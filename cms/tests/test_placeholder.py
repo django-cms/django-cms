@@ -589,7 +589,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         self.assertEqual(old_placeholder_2_plugin_count, current_placeholder_2_plugin_count)
 
     def test_placeholder_pk_thousands_format(self):
-        page = create_page("page", "nav_playground.html", "en", published=True)
+        page = create_page("page", "nav_playground.html", "en")
         title = page.get_title_obj("en")
         for placeholder in page.get_placeholders("en"):
             title.placeholders.remove(placeholder)

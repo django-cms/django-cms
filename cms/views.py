@@ -97,7 +97,7 @@ def details(request, slug):
     # These languages are then filtered out by the user allowed languages
     available_languages = [
         language for language in user_languages
-        if language in list(page.get_published_languages())
+        if language in list(page.get_languages())
     ]
 
     own_urls = [

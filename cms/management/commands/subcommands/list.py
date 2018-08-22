@@ -17,16 +17,15 @@ class ListApphooksCommand(SubcommandsCommand):
             Page.objects.exclude(application_urls='').exclude(
                 application_urls__isnull=True
             ).values_list(
-                'application_urls', 'publisher_is_draft', 'application_namespace'
+                'application_urls', 'application_namespace'
             )
         )
         apphooks = {}
-        for apphook, is_draft, application_namespace in urls:
-            state = 'draft' if is_draft else 'published'
+        for apphook, application_namespace in urls:
             if apphook in apphooks:
-                apphooks[apphook][0].append(state)
+                apphooks[apphook][0].append('active')
             else:
-                apphooks[apphook] = [[state], application_namespace]
+                apphooks[apphook] = [['active'], application_namespace]
         for apphook, attributes in apphooks.items():
             attributes[0].sort()
             if attributes[1]:

@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 from cms.models import Title
 from cms.utils.conf import get_cms_setting
 from django.db import migrations, models
+import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
@@ -55,5 +56,21 @@ class Migration(migrations.Migration):
             model_name='title',
             name='soft_root',
             field=models.BooleanField(db_index=True, default=False, help_text='All ancestors will not be displayed in the navigation', verbose_name='soft root'),
+        ),
+        migrations.CreateModel(
+            name='PageUrl',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('slug', models.SlugField(max_length=255, verbose_name='slug')),
+                ('path', models.CharField(db_index=True, max_length=255, null=True, verbose_name='Path')),
+                ('language', models.CharField(db_index=True, max_length=15, verbose_name='language')),
+                ('managed', models.BooleanField(default=False)),
+                ('page',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='urls', to='cms.Page',
+                                   verbose_name='page')),
+            ],
+            options={
+                'default_permissions': [],
+            },
         ),
     ]

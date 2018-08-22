@@ -7,11 +7,6 @@ URL_CHANGE = 'URL_CHANGE'
 RIGHT = object() # this is a trick so "foo is RIGHT" will only ever work for this, same goes for LEFT.
 LEFT = object()
 
-PUBLISHER_STATE_DEFAULT = 0
-PUBLISHER_STATE_DIRTY = 1
-# Page was marked published, but some of page parents are not.
-PUBLISHER_STATE_PENDING = 4
-
 PAGE_TYPES_ID = "page_types"
 PAGE_TREE_POSITIONS = ('last-child', 'first-child', 'left', 'right')
 

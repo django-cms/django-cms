@@ -7,7 +7,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
 from cms.api import create_page, create_title
-from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
 from cms.extensions import PageExtension
@@ -38,8 +37,6 @@ class ExtensionsTestCase(CMSTestCase):
         extension_pool.register(page_extension)
         self.assertEqual(len(extension_pool.page_extensions), initial_extension_count+1)
 
-        self.assertIs(extension_pool.signaling_activated, True)
-
         # --- Title registering --------------------------------------
         title_extension = self.get_title_extension_class()
 
@@ -50,8 +47,6 @@ class ExtensionsTestCase(CMSTestCase):
         # register second time
         extension_pool.register(title_extension)
         self.assertEqual(len(extension_pool.title_extensions), initial_extension_count+1)
-
-        self.assertIs(extension_pool.signaling_activated, True)
 
         # --- Unregister ---------------------------------------------
         extension_pool.unregister(page_extension)
@@ -93,9 +88,9 @@ class ExtensionsTestCase(CMSTestCase):
         return TestNoneExtension
 
     def test_copy_extensions(self):
-        root = create_page('Root', "nav_playground.html", "en", published=True)
+        root = create_page('Root', "nav_playground.html", "en")
         page = create_page('Test Page Extension', "nav_playground.html", "en",
-                           parent=root.get_draft_object())
+                           parent=root)
         subpage = create_page('Test subpage Extension', "nav_playground.html", "en",
                               parent=page)
         page = Page.objects.get(pk=page.pk)
@@ -145,9 +140,9 @@ class ExtensionsTestCase(CMSTestCase):
         self.assertEqual(len(extension_pool.get_title_extensions()), 2)
 
     def test_copy_multitable_extensions(self):
-        root = create_page('Root', "nav_playground.html", "en", published=True)
+        root = create_page('Root', "nav_playground.html", "en")
         page = create_page('Test Multi-Table Page Extension', "nav_playground.html", "en",
-                           parent=root.get_draft_object())
+                           parent=root)
         subpage = create_page('Test Multi-Table subpage Extension', "nav_playground.html", "en",
                               parent=page)
         page = Page.objects.get(pk=page.pk)
@@ -211,113 +206,6 @@ class ExtensionsTestCase(CMSTestCase):
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
         self.assertEqual(len(extension_pool.get_title_extensions()), 2)
 
-    def test_publish_page_extension(self):
-        page = create_page('Test Page Extension', "nav_playground.html", "en")
-        page_extension = MyPageExtension(extended_object=page, extra='page extension 1')
-        page_extension.save()
-        page.mypageextension = page_extension
-
-        # publish first time
-        page.publish('en')
-        self.assertEqual(page_extension.extra, page.publisher_public.mypageextension.extra)
-        self.assertEqual(page.get_publisher_state('en'), 0)
-        # change and publish again
-        page = Page.objects.get(pk=page.pk)
-        page_extension = page.mypageextension
-        page_extension.extra = 'page extension 1 - changed'
-        page_extension.save()
-        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
-        page.publish('en')
-        self.assertEqual(page.get_publisher_state('en', True), 0)
-        # delete
-        page_extension.delete()
-        self.assertFalse(MyPageExtension.objects.filter(pk=page_extension.pk).exists())
-        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
-
-    def test_publish_multitable_page_extension(self):
-        page = create_page('Test Multi-Table Page Extension', "nav_playground.html", "en")
-        page_extension = MultiTablePageExtension(extended_object=page,
-                                                 extension_parent_field='page extension 1',
-                                                 multitable_extra='multi-table page extension 1')
-        page_extension.save()
-        page.multitablepageextension = page_extension
-
-        # publish first time
-        page.publish('en')
-        # print(dir(page))
-        self.assertEqual(page_extension.extension_parent_field, page.publisher_public.multitablepageextension.extension_parent_field)
-        self.assertEqual(page_extension.multitable_extra, page.publisher_public.multitablepageextension.multitable_extra)
-        self.assertEqual(page.get_publisher_state('en'), 0)
-        # change and publish again
-        page = Page.objects.get(pk=page.pk)
-        page_extension = page.multitablepageextension
-        page_extension.extension_parent_field = 'page extension 1 - changed'
-        page_extension.multitable_extra = 'multi-table page extension 1 - changed'
-        page_extension.save()
-        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
-        page.publish('en')
-        self.assertEqual(page.get_publisher_state('en', True), 0)
-        # delete
-        page_extension.delete()
-        self.assertFalse(MultiTablePageExtension.objects.filter(pk=page_extension.pk).exists())
-        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
-
-
-    def test_publish_title_extension(self):
-        page = create_page('Test Title Extension', "nav_playground.html", "en")
-        title = page.get_title_obj()
-        title_extension = MyTitleExtension(extended_object=title, extra_title='title extension 1')
-        title_extension.save()
-        page.mytitleextension = title_extension
-
-        # publish first time
-        page.publish('en')
-        self.assertEqual(page.get_publisher_state('en'), 0)
-        self.assertEqual(title_extension.extra_title, page.publisher_public.get_title_obj().mytitleextension.extra_title)
-
-        # change and publish again
-        page = Page.objects.get(pk=page.pk)
-        title = page.get_title_obj()
-        title_extension = title.mytitleextension
-        title_extension.extra_title = 'title extension 1 - changed'
-        title_extension.save()
-        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
-        page.publish('en')
-        self.assertEqual(page.get_publisher_state('en', True), 0)
-
-        # delete
-        title_extension.delete()
-        self.assertFalse(MyTitleExtension.objects.filter(pk=title_extension.pk).exists())
-
-    def test_publish_mutlitable_title_extension(self):
-        page = create_page('Test Title Extension', "nav_playground.html", "en")
-        title = page.get_title_obj()
-        title_extension = MultiTableTitleExtension(extended_object=title,
-                                                   extension_title_parent_field='title extension 1',
-                                                   multitable_extra_title='multi table title extension 1')
-        title_extension.save()
-        page.multitabletitleextension = title_extension
-
-        # publish first time
-        page.publish('en')
-        self.assertEqual(page.get_publisher_state('en'), 0)
-        self.assertEqual(title_extension.extension_title_parent_field, page.publisher_public.get_title_obj().multitabletitleextension.extension_title_parent_field)
-        self.assertEqual(title_extension.multitable_extra_title, page.publisher_public.get_title_obj().multitabletitleextension.multitable_extra_title)
-
-        # change and publish again
-        page = Page.objects.get(pk=page.pk)
-        title = page.get_title_obj()
-        title_extension = title.multitabletitleextension
-        title_extension.extension_title_parent_field = 'title extension 1 - changed'
-        title_extension.multitable_extra_title = 'multitable title extension 1 - changed'
-        title_extension.save()
-        self.assertEqual(page.get_publisher_state('en', True), PUBLISHER_STATE_DIRTY)
-        page.publish('en')
-        self.assertEqual(page.get_publisher_state('en', True), 0)
-
-        # delete
-        title_extension.delete()
-        self.assertFalse(MultiTableTitleExtension.objects.filter(pk=title_extension.pk).exists())
 
 class ExtensionAdminTestCase(CMSTestCase):
 

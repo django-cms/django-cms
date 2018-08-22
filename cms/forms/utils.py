@@ -36,7 +36,6 @@ def get_page_choices_for_site(site, language):
     pages = (
         Page
         .objects
-        .drafts()
         .on_site(site)
         .select_related('node')
         .prefetch_related(translation_lookup)

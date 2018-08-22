@@ -36,9 +36,6 @@ class PageExtensionAdmin(ExtensionAdmin):
         """
         return {}
 
-    def get_queryset(self, request):
-        return super(PageExtensionAdmin, self).get_queryset(request).filter(extended_object__publisher_is_draft=True)
-
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):
         """
@@ -84,9 +81,6 @@ class TitleExtensionAdmin(ExtensionAdmin):
         Return empty perms dict thus hiding the model from admin index.
         """
         return {}
-
-    def get_queryset(self, request):
-        return super(TitleExtensionAdmin, self).get_queryset(request).filter(extended_object__page__publisher_is_draft=True)
 
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):

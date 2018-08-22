@@ -2,7 +2,6 @@
 from collections import OrderedDict
 from importlib import import_module
 
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
 from django.utils import six
@@ -15,7 +14,6 @@ from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_1_11
 from cms.utils.compat.dj import RegexPattern, URLPattern, URLResolver
 from cms.utils.i18n import get_language_list
-from cms.utils.moderator import use_draft
 
 
 APP_RESOLVERS = []
@@ -26,32 +24,23 @@ def clear_app_resolvers():
     APP_RESOLVERS = []
 
 
-def applications_page_check(request, current_page=None, path=None):
+def applications_page_check(request):
     """Tries to find if given path was resolved over application.
     Applications have higher priority than other cms pages.
     """
-    if current_page:
-        return current_page
-    if path is None:
-        # We should get in this branch only if an apphook is active on /
-        # This removes the non-CMS part of the URL.
-        path = request.path_info.replace(reverse('pages-root'), '', 1)
-        # check if application resolver can resolve this
+    # We should get in this branch only if an apphook is active on /
+    # This removes the non-CMS part of the URL.
+    path = request.path_info.replace(reverse('pages-root'), '', 1)
+
+    # check if application resolver can resolve this
     for lang in get_language_list():
         if path.startswith(lang + "/"):
             path = path[len(lang + "/"):]
 
-    use_public = not use_draft(request)
-
     for resolver in APP_RESOLVERS:
         try:
             page_id = resolver.resolve_page_id(path)
-            # yes, it is application page
-            page = Page.objects.public().get(id=page_id)
-            # If current page was matched, then we have some override for
-            # content from cms, but keep current page. Otherwise return page
-            # to which was application assigned.
-            return page if use_public else page.publisher_public
+            return Page.objects.get(id=page_id)
         except Resolver404:
             # Raised if the page is not managed by an apphook
             pass
@@ -174,18 +163,21 @@ def get_app_urls(urls):
             yield [urlconf]
 
 
-def get_patterns_for_title(path, title):
+def get_patterns_for_page_url(page_url):
     """
     Resolve the urlconf module for a path+title combination
     Returns a list of url objects.
     """
-    app = apphook_pool.get_apphook(title.page.application_urls)
+    path = page_url.path
+
+    if path and not path.endswith('/'):
+        path += '/'
+
+    app = apphook_pool.get_apphook(page_url.page.application_urls)
+
     url_patterns = []
-    for pattern_list in get_app_urls(app.get_urls(title.page, title.language)):
-        if path and not path.endswith('/'):
-            path += '/'
-        page_id = title.page.id
-        url_patterns += recurse_patterns(path, pattern_list, page_id)
+    for pattern_list in get_app_urls(app.get_urls(page_url.page, page_url.language)):
+        url_patterns += recurse_patterns(path, pattern_list, page_url.page_id)
     return url_patterns
 
 
@@ -218,40 +210,44 @@ def _get_app_patterns(site):
     If the app is still configured, but is no longer installed/available, then
     this method returns a degenerate patterns object: patterns('')
     """
-    from cms.models import Title
+    from cms.models.pagemodel import PageUrl
 
     included = []
+    hooked_applications = OrderedDict()
 
     # we don't have a request here so get_page_queryset() can't be used,
     # so use public() queryset.
     # This can be done because url patterns are used just in frontend
-    title_qs = Title.objects.public().filter(page__node__site=site)
-
-    hooked_applications = OrderedDict()
+    page_urls = PageUrl.objects.get_for_site(site)
 
     # Loop over all titles with an application hooked to them
-    titles = (title_qs.exclude(page__application_urls=None)
-              .exclude(page__application_urls='')
-              .order_by('-page__node__path').select_related())
-    # TODO: Need to be fixed for django-treebeard when forward ported to 3.1
-    for title in titles:
-        path = title.path
+    page_urls = (
+        page_urls
+        .exclude(page__application_urls=None)
+        .exclude(page__application_urls='')
+        .order_by('-page__node__path')
+        .select_related('page')
+    )
+
+    for page_url in page_urls:
         mix_id = "%s:%s:%s" % (
-            path + "/", title.page.application_urls, title.language)
+            page_url.path + "/",
+            page_url.page.application_urls,
+            page_url.language,
+        )
+
         if mix_id in included:
             # don't add the same thing twice
             continue
-        if not settings.APPEND_SLASH:
-            path += '/'
-        app = apphook_pool.get_apphook(title.page.application_urls)
+        app = apphook_pool.get_apphook(page_url.page.application_urls)
         if not app:
             continue
-        if title.page_id not in hooked_applications:
-            hooked_applications[title.page_id] = {}
-        app_ns = app.app_name, title.page.application_namespace
-        with override(title.language):
-            hooked_applications[title.page_id][title.language] = (
-                app_ns, get_patterns_for_title(path, title), app)
+        if page_url.page_id not in hooked_applications:
+            hooked_applications[page_url.page_id] = {}
+        app_ns = app.app_name, page_url.page.application_namespace
+        with override(page_url.language):
+            hooked_applications[page_url.page_id][page_url.language] = (
+                app_ns, get_patterns_for_page_url(page_url), app)
         included.append(mix_id)
         # Build the app patterns to be included in the cms urlconfs
     app_patterns = []

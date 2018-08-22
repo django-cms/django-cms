@@ -3,10 +3,9 @@ from functools import wraps
 
 from django.utils.decorators import available_attrs
 
-from cms.api import get_page_draft
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import GRANT_ALL_PERMISSIONS
-from cms.models import Page, Placeholder
+from cms.models import Page
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import (
@@ -39,16 +38,6 @@ _django_permissions_by_action = {
 
 
 def _get_draft_placeholders(page, language):
-    if not page.publisher_is_draft:
-        placeholders = (
-            Placeholder
-            .objects
-            .filter(
-                title__language=language,
-                title__page__pk=page.publisher_public_id,
-            )
-        )
-        return placeholders
     return page.get_placeholders(language)
 
 
@@ -272,8 +261,6 @@ def user_can_view_page(user, page, site=None):
     public_for = get_cms_setting('PUBLIC_FOR')
     can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
 
-    page = get_page_draft(page)
-
     # inherited and direct view permissions
     is_restricted = page.has_view_restrictions(site)
 
@@ -479,11 +466,7 @@ def has_generic_permission(page, user, action, site=None, check_global=True):
     if site is None:
         site = get_current_site()
 
-    if page.publisher_is_draft:
-        page_id = page.pk
-    else:
-        page_id = page.publisher_public_id
-
+    page_id = page.pk
     actions_map = {
         'add_page': get_add_id_list,
         'change_page': get_change_id_list,

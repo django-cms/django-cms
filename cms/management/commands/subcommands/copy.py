@@ -50,7 +50,7 @@ class CopyLangCommand(SubcommandsCommand):
         except AssertionError:
             raise CommandError('Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES')
 
-        for page in Page.objects.on_site(site).drafts():
+        for page in Page.objects.on_site(site):
             # copy title
             if from_lang in page.get_languages():
 
@@ -60,8 +60,6 @@ class CopyLangCommand(SubcommandsCommand):
                     if verbose:
                         self.stdout.write('copying title %s from language %s\n' % (title.title, from_lang))
                     title.id = None
-                    title.publisher_public_id = None
-                    title.publisher_state = 0
                     title.language = to_lang
 
                     if to_lang not in page.get_languages():
@@ -128,7 +126,6 @@ class CopySiteCommand(SubcommandsCommand):
         pages = (
             Page
             .objects
-            .drafts()
             .on_site(from_site)
             .filter(node__depth=1)
             .select_related('node')
