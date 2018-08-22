@@ -13,5 +13,4 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameModel('Title', 'PageContent'),
-
     ]
