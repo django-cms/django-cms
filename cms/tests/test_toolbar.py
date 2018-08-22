@@ -746,18 +746,12 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(response.content.decode('utf-8'), '/')
 
     def test_page_edit_redirect_no_editmode(self):
-        page1 = create_page("home", "nav_playground.html", "en",
-                            published=True)
-        page2 = create_page("test", "nav_playground.html", "en",
-                            parent=page1)
-        page3 = create_page("non-pub-1", "nav_playground.html", "en",
-                            published=False, parent=page2)
-        page4 = create_page("non-pub-2", "nav_playground.html", "en",
-                            published=False, parent=page3)
-        page3_content = self.get_page_title_obj(page3)
-        page3_edit_url = get_object_edit_url(page3_content)
-        page4_content = self.get_page_title_obj(page4)
-        page4_edit_url = get_object_edit_url(page4_content)
+        page1 = create_page("home", "nav_playground.html", "en", published=True)
+        page1_content = self.get_page_title_obj(page1)
+        page1_edit_url = get_object_edit_url(page1_content)
+        page2 = create_page("test", "nav_playground.html", "en", parent=page1)
+        page2_content = self.get_page_title_obj(page2)
+        page2_edit_url = get_object_edit_url(page2_content)
 
         superuser = self.get_superuser()
         url = admin_reverse('cms_page_resolve')
@@ -765,33 +759,20 @@ class ToolbarTests(ToolbarTestBase):
             # checking the redirect by passing URL parameters
             # redirect to the same page
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page1.get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), page1_edit_url)
             # redirect to the same page
             response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url())
-            # redirect to the first published ancestor
-            response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page3_edit_url)
-            # redirect to the first published ancestor
-            response = self.client.post(url, {'pk': page4.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page4_edit_url)
+            self.assertEqual(response.content.decode('utf-8'), page2_edit_url)
 
             # checking the redirect by setting the session data
             self._fake_logentry(page1.pk, superuser, 'test page')
             response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page1.get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), page1_edit_url)
 
             self._fake_logentry(page2.pk, superuser, 'test page')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), page2_edit_url)
 
-            self._fake_logentry(page3.pk, superuser, 'test page')
-            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page3_edit_url)
-
-            self._fake_logentry(page4.pk, superuser, 'test page')
-            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page4_edit_url)
 
     def test_page_edit_redirect_errors(self):
         page1 = create_page("home", "nav_playground.html", "en",
