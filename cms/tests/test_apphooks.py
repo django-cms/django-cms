@@ -154,7 +154,7 @@ class ApphooksTestCase(CMSTestCase):
                                     created_by=superuser, apphook="SampleApp")
         create_page("not-apphooked-page", "nav_playground.html", "en",
                     created_by=superuser, apphook="", slug='blankapp')
-        english_title = page.title_set.all()[0]
+        english_title = page.pagecontent_set.all()[0]
         self.assertEqual(english_title.language, 'en')
         create_title("de", "aphooked-page-de", page)
         with force_language("en"):

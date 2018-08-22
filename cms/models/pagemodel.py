@@ -205,7 +205,7 @@ class Page(models.Model):
             title = self.get_menu_title(fallback=True)
         except LanguageError:
             try:
-                title = self.title_set.all()[0]
+                title = self.pagecontent_set.all()[0]
             except IndexError:
                 title = None
         if title is None:
@@ -479,13 +479,13 @@ class Page(models.Model):
 
         if language and translations:
             page_urls = self.urls.filter(language=language)
-            translations = self.title_set.filter(language=language)
+            translations = self.pagecontent_set.filter(language=language)
         elif translations:
             page_urls = self.urls.all()
-            translations = self.title_set.all()
+            translations = self.pagecontent_set.all()
         else:
             page_urls = self.urls.none()
-            translations = self.title_set.none()
+            translations = self.pagecontent_set.none()
         translations = translations.prefetch_related('placeholders')
 
         for page_url in page_urls:
@@ -561,7 +561,7 @@ class Page(models.Model):
         descendants = list(
             self.get_descendant_pages()
             .select_related('node')
-            .prefetch_related('urls', 'title_set')
+            .prefetch_related('urls', 'pagecontent_set')
         )
         new_root_page = self.copy(target_site, parent_node=parent_node)
         new_root_node = new_root_page.node
@@ -606,7 +606,7 @@ class Page(models.Model):
         else:
             languages = [language]
 
-        self.title_set.filter(language__in=languages).delete()
+        self.pagecontent_set.filter(language__in=languages).delete()
 
     def save(self, **kwargs):
         if self.reverse_id == "":
@@ -635,13 +635,13 @@ class Page(models.Model):
 
     def update_translations(self, language=None, **data):
         if language:
-            translations = self.title_set.filter(language=language)
+            translations = self.pagecontent_set.filter(language=language)
         else:
-            translations = self.title_set.all()
+            translations = self.pagecontent_set.all()
         return translations.update(**data)
 
     def has_translation(self, language):
-        return self.title_set.filter(language=language).exists()
+        return self.pagecontent_set.filter(language=language).exists()
 
     def toggle_in_navigation(self, set_to=None):
         '''
@@ -749,7 +749,7 @@ class Page(models.Model):
         return self.get_languages()
 
     def set_translations_cache(self):
-        for translation in self.title_set.all():
+        for translation in self.pagecontent_set.all():
             self.title_cache.setdefault(translation.language, translation)
 
     def get_path_for_slug(self, slug, language):

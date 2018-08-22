@@ -125,12 +125,12 @@ class ExtensionsTestCase(CMSTestCase):
         for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             self.assertEqual(extension_pool.get_page_extensions(new_page)[0].extra,
                              old_page_extensions[index].extra)
-            self.assertEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].extra_title,
+            self.assertEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].extra_title,
                              old_title_extension[index].extra_title)
             # check that objects are actually different
             self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
                                 old_page_extensions[index].pk)
-            self.assertNotEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].pk,
+            self.assertNotEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
                                 old_title_extension[index].pk)
 
         # Test deleting original page for #3987
@@ -185,7 +185,7 @@ class ExtensionsTestCase(CMSTestCase):
         old_title_extension = [title_extension, subtitle_extension]
         for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             copied_page_extension = extension_pool.get_page_extensions(new_page)[0]
-            copied_title_extension = extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0]
+            copied_title_extension = extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0]
             self.assertEqual(copied_page_extension.extension_parent_field,
                              old_page_extensions[index].extension_parent_field)
             self.assertEqual(copied_page_extension.multitable_extra,
@@ -197,7 +197,7 @@ class ExtensionsTestCase(CMSTestCase):
             # check that objects are actually different
             self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
                                 old_page_extensions[index].pk)
-            self.assertNotEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].pk,
+            self.assertNotEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
                                 old_title_extension[index].pk)
 
         # Test deleting original page for #3987

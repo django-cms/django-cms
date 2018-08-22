@@ -60,9 +60,9 @@ class ExtensionPool(object):
                     instance.copy_to_public(target_page, language)
 
     def _copy_title_extensions(self, source_page, target_page, language, clone=False):
-        source_title = source_page.title_set.get(language=language)
+        source_title = source_page.pagecontent_set.get(language=language)
         if target_page:
-            target_title = target_page.title_set.get(language=language)
+            target_title = target_page.pagecontent_set.get(language=language)
         else:
             target_title = source_title.publisher_public
         for extension in self.title_extensions:

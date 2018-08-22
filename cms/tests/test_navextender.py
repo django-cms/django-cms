@@ -33,10 +33,10 @@ class NavExtenderTestCase(NavextendersFixture, CMSTestCase):
         menu_pool.menus = self.old_menu
 
     def _get_page(self, num):
-        return Page.objects.get(title_set__title='page%s' % num)
+        return Page.objects.get(pagecontent_set__title='page%s' % num)
 
     def _update_page(self, num, **stuff):
-        Page.objects.filter(title_set__title='page%s' % num).update(**stuff)
+        Page.objects.filter(pagecontent_set__title='page%s' % num).update(**stuff)
 
     def test_menu_registration(self):
         self.assertEqual(len(menu_pool.menus), 2)

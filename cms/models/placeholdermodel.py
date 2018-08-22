@@ -255,7 +255,7 @@ class Placeholder(models.Model):
         if not hasattr(self, '_page'):
             from cms.models.pagemodel import Page
             try:
-                self._page = Page.objects.distinct().get(title_set__placeholders=self)
+                self._page = Page.objects.distinct().get(pagecontent_set__placeholders=self)
             except (Page.DoesNotExist, Page.MultipleObjectsReturned):
                 self._page = None
         return self._page

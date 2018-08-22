@@ -210,7 +210,7 @@ class CMSMenu(Menu):
 
         pages = (
             pages
-            .filter(title_set__language__in=languages)
+            .filter(pagecontent_set__language__in=languages)
             .select_related('node')
             .order_by('node__path')
             .distinct()
@@ -231,7 +231,7 @@ class CMSMenu(Menu):
             queryset=PageUrl.objects.filter(language__in=languages),
         )
         translations_lookup = Prefetch(
-            'title_set',
+            'pagecontent_set',
             to_attr='filtered_translations',
             queryset=PageContent.objects.filter(language__in=languages),
         )

@@ -92,7 +92,7 @@ class TreeNodeAdmin(admin.ModelAdmin):
     search_fields = (
         '=page__id',
         'page__urls__slug',
-        'page__title_set__title',
+        'page__pagecontent_set__title',
         'page__reverse_id',
     )
 
@@ -106,7 +106,7 @@ class TreeNodeAdmin(admin.ModelAdmin):
 class BasePageAdmin(admin.ModelAdmin):
     form = AddPageForm
     ordering = ('node__path',)
-    search_fields = ('=id', 'urls__slug', 'title_set__title', 'reverse_id')
+    search_fields = ('=id', 'urls__slug', 'pagecontent_set__title', 'reverse_id')
     add_general_fields = ['title', 'slug', 'language', 'template']
     change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
@@ -156,7 +156,7 @@ class BasePageAdmin(admin.ModelAdmin):
             return (None, None)
 
         try:
-            translation = page.title_set.get(language=language)
+            translation = page.pagecontent_set.get(language=language)
         except PageContent.DoesNotExist:
             translation = None
         return (page, translation)
@@ -559,7 +559,7 @@ class BasePageAdmin(admin.ModelAdmin):
         filled_languages = []
 
         if obj:
-            filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
+            filled_languages = [t[0] for t in obj.pagecontent_set.filter(title__isnull=False).values_list('language')]
         allowed_languages = [lang[0] for lang in self._get_site_languages(request, obj)]
         return [lang for lang in filled_languages if lang in allowed_languages]
 
@@ -768,12 +768,12 @@ class BasePageAdmin(admin.ModelAdmin):
             languages = get_language_list(site.pk)
             pages = pages.prefetch_related(
                 Prefetch(
-                    'title_set',
+                    'pagecontent_set',
                     to_attr='filtered_urls',
                     queryset=PageUrl.objects.filter(language__in=languages)
                 ),
                 Prefetch(
-                    'title_set',
+                    'pagecontent_set',
                     to_attr='filtered_translations',
                     queryset=PageContent.objects.filter(language__in=languages)
                 ),
@@ -1226,7 +1226,7 @@ class BasePageAdmin(admin.ModelAdmin):
         allowed_languages = get_language_list(site.pk)
         pages = pages.prefetch_related(
             Prefetch(
-                'title_set',
+                'pagecontent_set',
                 to_attr='filtered_translations',
                 queryset=PageContent.objects.filter(language__in=allowed_languages)
             ),
@@ -1541,10 +1541,10 @@ class PageAdmin(BasePageAdmin):
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
             matching_published_pages = self.model.objects.filter(
-                Q(title_set__title__icontains=query_term, title_set__language=language_code)
-                | Q(urls__path__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
+                Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
+                | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
+                | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
+                | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
             ).distinct()
 
             results = []

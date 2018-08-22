@@ -29,7 +29,7 @@ def get_page_choices_for_site(site, language):
     fallbacks = i18n.get_fallback_languages(language, site_id=site.pk)
     languages = [language] + fallbacks
     translation_lookup = Prefetch(
-        'title_set',
+        'pagecontent_set',
         to_attr='filtered_translations',
         queryset=PageContent.objects.filter(language__in=languages).only('pk', 'page', 'language', 'title')
     )

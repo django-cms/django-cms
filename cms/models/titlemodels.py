@@ -48,7 +48,7 @@ class PageContent(models.Model):
     meta_description = models.TextField(_("description"), blank=True, null=True,
                                         help_text=_("The text displayed in search engines."))
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
-    page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="pagecontent_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     # Placeholders (plugins)
     placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
