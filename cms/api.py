@@ -6,18 +6,16 @@ WARNING: None of the functions defined in this module checks for permissions.
 You must implement the necessary permission checks in your own code before
 calling these methods!
 """
-import datetime
+import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
-from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
-from django.utils.translation import activate
 
 from cms import constants
 from cms.app_base import CMSApp
@@ -35,7 +33,7 @@ from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
-from cms.utils.permissions import _thread_locals, current_user
+from cms.utils.permissions import _thread_locals
 from cms.utils.plugins import copy_plugins_to_placeholder
 from menus.menu_pool import menu_pool
 
@@ -131,15 +129,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
     # validate parent
     if parent:
         assert isinstance(parent, Page)
-        assert parent.publisher_is_draft
-
-    # validate publication date
-    if publication_date:
-        assert isinstance(publication_date, datetime.date)
-
-    # validate publication end date
-    if publication_end_date:
-        assert isinstance(publication_end_date, datetime.date)
 
     if navigation_extenders:
         raw_menus = menu_pool.get_menus_by_attribute("cms_enabled", True)
@@ -168,14 +157,12 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
 
     if reverse_id:
-        if Page.objects.drafts().filter(reverse_id=reverse_id, node__site=site).exists():
+        if Page.objects.filter(reverse_id=reverse_id, node__site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(
         created_by=created_by,
         changed_by=created_by,
-        publication_date=publication_date,
-        publication_end_date=publication_end_date,
         reverse_id=reverse_id,
         navigation_extenders=navigation_extenders,
         application_urls=application_urls,
@@ -201,9 +188,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-
-    if published:
-        page.publish(language)
 
     if parent and position in ('last-child', 'first-child'):
         parent._clear_node_cache()
@@ -255,17 +239,22 @@ def create_title(language, title, page, menu_title=None, slug=None,
     if created_by and isinstance(created_by, get_user_model()):
         created_by = get_clean_username(created_by)
 
+    page.urls.create(
+        slug=slug,
+        path=path,
+        page=page,
+        managed=not bool(overwrite_url),
+        language=language,
+    )
+
     title = Title.objects.create(
         language=language,
         title=title,
         menu_title=menu_title,
         page_title=page_title,
-        slug=slug,
-        path=path,
         redirect=redirect,
         meta_description=meta_description,
         page=page,
-        has_url_overwrite=bool(overwrite_url),
         created_by=created_by,
         changed_by=created_by,
         soft_root=soft_root,
@@ -421,45 +410,14 @@ def publish_page(page, user, language):
 
     See docs/extending_cms/api_reference.rst for more info
     """
-    page = page.reload()
-
-    if not page.has_publish_permission(user):
-        raise PermissionDenied()
-    # Set the current_user to have the page's changed_by
-    # attribute set correctly.
-    # 'user' is a user object, but current_user() just wants the username (a string).
-    with current_user(user.get_username()):
-        page.publish(language)
-    return page.reload()
+    warnings.warn('This API function has been removed', UserWarning)
 
 
 def publish_pages(include_unpublished=False, language=None, site=None):
     """
     Create published public version of selected drafts.
     """
-    qs = Page.objects.drafts()
-
-    if not include_unpublished:
-        qs = qs.filter(title_set__published=True).distinct()
-
-    if site:
-        qs = qs.filter(node__site=site)
-
-    output_language = None
-    for i, page in enumerate(qs):
-        add = True
-        titles = page.title_set
-        if not include_unpublished:
-            titles = titles.filter(published=True)
-        for lang in titles.values_list("language", flat=True):
-            if language is None or lang == language:
-                if not output_language:
-                    output_language = lang
-                if not page.publish(lang):
-                    add = False
-        # we may need to activate the first (main) language for proper page title rendering
-        activate(output_language)
-        yield (page, add)
+    warnings.warn('This API function has been removed', UserWarning)
 
 
 def get_page_draft(page):
@@ -472,13 +430,7 @@ def get_page_draft(page):
     :return page: draft version of the page
     :type page: :class:`cms.models.pagemodel.Page` instance
     """
-    if page:
-        if page.publisher_is_draft:
-            return page
-        else:
-            return page.publisher_public
-    else:
-        return None
+    warnings.warn('This API function has been removed', UserWarning)
 
 
 def copy_plugins_to_language(page, source_language, target_language,

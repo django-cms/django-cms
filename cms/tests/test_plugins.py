@@ -28,17 +28,15 @@ from cms.plugin_pool import plugin_pool
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
     Article, Section, ArticlePluginModel,
-    FKModel,
-    M2MTargetModel)
+)
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
     TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5)
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
     NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate)
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
-    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PUBLISH,
+    URL_CMS_PAGE_CHANGE,
 )
-from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
@@ -159,7 +157,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # add a new text plugin
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.drafts().first()
+        page = Page.objects.first()
         created_plugin = self._create_link_plugin_on_page(page)
         # now edit the plugin
         plugin = self.__edit_link_plugin(created_plugin, "Hello World")
@@ -230,7 +228,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.drafts().first()
+            page = Page.objects.first()
             installed_plugins = plugin_pool.get_all_plugins('body', page)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
             self.assertNotIn('TextPlugin', installed_plugins)
@@ -246,35 +244,17 @@ class PluginsTestCase(PluginsTestBaseCase):
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
             self.client.post(URL_CMS_PAGE_ADD, page_data)
-            page = Page.objects.drafts().first()
+            page = Page.objects.first()
             installed_plugins = plugin_pool.get_all_plugins('body', page)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
             self.assertNotIn('TextPlugin', installed_plugins)
-
-    def test_plugin_edit_marks_page_dirty(self):
-        page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        self.assertEqual(response.status_code, 302)
-        page = Page.objects.drafts().first()
-        response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
-        self.assertEqual(response.status_code, 302)
-        created_plugin = self._create_link_plugin_on_page(page)
-        page = Page.objects.drafts().first()
-        self.assertEqual(page.is_dirty('en'), True)
-        response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
-        self.assertEqual(response.status_code, 302)
-        page = Page.objects.drafts().first()
-        self.assertEqual(page.is_dirty('en'), False)
-        self.__edit_link_plugin(created_plugin, "Hello World")
-        page = Page.objects.drafts().first()
-        self.assertEqual(page.is_dirty('en'), True)
 
     def test_plugin_order(self):
         """
         Test that plugin position is saved after creation
         """
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                                  slug="page1", published=True, in_navigation=True)
+                                  slug="page1", in_navigation=True)
         ph_en = page_en.get_placeholders("en").get(slot="col_left")
 
         # We check created objects and objects from the DB to be sure the position value
@@ -298,18 +278,15 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test that plugin position is saved after creation
         """
-        draft_page = api.create_page("PluginOrderPage", "col_two.html", "en",
-                                     slug="page1", published=False, in_navigation=True)
-        placeholder = draft_page.get_placeholders("en").get(slot="col_left")
+        cms_page = api.create_page("PluginOrderPage", "col_two.html", "en",
+                                     slug="page1", in_navigation=True)
+        placeholder = cms_page.get_placeholders("en").get(slot="col_left")
 
         # We check created objects and objects from the DB to be sure the position value
         # has been saved correctly
         text_plugin_2 = api.add_plugin(placeholder, "TextPlugin", "en", body="I'm the second")
         text_plugin_3 = api.add_plugin(placeholder, "TextPlugin", "en", body="I'm the third")
-        # Publish to create a 'live' version
-        draft_page.publish('en')
-        draft_page = draft_page.reload()
-        placeholder = draft_page.get_placeholders("en").get(slot="col_left")
+        placeholder = cms_page.get_placeholders("en").get(slot="col_left")
 
         # Add a plugin and move it to the first position
         text_plugin_1 = api.add_plugin(placeholder, "TextPlugin", "en", body="I'm the first")
@@ -325,11 +302,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.client.post(endpoint, data)
 
-        draft_page.publish('en')
-        draft_page = draft_page.reload()
-        live_page = draft_page.get_public_object()
-        placeholder = draft_page.get_placeholders('en').get(slot="col_left")
-        live_placeholder = live_page.get_placeholders('en').get(slot="col_left")
+        placeholder = cms_page.get_placeholders('en').get(slot="col_left")
 
         with self.settings(CMS_PERMISSION=False):
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_1.pk).position, 1)
@@ -337,12 +310,9 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_3.pk).position, 3)
 
             ## Finally we render the placeholder to test the actual content
-            draft_page_context = self.get_context(draft_page.get_absolute_url(), page=draft_page)
+            draft_page_context = self.get_context(cms_page.get_absolute_url(), page=cms_page)
             rendered_placeholder = _render_placeholder(placeholder, draft_page_context)
             self.assertEqual(rendered_placeholder, "I'm the firstI'm the secondI'm the third")
-            live_page_context = self.get_context(live_page.get_absolute_url(), page=live_page)
-            rendered_live_placeholder = _render_placeholder(live_placeholder, live_page_context)
-            self.assertEqual(rendered_live_placeholder, "I'm the firstI'm the secondI'm the third")
 
     def test_plugin_position(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
@@ -492,9 +462,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         for old_plugin, new_plugin in zip(old_plugins, new_plugins):
             self.assertEqual(old_plugin.get_children().count(), new_plugin.get_children().count())
 
-        with self.assertNumQueries(FuzzyInt(0, 207)):
-            page_en.publish('en')
-
     def test_copy_plugin_without_custom_model(self):
         page_en = api.create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
         page_de = api.create_page("CopyPluginTestPage (DE)", "nav_playground.html", "de")
@@ -567,42 +534,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual(response.status_code, 302)
         # there should be no plugins
         self.assertEqual(0, CMSPlugin.objects.all().count())
-
-    def test_remove_plugin_after_published(self):
-        # add a page
-        page = api.create_page("home", "nav_playground.html", "en")
-
-        # add a plugin
-        plugin = api.add_plugin(
-            placeholder=page.get_placeholders(settings.LANGUAGES[0][0]).get(slot='body'),
-            plugin_type='TextPlugin',
-            language=settings.LANGUAGES[0][0],
-            body=''
-        )
-        # there should be only 1 plugin
-        self.assertEqual(CMSPlugin.objects.all().count(), 1)
-        self.assertEqual(CMSPlugin.objects.filter(placeholder__title__page__publisher_is_draft=True).count(), 1)
-
-        # publish page
-        response = self.client.post(URL_CMS_PAGE + "%d/en/publish/" % page.pk, {1: 1})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(Page.objects.count(), 2)
-
-        # there should now be two plugins - 1 draft, 1 public
-        self.assertEqual(CMSPlugin.objects.all().count(), 2)
-
-        # delete the plugin
-        plugin_data = {
-            'plugin_id': plugin.pk
-        }
-
-        endpoint = self.get_delete_plugin_uri(plugin)
-        response = self.client.post(endpoint, plugin_data)
-
-        self.assertEqual(response.status_code, 302)
-        # there should be no plugins
-        self.assertEqual(CMSPlugin.objects.all().count(), 1)
-        self.assertEqual(CMSPlugin.objects.filter(placeholder__title__page__publisher_is_draft=False).count(), 1)
 
     def test_remove_plugin_not_associated_to_page(self):
         """
@@ -758,7 +689,7 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
-        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en")
         title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
@@ -815,7 +746,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                                     dict(require_parent=True, render_plugin=False))
 
         with register_plugins(ParentRequiredPlugin):
-            page = api.create_page("page", "nav_playground.html", "en", published=True)
+            page = api.create_page("page", "nav_playground.html", "en")
             placeholder = page.get_placeholders("en").get(slot='body')
 
             plugin_list = plugin_pool.get_all_plugins(placeholder=placeholder, page=page)
@@ -823,7 +754,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_plugin_toolbar_struct(self):
         # Tests that the output of the plugin toolbar structure.
-        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
 
         from cms.utils.placeholder import get_toolbar_plugin_struct
@@ -878,7 +809,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertNotIn('<a data-rel="add" href="LinkPlugin">Link</a>', output)
 
     def test_plugin_child_classes_from_settings(self):
-        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
         ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
                                     dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
@@ -901,7 +832,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                                     plugin.get_child_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_settings(self):
-        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
         ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
                                     dict(parent_classes=['TextPlugin'], render_plugin=False))
@@ -924,7 +855,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                                     plugin.get_parent_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_object(self):
-        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
         ParentPlugin = type('ParentPlugin', (CMSPluginBase,),
                                     dict(render_plugin=False))
@@ -940,7 +871,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertIn('ParentPlugin', child_classes)
 
     def test_plugin_require_parent_from_object(self):
-        page = api.create_page("page", "nav_playground.html", "en", published=True)
+        page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
         ParentPlugin = type('ParentPlugin', (CMSPluginBase,),
                                     dict(render_plugin=False))
@@ -1014,8 +945,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.count(), 0)
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.drafts().first()
-        page.publish('en')
+        page = Page.objects.first()
         placeholder = page.get_placeholders(self.FIRST_LANG).get(slot='col_left')
         add_url = self.get_add_plugin_uri(
             placeholder=placeholder,
@@ -1034,48 +964,6 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugin.sections.through._meta.db_table, 'manytomany_rel_articlepluginmodel_sections')
-
-    def test_add_plugin_with_m2m_and_publisher(self):
-        self.assertEqual(ArticlePluginModel.objects.count(), 0)
-        page_data = self.get_new_page_data()
-        response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-        self.assertEqual(response.status_code, 302)
-        page = Page.objects.drafts().first()
-        placeholder = page.get_placeholders(self.FIRST_LANG).get(slot='col_left')
-
-        # add a plugin
-        data = {
-            'title': "Articles Plugin 1",
-            'sections': self.section_pks
-        }
-
-        add_url = self.get_add_plugin_uri(
-            placeholder=placeholder,
-            plugin_type='ArticlePlugin',
-            language=self.FIRST_LANG,
-        )
-
-        response = self.client.post(add_url, data)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'admin/cms/page/plugin/confirm_form.html')
-
-        # there should be only 1 plugin
-        self.assertEqual(1, CMSPlugin.objects.all().count())
-        self.assertEqual(1, ArticlePluginModel.objects.count())
-        articles_plugin = ArticlePluginModel.objects.all()[0]
-        self.assertEqual(u'Articles Plugin 1', articles_plugin.title)
-        self.assertEqual(self.section_count, articles_plugin.sections.count())
-
-        # check publish box
-        api.publish_page(page, self.super_user, 'en')
-
-        # there should now be two plugins - 1 draft, 1 public
-        self.assertEqual(2, CMSPlugin.objects.all().count())
-        self.assertEqual(2, ArticlePluginModel.objects.all().count())
-
-        db_counts = [plugin.sections.count() for plugin in ArticlePluginModel.objects.all()]
-        expected = [self.section_count for i in range(len(db_counts))]
-        self.assertEqual(expected, db_counts)
 
     def test_copy_plugin_with_m2m(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -1149,53 +1037,6 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
         self.page2 = api.create_page(**page_data2)
         self.placeholder1 = self.page1.get_placeholders(self.FIRST_LANG).get(slot='body')
         self.placeholder2 = self.page2.get_placeholders(self.FIRST_LANG).get(slot='body')
-
-    def test_copy_fk_from_model(self):
-        plugin = api.add_plugin(
-            placeholder=self.placeholder1,
-            plugin_type="PluginWithFKFromModel",
-            language=self.FIRST_LANG,
-        )
-        FKModel.objects.create(fk_field=plugin)
-        old_public_count = FKModel.objects.filter(
-            fk_field__placeholder__title__page__publisher_is_draft=False
-        ).count()
-        api.publish_page(
-            self.page1,
-            self.super_user,
-            self.FIRST_LANG
-        )
-        new_public_count = FKModel.objects.filter(
-            fk_field__placeholder__title__page__publisher_is_draft=False
-        ).count()
-        self.assertEqual(
-            new_public_count,
-            old_public_count + 1
-        )
-
-    def test_copy_m2m_to_model(self):
-        plugin = api.add_plugin(
-            placeholder=self.placeholder1,
-            plugin_type="PluginWithM2MToModel",
-            language=self.FIRST_LANG,
-        )
-        m2m_target = M2MTargetModel.objects.create()
-        plugin.m2m_field.add(m2m_target)
-        old_public_count = M2MTargetModel.objects.filter(
-            pluginmodelwithm2mtomodel__placeholder__title__page__publisher_is_draft=False
-        ).count()
-        api.publish_page(
-            self.page1,
-            self.super_user,
-            self.FIRST_LANG
-        )
-        new_public_count = M2MTargetModel.objects.filter(
-            pluginmodelwithm2mtomodel__placeholder__title__page__publisher_is_draft=False
-        ).count()
-        self.assertEqual(
-            new_public_count,
-            old_public_count + 1
-        )
 
 
 class PluginsMetaOptionsTests(TestCase):

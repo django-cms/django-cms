@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import json
-import datetime
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
@@ -13,11 +12,9 @@ from django.urls import reverse
 from django.http import (Http404, HttpResponseBadRequest,
                          HttpResponseNotFound)
 from django.utils.encoding import force_text, smart_str
-from django.utils import timezone
 
 from cms import api
-from cms.api import create_page, create_title, add_plugin, publish_page
-from cms.admin.pageadmin import PageAdmin
+from cms.api import create_page, create_title, add_plugin
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
 from cms.models.pagemodel import Page, PageType
@@ -111,7 +108,7 @@ class AdminTestCase(AdminTestsBase):
         # The admin edits the page (change the page name for ex.)
         page_data = {
             'title': PAGE2,
-            'slug': page2.get_slug(),
+            'slug': page2.get_slug('en'),
             'template': page2.template,
             'application_urls': 'SampleApp',
             'application_namespace': 'space1',
@@ -130,14 +127,13 @@ class AdminTestCase(AdminTestsBase):
     def test_delete(self):
         admin_user = self.get_superuser()
         create_page("home", "nav_playground.html", "en",
-                           created_by=admin_user, published=True)
+                           created_by=admin_user)
         page = create_page("delete-page", "nav_playground.html", "en",
-                           created_by=admin_user, published=True)
+                           created_by=admin_user)
         create_page('child-page', "nav_playground.html", "en",
-                    created_by=admin_user, published=True, parent=page)
+                    created_by=admin_user, parent=page)
         body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
-        page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
             response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
@@ -146,14 +142,13 @@ class AdminTestCase(AdminTestsBase):
     def test_delete_diff_language(self):
         admin_user = self.get_superuser()
         create_page("home", "nav_playground.html", "en",
-                           created_by=admin_user, published=True)
+                           created_by=admin_user)
         page = create_page("delete-page", "nav_playground.html", "en",
-                           created_by=admin_user, published=True)
+                           created_by=admin_user)
         create_page('child-page', "nav_playground.html", "de",
-                    created_by=admin_user, published=True, parent=page)
+                    created_by=admin_user, parent=page)
         body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
-        page.publish('en')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
             response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
@@ -177,7 +172,7 @@ class AdminTestCase(AdminTestsBase):
     def test_pagetree_filtered(self):
         superuser = self.get_superuser()
         create_page("root-page", "nav_playground.html", "en",
-                    created_by=superuser, published=True)
+                    created_by=superuser)
         with self.login_user_context(superuser):
             url = admin_reverse('cms_page_changelist')
             response = self.client.get('%s?template__exact=nav_playground.html' % url)
@@ -187,7 +182,7 @@ class AdminTestCase(AdminTestsBase):
     def test_delete_translation(self):
         admin_user = self.get_superuser()
         page = create_page("delete-page-translation", "nav_playground.html", "en",
-                           created_by=admin_user, published=True)
+                           created_by=admin_user)
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
         create_title("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
         with self.login_user_context(admin_user):
@@ -199,62 +194,6 @@ class AdminTestCase(AdminTestsBase):
             self.assertEqual(response.status_code, 200)
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
             self.assertRedirects(response, URL_CMS_PAGE)
-
-    def test_change_dates(self):
-        admin_user, staff = self._get_guys()
-
-        with self.settings(USE_TZ=False, TIME_ZONE='UTC'):
-
-            page = create_page('test-page', 'nav_playground.html', 'en')
-            page.publish('en')
-            draft = page.get_draft_object()
-
-            original_date = draft.publication_date
-            original_end_date = draft.publication_end_date
-            new_date = timezone.now() - datetime.timedelta(days=1)
-            new_end_date = timezone.now() + datetime.timedelta(days=1)
-            url = admin_reverse('cms_page_dates', args=(draft.pk,))
-            with self.login_user_context(admin_user):
-                response = self.client.post(url, {
-                    'publication_date_0': new_date.date(),
-                    'publication_date_1': new_date.strftime("%H:%M:%S"),
-                    'publication_end_date_0': new_end_date.date(),
-                    'publication_end_date_1': new_end_date.strftime("%H:%M:%S"),
-                })
-                self.assertEqual(response.status_code, 302)
-                draft = Page.objects.get(pk=draft.pk)
-                self.assertNotEqual(draft.publication_date.timetuple(), original_date.timetuple())
-                self.assertEqual(draft.publication_date.timetuple(), new_date.timetuple())
-                self.assertEqual(draft.publication_end_date.timetuple(), new_end_date.timetuple())
-                if original_end_date:
-                    self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
-
-        with self.settings(USE_TZ=True, TIME_ZONE='UTC'):
-
-            page = create_page('test-page-2', 'nav_playground.html', 'en')
-            page.publish('en')
-            draft = page.get_draft_object()
-
-            original_date = draft.publication_date
-            original_end_date = draft.publication_end_date
-            new_date = timezone.localtime(timezone.now()) - datetime.timedelta(days=1)
-            new_end_date = timezone.localtime(timezone.now()) + datetime.timedelta(days=1)
-            url = admin_reverse('cms_page_dates', args=(draft.pk,))
-            with self.login_user_context(admin_user):
-                response = self.client.post(url, {
-                    'language': 'en',
-                    'publication_date_0': new_date.date(),
-                    'publication_date_1': new_date.strftime("%H:%M:%S"),
-                    'publication_end_date_0': new_end_date.date(),
-                    'publication_end_date_1': new_end_date.strftime("%H:%M:%S"),
-                })
-                self.assertEqual(response.status_code, 302)
-                draft = Page.objects.get(pk=draft.pk)
-                self.assertNotEqual(draft.publication_date.timetuple(), original_date.timetuple())
-                self.assertEqual(timezone.localtime(draft.publication_date).timetuple(), new_date.timetuple())
-                self.assertEqual(timezone.localtime(draft.publication_end_date).timetuple(), new_end_date.timetuple())
-                if original_end_date:
-                    self.assertNotEqual(draft.publication_end_date.timetuple(), original_end_date.timetuple())
 
     def test_change_template(self):
         template = get_cms_setting('TEMPLATES')[0][0]
@@ -299,12 +238,12 @@ class AdminTestCase(AdminTestsBase):
         admin_user = self.get_superuser()
         first_level_page = create_page('level1', 'nav_playground.html', 'en')
         second_level_page_top = create_page('level21', "nav_playground.html", "en",
-                                            created_by=admin_user, published=True, parent=first_level_page)
+                                            created_by=admin_user, parent=first_level_page)
         second_level_page_bottom = create_page('level22', "nav_playground.html", "en",
-                                               created_by=admin_user, published=True,
+                                               created_by=admin_user,
                                                parent=self.reload(first_level_page))
         third_level_page = create_page('level3', "nav_playground.html", "en",
-                                       created_by=admin_user, published=True, parent=second_level_page_top)
+                                       created_by=admin_user, parent=second_level_page_top)
         self.assertEqual(Page.objects.all().count(), 4)
 
         with self.login_user_context(admin_user):
@@ -317,20 +256,20 @@ class AdminTestCase(AdminTestsBase):
 
     def test_changelist_get_results(self):
         admin_user = self.get_superuser()
-        first_level_page = create_page('level1', 'nav_playground.html', 'en', published=True)
+        first_level_page = create_page('level1', 'nav_playground.html', 'en')
         second_level_page_top = create_page('level21', "nav_playground.html", "en",
-                                            created_by=admin_user, published=True,
+                                            created_by=admin_user,
                                             parent=first_level_page)
         second_level_page_bottom = create_page('level22', "nav_playground.html", "en", # nopyflakes
-                                               created_by=admin_user, published=True,
+                                               created_by=admin_user,
                                                parent=self.reload(first_level_page))
         third_level_page = create_page('level3', "nav_playground.html", "en", # nopyflakes
-                                       created_by=admin_user, published=True,
+                                       created_by=admin_user,
                                        parent=second_level_page_top)
         fourth_level_page = create_page('level23', "nav_playground.html", "en", # nopyflakes
                                         created_by=admin_user,
                                         parent=self.reload(first_level_page))
-        self.assertEqual(Page.objects.all().count(), 9)
+        self.assertEqual(Page.objects.all().count(), 5)
         endpoint = self.get_admin_url(Page, 'changelist')
 
         with self.login_user_context(admin_user):
@@ -396,7 +335,7 @@ class AdminTestCase(AdminTestsBase):
         add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
 
         # creating a de title of the page and adding plugins to it
-        create_title("de", page_en.get_title(), page_en, slug=page_en.get_slug())
+        create_title("de", page_en.get_title(), page_en, slug=page_en.get_slug('en'))
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE")
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE 2")
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE 3")
@@ -453,37 +392,6 @@ class AdminTests(AdminTestsBase):
     def get_page(self):
         return self.page
 
-    def test_change_publish_unpublish(self):
-        page = self.get_page()
-        permless = self.get_permless()
-        with self.login_user_context(permless):
-            request = self.get_request()
-            response = self.admin_class.publish_page(request, page.pk, "en")
-            self.assertEqual(response.status_code, 405)
-            page = self.reload(page)
-            self.assertFalse(page.is_published('en'))
-
-            request = self.get_request(post_data={'no': 'data'})
-            response = self.admin_class.publish_page(request, page.pk, "en")
-            self.assertEqual(response.status_code, 403)
-            page = self.reload(page)
-            self.assertFalse(page.is_published('en'))
-
-        admin_user = self.get_admin()
-        with self.login_user_context(admin_user):
-            request = self.get_request(post_data={'no': 'data'})
-            response = self.admin_class.publish_page(request, page.pk, "en")
-            self.assertEqual(response.status_code, 302)
-
-            page = self.reload(page)
-            self.assertTrue(page.is_published('en'))
-
-            response = self.admin_class.unpublish(request, page.pk, "en")
-            self.assertEqual(response.status_code, 302)
-
-            page = self.reload(page)
-            self.assertFalse(page.is_published('en'))
-
     def test_change_innavigation(self):
         page = self.get_page()
         permless = self.get_permless()
@@ -515,14 +423,6 @@ class AdminTests(AdminTestsBase):
             page = self.reload(page)
             self.assertEqual(old, not page.get_in_navigation())
 
-    def test_publish_page_requires_perms(self):
-        permless = self.get_permless()
-        with self.login_user_context(permless):
-            request = self.get_request()
-            request.method = "POST"
-            response = self.admin_class.publish_page(request, Page.objects.drafts().first().pk, "en")
-            self.assertEqual(response.status_code, 403)
-
     def test_remove_plugin_requires_post(self):
         ph = self.page.get_placeholders('en')[0]
         plugin = add_plugin(ph, 'TextPlugin', 'en', body='test')
@@ -538,22 +438,21 @@ class AdminTests(AdminTestsBase):
             request = self.get_request()
             self.assertRaises(Http404, self.admin_class.preview_page, request, 404, "en")
         page = self.get_page()
-        page.publish("en")
         page.set_as_homepage()
 
         new_site = Site.objects.create(id=2, domain='django-cms.org', name='django-cms')
-        new_page = create_page("testpage", "nav_playground.html", "fr", site=new_site, published=True)
+        new_page = create_page("testpage", "nav_playground.html", "fr", site=new_site)
 
         base_url = page.get_absolute_url()
         with self.login_user_context(permless):
             request = self.get_request('/?public=true')
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?%s&language=en' % (base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+            self.assertEqual(response['Location'], '%s?%s' % (base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
             request = self.get_request()
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?%s&language=en' % (base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+            self.assertEqual(response['Location'], '%s?%s' % (base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
 
             # Switch active site
             request.session['cms_admin_site'] = new_site.pk
@@ -562,7 +461,7 @@ class AdminTests(AdminTestsBase):
             response = self.admin_class.preview_page(request, new_page.pk, 'fr')
             self.assertEqual(response.status_code, 302)
             self.assertEqual(response['Location'],
-                             'http://django-cms.org/fr/testpage/?%s&language=fr' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                             'http://django-cms.org/fr/testpage/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
 
     def test_too_many_plugins_global(self):
         conf = {
@@ -611,45 +510,16 @@ class AdminTests(AdminTestsBase):
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
-    def test_edit_title_dirty_bit(self):
+    def test_edit_title_fields_title(self):
         language = "en"
         admin_user = self.get_admin()
         page = create_page('A', 'nav_playground.html', language)
-        page_admin = PageAdmin(Page, None)
-        page_admin._current_page = page
-        page.publish("en")
-        draft_page = page.get_draft_object()
         admin_url = reverse("admin:cms_page_edit_title_fields", args=(
-            draft_page.pk, language
+            page.pk, language
         ))
-
-        post_data = {
-            'title': "A Title"
-        }
         with self.login_user_context(admin_user):
-            self.client.post(admin_url, post_data)
-            draft_page = Page.objects.get(pk=page.pk).get_draft_object()
-            self.assertTrue(draft_page.is_dirty('en'))
-
-    def test_edit_title_languages(self):
-        language = "en"
-        admin_user = self.get_admin()
-        page = create_page('A', 'nav_playground.html', language)
-        page_admin = PageAdmin(Page, None)
-        page_admin._current_page = page
-        page.publish("en")
-        draft_page = page.get_draft_object()
-        admin_url = reverse("admin:cms_page_edit_title_fields", args=(
-            draft_page.pk, language
-        ))
-
-        post_data = {
-            'title': "A Title"
-        }
-        with self.login_user_context(admin_user):
-            self.client.post(admin_url, post_data)
-            draft_page = Page.objects.get(pk=page.pk).get_draft_object()
-            self.assertTrue(draft_page.is_dirty('en'))
+            self.client.post(admin_url, {'title': "A Title"})
+            self.assertEquals(page.get_page_title('en', force_reload=True), 'A Title')
 
 
 class NoDBAdminTests(CMSTestCase):
@@ -758,8 +628,8 @@ class AdminFormsTests(AdminTestsBase):
             response = self.client.post(endpoint, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertSequenceEqual(
-                cms_page.title_set.values_list('path', 'has_url_overwrite'),
-                [('overwrite/url', True)],
+                cms_page.urls.values_list('path', 'managed'),
+                [('overwrite/url', False)],
             )
 
     def test_missmatching_site_parent_dotsite(self):
@@ -882,11 +752,10 @@ class AdminFormsTests(AdminTestsBase):
             # Make sure no change was made
             self.assertEqual(Page.objects.get(pk=page.pk).get_template('de'), 'col_two.html')
 
-        de_translation = create_title('de', title='Page 1', page=page.reload())
-        de_translation.slug = ''
-        de_translation.save()
+        create_title('de', title='Page 1', page=page.reload())
 
         # Now try again but slug is set to empty string.
+        page.update_urls('de', slug='')
         page_data['language'] = 'de'
         page_data['template'] = 'nav_playground.html'
 
@@ -898,10 +767,8 @@ class AdminFormsTests(AdminTestsBase):
             # Make sure no change was made
             self.assertEqual(Page.objects.get(pk=page.pk).get_template(), 'col_two.html')
 
-        de_translation.slug = 'someslug'
-        de_translation.save()
-
         # Now try again but with the title having a slug.
+        page.update_urls('de', slug='someslug')
         page_data['language'] = 'de'
         page_data['template'] = 'nav_playground.html'
 
@@ -941,12 +808,11 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(page.application_urls, None)
 
     def test_create_page_type(self):
-        page = create_page('Test', 'static.html', 'en', published=True, reverse_id="home")
+        page = create_page('Test', 'static.html', 'en', reverse_id="home")
         for placeholder in page.get_placeholders('en'):
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-        page.publish('en')
-        self.assertEqual(Page.objects.count(), 2)
-        self.assertEqual(CMSPlugin.objects.count(), 4)
+        self.assertEqual(Page.objects.count(), 1)
+        self.assertEqual(CMSPlugin.objects.count(), 2)
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             # source is hidden because there's no page-types
@@ -959,9 +825,9 @@ class AdminFormsTests(AdminTestsBase):
                 data=page_data,
             )
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(Page.objects.count(), 4)
+            self.assertEqual(Page.objects.count(), 3)
             self.assertEqual(Page.objects.filter(is_page_type=True).count(), 2)
-            self.assertEqual(CMSPlugin.objects.count(), 6)
+            self.assertEqual(CMSPlugin.objects.count(), 4)
             new_page_id = Page.objects.filter(is_page_type=True).only('pk').latest('id').pk
             response = self.client.get(admin_reverse('cms_page_add'))
             expected_field = (
@@ -979,7 +845,7 @@ class AdminFormsTests(AdminTestsBase):
 
         cache.clear()
 
-        homepage = create_page('Test', 'static.html', 'en', published=True)
+        homepage = create_page('Test', 'static.html', 'en')
         homepage.set_as_homepage()
 
         for placeholder in homepage.get_placeholders('en'):
@@ -1009,7 +875,7 @@ class AdminFormsTests(AdminTestsBase):
 
         cache.clear()
         for i in range(10):
-            create_page('Test%s' % i, 'col_two.html', 'en', published=True)
+            create_page('Test%s' % i, 'col_two.html', 'en')
         for placeholder in Placeholder.objects.all():
             add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
 
@@ -1018,13 +884,13 @@ class AdminFormsTests(AdminTestsBase):
             with self.assertNumQueries(9):
                 force_text(self.client.get(self.get_admin_url(Page, 'changelist')))
 
-    def test_smart_link_published_pages(self):
+    def test_smart_link_pages(self):
         admin, staff_guy = self._get_guys()
         page_url = URL_CMS_PAGE_PUBLISHED  # Not sure how to achieve this with reverse...
-        create_page('home', 'col_two.html', 'en', published=True)
+        create_page('home', 'col_two.html', 'en')
 
         with self.login_user_context(staff_guy):
-            multi_title_page = create_page('main_title', 'col_two.html', 'en', published=True,
+            multi_title_page = create_page('main_title', 'col_two.html', 'en',
                                            overwrite_url='overwritten_url',
                                            menu_title='menu_title')
 
@@ -1033,7 +899,6 @@ class AdminFormsTests(AdminTestsBase):
             title.save()
 
             multi_title_page.save()
-            publish_page(multi_title_page, admin, 'en')
 
             # Non ajax call should return a 403 as this page shouldn't be accessed by anything else but ajax queries
             self.assertEqual(403, self.client.get(page_url).status_code)
@@ -1111,10 +976,10 @@ class AdminPageTreeTests(AdminTestsBase):
         admin_user, staff = self._get_guys()
         page_admin = self.admin_class
 
-        alpha = create_page('Alpha', 'nav_playground.html', 'en', published=True)
-        beta = create_page('Beta', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
-        gamma = create_page('Gamma', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
-        delta = create_page('Delta', TEMPLATE_INHERITANCE_MAGIC, 'en', published=True)
+        alpha = create_page('Alpha', 'nav_playground.html', 'en')
+        beta = create_page('Beta', TEMPLATE_INHERITANCE_MAGIC, 'en')
+        gamma = create_page('Gamma', TEMPLATE_INHERITANCE_MAGIC, 'en')
+        delta = create_page('Delta', TEMPLATE_INHERITANCE_MAGIC, 'en')
 
         # Current structure:
         #   <root>

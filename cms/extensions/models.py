@@ -1,6 +1,5 @@
 from django.db.models import ManyToManyField
 
-from cms.constants import PUBLISHER_STATE_DIRTY
 from django.db import models
 
 from cms.models import Page, Title
@@ -56,21 +55,8 @@ class BaseExtension(models.Model):
             if field:
                 setattr(clone, parent._meta.pk.attname, None)
 
-        clone.save(mark_page=False)
-
-        # If the target we're copying already has a publisher counterpart, then
-        # connect the dots.
-        target_prime = getattr(target, 'publisher_public')
-        if target_prime:
-            related_name = self.__class__.__name__.lower()
-            clone_prime = getattr(target_prime, related_name)
-            if clone_prime:
-                clone.public_extension = clone_prime
-            else:
-                clone.public_extension = None
-
+        clone.save()
         clone.copy_relations(self, language)
-        clone.save(force_update=True, mark_page=False)
         return clone
 
     def copy_to_public(self, public_object, language):
@@ -100,13 +86,12 @@ class BaseExtension(models.Model):
                 if field:
                     setattr(this, parent._meta.pk.attname, None)
 
-            this.save(mark_page=False)
+            this.save()
             self.public_extension = this
-            self.save(mark_page=False)
+            self.save()
 
         this.copy_relations(self, language)
-        this.save(force_update=True, mark_page=False)
-
+        this.save(force_update=True)
         return this
 
 
@@ -119,16 +104,6 @@ class PageExtension(BaseExtension):
     def get_page(self):
         return self.extended_object
 
-    def save(self, *args, **kwargs):
-        if kwargs.pop('mark_page', True):
-            self.get_page().title_set.update(publisher_state=PUBLISHER_STATE_DIRTY)  # mark page dirty
-        return super(BaseExtension, self).save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        if kwargs.pop('mark_page', True):
-            self.get_page().title_set.update(publisher_state=PUBLISHER_STATE_DIRTY)  # mark page dirty
-        return super(BaseExtension, self).delete(*args, **kwargs)
-
 
 class TitleExtension(BaseExtension):
     extended_object = models.OneToOneField(Title, on_delete=models.CASCADE, editable=False)
@@ -138,15 +113,3 @@ class TitleExtension(BaseExtension):
 
     def get_page(self):
         return self.extended_object.page
-
-    def save(self, *args, **kwargs):
-        if kwargs.pop('mark_page', True):
-            Title.objects.filter(pk=self.extended_object.pk).update(
-                publisher_state=PUBLISHER_STATE_DIRTY) # mark title dirty
-        return super(BaseExtension, self).save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        if kwargs.pop('mark_page', True):
-            Title.objects.filter(pk=self.extended_object.pk).update(
-                publisher_state=PUBLISHER_STATE_DIRTY) # mark title dirty
-        return super(BaseExtension, self).delete(*args, **kwargs)

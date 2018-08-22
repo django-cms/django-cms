@@ -37,7 +37,6 @@ from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request, get_site_id
 from cms.utils.compat.dj import get_middleware
-from cms.utils.moderator import use_draft
 from cms.utils.page import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
@@ -78,19 +77,9 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
     site = Site.objects._get_site_by_id(site_id)
     try:
         if 'pk' in page_lookup:
-            page = Page.objects.select_related('node').get(**page_lookup)
-            if request and use_draft(request):
-                if page.publisher_is_draft:
-                    return page
-                else:
-                    return page.publisher_draft
-            else:
-                if page.publisher_is_draft:
-                    return page.publisher_public
-                else:
-                    return page
+            return Page.objects.select_related('node').get(**page_lookup)
         else:
-            pages = get_page_queryset(site, draft=use_draft(request))
+            pages = get_page_queryset(site)
             return pages.select_related('node').get(**page_lookup)
     except Page.DoesNotExist:
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}

@@ -12,6 +12,7 @@ from django.utils import six
 from django.utils.encoding import force_text, python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
+from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils import get_site_id
@@ -19,7 +20,6 @@ from cms.utils.i18n import get_language_object
 from cms.constants import (
     EXPIRE_NOW,
     MAX_EXPIRATION_TTL,
-    PUBLISHER_STATE_DIRTY,
 )
 from cms.utils import get_language_from_request
 from cms.utils import permissions
@@ -397,34 +397,13 @@ class Placeholder(models.Model):
         return min_ttl
 
     def clear_cache(self, language, site_id=None):
+        if get_cms_setting('PAGE_CACHE'):
+            # Clears all the page caches
+            invalidate_cms_page_cache()
+
         if not site_id and self.page:
             site_id = self.page.node.site_id
         clear_placeholder_cache(self, language, get_site_id(site_id))
-
-    def mark_as_dirty(self, language, clear_cache=True):
-        """
-        Utility method to mark the attached object of this placeholder
-        (if any) as dirty.
-        This allows us to know when the content in this placeholder
-        has been changed.
-        """
-        from cms.models import Page, StaticPlaceholder, Title
-
-        if clear_cache:
-            self.clear_cache(language)
-
-        # Find the attached model for this placeholder
-        # This can be a static placeholder, page or none.
-        attached_model = self._get_attached_model()
-
-        if attached_model is Page:
-            Title.objects.filter(
-                page=self.page,
-                language=language,
-            ).update(publisher_state=PUBLISHER_STATE_DIRTY)
-
-        elif attached_model is StaticPlaceholder:
-            StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
 
     def get_plugin_tree_order(self, language, parent_id=None):
         """

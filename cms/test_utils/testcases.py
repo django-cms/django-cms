@@ -22,11 +22,6 @@ from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 
 from cms.api import create_page, add_plugin
-from cms.constants import (
-    PUBLISHER_STATE_DEFAULT,
-    PUBLISHER_STATE_DIRTY,
-    PUBLISHER_STATE_PENDING,
-)
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page
 from cms.models.permissionmodels import (
@@ -344,10 +339,10 @@ class BaseCMSTestCase(object):
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
-        source_translation = page.title_set.all()[0]
-        parent_translation = target_page.title_set.all()[0]
-        language = source_translation.language
-        copied_page_path = source_translation.get_path_for_base(parent_translation.path)
+        source_url = page.get_urls()[0]
+        parent_url = target_page.get_urls()[0]
+        language = source_url.language
+        copied_page_path = source_url.get_path_for_base(parent_url.path)
         new_page_slug = get_available_slug(target_site, copied_page_path, language)
 
         with self.settings(SITE_ID=target_site.pk):
@@ -358,7 +353,7 @@ class BaseCMSTestCase(object):
             Page.objects.all(),
             pk=response_data['id'],
         )
-        self.assertObjectExist(copied_page.title_set.filter(language=language), slug=new_page_slug)
+        self.assertObjectExist(copied_page.urls.filter(language=language), slug=new_page_slug)
         page._clear_node_cache()
         target_page._clear_node_cache()
         return copied_page
@@ -489,14 +484,12 @@ class BaseCMSTestCase(object):
             "nav_playground.html",
             "en",
             created_by=admin,
-            published=True,
         )
         page = create_page(
             "permissions",
             "nav_playground.html",
             "en",
             created_by=admin,
-            published=True,
             reverse_id='permissions',
         )
         return page
@@ -625,54 +618,7 @@ class BaseCMSTestCase(object):
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
-
-    def assertPending(self, page):
-        if page.publisher_is_draft:
-            # draft
-            self.assertFalse(page.is_published('en'))
-            self.assertTrue(bool(page.publisher_public_id))
-            self.assertTrue(page.get_title_obj('en').published)
-            self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_PENDING)
-            self.assertPending(page.publisher_public)
-        else:
-            # public
-            self.assertFalse(page.is_published('en'))
-            self.assertTrue(bool(page.publisher_public_id))
-            self.assertFalse(page.get_title_obj('en').published)
-
-    def assertPublished(self, page):
-        if page.publisher_is_draft:
-            # draft
-            self.assertTrue(page.is_published('en'))
-            self.assertTrue(page.get_title_obj('en').published)
-            self.assertTrue(bool(page.publisher_public_id))
-            self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DEFAULT)
-            self.assertPublished(page.publisher_public)
-        else:
-            # public
-            self.assertTrue(page.is_published('en'))
-            self.assertTrue(page.get_title_obj('en').published)
-            self.assertTrue(bool(page.publisher_public_id))
-
-    def assertUnpublished(self, page):
-        if page.publisher_is_draft:
-            # draft
-            self.assertFalse(page.is_published('en'))
-            self.assertTrue(bool(page.publisher_public_id))
-            self.assertFalse(page.get_title_obj('en').published)
-            self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
-            self.assertUnpublished(page.publisher_public)
-        else:
-            # public
-            self.assertFalse(page.is_published('en'))
-            self.assertTrue(bool(page.publisher_public_id))
-            self.assertFalse(page.get_title_obj('en').published)
-
-    def assertNeverPublished(self, page):
-        self.assertTrue(page.publisher_is_draft)
-        self.assertFalse(page.is_published('en'))
-        self.assertIsNone(page.publisher_public)
-        self.assertEqual(page.get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
+    pass
 
 
 class TransactionCMSTestCase(CMSTestCase, testcases.TransactionTestCase):

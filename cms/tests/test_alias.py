@@ -42,7 +42,6 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertEqual(response.status_code, 400)
         response = self.client.post(admin_reverse('cms_create_alias'), data={'plugin_id': text_plugin_1.pk})
         self.assertEqual(response.status_code, 403)
-        page_en.publish('en')
         response = self.client.get(page_en.get_absolute_url() + '?edit')
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "I'm the first", html=False)
@@ -70,7 +69,7 @@ class AliasTestCase(TransactionCMSTestCase):
 
     def test_alias_recursion_across_pages(self):
         superuser = self.get_superuser()
-        page_1 = api.create_page("page-1", "col_two.html", "en", published=True)
+        page_1 = api.create_page("page-1", "col_two.html", "en")
         page_1_pl = page_1.get_placeholders("en").get(slot="col_left")
         source_plugin = api.add_plugin(page_1_pl, 'StylePlugin', 'en', tag_type='div', class_name='info')
         # this creates a recursive alias on the same page
@@ -94,11 +93,6 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertContains(response, '<div class="info">', html=False)
 
     def test_alias_content_plugin_display(self):
-        '''
-        In edit mode, content is shown regardless of the source page publish status.
-        In published mode, content is shown only if the source page is published.
-        '''
-        superuser = self.get_superuser()
         source_page = api.create_page(
             "Alias plugin",
             "col_two.html",
@@ -125,26 +119,13 @@ class AliasTestCase(TransactionCMSTestCase):
             plugin=source_plugin,
         )
 
-        with self.login_user_context(superuser):
-            # Not published, not edit mode: hide content
-            response = self.client.get(target_page.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+        # Not edit mode: show content
+        response = self.client.get(target_page.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
-            # Not published, edit mode: show content
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
-
-        source_page.publish('en')
-
-        with self.login_user_context(superuser):
-            # Published, not edit mode: show content
-            response = self.client.get(target_page.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
-
-            # Published, edit mode: show content
+        with self.login_user_context(self.get_superuser()):
+            # Edit mode: show content
             response = self.client.get(target_page.get_absolute_url() + '?edit')
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
@@ -154,7 +135,6 @@ class AliasTestCase(TransactionCMSTestCase):
         In edit mode, content is shown regardless of the source page publish status.
         In published mode, content is shown only if the source page is published.
         '''
-        superuser = self.get_superuser()
         source_page = api.create_page(
             "Alias plugin",
             "col_two.html",
@@ -182,26 +162,13 @@ class AliasTestCase(TransactionCMSTestCase):
             alias_placeholder=source_placeholder,
         )
 
-        with self.login_user_context(superuser):
-            # Not published, not edit mode: hide content
-            response = self.client.get(target_page.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            self.assertNotContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
+        # Not edit mode: show content
+        response = self.client.get(target_page.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
-            # Not published, edit mode: show content
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
-
-        source_page.publish('en')
-
-        with self.login_user_context(superuser):
-            # Published, not edit mode: show content
-            response = self.client.get(target_page.get_absolute_url())
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
-
-            # Published, edit mode: show content
+        with self.login_user_context(self.get_superuser()):
+            # Edit mode: show content
             response = self.client.get(target_page.get_absolute_url() + '?edit')
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
@@ -351,7 +318,7 @@ class AliasTestCase(TransactionCMSTestCase):
         Test moving the plugin from the clipboard to a placeholder.
         '''
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                                  slug="page1", published=True, in_navigation=True)
+                                  slug="page1", in_navigation=True)
         ph_en = page_en.get_placeholders("en").get(slot="col_left")
         text_plugin_1 = api.add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
         with self.login_user_context(self.get_superuser()):
@@ -397,7 +364,7 @@ class AliasTestCase(TransactionCMSTestCase):
 
     def test_context_menus(self):
         page_en = api.create_page("PluginOrderPage", "col_two.html", "en",
-                                  slug="page1", published=True, in_navigation=True)
+                                  slug="page1", in_navigation=True)
         ph_en = page_en.get_placeholders("en").get(slot="col_left")
         context = self.get_context(page=page_en)
         context['placeholder'] = ph_en

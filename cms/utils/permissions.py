@@ -181,7 +181,6 @@ def get_page_actions_for_user(user, site):
     pages = (
         Page
         .objects
-        .drafts()
         .on_site(site)
         .select_related('node')
         .order_by('node__path')

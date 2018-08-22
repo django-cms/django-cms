@@ -42,7 +42,7 @@ class FixtureTestCase(NavextendersFixture, CMSTestCase):
         # Transaction disable, otherwise the connection it the test would be
         # isolated from the data loaded in the different command connection
         call_command('loaddata', dump[1], stdout=output)
-        self.assertEqual(10, Page.objects.count())
+        self.assertEqual(5, Page.objects.count())
         self.assertEqual(original_pages, Page.objects.count())
         self.assertEqual(5, TreeNode.objects.count())
         self.assertEqual(original_tree_nodes, TreeNode.objects.count())

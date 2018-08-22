@@ -328,7 +328,7 @@ class TestLanguagesNotInCMSLanguages(CMSTestCase):
 class TestLanguageFallbacks(CMSTestCase):
 
     def test_language_code(self):
-        self.create_homepage("home", "nav_playground.html", "fr", published=True)
+        self.create_homepage("home", "nav_playground.html", "fr")
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         response = self.client.get('/en/')
@@ -348,10 +348,8 @@ class TestLanguageFallbacks(CMSTestCase):
         },
     )
     def test_session_language(self):
-        page = self.create_homepage("home", "nav_playground.html", "en", published=True)
+        page = self.create_homepage("home", "nav_playground.html", "en")
         api.create_title('fr', "home", page)
-        page.publish('fr')
-        page.publish('en')
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/en/')
