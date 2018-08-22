@@ -6,7 +6,7 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.apphook_pool import apphook_pool
-from cms.models import EmptyTitle, PageUrl, Title
+from cms.models import EmptyTitle, PageUrl, PageContent
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -233,7 +233,7 @@ class CMSMenu(Menu):
         translations_lookup = Prefetch(
             'title_set',
             to_attr='filtered_translations',
-            queryset=Title.objects.filter(language__in=languages),
+            queryset=PageContent.objects.filter(language__in=languages),
         )
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
         # Build the blank title instances only once

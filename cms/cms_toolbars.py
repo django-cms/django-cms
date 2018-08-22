@@ -10,7 +10,7 @@ from django.utils.translation import override as force_language, ugettext_lazy a
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
+from cms.models import Placeholder, PageContent, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -267,8 +267,8 @@ class PageToolbar(CMSToolbar):
 
     def get_title(self):
         try:
-            return Title.objects.get(page=self.page, language=self.current_lang)
-        except Title.DoesNotExist:
+            return PageContent.objects.get(page=self.page, language=self.current_lang)
+        except PageContent.DoesNotExist:
             return None
 
     def has_page_change_permission(self):

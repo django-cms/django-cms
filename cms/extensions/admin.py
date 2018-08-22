@@ -1,4 +1,4 @@
-from cms.models import Page, Title
+from cms.models import Page, PageContent
 from cms.utils.page_permissions import user_can_change_page
 
 from django.contrib import admin
@@ -61,8 +61,8 @@ class TitleExtensionAdmin(ExtensionAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change and 'extended_object' in request.GET:
-            obj.extended_object = Title.objects.get(pk=request.GET['extended_object'])
-            title = Title.objects.get(pk=request.GET['extended_object'])
+            obj.extended_object = PageContent.objects.get(pk=request.GET['extended_object'])
+            title = PageContent.objects.get(pk=request.GET['extended_object'])
         else:
             title = obj.extended_object
         if not user_can_change_page(request.user, page=title.page):
@@ -90,7 +90,7 @@ class TitleExtensionAdmin(ExtensionAdmin):
         extended_object_id = request.GET.get('extended_object', False)
         if extended_object_id:
             try:
-                title = Title.objects.get(pk=extended_object_id)
+                title = PageContent.objects.get(pk=extended_object_id)
                 extension = self.model.objects.get(extended_object=title)
                 opts = self.model._meta
                 change_url = reverse('admin:%s_%s_change' %

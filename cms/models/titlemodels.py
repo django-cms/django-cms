@@ -13,7 +13,7 @@ from cms.utils.conf import get_cms_setting
 
 
 @python_2_unicode_compatible
-class Title(models.Model):
+class PageContent(models.Model):
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (constants.VISIBILITY_USERS, _('for logged in users only')),
         (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
@@ -30,7 +30,7 @@ class Title(models.Model):
     template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
     # These are the fields whose values are compared when saving
-    # a Title object to know if it has changed.
+    # a PageContent object to know if it has changed.
     editable_fields = [
         'title',
         'redirect',
@@ -99,7 +99,7 @@ class Title(models.Model):
         # delete template cache
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
-        super(Title, self).save(**kwargs)
+        super(PageContent, self).save(**kwargs)
 
     def has_placeholder_change_permission(self, user):
         return self.page.has_change_permission(user)
@@ -126,7 +126,7 @@ class Title(models.Model):
         return self._placeholder_cache
 
     def get_ancestor_titles(self):
-        return Title.objects.filter(
+        return PageContent.objects.filter(
             page__in=self.page.get_ancestor_pages(),
             language=self.language,
         )

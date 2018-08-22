@@ -22,10 +22,10 @@ from cms.api import create_page, add_plugin, create_title
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.middleware.user import CurrentUserMiddleware
+from cms.models import PageContent
 from cms.models.pagemodel import Page, PageType, PageUrl
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
-from cms.models.titlemodels import Title
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_MOVE,
     URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD
@@ -87,7 +87,7 @@ class PageTestBase(CMSTestCase):
         if not slug:
             slug = 'permissions-de'
 
-        lookup = Title.objects.filter(page__urls__slug=slug)
+        lookup = PageContent.objects.filter(page__urls__slug=slug)
 
         if title:
             lookup = lookup.filter(title=title)
@@ -177,7 +177,7 @@ class PageTest(PageTestBase):
 
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            self.assertEqual(Title.objects.all().count(), 0)
+            self.assertEqual(PageContent.objects.all().count(), 0)
             self.assertEqual(Page.objects.all().count(), 0)
             # create home
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
@@ -204,7 +204,7 @@ class PageTest(PageTestBase):
             username=getattr(superuser, get_user_model().USERNAME_FIELD),
             password=getattr(superuser, get_user_model().USERNAME_FIELD),
         )
-        self.assertEqual(Title.objects.all().count(), 0)
+        self.assertEqual(PageContent.objects.all().count(), 0)
         self.assertEqual(Page.objects.all().count(), 0)
         # create home
         with self.settings(SITE_ID=2):
@@ -213,7 +213,7 @@ class PageTest(PageTestBase):
             response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
             self.assertRedirects(response, URL_CMS_PAGE)
             self.assertEqual(Page.objects.filter(node__site=2).count(), 1)
-            self.assertEqual(Title.objects.filter(language='de').count(), 1)
+            self.assertEqual(PageContent.objects.filter(language='de').count(), 1)
 
         # The user is on site #1 but switches sites using the site switcher
         # on the page changelist.
@@ -224,7 +224,7 @@ class PageTest(PageTestBase):
         response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
         self.assertRedirects(response, URL_CMS_PAGE)
         self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
-        self.assertEqual(Title.objects.filter(language='de').count(), 2)
+        self.assertEqual(PageContent.objects.filter(language='de').count(), 2)
 
         Site.objects.clear_cache()
         client.logout()

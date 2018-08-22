@@ -32,7 +32,7 @@ except ImportError:
 
 class SlugWidget(forms.widgets.TextInput):
     """
-    Special widget for the slug field that requires Title field to be there.
+    Special widget for the slug field that requires PageContent field to be there.
     Adds the js for the slugifying.
     """
     class Media:

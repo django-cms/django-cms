@@ -62,7 +62,7 @@ class ExtensionToolbar(CMSToolbar):
     def get_title_extension_admin(self, language=None):
         """
         Get the admin urls for the title extensions menu items, depending on whether a TitleExtension instance exists
-        for each Title in the current page.
+        for each PageContent in the current page.
         A single language can be passed to only work on a single title.
 
         Return a list of tuples of the title extension and the url; the extension is None if no instance exists,

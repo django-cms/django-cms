@@ -780,7 +780,7 @@ class Page(models.Model):
     def get_fallbacks(self, language):
         return i18n.get_fallback_languages(language, site_id=self.node.site_id)
 
-    # ## Title object access
+    # ## PageContent object access
 
     def get_title_obj(self, language=None, fallback=True, force_reload=False):
         """Helper function for accessing wanted / current title.
@@ -789,7 +789,7 @@ class Page(models.Model):
         language = self._get_title_cache(language, fallback, force_reload)
         if language in self.title_cache:
             return self.title_cache[language]
-        from cms.models.titlemodels import EmptyTitle
+        from cms.models import EmptyTitle
 
         return EmptyTitle(language)
 
@@ -875,7 +875,7 @@ class Page(models.Model):
     def get_placeholders(self, language):
         from cms.models import Placeholder
 
-        return Placeholder.objects.filter(title__language=language, title__page=self)
+        return Placeholder.objects.filter(pagecontent__language=language, pagecontent__page=self)
 
     def get_changed_date(self, language=None, fallback=True, force_reload=False):
         """
@@ -931,9 +931,9 @@ class Page(models.Model):
                     return lang
 
         if force_reload:
-            from cms.models.titlemodels import Title
+            from cms.models import PageContent
 
-            titles = Title.objects.filter(page=self)
+            titles = PageContent.objects.filter(page=self)
             for title in titles:
                 self.title_cache[title.language] = title
             if self.title_cache.get(language):

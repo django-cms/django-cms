@@ -223,7 +223,7 @@ class Placeholder(models.Model):
         if hasattr(self, '_attached_model_cache'):
             return self._attached_model_cache
 
-        if self.page or self.title_set.exists():
+        if self.page or self.pagecontent_set.exists():
             from cms.models import Page
             self._attached_model_cache = Page
             return Page

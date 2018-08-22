@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0031_remove_page_fields'),
+        ('cms', '0031_remove_fields'),
     ]
 
     operations = [

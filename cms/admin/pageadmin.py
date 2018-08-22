@@ -51,8 +51,14 @@ from cms.admin.forms import (
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
 from cms.models import (
-    EmptyTitle, Page, PageUrl, PageType,
-    Title, CMSPlugin, Placeholder, PagePermission,
+    EmptyTitle,
+    CMSPlugin,
+    Page,
+    PageContent,
+    PagePermission,
+    PageType,
+    PageUrl,
+    Placeholder,
     GlobalPagePermission,
 )
 from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
@@ -151,7 +157,7 @@ class BasePageAdmin(admin.ModelAdmin):
 
         try:
             translation = page.title_set.get(language=language)
-        except Title.DoesNotExist:
+        except PageContent.DoesNotExist:
             translation = None
         return (page, translation)
 
@@ -482,7 +488,7 @@ class BasePageAdmin(admin.ModelAdmin):
             cms_pages.extend(self.model.objects.filter(node__in=nodes))
 
         # Delete all of the pages titles contents
-        placeholders = Placeholder.objects.filter(title__page__in=cms_pages)
+        placeholders = Placeholder.objects.filter(pagecontent__page__in=cms_pages)
         plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
         QuerySet.delete(plugins)
         placeholders.delete()
@@ -769,7 +775,7 @@ class BasePageAdmin(admin.ModelAdmin):
                 Prefetch(
                     'title_set',
                     to_attr='filtered_translations',
-                    queryset=Title.objects.filter(language__in=languages)
+                    queryset=PageContent.objects.filter(language__in=languages)
                 ),
             )
             pages = pages.distinct() if use_distinct else pages
@@ -1037,9 +1043,9 @@ class BasePageAdmin(admin.ModelAdmin):
         if translation is None:
             raise Http404('No translation matches requested language.')
 
-        titleopts = Title._meta
+        titleopts = PageContent._meta
         app_label = titleopts.app_label
-        saved_plugins = CMSPlugin.objects.filter(placeholder__title=translation, language=language)
+        saved_plugins = CMSPlugin.objects.filter(placeholder__pagecontent=translation, language=language)
         using = router.db_for_read(self.model)
 
         if DJANGO_2_0:
@@ -1222,7 +1228,7 @@ class BasePageAdmin(admin.ModelAdmin):
             Prefetch(
                 'title_set',
                 to_attr='filtered_translations',
-                queryset=Title.objects.filter(language__in=allowed_languages)
+                queryset=PageContent.objects.filter(language__in=allowed_languages)
             ),
             Prefetch(
                 'urls',
@@ -1386,7 +1392,7 @@ class BasePageAdmin(admin.ModelAdmin):
         raw_fields = request.GET.get("edit_fields", 'title')
         edit_fields = [field for field in raw_fields.split(",") if field in self.title_frontend_editable_fields]
         cancel_clicked = request.POST.get("_cancel", False)
-        opts = Title._meta
+        opts = PageContent._meta
 
         if not edit_fields:
             # Defaults to title
@@ -1397,7 +1403,7 @@ class BasePageAdmin(admin.ModelAdmin):
             Dynamic form showing only the fields to be edited
             """
             class Meta:
-                model = Title
+                model = PageContent
                 fields = edit_fields
 
         if not cancel_clicked and request.method == 'POST':

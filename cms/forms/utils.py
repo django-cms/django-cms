@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from cms.cache.choices import (
     clean_site_choices_cache, clean_page_choices_cache,
     _site_cache_key, _page_cache_key)
-from cms.models import Page, Title
+from cms.models import Page, PageContent
 from cms.utils import i18n
 
 
@@ -31,7 +31,7 @@ def get_page_choices_for_site(site, language):
     translation_lookup = Prefetch(
         'title_set',
         to_attr='filtered_translations',
-        queryset=Title.objects.filter(language__in=languages).only('pk', 'page', 'language', 'title')
+        queryset=PageContent.objects.filter(language__in=languages).only('pk', 'page', 'language', 'title')
     )
     pages = (
         Page

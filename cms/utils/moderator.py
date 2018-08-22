@@ -16,9 +16,9 @@ def get_model_queryset(model, request=None):
 
 
 def get_title_queryset(request=None):
-    from cms.models import Title
+    from cms.models import PageContent
 
-    return Title.objects.all()
+    return PageContent.objects.all()
 
 
 def get_cmsplugin_queryset(request=None):
