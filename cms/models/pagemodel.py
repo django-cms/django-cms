@@ -1060,12 +1060,6 @@ class Page(models.Model):
 
         return get_placeholders(self.get_template())
 
-    def get_declared_static_placeholders(self, context):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_static_placeholders
-
-        return get_static_placeholders(self.get_template(), context)
-
     def get_xframe_options(self, language=None, fallback=True, force_reload=False):
         title = self.get_title_obj(language, fallback, force_reload)
         if title:

@@ -448,20 +448,18 @@ class AdminTests(AdminTestsBase):
             request = self.get_request('/?public=true')
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?%s' % (base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+            self.assertEqual(response['Location'], base_url)
             request = self.get_request()
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?%s' % (base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-
+            self.assertEqual(response['Location'], base_url)
             # Switch active site
             request.session['cms_admin_site'] = new_site.pk
 
             # Preview page attached to active site but not to current site
             response = self.admin_class.preview_page(request, new_page.pk, 'fr')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'],
-                             'http://django-cms.org/fr/testpage/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            self.assertEqual(response['Location'], 'http://django-cms.org/fr/testpage/')
 
     def test_too_many_plugins_global(self):
         conf = {
@@ -855,18 +853,14 @@ class AdminFormsTests(AdminTestsBase):
         self.assertEqual(homepage.get_placeholders('en').count(), 2)
         with self.login_user_context(user):
             output = force_text(
-                self.client.get(
-                    '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-                ).content
+                self.client.get('/en/').content
             )
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in homepage.get_placeholders('en'):
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
             output = force_text(
-                self.client.get(
-                    '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-                ).content
+                self.client.get('/en/').content
             )
             self.assertIn('<b>Test</b>', output)
 

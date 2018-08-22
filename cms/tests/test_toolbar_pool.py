@@ -7,6 +7,7 @@ from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import ToolbarPool, toolbar_pool
+from cms.toolbar.utils import get_object_edit_url
 
 
 class TestToolbar(CMSToolbar):
@@ -57,7 +58,8 @@ class ToolbarPoolTests(CMSTestCase):
             toolbar_pool.register(TestToolbar)
             self.assertEqual(len(list(pool.get_toolbars().keys())), 2)
             page = api.create_page("home", "simple.html", "en")
-            page_edit_url_on = self.get_edit_on_url(page.get_absolute_url())
+            page_content = self.get_page_title_obj(page)
+            page_edit_url_on = get_object_edit_url(page_content)
 
             with self.login_user_context(self.get_superuser()):
                 response = self.client.get(page_edit_url_on)

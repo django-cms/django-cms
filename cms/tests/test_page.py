@@ -69,7 +69,6 @@ class PagesTestCase(TransactionCMSTestCase):
             create_page,
             template='nav_playground.html',
             language='en',
-            published=True,
         )
         page_a = _create('page_a')
         page_a_a = _create('page_a_a_a', parent=page_a)
@@ -187,8 +186,7 @@ class PagesTestCase(TransactionCMSTestCase):
         """ Checks for slug collisions on sibling pages - uses API to create pages
         """
         site = get_current_site()
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
         page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
                               parent=page1, slug="foo")
         page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
@@ -215,8 +213,7 @@ class PagesTestCase(TransactionCMSTestCase):
         """ Checks for slug collisions on root (not home) page and a home page child - uses API to create pages
         """
         site = get_current_site()
-        page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en')
         page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
                               parent=page1, slug="foo")
         page2 = create_page('test page 1_1', 'nav_playground.html', 'en',
@@ -243,8 +240,7 @@ class PagesTestCase(TransactionCMSTestCase):
         """ Checks for slug collisions on children of a non root page - uses API to create pages
         """
         site = get_current_site()
-        page1 = create_page('test page 1', 'nav_playground.html', 'en',
-                            published=True)
+        page1 = create_page('test page 1', 'nav_playground.html', 'en')
         page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
                               parent=page1, slug="foo")
         page1_1_1 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
@@ -312,14 +308,12 @@ class PagesTestCase(TransactionCMSTestCase):
             "Alpha",
             "nav_playground.html",
             "en",
-            published=True,
             parent=home,
         )
         beta = create_page(
             "Beta",
             "nav_playground.html",
             "en",
-            published=True,
             parent=home,
         )
         beta.move_page(alpha.node, position='left')
@@ -338,14 +332,12 @@ class PagesTestCase(TransactionCMSTestCase):
             "Alpha",
             "nav_playground.html",
             "en",
-            published=True,
             parent=home,
         )
         beta = create_page(
             "Beta",
             "nav_playground.html",
             "en",
-            published=True,
             parent=home,
         )
         beta.move_page(alpha.node, position='left')
@@ -551,8 +543,7 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(found_page, None)
 
     def test_get_page_without_final_slash(self):
-        root = create_page("root", "nav_playground.html", "en", slug="root",
-                           published=True)
+        root = create_page("root", "nav_playground.html", "en", slug="root")
         create_page("page", "nav_playground.html", "en", slug="page",
                            parent=root)
         request = self.get_request('/en/root/page')
@@ -568,8 +559,7 @@ class PagesTestCase(TransactionCMSTestCase):
         page3 = create_page('test page 3', 'nav_playground.html', 'en',
                             parent=page2)
 
-        page4 = create_page('test page 4', 'nav_playground.html', 'en',
-                            published=True)
+        page4 = create_page('test page 4', 'nav_playground.html', 'en')
 
         page5 = create_page('test page 5', 'nav_playground.html', 'en',
                             parent=page4)
@@ -762,7 +752,6 @@ class PagesTestCase(TransactionCMSTestCase):
             title='home',
             template='nav_playground.html',
             language='en',
-            published=True,
             slug='home',
             xframe_options=constants.X_FRAME_OPTIONS_ALLOW
         )
@@ -776,7 +765,6 @@ class PagesTestCase(TransactionCMSTestCase):
             title='home',
             template='nav_playground.html',
             language='en',
-            published=True,
             slug='home',
             xframe_options=constants.X_FRAME_OPTIONS_SAMEORIGIN
         )
@@ -790,7 +778,6 @@ class PagesTestCase(TransactionCMSTestCase):
             title='home',
             template='nav_playground.html',
             language='en',
-            published=True,
             slug='home',
             xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
@@ -804,7 +791,6 @@ class PagesTestCase(TransactionCMSTestCase):
             title='home',
             template='nav_playground.html',
             language='en',
-            published=True,
             slug='home',
             xframe_options=constants.X_FRAME_OPTIONS_DENY
         )
@@ -813,7 +799,6 @@ class PagesTestCase(TransactionCMSTestCase):
             title='subpage',
             template='nav_playground.html',
             language='en',
-            published=True,
             slug='subpage',
             parent=parent,
             xframe_options=constants.X_FRAME_OPTIONS_INHERIT
@@ -823,7 +808,6 @@ class PagesTestCase(TransactionCMSTestCase):
             title='subpage',
             template='nav_playground.html',
             language='en',
-            published=True,
             slug='subpage',
             parent=child1,
             xframe_options=constants.X_FRAME_OPTIONS_ALLOW
@@ -832,7 +816,6 @@ class PagesTestCase(TransactionCMSTestCase):
             title='subpage',
             template='nav_playground.html',
             language='en',
-            published=True,
             slug='subpage',
             parent=child2,
             xframe_options=constants.X_FRAME_OPTIONS_INHERIT
@@ -879,7 +862,6 @@ class PagesTestCase(TransactionCMSTestCase):
                 'test page 1',
                 'nav_playground.html',
                 'en',
-                published=True,
                 xframe_options=constants.X_FRAME_OPTIONS_ALLOW,
             )
 

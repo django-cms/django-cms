@@ -29,9 +29,8 @@ from cms.test_utils.project.placeholderapp.models import (
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
-from cms.toolbar.utils import get_toolbar_from_request
+from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
 from cms.utils.compat.tests import UnittestCompatMixin
-from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    get_placeholder_conf, get_placeholders, _get_nodelist,
                                    _scan_placeholders)
@@ -604,7 +603,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             user = self.get_superuser()
             self.client.login(username=getattr(user, get_user_model().USERNAME_FIELD),
                               password=getattr(user, get_user_model().USERNAME_FIELD))
-            endpoint = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            endpoint = get_object_edit_url(title)
             response = self.client.get(endpoint)
             for placeholder in page.get_placeholders("en"):
                 self.assertContains(

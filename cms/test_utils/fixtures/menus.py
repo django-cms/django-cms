@@ -118,7 +118,6 @@ class SoftrootFixture(object):
             'template': 'nav_playground.html',
             'language': 'en',
             'in_navigation': True,
-            'published': True,
         }
         with self.settings(CMS_PERMISSION=False):
             top = create_page('top', **defaults)
