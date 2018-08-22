@@ -51,7 +51,7 @@ class ManagementTestCase(CMSTestCase):
                 interactive=False,
                 stdout=out,
             )
-            self.assertEqual(out.getvalue(), "SampleApp (draft)\n")
+            self.assertEqual(out.getvalue(), "SampleApp (active)\n")
 
     def test_uninstall_apphooks_without_apphook(self):
         with apphooks():
@@ -83,11 +83,11 @@ class ManagementTestCase(CMSTestCase):
 
     def test_fix_tree_regression_5641(self):
         # ref: https://github.com/divio/django-cms/issues/5641
-        alpha = create_page("Alpha", "nav_playground.html", "en", published=True)
-        beta = create_page("Beta", "nav_playground.html", "en", published=False)
-        gamma = create_page("Gamma", "nav_playground.html", "en", published=False)
-        delta = create_page("Delta", "nav_playground.html", "en", published=True)
-        theta = create_page("Theta", "nav_playground.html", "en", published=True)
+        alpha = create_page("Alpha", "nav_playground.html", "en")
+        beta = create_page("Beta", "nav_playground.html", "en")
+        gamma = create_page("Gamma", "nav_playground.html", "en")
+        delta = create_page("Delta", "nav_playground.html", "en")
+        theta = create_page("Theta", "nav_playground.html", "en")
 
         beta.move_page(alpha.node, position='last-child')
         gamma.move_page(beta.node, position='last-child')
@@ -321,7 +321,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
 
     def setUp(self):
-        pages = Page.objects.drafts()
+        pages = Page.objects.all()
         for page in pages:
             self._fill_page_body(page, "en")
 
@@ -340,7 +340,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         management.call_command(
             'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out
         )
-        pages = Page.objects.on_site(site).drafts()
+        pages = Page.objects.on_site(site)
         for page in pages:
             self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
         # These asserts that no orphaned plugin exists
@@ -385,7 +385,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', '--skip-content',
             interactive=False, stdout=out
         )
-        pages = Page.objects.on_site(site).drafts()
+        pages = Page.objects.on_site(site)
         for page in pages:
             self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
         # These asserts that no orphaned plugin exists
@@ -426,7 +426,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         site_2 = Site.objects.create(name='site 2')
         site_2_pk = site_2.pk
         phs = []
-        for page in Page.objects.on_site(site_1_pk).drafts():
+        for page in Page.objects.on_site(site_1_pk):
             phs.extend(page.get_placeholders('en').values_list('pk', flat=True))
         number_start_plugins = CMSPlugin.objects.filter(placeholder__in=phs).count()
 
@@ -435,22 +435,18 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             'cms', 'copy', 'site', '--from-site=%s' % site_1_pk, '--to-site=%s' % site_2_pk,
             stdout=out
         )
-        for page in Page.objects.on_site(site_1_pk).drafts():
-            page.publish('en')
-        for page in Page.objects.on_site(site_2_pk).drafts():
-            page.publish('en')
 
-        pages_1 = list(Page.objects.drafts().on_site(site_1).select_related('node').order_by('node__path'))
-        pages_2 = list(Page.objects.drafts().on_site(site_2).select_related('node').order_by('node__path'))
+        pages_1 = list(Page.objects.on_site(site_1).select_related('node').order_by('node__path'))
+        pages_2 = list(Page.objects.on_site(site_2).select_related('node').order_by('node__path'))
         for index, page in enumerate(pages_1):
             self.assertEqual(page.get_title('en'), pages_2[index].get_title('en'))
             self.assertEqual(page.node.depth, pages_2[index].node.depth)
 
         phs_1 = []
         phs_2 = []
-        for page in Page.objects.on_site(site_1_pk).drafts():
+        for page in Page.objects.on_site(site_1_pk):
             phs_1.extend(page.get_placeholders('en').values_list('pk', flat=True))
-        for page in Page.objects.on_site(site_2_pk).drafts():
+        for page in Page.objects.on_site(site_2_pk):
             phs_2.extend(page.get_placeholders('en').values_list('pk', flat=True))
 
         # These asserts that no orphaned plugin exists
@@ -489,7 +485,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         management.call_command(
             'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out
         )
-        pages = Page.objects.on_site(site).drafts()
+        pages = Page.objects.on_site(site)
         for page in pages:
             self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
 
@@ -567,7 +563,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             interactive=False, stdout=out
         )
         text = out.getvalue()
-        page_count = Page.objects.on_site(site).drafts().count() + 1
+        page_count = Page.objects.on_site(site).count() + 1
         for idx in range(1, page_count):
             self.assertTrue("Skipping page page%d, language de not defined" % idx in text)
 
@@ -583,14 +579,14 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         number_start_plugins = CMSPlugin.objects.all().count()
         site_obj = Site.objects.create(domain="sample2.com", name="sample2.com", pk=site_active)
 
-        for page in Page.objects.on_site(1).drafts():
+        for page in Page.objects.on_site(1):
             origina_site1_langs[page.pk] = set(page.get_languages())
 
-        p1 = create_page('page1', published=True, in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
-        create_page('page4', published=True, in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
-        create_page('page2', published=True, in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj)
+        p1 = create_page('page1', in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
+        create_page('page4', in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
+        create_page('page2', in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj)
 
-        for page in Page.objects.on_site(site_active).drafts():
+        for page in Page.objects.on_site(site_active):
             self._fill_page_body(page, 'de')
 
         number_site2_plugins = CMSPlugin.objects.all().count() - number_start_plugins
@@ -601,10 +597,10 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             interactive=False, stdout=out
         )
 
-        for page in Page.objects.on_site(site_other).drafts():
+        for page in Page.objects.on_site(site_other):
             self.assertEqual(origina_site1_langs[page.pk], set(page.get_languages()))
 
-        for page in Page.objects.on_site(site_active).drafts():
+        for page in Page.objects.on_site(site_active):
             self.assertEqual(set(('de', 'fr')), set(page.get_languages()))
 
         # plugins for site 1

@@ -18,9 +18,8 @@ from django.utils.translation import (
 )
 
 from cms import constants
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY
-from cms.exceptions import PublicIsUnmodifiable, LanguageError
-from cms.models.managers import PageManager, PageNodeManager
+from cms.exceptions import LanguageError
+from cms.models.managers import PageManager, PageNodeManager, PageUrlManager
 from cms.utils import i18n
 from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
@@ -70,7 +69,7 @@ class TreeNode(MP_Node):
 
     def get_item(self):
         # Paving the way...
-        return Page.objects.get(node=self, publisher_is_draft=True)
+        return Page.objects.get(node=self)
 
     @property
     def is_branch(self):
@@ -159,11 +158,6 @@ class Page(models.Model):
     creation_date = models.DateTimeField(auto_now_add=True)
     changed_date = models.DateTimeField(auto_now=True)
 
-    publication_date = models.DateTimeField(_("publication date"), null=True, blank=True, help_text=_(
-        'When the page should go live. Status must be "Published" for page to go live.'), db_index=True)
-    publication_end_date = models.DateTimeField(_("publication end date"), null=True, blank=True,
-                                                help_text=_('When to expire the page. Leave empty to never expire.'),
-                                                db_index=True)
     #
     # Please use toggle_in_navigation() instead of affecting this property
     # directly so that the cms page cache can be invalidated as appropriate.
@@ -176,17 +170,6 @@ class Page(models.Model):
     is_home = models.BooleanField(editable=False, db_index=True, default=False)
     application_urls = models.CharField(_('application'), max_length=200, blank=True, null=True, db_index=True)
     application_namespace = models.CharField(_('application instance name'), max_length=200, blank=True, null=True)
-
-    # Publisher fields
-    publisher_is_draft = models.BooleanField(default=True, editable=False, db_index=True)
-    # This is misnamed - the one-to-one relation is populated on both ends
-    publisher_public = models.OneToOneField(
-        'self',
-        on_delete=models.CASCADE,
-        related_name='publisher_draft',
-        null=True,
-        editable=False,
-    )
     languages = models.CharField(max_length=255, editable=False, blank=True, null=True)
 
     # Flag that marks a page as page-type
@@ -208,13 +191,13 @@ class Page(models.Model):
             ('publish_page', 'Can publish page'),
             ('edit_static_placeholder', 'Can edit static placeholders'),
         )
-        unique_together = ('node', 'publisher_is_draft')
         verbose_name = _('page')
         verbose_name_plural = _('pages')
         app_label = 'cms'
 
     def __init__(self, *args, **kwargs):
         super(Page, self).__init__(*args, **kwargs)
+        self.urls_cache = {}
         self.title_cache = {}
 
     def __str__(self):
@@ -230,11 +213,10 @@ class Page(models.Model):
         return force_text(title)
 
     def __repr__(self):
-        display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
+        display = '<{module}.{class_name} id={id} object at {location}>'.format(
             module=self.__module__,
             class_name=self.__class__.__name__,
             id=self.pk,
-            is_draft=self.publisher_is_draft,
             location=hex(id(self)),
         )
         return display
@@ -248,6 +230,7 @@ class Page(models.Model):
                 Page.node.field.delete_cached_value(self)
 
     def _clear_internal_cache(self):
+        self.urls_cache = {}
         self.title_cache = {}
         self._clear_node_cache()
 
@@ -258,14 +241,15 @@ class Page(models.Model):
     def parent_page(self):
         return self.get_parent_page()
 
+    def has_valid_url(self, language):
+        return self.urls.filter(language=language, path__isnull=False).exists()
+
     def set_as_homepage(self, user=None):
         """
         Sets the given page as the homepage.
         Updates the title paths for all affected pages.
         Returns the old home page (if any).
         """
-        assert self.publisher_is_draft
-
         if user:
             changed_by = get_clean_username(user)
         else:
@@ -277,13 +261,11 @@ class Page(models.Model):
             old_home = self.__class__.objects.get(
                 is_home=True,
                 node__site=self.node.site_id,
-                publisher_is_draft=True,
             )
         except self.__class__.DoesNotExist:
             old_home_tree = []
         else:
             old_home.update(
-                draft_only=False,
                 is_home=False,
                 changed_by=changed_by,
                 changed_date=changed_date,
@@ -291,7 +273,6 @@ class Page(models.Model):
             old_home_tree = old_home._set_title_root_path()
 
         self.update(
-            draft_only=False,
             is_home=True,
             changed_by=changed_by,
             changed_date=changed_date,
@@ -299,75 +280,64 @@ class Page(models.Model):
         new_home_tree = self._remove_title_root_path()
         return (new_home_tree, old_home_tree)
 
-    def _update_title_path(self, language):
-        parent_page = self.get_parent_page()
-
-        if parent_page:
-            base = parent_page.get_path(language, fallback=True)
+    def _get_path_sql_value(self, base_path=''):
+        if base_path:
+            new_path = Concat(models.Value(base_path), models.Value('/'), models.F('slug'))
+        elif base_path is None:
+            new_path = None
         else:
-            base = ''
+            # the homepage
+            new_path = models.F('slug')
+        return new_path
 
-        title_obj = self.get_title_obj(language, fallback=False)
-        title_obj.path = title_obj.get_path_for_base(base)
-        title_obj.save()
+    def _update_url_path(self, language):
+        parent_page = self.get_parent_page()
+        base_path = parent_page.get_path(language) if parent_page else ''
+        new_path = self._get_path_sql_value(base_path)
 
-    def _update_title_path_recursive(self, language):
-        assert self.publisher_is_draft
-        from cms.models import Title
+        (PageUrl
+         .objects
+         .filter(language=language, page=self)
+         .exclude(managed=False)
+         .update(path=new_path))
 
+    def _update_url_path_recursive(self, language):
         if self.node.is_leaf() or language not in self.get_languages():
             return
 
         pages = self.get_child_pages()
-        base = self.get_path(language, fallback=True)
+        base_path = self.get_path(language)
+        new_path = self._get_path_sql_value(base_path)
 
-        if base:
-            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
-        else:
-            # User is moving the homepage
-            new_path = models.F('slug')
-
-        (Title
+        (PageUrl
          .objects
          .filter(language=language, page__in=pages)
-         .exclude(has_url_overwrite=True)
+         .exclude(managed=False)
          .update(path=new_path))
 
-        for child in pages.filter(title_set__language=language).iterator():
-            child._update_title_path_recursive(language)
+        for child in pages.filter(urls__language=language).iterator():
+            child._update_url_path_recursive(language)
 
     def _set_title_root_path(self):
-        from cms.models import Title
-
         node_tree = TreeNode.get_tree(self.node)
         page_tree = self.__class__.objects.filter(node__in=node_tree)
-        translations = Title.objects.filter(page__in=page_tree, has_url_overwrite=False)
+        page_urls = PageUrl.objects.filter(page__in=page_tree, managed=True, path__isnull=False)
 
-        for language, slug in self.title_set.values_list('language', 'slug'):
+        for language, slug in self.urls.values_list('language', 'slug'):
             # Update the translations for all descendants of this page
             # to include this page's slug as its path prefix
-            (translations
+            (page_urls
              .filter(language=language)
              .update(path=Concat(models.Value(slug), models.Value('/'), 'path')))
-
-            # Explicitly update this page's path to match its slug
-            # Doing this is cheaper than a TRIM call to remove the "/" characters
-            if self.publisher_public_id:
-                # include the public translation
-                current_translations = Title.objects.filter(page__in=[self.pk, self.publisher_public_id])
-            else:
-                current_translations = self.title_set.all()
-            current_translations.filter(language=language).update(path=slug)
+            self.update_urls(language, path=slug)
         return page_tree
 
     def _remove_title_root_path(self):
-        from cms.models import Title
-
         node_tree = TreeNode.get_tree(self.node)
         page_tree = self.__class__.objects.filter(node__in=node_tree)
-        translations = Title.objects.filter(page__in=page_tree, has_url_overwrite=False)
+        page_urls = PageUrl.objects.filter(page__in=page_tree, managed=True, path__isnull=False)
 
-        for language, slug in self.title_set.values_list('language', 'slug'):
+        for language, slug in self.urls.values_list('language', 'slug'):
             # Use 2 because of 1 indexing plus the fact we need to trim
             # the "/" character.
             trim_count = len(slug) + 2
@@ -376,14 +346,10 @@ class Page(models.Model):
                 models.Value(trim_count),
                 function='substr',
             )
-            (translations
+            (page_urls
              .filter(language=language, path__startswith=slug)
              .update(path=sql_func))
         return page_tree
-
-    def is_dirty(self, language):
-        state = self.get_publisher_state(language)
-        return state == PUBLISHER_STATE_DIRTY or state == PUBLISHER_STATE_PENDING
 
     def is_potential_home(self):
         """
@@ -392,7 +358,6 @@ class Page(models.Model):
         admin for determining whether to enable the "Set as home" menu item.
         :return: Boolean
         """
-        assert self.publisher_is_draft
         # Only root nodes are eligible for homepage
         return not self.is_home and bool(self.node.is_root())
 
@@ -406,28 +371,7 @@ class Page(models.Model):
             path = self.get_path(language, fallback) or self.get_slug(language, fallback)
             return reverse('pages-details-by-slug', kwargs={"slug": path})
 
-    def get_public_url(self, language=None, fallback=True):
-        """
-        Returns the URL of the published version of the current page.
-        Returns empty string if the page is not published.
-        """
-        try:
-            return self.get_public_object().get_absolute_url(language, fallback)
-        except:
-            return ''
-
-    def get_draft_url(self, language=None, fallback=True):
-        """
-        Returns the URL of the draft version of the current page.
-        Returns empty string if the draft page is not available.
-        """
-        try:
-            return self.get_draft_object().get_absolute_url(language, fallback)
-        except:
-            return ''
-
     def set_tree_node(self, site, target=None, position='first-child'):
-        assert self.publisher_is_draft
         assert position in ('last-child', 'first-child', 'left', 'right')
 
         new_node = TreeNode(site=site)
@@ -451,7 +395,6 @@ class Page(models.Model):
         check_title_slugs, overwrite_url on the moved page don't need any check
         as it remains the same regardless of the page position in the tree
         """
-        assert self.publisher_is_draft
         assert isinstance(target_node, TreeNode)
 
         inherited_template = self.template == constants.TEMPLATE_INHERITANCE_MAGIC
@@ -482,105 +425,21 @@ class Page(models.Model):
         # on access.
         self._clear_node_cache()
 
-        # Update the descendants to "PENDING"
-        # If the target (parent) page is not published
-        # and the page being moved is published.
-        titles = (
+        # Update the urls for the page being moved
+        # and is descendants.
+        languages = (
             self
-            .title_set
+            .urls
             .filter(language__in=self.get_languages())
-            .values_list('language', 'published')
+            .values_list('language', flat=True)
         )
-        parent_page = self.get_parent_page()
 
-        if parent_page:
-            parent_titles = (
-                parent_page
-                .title_set
-                .exclude(publisher_state=PUBLISHER_STATE_PENDING)
-                .values_list('language', 'published')
-            )
-            parent_titles_by_language = dict(parent_titles)
-        else:
-            parent_titles_by_language = {}
-
-        for language, published in titles:
-            parent_is_published = parent_titles_by_language.get(language)
-
-            # Update draft title path
-            self._update_title_path(language)
-            self._update_title_path_recursive(language)
-
-            if published and parent_is_published:
-                # this looks redundant but it's necessary
-                # for all the descendants of the page being
-                # moved to be set to the correct state.
-                self.publisher_public._update_title_path(language)
-                self.mark_as_published(language)
-                self.mark_descendants_as_published(language)
-            elif published and parent_page:
-                # page is published but it's parent is not
-                # mark the page being moved (source) as "pending"
-                self.mark_as_pending(language)
-                # mark all descendants of source as "pending"
-                self.mark_descendants_pending(language)
-            elif published:
-                self.publisher_public._update_title_path(language)
-                self.mark_as_published(language)
-                self.mark_descendants_as_published(language)
+        for language in languages:
+            if not self.is_home:
+                self._update_url_path(language)
+            self._update_url_path_recursive(language)
         self.clear_cache()
         return self
-
-    def _copy_titles(self, target, language, published):
-        """
-        Copy the title matching language to a new page (which must have a pk).
-        :param target: The page where the new title should be stored
-        """
-        source_title = self.title_set.get(language=language)
-
-        try:
-            target_title_id = (
-                target
-                .title_set
-                .filter(language=language)
-                .values_list('pk', flat=True)[0]
-            )
-        except IndexError:
-            target_title_id = None
-
-        source_title_id = source_title.pk
-
-        # If an old title exists, overwrite. Otherwise create new
-        target_title = copy.copy(source_title)
-        target_title.pk = target_title_id
-        target_title.page = target
-        target_title.publisher_is_draft = target.publisher_is_draft
-        target_title.publisher_public_id = source_title_id
-        target_title.published = published
-        target_title._publisher_keep_state = True
-
-        if published:
-            target_title.publisher_state = PUBLISHER_STATE_DEFAULT
-        else:
-            target_title.publisher_state = PUBLISHER_STATE_PENDING
-        target_title.save()
-
-        if target_title_id:
-            cleared_placeholders = target._clear_placeholders(language)
-            cleared_placeholders_by_slot = {pl.slot: pl for pl in cleared_placeholders}
-        else:
-            cleared_placeholders_by_slot = {}
-
-        for placeholder in source_title.get_placeholders():
-            try:
-                target_placeholder = cleared_placeholders_by_slot[placeholder.slot]
-            except KeyError:
-                target_placeholder = target_title.placeholders.create(
-                    slot=placeholder.slot,
-                    default_width=placeholder.default_width,
-                )
-            placeholder.copy_plugins(target_placeholder, language=language)
-        return target_title
 
     def _clear_placeholders(self, language):
         from cms.models import CMSPlugin
@@ -590,23 +449,6 @@ class Page(models.Model):
         plugins = CMSPlugin.objects.filter(placeholder__in=placeholder_ids, language=language)
         models.query.QuerySet.delete(plugins)
         return placeholders
-
-    def _copy_attributes(self, target, clean=False):
-        """
-        Copy all page data to the target. This excludes parent and other values
-        that are specific to an exact instance.
-        :param target: The Page to copy the attributes to
-        """
-        if not clean:
-            target.publication_date = self.publication_date
-            target.publication_end_date = self.publication_end_date
-            target.reverse_id = self.reverse_id
-        target.changed_by = self.changed_by
-        target.login_required = self.login_required
-        target.navigation_extenders = self.navigation_extenders
-        target.application_urls = self.application_urls
-        target.application_namespace = self.application_namespace
-        target.is_page_type = self.is_page_type
 
     def copy(self, site, parent_node=None, language=None,
              translations=True, permissions=False, extensions=True):
@@ -627,8 +469,6 @@ class Page(models.Model):
         new_page.publisher_public_id = None
         new_page.is_home = False
         new_page.reverse_id = None
-        new_page.publication_date = None
-        new_page.publication_end_date = None
         new_page.languages = ''
         new_page.save()
 
@@ -638,32 +478,39 @@ class Page(models.Model):
         new_page.node.__dict__['item'] = new_page
 
         if language and translations:
+            page_urls = self.urls.filter(language=language)
             translations = self.title_set.filter(language=language)
         elif translations:
+            page_urls = self.urls.all()
             translations = self.title_set.all()
         else:
+            page_urls = self.urls.none()
             translations = self.title_set.none()
         translations = translations.prefetch_related('placeholders')
+
+        for page_url in page_urls:
+            new_url = copy.copy(page_url)
+            new_url.pk = None
+            new_url.page = new_page
+
+            if parent_page:
+                base = parent_page.get_path(page_url.language)
+                path = '%s/%s' % (base, page_url.slug) if base else page_url.slug
+            else:
+                base = ''
+                path = page_url.slug
+
+            new_url.slug = get_available_slug(site, path, page_url.language)
+            new_url.path = '%s/%s' % (base, new_url.slug) if base else new_url.slug
+            new_url.save()
 
         # copy titles of this page
         for title in translations:
             new_title = copy.copy(title)
             new_title.pk = None
             new_title.page = new_page
-            new_title.published = False
-            new_title.publisher_public = None
             new_title.template = title.template
             new_title.xframe_options = title.xframe_options
-
-            if parent_page:
-                base = parent_page.get_path(title.language)
-                path = '%s/%s' % (base, title.slug) if base else title.slug
-            else:
-                base = ''
-                path = title.slug
-
-            new_title.slug = get_available_slug(site, path, title.language)
-            new_title.path = '%s/%s' % (base, new_title.slug) if base else new_title.slug
             new_title.save()
 
             for placeholder in title.placeholders.all():
@@ -699,9 +546,6 @@ class Page(models.Model):
         """
         Copy a page [ and all its descendants to a new location ]
         """
-        if not self.publisher_is_draft:
-            raise PublicIsUnmodifiable("copy page is not allowed for public pages")
-
         if position in ('first-child', 'last-child'):
             parent_node = target_node
         elif target_node:
@@ -717,7 +561,7 @@ class Page(models.Model):
         descendants = list(
             self.get_descendant_pages()
             .select_related('node')
-            .prefetch_related('title_set')
+            .prefetch_related('urls', 'title_set')
         )
         new_root_page = self.copy(target_site, parent_node=parent_node)
         new_root_node = new_root_page.node
@@ -764,9 +608,6 @@ class Page(models.Model):
 
         self.title_set.filter(language__in=languages).delete()
 
-        for language in languages:
-            self.mark_descendants_pending(language)
-
     def save(self, **kwargs):
         if self.reverse_id == "":
             self.reverse_id = None
@@ -781,31 +622,9 @@ class Page(models.Model):
 
         super(Page, self).save(**kwargs)
 
-    def save_base(self, *args, **kwargs):
-        """Overridden save_base. If an instance is draft, and was changed, mark
-        it as dirty.
-
-        Dirty flag is used for changed nodes identification when publish method
-        takes place. After current changes are published, state is set back to
-        PUBLISHER_STATE_DEFAULT (in publish method).
-        """
-        keep_state = getattr(self, '_publisher_keep_state', None)
-        if self.publisher_is_draft and not keep_state and self.is_new_dirty():
-            self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
-        if keep_state:
-            delattr(self, '_publisher_keep_state')
-        return super(Page, self).save_base(*args, **kwargs)
-
-    def update(self, refresh=False, draft_only=True, **data):
-        assert self.publisher_is_draft
-
+    def update(self, refresh=False, **data):
         cls = self.__class__
-
-        if not draft_only and self.publisher_public_id:
-            ids = [self.pk, self.publisher_public_id]
-            cls.objects.filter(pk__in=ids).update(**data)
-        else:
-            cls.objects.filter(pk=self.pk).update(**data)
+        cls.objects.filter(pk=self.pk).update(**data)
 
         if refresh:
             return self.reload()
@@ -824,28 +643,6 @@ class Page(models.Model):
     def has_translation(self, language):
         return self.title_set.filter(language=language).exists()
 
-    def is_new_dirty(self):
-        if self.pk:
-            fields = [
-                'publication_date', 'publication_end_date', 'reverse_id',
-                'navigation_extenders', 'login_required'
-            ]
-            try:
-                old_page = Page.objects.get(pk=self.pk)
-            except Page.DoesNotExist:
-                return True
-            for field in fields:
-                old_val = getattr(old_page, field)
-                new_val = getattr(self, field)
-                if not old_val == new_val:
-                    return True
-            return False
-        return True
-
-    def is_published(self, language, force_reload=False):
-        title_obj = self.get_title_obj(language, fallback=False, force_reload=force_reload)
-        return title_obj.published and title_obj.publisher_state != PUBLISHER_STATE_PENDING
-
     def toggle_in_navigation(self, set_to=None):
         '''
         Toggles (or sets) in_navigation and invalidates the cms page cache
@@ -862,100 +659,6 @@ class Page(models.Model):
         if new != old:
             self.clear_cache()
         return new
-
-    def get_publisher_state(self, language, force_reload=False):
-        try:
-            return self.get_title_obj(language, False, force_reload=force_reload).publisher_state
-        except AttributeError:
-            return None
-
-    def set_publisher_state(self, language, state, published=None):
-        title = self.title_set.get(language=language)
-        title.publisher_state = state
-        if published is not None:
-            title.published = published
-        title._publisher_keep_state = True
-        title.save()
-        if language in self.title_cache:
-            self.title_cache[language].publisher_state = state
-        return title
-
-    def publish(self, language):
-        """
-        :returns: True if page was successfully published.
-        """
-        from cms.utils.permissions import get_current_user_name
-
-        # Publish can only be called on draft pages
-        if not self.publisher_is_draft:
-            raise PublicIsUnmodifiable('The public instance cannot be published. Use draft.')
-
-        if not self._publisher_can_publish(language):
-            return False
-
-        if self.publisher_public_id:
-            public_page = Page.objects.get(pk=self.publisher_public_id)
-            public_languages = public_page.get_languages()
-        else:
-            public_page = Page()
-            public_languages = [language]
-
-        self._copy_attributes(public_page, clean=False)
-
-        if language not in public_languages:
-            public_languages.append(language)
-
-        # TODO: Get rid of the current user thread hack
-        public_page.changed_by = get_current_user_name()
-        public_page.is_home = self.is_home
-        public_page.publication_date = self.publication_date or now()
-        public_page.publisher_public = self
-        public_page.publisher_is_draft = False
-        public_page.languages = ','.join(public_languages)
-        public_page.node = self.node
-        public_page.save()
-
-        # Copy the page translation (title) matching language
-        # into a "public" version.
-        public_title = self._copy_titles(public_page, language, published=True)
-
-        # Ensure this draft page points to its public version
-        self.update(
-            draft_only=True,
-            changed_by=public_page.changed_by,
-            publisher_public=public_page,
-            publication_date=public_page.publication_date,
-        )
-
-        # Set the draft page translation matching language
-        # to point to its public version.
-        # Its important for draft to be published even if its state
-        # is pending.
-        self.update_translations(
-            language,
-            changed_by=public_page.changed_by,
-            published=True,
-            publisher_public=public_title,
-            publisher_state=PUBLISHER_STATE_DEFAULT,
-        )
-
-        if self.node.is_branch:
-            self.mark_descendants_as_published(language)
-
-        if language in self.title_cache:
-            del self.title_cache[language]
-
-        # fire signal after publishing is done
-        import cms.signals as cms_signals
-
-        cms_signals.post_publish.send(sender=Page, instance=self, language=language)
-
-        public_page.clear_cache(
-            language,
-            menu=True,
-            placeholder=True,
-        )
-        return True
 
     def clear_cache(self, language=None, menu=False, placeholder=False):
         from cms.cache import invalidate_cms_page_cache
@@ -976,43 +679,13 @@ class Page(models.Model):
             # Clears all menu caches for this page's site
             menu_pool.clear(site_id=self.node.site_id)
 
-    def unpublish(self, language, site=None):
-        """
-        Removes this page from the public site
-        :returns: True if this page was successfully unpublished
-        """
-        # Publish can only be called on draft pages
-        if not self.publisher_is_draft:
-            raise PublicIsUnmodifiable('The public instance cannot be unpublished. Use draft.')
-
-        self.update_translations(
-            language,
-            published=False,
-            publisher_state=PUBLISHER_STATE_DIRTY,
-        )
-
-        public_page = self.get_public_object()
-        public_page.update_translations(language, published=False)
-        public_page._clear_placeholders(language)
-        public_page.clear_cache(language)
-
-        self.mark_descendants_pending(language)
-
-        from cms.signals import post_unpublish
-        post_unpublish.send(sender=Page, instance=self, language=language)
-
-        return True
-
     def get_child_pages(self):
         nodes = self.node.get_children()
         pages = (
             self
             .__class__
             .objects
-            .filter(
-                node__in=nodes,
-                publisher_is_draft=self.publisher_is_draft,
-            )
+            .filter(node__in=nodes)
             .order_by('node__path')
         )
         return pages
@@ -1023,10 +696,7 @@ class Page(models.Model):
             self
             .__class__
             .objects
-            .filter(
-                node__in=nodes,
-                publisher_is_draft=self.publisher_is_draft,
-            )
+            .filter(node__in=nodes)
             .order_by('node__path')
         )
         return pages
@@ -1037,140 +707,21 @@ class Page(models.Model):
             self
             .__class__
             .objects
-            .filter(
-                node__in=nodes,
-                publisher_is_draft=self.publisher_is_draft,
-            )
+            .filter(node__in=nodes)
             .order_by('node__path')
         )
         return pages
 
     def get_root(self):
         node = self.node
-        return self.__class__.objects.get(
-            node__path=node.path[0:node.steplen],
-            publisher_is_draft=self.publisher_is_draft,
-        )
+        return self.__class__.objects.get(node__path=node.path[0:node.steplen])
 
     def get_parent_page(self):
         if not self.node.parent_id:
             return None
 
-        pages = Page.objects.filter(
-            node=self.node.parent_id,
-            publisher_is_draft=self.publisher_is_draft,
-        )
+        pages = Page.objects.filter(node=self.node.parent_id)
         return pages.select_related('node').first()
-
-    def mark_as_pending(self, language):
-        assert self.publisher_is_draft
-        assert self.publisher_public_id
-
-        self.get_public_object().title_set.filter(language=language).update(published=False)
-
-        if self.get_publisher_state(language) == PUBLISHER_STATE_DEFAULT:
-            # Only change the state if the draft page is published
-            # and it's state is the default (0), to avoid overriding a dirty state.
-            self.set_publisher_state(language, state=PUBLISHER_STATE_PENDING)
-
-    def mark_descendants_pending(self, language):
-        from cms.models import Title
-
-        if not self.publisher_is_draft:
-            raise PublicIsUnmodifiable('The public instance cannot be altered. Use draft.')
-
-        node_descendants = self.node.get_descendants()
-        page_descendants = self.__class__.objects.filter(node__in=node_descendants)
-
-        if page_descendants.filter(publisher_is_draft=True).exists():
-            # Only change the state if the draft page is not dirty
-            # to avoid overriding a dirty state.
-            Title.objects.filter(
-                published=True,
-                language=language,
-                page__in=page_descendants.filter(publisher_is_draft=True),
-                publisher_state=PUBLISHER_STATE_DEFAULT,
-            ).update(publisher_state=PUBLISHER_STATE_PENDING)
-
-        if page_descendants.filter(publisher_is_draft=False).exists():
-            Title.objects.filter(
-                published=True,
-                language=language,
-                page__in=page_descendants.filter(publisher_is_draft=False),
-            ).update(published=False)
-
-    def mark_as_published(self, language):
-        from cms.models import Title
-
-        (Title
-         .objects
-         .filter(page=self.publisher_public_id, language=language)
-         .update(publisher_state=PUBLISHER_STATE_DEFAULT, published=True))
-
-        draft = self.get_draft_object()
-
-        if draft.get_publisher_state(language) == PUBLISHER_STATE_PENDING:
-            # A check for pending is necessary because the page might have
-            # been modified after it was marked as pending.
-            draft.set_publisher_state(language, PUBLISHER_STATE_DEFAULT)
-
-    def mark_descendants_as_published(self, language):
-        from cms.models import Title
-
-        if not self.publisher_is_draft:
-            raise PublicIsUnmodifiable('The public instance cannot be published. Use draft.')
-
-        base = self.get_path(language, fallback=True)
-        node_children = self.node.get_children()
-        page_children = self.__class__.objects.filter(node__in=node_children)
-        page_children_draft = page_children.filter(publisher_is_draft=True)
-        page_children_public = page_children.filter(publisher_is_draft=False)
-
-        # Set public pending titles as published
-        unpublished_public = Title.objects.filter(
-            language=language,
-            page__in=page_children_public,
-            publisher_public__published=True,
-        )
-
-        if base:
-            new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
-        else:
-            # User is moving the homepage
-            new_path = models.F('slug')
-
-        # Update public title paths
-        unpublished_public.exclude(has_url_overwrite=True).update(path=new_path)
-
-        # Set unpublished pending titles to published
-        unpublished_public.filter(published=False).update(published=True)
-
-        # Update drafts
-        Title.objects.filter(
-            published=True,
-            language=language,
-            page__in=page_children_draft,
-            publisher_state=PUBLISHER_STATE_PENDING
-        ).update(publisher_state=PUBLISHER_STATE_DEFAULT)
-
-        # Continue publishing descendants, one branch at a time.
-        published_children = page_children_draft.filter(
-            title_set__published=True,
-            title_set__language=language,
-        )
-
-        for child in published_children.iterator():
-            child.mark_descendants_as_published(language)
-
-    def get_draft_object(self):
-        if not self.publisher_is_draft:
-            return self.publisher_draft
-        return self
-
-    def get_public_object(self):
-        if not self.publisher_is_draft:
-            return self
-        return self.publisher_public
 
     def get_languages(self):
         if self.languages:
@@ -1192,12 +743,10 @@ class Page(models.Model):
         # Commit. It's important to not call save()
         # we'd like to commit only the languages field and without
         # any kind of signals.
-        self.update(draft_only=False, languages=languages)
+        self.update(languages=languages)
 
     def get_published_languages(self):
-        if self.publisher_is_draft:
-            return self.get_languages()
-        return sorted([language for language in self.get_languages() if self.is_published(language)])
+        return self.get_languages()
 
     def set_translations_cache(self):
         for translation in self.title_set.all():
@@ -1214,6 +763,22 @@ class Page(models.Model):
         else:
             path = slug
         return path
+
+    def get_url(self, language):
+        return self.get_urls().get(language=language)
+
+    def get_urls(self):
+        return self.urls.all()
+
+    def update_urls(self, language=None, **data):
+        if language:
+            page_urls = self.get_urls().filter(language=language)
+        else:
+            page_urls = self.get_urls().all()
+        return page_urls.update(**data)
+
+    def get_fallbacks(self, language):
+        return i18n.get_fallback_languages(language, site_id=self.node.site_id)
 
     # ## Title object access
 
@@ -1237,17 +802,60 @@ class Page(models.Model):
         except AttributeError:
             return None
 
-    def get_path(self, language=None, fallback=True, force_reload=False):
+    def get_path(self, language, fallback=True):
         """
         get the path of the page depending on the given language
         """
-        return self.get_title_obj_attribute("path", language, fallback, force_reload)
+        languages = [language]
 
-    def get_slug(self, language=None, fallback=True, force_reload=False):
-        """
-        get the slug of the page depending on the given language
-        """
-        return self.get_title_obj_attribute("slug", language, fallback, force_reload)
+        if fallback:
+            languages.extend(self.get_fallbacks(language))
+
+        page_languages = self.get_languages()
+
+        for _language in languages:
+            if _language in page_languages:
+                language = _language
+                break
+
+        if language not in self.urls_cache:
+            self.urls_cache.update({
+                url.language: url for url in self.urls.filter(language__in=languages)
+            })
+
+            for _language in languages:
+                self.urls_cache.setdefault(_language, None)
+
+        try:
+            return self.urls_cache[language].path
+        except (AttributeError, KeyError):
+            return None
+
+    def get_slug(self, language, fallback=True):
+        languages = [language]
+
+        if fallback:
+            languages.extend(self.get_fallbacks(language))
+
+        page_languages = self.get_languages()
+
+        for _language in languages:
+            if _language in page_languages:
+                language = _language
+                break
+
+        if language not in self.urls_cache:
+            self.urls_cache.update({
+                url.language: url for url in self.urls.filter(language__in=languages)
+            })
+
+            for _language in languages:
+                self.urls_cache.setdefault(_language, None)
+
+        try:
+            return self.urls_cache[language].slug
+        except (AttributeError, KeyError):
+            return None
 
     def get_title(self, language=None, fallback=True, force_reload=False):
         """
@@ -1268,44 +876,6 @@ class Page(models.Model):
         from cms.models import Placeholder
 
         return Placeholder.objects.filter(title__language=language, title__page=self)
-
-    def _validate_title(self, title):
-        from cms.models.titlemodels import EmptyTitle
-        if isinstance(title, EmptyTitle):
-            return False
-        if not title.title or not title.slug:
-            return False
-        return True
-
-    def get_admin_tree_title(self):
-        from cms.models.titlemodels import EmptyTitle
-        language = get_language()
-
-        if not self.title_cache:
-            self.set_translations_cache()
-
-        if language not in self.title_cache or not self._validate_title(self.title_cache.get(language, EmptyTitle(language))):
-            fallback_langs = i18n.get_fallback_languages(language)
-            found = False
-            for lang in fallback_langs:
-                if lang in self.title_cache and self._validate_title(self.title_cache.get(lang, EmptyTitle(lang))):
-                    found = True
-                    language = lang
-            if not found:
-                language = None
-                for lang, item in self.title_cache.items():
-                    if not isinstance(item, EmptyTitle):
-                        language = lang
-        if not language:
-            return _("Empty")
-        title = self.title_cache[language]
-        if title.title:
-            return title.title
-        if title.page_title:
-            return title.page_title
-        if title.menu_title:
-            return title.menu_title
-        return title.slug
 
     def get_changed_date(self, language=None, fallback=True, force_reload=False):
         """
@@ -1410,11 +980,10 @@ class Page(models.Model):
         from cms.models import PagePermission
 
         if get_cms_setting('PERMISSION'):
-            page = self.get_draft_object()
             restrictions = (
                 PagePermission
                 .objects
-                .for_page(page)
+                .for_page(self)
                 .filter(can_view=True)
             )
             return restrictions.exists()
@@ -1482,19 +1051,6 @@ class Page(models.Model):
         """
         return self.__class__.objects.get(pk=self.pk)
 
-    def _publisher_can_publish(self, language):
-        """Is parent of this object already published?
-        """
-        if self.is_page_type:
-            return False
-
-        if not self.parent_page:
-            return True
-
-        if self.parent_page.publisher_public_id:
-            return self.parent_page.get_public_object().is_published(language)
-        return False
-
     def rescan_placeholders(self, language):
         return self.get_title_obj(language=language).rescan_placeholders()
 
@@ -1523,6 +1079,41 @@ class Page(models.Model):
 
     def get_limit_visibility_in_menu(self, language=None, fallback=True, force_reload=False):
         return self.get_title_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
+
+
+@python_2_unicode_compatible
+class PageUrl(models.Model):
+    slug = models.SlugField(_("slug"), max_length=255, db_index=True)
+    path = models.CharField(_("Path"), max_length=255, db_index=True, null=True)
+    language = models.CharField(_("language"), max_length=15, db_index=True)
+    page = models.ForeignKey(
+        Page,
+        on_delete=models.CASCADE,
+        verbose_name=_("page"),
+        related_name="urls",
+    )
+    managed = models.BooleanField(default=False)
+    objects = PageUrlManager()
+
+    class Meta:
+        app_label = 'cms'
+        default_permissions = []
+
+    def __str__(self):
+        return u"%s (%s)" % (self.path or self.slug, self.language)
+
+    def get_absolute_url(self, language=None, fallback=True):
+        if not language:
+            language = get_current_language()
+
+        with force_language(language):
+            if self.path == '':
+                return reverse('pages-root')
+            return reverse('pages-details-by-slug', kwargs={"slug": self.path})
+
+    def get_path_for_base(self, base_path=''):
+        old_base, sep, slug = self.path.rpartition('/')
+        return '%s/%s' % (base_path, slug) if base_path else slug
 
 
 class PageType(Page):

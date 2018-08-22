@@ -114,7 +114,7 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
 
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_no_app_setted_show_toolbar_in_cms_urls(self):
-        page = create_page('foo', 'col_two.html', 'en', published=True)
+        page = create_page('foo', 'col_two.html', 'en')
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
@@ -130,15 +130,15 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
 
     @override_settings(CMS_TOOLBAR_HIDE=False)
     def test_app_setted_show_toolbar_in_cms_urls(self):
-        page = create_page('foo', 'col_two.html', 'en', published=True)
-        page = create_page('foo', 'col_two.html', 'en', published=True, parent=page)
+        page = create_page('foo', 'col_two.html', 'en')
+        page = create_page('foo', 'col_two.html', 'en', parent=page)
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
     @override_settings(CMS_TOOLBAR_HIDE=True)
     def test_app_setted_show_toolbar_in_cms_urls_subpage(self):
-        page = create_page('foo', 'col_two.html', 'en', published=True)
-        page = create_page('foo', 'col_two.html', 'en', published=True, parent=page)
+        page = create_page('foo', 'col_two.html', 'en')
+        page = create_page('foo', 'col_two.html', 'en', parent=page)
         request = self.get_page_request(page, self.get_anon())
         self.assertTrue(hasattr(request, 'toolbar'))
 
@@ -211,7 +211,7 @@ class ToolbarTests(ToolbarTestBase):
         """
         old_pool = toolbar_pool.toolbars
         toolbar_pool.clear()
-        cms_page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        cms_page = create_page("toolbar-page", "col_two.html", "en")
 
         with self.login_user_context(self.get_superuser()):
             endpoint = cms_page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
@@ -223,8 +223,8 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_toolbar_request_endpoint_validation(self):
         endpoint = self.get_admin_url(UserSettings, 'get_toolbar')
-        cms_page = create_page("toolbar-page", "col_two.html", "en", published=True)
-        cms_page_2 = create_page("toolbar-page-2", "col_two.html", "en", published=True)
+        cms_page = create_page("toolbar-page", "col_two.html", "en")
+        cms_page_2 = create_page("toolbar-page-2", "col_two.html", "en")
 
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(
@@ -260,7 +260,7 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.status_code, 400)
 
     def test_toolbar_request_form(self):
-        cms_page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        cms_page = create_page("toolbar-page", "col_two.html", "en")
         generic_obj = Example1.objects.create(
             char_1="char_1",
             char_2="char_2",
@@ -346,7 +346,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(len(items), 0)
 
     def test_nonstaff(self):
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        page = create_page('test', 'nav_playground.html', 'en')
         request = self.get_page_request(page, self.get_nonstaff())
         toolbar = CMSToolbar(request)
         items = toolbar.get_left_items() + toolbar.get_right_items()
@@ -355,7 +355,7 @@ class ToolbarTests(ToolbarTestBase):
 
     @override_settings(CMS_PERMISSION=True)
     def test_template_change_permission(self):
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        page = create_page('test', 'nav_playground.html', 'en')
 
         # Staff user with change page permissions only
         staff_user = self.get_staff_user_with_no_permissions()
@@ -388,7 +388,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(len(template_item), 1)
 
     def test_markup(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         superuser = self.get_superuser()
 
@@ -424,7 +424,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response, output, html=True)
 
     def test_markup_generic_module(self):
-        page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page", "col_two.html", "en")
         page_structure_url = self.get_obj_structure_url(page.get_absolute_url())
         superuser = self.get_superuser()
 
@@ -436,7 +436,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_markup_link_custom_module(self):
         superuser = self.get_superuser()
-        page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page", "col_two.html", "en")
         page_structure_url = self.get_obj_structure_url(page.get_absolute_url())
 
         with self.login_user_context(superuser):
@@ -449,7 +449,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_extra_placeholder_menu_items(self):
         superuser = self.get_superuser()
-        page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page", "col_two.html", "en")
         page_structure_url = self.get_obj_structure_url(page.get_absolute_url())
 
         with self.login_user_context(superuser):
@@ -469,65 +469,8 @@ class ToolbarTests(ToolbarTestBase):
             '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"'
         )
 
-    def test_markup_toolbar_url_page(self):
-        superuser = self.get_superuser()
-        page_1 = create_page("top-page", "col_two.html", "en", published=True)
-        page_2 = create_page("sec-page", "col_two.html", "en", published=True, parent=page_1)
-        page_3 = create_page("trd-page", "col_two.html", "en", published=False, parent=page_1)
-
-        # page with publish = draft
-        # check when in draft mode
-        with self.login_user_context(superuser):
-            response = self.client.get('%s?%s' % (
-                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?preview&amp;%s"' % (
-            page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        ))
-        # check when in live mode
-        with self.login_user_context(superuser):
-            response = self.client.get('%s?preview&%s' % (
-                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?%s"' % (
-            page_2.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        ))
-        self.assertEqual(page_2.get_draft_url(), page_2.get_public_url())
-
-        # page with publish != draft
-        page_2.get_title_obj().slug = 'mod-page'
-        page_2.get_title_obj().path = 'top-page/mod-page'
-        page_2.get_title_obj().save()
-        # check when in draft mode
-        with self.login_user_context(superuser):
-            response = self.client.get('%s?%s' % (
-                page_2.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?preview&amp;%s"' % (
-            page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        ))
-        # check when in live mode
-        with self.login_user_context(superuser):
-            response = self.client.get('%s?preview&%s' % (
-                page_2.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')))
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'href="%s?%s"' % (
-            page_2.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        ))
-        self.assertNotEqual(page_2.get_draft_url(), page_2.get_public_url())
-
-        # not published page
-        # check when in draft mode
-        with self.login_user_context(superuser):
-            response = self.client.get('%s?%s' % (
-                page_3.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
-        self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'cms-toolbar-item-switch')
-        self.assertEqual(page_3.get_public_url(), '')
-        self.assertNotEqual(page_3.get_draft_url(), page_3.get_public_url())
-
     def test_markup_plugin_template(self):
-        page = create_page("toolbar-page-1", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page-1", "col_two.html", "en")
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         plugin_1 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
                               plugin_type='TestPluginAlpha', alpha='alpha')
@@ -590,7 +533,7 @@ class ToolbarTests(ToolbarTestBase):
     def test_toolbar_login_redirect_validation(self):
         user = self._create_user('toolbar', True, True)
         username = getattr(user, user.USERNAME_FIELD)
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         page.set_as_homepage()
         login_url = reverse('cms_login')
         endpoint = '{}?next=https://notyourdomain.com'.format(login_url)
@@ -598,7 +541,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertRedirects(response, page.get_absolute_url(), fetch_redirect_response=False)
 
     def test_show_toolbar_login_anonymous(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
@@ -606,14 +549,14 @@ class ToolbarTests(ToolbarTestBase):
 
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=False)
     def test_hide_toolbar_login_anonymous_setting(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         response = self.client.get(page_edit_on_url)
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'cms-form-login')
 
     def test_hide_toolbar_login_nonstaff(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
 
         with self.login_user_context(self.get_nonstaff()):
@@ -636,7 +579,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(toolbar.show_toolbar)
 
     def test_no_change_button(self):
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        page = create_page('test', 'nav_playground.html', 'en')
         user = self.get_staff()
         user.user_permissions.all().delete()
         request = self.get_page_request(page, user, edit=True)
@@ -661,9 +604,8 @@ class ToolbarTests(ToolbarTestBase):
         Tests that the buttons remain even when the language changes.
         """
         user = self.get_staff()
-        cms_page = create_page('test-en', 'nav_playground.html', 'en', published=True)
+        cms_page = create_page('test-en', 'nav_playground.html', 'en')
         create_title('de', 'test-de', cms_page)
-        cms_page.publish('de')
         en_request = self.get_page_request(cms_page, user, edit=True)
         en_toolbar = CMSToolbar(en_request)
         en_toolbar.populate()
@@ -698,7 +640,7 @@ class ToolbarTests(ToolbarTestBase):
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
     def test_placeholder_name(self):
         superuser = self.get_superuser()
-        page = create_page("toolbar-page", "col_two.html", "en", published=True)
+        page = create_page("toolbar-page", "col_two.html", "en")
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
 
         with self.login_user_context(superuser):
@@ -713,7 +655,7 @@ class ToolbarTests(ToolbarTestBase):
             self.assertEqual(response.status_code, 200)
 
     def test_remove_lang(self):
-        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        page = create_page('test', 'nav_playground.html', 'en')
         page_edit_on_url = self.get_edit_on_url(page.get_absolute_url())
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
@@ -767,7 +709,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(len(toolbar.get_right_items()), 1)
 
     def test_negative_position_left(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         request = self.get_page_request(page, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
         # Starting point: [Menu:Example, Menu:Page, Menu:Language]
@@ -778,7 +720,7 @@ class ToolbarTests(ToolbarTestBase):
         self.assertEqual(toolbar.get_left_items().index(menu2), 2)
 
     def test_negative_position_right(self):
-        page = create_page("toolbar-page", "nav_playground.html", "en", published=True)
+        page = create_page("toolbar-page", "nav_playground.html", "en")
         request = self.get_page_request(page, self.get_staff(), '/')
         toolbar = CMSToolbar(request)
         # Starting point: [] (empty)
@@ -792,7 +734,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_page_create_redirect(self):
         superuser = self.get_superuser()
-        page = self.create_homepage("home", "nav_playground.html", "en", published=True)
+        page = self.create_homepage("home", "nav_playground.html", "en")
         resolve_url_on = '%s?%s' % (admin_reverse('cms_page_resolve'),
                                     get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         resolve_url_off = '%s?%s' % (admin_reverse('cms_page_resolve'),
@@ -804,22 +746,20 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.post(self.get_admin_url(Page, 'add'), page_data)
             self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
 
-            public_home = Page.objects.public().get(is_home=True)
-
             # test redirection when toolbar is in edit mode
-            response = self.client.post(resolve_url_on, {'pk': public_home.pk,
+            response = self.client.post(resolve_url_on, {'pk': page.pk,
                                                          'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '/en/test-page-1/')
 
             self.client.post(URL_CMS_PAGE_ADD, page_data)
 
             # test redirection when toolbar is not in edit mode
-            response = self.client.post(resolve_url_off, {'pk': public_home.pk,
+            response = self.client.post(resolve_url_off, {'pk': page.pk,
                                                           'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '/en/')
+            self.assertEqual(response.content.decode('utf-8'), '/en/?edit')
 
     def test_page_edit_redirect_editmode(self):
-        page1 = self.create_homepage("home", "nav_playground.html", "en", published=True)
+        page1 = self.create_homepage("home", "nav_playground.html", "en")
         page2 = create_page("test", "nav_playground.html", "en",
                             published=True)
         page3 = create_page("non-pub", "nav_playground.html", "en",
@@ -848,7 +788,7 @@ class ToolbarTests(ToolbarTestBase):
         page1 = create_page("home", "nav_playground.html", "en",
                             published=True)
         page2 = create_page("test", "nav_playground.html", "en",
-                            published=True, parent=page1)
+                            parent=page1)
         page3 = create_page("non-pub-1", "nav_playground.html", "en",
                             published=False, parent=page2)
         page4 = create_page("non-pub-2", "nav_playground.html", "en",
@@ -859,10 +799,10 @@ class ToolbarTests(ToolbarTestBase):
             # checking the redirect by passing URL parameters
             # redirect to the same page
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page1.get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), page1.get_absolute_url() + '?edit')
             # redirect to the same page
             response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url() + '?edit')
             # redirect to the first published ancestor
             response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
@@ -877,22 +817,22 @@ class ToolbarTests(ToolbarTestBase):
             )
 
             # checking the redirect by setting the session data
-            self._fake_logentry(page1.get_draft_object().pk, superuser, 'test page')
+            self._fake_logentry(page1.pk, superuser, 'test page')
             response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page1.get_public_object().get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), page1.get_absolute_url() + '?edit')
 
-            self._fake_logentry(page2.get_draft_object().pk, superuser, 'test page')
+            self._fake_logentry(page2.pk, superuser, 'test page')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page2.get_public_object().get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url() + '?edit')
 
-            self._fake_logentry(page3.get_draft_object().pk, superuser, 'test page')
+            self._fake_logentry(page3.pk, superuser, 'test page')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
                 page3.get_absolute_url(),
                 get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
             )
 
-            self._fake_logentry(page4.get_draft_object().pk, superuser, 'test page')
+            self._fake_logentry(page4.pk, superuser, 'test page')
             response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '%s?%s' % (
                 page4.get_absolute_url(),
@@ -903,7 +843,7 @@ class ToolbarTests(ToolbarTestBase):
         page1 = create_page("home", "nav_playground.html", "en",
                             published=True)
         page2 = create_page("test", "nav_playground.html", "en",
-                            published=True, parent=page1)
+                            parent=page1)
         create_page("non-pub", "nav_playground.html", "en",
                     published=False, parent=page2)
         superuser = self.get_superuser()
@@ -913,7 +853,7 @@ class ToolbarTests(ToolbarTestBase):
             # logentry - non existing id - parameter is used
             self._fake_logentry(9999, superuser, 'test page')
             response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page2.get_public_object().get_absolute_url())
+            self.assertEqual(response.content.decode('utf-8'), page2.get_absolute_url() + '?edit')
             # parameters - non existing id - no redirection
             response = self.client.post(url, {'pk': 9999, 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
@@ -934,7 +874,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def test_remove_language(self):
         page = create_page(
-            "toolbar-page", "nav_playground.html", "en", published=True
+            "toolbar-page", "nav_playground.html", "en"
         )
         create_title(title="de page", language="de", page=page)
         create_title(title="fr page", language="fr", page=page)
@@ -969,7 +909,7 @@ class ToolbarTests(ToolbarTestBase):
             )
 
     def test_add_language(self):
-        page = create_page("tbp", "nav_playground.html", "en", published=True)
+        page = create_page("tbp", "nav_playground.html", "en")
         request = self.get_page_request(page, self.get_staff(), '/', edit=True)
         self.assertMenuItems(
             request, LANGUAGE_MENU_IDENTIFIER, 'Add Translation',
@@ -984,13 +924,11 @@ class ToolbarTests(ToolbarTestBase):
         )
 
     def test_copy_plugins(self):
-        page = create_page("tbp", "nav_playground.html", "en", published=True)
+        page = create_page("tbp", "nav_playground.html", "en")
         title_de = create_title('de', 'de page', page)
         add_plugin(title_de.placeholders.get(slot='body'), "TextPlugin", "de", body='de body')
         title_fr = create_title('fr', 'fr page', page)
         add_plugin(title_fr.placeholders.get(slot='body'), "TextPlugin", "fr", body='fr body')
-        page.publish('de')
-        page.publish('fr')
 
         staff = self.get_staff()
 
@@ -1033,7 +971,6 @@ class ToolbarTests(ToolbarTestBase):
 
         page = create_page("home", "nav_playground.html", "en",
                            published=True)
-        page.publish('en')
         self.get_page_request(page, superuser, '/')
         #
         # Test that the logout shows the username of the logged-in user if
@@ -1074,17 +1011,14 @@ class ToolbarTests(ToolbarTestBase):
         page0 = create_page("home", "nav_playground.html", "en",
                             published=True)
         page1 = create_page("internal", "nav_playground.html", "en",
-                            published=True, parent=page0)
-        page2 = create_page("unpublished", "nav_playground.html", "en",
-                            published=False, parent=page0)
+                            parent=page0)
+        create_page("unpublished", "nav_playground.html", "en", published=False, parent=page0)
         page3 = create_page("login_restricted", "nav_playground.html", "en",
-                            published=True, parent=page0, login_required=True)
+                            parent=page0, login_required=True)
         page4 = create_page("view_restricted", "nav_playground.html", "en",
-                            published=True, parent=page0)
+                            parent=page0)
         PagePermission.objects.create(page=page4, can_view=True,
                                       user=superuser)
-        page4.publish('en')
-        page4 = page4.get_public_object()
         self.get_page_request(page4, superuser, '/')
 
         with self.login_user_context(superuser):
@@ -1094,13 +1028,6 @@ class ToolbarTests(ToolbarTestBase):
             menu_name = _(u'Logout %s') % self.get_username(superuser)
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
-
-            # Unpublished page, redirect
-            response = self.client.get(page2.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            toolbar = response.context['request'].toolbar
-            admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with login restrictions, redirect
             response = self.client.get(page3.get_absolute_url('en') + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
@@ -1125,7 +1052,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_markup_toolbar_url_model(self):
         superuser = self.get_superuser()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1135,20 +1062,19 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="%s?preview&amp;%s"' % (
-            ex1.get_public_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+            ex1.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
         ))
         # check when in live mode
         request = self.get_page_request(page, superuser, preview=True)
         response = detail_view(request, ex1.pk)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="%s?%s"' % (
-            ex1.get_draft_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+            ex1.get_absolute_url(), get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         ))
-        self.assertNotEqual(ex1.get_draft_url(), ex1.get_public_url())
 
     def test_anon(self):
         user = self.get_anon()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1159,7 +1085,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_noedit(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1170,7 +1096,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_edit(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1185,7 +1111,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_invalid_item(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1207,7 +1133,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_as_varname(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1232,7 +1158,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         Tests the {% render_placeholder %} templatetag.
         """
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1289,7 +1215,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_filters(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
                        char_3="char_3",
                        char_4="char_4")
@@ -1339,7 +1265,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 {% endblock content %}
 '''
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
                        char_3="char_3",
                        char_4="char_4")
@@ -1360,7 +1286,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Ensure we have a consistent testing env...
         with self.settings(USE_L10N=False, DATE_FORMAT="M. d, Y"):
             user = self.get_staff()
-            page = create_page('Test', 'col_two.html', 'en', published=True)
+            page = create_page('Test', 'col_two.html', 'en')
             ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
                            char_3="char_3",
                            char_4="char_4", date_field=datetime.date(2012, 1, 2))
@@ -1424,7 +1350,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_filters_notoolbar(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1, <p>hello</p>, <p>hello</p>, <p>hello</p>, <p>hello</p>", char_2="char_2",
                        char_3="char_3",
                        char_4="char_4")
@@ -1478,7 +1404,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_icon_tag(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1500,7 +1426,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_icon_followed_by_render_model_block_tag(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4", date_field=datetime.date(2012, 1, 1))
         ex1.save()
@@ -1532,7 +1458,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_add_tag(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1555,7 +1481,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_add_tag_class(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1577,7 +1503,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_add_tag_classview(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1600,7 +1526,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_block_tag(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4", date_field=datetime.date(2012, 1, 1))
         ex1.save()
@@ -1707,7 +1633,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_invalid_attribute(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1748,7 +1674,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_callable_item(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1770,7 +1696,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_view_method(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1788,7 +1714,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_view_url(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1806,7 +1732,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_method_attribute(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1831,7 +1757,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_admin_url(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1855,7 +1781,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_admin_url_extra_field(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1881,7 +1807,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_admin_url_multiple_fields(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1908,7 +1834,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_instance_method(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1932,7 +1858,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def test_item_from_context(self):
         user = self.get_staff()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1961,7 +1887,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         exadmin = site._registry[Example1]
 
         user = self.get_superuser()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1978,7 +1904,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         exadmin = site._registry[Example1]
 
         user = self.get_superuser()
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
                        char_4="char_4")
         ex1.save()
@@ -1992,16 +1918,15 @@ class EditModelTemplateTagTest(ToolbarTestBase):
     def test_edit_page(self):
         language = "en"
         user = self.get_superuser()
-        page = create_page('Test', 'col_two.html', language, published=True)
+        page = create_page('Test', 'col_two.html', language)
         title = page.get_title_obj(language)
         title.menu_title = 'Menu Test'
         title.page_title = 'Page Test'
         title.title = 'Main Test'
         title.save()
-        page.publish('en')
         page.reload()
         request = self.get_page_request(page, user, edit=True)
-        response = details(request, page.get_path())
+        response = details(request, page.get_path(language))
         self.assertContains(
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_page_title-{0} cms-render-model"></template>'
@@ -2072,7 +1997,7 @@ class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
         Tests whether the admin urls triggered when the toolbar is active works
         (i.e.: no NoReverseMatch is raised) with numeric pks
         """
-        page = create_page('Test', 'col_two.html', 'en', published=True)
+        page = create_page('Test', 'col_two.html', 'en')
         ex = Example1(
             char_1='one',
             char_2='two',
