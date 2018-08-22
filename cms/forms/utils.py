@@ -48,7 +48,7 @@ def get_page_choices_for_site(site, language):
         titles_by_language = {trans.language: trans.title for trans in translations}
 
         for language in languages:
-            # EmptyTitle is used to prevent the cms from trying
+            # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
             if language in titles_by_language:
                 title = titles_by_language[language]

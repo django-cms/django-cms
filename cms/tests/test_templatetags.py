@@ -19,7 +19,7 @@ from mock import patch
 import cms
 from cms.api import create_page, create_title, add_plugin
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.models import EmptyTitle, Page, PageContent, Placeholder, PageUrl
+from cms.models import EmptyPageContent, Page, PageContent, Placeholder, PageUrl
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
     _show_placeholder_by_id,
@@ -68,7 +68,7 @@ class TemplatetagTests(CMSTestCase):
                 page.title_cache = {'en': PageContent()}
                 page.urls_cache = {'en': PageUrl(slug='test2')}
                 self.assertEqual('test2', force_text(get_page_display_name(page)))
-                page.title_cache = {'en': PageContent(), 'fr': EmptyTitle('fr')}
+                page.title_cache = {'en': PageContent(), 'fr': EmptyPageContent('fr')}
                 self.assertEqual('test2', force_text(get_page_display_name(page)))
 
     def test_get_site_id_from_nothing(self):

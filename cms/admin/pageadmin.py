@@ -51,7 +51,7 @@ from cms.admin.forms import (
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
 from cms.models import (
-    EmptyTitle,
+    EmptyPageContent,
     CMSPlugin,
     Page,
     PageContent,
@@ -1264,9 +1264,9 @@ class BasePageAdmin(admin.ModelAdmin):
             page.title_cache = {trans.language: trans for trans in page.filtered_translations}
 
             for _language in languages:
-                # EmptyTitle is used to prevent the cms from trying
+                # EmptyPageContent is used to prevent the cms from trying
                 # to find a translation in the database
-                page.title_cache.setdefault(_language, EmptyTitle(language=_language))
+                page.title_cache.setdefault(_language, EmptyPageContent(language=_language))
 
             has_move_page_permission = self.has_move_page_permission(request, obj=page)
 

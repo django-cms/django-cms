@@ -784,14 +784,14 @@ class Page(models.Model):
 
     def get_title_obj(self, language=None, fallback=True, force_reload=False):
         """Helper function for accessing wanted / current title.
-        If wanted title doesn't exists, EmptyTitle instance will be returned.
+        If wanted title doesn't exists, EmptyPageContent instance will be returned.
         """
         language = self._get_title_cache(language, fallback, force_reload)
         if language in self.title_cache:
             return self.title_cache[language]
-        from cms.models import EmptyTitle
+        from cms.models import EmptyPageContent
 
-        return EmptyTitle(language)
+        return EmptyPageContent(language)
 
     def get_title_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
         """Helper function for getting attribute or None from wanted/current title.
@@ -924,7 +924,7 @@ class Page(models.Model):
         force_reload = (force_reload or language not in self.title_cache)
 
         if fallback and not self.title_cache.get(language):
-            # language can be in the cache but might be an EmptyTitle instance
+            # language can be in the cache but might be an EmptyPageContent instance
             fallback_langs = i18n.get_fallback_languages(language)
             for lang in fallback_langs:
                 if self.title_cache.get(lang):

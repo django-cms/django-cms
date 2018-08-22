@@ -189,7 +189,7 @@ class PageContent(models.Model):
             return None
 
 
-class EmptyTitle(object):
+class EmptyPageContent(object):
     """
     Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.
