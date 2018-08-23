@@ -230,7 +230,6 @@ casper.test.begin('Shortcuts modal', function(test) {
             // click on "Example.com" menu item
             this.click('.cms-toolbar-item-navigation > li:nth-child(1) > a');
         })
-        // opening "Clipboard" menu item
         .wait(10, function() {
             this.click(xPath('//a[.//span[text()[contains(.,"Shortcuts")]]]'));
         })
@@ -242,6 +241,10 @@ casper.test.begin('Shortcuts modal', function(test) {
             this.click('.cms-modal-close');
         })
         .waitWhileVisible('.cms-modal-open')
+        .then(function () {
+            this.click('.cms-btn-switch-edit');
+        })
+        .wait(2000)
         .then(cms.switchTo('structure'))
         .then(function() {
             // click on "Example.com" menu item
