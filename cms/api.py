@@ -113,7 +113,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
     See docs/extending_cms/api_reference.rst for more info
     """
     if published != None:
-        raise Exception("WTF")
+        warnings.warn('This API function no longer accepts a published argument', UserWarning)
+
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
         assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
