@@ -3,6 +3,10 @@
 
 {% block title %}{{ profile.name }} - Divio Partner{% endblock %}
 
+{% block meta_description %}
+    <meta name="description" content="{{ profile.name }} - {{ profile.description|striptags|truncatechars:"200" }}">
+{% endblock %}
+
 {% block extend_base %}
     <div class="container">
         <div class="row justify-content-between">
