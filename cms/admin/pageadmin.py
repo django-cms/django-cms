@@ -59,6 +59,7 @@ from cms.operations.helpers import send_post_page_operation, send_pre_page_opera
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils import permissions, get_current_site, get_language_from_request
 from cms.utils import page_permissions
 from cms.utils.i18n import (
@@ -1163,8 +1164,7 @@ class BasePageAdmin(admin.ModelAdmin):
             self.message_user(request, message, level=messages.ERROR)
             return HttpResponseRedirect(self.get_admin_url('changelist'))
 
-        attrs = "?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        url = page.get_absolute_url(language) + attrs
+        url = page.get_absolute_url(language)
 
         if site != active_site and page.node.site_id != site.pk:
             # The user has selected a site using the site selector menu
@@ -1354,10 +1354,7 @@ class BasePageAdmin(admin.ModelAdmin):
         if obj:
             if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode_active', False):
                 if isinstance(obj, Page):
-                    url = '%s?%s' % (
-                        obj.get_absolute_url(),
-                        get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-                    )
+                    url = get_object_edit_url(obj.get_title_obj())
                 else:
                     url = obj.get_absolute_url()
             else:

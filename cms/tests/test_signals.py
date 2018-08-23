@@ -26,7 +26,6 @@ class SignalTests(CMSTestCase):
                         "apphooked-page",
                         "nav_playground.html",
                         "en",
-                        published=True,
                     )
                     redirect_to = self.get_admin_url(Page, 'changelist')
                     endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
@@ -58,7 +57,6 @@ class SignalTests(CMSTestCase):
                     "apphooked-page",
                     "nav_playground.html",
                     "en",
-                    published=True,
                     apphook="SampleApp",
                     apphook_namespace="test"
                 )
@@ -85,7 +83,6 @@ class SignalTests(CMSTestCase):
                         "apphooked-page",
                         "nav_playground.html",
                         "en",
-                        published=True,
                         apphook="SampleApp",
                         apphook_namespace="test"
                     )

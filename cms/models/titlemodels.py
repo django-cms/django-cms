@@ -188,6 +188,9 @@ class Title(models.Model):
         except IndexError:
             return None
 
+    def get_absolute_url(self, language=None):
+        return self.page.get_absolute_url(language=language)
+
 
 class EmptyTitle(object):
     """

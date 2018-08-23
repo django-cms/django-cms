@@ -14,6 +14,7 @@ from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
+from cms.toolbar.utils import get_object_edit_url, get_object_structure_url
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_dict
@@ -254,16 +255,17 @@ class PageToolbar(CMSToolbar):
     def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         structure_active = self.toolbar.structure_mode_active
         edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
-        build_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__BUILD'))
-        edit_url = '{}?{}'.format(self.toolbar.request_path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
 
-        if self.request.user.has_perm("cms.use_structure"):
-            switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
-                                                    extra_classes=extra_classes)
-            switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False,
-                    extra_classes='cms-structure-btn')
-            switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False,
-                    extra_classes='cms-content-btn')
+        with force_language(self.current_lang):
+            if self.request.user.has_perm("cms.use_structure"):
+                build_url = get_object_structure_url(self.title) if self.title else ''
+                edit_url = get_object_edit_url(self.title) if self.title else ''
+                switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
+                                                        extra_classes=extra_classes)
+                switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False,
+                        extra_classes='cms-structure-btn')
+                switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False,
+                        extra_classes='cms-content-btn')
 
     def get_title(self):
         try:
@@ -277,6 +279,9 @@ class PageToolbar(CMSToolbar):
         return self.page_change_permission
 
     def in_apphook(self):
+        if self.toolbar.edit_mode_active:
+            return False
+
         with force_language(self.toolbar.request_language):
             try:
                 resolver = resolve(self.toolbar.request_path)
@@ -519,8 +524,9 @@ class PageToolbar(CMSToolbar):
             current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
 
             # page edit
-            page_edit_url = '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-            current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
+            with force_language(self.current_lang):
+                page_edit_url = get_object_edit_url(self.title) if self.title else ''
+                current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
 
             # page settings
             page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.request_language)

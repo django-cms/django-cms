@@ -2,12 +2,12 @@
 <div class="cms-toolbar-item cms-toolbar-item-buttons cms-toolbar-item-switch-save-edit">
     {% if cms_toolbar.edit_mode_active %}
     <a class="cms-btn cms-btn-switch-save"
-        href="{% firstof cms_toolbar.get_object_public_url cms_toolbar.request_path %}?preview&amp;{{ cms_toolbar.edit_mode_url_off }}">
+        href="{{ cms_toolbar.get_object_preview_url }}">
         <span>{% trans "Preview" %}</span>
     </a>
     {% else %}
     <a class="cms-btn cms-btn-action cms-btn-switch-edit"
-        href="{% firstof cms_toolbar.get_object_draft_url cms_toolbar.request_path %}?{{ cms_toolbar.edit_mode_url_on }}">
+        href="{{ cms_toolbar.get_object_edit_url }}">
         {% trans "Edit" %}
     </a>
     {% endif %}

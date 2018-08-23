@@ -10,6 +10,11 @@ from cms.models import UserSettings, Placeholder
 from cms.templates import TemplatesCache
 from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
 from cms.toolbar_pool import toolbar_pool
+from cms.toolbar.utils import (
+    get_object_edit_url,
+    get_object_structure_url,
+    get_object_preview_url,
+)
 from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
@@ -29,10 +34,18 @@ from django.utils.translation import override as force_language
 class BaseToolbar(ToolbarAPIMixin):
 
     watch_models = []
-    edit_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-    edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-    structure_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+
+    @cached_property
+    def _resolver_match(self):
+        if getattr(self.request, 'resolver_match', None):
+            return self.request.resolver_match
+
+        try:
+            match = resolve(self.request.path_info)
+        except Resolver404:
+            match = None
+        return match
 
     @cached_property
     def site_language(self):
@@ -73,28 +86,31 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def structure_mode_active(self):
-        structure = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
-        return self.is_staff and structure in self.request.GET
+        if self.is_staff and self._resolver_match:
+            return self._resolver_match.url_name == 'cms_placeholder_render_object_structure'
+        return False
 
     @cached_property
     def edit_mode_active(self):
         if not self.show_toolbar:
             return False
-        return self.structure_mode_active or self.content_mode_active
+
+        if self.structure_mode_active:
+            return True
+
+        if self._resolver_match:
+            return self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+        return False
 
     @cached_property
     def content_mode_active(self):
         if self.structure_mode_active:
             # Structure mode always takes precedence
             return False
-        return self.is_staff and self.request.session.get('cms_edit', False)
+        return self.is_staff and not self.edit_mode_active
 
     @cached_property
     def uses_legacy_structure_mode(self):
-        current_page = self.request.current_page
-
-        if not current_page or current_page.application_urls:
-            return True
         return False
 
     @cached_property
@@ -121,7 +137,6 @@ class CMSToolbar(BaseToolbar):
         self.redirect_url = None
         self.request = None
         self.is_staff = None
-        self.show_toolbar = None
         self.clipboard = None
         self.toolbar_language = None
         self.show_toolbar = True
@@ -176,7 +191,7 @@ class CMSToolbar(BaseToolbar):
     def init_toolbar(self, request, request_path=None):
         self.request = request
         self.is_staff = self.request.user.is_staff
-        self.show_toolbar = self.is_staff or self.request.session.get('cms_edit', False)
+        self.show_toolbar = self.is_staff
 
         if self.request.session.get('cms_toolbar_disabled', False):
             self.show_toolbar = False
@@ -313,25 +328,19 @@ class CMSToolbar(BaseToolbar):
             return self.obj.pk
         return ''
 
-    def get_object_public_url(self):
+    def get_object_preview_url(self):
         if self.obj:
-            with force_language(self.request_language):
-                try:
-                    return self.obj.get_absolute_url()
-                except:
-                    pass
+            return get_object_preview_url(self.obj, language=self.request_language)
         return ''
 
-    def get_object_draft_url(self):
+    def get_object_edit_url(self):
         if self.obj:
-            with force_language(self.request_language):
-                try:
-                    return self.obj.get_draft_url()
-                except:
-                    try:
-                        return self.obj.get_absolute_url()
-                    except:
-                        pass
+            return get_object_edit_url(self.obj, language=self.request_language)
+        return ''
+
+    def get_object_structure_url(self):
+        if self.obj:
+            return get_object_structure_url(self.obj, language=self.request_language)
         return ''
 
     # Internal API
@@ -444,9 +453,9 @@ class CMSToolbar(BaseToolbar):
         context = {
             'cms_toolbar': self,
             'cms_renderer': renderer,
-            'cms_edit_on': self.edit_mode_url_on,
-            'cms_edit_off': self.edit_mode_url_off,
-            'cms_structure_on': self.structure_mode_url_on,
+            'cms_edit_url': self.get_object_edit_url(),
+            'cms_preview_url': self.get_object_preview_url(),
+            'cms_structure_url': self.get_object_structure_url(),
             'cms_version': __version__,
             'django_version': DJANGO_VERSION,
             'login_form': CMSToolbarLoginForm(),
