@@ -95,7 +95,7 @@ class PageUrlManager(models.Manager):
         return self.filter(**kwargs)
 
 
-class TitleManager(models.Manager):
+class PageContentManager(models.Manager):
     def get_title(self, page, language, language_fallback=False):
         """
         Gets the latest content for a particular page and language. Falls back

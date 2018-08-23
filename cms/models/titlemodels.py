@@ -7,7 +7,7 @@ from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
-from cms.models.managers import TitleManager
+from cms.models.managers import PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
 
@@ -77,7 +77,7 @@ class PageContent(models.Model):
         default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
     )
 
-    objects = TitleManager()
+    objects = PageContentManager()
 
     class Meta:
         unique_together = (('language', 'page'),)
