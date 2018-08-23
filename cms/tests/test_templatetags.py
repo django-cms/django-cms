@@ -19,7 +19,7 @@ from mock import patch
 import cms
 from cms.api import create_page, create_title, add_plugin
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.models import Page, Placeholder, PageUrl, Title, EmptyTitle
+from cms.models import EmptyPageContent, Page, PageContent, Placeholder, PageUrl
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
     _show_placeholder_by_id,
@@ -60,16 +60,16 @@ class TemplatetagTests(CMSTestCase):
         ]}
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
-                page.title_cache = {'en': Title(page_title="test2", title="test2")}
+                page.title_cache = {'en': PageContent(page_title="test2", title="test2")}
                 self.assertEqual('test2', force_text(get_page_display_name(page)))
-                page.title_cache = {'en': Title(page_title="test2")}
+                page.title_cache = {'en': PageContent(page_title="test2")}
                 self.assertEqual('test2', force_text(get_page_display_name(page)))
-                page.title_cache = {'en': Title(menu_title="test2")}
+                page.title_cache = {'en': PageContent(menu_title="test2")}
                 self.assertEqual('test2', force_text(get_page_display_name(page)))
-                page.title_cache = {'en': Title()}
+                page.title_cache = {'en': PageContent()}
                 page.urls_cache = {'en': PageUrl(slug='test2')}
                 self.assertEqual('test2', force_text(get_page_display_name(page)))
-                page.title_cache = {'en': Title(), 'fr': EmptyTitle('fr')}
+                page.title_cache = {'en': PageContent(), 'fr': EmptyPageContent('fr')}
                 self.assertEqual('test2', force_text(get_page_display_name(page)))
 
     def test_get_site_id_from_nothing(self):
@@ -163,10 +163,10 @@ class TemplatetagTests(CMSTestCase):
 
 class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
     def _getfirst(self):
-        return Page.objects.get(title_set__title='first')
+        return Page.objects.get(pagecontent_set__title='first')
 
     def _getsecond(self):
-        return Page.objects.get(title_set__title='second')
+        return Page.objects.get(pagecontent_set__title='second')
 
     def test_get_page_by_untyped_arg_none(self):
         control = self._getfirst()
@@ -494,7 +494,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_placeholder_with_no_page(self):
         page = create_page('Test', 'col_two.html', 'en')
-        page.title_cache['en'] = page.title_set.get(language='en')
+        page.title_cache['en'] = page.pagecontent_set.get(language='en')
         template = "{% load cms_tags %}{% placeholder test or %}< --- empty --->{% endplaceholder %}"
         request = RequestFactory().get('/asdadsaasd/')
         user = self.get_superuser()
@@ -509,7 +509,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_placeholder_as_var(self):
         page = create_page('Test', 'col_two.html', 'en')
-        page.title_cache['en'] = page.title_set.get(language='en')
+        page.title_cache['en'] = page.pagecontent_set.get(language='en')
         template = "{% load cms_tags %}{% placeholder test or %}< --- empty --->{% endplaceholder %}"
         request = RequestFactory().get('/asdadsaasd/')
         user = self.get_superuser()

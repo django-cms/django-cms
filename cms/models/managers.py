@@ -48,7 +48,7 @@ class PageManager(models.Manager):
             site = Site.objects.get_current()
             qs = qs.on_site(site)
 
-        qt = Q(title_set__title__icontains=q)
+        qt = Q(pagecontent_set__title__icontains=q)
 
         # find 'searchable' plugins and build query
         qp = Q()
@@ -70,7 +70,7 @@ class PageManager(models.Manager):
                             field,
                         ): q})
         if language:
-            qt &= Q(title_set__language=language)
+            qt &= Q(pagecontent_set__language=language)
             qp &= Q(cmsplugin__language=language)
 
         qs = qs.filter(qt | qp)
@@ -95,7 +95,7 @@ class PageUrlManager(models.Manager):
         return self.filter(**kwargs)
 
 
-class TitleManager(models.Manager):
+class PageContentManager(models.Manager):
     def get_title(self, page, language, language_fallback=False):
         """
         Gets the latest content for a particular page and language. Falls back

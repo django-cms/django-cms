@@ -21,12 +21,12 @@ from cms import constants
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.models import PageContent
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import (PageUser, PagePermission, GlobalPagePermission,
                                          ACCESS_PAGE_AND_DESCENDANTS)
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site
@@ -250,7 +250,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
         language=language,
     )
 
-    title = Title.objects.create(
+    title = PageContent.objects.create(
         language=language,
         title=title,
         menu_title=menu_title,

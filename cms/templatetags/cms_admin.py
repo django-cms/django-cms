@@ -41,7 +41,7 @@ def show_admin_menu_for_pages(context, descendants, depth=1):
 
 @register.simple_tag(takes_context=False)
 def get_page_display_name(cms_page):
-    from cms.models.titlemodels import EmptyTitle
+    from cms.models import EmptyPageContent
     language = get_language()
 
     if not cms_page.title_cache:
@@ -57,7 +57,7 @@ def get_page_display_name(cms_page):
         if not found:
             language = None
             for lang, item in cms_page.title_cache.items():
-                if not isinstance(item, EmptyTitle):
+                if not isinstance(item, EmptyPageContent):
                     language = lang
     if not language:
         return _("Empty")

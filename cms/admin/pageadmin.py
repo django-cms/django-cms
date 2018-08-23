@@ -51,8 +51,14 @@ from cms.admin.forms import (
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
 from cms.models import (
-    EmptyTitle, Page, PageUrl, PageType,
-    Title, CMSPlugin, Placeholder, PagePermission,
+    EmptyPageContent,
+    CMSPlugin,
+    Page,
+    PageContent,
+    PagePermission,
+    PageType,
+    PageUrl,
+    Placeholder,
     GlobalPagePermission,
 )
 from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
@@ -87,7 +93,7 @@ class TreeNodeAdmin(admin.ModelAdmin):
     search_fields = (
         '=page__id',
         'page__urls__slug',
-        'page__title_set__title',
+        'page__pagecontent_set__title',
         'page__reverse_id',
     )
 
@@ -101,7 +107,7 @@ class TreeNodeAdmin(admin.ModelAdmin):
 class BasePageAdmin(admin.ModelAdmin):
     form = AddPageForm
     ordering = ('node__path',)
-    search_fields = ('=id', 'urls__slug', 'title_set__title', 'reverse_id')
+    search_fields = ('=id', 'urls__slug', 'pagecontent_set__title', 'reverse_id')
     add_general_fields = ['title', 'slug', 'language', 'template']
     change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
@@ -151,8 +157,8 @@ class BasePageAdmin(admin.ModelAdmin):
             return (None, None)
 
         try:
-            translation = page.title_set.get(language=language)
-        except Title.DoesNotExist:
+            translation = page.pagecontent_set.get(language=language)
+        except PageContent.DoesNotExist:
             translation = None
         return (page, translation)
 
@@ -483,7 +489,7 @@ class BasePageAdmin(admin.ModelAdmin):
             cms_pages.extend(self.model.objects.filter(node__in=nodes))
 
         # Delete all of the pages titles contents
-        placeholders = Placeholder.objects.filter(title__page__in=cms_pages)
+        placeholders = Placeholder.objects.filter(pagecontent__page__in=cms_pages)
         plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
         QuerySet.delete(plugins)
         placeholders.delete()
@@ -554,7 +560,7 @@ class BasePageAdmin(admin.ModelAdmin):
         filled_languages = []
 
         if obj:
-            filled_languages = [t[0] for t in obj.title_set.filter(title__isnull=False).values_list('language')]
+            filled_languages = [t[0] for t in obj.pagecontent_set.filter(title__isnull=False).values_list('language')]
         allowed_languages = [lang[0] for lang in self._get_site_languages(request, obj)]
         return [lang for lang in filled_languages if lang in allowed_languages]
 
@@ -763,14 +769,14 @@ class BasePageAdmin(admin.ModelAdmin):
             languages = get_language_list(site.pk)
             pages = pages.prefetch_related(
                 Prefetch(
-                    'title_set',
+                    'urls',
                     to_attr='filtered_urls',
                     queryset=PageUrl.objects.filter(language__in=languages)
                 ),
                 Prefetch(
-                    'title_set',
+                    'pagecontent_set',
                     to_attr='filtered_translations',
-                    queryset=Title.objects.filter(language__in=languages)
+                    queryset=PageContent.objects.filter(language__in=languages)
                 ),
             )
             pages = pages.distinct() if use_distinct else pages
@@ -1038,9 +1044,9 @@ class BasePageAdmin(admin.ModelAdmin):
         if translation is None:
             raise Http404('No translation matches requested language.')
 
-        titleopts = Title._meta
+        titleopts = PageContent._meta
         app_label = titleopts.app_label
-        saved_plugins = CMSPlugin.objects.filter(placeholder__title=translation, language=language)
+        saved_plugins = CMSPlugin.objects.filter(placeholder__pagecontent=translation, language=language)
         using = router.db_for_read(self.model)
 
         if DJANGO_2_0:
@@ -1220,9 +1226,9 @@ class BasePageAdmin(admin.ModelAdmin):
         allowed_languages = get_language_list(site.pk)
         pages = pages.prefetch_related(
             Prefetch(
-                'title_set',
+                'pagecontent_set',
                 to_attr='filtered_translations',
-                queryset=Title.objects.filter(language__in=allowed_languages)
+                queryset=PageContent.objects.filter(language__in=allowed_languages)
             ),
             Prefetch(
                 'urls',
@@ -1258,9 +1264,9 @@ class BasePageAdmin(admin.ModelAdmin):
             page.title_cache = {trans.language: trans for trans in page.filtered_translations}
 
             for _language in languages:
-                # EmptyTitle is used to prevent the cms from trying
+                # EmptyPageContent is used to prevent the cms from trying
                 # to find a translation in the database
-                page.title_cache.setdefault(_language, EmptyTitle(language=_language))
+                page.title_cache.setdefault(_language, EmptyPageContent(language=_language))
 
             has_move_page_permission = self.has_move_page_permission(request, obj=page)
 
@@ -1383,7 +1389,7 @@ class BasePageAdmin(admin.ModelAdmin):
         raw_fields = request.GET.get("edit_fields", 'title')
         edit_fields = [field for field in raw_fields.split(",") if field in self.title_frontend_editable_fields]
         cancel_clicked = request.POST.get("_cancel", False)
-        opts = Title._meta
+        opts = PageContent._meta
 
         if not edit_fields:
             # Defaults to title
@@ -1394,7 +1400,7 @@ class BasePageAdmin(admin.ModelAdmin):
             Dynamic form showing only the fields to be edited
             """
             class Meta:
-                model = Title
+                model = PageContent
                 fields = edit_fields
 
         if not cancel_clicked and request.method == 'POST':
@@ -1532,10 +1538,10 @@ class PageAdmin(BasePageAdmin):
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
             matching_published_pages = self.model.objects.filter(
-                Q(title_set__title__icontains=query_term, title_set__language=language_code)
-                | Q(urls__path__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
+                Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
+                | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
+                | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
+                | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
             ).distinct()
 
             results = []

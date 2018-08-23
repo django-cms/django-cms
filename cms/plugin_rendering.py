@@ -13,7 +13,7 @@ from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
-from cms.models.titlemodels import Title
+from cms.models import PageContent
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
@@ -500,7 +500,7 @@ class ContentRenderer(BaseRenderer):
             if DJANGO_1_11:
                 title._page_cache = page
             else:
-                Title.page.field.set_cached_value(title, page)
+                PageContent.page.field.set_cached_value(title, page)
             # Creates any placeholders missing on the page
             placeholders = title.rescan_placeholders().values()
 

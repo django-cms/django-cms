@@ -16,12 +16,11 @@ from django.utils.encoding import force_text, smart_str
 from cms import api
 from cms.api import create_page, create_title, add_plugin
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import StaticPlaceholder
+from cms.models import PageContent, StaticPlaceholder
 from cms.models.pagemodel import Page, PageType
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE,URL_CMS_TRANSLATION_DELETE,
@@ -571,7 +570,7 @@ class PluginPermissionTests(AdminTestsBase):
 
     def _give_cms_permissions(self, user, save=True):
         for perm_type in ['add', 'change', 'delete']:
-            for model in [Page, Title]:
+            for model in [Page, PageContent]:
                 self._give_permission(user, model, perm_type, False)
         gpp = GlobalPagePermission.objects.create(
             user=user,

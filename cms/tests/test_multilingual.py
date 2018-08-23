@@ -7,7 +7,7 @@ from django.test.utils import override_settings
 from cms.api import create_page, create_title, add_plugin
 from cms.forms.utils import update_site_and_page_choices
 from cms.exceptions import LanguageError
-from cms.models import Title, EmptyTitle
+from cms.models import EmptyPageContent, PageContent
 from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
 from cms.utils.conf import get_cms_setting
@@ -87,7 +87,7 @@ class MultilingualTestCase(CMSTestCase):
 
             # Ensure that the language version is not returned
             # since it does not exist
-            self.assertTrue(isinstance(page.get_title_obj(language=TESTLANG2, fallback=False), EmptyTitle))
+            self.assertTrue(isinstance(page.get_title_obj(language=TESTLANG2, fallback=False), EmptyPageContent))
 
             # Now create it
             self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2), page_data2)
@@ -297,7 +297,7 @@ class MultilingualTestCase(CMSTestCase):
         page = create_page("page", "nav_playground.html", "en")
         ph_en = page.get_placeholders("en").get(slot="body")
         add_plugin(ph_en, "TextPlugin", "en", body="I'm the first")
-        title = Title(title="page", language="ru", page=page)
+        title = PageContent(title="page", language="ru", page=page)
         title.save()
         # add wrong plugin language
         add_plugin(ph_en, "TextPlugin", "ru", body="I'm the second")

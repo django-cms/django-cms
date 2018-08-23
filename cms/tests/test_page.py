@@ -17,7 +17,7 @@ from django.utils.translation import override as force_language
 from cms import constants
 from cms.api import create_page, add_plugin, create_title
 from cms.forms.validators import validate_url_uniqueness
-from cms.models import Page, Title
+from cms.models import Page, PageContent
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
@@ -607,7 +607,7 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNotNone(saved_page.pk)
         self.assertIn('id={}'.format(saved_page.pk), repr(saved_page))
 
-        non_saved_title = Title()
+        non_saved_title = PageContent()
         self.assertIsNone(non_saved_title.pk)
         self.assertIn('id=None', repr(non_saved_title))
 
@@ -720,7 +720,7 @@ class PagesTestCase(TransactionCMSTestCase):
                 CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), ),
         ):
             page = create_page('home', 'placeholder_tests/base.html', 'en', slug='home')
-            page.title_cache['en'] = page.title_set.get(language='en')
+            page.title_cache['en'] = page.pagecontent_set.get(language='en')
             placeholders = list(page.get_placeholders('en'))
             for i, placeholder in enumerate(placeholders):
                 for j in range(5):

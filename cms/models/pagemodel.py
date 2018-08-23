@@ -205,7 +205,7 @@ class Page(models.Model):
             title = self.get_menu_title(fallback=True)
         except LanguageError:
             try:
-                title = self.title_set.all()[0]
+                title = self.pagecontent_set.all()[0]
             except IndexError:
                 title = None
         if title is None:
@@ -479,13 +479,13 @@ class Page(models.Model):
 
         if language and translations:
             page_urls = self.urls.filter(language=language)
-            translations = self.title_set.filter(language=language)
+            translations = self.pagecontent_set.filter(language=language)
         elif translations:
             page_urls = self.urls.all()
-            translations = self.title_set.all()
+            translations = self.pagecontent_set.all()
         else:
             page_urls = self.urls.none()
-            translations = self.title_set.none()
+            translations = self.pagecontent_set.none()
         translations = translations.prefetch_related('placeholders')
 
         for page_url in page_urls:
@@ -561,7 +561,7 @@ class Page(models.Model):
         descendants = list(
             self.get_descendant_pages()
             .select_related('node')
-            .prefetch_related('urls', 'title_set')
+            .prefetch_related('urls', 'pagecontent_set')
         )
         new_root_page = self.copy(target_site, parent_node=parent_node)
         new_root_node = new_root_page.node
@@ -606,7 +606,7 @@ class Page(models.Model):
         else:
             languages = [language]
 
-        self.title_set.filter(language__in=languages).delete()
+        self.pagecontent_set.filter(language__in=languages).delete()
 
     def save(self, **kwargs):
         if self.reverse_id == "":
@@ -635,13 +635,13 @@ class Page(models.Model):
 
     def update_translations(self, language=None, **data):
         if language:
-            translations = self.title_set.filter(language=language)
+            translations = self.pagecontent_set.filter(language=language)
         else:
-            translations = self.title_set.all()
+            translations = self.pagecontent_set.all()
         return translations.update(**data)
 
     def has_translation(self, language):
-        return self.title_set.filter(language=language).exists()
+        return self.pagecontent_set.filter(language=language).exists()
 
     def toggle_in_navigation(self, set_to=None):
         '''
@@ -749,7 +749,7 @@ class Page(models.Model):
         return self.get_languages()
 
     def set_translations_cache(self):
-        for translation in self.title_set.all():
+        for translation in self.pagecontent_set.all():
             self.title_cache.setdefault(translation.language, translation)
 
     def get_path_for_slug(self, slug, language):
@@ -780,20 +780,20 @@ class Page(models.Model):
     def get_fallbacks(self, language):
         return i18n.get_fallback_languages(language, site_id=self.node.site_id)
 
-    # ## Title object access
+    # ## PageContent object access
 
     def get_title_obj(self, language=None, fallback=True, force_reload=False):
         """Helper function for accessing wanted / current title.
-        If wanted title doesn't exists, EmptyTitle instance will be returned.
+        If wanted title doesn't exists, EmptyPageContent instance will be returned.
         """
         language = self._get_title_cache(language, fallback, force_reload)
         if language in self.title_cache:
             return self.title_cache[language]
-        from cms.models.titlemodels import EmptyTitle
+        from cms.models import EmptyPageContent
 
-        return EmptyTitle(language)
+        return EmptyPageContent(language)
 
-    def get_title_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
+    def get_page_content_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
         """Helper function for getting attribute or None from wanted/current title.
         """
         try:
@@ -861,13 +861,13 @@ class Page(models.Model):
         """
         get the title of the page depending on the given language
         """
-        return self.get_title_obj_attribute("title", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("title", language, fallback, force_reload)
 
     def get_menu_title(self, language=None, fallback=True, force_reload=False):
         """
         get the menu title of the page depending on the given language
         """
-        menu_title = self.get_title_obj_attribute("menu_title", language, fallback, force_reload)
+        menu_title = self.get_page_content_obj_attribute("menu_title", language, fallback, force_reload)
         if not menu_title:
             return self.get_title(language, True, force_reload)
         return menu_title
@@ -875,25 +875,25 @@ class Page(models.Model):
     def get_placeholders(self, language):
         from cms.models import Placeholder
 
-        return Placeholder.objects.filter(title__language=language, title__page=self)
+        return Placeholder.objects.filter(pagecontent__language=language, pagecontent__page=self)
 
     def get_changed_date(self, language=None, fallback=True, force_reload=False):
         """
         get when this page was last updated
         """
-        return self.get_title_obj_attribute("changed_date", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("changed_date", language, fallback, force_reload)
 
     def get_changed_by(self, language=None, fallback=True, force_reload=False):
         """
         get user who last changed this page
         """
-        return self.get_title_obj_attribute("changed_by", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("changed_by", language, fallback, force_reload)
 
     def get_page_title(self, language=None, fallback=True, force_reload=False):
         """
         get the page title of the page depending on the given language
         """
-        page_title = self.get_title_obj_attribute("page_title", language, fallback, force_reload)
+        page_title = self.get_page_content_obj_attribute("page_title", language, fallback, force_reload)
 
         if not page_title:
             return self.get_title(language, True, force_reload)
@@ -903,7 +903,7 @@ class Page(models.Model):
         """
         get content for the description meta tag for the page depending on the given language
         """
-        return self.get_title_obj_attribute("meta_description", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("meta_description", language, fallback, force_reload)
 
     def get_application_urls(self, language=None, fallback=True, force_reload=False):
         """
@@ -915,7 +915,7 @@ class Page(models.Model):
         """
         get redirect
         """
-        return self.get_title_obj_attribute("redirect", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("redirect", language, fallback, force_reload)
 
     def _get_title_cache(self, language, fallback, force_reload):
         if not language:
@@ -924,16 +924,16 @@ class Page(models.Model):
         force_reload = (force_reload or language not in self.title_cache)
 
         if fallback and not self.title_cache.get(language):
-            # language can be in the cache but might be an EmptyTitle instance
+            # language can be in the cache but might be an EmptyPageContent instance
             fallback_langs = i18n.get_fallback_languages(language)
             for lang in fallback_langs:
                 if self.title_cache.get(lang):
                     return lang
 
         if force_reload:
-            from cms.models.titlemodels import Title
+            from cms.models import PageContent
 
-            titles = Title.objects.filter(page=self)
+            titles = PageContent.objects.filter(page=self)
             for title in titles:
                 self.title_cache[title.language] = title
             if self.title_cache.get(language):
@@ -948,11 +948,11 @@ class Page(models.Model):
 
     @property
     def template(self):
-        return self.get_title_obj_attribute("template")
+        return self.get_page_content_obj_attribute("template")
 
     @property
     def soft_root(self):
-        return self.get_title_obj_attribute("soft_root")
+        return self.get_page_content_obj_attribute("soft_root")
 
     def get_template(self, language=None, fallback=True, force_reload=False):
         title = self.get_title_obj(language, fallback, force_reload)
@@ -1066,13 +1066,13 @@ class Page(models.Model):
             return title.get_xframe_options()
 
     def get_soft_root(self, language=None, fallback=True, force_reload=False):
-        return self.get_title_obj_attribute("soft_root", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("soft_root", language, fallback, force_reload)
 
     def get_in_navigation(self, language=None, fallback=True, force_reload=False):
-        return self.get_title_obj_attribute("in_navigation", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("in_navigation", language, fallback, force_reload)
 
     def get_limit_visibility_in_menu(self, language=None, fallback=True, force_reload=False):
-        return self.get_title_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
 
 
 @python_2_unicode_compatible
