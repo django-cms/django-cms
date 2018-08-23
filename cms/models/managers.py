@@ -2,6 +2,7 @@
 import functools
 import operator
 
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
@@ -119,6 +120,16 @@ class TitleManager(models.Manager):
             else:
                 raise
         return None
+
+
+class PlaceholderManager(models.Manager):
+
+    def filter_for_obj(self, obj):
+        """
+        Returns all placeholders for given object
+        """
+        content_type = ContentType.objects.get_for_model(obj)
+        return self.filter(content_type=content_type, object_id=obj.pk)
 
 
 ################################################################################

@@ -15,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
+from cms.models.managers import PlaceholderManager
 from cms.utils import get_site_id
 from cms.utils.i18n import get_language_object
 from cms.constants import (
@@ -46,6 +47,8 @@ class Placeholder(models.Model):
     cache_placeholder = True
     is_static = False
     is_editable = True
+
+    objects = PlaceholderManager()
 
     class Meta:
         app_label = 'cms'

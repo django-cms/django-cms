@@ -21,7 +21,7 @@ def forwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0031_remove_page_fields'),
+        ('cms', '0031_remove_fields'),
     ]
 
     operations = [

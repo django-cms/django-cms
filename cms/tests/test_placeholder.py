@@ -718,6 +718,31 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
 
+    def test_sets_source_when_title_is_created(self):
+        """
+        This tests when a title is created, the source field for the
+        created placeholders are set to that title.
+        """
+        page = create_page('test page en', 'col_two.html', 'en')
+
+        # check for en
+        page_content_en = self.get_page_title_obj(page)
+        self.assertQuerysetEqual(
+            Placeholder.objects.filter_for_obj(page_content_en),
+            page_content_en.get_placeholders(),
+            transform=lambda x: x,
+            ordered=False,
+        )
+
+        # check for another language = de
+        page_content_de = create_title('de', 'test page en', page)
+        self.assertQuerysetEqual(
+            Placeholder.objects.filter_for_obj(page_content_de),
+            page_content_de.get_placeholders(),
+            transform=lambda x: x,
+            ordered=False,
+        )
+
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
     def test_placeholder_no_action(self):
