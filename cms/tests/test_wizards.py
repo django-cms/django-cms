@@ -103,12 +103,12 @@ class WizardTestMixin(object):
             form=ModelWizardForm,
         )
 
-        class TitleWizard(Wizard):
+        class PageContentWizard(Wizard):
             pass
 
         # This is a bad wizard definition as it neither defines a model, nor
         # uses a ModelForm that has model defined in Meta
-        cls.title_wizard = TitleWizard(
+        cls.title_wizard = PageContentWizard(
             title=_(u"Page"),
             weight=100,
             form=BadModelForm,

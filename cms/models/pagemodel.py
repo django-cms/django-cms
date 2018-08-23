@@ -793,7 +793,7 @@ class Page(models.Model):
 
         return EmptyPageContent(language)
 
-    def get_title_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
+    def get_page_content_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
         """Helper function for getting attribute or None from wanted/current title.
         """
         try:
@@ -861,13 +861,13 @@ class Page(models.Model):
         """
         get the title of the page depending on the given language
         """
-        return self.get_title_obj_attribute("title", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("title", language, fallback, force_reload)
 
     def get_menu_title(self, language=None, fallback=True, force_reload=False):
         """
         get the menu title of the page depending on the given language
         """
-        menu_title = self.get_title_obj_attribute("menu_title", language, fallback, force_reload)
+        menu_title = self.get_page_content_obj_attribute("menu_title", language, fallback, force_reload)
         if not menu_title:
             return self.get_title(language, True, force_reload)
         return menu_title
@@ -881,19 +881,19 @@ class Page(models.Model):
         """
         get when this page was last updated
         """
-        return self.get_title_obj_attribute("changed_date", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("changed_date", language, fallback, force_reload)
 
     def get_changed_by(self, language=None, fallback=True, force_reload=False):
         """
         get user who last changed this page
         """
-        return self.get_title_obj_attribute("changed_by", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("changed_by", language, fallback, force_reload)
 
     def get_page_title(self, language=None, fallback=True, force_reload=False):
         """
         get the page title of the page depending on the given language
         """
-        page_title = self.get_title_obj_attribute("page_title", language, fallback, force_reload)
+        page_title = self.get_page_content_obj_attribute("page_title", language, fallback, force_reload)
 
         if not page_title:
             return self.get_title(language, True, force_reload)
@@ -903,7 +903,7 @@ class Page(models.Model):
         """
         get content for the description meta tag for the page depending on the given language
         """
-        return self.get_title_obj_attribute("meta_description", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("meta_description", language, fallback, force_reload)
 
     def get_application_urls(self, language=None, fallback=True, force_reload=False):
         """
@@ -915,7 +915,7 @@ class Page(models.Model):
         """
         get redirect
         """
-        return self.get_title_obj_attribute("redirect", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("redirect", language, fallback, force_reload)
 
     def _get_title_cache(self, language, fallback, force_reload):
         if not language:
@@ -948,11 +948,11 @@ class Page(models.Model):
 
     @property
     def template(self):
-        return self.get_title_obj_attribute("template")
+        return self.get_page_content_obj_attribute("template")
 
     @property
     def soft_root(self):
-        return self.get_title_obj_attribute("soft_root")
+        return self.get_page_content_obj_attribute("soft_root")
 
     def get_template(self, language=None, fallback=True, force_reload=False):
         title = self.get_title_obj(language, fallback, force_reload)
@@ -1066,13 +1066,13 @@ class Page(models.Model):
             return title.get_xframe_options()
 
     def get_soft_root(self, language=None, fallback=True, force_reload=False):
-        return self.get_title_obj_attribute("soft_root", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("soft_root", language, fallback, force_reload)
 
     def get_in_navigation(self, language=None, fallback=True, force_reload=False):
-        return self.get_title_obj_attribute("in_navigation", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("in_navigation", language, fallback, force_reload)
 
     def get_limit_visibility_in_menu(self, language=None, fallback=True, force_reload=False):
-        return self.get_title_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
+        return self.get_page_content_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
 
 
 @python_2_unicode_compatible
