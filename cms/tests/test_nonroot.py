@@ -30,7 +30,6 @@ class NonRootCase(CMSTestCase):
             title="page1",
             template="nav_playground.html",
             language="en",
-            published=True,
             in_navigation=True,
         )
         self.page2 = create_page("page2", "nav_playground.html", "en",

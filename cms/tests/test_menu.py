@@ -100,11 +100,9 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
         # Attached both menus to separate pages
         create_page("apphooked-page", "nav_playground.html", "en",
-                    published=True,
                     navigation_extenders='StaticMenu')
 
         create_page("apphooked-page", "nav_playground.html", "en",
-                    published=True,
                     navigation_extenders='StaticMenu2')
 
         registered = menu_pool.get_registered_menus(for_rendering=False)
@@ -131,11 +129,9 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
         self.assertEqual(len(request_1_renderer.menus), 1)
 
         create_page("apphooked-page", "nav_playground.html", "en",
-                    published=True,
                     navigation_extenders='StaticMenu')
 
         create_page("apphooked-page", "nav_playground.html", "en",
-                    published=True,
                     navigation_extenders='StaticMenu2')
 
         request_2 = self.get_request('/en/')
@@ -180,7 +176,6 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                 create_page("apphooked-page", "nav_playground.html", "en",
                             apphook="SampleApp2")
                 create_page("apphooked-page", "nav_playground.html", "en",
-                            published=True,
                             navigation_extenders='StaticMenu')
                 create_page("apphooked-page", "nav_playground.html", "en",
                             apphook="NamespacedApp", apphook_namespace='whatever',
@@ -1316,7 +1311,6 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         stdkwargs = {
             'template': 'nav_playground.html',
             'language': 'en',
-            'published': True,
             'in_navigation': True,
         }
         a = create_page('A', reverse_id='a', **stdkwargs)
@@ -1777,7 +1771,6 @@ class SoftrootTests(CMSTestCase):
         stdkwargs = {
             'template': 'nav_playground.html',
             'language': 'en',
-            'published': True,
             'in_navigation': True,
         }
         home = create_page("Home", **stdkwargs)
@@ -1825,7 +1818,6 @@ class SoftrootTests(CMSTestCase):
         stdkwargs = {
             'template': 'nav_playground.html',
             'language': 'en',
-            'published': True,
             'in_navigation': True,
         }
         home = create_page("Home", **stdkwargs)
@@ -1868,7 +1860,6 @@ class SoftrootTests(CMSTestCase):
         stdkwargs = {
             'template': 'nav_playground.html',
             'language': 'en',
-            'published': True,
             'in_navigation': True,
         }
         home = create_page("Home", **stdkwargs)
@@ -1913,7 +1904,6 @@ class SoftrootTests(CMSTestCase):
         stdkwargs = {
             'template': 'nav_playground.html',
             'language': 'en',
-            'published': True,
             'in_navigation': True,
         }
         home = create_page("Home", **stdkwargs)

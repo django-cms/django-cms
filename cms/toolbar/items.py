@@ -502,7 +502,7 @@ class ButtonList(BaseItem):
         }
 
         if self.toolbar:
-            context['cms_structure_on'] = self.toolbar.structure_mode_url_on
+            context['cms_structure_url'] = self.toolbar.get_object_structure_url()
         return context
 
 

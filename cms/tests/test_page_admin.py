@@ -508,14 +508,12 @@ class PageTest(PageTestBase):
             "nav_playground.html",
             language="en",
             parent=homepage,
-            published=True,
         )
         pending_child_2 = create_page(
             "child-2",
             "nav_playground.html",
             language="en",
             parent=homepage,
-            published=True,
         )
         expected_tree = [
             (homepage, ''),
@@ -693,7 +691,6 @@ class PageTest(PageTestBase):
             "child-0002",
             template="nav_playground.html",
             language="de",
-            published=True,
             parent=site_2_parent,
             site=site_2,
         )
@@ -701,7 +698,6 @@ class PageTest(PageTestBase):
             "child-0003",
             template="nav_playground.html",
             language="de",
-            published=True,
             parent=site_2_parent,
             site=site_2,
         )
@@ -709,7 +705,6 @@ class PageTest(PageTestBase):
             "child-0005",
             template="nav_playground.html",
             language="de",
-            published=True,
             parent=site_2_parent,
             site=site_2,
         )
@@ -1020,14 +1015,12 @@ class PageTest(PageTestBase):
             "nav_playground.html",
             language="en",
             parent=homepage,
-            published=True,
         )
         home_child_2 = create_page(
             "child-2",
             "nav_playground.html",
             language="en",
             parent=homepage,
-            published=True,
         )
         home_sibling_1 = create_page("root-1", "nav_playground.html", "en")
 
@@ -1195,7 +1188,6 @@ class PageTest(PageTestBase):
             'page',
             'nav_playground.html',
             language='en',
-            published=True,
             overwrite_url='/new-url/',
         )
         expected = (

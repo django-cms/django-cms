@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.http import Http404
-from django.shortcuts import render
 from django.template.response import TemplateResponse
 from django.urls import Resolver404, resolve, reverse
 
 from cms import __version__
 from cms import constants
 from cms.cache.page import set_page_cache
-from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_template_from_request
 from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 
@@ -50,15 +48,6 @@ def render_page(request, page, current_language, slug):
         response['X-Frame-Options'] = 'DENY'
     return response
 
-
-def render_object_structure(request, obj):
-    context = {
-        'object': obj,
-        'cms_toolbar': request.toolbar,
-    }
-    return render(request, 'cms/toolbar/structure.html', context)
-
-
 def _handle_no_page(request):
     try:
         #add a $ to the end of the url (does not match on the cms anymore)
@@ -73,7 +62,6 @@ def _handle_no_page(request):
 def _render_welcome_page(request):
     context = {
         'cms_version': __version__,
-        'cms_edit_on': get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'),
         'django_debug': settings.DEBUG,
         'next_url': reverse('pages-root'),
     }

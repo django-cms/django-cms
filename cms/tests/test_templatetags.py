@@ -30,6 +30,7 @@ from cms.templatetags.cms_admin import get_page_display_name
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_site_id
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import get_placeholders
@@ -433,14 +434,15 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         from django.core.cache import cache
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
+        page_content = self.get_page_title_obj(page)
         placeholder = page.get_placeholders('en')[0]
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         template = "{% load cms_tags %}{% render_plugin plugin %}"
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(get_object_edit_url(page_content))
         user = self._create_user("admin", True, True)
         request.user = user
         request.current_page = page
-        request.session = {'cms_edit': True}
+        request.session = {}
         request.toolbar = CMSToolbar(request)
         request.toolbar.show_toolbar = True
         output = self.render_template_obj(template, {'plugin': plugin}, request)
@@ -469,13 +471,15 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         self.assertEqual('<b>Test</b>', output)
 
     def test_render_plugin_no_context(self):
+        page = create_page('Test', 'col_two.html', 'en')
+        page_content = self.get_page_title_obj(page)
         placeholder = Placeholder.objects.create(slot='test')
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='Test')
         superuser = self.get_superuser()
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(get_object_edit_url(page_content))
         request.current_page = None
         request.user = superuser
-        request.session = {'cms_edit': True}
+        request.session = {}
         request.toolbar = CMSToolbar(request)
         context = SekizaiContext({
             'request': request,
@@ -525,12 +529,13 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         Category.objects.create(name='foo', depth=1)
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
+        page_content = self.get_page_title_obj(page)
         template = "{% load cms_tags %}{% render_model category 'name' %}"
         user = self._create_user("admin", True, True)
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(get_object_edit_url(page_content))
         request.user = user
         request.current_page = page
-        request.session = {'cms_edit': True}
+        request.session = {}
         request.toolbar = CMSToolbar(request)
         request.toolbar.is_staff = True
         category = Category.objects.only('name').get()
@@ -555,15 +560,16 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
+        page_content = self.get_page_title_obj(page)
         template = "{% load cms_tags %}{% render_model_add category %}"
         user = self._create_user("admin", True, True)
-        request = RequestFactory().get(page.get_absolute_url())
+        request = RequestFactory().get(get_object_edit_url(page_content))
         request.user = user
         request.current_page = page
         request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
         request.toolbar.is_staff = True
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(1):
             output = self.render_template_obj(template, {'category': Category()}, request)
         expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
         expected_end = '<template class="cms-plugin cms-plugin-end cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
@@ -587,15 +593,16 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
+        page_content = self.get_page_title_obj(page)
         template = "{% load cms_tags %}{% render_model_add_block category %}wrapped{% endrender_model_add_block %}"
         user = self._create_user("admin", True, True)
-        request = RequestFactory().get(page.get_absolute_url())
+        request = RequestFactory().get(get_object_edit_url(page_content))
         request.user = user
         request.current_page = page
         request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
         request.toolbar.is_staff = True
-        with self.assertNumQueries(0):
+        with self.assertNumQueries(1):
             output = self.render_template_obj(template, {'category': Category()}, request)
         expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 '
         'cms-render-model-add"></template>'

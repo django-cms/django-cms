@@ -8,6 +8,7 @@ from cms.models import Placeholder
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import TransactionCMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils.urlutils import admin_reverse
 
 from sekizai.data import UniqueSequence
@@ -52,7 +53,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "col_two.html",
             "en",
             slug="page1",
-            published=True,
             in_navigation=True,
         )
         ph_1_en = page_en.get_placeholders("en").get(slot="col_left")
@@ -97,7 +97,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Alias plugin",
             "col_two.html",
             "en",
-            published=False,
         )
         source_plugin = api.add_plugin(
             source_page.get_placeholders("en").get(slot="col_left"),
@@ -110,7 +109,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Alias plugin",
             "col_two.html",
             "en",
-            published=False,
         )
         api.add_plugin(
             target_page.get_placeholders("en").get(slot="col_left"),
@@ -119,6 +117,8 @@ class AliasTestCase(TransactionCMSTestCase):
             plugin=source_plugin,
         )
 
+        target_page_content = self.get_page_title_obj(target_page)
+
         # Not edit mode: show content
         response = self.client.get(target_page.get_absolute_url())
         self.assertEqual(response.status_code, 200)
@@ -126,7 +126,7 @@ class AliasTestCase(TransactionCMSTestCase):
 
         with self.login_user_context(self.get_superuser()):
             # Edit mode: show content
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            response = self.client.get(get_object_edit_url(target_page_content))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
@@ -139,7 +139,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Alias plugin",
             "col_two.html",
             "en",
-            published=False,
         )
         source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
         api.add_plugin(
@@ -153,7 +152,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Alias plugin",
             "col_two.html",
             "en",
-            published=False,
         )
         api.add_plugin(
             target_page.get_placeholders('en').get(slot="col_left"),
@@ -162,6 +160,8 @@ class AliasTestCase(TransactionCMSTestCase):
             alias_placeholder=source_placeholder,
         )
 
+        target_page_content = self.get_page_title_obj(target_page)
+
         # Not edit mode: show content
         response = self.client.get(target_page.get_absolute_url())
         self.assertEqual(response.status_code, 200)
@@ -169,7 +169,7 @@ class AliasTestCase(TransactionCMSTestCase):
 
         with self.login_user_context(self.get_superuser()):
             # Edit mode: show content
-            response = self.client.get(target_page.get_absolute_url() + '?edit')
+            response = self.client.get(get_object_edit_url(target_page_content))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<a href="https://www.django-cms.org" >A Link</a>', html=True)
 
@@ -182,7 +182,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Home",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
@@ -199,7 +198,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Target",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         target_placeholder = target_page.get_placeholders("en").get(slot="col_left")
@@ -210,10 +208,11 @@ class AliasTestCase(TransactionCMSTestCase):
             alias_placeholder=source_placeholder,
         )
 
+        target_page_content = self.get_page_title_obj(target_page)
+
         with self.login_user_context(self.get_superuser()):
-            context = self.get_context(path=target_page.get_absolute_url(), page=target_page)
+            context = self.get_context(path=get_object_edit_url(target_page_content))
             request = context['request']
-            request.session['cms_edit'] = True
             request.toolbar = CMSToolbar(request)
             renderer = request.toolbar.get_content_renderer()
             context[get_varname()] = defaultdict(UniqueSequence)
@@ -222,7 +221,7 @@ class AliasTestCase(TransactionCMSTestCase):
                 context=context,
                 language='en',
                 page=target_page,
-                editable=True
+                editable=True,
             )
 
             tag_format = '<template class="cms-plugin cms-plugin-start cms-plugin-{}">'
@@ -247,14 +246,12 @@ class AliasTestCase(TransactionCMSTestCase):
             "Home",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         source_page = api.create_page(
             "Source",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         source_placeholder = source_page.get_placeholders("en").get(slot="col_left")
@@ -271,7 +268,6 @@ class AliasTestCase(TransactionCMSTestCase):
             "Target",
             "col_two.html",
             "en",
-            published=True,
             in_navigation=True,
         )
         target_placeholder = target_page.get_placeholders('en').get(slot="col_left")

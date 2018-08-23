@@ -10,8 +10,6 @@ from django.utils.safestring import mark_safe
 
 from sekizai.helpers import get_varname
 
-from cms.models import StaticPlaceholder
-
 
 register = template.Library()
 
@@ -32,27 +30,11 @@ def bool(value):
         return 'false'
 
 
-@register.simple_tag(takes_context=True)
-def render_cms_structure_js(context, renderer, obj):
+@register.simple_tag()
+def render_cms_structure_js(renderer, obj):
     cms_page = obj.page
     markup_bits = []
-    static_placeholders = []
     page_placeholders_by_slot = obj.rescan_placeholders()
-    declared_static_placeholders = cms_page.get_declared_static_placeholders(context)
-
-    for static_placeholder in declared_static_placeholders:
-        kwargs = {
-            'code': static_placeholder.slot,
-            'defaults': {'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE}
-        }
-
-        if static_placeholder.site_bound:
-            kwargs['site'] = renderer.current_site.pk
-        else:
-            kwargs['site_id__isnull'] = True
-
-        static_placeholder = StaticPlaceholder.objects.get_or_create(**kwargs)[0]
-        static_placeholders.append(static_placeholder)
 
     for placeholder_node in cms_page.get_declared_placeholders():
         page_placeholder = page_placeholders_by_slot.get(placeholder_node.slot)
@@ -61,9 +43,6 @@ def render_cms_structure_js(context, renderer, obj):
             placeholder_js = renderer.render_page_placeholder(cms_page, page_placeholder)
             markup_bits.append(placeholder_js)
 
-    for placeholder in static_placeholders:
-        placeholder_js = renderer.render_static_placeholder(placeholder)
-        markup_bits.append(placeholder_js)
     return mark_safe('\n'.join(markup_bits))
 
 

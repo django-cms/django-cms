@@ -22,8 +22,9 @@ from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 
 from cms.api import create_page, add_plugin
+from cms.middleware.toolbar import ToolbarMiddleware
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
-from cms.models import Page
+from cms.models import Page, Title
 from cms.models.permissionmodels import (
     GlobalPagePermission,
     PagePermission,
@@ -33,6 +34,7 @@ from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
+
 
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -156,6 +158,9 @@ class BaseCMSTestCase(object):
         pp = PagePermission.objects.create(**options)
         pp.sites = Site.objects.all()
         return pp
+
+    def get_page_title_obj(self, page, language="en"):
+        return Title.objects.get(page=page, language=language)
 
     def _create_user(self, username, is_staff=False, is_superuser=False,
                      is_active=True, add_default_permissions=False, permissions=None):
@@ -437,6 +442,25 @@ class BaseCMSTestCase(object):
         request._messages = MockStorage()
         return request
 
+    def get_page_request(self, page, user, path=None, lang_code='en', disable=False):
+        path = path or page and page.get_absolute_url()
+
+        request = RequestFactory().get(path)
+        request.session = {}
+        request.user = user
+        request.LANGUAGE_CODE = lang_code
+        request.GET = request.GET.copy()
+
+        # Hide the toolbar
+        if disable:
+            request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
+        request.current_page = page
+        mid = ToolbarMiddleware()
+        mid.process_request(request)
+        if hasattr(request, 'toolbar'):
+            request.toolbar.populate()
+        return request
+
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
         result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
@@ -595,15 +619,6 @@ class BaseCMSTestCase(object):
             'cms_path': path,
         })
         return endpoint
-
-    def get_edit_on_url(self, url):
-        return '{}?{}'.format(url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-
-    def get_edit_off_url(self, url):
-        return '{}?{}'.format(url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
-
-    def get_obj_structure_url(self, url):
-        return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__BUILD'))
 
     def get_toolbar_disable_url(self, url):
         return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__DISABLE'))

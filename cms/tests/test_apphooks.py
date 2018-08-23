@@ -25,7 +25,6 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
@@ -334,13 +333,13 @@ class ApphooksTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             with force_language("en"):
                 path = reverse('sample-settings')
-                request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                request = self.get_request(path)
                 request.LANGUAGE_CODE = 'en'
                 attached_to_page = applications_page_check(request)
                 self.assertEqual(attached_to_page.pk, page.pk)
             with force_language("de"):
                 path = reverse('sample-settings')
-                request = self.get_request(path + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+                request = self.get_request(path)
                 request.LANGUAGE_CODE = 'de'
                 attached_to_page = applications_page_check(request)
                 self.assertEqual(attached_to_page.pk, page.pk)
@@ -429,7 +428,6 @@ class ApphooksTestCase(CMSTestCase):
                             "nav_playground.html",
                             language="en",
                             created_by=self.superuser,
-                            published=True,
                             parent=de_title.page.get_parent_page(),
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
@@ -877,7 +875,6 @@ class ApphooksTestCase(CMSTestCase):
         """
         defaults = {
             'language': 'en',
-            'published': True,
             'in_navigation': True,
             'template': 'nav_playground.html',
         }
@@ -906,7 +903,6 @@ class ApphooksTestCase(CMSTestCase):
         # Refs - https://github.com/divio/django-cms/issues/6336
         defaults = {
             'language': 'en',
-            'published': True,
             'in_navigation': True,
             'template': 'nav_playground.html',
         }

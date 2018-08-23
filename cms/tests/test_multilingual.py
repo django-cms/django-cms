@@ -201,14 +201,12 @@ class MultilingualTestCase(CMSTestCase):
             "page",
             template='nav_playground.html',
             language="de",
-            published=True,
             site=site_2,
         )
         page_2 = create_page(
             "page",
             template='nav_playground.html',
             language="de",
-            published=True,
             site=site_2,
         )
 
@@ -227,14 +225,12 @@ class MultilingualTestCase(CMSTestCase):
             "page",
             template='nav_playground.html',
             language="de",
-            published=True,
             site=site_2,
         )
         page_2 = create_page(
             "page",
             template='nav_playground.html',
             language="de",
-            published=True,
             site=site_2,
         )
 
@@ -305,7 +301,7 @@ class MultilingualTestCase(CMSTestCase):
         title.save()
         # add wrong plugin language
         add_plugin(ph_en, "TextPlugin", "ru", body="I'm the second")
-        endpoint = page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        endpoint = page.get_absolute_url()
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)

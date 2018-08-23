@@ -82,3 +82,32 @@ def get_timezone_name():
     # Hence this paranoid conversion to create a valid cache key.
     tz_name = force_text(get_current_timezone_name(), errors='ignore')
     return tz_name.encode('ascii', 'ignore').decode('ascii').replace(' ', '_')
+
+
+def is_editable_model(model_class):
+    """
+    Return True if the model_class is editable.
+    Checks whether the model_class has any relationships with Placeholder.
+    If not, checks whether the model_class has an admin class
+    and is inherited by FrontendEditableAdminMixin.
+    :param model_class: The model class
+    :return: Boolean
+    """
+    from django.contrib import admin
+
+    from cms.admin.placeholderadmin import FrontendEditableAdminMixin
+    from cms.models.placeholdermodel import Placeholder
+
+    # First check whether model_class has
+    # any fields which has a relation to Placeholder
+    for field in model_class._meta.get_fields():
+        if field.related_model == Placeholder:
+            return True
+
+    # Check whether model_class has an admin class
+    # and whether its inherited from FrontendEditableAdminMixin
+    try:
+        admin_class = admin.site._registry[model_class]
+    except KeyError:
+        return False
+    return isinstance(admin_class, FrontendEditableAdminMixin)
