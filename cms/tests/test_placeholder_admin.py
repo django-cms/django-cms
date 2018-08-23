@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 
+from cms.api import create_page
 from cms.models import Placeholder, UserSettings, CMSPlugin
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.urlutils import admin_reverse
 
 
 class PlaceholderAdminTestCase(CMSTestCase):
@@ -163,3 +166,14 @@ class PlaceholderAdminTestCase(CMSTestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(placeholder.get_plugins('en').count(), 0)
+
+    def test_object_edit_endpoint(self):
+        page = create_page('Page 1', 'nav_playground.html', 'en')
+        title = page.get_title_obj()
+        title_type = ContentType.objects.get(app_label='cms', model='title')
+        superuser = self.get_superuser()
+        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(title_type.pk, title.pk,))
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+
+        self.assertEqual(response.status_code, 200)

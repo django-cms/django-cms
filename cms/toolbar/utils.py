@@ -2,9 +2,10 @@ from __future__ import unicode_literals
 from collections import defaultdict, deque
 import json
 
+from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_text
 from django.utils.six import text_type
-from django.utils.translation import override as force_language, ugettext
+from django.utils.translation import get_language, override as force_language, ugettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.utils.urlutils import admin_reverse
@@ -116,3 +117,33 @@ def get_toolbar_from_request(request):
     from .toolbar import EmptyToolbar
 
     return getattr(request, 'toolbar', EmptyToolbar(request))
+
+
+def get_object_edit_url(obj, language=None):
+    content_type = ContentType.objects.get_for_model(obj)
+
+    if not language:
+        language = get_language()
+
+    with force_language(language):
+        return admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
+
+
+def get_object_preview_url(obj, language=None):
+    content_type = ContentType.objects.get_for_model(obj)
+
+    if not language:
+        language = get_language()
+
+    with force_language(language):
+        return admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
+
+
+def get_object_structure_url(obj, language=None):
+    content_type = ContentType.objects.get_for_model(obj)
+
+    if not language:
+        language = get_language()
+
+    with force_language(language):
+        return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])

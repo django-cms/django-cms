@@ -103,7 +103,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 created_by='python-api', parent=None,
                 publication_date=None, publication_end_date=None,
                 in_navigation=False, soft_root=False, reverse_id=None,
-                navigation_extenders=None, published=False, site=None,
+                navigation_extenders=None, published=None, site=None,
                 login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None,
                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
@@ -112,6 +112,8 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     See docs/extending_cms/api_reference.rst for more info
     """
+    if published != None:
+        raise Exception("WTF")
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
         assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]

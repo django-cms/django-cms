@@ -17,9 +17,6 @@ for arg in sys.argv:
     if arg == '--CMS_PERMISSION=False':
         permission = False
 
-    if arg == '--CMS_TOOLBAR_URL__EDIT_ON=test-edit':
-        cms_toolbar_edit_on = 'test-edit'
-
     if arg.startswith('--port='):
         port = arg.split('=')[1]
 
@@ -67,7 +64,6 @@ HELPER_SETTINGS = dict(
         'permissions': 0,
     },
     CMS_PAGE_CACHE=False,
-    CMS_TOOLBAR_URL__EDIT_ON=cms_toolbar_edit_on,
     # required for integration tests
     LOGIN_URL='/admin/login/?user-login=test',
     CMS_LANGUAGES={

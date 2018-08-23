@@ -33,3 +33,7 @@ class SampleAppConfig(models.Model):
         max_length=100,
         unique=True,
     )
+
+
+class SomeEditableModel(models.Model):
+    pass
