@@ -769,7 +769,7 @@ class BasePageAdmin(admin.ModelAdmin):
             languages = get_language_list(site.pk)
             pages = pages.prefetch_related(
                 Prefetch(
-                    'pagecontent_set',
+                    'urls',
                     to_attr='filtered_urls',
                     queryset=PageUrl.objects.filter(language__in=languages)
                 ),
