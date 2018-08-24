@@ -95,7 +95,7 @@ describe('CMS.StructureBoard', function() {
             CMS.config = {
                 settings: {
                     mode: 'edit',
-                    structure: 'structure'
+                    structure: '/structure'
                 },
                 mode: 'edit'
             };
@@ -843,7 +843,7 @@ describe('CMS.StructureBoard', function() {
             CMS.config = {
                 settings: {
                     mode: 'structure',
-                    structure: 'structure'
+                    structure: '/structure'
                 },
                 mode: 'structure'
             };
@@ -2106,10 +2106,15 @@ describe('CMS.StructureBoard', function() {
     });
 
     describe('_loadToolbar', () => {
+
         it('loads toolbar url', () => {
             const board = new StructureBoard();
 
             spyOn($, 'ajax');
+            CMS.config.settings.structure = '/structure';
+            CMS.config.settings.edit = '/edit';
+            CMS.config.settings.mode = 'edit';
+
             CMS.config.request = {
                 toolbar: 'TOOLBAR_URL',
                 pk: 100,
@@ -2120,7 +2125,7 @@ describe('CMS.StructureBoard', function() {
 
             expect($.ajax).toHaveBeenCalledWith({
                 url: jasmine.stringMatching(
-                    /TOOLBAR_URL\?obj_id=100&amp;obj_type=cms.page&amp;cms_path=%2Fcontext.html.*/
+                    /TOOLBAR_URL\?obj_id=100&amp;obj_type=cms.page&amp;cms_path=%2Fstructure*/
                 )
             });
         });
@@ -2150,7 +2155,7 @@ describe('CMS.StructureBoard', function() {
             };
             spyOn($, 'ajax').and.callFake(req => {
                 expect(req.method).toEqual('GET');
-                expect(req.url).toMatch(/\?edit/);
+                expect(req.url).toEqual('/edit');
                 return request;
             });
 
@@ -2170,7 +2175,7 @@ describe('CMS.StructureBoard', function() {
             };
             spyOn($, 'ajax').and.callFake(req => {
                 expect(req.method).toEqual('GET');
-                expect(req.url).toMatch(/\?structure/);
+                expect(req.url).toEqual('/structure');
                 return request;
             });
 
@@ -2190,7 +2195,7 @@ describe('CMS.StructureBoard', function() {
             };
             spyOn($, 'ajax').and.callFake(req => {
                 expect(req.method).toEqual('GET');
-                expect(req.url).toMatch(/\?edit/);
+                expect(req.url).toEqual('/edit');
                 return request;
             });
 

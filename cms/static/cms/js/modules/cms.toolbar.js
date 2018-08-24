@@ -358,43 +358,6 @@ var Toolbar = new Class({
                     });
                 }
             });
-
-            // in case of the publish button
-            btn.find('.cms-publish-page').off(`${that.click}.publishpage`).on(`${that.click}.publishpage`, function(e) {
-                if (!Helpers.secureConfirm(CMS.config.lang.publish)) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                }
-            });
-
-            btn.find('.cms-btn-publish').off(`${that.click}.publish`).on(`${that.click}.publish`, function(e) {
-                e.preventDefault();
-                showLoader();
-                // send post request to prevent xss attacks
-                $.ajax({
-                    type: 'post',
-                    url: $(this).prop('href'),
-                    data: {
-                        placeholders: getPlaceholderIds(CMS._plugins),
-                        csrfmiddlewaretoken: CMS.config.csrf
-                    },
-                    success: function() {
-                        var url = Helpers.makeURL(Helpers._getWindow().location.href.split('?')[0], [
-                            [CMS.settings.edit_off, 'true']
-                        ]);
-
-                        Helpers.reloadBrowser(url);
-                        hideLoader();
-                    },
-                    error: function(jqXHR) {
-                        hideLoader();
-                        CMS.API.Messages.open({
-                            message: jqXHR.responseText + ' | ' + jqXHR.status + ' ' + jqXHR.statusText,
-                            error: true
-                        });
-                    }
-                });
-            });
         });
 
         this.ui.window

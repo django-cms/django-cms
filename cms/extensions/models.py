@@ -1,8 +1,7 @@
 from django.db.models import ManyToManyField
-
 from django.db import models
 
-from cms.models import Page, Title
+from cms.models import Page, PageContent
 
 
 class BaseExtension(models.Model):
@@ -106,7 +105,7 @@ class PageExtension(BaseExtension):
 
 
 class TitleExtension(BaseExtension):
-    extended_object = models.OneToOneField(Title, on_delete=models.CASCADE, editable=False)
+    extended_object = models.OneToOneField(PageContent, on_delete=models.CASCADE, editable=False)
 
     class Meta:
         abstract = True

@@ -4,7 +4,7 @@ from collections import defaultdict
 from django.contrib.sitemaps import Sitemap
 from django.db.models import Q
 
-from cms.models import Title, PageUrl
+from cms.models import PageContent, PageUrl
 from cms.utils import get_current_site
 from cms.utils.i18n import get_public_languages
 
@@ -43,7 +43,7 @@ class CMSSitemap(Sitemap):
         #
         # This rules any redirected locations out.
         #
-        # If, for some reason, you require redirecting pages (Titles) to be
+        # If, for some reason, you require redirecting pages (PageContent) to be
         # included, simply create a new class inheriting from this one, and
         # supply a new items() method which doesn't filter out the redirects.
         site = get_current_site()
@@ -58,7 +58,7 @@ class CMSSitemap(Sitemap):
         )
         excluded_titles_by_page = defaultdict(set)
         excluded_translations = (
-            Title
+            PageContent
             .objects
             .filter(language__in=languages, page__node__site=site)
             .exclude(Q(redirect='') | Q(redirect__isnull=True))

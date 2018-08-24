@@ -6,7 +6,7 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.apphook_pool import apphook_pool
-from cms.models import EmptyTitle, PageUrl, Title
+from cms.models import EmptyPageContent, PageUrl, PageContent
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -210,7 +210,7 @@ class CMSMenu(Menu):
 
         pages = (
             pages
-            .filter(title_set__language__in=languages)
+            .filter(pagecontent_set__language__in=languages)
             .select_related('node')
             .order_by('node__path')
             .distinct()
@@ -231,22 +231,22 @@ class CMSMenu(Menu):
             queryset=PageUrl.objects.filter(language__in=languages),
         )
         translations_lookup = Prefetch(
-            'title_set',
+            'pagecontent_set',
             to_attr='filtered_translations',
-            queryset=Title.objects.filter(language__in=languages),
+            queryset=PageContent.objects.filter(language__in=languages),
         )
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
         # Build the blank title instances only once
-        blank_title_cache = {language: EmptyTitle(language=language) for language in languages}
+        blank_title_cache = {language: EmptyPageContent(language=language) for language in languages}
 
         if lang not in blank_title_cache:
-            blank_title_cache[lang] = EmptyTitle(language=lang)
+            blank_title_cache[lang] = EmptyPageContent(language=lang)
 
         # Maps a node id to its page id
         node_id_to_page = {}
 
         def _page_to_node(page):
-            # EmptyTitle is used to prevent the cms from trying
+            # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
             page.title_cache = blank_title_cache.copy()
 

@@ -170,7 +170,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
     def test_object_edit_endpoint(self):
         page = create_page('Page 1', 'nav_playground.html', 'en')
         title = page.get_title_obj()
-        title_type = ContentType.objects.get(app_label='cms', model='title')
+        title_type = ContentType.objects.get(app_label='cms', model='pagecontent')
         superuser = self.get_superuser()
         endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(title_type.pk, title.pk,))
         with self.login_user_context(superuser):

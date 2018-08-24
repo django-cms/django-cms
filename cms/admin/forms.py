@@ -22,7 +22,7 @@ from cms.extensions import extension_pool
 from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.forms.validators import validate_relative_url, validate_url_uniqueness
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
-from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, Title,
+from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, PageContent,
                         Placeholder, GlobalPagePermission, TreeNode)
 from cms.models.permissionmodels import User
 from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE
@@ -190,7 +190,7 @@ class AddPageForm(BasePageForm):
         if root_page:
             # Set the choicefield's choices to the various page_types
             descendants = root_page.get_descendant_pages().filter(is_page_type=True)
-            titles = Title.objects.filter(page__in=descendants, language=self._language)
+            titles = PageContent.objects.filter(page__in=descendants, language=self._language)
             choices = [('', '---------')]
             choices.extend((title.page_id, title.title) for title in titles)
             source_field.choices = choices
@@ -281,7 +281,7 @@ class AddPageForm(BasePageForm):
         source = self.cleaned_data.get('source')
         if source:
             return source.get_template(self._language)
-        return Title.TEMPLATE_DEFAULT
+        return PageContent.TEMPLATE_DEFAULT
 
     def save(self, *args, **kwargs):
         source = self.cleaned_data.get('source')
@@ -558,17 +558,17 @@ class AdvancedSettingsForm(forms.ModelForm):
                                    help_text=_("All ancestors will not be displayed in the navigation"))
 
     xframe_options = forms.ChoiceField(
-        choices=Title._meta.get_field('xframe_options').choices,
+        choices=PageContent._meta.get_field('xframe_options').choices,
         label=_('X Frame Options'),
         help_text=_('Whether this page can be embedded in other pages or websites'),
-        initial=Title._meta.get_field('xframe_options').default,
+        initial=PageContent._meta.get_field('xframe_options').default,
         required=False,
     )
     template = forms.ChoiceField(
-        choices=Title._meta.get_field('template').choices,
+        choices=PageContent._meta.get_field('template').choices,
         label=_('Template'),
         help_text=_('The template used to render the content.'),
-        initial=Title._meta.get_field('template').default,
+        initial=PageContent._meta.get_field('template').default,
         required=False,
     )
 
@@ -799,7 +799,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
         xframe_options = self.cleaned_data['xframe_options']
         if xframe_options == '':
-            return Title._meta.get_field('xframe_options').default
+            return PageContent._meta.get_field('xframe_options').default
 
         return xframe_options
 
@@ -866,10 +866,10 @@ class PagePermissionForm(forms.ModelForm):
     _request = None
 
     limit_visibility_in_menu = forms.TypedChoiceField(
-        choices=Title._meta.get_field('limit_visibility_in_menu').choices,
+        choices=PageContent._meta.get_field('limit_visibility_in_menu').choices,
         label=_("menu visibility"),
         help_text=_("limit when this page is visible in the menu"),
-        initial=Title._meta.get_field('limit_visibility_in_menu').default,
+        initial=PageContent._meta.get_field('limit_visibility_in_menu').default,
         required=False,
         coerce=int,
         empty_value=None,

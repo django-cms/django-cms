@@ -58,7 +58,7 @@ class BaseMenuTest(CMSTestCase):
         super(BaseMenuTest, self).tearDown()
 
     def get_page(self, num):
-        return Page.objects.get(title_set__title='P%s' % num)
+        return Page.objects.get(pagecontent_set__title='P%s' % num)
 
 
 class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
@@ -200,7 +200,7 @@ class ExtendedFixturesMenuTests(ExtendedMenusFixture, BaseMenuTest):
           + P8
     """
     def get_page(self, num):
-        return Page.objects.get(title_set__title='P%s' % num)
+        return Page.objects.get(pagecontent_set__title='P%s' % num)
 
     def get_all_pages(self):
         return Page.objects.all()
@@ -256,7 +256,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
           + P8
     """
     def get_page(self, num):
-        return Page.objects.get(title_set__title='P%s' % num)
+        return Page.objects.get(pagecontent_set__title='P%s' % num)
 
     def get_all_pages(self):
         return Page.objects.all()
@@ -735,7 +735,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl.render(context)
         nodes = context['children']
         number_of_p6_children = page6.get_child_pages().filter(
-            title_set__language='en', title_set__in_navigation=True).count()
+            pagecontent_set__language='en', pagecontent_set__in_navigation=True).count()
         self.assertEqual(len(nodes), number_of_p6_children)
 
         page7 = self.get_page(7)
@@ -749,11 +749,11 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl.render(context)
         nodes = context['children']
         number_of_p7_children = page7.get_child_pages().filter(
-            title_set__language='en', title_set__in_navigation=True).count()
+            pagecontent_set__language='en', pagecontent_set__in_navigation=True).count()
         self.assertEqual(len(nodes), number_of_p7_children)
 
     def test_show_breadcrumb_invisible(self):
-        parent = Page.objects.get(title_set__title='P3')
+        parent = Page.objects.get(pagecontent_set__title='P3')
         invisible_page = create_page("invisible", "nav_playground.html", "en",
             parent=parent, in_navigation=False)
         context = self.get_context(
@@ -970,7 +970,7 @@ class MenuTests(BaseMenuTest):
         nl_page_1 = Page()
         nl_page_1.set_tree_node(site=site_2, target=None)
         nl_page_1.save()
-        nl_page_1.title_set.create(
+        nl_page_1.pagecontent_set.create(
             language='nl',
             title='NL-P1',
             template='nav_playground.html',
@@ -980,7 +980,7 @@ class MenuTests(BaseMenuTest):
         nl_page_2 = Page()
         nl_page_2.set_tree_node(site=site_2, target=None)
         nl_page_2.save()
-        nl_page_2.title_set.create(
+        nl_page_2.pagecontent_set.create(
             language='nl',
             title='NL-P2',
             template='nav_playground.html',
@@ -1666,7 +1666,7 @@ class PublicViewPermissionMenuTests(CMSTestCase):
             Page
             .objects
             .filter(pk__in=(page.pk for page in pages))
-            .values_list('title_set__title', flat=True)
+            .values_list('pagecontent_set__title', flat=True)
         )
         self.assertSequenceEqual(sorted(pages), ['a', 'b1', 'c1', 'c2'])
 
@@ -1676,7 +1676,7 @@ class PublicViewPermissionMenuTests(CMSTestCase):
             Page
             .objects
             .filter(pk__in=(page.pk for page in pages))
-            .values_list('title_set__title', flat=True)
+            .values_list('pagecontent_set__title', flat=True)
         )
         self.assertSequenceEqual(sorted(pages), ['a', 'b1', 'c1', 'c2'])
 

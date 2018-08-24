@@ -165,7 +165,7 @@ class ViewPermissionTests(CMSTestCase):
             ("page_d", self.GROUPNAME_5, ACCESS_PAGE),
         ]
         for title, groupname, inherit in data:
-            page = Page.objects.get(title_set__title=title)
+            page = Page.objects.get(pagecontent_set__title=title)
             group = Group.objects.get(name__iexact=groupname)
             PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=inherit)
 
@@ -247,10 +247,10 @@ class ViewPermissionTests(CMSTestCase):
             user = get_user_model().objects.get(**query)
         request = self.get_request(user)
         visible_page_ids = [page.pk for page in get_visible_nodes(request, all_pages, self.site)]
-        public_page_ids = Page.objects.filter(title_set__title__in=expected_granted_pages).values_list('id',
+        public_page_ids = Page.objects.filter(pagecontent_set__title__in=expected_granted_pages).values_list('id',
                                                                                                                 flat=True)
         self.assertEqual(len(visible_page_ids), len(expected_granted_pages))
-        restricted_pages = Page.objects.exclude(title_set__title__in=expected_granted_pages).values_list('id',
+        restricted_pages = Page.objects.exclude(pagecontent_set__title__in=expected_granted_pages).values_list('id',
                                                                                                                   flat=True)
         self.assertNodeMemberships(visible_page_ids, restricted_pages, public_page_ids)
 
@@ -530,7 +530,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         """
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
-        page = Page.objects.get(title_set__title="page_b")
+        page = Page.objects.get(pagecontent_set__title="page_b")
         group = Group.objects.get(name=self.GROUPNAME_1)
         PagePermission.objects.create(can_view=False, group=group, page=page)
         urls = self.get_url_dict(all_pages)
@@ -591,7 +591,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         """
         Setup group_6_ACCESS_PAGE view restriction
         """
-        page = Page.objects.get(title_set__title="page_6")
+        page = Page.objects.get(pagecontent_set__title="page_6")
         group = Group.objects.get(name__iexact=self.GROUPNAME_6)
         PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE_AND_CHILDREN)
         PagePermission.objects.create(can_view=True, group=group, page=page, grant_on=ACCESS_PAGE_AND_DESCENDANTS)
