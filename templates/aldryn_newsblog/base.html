@@ -1,4 +1,5 @@
 {% extends CMS_TEMPLATE %}
+{% load apphooks_config_tags cms_tags i18n %}
 
 {% block canonical %}
 <link rel="canonical" href="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% if article %}{% namespace_url 'article-detail' article.slug namespace=namespace default='' %}{% else %}{% page_url request.current_page %}{% endif %}">
