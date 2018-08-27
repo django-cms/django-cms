@@ -20,6 +20,11 @@
         {% endblock %}
         <meta name="google-site-verification" content="nMw81ePBf_YjYHq2mEoj3mzKxwQRl4uy1CnQ2hno7Nc" />
     {% endblock meta_tags %}
+    {% block canonical %}
+    {% if request and request.current_page %}
+    <link rel="canonical" href="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% if article %}{{ article.get_absolute_url }}{% else %}{% page_url request.current_page %}{% endif %}">
+    {% endif %}
+    {% endblock %}
     <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
     <!--[if IE]><link rel="shortcut icon" href="{% static 'favicon.ico' %}"><![endif]-->
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-icon-180x180.png' %}">

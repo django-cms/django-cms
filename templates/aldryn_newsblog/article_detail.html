@@ -4,6 +4,37 @@
 {% block title %}{{ article.title }} - {{ block.super }}{% endblock %}
 {% block breadcrumb %}{% endblock %}
 
+{% block meta_description %}
+    {% if article.meta_title %}
+        <meta name="title" content="{{ article.meta_title|default:article.title }}" />
+        <meta itemprop="name" content="{{ article.meta_title|default:article.title }}">
+        <meta name="twitter:title" content="{{ article.meta_title|default:article.title }}" />
+        <meta property="og:title" content="{{ article.meta_title|default:article.title }}" />
+    {% else %}
+        <meta name="title" content="{{ article.title }}">
+    {% endif %}
+
+    {% if article.meta_description %}
+        <meta name="twitter:description" content="{{ article.meta_description|default:article.lead_in|striptags }} /">
+        <meta name="description" content="{{ article.meta_description|default:article.lead_in|striptags }} /">
+        <meta property="og:description" content="{{ article.meta_description|striptags|default:article.lead_in|striptags }}" />
+    {% else %}
+        <meta name="description" content="{{ article.lead_in|striptags }}">
+    {% endif %}
+
+
+    <meta property="og:url" content="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% if article %}{{ article.get_absolute_url }}{% else %}{% page_url request.current_page %}{% endif %}">
+    <meta name="twitter:url" content="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% if article %}{{ article.get_absolute_url }}{% else %}{% page_url request.current_page %}{% endif %}">
+    <meta property="og:type" content="blog">
+
+    <meta property="og:locale" content="{{ LANGUAGE_CODE }}">
+    <meta name="twitter:card" content="summary_large_image">
+
+    {% if article.tags.exists %}
+    <meta name="keywords" content="{% for tag in article.tags.all %}{{ tag }}{% if not forloop.last %}, {% endif %}{% endfor %}">
+    {% endif %}
+{% endblock %}
+
 {% block feature %}
 <div class="page-header">
     <div class="container">
