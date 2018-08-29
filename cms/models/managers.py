@@ -124,9 +124,9 @@ class PageContentManager(models.Manager):
 
 class PlaceholderManager(models.Manager):
 
-    def filter_for_obj(self, obj):
+    def get_for_obj(self, obj):
         """
-        Returns all placeholders for given object
+        Get all placeholders for given object
         """
         content_type = ContentType.objects.get_for_model(obj)
         return self.filter(content_type=content_type, object_id=obj.pk)

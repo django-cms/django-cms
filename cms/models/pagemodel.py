@@ -518,6 +518,7 @@ class Page(models.Model):
                 new_placeholder = new_title.placeholders.create(
                     slot=placeholder.slot,
                     default_width=placeholder.default_width,
+                    source=new_title,
                 )
                 placeholder.copy_plugins(new_placeholder, language=new_title.language)
             new_page.title_cache[new_title.language] = new_title

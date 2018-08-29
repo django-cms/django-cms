@@ -315,6 +315,7 @@ class AddPageForm(BasePageForm):
                 target_placeholder = translation.placeholders.create(
                     slot=source_placeholder.slot,
                     default_width=source_placeholder.default_width,
+                    source=translation,
                 )
                 source_placeholder.copy_plugins(target_placeholder, language=translation.language)
 

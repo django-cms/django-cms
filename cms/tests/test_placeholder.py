@@ -728,7 +728,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         # check for en
         page_content_en = self.get_page_title_obj(page)
         self.assertQuerysetEqual(
-            Placeholder.objects.filter_for_obj(page_content_en),
+            Placeholder.objects.get_for_obj(page_content_en),
             page_content_en.get_placeholders(),
             transform=lambda x: x,
             ordered=False,
@@ -737,7 +737,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         # check for another language = de
         page_content_de = create_title('de', 'test page en', page)
         self.assertQuerysetEqual(
-            Placeholder.objects.filter_for_obj(page_content_de),
+            Placeholder.objects.get_for_obj(page_content_de),
             page_content_de.get_placeholders(),
             transform=lambda x: x,
             ordered=False,

@@ -3,10 +3,13 @@ from __future__ import unicode_literals
 
 import json
 
-from classytags.core import Tag, Options
-from cms.utils.encoder import SafeJSONEncoder
 from django import template
 from django.utils.safestring import mark_safe
+
+from cms.utils.encoder import SafeJSONEncoder
+from cms.utils.placeholder import get_declared_placeholders_for_obj, rescan_placeholders_for_obj
+
+from classytags.core import Tag, Options
 
 from sekizai.helpers import get_varname
 
@@ -32,18 +35,34 @@ def bool(value):
 
 @register.simple_tag()
 def render_cms_structure_js(renderer, obj):
-    cms_page = obj.page
     markup_bits = []
-    page_placeholders_by_slot = obj.rescan_placeholders()
+    obj_placeholders_by_slot = _rescan_placeholders(obj)
+    declared_placeholders = _get_declared_placeholders_for_obj(obj)
 
-    for placeholder_node in cms_page.get_declared_placeholders():
-        page_placeholder = page_placeholders_by_slot.get(placeholder_node.slot)
+    for placeholder_node in declared_placeholders:
+        obj_placeholder = obj_placeholders_by_slot.get(placeholder_node.slot)
 
-        if page_placeholder:
-            placeholder_js = renderer.render_page_placeholder(cms_page, page_placeholder)
+        if obj_placeholder:
+            placeholder_js = renderer.render_placeholder(obj_placeholder, language=None, page=obj)
             markup_bits.append(placeholder_js)
 
     return mark_safe('\n'.join(markup_bits))
+
+
+def _rescan_placeholders(obj):
+    from cms.models import PageContent
+
+    if isinstance(obj, PageContent):
+        return obj.rescan_placeholders()
+    return rescan_placeholders_for_obj(obj)
+
+
+def _get_declared_placeholders_for_obj(obj):
+    from cms.models import PageContent
+
+    if isinstance(obj, PageContent):
+        return obj.page.get_declared_placeholders()
+    return get_declared_placeholders_for_obj(obj)
 
 
 @register.simple_tag(takes_context=True)
