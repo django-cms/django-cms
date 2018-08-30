@@ -96,15 +96,13 @@ class PageField(models.ForeignKey):
         return super(PageField, self).formfield(**defaults)
 
 
-class PlaceholderGenericField(GenericRelation):
+class PlaceholderRelationField(GenericRelation):
 
     def __init__(self, **kwargs):
         kwargs.pop('object_id_field', None)
         kwargs.pop('content_type_field', None)
 
-        super(PlaceholderGenericField, self).__init__(
-            Placeholder,
-            object_id_field='object_id',
-            content_type_field='content_type',
+        super(PlaceholderRelationField, self).__init__(
+            Placeholder, object_id_field='object_id', content_type_field='content_type',
             **kwargs
         )

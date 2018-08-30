@@ -767,7 +767,8 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
     def test_sets_source_when_external_object_is_rendered(self):
         """
         This tests the implementation for external objects to use the {% placeholder %}
-        tag creates placeholders with the source field set to the current object
+        template tag where placeholders are created with the source field
+        set to the current object.
         """
         from cms.utils.placeholder import get_declared_placeholders_for_obj
 
@@ -823,6 +824,23 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
                 '<script data-cms id="cms-plugin-child-classes-%s" type="text/cms-template">'
                 % placeholders.get(slot=placeholder.slot).pk
             )
+
+    def test_placeholder_relation_field(self):
+        """
+        This tests the PlaceholderRelationField where it returns (does a reverse relation)
+        the placeholders for the attached object.
+        """
+        poll = FancyPoll.objects.create(name='poll 1')
+
+        with self.login_user_context(self.get_superuser()):
+            self.client.get(get_object_edit_url(poll))
+
+        self.assertQuerysetEqual(
+            poll.placeholders.all(),
+            Placeholder.objects.get_for_obj(poll),
+            transform=lambda x: x,
+            ordered=False
+        )
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
