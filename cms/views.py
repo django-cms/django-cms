@@ -224,7 +224,8 @@ def render_object_edit(request, content_type_id, object_id):
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    return extension.toolbar_enabled_models[content_type](request, content_type_obj)
+    render_func = extension.toolbar_enabled_models[content_type.model_class()]
+    return render_func(request, content_type_obj)
 
 
 def render_object_preview(request, content_type_id, object_id):
@@ -241,4 +242,5 @@ def render_object_preview(request, content_type_id, object_id):
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    return extension.toolbar_enabled_models[content_type](request, content_type_obj)
+    render_func = extension.toolbar_enabled_models[content_type.model_class()]
+    return render_func(request, content_type_obj)
