@@ -223,7 +223,7 @@ class Placeholder(models.Model):
         if hasattr(self, '_attached_model_cache'):
             return self._attached_model_cache
 
-        if self.page or self.title_set.exists():
+        if self.page or self.pagecontent_set.exists():
             from cms.models import Page
             self._attached_model_cache = Page
             return Page
@@ -255,7 +255,7 @@ class Placeholder(models.Model):
         if not hasattr(self, '_page'):
             from cms.models.pagemodel import Page
             try:
-                self._page = Page.objects.distinct().get(title_set__placeholders=self)
+                self._page = Page.objects.distinct().get(pagecontent_set__placeholders=self)
             except (Page.DoesNotExist, Page.MultipleObjectsReturned):
                 self._page = None
         return self._page

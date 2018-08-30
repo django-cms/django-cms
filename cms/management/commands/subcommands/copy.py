@@ -8,7 +8,7 @@ from django.db import transaction
 
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import Page, StaticPlaceholder, EmptyTitle
+from cms.models import EmptyPageContent, Page, StaticPlaceholder
 from cms.utils import get_language_list
 from cms.utils.plugins import copy_plugins_to_placeholder
 
@@ -55,7 +55,7 @@ class CopyLangCommand(SubcommandsCommand):
             if from_lang in page.get_languages():
 
                 title = page.get_title_obj(to_lang, fallback=False)
-                if isinstance(title, EmptyTitle):
+                if isinstance(title, EmptyPageContent):
                     title = page.get_title_obj(from_lang)
                     if verbose:
                         self.stdout.write('copying title %s from language %s\n' % (title.title, from_lang))

@@ -19,7 +19,7 @@ from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
-from cms.models import Title, Page
+from cms.models import Page, PageContent
 from cms.middleware.page import get_page
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
@@ -153,7 +153,7 @@ class ApphooksTestCase(CMSTestCase):
                                     created_by=superuser, apphook="SampleApp")
         create_page("not-apphooked-page", "nav_playground.html", "en",
                     created_by=superuser, apphook="", slug='blankapp')
-        english_title = page.title_set.all()[0]
+        english_title = page.pagecontent_set.all()[0]
         self.assertEqual(english_title.language, 'en')
         create_title("de", "aphooked-page-de", page)
         with force_language("en"):
@@ -419,7 +419,7 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         titles = self.create_base_structure(NS_APP_NAME, ['en', 'de'], 'instance_1')
         public_de_title = titles[1]
-        de_title = Title.objects.get(page=public_de_title.page, language="de")
+        de_title = PageContent.objects.get(page=public_de_title.page, language="de")
 
         self.reload_urls()
         self.apphook_clear()
