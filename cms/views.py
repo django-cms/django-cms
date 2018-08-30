@@ -8,7 +8,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse, resolve
+from django.urls import reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
@@ -19,8 +19,7 @@ from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
-from cms.page_rendering import (_handle_no_page, _render_welcome_page,
-                                render_page, render_pagecontent)
+from cms.page_rendering import _handle_no_page, _render_welcome_page, render_pagecontent
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
