@@ -340,9 +340,6 @@ def _find_topmost_template(extend_node):
 
 
 def rescan_placeholders_for_obj(obj):
-    if not hasattr(obj, 'get_template'):
-        raise NotImplementedError('%s should implement get_template' % obj.__class__.__name__)
-
     from cms.models import Placeholder
 
     existing = OrderedDict()

@@ -21,7 +21,7 @@ from cms.plugin_pool import plugin_pool
 from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.fancy_poll_app.models import FancyPoll
+from cms.test_utils.project.placeholder_relation_field_app.models import FancyPoll
 from cms.test_utils.project.placeholderapp.models import (
     DynamicPlaceholderSlotExample,
     Example1,

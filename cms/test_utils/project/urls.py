@@ -12,7 +12,7 @@ from cms.utils.conf import get_cms_setting
 from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2, LoginForm3
 from cms.test_utils.project.placeholderapp.views import example_view, latest_view
 from cms.test_utils.project.sampleapp.views import plain_view
-from cms.test_utils.project.fancy_poll_app.views import detail as fancy_poll_detail_view
+from cms.test_utils.project.placeholder_relation_field_app.views import detail as fancy_poll_detail_view
 
 admin.autodiscover()
 

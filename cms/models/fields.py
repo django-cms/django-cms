@@ -101,8 +101,9 @@ class PlaceholderRelationField(GenericRelation):
     def __init__(self, **kwargs):
         kwargs.pop('object_id_field', None)
         kwargs.pop('content_type_field', None)
-
         super(PlaceholderRelationField, self).__init__(
-            Placeholder, object_id_field='object_id', content_type_field='content_type',
+            Placeholder,
+            object_id_field='object_id',
+            content_type_field='content_type',
             **kwargs
         )

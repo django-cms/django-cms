@@ -322,15 +322,20 @@ class ContentRenderer(BaseRenderer):
 
     def render_obj_placeholder(self, slot, context, inherit,
                                nodelist=None, editable=True):
+        from cms.models import Placeholder
+
         # Check if page, if so delegate to render_page_placeholder
         if self.current_page:
-            return self.render_page_placeholder(slot, context, inherit,
-                                                nodelist=nodelist, editable=editable)
+            return self.render_page_placeholder(
+                slot,
+                context,
+                inherit,
+                nodelist=nodelist,
+                editable=editable,
+            )
 
         # Not page, therefore we will use toolbar object as
         # the current object and render the placeholder
-        from cms.models import Placeholder
-
         current_obj = self.toolbar.get_object()
         rescan_placeholders_for_obj(current_obj)
         placeholder = Placeholder.objects.get_for_obj(current_obj).get(slot=slot)
