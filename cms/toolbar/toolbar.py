@@ -103,6 +103,12 @@ class BaseToolbar(ToolbarAPIMixin):
         return False
 
     @cached_property
+    def preview_mode_active(self):
+        if self.is_staff and self._resolver_match:
+            return self._resolver_match.url_name == 'cms_placeholder_render_object_preview'
+        return False
+
+    @cached_property
     def content_mode_active(self):
         if self.structure_mode_active:
             # Structure mode always takes precedence
