@@ -1,0 +1,15 @@
+{% load cms_tags sekizai_tags %}
+<html>
+    <head>
+        <title>Poll: {{ poll.name }}</title>
+        {% render_block "css" %}
+    </head>
+    <body>
+        {% cms_toolbar %}
+        <h1>{{ poll.name }}</h1>
+        {% placeholder "header2" %}
+        {% placeholder "content2" %}
+        {% placeholder "footer2" %}
+        {% render_block "js" %}
+    </body>
+</html>
