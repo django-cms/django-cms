@@ -852,10 +852,10 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page("tbp", "nav_playground.html", "en")
         title_en = self.get_page_title_obj(page)
         edit_url_en = get_object_edit_url(title_en)
-        title_de = create_title('de', 'de page', page)
+        title_de = create_title('de', 'de page', page, template='nav_playground.html')
         edit_url_de = get_object_edit_url(title_de)
         add_plugin(title_de.placeholders.get(slot='body'), "TextPlugin", "de", body='de body')
-        title_fr = create_title('fr', 'fr page', page)
+        title_fr = create_title('fr', 'fr page', page, template='nav_playground.html')
         add_plugin(title_fr.placeholders.get(slot='body'), "TextPlugin", "fr", body='fr body')
 
         staff = self.get_staff()
