@@ -297,6 +297,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         """
         page = create_page('Test', 'col_two.html', 'en')
         # I need to make it seem like the user added another placeholder to the SAME template.
+        page.title_cache['en'] = page.get_title_obj('en')
         page.title_cache['en']._template_cache = 'col_three.html'
 
         request = self.get_request(page=page)
