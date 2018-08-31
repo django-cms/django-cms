@@ -776,10 +776,12 @@ class Modal {
 
                             var action = item.closest('form').prop('action');
 
-                            if (action.match(/delete-plugin/)) {
+                            // in case action is an input (see https://github.com/jquery/jquery/issues/3691)
+                            // it's definitely not a plugin/placeholder deletion
+                            if (typeof action === 'string' && action.match(/delete-plugin/)) {
                                 that.justDeletedPlugin = /delete-plugin\/(\d+)\//gi.exec(action)[1];
                             }
-                            if (action.match(/clear-placeholder/)) {
+                            if (typeof action === 'string' && action.match(/clear-placeholder/)) {
                                 that.justDeletedPlaceholder = /clear-placeholder\/(\d+)\//gi.exec(action)[1];
                             }
                         }
