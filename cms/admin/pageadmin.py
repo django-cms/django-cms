@@ -489,7 +489,12 @@ class BasePageAdmin(admin.ModelAdmin):
             cms_pages.extend(self.model.objects.filter(node__in=nodes))
 
         # Delete all of the pages titles contents
-        placeholders = Placeholder.objects.filter(pagecontent__page__in=cms_pages)
+        ct_page_content = ContentType.objects.get_for_model(PageContent)
+        page_content_objs = PageContent.objects.filter(page__in=cms_pages)
+        placeholders = Placeholder.objects.filter(
+            content_type=ct_page_content,
+            object_id__in=page_content_objs,
+        )
         plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
         QuerySet.delete(plugins)
         placeholders.delete()
@@ -1046,7 +1051,11 @@ class BasePageAdmin(admin.ModelAdmin):
 
         titleopts = PageContent._meta
         app_label = titleopts.app_label
-        saved_plugins = CMSPlugin.objects.filter(placeholder__pagecontent=translation, language=language)
+        placeholders = Placeholder.objects.get_for_obj(translation)
+        saved_plugins = CMSPlugin.objects.filter(
+            placeholder__in=placeholders,
+            language=language,
+        )
         using = router.db_for_read(self.model)
 
         if DJANGO_2_0:

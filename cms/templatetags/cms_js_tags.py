@@ -36,8 +36,8 @@ def bool(value):
 @register.simple_tag()
 def render_cms_structure_js(renderer, obj):
     markup_bits = []
-    obj_placeholders_by_slot = _rescan_placeholders(obj)
-    declared_placeholders = _get_declared_placeholders_for_obj(obj)
+    obj_placeholders_by_slot = rescan_placeholders_for_obj(obj)
+    declared_placeholders = get_declared_placeholders_for_obj(obj)
 
     for placeholder_node in declared_placeholders:
         obj_placeholder = obj_placeholders_by_slot.get(placeholder_node.slot)
@@ -47,22 +47,6 @@ def render_cms_structure_js(renderer, obj):
             markup_bits.append(placeholder_js)
 
     return mark_safe('\n'.join(markup_bits))
-
-
-def _rescan_placeholders(obj):
-    from cms.models import PageContent
-
-    if isinstance(obj, PageContent):
-        return obj.rescan_placeholders()
-    return rescan_placeholders_for_obj(obj)
-
-
-def _get_declared_placeholders_for_obj(obj):
-    from cms.models import PageContent
-
-    if isinstance(obj, PageContent):
-        return obj.page.get_declared_placeholders()
-    return get_declared_placeholders_for_obj(obj)
 
 
 @register.simple_tag(takes_context=True)
