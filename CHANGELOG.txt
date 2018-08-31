@@ -20,6 +20,7 @@
   url on save.
 * Fixed a bug where setting the ``on_delete`` option on ``PlaceholderField``
   and ``PageField`` fields would be ignored.
+* Fixed a bug when deleting a modal from changelist inside a modal
 
 
 === 3.5.2 (2018-04-11) ===
