@@ -10,11 +10,7 @@ def pre_save_page(instance, **kwargs):
 
 
 def pre_delete_page(instance, **kwargs):
-    for placeholder in instance.get_placeholders():
-        for plugin in placeholder.get_plugins().order_by('-depth'):
-            plugin._no_reorder = True
-            plugin.delete(no_mp=True)
-        placeholder.delete()
+    instance.get_placeholders().delete()
     clear_permission_cache()
 
 
