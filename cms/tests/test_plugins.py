@@ -33,10 +33,7 @@ from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
     TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5)
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
     NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate)
-from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_ADD,
-    URL_CMS_PAGE_CHANGE,
-)
+from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request, get_object_edit_url
 from cms.utils.plugins import copy_plugins_to_placeholder
@@ -108,12 +105,6 @@ class PluginsTestBaseCase(CMSTestCase):
     def tearDown(self):
         self._login_context.__exit__(None, None, None)
 
-    def approve_page(self, page):
-        response = self.client.get(URL_CMS_PAGE + "%d/approve/" % page.pk)
-        self.assertRedirects(response, URL_CMS_PAGE)
-        # reload page
-        return self.reload_page(page)
-
     def get_request(self, *args, **kwargs):
         request = super(PluginsTestBaseCase, self).get_request(*args, **kwargs)
         request.placeholder_media = Media()
@@ -155,7 +146,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         # add a new text plugin
         page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(self.get_page_add_uri('en'), page_data)
         page = Page.objects.first()
         created_plugin = self._create_link_plugin_on_page(page)
         # now edit the plugin
@@ -222,11 +213,12 @@ class PluginsTestCase(PluginsTestBaseCase):
                 'excluded_plugins': ['TextPlugin']
             }
         }
+        add_page_endpoint = self.get_page_add_uri('en')
 
         # try to add a new text plugin
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(add_page_endpoint, page_data)
             page = Page.objects.first()
             installed_plugins = plugin_pool.get_all_plugins('body', page)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
@@ -242,7 +234,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         # try to add a new text plugin
         with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
             page_data = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(add_page_endpoint, page_data)
             page = Page.objects.first()
             installed_plugins = plugin_pool.get_all_plugins('body', page)
             installed_plugins = [cls.__name__ for cls in installed_plugins]
@@ -944,7 +936,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         # add a new text plugin
         self.assertEqual(ArticlePluginModel.objects.count(), 0)
         page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
+        self.client.post(self.get_page_add_uri('en'), page_data)
         page = Page.objects.first()
         placeholder = page.get_placeholders(self.FIRST_LANG).get(slot='col_left')
         add_url = self.get_add_plugin_uri(
@@ -988,12 +980,12 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         #create 2nd language page
         page_data.update({
-            'language': self.SECOND_LANG,
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
+            'cms_page': page.pk,
         })
-        response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
-
-        self.assertRedirects(response, URL_CMS_PAGE + "?language=%s" % self.SECOND_LANG)
+        endpoint = self.get_page_add_uri(self.SECOND_LANG, page)
+        response = self.client.post(endpoint, page_data)
+        self.assertRedirects(response, self.get_pages_admin_list_uri(self.SECOND_LANG))
         self.assertEqual(CMSPlugin.objects.filter(language=self.FIRST_LANG).count(), 1)
         self.assertEqual(CMSPlugin.objects.filter(language=self.SECOND_LANG).count(), 0)
         self.assertEqual(CMSPlugin.objects.count(), 1)

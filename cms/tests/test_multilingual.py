@@ -8,8 +8,7 @@ from cms.api import create_page, create_title, add_plugin
 from cms.forms.utils import update_site_and_page_choices
 from cms.exceptions import LanguageError
 from cms.models import EmptyPageContent, PageContent
-from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
+from cms.test_utils.testcases import CMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.conf import get_languages
 
@@ -73,16 +72,16 @@ class MultilingualTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             page_data = self.get_pagedata_from_dbfields(page_data)
 
-            self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG), page_data)
-            self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, TESTLANG))
+            self.client.post(self.get_page_change_uri(TESTLANG, page), page_data)
 
             # Create a different language using the edit admin page
             # This test case is bound in actual experience...
             # pull#1604
+            TESTLANG2 = get_secondary_language(current_site=current_site)
             page_data2 = page_data.copy()
             page_data2['title'] = 'ein Titel'
             page_data2['slug'] = 'ein-slug'
-            TESTLANG2 = get_secondary_language(current_site=current_site)
+            page_data2['cms_page'] = page.pk
             page_data2['language'] = TESTLANG2
 
             # Ensure that the language version is not returned
@@ -90,11 +89,12 @@ class MultilingualTestCase(CMSTestCase):
             self.assertTrue(isinstance(page.get_title_obj(language=TESTLANG2, fallback=False), EmptyPageContent))
 
             # Now create it
-            self.client.post(URL_CMS_PAGE_CHANGE_LANGUAGE % (page.pk, TESTLANG2), page_data2)
+            self.client.post(self.get_page_add_uri(TESTLANG2, page), page_data2)
 
             page = page.reload()
 
             # Test the new language version
+            page._clear_internal_cache()
             self.assertEqual(page.get_title(language=TESTLANG2), page_data2['title'])
             self.assertEqual(page.get_slug(language=TESTLANG2), page_data2['slug'])
 

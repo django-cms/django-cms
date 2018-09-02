@@ -155,21 +155,10 @@ class CreateCMSPageForm(AddPageForm):
     def save(self, **kwargs):
         from cms.api import add_plugin
 
-        new_page = super(CreateCMSPageForm, self).save(**kwargs)
+        new_page = super(CreateCMSPageForm, self).save(**kwargs).page
 
         if self.cleaned_data.get("page_type"):
             return new_page
-
-        parent_node = self.cleaned_data.get('parent_node')
-
-        if parent_node and new_page.parent_page.is_page_type:
-            # the new page was created under a page-type page
-            # set the new page as a page-type too
-            new_page.update(is_page_type=True)
-            new_page.update_translations(
-                self._language,
-                in_navigation=False,
-            )
 
         # If the user provided content, then use that instead.
         content = self.cleaned_data.get('content')

@@ -213,10 +213,10 @@
                             }, {
                                 "title": "{{ _('View')|escapejs }}",
                                 "key": "preview"
-                            }, {% for lang in site_languages %}{
-                                "title": "<a href=\"{% url opts|admin_urlname:'changelist' %}?language={{ lang }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang{% if preview_language == lang %} active{% endif %}\">{{ lang|upper }}</a>",
-                                "key": "{{ lang }}"
-                            }, {% endfor %} {
+                            }, {
+                                "title": "<a href=\"{% url opts|admin_urlname:'changelist' %}?language={{ preview_language }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang active\">{{ preview_language|upper }}</a>",
+                                "key": "{{ preview_language }}"
+                            }, {
                                 "title": "{{ _('Menu')|escapejs }}",
                                 "key": "menu"
                             },
@@ -277,10 +277,10 @@
                         }, {
                             "title": "{{ _('View')|escapejs }}",
                             "key": "preview"
-                        }, {% for lang in site_languages %}{
-                            "title": "<a href=\"{% url opts|admin_urlname:'changelist' %}?language={{ lang }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang{% if preview_language == lang %} active{% endif %}\">{{ lang|upper }}</a>",
-                            "key": "{{ lang }}"
-                        }, {% endfor %} {
+                        }, {
+                            "title": "<a href=\"{% url opts|admin_urlname:'changelist' %}?language={{ preview_language }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang active\">{{ preview_language|upper }}</a>",
+                            "key": "{{ preview_language }}"
+                        }, {
                             "title": "{{ _('Menu')|escapejs }}",
                             "key": "menu"
                         },
