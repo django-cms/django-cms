@@ -898,15 +898,16 @@ class PlaceholderAdmin(admin.ModelAdmin):
         return updated_plugin
 
     def _cut_plugin(self, request, plugin, target_language, target_placeholder):
-        if not self.has_move_plugin_permission(request, plugin, target_placeholder):
-            message = force_text(_("You have no permission to cut this plugin"))
-            raise PermissionDenied(message)
-
-        if not target_placeholder.check_source(request.user):
-            message = force_text(_("You have no permission to cut this plugin"))
-            raise PermissionDenied(message)
-
         source_placeholder = plugin.placeholder
+
+        if not self.has_move_plugin_permission(request, plugin, source_placeholder):
+            message = force_text(_("You have no permission to cut this plugin"))
+            raise PermissionDenied(message)
+
+        if not source_placeholder.check_source(request.user):
+            message = force_text(_("You have no permission to cut this plugin"))
+            raise PermissionDenied(message)
+
         action_token = self._send_pre_placeholder_operation(
             request,
             operation=operations.CUT_PLUGIN,

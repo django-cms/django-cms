@@ -113,7 +113,7 @@ class PlaceholderRelationField(GenericRelation):
             **kwargs
         )
 
-    @cached_property
+    @property
     def checks(self):
         return chain(self.default_checks, self._checks)
 
