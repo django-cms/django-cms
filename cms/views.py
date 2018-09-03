@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
@@ -18,7 +19,8 @@ from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
-from cms.page_rendering import _handle_no_page, render_page, _render_welcome_page
+from cms.page_rendering import (_handle_no_page, _render_welcome_page,
+                                render_page, render_pagecontent)
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
@@ -163,10 +165,11 @@ def details(request, slug):
     if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
 
+    content = page.get_title_obj(language=request_language)
     if hasattr(request, 'toolbar'):
-        request.toolbar.set_object(page.get_title_obj(language=request_language))
+        request.toolbar.set_object(content)
 
-    return render_page(request, page, current_language=request_language, slug=slug)
+    return render_pagecontent(request, content)
 
 
 @require_POST
@@ -216,14 +219,13 @@ def render_object_edit(request, content_type_id, object_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    if not hasattr(content_type_obj, 'get_absolute_url'):
-        return HttpResponseBadRequest('Requested object does not have a valid url')
+    extension = apps.get_app_config('cms').cms_extension
+    if not content_type not in extension.toolbar_enabled_models:
+        return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
-    abs_url = content_type_obj.get_absolute_url()
-    match = resolve(abs_url)
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    return match.func(request, *match.args, **match.kwargs)
+    return extension.toolbar_enabled_models[content_type](request, content_type_obj)
 
 
 def render_object_preview(request, content_type_id, object_id):
@@ -234,11 +236,10 @@ def render_object_preview(request, content_type_id, object_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    if not hasattr(content_type_obj, 'get_absolute_url'):
-        return HttpResponseBadRequest('Requested object does not have a valid url')
+    extension = apps.get_app_config('cms').cms_extension
+    if not content_type not in extension.toolbar_enabled_models:
+        return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
-    abs_url = content_type_obj.get_absolute_url()
-    match = resolve(abs_url)
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    return match.func(request, *match.args, **match.kwargs)
+    return extension.toolbar_enabled_models[content_type](request, content_type_obj)
