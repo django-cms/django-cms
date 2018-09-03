@@ -100,12 +100,10 @@ class PageField(models.ForeignKey):
 
 
 class PlaceholderRelationField(GenericRelation):
-    default_checks = ()
+    default_checks = []
 
     def __init__(self, checks=None, **kwargs):
-        if checks is None:
-            checks = ()
-        self._checks = checks
+        self._checks = checks or ()
         kwargs.pop('object_id_field', None)
         kwargs.pop('content_type_field', None)
         super(PlaceholderRelationField, self).__init__(
@@ -119,5 +117,5 @@ class PlaceholderRelationField(GenericRelation):
     def checks(self):
         return chain(self.default_checks, self._checks)
 
-    def run_checks(self, user, placeholder):
-        return all(check_(user, placeholder) for check_ in self.checks)
+    def run_checks(self, placeholder, user):
+        return all(check_(placeholder, user) for check_ in self.checks)

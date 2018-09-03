@@ -198,7 +198,7 @@ class Placeholder(models.Model):
         remote_field = self._get_source_remote_field()
         if remote_field is None:
             return True
-        return remote_field.run_checks(user, self)
+        return remote_field.run_checks(self, user)
 
     def _get_related_objects(self):
         fields = self._meta._get_fields(
