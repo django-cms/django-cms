@@ -191,7 +191,10 @@ def login(request):
 
 
 def render_object_structure(request, content_type_id, object_id):
-    content_type = ContentType.objects.get_for_id(content_type_id)
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+    except ContentType.DoesNotExist:
+        raise Http404
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
@@ -208,10 +211,14 @@ def render_object_structure(request, content_type_id, object_id):
 
 
 def render_object_edit(request, content_type_id, object_id):
-    content_type = ContentType.objects.get_for_id(content_type_id)
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+    except ContentType.DoesNotExist:
+        raise Http404
+    model = content_type.model_class()
 
     if not is_editable_model(content_type.model_class()):
-        raise Http404
+        return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
@@ -219,17 +226,21 @@ def render_object_edit(request, content_type_id, object_id):
         raise Http404
 
     extension = apps.get_app_config('cms').cms_extension
-    if not content_type not in extension.toolbar_enabled_models:
+    if model not in extension.toolbar_enabled_models:
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    render_func = extension.toolbar_enabled_models[content_type.model_class()]
+    render_func = extension.toolbar_enabled_models[model]
     return render_func(request, content_type_obj)
 
 
 def render_object_preview(request, content_type_id, object_id):
-    content_type = ContentType.objects.get_for_id(content_type_id)
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+    except ContentType.DoesNotExist:
+        raise Http404
+    model = content_type.model_class()
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
@@ -237,10 +248,10 @@ def render_object_preview(request, content_type_id, object_id):
         raise Http404
 
     extension = apps.get_app_config('cms').cms_extension
-    if not content_type not in extension.toolbar_enabled_models:
+    if model not in extension.toolbar_enabled_models:
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    render_func = extension.toolbar_enabled_models[content_type.model_class()]
+    render_func = extension.toolbar_enabled_models[model]
     return render_func(request, content_type_obj)
