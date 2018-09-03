@@ -451,7 +451,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy these plugins.')
-            return PermissionDenied(message)
+            raise PermissionDenied(message)
 
         # Empty the clipboard
         target_placeholder.clear()
@@ -476,7 +476,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy this placeholder.')
-            return PermissionDenied(force_text(message))
+            raise PermissionDenied(force_text(message))
 
         # Empty the clipboard
         target_placeholder.clear()
@@ -522,7 +522,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy these plugins.')
-            return PermissionDenied(force_text(message))
+            raise PermissionDenied(force_text(message))
 
         target_tree_order = target_placeholder.get_plugin_tree_order(
             language=target_language,
@@ -725,7 +725,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not target_placeholder.check_source(request.user):
             message = force_text(_("You have no permission to paste this plugin"))
-            return PermissionDenied(message)
+            raise PermissionDenied(message)
 
         if target_parent:
             target_parent_id = target_parent.pk
