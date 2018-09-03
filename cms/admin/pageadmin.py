@@ -18,6 +18,7 @@ from django.core.exceptions import (ObjectDoesNotExist,
 from django.db import router, transaction
 from django.db.models import Q, Prefetch
 from django.db.models.query import QuerySet
+from django.forms.fields import IntegerField
 from django.http import (
     QueryDict,
     HttpResponseRedirect,
@@ -990,8 +991,9 @@ class PageContentAdmin(admin.ModelAdmin):
 
         try:
             page_id = request.GET.get('cms_page') or request.POST.get('cms_page')
+            page_id = IntegerField().clean(page_id)
             cms_page = Page.objects.get(pk=page_id)
-        except Page.DoesNotExist:
+        except (ValidationError, Page.DoesNotExist):
             cms_page = None
 
         if cms_page:
@@ -1053,12 +1055,13 @@ class PageContentAdmin(admin.ModelAdmin):
 
     def _has_add_permission_from_request(self, request):
         site = get_site(request)
-        parent_node_id = request.GET.get('parent_node', None)
+        parent_node_id = request.GET.get('parent_node')
 
         if parent_node_id:
             try:
+                parent_node_id = IntegerField().clean(parent_node_id)
                 parent_item = Page.objects.get(node=parent_node_id)
-            except self.model.DoesNotExist:
+            except (ValidationError, Page.DoesNotExist):
                 return False
         else:
             parent_item = None
