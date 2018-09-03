@@ -215,9 +215,10 @@ def render_object_edit(request, content_type_id, object_id):
         content_type = ContentType.objects.get_for_id(content_type_id)
     except ContentType.DoesNotExist:
         raise Http404
-    model = content_type.model_class()
+    else:
+        model = content_type.model_class()
 
-    if not is_editable_model(content_type.model_class()):
+    if not is_editable_model(model):
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     try:
@@ -226,6 +227,7 @@ def render_object_edit(request, content_type_id, object_id):
         raise Http404
 
     extension = apps.get_app_config('cms').cms_extension
+
     if model not in extension.toolbar_enabled_models:
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
@@ -240,7 +242,8 @@ def render_object_preview(request, content_type_id, object_id):
         content_type = ContentType.objects.get_for_id(content_type_id)
     except ContentType.DoesNotExist:
         raise Http404
-    model = content_type.model_class()
+    else:
+        model = content_type.model_class()
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
@@ -248,6 +251,7 @@ def render_object_preview(request, content_type_id, object_id):
         raise Http404
 
     extension = apps.get_app_config('cms').cms_extension
+
     if model not in extension.toolbar_enabled_models:
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
