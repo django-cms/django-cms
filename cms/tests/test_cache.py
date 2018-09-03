@@ -619,7 +619,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
         self.page = create_page(
             'en test page', 'nav_playground.html', 'en')
         # Now create and publish as 'de' title
-        create_title('de', "de test page", self.page)
+        create_title('de', "de test page", self.page, template='nav_playground.html')
 
         self.placeholder_en = self.page.get_placeholders("en").filter(slot="body")[0]
         self.placeholder_de = self.page.get_placeholders("de").filter(slot="body")[0]

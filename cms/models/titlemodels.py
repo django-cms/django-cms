@@ -1,19 +1,18 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
-
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
-from cms.models.managers import TitleManager
+from cms.models.fields import PlaceholderRelationField
+from cms.models.managers import PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
 
 
 @python_2_unicode_compatible
-class Title(models.Model):
+class PageContent(models.Model):
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (constants.VISIBILITY_USERS, _('for logged in users only')),
         (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
@@ -30,7 +29,7 @@ class Title(models.Model):
     template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
     # These are the fields whose values are compared when saving
-    # a Title object to know if it has changed.
+    # a PageContent object to know if it has changed.
     editable_fields = [
         'title',
         'redirect',
@@ -48,10 +47,10 @@ class Title(models.Model):
     meta_description = models.TextField(_("description"), blank=True, null=True,
                                         help_text=_("The text displayed in search engines."))
     redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
-    page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="title_set")
+    page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="pagecontent_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     # Placeholders (plugins)
-    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
+    placeholders = PlaceholderRelationField()
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
@@ -77,7 +76,7 @@ class Title(models.Model):
         default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
     )
 
-    objects = TitleManager()
+    objects = PageContentManager()
 
     class Meta:
         unique_together = (('language', 'page'),)
@@ -99,7 +98,7 @@ class Title(models.Model):
         # delete template cache
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
-        super(Title, self).save(**kwargs)
+        super(PageContent, self).save(**kwargs)
 
     def has_placeholder_change_permission(self, user):
         return self.page.has_change_permission(user)
@@ -108,17 +107,9 @@ class Title(models.Model):
         """
         Rescan and if necessary create placeholders in the current template.
         """
-        existing = OrderedDict()
-        placeholders = [pl.slot for pl in self.page.get_declared_placeholders()]
+        from cms.utils.placeholder import rescan_placeholders_for_obj
 
-        for placeholder in self.placeholders.all():
-            if placeholder.slot in placeholders:
-                existing[placeholder.slot] = placeholder
-
-        for placeholder in placeholders:
-            if placeholder not in existing:
-                existing[placeholder] = self.placeholders.create(slot=placeholder)
-        return existing
+        return rescan_placeholders_for_obj(self)
 
     def get_placeholders(self):
         if not hasattr(self, '_placeholder_cache'):
@@ -126,7 +117,7 @@ class Title(models.Model):
         return self._placeholder_cache
 
     def get_ancestor_titles(self):
-        return Title.objects.filter(
+        return PageContent.objects.filter(
             page__in=self.page.get_ancestor_pages(),
             language=self.language,
         )
@@ -192,7 +183,7 @@ class Title(models.Model):
         return self.page.get_absolute_url(language=language)
 
 
-class EmptyTitle(object):
+class EmptyPageContent(object):
     """
     Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.

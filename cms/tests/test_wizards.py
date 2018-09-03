@@ -103,12 +103,12 @@ class WizardTestMixin(object):
             form=ModelWizardForm,
         )
 
-        class TitleWizard(Wizard):
+        class PageContentWizard(Wizard):
             pass
 
         # This is a bad wizard definition as it neither defines a model, nor
         # uses a ModelForm that has model defined in Meta
-        cls.title_wizard = TitleWizard(
+        cls.title_wizard = PageContentWizard(
             title=_(u"Page"),
             weight=100,
             form=BadModelForm,
@@ -398,13 +398,13 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         )
 
         self.assertTrue(form.is_valid())
-        self.assertFalse(Page.objects.filter(title_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
+        self.assertFalse(Page.objects.filter(pagecontent_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
         with self.settings(CMS_TEMPLATES=[("col_invalid.html", "notvalid")]):
             self.assertRaises(TemplateSyntaxError, form.save)
             # The template raised an exception which should cause the database to roll back
             # instead of committing a page in a partial state.
-            self.assertFalse(Page.objects.filter(title_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
+            self.assertFalse(Page.objects.filter(pagecontent_set__template=TEMPLATE_INHERITANCE_MAGIC).exists())
 
     def test_wizard_content_placeholder_setting(self):
         """

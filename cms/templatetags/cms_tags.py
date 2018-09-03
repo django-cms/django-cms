@@ -298,7 +298,7 @@ class Placeholder(Tag):
         inherit = 'inherit' in extra_bits
 
         try:
-            content = renderer.render_page_placeholder(
+            content = renderer.render_obj_placeholder(
                 slot=name,
                 context=context,
                 inherit=inherit,
