@@ -3,7 +3,6 @@ from itertools import chain
 
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
-from django.utils.functional import cached_property
 
 from cms.forms.fields import PageSelectFormField
 from cms.models.placeholdermodel import Placeholder
