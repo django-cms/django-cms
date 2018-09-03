@@ -466,7 +466,7 @@ class PagesTestCase(TransactionCMSTestCase):
         grand_child2_title.save()
 
         self.assertFalse(hasattr(grand_child_title, '_template_cache'))
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             self.assertEqual(child_title.template, constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 

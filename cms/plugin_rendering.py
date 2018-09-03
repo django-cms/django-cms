@@ -23,7 +23,11 @@ from cms.utils import get_language_from_request
 from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
-from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
+from cms.utils.placeholder import (
+    get_toolbar_plugin_struct,
+    rescan_placeholders_for_obj,
+    restore_sekizai_context,
+)
 from cms.utils.plugins import get_plugin_restrictions
 
 
@@ -315,6 +319,35 @@ class ContentRenderer(BaseRenderer):
             'placeholder_id': placeholder.pk,
         }
         return context
+
+    def render_obj_placeholder(self, slot, context, inherit,
+                               nodelist=None, editable=True):
+        from cms.models import Placeholder
+
+        # Check if page, if so delegate to render_page_placeholder
+        if self.current_page:
+            return self.render_page_placeholder(
+                slot,
+                context,
+                inherit,
+                nodelist=nodelist,
+                editable=editable,
+            )
+
+        # Not page, therefore we will use toolbar object as
+        # the current object and render the placeholder
+        current_obj = self.toolbar.get_object()
+        rescan_placeholders_for_obj(current_obj)
+        placeholder = Placeholder.objects.get_for_obj(current_obj).get(slot=slot)
+        content = self.render_placeholder(
+            placeholder,
+            context=context,
+            page=current_obj,
+            editable=editable,
+            use_cache=True,
+            nodelist=None,
+        )
+        return content
 
     def render_page_placeholder(self, slot, context, inherit,
                                 page=None, nodelist=None, editable=True):

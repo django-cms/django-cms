@@ -1595,7 +1595,8 @@ class PermissionsTestCase(PageTestBase):
             "de",
             "permissions-de",
             page.reload(),
-            slug="permissions-de"
+            slug="permissions-de",
+            template="nav_playground.html",
         )
         return translation
 

@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
-
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
+from cms.models.fields import PlaceholderRelationField
 from cms.models.managers import PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
@@ -51,7 +50,7 @@ class PageContent(models.Model):
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="pagecontent_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     # Placeholders (plugins)
-    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
+    placeholders = PlaceholderRelationField()
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
@@ -108,17 +107,9 @@ class PageContent(models.Model):
         """
         Rescan and if necessary create placeholders in the current template.
         """
-        existing = OrderedDict()
-        placeholders = [pl.slot for pl in self.page.get_declared_placeholders()]
+        from cms.utils.placeholder import rescan_placeholders_for_obj
 
-        for placeholder in self.placeholders.all():
-            if placeholder.slot in placeholders:
-                existing[placeholder.slot] = placeholder
-
-        for placeholder in placeholders:
-            if placeholder not in existing:
-                existing[placeholder] = self.placeholders.create(slot=placeholder)
-        return existing
+        return rescan_placeholders_for_obj(self)
 
     def get_placeholders(self):
         if not hasattr(self, '_placeholder_cache'):

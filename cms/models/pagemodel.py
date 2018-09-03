@@ -873,9 +873,10 @@ class Page(models.Model):
         return menu_title
 
     def get_placeholders(self, language):
-        from cms.models import Placeholder
+        from cms.models import PageContent, Placeholder
 
-        return Placeholder.objects.filter(pagecontent__language=language, pagecontent__page=self)
+        page_content = PageContent.objects.get(language=language, page=self)
+        return Placeholder.objects.get_for_obj(page_content)
 
     def get_changed_date(self, language=None, fallback=True, force_reload=False):
         """

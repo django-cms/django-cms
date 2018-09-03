@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from cms.cache.choices import (
     clean_site_choices_cache, clean_page_choices_cache,
     _site_cache_key, _page_cache_key)
-from cms.models import Page, PageContent
+from cms.models import Page
 from cms.utils import i18n
 
 
@@ -26,6 +26,8 @@ def get_sites():
 
 
 def get_page_choices_for_site(site, language):
+    from cms.models import PageContent
+
     fallbacks = i18n.get_fallback_languages(language, site_id=site.pk)
     languages = [language] + fallbacks
     translation_lookup = Prefetch(

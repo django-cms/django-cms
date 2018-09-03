@@ -96,7 +96,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     template = None
 
     if page:
-        template = page.template
+        template = page.get_template()
 
     modules = get_placeholder_conf("plugin_modules", slot, template, default={})
     names = get_placeholder_conf("plugin_labels", slot, template, default={})
@@ -337,3 +337,29 @@ def _find_topmost_template(extend_node):
         return _find_topmost_template(node)
         # No ExtendsNode
     return extend_node.get_parent(get_context())
+
+
+def rescan_placeholders_for_obj(obj):
+    from cms.models import Placeholder
+
+    existing = OrderedDict()
+    declared_placeholders = get_declared_placeholders_for_obj(obj)
+    placeholders = [pl.slot for pl in declared_placeholders]
+
+    for placeholder in Placeholder.objects.get_for_obj(obj):
+        if placeholder.slot in placeholders:
+            existing[placeholder.slot] = placeholder
+
+    for placeholder in placeholders:
+        if placeholder not in existing:
+            existing[placeholder] = Placeholder.objects.create(
+                slot=placeholder,
+                source=obj,
+            )
+    return existing
+
+
+def get_declared_placeholders_for_obj(obj):
+    if not hasattr(obj, 'get_template'):
+        raise NotImplementedError('%s should implement get_template' % obj.__class__.__name__)
+    return get_placeholders(obj.get_template())
