@@ -186,6 +186,20 @@ class Placeholder(models.Model):
                 return False
         return True
 
+    def _get_source_remote_field(self):
+        if self.source is None:
+            return
+        return next(
+            f for f in self.source._meta.get_fields()
+            if f.related_model == Placeholder
+        )
+
+    def check_source(self, user):
+        remote_field = self._get_source_remote_field()
+        if remote_field is None:
+            return True
+        return remote_field.run_checks(self, user)
+
     def _get_related_objects(self):
         fields = self._meta._get_fields(
             forward=False, reverse=True,
