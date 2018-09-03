@@ -456,7 +456,7 @@ class PageToolbar(CMSToolbar):
             new_page_params = {'edit': 1}
             new_sub_page_params = {'edit': 1, 'parent_node': self.page.node_id}
 
-            add_page_url = admin_reverse('cms_page_add')
+            add_page_url = admin_reverse('cms_pagecontent_add')
             advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
             page_settings_url = admin_reverse('cms_pagecontent_change', args=(self.title.pk,))
             duplicate_page_url = admin_reverse('cms_pagecontent_duplicate', args=[self.title.pk])

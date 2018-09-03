@@ -950,7 +950,7 @@ class PageContentAdmin(admin.ModelAdmin):
             # because its value is in the url,
             # we have to set the initial value manually
             request.GET = request.GET.copy()
-            request.GET['source'] = obj.page_ic
+            request.GET['source'] = obj.page_id
         return self.add_view(request)
 
     def get_unihandecode_context(self, language):
