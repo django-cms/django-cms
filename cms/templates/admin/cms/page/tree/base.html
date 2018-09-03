@@ -22,7 +22,7 @@
         <div class="breadcrumbs cms-pagetree-breadcrumbs">
             <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
             <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a> &rsaquo;
-            {{ opts.verbose_name_plural|capfirst|escape }}
+            Pages
             {# TODO might remove this or add reset #}
             {% if request.GET.q or request.POST.q %}
             &rsaquo; {% trans "Search" %}
@@ -138,7 +138,7 @@
                     {% if has_add_permission %}
                         <a href="{% url opts|admin_urlname:'add' %}" class="cms-pagetree-header-create cms-btn cms-btn-toolbar cms-btn-action">
                             {% blocktrans with opts.verbose_name|title as name %}
-                                New {{ name }}
+                                New Page
                             {% endblocktrans %}
                         </a>
                     {% endif %}
@@ -148,8 +148,15 @@
             <div class="clear"></div>
 
             <form id="changelist-form" action="" method="post" novalidate>{% csrf_token %}
-                <div class="cms-pagetree cms-pagetree-section">
+                <div class="cms-pagetree cms-pagetree-section cms-pagetree-section-header">
                     <h2>{% trans "Main Navigation" %}</h2>
+                    {% if LANGUAGES|length > 1 %}
+                        <select class="js-cms-pagetree-languages">
+                            {% for language_code, name in LANGUAGES %}
+                                <option value="{{ language_code }}" {% if request.GET.language == language_code or not request.GET.language and forloop.first %} selected{% endif %}>{{ name }}</option>
+                            {% endfor %}
+                        </select>
+                    {% endif %}
                     <div class="cms-pagetree-section-nav">
                         {% if has_add_permission %}
                             <div class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
@@ -178,9 +185,9 @@
                         <div class="cms-pagetree-jstree js-cms-pagetree" data-json='{
                             "urls": {
                                 "tree": "{% url opts|admin_urlname:'get_tree' %}",
-                                "move": "./{id}/move-page/",
-                                "copy": "./{id}/copy-page/",
-                                "copyPermission": "./{id}/dialog/copy/",
+                                "move": "../page/{id}/move-page/",
+                                "copy": "../page/{id}/copy-page/",
+                                "copyPermission": "../page/{id}/dialog/copy/",
                                 "theme": "{% static 'cms/css/' %}"
                             },
                             "csrf": "{{ csrf_token }}",
@@ -242,9 +249,9 @@
                         "empty": true,
                         "urls": {
                             "tree": "{% url opts|admin_urlname:'get_tree' %}",
-                            "move": "./{id}/move-page/",
-                            "copy": "./{id}/copy-page/",
-                            "copyPermission": "./{id}/dialog/copy/",
+                            "move": "../page/{id}/move-page/",
+                            "copy": "../page/{id}/copy-page/",
+                            "copyPermission": "../page/{id}/dialog/copy/",
                             "theme": "{% static 'cms/css/' %}"
                         },
                         "csrf": "{{ csrf_token }}",
@@ -290,7 +297,7 @@
                         }]
                     }' data-settings-url="{% cms_admin_url "cms_usersettings_session_store" %}">
                         {% url opts|admin_urlname:'add' as add_url %}
-                        {% blocktrans with object=opts.verbose_name|lower %}
+                        {% blocktrans with object='page' %}
                             <em>There is no {{ object }} around yet.</em>
                             <br>
                             <a href="{{ add_url }}" class="addlink">Add {{ object }}</a> now.

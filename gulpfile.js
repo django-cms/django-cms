@@ -57,7 +57,7 @@ var INTEGRATION_TESTS = [
         // 'wizard',  FIXME broken wizard step 2 form in Django >= 2.0
         // 'editMode', // broken
         'sideframe', // WORKS
-        // 'createContent', FIXME broken cause of text plugin
+        'createContent',
         'users', // WORKS
         'addNewUser', // WORKS
         'newPage', // WORKS
@@ -73,13 +73,13 @@ var INTEGRATION_TESTS = [
     [
         // 'pageTypes', // FIXME fails on adding TextPlugin mid tree
         // 'switchLanguage', // FIXME fails because EmptyTitle doesn't have rescan_placeholders
-        // 'editContent', // FIXME broken cause of text plugin
+        'editContent', // FIXME broken cause of text plugin
         // 'editContentTools', // FIXME fails when pasting with a weird error. looks ckeditor related
         // 'publish', // broken
         // 'loginToolbar', // fails since page is never published
         'changeSettings', // WORKS
         // 'toolbar-login-apphooks', // broken
-        'permissions-enabled', // WORKS
+        // 'permissions-enabled', // permissions were moved into advanced settings
         // {
         //     serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
         //     file: 'copy-from-language'
@@ -88,14 +88,14 @@ var INTEGRATION_TESTS = [
         //     serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
         //     file: 'pagetree-no-permission'
         // },
-        {
-            serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
-            file: 'permissions-disabled' // WORKS
-        }
+        // {
+        //     serverArgs: '--CMS_PERMISSION=False --CMS_TOOLBAR_URL__EDIT_ON=test-edit',
+        //     file: 'permissions-disabled' // permissions were moved into advanced settings
+        // }
     ],
     [
-        // 'pagetree',
-        // 'pagetree-drag-n-drop-copy',
+        'pagetree',
+        'pagetree-drag-n-drop-copy',
         'disableToolbar', // WORKS
         // 'dragndrop', // FIXME broken cause of text editor
         'copy-apphook-page' // WORKS

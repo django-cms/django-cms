@@ -378,6 +378,17 @@
         margin-top: -1px;
     }
 }
+
+.cms-pagetree-section-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    select {
+        width: 120px !important;
+        margin-left: 15px;
+    }
+}
 .cms-pagetree-section-condensed {
     padding: $pagetree-section-padding-condensed;
 }
