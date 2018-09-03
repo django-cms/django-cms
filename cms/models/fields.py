@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
+from itertools import chain
+
 from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
+from django.utils.functional import cached_property
 
 from cms.forms.fields import PageSelectFormField
 from cms.models.placeholdermodel import Placeholder
@@ -97,8 +100,12 @@ class PageField(models.ForeignKey):
 
 
 class PlaceholderRelationField(GenericRelation):
+    default_checks = ()
 
-    def __init__(self, **kwargs):
+    def __init__(self, checks=None, **kwargs):
+        if checks is None:
+            checks = ()
+        self._checks = checks
         kwargs.pop('object_id_field', None)
         kwargs.pop('content_type_field', None)
         super(PlaceholderRelationField, self).__init__(
@@ -107,3 +114,10 @@ class PlaceholderRelationField(GenericRelation):
             content_type_field='content_type',
             **kwargs
         )
+
+    @cached_property
+    def checks(self):
+        return chain(self.default_checks, self._checks)
+
+    def run_checks(self, user, placeholder):
+        return all(check_(user, placeholder) for check_ in self.checks)
