@@ -365,8 +365,11 @@ class PageAdmin(admin.ModelAdmin):
             **get_deleted_objects_additional_kwargs
         )
 
+        # This is bad and I should feel bad.
+        if 'placeholder' in perms_needed:
+            perms_needed.remove('placeholder')
+
         if 'page content' in perms_needed:
-            # This is bad and I should feel bad.
             perms_needed.remove('page content')
 
         if request.POST and not protected:  # The user has confirmed the deletion.
@@ -1260,6 +1263,7 @@ class PageContentAdmin(admin.ModelAdmin):
             copy_plugins_to_placeholder(plugins, target, language=target_language)
         return HttpResponse("ok")
 
+    @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
         page_content = self.get_object(request, object_id=object_id)
         page = page_content.page
@@ -1331,8 +1335,11 @@ class PageContentAdmin(admin.ModelAdmin):
             list(perms_needed_plugins)
         )
 
+        # This is bad and I should feel bad.
+        if 'placeholder' in perms_needed:
+            perms_needed.remove('placeholder')
+
         if 'page content' in perms_needed:
-            # This is bad and I should feel bad.
             perms_needed.remove('page content')
 
         if request.method == 'POST':

@@ -12,6 +12,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.AlterModelOptions(
+            name='placeholder',
+            options={'default_permissions': [], 'permissions': (('use_structure', 'Can use Structure mode'),)},
+        ),
         migrations.RemoveField(
             model_name='pagecontent',
             name='placeholders',

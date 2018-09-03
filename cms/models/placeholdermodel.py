@@ -52,6 +52,7 @@ class Placeholder(models.Model):
 
     class Meta:
         app_label = 'cms'
+        default_permissions = []
         permissions = (
             (u"use_structure", u"Can use Structure mode"),
         )
