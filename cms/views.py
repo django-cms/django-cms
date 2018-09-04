@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
@@ -7,7 +8,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse, resolve
+from django.urls import reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
@@ -18,7 +19,7 @@ from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
-from cms.page_rendering import _handle_no_page, render_page, _render_welcome_page
+from cms.page_rendering import _handle_no_page, _render_welcome_page, render_pagecontent
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
@@ -163,10 +164,13 @@ def details(request, slug):
     if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
 
+    content = page.get_title_obj(language=request_language)
+    # use the page object with populated cache
+    content.page = page
     if hasattr(request, 'toolbar'):
-        request.toolbar.set_object(page.get_title_obj(language=request_language))
+        request.toolbar.set_object(content)
 
-    return render_page(request, page, current_language=request_language, slug=slug)
+    return render_pagecontent(request, content)
 
 
 @require_POST
@@ -189,7 +193,10 @@ def login(request):
 
 
 def render_object_structure(request, content_type_id, object_id):
-    content_type = ContentType.objects.get_for_id(content_type_id)
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+    except ContentType.DoesNotExist:
+        raise Http404
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
@@ -206,39 +213,51 @@ def render_object_structure(request, content_type_id, object_id):
 
 
 def render_object_edit(request, content_type_id, object_id):
-    content_type = ContentType.objects.get_for_id(content_type_id)
-
-    if not is_editable_model(content_type.model_class()):
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+    except ContentType.DoesNotExist:
         raise Http404
+    else:
+        model = content_type.model_class()
+
+    if not is_editable_model(model):
+        return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
 
-    if not hasattr(content_type_obj, 'get_absolute_url'):
-        return HttpResponseBadRequest('Requested object does not have a valid url')
+    extension = apps.get_app_config('cms').cms_extension
 
-    abs_url = content_type_obj.get_absolute_url()
-    match = resolve(abs_url)
+    if model not in extension.toolbar_enabled_models:
+        return HttpResponseBadRequest('Requested object does not support frontend rendering')
+
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    return match.func(request, *match.args, **match.kwargs)
+    render_func = extension.toolbar_enabled_models[model]
+    return render_func(request, content_type_obj)
 
 
 def render_object_preview(request, content_type_id, object_id):
-    content_type = ContentType.objects.get_for_id(content_type_id)
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+    except ContentType.DoesNotExist:
+        raise Http404
+    else:
+        model = content_type.model_class()
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
 
-    if not hasattr(content_type_obj, 'get_absolute_url'):
-        return HttpResponseBadRequest('Requested object does not have a valid url')
+    extension = apps.get_app_config('cms').cms_extension
 
-    abs_url = content_type_obj.get_absolute_url()
-    match = resolve(abs_url)
+    if model not in extension.toolbar_enabled_models:
+        return HttpResponseBadRequest('Requested object does not support frontend rendering')
+
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    return match.func(request, *match.args, **match.kwargs)
+    render_func = extension.toolbar_enabled_models[model]
+    return render_func(request, content_type_obj)
