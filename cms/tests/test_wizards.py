@@ -17,7 +17,7 @@ from cms.api import create_page
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
-from cms.models import Page, PageType, UserSettings
+from cms.models import Page, UserSettings
 from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
@@ -324,54 +324,6 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         self.assertEqual(child_page.parent_page, parent_page)
         self.assertEqual(child_page.get_title('en'), 'Child')
         self.assertEqual(child_page.get_path('en'), 'parent/child')
-
-    def test_wizard_create_child_page_under_page_type(self):
-        """
-        When a user creates a child page through the wizard,
-        if the parent page is a page-type, the child page should
-        also be a page-type.
-        """
-        site = get_current_site()
-        superuser = self.get_superuser()
-
-        with self.login_user_context(superuser):
-            request = self.get_request()
-        source_page = create_page(
-            title="Source",
-            template=TEMPLATE_INHERITANCE_MAGIC,
-            language="en",
-        )
-
-        with self.login_user_context(superuser):
-            self.client.post(
-                self.get_admin_url(PageType, 'add'),
-                data={'source': source_page.pk, 'title': 'type1', 'slug': 'type1', '_save': 1},
-            )
-
-        types_root = PageType.get_root_page(site)
-        parent_page = types_root.get_child_pages()[0]
-        data = {
-            'title': 'page-type-child',
-            'slug': 'page-type-child',
-            'page_type': None,
-        }
-        form = CreateCMSSubPageForm(
-            data=data,
-            wizard_page=parent_page,
-            wizard_site=site,
-            wizard_language='en',
-            wizard_request=request,
-        )
-        self.assertTrue(form.is_valid())
-
-        child_page = form.save()
-
-        self.assertTrue(child_page.is_page_type)
-        self.assertFalse(child_page.get_in_navigation('en'))
-        self.assertEqual(child_page.node.depth, 3)
-        self.assertEqual(child_page.parent_page, parent_page)
-        self.assertEqual(child_page.get_title('en'), 'page-type-child')
-        self.assertEqual(child_page.get_path('en'), 'page_types/type1/page-type-child')
 
     def test_wizard_create_atomic(self):
         # Ref: https://github.com/divio/django-cms/issues/5652

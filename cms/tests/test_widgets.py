@@ -20,6 +20,6 @@ class WidgetTestCases(CMSTestCase):
     def test_pagesmartwidget(self):
         create_page("Test page", "nav_playground.html", "en")
         create_page("Test page2", "nav_playground.html", "en")
-        widget = PageSmartLinkWidget(ajax_view='admin:cms_page_get_published_pagelist')
+        widget = PageSmartLinkWidget(ajax_view='admin:cms_page_get_list')
         widget.language = 'en'
         self.assertIn('page', widget.render("page", ''))

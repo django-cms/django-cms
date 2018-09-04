@@ -631,11 +631,12 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'i-want-another-url/')
 
-        endpoint = self.get_admin_url(Page, 'change', page2.pk)
+        endpoint = self.get_page_change_uri('en', page2)
 
         with self.login_user_context(superuser):
-            response = self.client.post(endpoint, {'title': 'test page 2', 'slug': 'page-test-2'})
-            self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
+            data = {'title': 'test page 2', 'slug': 'page-test-2', 'template': 'nav_playground.html'}
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
         page2 = Page.objects.get(pk=page2.pk)
         page3 = Page.objects.get(pk=page3.pk)
@@ -881,12 +882,12 @@ class PageTreeTests(CMSTestCase):
         create_page('grandpa', 'nav_playground.html', 'en', slug='home')
         parent = create_page('parent', 'nav_playground.html', 'en', slug='parent')
         child = create_page('child', 'nav_playground.html', 'en', slug='child', parent=parent)
-
-        endpoint = self.get_admin_url(Page, 'change', parent.pk)
+        endpoint = self.get_page_change_uri('en', parent)
 
         with self.login_user_context(superuser):
-            response = self.client.post(endpoint, {'title': 'parent', 'slug': 'father'})
-            self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
+            data = {'title': 'parent', 'slug': 'father', 'template': 'nav_playground.html'}
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
         child = Page.objects.get(pk=child.pk)
 
@@ -903,12 +904,12 @@ class PageTreeTests(CMSTestCase):
                                  parent=child.reload())
         grandchild_3 = create_page('grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3',
                                  parent=child.reload())
-
-        endpoint = self.get_admin_url(Page, 'change', parent.pk)
+        endpoint = self.get_page_change_uri('en', parent)
 
         with self.login_user_context(superuser):
-            response = self.client.post(endpoint, {'title': 'parent', 'slug': 'father'})
-            self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
+            data = {'title': 'parent', 'slug': 'father', 'template': 'nav_playground.html'}
+            response = self.client.post(endpoint, data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
         self.assertEqual(grandchild_1.get_absolute_url(language='en'), '/en/father/child/grandchild-1/')
         self.assertEqual(grandchild_2.get_absolute_url(language='en'), '/en/father/child/grandchild-2/')

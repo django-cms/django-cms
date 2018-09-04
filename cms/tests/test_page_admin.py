@@ -17,18 +17,17 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.admin.pageadmin import PageAdmin
+from cms.admin.pageadmin import PageContentAdmin
 from cms.api import create_page, add_plugin, create_title
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models import PageContent
-from cms.models.pagemodel import Page, PageType, PageUrl
+from cms.models.pagemodel import Page, PageUrl
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_MOVE,
-    URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD
+    CMSTestCase, URL_CMS_PAGE_MOVE,
 )
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
@@ -139,12 +138,6 @@ class PageTestBase(CMSTestCase):
         page_data = self.get_new_page_data_dbfields()
         return create_page(**page_data)
 
-    def get_admin(self):
-        """
-        Returns a PageAdmin instance.
-        """
-        return PageAdmin(Page, admin.site)
-
     def get_post_request(self, data):
         return self.get_request(post_data=data)
 
@@ -165,7 +158,7 @@ class PageTest(PageTestBase):
         superuser = self.get_superuser()
 
         with self.login_user_context(superuser):
-            response = self.client.get(URL_CMS_PAGE_ADD)
+            response = self.client.get(self.get_page_add_uri('en'))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<title>Add a page</title>', html=True)
 
@@ -180,8 +173,8 @@ class PageTest(PageTestBase):
             self.assertEqual(PageContent.objects.all().count(), 0)
             self.assertEqual(Page.objects.all().count(), 0)
             # create home
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(self.get_page_add_uri('en'), page_data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
             page_url = PageUrl.objects.get(slug=page_data['slug'])
             self.assertEqual(page_url.page.get_title(), page_data['title'])
@@ -208,21 +201,23 @@ class PageTest(PageTestBase):
         self.assertEqual(Page.objects.all().count(), 0)
         # create home
         with self.settings(SITE_ID=2):
+            endpoint = self.get_page_add_uri('en')
             # url uses "en" as the request language
             # but the site is configured to use "de" and "fr"
-            response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
-            self.assertRedirects(response, URL_CMS_PAGE)
+            response = client.post(endpoint, self.get_new_page_data())
+            self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
             self.assertEqual(Page.objects.filter(node__site=2).count(), 1)
             self.assertEqual(PageContent.objects.filter(language='de').count(), 1)
 
         # The user is on site #1 but switches sites using the site switcher
         # on the page changelist.
-        client.post(self.get_admin_url(Page, 'changelist'), {'site': 2})
+        client.post(self.get_pages_admin_list_uri(), {'site': 2})
 
         # url uses "en" as the request language
         # but the site is configured to use "de" and "fr"
-        response = client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
-        self.assertRedirects(response, URL_CMS_PAGE)
+        endpoint = self.get_page_add_uri('en')
+        response = client.post(endpoint, self.get_new_page_data())
+        self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
         self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
         self.assertEqual(PageContent.objects.filter(language='de').count(), 2)
 
@@ -238,8 +233,8 @@ class PageTest(PageTestBase):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             # create home and auto publish
-            response = self.client.post(URL_CMS_PAGE_ADD, page_1)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(self.get_page_add_uri('en'), page_1)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
             home_url = PageUrl.objects.get(slug=page_1['slug'])
 
@@ -247,15 +242,16 @@ class PageTest(PageTestBase):
             page_3 = self.get_new_page_data(parent_id=home_url.page.node.pk)
             page_4 = self.get_new_page_data(parent_id=home_url.page.node.pk)
 
-            response = self.client.post(URL_CMS_PAGE_ADD, page_2)
-            self.assertRedirects(response, URL_CMS_PAGE)
-            response = self.client.post(URL_CMS_PAGE_ADD, page_3)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(self.get_page_add_uri('en'), page_2)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
+            response = self.client.post(self.get_page_add_uri('en'), page_3)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
             page2_url = PageUrl.objects.get(slug=page_2['slug'])
 
-            response = self.client.post(URL_CMS_PAGE_ADD + '?target=%s&amp;position=right' % page2_url.page.pk, page_4)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            add_endpoint = self.get_page_add_uri('en')
+            response = self.client.post(add_endpoint + '&target=%s&amp;position=right' % page2_url.page.pk, page_4)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
     def test_slug_collision(self):
         """
@@ -265,23 +261,23 @@ class PageTest(PageTestBase):
         # create first page
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
+            add_endpoint = self.get_page_add_uri('en')
             # Home
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(add_endpoint, page_data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
             # Second root
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(add_endpoint, page_data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            new_page_id = Page.objects.only('id').latest('id').pk
+            response = self.client.post(add_endpoint, page_data)
+            new_page = Page.objects.only('id').latest('id')
             expected_error = (
                 '<ul class="errorlist"><li>Page '
                 '<a href="{}" target="_blank">test page 1</a> '
                 'has the same url \'test-page-1\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', new_page_id))
+            ).format(self.get_page_change_uri('en', new_page))
 
             self.assertEqual(response.status_code, 200)
-            self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
             self.assertContains(response, expected_error)
 
     def test_child_slug_collision(self):
@@ -294,47 +290,45 @@ class PageTest(PageTestBase):
         child_page = create_page("child-page", 'nav_playground.html', "en", parent=root)
         root.set_as_homepage()
         superuser = self.get_superuser()
+        add_endpoint = self.get_page_add_uri('en')
         with self.login_user_context(superuser):
             # slug collision between two child pages of the same node
             page_data = self.get_new_page_data(page.node.pk)
             page_data['slug'] = 'subpage'
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            response = self.client.post(add_endpoint, page_data)
             expected_markup = (
                 '<ul class="errorlist">'
                 '<li>Page <a href="{}" target="_blank">subpage</a> '
                 'has the same url \'page/subpage\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', sub_page.pk))
+            ).format(self.get_page_change_uri('en', sub_page))
 
             self.assertEqual(response.status_code, 200)
-            self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
             self.assertContains(response, expected_markup)
 
             # slug collision between page with no parent and a child page of home-page
             page_data = self.get_new_page_data()
             page_data['slug'] = 'child-page'
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            response = self.client.post(add_endpoint, page_data)
             expected_markup = (
                 '<ul class="errorlist">'
                 '<li>Page <a href="{}" target="_blank">child-page</a> '
                 'has the same url \'child-page\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', child_page.pk))
+            ).format(self.get_page_change_uri('en', child_page))
 
             self.assertEqual(response.status_code, 200)
-            self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
             self.assertContains(response, expected_markup)
 
             # slug collision between two top-level pages
             page_data = self.get_new_page_data()
             page_data['slug'] = 'page'
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            response = self.client.post(add_endpoint, page_data)
             expected_markup = (
                 '<ul class="errorlist">'
                 '<li>Page <a href="{}" target="_blank">page</a> '
                 'has the same url \'page\' as current page.</li></ul>'
-            ).format(self.get_admin_url(Page, 'change', page.pk))
+            ).format(self.get_page_change_uri('en', page))
 
             self.assertEqual(response.status_code, 200)
-            self.assertTrue(response.request['PATH_INFO'].endswith(URL_CMS_PAGE_ADD))
             self.assertContains(response, expected_markup)
 
     def test_edit_page(self):
@@ -344,14 +338,17 @@ class PageTest(PageTestBase):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            endpoint = self.get_page_add_uri('en')
+            self.client.post(endpoint, page_data)
             page = Page.objects.get(urls__slug=page_data['slug'])
-            response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
+            response = self.client.get(self.get_page_change_uri('en', page))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<title>Change a page</title>', html=True)
             page_data['title'] = 'changed title'
-            response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            page_data['template'] = page.get_template('en')
+            response = self.client.post(self.get_page_change_uri('en', page), page_data)
+            page._clear_internal_cache()
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
             self.assertEqual(page.get_title(), 'changed title')
 
     def test_page_redirect_field_validation(self):
@@ -359,12 +356,12 @@ class PageTest(PageTestBase):
         data = self.get_new_page_data()
 
         with self.login_user_context(superuser):
-            self.client.post(URL_CMS_PAGE_ADD, data)
+            self.client.post(self.get_page_add_uri('en'), data)
 
         page = Page.objects.get(urls__slug=data['slug'])
-        data = {'template': page.template}
-        endpoint = URL_CMS_PAGE_ADVANCED_CHANGE % page.pk
-        redirect_to = URL_CMS_PAGE
+        data['template'] = page.template
+        endpoint = self.get_page_change_uri('en', page)
+        redirect_to = self.get_pages_admin_list_uri('en')
 
         with self.login_user_context(superuser):
             data['redirect'] = '/'
@@ -413,13 +410,14 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
             page_data["meta_description"] = "I am a page"
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(self.get_page_add_uri('en'), page_data)
             page = Page.objects.get(urls__slug=page_data['slug'])
-            response = self.client.get(URL_CMS_PAGE_CHANGE % page.id)
+            response = self.client.get(self.get_page_change_uri('en', page))
             self.assertEqual(response.status_code, 200)
+            page_data['template'] = page.get_template('en')
             page_data['meta_description'] = 'I am a duck'
-            response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(self.get_page_change_uri('en', page), page_data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
             page = Page.objects.get(urls__slug=page_data["slug"])
             self.assertEqual(page.get_meta_description(), 'I am a duck')
 
@@ -431,9 +429,9 @@ class PageTest(PageTestBase):
             page_data = self.get_new_page_data()
             page_data["title"] = "Hello"
             page_data["meta_description"] = "I am a page"
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(self.get_page_add_uri('en'), page_data)
             page = Page.objects.get(urls__slug=page_data['slug'])
-            self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
+            self.client.post(self.get_page_change_uri('en', page), page_data)
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute title %} {% page_attribute meta_description %}")
             req = HttpRequest()
@@ -452,9 +450,9 @@ class PageTest(PageTestBase):
             # some databases don't store microseconds, so move the start flag
             # back by 1 second
             before_change = tz_now()+datetime.timedelta(seconds=-1)
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.client.post(self.get_page_add_uri('en'), page_data)
             page = Page.objects.get(urls__slug=page_data['slug'])
-            self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
+            self.client.post(self.get_page_change_uri('en', page), page_data)
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute changed_by %} changed "
                 "on {% page_attribute changed_date as page_change %}"
@@ -496,8 +494,9 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
             for page in page_tree:
-                edit_url = self.get_admin_url(Page, 'change', page.pk)
-                page_markup = row_markup % (edit_url, page.get_title('en'))
+                content = page.get_title_obj('en')
+                edit_url = self.get_admin_url(PageContent, 'change', content.pk)
+                page_markup = row_markup % (edit_url, str(content))
                 self.assertContains(response, page_markup, html=True)
 
     def test_homepage_with_children(self):
@@ -606,81 +605,6 @@ class PageTest(PageTestBase):
             PageUrl.objects.filter(slug=new_slug, path=new_path).count(),
             1,
         )
-
-    def test_copy_page_to_root_with_pagetypes(self):
-        """
-        When a page is copied, the cms should not count page types
-        when calculating where the sibling node of the new page.
-        """
-        data = {
-            'position': 4,
-            'source_site': 1,
-            'copy_permissions': 'on',
-            'copy_moderation': 'on',
-        }
-        superuser = self.get_superuser()
-        page_1 = create_page("page_a", "nav_playground.html", "en")
-        page_2 = create_page("page_b", "nav_playground.html", "en")
-
-        with self.login_user_context(superuser):
-            # Creates a page type whose nodes will be in the middle
-            # of other page nodes.
-            self.client.post(
-                self.get_admin_url(PageType, 'add'),
-                data={'source': page_1.pk, 'title': 'type1', 'slug': 'type1', '_save': 1},
-            )
-            self.client.post(
-                self.get_admin_url(PageType, 'add'),
-                data={'source': page_1.pk, 'title': 'type2', 'slug': 'type2', '_save': 1},
-            )
-            page_type_0 = self.assertObjectExist(
-                Page.objects.all(),
-                is_page_type=True,
-                node__parent__isnull=True,
-            )
-            page_type_1 = self.assertObjectExist(
-                Page.objects.all(),
-                is_page_type=True,
-                urls__slug='type1',
-            )
-            page_type_2 = self.assertObjectExist(
-                Page.objects.all(),
-                is_page_type=True,
-                urls__slug='type2',
-            )
-
-            # Add some normal pages on top of the page type nodes
-            page_3 = create_page("page_c", "nav_playground.html", "en")
-            page_4 = create_page("page_d", "nav_playground.html", "en")
-
-            # Copy a page and insert it at the bottom of all pages
-            endpoint = self.get_admin_url(Page, 'copy_page', page_1.pk)
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 200)
-
-        new_slug = page_1.get_path('en') + '-copy-2'
-        new_path = page_1.get_slug('en') + '-copy-2'
-
-        page_5_url = self.assertObjectExist(
-            PageUrl.objects.all(),
-            slug=new_slug,
-            path=new_path,
-        )
-        page_5 = page_5_url.page
-
-        tree = (
-            (page_1, '0001'),
-            (page_2, '0002'),
-            (page_type_0, '0003'),
-            (page_type_1, '00030001'),
-            (page_type_2, '00030002'),
-            (page_3, '0004'),
-            (page_4, '0005'),
-            (page_5, '0006'),
-        )
-
-        for page, path in tree:
-            self.assertEqual(self.reload(page.node).path, path)
 
     def test_copy_page_to_different_site(self):
         superuser = self.get_superuser()
@@ -917,28 +841,18 @@ class PageTest(PageTestBase):
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_c, position=0)
 
-    def test_language_change(self):
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            page_data = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_data)
-            pk = Page.objects.first().pk
-            response = self.client.get(URL_CMS_PAGE_CHANGE % pk, {"language": "en"})
-            self.assertEqual(response.status_code, 200)
-            response = self.client.get(URL_CMS_PAGE_CHANGE % pk, {"language": "de"})
-            self.assertEqual(response.status_code, 200)
-
     def test_move_page(self):
         superuser = self.get_superuser()
+        add_endpoint = self.get_page_add_uri('en')
         with self.login_user_context(superuser):
             page_home = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_home)
+            self.client.post(add_endpoint, page_home)
             page_data1 = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_data1)
+            self.client.post(add_endpoint, page_data1)
             page_data2 = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_data2)
+            self.client.post(add_endpoint, page_data2)
             page_data3 = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_data3)
+            self.client.post(add_endpoint, page_data3)
             pages = list(Page.objects.order_by('node__path'))
             home = pages[0]
             page1 = pages[1]
@@ -1048,7 +962,7 @@ class PageTest(PageTestBase):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_home = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_ADD, page_home)
+            self.client.post(self.get_page_add_uri('en'), page_home)
 
             # Create parent page
             page_root = create_page("Parent", 'col_three.html', "en")
@@ -1120,8 +1034,8 @@ class PageTest(PageTestBase):
         page_data['language'] = TESTLANG
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
-            self.assertRedirects(response, URL_CMS_PAGE)
+            response = self.client.post(self.get_page_add_uri('en'), page_data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
             page = Page.objects.get(urls__slug=page_data['slug'])
             with LanguageOverride(TESTLANG):
                 self.assertEqual(page.get_title(), 'changed title')
@@ -1139,17 +1053,20 @@ class PageTest(PageTestBase):
     def test_set_overwrite_url(self):
         superuser = self.get_superuser()
         cms_page = create_page('page', 'nav_playground.html', 'en')
+        translation = cms_page.get_title_obj('en', fallback=False)
         expected = (
             '<input id="id_overwrite_url" maxlength="255" '
             'value="new-url" name="overwrite_url" type="text" />'
         )
-        changelist = self.get_admin_url(Page, 'changelist')
-        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+        changelist = self.get_pages_admin_list_uri()
+        endpoint = self.get_page_change_uri('en', cms_page)
 
         with self.login_user_context(superuser):
             page_data = {
+                'title': translation.title,
+                'slug': cms_page.get_slug('en'),
                 'overwrite_url': '/new-url/',
-                'template': cms_page.template,
+                'template': translation.template,
             }
             response = self.client.post(endpoint, page_data)
             self.assertRedirects(response, changelist)
@@ -1165,17 +1082,20 @@ class PageTest(PageTestBase):
         create_page('home', 'nav_playground.html', 'en')
         boo = create_page('boo', 'nav_playground.html', 'en')
         hoo = create_page('hoo', 'nav_playground.html', 'en')
+        translation = hoo.get_title_obj('en', fallback=False)
         expected_error = (
             '<ul class="errorlist"><li>Page '
             '<a href="{}" target="_blank">boo</a> '
             'has the same url \'boo\' as current page "hoo".</li></ul>'
-        ).format(self.get_admin_url(Page, 'change', boo.pk))
+        ).format(self.get_page_change_uri('en', boo))
 
         with self.login_user_context(superuser):
-            endpoint = self.get_admin_url(Page, 'advanced', hoo.pk)
+            endpoint = self.get_page_change_uri('en', hoo)
             page_data = {
+                'title': translation.title,
+                'slug': hoo.get_slug('en'),
                 'overwrite_url': '/boo/',
-                'template': hoo.template,
+                'template': translation.template,
             }
             response = self.client.post(endpoint, page_data)
             self.assertEqual(response.status_code, 200)
@@ -1190,20 +1110,23 @@ class PageTest(PageTestBase):
             language='en',
             overwrite_url='/new-url/',
         )
+        translation = cms_page.get_title_obj('en', fallback=False)
         expected = (
             '<input id="id_overwrite_url" maxlength="255" '
             'name="overwrite_url" type="text" />'
         )
-        changelist = self.get_admin_url(Page, 'changelist')
-        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+        changelist = self.get_pages_admin_list_uri()
+        endpoint = self.get_page_change_uri('en', cms_page)
 
         # control test
         self.assertTrue(cms_page.urls.filter(path='new-url').exists())
 
         with self.login_user_context(superuser):
             page_data = {
+                'title': translation.title,
+                'slug': cms_page.get_slug('en'),
                 'overwrite_url': '',
-                'template': cms_page.template,
+                'template': translation.template,
             }
             response = self.client.post(endpoint, page_data)
             self.assertRedirects(response, changelist)
@@ -1212,59 +1135,18 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint)
             self.assertContains(response, expected, html=True)
 
-    def test_advanced_settings_form(self):
-        superuser = self.get_superuser()
-        page = create_page('Page 1', 'nav_playground.html', 'en')
-        endpoint = self.get_admin_url(Page, 'advanced', page.pk)
-
-        # First we provide fully valid conditions to make sure
-        # the form is working.
-        page_data = {
-            'template': 'col_two.html',
-        }
-
-        with self.login_user_context(superuser):
-            redirect_to = self.get_admin_url(Page, 'change', page.pk) + '?language=de'
-            # Add german as the current language
-            # Note that german has not been created as page translation.
-            response = self.client.post(endpoint + '?language=de', page_data, follow=True)
-            self.assertRedirects(response, redirect_to)
-            self.assertEqual(
-                [m.message for m in response.context['messages']],
-                ["Please create the German page translation before editing it's advanced settings."]
-            )
-
-        create_title('de', title='Page 1', page=page)
-        # First make sure the title has no slug
-        page.update_urls('de', slug='')
-
-        expected_error = (
-            '<ul class="errorlist">'
-            '<li>Please set the German slug before editing its advanced settings.</li></ul>'
-        )
-
-        with self.login_user_context(superuser):
-            response = self.client.post(endpoint + '?language=de', page_data)
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_error)
-
+    @override_settings(CMS_PERMISSION=False)
     def test_advanced_settings_form_apphook(self):
         superuser = self.get_superuser()
         cms_page = create_page('app', 'nav_playground.html', 'en')
         cms_pages = Page.objects.filter(pk=cms_page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        redirect_to = self.get_pages_admin_list_uri()
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
         page_data = {
-            "redirect": "",
-            "language": "en",
             "reverse_id": "",
             "navigation_extenders": "",
-            "site": "1",
-            "xframe_options": "0",
             "application_urls": "SampleApp",
             "application_namespace": "sampleapp",
-            "overwrite_url": "",
-            "template": "INHERIT",
         }
 
         with self.login_user_context(superuser):
@@ -1293,10 +1175,13 @@ class PageTest(PageTestBase):
                 1,
             )
 
-    @override_settings(CMS_APPHOOKS=[
-        'cms.test_utils.project.sampleapp.cms_apps.SampleApp',
-        'cms.test_utils.project.sampleapp.cms_apps.SampleAppWithConfig',
-    ])
+    @override_settings(
+        CMS_APPHOOKS=[
+            'cms.test_utils.project.sampleapp.cms_apps.SampleApp',
+            'cms.test_utils.project.sampleapp.cms_apps.SampleAppWithConfig',
+        ],
+        CMS_PERMISSION=False,
+    )
     def test_advanced_settings_form_apphook_config(self):
         clear_app_resolvers()
         clear_url_caches()
@@ -1310,20 +1195,14 @@ class PageTest(PageTestBase):
         app_config = SampleAppConfig.objects.create(namespace='sample')
         cms_page = create_page('app', 'nav_playground.html', 'en')
         cms_pages = Page.objects.filter(pk=cms_page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        redirect_to = self.get_pages_admin_list_uri()
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
         page_data = {
-            "redirect": "",
-            "language": "en",
             "reverse_id": "",
             "navigation_extenders": "",
-            "site": "1",
-            "xframe_options": "0",
             "application_urls": "SampleAppWithConfig",
             "application_configs": app_config.pk,
             "application_namespace": "sampleapp",
-            "overwrite_url": "",
-            "template": "INHERIT",
         }
 
         with self.login_user_context(superuser):
@@ -1404,16 +1283,18 @@ class PageTest(PageTestBase):
     def test_form_url_page_change(self):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            pageadmin = self.get_admin()
+            content_admin = PageContentAdmin(PageContent, admin.site)
             page = self.get_page()
-            form_url = admin_reverse("cms_page_change", args=(page.pk,))
+            content = self.get_page_title_obj(page, 'en')
+            form_url = self.get_page_change_uri('en', page)
             # Middleware is needed to correctly setup the environment for the admin
             middleware = CurrentUserMiddleware()
             request = self.get_request()
             middleware.process_request(request)
-            response = pageadmin.change_view(
-                request, str(page.pk),
-                form_url=form_url)
+            response = content_admin.change_view(
+                request, str(content.pk),
+                form_url=form_url,
+            )
             self.assertTrue('form_url' in response.context_data)
             self.assertEqual(response.context_data['form_url'], form_url)
 
@@ -1453,7 +1334,7 @@ class PageTest(PageTestBase):
 
         with self.login_user_context(superuser):
             with force_language('de'):
-                endpoint = self.get_admin_url(Page, 'get_tree')
+                endpoint = self.get_admin_url(PageContent, 'get_tree')
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
                 parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
@@ -1462,7 +1343,7 @@ class PageTest(PageTestBase):
 
     def test_page_get_tree_endpoint_flat(self):
         superuser = self.get_superuser()
-        endpoint = self.get_admin_url(Page, 'get_tree')
+        endpoint = self.get_admin_url(PageContent, 'get_tree')
 
         create_page('Home', 'nav_playground.html', 'en')
         alpha = create_page('Alpha', 'nav_playground.html', 'en')
@@ -1485,7 +1366,7 @@ class PageTest(PageTestBase):
 
     def test_page_get_tree_endpoint_nested(self):
         superuser = self.get_superuser()
-        endpoint = self.get_admin_url(Page, 'get_tree')
+        endpoint = self.get_admin_url(PageContent, 'get_tree')
 
         create_page('Home', 'nav_playground.html', 'en')
         alpha = create_page('Alpha', 'nav_playground.html', 'en')
@@ -1516,7 +1397,7 @@ class PageTest(PageTestBase):
 
     def test_page_changelist_search(self):
         superuser = self.get_superuser()
-        endpoint = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_pages_admin_list_uri()
 
         create_page('Home', 'nav_playground.html', 'en')
         alpha = create_page('Alpha', 'nav_playground.html', 'en')
@@ -1700,11 +1581,11 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(
                 response,
-                '<a href="/en/admin/cms/page/">Pages</a>',
+                '<a href="/en/admin/cms/pagecontent/">Page contents</a>',
                 html=True,
             )
 
-        endpoint = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_pages_admin_list_uri()
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
@@ -1726,7 +1607,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 404)
 
-        endpoint = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_pages_admin_list_uri()
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
@@ -1738,8 +1619,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         on the Page model and and he has global change permissions.
         """
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'change', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_page_change_uri('en', page)
+        redirect_to = self.get_pages_admin_list_uri()
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(slug='permissions-2')
@@ -1759,7 +1640,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         does not have global change permissions.
         """
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'change', page.pk)
+        endpoint = self.get_page_change_uri('en', page)
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(slug='permissions-2')
@@ -1789,7 +1670,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'advanced', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        redirect_to = self.get_pages_admin_list_uri()
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(reverse_id='permissions-2')
@@ -1847,7 +1728,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'delete', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        redirect_to = self.get_pages_admin_list_uri()
         staff_user = self.get_staff_user_with_no_permissions()
 
         self.add_permission(staff_user, 'change_page')
@@ -1900,7 +1781,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         endpoint = self.get_admin_url(Page, 'delete', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        redirect_to = self.get_pages_admin_list_uri()
         staff_user = self.get_staff_user_with_no_permissions()
 
         self._add_plugin_to_page(page)
@@ -1960,10 +1841,10 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         global delete & change permissions.
         """
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
-        staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'delete', translation.pk)
+        redirect_to = self.get_pages_admin_list_uri()
+        staff_user = self.get_staff_user_with_no_permissions()
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
@@ -1983,9 +1864,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         does not have global delete permissions.
         """
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'delete', translation.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
@@ -2016,10 +1897,10 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         and global delete & change permissions.
         """
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
-        staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'delete', translation.pk)
+        redirect_to = self.get_pages_admin_list_uri()
+        staff_user = self.get_staff_user_with_no_permissions()
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -2043,9 +1924,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         and/or does not have global delete permissions.
         """
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'delete', translation.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -2068,7 +1949,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        endpoint = self.get_admin_url(Page, 'change_template', page.pk)
+        endpoint = self.get_page_change_template_uri('en', page)
 
         self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=True, can_change_advanced_settings=True)
@@ -2089,7 +1970,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        endpoint = self.get_admin_url(Page, 'change_template', page.pk)
+        endpoint = self.get_page_change_template_uri('en', page)
 
         self.add_permission(staff_user, 'change_page')
         self.add_global_permission(staff_user, can_change=True)
@@ -2143,7 +2024,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
 
@@ -2159,9 +2040,12 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2177,7 +2061,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
 
@@ -2193,11 +2077,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2))
 
     def test_user_can_edit_page_permissions(self):
@@ -2209,7 +2095,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
 
@@ -2233,9 +2119,12 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2256,7 +2145,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
 
@@ -2280,11 +2169,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
                     user=staff_user_2,
@@ -2301,7 +2192,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
         permission = self.add_page_permission(user=staff_user_2, page=page)
@@ -2320,9 +2211,12 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2338,7 +2232,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
         permission = self.add_page_permission(user=staff_user_2, page=page)
@@ -2357,11 +2251,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2))
 
     def test_user_can_add_page_view_restrictions(self):
@@ -2373,7 +2269,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
 
@@ -2389,9 +2285,12 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2407,7 +2306,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
 
@@ -2423,11 +2322,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2, can_view=True))
 
     def test_user_can_edit_page_view_restrictions(self):
@@ -2439,7 +2340,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
 
@@ -2462,9 +2363,12 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2485,7 +2389,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
         permission = self.add_page_permission(
@@ -2507,11 +2411,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
                     user=staff_user_2,
@@ -2528,7 +2434,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
         permission = self.add_page_permission(
@@ -2549,9 +2455,12 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2567,7 +2476,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         admin = self.get_superuser()
         page = self.get_permissions_test_page()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=admin)
         permission = self.add_page_permission(
@@ -2588,11 +2497,13 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             staff_user,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
 
     def test_permissions_cache_invalidation(self):
@@ -2601,7 +2512,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         set_permission_cache(staff_user, "change_page", [page.pk])
 
         with self.login_user_context(self.get_superuser()):
@@ -2609,48 +2520,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             data['_continue'] = '1'
             self.client.post(endpoint, data)
         self.assertIsNone(get_permission_cache(staff_user, "change_page"))
-
-    def test_user_can_edit_title_fields(self):
-        """
-        User can edit title (translation) fields if he has
-        global change permissions.
-        """
-        page = self.get_permissions_test_page()
-        staff_user = self.get_staff_user_with_no_permissions()
-        title = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
-
-        self.add_permission(staff_user, 'change_page')
-        self.add_global_permission(staff_user, can_change=True)
-
-        with self.login_user_context(staff_user):
-            data = model_to_dict(title, fields=['title'])
-            data['title'] = 'permissions-de-2'
-
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 200)
-            self.assertTrue(self._translation_exists(title='permissions-de-2'))
-
-    def test_user_cant_edit_title_fields(self):
-        """
-        User can't edit title (translation) fields if he does not have
-        global change permissions.
-        """
-        page = self.get_permissions_test_page()
-        staff_user = self.get_staff_user_with_no_permissions()
-        title = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
-
-        self.add_permission(staff_user, 'change_page')
-        self.add_global_permission(staff_user, can_change=False)
-
-        with self.login_user_context(staff_user):
-            data = model_to_dict(title, fields=['title'])
-            data['title'] = 'permissions-de-2'
-
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
-            self.assertFalse(self._translation_exists(title='permissions-de-2'))
 
     def test_user_can_copy_page(self):
         """
@@ -2954,19 +2823,21 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'copy_language', page.pk)
+        source_translation = self.get_page_title_obj(page, 'en')
+        target_translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'copy_language', source_translation.pk)
         plugins = [
             self._add_plugin_to_page(page),
             self._add_plugin_to_page(page),
             self._add_plugin_to_page(page),
             self._add_plugin_to_page(page),
         ]
-        placeholder = plugins[0].placeholder
+        source_placeholder = plugins[0].placeholder
+        target_placeholder = target_translation.get_placeholders().get(slot=source_placeholder.slot)
 
         data = {
             'source_language': 'en',
-            'target_language': translation.language,
+            'target_language': target_translation.language,
         }
 
         self.add_permission(staff_user, 'change_page')
@@ -2976,7 +2847,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
-            new_plugins = placeholder.get_plugins(translation.language)
+            new_plugins = target_placeholder.get_plugins()
             self.assertEqual(new_plugins.count(), len(plugins))
 
     def test_user_cant_copy_plugins_to_language(self):
@@ -2989,7 +2860,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'copy_language', page.pk)
+        endpoint = self.get_admin_url(PageContent, 'copy_language', translation.pk)
         plugins = [
             self._add_plugin_to_page(page),
             self._add_plugin_to_page(page),
@@ -3136,11 +3007,11 @@ class PermissionsOnPageTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(
                 response,
-                '<a href="/en/admin/cms/page/">Pages</a>',
+                '<a href="/en/admin/cms/pagecontent/">Page contents</a>',
                 html=True,
             )
 
-        endpoint = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_pages_admin_list_uri()
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
@@ -3167,7 +3038,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 404)
 
-        endpoint = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_pages_admin_list_uri()
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
@@ -3179,8 +3050,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         on the Page model and and he has global change permissions.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'change', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_page_change_uri('en', page)
+        redirect_to = self.get_pages_admin_list_uri()
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(slug='permissions-2')
@@ -3204,7 +3075,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         does not have global change permissions.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'change', page.pk)
+        endpoint = self.get_page_change_uri('en', page)
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(slug='permissions-2')
@@ -3238,7 +3109,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         endpoint = self.get_admin_url(Page, 'advanced', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        redirect_to = self.get_pages_admin_list_uri()
         staff_user = self.get_staff_user_with_no_permissions()
 
         data = self._get_page_data(reverse_id='permissions-2')
@@ -3432,10 +3303,10 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page delete & change permissions.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
-        staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'delete', translation.pk)
+        redirect_to = self.get_pages_admin_list_uri()
+        staff_user = self.get_staff_user_with_no_permissions()
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
@@ -3460,9 +3331,9 @@ class PermissionsOnPageTest(PermissionsTestCase):
         does not have global delete permissions.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'delete', translation.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
 
         self.add_permission(staff_user, 'change_page')
         self.add_permission(staff_user, 'delete_page')
@@ -3498,10 +3369,10 @@ class PermissionsOnPageTest(PermissionsTestCase):
         and page delete & change permissions.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        redirect_to = self.get_admin_url(Page, 'changelist')
-        staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'delete', translation.pk)
+        redirect_to = self.get_pages_admin_list_uri()
+        staff_user = self.get_staff_user_with_no_permissions()
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -3530,9 +3401,9 @@ class PermissionsOnPageTest(PermissionsTestCase):
         and/or does not have global delete permissions.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
-        staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'delete', translation.pk)
+        staff_user = self.get_staff_user_with_no_permissions()
 
         self._add_plugin_to_page(page, language=translation.language)
 
@@ -3560,7 +3431,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         global change permission and global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
 
@@ -3577,9 +3448,12 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3594,7 +3468,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         and/or does not have global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
 
@@ -3611,11 +3485,13 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2))
 
     def test_user_can_edit_page_permissions(self):
@@ -3626,7 +3502,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         global change permission and global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
 
@@ -3651,9 +3527,12 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3673,7 +3552,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         and/or does not have global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
 
@@ -3698,11 +3577,13 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
                     user=staff_user_2,
@@ -3718,7 +3599,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         global change permission and global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
         permission = self.add_page_permission(user=staff_user_2, page=page)
@@ -3738,9 +3619,12 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3755,7 +3639,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         and/or does not have global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
         permission = self.add_page_permission(user=staff_user_2, page=page)
@@ -3775,11 +3659,13 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2))
 
     def test_user_can_add_page_view_restrictions(self):
@@ -3790,7 +3676,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         global change permission and global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
 
@@ -3807,9 +3693,12 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3824,7 +3713,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         and/or does not have global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
 
@@ -3841,11 +3730,13 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2, can_view=True))
 
     def test_user_can_edit_page_view_restrictions(self):
@@ -3856,7 +3747,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         global change permission and global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
 
@@ -3880,9 +3771,12 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3902,7 +3796,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         and/or does not have global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
         permission = self.add_page_permission(
@@ -3925,11 +3819,13 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
                     user=staff_user_2,
@@ -3945,7 +3841,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         global change permission and global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
         permission = self.add_page_permission(
@@ -3967,9 +3863,12 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=True,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3984,7 +3883,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         and/or does not have global change permissions permission.
         """
         page = self._permissions_page
-        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        endpoint = self.get_admin_url(Page, 'advanced', page.pk) + '?language=en'
         staff_user = self.get_staff_user_with_no_permissions()
         staff_user_2 = self.get_staff_page_user(created_by=staff_user)
         permission = self.add_page_permission(
@@ -4006,62 +3905,14 @@ class PermissionsOnPageTest(PermissionsTestCase):
             page,
             can_change=True,
             can_change_permissions=False,
+            can_change_advanced_settings=True,
         )
 
         with self.login_user_context(staff_user):
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
+            response = self.client.get(endpoint)
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
-
-    def test_user_can_edit_title_fields(self):
-        """
-        User can edit title (translation) fields if he has
-        global change permissions.
-        """
-        page = self._permissions_page
-        staff_user = self.get_staff_user_with_no_permissions()
-        title = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
-
-        self.add_page_permission(
-            staff_user,
-            page,
-            can_change=True,
-        )
-        self.add_permission(staff_user, 'change_page')
-
-        with self.login_user_context(staff_user):
-            data = model_to_dict(title, fields=['title'])
-            data['title'] = 'permissions-de-2'
-
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 200)
-            self.assertTrue(self._translation_exists(title='permissions-de-2'))
-
-    def test_user_cant_edit_title_fields(self):
-        """
-        User can't edit title (translation) fields if he does not have
-        global change permissions.
-        """
-        page = self._permissions_page
-        staff_user = self.get_staff_user_with_no_permissions()
-        title = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
-
-        self.add_page_permission(
-            staff_user,
-            page,
-            can_change=False,
-        )
-        self.add_permission(staff_user, 'change_page')
-
-        with self.login_user_context(staff_user):
-            data = model_to_dict(title, fields=['title'])
-            data['title'] = 'permissions-de-2'
-
-            response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 403)
-            self.assertFalse(self._translation_exists(title='permissions-de-2'))
 
     # Plugin related tests
 
@@ -4379,19 +4230,21 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'copy_language', page.pk)
+        source_translation = self.get_page_title_obj(page, 'en')
+        target_translation = self._add_translation_to_page(page)
+        endpoint = self.get_admin_url(PageContent, 'copy_language', source_translation.pk)
         plugins = [
             self._add_plugin_to_page(page),
             self._add_plugin_to_page(page),
             self._add_plugin_to_page(page),
             self._add_plugin_to_page(page),
         ]
-        placeholder = plugins[0].placeholder
+        source_placeholder = plugins[0].placeholder
+        target_placeholder = target_translation.get_placeholders().get(slot=source_placeholder.slot)
 
         data = {
             'source_language': 'en',
-            'target_language': translation.language,
+            'target_language': target_translation.language,
         }
 
         self.add_permission(staff_user, 'change_page')
@@ -4405,7 +4258,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
-            new_plugins = placeholder.get_plugins(translation.language)
+            new_plugins = target_placeholder.get_plugins()
             self.assertEqual(new_plugins.count(), len(plugins))
 
     def test_user_cant_copy_plugins_to_language(self):
@@ -4418,7 +4271,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
         translation = self._add_translation_to_page(page)
-        endpoint = self.get_admin_url(Page, 'copy_language', page.pk)
+        endpoint = self.get_admin_url(PageContent, 'copy_language', translation.pk)
         plugins = [
             self._add_plugin_to_page(page),
             self._add_plugin_to_page(page),

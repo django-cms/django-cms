@@ -23,6 +23,10 @@ casper.test.tearDown(function(done) {
 casper.test.begin('User Add Content', function(test) {
     casper
         .start(globals.editUrl)
+        .then(function () {
+            this.click('.cms-btn-switch-edit');
+        })
+        .wait(2000)
         .then(cms.switchTo('structure'))
         .waitUntilVisible('.cms-structure', function() {
             this.click('.cms-submenu-add [data-cms-tooltip="Add plugin"]');

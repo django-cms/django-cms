@@ -10,11 +10,11 @@ from django.test.utils import override_settings
 from cms.api import assign_user_to_page, create_page, create_page_user
 from cms.admin.forms import save_permissions
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, ACCESS_PAGE
+from cms.models import Page, PageContent, ACCESS_PAGE
 from cms.models.permissionmodels import (ACCESS_PAGE_AND_DESCENDANTS,
                                          PagePermission,
                                          GlobalPagePermission)
-from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, CMSTestCase)
+from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_2_0
@@ -130,17 +130,17 @@ class PermissionModeratorTests(CMSTestCase):
 
     def test_super_can_add_page_to_root(self):
         with self.login_user_context(self.user_super):
-            response = self.client.get(URL_CMS_PAGE_ADD)
+            response = self.client.get(self.get_page_add_uri('en'))
             self.assertEqual(response.status_code, 200)
 
     def test_master_cannot_add_page_to_root(self):
         with self.login_user_context(self.user_master):
-            response = self.client.get(URL_CMS_PAGE_ADD)
+            response = self.client.get(self.get_page_add_uri('en'))
             self.assertEqual(response.status_code, 403)
 
     def test_slave_cannot_add_page_to_root(self):
         with self.login_user_context(self.user_slave):
-            response = self.client.get(URL_CMS_PAGE_ADD)
+            response = self.client.get(self.get_page_add_uri('en'))
             self.assertEqual(response.status_code, 403)
 
     def test_super_can_add_plugin(self):
@@ -601,7 +601,7 @@ class GlobalPermissionTests(CMSTestCase):
                     expected_perms = {'add': True, 'change': True, 'delete': False}
                     if not DJANGO_2_0:
                         expected_perms.update({'view': True})
-                    self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
+                    self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
 
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
@@ -622,7 +622,7 @@ class GlobalPermissionTests(CMSTestCase):
                 expected_perms = {'add': False, 'change': False, 'delete': False}
                 if not DJANGO_2_0:
                     expected_perms.update({'view': False})
-                self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
+                self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
                 # but, going back to the first user, they should.
                 request = RequestFactory().get('/', data={'site__exact': site_2.pk})
                 request.user = USERS[0]
@@ -631,7 +631,7 @@ class GlobalPermissionTests(CMSTestCase):
                 expected_perms = {'add': True, 'change': True, 'delete': False}
                 if not DJANGO_2_0:
                     expected_perms.update({'view': True})
-                self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
+                self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
 
     def test_has_page_add_permission_with_target(self):
         page = create_page('Test', 'nav_playground.html', 'en')

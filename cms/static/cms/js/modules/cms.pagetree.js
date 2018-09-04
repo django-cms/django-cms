@@ -3,6 +3,7 @@
  */
 
 import $ from 'jquery';
+import URL from 'urijs';
 
 import Class from 'classjs';
 import { Helpers, KEYS } from './cms.base';
@@ -45,6 +46,8 @@ var PageTree = new Class({
 
         Helpers.csrf(this.options.csrf);
 
+        this._setupLanguages();
+
         // cancel if pagetree is not available
         if ($.isEmptyObject(opts) || opts.empty) {
             this._getClipboard();
@@ -77,8 +80,20 @@ var PageTree = new Class({
             document: $(document),
             tree: pagetree.find('.js-cms-pagetree'),
             dialog: $('.js-cms-tree-dialog'),
-            siteForm: $('.js-cms-pagetree-site-form')
+            siteForm: $('.js-cms-pagetree-site-form'),
+            languagesSelect: $('.js-cms-pagetree-languages')
         };
+    },
+
+    _setupLanguages: function _setupLanguages() {
+        this.ui.languagesSelect.on('change', () => {
+            const newLanguage = this.ui.languagesSelect.val();
+
+            const url = new URL(window.location.href).removeSearch('language')
+                .addSearch('language', newLanguage).toString();
+
+            window.location.href = url;
+        });
     },
 
     /**

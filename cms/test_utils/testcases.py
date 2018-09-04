@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.six.moves.urllib.parse import unquote, urljoin
 from django.utils.timezone import now
-from django.utils.translation import activate
+from django.utils.translation import activate, get_language
 from menus.menu_pool import menu_pool
 
 from cms.api import create_page, add_plugin
@@ -38,20 +38,13 @@ from cms.utils.urlutils import admin_reverse
 
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"
-URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
-URL_CMS_PAGE_CHANGE_BASE = urljoin(URL_CMS_PAGE, "%d/")
-URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "change/")
 URL_CMS_PAGE_ADVANCED_CHANGE = urljoin(URL_CMS_PAGE, "%d/advanced-settings/")
-URL_CMS_PAGE_PERMISSION_CHANGE = urljoin(URL_CMS_PAGE, "%d/permission-settings/")
 URL_CMS_PAGE_PERMISSIONS = urljoin(URL_CMS_PAGE, "%d/permissions/")
-URL_CMS_PAGE_PUBLISHED = urljoin(URL_CMS_PAGE, "published-pages/")
+URL_CMS_PAGE_PUBLISHED = urljoin(URL_CMS_PAGE, "list/")
 URL_CMS_PAGE_MOVE = urljoin(URL_CMS_PAGE, "%d/move-page/")
 URL_CMS_PAGE_COPY = urljoin(URL_CMS_PAGE, "%d/copy-page/")
-URL_CMS_PAGE_CHANGE_LANGUAGE = URL_CMS_PAGE_CHANGE + "?language=%s"
-URL_CMS_PAGE_CHANGE_TEMPLATE = urljoin(URL_CMS_PAGE_CHANGE, "change-template/")
-URL_CMS_PAGE_PUBLISH = urljoin(URL_CMS_PAGE_CHANGE_BASE, "%s/publish/")
-URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete/")
-URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete-translation/")
+URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE, "%d/delete/")
+URL_CMS_TRANSLATION_DELETE = urljoin('/en/admin/cms/pagecontent/', "delete-translation/")
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
@@ -522,6 +515,37 @@ class BaseCMSTestCase(object):
         from cms.plugin_pool import plugin_pool
 
         return plugin_pool.get_plugin(plugin_type).model
+
+    def get_pages_admin_list_uri(self, language=None):
+        endpoint = admin_reverse('cms_pagecontent_changelist')
+        data = {'language': language or get_language()}
+        return endpoint + '?' + urlencode(data)
+
+    def get_page_add_uri(self, language, page=None):
+        endpoint = admin_reverse('cms_pagecontent_add')
+        data = {'language': language}
+
+        if page:
+            data['cms_page'] = page.pk
+        return endpoint + '?' + urlencode(data)
+
+    def get_page_change_uri(self, language, page):
+        content = page.get_title_obj(language, fallback=False)
+        endpoint = admin_reverse('cms_pagecontent_change', args=(content.pk,))
+        data = {'language': language}
+        return endpoint + '?' + urlencode(data)
+
+    def get_page_delete_translation_uri(self, language, page):
+        content = page.get_title_obj(language, fallback=False)
+        endpoint = admin_reverse('cms_pagecontent_delete', args=(content.pk,))
+        data = {'language': language}
+        return endpoint + '?' + urlencode(data)
+
+    def get_page_change_template_uri(self, language, page):
+        content = page.get_title_obj(language, fallback=False)
+        endpoint = admin_reverse('cms_pagecontent_change_template', args=(content.pk,))
+        data = {'language': language}
+        return endpoint + '?' + urlencode(data)
 
     def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None, position=None):
         if placeholder.page:
