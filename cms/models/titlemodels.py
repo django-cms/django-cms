@@ -79,6 +79,7 @@ class PageContent(models.Model):
     objects = PageContentManager()
 
     class Meta:
+        default_permissions = []
         unique_together = (('language', 'page'),)
         app_label = 'cms'
 
@@ -94,11 +95,37 @@ class PageContent(models.Model):
         )
         return display
 
+    def update(self, **data):
+        cls = self.__class__
+        cls.objects.filter(pk=self.pk).update(**data)
+
+        for field, value in data.items():
+            setattr(self, field, value)
+        return
+
     def save(self, **kwargs):
         # delete template cache
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
         super(PageContent, self).save(**kwargs)
+
+    def toggle_in_navigation(self, set_to=None):
+        '''
+        Toggles (or sets) in_navigation and invalidates the cms page cache
+        '''
+        old = bool(self.in_navigation)
+
+        if set_to in [True, False]:
+            new = set_to
+        else:
+            new = not old
+
+        self.update(in_navigation=new)
+
+        # If there was a change, invalidate the cms page cache
+        if new != old:
+            self.page.clear_cache()
+        return new
 
     def has_placeholder_change_permission(self, user):
         return self.page.has_change_permission(user)

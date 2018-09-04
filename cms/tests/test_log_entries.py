@@ -7,7 +7,6 @@ from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, Placeholder, UserSettings
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_MOVE,
-    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD,
 )
 from cms.utils import get_current_site
 from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
@@ -51,7 +50,7 @@ class LogPageOperationsTests(CMSTestCase):
         page_data = self.get_new_page_data()
 
         with self.login_user_context(self._admin_user):
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            response = self.client.post(self.get_page_add_uri('en'), page_data)
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)
             page_one = Page.objects.get(urls__slug=page_data['slug'])
@@ -100,10 +99,11 @@ class LogPageOperationsTests(CMSTestCase):
             page = create_page('home', 'nav_playground.html', 'en')
             page._clear_internal_cache()
             page_data = self.get_new_page_data()
+            page_data['template'] = 'nav_playground.html'
 
             # Get and edit the page
             page_data['slug'] = 'changed slug'
-            response = self.client.post(URL_CMS_PAGE_CHANGE % page.id, page_data)
+            response = self.client.post(self.get_page_change_uri('en', page), page_data)
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)
             # Test that the log count is correct
@@ -111,13 +111,13 @@ class LogPageOperationsTests(CMSTestCase):
 
             log_entry = LogEntry.objects.all()[0]
             # Check that the contents of the log message is correct
-            self.assertEqual('Changed', log_entry.change_message)
+            self.assertEqual('Changed Page Translation', log_entry.change_message)
             # Check the action flag is set correctly
             self.assertEqual(CHANGE, log_entry.action_flag)
             # Check the object id is set correctly
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
-            self.assertEqual(str(page), log_entry.object_repr)
+            self.assertEqual(str(page.reload()), log_entry.object_repr)
             # Check that the correct user created the log
             self.assertEqual(self._admin_user.pk, log_entry.user_id)
 
@@ -185,13 +185,14 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en")
             title = create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
-            endpoint = self.get_admin_url(Page, 'edit_title_fields', page.pk, title.language)
-            data = model_to_dict(title, fields=['title'])
+            endpoint = self.get_page_change_uri(title.language, page)
+            data = model_to_dict(title, fields=['title', 'template'])
             data['title'] = 'my_new_title_field'
+            data['slug'] = page.get_slug('de')
 
             response = self.client.post(endpoint, data)
             # Test that the end point is valid
-            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.status_code, 302)
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
 
@@ -214,7 +215,7 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en")
             create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
-            endpoint = self.get_admin_url(Page, 'delete_translation', page.pk)
+            endpoint = self.get_page_delete_translation_uri('de', page)
             post_data = {'post': 'yes', 'language': 'de'}
 
             response = self.client.post(endpoint, post_data)

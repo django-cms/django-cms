@@ -643,23 +643,6 @@ class Page(models.Model):
     def has_translation(self, language):
         return self.pagecontent_set.filter(language=language).exists()
 
-    def toggle_in_navigation(self, set_to=None):
-        '''
-        Toggles (or sets) in_navigation and invalidates the cms page cache
-        '''
-        old = self.get_in_navigation()
-        if set_to in [True, False]:
-            new = set_to
-        else:
-            new = not old
-
-        self.update_translations(in_navigation=new)
-
-        # If there was a change, invalidate the cms page cache
-        if new != old:
-            self.clear_cache()
-        return new
-
     def clear_cache(self, language=None, menu=False, placeholder=False):
         from cms.cache import invalidate_cms_page_cache
 

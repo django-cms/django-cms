@@ -22,7 +22,7 @@ def validate_url(value):
         URLValidator()(value)
 
 
-def validate_url_uniqueness(site, path, language, exclude_page=None):
+def validate_url_uniqueness(site, path, language, user_language=None, exclude_page=None):
     """ Checks for conflicting urls
     """
     from cms.models.pagemodel import PageUrl
@@ -41,10 +41,12 @@ def validate_url_uniqueness(site, path, language, exclude_page=None):
     except IndexError:
         return True
 
-    if conflict_page.is_page_type:
-        change_url = admin_reverse('cms_pagetype_change', args=[conflict_page.pk])
-    else:
-        change_url = admin_reverse('cms_page_change', args=[conflict_page.pk])
+    conflict_translation = conflict_page.get_title_obj(language, fallback=False)
+
+    change_url = admin_reverse('cms_pagecontent_change', args=[conflict_translation.pk])
+
+    if user_language:
+        change_url += '?language={}'.format(user_language)
 
     conflict_url = '<a href="%(change_url)s" target="_blank">%(page_title)s</a>' % {
         'change_url': change_url,

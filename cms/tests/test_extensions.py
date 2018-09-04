@@ -10,7 +10,7 @@ from cms.api import create_page, create_title
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
 from cms.extensions import PageExtension
-from cms.models import Page, PageType
+from cms.models import Page, PageContent
 from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
 from cms.test_utils.project.extensionapp.models import MultiTablePageExtension, MultiTableTitleExtension
 from cms.test_utils.testcases import CMSTestCase
@@ -250,6 +250,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
     def test_duplicate_extensions(self):
         with self.login_user_context(self.admin):
+            content = self.get_page_title_obj(self.page, 'en')
             # create page copy
             page_data = {
                 'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
@@ -259,33 +260,12 @@ class ExtensionAdminTestCase(CMSTestCase):
             self.assertEqual(MyPageExtension.objects.all().count(), 1)
             self.assertEqual(MyTitleExtension.objects.all().count(), 1)
             response = self.client.post(
-                self.get_admin_url(Page, 'duplicate', self.page.pk),
+                self.get_admin_url(PageContent, 'duplicate', content.pk),
                 data=page_data,
             )
             # Check that page and its extensions have been copied
-            self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
             self.assertEqual(Page.objects.all().count(), 3)
-            self.assertEqual(MyPageExtension.objects.all().count(), 2)
-            self.assertEqual(MyTitleExtension.objects.all().count(), 2)
-
-    def test_page_type_extensions(self):
-        with self.login_user_context(self.admin):
-            # create page copy
-            page_data = {
-                'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
-                'site': 1, 'language': 'en', 'source': self.page.pk,
-            }
-            self.assertEqual(Page.objects.all().count(), 2)
-            self.assertEqual(MyPageExtension.objects.all().count(), 1)
-            self.assertEqual(MyTitleExtension.objects.all().count(), 1)
-            response = self.client.post(
-                self.get_admin_url(PageType, 'add'),
-                data=page_data,
-            )
-            self.assertRedirects(response, self.get_admin_url(PageType, 'changelist'))
-            # Check that new page type has extensions from source page
-            self.assertEqual(Page.objects.all().count(), 4)
-            self.assertEqual(Page.objects.filter(is_page_type=True).count(), 2)
             self.assertEqual(MyPageExtension.objects.all().count(), 2)
             self.assertEqual(MyTitleExtension.objects.all().count(), 2)
 

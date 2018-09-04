@@ -26,7 +26,7 @@ from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_u
 from cms.models import Page, UserSettings, PagePermission
 from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
 from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_PAGE_CHANGE, URL_CMS_USERSETTINGS)
+from cms.test_utils.testcases import (CMSTestCase, URL_CMS_USERSETTINGS)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar_pool import toolbar_pool
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
@@ -699,8 +699,8 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
             self.assertEqual(response.content.decode('utf-8'), '')
             page_data = self.get_new_page_data(parent_id=page.node.pk)
-            response = self.client.post(self.get_admin_url(Page, 'add'), page_data)
-            self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
+            response = self.client.post(self.get_page_add_uri('en'), page_data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
             new_page = Page.objects.get(urls__slug__startswith='test-page-')
             edit_url = get_object_edit_url(self.get_page_title_obj(new_page))
@@ -717,7 +717,9 @@ class ToolbarTests(ToolbarTestBase):
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             page_data = self.get_new_page_data()
-            self.client.post(URL_CMS_PAGE_CHANGE % page2.pk, page_data)
+            page_data['template'] = 'nav_playground.html'
+            change_endpoint = self.get_page_change_uri('en', page2)
+            self.client.post(change_endpoint, page_data)
             url = admin_reverse('cms_page_resolve')
             # first call returns the latest modified page with updated slug even if a different
             # page has been requested
@@ -1866,6 +1868,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         edit_url = get_object_edit_url(title)
         request = self.get_page_request(page, user, edit_url)
         response = details(request, page.get_path(language))
+        response.render()
         self.assertContains(
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_page_title-{0} cms-render-model"></template>'
@@ -1887,9 +1890,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-%s cms-render-model cms-render-model-block"></template>\n        <h3>Menu</h3>' % page.pk)
-        self.assertContains(
-            response,
-            "edit_plugin: '%s?language=%s&amp;edit_fields=changelist'" % (admin_reverse('cms_page_changelist'), language))
+
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
 

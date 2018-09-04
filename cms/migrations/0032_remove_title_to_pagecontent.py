@@ -14,6 +14,10 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RenameModel('Title', 'PageContent'),
+        migrations.AlterModelOptions(
+            name='pagecontent',
+            options={'default_permissions': []},
+        ),
         migrations.AlterField(
             model_name='pagecontent',
             name='page',
