@@ -26,13 +26,13 @@ def set_page_url(apps, schema_editor):
     db_alias = schema_editor.connection.alias
     create_url = PageUrl.objects.using(db_alias).create
 
-    for cms_page in Page.objects.prefetch_related('title'):
+    for cms_page in Page.objects.all():
         for translation in cms_page.title_set.all():
             create_url(
                 page=cms_page,
                 slug=translation.slug,
                 path=translation.path,
-                managed=not bool(translation.overwrite_url),
+                managed=not bool(translation.has_url_overwrite),
                 language=translation.language,
             )
 
