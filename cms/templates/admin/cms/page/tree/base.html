@@ -150,10 +150,10 @@
             <form id="changelist-form" action="" method="post" novalidate>{% csrf_token %}
                 <div class="cms-pagetree cms-pagetree-section cms-pagetree-section-header">
                     <h2>{% trans "Main Navigation" %}</h2>
-                    {% if LANGUAGES|length > 1 %}
+                    {% if site_languages|length > 1 %}
                         <select class="js-cms-pagetree-languages">
-                            {% for language_code, name in LANGUAGES %}
-                                <option value="{{ language_code }}" {% if request.GET.language == language_code or not request.GET.language and forloop.first %} selected{% endif %}>{{ name }}</option>
+                            {% for language_code, name in site_languages %}
+                                <option value="{{ language_code }}" {% if preview_language == language_code %} selected{% endif %}>{{ name }}</option>
                             {% endfor %}
                         </select>
                     {% endif %}

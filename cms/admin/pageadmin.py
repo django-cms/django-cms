@@ -331,6 +331,17 @@ class PageAdmin(admin.ModelAdmin):
             return HttpResponse(json.dumps(results), content_type='application/json')
         return HttpResponseForbidden()
 
+    def changelist_view(self, request, extra_context=None):
+        can_change_any_page = page_permissions.user_can_change_at_least_one_page(
+            user=request.user,
+            site=get_site(request),
+            use_cache=False,
+        )
+
+        if not can_change_any_page:
+            raise Http404
+        return HttpResponseRedirect(admin_reverse('cms_pagecontent_changelist'))
+
     @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
         # This is an unfortunate copy/paste from django's delete view.
@@ -1195,7 +1206,7 @@ class PageContentAdmin(admin.ModelAdmin):
             'media': self.media,
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
-            'site_languages': get_language_list(site.pk),
+            'site_languages': get_language_tuple(site.pk),
             'preview_language': language,
             'changelist_form': changelist_form,
             'cms_current_site': site,
