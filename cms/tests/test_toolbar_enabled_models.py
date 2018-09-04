@@ -16,7 +16,7 @@ from cms.utils.setup import setup_cms_apps
 from cms.views import render_object_edit, render_object_preview
 
 
-class ConfigureFrontendRenderingUnitTestCase(CMSTestCase):
+class ConfigureToolbarEnabledModelsUnitTestCase(CMSTestCase):
 
     def test_adds_to_mapping(self):
         """Test that a list of (model, render_func) elements gets
@@ -37,9 +37,9 @@ class ConfigureFrontendRenderingUnitTestCase(CMSTestCase):
             {model1: render_func1, model2: render_func2},
         )
 
-    def test_doesnt_raise_exception_when_frontend_rendering_undefined(self):
+    def test_doesnt_raise_exception_when_toolbar_enabled_models_undefined(self):
         """
-        If the frontend rendering setting is not present in the config, simply
+        If the toolbar enabled models setting is not present in the config, simply
         ignore this.
         """
         extensions = CMSCoreExtensions()
@@ -51,7 +51,7 @@ class ConfigureFrontendRenderingUnitTestCase(CMSTestCase):
 
     def test_raises_exception_if_not_iterable(self):
         """
-        If the frontend rendering setting isn't iterable, raise an exception.
+        If the toolbar enabled models setting isn't iterable, raise an exception.
         """
         extensions = CMSCoreExtensions()
         cms_config = Mock(
@@ -62,7 +62,7 @@ class ConfigureFrontendRenderingUnitTestCase(CMSTestCase):
     @patch('cms.cms_config.logger.warning')
     def test_warning_if_registering_the_same_model_twice(self, mocked_logger):
         """
-        If a model is already added to the frontend rendering dict,
+        If a model is already added to the toolbar enabled models dict,
         log a warning.
         """
         extensions = CMSCoreExtensions()
@@ -76,14 +76,14 @@ class ConfigureFrontendRenderingUnitTestCase(CMSTestCase):
         mocked_logger.assert_called_once_with(
             "Model {} already registered for frontend rendering".format(model)
         )
-        # Frontend rendering dict is still what we expect it to be
+        # Toolbar enabled models dict is still what we expect it to be
         self.assertDictEqual(
             extensions.toolbar_enabled_models,
             {model: render_func},
         )
 
 
-class ConfigureFrontendRenderingIntegrationTestCase(CMSTestCase):
+class ConfigureToolbarEnabledModelsRenderingIntegrationTestCase(CMSTestCase):
 
     def setUp(self):
         # The results of get_cms_extension_apps and get_cms_config_apps
@@ -93,23 +93,23 @@ class ConfigureFrontendRenderingIntegrationTestCase(CMSTestCase):
         get_cms_extension_apps.cache_clear()
         get_cms_config_apps.cache_clear()
 
-    def test_adds_all_frontend_rendering_settings_to_dict(self):
+    def test_adds_all_toolbar_enabled_models_settings_to_dict(self):
         """
-        Check that all rendering frontend settings are picked up
+        Check that all toolbar enabled models settings are picked up
         from cms.cms_config.
         """
         setup_cms_apps()
         app = apps.get_app_config('cms')
-        expected_frontend_rendering_settings = {
+        expected_toolbar_enabled_models_settings = {
             PageContent: render_pagecontent,
         }
         self.assertDictEqual(
             app.cms_extension.toolbar_enabled_models,
-            expected_frontend_rendering_settings,
+            expected_toolbar_enabled_models_settings,
         )
 
 
-class FrontendRenderingTestCase(CMSTestCase):
+class ToolbarEnabledModelsTestCase(CMSTestCase):
 
     def test_render_preview_not_supported(self):
         """Test that attempting to use render_object_preview with
@@ -146,7 +146,7 @@ class FrontendRenderingTestCase(CMSTestCase):
         extension = apps.get_app_config('cms').cms_extension
         with patch.object(extension, 'toolbar_enabled_models', mocked_models):
             response = render_object_edit(request, ctype.pk, page.pk)
-        # even though Page is registered for frontend rendering,
+        # even though Page is registered for toolbar enabled models,
         # it doesn't pass is_editable_model check, so this view returns 400
         self.assertEqual(response.status_code, 400)
 
@@ -159,7 +159,7 @@ class FrontendRenderingTestCase(CMSTestCase):
         ctype = ContentType.objects.get_for_model(Page)
         page = create_page('home', 'nav_playground.html', 'en')
         with self.assertRaises(Http404):
-            response = render_object_preview(request, ctype.pk, page.pk + 100)
+            render_object_preview(request, ctype.pk, page.pk + 100)
 
     def test_render_preview_ctype_not_found(self):
         """Test that render_object_object returns 404 when provided
@@ -169,7 +169,7 @@ class FrontendRenderingTestCase(CMSTestCase):
         request.toolbar = CMSToolbar(request)
         ctype = ContentType.objects.last()
         with self.assertRaises(Http404):
-            response = render_object_preview(request, ctype.pk + 100, 1)
+            render_object_preview(request, ctype.pk + 100, 1)
 
     def test_render_preview_uses_render_func(self):
         """Test that render_object_preview uses render_func associated
@@ -183,5 +183,5 @@ class FrontendRenderingTestCase(CMSTestCase):
         mocked_models = {Page: render_func}
         extension = apps.get_app_config('cms').cms_extension
         with patch.object(extension, 'toolbar_enabled_models', mocked_models):
-            response = render_object_preview(request, ctype.pk, page.pk)
+            render_object_preview(request, ctype.pk, page.pk)
         render_func.assert_called_once_with(request, page)
