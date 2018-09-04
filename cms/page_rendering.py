@@ -17,7 +17,7 @@ def render_page(request, page, current_language, slug):
     """
     context = {}
     context['lang'] = current_language
-    context['current_page'] = page
+    request.current_page = context['current_page'] = page
     context['has_change_permissions'] = user_can_change_page(request.user, page)
     context['has_view_permissions'] = user_can_view_page(request.user, page)
 

@@ -165,6 +165,8 @@ def details(request, slug):
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
 
     content = page.get_title_obj(language=request_language)
+    # use the page object with populated cache
+    content.page = page
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(content)
 
