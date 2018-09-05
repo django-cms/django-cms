@@ -268,7 +268,8 @@ class PageToolbar(CMSToolbar):
                         extra_classes='cms-content-btn')
 
     def get_page_content(self):
-        return self.page.get_title_obj(language=self.current_lang)
+        page_content = self.page.get_title_obj(language=self.current_lang, fallback=False)
+        return page_content or None
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
