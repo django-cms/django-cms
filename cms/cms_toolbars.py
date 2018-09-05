@@ -268,13 +268,7 @@ class PageToolbar(CMSToolbar):
                         extra_classes='cms-content-btn')
 
     def get_page_content(self):
-        obj = self.toolbar.get_object()
-        if obj and isinstance(obj, PageContent):
-            return obj
-        try:
-            return PageContent.objects.get(page=self.page, language=self.current_lang)
-        except PageContent.DoesNotExist:
-            return None
+        return self.page.get_title_obj(language=self.current_lang)
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
