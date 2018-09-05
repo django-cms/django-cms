@@ -9,7 +9,6 @@ from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.db import models
 from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.utils.timezone import now as tz_now
@@ -20,7 +19,6 @@ from cms.api import create_page, add_plugin, create_title, publish_page
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, Title
-from cms.models.fields import PageField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
@@ -1147,32 +1145,6 @@ class PagesTestCase(TransactionCMSTestCase):
             resp = self.client.get(endpoint)
             self.assertContains(resp, public_text)
             self.assertNotContains(resp, draft_text)
-
-
-class TestPageOnDeleteModel(models.Model):
-    title = models.CharField(default='on delete test', max_length=50)
-    page = PageField(on_delete=models.SET_NULL, null=True)
-
-
-class PageFieldOnDeleteTests(CMSTestCase):
-    @staticmethod
-    def create_test_page():
-        page = create_page('on delete test page',
-                           template='nav_playground.html',
-                           language='en',
-                           published=True)
-        return page.reload()
-
-    def test_page_field_on_delete(self):
-        """
-        PageField uses on_delete override
-        """
-        page = self.create_test_page()
-        on_delete_model = TestPageOnDeleteModel.objects.create(page=page)
-        page.delete()
-        on_delete_model.refresh_from_db()
-        self.assertIsNotNone(on_delete_model)
-        self.assertIsNone(on_delete_model.page)
 
 
 class PageTreeTests(CMSTestCase):
