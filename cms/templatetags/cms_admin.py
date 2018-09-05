@@ -12,11 +12,23 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, ugettext_lazy as _
 
 from cms.utils import i18n
+from cms.utils.urlutils import admin_reverse
 
 
 register = template.Library()
 
 CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
+
+
+@register.simple_tag(takes_context=False)
+def get_admin_url_for_language(page, language):
+    if language not in page.get_languages():
+        admin_url = admin_reverse('cms_pagecontent_add')
+        admin_url += '?cms_page={}&language={}'.format(page.pk, language)
+        return admin_url
+
+    page_content = page.get_title_obj(language, fallback=False)
+    return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
 
 
 @register.simple_tag(takes_context=True)
@@ -124,29 +136,14 @@ class PageSubmitRow(InclusionTag):
         change = context['change']
         is_popup = context['is_popup']
         save_as = context['save_as']
-        basic_info = context.get('basic_info', False)
-        advanced_settings = context.get('advanced_settings', False)
-        change_advanced_settings = context.get('can_change_advanced_settings', False)
         language = context.get('language', '')
         filled_languages = context.get('filled_languages', [])
-
-        show_buttons = language in filled_languages
-
-        if show_buttons:
-            show_buttons = (basic_info or advanced_settings) and change_advanced_settings
-
         context = {
-            # TODO check this (old code: opts.get_ordered_objects() )
-            'onclick_attrib': (opts and change
-                               and 'onclick="submitOrderForm();"' or ''),
             'show_delete_link': False,
             'show_save_as_new': not is_popup and change and save_as,
             'show_save_and_add_another': False,
             'show_save_and_continue': not is_popup and context['has_change_permission'],
             'is_popup': is_popup,
-            'basic_info_active': basic_info,
-            'advanced_settings_active': advanced_settings,
-            'show_buttons': show_buttons,
             'show_save': True,
             'language': language,
             'language_is_filled': language in filled_languages,

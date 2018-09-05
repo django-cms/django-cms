@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
-
 from django.db import models
 from django.utils import timezone
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from cms import constants
+from cms.models.fields import PlaceholderRelationField
 from cms.models.managers import PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
@@ -51,7 +50,7 @@ class PageContent(models.Model):
     page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="pagecontent_set")
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     # Placeholders (plugins)
-    placeholders = models.ManyToManyField('cms.Placeholder', editable=False)
+    placeholders = PlaceholderRelationField()
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
@@ -80,6 +79,7 @@ class PageContent(models.Model):
     objects = PageContentManager()
 
     class Meta:
+        default_permissions = []
         unique_together = (('language', 'page'),)
         app_label = 'cms'
 
@@ -95,11 +95,37 @@ class PageContent(models.Model):
         )
         return display
 
+    def update(self, **data):
+        cls = self.__class__
+        cls.objects.filter(pk=self.pk).update(**data)
+
+        for field, value in data.items():
+            setattr(self, field, value)
+        return
+
     def save(self, **kwargs):
         # delete template cache
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
         super(PageContent, self).save(**kwargs)
+
+    def toggle_in_navigation(self, set_to=None):
+        '''
+        Toggles (or sets) in_navigation and invalidates the cms page cache
+        '''
+        old = bool(self.in_navigation)
+
+        if set_to in [True, False]:
+            new = set_to
+        else:
+            new = not old
+
+        self.update(in_navigation=new)
+
+        # If there was a change, invalidate the cms page cache
+        if new != old:
+            self.page.clear_cache()
+        return new
 
     def has_placeholder_change_permission(self, user):
         return self.page.has_change_permission(user)
@@ -108,17 +134,9 @@ class PageContent(models.Model):
         """
         Rescan and if necessary create placeholders in the current template.
         """
-        existing = OrderedDict()
-        placeholders = [pl.slot for pl in self.page.get_declared_placeholders()]
+        from cms.utils.placeholder import rescan_placeholders_for_obj
 
-        for placeholder in self.placeholders.all():
-            if placeholder.slot in placeholders:
-                existing[placeholder.slot] = placeholder
-
-        for placeholder in placeholders:
-            if placeholder not in existing:
-                existing[placeholder] = self.placeholders.create(slot=placeholder)
-        return existing
+        return rescan_placeholders_for_obj(self)
 
     def get_placeholders(self):
         if not hasattr(self, '_placeholder_cache'):

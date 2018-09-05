@@ -223,7 +223,7 @@ def render_object_edit(request, content_type_id, object_id):
     match = resolve(abs_url)
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    return match.func(request, **match.kwargs)
+    return match.func(request, *match.args, **match.kwargs)
 
 
 def render_object_preview(request, content_type_id, object_id):
@@ -241,4 +241,4 @@ def render_object_preview(request, content_type_id, object_id):
     match = resolve(abs_url)
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
-    return match.func(request, **match.kwargs)
+    return match.func(request, *match.args, **match.kwargs)

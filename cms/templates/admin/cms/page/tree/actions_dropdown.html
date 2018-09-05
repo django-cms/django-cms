@@ -72,18 +72,6 @@
                     <span>{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}</span>
                 </a>
         </li>
-        {% if CMS_PERMISSION %}
-            <li>
-                {% if has_change_permissions_permission %}
-                    <a href="{% url opts|admin_urlname:'permissions' page.id %}" title="{% filter escapejs %}{% trans "Permissions" %}{% endfilter %}">
-                {% else %}
-                    <a href="#" class="cms-pagetree-dropdown-item-disabled">
-                {% endif %}
-                        <span class="cms-icon cms-icon-lock"></span>
-                        <span>{% filter escapejs %}{% trans "Permissions" %}{% endfilter %}</span>
-                    </a>
-            </li>
-        {% endif %}
     {% endblock actions %}
     <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
     <li>

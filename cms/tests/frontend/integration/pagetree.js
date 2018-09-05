@@ -62,23 +62,22 @@ casper.test.begin('Correctly displays languages', function(test) {
         // switch to sideframe
         .withFrame(0, function() {
             casper.waitForSelector('.cms-pagetree-jstree').wait(3000).then(cms.expandPageTree()).then(function() {
-                var pageId = cms.getPageId('Homepage');
 
                 // check that languages look correct
                 test.assertExists(
-                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span',
+                    'select option[value=en]',
                     'Controls for publishing in EN are visible'
                 );
                 test.assertExists(
-                    '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span',
+                    'select option[value=de]',
                     'Controls for publishing in DE are visible'
                 );
                 test.assertExists(
-                    '.cms-tree-item-lang a[href*="' + pageId + '/it/preview/"] span',
+                    'select option[value=it]',
                     'Controls for publishing in IT are visible'
                 );
                 test.assertExists(
-                    '.cms-tree-item-lang a[href*="' + pageId + '/zh-cn/preview/"] span',
+                    'select option[value=zh-cn]',
                     'Controls for publishing in ZH-CN are visible'
                 );
             });
@@ -105,7 +104,7 @@ casper.test.begin('Settings and advanced settings are accessible', function(test
                     var pageId = cms.getPageId('Homepage');
                     // check that languages look correct
 
-                    this.click('a[href*="page/' + pageId + '"].cms-icon-pencil');
+                    this.click('a[href*="pagecontent/' + pageId + '"].cms-icon-pencil');
                 })
                 .waitForUrl(/page/)
                 .waitForSelector('#content')
@@ -115,7 +114,7 @@ casper.test.begin('Settings and advanced settings are accessible', function(test
                         'Settings can be accessed from page tree'
                     );
 
-                    this.click(xPath('//a[contains(text(), "Pages")][contains(@href, "admin/cms/page")]'));
+                    this.click(xPath('//a[contains(text(), "Page contents")][contains(@href, "admin/cms/page")]'));
                 })
                 .waitForUrl(/page/)
                 .waitForSelector('.cms-pagetree-jstree')
@@ -160,7 +159,6 @@ casper.test.begin('Pages can be added through the page tree', function(test) {
                 .waitUntilVisible('.success')
                 .wait(2000)
                 .then(function() {
-                    var pageId = cms.getPageId('Homepage');
                     var pageNodeId = cms.getPageNodeId('Homepage');
 
                     test.assertExists(
@@ -168,11 +166,11 @@ casper.test.begin('Pages can be added through the page tree', function(test) {
                         'Page was successfully added'
                     );
                     test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '"] span.published',
+                        'span.published',
                         'Page is published by default'
                     );
                     // add nested page
-                    this.click('a[href*="/admin/cms/page/add/?parent_node=' + pageNodeId + '"]');
+                    this.click('a[href*="/admin/cms/pagecontent/add/?parent_node=' + pageNodeId + '"]');
                 })
                 .waitForSelector('#page_form', function() {
                     this.sendKeys('#id_title', 'Nested page');
@@ -184,8 +182,6 @@ casper.test.begin('Pages can be added through the page tree', function(test) {
                 .then(cms.waitUntilAllAjaxCallsFinish())
                 .then(cms.expandPageTree())
                 .then(function() {
-                    var pageId = cms.getPageId('Nested page');
-
                     test.assertExists(
                         xPath(
                             createJSTreeXPathFromTree([
@@ -197,9 +193,10 @@ casper.test.begin('Pages can be added through the page tree', function(test) {
                         ),
                         'Newly created page is added'
                     );
-                    test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '"] span.empty',
-                        'Nested page is not published'
+                    test.assertElementCount(
+                        'span.published',
+                        2,
+                        'Nested page is also published'
                     );
                 });
         })
@@ -372,154 +369,43 @@ casper.test.begin('Pages can be nested / unnested', function(test) {
         });
 });
 
-casper.test.begin('Pages cannot be published if it does not have a title and slug', function(test) {
-    var pageId;
+// casper.test.begin('Pages cannot be published if it does not have a title and slug', function(test) {
+//     var pageId;
+//
+//     casper
+//         .start()
+//         .then(cms.addPage({ title: 'Homepage' }))
+//         .thenOpen(globals.baseUrl)
+//         .then(cms.openSideframe())
+//         // switch to sideframe
+//         .withFrame(0, function() {
+//             casper
+//                 .waitForSelector('.cms-pagetree-jstree', function() {
+//                     pageId = cms.getPageId('Homepage');
+//                     test.assertExists(
+//                         '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
+//                         'Page is published by default in main lang'
+//                     );
+//                     test.assertExists(
+//                         '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
+//                         'Page is not published by default in another language'
+//                     );
+//                 })
+//                 .then(function() {
+//                     this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty');
+//                 })
+//                 .waitUntilVisible('.cms-pagetree-dropdown-menu', function() {
+//                     test.assertVisible('.cms-pagetree-dropdown-menu', 'Publishing dropdown is open');
+//
+//                     test.assertDoesntExist('.cms-pagetree-dropdown-menu-open a[href*="/de/publish/"]');
+//                 });
+//         })
+//         .then(cms.removePage({ title: 'Homepage' }))
+//         .run(function() {
+//             test.done();
+//         });
+// });
 
-    casper
-        .start()
-        .then(cms.addPage({ title: 'Homepage' }))
-        .thenOpen(globals.baseUrl)
-        .then(cms.openSideframe())
-        // switch to sideframe
-        .withFrame(0, function() {
-            casper
-                .waitForSelector('.cms-pagetree-jstree', function() {
-                    pageId = cms.getPageId('Homepage');
-                    test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
-                        'Page is published by default in main lang'
-                    );
-                    test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
-                        'Page is not published by default in another language'
-                    );
-                })
-                .then(function() {
-                    this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty');
-                })
-                .waitUntilVisible('.cms-pagetree-dropdown-menu', function() {
-                    test.assertVisible('.cms-pagetree-dropdown-menu', 'Publishing dropdown is open');
-
-                    test.assertDoesntExist('.cms-pagetree-dropdown-menu-open a[href*="/de/publish/"]');
-                });
-        })
-        .then(cms.removePage({ title: 'Homepage' }))
-        .run(function() {
-            test.done();
-        });
-});
-
-casper.test.begin('Pages can be published/unpublished if it does have a title and slug', function(test) {
-    var pageId;
-
-    casper
-        .start()
-        .then(cms.addPage({ title: 'Homepage' }))
-        // this should be baseUrl, but if you never accessed /?edit the CMS doesn't know
-        // that you ever been in edit mode and will redirect you to a 404 once you unpublish home page
-        .thenOpen(globals.editUrl)
-        .then(cms.openSideframe())
-        // switch to sideframe
-        .withFrame(0, function() {
-            casper
-                .waitForSelector('.cms-pagetree-jstree')
-                .wait(1000, function() {
-                    pageId = cms.getPageId('Homepage');
-                    test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
-                        'Page is published by default in main lang'
-                    );
-                    test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.empty',
-                        'Page is not published by default in another language'
-                    );
-                })
-                // then edit the page to have german translation
-                .then(function() {
-                    this.click('.js-cms-tree-advanced-settings[href*="' + pageId + '"]');
-                })
-                .waitUntilVisible('#page_form', function() {
-                    this.click('#debutton');
-                })
-                .waitForSelector('#debutton.selected', function() {
-                    this.sendKeys('#id_title', 'Startseite');
-                    this.click('input[name="_save"]');
-                })
-                .waitUntilVisible('.cms-pagetree-jstree .cms-tree-item-lang', function() {
-                    this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished');
-                })
-                .waitUntilVisible('.cms-pagetree-dropdown-menu', function() {
-                    test.assertVisible('.cms-pagetree-dropdown-menu', 'Publishing dropdown is open');
-
-                    this.click('.cms-pagetree-dropdown-menu-open a[href*="/de/publish/"]');
-                })
-                .waitForResource(/publish/)
-                .waitForResource(/get-tree/)
-                .wait(200);
-        })
-        .wait(2000)
-        .withFrame(0, function() {
-            casper
-                .waitUntilVisible('.cms-pagetree-jstree', function() {
-                    pageId = cms.getPageId('Homepage');
-                    test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.published',
-                        'Page was published in German because it does have a title and slug'
-                    );
-                })
-                .then(function() {
-                    this.click('.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"]');
-                })
-                .waitUntilVisible('.cms-pagetree-dropdown-menu', function() {
-                    this.click('.cms-pagetree-dropdown-menu-open a[href*="/de/unpublish/"]');
-                })
-                .waitForResource(/unpublish/)
-                .waitForResource(/get-tree/)
-                .wait(200);
-        })
-        .wait(2000)
-        .withFrame(0, function() {
-            casper
-                .waitUntilVisible('.cms-pagetree-jstree')
-                .then(cms.waitUntilAllAjaxCallsFinish())
-                .then(function() {
-                    pageId = cms.getPageId('Homepage');
-                    test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '/de/preview/"] span.unpublished',
-                        'Page in German was unpublished'
-                    );
-                })
-                .waitUntilVisible('.cms-pagetree-jstree', function() {
-                    test.assertExists(
-                        '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.published',
-                        'Page is published in English'
-                    );
-                })
-                .then(function() {
-                    this.click('.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"]');
-                })
-                .waitUntilVisible('.cms-pagetree-dropdown-menu', function() {
-                    this.click('.cms-pagetree-dropdown-menu-open a[href*="/en/unpublish/"]');
-                })
-                .waitForResource(/unpublish/)
-                .waitForResource(/get-tree/)
-                .wait(200);
-        })
-        .wait(2000)
-        .withFrame(0, function() {
-            casper.waitUntilVisible('.cms-pagetree-jstree').then(cms.waitUntilAllAjaxCallsFinish()).then(function() {
-                pageId = cms.getPageId('Homepage');
-                test.assertExists(
-                    '.cms-tree-item-lang a[href*="' + pageId + '/en/preview/"] span.unpublished',
-                    'Page in English was unpublished'
-                );
-            });
-        })
-        .then(cms.removePage({ title: 'Homepage' }))
-        .run(function() {
-            test.done();
-        });
-});
 
 casper.test.begin('Pages can be copied and pasted', function(test) {
     casper
@@ -1505,23 +1391,24 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
         .withFrame(0, function() {
             casper
                 .waitUntilVisible('.cms-pagetree-jstree')
-                .then(function() {
-                    test.assertExists(
-                        xPath(
-                            createJSTreeXPathFromTree([
-                                {
-                                    name: 'Homepage'
-                                }
-                            ])
-                        ),
-                        'At first nested page is not visible'
-                    );
-                })
-                .then(function() {
-                    this.click('.jstree-closed[data-node-id="' + cms.getPageNodeId('Homepage') + '"] > .jstree-ocl');
-                })
-                .waitForResource(/get-tree/)
-                .wait(2000)
+                // .then(function() {
+                //     test.assertExists(
+                //         xPath(
+                //             createJSTreeXPathFromTree([
+                //                 {
+                //                     name: 'Homepage'
+                //                 }
+                //             ])
+                //         ),
+                //         'At first nested page is not visible'
+                //     );
+                // })
+                // .wait(1000)
+                // .then(function() {
+                //     this.click('.jstree-closed[data-node-id="' + cms.getPageNodeId('Homepage') + '"] > .jstree-ocl');
+                // })
+                // .waitForResource(/get-tree/)
+                // .wait(2000)
                 .then(function() {
                     test.assertExists(
                         xPath(

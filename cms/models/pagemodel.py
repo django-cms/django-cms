@@ -643,23 +643,6 @@ class Page(models.Model):
     def has_translation(self, language):
         return self.pagecontent_set.filter(language=language).exists()
 
-    def toggle_in_navigation(self, set_to=None):
-        '''
-        Toggles (or sets) in_navigation and invalidates the cms page cache
-        '''
-        old = self.get_in_navigation()
-        if set_to in [True, False]:
-            new = set_to
-        else:
-            new = not old
-
-        self.update_translations(in_navigation=new)
-
-        # If there was a change, invalidate the cms page cache
-        if new != old:
-            self.clear_cache()
-        return new
-
     def clear_cache(self, language=None, menu=False, placeholder=False):
         from cms.cache import invalidate_cms_page_cache
 
@@ -873,9 +856,10 @@ class Page(models.Model):
         return menu_title
 
     def get_placeholders(self, language):
-        from cms.models import Placeholder
+        from cms.models import PageContent, Placeholder
 
-        return Placeholder.objects.filter(pagecontent__language=language, pagecontent__page=self)
+        page_content = PageContent.objects.get(language=language, page=self)
+        return Placeholder.objects.get_for_obj(page_content)
 
     def get_changed_date(self, language=None, fallback=True, force_reload=False):
         """

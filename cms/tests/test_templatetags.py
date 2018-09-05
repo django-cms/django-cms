@@ -297,6 +297,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         """
         page = create_page('Test', 'col_two.html', 'en')
         # I need to make it seem like the user added another placeholder to the SAME template.
+        page.title_cache['en'] = page.get_title_obj('en')
         page.title_cache['en']._template_cache = 'col_three.html'
 
         request = self.get_request(page=page)
@@ -383,11 +384,11 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.current_page = page
 
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(5):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
 
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(2):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
 
@@ -402,14 +403,14 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.current_page = page
         request.user = user
         template = "{% load cms_tags %}{% show_placeholder slot page 'en' 1 %}"
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(5):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test2</b>')
         request = RequestFactory().get('/?preview')
         request.current_page = page
         request.user = user
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test2</b>', output)
 

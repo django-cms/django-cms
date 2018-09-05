@@ -15,6 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
+from cms.models.managers import PlaceholderManager
 from cms.utils import get_site_id
 from cms.utils.i18n import get_language_object
 from cms.constants import (
@@ -47,8 +48,11 @@ class Placeholder(models.Model):
     is_static = False
     is_editable = True
 
+    objects = PlaceholderManager()
+
     class Meta:
         app_label = 'cms'
+        default_permissions = []
         permissions = (
             (u"use_structure", u"Can use Structure mode"),
         )
@@ -183,6 +187,20 @@ class Placeholder(models.Model):
                 return False
         return True
 
+    def _get_source_remote_field(self):
+        if self.source is None:
+            return
+        return next(
+            f for f in self.source._meta.get_fields()
+            if f.related_model == Placeholder
+        )
+
+    def check_source(self, user):
+        remote_field = self._get_source_remote_field()
+        if remote_field is None:
+            return True
+        return remote_field.run_checks(self, user)
+
     def _get_related_objects(self):
         fields = self._meta._get_fields(
             forward=False, reverse=True,
@@ -220,19 +238,8 @@ class Placeholder(models.Model):
             return None
 
     def _get_attached_model(self):
-        if hasattr(self, '_attached_model_cache'):
-            return self._attached_model_cache
-
-        if self.page or self.pagecontent_set.exists():
-            from cms.models import Page
-            self._attached_model_cache = Page
-            return Page
-
-        field = self._get_attached_field()
-        if field:
-            self._attached_model_cache = field.model
-            return field.model
-        self._attached_model_cache = None
+        if self.source:
+            return self.source._meta.model
         return None
 
     def _get_attached_models(self):
@@ -241,15 +248,23 @@ class Placeholder(models.Model):
         """
         if hasattr(self, '_attached_models_cache'):
             return self._attached_models_cache
+
         self._attached_models_cache = [field.model for field in self._get_attached_fields()]
+
+        if self.source:
+            self._attached_models_cache += [self.source._meta.model]
         return self._attached_models_cache
 
     def _get_attached_objects(self):
         """
         Returns a list of objects attached to this placeholder.
         """
-        return [obj for field in self._get_attached_fields()
+        objs = [obj for field in self._get_attached_fields()
                 for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
+
+        if not objs and self.source:
+            return [self.source]
+        return objs
 
     def page_getter(self):
         if not hasattr(self, '_page'):

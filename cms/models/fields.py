@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
+from itertools import chain
+
+from django.contrib.contenttypes.fields import GenericRelation
+from django.db import models
+
 from cms.forms.fields import PageSelectFormField
 from cms.models.placeholdermodel import Placeholder
-from django.db import models
 
 
 class PlaceholderField(models.ForeignKey):
@@ -92,3 +96,25 @@ class PageField(models.ForeignKey):
         }
         defaults.update(kwargs)
         return super(PageField, self).formfield(**defaults)
+
+
+class PlaceholderRelationField(GenericRelation):
+    default_checks = []
+
+    def __init__(self, checks=None, **kwargs):
+        self._checks = checks or ()
+        kwargs.pop('object_id_field', None)
+        kwargs.pop('content_type_field', None)
+        super(PlaceholderRelationField, self).__init__(
+            Placeholder,
+            object_id_field='object_id',
+            content_type_field='content_type',
+            **kwargs
+        )
+
+    @property
+    def checks(self):
+        return chain(self.default_checks, self._checks)
+
+    def run_checks(self, placeholder, user):
+        return all(check_(placeholder, user) for check_ in self.checks)
