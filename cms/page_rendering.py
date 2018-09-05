@@ -66,3 +66,9 @@ def _render_welcome_page(request):
         'next_url': reverse('pages-root'),
     }
     return TemplateResponse(request, "cms/welcome.html", context)
+
+
+def render_pagecontent(request, pagecontent):
+    request.current_page = page = pagecontent.page
+    language = pagecontent.language
+    return render_page(request, page, language, page.get_slug(language))

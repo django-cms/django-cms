@@ -134,28 +134,6 @@ class ViewTests(CMSTestCase):
         response = details(request, one.get_path('en'))
         self.assertEqual(response.status_code, 200)
 
-    def test_redirect_with_toolbar(self):
-        page = create_page("one", "nav_playground.html", "en",
-                    redirect='/en/page2')
-        page_content = self.get_page_title_obj(page)
-        page_edit_on_url = get_object_edit_url(page_content)
-
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            response = self.client.get(page_edit_on_url)
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'This page has no preview')
-
-            self.client.get(page_edit_on_url)
-            response = self.client.get(get_object_preview_url(page_content))
-            self.assertEqual(response.status_code, 302)
-
-            self.client.get(page_edit_on_url)
-            response = self.client.get(self.get_toolbar_disable_url(page_edit_on_url))
-            # edit endpoint overrides toolbar_off and enables it
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, 'This page has no preview')
-
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", login_required=True)
         plain_url = '/accounts/'
