@@ -10,7 +10,7 @@ from django.utils.translation import override as force_language, ugettext_lazy a
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import Placeholder, PageContent, Page, PageType, StaticPlaceholder
+from cms.models import Placeholder, Page, PageContent, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -267,6 +267,15 @@ class PageToolbar(CMSToolbar):
                 switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False,
                         extra_classes='cms-content-btn')
 
+    def get_page_content(self):
+        obj = self.toolbar.get_object()
+        if obj and isinstance(obj, PageContent):
+            return obj
+        try:
+            return PageContent.objects.get(page=self.page, language=self.current_lang)
+        except PageContent.DoesNotExist:
+            return None
+
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
             self.page_change_permission = can_change_page(self.request)
@@ -314,7 +323,7 @@ class PageToolbar(CMSToolbar):
 
     def populate(self):
         self.page = self.request.current_page
-        self.title = self.toolbar.get_object() if self.page else None
+        self.title = self.get_page_content() if self.page else None
         self.permissions_activated = get_cms_setting('PERMISSION')
         self.change_admin_menu()
         self.add_page_menu()

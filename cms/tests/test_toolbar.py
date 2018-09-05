@@ -202,15 +202,15 @@ class ToolbarTests(ToolbarTestBase):
     def test_toolbar_request_endpoint_validation(self):
         endpoint = self.get_admin_url(UserSettings, 'get_toolbar')
         cms_page = create_page("toolbar-page", "col_two.html", "en")
-        cms_page_2 = create_page("toolbar-page-2", "col_two.html", "en")
+        page_content = self.get_page_title_obj(cms_page)
 
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(
                 endpoint,
                 data={
-                    'obj_id': cms_page.pk,
-                    'obj_type': 'cms.page',
-                    'cms_path': cms_page.get_absolute_url('en')
+                    'obj_id': page_content.pk,
+                    'obj_type': 'cms.pagecontent',
+                    'cms_path': get_object_edit_url(page_content)
                 },
             )
             self.assertEqual(response.status_code, 200)
@@ -222,17 +222,6 @@ class ToolbarTests(ToolbarTestBase):
                     'obj_id': cms_page.pk,
                     'obj_type': 'cms.somemodel',
                     'cms_path': cms_page.get_absolute_url('en')
-                },
-            )
-            self.assertEqual(response.status_code, 400)
-
-            # Page from path does not match attached toolbar obj
-            response = self.client.get(
-                endpoint,
-                data={
-                    'obj_id': cms_page.pk,
-                    'obj_type': 'cms.page',
-                    'cms_path': cms_page_2.get_absolute_url('en')
                 },
             )
             self.assertEqual(response.status_code, 400)
