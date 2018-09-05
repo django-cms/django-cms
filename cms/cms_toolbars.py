@@ -10,7 +10,7 @@ from django.utils.translation import override as force_language, ugettext_lazy a
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import Placeholder, Page, PageContent, PageType, StaticPlaceholder
+from cms.models import Placeholder, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
