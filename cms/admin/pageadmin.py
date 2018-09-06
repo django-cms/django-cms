@@ -872,6 +872,18 @@ class PageContentAdmin(admin.ModelAdmin):
         # Block the admin log for change. A signal takes care of this!
         return
 
+    def get_object(self, request, object_id, from_field=None):
+        """
+        Return an instance matching the field and value provided, the primary
+        key is used if no field is provided. Return ``None`` if no match is
+        found or the object_id fails validation.
+        """
+        obj = super(PageContentAdmin, self).get_object(request, object_id, from_field)
+
+        if obj:
+            obj.page.title_cache[obj.language] = obj
+        return obj
+
     def get_admin_url(self, action, *args):
         url_name = "{}_{}_{}".format(
             self.opts.app_label,

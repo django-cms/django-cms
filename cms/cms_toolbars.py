@@ -10,7 +10,7 @@ from django.utils.translation import override as force_language, ugettext_lazy a
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import Placeholder, PageContent, Page, PageType, StaticPlaceholder
+from cms.models import Placeholder, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -268,10 +268,8 @@ class PageToolbar(CMSToolbar):
                         extra_classes='cms-content-btn')
 
     def get_page_content(self):
-        try:
-            return PageContent.objects.get(page=self.page, language=self.current_lang)
-        except PageContent.DoesNotExist:
-            return None
+        page_content = self.page.get_title_obj(language=self.current_lang, fallback=False)
+        return page_content or None
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
