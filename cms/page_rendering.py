@@ -69,6 +69,7 @@ def _render_welcome_page(request):
 
 
 def render_pagecontent(request, pagecontent):
-    request.current_page = page = pagecontent.page
     language = pagecontent.language
+    request.current_page = page = pagecontent.page
+    page.title_cache[language] = pagecontent
     return render_page(request, page, language, page.get_slug(language))

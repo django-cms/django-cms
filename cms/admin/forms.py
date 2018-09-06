@@ -300,6 +300,7 @@ class AddPageForm(BasePageContentForm):
         operation_token = send_pre_page_operation(
             request=self._request,
             operation=ADD_PAGE_TRANSLATION,
+            language=self._language,
         )
 
         if page:
@@ -345,6 +346,7 @@ class AddPageForm(BasePageContentForm):
             operation=ADD_PAGE_TRANSLATION,
             token=operation_token,
             obj=new_page,
+            language=self._language,
         )
         return translation
 
@@ -552,6 +554,7 @@ class ChangePageForm(BasePageContentForm):
         operation_token = send_pre_page_operation(
             request=self._request,
             operation=CHANGE_PAGE_TRANSLATION,
+            language=self._language,
         )
 
         data = self.cleaned_data.copy()
@@ -582,6 +585,7 @@ class ChangePageForm(BasePageContentForm):
             operation=CHANGE_PAGE_TRANSLATION,
             token=operation_token,
             obj=page,
+            language=self._language,
         )
         return page_content
 
