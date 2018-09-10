@@ -18,6 +18,8 @@
 * Fixed a bug with expanding static placeholder by clicking on "Expand All" button
 * Fixed a bug where descendant pages with a custom url would lose the overwritten
   url on save.
+* Fixed a bug where setting the ``on_delete`` option on ``PlaceholderField``
+  and ``PageField`` fields would be ignored.
 
 
 === 3.5.2 (2018-04-11) ===
