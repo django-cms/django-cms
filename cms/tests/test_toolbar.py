@@ -6,9 +6,7 @@ import re
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth.models import AnonymousUser, Permission
-from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -23,7 +21,7 @@ from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
 from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
                               LANGUAGE_MENU_IDENTIFIER)
-from cms.models import Page, UserSettings, PagePermission
+from cms.models import UserSettings, PagePermission
 from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
 from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_USERSETTINGS)
@@ -56,19 +54,6 @@ class ToolbarTestBase(CMSTestCase):
     def get_superuser(self):
         superuser = self._create_user('superuser', True, True)
         return superuser
-
-    def _fake_logentry(self, instance_id, user, text, model=Page):
-        LogEntry.objects.log_action(
-            user_id=user.id,
-            content_type_id=ContentType.objects.get_for_model(model).pk,
-            object_id=instance_id,
-            object_repr=text,
-            action_flag=CHANGE,
-        )
-        entry = LogEntry.objects.filter(user=user, object_id=instance_id, action_flag__in=(CHANGE,))[0]
-        session = self.client.session
-        session['cms_log_latest'] = entry.pk
-        session.save()
 
     def _get_example_obj(self):
         obj = Example1.objects.create(
@@ -679,97 +664,6 @@ class ToolbarTests(ToolbarTestBase):
         menu4 = toolbar.get_or_create_menu("menu4", "Menu4", side=toolbar.RIGHT, position=-2)
         self.assertEqual(toolbar.get_right_items().index(menu3), 3)
         self.assertEqual(toolbar.get_right_items().index(menu4), 2)
-
-    def test_page_create_redirect(self):
-        superuser = self.get_superuser()
-        page = self.create_homepage("home", "nav_playground.html", "en")
-        resolve_url = admin_reverse('cms_page_resolve')
-        with self.login_user_context(superuser):
-            response = self.client.post(resolve_url, {'pk': '', 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '')
-            page_data = self.get_new_page_data(parent_id=page.node.pk)
-            response = self.client.post(self.get_page_add_uri('en'), page_data)
-            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
-
-            new_page = Page.objects.get(urls__slug__startswith='test-page-')
-            edit_url = get_object_edit_url(self.get_page_title_obj(new_page))
-            response = self.client.post(resolve_url, {'pk': page.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), edit_url)
-
-    def test_page_edit_redirect_editmode(self):
-        page1 = self.create_homepage("home", "nav_playground.html", "en")
-        page1_content = self.get_page_title_obj(page1)
-        page2 = create_page("test", "nav_playground.html", "en")
-        page2_content = self.get_page_title_obj(page2)
-        page3 = create_page("non-pub", "nav_playground.html", "en")
-        page3_content = self.get_page_title_obj(page3)
-        superuser = self.get_superuser()
-        with self.login_user_context(superuser):
-            page_data = self.get_new_page_data()
-            page_data['template'] = 'nav_playground.html'
-            change_endpoint = self.get_page_change_uri('en', page2)
-            self.client.post(change_endpoint, page_data)
-            url = admin_reverse('cms_page_resolve')
-            # first call returns the latest modified page with updated slug even if a different
-            # page has been requested
-            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page2_content))
-            # following call returns the actual page requested
-            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page1_content))
-            # non published page - staff user can access it
-            response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page3_content))
-        # anonymous users should be redirected to the root page
-        response = self.client.post(url, {'pk': page3.pk, 'model': 'cms.page'})
-        self.assertEqual(response.content.decode('utf-8'), '/')
-
-    def test_page_edit_redirect_no_editmode(self):
-        page1 = create_page("home", "nav_playground.html", "en")
-        page1_content = self.get_page_title_obj(page1)
-        page1_edit_url = get_object_edit_url(page1_content)
-        page2 = create_page("test", "nav_playground.html", "en", parent=page1)
-        page2_content = self.get_page_title_obj(page2)
-        page2_edit_url = get_object_edit_url(page2_content)
-
-        superuser = self.get_superuser()
-        url = admin_reverse('cms_page_resolve')
-        with self.login_user_context(superuser):
-            # checking the redirect by passing URL parameters
-            # redirect to the same page
-            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page1_edit_url)
-            # redirect to the same page
-            response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page2_edit_url)
-
-            # checking the redirect by setting the session data
-            self._fake_logentry(page1.pk, superuser, 'test page')
-            response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page1_edit_url)
-
-            self._fake_logentry(page2.pk, superuser, 'test page')
-            response = self.client.post(url, {'pk': page1.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), page2_edit_url)
-
-
-    def test_page_edit_redirect_errors(self):
-        page1 = create_page("home", "nav_playground.html", "en")
-        page2 = create_page("test", "nav_playground.html", "en",
-                            parent=page1)
-        page2_content = self.get_page_title_obj(page2)
-        create_page("non-pub", "nav_playground.html", "en", parent=page2)
-        superuser = self.get_superuser()
-        url = admin_reverse('cms_page_resolve')
-
-        with self.login_user_context(superuser):
-            # logentry - non existing id - parameter is used
-            self._fake_logentry(9999, superuser, 'test page')
-            response = self.client.post(url, {'pk': page2.pk, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), get_object_edit_url(page2_content))
-            # parameters - non existing id - no redirection
-            response = self.client.post(url, {'pk': 9999, 'model': 'cms.page'})
-            self.assertEqual(response.content.decode('utf-8'), '')
 
     def assertMenuItems(self, request, menu_id, name, items=None):
         toolbar = CMSToolbar(request)
