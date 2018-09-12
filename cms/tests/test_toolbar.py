@@ -489,6 +489,13 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
 
+    def test_hide_toolbar_disabled_no_persist(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en")
+        request = self.get_page_request(page, self.get_staff(), disable=True, persist=False)
+        self.assertFalse(request.session.get('cms_toolbar_disabled'))
+        toolbar = CMSToolbar(request)
+        self.assertFalse(toolbar.show_toolbar)
+
     def test_toolbar_login_redirect_validation(self):
         user = self._create_user('toolbar', True, True)
         username = getattr(user, user.USERNAME_FIELD)

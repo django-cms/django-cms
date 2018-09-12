@@ -64,14 +64,16 @@ class ToolbarMiddleware(MiddlewareMixin):
         if not self.is_cms_request(request):
             return
 
+        persist = get_cms_setting('CMS_TOOLBAR_URL__PERSIST')
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
-        if disable_toolbar in request.GET:
-            request.session['cms_toolbar_disabled'] = True
+        if request.GET.get(persist, True):
+            if disable_toolbar in request.GET:
+                request.session['cms_toolbar_disabled'] = True
 
-        if enable_toolbar in request.GET or self.is_edit_mode(request):
-            request.session['cms_toolbar_disabled'] = False
+            if enable_toolbar in request.GET or self.is_edit_mode(request):
+                request.session['cms_toolbar_disabled'] = False
 
         if request.user.is_staff:
             try:
