@@ -337,7 +337,7 @@ var Sideframe = new Class({
         CMS.settings = Helpers.setSettings(CMS.settings);
 
         // check for reloading
-        Helpers.reloadBrowser(this.options.onClose, false, true);
+        Helpers.reloadBrowser(this.options.onClose);
 
         // trigger hide animation
         this._hide({

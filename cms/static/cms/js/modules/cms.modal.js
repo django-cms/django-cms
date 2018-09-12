@@ -386,7 +386,7 @@ class Modal {
 
         // handle refresh option
         if (this.options.onClose) {
-            Helpers.reloadBrowser(this.options.onClose, false, true);
+            Helpers.reloadBrowser(this.options.onClose, false);
         }
 
         this._hide({

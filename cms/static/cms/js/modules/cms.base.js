@@ -86,16 +86,10 @@ export const Helpers = {
      * @method reloadBrowser
      * @param {String} url where to redirect. if equal to `REFRESH_PAGE` will reload page instead
      * @param {Number} timeout=0 timeout in ms
-     * @param {Boolean} ajax if set to true first initiates **synchronous**
-     *     ajax request to figure out if the browser should reload current page,
-     *     move to another one, or do nothing.
-     * @param {Object} [data] optional data to be passed instead of one provided by request config
-     * @param {String} [data.model=CMS.config.request.model]
-     * @param {String|Number} [data.pk=CMS.config.request.pk]
-     * @returns {Boolean|void}
+     * @returns {void}
      */
     // eslint-disable-next-line max-params
-    reloadBrowser: function(url, timeout, ajax, data) {
+    reloadBrowser: function(url, timeout) {
         var that = this;
         // is there a parent window?
         var win = this._getWindow();
@@ -103,51 +97,15 @@ export const Helpers = {
 
         that._isReloading = true;
 
-        // if there is an ajax reload, prioritize
-        if (ajax) {
-            parent.CMS.API.locked = true;
-            // check if the url has changed, if true redirect to the new path
-            // this requires an ajax request
-            $.ajax({
-                async: false,
-                type: 'GET',
-                url: parent.CMS.config.request.url,
-                data: data || {
-                    model: parent.CMS.config.request.model,
-                    pk: parent.CMS.config.request.pk
-                },
-                success: function(response) {
-                    parent.CMS.API.locked = false;
-
-                    if (response === '' && !url) {
-                        // cancel if response is empty
-                        return false;
-                    } else if (parent.location.pathname !== response && response !== '') {
-                        // api call to the backend to check if the current path is still the same
-                        that.reloadBrowser(response);
-                    } else if (url === 'REFRESH_PAGE') {
-                        // if on_close provides REFRESH_PAGE, only do a reload
-                        that.reloadBrowser();
-                    } else if (url) {
-                        // on_close can also provide a url, reload to the new destination
-                        that.reloadBrowser(url);
-                    }
-                }
-            });
-
-            // cancel further operations
-            return false;
-        }
-
         // add timeout if provided
         parent.setTimeout(function() {
-            if (url && url !== parent.location.href) {
+            if (url === 'REFRESH_PAGE' || !url || url === parent.location.href) {
+                // ensure page is always reloaded #3413
+                parent.location.reload();
+            } else {
                 // location.reload() takes precedence over this, so we
                 // don't want to reload the page if we need a redirect
                 parent.location.href = url;
-            } else {
-                // ensure page is always reloaded #3413
-                parent.location.reload();
             }
         }, timeout || 0);
     },
