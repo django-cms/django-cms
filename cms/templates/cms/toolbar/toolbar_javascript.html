@@ -20,7 +20,6 @@ CMS.config = {
         'model': '{{ cms_toolbar.get_object_model }}',
         'page_id': '{{ request.current_page.pk|unlocalize }}',
         'pk': '{{ cms_toolbar.get_object_pk|unlocalize }}',
-        'url': '{% language cms_toolbar.request_language %}{% cms_admin_url "cms_page_resolve" %}{% endlanguage %}',
         'toolbar': '{% language cms_toolbar.request_language %}{% cms_admin_url "cms_usersettings_get_toolbar" %}{% endlanguage %}'
     },
     'lang': {

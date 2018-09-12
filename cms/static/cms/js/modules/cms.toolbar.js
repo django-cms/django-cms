@@ -512,11 +512,11 @@ var Toolbar = new Class({
                     if (onSuccess === 'FOLLOW_REDIRECT') {
                         Helpers.reloadBrowser(response.url);
                     } else {
-                        Helpers.reloadBrowser(onSuccess, false, true);
+                        Helpers.reloadBrowser(onSuccess);
                     }
                 } else {
                     // reload
-                    Helpers.reloadBrowser(false, false, true);
+                    Helpers.reloadBrowser();
                 }
             })
             .fail(function(jqXHR) {
