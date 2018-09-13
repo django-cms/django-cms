@@ -884,22 +884,7 @@ var PageTree = new Class({
                         // simply reload the page
                         that._reloadHelper();
                     } else {
-                        // if we're in the sideframe we have to actually
-                        // check if we are publishing a page we're currently in
-                        // because if the slug did change we would need to
-                        // redirect to that new slug
-                        // Problem here is that in case of the apphooked page
-                        // the model and pk are empty and reloadBrowser doesn't really
-                        // do anything - so here we specifically force the data
-                        // to be the data about the page and not the model
-                        var parent = window.parent ? window.parent : window;
-                        var data = {
-                            // this shouldn't be hardcoded, but there is no way around it
-                            model: 'cms.page',
-                            pk: parent.CMS.config.request.page_id
-                        };
-
-                        Helpers.reloadBrowser('REFRESH_PAGE', false, true, data);
+                        Helpers.reloadBrowser('REFRESH_PAGE');
                     }
                 })
                 .fail(function(error) {

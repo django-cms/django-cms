@@ -3,7 +3,6 @@
 Edit Toolbar middleware
 """
 from django import forms
-from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.exceptions import ValidationError
 from django.urls import resolve
 from django.utils.functional import SimpleLazyObject
@@ -76,14 +75,6 @@ class ToolbarMiddleware(MiddlewareMixin):
             if enable_toolbar in request.GET or self.is_edit_mode(request):
                 request.session['cms_toolbar_disabled'] = False
 
-        if request.user.is_staff:
-            try:
-                request.cms_latest_entry = LogEntry.objects.filter(
-                    user=request.user,
-                    action_flag__in=(ADDITION, CHANGE)
-                ).only('pk').order_by('-pk')[0].pk
-            except IndexError:
-                request.cms_latest_entry = -1
         request.toolbar = SimpleLazyObject(lambda: CMSToolbar(request))
 
     def process_response(self, request, response):
@@ -96,21 +87,4 @@ class ToolbarMiddleware(MiddlewareMixin):
 
         if toolbar._cache_disabled:
             add_never_cache_headers(response)
-
-        if hasattr(request, 'user') and request.user.is_staff and response.status_code != 500:
-            try:
-                if hasattr(request, 'cms_latest_entry'):
-                    pk = LogEntry.objects.filter(
-                        user=request.user,
-                        action_flag__in=(ADDITION, CHANGE)
-                    ).only('pk').order_by('-pk')[0].pk
-
-                    if request.cms_latest_entry != pk:
-                        request.session['cms_log_latest'] = pk
-            # If there were no LogEntries, just don't touch the session.
-            # Note that in the case of a user logging-in as another user,
-            # request may have a cms_latest_entry attribute, but there are no
-            # LogEntries for request.user.
-            except IndexError:
-                pass
         return response
