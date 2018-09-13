@@ -69,7 +69,7 @@ DEFAULTS = {
     'UNIHANDECODE_DECODERS': ['ja', 'zh', 'kr', 'vn', 'diacritic'],
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
     'TOOLBAR_ANONYMOUS_ON': True,
-    'TOOLBAR_URL__PERSIST': 'toolbar_persist',
+    'TOOLBAR_URL__PERSIST': 'persist',
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'TOOLBAR_URL__ENABLE': 'toolbar_on',
     'ADMIN_NAMESPACE': 'admin',
