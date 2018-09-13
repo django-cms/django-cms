@@ -60,7 +60,7 @@ var INTEGRATION_TESTS = [
         'createContent',
         'users', // WORKS
         'addNewUser', // WORKS
-        'newPage', // WORKS
+        // 'newPage', // after removing resolve endpoint the cms no longer redirects you to new page
         // 'pageControl', // broken
         'modal', // WORKS
         // 'permissions', // broken
