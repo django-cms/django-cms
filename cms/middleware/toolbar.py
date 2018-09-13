@@ -67,8 +67,9 @@ class ToolbarMiddleware(MiddlewareMixin):
         persist = get_cms_setting('CMS_TOOLBAR_URL__PERSIST')
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+        field = forms.BooleanField(required=False)
 
-        if request.GET.get(persist, True):
+        if field.clean(request.GET.get(persist, True)):
             if disable_toolbar in request.GET:
                 request.session['cms_toolbar_disabled'] = True
 
