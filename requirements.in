@@ -26,3 +26,5 @@ https://control.divio.com/api/v1/apps/serve/django-privacy-mgmt/0.0.15/419c8f32-
 
 # dependency conflicts
 django-taggit<=0.22.2
+django-storages<=1.6.6
+django-polymorphic<=1.3.1
