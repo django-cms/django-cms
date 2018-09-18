@@ -199,8 +199,20 @@ class CMSToolbar(BaseToolbar):
         self.is_staff = self.request.user.is_staff
         self.show_toolbar = self.is_staff
 
-        if self.request.session.get('cms_toolbar_disabled', False):
-            self.show_toolbar = False
+        enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
+        disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+
+        if self.show_toolbar:
+            edit_mode = (
+                self._resolver_match and
+                self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+            )
+            if enable_toolbar in self.request.GET or edit_mode:
+                self.show_toolbar = True
+            elif disable_toolbar in self.request.GET:
+                self.show_toolbar = False
+            elif self.request.session.get('cms_toolbar_disabled', False):
+                self.show_toolbar = False
 
         # We need to store the current language in case the user's preferred language is different.
         self.toolbar_language = self.request_language
