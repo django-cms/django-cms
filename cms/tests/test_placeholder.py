@@ -21,6 +21,7 @@ from cms.plugin_pool import plugin_pool
 from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
+from cms.test_utils.project.placeholder_relation_field_app.models import FancyPoll
 from cms.test_utils.project.placeholderapp.models import (
     DynamicPlaceholderSlotExample,
     Example1,
@@ -29,7 +30,11 @@ from cms.test_utils.project.placeholderapp.models import (
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
-from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+from cms.toolbar.utils import (
+    get_object_edit_url,
+    get_object_structure_url,
+    get_toolbar_from_request,
+)
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    get_placeholder_conf, get_placeholders, _get_nodelist,
@@ -717,6 +722,125 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         output = template.render({})
         self.assertEqual(['Whee'], [o for o in output.split('\n')
             if 'Whee' in o])
+
+    def test_sets_source_when_title_is_created(self):
+        """
+        This tests when a title is created, the source field for the
+        created placeholders are set to that title.
+        """
+        page = create_page('test page en', 'col_two.html', 'en')
+
+        # check for en
+        page_content_en = self.get_page_title_obj(page)
+        self.assertQuerysetEqual(
+            Placeholder.objects.get_for_obj(page_content_en),
+            page_content_en.get_placeholders(),
+            transform=lambda x: x,
+            ordered=False,
+        )
+
+        # check for another language = de
+        page_content_de = create_title('de', 'test page de', page)
+        self.assertQuerysetEqual(
+            Placeholder.objects.get_for_obj(page_content_de),
+            page_content_de.get_placeholders(),
+            transform=lambda x: x,
+            ordered=False,
+        )
+
+    def test_sets_source_when_title_is_copied(self):
+        """
+        This tests when a title is copied, the source field for the
+        created placeholders are set to the new title.
+        """
+        page = create_page('source page', 'col_two.html', 'en')
+
+        with self.login_user_context(self.get_superuser()):
+            new_page = self.copy_page(page, page, position=1)
+
+        page_content = self.get_page_title_obj(page)
+        new_page_content = self.get_page_title_obj(new_page)
+        page_content_plhs = Placeholder.objects.get_for_obj(page_content)
+        new_page_content_plhs = Placeholder.objects.get_for_obj(new_page_content)
+        self.assertEqual(page_content_plhs.count(), new_page_content_plhs.count())
+
+    def test_sets_source_when_external_object_is_rendered(self):
+        """
+        This tests the implementation for external objects to use the {% placeholder %}
+        template tag where placeholders are created with the source field
+        set to the current object.
+        """
+        from cms.utils.placeholder import get_declared_placeholders_for_obj
+
+        poll = FancyPoll.objects.create(name='poll 1')
+
+        # Go to the poll for the first time
+        response = self.client.get(poll.get_absolute_url())
+        placeholders = Placeholder.objects.get_for_obj(poll)
+        self.assertEqual(placeholders.count(), 2)
+
+        # Now go to edit mode
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(get_object_edit_url(poll))
+
+        placeholders = Placeholder.objects.get_for_obj(poll)
+        self.assertEqual(placeholders.count(), 2)
+
+        # Now go to structure mode
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(get_object_structure_url(poll))
+
+        placeholders = Placeholder.objects.get_for_obj(poll)
+        self.assertEqual(placeholders.count(), 2)
+        declared_placeholders = get_declared_placeholders_for_obj(poll)
+        self.assertEqual(len(declared_placeholders), 2)
+
+        for placeholder in declared_placeholders:
+            self.assertContains(
+                response,
+                '<script data-cms id="cms-plugin-child-classes-%s" type="text/cms-template">'
+                % placeholders.get(slot=placeholder.slot).pk
+            )
+
+        # Change the template
+        poll.template = 'fancy_poll_app/detail2.html'
+        poll.save()
+
+        # Now go to structure mode again
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(get_object_structure_url(poll))
+
+        placeholders = Placeholder.objects.get_for_obj(poll)
+        # By this time rescanning should have occurred
+        # and created new placeholders
+        placeholders = Placeholder.objects.get_for_obj(poll)
+        self.assertEqual(placeholders.count(), 5)
+        declared_placeholders = get_declared_placeholders_for_obj(poll)
+        self.assertEqual(len(declared_placeholders), 3)
+
+        for placeholder in declared_placeholders:
+            self.assertContains(
+                response,
+                '<script data-cms id="cms-plugin-child-classes-%s" type="text/cms-template">'
+                % placeholders.get(slot=placeholder.slot).pk
+            )
+
+    def test_placeholder_relation_field(self):
+        """
+        This tests the PlaceholderRelationField where it returns (does a reverse relation)
+        the placeholders for the attached object.
+        """
+        poll = FancyPoll.objects.create(name='poll 1')
+
+        with self.login_user_context(self.get_superuser()):
+            self.client.get(get_object_edit_url(poll))
+
+        self.assertQuerysetEqual(
+            poll.placeholders.all(),
+            Placeholder.objects.get_for_obj(poll),
+            transform=lambda x: x,
+            ordered=False
+        )
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):

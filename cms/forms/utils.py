@@ -10,7 +10,7 @@ from django.utils.safestring import mark_safe
 from cms.cache.choices import (
     clean_site_choices_cache, clean_page_choices_cache,
     _site_cache_key, _page_cache_key)
-from cms.models import Page, Title
+from cms.models import Page
 from cms.utils import i18n
 
 
@@ -26,12 +26,14 @@ def get_sites():
 
 
 def get_page_choices_for_site(site, language):
+    from cms.models import PageContent
+
     fallbacks = i18n.get_fallback_languages(language, site_id=site.pk)
     languages = [language] + fallbacks
     translation_lookup = Prefetch(
-        'title_set',
+        'pagecontent_set',
         to_attr='filtered_translations',
-        queryset=Title.objects.filter(language__in=languages).only('pk', 'page', 'language', 'title')
+        queryset=PageContent.objects.filter(language__in=languages).only('pk', 'page', 'language', 'title')
     )
     pages = (
         Page
@@ -48,7 +50,7 @@ def get_page_choices_for_site(site, language):
         titles_by_language = {trans.language: trans.title for trans in translations}
 
         for language in languages:
-            # EmptyTitle is used to prevent the cms from trying
+            # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
             if language in titles_by_language:
                 title = titles_by_language[language]

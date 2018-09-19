@@ -10,7 +10,7 @@ from cms.api import create_page, create_title
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
 from cms.extensions import PageExtension
-from cms.models import Page, PageType
+from cms.models import Page, PageContent
 from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
 from cms.test_utils.project.extensionapp.models import MultiTablePageExtension, MultiTableTitleExtension
 from cms.test_utils.testcases import CMSTestCase
@@ -125,12 +125,12 @@ class ExtensionsTestCase(CMSTestCase):
         for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             self.assertEqual(extension_pool.get_page_extensions(new_page)[0].extra,
                              old_page_extensions[index].extra)
-            self.assertEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].extra_title,
+            self.assertEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].extra_title,
                              old_title_extension[index].extra_title)
             # check that objects are actually different
             self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
                                 old_page_extensions[index].pk)
-            self.assertNotEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].pk,
+            self.assertNotEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
                                 old_title_extension[index].pk)
 
         # Test deleting original page for #3987
@@ -185,7 +185,7 @@ class ExtensionsTestCase(CMSTestCase):
         old_title_extension = [title_extension, subtitle_extension]
         for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             copied_page_extension = extension_pool.get_page_extensions(new_page)[0]
-            copied_title_extension = extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0]
+            copied_title_extension = extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0]
             self.assertEqual(copied_page_extension.extension_parent_field,
                              old_page_extensions[index].extension_parent_field)
             self.assertEqual(copied_page_extension.multitable_extra,
@@ -197,7 +197,7 @@ class ExtensionsTestCase(CMSTestCase):
             # check that objects are actually different
             self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
                                 old_page_extensions[index].pk)
-            self.assertNotEqual(extension_pool.get_title_extensions(new_page.title_set.get(language='en'))[0].pk,
+            self.assertNotEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
                                 old_title_extension[index].pk)
 
         # Test deleting original page for #3987
@@ -250,6 +250,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
     def test_duplicate_extensions(self):
         with self.login_user_context(self.admin):
+            content = self.get_page_title_obj(self.page, 'en')
             # create page copy
             page_data = {
                 'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
@@ -259,33 +260,12 @@ class ExtensionAdminTestCase(CMSTestCase):
             self.assertEqual(MyPageExtension.objects.all().count(), 1)
             self.assertEqual(MyTitleExtension.objects.all().count(), 1)
             response = self.client.post(
-                self.get_admin_url(Page, 'duplicate', self.page.pk),
+                self.get_admin_url(PageContent, 'duplicate', content.pk),
                 data=page_data,
             )
             # Check that page and its extensions have been copied
-            self.assertRedirects(response, self.get_admin_url(Page, 'changelist'))
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
             self.assertEqual(Page.objects.all().count(), 3)
-            self.assertEqual(MyPageExtension.objects.all().count(), 2)
-            self.assertEqual(MyTitleExtension.objects.all().count(), 2)
-
-    def test_page_type_extensions(self):
-        with self.login_user_context(self.admin):
-            # create page copy
-            page_data = {
-                'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
-                'site': 1, 'language': 'en', 'source': self.page.pk,
-            }
-            self.assertEqual(Page.objects.all().count(), 2)
-            self.assertEqual(MyPageExtension.objects.all().count(), 1)
-            self.assertEqual(MyTitleExtension.objects.all().count(), 1)
-            response = self.client.post(
-                self.get_admin_url(PageType, 'add'),
-                data=page_data,
-            )
-            self.assertRedirects(response, self.get_admin_url(PageType, 'changelist'))
-            # Check that new page type has extensions from source page
-            self.assertEqual(Page.objects.all().count(), 4)
-            self.assertEqual(Page.objects.filter(is_page_type=True).count(), 2)
             self.assertEqual(MyPageExtension.objects.all().count(), 2)
             self.assertEqual(MyTitleExtension.objects.all().count(), 2)
 

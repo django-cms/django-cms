@@ -38,6 +38,10 @@ casper.test.begin('Edit content', function(test) {
 
     casper
         .start(globals.editUrl)
+        .then(function () {
+            this.click('.cms-btn-switch-edit');
+        })
+        .wait(2000)
         // make sure we are in content mode
         .then(cms.switchTo('content'))
         // check edit modal window appearance after double click in content mode

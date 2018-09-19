@@ -353,6 +353,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
             message = force_text(_('You do not have permission to add a plugin'))
             return HttpResponseForbidden(message)
 
+        if not placeholder.check_source(request.user):
+            message = force_text(_('You do not have permission to add a plugin'))
+            return HttpResponseForbidden(message)
+
         plugin_class = plugin_pool.get_plugin(plugin_type)
         plugin_instance = plugin_class(plugin_class.model, self.admin_site)
 
@@ -445,6 +449,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
             message = _('You do not have permission to copy these plugins.')
             raise PermissionDenied(force_text(message))
 
+        if not target_placeholder.check_source(request.user):
+            message = _('You do not have permission to copy these plugins.')
+            raise PermissionDenied(message)
+
         # Empty the clipboard
         target_placeholder.clear()
 
@@ -463,6 +471,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
         old_plugins = source_placeholder.get_plugins_list(language=source_language)
 
         if not self.has_copy_plugins_permission(request, old_plugins):
+            message = _('You do not have permission to copy this placeholder.')
+            raise PermissionDenied(force_text(message))
+
+        if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy this placeholder.')
             raise PermissionDenied(force_text(message))
 
@@ -505,6 +517,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
         )
 
         if not has_permissions:
+            message = _('You do not have permission to copy these plugins.')
+            raise PermissionDenied(force_text(message))
+
+        if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy these plugins.')
             raise PermissionDenied(force_text(message))
 
@@ -559,6 +575,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not self.has_change_plugin_permission(request, obj):
             return HttpResponseForbidden(force_text(_("You do not have permission to edit this plugin")))
+
+        if not obj.placeholder.check_source(request.user):
+            message = force_text(_("You do not have permission to edit this plugin"))
+            return HttpResponseForbidden(message)
 
         response = plugin_instance.change_view(request, str(plugin_id))
 
@@ -703,6 +723,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
             message = force_text(_("You have no permission to paste this plugin"))
             raise PermissionDenied(message)
 
+        if not target_placeholder.check_source(request.user):
+            message = force_text(_("You have no permission to paste this plugin"))
+            raise PermissionDenied(message)
+
         if target_parent:
             target_parent_id = target_parent.pk
         else:
@@ -759,6 +783,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
             message = force_text(_("You have no permission to paste this placeholder"))
             raise PermissionDenied(message)
 
+        if not target_placeholder.check_source(request.user):
+            message = force_text(_("You have no permission to paste this placeholder"))
+            raise PermissionDenied(message)
+
         action_token = self._send_pre_placeholder_operation(
             request,
             operation=operations.PASTE_PLACEHOLDER,
@@ -812,7 +840,15 @@ class PlaceholderAdmin(admin.ModelAdmin):
             message = force_text(_("You have no permission to move this plugin"))
             raise PermissionDenied(message)
 
-        if target_placeholder and not self.has_move_plugin_permission(request, plugin, source_placeholder):
+        if target_placeholder and not self.has_move_plugin_permission(request, plugin, target_placeholder):
+            message = force_text(_("You have no permission to move this plugin"))
+            raise PermissionDenied(message)
+
+        if not source_placeholder.check_source(request.user):
+            message = force_text(_("You have no permission to move this plugin"))
+            raise PermissionDenied(message)
+
+        if target_placeholder and not target_placeholder.check_source(request.user):
             message = force_text(_("You have no permission to move this plugin"))
             raise PermissionDenied(message)
 
@@ -861,12 +897,17 @@ class PlaceholderAdmin(admin.ModelAdmin):
         )
         return updated_plugin
 
-    def _cut_plugin(self, request, plugin, target_language,  target_placeholder):
-        if not self.has_move_plugin_permission(request, plugin, target_placeholder):
+    def _cut_plugin(self, request, plugin, target_language, target_placeholder):
+        source_placeholder = plugin.placeholder
+
+        if not self.has_move_plugin_permission(request, plugin, source_placeholder):
             message = force_text(_("You have no permission to cut this plugin"))
             raise PermissionDenied(message)
 
-        source_placeholder = plugin.placeholder
+        if not source_placeholder.check_source(request.user):
+            message = force_text(_("You have no permission to cut this plugin"))
+            raise PermissionDenied(message)
+
         action_token = self._send_pre_placeholder_operation(
             request,
             operation=operations.CUT_PLUGIN,
@@ -911,6 +952,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
         if not self.has_delete_plugin_permission(request, plugin):
             return HttpResponseForbidden(force_text(
                 _("You do not have permission to delete this plugin")))
+
+        if not plugin.placeholder.check_source(request.user):
+            message = force_text(_("You do not have permission to delete this plugin"))
+            raise PermissionDenied(message)
 
         opts = plugin._meta
         using = router.db_for_write(opts.model)
@@ -996,6 +1041,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not self.has_clear_placeholder_permission(request, placeholder, language):
             return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
+
+        if not placeholder.check_source(request.user):
+            message = force_text(_("You do not have permission to clear this placeholder"))
+            raise PermissionDenied(message)
 
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)

@@ -10,7 +10,7 @@ from django.utils.translation import override as force_language, ugettext_lazy a
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
+from cms.models import Placeholder, Page, PageType, StaticPlaceholder
 from cms.toolbar.items import TemplateItem, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -267,11 +267,9 @@ class PageToolbar(CMSToolbar):
                 switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False,
                         extra_classes='cms-content-btn')
 
-    def get_title(self):
-        try:
-            return Title.objects.get(page=self.page, language=self.current_lang)
-        except Title.DoesNotExist:
-            return None
+    def get_page_content(self):
+        page_content = self.page.get_title_obj(language=self.current_lang, fallback=False)
+        return page_content or None
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
@@ -320,7 +318,7 @@ class PageToolbar(CMSToolbar):
 
     def populate(self):
         self.page = self.request.current_page
-        self.title = self.get_title() if self.page else None
+        self.title = self.get_page_content() if self.page else None
         self.permissions_activated = get_cms_setting('PERMISSION')
         self.change_admin_menu()
         self.add_page_menu()
@@ -354,7 +352,7 @@ class PageToolbar(CMSToolbar):
         self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
 
     def add_page_settings_button(self, extra_classes=('cms-btn-action',)):
-        url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.page.pk]), self.toolbar.request_language)
+        url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.title.pk]), self.toolbar.request_language)
         self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
 
     # Menus
@@ -385,20 +383,14 @@ class PageToolbar(CMSToolbar):
             if add:
                 add_plugins_menu = language_menu.get_or_create_menu('{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation'))
 
-                if self.page.is_page_type:
-                    page_change_url = admin_reverse('cms_pagetype_change', args=(self.page.pk,))
-                else:
-                    page_change_url = admin_reverse('cms_page_change', args=(self.page.pk,))
+                page_add_url = admin_reverse('cms_pagecontent_add')
 
                 for code, name in add:
-                    url = add_url_parameters(page_change_url, language=code)
+                    url = add_url_parameters(page_add_url, page=self.page.pk, language=code)
                     add_plugins_menu.add_modal_item(name, url=url)
 
             if remove:
-                if self.page.is_page_type:
-                    translation_delete_url = admin_reverse('cms_pagetype_delete_translation', args=(self.page.pk,))
-                else:
-                    translation_delete_url = admin_reverse('cms_page_delete_translation', args=(self.page.pk,))
+                translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(self.title.pk,))
 
                 remove_plugins_menu = language_menu.get_or_create_menu('{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation'))
                 disabled = len(remove) == 1
@@ -411,10 +403,7 @@ class PageToolbar(CMSToolbar):
                 title = _('from %s')
                 question = _('Are you sure you want to copy all plugins from %s?')
 
-                if self.page.is_page_type:
-                    page_copy_url = admin_reverse('cms_pagetype_copy_language', args=(self.page.pk,))
-                else:
-                    page_copy_url = admin_reverse('cms_page_copy_language', args=(self.page.pk,))
+                page_copy_url = admin_reverse('cms_pagecontent_copy_language', args=(self.title.pk,))
 
                 for code, name in copy:
                     copy_plugins_menu.add_ajax_item(
@@ -435,7 +424,7 @@ class PageToolbar(CMSToolbar):
 
         if not self._changed_admin_menu and can_change_page:
             admin_menu = self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            url = admin_reverse('cms_page_changelist')  # cms page admin
+            url = admin_reverse('cms_pagecontent_changelist')  # cms page admin
             params = {'language': self.toolbar.request_language}
             if self.page:
                 params['page_id'] = self.page.pk
@@ -445,7 +434,7 @@ class PageToolbar(CMSToolbar):
             self._changed_admin_menu = True
 
     def add_page_menu(self):
-        if self.page:
+        if self.page and self.title:
             edit_mode = self.toolbar.edit_mode_active
             refresh = self.toolbar.REFRESH_PAGE
             can_change = user_can_change_page(
@@ -465,16 +454,10 @@ class PageToolbar(CMSToolbar):
             new_page_params = {'edit': 1}
             new_sub_page_params = {'edit': 1, 'parent_node': self.page.node_id}
 
-            if self.page.is_page_type:
-                add_page_url = admin_reverse('cms_pagetype_add')
-                advanced_url = admin_reverse('cms_pagetype_advanced', args=(self.page.pk,))
-                page_settings_url = admin_reverse('cms_pagetype_change', args=(self.page.pk,))
-                duplicate_page_url = admin_reverse('cms_pagetype_duplicate', args=[self.page.pk])
-            else:
-                add_page_url = admin_reverse('cms_page_add')
-                advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
-                page_settings_url = admin_reverse('cms_page_change', args=(self.page.pk,))
-                duplicate_page_url = admin_reverse('cms_page_duplicate', args=[self.page.pk])
+            add_page_url = admin_reverse('cms_pagecontent_add')
+            advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
+            page_settings_url = admin_reverse('cms_pagecontent_change', args=(self.title.pk,))
+            duplicate_page_url = admin_reverse('cms_pagecontent_duplicate', args=[self.title.pk])
 
             can_add_root_page = page_permissions.user_can_add_page(
                 user=self.request.user,
@@ -542,10 +525,7 @@ class PageToolbar(CMSToolbar):
 
             # templates menu
             if edit_mode:
-                if self.page.is_page_type:
-                    action = admin_reverse('cms_pagetype_change_template', args=(self.page.pk,))
-                else:
-                    action = admin_reverse('cms_page_change_template', args=(self.page.pk,))
+                action = admin_reverse('cms_pagecontent_change_template', args=(self.title.pk,))
 
                 if can_change_advanced:
                     templates_menu = current_page_menu.get_or_create_menu(
@@ -561,47 +541,19 @@ class PageToolbar(CMSToolbar):
                         templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
                                                      on_success=refresh)
 
-            # page type
-            if not self.page.is_page_type:
-                page_type_url = admin_reverse('cms_pagetype_add')
-                page_type_url = add_url_parameters(page_type_url, source=self.page.pk, language=self.toolbar.request_language)
-                page_type_disabled = not edit_mode or not can_add_root_page
-                current_page_menu.add_modal_item(_('Save as Page Type'), page_type_url, disabled=page_type_disabled)
-
-                # second break
-                current_page_menu.add_break(PAGE_MENU_SECOND_BREAK)
-
-            # permissions
-            if self.permissions_activated:
-                permissions_url = admin_reverse('cms_page_permissions', args=(self.page.pk,))
-                permission_disabled = not edit_mode
-
-                if not permission_disabled:
-                    permission_disabled = not page_permissions.user_can_change_page_permissions(
-                        user=self.request.user,
-                        page=self.page,
-                    )
-                current_page_menu.add_modal_item(_('Permissions'), url=permissions_url, disabled=permission_disabled)
-                # third break
-                current_page_menu.add_break(PAGE_MENU_THIRD_BREAK)
-
-            if not self.page.is_page_type:
-                # navigation toggle
-                in_navigation = self.page.get_in_navigation(language=self.toolbar.request_language)
-                nav_title = _('Hide in navigation') if in_navigation else _('Display in navigation')
-                nav_action = admin_reverse('cms_page_change_innavigation', args=(self.page.pk,))
-                current_page_menu.add_ajax_item(
-                    nav_title,
-                    action=nav_action,
-                    disabled=(not edit_mode or not can_change),
-                    on_success=refresh,
-                )
+            # navigation toggle
+            in_navigation = self.title.in_navigation
+            nav_title = _('Hide in navigation') if in_navigation else _('Display in navigation')
+            nav_action = admin_reverse('cms_pagecontent_change_innavigation', args=(self.title.pk,))
+            current_page_menu.add_ajax_item(
+                nav_title,
+                action=nav_action,
+                disabled=(not edit_mode or not can_change),
+                on_success=refresh,
+            )
 
             # delete
-            if self.page.is_page_type:
-                delete_url = admin_reverse('cms_pagetype_delete', args=(self.page.pk,))
-            else:
-                delete_url = admin_reverse('cms_page_delete', args=(self.page.pk,))
+            delete_url = admin_reverse('cms_page_delete', args=(self.page.pk,))
             delete_disabled = not edit_mode or not user_can_delete_page(self.request.user, page=self.page)
             on_delete_redirect_url = self.get_on_delete_redirect_url()
             current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,

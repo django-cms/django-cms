@@ -3,6 +3,7 @@
  */
 
 import $ from 'jquery';
+import URL from 'urijs';
 
 import Class from 'classjs';
 import { Helpers, KEYS } from './cms.base';
@@ -45,6 +46,8 @@ var PageTree = new Class({
 
         Helpers.csrf(this.options.csrf);
 
+        this._setupLanguages();
+
         // cancel if pagetree is not available
         if ($.isEmptyObject(opts) || opts.empty) {
             this._getClipboard();
@@ -77,8 +80,20 @@ var PageTree = new Class({
             document: $(document),
             tree: pagetree.find('.js-cms-pagetree'),
             dialog: $('.js-cms-tree-dialog'),
-            siteForm: $('.js-cms-pagetree-site-form')
+            siteForm: $('.js-cms-pagetree-site-form'),
+            languagesSelect: $('.js-cms-pagetree-languages')
         };
+    },
+
+    _setupLanguages: function _setupLanguages() {
+        this.ui.languagesSelect.on('change', () => {
+            const newLanguage = this.ui.languagesSelect.val();
+
+            const url = new URL(window.location.href).removeSearch('language')
+                .addSearch('language', newLanguage).toString();
+
+            window.location.href = url;
+        });
     },
 
     /**
@@ -869,22 +884,7 @@ var PageTree = new Class({
                         // simply reload the page
                         that._reloadHelper();
                     } else {
-                        // if we're in the sideframe we have to actually
-                        // check if we are publishing a page we're currently in
-                        // because if the slug did change we would need to
-                        // redirect to that new slug
-                        // Problem here is that in case of the apphooked page
-                        // the model and pk are empty and reloadBrowser doesn't really
-                        // do anything - so here we specifically force the data
-                        // to be the data about the page and not the model
-                        var parent = window.parent ? window.parent : window;
-                        var data = {
-                            // this shouldn't be hardcoded, but there is no way around it
-                            model: 'cms.page',
-                            pk: parent.CMS.config.request.page_id
-                        };
-
-                        Helpers.reloadBrowser('REFRESH_PAGE', false, true, data);
+                        Helpers.reloadBrowser('REFRESH_PAGE');
                     }
                 })
                 .fail(function(error) {

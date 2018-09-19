@@ -16,7 +16,7 @@ from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
 from cms.forms.utils import update_site_and_page_choices, get_site_choices, get_page_choices
 from cms.forms.widgets import ApplicationConfigSelect
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
+    CMSTestCase, URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_PERMISSIONS
 )
 from cms.utils import get_current_site
 
@@ -249,7 +249,7 @@ class PermissionFormTestCase(CMSTestCase):
                             can_change=True)
 
         with self.login_user_context(self.get_superuser()):
-            response = self.client.get(URL_CMS_PAGE_PERMISSION_CHANGE % page.pk)
+            response = self.client.get(URL_CMS_PAGE_ADVANCED_CHANGE % page.pk)
             self.assertEqual(response.status_code, 200)
             response = self.client.get(URL_CMS_PAGE_PERMISSIONS % page.pk)
             self.assertEqual(response.status_code, 200)

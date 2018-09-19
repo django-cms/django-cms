@@ -489,7 +489,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         for page in pages:
             self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
 
-        # Original Title untouched
+        # Original PageContent untouched
         self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))
 
         # Plugins still copied

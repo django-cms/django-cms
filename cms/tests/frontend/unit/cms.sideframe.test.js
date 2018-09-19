@@ -347,12 +347,12 @@ describe('CMS.Sideframe', function() {
         it('checks if page requires reloading', function() {
             sideframe.open({ url: url });
             sideframe.close();
-            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(false, false, true);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(false);
 
             sideframe = new CMS.Sideframe({ onClose: 'REFRESH_PAGE' });
             sideframe.open({ url: url });
             sideframe.close();
-            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('REFRESH_PAGE', false, true);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('REFRESH_PAGE');
         });
 
         it('removes the loader from sideframe', function() {

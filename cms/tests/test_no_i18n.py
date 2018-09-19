@@ -6,9 +6,7 @@ from django.urls import clear_url_caches
 
 from cms.api import create_page
 from cms.models import Page, CMSPlugin
-from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_ADD,
-                                      URL_CMS_PAGE_CHANGE_TEMPLATE)
+from cms.test_utils.testcases import CMSTestCase
 
 
 overrides = dict(
@@ -117,16 +115,15 @@ class TestNoI18N(CMSTestCase):
             'slug': 'test-page1',
             'language': "en-us",
             'parent': '',
-            'site': 1,
         }
         # required only if user haves can_change_permission
         self.super_user = self._create_user("test", True, True)
         self.client.login(username=getattr(self.super_user, get_user_model().USERNAME_FIELD),
                           password=getattr(self.super_user, get_user_model().USERNAME_FIELD))
 
-        self.client.post(URL_CMS_PAGE_ADD[3:], page_data)
+        self.client.post(self.get_page_add_uri('en'), page_data)
         page = Page.objects.first()
-        self.client.post(URL_CMS_PAGE_CHANGE_TEMPLATE[3:] % page.pk, page_data)
+        self.client.post(self.get_page_change_template_uri('en-us', page)[3:], page_data)
         page = Page.objects.first()
         placeholder = page.get_placeholders("en-us").latest('id')
         data = {'name': 'Hello', 'external_link': 'http://www.example.org/'}

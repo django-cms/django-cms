@@ -32,6 +32,11 @@ casper.test.tearDown(function(done) {
 casper.test.begin('Doubleclick on plugins with links handled correctly', function(test) {
     casper
         .start(globals.editUrl)
+        .waitForSelector('.cms-toolbar-expanded')
+        .then(function () {
+            this.click('.cms-btn-switch-edit');
+        })
+        .wait(2000)
         .then(cms.switchTo('content'))
         .waitForSelector('.cms-toolbar-expanded', function() {
             this.mouse.doubleclick('a.cms-plugin');

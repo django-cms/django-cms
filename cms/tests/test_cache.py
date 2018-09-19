@@ -162,7 +162,7 @@ class CacheTestCase(CMSTestCase):
             request.toolbar = CMSToolbar(request)
             with self.assertNumQueries(FuzzyInt(4, 6)):
                 output = self.render_template_obj(template, {}, request)
-            with self.assertNumQueries(FuzzyInt(14, 24)):
+            with self.assertNumQueries(FuzzyInt(13, 24)):
                 response = self.client.get(page1_url)
                 self.assertTrue("no-cache" in response['Cache-Control'])
                 resp1 = response.content.decode('utf8').split("$$$")[1]
@@ -619,7 +619,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
         self.page = create_page(
             'en test page', 'nav_playground.html', 'en')
         # Now create and publish as 'de' title
-        create_title('de', "de test page", self.page)
+        create_title('de', "de test page", self.page, template='nav_playground.html')
 
         self.placeholder_en = self.page.get_placeholders("en").filter(slot="body")[0]
         self.placeholder_de = self.page.get_placeholders("de").filter(slot="body")[0]

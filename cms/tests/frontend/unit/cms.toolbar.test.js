@@ -241,7 +241,7 @@ describe('CMS.Toolbar', function () {
                 onSuccess: '/another-url'
             });
 
-            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('/another-url', false, true);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('/another-url');
         });
 
         it('reloads the page if no callback or onSuccess passed', function () {
@@ -260,7 +260,7 @@ describe('CMS.Toolbar', function () {
                 url: '/url'
             });
 
-            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(false, false, true);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
         });
 
         it('handles parameters', function () {
@@ -533,20 +533,6 @@ describe('CMS.Toolbar', function () {
             expect($.Event.prototype.stopPropagation).toHaveBeenCalled();
         });
 
-        it('attaches a handler to publish page button', function () {
-            spyOn($, 'ajax');
-            spyOn($.Event.prototype, 'preventDefault').and.callThrough();
-            spyOn($.Event.prototype, 'stopImmediatePropagation').and.callThrough();
-            spyOn(CMS.API.Helpers, 'secureConfirm').and.returnValues(false, true);
-
-            var publishButton = toolbar.ui.buttons.eq(2).find('.cms-publish-page');
-            publishButton.trigger(toolbar.click);
-            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(1);
-            expect($.Event.prototype.stopImmediatePropagation).toHaveBeenCalledTimes(1);
-            publishButton.trigger(toolbar.click);
-            expect($.Event.prototype.preventDefault).toHaveBeenCalledTimes(2);
-            expect($.Event.prototype.stopImmediatePropagation).toHaveBeenCalledTimes(1);
-        });
     });
 
     describe('._screenBlock()', function () {

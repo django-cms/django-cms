@@ -496,10 +496,9 @@ describe('CMS.Modal', function() {
         it('reloads the browser if onClose is provided', function(done) {
             modal = new CMS.Modal({ onClose: '/this-url' });
             modal.open({ html: '<div></div>' });
-            spyOn(Helpers, 'reloadBrowser').and.callFake(function(url, timeout, ajax) {
+            spyOn(Helpers, 'reloadBrowser').and.callFake(function(url, timeout) {
                 expect(url).toEqual('/this-url');
                 expect(timeout).toEqual(false);
-                expect(ajax).toEqual(true);
                 done();
             });
             modal.close();
@@ -2201,7 +2200,7 @@ describe('CMS.Modal', function() {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
-                expect(Helpers.reloadBrowser).toHaveBeenCalledWith(jasmine.any(String), false, true);
+                expect(Helpers.reloadBrowser).toHaveBeenCalledWith(jasmine.any(String));
                 done();
             });
         });
@@ -2213,7 +2212,7 @@ describe('CMS.Modal', function() {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
-                expect(Helpers.reloadBrowser).toHaveBeenCalledWith('/custom-on-close', false, true);
+                expect(Helpers.reloadBrowser).toHaveBeenCalledWith('/custom-on-close');
                 done();
             });
         });
@@ -2225,7 +2224,7 @@ describe('CMS.Modal', function() {
                 url: '/base/cms/tests/frontend/unit/html/modal_iframe_messages.html'
             });
             modal.ui.modal.find('iframe').on('load', function() {
-                expect(showLoader).toHaveBeenCalledTimes(2);
+                expect(showLoader).toHaveBeenCalledTimes(1);
                 expect(modal.ui.modalBody).toHaveClass('cms-loader');
                 done();
             });

@@ -7,7 +7,7 @@
 <div class="breadcrumbs">
     <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
     &rsaquo; <a href="{% url 'admin:app_list' app_label=opts.app_label %}">{{ opts.app_config.verbose_name }}</a>
-    &rsaquo; {% if has_change_permission %}<a href="{% url opts|admin_urlname:'changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
+    &rsaquo; {% if has_change_permission %}<a href="{% url 'admin:cms_pagecontent_changelist' %}">{{ opts.verbose_name_plural|capfirst }}</a>{% else %}{{ opts.verbose_name_plural|capfirst }}{% endif %}
     &rsaquo; {% if add %}{% trans 'Add' %} {{ opts.verbose_name }}{% else %}{{ original|truncatewords:"18" }}{% endif %}
 </div>
 {% endblock %}
@@ -30,7 +30,7 @@
     {% if not popup and not add %}
         <ul class="object-tools hide-in-modal">
             <li>
-                {% url opts|admin_urlname:'preview_page' page.id language as admin_url %}
+                {% url opts|admin_urlname:'preview_page' cms_page.id language as admin_url %}
                 <a href="{{ admin_url }}" target="_parent">{% trans "View on site" %}</a>
             </li>
         </ul>
@@ -46,12 +46,10 @@
 {% csrf_token %}
 {% block form_top %}{% endblock %}
 
-<div style="display: none;"><input type="hidden" name="language" value="{{language}}" id="id_language"/></div>
-
 {% if show_language_tabs and not show_permissions %}
 <div id="page_form_lang_tabs">
     {% for lang_code, lang_name in language_tabs %}
-        <input type="button" onclick="CMS.API.changeLanguage('./?language={{lang_code}}');"
+        <input type="button" onclick="CMS.API.changeLanguage('{% get_admin_url_for_language cms_page lang_code %}');"
             class="language_button {% if lang_code == language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endif %}"
             id="{{lang_code}}button" name="{{lang_code}}" value="{{lang_name}}" />
     {% endfor %}
@@ -78,7 +76,6 @@
 {% endfor %}
 
 {% if show_permissions %}
-    {% if CMS_PERMISSION and can_change_permissions %}
     <div class="inline-group">
         <div class="tabular inline-related">
             <fieldset id="inherited_permissions" class="module aligned collapse">
@@ -87,7 +84,6 @@
             </fieldset>
         </div>
     </div>
-    {% endif %}
 {% endif %}
 
 {% block after_related_objects %}{% endblock %}

@@ -11,7 +11,8 @@ from cms.test_utils.testcases import CMSTestCase
 
 
 overrides = {
-    'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + settings.MIDDLEWARE
+    'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + settings.MIDDLEWARE,
+    'CMS_PERMISSION': False,
 }
 @override_settings(**overrides)
 class SignalTests(CMSTestCase):
@@ -27,20 +28,14 @@ class SignalTests(CMSTestCase):
                         "nav_playground.html",
                         "en",
                     )
-                    redirect_to = self.get_admin_url(Page, 'changelist')
+                    redirect_to = self.get_pages_admin_list_uri()
                     endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
                     current_revision, _ = UrlconfRevision.get_or_create_revision()
                     page_data = {
-                        "redirect": "",
-                        "language": "en",
                         "reverse_id": "",
                         "navigation_extenders": "",
-                        "site": "1",
-                        "xframe_options": "0",
                         "application_urls": "SampleApp",
                         "application_namespace": "sampleapp",
-                        "overwrite_url": "",
-                        "template": "INHERIT",
                     }
                     response = self.client.post(endpoint, page_data)
                     self.assertRedirects(response, redirect_to)
@@ -72,7 +67,7 @@ class SignalTests(CMSTestCase):
 
     def test_urls_need_reloading_signal_change_slug(self):
         superuser = self.get_superuser()
-        redirect_to = self.get_admin_url(Page, 'changelist')
+        redirect_to = self.get_pages_admin_list_uri()
 
         with apphooks(SampleApp):
             with self.login_user_context(superuser):
@@ -87,10 +82,11 @@ class SignalTests(CMSTestCase):
                         apphook_namespace="test"
                     )
                     # Change slug should trigger the signal
-                    endpoint = self.get_admin_url(Page, 'change', page.pk)
+                    endpoint = self.get_page_change_uri('en', page)
                     page_data = {
                         'title': 'apphooked-page',
                         'slug': 'apphooked-page-2',
+                        'template': 'nav_playground.html'
                     }
                     response = self.client.post(endpoint, page_data)
                     self.assertRedirects(response, redirect_to)
