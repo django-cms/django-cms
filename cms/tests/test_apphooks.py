@@ -2,10 +2,8 @@
 # -*- coding: utf-8 -*-
 import sys
 
-from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.test.utils import override_settings
@@ -19,13 +17,12 @@ from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
-from cms.models import Page, PageContent
+from cms.models import PageContent
 from cms.middleware.page import get_page
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -78,19 +75,6 @@ class ApphooksTestCase(CMSTestCase):
         for module in url_modules:
             if module in sys.modules:
                 del sys.modules[module]
-
-    def _fake_logentry(self, instance_id, user, text, model=Page):
-        LogEntry.objects.log_action(
-            user_id=user.id,
-            content_type_id=ContentType.objects.get_for_model(model).pk,
-            object_id=instance_id,
-            object_repr=text,
-            action_flag=CHANGE,
-        )
-        entry = LogEntry.objects.filter(user=user, action_flag__in=(CHANGE,))[0]
-        session = self.client.session
-        session['cms_log_latest'] = entry.pk
-        session.save()
 
     def create_base_structure(self, apphook, title_langs, namespace=None):
         self.apphook_clear()
@@ -743,21 +727,6 @@ class ApphooksTestCase(CMSTestCase):
             self.assertEqual(len(switchers), 1)
 
             self.user = None
-
-    def test_page_edit_redirect_models(self):
-        apphooks = (
-            'cms.test_utils.project.placeholderapp.cms_apps.Example1App',
-        )
-        ex1 = Example1.objects.create(char_1="char_1", char_2="char_2",
-                                      char_3="char_3", char_4="char_4")
-        with self.settings(CMS_APPHOOKS=apphooks, ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls'):
-            self.create_base_structure('Example1App', 'en')
-            url = admin_reverse('cms_page_resolve')
-            self.user = self._create_user('admin_staff', True, True)
-            with self.login_user_context(self.user):
-                # parameters - non page object
-                response = self.client.post(url, {'pk': ex1.pk, 'model': 'placeholderapp.example1'})
-                self.assertEqual(response.content.decode('utf-8'), ex1.get_absolute_url())
 
     def test_nested_apphooks_urls(self):
         # make sure that urlparams actually reach the apphook views

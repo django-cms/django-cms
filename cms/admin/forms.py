@@ -313,6 +313,7 @@ class AddPageForm(BasePageContentForm):
             new_page.save()
 
         translation = self.create_translation(new_page)
+        new_page.title_cache[translation.language] = translation
 
         if source:
             extension_pool.copy_extensions(

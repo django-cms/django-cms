@@ -185,10 +185,10 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en")
             title = create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
-            endpoint = self.get_page_change_uri(title.language, page)
+            endpoint = self.get_page_change_uri('en', page)
             data = model_to_dict(title, fields=['title', 'template'])
             data['title'] = 'my_new_title_field'
-            data['slug'] = page.get_slug('de')
+            data['slug'] = page.get_slug('en')
 
             response = self.client.post(endpoint, data)
             # Test that the end point is valid
@@ -204,7 +204,7 @@ class LogPageOperationsTests(CMSTestCase):
             # Check the object id is set correctly
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
-            self.assertEqual(str(page), log_entry.object_repr)
+            self.assertEqual(str(page.reload()), log_entry.object_repr)
             # Check that the correct user created the log
             self.assertEqual(self._admin_user.pk, log_entry.user_id)
 
@@ -215,8 +215,8 @@ class LogPageOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en")
             create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
-            endpoint = self.get_page_delete_translation_uri('de', page)
-            post_data = {'post': 'yes', 'language': 'de'}
+            endpoint = self.get_page_delete_translation_uri('en', page)
+            post_data = {'post': 'yes', 'language': 'en'}
 
             response = self.client.post(endpoint, post_data)
             # Test that the end point is valid

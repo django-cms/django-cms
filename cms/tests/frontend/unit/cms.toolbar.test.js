@@ -241,7 +241,7 @@ describe('CMS.Toolbar', function () {
                 onSuccess: '/another-url'
             });
 
-            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('/another-url', false, true);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('/another-url');
         });
 
         it('reloads the page if no callback or onSuccess passed', function () {
@@ -260,7 +260,7 @@ describe('CMS.Toolbar', function () {
                 url: '/url'
             });
 
-            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(false, false, true);
+            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith();
         });
 
         it('handles parameters', function () {
