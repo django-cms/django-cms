@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.apps import apps
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
@@ -10,9 +10,10 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
+from django.utils.encoding import force_text
 from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
-from django.utils.translation import get_language_from_request
+from django.utils.translation import get_language_from_request, ugettext as _
 from django.views.decorators.http import require_POST
 
 from cms.cache.page import get_page_cache
@@ -221,17 +222,23 @@ def render_object_edit(request, content_type_id, object_id):
         model = content_type.model_class()
 
     if not is_editable_model(model):
-        return HttpResponseBadRequest('Requested object does not support frontend rendering')
+        message = force_text(_("Requested object does not support frontend rendering"))
+        return HttpResponseBadRequest(message)
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
 
+    if not content_type_obj.check_source(request.user):
+        message = force_text(_("You have no permission to edit this object"))
+        raise PermissionDenied(message)
+
     extension = apps.get_app_config('cms').cms_extension
 
     if model not in extension.toolbar_enabled_models:
-        return HttpResponseBadRequest('Requested object does not support frontend rendering')
+        message = force_text(_("Requested object does not support frontend rendering"))
+        return HttpResponseBadRequest(message)
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
@@ -255,7 +262,8 @@ def render_object_preview(request, content_type_id, object_id):
     extension = apps.get_app_config('cms').cms_extension
 
     if model not in extension.toolbar_enabled_models:
-        return HttpResponseBadRequest('Requested object does not support frontend rendering')
+        message = force_text(_("Requested object does not support frontend rendering"))
+        return HttpResponseBadRequest(message)
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
