@@ -158,7 +158,6 @@ class PlaceholderToolbar(CMSToolbar):
         return False
 
     # Buttons
-
     def add_edit_button(self):
         url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language)
         item = ButtonList(side=self.toolbar.RIGHT)
