@@ -226,13 +226,33 @@ def render_object_edit(request, content_type_id, object_id):
         return HttpResponseBadRequest(message)
 
     try:
-        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+        content = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
 
-    if not content_type_obj.check_source(request.user):
-        message = force_text(_("You have no permission to edit this object"))
-        raise PermissionDenied(message)
+    """
+    placeholder_field_list = [
+        f for f in content_obj._meta.get_fields()
+        if f.related_model == Placeholder
+    ]
+
+    for placeholder in placeholder_field_list:
+
+        ""
+        ModelB = apps.get_model(z.app_label, 'ModelB')
+        my_placeholder = getattr(content_obj, placeholder.name)
+        my_placeholder = my_placeholder.objects.all()
+        ""
+
+        if not my_placeholder.check_source(request.user):
+            message = force_text(_("You have no permission to edit this object"))
+            raise PermissionDenied(message)
+    """
+
+    for placeholder in content.get_placeholders():
+        if not placeholder.check_source(request.user):
+            message = force_text(_("You have no permission to edit this object"))
+            raise PermissionDenied(message)
 
     extension = apps.get_app_config('cms').cms_extension
 
@@ -241,9 +261,9 @@ def render_object_edit(request, content_type_id, object_id):
         return HttpResponseBadRequest(message)
 
     toolbar = get_toolbar_from_request(request)
-    toolbar.set_object(content_type_obj)
+    toolbar.set_object(content)
     render_func = extension.toolbar_enabled_models[model]
-    return render_func(request, content_type_obj)
+    return render_func(request, content)
 
 
 def render_object_preview(request, content_type_id, object_id):

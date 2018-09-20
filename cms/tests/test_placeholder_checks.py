@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from mock import call, Mock, patch
 
+from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 
 from cms.api import create_page
@@ -8,6 +9,7 @@ from cms.models import Placeholder, UserSettings
 from cms.models import fields
 from cms.models.fields import PlaceholderRelationField
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.urlutils import admin_reverse
 
 
 class ChecksTestCase(CMSTestCase):
@@ -279,3 +281,16 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
             self.client.post(uri, data)
 
         self.check.assert_called_once_with(placeholder, superuser)
+
+    def test_object_edit_endpoint(self):
+        superuser = self.get_superuser()
+        page = create_page('test', 'nav_playground.html', 'en')
+        title = page.get_title_obj()
+
+        title_type = ContentType.objects.get(app_label='cms', model='pagecontent')
+        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(title_type.pk, title.pk,))
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint)
+
+        self.assertEqual(response.status_code, 200)
