@@ -108,13 +108,13 @@ class PlaceholderToolbar(CMSToolbar):
         toolbar = self.toolbar
 
         if toolbar._async and 'placeholders[]' in request.GET:
-            # AJAX request to reload page structure
+            # AJAX request to reload page structure.
             placeholder_ids = request.GET.getlist('placeholders[]')
             self.placeholders = Placeholder.objects.filter(pk__in=placeholder_ids)
         else:
             if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:
-                # User has explicitly requested structure mode
-                # and the object (page, blog, etc..) allows for the non-legacy structure mode
+                # User has explicitly requested structure mode.
+                # and the object (page, blog, etc..) allows for the non-legacy structure mode.
                 renderer = toolbar.structure_renderer
             else:
                 renderer = toolbar.get_content_renderer()
@@ -122,9 +122,8 @@ class PlaceholderToolbar(CMSToolbar):
             self.placeholders = renderer.get_rendered_placeholders()
 
     def add_edit_button(self):
-        if self.page:
-            if not user_can_change_page(self.request.user, page=self.page):
-                return
+        if self.page and not user_can_change_page(self.request.user, page=self.page):
+            return
 
         item = ButtonList(side=self.toolbar.RIGHT)
         url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language)
@@ -137,9 +136,8 @@ class PlaceholderToolbar(CMSToolbar):
         self.toolbar.add_item(item)
 
     def add_preview_button(self):
-        if self.page:
-            if not user_can_change_page(self.request.user, page=self.page):
-                return
+        if self.page and not user_can_change_page(self.request.user, page=self.page):
+            return
 
         item = ButtonList(side=self.toolbar.RIGHT)
         url = get_object_preview_url(self.toolbar.obj, language=self.toolbar.request_language)
@@ -152,9 +150,11 @@ class PlaceholderToolbar(CMSToolbar):
         self.toolbar.add_item(item)
 
     def add_structure_mode(self):
-        if self.page and not self.page.application_urls:
-            if not user_can_change_page(self.request.user, page=self.page):
-                return
+        if (
+            self.page and not self.page.application_urls and
+            not user_can_change_page(self.request.user, page=self.page)
+        ):
+            return
 
         if not any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
             return
