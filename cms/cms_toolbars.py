@@ -65,6 +65,7 @@ class PlaceholderToolbar(CMSToolbar):
 
     def post_template_populate(self):
         self.add_wizard_button()
+        self.render_object_editable_buttons()
 
     def add_wizard_button(self):
         from cms.wizards.wizard_pool import entry_choices
@@ -88,20 +89,21 @@ class PlaceholderToolbar(CMSToolbar):
                                       disabled=disabled,
                                       on_close=REFRESH_PAGE)
 
-    def _render_object_editable_buttons(self):
+    def render_object_editable_buttons(self):
         self.init_placeholders()
 
         if not self.toolbar.obj:
             return
 
-        # Add edit button when in content mode.
-        if self.toolbar.content_mode_active:
+        # Edit button
+        if self._can_add_edit_button():
             self.add_edit_button()
-        # Add preview button when in edit mode.
-        if self.toolbar.edit_mode_active:
+        # Preview button
+        if self._can_add_preview_button():
             self.add_preview_button()
-        # Always add structure mode.
-        self.add_structure_mode()
+        # Structure mode
+        if self._can_add_structure_mode():
+            self.add_structure_mode()
 
     def init_placeholders(self):
         request = self.request
@@ -121,12 +123,39 @@ class PlaceholderToolbar(CMSToolbar):
 
             self.placeholders = renderer.get_rendered_placeholders()
 
-    def add_edit_button(self):
-        if self.page and not user_can_change_page(self.request.user, page=self.page):
-            return
+    # Helpers to check whether buttons can be rendered
 
-        item = ButtonList(side=self.toolbar.RIGHT)
+    def _can_add_edit_button(self):
+        if not self.toolbar.content_mode_active:
+            return False
+        elif self.page and not user_can_change_page(self.request.user, page=self.page):
+            return False
+        return True
+
+    def _can_add_preview_button(self):
+        if not self.toolbar.edit_mode_active:
+            return False
+        elif self.page and not user_can_change_page(self.request.user, page=self.page):
+            return False
+        return True
+
+    def _can_add_structure_mode(self):
+        if not self.request.user.has_perm('cms.use_structure'):
+            return False
+        elif (
+            self.page and not self.page.application_urls and
+            not user_can_change_page(self.request.user, page=self.page)
+        ):
+            return False
+        elif not any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
+            return False
+        return True
+
+    # Buttons
+
+    def add_edit_button(self):
         url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language)
+        item = ButtonList(side=self.toolbar.RIGHT)
         item.add_button(
             _('Edit'),
             url=url,
@@ -136,11 +165,8 @@ class PlaceholderToolbar(CMSToolbar):
         self.toolbar.add_item(item)
 
     def add_preview_button(self):
-        if self.page and not user_can_change_page(self.request.user, page=self.page):
-            return
-
-        item = ButtonList(side=self.toolbar.RIGHT)
         url = get_object_preview_url(self.toolbar.obj, language=self.toolbar.request_language)
+        item = ButtonList(side=self.toolbar.RIGHT)
         item.add_button(
             _('Preview'),
             url=url,
@@ -149,45 +175,30 @@ class PlaceholderToolbar(CMSToolbar):
         )
         self.toolbar.add_item(item)
 
-    def add_structure_mode(self):
-        if (
-            self.page and not self.page.application_urls and
-            not user_can_change_page(self.request.user, page=self.page)
-        ):
-            return
-
-        if not any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
-            return
-
-        self.add_structure_mode_item()
-
-    def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
+    def add_structure_mode(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         structure_active = self.toolbar.structure_mode_active
         edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
-
-        with force_language(self.current_lang):
-            if self.request.user.has_perm('cms.use_structure'):
-                build_url = get_object_structure_url(self.toolbar.obj)
-                edit_url = get_object_edit_url(self.toolbar.obj)
-                switcher = self.toolbar.add_button_list(
-                    'Mode Switcher',
-                    side=self.toolbar.RIGHT,
-                    extra_classes=extra_classes,
-                )
-                switcher.add_button(
-                    _('Structure'),
-                    build_url,
-                    active=structure_active,
-                    disabled=False,
-                    extra_classes='cms-structure-btn',
-                )
-                switcher.add_button(
-                    _('Content'),
-                    edit_url,
-                    active=edit_mode_active,
-                    disabled=False,
-                    extra_classes='cms-content-btn',
-                )
+        build_url = get_object_structure_url(self.toolbar.obj, language=self.toolbar.request_language)
+        edit_url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language)
+        switcher = self.toolbar.add_button_list(
+            'Mode Switcher',
+            side=self.toolbar.RIGHT,
+            extra_classes=extra_classes,
+        )
+        switcher.add_button(
+            _('Structure'),
+            build_url,
+            active=structure_active,
+            disabled=False,
+            extra_classes='cms-structure-btn',
+        )
+        switcher.add_button(
+            _('Content'),
+            edit_url,
+            active=edit_mode_active,
+            disabled=False,
+            extra_classes='cms-content-btn',
+        )
 
 
 @toolbar_pool.register
