@@ -444,6 +444,7 @@ class CMSToolbar(BaseToolbar):
         if not self.request.user.is_staff:
             return
         self._call_toolbar('post_template_populate')
+        self._render_object_editable_buttons()
 
     def _call_toolbar(self, func_name):
         with force_language(self.toolbar_language):
@@ -510,6 +511,13 @@ class CMSToolbar(BaseToolbar):
             toolbar = render_to_string('cms/toolbar/toolbar_with_structure.html', flatten_context(context))
         # return the toolbar content and the content below
         return '%s\n%s' % (toolbar, rendered_contents)
+
+    def _render_object_editable_buttons(self):
+        with force_language(self.toolbar_language):
+            toolbar = self.toolbars.get('cms.cms_toolbars.PlaceholderToolbar')
+            if not toolbar:
+                return
+            toolbar._render_object_editable_buttons()
 
 
 class EmptyToolbar(BaseToolbar):
