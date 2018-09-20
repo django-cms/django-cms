@@ -96,10 +96,10 @@ class PlaceholderToolbar(CMSToolbar):
             return
 
         # Edit button
-        if self._can_add_edit_button():
+        if self.toolbar.content_mode_active and self._can_add_button():
             self.add_edit_button()
         # Preview button
-        if self._can_add_preview_button():
+        if self.toolbar.edit_mode_active and self._can_add_button():
             self.add_preview_button()
         # Structure mode
         if self._can_add_structure_mode():
@@ -124,32 +124,38 @@ class PlaceholderToolbar(CMSToolbar):
             self.placeholders = renderer.get_rendered_placeholders()
 
     # Helpers to check whether buttons can be rendered
+    def _has_page_change_perm(self):
+        if self.page and user_can_change_page(self.request.user, page=self.page):
+            return True
+        return False
 
-    def _can_add_edit_button(self):
-        if not self.toolbar.content_mode_active:
+    def _has_placeholder_change_perm(self):
+        if not self.placeholders:
             return False
-        elif self.page and not user_can_change_page(self.request.user, page=self.page):
-            return False
-        return True
+        return any(
+            ph for ph in self.placeholders
+            if ph.has_change_permission(self.request.user)
+        )
 
-    def _can_add_preview_button(self):
-        if not self.toolbar.edit_mode_active:
-            return False
-        elif self.page and not user_can_change_page(self.request.user, page=self.page):
-            return False
-        return True
+    def _can_add_button(self):
+        if self._has_page_change_perm():
+            return True
+        elif self._has_placeholder_change_perm():
+            return True
+        return False
 
     def _can_add_structure_mode(self):
         if not self.request.user.has_perm('cms.use_structure'):
             return False
-        elif (
+
+        if (
             self.page and not self.page.application_urls and
-            not user_can_change_page(self.request.user, page=self.page)
+            self._has_page_change_perm()
         ):
-            return False
-        elif not any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
-            return False
-        return True
+            return True
+        elif self._has_placeholder_change_perm():
+            return True
+        return False
 
     # Buttons
 
@@ -388,6 +394,10 @@ class PageToolbar(CMSToolbar):
         self.change_admin_menu()
         self.add_page_menu()
         self.change_language_menu()
+
+    def post_template_populate(self):
+        if self.page and self.toolbar.edit_mode_active and not self.title:
+            self.add_page_settings_button()
 
     def add_page_settings_button(self, extra_classes=('cms-btn-action',)):
         url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.title.pk]), self.toolbar.request_language)
