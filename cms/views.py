@@ -19,7 +19,7 @@ from django.views.decorators.http import require_POST
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
-from cms.models.pagemodel import TreeNode
+from cms.models import TreeNode, Placeholder
 from cms.page_rendering import _handle_no_page, _render_welcome_page, render_pagecontent
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
@@ -230,24 +230,18 @@ def render_object_edit(request, content_type_id, object_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    """
     placeholder_field_list = [
-        f for f in content_obj._meta.get_fields()
+        f for f in content._meta.get_fields()
         if f.related_model == Placeholder
     ]
 
-    for placeholder in placeholder_field_list:
+    for placeholder_field in placeholder_field_list:
 
-        ""
-        ModelB = apps.get_model(z.app_label, 'ModelB')
-        my_placeholder = getattr(content_obj, placeholder.name)
-        my_placeholder = my_placeholder.objects.all()
-        ""
+        placeholder_model = getattr(content, placeholder_field.name)
 
-        if not my_placeholder.check_source(request.user):
+        if not placeholder_field.run_checks(placeholder_model, request.user):
             message = force_text(_("You have no permission to edit this object"))
             raise PermissionDenied(message)
-    """
 
     for placeholder in content.get_placeholders():
         if not placeholder.check_source(request.user):
