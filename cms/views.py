@@ -237,9 +237,9 @@ def render_object_edit(request, content_type_id, object_id):
 
     for placeholder_field in placeholder_field_list:
 
-        placeholder_model = getattr(content, placeholder_field.name)
+        placeholder = getattr(content, placeholder_field.name)
 
-        if not placeholder_field.run_checks(placeholder_model, request.user):
+        if not placeholder_field.run_checks(placeholder.model, request.user):
             message = force_text(_("You have no permission to edit this object"))
             raise PermissionDenied(message)
 

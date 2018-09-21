@@ -282,15 +282,22 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
 
         self.check.assert_called_once_with(placeholder, superuser)
 
-    def test_object_edit_endpoint(self):
+    def test_pagecontent_object_edit_endpoint(self):
+        """
+        Each page contents placeholders run through the checks for each placeholder
+        """
         superuser = self.get_superuser()
         page = create_page('test', 'nav_playground.html', 'en')
-        title = page.get_title_obj()
+        placeholder = page.get_placeholders('en').get(slot='body')
+        pagecontent = page.get_title_obj()
 
-        title_type = ContentType.objects.get(app_label='cms', model='pagecontent')
-        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(title_type.pk, title.pk,))
+        pagecontent_type = ContentType.objects.get(app_label='cms', model='pagecontent')
+        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(pagecontent_type.pk, pagecontent.pk,))
 
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
 
-        self.assertEqual(response.status_code, 200)
+        # The test method is called for all o fthe page contents placeholders
+        for page_placeholder in pagecontent.placeholders.all():
+            placeholder_model = page_placeholder._meta.model
+            self.check.assert_called_once_with(placeholder_model, superuser)
