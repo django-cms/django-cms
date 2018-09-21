@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from itertools import chain
 import operator
 import warnings
 from collections import OrderedDict
@@ -364,9 +365,6 @@ def get_declared_placeholders_for_obj(obj):
     if not hasattr(obj, 'get_template'):
         raise NotImplementedError('%s should implement get_template' % obj.__class__.__name__)
     return get_placeholders(obj.get_template())
-
-
-from itertools import chain
 
 
 def run_placeholder_container_checks(container, user):
