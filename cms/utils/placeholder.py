@@ -366,26 +366,26 @@ def get_declared_placeholders_for_obj(obj):
     return get_placeholders(obj.get_template())
 
 
+from itertools import chain
+
+
 def run_placeholder_container_checks(container, user):
     """
     Get all of the placeholders from the parents and
     run their checks
     """
-    # If the object has a get_placehodler helepr method use it,
+    # If the object has a get_placehodler helper method use it,
     # it's cached for PageContent!!
     if hasattr(container, 'get_placeholders'):
-        for placeholder in container.get_placeholders():
-            if not placeholder.check_source(request.user):
-                return False
+        placeholders = container.get_placeholders()
     else:
-        placeholder_field_list = [
+        placeholder_fields = [
             f for f in container._meta.get_fields()
             if f.related_model == Placeholder
         ]
-        for placeholder_field in placeholder_field_list:
-            placeholder_list = getattr(container, placeholder_field.name).all()
-            # For each placeholder instance run the registered checks
-            for placeholder in placeholder_list:
-                if not placeholder_field.run_checks(placeholder, user):
-                    return False
+        placeholders = chain.from_iterable(getattr(container, field.name).all() for field in placeholder_fields)
+
+    for placeholder in placeholders:
+        if not placeholder.check_source(user):
+            return False
     return True
