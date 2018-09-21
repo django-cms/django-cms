@@ -369,16 +369,23 @@ def get_declared_placeholders_for_obj(obj):
 def run_placeholder_container_checks(container, user):
     """
     Get all of the placeholders from the parents and
-    run checks
+    run their checks
     """
-    placeholder_field_list = [
-        f for f in container._meta.get_fields()
-        if f.related_model == Placeholder
-    ]
-    for placeholder_field in placeholder_field_list:
-        placeholder_list = getattr(container, placeholder_field.name).all()
-        # For each placeholder instance run the registered checks
-        for placeholder in placeholder_list:
-            if not placeholder_field.run_checks(placeholder, user):
+    # If the object has a get_placehodler helepr method use it,
+    # it's cached for PageContent!!
+    if hasattr(container, 'get_placeholders'):
+        for placeholder in container.get_placeholders():
+            if not placeholder.check_source(request.user):
                 return False
+    else:
+        placeholder_field_list = [
+            f for f in container._meta.get_fields()
+            if f.related_model == Placeholder
+        ]
+        for placeholder_field in placeholder_field_list:
+            placeholder_list = getattr(container, placeholder_field.name).all()
+            # For each placeholder instance run the registered checks
+            for placeholder in placeholder_list:
+                if not placeholder_field.run_checks(placeholder, user):
+                    return False
     return True
