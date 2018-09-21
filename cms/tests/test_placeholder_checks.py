@@ -282,22 +282,24 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
 
         self.check.assert_called_once_with(placeholder, superuser)
 
-    def test_pagecontent_object_edit_endpoint(self):
+    def test_pagecontent_object_edit_endpoint_runs_placeholder_checks(self):
         """
-        Each page contents placeholders run through the checks for each placeholder
+        A pagecontents placeholders has each placeholder check executed
         """
         superuser = self.get_superuser()
         page = create_page('test', 'nav_playground.html', 'en')
-        placeholder = page.get_placeholders('en').get(slot='body')
         pagecontent = page.get_title_obj()
-
         pagecontent_type = ContentType.objects.get(app_label='cms', model='pagecontent')
         endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(pagecontent_type.pk, pagecontent.pk,))
 
         with self.login_user_context(superuser):
-            response = self.client.get(endpoint)
+            self.client.get(endpoint)
 
-        # The test method is called for all o fthe page contents placeholders
+        placeholder_check_list = []
         for page_placeholder in pagecontent.placeholders.all():
-            placeholder_model = page_placeholder._meta.model
-            self.check.assert_called_once_with(placeholder_model, superuser)
+            placeholder_check_list.append(
+                call(page_placeholder, superuser)
+            )
+
+        self.assertTrue(len(placeholder_check_list) >= 1)
+        self.check.assert_has_calls(placeholder_check_list)

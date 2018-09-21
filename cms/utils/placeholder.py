@@ -15,6 +15,7 @@ from django.utils import six
 from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
+from cms.models import Placeholder
 from cms.utils.conf import get_cms_setting
 
 
@@ -363,3 +364,21 @@ def get_declared_placeholders_for_obj(obj):
     if not hasattr(obj, 'get_template'):
         raise NotImplementedError('%s should implement get_template' % obj.__class__.__name__)
     return get_placeholders(obj.get_template())
+
+
+def run_placeholder_container_checks(container, user):
+    """
+    Get all of the placeholders from the parents and
+    run checks
+    """
+    placeholder_field_list = [
+        f for f in container._meta.get_fields()
+        if f.related_model == Placeholder
+    ]
+    for placeholder_field in placeholder_field_list:
+        placeholder_list = getattr(container, placeholder_field.name).all()
+        # For each placeholder instance run the registered checks
+        for placeholder in placeholder_list:
+            if not placeholder_field.run_checks(placeholder, user):
+                return False
+    return True

@@ -19,7 +19,7 @@ from django.views.decorators.http import require_POST
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
-from cms.models import TreeNode, Placeholder
+from cms.models.pagemodel import TreeNode
 from cms.page_rendering import _handle_no_page, _render_welcome_page, render_pagecontent
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
@@ -30,6 +30,7 @@ from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             get_default_language_for_site,
                             is_language_prefix_patterns_used)
 from cms.utils.page import get_page_from_request
+from cms.utils.placeholder import run_placeholder_container_checks
 
 
 def _clean_redirect_url(redirect_url, language):
@@ -230,18 +231,9 @@ def render_object_edit(request, content_type_id, object_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    placeholder_field_list = [
-        f for f in content._meta.get_fields()
-        if f.related_model == Placeholder
-    ]
-
-    for placeholder_field in placeholder_field_list:
-
-        placeholder = getattr(content, placeholder_field.name)
-
-        if not placeholder_field.run_checks(placeholder.model, request.user):
-            message = force_text(_("You have no permission to edit this object"))
-            raise PermissionDenied(message)
+    if not run_placeholder_container_checks(content, request.user):
+        message = force_text(_("You have no permission to edit this object"))
+        raise PermissionDenied(message)
 
     extension = apps.get_app_config('cms').cms_extension
 
