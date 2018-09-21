@@ -243,11 +243,6 @@ def render_object_edit(request, content_type_id, object_id):
             message = force_text(_("You have no permission to edit this object"))
             raise PermissionDenied(message)
 
-    for placeholder in content.get_placeholders():
-        if not placeholder.check_source(request.user):
-            message = force_text(_("You have no permission to edit this object"))
-            raise PermissionDenied(message)
-
     extension = apps.get_app_config('cms').cms_extension
 
     if model not in extension.toolbar_enabled_models:
