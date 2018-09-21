@@ -4,10 +4,11 @@ from mock import call, Mock, patch
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 
+
 from cms.api import create_page
-from cms.models import Placeholder, UserSettings
-from cms.models import fields
+from cms.models import fields, Placeholder, UserSettings
 from cms.models.fields import PlaceholderRelationField
+from cms.test_utils.project.placeholder_relation_field_app.models import FancyPoll
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.urlutils import admin_reverse
 
@@ -84,6 +85,18 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
 
     def tearDown(self):
         fields.PlaceholderRelationField.default_checks = self.original_checks
+
+
+    def _get_example_obj(self):
+        obj = Example1.objects.create(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four',
+            placeholders=Placeholder.objects.create(),
+        )
+        obj.save()
+        return obj
 
     def _get_move_data(self, plugin, position, placeholder=None, parent=None):
         try:
@@ -296,9 +309,29 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
             self.client.get(endpoint)
 
         placeholder_check_list = []
-        for page_placeholder in pagecontent.placeholders.all():
+        for placeholder in pagecontent.placeholders.all():
             placeholder_check_list.append(
-                call(page_placeholder, superuser)
+                call(placeholder, superuser)
+            )
+
+        self.assertTrue(len(placeholder_check_list) >= 1)
+        self.check.assert_has_calls(placeholder_check_list)
+
+    def test_no_get_placeholders_object_edit_endpoint_runs_placeholder_checks(self):
+
+        superuser = self.get_superuser()
+        container = FancyPoll.objects.create(name='poll 1')
+        container_type = ContentType.objects.get_for_model(container)
+        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(container_type.pk, container.pk,))
+        placeholders = Placeholder.objects.get_for_obj(container)
+
+        with self.login_user_context(superuser):
+            self.client.get(endpoint)
+
+        placeholder_check_list = []
+        for placeholder in placeholders:
+            placeholder_check_list.append(
+                call(placeholder, superuser)
             )
 
         self.assertTrue(len(placeholder_check_list) >= 1)
