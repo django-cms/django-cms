@@ -4,7 +4,7 @@ from cms.signals.apphook import set_restart_trigger
 
 
 def pre_save_page(instance, **kwargs):
-    if instance.publisher_is_draft:
+    if instance.publisher_is_draft and not kwargs.get('raw'):
         instance.clear_cache(menu=True)
         clear_permission_cache()
 
