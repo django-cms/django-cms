@@ -24,22 +24,22 @@ on the subject.
 
 Here's a full example of ``urls.py``::
 
-    from django.conf import settings
     from django.conf.urls import include, url
-    from django.contrib import admin
     from django.conf.urls.i18n import i18n_patterns
+    from django.contrib import admin
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    from django.views.i18n import JavaScriptCatalog
+
 
     admin.autodiscover()
 
-    urlpatterns = [
-        url(r'^jsi18n/(?P<packages>\S+?)/$', 'django.views.i18n.javascript_catalog'),
-    ]
-
+    urlpatterns = i18n_patterns(
+        url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    )
     urlpatterns += staticfiles_urlpatterns()
 
     # note the django CMS URLs included via i18n_patterns
-    urlpatterns += i18n_patterns('',
+    urlpatterns += i18n_patterns(
         url(r'^admin/', include(admin.site.urls)),
         url(r'^', include('cms.urls')),
     )
