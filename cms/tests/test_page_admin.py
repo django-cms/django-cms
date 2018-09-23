@@ -1421,6 +1421,47 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint)
             self.assertContains(response, expected, html=True)
 
+    @override_settings(CMS_PERMISSION=False)
+    def test_rewrite_url_being_corrupted_after_save_basic_settings(self):
+        superuser = self.get_superuser()
+        parent_page = create_page(
+            'parent',
+            'nav_playground.html',
+            language='en',
+            published=True,
+        )
+        child_page = create_page(
+            'child',
+            'nav_playground.html',
+            language='en',
+            published=True,
+            parent=parent_page,
+        )
+
+        with self.login_user_context(superuser):
+            endpoint = self.get_admin_url(Page, 'advanced', child_page.pk)
+            self.client.post(
+                endpoint,
+                {
+                    'overwrite_url': 'rewrited',
+                    'template': child_page.template,
+                },
+            )
+            child_page.publish('en')
+
+            endpoint = self.get_admin_url(Page, 'change', child_page.pk)
+            self.client.post(
+                endpoint,
+                {
+                    'language': 'en',
+                    'title': 'child',
+                    'slug': 'child',
+                },
+            )
+
+        title = child_page.get_title_obj('en', fallback=False)
+        self.assertEqual(title.path, 'rewrited')
+
     def test_advanced_settings_form(self):
         superuser = self.get_superuser()
         page = create_page('Page 1', 'nav_playground.html', 'en')

@@ -11,7 +11,6 @@
 * Introduced Django 2.1 support.
 * Fixed rendering of permission icons. Use SVG variants instead of GIFs.
 
-
 === 3.5.2 (2018-04-11) ===
 
 * Fixed a bug where shortcuts menu entry would stop working after toolbar reload

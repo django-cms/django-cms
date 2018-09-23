@@ -230,7 +230,7 @@ class Page(models.Model):
     is_page_type = models.BooleanField(default=False)
 
     node = models.ForeignKey(
-        'TreeNode',
+        TreeNode,
         related_name='cms_pages',
         on_delete=models.CASCADE,
     )

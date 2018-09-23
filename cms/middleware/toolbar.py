@@ -49,7 +49,7 @@ class ToolbarMiddleware(MiddlewareMixin):
     def process_request(self, request):
         """
         If we should show the toolbar for this request, put it on
-        request.toolbar. Then call the request_hook on the toolbar.
+        request.toolbar.
         """
 
         if not self.is_cms_request(request):
