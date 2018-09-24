@@ -30,7 +30,7 @@ from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             get_default_language_for_site,
                             is_language_prefix_patterns_used)
 from cms.utils.page import get_page_from_request
-from cms.utils.placeholder import run_placeholder_container_checks
+from cms.utils.placeholder import run_source_container_checks
 
 
 def _clean_redirect_url(redirect_url, language):
@@ -231,7 +231,7 @@ def render_object_edit(request, content_type_id, object_id):
     except ObjectDoesNotExist:
         raise Http404
 
-    if not run_placeholder_container_checks(content, request.user):
+    if not run_source_container_checks(content, request.user):
         message = force_text(_("You have no permission to edit this object"))
         raise PermissionDenied(message)
 

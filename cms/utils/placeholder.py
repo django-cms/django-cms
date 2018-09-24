@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-from itertools import chain
 import operator
 import warnings
 from collections import OrderedDict
+from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -367,10 +367,10 @@ def get_declared_placeholders_for_obj(obj):
     return get_placeholders(obj.get_template())
 
 
-def run_placeholder_container_checks(container, user):
+def run_source_container_checks(container, user):
     """
-    Get all of the placeholders from the parents and
-    run their checks
+    Get all of the placeholders attached to the source
+    object and run their registered checks
     """
     # If the object has a get_placehodler helper method use it,
     # it's cached for PageContent!!
