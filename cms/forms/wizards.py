@@ -70,12 +70,12 @@ class CreateCMSPageForm(AddPageForm):
         self.fields['slug'].widget = SlugWidget()
         self.fields['slug'].help_text = _(u"Leave empty for automatic slug, or override as required.")
 
-    def get_placeholder(self, page, slot=None):
+    def get_placeholder(self, page_content, slot=None):
         """
         Returns the named placeholder or, if no «slot» provided, the first
         editable, non-static placeholder or None.
         """
-        placeholders = page.get_placeholders(self._language)
+        placeholders = page_content.get_placeholders()
 
         if slot:
             placeholders = placeholders.filter(slot=slot)
@@ -155,7 +155,8 @@ class CreateCMSPageForm(AddPageForm):
     def save(self, **kwargs):
         from cms.api import add_plugin
 
-        new_page = super(CreateCMSPageForm, self).save(**kwargs).page
+        new_translation = super(CreateCMSPageForm, self).save(**kwargs)
+        new_page = new_translation.page
 
         if self.cleaned_data.get("page_type"):
             return new_page
@@ -169,7 +170,7 @@ class CreateCMSPageForm(AddPageForm):
         if plugin_type in plugin_pool.plugins and plugin_body:
             if content and permissions.has_plugin_permission(
                     self._user, plugin_type, "add"):
-                placeholder = self.get_placeholder(new_page, slot=slot)
+                placeholder = self.get_placeholder(new_translation, slot=slot)
                 if placeholder:
                     opts = {
                         'placeholder': placeholder,
