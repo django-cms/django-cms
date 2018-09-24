@@ -10,6 +10,7 @@ from cms.models import fields, Placeholder, UserSettings
 from cms.models.fields import PlaceholderRelationField
 from cms.test_utils.project.placeholder_relation_field_app.models import FancyPoll
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.placeholder import get_declared_placeholders_for_obj
 from cms.utils.urlutils import admin_reverse
 
 
@@ -85,18 +86,6 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
 
     def tearDown(self):
         fields.PlaceholderRelationField.default_checks = self.original_checks
-
-
-    def _get_example_obj(self):
-        obj = Example1.objects.create(
-            char_1='one',
-            char_2='two',
-            char_3='tree',
-            char_4='four',
-            placeholders=Placeholder.objects.create(),
-        )
-        obj.save()
-        return obj
 
     def _get_move_data(self, plugin, position, placeholder=None, parent=None):
         try:
@@ -320,10 +309,15 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
     def test_no_get_placeholders_object_edit_endpoint_runs_placeholder_checks(self):
 
         superuser = self.get_superuser()
-        container = FancyPoll.objects.create(name='poll 1')
-        container_type = ContentType.objects.get_for_model(container)
-        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(container_type.pk, container.pk,))
-        placeholders = Placeholder.objects.get_for_obj(container)
+        poll = FancyPoll.objects.create(name='poll 1')
+        poll_type = ContentType.objects.get_for_model(poll)
+        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(poll_type.pk, poll.pk,))
+
+        # Go to the poll for the first time, generates the placeholders!!
+        self.client.get(poll.get_absolute_url())
+        placeholders = Placeholder.objects.get_for_obj(poll)
+
+        self.assertEqual(placeholders.count(), 2)
 
         with self.login_user_context(superuser):
             self.client.get(endpoint)
