@@ -10,7 +10,6 @@ from cms.models import fields, Placeholder, UserSettings
 from cms.models.fields import PlaceholderRelationField
 from cms.test_utils.project.placeholder_relation_field_app.models import FancyPoll
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.placeholder import get_declared_placeholders_for_obj
 from cms.utils.urlutils import admin_reverse
 
 
@@ -316,8 +315,6 @@ class ChecksUsedInAdminEndpointsTestCase(CMSTestCase):
         # Go to the poll for the first time, generates the placeholders!!
         self.client.get(poll.get_absolute_url())
         placeholders = Placeholder.objects.get_for_obj(poll)
-
-        self.assertEqual(placeholders.count(), 2)
 
         with self.login_user_context(superuser):
             self.client.get(endpoint)
