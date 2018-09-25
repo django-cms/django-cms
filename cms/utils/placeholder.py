@@ -383,7 +383,4 @@ def run_source_container_checks(container, user):
         ]
         placeholders = chain.from_iterable(getattr(container, field.name).all() for field in placeholder_fields)
 
-    for placeholder in placeholders:
-        if not placeholder.check_source(user):
-            return False
-    return True
+    return any(placeholder.check_source(user) for placeholder in placeholders)
