@@ -381,7 +381,8 @@ def run_source_container_checks(container, user):
             f for f in container._meta.get_fields()
             if f.related_model == Placeholder
         ]
-        container_placeholders = getattr(container, field.name).all()
-        placeholders = chain.from_iterable(container_placeholders for field in placeholder_fields)
-
+        placeholders = chain.from_iterable(
+            getattr(container, field.name).all()
+            for field in placeholder_fields
+        )
     return any(placeholder.check_source(user) for placeholder in placeholders)
