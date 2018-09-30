@@ -395,14 +395,6 @@ class PageToolbar(CMSToolbar):
         self.add_page_menu()
         self.change_language_menu()
 
-    def post_template_populate(self):
-        if self.page and self.toolbar.edit_mode_active and not self.title:
-            self.add_page_settings_button()
-
-    def add_page_settings_button(self, extra_classes=('cms-btn-action',)):
-        url = admin_reverse('cms_page_advanced', args=[self.page.pk])
-        self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
-
     # Menus
     def change_language_menu(self):
         if self.toolbar.edit_mode_active and self.page:
