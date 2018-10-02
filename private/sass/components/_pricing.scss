@@ -1,3 +1,4 @@
+// this is the column pricing
 .pricing {
     font-size: 14px;
     line-height: 20px;
@@ -179,5 +180,95 @@
                 border-bottom: 1px solid $table-border-color;
             }
         }
+    }
+}
+
+// this is the tab pricing
+.pricing-tabs {
+    .nav-item a {
+        border-bottom: none;
+    }
+
+    .nav-link {
+        color: $body-color;
+        font-size: rem(14px);
+        font-weight: 700;
+        text-transform: uppercase;
+        text-align: center;
+        line-height: rem(22px);
+        letter-spacing: rem(1.8px);
+
+        min-width: rem(200px);
+        padding: rem(100px) rem(50px) rem(10px);
+        border: rem(1px) solid $gray-100;
+        background-repeat: no-repeat;
+        background-position: center top;
+        background-size: 100%;
+    }
+
+    .tab-pane {
+        padding: rem(60px) rem(50px);
+        border: rem(1px) solid $gray-300;
+        border-top: none;
+        background: #fff;
+    }
+
+    .icon-customise {
+        font-size: 150%;
+        margin-top: rem(-4px);
+        margin-right: rem(5px);
+    }
+
+    .pricing-title {
+        text-align: left;
+    }
+}
+
+.pricing-tabs-economy .nav-link {
+    background-image: url('../img/pricing/plane-2.png');
+}
+
+.pricing-tabs-business .nav-link {
+    background-image: url('../img/pricing/plane-3.png');
+}
+
+.pricing-tabs-premium .nav-link {
+    background-image: url('../img/pricing/support.png');
+    background-size: 80%;
+}
+
+.pricing-tabs-premium {
+    margin-left: auto;
+}
+
+.pricing-tabs-price {
+    color: $secondary;
+    font-weight: 700;
+    text-align: center;
+    padding-top: 20px;
+}
+
+.pricing-tabs-price-value {
+    font-size: 80px;
+    line-height: 40px;
+    padding-right: 10px;
+}
+
+.pricing-tabs-price-currency {
+    font-size: 20px;
+    line-height: 40px;
+}
+
+.pricing-tabs-price-period {
+    color: $body-color;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.pricing-tabs-slider {
+    .h6 {
+        color: $primary;
+        font-size: rem(12px);
+        margin: 0;
     }
 }

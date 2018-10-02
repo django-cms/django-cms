@@ -246,3 +246,27 @@ figure {
         font-size: rem(14px);
     }
 }
+
+.list-ticks {
+    li {
+        position: relative;
+        padding-left: rem(30px);
+
+        &:before {
+            content: '';
+            background-image: url('../img/icons/check.svg');
+            background-size: rem(16px) rem(16px);
+            height: rem(16px);
+            width: rem(16px);
+
+            position: absolute;
+            top: rem(3px);
+            left: 0;
+        }
+    }
+}
+
+.list-wide li {
+    margin-top: rem(5px);
+    margin-bottom: rem(5px);
+}
