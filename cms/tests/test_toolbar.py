@@ -349,23 +349,45 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response, '<div id="cms-top"')
         self.assertContains(response, 'cms.base.css')
 
-    def test_live_draft_markup_on_app_page(self):
+    def test_placeholder_buttons_on_app_page(self):
         """
         Checks that the "edit page" button shows up
         on non-cms pages with app placeholders.
         """
         superuser = self.get_superuser()
         ex1 = self._get_example_obj()
+
+        # Test for Edit button
         obj_edit_url = get_object_edit_url(ex1)
-        output = (
-            '<a class="cms-btn cms-btn-action cms-btn-switch-edit" '
-            'href="{}">Edit</a>'
-        ).format(obj_edit_url)
 
         with self.login_user_context(superuser):
             response = self.client.get('/en/example/latest/')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, output, html=True)
+        toolbar = response.wsgi_request.toolbar
+        self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
+        edit_button = toolbar.get_right_items()[1].buttons[0]
+        self.assertEqual(edit_button.name, 'Edit')
+        self.assertEqual(edit_button.url, obj_edit_url)
+        self.assertEqual(
+            edit_button.extra_classes,
+            ['cms-btn', 'cms-btn-action', 'cms-btn-switch-edit']
+        )
+
+        # Test for Preview button
+        obj_preview_url = get_object_preview_url(ex1)
+
+        with self.login_user_context(superuser):
+            response = self.client.get(obj_edit_url)
+        self.assertEqual(response.status_code, 200)
+        toolbar = response.wsgi_request.toolbar
+        self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
+        preview_button = toolbar.get_right_items()[1].buttons[0]
+        self.assertEqual(preview_button.name, 'Preview')
+        self.assertEqual(preview_button.url, obj_preview_url)
+        self.assertEqual(
+            preview_button.extra_classes,
+            ['cms-btn', 'cms-btn-switch-save']
+        )
 
     def test_markup_generic_module(self):
         page = create_page("toolbar-page", "col_two.html", "en")
@@ -545,12 +567,14 @@ class ToolbarTests(ToolbarTestBase):
 
         en_request = self.get_page_request(cms_page, user, edit_url_en)
         en_toolbar = CMSToolbar(en_request)
+        en_toolbar.set_object(page_content_en)
         en_toolbar.populate()
         en_toolbar.post_template_populate()
         # Logo + templates + page-menu + admin-menu + logout
         self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5)
         de_request = self.get_page_request(cms_page, user, edit_url_de, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
+        de_toolbar.set_object(page_content_de)
         de_toolbar.populate()
         de_toolbar.post_template_populate()
         # Logo + templates + page-menu + admin-menu + logout
