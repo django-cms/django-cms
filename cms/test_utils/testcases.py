@@ -435,7 +435,7 @@ class BaseCMSTestCase(object):
         request._messages = MockStorage()
         return request
 
-    def get_page_request(self, page, user, path=None, lang_code='en', disable=False):
+    def get_page_request(self, page, user, path=None, lang_code='en', disable=False, persist=None):
         path = path or page and page.get_absolute_url()
 
         request = RequestFactory().get(path)
@@ -447,6 +447,8 @@ class BaseCMSTestCase(object):
         # Hide the toolbar
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
+        if persist is not None:
+            request.GET[get_cms_setting('CMS_TOOLBAR_URL__PERSIST')] = persist
         request.current_page = page
         mid = ToolbarMiddleware()
         mid.process_request(request)

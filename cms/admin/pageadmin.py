@@ -8,7 +8,6 @@ from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin, messages
-from django.contrib.admin.models import LogEntry
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
@@ -62,8 +61,6 @@ from cms.models import (
 from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
-from cms.toolbar_pool import toolbar_pool
-from cms.toolbar.utils import get_object_edit_url
 from cms.utils import permissions, get_current_site
 from cms.utils import page_permissions
 from cms.utils.i18n import (
@@ -180,7 +177,6 @@ class PageAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/dialog/copy/$', self.get_copy_dialog),  # copy dialog
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
             pat(r'^([0-9]+)/set-home/$', self.set_home),
-            url(r'^resolve/$', self.resolve, name="cms_page_resolve"),
         ]
 
         if plugin_pool.registered_plugins:
@@ -728,54 +724,6 @@ class PageAdmin(admin.ModelAdmin):
 
         new_page = form.copy_page()
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
-
-    def resolve(self, request):
-        if not request.user.is_staff:
-            return HttpResponse('/', content_type='text/plain')
-        obj = False
-        url = False
-        if request.session.get('cms_log_latest', False):
-            log = LogEntry.objects.get(pk=request.session['cms_log_latest'])
-            try:
-                obj = log.get_edited_object()
-            except (ObjectDoesNotExist, ValueError):
-                obj = None
-            del request.session['cms_log_latest']
-            if obj and obj.__class__ in toolbar_pool.get_watch_models() and hasattr(obj, 'get_absolute_url'):
-                # This is a test if the object url can be retrieved
-                # In case it can't, object it's not taken into account
-                try:
-                    force_text(obj.get_absolute_url())
-                except:
-                    obj = None
-            else:
-                obj = None
-        if not obj:
-            pk = request.GET.get('pk', False) or request.POST.get('pk', False)
-            full_model = request.GET.get('model') or request.POST.get('model', False)
-            if pk and full_model:
-                app_label, model = full_model.split('.')
-                if pk and app_label:
-                    ctype = ContentType.objects.get(app_label=app_label, model=model)
-                    try:
-                        obj = ctype.get_object_for_this_type(pk=pk)
-                    except ctype.model_class().DoesNotExist:
-                        obj = None
-                    try:
-                        force_text(obj.get_absolute_url())
-                    except:
-                        obj = None
-        if obj:
-            if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode_active', False):
-                if isinstance(obj, Page):
-                    url = get_object_edit_url(obj.get_title_obj())
-                else:
-                    url = obj.get_absolute_url()
-            else:
-                url = obj.get_absolute_url()
-        if url:
-            return HttpResponse(force_text(url), content_type='text/plain')
-        return HttpResponse('', content_type='text/plain')
 
     def edit_title_fields(self, request, page_id, language):
         page = self.get_object(page_id)

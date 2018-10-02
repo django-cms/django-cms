@@ -423,7 +423,7 @@ var Toolbar = new Class({
 
         // open sideframe if it was previously opened
         if (CMS.settings.sideframe && CMS.settings.sideframe.url && CMS.config.auth) {
-            var sideframe = new Sideframe();
+            var sideframe = CMS.API.Sideframe || new Sideframe();
 
             sideframe.open({
                 url: CMS.settings.sideframe.url,
@@ -512,11 +512,11 @@ var Toolbar = new Class({
                     if (onSuccess === 'FOLLOW_REDIRECT') {
                         Helpers.reloadBrowser(response.url);
                     } else {
-                        Helpers.reloadBrowser(onSuccess, false, true);
+                        Helpers.reloadBrowser(onSuccess);
                     }
                 } else {
                     // reload
-                    Helpers.reloadBrowser(false, false, true);
+                    Helpers.reloadBrowser();
                 }
             })
             .fail(function(jqXHR) {
@@ -575,7 +575,7 @@ var Toolbar = new Class({
                 });
                 break;
             case 'sideframe':
-                var sideframe = new Sideframe({
+                var sideframe = CMS.API.Sideframe || new Sideframe({
                     onClose: el.data('on-close')
                 });
 
