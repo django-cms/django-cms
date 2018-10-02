@@ -426,7 +426,7 @@ class PageToolbar(CMSToolbar):
                 page_add_url = admin_reverse('cms_pagecontent_add')
 
                 for code, name in add:
-                    url = add_url_parameters(page_add_url, page=self.page.pk, language=code)
+                    url = add_url_parameters(page_add_url, cms_page=self.page.pk, language=code)
                     add_plugins_menu.add_modal_item(name, url=url)
 
             if remove:
