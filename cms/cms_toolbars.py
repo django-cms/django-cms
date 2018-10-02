@@ -4,17 +4,20 @@ from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-from django.db.models import Q
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.translation import override as force_language, ugettext_lazy as _
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import Placeholder, Page, PageType, StaticPlaceholder
-from cms.toolbar.items import TemplateItem, REFRESH_PAGE
+from cms.models import Placeholder, Page, PageType
+from cms.toolbar.items import ButtonList, REFRESH_PAGE
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.toolbar.utils import get_object_edit_url, get_object_structure_url
+from cms.toolbar.utils import (
+    get_object_edit_url,
+    get_object_preview_url,
+    get_object_structure_url,
+)
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple, get_language_dict
@@ -63,6 +66,7 @@ class PlaceholderToolbar(CMSToolbar):
     def post_template_populate(self):
         super(PlaceholderToolbar, self).post_template_populate()
         self.add_wizard_button()
+        self.render_object_editable_buttons()
 
     def add_wizard_button(self):
         from cms.wizards.wizard_pool import entry_choices
@@ -85,6 +89,122 @@ class PlaceholderToolbar(CMSToolbar):
                                       side=self.toolbar.RIGHT,
                                       disabled=disabled,
                                       on_close=REFRESH_PAGE)
+
+    def render_object_editable_buttons(self):
+        self.init_placeholders()
+
+        if not self.toolbar.obj:
+            return
+
+        # Edit button
+        if self.toolbar.content_mode_active and self._can_add_button():
+            self.add_edit_button()
+        # Preview button
+        if self.toolbar.edit_mode_active and self._can_add_button():
+            self.add_preview_button()
+        # Structure mode
+        if self._can_add_structure_mode():
+            self.add_structure_mode()
+
+    def init_placeholders(self):
+        request = self.request
+        toolbar = self.toolbar
+
+        if toolbar._async and 'placeholders[]' in request.GET:
+            # AJAX request to reload page structure.
+            placeholder_ids = request.GET.getlist('placeholders[]')
+            self.placeholders = Placeholder.objects.filter(pk__in=placeholder_ids)
+        else:
+            if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:
+                # User has explicitly requested structure mode.
+                # and the object (page, blog, etc..) allows for the non-legacy structure mode.
+                renderer = toolbar.structure_renderer
+            else:
+                renderer = toolbar.get_content_renderer()
+
+            self.placeholders = renderer.get_rendered_placeholders()
+
+    # Helpers to check whether buttons can be rendered
+    def _has_page_change_perm(self):
+        if self.page and user_can_change_page(self.request.user, page=self.page):
+            return True
+        return False
+
+    def _has_placeholder_change_perm(self):
+        if not self.placeholders:
+            return False
+        return any(
+            ph for ph in self.placeholders
+            if ph.has_change_permission(self.request.user)
+        )
+
+    def _can_add_button(self):
+        if self._has_page_change_perm():
+            return True
+        elif self._has_placeholder_change_perm():
+            return True
+        return False
+
+    def _can_add_structure_mode(self):
+        if not self.request.user.has_perm('cms.use_structure'):
+            return False
+
+        if (
+            self.page and not self.page.application_urls and
+            self._has_page_change_perm()
+        ):
+            return True
+        elif self._has_placeholder_change_perm():
+            return True
+        return False
+
+    # Buttons
+    def add_edit_button(self):
+        url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language)
+        item = ButtonList(side=self.toolbar.RIGHT)
+        item.add_button(
+            _('Edit'),
+            url=url,
+            disabled=False,
+            extra_classes=['cms-btn', 'cms-btn-action', 'cms-btn-switch-edit'],
+        )
+        self.toolbar.add_item(item)
+
+    def add_preview_button(self):
+        url = get_object_preview_url(self.toolbar.obj, language=self.toolbar.request_language)
+        item = ButtonList(side=self.toolbar.RIGHT)
+        item.add_button(
+            _('Preview'),
+            url=url,
+            disabled=False,
+            extra_classes=['cms-btn', 'cms-btn-switch-save'],
+        )
+        self.toolbar.add_item(item)
+
+    def add_structure_mode(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
+        structure_active = self.toolbar.structure_mode_active
+        edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
+        build_url = get_object_structure_url(self.toolbar.obj, language=self.toolbar.request_language)
+        edit_url = get_object_edit_url(self.toolbar.obj, language=self.toolbar.request_language)
+        switcher = self.toolbar.add_button_list(
+            'Mode Switcher',
+            side=self.toolbar.RIGHT,
+            extra_classes=extra_classes,
+        )
+        switcher.add_button(
+            _('Structure'),
+            build_url,
+            active=structure_active,
+            disabled=False,
+            extra_classes='cms-structure-btn',
+        )
+        switcher.add_button(
+            _('Content'),
+            edit_url,
+            active=edit_mode_active,
+            disabled=False,
+            extra_classes='cms-content-btn',
+        )
 
 
 @toolbar_pool.register
@@ -218,55 +338,6 @@ class PageToolbar(CMSToolbar):
     _changed_admin_menu = None
     watch_models = [Page, PageType]
 
-    def init_placeholders(self):
-        request = self.request
-        toolbar = self.toolbar
-
-        if toolbar._async and 'placeholders[]' in request.GET:
-            # AJAX request to reload page structure
-            placeholder_ids = request.GET.getlist("placeholders[]")
-            self.placeholders = Placeholder.objects.filter(pk__in=placeholder_ids)
-            self.statics = StaticPlaceholder.objects.filter(
-                Q(draft__in=placeholder_ids) | Q(public__in=placeholder_ids)
-            )
-        else:
-            if toolbar.structure_mode_active and not toolbar.uses_legacy_structure_mode:
-                # User has explicitly requested structure mode
-                # and the object (page, blog, etc..) allows for the non-legacy structure mode
-                renderer = toolbar.structure_renderer
-            else:
-                renderer = toolbar.get_content_renderer()
-
-            self.placeholders = renderer.get_rendered_placeholders()
-            self.statics = renderer.get_rendered_static_placeholders()
-
-    def add_structure_mode(self):
-        if self.page and not self.page.application_urls:
-            if user_can_change_page(self.request.user, page=self.page):
-                return self.add_structure_mode_item()
-
-        elif any(ph for ph in self.placeholders if ph.has_change_permission(self.request.user)):
-            return self.add_structure_mode_item()
-
-        for sp in self.statics:
-            if sp.has_change_permission(self.request):
-                return self.add_structure_mode_item()
-
-    def add_structure_mode_item(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
-        structure_active = self.toolbar.structure_mode_active
-        edit_mode_active = (not structure_active and self.toolbar.edit_mode_active)
-
-        with force_language(self.current_lang):
-            if self.request.user.has_perm("cms.use_structure"):
-                build_url = get_object_structure_url(self.title) if self.title else ''
-                edit_url = get_object_edit_url(self.title) if self.title else ''
-                switcher = self.toolbar.add_button_list('Mode Switcher', side=self.toolbar.RIGHT,
-                                                        extra_classes=extra_classes)
-                switcher.add_button(_('Structure'), build_url, active=structure_active, disabled=False,
-                        extra_classes='cms-structure-btn')
-                switcher.add_button(_('Content'), edit_url, active=edit_mode_active, disabled=False,
-                        extra_classes='cms-content-btn')
-
     def get_page_content(self):
         page_content = self.page.get_title_obj(language=self.current_lang, fallback=False)
         return page_content or None
@@ -323,37 +394,6 @@ class PageToolbar(CMSToolbar):
         self.change_admin_menu()
         self.add_page_menu()
         self.change_language_menu()
-
-    def post_template_populate(self):
-        self.init_placeholders()
-        self.add_draft_live()
-        self.add_structure_mode()
-
-    # Buttons
-    def add_draft_live(self):
-        if self.page:
-            if self.toolbar.edit_mode_active and not self.title:
-                self.add_page_settings_button()
-
-            if user_can_change_page(self.request.user, page=self.page):
-                return self.add_draft_live_item()
-
-        elif self.placeholders:
-            return self.add_draft_live_item()
-
-        for sp in self.statics:
-            if sp.has_change_permission(self.request):
-                return self.add_draft_live_item()
-
-    def add_draft_live_item(self, template='cms/toolbar/items/live_draft.html', extra_context=None):
-        context = {'cms_toolbar': self.toolbar}
-        context.update(extra_context or {})
-        pos = len(self.toolbar.right_items)
-        self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
-
-    def add_page_settings_button(self, extra_classes=('cms-btn-action',)):
-        url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.title.pk]), self.toolbar.request_language)
-        self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
 
     # Menus
     def change_language_menu(self):
