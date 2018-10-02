@@ -367,12 +367,12 @@ def get_declared_placeholders_for_obj(obj):
     return get_placeholders(obj.get_template())
 
 
-def run_source_container_checks(container, user):
+def run_placeholder_source_checks(container, user):
     """
     Get all of the placeholders attached to the source
     object and run their registered checks
     """
-    # If the object has a get_placehodler helper method use it,
+    # If the object has a get_placeholder helper method use it,
     # it's cached for PageContent!!
     if hasattr(container, 'get_placeholders'):
         placeholders = container.get_placeholders()
