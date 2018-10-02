@@ -101,7 +101,6 @@ describe('CMS.Sideframe', function() {
             CMS.API.Messages = {
                 open: $.noop
             };
-            spyOn(CMS.API.Helpers, 'reloadBrowser');
             CMS.API.Toolbar = {
                 open: jasmine.createSpy()
             };
@@ -303,7 +302,6 @@ describe('CMS.Sideframe', function() {
             CMS.API.Messages = {
                 open: jasmine.createSpy()
             };
-            spyOn(CMS.API.Helpers, 'reloadBrowser');
             // fake _content that loads the iframe since
             // we do not really care, and things fail in IE
             spyOn(CMS.Sideframe.prototype, '_content');
@@ -342,17 +340,6 @@ describe('CMS.Sideframe', function() {
                 hidden: true
             });
             expect(CMS.API.Helpers.setSettings).toHaveBeenCalled();
-        });
-
-        it('checks if page requires reloading', function() {
-            sideframe.open({ url: url });
-            sideframe.close();
-            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith(false);
-
-            sideframe = new CMS.Sideframe({ onClose: 'REFRESH_PAGE' });
-            sideframe.open({ url: url });
-            sideframe.close();
-            expect(CMS.API.Helpers.reloadBrowser).toHaveBeenCalledWith('REFRESH_PAGE');
         });
 
         it('removes the loader from sideframe', function() {
