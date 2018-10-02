@@ -367,22 +367,22 @@ def get_declared_placeholders_for_obj(obj):
     return get_placeholders(obj.get_template())
 
 
-def run_placeholder_source_checks(container, user):
+def run_placeholder_source_checks(source, user):
     """
     Get all of the placeholders attached to the source
     object and run their registered checks
     """
     # If the object has a get_placeholder helper method use it,
     # it's cached for PageContent!!
-    if hasattr(container, 'get_placeholders'):
-        placeholders = container.get_placeholders()
+    if hasattr(source, 'get_placeholders'):
+        placeholders = source.get_placeholders()
     else:
         placeholder_fields = [
-            f for f in container._meta.get_fields()
+            f for f in source._meta.get_fields()
             if f.related_model == Placeholder
         ]
         placeholders = chain.from_iterable(
-            getattr(container, field.name).all()
+            getattr(source, field.name).all()
             for field in placeholder_fields
         )
     return any(placeholder.check_source(user) for placeholder in placeholders)
