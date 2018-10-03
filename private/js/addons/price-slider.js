@@ -48,7 +48,7 @@ class PricingSlider {
         }
 
         noUISlider.create(element, {
-            start: data.value,
+            start: data.min,
             // step patterns
             step: data.step,
             tooltips: true,
@@ -87,7 +87,7 @@ class PricingSlider {
 
         // if it matches the base value no additional
         // calculation is required
-        if (value ===  data.min) {
+        if (value === data.step) {
             // special treatment to handle the base cost of one value
             // this is used to display the general base costs for each group
             if (data.base) {
@@ -137,6 +137,11 @@ export function initPriceSlider() {
         priceContainer: $('.pricing-tabs-price-value').eq(0),
     });
 
+    Sliders.business = new PricingSlider({
+        container: pane.eq(1),
+        priceContainer: $('.pricing-tabs-price-value').eq(1),
+    });
+
     // stick price to container when scrolling
     tabs.find('a').on('click', () => {
         if (economySticky && businessSticky) {
@@ -148,13 +153,13 @@ export function initPriceSlider() {
     }).trigger('click');
 
     // url handling for tabs
-    setQueryParams(getQueryParams(document.location.search));
+    setHash(getHash(window.location.hash));
 }
 
-function setQueryParams(qs) {
+function setHash(obj) {
     let tabs = $('.nav-tabs .nav-link');
 
-    switch(qs.tab) {
+    switch(obj.tab) {
     case 'business':
         tabs.eq(1).tab('show');
         break;
@@ -165,28 +170,27 @@ function setQueryParams(qs) {
         tabs.eq(0).tab('show');
     }
 
-    if (qs.economy) {
-        // pass to initialisation, can be:
-        // [2,10,4,2,10,15,2048]
-        Sliders.economy.setDataSequence(qs.economy);
+    // pass to initialisation, can be: 2,6,500,6,15,4
+    if (obj.economy) {
+        Sliders.economy.setDataSequence(obj.economy);
+    }
+    if (obj.business) {
+        Sliders.business.setDataSequence(obj.business);
     }
 }
 
 // for example
-// ?tab=economy&economy=2,10,4,2,10,15,2048
-function getQueryParams(qs) {
-    qs = qs.split('+').join(' ');
+// #tab=business&economy=2,6,500,6,15,4
+function getHash(hash) {
+    hash = hash.substr(1);
 
-    var params = {},
-        tokens,
-        re = /[?&]?([^=]+)=([^&]*)/g;
+    let result = hash.split('&').reduce((result, item) => {
+        let parts = item.split('=');
+        result[parts[0]] = parts[1];
+        return result;
+    }, {});
 
-    // eslint-disable-next-line
-    while (tokens = re.exec(qs)) {
-        params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
-    }
-
-    return params;
+    return result;
 }
 
 // sample markup
