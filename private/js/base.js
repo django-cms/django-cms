@@ -17,6 +17,7 @@ import { initPandadocForms } from 'addons/pandadoc';
 import { initMessages } from 'addons/messages';
 import 'addons/flying-focus';
 import { initLazyLoad } from 'addons/lazyload';
+import { initPriceSlider } from 'addons/price-slider';
 
 svg4everybody();
 
@@ -57,4 +58,5 @@ $(() => {
     initAnalytics();
     initPandadocForms();
     initMessages();
+    initPriceSlider();
 });

@@ -185,6 +185,10 @@
 
 // this is the tab pricing
 .pricing-tabs {
+    .nav-tabs {
+        flex-wrap: nowrap;
+    }
+
     .nav-item a {
         border-bottom: none;
     }
@@ -198,8 +202,11 @@
         line-height: rem(22px);
         letter-spacing: rem(1.8px);
 
-        min-width: rem(200px);
-        padding: rem(100px) rem(50px) rem(10px);
+        @include media-breakpoint-up(md) {
+            min-width: rem(200px);
+            padding: rem(100px) rem(50px) rem(10px);
+        }
+        min-height: 50px;
         border: rem(1px) solid $gray-100;
         background-repeat: no-repeat;
         background-position: center top;
@@ -213,28 +220,42 @@
         background: #fff;
     }
 
-    .icon-customise {
-        font-size: 150%;
-        margin-top: rem(-4px);
-        margin-right: rem(5px);
+    .icon-notification {
+        position: relative;
+        top: 7px;
     }
 
     .pricing-title {
         text-align: left;
+        padding-left: 40px;
+        position: relative;
+
+        .icon-customise {
+            font-size: 150%;
+            position: absolute;
+            left: 0;
+            top: -4px;
+        }
+    }
+
+    small {
+        font-size: 12px;
     }
 }
 
-.pricing-tabs-economy .nav-link {
-    background-image: url('../img/pricing/plane-2.png');
-}
+@include media-breakpoint-up(md) {
+    .pricing-tabs-economy .nav-link {
+        background-image: url('../img/pricing/plane-2.png');
+    }
 
-.pricing-tabs-business .nav-link {
-    background-image: url('../img/pricing/plane-3.png');
-}
+    .pricing-tabs-business .nav-link {
+        background-image: url('../img/pricing/plane-3.png');
+    }
 
-.pricing-tabs-premium .nav-link {
-    background-image: url('../img/pricing/support.png');
-    background-size: 80%;
+    .pricing-tabs-premium .nav-link {
+        background-image: url('../img/pricing/support.png');
+        background-size: 80%;
+    }
 }
 
 .pricing-tabs-premium {
@@ -245,24 +266,24 @@
     color: $secondary;
     font-weight: 700;
     text-align: center;
-    padding-top: 20px;
+    padding-top: rem(20px);
 }
 
 .pricing-tabs-price-value {
-    font-size: 80px;
-    line-height: 40px;
-    padding-right: 10px;
+    font-size: rem(80px);
+    line-height: rem(40px);
+    padding-right: rem(10px);
 }
 
 .pricing-tabs-price-currency {
-    font-size: 20px;
-    line-height: 40px;
+    font-size: rem(20px);
+    line-height: rem(40px);
 }
 
 .pricing-tabs-price-period {
     color: $body-color;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: rem(2px);
 }
 
 .pricing-tabs-slider {
@@ -270,5 +291,15 @@
         color: $primary;
         font-size: rem(12px);
         margin: 0;
+    }
+}
+
+.pricing-tabs-visual {
+    height: calc(100% + 70px);
+    margin-top: 20px;
+
+    @include media-breakpoint-up(xl) {
+        height: calc(100% + 200px);
+        margin-top: 20px;
     }
 }

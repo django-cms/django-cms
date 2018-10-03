@@ -1,0 +1,245 @@
+/*! nouislider - 12.0.0 - 9/14/2018 */
+/* Functional styling;
+ * These styles are required for noUiSlider to function.
+ * You don't need to change these rules to apply your design.
+ */
+.noUi-target,
+.noUi-target * {
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  touch-action: none;
+  user-select: none;
+  box-sizing: border-box;
+}
+.noUi-target {
+  position: relative;
+  direction: ltr;
+  margin-top: 12px;
+  margin-bottom: 40px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+.noUi-base {
+    &:before,
+    &:after {
+        border-radius: 8px;
+        position: absolute;
+        content: '';
+        top: 0;
+        height: 100%;
+        background: $input-bg;
+    }
+    &:before {
+        left: -8px;
+        background: theme-color(primary);
+        z-index: 1;
+        width: 13px;
+    }
+    &:after {
+        right: -8px;
+    }
+}
+    .noUi-connect {
+        &:before,
+        &:after {
+            border-radius: 8px;
+            position: absolute;
+            content: '';
+            top: 0;
+            height: 100%;
+            background: theme-color(primary);
+        }
+        &:before {
+            left: -8px;
+        }
+    }
+.noUi-base,
+.noUi-connects {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  z-index: 1;
+}
+/* Wrapper for all connect elements.
+ */
+.noUi-connects {
+  overflow: hidden;
+  z-index: 0;
+}
+.noUi-connect,
+.noUi-origin {
+  will-change: transform;
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  transform-origin: 0 0;
+}
+/* Offset direction
+ */
+html:not([dir="rtl"]) .noUi-horizontal .noUi-origin {
+  left: auto;
+  right: 0;
+}
+/* Give origins 0 height/width so they don't interfere with clicking the
+ * connect elements.
+ */
+.noUi-horizontal .noUi-origin {
+  height: 0;
+}
+.noUi-handle {
+  position: absolute;
+}
+.noUi-state-tap .noUi-connect,
+.noUi-state-tap .noUi-origin {
+  transition: transform 0.3s;
+}
+.noUi-state-drag * {
+  cursor: inherit !important;
+}
+/* Slider size and handle placement;
+ */
+.noUi-horizontal {
+  height: 6px;
+}
+.noUi-horizontal .noUi-handle {
+  width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  left: -8px;
+  top: -5px;
+}
+html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
+  right: -8px;
+  left: auto;
+}
+/* Styling;
+ * Giving the connect element a border radius causes issues with using transform: scale
+ */
+.noUi-target {
+  background: $gray-300;
+  border-radius: 6px;
+}
+.noUi-connects {
+  border-radius: 3px;
+}
+.noUi-connect {
+  background: theme-color(primary);
+}
+/* Handles and cursors;
+ */
+.noUi-draggable {
+  cursor: ew-resize;
+}
+.noUi-handle {
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: #fff;
+  cursor: default;
+  box-shadow: 0 2px 4px rgba(#8C8C8C, 0.3), 0 -2px 4px rgba(#8C8C8C, 0.2);
+}
+.noUi-active {
+  box-shadow: 0 2px 4px rgba(#8C8C8C, 0.5), 0 -2px 4px rgba(#8C8C8C, 0.5);
+}
+/* Disabled state;
+ */
+[disabled] .noUi-connect {
+  background: #B8B8B8;
+}
+[disabled].noUi-target,
+[disabled].noUi-handle,
+[disabled] .noUi-handle {
+  cursor: not-allowed;
+}
+/* Base;
+ *
+ */
+.noUi-pips,
+.noUi-pips * {
+  box-sizing: border-box;
+}
+.noUi-pips {
+  position: absolute;
+  color: theme-color(secondary);
+}
+/* Values;
+ *
+ */
+.noUi-value {
+  position: absolute;
+  white-space: nowrap;
+  text-align: center;
+}
+.noUi-value-sub {
+  color: theme-color(secondary);
+  font-size: 10px;
+}
+/* Markings;
+ *
+ */
+.noUi-marker {
+  position: absolute;
+  background: theme-color(secondary);
+}
+.noUi-marker-sub {
+  background: theme-color(secondary);
+}
+.noUi-marker-large {
+  background: theme-color(secondary);
+}
+/* Horizontal layout;
+ *
+ */
+.noUi-pips-horizontal {
+  padding: 10px 0;
+  height: 30px;
+  top: 100%;
+  left: 8px;
+  right: 8px;
+}
+.noUi-value-horizontal {
+  transform: translate(-50%, 0%);
+    min-width: 16px;
+
+  &:nth-child(2) {
+    transform: translate(0%, 0%);
+    margin-left: -8px;
+  }
+
+  &:last-child {
+    transform: translate(-100%, 0%);
+    margin-left: 8px;
+  }
+}
+.noUi-marker-horizontal.noUi-marker {
+  margin-left: -1px;
+  width: 2px;
+  height: 5px;
+}
+.noUi-marker-horizontal.noUi-marker-normal {
+}
+.noUi-marker-horizontal.noUi-marker-sub {
+  height: 10px;
+}
+.noUi-marker-horizontal.noUi-marker-large {
+  display: none;
+  height: 15px;
+}
+.noUi-tooltip {
+  display: block;
+  position: absolute;
+  color: $body-color;
+  padding: 5px;
+  font-size: 14px;
+  text-align: center;
+  white-space: nowrap;
+}
+.noUi-horizontal .noUi-tooltip {
+  transform: translate(-50%, 0);
+  left: 45px;
+  top: 120%;
+  width: 100px;
+  text-align: left;
+}
