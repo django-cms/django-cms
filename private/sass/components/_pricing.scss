@@ -241,6 +241,10 @@
     small {
         font-size: 12px;
     }
+
+    .btn-sm {
+        height: 30px;
+    }
 }
 
 @include media-breakpoint-up(md) {

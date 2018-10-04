@@ -238,8 +238,12 @@ html:not([dir="rtl"]) .noUi-horizontal .noUi-handle {
 }
 .noUi-horizontal .noUi-tooltip {
   transform: translate(-50%, 0);
-  left: 45px;
+  left: 5px;
   top: 120%;
   width: 100px;
-  text-align: left;
+  text-align: center;
+  @include media-breakpoint-up(lg) {
+      left: 45px;
+      text-align: left;
+  }
 }
