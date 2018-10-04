@@ -117,6 +117,7 @@ class PricingSlider {
             let targetValue = parseFloat(target[0].noUiSlider.get().split(' ')[0]);
             let targetPrice = parseFloat(target.data().cost);
 
+            // keeping the consoles for reference
             // console.log(originValue, originPrice, targetValue, targetPrice);
             if (data.multiply) {
                 // console.log((originValue * targetValue * originPrice) + (targetValue * targetPrice));
@@ -130,8 +131,8 @@ class PricingSlider {
 
             if (el.data().min === originValue && target.data().min === targetValue) {
                 // console.log('reset both');
-                el.data('calculatedCosts', el.data().base || 0);
-                target.data('calculatedCosts', target.data().base || 0);
+                el.data('calculatedCosts', el.data().base||0);
+                target.data('calculatedCosts', target.data().base||0);
             }
         }
 
