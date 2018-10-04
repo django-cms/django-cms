@@ -73,17 +73,19 @@ class PricingSlider {
                 from: value => value,
             },
             connect: [true, false],
-        }).on('update', (values, handle, unencoded) =>
+        });
+
+        element.noUiSlider.on('update', (values, handle, unencoded) =>
             this._updatePrice(element, values, handle, unencoded));
     }
 
     _updatePrice(element, values, handle, unencoded) {
-        // we need to loop through each element and get the content
-        let baseValue = parseInt(this.baseValue);
+        let baseValue = parseFloat(this.baseValue);
         let value = unencoded[0];
         let el = $(element);
         let data = el.data();
         let costs = 0;
+        let calculatedCosts = 0;
 
         // if it matches the base value no additional
         // calculation is required
@@ -91,24 +93,57 @@ class PricingSlider {
             // special treatment to handle the base cost of one value
             // this is used to display the general base costs for each group
             if (data.base) {
-                el.data('calculatedCosts', data.base);
+                calculatedCosts = data.base;
             } else {
-                el.data('calculatedCosts', 0);
+                calculatedCosts = 0;
             }
         } else {
             // update data costs on each element
-            el.data('calculatedCosts', data.cost * (value - data.min));
+            if (data.base) {
+                // for the base value the minimum cost do not apply
+                calculatedCosts = data.cost * value + data.base;
+            } else {
+                calculatedCosts = data.cost * (value - data.min);
+            }
+        }
+        el.data('calculatedCosts', calculatedCosts);
+
+        // override values if a multiplication needs to happen
+        let target = this.elements.eq(data.multiplicator);
+        if (data.multiplicator !== undefined
+            && element.noUiSlider && target[0].noUiSlider) {
+            let originValue = parseFloat(element.noUiSlider.get().split(' ')[0]);
+            let originPrice = parseFloat(el.data().cost);
+            let targetValue = parseFloat(target[0].noUiSlider.get().split(' ')[0]);
+            let targetPrice = parseFloat(target.data().cost);
+
+            // console.log(originValue, originPrice, targetValue, targetPrice);
+            if (data.multiply) {
+                // console.log((originValue * targetValue * originPrice) + (targetValue * targetPrice));
+                el.data('calculatedCosts', originValue * targetValue * originPrice);
+                target.data('calculatedCosts', targetValue * targetPrice);
+            } else {
+                // console.log((originValue * targetValue * targetPrice) + (originValue * originPrice));
+                el.data('calculatedCosts', originValue * originPrice);
+                target.data('calculatedCosts', originValue * targetValue * targetPrice);
+            }
+
+            if (el.data().min === originValue && target.data().min === targetValue) {
+                // console.log('reset both');
+                el.data('calculatedCosts', el.data().base || 0);
+                target.data('calculatedCosts', target.data().base || 0);
+            }
         }
 
         // calculate new costs
         this.elements.each((index, item) => {
-            let calculatedCosts = parseInt($(item).data('calculatedCosts'));
-            if (calculatedCosts) {
-                costs += calculatedCosts;
+            let calculate = parseFloat($(item).data('calculatedCosts'));
+            if (calculate) {
+                costs += calculate;
             }
         });
 
-        this.priceContainer.text(costs||baseValue);
+        this.priceContainer.text(Math.round(costs||baseValue));
     }
 
     setDataSequence(sequence) {
