@@ -257,8 +257,20 @@
     }
 
     .pricing-tabs-premium .nav-link {
-        background-image: url('../img/pricing/support.png');
+        background-image: url('../img/pricing/premium.png');
         background-size: 80%;
+        background-position: center 15px;
+        // make tab wider to center text
+        @include media-breakpoint-up(lg) {
+            background-position: center 16px;
+            background-size: 60%;
+            min-width: 360px;
+        }
+        @include media-breakpoint-up(xl) {
+            background-position: center 18px;
+            background-size: 60%;
+            min-width: 330px;
+        }
     }
 }
 
