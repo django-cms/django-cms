@@ -5,7 +5,7 @@
         {% if instance.tab_alignment %} {{ instance.tab_alignment }}{% endif %}"
         role="tablist">
         {% for plugin in instance.child_plugin_instances %}
-            <li class="nav-item {{ plugin.attributes.class }}">
+            <li class="nav-item {{ plugin.attributes.class }}" {{ plugin.attributes_str }}>
                 <a href="#tab-{{ plugin.pk }}"
                     class="nav-link{% if instance.tab_index == forloop.counter %} active{% endif %}"
                     id="tab-label-{{ plugin.pk }}"

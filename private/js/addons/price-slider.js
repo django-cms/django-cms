@@ -163,7 +163,7 @@ class PricingSlider {
 }
 
 export function initPriceSlider() {
-    let tabs = $('.nav-tabs');
+    let tabs = $('.nav-tabs').find('a');
     let pane = $('.tab-pane');
     let economySticky;
     let businessSticky;
@@ -179,17 +179,33 @@ export function initPriceSlider() {
     });
 
     // stick price to container when scrolling
-    tabs.find('a').on('click', () => {
+    tabs.on('click', (e) => {
         if (economySticky && businessSticky) {
             economySticky.destroy();
             businessSticky.destroy();
         }
         economySticky = new Sticky('.js-pricing-tabs-price-economy');
         businessSticky = new Sticky('.js-pricing-tabs-price-business');
-    }).trigger('click');
+
+        // change tab hash
+        newHash('tab', $(e.target).parent().data().type);
+    });
 
     // url handling for tabs
     setHash(getHash(window.location.hash));
+}
+
+function newHash(type, hash) {
+    let tmp = window.location.hash;
+    tmp = tmp.replace('#', '');
+
+    if (type === 'tab' && tmp.match(/tab/)) {
+        tmp = tmp.replace(/tab=([^&]*)?/, hash);
+    } else {
+        tmp = hash;
+    }
+
+    window.location.hash = type + '=' + tmp;
 }
 
 function setHash(obj) {
