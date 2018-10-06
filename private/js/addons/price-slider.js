@@ -180,6 +180,8 @@ export function initPriceSlider() {
 
     // stick price to container when scrolling
     tabs.on('click', (e) => {
+        let type = $(e.target).parent().data().type;
+
         if (economySticky && businessSticky) {
             economySticky.destroy();
             businessSticky.destroy();
@@ -188,7 +190,12 @@ export function initPriceSlider() {
         businessSticky = new Sticky('.js-pricing-tabs-price-business');
 
         // change tab hash
-        newHash('tab', $(e.target).parent().data().type);
+        newHash('tab', type);
+
+        // send intercom event when changing tabs
+        if (window.Intercom) {
+            Intercom('trackEvent', 'plantab-' + type);
+        }
     });
 
     // url handling for tabs
