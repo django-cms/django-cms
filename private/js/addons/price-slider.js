@@ -165,8 +165,8 @@ class PricingSlider {
 export function initPriceSlider() {
     let tabs = $('.nav-tabs').find('a');
     let pane = $('.tab-pane');
-    let economySticky;
-    let businessSticky;
+    let economySticky = new Sticky('.js-pricing-tabs-price-economy');
+    let businessSticky = new Sticky('.js-pricing-tabs-price-business');
 
     Sliders.economy = new PricingSlider({
         container: pane.eq(0),
