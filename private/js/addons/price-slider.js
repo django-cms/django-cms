@@ -101,7 +101,7 @@ class PricingSlider {
             // update data costs on each element
             if (data.base) {
                 // for the base value the minimum cost do not apply
-                calculatedCosts = data.cost * value + data.base;
+                calculatedCosts = data.cost * value// + data.base;
             } else {
                 calculatedCosts = data.cost * (value - data.min);
             }
@@ -194,7 +194,7 @@ export function initPriceSlider() {
 
         // send intercom event when changing tabs
         if (window.Intercom) {
-            Intercom('trackEvent', 'plantab-' + type);
+            window.Intercom('trackEvent', 'plantab-' + type);
         }
     });
 
