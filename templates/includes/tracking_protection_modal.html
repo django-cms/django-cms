@@ -1,0 +1,19 @@
+{% load i18n cms_tags %}
+<div class="modal fade js-tracking-protection-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Your browser is blocking access to our support tools</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {% static_placeholder "tracking protection modal content" or %}
+                    <p>Some web advertising and tracking blockers interfere with our support tools. If you&#39;re seeing this message, it means that your access to our support is being blocked.</p>
+                    <p>To access our support, you&#39;ll need to turn off these blockers for our site or for this session.</p>
+                    <p>See <a class="alert-link" href="http://support.divio.com/control-panel/how-to-unblock-our-support-tools-in-your-browser" target="_blank">How to unblock our support tools in your browser</a>.</p>
+                {% endstatic_placeholder %}
+            </div>
+        </div>
+    </div>
+</div>
