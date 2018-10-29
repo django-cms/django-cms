@@ -16,7 +16,7 @@ from django.utils import six
 from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
-from cms.models import Placeholder
+from cms.models import PlaceholderRelationField
 from cms.utils.conf import get_cms_setting
 
 
@@ -372,14 +372,12 @@ def run_placeholder_source_checks(source, user):
     Get all of the placeholders attached to the source
     object and run their registered checks
     """
-    # If the object has a get_placeholder helper method use it,
-    # it's cached for PageContent!!
     if hasattr(source, 'get_placeholders'):
         placeholders = source.get_placeholders()
     else:
         placeholder_fields = [
             f for f in source._meta.get_fields()
-            if f.related_model == Placeholder
+            if isinstance(f, PlaceholderRelationField)
         ]
         placeholders = chain.from_iterable(
             getattr(source, field.name).all()
