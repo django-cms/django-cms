@@ -22,6 +22,7 @@ from cms.admin.forms import RequestToolbarForm
 from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
                               LANGUAGE_MENU_IDENTIFIER)
 from cms.models import UserSettings, PagePermission
+from cms.test_utils.project.placeholder_relation_field_app.models import FancyPoll
 from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
 from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_USERSETTINGS)
@@ -355,13 +356,15 @@ class ToolbarTests(ToolbarTestBase):
         on non-cms pages with app placeholders.
         """
         superuser = self.get_superuser()
-        ex1 = self._get_example_obj()
+        poll = FancyPoll.objects.create(name='poll 1')
 
         # Test for Edit button
-        obj_edit_url = get_object_edit_url(ex1)
+        obj_edit_url = get_object_edit_url(poll)
 
         with self.login_user_context(superuser):
-            response = self.client.get('/en/example/latest/')
+            response = self.client.get(
+                reverse('fancy_poll_detail_view', args=(poll.pk,)),
+            )
         self.assertEqual(response.status_code, 200)
         toolbar = response.wsgi_request.toolbar
         self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
@@ -374,7 +377,7 @@ class ToolbarTests(ToolbarTestBase):
         )
 
         # Test for Preview button
-        obj_preview_url = get_object_preview_url(ex1)
+        obj_preview_url = get_object_preview_url(poll)
 
         with self.login_user_context(superuser):
             response = self.client.get(obj_edit_url)
