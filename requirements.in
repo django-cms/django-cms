@@ -1,7 +1,7 @@
 # <INSTALLED_ADDONS>  # Warning: text inside the INSTALLED_ADDONS tags is auto-generated. Manual changes will be overwritten.
 https://control.divio.com/api/v1/apps/serve/aldryn-addons/1.0.2/24f5d1c8-66fe-43b2-a540-17d61045a72b/aldryn-addons-1.0.2.tar.gz#egg=aldryn-addons==1.0.2
 https://control.divio.com/api/v1/apps/serve/aldryn-django/1.11.15.1/f9e543d2-3127-4458-b0f5-d69d282bf0ac/aldryn-django-1.11.15.1.tar.gz#egg=aldryn-django==1.11.15.1
-https://control.divio.com/api/v1/apps/serve/aldryn-sso/1.1.16/dbe0c45a-c981-4beb-8624-b0d2c4196aa0/aldryn-sso-1.1.16.tar.gz#egg=aldryn-sso==1.1.16
+https://control.divio.com/api/v1/apps/serve/aldryn-sso/1.4.3/6fa8f39e-033a-405d-a7d2-39a86c3da147/aldryn-sso-1.4.3.tar.gz#egg=aldryn-sso==1.4.3
 https://control.divio.com/api/v1/apps/serve/aldryn-django-cms/3.5.2.2/88bf7991-90a3-4c98-acf5-42c3fa14e2a4/aldryn-django-cms-3.5.2.2.tar.gz#egg=aldryn-django-cms==3.5.2.2
 https://control.divio.com/api/v1/apps/serve/aldryn-forms/3.0.4/7e972f96-36f6-484b-96c7-bce255b87aa9/aldryn-forms-3.0.4.tar.gz#egg=aldryn-forms==3.0.4
 https://control.divio.com/api/v1/apps/serve/aldryn-newsblog/2.1.1/7f7e0e5c-db27-4369-9151-ef7cd88c6ee1/aldryn-newsblog-2.1.1.tar.gz#egg=aldryn-newsblog==2.1.1
