@@ -123,6 +123,9 @@ class BaseToolbar(ToolbarAPIMixin):
     def templates(self):
         return TemplatesCache()
 
+    @cached_property
+    def sideframe_enabled(self):
+        return get_cms_setting('SIDEFRAME_ENABLED')
 
 class CMSToolbar(BaseToolbar):
     """
