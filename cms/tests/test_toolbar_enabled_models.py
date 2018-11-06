@@ -100,13 +100,9 @@ class ConfigureToolbarEnabledModelsRenderingIntegrationTestCase(CMSTestCase):
         """
         setup_cms_apps()
         app = apps.get_app_config('cms')
-        expected_toolbar_enabled_models_settings = {
-            PageContent: render_pagecontent,
-        }
-        self.assertDictEqual(
-            app.cms_extension.toolbar_enabled_models,
-            expected_toolbar_enabled_models_settings,
-        )
+        toolbar_enabled_models = app.cms_extension.toolbar_enabled_models
+        self.assertIn(PageContent, toolbar_enabled_models.keys())
+        self.assertEqual(toolbar_enabled_models[PageContent], render_pagecontent)
 
 
 class ToolbarEnabledModelsTestCase(CMSTestCase):

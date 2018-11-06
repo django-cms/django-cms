@@ -40,9 +40,14 @@ def detail_view(request, pk, template_name='detail.html', item_name="char_1",
                 template_string='',):
     if request.user.is_staff and request.toolbar:
         instance = Example1.objects.get(pk=pk)
+        request.toolbar.set_object(instance)
     else:
         instance = Example1.objects.get(pk=pk, publish=True)
     return _base_detail(request, instance, template_name, item_name, template_string)
+
+
+def render_example_content(request, example_content):
+    return detail_view(request, example_content.pk)
 
 
 def latest_view(request):

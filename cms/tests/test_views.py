@@ -153,31 +153,48 @@ class ViewTests(CMSTestCase):
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en")
         page_content = self.get_page_title_obj(page)
-        page_edit_url = get_object_edit_url(page_content)
+        page_preview_url = get_object_preview_url(page_content)
         # Anon user
-        response = self.client.get(page_edit_url)
-        self.assertRedirects(response, '/en/admin/login/?next={}'.format(page_edit_url))
+        response = self.client.get(page_preview_url)
+        self.assertRedirects(response, '/en/admin/login/?next={}'.format(page_preview_url))
 
         # Superuser
         user = self.get_superuser()
         with self.login_user_context(user):
-            response = self.client.get(page_edit_url)
-        self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
+            response = self.client.get(page_preview_url)
+        toolbar = response.wsgi_request.toolbar
+        edit_button = toolbar.get_right_items()[1].buttons[0]
+        self.assertEqual(edit_button.name, 'Edit')
+        self.assertEqual(edit_button.url, get_object_edit_url(page_content))
+        self.assertEqual(
+            edit_button.extra_classes,
+            ['cms-btn', 'cms-btn-action', 'cms-btn-switch-edit']
+        )
 
         # Admin but with no permission
         user = self.get_staff_user_with_no_permissions()
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
         with self.login_user_context(user):
-            response = self.client.get(page_edit_url)
-        self.assertNotContains(response, "cms-toolbar-item-switch-save-edit", 200)
+            response = self.client.get(page_preview_url)
+        toolbar = response.wsgi_request.toolbar
+        self.assertEqual(len(toolbar.get_right_items()), 1) # Only has Create button
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
-            response = self.client.get(page_edit_url)
-        self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
+            response = self.client.get(page_preview_url)
+        toolbar = response.wsgi_request.toolbar
+        edit_button = toolbar.get_right_items()[1].buttons[0]
+        self.assertEqual(edit_button.name, 'Edit')
+        self.assertEqual(edit_button.url, get_object_edit_url(page_content))
+        self.assertEqual(
+            edit_button.extra_classes,
+            ['cms-btn', 'cms-btn-action', 'cms-btn-switch-edit']
+        )
 
     def test_toolbar_switch_urls(self):
+        from django.utils.translation import ugettext_lazy as _
+
         user = self.get_superuser()
         user_settings = UserSettings(language="en", user=user)
         placeholder = Placeholder(slot="clipboard")
@@ -191,9 +208,9 @@ class ViewTests(CMSTestCase):
         page.set_as_homepage()
 
         with self.login_user_context(user), force_language('fr'):
-            edit_url = get_object_edit_url(page_content)
-            preview_url = get_object_preview_url(page_content)
-            structure_url = get_object_structure_url(page_content)
+            edit_url = get_object_edit_url(page_content, language='fr')
+            preview_url = get_object_preview_url(page_content, language='fr')
+            structure_url = get_object_structure_url(page_content, language='fr')
 
             response = self.client.get(edit_url)
             expected = """
@@ -212,15 +229,16 @@ class ViewTests(CMSTestCase):
                 count=1,
                 html=True,
             )
-            self.assertContains(
-                response,
-                '<a class="cms-btn cms-btn-switch-save" href="%s">'
-                '<span>Preview</span></a>' % (
-                    preview_url,
-                ),
-                count=1,
-                html=True,
+            toolbar = response.wsgi_request.toolbar
+            self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
+            preview_button = toolbar.get_right_items()[1].buttons[0]
+            self.assertEqual(preview_button.name, _('Preview'))
+            self.assertEqual(preview_button.url, preview_url)
+            self.assertEqual(
+                preview_button.extra_classes,
+                ['cms-btn', 'cms-btn-switch-save']
             )
+
             response = self.client.get(preview_url)
             self.assertContains(
                 response,
@@ -228,13 +246,14 @@ class ViewTests(CMSTestCase):
                 count=1,
                 html=True,
             )
-            self.assertContains(
-                response,
-                '<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="%s">Edit</a>' % (
-                    edit_url,
-                ),
-                count=1,
-                html=True,
+            toolbar = response.wsgi_request.toolbar
+            self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
+            edit_button = toolbar.get_right_items()[1].buttons[0]
+            self.assertEqual(edit_button.name, _('Edit'))
+            self.assertEqual(edit_button.url, edit_url)
+            self.assertEqual(
+                edit_button.extra_classes,
+                ['cms-btn', 'cms-btn-action', 'cms-btn-switch-edit']
             )
 
     def test_incorrect_slug_for_language(self):
