@@ -125,3 +125,11 @@ class CMSAppExtension(six.with_metaclass(ABCMeta)):
         :param cms_config: the cms config class of the app
         """
         pass
+
+    def ready(self):
+        """Override this method to run code after all CMS extensions
+        have been configured.
+
+        This method will be run once, even if no cms app config sets
+        its "<app_label>_enabled" attribute to True"""
+        pass

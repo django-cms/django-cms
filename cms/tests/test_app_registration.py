@@ -283,6 +283,18 @@ class ConfigureCmsAppsTestCase(CMSTestCase):
             feature_app_y.cms_extension.configure_app.call_args_list[1][0][0],
             config_app_y.cms_config)
 
+    @patch.object(apps, 'get_app_configs')
+    def test_runs_ready_for_all_extensions(self, mocked_apps):
+        feature_app = Mock(spec=AppConfig)
+        feature_app.label = 'djangocms_feature_x'
+        feature_app.cms_extension = Mock(spec=['ready'])
+
+        mocked_apps.return_value = [feature_app]
+
+        app_registration.ready_cms_apps([feature_app])
+
+        feature_app.cms_extension.ready.assert_called_once_with()
+
 
 class SetupCmsAppsTestCase(CMSTestCase):
 
