@@ -66,7 +66,8 @@ before_script:
 
 before_install:
   - "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""
-  - pip install -U pip>=8.0
+  - if [ "$TRAVIS_PYTHON_VERSION" <= 3.3 ]; then pip install -U pip==7.1.2; fi
+  - if [ "$TRAVIS_PYTHON_VERSION" >= 3.4 ]; then pip install -U pip>=8.0; fi
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[skip saucelabs\]'; export USE_SAUCE_LABS=$?; true
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[ci only docs\]'; export ONLY_DOCS=$?; true
 
