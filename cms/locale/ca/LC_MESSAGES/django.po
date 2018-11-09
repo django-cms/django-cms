@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2018-11-09 10:29+0100\n"
+"PO-Revision-Date: 2018-11-06 10:53+0000\n"
+"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Catalan (http://www.transifex.com/divio/django-cms/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -107,6 +107,10 @@ msgstr "Informeu l'slug en %(language)s abans d'editar la seva configuració ava
 
 msgid "A page with this reverse URL id exists already."
 msgstr "Una pàgina amb una URL que correspon amb aquest id ja existeix."
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
 
 msgid "An application instance using this configuration already exists."
 msgstr "Ja existeix una instància d'aplicació amb aquesta configuració."
@@ -1530,6 +1534,10 @@ msgstr "Articles"
 
 msgid "Sample App"
 msgstr "App de prova"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "App d'exemple amb permisos exclosos"
