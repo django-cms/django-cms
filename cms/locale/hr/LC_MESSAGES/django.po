@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Translators:
-# Damir <damir.arbula@gmail.com>, 2013-2015
+# Damir <damir.arbula@gmail.com>, 2013-2015,2018
 # Dino Ilic <dino.ilic@gmail.com>, 2017
 # legendri <legendri@gmail.com>, 2012
 # legendri <legendri@gmail.com>, 2012
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2018-11-09 10:29+0100\n"
+"PO-Revision-Date: 2018-11-06 17:44+0000\n"
+"Last-Translator: Damir <damir.arbula@gmail.com>\n"
 "Language-Team: Croatian (http://www.transifex.com/divio/django-cms/language/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -103,10 +103,14 @@ msgstr "Postavke neovisne o izabranom jeziku"
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Postavite %(language)s slug prije uređivanja naprednih postavki"
 
 msgid "A page with this reverse URL id exists already."
 msgstr "Stranica sa zadatim inverznim URL-om već postoji."
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr "Neispravna vrijednost za postavku aplikacije."
 
 msgid "An application instance using this configuration already exists."
 msgstr "Aplikacija koja koristi ovu konfiguraciju već postoji."
@@ -115,10 +119,10 @@ msgid "An application instance with this name already exists."
 msgstr "Aplikacija s ovim imenom već postoji."
 
 msgid "Yes"
-msgstr ""
+msgstr "Da"
 
 msgid "No"
-msgstr ""
+msgstr "Ne"
 
 msgid "user"
 msgstr "korisnik"
@@ -138,36 +142,36 @@ msgstr "Izbriši"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno stvaranje stranice bez ovlasti za uređivanje stvorene stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno brisanje stranice bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno postavljanje ovlasti bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno brisanje ovlasti stranice bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno dodavanje ovlasti stranice bez ovlasti za uređivanje dodane ovlasti. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno brisanje ovlasti stranice bez ovlasti za uređivanje ovlasti. Uredite tražene ovlasti."
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Neispravan tip plugina '%s'"
 
 msgid "Language must be set to a supported language!"
 msgstr "Jezik mora biti postavljen na jedan od podržanih!"
@@ -266,7 +270,7 @@ msgstr ""
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr "Naslov i plagin na jeziku %(language)s je obrisan"
+msgstr "Naslov i plugin na jeziku %(language)s je obrisan"
 
 #, python-format
 #| msgid "You do not have permission to change pages."
@@ -283,10 +287,10 @@ msgid "Add Page Copy"
 msgstr "Dodaj kopiju stranice"
 
 msgid "New sub page"
-msgstr ""
+msgstr "Nova podstranica"
 
 msgid "New page"
-msgstr ""
+msgstr "Nova stranica"
 
 msgid "The page is not eligible to be home."
 msgstr ""
@@ -390,7 +394,7 @@ msgid ""
 msgstr ""
 
 msgid "Create"
-msgstr ""
+msgstr "Stvori"
 
 msgid "Sites"
 msgstr "Sjedišta"
@@ -437,7 +441,7 @@ msgstr "Sadržaj"
 
 #| msgid "Publish changes"
 msgid "Publish page changes"
-msgstr ""
+msgstr "Objavi promjene"
 
 msgid "Publish page now"
 msgstr "Objavi stranicu sada"
@@ -474,7 +478,7 @@ msgstr "Stranica"
 
 #| msgid "Create"
 msgid "Create Page"
-msgstr ""
+msgstr "Stvori stranicu"
 
 msgid "New Page"
 msgstr "Nova stranica"
@@ -987,7 +991,7 @@ msgid "Cut"
 msgstr "Izreži"
 
 msgid "Paste"
-msgstr ""
+msgstr "Zalijepi"
 
 #| msgid "Save as new"
 msgid "Set as home"
@@ -1531,6 +1535,10 @@ msgstr "Članci"
 
 msgid "Sample App"
 msgstr "Ogledna Aplikacija"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "Primjer aplikacije bez uključenih ovlasti"

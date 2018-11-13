@@ -7,6 +7,7 @@
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
+# Christofer Huynh <christofer.huynh@gmail.com>, 2018
 # hula <fredrik@1px.se>, 2014
 # hannseman <hannseman@gmail.com>, 2011
 # hannseman <hannseman@gmail.com>, 2011
@@ -29,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2018-11-09 10:29+0100\n"
+"PO-Revision-Date: 2018-11-06 10:53+0000\n"
+"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/divio/django-cms/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -71,7 +72,7 @@ msgid ""
 msgstr "Anger vad som visas i webbläsarens topp eller i bokmärken"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "Beskrivning metatagg"
 
 msgid "A description of the page used by search engines."
 msgstr "En beskrivning av sidan som används av sökmotorer."
@@ -98,7 +99,7 @@ msgid "Keep this field empty if standard path should be used."
 msgstr "Lämna tomt om den vanliga sökvägen ska användas."
 
 msgid "X Frame Options"
-msgstr ""
+msgstr "X Frame alternativ"
 
 msgid "Whether this page can be embedded in other pages or websites"
 msgstr "Om denna sida kan inbäddas i andra sidor eller sajter"
@@ -124,6 +125,10 @@ msgstr "URL-rubrik för %(language)s måste sättas innan de avancerade inställ
 
 msgid "A page with this reverse URL id exists already."
 msgstr "En sida med detta URL-id finns redan."
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
 
 msgid "An application instance using this configuration already exists."
 msgstr "En instans av applikationen som använder denna konfiguration finns redan."
@@ -190,11 +195,11 @@ msgid "Language must be set to a supported language!"
 msgstr "Språket måste vara ett av de som stödjs"
 
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "Parent plugin språket måste vara på samma språk!"
 
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "Parent plugin platshållare måste vara samma som platshållare!"
 
 #, python-format
 msgid ""
@@ -240,7 +245,7 @@ msgstr "Du har inte tillåtelse att kopiera dessa plugins"
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Fel! Du har inte rättighet att kopiera denna sida."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
@@ -422,16 +427,16 @@ msgid "User settings"
 msgstr "Användarinställningar"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "Urklipp..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Rensa urklipp"
 
 msgid "Disable toolbar"
 msgstr "Inaktivera verktygsfält "
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Genvägar..."
 
 msgid "Users"
 msgstr "Användare"
@@ -1149,7 +1154,7 @@ msgstr "Applikation: %(apphook)s"
 #, python-format
 #| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
-msgstr ""
+msgstr "Förhandsgranska denna sidan på %(language)s"
 
 msgid "Preview"
 msgstr "Förhandsgranska"
@@ -1174,7 +1179,7 @@ msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Inställningar för sida (SHIFT-klicka för avancerade inställningar)"
 
 msgid "Clipboard"
-msgstr ""
+msgstr "Urklipp"
 
 msgid "Add plugin"
 msgstr "Lägg till plugin"
@@ -1210,7 +1215,7 @@ msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr "Detta plugn kan inte flyttas eller redigeras utanför sitt förälder-plugin"
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Urklippen är tom."
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr "Detta plugin tillåter inte andra plugins av denna typ som underplugins"
@@ -1547,6 +1552,10 @@ msgstr "Artiklar"
 
 msgid "Sample App"
 msgstr "Exempel-app"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr ""
