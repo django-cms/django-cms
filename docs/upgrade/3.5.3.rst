@@ -1,0 +1,34 @@
+.. _upgrade-to-3.5.3:
+
+###################
+3.5.3 release notes
+###################
+
+*******************
+What's new in 3.5.3
+*******************
+
+Bug Fixes
+=========
+
+* Fixed ``TreeNode.DoesNotExist`` exception raised when exporting
+  and loading database contents via ``dumpdata`` and ``loaddata``.
+* Fixed a bug where ``request.current_page`` would always be the public page,
+  regardless of the toolbar status (draft / live). This only affected custom
+  urls from an apphook.
+* Removed extra quotation mark from the sideframe button template
+* Fixed a bug where structureboard tried to preload markup when using legacy
+  renderer
+* Fixed a bug where updates on other tab are not correctly propagated if the
+  operation was to move a plugin in the top level of same placeholder
+* Fixed a bug where xframe options were processed by clickjacking middleware
+  when page was served from cache, rather then get this value from cache
+* Fixed a bug where cached page permissions overrides global permissions
+* Fixed a bug where plugins that are not rendered in content wouldn't be
+  editable in structure board
+* Fixed a bug with expanding static placeholder by clicking on "Expand All" button
+* Fixed a bug where descendant pages with a custom url would lose the overwritten
+  url on save.
+* Fixed a bug where setting the ``on_delete`` option on ``PlaceholderField``
+  and ``PageField`` fields would be ignored.
+* Fixed a bug when deleting a modal from changelist inside a modal
