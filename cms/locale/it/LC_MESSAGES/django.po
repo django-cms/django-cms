@@ -28,8 +28,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 10:29+0100\n"
-"PO-Revision-Date: 2018-11-07 23:15+0000\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-14 09:30+0000\n"
 "Last-Translator: geobaldi <geobaldi@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/divio/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
@@ -133,6 +133,9 @@ msgstr "Esiste già un'istanza di applicazione che usa la stessa configurazione.
 
 msgid "An application instance with this name already exists."
 msgstr "Esiste già un'istanza di applicazione con lo stesso nome."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "Sì"
@@ -570,9 +573,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Aggiungi un altro"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1222,7 +1222,7 @@ msgid "This plugin cannot have nested plugins."
 msgstr "Questo plugin non può contenere plugin."
 
 msgid "Highlight"
-msgstr ""
+msgstr "Evidenzia"
 
 msgid "Available plugins"
 msgstr "Plugin disponibili"
@@ -1450,6 +1450,9 @@ msgstr ""
 
 msgid "Welcome to django CMS"
 msgstr "Benvenuto in django CMS"
+
+msgid "Add Another"
+msgstr "Aggiungi un altro"
 
 msgid "Back"
 msgstr "Indietro"

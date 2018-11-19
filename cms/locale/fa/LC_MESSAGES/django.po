@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 10:29+0100\n"
-"PO-Revision-Date: 2018-11-06 10:53+0000\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-09 12:08+0000\n"
 "Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Persian (http://www.transifex.com/divio/django-cms/language/fa/)\n"
 "MIME-Version: 1.0\n"
@@ -131,6 +131,9 @@ msgstr "یک برنامه موردی با این تنظیمات از پیش وج
 
 msgid "An application instance with this name already exists."
 msgstr "یک برنامه موردی با این نام از پیش وجود دارد."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "بله"
@@ -568,9 +571,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "اضافه کردن یکی دیگر"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1448,6 +1448,9 @@ msgstr ""
 
 msgid "Welcome to django CMS"
 msgstr "به سیستم مدیریت محتوای جنگو خوش آمدید"
+
+msgid "Add Another"
+msgstr "اضافه کردن یکی دیگر"
 
 msgid "Back"
 msgstr "قبلی"

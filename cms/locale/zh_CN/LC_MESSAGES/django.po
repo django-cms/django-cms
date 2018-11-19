@@ -30,8 +30,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 10:29+0100\n"
-"PO-Revision-Date: 2018-11-06 10:53+0000\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-09 12:08+0000\n"
 "Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/divio/django-cms/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
@@ -135,6 +135,9 @@ msgstr "已经存在使用此设置的应用实例。"
 
 msgid "An application instance with this name already exists."
 msgstr "已经存在使用此名称的应用实例。"
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr ""
@@ -572,9 +575,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "添加其他"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1451,6 +1451,9 @@ msgstr ""
 
 msgid "Welcome to django CMS"
 msgstr "欢迎来到django CMS"
+
+msgid "Add Another"
+msgstr "添加其他"
 
 msgid "Back"
 msgstr "返回"
