@@ -28,6 +28,7 @@
 # Marc Antoine THEVENET <mat@idimweb.com>, 2016
 # mbi0 <marco@cruncher.ch>, 2013
 # mbi0 <marco@cruncher.ch>, 2013
+# Nicolas PASCAL <np.pascal@gmail.com>, 2018
 # Patrick Lauber <patrick.lauber@divio.ch>, 2014
 # Samuel Sorin, 2016
 # kalvn <screamflydream@gmail.com>, 2014
@@ -38,9 +39,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 10:29+0100\n"
-"PO-Revision-Date: 2018-11-06 10:53+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-13 22:45+0000\n"
+"Last-Translator: Nicolas PASCAL <np.pascal@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -136,13 +137,16 @@ msgstr "Une page avec cet identifiant existe déjà."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Valeur de configuration d'application non valide"
 
 msgid "An application instance using this configuration already exists."
 msgstr "Il existe déjà une instance d'application utilisant cette configuration."
 
 msgid "An application instance with this name already exists."
 msgstr "Il existe déjà une instance d'application portant ce nom."
+
+msgid "You can't move the home page inside another page"
+msgstr "Vous ne pouvez pas déplacer la page d'accueil dans une autre page"
 
 msgid "Yes"
 msgstr "Oui"
@@ -580,9 +584,6 @@ msgstr "La page %(conflict_page)s a le même url (\"%(url)s\") que la page actue
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "La page %(conflict_page)s a le même url (\"%(url)s\") que la page actuelle."
-
-msgid "Add Another"
-msgstr "Ajouter"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1229,17 +1230,17 @@ msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr "Ce plugin n'accepte pas des plugins imbriqués de ce type."
 
 msgid "This plugin cannot have nested plugins."
-msgstr "Il est impossible d'imbriquer des plugins dans ce plugin."
+msgstr "Ce plugin ne peut pas avoir de plugins imbriqués."
 
 msgid "Highlight"
-msgstr ""
+msgstr "Surligner"
 
 msgid "Available plugins"
 msgstr "Plugin disponibles"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "Afficher/masquer la structure"
 
 #| msgid "View published"
 msgid "View published"
@@ -1461,6 +1462,9 @@ msgstr "\n<p class=\"cms-welcome-notes\">Vous voyez ce message parce que vous av
 msgid "Welcome to django CMS"
 msgstr "Bienvenue sur django CMS"
 
+msgid "Add Another"
+msgstr "Ajouter"
+
 msgid "Back"
 msgstr "Retour"
 
@@ -1563,7 +1567,7 @@ msgstr "Exemple d'application"
 
 #| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
-msgstr ""
+msgstr "Exemple d'Application avec configuration"
 
 msgid "Sample App with excluded permissions"
 msgstr "Exemple d'application avec permissions exclues"

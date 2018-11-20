@@ -35,8 +35,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 10:29+0100\n"
-"PO-Revision-Date: 2018-11-06 12:57+0000\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-12 06:05+0000\n"
 "Last-Translator: Peter Wischer <peter.wischer@lwl.org>\n"
 "Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -140,6 +140,9 @@ msgstr "Eine Applikation-Instanz mit dieser Konfiguration existiert bereits."
 
 msgid "An application instance with this name already exists."
 msgstr "Eine Applikation-Instanz mit diesem Namen existiert bereits."
+
+msgid "You can't move the home page inside another page"
+msgstr "Die Startseite kann nicht in ein andere Seite verschoben werden"
 
 msgid "Yes"
 msgstr "Ja"
@@ -577,9 +580,6 @@ msgstr "Die Seite %(conflict_page)s hat die selbe URL '%(url)s' wie die aktuelle
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Die Seite %(conflict_page)s hat die selbe URL '%(url)s' wie die aktuelle Seite."
-
-msgid "Add Another"
-msgstr "Weitere hinzufügen"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1457,6 +1457,9 @@ msgstr "\n<p class=\"cms-welcome-notes\">Sie sehen diese Meldung weil Sie <code>
 
 msgid "Welcome to django CMS"
 msgstr "Willkommen im django CMS"
+
+msgid "Add Another"
+msgstr "Weitere hinzufügen"
 
 msgid "Back"
 msgstr "Zurück"

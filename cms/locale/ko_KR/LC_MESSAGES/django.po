@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 10:29+0100\n"
-"PO-Revision-Date: 2018-11-06 10:53+0000\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-09 12:08+0000\n"
 "Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/divio/django-cms/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
@@ -117,6 +117,9 @@ msgstr "이 설정을 사용하는 응용 프로그램이 이미 존재합니다
 
 msgid "An application instance with this name already exists."
 msgstr "이 이름을 가진 응용 프로그램이 이미 존재 합니다. "
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr ""
@@ -554,9 +557,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "계속 추가"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1433,6 +1433,9 @@ msgstr ""
 
 msgid "Welcome to django CMS"
 msgstr ""
+
+msgid "Add Another"
+msgstr "계속 추가"
 
 msgid "Back"
 msgstr ""
