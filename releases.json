@@ -1,7 +1,7 @@
 {
     "latest": {
-        "version": "3.5.2",
-        "url": "http://docs.django-cms.org/en/latest/upgrade/3.5.2.html"
+        "version": "3.5.3",
+        "url": "http://docs.django-cms.org/en/latest/upgrade/3.5.3.html"
     },
     "patches": [
         {
