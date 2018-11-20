@@ -2,5 +2,7 @@
     "alignment": "", 
     "nesting": false, 
     "ratio": "", 
+    "responsive_images": false, 
+    "responsive_images_viewport_breakpoints": "", 
     "templates": "lazyload"
 }

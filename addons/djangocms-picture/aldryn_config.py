@@ -24,6 +24,15 @@ class Form(forms.BaseForm):
         required=False,
         initial=False,
     )
+    responsive_images = forms.CheckboxField(
+        'Enable responsive images technique',
+        required=False,
+        initial=False,
+    )
+    responsive_images_viewport_breakpoints = forms.CharField(
+        'List of viewport breakpoints (in pixels) for responsive images (comma separated)',
+        required=False,
+    )
 
     def clean(self):
         data = super(Form, self).clean()
@@ -36,8 +45,9 @@ class Form(forms.BaseForm):
             data['alignment'] = ', '.join(data['alignment'])
 
         # prettify
-        data['templates'] = ', '.join(split_and_strip(data['templates']))
-        data['alignment'] = ', '.join(split_and_strip(data['alignment']))
+        for field in ('templates', 'alignment', 'responsive_images_viewport_breakpoints'):
+            data[field] = ', '.join(split_and_strip(data[field]))
+
         return data
 
     def to_settings(self, data, settings):
@@ -56,4 +66,9 @@ class Form(forms.BaseForm):
         if data['nesting']:
             settings['DJANGOCMS_PICTURE_NESTING'] = data['nesting']
 
+        settings['DJANGOCMS_PICTURE_RESPONSIVE_IMAGES'] = data.get('responsive_images', False)
+        breakpoints = data.get('responsive_images_viewport_breakpoints')
+        if breakpoints:
+            breakpoints = [float(x) for x in split_and_strip(breakpoints)]
+            settings['DJANGOCMS_PICTURE_RESPONSIVE_IMAGES_VIEWPORT_BREAKPOINTS'] = breakpoints
         return settings
