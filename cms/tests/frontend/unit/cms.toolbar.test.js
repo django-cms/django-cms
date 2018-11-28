@@ -644,6 +644,19 @@ describe('CMS.Toolbar', function () {
             });
         });
 
+        it('sideframe disabled defaults to redirecting to the url', function () {
+
+            // Set the switch to disable the sideframe
+            CMS.settings = $.extend(true, CMS.settings, {
+                sideframe: { 'enabled': false }
+            });
+            expect(fakeWindow.location.href).toEqual('');
+            toolbar._delegate(
+                $('<div href="disabled-sideframe-href" data-rel="sideframe" ></div>')
+            );
+            expect(fakeWindow.location.href).toEqual('disabled-sideframe-href');
+        });
+
         it('opens message if item is "message"', function () {
             toolbar._delegate($('<div data-rel="message" data-text="message!"></div>'));
 

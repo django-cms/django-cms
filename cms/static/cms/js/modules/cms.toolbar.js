@@ -421,8 +421,12 @@ var Toolbar = new Class({
             });
         }
 
-        // open sideframe if it was previously opened
-        if (CMS.settings.sideframe && CMS.settings.sideframe.url && CMS.config.auth) {
+        // open sideframe if it was previously opened and it's enabled
+        if (CMS.settings.sideframe
+            && CMS.settings.sideframe.url
+            && CMS.config.auth
+            && CMS.settings.sideframe.enabled
+        ) {
             var sideframe = CMS.API.Sideframe || new Sideframe();
 
             sideframe.open({
@@ -574,16 +578,6 @@ var Toolbar = new Class({
                     message: el.data('text')
                 });
                 break;
-            case 'sideframe':
-                var sideframe = CMS.API.Sideframe || new Sideframe({
-                    onClose: el.data('on-close')
-                });
-
-                sideframe.open({
-                    url: el.attr('href'),
-                    animate: true
-                });
-                break;
             case 'ajax':
                 this.openAjax({
                     url: el.attr('href'),
@@ -593,6 +587,20 @@ var Toolbar = new Class({
                     onSuccess: el.data('on-success')
                 });
                 break;
+            case 'sideframe':
+                // If the sideframe is enabled, show it
+                if(CMS.settings.sideframe.enabled) {
+                    var sideframe = CMS.API.Sideframe || new Sideframe({
+                        onClose: el.data('on-close')
+                    });
+
+                    sideframe.open({
+                        url: el.attr('href'),
+                        animate: true
+                    });
+                    break;
+                }
+                // Else fall through to default, the sideframe is disabled
             default:
                 Helpers._getWindow().location.href = el.attr('href');
         }

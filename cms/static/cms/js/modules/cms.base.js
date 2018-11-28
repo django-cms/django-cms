@@ -184,8 +184,8 @@ export const Helpers = {
      * @returns {Object}
      */
     setSettings: function(newSettings) {
-        // merge settings
-        var settings = JSON.stringify($.extend({}, window.CMS.config.settings, newSettings));
+        // merge settings - deep copy merge
+        var settings = JSON.stringify($.extend(true, window.CMS.config.settings, newSettings));
 
         // use local storage or session
         if (this._isStorageSupported) {
