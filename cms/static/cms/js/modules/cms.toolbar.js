@@ -423,7 +423,7 @@ var Toolbar = new Class({
 
         // open sideframe if it was previously opened and it's enabled
         var sideFrameEnabled = typeof CMS.settings.sideframe_enabled === 'undefined' || CMS.settings.sideframe_enabled;
-        
+
         if (CMS.settings.sideframe
             && CMS.settings.sideframe.url
             && CMS.config.auth
