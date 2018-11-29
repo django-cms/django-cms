@@ -422,7 +422,8 @@ var Toolbar = new Class({
         }
 
         // open sideframe if it was previously opened and it's enabled
-        var sideFrameEnabled = typeof CMS.settings.sideframe_enabled == 'undefined' || CMS.settings.sideframe_enabled
+        var sideFrameEnabled = typeof CMS.settings.sideframe_enabled === 'undefined' || CMS.settings.sideframe_enabled;
+        
         if (CMS.settings.sideframe
             && CMS.settings.sideframe.url
             && CMS.config.auth
@@ -590,7 +591,7 @@ var Toolbar = new Class({
                 break;
             case 'sideframe':
                 // If the sideframe is enabled, show it
-                if (typeof CMS.settings.sideframe_enabled == 'undefined' || CMS.settings.sideframe_enabled) {
+                if (typeof CMS.settings.sideframe_enabled === 'undefined' || CMS.settings.sideframe_enabled) {
                     var sideframe = CMS.API.Sideframe || new Sideframe({
                         onClose: el.data('on-close')
                     });
