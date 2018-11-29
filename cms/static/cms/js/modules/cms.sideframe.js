@@ -257,6 +257,7 @@ var Sideframe = new Class({
         CMS.settings.sideframe = CMS.settings.sideframe || {};
         CMS.settings.sideframe.url = iframeUrl;
         CMS.settings.sideframe.hidden = false;
+        CMS.settings.sideframe_enabled = true;
         CMS.settings = Helpers.setSettings(window.CMS.settings);
 
         this.pageLoadInterval = setInterval(() => {

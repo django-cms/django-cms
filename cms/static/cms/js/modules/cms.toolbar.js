@@ -589,7 +589,7 @@ var Toolbar = new Class({
                 break;
             case 'sideframe':
                 // If the sideframe is enabled, show it
-                if(CMS.settings.sideframe_enabled) {
+                if (CMS.settings.sideframe_enabled) {
                     var sideframe = CMS.API.Sideframe || new Sideframe({
                         onClose: el.data('on-close')
                     });
