@@ -1,5 +1,7 @@
 from __future__ import unicode_literals
 
+import re
+
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
 from django.utils.encoding import force_text
@@ -21,6 +23,20 @@ def validate_url(value):
     except ValidationError:
         # Fallback to absolute urls
         URLValidator()(value)
+
+
+def validate_url_extra(value):
+    try:
+        # Try normal validator first
+        validate_url(value)
+    except ValidationError:
+        # Fallback to absolute urls
+        if re.match(r'^tel:[0-9\+\#\*\-\.\(\)]+$', value):
+            pass
+        elif re.match(r'^mailto:\S+$', value):
+            pass
+        else:
+            raise
 
 
 def validate_url_uniqueness(site, path, language, exclude_page=None):
