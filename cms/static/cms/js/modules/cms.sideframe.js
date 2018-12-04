@@ -116,6 +116,13 @@ var Sideframe = new Class({
             throw new Error('The arguments passed to "open" were invalid.');
         }
 
+        // Fail gracefully when open is called when disabled
+
+
+        if (typeof CMS.settings.sideframe_enabled !== 'undefined' && CMS.settings.sideframe_enabled == false) {
+            return false;
+        }
+
         var url = opts.url;
         var animate = opts.animate;
 
