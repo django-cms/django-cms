@@ -117,9 +117,7 @@ var Sideframe = new Class({
         }
 
         // Fail gracefully when open is called when disabled
-
-
-        if (typeof CMS.settings.sideframe_enabled !== 'undefined' && CMS.settings.sideframe_enabled === false) {
+        if (CMS.settings.sideframe_enabled === false) {
             return false;
         }
 
