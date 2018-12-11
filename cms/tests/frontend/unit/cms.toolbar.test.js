@@ -98,7 +98,7 @@ describe('CMS.Toolbar', function () {
         it('initializes the states', function (done) {
             CMS.Toolbar.prototype._initialStates.and.callThrough();
             CMS.Toolbar.prototype._initialStates.calls.reset();
-            CMS.settings = { sideframe: {}, version: 'fake' };
+            CMS.settings = { sideframe_enabled: true, sideframe: {}, version: 'fake' };
             CMS.config = { settings: { version: 'fake' }, auth: true };
             toolbar.ui.document.on('cms-ready', function () {
                 // expect this to happen
@@ -641,6 +641,24 @@ describe('CMS.Toolbar', function () {
             expect(sideframeOpen).toHaveBeenCalledWith({
                 url: 'href2',
                 animate: true
+            });
+        });
+
+        it('sideframe disabled defaults to redirecting to the url', function () {
+
+            // Set the switch to disable the sideframe
+            CMS.settings = $.extend(true, CMS.settings, {
+                sideframe_enabled: false
+            });
+            expect(fakeWindow.location.href).toEqual('');
+            toolbar._delegate(
+                $('<div href="disabled-sideframe-href" data-rel="sideframe" ></div>')
+            );
+            expect(fakeWindow.location.href).toEqual('disabled-sideframe-href');
+
+            // Reset the switch to enable the sideframe for other tests
+            CMS.settings = $.extend(true, CMS.settings, {
+                sideframe_enabled: true
             });
         });
 

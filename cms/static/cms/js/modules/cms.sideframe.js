@@ -116,6 +116,11 @@ var Sideframe = new Class({
             throw new Error('The arguments passed to "open" were invalid.');
         }
 
+        // Fail gracefully when open is called when disabled
+        if (CMS.settings.sideframe_enabled === false) {
+            return false;
+        }
+
         var url = opts.url;
         var animate = opts.animate;
 
@@ -257,6 +262,7 @@ var Sideframe = new Class({
         CMS.settings.sideframe = CMS.settings.sideframe || {};
         CMS.settings.sideframe.url = iframeUrl;
         CMS.settings.sideframe.hidden = false;
+        CMS.settings.sideframe_enabled = true;
         CMS.settings = Helpers.setSettings(window.CMS.settings);
 
         this.pageLoadInterval = setInterval(() => {

@@ -113,6 +113,7 @@ CMS.config = {
         'toolbar': 'expanded',
         'mode': {% if cms_toolbar.structure_mode_active %}'structure'{% else %}'edit'{% endif %},
         'sideframe': { 'url': '' },
+        'sideframe_enabled': {{ cms_toolbar.sideframe_enabled|yesno:'true,false' }},
         'states': [],
         'edit': '{{ cms_edit_url }}',
         'edit_off': '{{ cms_preview_url }}',
