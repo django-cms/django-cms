@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Translators:
+# Jonas Hyatt <jonas@hyatt.space>, 2018
 # Kristian Øllegaard <kristian@oellegaard.com>, 2011
 # Kristian Øllegaard <kristian@oellegaard.com>, 2011
 # Kristian Øllegaard <kristian@oellegaard.com>, 2011
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-09 12:08+0000\n"
+"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Danish (http://www.transifex.com/divio/django-cms/language/da/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -100,10 +101,10 @@ msgid "Start typing..."
 msgstr "Begynd at taste"
 
 msgid "Application configurations"
-msgstr ""
+msgstr "Applikations konfigurationer"
 
 msgid "Language independent options"
-msgstr ""
+msgstr "Sprog uafhængige indstillinger"
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -112,17 +113,24 @@ msgstr ""
 msgid "A page with this reverse URL id exists already."
 msgstr "En side med denne reverse adresse id eksisterer allerede"
 
-msgid "An application instance using this configuration already exists."
+#| msgid "Application configurations"
+msgid "Invalid application config value"
 msgstr ""
 
+msgid "An application instance using this configuration already exists."
+msgstr "En applikationsinstans med denne konfiguration eksisterer allerede."
+
 msgid "An application instance with this name already exists."
+msgstr "En applikationsinstans med dette navn eksisterer allerede."
+
+msgid "You can't move the home page inside another page"
 msgstr ""
 
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 msgid "No"
-msgstr ""
+msgstr "Nej"
 
 msgid "user"
 msgstr "bruger"
@@ -142,22 +150,22 @@ msgstr "Slet"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Brugere kan ikke oprette en side uden rettigheder til at ændre den oprettede side. Ret de relevante brugerrettigheder."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Brugere kan ikke slette en side uden rettigheder til at ændre siden. Ret de relevante brugerrettigheder."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Brugere kan ikke sætte side tilladelser uden rettigheder til at ændre den siden. Ret de relevante brugerrettigheder."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Brugere kan ikke slette siden uden rettigheder til at ændre siden. Ret de relevante brugerrettigheder."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
@@ -171,7 +179,7 @@ msgstr ""
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Ugyldig plugin type '%s'"
 
 msgid "Language must be set to a supported language!"
 msgstr "Sprog skal sættes til et understøttet sprog!"
@@ -227,12 +235,12 @@ msgstr "Du har ikke rettigheder til at kopiere disse plugins."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Fejl! Du har ikke rettigheder til at kopiere denne side."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "Fejl! Den side du indsætter er ikke oversat til nogen af de sprog der er konfigureret af siden."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -266,7 +274,7 @@ msgstr "Den %(language)s side \"%(page)s\" blev afpubliceret"
 
 #| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "Du har ikke rettigheder til at slette denne side"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
@@ -275,7 +283,7 @@ msgstr "Titel og plugins med sproget %(language)s blev slettet"
 #, python-format
 #| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
+msgstr "Du har ikke rettigheder til at se siden \"%(title)s\""
 
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Du har ikke rettigheder til at ændre i denne sides i_navigation status"
@@ -287,10 +295,10 @@ msgid "Add Page Copy"
 msgstr "Tilføj Side Kopi"
 
 msgid "New sub page"
-msgstr ""
+msgstr "Ny underside"
 
 msgid "New page"
-msgstr ""
+msgstr "Ny side"
 
 msgid "The page is not eligible to be home."
 msgstr ""
@@ -316,7 +324,7 @@ msgid "You do not have permission to copy this placeholder."
 msgstr ""
 
 msgid "Plugin not found"
-msgstr ""
+msgstr "Plugin blev ikke fundet"
 
 msgid "You do not have permission to edit this plugin"
 msgstr "Du har ikke rettigheder til at redigere dette plugin"
@@ -332,7 +340,7 @@ msgstr ""
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "Du har ikke rettigheder til at indsætte dette plugin"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
@@ -382,10 +390,10 @@ msgid "Placeholder"
 msgstr "Pladsholder"
 
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 msgid "Create Alias"
-msgstr ""
+msgstr "Opret Alias"
 
 #, python-format
 msgid ""
@@ -394,7 +402,7 @@ msgid ""
 msgstr ""
 
 msgid "Create"
-msgstr ""
+msgstr "Opret"
 
 msgid "Sites"
 msgstr "Sider"
@@ -409,23 +417,23 @@ msgid "User settings"
 msgstr "Bruger indstillinger"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "Udklipsholder..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Ryd udklipsholder"
 
 msgid "Disable toolbar"
-msgstr ""
+msgstr "Deaktiver værktøjslinje"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Genveje..."
 
 msgid "Users"
 msgstr "Brugere"
 
 #, python-format
 msgid "Logout %s"
-msgstr ""
+msgstr "Log ud %s"
 
 msgid "Logout"
 msgstr "Log ud"
@@ -441,7 +449,7 @@ msgstr "Indhold"
 
 #| msgid "Publish changes"
 msgid "Publish page changes"
-msgstr ""
+msgstr "Publicér sidens ændringer"
 
 msgid "Publish page now"
 msgstr "Publicér side nu"
@@ -451,24 +459,24 @@ msgstr "Sideindstillinger"
 
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
-msgstr ""
+msgstr "Tilføj oversættelse"
 
 #| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
-msgstr ""
+msgstr "Slet oversættelse"
 
 #| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
-msgstr ""
+msgstr "Kopiér alle plugins"
 
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "fra %s"
 
 #, python-format
 #| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Er du sikker på at du vil kopiere alle plugins fra %s?"
 
 msgid "Pages"
 msgstr "Sider"
@@ -478,7 +486,7 @@ msgstr "Side"
 
 #| msgid "Create"
 msgid "Create Page"
-msgstr ""
+msgstr "Opret side"
 
 msgid "New Page"
 msgstr "Ny Side"
@@ -526,10 +534,10 @@ msgid "Delete page"
 msgstr "Slet side"
 
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "Opret ny side ved siden af den nuværende side."
 
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "Opret ny side under den nuværende side."
 
 msgid "Select a valid site"
 msgstr "Vælg et gyldigt website"
@@ -555,9 +563,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 
-msgid "Add Another"
-msgstr "Tilføj endnu en"
-
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
@@ -573,7 +578,7 @@ msgid "You don't have the permissions required to add a page."
 msgstr ""
 
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 msgid "position"
 msgstr "position"
@@ -910,7 +915,7 @@ msgstr "Kodeord:"
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "Tilføj en side"
 
 msgid "Change a page"
 msgstr "Ret en side"
@@ -990,11 +995,11 @@ msgid "Cut"
 msgstr "Klip"
 
 msgid "Paste"
-msgstr ""
+msgstr "Indsæt"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Markér som hjem"
 
 msgid "is restricted"
 msgstr "er begrænset"
@@ -1003,7 +1008,7 @@ msgid "last change by"
 msgstr "sidst ændring af"
 
 msgid "meta"
-msgstr ""
+msgstr "meta"
 
 msgid "List of pages"
 msgstr "Sideliste"
@@ -1013,7 +1018,7 @@ msgstr "Søg"
 
 #| msgid "Page Title"
 msgid "Page Tree"
-msgstr ""
+msgstr "Sidetræ"
 
 msgid "Reset filter"
 msgstr ""
@@ -1058,17 +1063,17 @@ msgid "Are you sure you want to § this page?"
 msgstr ""
 
 msgid "Reload"
-msgstr ""
+msgstr "Genindlæs"
 
 #| msgid "New Page"
 msgid "New node"
-msgstr ""
+msgstr "Ny node"
 
 msgid "nodes"
-msgstr ""
+msgstr "noder"
 
 msgid "View"
-msgstr ""
+msgstr "Vis"
 
 msgid "Menu"
 msgstr "Menu"
@@ -1096,19 +1101,19 @@ msgid "Close"
 msgstr "Luk"
 
 msgid "Legend"
-msgstr ""
+msgstr "Legende"
 
 #| msgid "published"
 msgid "Published"
-msgstr ""
+msgstr "Publiceret"
 
 #| msgid "Change"
 msgid "Changed"
-msgstr ""
+msgstr "Ændret"
 
 #| msgid "unpublished"
 msgid "Unpublished"
-msgstr ""
+msgstr "Upubliceret"
 
 #| msgid "in menu"
 msgid "In menu"
@@ -1120,7 +1125,7 @@ msgstr ""
 
 #| msgid "New page"
 msgid "View page"
-msgstr ""
+msgstr "Vis side"
 
 #| msgid "softroot"
 msgid "Softroot"
@@ -1148,7 +1153,7 @@ msgid "Unpublish"
 msgstr "Afpublicér"
 
 msgid "Configure"
-msgstr ""
+msgstr "Konfigurér"
 
 msgid "in menu"
 msgstr "i menu"
@@ -1161,10 +1166,10 @@ msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
 
 msgid "Clipboard"
-msgstr ""
+msgstr "Udklipsholder"
 
 msgid "Add plugin"
-msgstr ""
+msgstr "Tilføj plugin"
 
 msgid "Copy all"
 msgstr "Kopiér alle"
@@ -1182,7 +1187,7 @@ msgid "This is a static placeholder"
 msgstr ""
 
 msgid "Expand all"
-msgstr ""
+msgstr "Udvid alle"
 
 msgid "Collapse all"
 msgstr ""
@@ -1197,7 +1202,7 @@ msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr ""
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Udklipsholderen er tom."
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr ""
@@ -1226,7 +1231,7 @@ msgid "Add plugin to"
 msgstr ""
 
 msgid "More"
-msgstr ""
+msgstr "Mere"
 
 #, python-format
 #| msgid "Development version using django CMS %(cms_version)s"
@@ -1435,6 +1440,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr ""
 
+msgid "Add Another"
+msgstr "Tilføj endnu en"
+
 msgid "Back"
 msgstr ""
 
@@ -1534,6 +1542,10 @@ msgstr "Artikler"
 
 msgid "Sample App"
 msgstr "Eksempel app"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr ""

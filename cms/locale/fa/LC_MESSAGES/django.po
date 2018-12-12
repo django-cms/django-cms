@@ -14,6 +14,7 @@
 # farshad <akbari.farshad@gmail.com>, 2014
 # hadiazaddel <hadiazaddel@chmail.ir>, 2014
 # hadiazaddel <hadiazaddel@chmail.ir>, 2014
+# Majid Vaghari <majid_vaghari2009@yahoo.com>, 2018
 # Matin M. <moosaei.matin@aol.com>, 2013
 # Mazdak Badakhshan <geraneum@gmail.com>, 2014
 # Meysam K <meysamkermani@gmail.com>, 2017
@@ -25,15 +26,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-09 12:08+0000\n"
+"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Persian (http://www.transifex.com/divio/django-cms/language/fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fa\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "All"
 msgstr "همه"
@@ -121,11 +122,18 @@ msgstr "لطفا عنوان %(language)s را ویرایش کنید، قبل ا�
 msgid "A page with this reverse URL id exists already."
 msgstr "صفحه-ای با شناسه-ی این آدرس معکوس وجود دارد."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr "یک برنامه موردی با این تنظیمات از پیش وجود دارد."
 
 msgid "An application instance with this name already exists."
 msgstr "یک برنامه موردی با این نام از پیش وجود دارد."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "بله"
@@ -236,7 +244,7 @@ msgstr "شما دسترسى لازم را براى كپى بردارى اين ا
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "خطا! شما اختیارات کپی این صفحه را ندارید."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
@@ -427,7 +435,7 @@ msgid "Disable toolbar"
 msgstr "از کار انداختن نوار ابزار"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "میانبرها..."
 
 msgid "Users"
 msgstr "كاربر ها"
@@ -563,9 +571,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "اضافه کردن یکی دیگر"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -933,6 +938,7 @@ msgstr "مشاهده روی وب‌گاه"
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "لطفا خطاهای زیر را تصحیح کنید."
+msgstr[1] "لطفا خطاهای زیر را تصحیح کنید."
 
 msgid "All permissions"
 msgstr "تمامی اختیارات"
@@ -1268,7 +1274,7 @@ msgstr "شما تغییراتی ذخیره نشده دارید."
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "در حال بارگذاری"
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
@@ -1443,6 +1449,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "به سیستم مدیریت محتوای جنگو خوش آمدید"
 
+msgid "Add Another"
+msgstr "اضافه کردن یکی دیگر"
+
 msgid "Back"
 msgstr "قبلی"
 
@@ -1542,6 +1551,10 @@ msgstr "مقالات"
 
 msgid "Sample App"
 msgstr "ابزار نمونه"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "اَپ نمونه با سطح دسترسی‌های محدود"
@@ -1832,6 +1845,7 @@ msgstr "در حال حاظر یک ویزارد ثبت شده برای : %s"
 #~ msgid "%(counter)s result"
 #~ msgid_plural "%(counter)s results"
 #~ msgstr[0] "a848884d0af974a125106fa2043a5716_pl_0"
+#~ msgstr[1] "a848884d0af974a125106fa2043a5716_pl_1"
 
 #~ msgid "%(full_result_count)s total"
 #~ msgstr "%(full_result_count)s total"

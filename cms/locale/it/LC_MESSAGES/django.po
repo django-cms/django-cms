@@ -8,6 +8,7 @@
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Francesco Moggia <f.moggia@gmail.com>, 2013
+# geobaldi <geobaldi@gmail.com>, 2018
 # giammi <gian-maria.daffre@giammi.org>, 2017
 # yakky <i.spalletti@nephila.it>, 2011
 # yakky <i.spalletti@nephila.it>, 2013-2016
@@ -27,9 +28,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-14 09:30+0000\n"
+"Last-Translator: geobaldi <geobaldi@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/divio/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -123,11 +124,18 @@ msgstr "Imposta lo slug per la lingua %(language)s prima di modificare le impost
 msgid "A page with this reverse URL id exists already."
 msgstr "Esiste già una pagina con questo reverse URL id."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr "Esiste già un'istanza di applicazione che usa la stessa configurazione."
 
 msgid "An application instance with this name already exists."
 msgstr "Esiste già un'istanza di applicazione con lo stesso nome."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "Sì"
@@ -238,12 +246,12 @@ msgstr "Non hai i permessi per copiare questi plugin."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Errore! Non hai il permesso di copiare questa pagina"
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "Errore! la pagina che stai incollando non è tradotta in nessuna delle lingue configurate sul sito di destinazione"
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -429,7 +437,7 @@ msgid "Disable toolbar"
 msgstr "Disattiva toolbar"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Scorciatoie..."
 
 msgid "Users"
 msgstr "Utenti"
@@ -565,9 +573,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Aggiungi un altro"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -921,7 +926,7 @@ msgstr "Password:"
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "Aggiungi una pagina"
 
 msgid "Change a page"
 msgstr "Modifica una pagina"
@@ -1217,7 +1222,7 @@ msgid "This plugin cannot have nested plugins."
 msgstr "Questo plugin non può contenere plugin."
 
 msgid "Highlight"
-msgstr ""
+msgstr "Evidenzia"
 
 msgid "Available plugins"
 msgstr "Plugin disponibili"
@@ -1446,6 +1451,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "Benvenuto in django CMS"
 
+msgid "Add Another"
+msgstr "Aggiungi un altro"
+
 msgid "Back"
 msgstr "Indietro"
 
@@ -1546,15 +1554,19 @@ msgstr "Articoli"
 msgid "Sample App"
 msgstr "App d'esempio"
 
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr "App di esempio con configurazione"
+
 msgid "Sample App with excluded permissions"
 msgstr "App di prova con permessi esclusi"
 
 msgid "Sample App 2"
-msgstr "App di Esempio 2"
+msgstr "App di esempio 2"
 
 #| msgid "Sample App 2"
 msgid "Sample App 3"
-msgstr ""
+msgstr "App di esempio 3"
 
 msgid "Namespaced App"
 msgstr "App con namespace"

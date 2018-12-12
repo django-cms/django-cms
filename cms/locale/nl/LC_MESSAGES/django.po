@@ -27,9 +27,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2018-11-09 13:20+0100\n"
+"PO-Revision-Date: 2018-11-09 12:08+0000\n"
+"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/divio/django-cms/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -123,11 +123,18 @@ msgstr "Maak eerst de %(language)s slug, nog voordat u de geavanceerde settings 
 msgid "A page with this reverse URL id exists already."
 msgstr "Er bestaat al een pagina met dit omgekeerde URL kenmerk."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr "Een applicatie instantie met deze configuratie bestaat al."
 
 msgid "An application instance with this name already exists."
 msgstr "Een applicatie instantie met deze naam bestaat al."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "Ja"
@@ -565,9 +572,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Nog één toevoegen"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1446,6 +1450,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "Welkom bij django CMS"
 
+msgid "Add Another"
+msgstr "Nog één toevoegen"
+
 msgid "Back"
 msgstr "Terug"
 
@@ -1545,6 +1552,10 @@ msgstr "Artikelen"
 
 msgid "Sample App"
 msgstr "Voorbeeldapplicatie"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "Voorbeeld App met uitgesloten permissies"
