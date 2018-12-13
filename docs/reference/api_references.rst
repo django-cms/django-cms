@@ -80,8 +80,8 @@ Functions and constants
     :type created_by: str of :class:`django.contrib.auth.models.User` instance
     :param parent: Parent page of this page
     :type parent: :class:`cms.models.Page` instance
-    :param datetime publication_date: Date to publish this page
-    :param datetime publication_end_date: Date to unpublish this page
+    :param datetime.datetime publication_date: Date to publish this page
+    :param datetime.datetime publication_end_date: Date to unpublish this page
     :param bool in_navigation: Whether this page should be in the navigation or not
     :param bool soft_root: Whether this page is a soft root or not
     :param str reverse_id: Reverse ID of this page (for template tags)
