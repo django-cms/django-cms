@@ -95,7 +95,7 @@ Functions and constants
     :param str position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param str   overwrite_url: Overwritten path for this page
     :param int xframe_options: X Frame Option value for Clickjacking protection
-    :param str page_title: Overriden page title for html title tag
+    :param str page_title: Overridden page title for HTML title tag
 
 
 .. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None)
@@ -113,7 +113,7 @@ Functions and constants
     :param parent: Used for automated slug generation
     :type parent: :class:`cms.models.Page` instance
     :param str overwrite_url: Overwritten path for this page
-    :param str page_title: Overriden page title for html title tag
+    :param str page_title: Overridden page title for HTML title tag
 
 
 .. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)
