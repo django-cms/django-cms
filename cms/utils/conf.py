@@ -232,10 +232,12 @@ def _ensure_languages_settings(languages):
 
 
 def get_languages():
-    if settings.SITE_ID != hash(settings.SITE_ID):
-        raise ImproperlyConfigured(
-            "SITE_ID must be an integer"
-        )
+    try:
+        int(settings.SITE_ID)
+    except (AttributeError, TypeError, ValueError):
+       raise ImproperlyConfigured(
+           "SITE_ID must be an integer"
+       )
     if not settings.USE_I18N:
         return _ensure_languages_settings(
             {settings.SITE_ID: [{'code': settings.LANGUAGE_CODE, 'name': settings.LANGUAGE_CODE}]})
