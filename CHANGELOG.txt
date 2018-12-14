@@ -1,3 +1,6 @@
+=== (next) ===
+* Fixed configuration check, in case SITE_ID is lazy.
+
 === 3.5.3 (2018-11-20) ===
 
 * Fixed ``TreeNode.DoesNotExist`` exception raised when exporting
