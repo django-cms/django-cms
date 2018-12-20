@@ -827,8 +827,6 @@ class Page(models.Model):
 
         if created:
             self.created_by = self.changed_by
-
-        self.clear_cache(menu=True)
         super(Page, self).save(**kwargs)
 
     def save_base(self, *args, **kwargs):
