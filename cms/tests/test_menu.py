@@ -306,9 +306,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             title = Title.objects.drafts().get(slug=page_data['slug'])
             self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
             page = title.page
-            self.assertEqual(page.get_title(), page_data['title'])
-            self.assertEqual(page.get_slug(), page_data['slug'])
-            self.assertEqual(page.placeholders.all().count(), 2)
 
         with force_language("en"):
             response = self.client.get(self.get_pages_root())  # path = '/'
