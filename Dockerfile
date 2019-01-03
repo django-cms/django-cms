@@ -5,7 +5,7 @@
 # </WARNING>
 
 # <DOCKER_FROM>
-FROM aldryn/base-project:py3-3.23
+FROM aldryn/base-project:py3-3.25.1
 # </DOCKER_FROM>
 
 # <NODE>
