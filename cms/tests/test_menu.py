@@ -17,12 +17,12 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE
 from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
@@ -296,6 +296,32 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             [node.get_absolute_url() for node in nodes],
             [page.get_absolute_url() for page in pages],
         )
+
+    def test_show_new_draft_page_in_menu(self):
+        with self.login_user_context(self.get_superuser()):
+            page_data = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+            title = Title.objects.drafts().get(slug=page_data['slug'])
+            self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
+            page = title.page
+            self.assertEqual(page.get_title(), page_data['title'])
+            self.assertEqual(page.get_slug(), page_data['slug'])
+            self.assertEqual(page.placeholders.all().count(), 2)
+
+        with force_language("en"):
+            response = self.client.get(self.get_pages_root())  # path = '/'
+        self.assertEqual(response.status_code, 200)
+        request = self.get_request()
+
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+
+        menu = renderer.get_menu('CMSMenu')
+        nodes = menu.get_nodes(request)
+
+        self.assertEqual(page.get_title(), nodes[-1].title)
 
     def test_cms_menu_public_with_multiple_languages(self):
         for page in Page.objects.drafts():
