@@ -299,25 +299,25 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_show_new_draft_page_in_menu(self):
         with self.login_user_context(self.get_superuser()):
+            response = self.client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        renderer.get_nodes()
+        self.assertEqual(CacheKey.objects.first().key, 'cms_3.6.0rc1_menu_nodes_en_1:draft')
+
+        with self.login_user_context(self.get_superuser()):
             page_data = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
+            page = Title.objects.drafts().get(slug=page_data['slug']).page
 
-            title = Title.objects.drafts().get(slug=page_data['slug'])
-            self.assertRaises(Title.DoesNotExist, Title.objects.public().get, slug=page_data['slug'])
-            page = title.page
-
-        with force_language("en"):
-            response = self.client.get(self.get_pages_root())  # path = '/'
-        self.assertEqual(response.status_code, 200)
-        request = self.get_request()
-
+        request = self.get_request('/')
         renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
-
-        menu = renderer.get_menu('CMSMenu')
-        nodes = menu.get_nodes(request)
-
+        nodes = renderer.get_nodes()
         self.assertEqual(page.get_title(), nodes[-1].title)
 
     def test_cms_menu_public_with_multiple_languages(self):
