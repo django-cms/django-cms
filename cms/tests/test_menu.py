@@ -299,25 +299,28 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_show_new_draft_page_in_menu(self):
         with self.login_user_context(self.get_superuser()):
-            response = self.client.post(URL_CMS_PAGE_ADD, self.get_new_page_data())
+            page_data_1 = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data_1)
             self.assertRedirects(response, URL_CMS_PAGE)
 
         request = self.get_request('/')
         renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         renderer.get_nodes()
-        self.assertEqual(CacheKey.objects.first().key, 'cms_3.6.0rc1_menu_nodes_en_1:draft')
+        self.assertEqual(CacheKey.objects.count(), 1)
 
         with self.login_user_context(self.get_superuser()):
-            page_data = self.get_new_page_data()
-            response = self.client.post(URL_CMS_PAGE_ADD, page_data)
+            page_data_2 = self.get_new_page_data()
+            self.assertNotEqual(page_data_1['slug'], page_data_2['slug'])
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data_2)
             self.assertRedirects(response, URL_CMS_PAGE)
-            page = Title.objects.drafts().get(slug=page_data['slug']).page
+            page = Title.objects.drafts().get(slug=page_data_2['slug']).page
 
         request = self.get_request('/')
         renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         nodes = renderer.get_nodes()
+        self.assertEqual(CacheKey.objects.count(), 1)
         self.assertEqual(page.get_title(), nodes[-1].title)
 
     def test_cms_menu_public_with_multiple_languages(self):
