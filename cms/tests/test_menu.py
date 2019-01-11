@@ -298,6 +298,9 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         )
 
     def test_show_new_draft_page_in_menu(self):
+        """
+        Test checks if the menu cache is cleaned after create a new draft page.
+        """
         with self.login_user_context(self.get_superuser()):
             page_data_1 = self.get_new_page_data()
             response = self.client.post(URL_CMS_PAGE_ADD, page_data_1)
