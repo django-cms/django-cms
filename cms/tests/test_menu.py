@@ -17,12 +17,12 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE
 from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
@@ -295,6 +295,38 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertSequenceEqual(
             [node.get_absolute_url() for node in nodes],
             [page.get_absolute_url() for page in pages],
+        )
+
+    def test_show_page_in_menu_after_move_page(self):
+        """
+        Test checks if the menu cache is cleaned after move page.
+        """
+        homepage = create_page("home", "nav_playground.html", "en", published=True)
+        homepage.set_as_homepage()
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_before = renderer.get_nodes()
+        index_before = [i for i, s in enumerate(nodes_before) if s.title == homepage.get_title()]
+
+        with self.login_user_context(self.get_superuser()):
+            # Moves the homepage to the second position in the tree
+            data = {'id': homepage.pk, 'position': 1}
+            endpoint = self.get_admin_url(Page, 'move_page', homepage.pk)
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_after = renderer.get_nodes()
+        index_after = [i for i, s in enumerate(nodes_after) if s.title == homepage.get_title()]
+
+        self.assertNotEqual(
+            index_before,
+            index_after,
+            'Index should not be the same after move page in navigation'
         )
 
     def test_cms_menu_public_with_multiple_languages(self):
