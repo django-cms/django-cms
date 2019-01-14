@@ -346,6 +346,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             endpoint = self.get_admin_url(Page, 'move_page', homepage.pk)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
+            self.assertEqual(CacheKey.objects.count(), 0)
 
         request = self.get_request('/')
         renderer = menu_pool.get_renderer(request)
