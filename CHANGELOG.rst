@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+* Fixed a bug where menu link is outdated when page moved.
 * Unified icon font with icons for versioning, moderation and version locking
 * Django 4.1 and 4.0 support
 * Python 3.10 support
@@ -34,6 +35,7 @@ unreleased
 ==================
 
 * Introduced Django 2.2 support.
+=======
 * Removed the ``cms moderator`` command.
 * Dropped Django < 1.11 support.
 * Removed the translatable content get / set methods from ``CMSPlugin`` model.

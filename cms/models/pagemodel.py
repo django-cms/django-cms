@@ -434,11 +434,12 @@ class Page(models.Model):
             .values_list('language', flat=True)
         )
 
+<<<<<<< HEAD
         for language in languages:
             if not self.is_home:
                 self._update_url_path(language)
             self._update_url_path_recursive(language)
-        self.clear_cache()
+        self.clear_cache(menu=True)
         return self
 
     def _clear_placeholders(self, language):
