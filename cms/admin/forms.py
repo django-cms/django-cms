@@ -294,6 +294,8 @@ class AddPageForm(BasePageForm):
             # its the first page. publish it right away
             new_page.publish(translation.language)
             new_page.set_as_homepage(self._user)
+
+        new_page.clear_cache(menu=True)
         return new_page
 
 
