@@ -338,6 +338,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         renderer.draft_mode_active = True
         nodes_before = renderer.get_nodes()
         index_before = [i for i, s in enumerate(nodes_before) if s.title == homepage.get_title()]
+        self.assertEqual(CacheKey.objects.count(), 1)
 
         with self.login_user_context(self.get_superuser()):
             # Moves the homepage to the second position in the tree
@@ -352,6 +353,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         nodes_after = renderer.get_nodes()
         index_after = [i for i, s in enumerate(nodes_after) if s.title == homepage.get_title()]
 
+        self.assertEqual(CacheKey.objects.count(), 1)
         self.assertNotEqual(
             index_before,
             index_after,
