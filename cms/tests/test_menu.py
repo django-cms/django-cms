@@ -301,6 +301,40 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             [page.get_absolute_url() for page in pages],
         )
 
+    def test_show_page_in_menu_after_move_page(self):
+        """
+        Test checks if the menu cache is cleaned after move page.
+        """
+        page = create_page('page to move', 'nav_playground.html', 'en')
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_before = renderer.get_nodes()
+        index_before = [i for i, s in enumerate(nodes_before) if s.title == page.get_title()]
+        self.assertEqual(CacheKey.objects.count(), 1)
+
+        with self.login_user_context(self.get_superuser()):
+            # Moves the page to the second position in the tree
+            data = {'id': page.pk, 'position': 1}
+            endpoint = self.get_admin_url(Page, 'move_page', page.pk)
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(CacheKey.objects.count(), 0)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_after = renderer.get_nodes()
+        index_after = [i for i, s in enumerate(nodes_after) if s.title == page.get_title()]
+
+        self.assertEqual(CacheKey.objects.count(), 1)
+        self.assertNotEqual(
+            index_before,
+            index_after,
+            'Index should not be the same after move page in navigation'
+        )
+
     def test_cms_menu_public_with_multiple_languages(self):
         pages = self.get_all_pages().order_by('node__path')
 
