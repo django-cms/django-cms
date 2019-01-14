@@ -330,20 +330,19 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         """
         Test checks if the menu cache is cleaned after move page.
         """
-        homepage = create_page("home", "nav_playground.html", "en", published=True)
-        homepage.set_as_homepage()
+        page = create_page('page to move', 'nav_playground.html', 'en', published=True)
 
         request = self.get_request('/')
         renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         nodes_before = renderer.get_nodes()
-        index_before = [i for i, s in enumerate(nodes_before) if s.title == homepage.get_title()]
+        index_before = [i for i, s in enumerate(nodes_before) if s.title == page.get_title()]
         self.assertEqual(CacheKey.objects.count(), 1)
 
         with self.login_user_context(self.get_superuser()):
-            # Moves the homepage to the second position in the tree
-            data = {'id': homepage.pk, 'position': 1}
-            endpoint = self.get_admin_url(Page, 'move_page', homepage.pk)
+            # Moves the page to the second position in the tree
+            data = {'id': page.pk, 'position': 1}
+            endpoint = self.get_admin_url(Page, 'move_page', page.pk)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
             self.assertEqual(CacheKey.objects.count(), 0)
@@ -352,7 +351,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         renderer = menu_pool.get_renderer(request)
         renderer.draft_mode_active = True
         nodes_after = renderer.get_nodes()
-        index_after = [i for i, s in enumerate(nodes_after) if s.title == homepage.get_title()]
+        index_after = [i for i, s in enumerate(nodes_after) if s.title == page.get_title()]
 
         self.assertEqual(CacheKey.objects.count(), 1)
         self.assertNotEqual(
