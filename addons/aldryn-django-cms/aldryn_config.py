@@ -99,13 +99,19 @@ class Form(forms.BaseForm):
                 'cms.context_processors.cms_settings',
             ])
 
-        settings['MIDDLEWARE_CLASSES'].extend([
+        middlewares = [
             'cms.middleware.user.CurrentUserMiddleware',
             'cms.middleware.page.CurrentPageMiddleware',
             'cms.middleware.toolbar.ToolbarMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
-        ])
-        settings['MIDDLEWARE_CLASSES'].insert(0, 'cms.middleware.utils.ApphookReloadMiddleware',)
+        ]
+
+        if settings.get('MIDDLEWARE_CLASSES', None):
+            settings['MIDDLEWARE_CLASSES'].extend(middlewares)
+            settings['MIDDLEWARE_CLASSES'].insert(0, 'cms.middleware.utils.ApphookReloadMiddleware',)
+        else:
+            settings['MIDDLEWARE'].extend(middlewares)
+            settings['MIDDLEWARE'].insert(0, 'cms.middleware.utils.ApphookReloadMiddleware',)
 
         settings['ADDON_URLS_I18N_LAST'] = 'cms.urls'
 
