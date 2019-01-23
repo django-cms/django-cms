@@ -360,6 +360,40 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             'Index should not be the same after move page in navigation'
         )
 
+    def test_show_page_in_menu_after_copy_page(self):
+        """
+        Test checks if the menu cache is cleaned after copy page.
+        """
+        page = create_page('page to copy', 'nav_playground.html', 'en', published=True)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_before = renderer.get_nodes()
+        self.assertEqual(CacheKey.objects.count(), 1)
+
+        with self.login_user_context(self.get_superuser()):
+            # Copy the page
+            data = {
+                'position': 1,
+                'source_site': 1,
+                'copy_permissions': 'on',
+                'copy_moderation': 'on',
+            }
+            endpoint = self.get_admin_url(Page, 'copy_page', page.pk)
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(CacheKey.objects.count(), 0)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_after = renderer.get_nodes()
+
+        self.assertEqual(CacheKey.objects.count(), 1)
+        self.assertGreater(len(nodes_after), len(nodes_before))
+        self.assertEqual(page.get_title(), nodes_after[-1].title)
+
     def test_cms_menu_public_with_multiple_languages(self):
         for page in Page.objects.drafts():
             create_title(
