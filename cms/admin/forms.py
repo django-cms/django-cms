@@ -898,6 +898,7 @@ class CopyPageForm(PageTreeForm):
             copy_permissions=copy_permissions,
             target_site=self._site,
         )
+        new_page.clear_cache(menu=True)
         return new_page
 
     def _get_tree_options_for_root(self, position):
