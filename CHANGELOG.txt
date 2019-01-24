@@ -1,7 +1,5 @@
 === 3.6.0 (unreleased) ===
 
-* Fixed a bug where menu link is outdated when page moved.
-* Fixed a bug where menu link is outdated when page is created.
 * Removed the ``cms moderator`` command.
 * Dropped Django < 1.11 support.
 * Removed the translatable content get / set methods from ``CMSPlugin`` model.
