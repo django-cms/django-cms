@@ -23,13 +23,14 @@
 # Mohammad Rafiei <mohammad.rafiei69@gmail.com>, 2017
 # omid zarin <mester.hope.oz@gmail.com>, 2014
 # Pouya Abbassi, 2016
+# Sina Rezaei <sinarezaei1991@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-14 13:19+0100\n"
-"PO-Revision-Date: 2018-12-20 13:33+0000\n"
-"Last-Translator: Fariman Ghaedi <farimanghaedi@gmail.com>\n"
+"POT-Creation-Date: 2019-01-24 10:23+0100\n"
+"PO-Revision-Date: 2019-01-19 23:33+0000\n"
+"Last-Translator: Sina Rezaei <sinarezaei1991@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/divio/django-cms/language/fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -125,7 +126,7 @@ msgstr "صفحه-ای با شناسه-ی این آدرس معکوس وجود د�
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "مقدار تنظیمات برنامه نامعتبر است."
 
 msgid "An application instance using this configuration already exists."
 msgstr "یک برنامه موردی با این تنظیمات از پیش وجود دارد."
@@ -563,7 +564,7 @@ msgstr "یک صفحه معتبر انتخاب کنید"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "آدرس صفحه %(conflict_page)s با آدرس صفحه فعلی %(url)s یکسان است \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -571,7 +572,7 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "آدرس صفحه %(conflict_page)s با آدرس صفحه فعلی %(url)s یکسان است."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1099,7 +1100,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n<em>هیچ %(object)s یافت نشد</em>\n\n<a href=\"%(add_url)s\" class=\"addlink\">همین الان %(object)s اضافه کنید</a>."
 
 msgid "Copy options"
 msgstr "تنظیمات کپی"
@@ -1221,14 +1222,14 @@ msgid "This plugin cannot have nested plugins."
 msgstr "این پلاگین نمیتواند پلاگینهای تو‌در‌تو داشته باشد."
 
 msgid "Highlight"
-msgstr ""
+msgstr "هایلایت"
 
 msgid "Available plugins"
 msgstr "افزونه‌های موجود"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "تغییر ساختار"
 
 #| msgid "View published"
 msgid "View published"
@@ -1427,7 +1428,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr ""
+msgstr "\n<p class=\"cms-welcome-notes\">اگر شما نماد «سیستم مدیریت محتوای جنگو» را در بالای صفحه نمی‌بینید، مطمئن شوید\nپوشه‌ی <code>static/cms</code> را به فایل‌های ایستای خود\nلینک کرده‌اید.</p>"
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1445,7 +1446,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n<p class=\"cms-welcome-notes\">شما این پیغام را می‌بینید چون <code>DEBUG = True</code> را در تنظیمات جنگو فعال کرده‌اید.</p>"
 
 msgid "Welcome to django CMS"
 msgstr "به سیستم مدیریت محتوای جنگو خوش آمدید"
