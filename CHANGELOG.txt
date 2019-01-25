@@ -1,3 +1,7 @@
+=== develop ===
+* Fixed the usage of templatetag ``{% page_url 'page_lookup' as varname %}`` to not
+  raise an exception.
+
 === 3.5.3 (2018-11-20) ===
 
 * Fixed ``TreeNode.DoesNotExist`` exception raised when exporting
