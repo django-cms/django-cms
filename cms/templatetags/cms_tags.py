@@ -421,6 +421,12 @@ class PageAttribute(AsTag):
             return ret_val
         return ''
 
+    def get_value_for_context(self, context, **kwargs):
+        try:
+            return super(PageAttribute, self).get_value_for_context(context, **kwargs)
+        except Page.DoesNotExist:
+            return ''
+
 
 class CMSToolbar(RenderBlock):
     name = 'cms_toolbar'
