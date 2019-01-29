@@ -2,7 +2,7 @@
 https://control.divio.com/api/v1/apps/serve/aldryn-addons/1.0.4/5cc40a55-a1e5-4906-a8df-03a1029a62f5/aldryn-addons-1.0.4.tar.gz#egg=aldryn-addons==1.0.4
 https://control.divio.com/api/v1/apps/serve/aldryn-django/1.11.18.3/9227a242-844f-4dc9-8614-6519836acc1c/aldryn-django-1.11.18.3.tar.gz#egg=aldryn-django==1.11.18.3
 https://control.divio.com/api/v1/apps/serve/aldryn-sso/1.5.1/4e2eb564-fbf5-4d5f-96e0-4059f3185ffe/aldryn-sso-1.5.1.tar.gz#egg=aldryn-sso==1.5.1
-https://control.divio.com/api/v1/apps/serve/aldryn-django-cms/3.5.3.3/0d70ac86-cd2b-4406-8272-88f466e08ac5/aldryn-django-cms-3.5.3.3.tar.gz#egg=aldryn-django-cms==3.5.3.3
+https://control.divio.com/api/v1/apps/serve/aldryn-django-cms/3.6.0.7/69dadc68-91c9-4a01-b9ae-fe37f8f513e5/aldryn-django-cms-3.6.0.7.tar.gz#egg=aldryn-django-cms==3.6.0.7
 https://control.divio.com/api/v1/apps/serve/aldryn-forms/3.0.4/7e972f96-36f6-484b-96c7-bce255b87aa9/aldryn-forms-3.0.4.tar.gz#egg=aldryn-forms==3.0.4
 https://control.divio.com/api/v1/apps/serve/aldryn-newsblog/2.1.1/7f7e0e5c-db27-4369-9151-ef7cd88c6ee1/aldryn-newsblog-2.1.1.tar.gz#egg=aldryn-newsblog==2.1.1
 https://control.divio.com/api/v1/apps/serve/aldryn-redirects/1.3.3/f04164f3-65f0-4bf6-ac94-37a69bdd36c9/aldryn-redirects-1.3.3.tar.gz#egg=aldryn-redirects==1.3.3
