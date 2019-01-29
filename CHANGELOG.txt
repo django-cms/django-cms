@@ -1,4 +1,4 @@
-=== 3.6.0 (unreleased) ===
+=== 3.6.0 (2019-01-29) ===
 
 * Removed the ``cms moderator`` command.
 * Dropped Django < 1.11 support.
