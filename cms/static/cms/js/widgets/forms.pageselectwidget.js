@@ -2,21 +2,20 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-// #############################################################################
-// NAMESPACES
-/**
- * @module CMS
- */
-var CMS = window.CMS || {};
+// this essentially makes sure that dynamically required bundles are loaded
+// from the same place
+// eslint-disable-next-line
+__webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.pageselectwidget');
 
 // #############################################################################
 // PAGE SELECT WIDGET
 // cms/forms/widgets.py
-(function ($) {
-    'use strict';
+require.ensure(
+    [],
+    function(require) {
+        var $ = require('jquery');
+        var Class = require('classjs');
 
-    // shorthand for jQuery(document).ready();
-    $(function () {
         /**
          * Manages the selection of two select fields. The first field
          * sets the "Site" and the second the "Pagetree".
@@ -24,8 +23,7 @@ var CMS = window.CMS || {};
          * @class PageSelectWidget
          * @namespace CMS
          */
-        CMS.PageSelectWidget = new CMS.Class({
-
+        var PageSelectWidget = new Class({
             initialize: function initialize(options) {
                 this.options = $.extend(true, {}, this.options, options);
                 // load functionality
@@ -48,22 +46,22 @@ var CMS = window.CMS || {};
 
                 // handles the change event on the first select "site"
                 // that controls the display of the second select "pagetree"
-                group0.on('change', function () {
-                    tmp = $(this).children(':selected').text();
+                group0
+                    .on('change', function() {
+                        tmp = $(this).children(':selected').text();
 
-                    group1.find('optgroup').remove();
-                    group1.append(
-                        group2.find('optgroup[label="' + tmp + '"]').clone()
-                    ).change();
+                        group1.find('optgroup').remove();
+                        group1.append(group2.find('optgroup[label="' + tmp + '"]').clone()).change();
 
-                    // refresh second select
-                    setTimeout(function () {
-                        group1.trigger('change');
-                    }, 0);
-                }).trigger('change');
+                        // refresh second select
+                        setTimeout(function() {
+                            group1.trigger('change');
+                        }, 0);
+                    })
+                    .trigger('change');
 
                 // sets the correct value
-                group1.on('change', function () {
+                group1.on('change', function() {
                     tmp = $(this).find('option:selected').val();
 
                     if (tmp) {
@@ -79,5 +77,15 @@ var CMS = window.CMS || {};
             }
         });
 
-    });
-})(CMS.$);
+        window.CMS = window.CMS || {};
+        window.CMS.PageSelectWidget = PageSelectWidget;
+
+        // init
+        $(function() {
+            window.CMS.Widgets._pageSelectWidgets.forEach(function(widget) {
+                new PageSelectWidget(widget);
+            });
+        });
+    },
+    'admin.widget'
+);

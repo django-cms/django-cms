@@ -2,6 +2,8 @@
 Template Tags
 #############
 
+..  module:: cms.templatetags.cms_tags
+
 *****************
 CMS template tags
 *****************
@@ -13,12 +15,14 @@ top of your template::
 
     {% load cms_tags %}
 
-.. template tag:: placeholder
+
+Placeholders
+============
+
+..  templatetag:: placeholder
 
 placeholder
-===========
-.. versionchanged:: 2.1
-    The placeholder name became case sensitive.
+-----------
 
 The ``placeholder`` template tag defines a placeholder on a page. All
 placeholders in a template will be auto-detected and can be filled with
@@ -28,6 +32,10 @@ content of these plugins will appear where the ``placeholder`` tag was.
 Example::
 
     {% placeholder "content" %}
+
+.. image:: /reference/images/placeholder.png
+   :alt: a placeholder named 'content'
+   :align: center
 
 If you want additional content to be displayed in case the placeholder is
 empty, use the ``or`` argument and an additional ``{% endplaceholder %}``
@@ -63,17 +71,27 @@ pages have plugins that generate content::
 See also the :setting:`CMS_PLACEHOLDER_CONF` setting where you can also add extra
 context variables and change some other placeholder behaviour.
 
-.. template tag:: static_placeholder
+..  important::
+
+    ``{% placeholder %}`` will only work inside the template's ``<body>``.
+
+
+..  templatetag:: static_placeholder
 
 static_placeholder
-==================
-.. versionadded:: 3.0
+------------------
 
-The static_placeholder template tag can be used anywhere in any template and is not bound to any
-page or model. It needs a name and it will create a placeholder that you can fill with plugins
-afterwards. The static_placeholder tag is normally used to display the same content on multiple
-locations or inside of apphooks or other third party apps. Static_placeholder need to be published to
-show up on live pages.
+The ``{% static_placeholder %}`` template tag can be used anywhere in a template element after
+the ``{% cms_toolbar %}`` tag. A static placeholder instance is not bound to any particular page
+or model - in other words, everywhere it appears, a static placeholder will hold exactly the same
+content.
+
+The ``{% static_placeholder %}`` tag is normally used to display the same content on multiple
+locations or inside of apphooks or other third party apps.
+
+Otherwise, a static placeholder behaves like a "normal" placeholder, to which plugins can be added.
+
+A static placeholder needs to be published to show up on live pages, and requires a name.
 
 Example::
 
@@ -81,10 +99,14 @@ Example::
 
     {% static_placeholder "footer" %}
 
+.. image:: /reference/images/static-placeholder.png
+   :alt: a static placeholder
+   :align: center
 
-.. warning::
+..  note::
 
-    Static_placeholders are not included in the undo/redo and page history pages
+    To reduce clutter in the interface, the plugins in static placeholders are hidden by default.
+    Click or tap on the name of the static placeholder to reveal/hide them.
 
 If you want additional content to be displayed in case the static placeholder is
 empty, use the ``or`` argument and an additional ``{% endstatic_placeholder %}``
@@ -105,16 +127,20 @@ Example::
 
     {% static_placeholder "footer" site or %}There is no content.{% endstatic_placeholder %}
 
-Note that the `Django "sites" framework <https://docs.djangoproject.com/en/dev/ref/contrib/sites/>`_ *is* required and ``SITE_ID``
-:ref:`*must* be set <configure-django-cms>` in ``settings.py`` for this (not to mention other
-aspects of django CMS) to work correctly.
+Note that the `Django "sites" framework <https://docs.djangoproject.com/en/dev/ref/contrib/sites/>`_ *is* required and
+``SITE_ID`` *must* be set in ``settings.py`` for this (not to mention other aspects of django CMS) to work correctly.
 
-.. templatetag:: render_placeholder
+..  important::
+
+    ``{% static_placeholder %}`` will only work inside the template's ``<body>``.
+
+
+..  templatetag:: render_placeholder
 
 render_placeholder
 ==================
 
-`{% render_placeholder %}` is used if you have a PlaceholderField in your own model and want
+``{% render_placeholder %}`` is used if you have a PlaceholderField in your own model and want
 to render it in the template.
 
 The :ttag:`render_placeholder` tag takes the following parameters:
@@ -148,7 +174,7 @@ render only the English (``en``) plugins:
     When used in this manner, the placeholder will not be displayed for
     editing when the CMS is in edit mode.
 
-.. templatetag:: render_uncached_placeholder
+..  templatetag:: render_uncached_placeholder
 
 render_uncached_placeholder
 ===========================
@@ -170,7 +196,7 @@ Example::
     {% render_uncached_placeholder mymodel_instance.my_placeholder language 'en' %}
 
 
-.. templatetag:: show_placeholder
+..  templatetag:: show_placeholder
 
 show_placeholder
 ================
@@ -193,7 +219,7 @@ Examples::
     {% show_placeholder "teaser" request.current_page.get_root %}
 
 
-.. templatetag:: show_uncached_placeholder
+..  templatetag:: show_uncached_placeholder
 
 show_uncached_placeholder
 =========================
@@ -213,7 +239,7 @@ Example::
     {% show_uncached_placeholder "footer" "footer_container_page" %}
 
 
-.. templatetag:: page_lookup
+..  templatetag:: page_lookup
 
 page_lookup
 ===========
@@ -221,7 +247,7 @@ page_lookup
 The ``page_lookup`` argument, passed to several template tags to retrieve a
 page, can be of any of the following types:
 
-* :class:`str <basestring>`: interpreted as the ``reverse_id`` field of the desired page, which
+* :class:`str`: interpreted as the ``reverse_id`` field of the desired page, which
   can be set in the "Advanced" section when editing a page.
 * :class:`int`: interpreted as the primary key (``pk`` field) of the desired page
 * :class:`dict`: a dictionary containing keyword arguments to find the desired page
@@ -255,7 +281,7 @@ inherit the content of its root-level ancestor::
     {% endplaceholder %}
 
 
-.. templatetag:: page_url
+..  templatetag:: page_url
 
 
 page_url
@@ -279,12 +305,10 @@ Example::
 
 If a matching page isn't found and :setting:`django:DEBUG` is ``True``, an
 exception will be raised. However, if :setting:`django:DEBUG` is ``False``, an
-exception will not be raised. Additionally, if
-:setting:`django:SEND_BROKEN_LINK_EMAILS` is ``True`` and you have specified
-some addresses in :setting:`django:MANAGERS`, an email will be sent to those
-addresses to inform them of the broken link.
+exception will not be raised.
 
 .. versionadded:: 3.0
+
     page_url now supports the ``as`` argument. When used this way, the tag
     emits nothing, but sets a variable in the context with the specified name
     to the resulting value.
@@ -299,7 +323,7 @@ Example::
     {% page_url request.current_page as current_url %}{% if current_url and current_url != request.get_full_path %}<link rel="canonical" href="{% page_url request.current_page %}">{% endif %}
 
 
-.. templatetag:: page_attribute
+..  templatetag:: page_attribute
 
 page_attribute
 ==============
@@ -347,7 +371,7 @@ Example::
         {% page_attribute "page_title" "my_page_reverse_id" as title %}
         <a href="/mypage/">{{ title }}</a>
 
-.. templatetag:: render_plugin
+..  templatetag:: render_plugin
 .. versionadded:: 2.4
 
 render_plugin
@@ -376,7 +400,7 @@ Normally the children of plugins can be accessed via the ``child_plugins`` attri
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
 .. versionadded:: 3.0
-.. templatetag:: render_plugin_block
+..  templatetag:: render_plugin_block
 
 render_plugin_block
 ===================
@@ -430,17 +454,11 @@ Example::
     </div>
     {% endblock %}
 
-.. templatetag:: render_model
+..  templatetag:: render_model
 .. versionadded:: 3.0
 
 render_model
 ============
-
-.. warning::
-
-    ``render_model`` marks as safe the content of the rendered model
-    attribute. This may be a security risk if used on fields which may contains
-    non-trusted content. Be aware, and use the template tag accordingly.
 
 ``render_model`` is the way to add frontend editing to any Django model.
 It both renders the content of the given attribute of the model instance and
@@ -466,7 +484,7 @@ This will render to:
 .. code-block:: html+django
 
     <!-- The content of the H1 is the active area that triggers the frontend editor -->
-    <h1><div class="cms-plugin cms-plugin-myapp-mymodel-title-1">{{ my_model.title }}</div></h1>
+    <h1><cms-plugin class="cms-plugin cms-plugin-myapp-mymodel-title-1">{{ my_model.title }}</cms-plugin></h1>
 
 **Arguments:**
 
@@ -492,13 +510,20 @@ This will render to:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-.. warning::
+.. note::
 
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    By default this template tag escapes the content of the rendered
+    model attribute. This helps prevent a range of security vulnerabilities
+    stemming from HTML, JavaScript, and CSS Code Injection.
+
+    To change this behaviour, the project administrator should carefully review
+    each use of this template tag and ensure that all content which is rendered
+    to a page using this template tag is cleansed of any potentially harmful
+    HTML markup, CSS styles or JavaScript.
+
+    Once the administrator is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the template tag
+    if the content should be rendered without escaping.
 
 .. warning::
 
@@ -509,7 +534,7 @@ This will render to:
     As a workaround ``render_model_icon`` can be used instead.
 
 
-.. templatetag:: render_model_block
+..  templatetag:: render_model_block
 .. versionadded:: 3.0
 
 render_model_block
@@ -532,13 +557,13 @@ This will render to:
 .. code-block:: html+django
 
     <!-- This whole block is the active area that triggers the frontend editor -->
-    <div class="cms-plugin cms-plugin-myapp-mymodel-1">
+    <template class="cms-plugin cms-plugin-start cms-plugin-myapp-mymodel-1"></template>
         <h1>{{ my_model.title }}</h1>
         <div class="body">
             {{ my_model.date|date:"d F Y" }}
             {{ my_model.text }}
         </div>
-    </div>
+    <template class="cms-plugin cms-plugin-end cms-plugin-myapp-mymodel-1"></template>
 
 In the block the ``my_model`` is aliased as ``instance`` and every attribute and
 method is available; also template tags and filters are available in the block.
@@ -567,15 +592,23 @@ method is available; also template tags and filters are available in the block.
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-.. warning::
+.. note::
 
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    By default this template tag escapes the content of the rendered
+    model attribute. This helps prevent a range of security vulnerabilities
+    stemming from HTML, JavaScript, and CSS Code Injection.
 
-.. templatetag:: render_model_icon
+    To change this behaviour, the project administrator should carefully review
+    each use of this template tag and ensure that all content which is rendered
+    to a page using this template tag is cleansed of any potentially harmful
+    HTML markup, CSS styles or JavaScript.
+
+    Once the administrator is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the template tag
+    if the content should be rendered without escaping.
+
+
+..  templatetag:: render_model_icon
 .. versionadded:: 3.0
 
 
@@ -599,10 +632,10 @@ It will render to something like:
 
     <h3>
         <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
-        <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-icon">
+        <template class="cms-plugin cms-plugin-start cms-plugin-myapp-mymodel-1 cms-render-model-icon"></template>
             <!-- The image below is the active area that triggers the frontend editor -->
             <img src="/static/cms/img/toolbar/render_model_placeholder.png">
-        </div>
+        <template class="cms-plugin cms-plugin-end cms-plugin-myapp-mymodel-1 cms-render-model-icon"></template>
     </h3>
 
 .. note::
@@ -626,15 +659,23 @@ It will render to something like:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-.. warning::
+.. note::
 
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    By default this template tag escapes the content of the rendered
+    model attribute. This helps prevent a range of security vulnerabilities
+    stemming from HTML, JavaScript, and CSS Code Injection.
 
-.. templatetag:: render_model_add
+    To change this behaviour, the project administrator should carefully review
+    each use of this template tag and ensure that all content which is rendered
+    to a page using this template tag is cleansed of any potentially harmful
+    HTML markup, CSS styles or JavaScript.
+
+    Once the administrator is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the template tag
+    if the content should be rendered without escaping.
+
+
+..  templatetag:: render_model_add
 .. versionadded:: 3.0
 
 
@@ -656,10 +697,10 @@ It will render to something like:
 
     <h3>
         <a href="{{ my_model.get_absolute_url }}">{{ my_model.title }}</a>
-        <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-add">
+        <template class="cms-plugin cms-plugin-start cms-plugin-myapp-mymodel-1 cms-render-model-add"></template>
             <!-- The image below is the active area that triggers the frontend editor -->
             <img src="/static/cms/img/toolbar/render_model_placeholder.png">
-        </div>
+        <template class="cms-plugin cms-plugin-end cms-plugin-myapp-mymodel-1 cms-render-model-add"></template>
     </h3>
 
 .. note::
@@ -681,13 +722,20 @@ It will render to something like:
 * ``varname`` (optional): the template tag output can be saved as a context
   variable for later use.
 
-.. warning::
+.. note::
 
-    In this version of django CMS, the setting :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS`
-    has a default value of ``True`` to provide behavior consistent with
-    previous releases. However, all developers are encouraged to set this
-    value to ``False`` to help prevent a range of security vulnerabilities
-    stemming from HTML, Javascript, and CSS Code Injection.
+    By default this template tag escapes the content of the rendered
+    model attribute. This helps prevent a range of security vulnerabilities
+    stemming from HTML, JavaScript, and CSS Code Injection.
+
+    To change this behaviour, the project administrator should carefully review
+    each use of this template tag and ensure that all content which is rendered
+    to a page using this template tag is cleansed of any potentially harmful
+    HTML markup, CSS styles or JavaScript.
+
+    Once the administrator is satisfied that the content is
+    clean, he or she can add the "safe" filter parameter to the template tag
+    if the content should be rendered without escaping.
 
 .. warning::
 
@@ -699,7 +747,7 @@ It will render to something like:
 
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
-.. templatetag:: render_model_add_block
+..  templatetag:: render_model_add_block
 .. versionadded:: 3.1
 
 render_model_add_block
@@ -722,9 +770,9 @@ It will render to something like:
 
 .. code-block:: html+django
 
-    <div class="cms-plugin cms-plugin-myapp-mymodel-1 cms-render-model-add">
-      <div>New Object</div>
-    </div>
+    <template class="cms-plugin cms-plugin-start cms-plugin-myapp-mymodel-1 cms-render-model-add"></template>
+        <div>New Object</div>
+    <template class="cms-plugin cms-plugin-end cms-plugin-myapp-mymodel-1 cms-render-model-add"></template>
 
 
 .. warning::
@@ -752,7 +800,7 @@ It will render to something like:
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
 
-.. templatetag:: page_language_url
+..  templatetag:: page_language_url
 
 
 page_language_url
@@ -760,9 +808,9 @@ page_language_url
 
 Returns the URL of the current page in an other language::
 
-    {% page_language_url de %}
-    {% page_language_url fr %}
-    {% page_language_url en %}
+    {% page_language_url "de" %}
+    {% page_language_url "fr" %}
+    {% page_language_url "en" %}
 
 If the current URL has no CMS Page and is handled by a navigation extender and
 the URL changes based on the language, you will need to set a ``language_changer``
@@ -770,8 +818,8 @@ function with the ``set_language_changer`` function in ``menus.utils``.
 
 For more information, see :doc:`/topics/i18n`.
 
-.. templatetag:: language_chooser
 
+..  templatetag:: language_chooser
 
 language_chooser
 ================
@@ -804,16 +852,23 @@ function with the ``set_language_changer`` function in ``menus.utils``.
 
 For more information, see :doc:`/topics/i18n`.
 
+
+..  templatetag:: cms_toolbar
+
 *********************
 Toolbar template tags
 *********************
 
 .. highlightlang:: html+django
 
-The ``cms_toolbar`` template tag is included in the ``cms_tags`` library and will add the
-required CSS and javascript to the sekizai blocks in the base template. The template tag
-has to be placed after the ``<body>`` tag and before any ``{% cms_placeholder %}`` occurrences
-within your HTML.
+The ``cms_toolbar`` template tag is included in the ``cms_tags`` library and will add the required
+CSS and javascript to the sekizai blocks in the base template. The template tag must be placed
+before any ``{% placeholder %}`` occurrences within your HTML.
+
+..  important::
+
+    ``{% cms_toolbar %}`` will only work correctly inside the template's ``<body>``.
+
 
 Example::
 
@@ -823,9 +878,8 @@ Example::
     ...
 
 
-.. note::
+..  note::
 
-    Be aware that you can not surround the cms_toolbar tag with block tags.
+    Be aware that you cannot surround the ``cms_toolbar`` tag with block tags.
     The toolbar tag will render everything below it to collect all plugins and placeholders, before
     it renders itself. Block tags interfere with this.
-

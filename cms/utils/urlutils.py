@@ -2,7 +2,7 @@
 import re
 
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
 from django.utils.six.moves.urllib.parse import urlparse
@@ -13,6 +13,14 @@ from cms.utils.conf import get_cms_setting
 
 # checks validity of absolute / relative url
 any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')
+
+# checks validity of relative url
+# matches the following:
+# /test
+# /test/
+# ./test/
+# ../test/
+relative_url_regex = re.compile(r'^[^/<>]+/[^/<>].*$|^/[^/<>]*.*$', re.IGNORECASE)
 
 
 def levelize_path(path):
@@ -61,7 +69,12 @@ def is_media_request(request):
 
 
 def static_with_version(path):
-    return '%s?%s' % (path, cms.__version__)
+    """
+    Changes provided path from `path/to/filename.ext` to `path/to/$CMS_VERSION/filename.ext`
+    """
+    path_re = re.compile('(.*)/([^/]*$)')
+
+    return re.sub(path_re, r'\1/%s/\2' % (cms.__version__), path)
 
 
 def add_url_parameters(url, *args, **params):

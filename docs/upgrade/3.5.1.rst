@@ -1,0 +1,23 @@
+.. _upgrade-to-3.5.1:
+
+###################
+3.5.1 release notes
+###################
+
+*******************
+What's new in 3.5.1
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a bug where editing pages with primary keys greater than 999 would throw an
+  exception.
+* Fixed a ``MultipleObjectsReturned`` exception raised on the page types migration
+  with multiple page types per site.
+* Fixed a bug which prevented toolbar js from working correctly when rendered
+  before toolbar.
+* Fixed a bug where CMS would incorrectly highlight plugin content when plugin
+  contains invisible elements
+* Fixed a regression where templates which inherit from a template using an ``{% extends %}``
+  tag with a default would raise an exception.

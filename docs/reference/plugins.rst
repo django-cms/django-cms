@@ -6,553 +6,564 @@ Plugins
 CMSPluginBase Attributes and Methods Reference
 **********************************************
 
-These are a list of attributes and methods that can (or should) be overridden
-on your Plugin definition.
+..  class:: cms.plugin_base.CMSPluginBase
 
-Attributes
-==========
+    Inherits :class:`django:django.contrib.admin.ModelAdmin` and in most respects behaves like a
+    normal sub-class. Note however that some attributes of ``ModelAdmin`` simply won't make sense in the
+    context of a Plugin.
 
-admin_preview
--------------
 
-Default: ``False``
+    **Attributes**
 
-If ``True``, displays a preview in the admin.
+    ..  attribute:: admin_preview
 
+        Default: ``False``
 
-allow_children
---------------
+        If ``True``, displays a preview in the admin.
 
-Default: ``False``
 
-Can this plugin have child plugins? Or can other plugins be placed inside this
-plugin? If set to ``True`` you are responsible to render the children in your
-plugin template.
+    ..  attribute:: allow_children
 
-Please use something like this or something similar:
+        Default: ``False``
 
-.. code-block:: html+django
+        Allows this plugin to have child plugins - other plugins placed inside it?
 
-    {% load cms_tags %}
-    <div class="myplugin">
-        {{ instance.my_content }}
-        {% for plugin in instance.child_plugin_instances %}
-            {% render_plugin plugin %}
-        {% endfor %}
-    </div>
+        If ``True`` you need to ensure that your plugin can render its children in the plugin template. For example:
 
+        .. code-block:: html+django
 
-Be sure to access ``instance.child_plugin_instances`` to get all children.
-They are pre-filled and ready to use. To finally render your child plugins use
-the ``{% render_plugin %}`` template tag.
+            {% load cms_tags %}
+            <div class="myplugin">
+                {{ instance.my_content }}
+                {% for plugin in instance.child_plugin_instances %}
+                    {% render_plugin plugin %}
+                {% endfor %}
+            </div>
 
-See also: `child_classes`_, `parent_classes`_, `require_parent`_
+        ``instance.child_plugin_instances`` provides access to all the plugin's children.
+        They are pre-filled and ready to use. The child plugins should be rendered using
+        the ``{% render_plugin %}`` template tag.
 
+        See also: :attr:`child_classes`, :attr:`parent_classes`, :attr:`require_parent`.
 
-cache
------
 
-Default: :setting:`CMS_PLUGIN_CACHE`
+    ..  attribute:: cache
 
-Is this plugin cacheable? If your plugin displays content based on the user or
-request or other dynamic properties set this to False.
+        Default: :setting:`CMS_PLUGIN_CACHE`
 
-.. warning::
-    If you disable a plugin cache be sure to restart the server and clear the cache afterwards.
+        Is this plugin cacheable? If your plugin displays content based on the user or
+        request or other dynamic properties set this to ``False``.
 
+        If present and set to ``False``, the plugin will prevent the caching of
+        the resulting page.
 
-change_form_template
---------------------
+        .. important:: Setting this to ``False`` will effectively disable the
+                       CMS page cache and all upstream caches for pages where
+                       the plugin appears. This may be useful in certain cases
+                       but for general cache management, consider using the much
+                       more capable :meth:`get_cache_expiration`.
 
-Default: ``admin/cms/page/plugin_change_form.html``
+        .. warning::
 
-The template used to render the form when you edit the plugin.
+            If you disable a plugin cache be sure to restart the server and clear the cache afterwards.
 
-Example::
 
-    class MyPlugin(CMSPluginBase):
-        model = MyModel
-        name = _("My Plugin")
-        render_template = "cms/plugins/my_plugin.html"
-        change_form_template = "admin/cms/page/plugin_change_form.html"
+    ..  attribute:: change_form_template
 
-See also: `frontend_edit_template`_
+        Default: ``admin/cms/page/plugin_change_form.html``
 
+        The template used to render the form when you edit the plugin.
 
-child_classes
--------------
+        Example::
 
-Default: ``None``
+            class MyPlugin(CMSPluginBase):
+                model = MyModel
+                name = _("My Plugin")
+                render_template = "cms/plugins/my_plugin.html"
+                change_form_template = "admin/cms/page/plugin_change_form.html"
 
-A List of Plugin Class Names. If this is set, only plugins listed here can be
-added to this plugin.
+        See also: :attr:`frontend_edit_template`.
 
-See also: `parent_classes`_
 
+    ..  attribute:: child_classes
 
-disable_child_plugins
----------------------
+        Default: ``None``
 
-Default: ``False``
+        A list of Plugin Class Names. If this is set, only plugins listed here can be
+        added to this plugin.
 
-Disables dragging of child plugins in structure mode.
+        See also: :attr:`parent_classes`.
 
 
-frontend_edit_template
-----------------------
+    ..  attribute:: disable_child_plugins
 
-Default: ``cms/toolbar/placeholder_wrapper.html``
+        Default: ``False``
 
-The template used for wrapping the plugin in frontend editing.
+        Disables dragging of child plugins in structure mode.
 
-See also: `change_form_template`_
 
+    .. attribute:: form
 
-model
------
+        Custom form class to be used to edit this plugin.
 
-Default: ``CMSPlugin``
 
-If the plugin requires per-instance settings, then this setting must be set to
-a model that inherits from :class:`CMSPlugin`.
+    ..  attribute:: frontend_edit_template
 
-See also: :ref:`storing configuration`
+        *This attribute is deprecated and will be removed in 3.5.*
 
+        Default: ``cms/toolbar/plugin.html``
 
-page_only
----------
+        The template used for wrapping the plugin in frontend editing.
 
-Default: ``False``
+        See also: :attr:`change_form_template`.
 
-Can this plugin only be attached to a placeholder that is attached to a page?
-Set this to ``True`` if you always need a page for this plugin.
 
-See also: `child_classes`_, `parent_classes`_, `require_parent`_,
+    ..  attribute:: model
 
+        Default: ``CMSPlugin``
 
-parent_classes
---------------
+        If the plugin requires per-instance settings, then this setting must be set to
+        a model that inherits from :class:`~cms.models.pluginmodel.CMSPlugin`.
 
-Default: ``None``
+        See also: :ref:`storing configuration`.
 
-A list of Plugin Class Names. If this is set, this plugin may only be added
-to plugins listed here.
 
-See also: `child_classes`_, `require_parent`_
+    .. attribute:: module
 
+        Will group the plugin in the plugin picker. If module is ``None``,
+        plugin is listed in the "Generic" group.
 
-render_plugin
--------------
 
-Default: ``True``
+    .. attribute:: name
 
-Should the plugin be rendered at all, or doesn't it have any output?  If
-`render_plugin` is ``True``, then you must also define :meth:`render_template`
+        Will be displayed in the plugin picker.
 
-See also: `render_template`_, `get_render_template`_
 
+    ..  attribute:: page_only
 
-render_template
----------------
+        Default: ``False``
 
-Default: ``None``
+        Set to ``True`` if this plugin should only be used in a placeholder that is attached to a django CMS page,
+        and not other models with ``PlaceholderFields``.
 
-The path to the template used to render the template. If ``render_plugin``
-is ``True`` either this or ``get_render_template`` **must** be defined;
+        See also: :attr:`child_classes`, :attr:`parent_classes`, :attr:`require_parent`.
 
-See also: `render_plugin`_ , `get_render_template`_
 
+    ..  attribute:: parent_classes
 
-require_parent
---------------
+        Default: ``None``
 
-Default: ``False``
+        A list of the names of permissible parent classes for this plugin.
 
-Is it required that this plugin is a child of another plugin? Or can it be
-added to any placeholder, even one attached to a page.
+        See also: :attr:`child_classes`, :attr:`require_parent`.
 
-See also: `child_classes`_, `parent_classes`_
 
+    ..  attribute:: render_plugin
 
-text_enabled
-------------
+        If set to ``False``, this plugin will not be rendered at all.
+        Default: ``True``
 
-Default: ``False``
+        If ``True``, :meth:`render_template` must also be defined.
 
-Can the plugin be inserted inside the text plugin?  If this is ``True`` then
-:meth:`icon_src` must be overridden.
+        See also: :attr:`render_template`, :meth:`get_render_template`.
 
-See also: `icon_src`_, `icon_alt`_
 
+    ..  attribute:: render_template
 
-Methods
-=======
+        Default: ``None``
 
-.. _render:
+        The path to the template used to render the template. If ``render_plugin``
+        is ``True`` either this or ``get_render_template`` **must** be defined;
 
-render
-------
+        See also: :attr:`render_plugin` , :meth:`get_render_template`.
 
-The :meth:`render` method takes three arguments:
 
-* ``context``: The context with which the page is rendered.
-* ``instance``: The instance of your plugin that is rendered.
-* ``placeholder``: The name of the placeholder that is rendered.
+    ..  attribute:: require_parent
 
-This method must return a dictionary or an instance of
-:class:`django.template.Context`, which will be used as context to render the
-plugin template.
+        Default: ``False``
 
-.. versionadded:: 2.4
+        Is it required that this plugin is a child of another plugin? Or can it be
+        added to any placeholder, even one attached to a page.
 
-By default this method will add ``instance`` and ``placeholder`` to the
-context, which means for simple plugins, there is no need to overwrite this
-method.
+        See also: :attr:`child_classes`, :attr:`parent_classes`.
 
-If you overwrite this method it's recommended to always populate the context
-with default values by calling the render method of the super class::
 
-    def render(self, context, instance, placeholder):
-        context = super(MyPlugin, self).render(context, instance, placeholder)
-        ...
-        return context
+    ..  attribute:: text_enabled
 
+        Default: ``False``
 
-get_render_template
--------------------
+        This attribute controls whether your plugin will be usable (and rendered)
+        in a text plugin. When you edit a text plugin on a page, the plugin will show up in
+        the *CMS Plugins* dropdown and can be configured and inserted. The output will even
+        be previewed in the text editor.
 
-If you need to determine the plugin render model at render time
-you can implement :meth:`get_render_template` method on the plugin
-class; this method takes the same arguments as ``render``.
-The method **must** return a valid template file path.
+        Of course, not all plugins are usable in text plugins. Therefore the default of this
+        attribute is ``False``. If your plugin *is* usable in a text plugin:
 
-Example::
+        * set this to ``True``
+        * make sure your plugin provides its own :meth:`icon_alt`, this will be used as a tooltip in
+          the text-editor and comes in handy when you use multiple plugins in your text.
 
-    def get_render_template(self, context, instance, placeholder):
-        if instance.attr = 'one':
-            return 'template1.html'
-        else:
-            return 'template2.html'
+        See also: :meth:`icon_alt`, :meth:`icon_src`.
 
-See also: `render_plugin`_ , `render_template`_
 
-icon_src
---------
+    **Methods**
 
-By default, this returns an empty string, which, if left unoverridden would
-result in no icon rendered at all, which, in turn, would render the plugin
-uneditable by the operator inside a parent text plugin.
+    .. method:: get_plugin_urls(instance)
 
-Therefore, this should be overridden when the plugin has ``text_enabled`` set to
-``True`` to return the path to an icon to display in the text of the text
-plugin.
+        Returns the URL patterns the plugin wants to register views for.
+        They are included under django CMS's page admin URLS in the plugin path
+        (e.g.: ``/admin/cms/page/plugin/<plugin-name>/`` in the default case).
 
-icon_src takes 1 argument:
 
-* ``instance``: The instance of the plugin model
+        ``get_plugin_urls()`` is useful if your plugin needs to talk asynchronously to the admin.
 
-Example::
 
-    def icon_src(self, instance):
-        return settings.STATIC_URL + "cms/img/icons/plugins/link.png"
+    ..  method:: get_render_template()
 
-See also: `text_enabled`_, `icon_alt`_
+        If you need to determine the plugin render model at render time
+        you can implement the :meth:`get_render_template` method on the plugin
+        class; this method takes the same arguments as ``render``.
 
+        The method **must** return a valid template file path.
 
-icon_alt
---------
+        Example::
 
-Although it is optional, authors of "text enabled" plugins should consider
-overriding this function as well.
+            def get_render_template(self, context, instance, placeholder):
+                if instance.attr = 'one':
+                    return 'template1.html'
+                else:
+                    return 'template2.html'
 
-This function accepts the ``instance`` as a parameter and returns a string to be
-used as the ``alt`` text for the plugin's icon which will appear as a tooltip in
-most browsers.  This is useful, because if the same plugin is used multiple
-times within the same text plugin, they will typically all render with the
-same icon rendering them visually identical to one another. This ``alt`` text and
-related tooltip will help the operator distinguish one from the others.
+        See also: :meth:`render_plugin` , :meth:`render_template`
 
-By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
-[instance]", but can be modified to return anything you like.
 
-:meth:`icon_alt` takes 1 argument:
+    ..  method:: get_extra_placeholder_menu_items(self, request, placeholder)
 
-* ``instance``: The instance of the plugin model
+        Extends the context menu for all placeholders.
 
-The default implementation is as follows::
+        To add one or more custom context menu items that are displayed in the context menu for all placeholders when
+        in structure mode, override this method in a related plugin to return a list of
+        :class:`cms.plugin_base.PluginMenuItem` instances.
 
-    def icon_alt(self, instance):
-        return "%s - %s" % (force_text(self.name), force_text(instance))
 
-See also: `text_enabled`_, `icon_src`_
+    ..  method:: get_extra_global_plugin_menu_items(self, request, plugin)
 
-text_editor_button_icon
------------------------
+        Extends the context menu for all plugins.
 
-When `text_enabled`_ is ``True``, this plugin can be added in a text editor and
-there might be an icon button for that purpose. This method allows to override
-this icon.
+        To add one or more custom context menu items that are displayed in the context menu for all plugins when in
+        structure mode, override this method in a related plugin to return a list of
+        :class:`cms.plugin_base.PluginMenuItem` instances.
 
-By default, it returns ``None`` and each text editor plugin may have its own
-fallback icon.
 
-:meth:`text_editor_button_icon` takes 2 arguments:
+    ..  method:: get_extra_local_plugin_menu_items()
 
-* ``editor_name``: The plugin name of the text editor
-* ``icon_context``: A dictionary containing information about the needed icon
-  like `width`, `height`, `theme`, etc
+        Extends the context menu for a specific plugin. To add one or more custom
+        context menu items that are displayed in the context menu for a given plugin
+        when in structure mode, override this method in the plugin to return a list of
+        :class:`cms.plugin_base.PluginMenuItem` instances.
 
-Usually this method should return the icon URL. But, it may depends on the text
-editor because what is needed may differ. Please consult the documentation of
-your text editor plugin.
+    .. _get_cache_expiration:
 
-This requires support from the text plugin; support for this is currently planned
-for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
+    ..  method:: get_cache_expiration(self, request, instance, placeholder)
 
-See also: `text_enabled`_
+        Provides expiration value to the placeholder, and in turn to the page
+        for determining the appropriate Cache-Control headers to add to the
+        HTTPResponse object.
 
-.. _get_extra_placeholder_menu_items:
+        Must return one of:
 
-get_extra_placeholder_menu_items
---------------------------------
+            :``None``:
+                This means the placeholder and the page will not even consider
+                this plugin when calculating the page expiration.
 
-``get_extra_placeholder_menu_items(self, request, placeholder)``
+            :``datetime``:
+                A specific date and time (timezone-aware) in the future when
+                this plugin's content expires.
 
-Extends the context menu for all placeholders. To add one or more custom context
-menu items that are displayed in the context menu for all placeholders when in
-structure mode, override this method in a related plugin to return a list of
-:class:`cms.plugin_base.PluginMenuItem` instances.
+                .. important:: The returned ``datetime`` must be timezone-aware
+                               or the plugin will be ignored (with a warning)
+                               during expiration calculations.
 
-.. _get_extra_global_plugin_menu_items:
+            :``int``:
+                An number of seconds that this plugin's content can be cached.
 
-get_extra_global_plugin_menu_items
-----------------------------------
+        There are constants are defined in ``cms.constants`` that may be
+        useful: :const:`~cms.constants.EXPIRE_NOW` and :data:`~cms.constants.MAX_EXPIRATION_TTL`.
 
-``get_extra_global_plugin_menu_items(self, request, plugin)``
+        An integer value of ``0`` (zero) or :const:`~cms.constants.EXPIRE_NOW` effectively means
+        "do not cache". Negative values will be treated as :const:`~cms.constants.EXPIRE_NOW`.
+        Values exceeding the value :data:`~cms.constants.MAX_EXPIRATION_TTL` will be set to
+        that value.
 
-Extends the context menu for all plugins. To add one or more custom context menu
-items that are displayed in the context menu for all plugins when in structure
-mode, override this method in a related plugin to return a list of
-:class:`cms.plugin_base.PluginMenuItem` instances.
+        Negative ``timedelta`` values or those greater than :data:`~cms.constants.MAX_EXPIRATION_TTL`
+        will also be ranged in the same manner.
 
-.. _get_extra_local_plugin_menu_items:
+        Similarly, ``datetime`` values earlier than now will be treated as :const:`~cms.constants.EXPIRE_NOW`. Values
+        greater than :const:`~cms.constants.MAX_EXPIRATION_TTL` seconds in the future will be treated as
+        :data:`~cms.constants.MAX_EXPIRATION_TTL` seconds in the future.
 
-get_extra_local_plugin_menu_items
----------------------------------
+        :param request: Relevant ``HTTPRequest`` instance.
+        :param instance: The ``CMSPlugin`` instance that is being rendered.
+        :rtype: ``None`` or ``datetime`` or ``int``
 
-``get_extra_local_plugin_menu_items(self, request, plugin)``
 
-Extends the context menu for a specific plugin. To add one or more custom
-context menu items that are displayed in the context menu for a given plugin
-when in structure mode, override this method in the plugin to return a list of
-:class:`cms.plugin_base.PluginMenuItem` instances.
+    .. _get_vary_cache_on:
 
-.. _get_cache_expiration:
+    ..  method:: get_vary_cache_on(self, request, instance, placeholder)
 
-get_cache_expiration
---------------------
+        Returns an HTTP VARY header string or a list of them to be considered by the placeholder
+        and in turn by the page to caching behaviour.
 
-``get_cache_expiration(self, request, instance, placeholder)``
+        Overriding this method is optional.
 
-Return a positive integer of seconds or a future, TZ-aware `datetime` to
-explicitly declare when this plugin's content should expire from caching.
-This will affect the internal cms caching, Django's caching middleware
-caching, any downstream caches and client browser caching.
+        Must return one of:
 
-This method is optional. The default implementation returns ``None`` which
-will not affect the cms's normal cache expiration functions.
+            :``None``:
+                This means that this plugin declares no headers for the cache
+                to be varied upon. (default)
 
-.. _get_vary_cache_on:
+            :string:
+                The name of a header to vary caching upon.
 
-get_vary_cache_on
------------------
+            :list of strings:
+                A list of strings, each corresponding to a header to vary the
+                cache upon.
 
-``get_vary_cache_on(self, request, instance, placeholder)``
 
-Return an HTTP header name or a list of HTTP header names and they will
-affect the caching of the containing placeholder and ultimately the page.
+    ..  method:: icon_alt()
 
-This method is optional. The default implementation returns ``None`` which
-will not affect HTTP ``VARY`` headers.
+        By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
+        [instance]", but can be modified to return anything you like.
+
+        This function accepts the ``instance`` as a parameter and returns a string to be
+        used as the ``alt`` text for the plugin's preview or icon.
+
+        Authors of text-enabled plugins should consider overriding this function as
+        it will be rendered as a tooltip in most browser. This is useful, because if
+        the same plugin is used multiple times, this tooltip can provide information about
+        its configuration.
+
+        :meth:`icon_alt` takes 1 argument:
+
+        * ``instance``: The instance of the plugin model
+
+        The default implementation is as follows::
+
+            def icon_alt(self, instance):
+                return "%s - %s" % (force_text(self.name), force_text(instance))
+
+        See also: :attr:`text_enabled`, :meth:`icon_src`.
+
+
+    .. method:: icon_src(instance)
+
+        By default, this returns an empty string, which, if left unoverridden would
+        result in no icon rendered at all, which, in turn, would render the plugin
+        uneditable by the operator inside a parent text plugin.
+
+        Therefore, this should be overridden when the plugin has ``text_enabled`` set to
+        ``True`` to return the path to an icon to display in the text of the text
+        plugin.
+
+        Since djangocms-text-ckeditor introduced inline previews of plugins, the icon
+        will not be rendered anymore.
+
+        icon_src takes 1 argument:
+
+        * ``instance``: The instance of the plugin model
+
+        Example::
+
+            def icon_src(self, instance):
+                return settings.STATIC_URL + "cms/img/icons/plugins/link.png"
+
+        See also: :attr:`text_enabled`, :meth:`icon_alt`
+
+
+    .. method:: render(context, instance, placeholder)
+
+        This method returns the context to be used to render the template
+        specified in :attr:`render_template`.
+
+        The :meth:`render` method takes three arguments:
+
+        * ``context``: The context with which the page is rendered.
+        * ``instance``: The instance of your plugin that is rendered.
+        * ``placeholder``: The name of the placeholder that is rendered.
+
+        This method must return a dictionary or an instance of
+        :class:`django.template.Context`, which will be used as context to render the
+        plugin template.
+
+        By default this method will add ``instance`` and ``placeholder`` to the
+        context, which means for simple plugins, there is no need to overwrite this
+        method.
+
+        If you overwrite this method it's recommended to always populate the context
+        with default values by calling the render method of the super class::
+
+            def render(self, context, instance, placeholder):
+                context = super(MyPlugin, self).render(context, instance, placeholder)
+                ...
+                return context
+
+        :param context: Current template context.
+        :param instance: Plugin instance that is being rendered.
+        :param placeholder: Name of the placeholder the plugin is in.
+        :rtype: ``dict``
+
+
+    ..  method:: text_editor_button_icon()
+
+        When :attr:`text_enabled` is ``True``, this plugin can be added in a text editor and
+        there might be an icon button for that purpose. This method allows to override
+        this icon.
+
+        By default, it returns ``None`` and each text editor plugin may have its own
+        fallback icon.
+
+        :meth:`text_editor_button_icon` takes 2 arguments:
+
+        * ``editor_name``: The plugin name of the text editor
+        * ``icon_context``: A dictionary containing information about the needed icon
+          like `width`, `height`, `theme`, etc
+
+        Usually this method should return the icon URL. But, it may depends on the text
+        editor because what is needed may differ. Please consult the documentation of
+        your text editor plugin.
+
+        This requires support from the text plugin; support for this is currently planned
+        for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
+
+        See also: :attr:`text_enabled`.
+
+
+.. class:: cms.plugin_base.PluginMenuItem
+
+    .. method:: __init___(name, url, data, question=None, action='ajax', attributes=None)
+
+        Creates an item in the plugin / placeholder menu
+
+        :param name: Item name (label)
+        :param url: URL the item points to. This URL will be called using POST
+        :param data: Data to be POSTed to the above URL
+        :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
+        :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
+        :param attributes: Dictionary whose content will be added as data-attributes to the menu item
 
 
 ******************************************
 CMSPlugin Attributes and Methods Reference
 ******************************************
 
-These are a list of attributes and methods that can (or should) be overridden
-on your plugin's `model` definition.
+..  class:: cms.models.pluginmodel.CMSPlugin
 
-See also: :ref:`storing configuration`
+    See also: :ref:`storing configuration`
 
+    **Attributes**
 
-Attributes
-==========
+    ..  attribute:: translatable_content_excluded_fields
 
+    Default: ``[ ]``
 
-translatable_content_excluded_fields
-------------------------------------
+    A list of plugin fields which will not be exported while using :meth:`get_translatable_content`.
 
-Default: ``[ ]``
+    See also: :meth:`get_translatable_content`, :meth:`set_translatable_content`.
 
-A list of plugin fields which will not be exported while using :meth:`get_translatable_content`.
+    **Methods**
 
-See also: `get_translatable_content`_, `set_translatable_content`_
+    ..  method:: copy_relations()
 
+        Handle copying of any relations attached to this plugin. Custom plugins have
+        to do this themselves.
 
-Methods
-=======
+        ``copy_relations`` takes 1 argument:
 
+        * ``old_instance``: The source plugin instance
 
-copy_relations
---------------
+        See also: :ref:`Handling-Relations`, :meth:`post_copy`.
 
-Handle copying of any relations attached to this plugin. Custom plugins have
-to do this themselves.
+    ..  method:: get_translatable_content()
 
-``copy_relations`` takes 1 argument:
+        Get a dictionary of all content fields (field name / field value pairs) from
+        the plugin.
 
-* ``old_instance``: The source plugin instance
+        Example::
 
-See also: :ref:`Handling-Relations`, `post_copy`_
+            from djangocms_text_ckeditor.models import Text
 
+            plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+            plugin.get_translatable_content()
+            # returns {'body': u'<p>I am text!</p>\n'}
 
-get_translatable_content
-------------------------
+        See also: :attr:`translatable_content_excluded_fields`, :attr:`set_translatable_content`.
 
-Get a dictionary of all content fields (field name / field value pairs) from
-the plugin.
 
-Example::
+    ..  method:: post_copy()
 
-    from djangocms_text_ckeditor.models import Text
+        Can (should) be overridden to handle the copying of plugins which contain
+        children plugins after the original parent has been copied.
 
-    plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
-    plugin.get_translatable_content()
-    # returns {'body': u'<p>I am text!</p>\n'}
+        ``post_copy`` takes 2 arguments:
 
+        * ``old_instance``: The old plugin instance instance
+        * ``new_old_ziplist``: A list of tuples containing new copies and the old existing child plugins.
 
-See also: `translatable_content_excluded_fields`_, `set_translatable_content`_
+        See also: :ref:`Handling-Relations`, :meth:`copy_relations`.
 
 
-post_copy
----------
+    ..  method:: set_translatable_content()
 
-Can (should) be overridden to handle the copying of plugins which contain
-children plugins after the original parent has been copied.
+        Takes a dictionary of plugin fields (field name / field value pairs) and
+        overwrites the plugin's fields. Returns ``True`` if all fields have been
+        written successfully, and ``False`` otherwise.
 
-``post_copy`` takes 2 arguments:
+        ``set_translatable_content`` takes 1 argument:
 
-* ``old_instance``: The old plugin instance instance
-* ``new_old_ziplist``: A list of tuples containing new copies and the old existing child plugins.
+        * ``fields``: A dictionary containing the field names and translated content for each.
 
-See also: :ref:`Handling-Relations`, `copy_relations`_
+        * :meth:`get_translatable_content()`
 
+        Example::
 
-set_translatable_content
-------------------------
+            from djangocms_text_ckeditor.models import Text
 
-Takes a dictionary of plugin fields (field name / field value pairs) and
-overwrites the plugin's fields. Returns ``True`` if all fields have been
-written successfully, and ``False`` otherwise.
+            plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+            plugin.set_translatable_content({'body': u'<p>This is a different text!</p>\n'})
+            # returns True
 
-set_translatable_content takes 1 argument:
+        See also: :attr:`translatable_content_excluded_fields`, :meth:`get_translatable_content`.
 
-* ``fields``: A dictionary containing the field names and translated content for each.
 
-Example::
+    ..  method:: get_add_url()
 
-    from djangocms_text_ckeditor.models import Text
+        Returns the URL to call to add a plugin instance; useful to implement plugin-specific
+        logic in a custom view.
 
-    plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
-    plugin.set_translatable_content({'body': u'<p>This is a different text!</p>\n'})
-    # returns True
 
-See also: `translatable_content_excluded_fields`_, `get_translatable_content`_
+    ..  method:: get_edit_url()
 
+        Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
+        logic in a custom view.
 
-get_add_url
------------
 
-Returns the URL to call to add a plugin instance; useful to implement plugin-specific
-logic in a custom view.
+    ..  method:: get_move_url()
 
-get_edit_url
-------------
+        Returns the URL to call to move a plugin instance; useful to implement plugin-specific
+        logic in a custom view.
 
-Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
-logic in a custom view.
 
-get_move_url
-------------
+    ..  method:: get_delete_url()
 
-Returns the URL to call to move a plugin instance; useful to implement plugin-specific
-logic in a custom view.
+        Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
+        logic in a custom view.
 
-get_delete_url
---------------
 
-Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
-logic in a custom view.
+    ..  method:: get_copy_url()
 
-get_copy_url
-------------
+        Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
+        logic in a custom view.
 
-Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
-logic in a custom view.
 
-
-add_url
--------
-
-Returns the URL to call to add a plugin instance; useful to implement plugin-specific
-logic in a custom view.
-
-This property is now deprecated. Will be removed in 3.4.
-Use the ``get_add_url`` method instead.
-
-Default: None (``cms_page_add_plugin`` view is used)
-
-edit_url
---------
-
-Returns the URL to call to edit a plugin instance; useful to implement plugin-specific
-logic in a custom view.
-
-This property is now deprecated. Will be removed in 3.4.
-Use the ``get_edit_url`` method instead.
-
-Default: None (``cms_page_edit_plugin`` view is used)
-
-move_url
---------
-
-Returns the URL to call to move a plugin instance; useful to implement plugin-specific
-logic in a custom view.
-
-This property is now deprecated. Will be removed in 3.4.
-Use the ``get_move_url`` method instead.
-
-Default: None (``cms_page_move_plugin`` view is used)
-
-delete_url
-----------
-
-Returns the URL to call to delete a plugin instance; useful to implement plugin-specific
-logic in a custom view.
-
-This property is now deprecated. Will be removed in 3.4.
-Use the ``get_delete_url`` method instead.
-
-Default: None (``cms_page_delete_plugin`` view is used)
-
-copy_url
---------
-
-Returns the URL to call to copy a plugin instance; useful to implement plugin-specific
-logic in a custom view.
-
-This property is now deprecated. Will be removed in 3.4.
-Use the ``get_copy_url`` method instead.
-
-Default: None (``cms_page_copy_plugins`` view is used)
+..  class:: cms.plugin_pool.PluginPool

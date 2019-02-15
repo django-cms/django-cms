@@ -1,8 +1,8 @@
 .. _custom-plugins:
 
-##############
-Custom Plugins
-##############
+#####################
+How to create Plugins
+#####################
 
 CMS Plugins are reusable content publishers that can be inserted into django
 CMS pages (or indeed into any content that uses django CMS placeholders). They
@@ -17,7 +17,8 @@ It's like magic, but quicker.
 Unless you're lucky enough to discover that your needs can be met by the
 built-in plugins, or by the many available third-party plugins, you'll have to
 write your own custom CMS Plugin. Don't worry though - writing a CMS Plugin is
-rather simple.
+very straightforward.
+
 
 *************************************
 Why would you need to write a plugin?
@@ -71,9 +72,9 @@ A note about :class:`cms.plugin_base.CMSPluginBase`
 ===================================================
 
 :class:`cms.plugin_base.CMSPluginBase` is actually a sub-class of
-:class:`django.contrib.admin.options.ModelAdmin`.
+:class:`django:django.contrib.admin.ModelAdmin`.
 
-Because :class:`CMSPluginBase` sub-classes ``ModelAdmin`` several important
+Because :class:`~cms.plugin_base.CMSPluginBase` sub-classes ``ModelAdmin`` several important
 ``ModelAdmin`` options are also available to CMS plugin developers. These
 options are often used:
 
@@ -146,12 +147,11 @@ In ``cms_plugins.py``, you place your plugins. For our example, include the foll
     from cms.models.pluginmodel import CMSPlugin
     from django.utils.translation import ugettext_lazy as _
 
+    @plugin_pool.register_plugin
     class HelloPlugin(CMSPluginBase):
         model = CMSPlugin
         render_template = "hello_plugin.html"
         cache = False
-
-    plugin_pool.register_plugin(HelloPlugin)
 
 Now we're almost done. All that's left is to add the template. Add the
 following into the root template directory in a file called
@@ -193,14 +193,14 @@ is ``True`` (the default):
 * ``get_render_template``: A method that returns a template path to render the
   plugin with.
 
-In addition to those attributes, you can also override the :ref:`render` method
+In addition to those attributes, you can also override the :meth:`~cms.plugin_base.CMSPluginBase.render()` method
 which determines the template context variables that are used to render your
 plugin. By default, this method only adds ``instance`` and ``placeholder``
 objects to your context, but plugins can override this to include any context
 that is required.
 
 A number of other methods are available for overriding on your CMSPluginBase
-sub-classes. See: :mod:`cms.plugin_base` for further details.
+sub-classes. See: :class:`~cms.plugin_base.CMSPluginBase` for further details.
 
 
 ***************
@@ -247,7 +247,7 @@ In our ``models.py`` we add the following::
 If you followed the Django tutorial, this shouldn't look too new to you. The
 only difference to normal models is that you sub-class
 :class:`cms.models.pluginmodel.CMSPlugin` rather than
-:class:`django.db.models.base.Model`.
+:class:`django.db.models.Model`.
 
 Now we need to change our plugin definition to use this model, so our new
 ``cms_plugins.py`` looks like this::
@@ -258,6 +258,7 @@ Now we need to change our plugin definition to use this model, so our new
 
     from .models import Hello
 
+    @plugin_pool.register_plugin
     class HelloPlugin(CMSPluginBase):
         model = Hello
         name = _("Hello Plugin")
@@ -267,8 +268,6 @@ Now we need to change our plugin definition to use this model, so our new
         def render(self, context, instance, placeholder):
             context = super(HelloPlugin, self).render(context, instance, placeholder)
             return context
-
-    plugin_pool.register_plugin(HelloPlugin)
 
 We changed the ``model`` attribute to point to our newly created ``Hello``
 model and pass the model instance to the context.
@@ -361,6 +360,11 @@ new plugin::
         title = models.CharField(max_length=50)
 
         def copy_relations(self, oldinstance):
+            # Before copying related objects from the old instance, the ones
+            # on the current one need to be deleted. Otherwise, duplicates may
+            # appear on the public version of the page
+            self.associated_item.all().delete()
+
             for associated_item in oldinstance.associated_item.all():
                 # instance.pk = None; instance.pk.save() is the slightly odd but
                 # standard Django way of copying a saved model instance
@@ -431,7 +435,7 @@ Plugin form
 ===========
 
 Since :class:`cms.plugin_base.CMSPluginBase` extends
-:class:`django.contrib.admin.options.ModelAdmin`, you can customise the form
+:class:`django:django.contrib.admin.ModelAdmin`, you can customise the form
 for your plugins just as you would customise your admin interfaces.
 
 The template that the plugin editing mechanism uses is
@@ -454,19 +458,8 @@ variable), which you'd likely place in ``{% block extrahead %}``, after a ``{{
 block.super }}`` to inherit the existing items that were in the parent
 template.
 
-Or: ``cms/templates/admin/cms/page/plugin/change_form.html`` extends Django's
-own ``admin/base_site.html``, which loads a rather elderly version of jQuery,
-and your plugin admin might require something newer. In this case, in your
-custom ``change_form_template`` you could do something like::
-
-    {% block jquery %}
-        <script type="text/javascript" src="///ajax.googleapis.com/ajax/libs/jquery/1.8.0/jquery.min.js" type="text/javascript"></script>
-    {% endblock jquery %}``
-
-to override the ``{% block jquery %}``.
 
 .. _custom-plugins-handling-media:
-
 
 Handling media
 ==============
@@ -633,7 +626,7 @@ In your ``yourapp.cms_plugin_processors.py``::
 
 .. _Django admin documentation: http://docs.djangoproject.com/en/dev/ref/contrib/admin/
 .. _django-sekizai: https://github.com/ojii/django-sekizai
-.. _django-sekizai documentation: http://django-sekizai.readthedocs.org
+.. _django-sekizai documentation: https://django-sekizai.readthedocs.io
 
 
 Nested Plugins
@@ -659,6 +652,7 @@ achieve this functionality:
 
     from .models import ParentPlugin, ChildPlugin
 
+    @plugin_pool.register_plugin
     class ParentCMSPlugin(CMSPluginBase):
         render_template = 'parent.html'
         name = 'Parent'
@@ -672,9 +666,8 @@ achieve this functionality:
             context = super(ParentCMSPlugin, self).render(context, instance, placeholder)
             return context
 
-    plugin_pool.register_plugin(ParentCMSPlugin)
 
-
+    @plugin_pool.register_plugin
     class ChildCMSPlugin(CMSPluginBase):
         render_template = 'child.html'
         name = 'Child'
@@ -687,8 +680,6 @@ achieve this functionality:
         def render(self, context, instance, placeholder):
             context = super(ChildCMSPlugin, self).render(context, instance, placeholder)
             return context
-
-    plugin_pool.register_plugin(ChildCMSPlugin)
 
 
 ``parent.html``:
@@ -727,9 +718,9 @@ of placeholders or plugins.
 
 For this purpose you can overwrite 3 methods on CMSPluginBase.
 
-* :ref:`get_extra_placeholder_menu_items`
-* :ref:`get_extra_global_plugin_menu_items`
-* :ref:`get_extra_local_plugin_menu_items`
+* :meth:`~cms.plugin_base.CMSPluginBase.get_extra_placeholder_menu_items`
+* :meth:`~cms.plugin_base.CMSPluginBase.get_extra_global_plugin_menu_items`
+* :meth:`~cms.plugin_base.CMSPluginBase.get_extra_local_plugin_menu_items`
 
 Example::
 

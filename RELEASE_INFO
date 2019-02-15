@@ -5,8 +5,10 @@
 - Build newest english JS translations (django-admin.py makemessages -l en -d djangojs)
 - Pull translations (tx pull -f -a)
 - Compile translations (django-admin.py compilemessages)
-- Make sure css files are compiled from latest sass source (gulp sass)
-- Make sure js files are bundled and minified propery from latest source (gulp bundle)
+- Make sure icons are recreated in the new place (gulp icons)
+- Make sure CSS files are compiled from latest sass source (gulp sass)
+- Make sure JS files are bundled and minified propery from latest source (gulp bundle)
+- Make sure to remove JS, CSS and font files from the older version of CMS
 - Check CHANGELOG that all closed PRs are present.
 - Prepare blog post, including "Release" tag
 - update AUTHORS file (python develop.py authors)

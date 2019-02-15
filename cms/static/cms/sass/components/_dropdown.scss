@@ -1,0 +1,231 @@
+.cms-dropdown-caret {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-top:   5px dashed;
+    border-top:   5px solid \9; // IE8
+    border-right: 5px solid transparent;
+    border-left:  5px solid transparent;
+}
+
+.cms-dropdown {
+    position: relative;
+
+    > .cms-btn {
+        border-radius: $border-radius-base !important;
+    }
+}
+
+// Prevent the focus on the dropdown toggle when closing dropdowns
+.cms-dropdown-toggle:focus {
+    outline: 0;
+}
+
+.cms-dropdown-toggle-thin {
+    margin-left: -1px;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
+
+    .cms-dropdown-caret {
+        margin-left: 0px;
+    }
+}
+
+.cms-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: z('dropdown', 'base');
+    display: none !important; // none by default, but block on "open" of the menu
+    float: left;
+    min-width: $dropdown-width;
+    padding: 5px 0;
+    margin: 2px 0 0; // override default ul
+    list-style: none;
+    font-size: $font-size-normal !important;
+    text-align: left; // Ensures proper alignment if parent has it changed (e.g., modal footer)
+    background-color: $dropdown-bg;
+    border: 1px solid $dropdown-border;
+    border-radius: $border-radius-normal;
+    box-shadow: $dropdown-shadow;
+    background-clip: padding-box;
+
+    // Links within the dropdown menu
+    > li > a {
+        display: block !important;
+        padding: 3px 20px !important;
+        border: none !important;
+        clear: both;
+        font-weight: normal;
+        line-height: 30px;
+        float: none !important;
+        font-size: $font-size-normal !important;
+        border-radius: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        height: 30px;
+        color: $dropdown-link-color;
+        &.cms-btn-action,
+        &.cms-btn-caution {
+            color: white;
+        }
+        white-space: nowrap; // prevent links from randomly breaking onto new lines
+    }
+
+    .cms-toolbar-item-navigation-break {
+        @include hide-content();
+        height: 1px;
+        margin: 0 0 4px;
+        padding: 0 0 4px;
+        border-bottom: 1px solid $gray-lighter;
+    }
+}
+.cms-toolbar-right {
+    .cms-dropdown-menu {
+        left: auto;
+        right: -1px;
+    }
+}
+
+// Hover/Focus state
+.cms-dropdown-menu > li > a {
+    border-radius: none;
+    background-color: none;
+    &:hover,
+    &:focus {
+        text-decoration: none;
+        color: $dropdown-link-hover-color;
+        background-color: $dropdown-link-hover-bg;
+    }
+}
+
+// Active state
+.cms-dropdown-menu > li > a.cms-btn-active {
+    &,
+    &:hover,
+    &:focus {
+        color: $dropdown-link-active-color;
+        text-decoration: none;
+        outline: 0;
+        background-color: $dropdown-link-active-bg;
+    }
+}
+
+// Disabled state
+//
+// Gray out text and ensure the hover/focus state remains gray
+
+.cms-dropdown-menu > li > a.cms-btn-disabled {
+    opacity: 0.2 !important;
+    &,
+    &:hover,
+    &:focus {
+        color: $dropdown-link-disabled-color;
+    }
+
+    // Nuke hover/focus effects
+    &,
+    &:hover,
+    &:focus {
+        text-decoration: none !important;
+        background-color: transparent !important;
+        background-image: none !important;
+        cursor: not-allowed !important;
+    }
+}
+
+// Open state for the dropdown
+.cms-dropdown-open {
+    // Show the menu
+    > .cms-dropdown-menu {
+        display: block !important;
+    }
+
+    // Remove the outline when :focus is triggered
+    .cms-dropdown-toggle {
+        outline: 0;
+    }
+
+    .cms-dropdown-toggle {
+        @extend .cms-btn-active;
+    }
+}
+
+
+// Backdrop to catch body clicks on mobile, etc.
+.cms-dropdown-backdrop {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    z-index: z('dropdown', 'backdrop');
+}
+
+.cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
+    .cms-dropdown-toggle {
+        text-align: left !important;
+        .cms-dropdown-caret {
+            position: absolute;
+            right: 15px;
+            top: 18px;
+        }
+    }
+    .cms-dropdown-menu {
+        display: none !important;
+        margin-left: 0px !important;
+        width: 100% !important;
+        border: 1px solid $gray-lighter;
+        border-bottom-left-radius: $border-radius-normal;
+        border-bottom-right-radius: $border-radius-normal;
+        margin-top: -1px;
+        li > a.cms-btn {
+            text-align: left;
+        }
+    }
+    .cms-dropdown-open .cms-dropdown-menu {
+        display: block !important;
+    }
+
+    .cms-btn-group {
+        display: table;
+        width: 100%;
+        > .cms-btn {
+            display: table-cell;
+            text-align: left !important;
+            &.cms-btn-action,
+            &.cms-btn-caution {
+                color: white;
+            }
+            &:first-child {
+                border-right: none !important;
+            }
+            &:last-child {
+                width: 40px;
+                text-align: center !important;
+            }
+
+            .cms-dropdown-caret {
+                position: static !important;
+            }
+        }
+    }
+}
+
+.cms-btn-group {
+    > .cms-btn {
+        &.cms-btn-action:last-child {
+            border-left: 1px solid darken($color-primary, 10%);
+
+        }
+        &.cms-btn-caution:last-child {
+            border-left: 1px solid darken($color-danger, 10%);
+        }
+    }
+}
+
+&.cms.cms-toolbar-debug .cms-btn-group > .cms-btn.cms-btn-action:last-child {
+    border-left: 1px solid darken($toolbar-debug-bgcolor, 10%) !important;
+}

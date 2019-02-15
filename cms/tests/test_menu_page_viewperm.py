@@ -5,13 +5,16 @@ from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
 from cms.api import create_page
-from cms.cms_menus import get_visible_pages
+from cms.cms_menus import get_visible_nodes
 from cms.models import Page
 from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
 from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.page_permissions import user_can_view_page
+
 from menus.menu_pool import menu_pool
+
 
 __all__ = [
     'ViewPermissionTreeBugTests',
@@ -67,7 +70,9 @@ class ViewPermissionTests(CMSTestCase):
             'published': True,
             'in_navigation': True,
         }
-        page_a = create_page("page_a", **stdkwargs) # first page slug is /
+        homepage = create_page("page_a", **stdkwargs)
+        homepage.set_as_homepage()
+
         page_b = create_page("page_b", **stdkwargs)
         page_c = create_page("page_c", **stdkwargs)
         page_d = create_page("page_d", **stdkwargs)
@@ -94,7 +99,7 @@ class ViewPermissionTests(CMSTestCase):
         page_d_d = create_page("page_d_d", parent=page_d, **stdkwargs)
 
         pages = [
-            page_a,
+            homepage,
             page_b,
             page_b_a,
             page_b_b,
@@ -181,12 +186,10 @@ class ViewPermissionTests(CMSTestCase):
         self.assertEqual(response.status_code, 404)
 
     def assertViewAllowed(self, page, user):
-        request = self.get_request(user, page)
-        self.assertTrue(page.has_view_permission(request))
+        self.assertTrue(user_can_view_page(user, page))
 
     def assertViewNotAllowed(self, page, user):
-        request = self.get_request(user, page)
-        self.assertFalse(page.has_view_permission(request))
+        self.assertFalse(user_can_view_page(user, page))
 
     def assertInMenu(self, page, user):
         request = self.get_request(user, page)
@@ -244,7 +247,7 @@ class ViewPermissionTests(CMSTestCase):
             query[get_user_model().USERNAME_FIELD+'__iexact'] = username
             user = get_user_model().objects.get(**query)
         request = self.get_request(user)
-        visible_page_ids = get_visible_pages(request, all_pages, self.site)
+        visible_page_ids = [page.pk for page in get_visible_nodes(request, all_pages, self.site)]
         public_page_ids = Page.objects.drafts().filter(title_set__title__in=expected_granted_pages).values_list('id',
                                                                                                                 flat=True)
         self.assertEqual(len(visible_page_ids), len(expected_granted_pages))
@@ -260,9 +263,12 @@ class ViewPermissionTests(CMSTestCase):
         attrs = {
             'user': user or AnonymousUser(),
             'REQUEST': {},
+            'COOKIES': {},
+            'META': {},
             'POST': {},
             'GET': {},
             'path': path,
+            'path_info': path,
             'session': {},
         }
         return type('Request', (object,), attrs)
@@ -286,8 +292,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         """
         all_pages = self._setup_tree_pages()
         request = self.get_request()
-        visible_page_ids = get_visible_pages(request, all_pages, self.site)
-        self.assertEqual(len(all_pages), len(visible_page_ids))
+        visible_pages = get_visible_nodes(request, all_pages, self.site)
+        self.assertEqual(len(all_pages), len(visible_pages))
         menu_renderer = menu_pool.get_renderer(request)
         nodes = menu_renderer.get_nodes()
         self.assertEqual(len(nodes), len(all_pages))
@@ -538,7 +544,7 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
 )
 class ViewPermissionTreeBugTests(ViewPermissionTests):
     """Test issue 1113
-    https://github.com/divio/django-cms/issues/1113
+   https://github.com/divio/django-cms/issues/1113
     Wrong view permission calculation in PagePermission.objects.for_page
     grant_on=ACCESS_PAGE_AND_CHILDREN or ACCESS_PAGE_AND_DESCENDANTS to page 6
     Test if this affects the menu entries and page visibility
@@ -561,13 +567,14 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
             'published': True,
             'in_navigation': True,
         }
-        page_1 = create_page("page_1", **stdkwargs) # first page slug is /
-        page_2 = create_page("page_2", parent=page_1, **stdkwargs)
+        homepage = create_page("page_1", **stdkwargs)
+        homepage.set_as_homepage()
+        page_2 = create_page("page_2", parent=homepage, **stdkwargs)
         page_3 = create_page("page_3", parent=page_2, **stdkwargs)
         page_4 = create_page("page_4", parent=page_3, **stdkwargs)
-        page_5 = create_page("page_5", parent=page_1, **stdkwargs)
+        page_5 = create_page("page_5", parent=homepage, **stdkwargs)
         page_6 = create_page("page_6", parent=page_5, **stdkwargs)
-        return [page_1,
+        return [homepage,
             page_2,
             page_3,
             page_4,

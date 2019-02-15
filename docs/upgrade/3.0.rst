@@ -43,8 +43,7 @@ objects. See :doc:`/how_to/toolbar`.
 .. warning:: Upgrading from previous versions
 
     3.0 now requires the ``django.contrib.messages`` application for the
-    toolbar to work. See :ref:`Enable messages <enable-messages>` for how to
-    enable it.
+    toolbar to work.
 
 New Page Types
 ==============
@@ -141,7 +140,7 @@ We removed the file plugin (``cms.plugins.file``). Its new location is at:
 As an alternative, you could also use the following (yet you will not be able
 to keep your existing files from the old ``cms.plugins.file``!)
 
-* https://github.com/stefanfoulis/django-filer
+* https://github.com/divio/django-filer
 
 
 Flash Plugin
@@ -357,8 +356,8 @@ template tags you can just do:
 ``getter`` and ``setter`` for translatable plugin content
 =========================================================
 
-A plugin's translatable content can now be read and set through :meth:`get_translatable_content`
-and :meth:`set_translatable_content`. See :ref:`Custom Plugins <custom-plugins>` for more info.
+A plugin's translatable content can now be read and set through :meth:`~cms.models.pluginmodel.CMSPlugin.get_translatable_content()`
+and :meth:`~cms.models.pluginmodel.CMSPlugin.set_translatable_content()`. See :ref:`Custom Plugins <custom-plugins>` for more info.
 
 No more DB table-name magic for plugins
 =======================================
@@ -431,7 +430,7 @@ Upgrading from 2.4
     Django Debug Toolbar is installed. Please remove/disable Django Debug
     Toolbar and other non-essential apps before attempting to upgrade, then
     once complete, re-enable them following the `"Explicit setup"
-    <http://django-debug-toolbar.readthedocs.org/en/1.0/installation.html#explicit-setup>`_
+    <https://django-debug-toolbar.readthedocs.io/en/1.0/installation.html#explicit-setup>`_
     instructions.
 
 If you want to upgrade from version 2.4 to 3.0, there's a few things you need to do.

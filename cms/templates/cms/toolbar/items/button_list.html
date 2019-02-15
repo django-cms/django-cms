@@ -1,5 +1,17 @@
-<div class="cms-toolbar-item cms-toolbar-item-buttons {{ extra_classes|join:' ' }}">
-    {% for button in buttons %}
-        {{ button.render }}
-    {% endfor %}
-</div>
+{% load i18n %}
+{% if 'cms-toolbar-item-cms-mode-switcher' in extra_classes %}
+    <div class="{{ extra_classes|join:' ' }}">
+        <a href="?{{ cms_structure_on }}" class="cms-btn cms-btn-disabled" title="{% trans 'Toggle structure' %}"
+            {% for button in buttons %}
+                data-{{ button.extra_classes }}='{ "url": "{{ button.url }}", "name": "{{ button.name }}" }'
+            {% endfor %}>
+            <span class="cms-icon cms-icon-plugins"></span>
+        </a>
+    </div>
+{% else %}
+    <div class="cms-toolbar-item cms-toolbar-item-buttons {{ extra_classes|join:' ' }}">
+        {% for button in buttons %}
+            {{ button.render }}
+        {% endfor %}
+    </div>
+{% endif %}

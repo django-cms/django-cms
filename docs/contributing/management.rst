@@ -4,7 +4,7 @@
 Code and project management
 ###########################
 
-We use our `GitHub project <http://github.com/divio/django-cms>`_ for managing both django CMS code
+We use our `GitHub project <https://github.com/divio/django-cms>`_ for managing both django CMS code
 and development activity.
 
 This document describes how we manage tickets on GitHub. By "tickets", we mean GitHub issues and
@@ -31,7 +31,7 @@ Raising an issue
         or in any other public forum until we have had a chance to deal with it.
 
 Except in the case of security matters, of course, you're welcome to raise issues in any way that
-suits you - :ref:`on one of our email lists, or the IRC channel <community-resources>` or in person
+suits you - :ref:`on one of our email lists, or the IRC channel <development-community>` or in person
 if you happen to meet another django CMS developer.
 
 It's very helpful though if you don't just raise an issue by mentioning it to people, but actually

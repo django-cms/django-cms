@@ -1,0 +1,53 @@
+.. _upgrade-to-3.4.4:
+
+###################
+3.4.4 release notes
+###################
+
+
+
+*******************
+What's new in 3.4.4
+*******************
+
+Bug Fixes
+=========
+
+
+
+Improvements and new features
+=============================
+
+
+
+Deprecations
+============
+
+
+
+*****************************
+Backward incompatible changes
+*****************************
+
+Page methods
+============
+
+The following methods have been removed from the ``Page`` model:
+
+* ``reset_to_live``
+  This internal method was removed and replaced with ``revert_to_live``.
+
+
+Placeholder utilities
+=====================
+
+Because of a performance issue with placeholder inheritance,
+we've altered the return value for the following internal placeholder utility functions:
+
+* ``cms.utils.placeholder._scan_placeholders``
+  This will now return a list of ``Placeholder`` tag instances instead of a list of placeholder slot names.
+  You can get the slot name by calling the ``get_name()`` method on the ``Placeholder`` tag instance.
+
+* ``cms.utils.placeholder.get_placeholders``
+  This will now return a list of ``DeclaredPlaceholder`` instances instead of a list of placeholder slot names.
+  You can get the slot name by accessing the ``slot`` attribute on the ``DeclaredPlaceholder`` instance.

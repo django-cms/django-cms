@@ -69,6 +69,7 @@ get_title
 Simply returns the ``title`` property assigned during instantiation. Override
 this method if this needs to be determined programmatically.
 
+.. _get_success_url:
 
 get_success_url
 ===============
@@ -87,6 +88,7 @@ the current page after the object is created.
 This method is called by the CMS with the parameter:
 
     :obj: The created object
+    :kwargs: Arbitrary keyword arguments
 
 
 get_weight

@@ -11,7 +11,6 @@ $color-primary: #00bbff;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
-$color-window: #fcfcfc;
 
 // COLORS gray
 $gray:            lighten($black, 40%); // #666;
@@ -20,6 +19,9 @@ $gray-lighter:    lighten($gray, 46.5%); // #ddd
 $gray-light:      lighten($gray, 20%); // #999
 $gray-darker:     darken($gray, 13%); // #454545
 $gray-darkest:    darken($gray, 20%); // #333
+
+// used in pagetree / filer headers
+$gray-super-lightest: #f7f7f7;
 
 $gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-lightest, 1%), 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
 $gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
@@ -62,7 +64,6 @@ $z-layers: (
         "resize":       102,
     ),
     "messages":         999999,
-    "toolbar-trigger":  9999999,
     "toolbar": (
         "base":         9999999,
         "left":         10,
@@ -76,6 +77,10 @@ $z-layers: (
         "frame":        10,
         "shim":         5,
         "dimmer":       1,
+    ),
+    "dropdown": (
+        "base":         9999999,
+        "backdrop":     9999990
     ),
     "structure": (
         "base":         9999,
@@ -206,16 +211,10 @@ $toolbar-shadow: 0 0 5px rgba($black, 0.2);
 $toolbar-left-space: 15px;
 $toolbar-border: $gray-lighter;
 
-$toolbar-debug-height: 5px;
-$toolbar-debug-bgsize: 10px 10px;
-$toolbar-debug-bgcolor: #fcd200;
+$toolbar-debug-height: 3px;
+$toolbar-debug-bgcolor: #fad507;
 
 $toolbar-logo-height: 21px;
-
-$toolbar-trigger-width: $toolbar-height;
-$toolbar-trigger-height: $toolbar-height;
-$toolbar-trigger-icon-size: 10px;
-$toolbar-trigger-loader-size: 20px;
 
 $toolbar-right-space: 15px;
 
@@ -328,6 +327,16 @@ $dropdown-item-icon-position: 14px;
 $dropdown-arrow-side: 10px;
 $dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $dropdown-arrow-side/2;
 
+$dropdown-bg:                  $submenu-dropdown-bgcolor;
+$dropdown-border:              transparent;
+$dropdown-header-color:        $gray;
+$dropdown-link-color:          $submenu-item-color;
+$dropdown-link-hover-color:    $submenu-item-hover-color;
+$dropdown-link-hover-bg:       $color-primary;
+$dropdown-link-active-color:   $submenu-item-hover-color;
+$dropdown-link-active-bg:      $color-primary;
+$dropdown-link-disabled-color: black;
+$dropdown-link-disabled-bg:    white;
 
 //##############################################################################
 // Add plugin

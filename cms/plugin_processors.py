@@ -3,7 +3,6 @@ from django.utils.safestring import mark_safe
 
 def plugin_meta_context_processor(instance, placeholder, context):
     return {
-        'plugin_index': instance._render_meta.index, # deprecated template variable
         'plugin': {
             'counter': instance._render_meta.index + 1,
             'counter0': instance._render_meta.index,

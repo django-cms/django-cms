@@ -37,5 +37,5 @@ your site may have.
     reference/index
 
 
-.. _django-cms-developers: http://groups.google.com/group/django-cms-developers
+.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _freenode : http://freenode.net/

@@ -12,6 +12,7 @@
 </head>
 <body class="cms-welcome-bg">
     {% cms_toolbar %}
+    {% language request.toolbar.toolbar_language %}
     <div class="cms-reset cms-welcome">
         <header class="cms-welcome-header">
             <h1 class="cms-welcome-heading">
@@ -63,15 +64,21 @@
                 <p class="cms-welcome-notes">If you don't see the django CMS logo at the top, make sure
                     you linked the <code>static/cms</code> folder to your
                     static files.</p>
-                <p class="cms-welcome-notes">You're seeing this message because you have
-                    <code>DEBUG = True</code> in your django settings file and
-                    haven't added any pages yet.
-                </p>
             {% endblocktrans %}
+            {% if django_debug %}
+                {% blocktrans %}
+                    <p class="cms-welcome-notes">You're seeing this message because you have
+                        <code>DEBUG = True</code> in your django settings file and
+                        haven't added any pages yet.
+                    </p>
+                {% endblocktrans %}
+            {% endif %}
         </footer>
     </div>
+    {% endlanguage %}
     {% render_block "js" %}
 
+    {% language request.toolbar.toolbar_language %}
     <script>
         {% if user.is_authenticated %}
             CMS.$(function () {
@@ -83,7 +90,6 @@
                         url: '{% url "cms_wizard_create" %}?language={{ LANGUAGE_CODE }}',
                         title: '{% trans "Welcome to django CMS" %}'
                     });
-                    CMS.API.Toolbar.open();
                 });
 
                 // automatically trigger the modal if sideframe isn't open
@@ -92,8 +98,9 @@
                 }
             });
         {% else %}
-            window.location.href = '{% url "admin:login" %}?next=/{{ LANGUAGE_CODE }}/?{{ cms_edit_on }}';
+            window.location.href = '{% url "admin:login" %}?next={{ next_url }}?{{ cms_edit_on }}';
         {% endif %}
     </script>
+    {% endlanguage %}
 </body>
 </html>

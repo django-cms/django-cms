@@ -8,12 +8,26 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.six.moves.urllib.parse import urljoin
 
 from cms import constants
+from cms import __version__
 
 
 __all__ = ['get_cms_setting']
 
 
 class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
+
+
+def _load_from_file(module_path):
+    """
+    Load a python module from its absolute filesystem path
+    """
+    from imp import load_module, PY_SOURCE
+
+    imported = None
+    if module_path:
+        with open(module_path, 'r') as openfile:
+            imported = load_module("mod", openfile, module_path, ('imported', 'r', PY_SOURCE))
+    return imported
 
 
 def default(name):
@@ -48,25 +62,22 @@ DEFAULTS = {
     'PAGE_CACHE': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
-    'CACHE_PREFIX': 'cms-',
+    'CACHE_PREFIX': 'cms_{}_'.format(__version__),
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
     'UNIHANDECODE_VERSION': None,
     'UNIHANDECODE_DECODERS': ['ja', 'zh', 'kr', 'vn', 'diacritic'],
     'UNIHANDECODE_DEFAULT_DECODER': 'diacritic',
-    'MAX_PAGE_PUBLISH_REVERSIONS': 10,
-    'MAX_PAGE_HISTORY_REVERSIONS': 15,
     'TOOLBAR_ANONYMOUS_ON': True,
     'TOOLBAR_URL__EDIT_ON': 'edit',
     'TOOLBAR_URL__EDIT_OFF': 'edit_off',
-    'TOOLBAR_URL__BUILD': 'build',
+    'TOOLBAR_URL__BUILD': 'structure',
     'TOOLBAR_URL__DISABLE': 'toolbar_off',
     'ADMIN_NAMESPACE': 'admin',
     'APP_NAME': None,
     'TOOLBAR_HIDE': False,
-    'INTERNAL_IPS': settings.INTERNAL_IPS,  # Django default is []
+    'INTERNAL_IPS': [],
     'REQUEST_IP_RESOLVER': 'cms.utils.request_ip_resolvers.default_request_ip_resolver',
-    'UNESCAPED_RENDER_MODEL_TAGS': True,
     'PAGE_WIZARD_DEFAULT_TEMPLATE': constants.TEMPLATE_INHERITANCE_MAGIC,
     'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
     'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
@@ -106,7 +117,7 @@ def get_toolbar_url__edit_off():
 
 
 @default('CMS_TOOLBAR_URL__BUILD')
-def get_toolbar_url__build():
+def get_toolbar_url__structure():
     return get_cms_setting('TOOLBAR_URL__BUILD')
 
 
@@ -116,7 +127,6 @@ def get_toolbar_url__disable():
 
 
 def get_templates():
-    from cms.utils.django_load import load_from_file
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
         # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory
@@ -127,12 +137,9 @@ def get_templates():
         # valid templates directory. Here we mimick what the filesystem and
         # app_directories template loaders do
         prefix = ''
-        # Relative to TEMPLATE_DIRS for filesystem loader
+        # Relative to TEMPLATE['DIRS'] for filesystem loader
 
-        try:
-            path = settings.TEMPLATE_DIRS
-        except IndexError:
-            path = [template['DIRS'][0] for template in settings.TEMPLATES]
+        path = [template['DIRS'][0] for template in settings.TEMPLATES]
 
         for basedir in path:
             if tpldir.find(basedir) == 0:
@@ -150,8 +157,8 @@ def get_templates():
         config_path = os.path.join(tpldir, '__init__.py')
         # Try to load templates list and names from the template module
         # If module file is not present skip configuration and just dump the filenames as templates
-        if config_path:
-            template_module = load_from_file(config_path)
+        if os.path.isfile(config_path):
+            template_module = _load_from_file(config_path)
             templates = [(os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()]
         else:
             templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
@@ -264,26 +271,14 @@ COMPLEX = {
     'UNIHANDECODE_HOST': get_unihandecode_host,
     'CMS_TOOLBAR_URL__EDIT_ON': get_toolbar_url__edit_on,
     'CMS_TOOLBAR_URL__EDIT_OFF': get_toolbar_url__edit_off,
-    'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__build,
+    'CMS_TOOLBAR_URL__BUILD': get_toolbar_url__structure,
     'CMS_TOOLBAR_URL__DISABLE': get_toolbar_url__disable,
-}
-
-DEPRECATED_CMS_SETTINGS = {
-    # Old CMS_WIZARD_* settings to be removed in v3.5.0
-    'PAGE_WIZARD_DEFAULT_TEMPLATE': 'WIZARD_DEFAULT_TEMPLATE',
-    'PAGE_WIZARD_CONTENT_PLUGIN': 'WIZARD_CONTENT_PLUGIN',
-    'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'WIZARD_CONTENT_PLUGIN_BODY',
-    'PAGE_WIZARD_CONTENT_PLACEHOLDER': 'WIZARD_CONTENT_PLACEHOLDER',
 }
 
 
 def get_cms_setting(name):
     if name in COMPLEX:
         return COMPLEX[name]()
-    elif name in DEPRECATED_CMS_SETTINGS:
-        new_setting = 'CMS_%s' % name
-        old_setting = 'CMS_%s' % DEPRECATED_CMS_SETTINGS[name]
-        return getattr(settings, new_setting, getattr(settings, old_setting, DEFAULTS[name]))
     return getattr(settings, 'CMS_%s' % name, DEFAULTS[name])
 
 

@@ -25,6 +25,6 @@ module.exports = {
         "no-magic-numbers": 0,
         "max-nested-callbacks": [2, 8],
         "newline-after-var": 0,
-        "strict": [2, "global"]
+        "strict": [0]
     }
 };

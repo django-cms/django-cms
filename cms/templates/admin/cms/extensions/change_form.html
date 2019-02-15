@@ -1,11 +1,12 @@
-{% extends "admin/change_form.html" %}{% load i18n %}
+{% extends "admin/change_form.html" %}{% load i18n admin_urls %}
 
 {% block submit_buttons_bottom %}
 <div class="submit-row"{% if is_popup %} style="overflow: auto;"{% endif %}>
     <input type="submit" name="_save" class="default" value="{% trans 'Save' %}"/>
     {% if not add %}
         <p class="deletelink-box">
-            <a href="delete/" class="deletelink">{% trans "Delete" %}</a>
+            {% url opts|admin_urlname:'delete' original.pk|admin_urlquote as delete_url %}
+            <a href="{% add_preserved_filters delete_url %}" class="deletelink">{% trans "Delete" %}</a>
         </p>
     {% endif %}
 </div>

@@ -2,10 +2,14 @@
 # -*- coding: utf-8 -*-
 import os
 import sys
+import warnings
 
 import app_manage
 
+from cms.exceptions import DontUsePageAttributeWarning
+
 gettext = lambda s: s
+warnings.filterwarnings('ignore', category=DontUsePageAttributeWarning)
 
 
 def install_auth_user_model(settings, value):
@@ -19,17 +23,13 @@ def install_auth_user_model(settings, value):
     settings['AUTH_USER_MODEL'] = value
 
 
-def _get_migration_modules(apps):
-    modules = {}
-    for module in apps:
-        module_name = '%s.migrations_django' % module
-        try:
-            __import__(module_name)
-        except ImportError:
-            pass
-        else:
-            modules[module] = module_name
-    return modules
+class DisableMigrations(object):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return 'notmigrations'
 
 
 if __name__ == '__main__':
@@ -43,32 +43,26 @@ if __name__ == '__main__':
 
     PLUGIN_APPS = [
         'djangocms_text_ckeditor',
-        'djangocms_column',
-        'djangocms_picture',
-        'djangocms_file',
-        'djangocms_googlemap',
-        'djangocms_inherit',
-        'djangocms_teaser',
-        'djangocms_video',
-        'djangocms_style',
-        'djangocms_link',
         'cms.test_utils.project.sampleapp',
         'cms.test_utils.project.placeholderapp',
+        'cms.test_utils.project.pluginapp.plugins.link',
+        'cms.test_utils.project.pluginapp.plugins.multicolumn',
+        'cms.test_utils.project.pluginapp.plugins.multiwrap',
+        'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.pluginapp.plugins.manytomany_rel',
         'cms.test_utils.project.pluginapp.plugins.extra_context',
         'cms.test_utils.project.pluginapp.plugins.meta',
         'cms.test_utils.project.pluginapp.plugins.one_thing',
         'cms.test_utils.project.pluginapp.plugins.revdesc',
         'cms.test_utils.project.fakemlng',
-        'cms.test_utils.project.fileapp',
         'cms.test_utils.project.objectpermissionsapp',
         'cms.test_utils.project.bunch_of_plugins',
         'cms.test_utils.project.extensionapp',
         'cms.test_utils.project.mti_pluginapp',
+        'cms.test_utils.project.nested_plugins_app',
     ]
 
     INSTALLED_APPS = [
-        'debug_toolbar',
         'django.contrib.auth',
         'django.contrib.contenttypes',
         'django.contrib.sessions',
@@ -80,11 +74,19 @@ if __name__ == '__main__':
         'treebeard',
         'cms',
         'menus',
-        'reversion',
         'sekizai',
-        'hvad',
-        'better_test',
     ] + PLUGIN_APPS
+
+    MIGRATION_MODULES = {
+        'auth': None,
+        'admin': None,
+        'contenttypes': None,
+        'sessions': None,
+        'sites': None,
+        'cms': None,
+        'menus': None,
+        'djangocms_text_ckeditor': None,
+    }
 
     dynamic_configs = {
         'TEMPLATES': [{
@@ -94,53 +96,46 @@ if __name__ == '__main__':
             'OPTIONS': {
                 'debug': True,
                 'context_processors': [
-                    "django.contrib.auth.context_processors.auth",
+                    'django.contrib.auth.context_processors.auth',
                     'django.contrib.messages.context_processors.messages',
-                    "django.template.context_processors.i18n",
-                    "django.template.context_processors.debug",
-                    "django.template.context_processors.request",
-                    "django.template.context_processors.media",
+                    'django.template.context_processors.i18n',
+                    'django.template.context_processors.debug',
+                    'django.template.context_processors.request',
+                    'django.template.context_processors.media',
                     'django.template.context_processors.csrf',
-                    "cms.context_processors.cms_settings",
-                    "sekizai.context_processors.sekizai",
-                    "django.template.context_processors.static",
+                    'cms.context_processors.cms_settings',
+                    'sekizai.context_processors.sekizai',
+                    'django.template.context_processors.static',
                 ],
                 'loaders': (
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.eggs.Loader',
                 )
             }
         }
     ]}
 
-    plugins = ('djangocms_column', 'djangocms_googlemap',
-               'djangocms_inherit', 'djangocms_link', 'djangocms_picture', 'djangocms_style',
-               'djangocms_teaser', 'djangocms_video')
-
-    migrate = '--migrate' in sys.argv and '--no-migrations' not in sys.argv
-    if '--migrate' in sys.argv and '--no-migrations' in sys.argv:
-        print('Both --migrate and --no-migrations have been provided. --no-migrations is in effect.')
-    if '--migrate' in sys.argv:
-        sys.argv.remove('--migrate')
-
-    dynamic_configs['MIGRATION_MODULES'] = _get_migration_modules(plugins)
-    if not dynamic_configs.get('TESTS_MIGRATE', migrate):
-        # Disable migrations
-        class DisableMigrations(object):
-
-            def __contains__(self, item):
-                return True
-
-            def __getitem__(self, item):
-                return 'notmigrations'
-
-        dynamic_configs['MIGRATION_MODULES'] = DisableMigrations()
     if 'test' in sys.argv:
         SESSION_ENGINE = "django.contrib.sessions.backends.cache"
     else:
         SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
+    MIDDLEWARES = [
+        'django.middleware.cache.UpdateCacheMiddleware',
+        'django.middleware.http.ConditionalGetMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware',
+        'django.middleware.cache.FetchFromCacheMiddleware',
+    ]
+    dynamic_configs['MIDDLEWARE'] = MIDDLEWARES
     app_manage.main(
         ['cms', 'menus'],
         app_manage.Argument(
@@ -182,21 +177,6 @@ if __name__ == '__main__':
         ADMIN_MEDIA_PREFIX='/static/admin/',
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
         PLUGIN_APPS=PLUGIN_APPS,
-        MIDDLEWARE_CLASSES=[
-            'django.middleware.cache.UpdateCacheMiddleware',
-            'django.middleware.http.ConditionalGetMiddleware',
-            'django.contrib.sessions.middleware.SessionMiddleware',
-            'django.contrib.auth.middleware.AuthenticationMiddleware',
-            'django.contrib.messages.middleware.MessageMiddleware',
-            'django.middleware.csrf.CsrfViewMiddleware',
-            'django.middleware.locale.LocaleMiddleware',
-            'django.middleware.common.CommonMiddleware',
-            'cms.middleware.language.LanguageCookieMiddleware',
-            'cms.middleware.user.CurrentUserMiddleware',
-            'cms.middleware.page.CurrentPageMiddleware',
-            'cms.middleware.toolbar.ToolbarMiddleware',
-            'django.middleware.cache.FetchFromCacheMiddleware',
-        ],
         INSTALLED_APPS=INSTALLED_APPS,
         DEBUG_TOOLBAR_PATCH_SETTINGS = False,
         INTERNAL_IPS=['127.0.0.1'],
@@ -333,5 +313,6 @@ if __name__ == '__main__':
         ),
         ALLOWED_HOSTS=['localhost'],
         TEST_RUNNER='django.test.runner.DiscoverRunner',
+        MIGRATION_MODULES=MIGRATION_MODULES,
         **dynamic_configs
     )

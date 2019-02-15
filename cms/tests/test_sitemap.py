@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
+import copy
+
+from cms.api import create_page, create_title
 from cms.models import Title, Page
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
-from cms.api import create_page, create_title
+from cms.utils.conf import get_cms_setting
 
 
 class SitemapTestCase(CMSTestCase):
@@ -58,22 +61,15 @@ class SitemapTestCase(CMSTestCase):
             create_title(language='de', title="other title %s" % p10.get_title('en'), page=p10)
 
             create_page('P11', published=True, in_navigation=True, parent=p9, **defaults)
-            p1 = p1.reload()
-            p2 = p2.reload()
-            p3 = p3.reload()
-            p4 = p4.reload()
-            p5 = p5.reload()
-            p6 = p6.reload()
-            p7 = p7.reload()
-            p8 = p8.reload()
-            p8.publish('de')
-            p7.publish('de')
-            p5.publish('de')
-            p3.publish('de')
-            p2.publish('de')
-            p6.publish('de')
-            p4.publish('de')
-            p1.publish('de')
+
+            p1.reload().publish('de')
+            p2.reload().publish('de')
+            p3.reload().publish('de')
+            p4.reload().publish('de')
+            p5.reload().publish('de')
+            p6.reload().publish('de')
+            p7.reload().publish('de')
+            p8.reload().publish('de')
             self.assertEqual(Title.objects.filter(published=True, publisher_is_draft=False).count(), 18)
 
 
@@ -151,3 +147,21 @@ class SitemapTestCase(CMSTestCase):
             else:
                 url = 'http://example.com/%s/%s' % (title.language, title.path)
             self.assertFalse(url in locations)
+
+    def test_sitemap_uses_public_languages_only(self):
+        """
+        Pages on the sitemap should only show public languages.
+        """
+        lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
+        # sanity check
+        assert lang_settings[1][1]['code'] == 'de'
+        # set german as private
+        lang_settings[1][1]['public'] = False
+
+        with self.settings(CMS_LANGUAGES=lang_settings):
+            for item in CMSSitemap().get_urls():
+                url = 'http://example.com/en/'
+
+                if item['item'].path:
+                    url += item['item'].path + '/'
+                self.assertEqual(item['location'], url)

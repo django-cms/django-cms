@@ -28,8 +28,13 @@ class NonRootCase(CMSTestCase):
         + P4
 
         """
-        self.page1 = create_page("page1", "nav_playground.html", "en",
-                                 published=True, in_navigation=True)
+        self.page1 = self.create_homepage(
+            title="page1",
+            template="nav_playground.html",
+            language="en",
+            published=True,
+            in_navigation=True,
+        )
         self.page2 = create_page("page2", "nav_playground.html", "en",
                           parent=self.page1, published=True, in_navigation=True)
         self.page3 = create_page("page3", "nav_playground.html", "en",
@@ -59,7 +64,7 @@ class NonRootCase(CMSTestCase):
 
     def test_show_breadcrumb(self):
         page2 = Page.objects.get(pk=self.page2.pk)
-        context = self.get_context(path=self.page2.get_absolute_url())
+        context = self.get_context(path=self.page2.get_absolute_url(), page=self.page2.publisher_public)
         tpl = Template("{% load menu_tags %}{% show_breadcrumb %}")
         tpl.render(context)
         nodes = context['ancestors']

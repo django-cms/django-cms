@@ -1,0 +1,22 @@
+.. _upgrade-to-3.5.2:
+
+###################
+3.5.2 release notes
+###################
+
+*******************
+What's new in 3.5.2
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a bug where short-cuts menu entry would stop working after toolbar reload
+* Fixed a race condition in frontend code that could lead to sideframe being
+  opened with blank page
+* Fixed a bug where the direct children of the homepage would get a leading ``/``
+  character when the homepage was moved or published.
+* Fixed a bug where non-staff user would be able to open empty structure board
+* Fixed a bug where a static file from Django admin was referenced that no
+  longer existed in Django 1.9 and up.
+* Fixed a bug where the migration 0018 would fail under certain databases.

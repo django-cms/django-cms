@@ -1,6 +1,5 @@
 from copy import deepcopy
 import os
-from classytags.tests import DummyParser, DummyTokens
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -8,22 +7,28 @@ from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
+from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
+
+from mock import patch
 
 import cms
 from cms.api import create_page, create_title, add_plugin
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, Placeholder
-from cms.templatetags.cms_tags import (_get_page_by_untyped_arg,
-                                       _show_placeholder_for_page,
-                                       _get_placeholder, RenderPlugin)
+from cms.templatetags.cms_tags import (
+    _get_page_by_untyped_arg,
+    _show_placeholder_by_id,
+    render_plugin,
+)
 from cms.templatetags.cms_js_tags import json_filter
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils import get_cms_setting, get_site_id
+from cms.utils import get_site_id
+from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import get_placeholders
 from sekizai.context import SekizaiContext
 
@@ -82,7 +87,7 @@ class TemplatetagTests(CMSTestCase):
         self.assertEqual('"%s"' % today.isoformat()[:-3], json_filter(today))
 
     def test_static_with_version(self):
-        expected = '<script src="/static/cms/css/cms.base.css?%(version)s" type="text/javascript"></script>'
+        expected = '<script src="/static/cms/css/%(version)s/cms.base.css" type="text/javascript"></script>'
         expected = expected % {'version': cms.__version__}
 
         template = (
@@ -91,6 +96,31 @@ class TemplatetagTests(CMSTestCase):
         )
 
         output = self.render_template_obj(template, {}, None)
+        self.assertEqual(expected, output)
+
+    @override_settings(STATICFILES_STORAGE='django.contrib.staticfiles.storage.ManifestStaticFilesStorage')
+    @patch('django.contrib.staticfiles.storage.staticfiles_storage')
+    def test_static_with_version_manifest(self, mock_storage):
+        """
+        Check that static files are looked up at the location where they are
+        stored when using static file manifests.
+        """
+        mock_storage.url.side_effect = lambda x: '/static/' + x
+
+        template = (
+            """{% load staticfiles cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
+            """type="text/javascript"></script>"""
+        )
+
+        output = self.render_template_obj(template, {}, None)
+        # If the manifest is used for looking up the static file (Django 1.10
+        # and later), it needs to be looked up with a proper path.
+        versioned_filename = 'cms/css/%s/cms.base.css' % cms.__version__
+        if mock_storage.url.called:
+            mock_storage.url.assert_called_with(versioned_filename)
+
+        expected = '<script src="/static/%s" type="text/javascript"></script>'
+        expected = expected % versioned_filename
         self.assertEqual(expected, output)
 
 
@@ -175,11 +205,11 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         with self.settings(DEBUG=True):
             context = self.get_context('/')
 
-            self.assertRaises(Placeholder.DoesNotExist, _show_placeholder_for_page,
+            self.assertRaises(Placeholder.DoesNotExist, _show_placeholder_by_id,
                               context, 'does_not_exist', 'myreverseid')
         with self.settings(DEBUG=False):
-            content = _show_placeholder_for_page(context, 'does_not_exist', 'myreverseid')
-            self.assertEqual(content['content'], '')
+            content = _show_placeholder_by_id(context, 'does_not_exist', 'myreverseid')
+            self.assertEqual(content, '')
 
     def test_untranslated_language_url(self):
         """ Tests page_language_url templatetag behavior when used on a page
@@ -219,7 +249,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             context = self.get_context(page_3.get_absolute_url())
             context['request'].current_page = page_3.publisher_public
             res = self.render_template_obj(tpl, context.__dict__, context['request'])
-            self.assertEqual(res, "/de/page-3/")
+            self.assertEqual(res, "/en/page-3/")
         lang_settings[1][1]['hide_untranslated'] = True
 
         with self.settings(CMS_LANGUAGES=lang_settings):
@@ -239,16 +269,23 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         creates the placeholder.
         """
         page = create_page('Test', 'col_two.html', 'en')
-        # I need to make it seem like the user added another plcaeholder to the SAME template.
+        # I need to make it seem like the user added another placeholder to the SAME template.
         page._template_cache = 'col_three.html'
 
-        class FakeRequest(object):
-            current_page = page
-            GET = {'language': 'en'}
+        request = self.get_request(page=page)
+        context = SekizaiContext()
+        context['request'] = request
 
-        placeholder = _get_placeholder(page, page, dict(request=FakeRequest()), 'col_right')
-        page.placeholders.get(slot='col_right')
-        self.assertEqual(placeholder.slot, 'col_right')
+        self.assertObjectDoesNotExist(page.placeholders.all(), slot='col_right')
+        context = self.get_context(page=page)
+        renderer = self.get_content_renderer(request)
+        renderer.render_page_placeholder(
+            'col_right',
+            context,
+            inherit=False,
+            page=page,
+        )
+        self.assertObjectExist(page.placeholders.all(), slot='col_right')
 
 
 class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
@@ -283,9 +320,20 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>En Test</b>')
         add_plugin(placeholder, TextPlugin, 'fr', body='<b>Fr Test</b>')
+
         request = RequestFactory().get('/')
         request.user = AnonymousUser()
         request.current_page = page
+
+        template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
+        output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
+        self.assertIn('<b>En Test</b>', output)
+
+        template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'fr' 1 %}{% render_block 'js' %}"
+        output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
+        self.assertIn('<b>Fr Test</b>', output)
+
+        # Cache is now primed for both languages
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
         output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>En Test</b>', output)
@@ -301,11 +349,13 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         page = create_page('Test', 'col_two.html', 'en')
         placeholder = page.placeholders.all()[0]
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+
         request = RequestFactory().get('/')
         request.user = AnonymousUser()
         request.current_page = page
+
         template = "{% load cms_tags sekizai_tags %}{% show_placeholder slot page 'en' 1 %}{% render_block 'js' %}"
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
 
@@ -324,14 +374,14 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.current_page = page.publisher_public
         request.user = user
         template = "{% load cms_tags %}{% show_placeholder slot page 'en' 1 %}"
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test</b>', output)
         add_plugin(placeholder, TextPlugin, 'en', body='<b>Test2</b>')
         request = RequestFactory().get('/?preview')
         request.current_page = page
         request.user = user
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(3):
             output = self.render_template_obj(template, {'page': page, 'slot': placeholder.slot}, request)
         self.assertIn('<b>Test2</b>', output)
 
@@ -352,26 +402,61 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
             output = self.render_template_obj(template, {'plugin': plugin}, request)
         self.assertIn('<b>Test</b>', output)
 
+    def test_render_plugin_editable(self):
+        from django.core.cache import cache
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        placeholder = page.placeholders.all()[0]
+        plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+        template = "{% load cms_tags %}{% render_plugin plugin %}"
+        request = RequestFactory().get('/')
+        user = self._create_user("admin", True, True)
+        request.user = user
+        request.current_page = page
+        request.session = {'cms_edit': True}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.show_toolbar = True
+        output = self.render_template_obj(template, {'plugin': plugin}, request)
+        expected = (
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>'
+            '<b>Test</b>'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'
+        )
+        self.assertEqual(output, expected.format(plugin.pk))
+
+    def test_render_plugin_not_editable(self):
+        from django.core.cache import cache
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        placeholder = page.placeholders.all()[0]
+        plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
+        template = "{% load cms_tags %}{% render_plugin plugin %}"
+        request = RequestFactory().get('/')
+        user = self._create_user("admin", True, True)
+        request.user = user
+        request.current_page = page
+        request.session = {'cms_edit': False}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.show_toolbar = True
+        output = self.render_template_obj(template, {'plugin': plugin}, request)
+        self.assertEqual('<b>Test</b>', output)
+
     def test_render_plugin_no_context(self):
         placeholder = Placeholder.objects.create(slot='test')
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='Test')
-        parser = DummyParser()
-        tokens = DummyTokens(plugin)
-        tag = RenderPlugin(parser, tokens)
         superuser = self.get_superuser()
         request = RequestFactory().get('/')
         request.current_page = None
         request.user = superuser
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         context = SekizaiContext({
-            'request': request
+            'request': request,
         })
-        output = tag.render(context)
+        output = render_plugin(context, plugin)
         self.assertEqual(
             output,
-            '<div class="cms-plugin cms-plugin-{0}">Test</div>'.format(
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>Test<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'.format(
                 plugin.pk
             )
         )
@@ -383,12 +468,12 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self.get_superuser()
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
-        with self.assertNumQueries(4):
-            self.render_template_obj(template, {}, request)
+        with self.assertNumQueries(2):
+            output = self.render_template_obj(template, {}, request)
+            self.assertEqual(output, '< --- empty --->')
 
     def test_render_placeholder_as_var(self):
         page = create_page('Test', 'col_two.html', 'en', published=True)
@@ -397,12 +482,43 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         user = self.get_superuser()
         request.user = user
         request.current_page = page
+        request.session = {'cms_edit': True}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.is_staff = True
+        with self.assertNumQueries(2):
+            output = self.render_template_obj(template, {}, request)
+            self.assertEqual(output, '< --- empty --->')
+
+    def test_render_model_with_deferred_fields(self):
+        from django.core.cache import cache
+        from cms.test_utils.project.sampleapp.models import Category
+
+        Category.objects.create(name='foo', depth=1)
+        cache.clear()
+        page = create_page('Test', 'col_two.html', 'en', published=True)
+        template = "{% load cms_tags %}{% render_model category 'name' %}"
+        user = self._create_user("admin", True, True)
+        request = RequestFactory().get('/')
+        request.user = user
+        request.current_page = page
+        request.session = {'cms_edit': True}
+        request.toolbar = CMSToolbar(request)
+        request.toolbar.is_staff = True
+        category = Category.objects.only('name').get()
+        output = self.render_template_obj(template, {'category': category}, request)
+        expected = "cms-plugin cms-plugin-start cms-plugin-sampleapp-category-name-%d cms-render-model" % category.pk
+        self.assertIn(expected, output)
+
+        # Now test that it does NOT render when not in edit mode
+        request = RequestFactory().get('/')
+        request.user = user
+        request.current_page = page
         request.session = {}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
-        request.toolbar.is_staff = True
-        with self.assertNumQueries(4):
-            self.render_template_obj(template, {}, request)
+        with self.assertNumQueries(0):
+            output = self.render_template_obj(template, {'category': category}, request)
+        expected = 'foo'
+        self.assertEqual(expected, output)
 
     def test_render_model_add(self):
         from django.core.cache import cache
@@ -412,20 +528,21 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         page = create_page('Test', 'col_two.html', 'en', published=True)
         template = "{% load cms_tags %}{% render_model_add category %}"
         user = self._create_user("admin", True, True)
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {'category': Category()}, request)
-        expected = 'cms-plugin cms-plugin-sampleapp-category-add-0 cms-render-model-add'
-        self.assertIn(expected, output)
+        expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
+        expected_end = '<template class="cms-plugin cms-plugin-end cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
+        self.assertIn(expected_start, output)
+        self.assertIn(expected_end, output)
 
         # Now test that it does NOT render when not in edit mode
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
         request.session = {}
@@ -443,21 +560,23 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         page = create_page('Test', 'col_two.html', 'en', published=True)
         template = "{% load cms_tags %}{% render_model_add_block category %}wrapped{% endrender_model_add_block %}"
         user = self._create_user("admin", True, True)
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
-        request.session = {}
+        request.session = {'cms_edit': True}
         request.toolbar = CMSToolbar(request)
-        request.toolbar.edit_mode = True
         request.toolbar.is_staff = True
         with self.assertNumQueries(0):
             output = self.render_template_obj(template, {'category': Category()}, request)
-        expected = 'cms-plugin cms-plugin-sampleapp-category-add-0 '
-        'cms-render-model-add'
-        self.assertIn(expected, output)
+        expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 '
+        'cms-render-model-add"></template>'
+        expected_end = '<template class="cms-plugin cms-plugin-end cms-plugin-sampleapp-category-add-0 '
+        'cms-render-model-add"></template>'
+        self.assertIn(expected_start, output)
+        self.assertIn(expected_end, output)
 
         # Now test that it does NOT render when not in edit mode
-        request = RequestFactory().get('/')
+        request = RequestFactory().get(page.get_absolute_url())
         request.user = user
         request.current_page = page
         request.session = {}

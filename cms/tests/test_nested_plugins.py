@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
-import json
-from django.utils.http import urlencode
-
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import create_page, add_plugin
-from cms.constants import PLUGIN_MOVE_ACTION
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
-from cms.test_utils.testcases import URL_CMS_PLUGIN_PAGE_MOVE, URL_CMS_PLUGIN_PAGE_ADD
 from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.copy_plugins import copy_plugins_to
-from cms.utils.i18n import force_language
 from cms.utils.plugins import reorder_plugins
 
 
@@ -612,7 +606,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             text_plugin = self.reload(text_plugin)
             link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin)
             link_plugin.name = u"django-cms Link"
-            link_plugin.url = u"https://www.django-cms.org"
+            link_plugin.external_link = u"https://www.django-cms.org"
 
             # as for some reason mptt does not
             # update the parent child relationship
@@ -681,13 +675,13 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             text_plugin_two = self.reload(text_plugin_two)
             link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin_two)
             link_plugin.name = u"django-cms Link"
-            link_plugin.url = u"https://www.django-cms.org"
+            link_plugin.external_link = u"https://www.django-cms.org"
             link_plugin.parent = text_plugin_two
             link_plugin.save()
 
             link_plugin = self.reload(link_plugin)
             text_plugin_two = self.reload(text_plugin_two)
-            in_txt = """<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
+            in_txt = """<cms-plugin id="%s" title="Link" alt="Link"></cms-plugin>"""
             nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
             # emulate the editor in admin that adds some txt for the nested plugin
             text_plugin_two.body = nesting_body
@@ -831,16 +825,16 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # validate the textplugin body texts
             msg = u"org plugin and copied plugin are the same"
             self.assertTrue(org_link_child_plugin.id != copied_link_child_plugin.id, msg)
-            needle = u"plugin_obj_%s"
-            msg = u"child plugin id differs to parent in body plugin_obj_id"
+            needle = u"%s"
+            msg = u"child plugin id differs to parent in body"
             # linked child is in body
             self.assertTrue(org_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) != -1, msg)
-            msg = u"copy: child plugin id differs to parent in body plugin_obj_id"
+            msg = u"copy: child plugin id differs to parent in body"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) != -1, msg)
             # really nothing else
-            msg = u"child link plugin id differs to parent body plugin_obj_id"
+            msg = u"child link plugin id differs to parent body"
             self.assertTrue(org_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) == -1, msg)
-            msg = u"copy: child link plugin id differs to parent body plugin_obj_id"
+            msg = u"copy: child link plugin id differs to parent body"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) == -1, msg)
             # now reverse lookup the placeholders from the plugins
             org_placeholder = org_link_child_plugin.placeholder
@@ -888,13 +882,13 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             text_plugin_two = self.reload(text_plugin_two)
             link_plugin = add_plugin(page_one_ph_two, u"LinkPlugin", u"en", target=text_plugin_two)
             link_plugin.name = u"django-cms Link"
-            link_plugin.url = u"https://www.django-cms.org"
+            link_plugin.external_link = u"https://www.django-cms.org"
             link_plugin.parent = text_plugin_two
             link_plugin.save()
             # reload after every save
             link_plugin = self.reload(link_plugin)
             text_plugin_two = self.reload(text_plugin_two)
-            in_txt = u"""<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
+            in_txt = u"""<cms-plugin id="%s" title="Link" alt="Link"></cms-plugin>"""
             nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
             # emulate the editor in admin that adds some txt for the nested plugin
             text_plugin_two.body = nesting_body
@@ -930,27 +924,18 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             self.assertEqual(pre_copy_placeholder_count, 6)
             superuser = self.get_superuser()
 
-            with force_language('en'):
-                action_urls = text_plugin_two.get_action_urls()
-
             with self.login_user_context(superuser):
                 # now move the parent text plugin to another placeholder
                 post_data = {
                     'placeholder_id': page_one_ph_three.id,
                     'plugin_id': text_plugin_two.id,
-                    'plugin_language': 'en',
+                    'target_language': 'en',
                     'plugin_parent': '',
 
                 }
-                plugin_class = text_plugin_two.get_plugin_class_instance()
-                expected = {
-                    'reload': plugin_class.requires_reload(PLUGIN_MOVE_ACTION),
-                    'urls': action_urls,
-                }
-                edit_url = URL_CMS_PLUGIN_PAGE_MOVE % page_one.id
+                edit_url = self.get_move_plugin_uri(text_plugin_two)
                 response = self.client.post(edit_url, post_data)
                 self.assertEqual(response.status_code, 200)
-                self.assertEqual(json.loads(response.content.decode('utf8')), expected)
                 # check if the plugin got moved
                 page_one = self.reload(page_one)
                 self.reload(text_plugin_two)
@@ -1071,16 +1056,16 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
             # validate the textplugin body texts
             msg = u"org plugin and copied plugin are the same"
             self.assertNotEqual(org_link_child_plugin.id, copied_link_child_plugin.id, msg)
-            needle = u"plugin_obj_%s"
-            msg = u"child plugin id differs to parent in body plugin_obj_id"
+            needle = u"%s"
+            msg = u"child plugin id differs to parent in body"
             # linked child is in body
             self.assertTrue(org_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) != -1, msg)
             msg = u"copy: child plugin id differs to parent in body plugin_obj_id"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) != -1, msg)
             # really nothing else
-            msg = u"child link plugin id differs to parent body plugin_obj_id"
+            msg = u"child link plugin id differs to parent body"
             self.assertTrue(org_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) == -1, msg)
-            msg = u"copy: child link plugin id differs to parent body plugin_obj_id"
+            msg = u"copy: child link plugin id differs to parent body"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) == -1, msg)
             # now reverse lookup the placeholders from the plugins
             org_placeholder = org_link_child_plugin.placeholder
@@ -1098,18 +1083,9 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         with self.login_user_context(superuser):
             post_data = {
                 'name': 'test',
-                'url': 'http://www.example.org/'
+                'external_link': 'http://www.example.org/'
             }
-            get_data = {
-                'placeholder_id': page_one_ph_one.id,
-                'plugin_type': 'LinkPlugin',
-                'plugin_language': 'en',
-                'plugin_parent': text_plugin_en.pk,
-
-            }
-            add_url = URL_CMS_PLUGIN_PAGE_ADD % page_one.pk + '?' + urlencode(
-                get_data
-            )
+            add_url = self.get_add_plugin_uri(page_one_ph_one, 'LinkPlugin', parent=text_plugin_en)
             response = self.client.post(add_url, post_data)
             self.assertEqual(response.status_code, 200)
             self.assertTemplateUsed(

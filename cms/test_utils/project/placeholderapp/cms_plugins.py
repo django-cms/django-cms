@@ -14,7 +14,8 @@ class EmptyPlugin(CMSPluginBase):
     def icon_src(self, instance):
         return settings.STATIC_URL + u"cms/img/icons/plugins/image.png"
 
-    def get_extra_placeholder_menu_items(self, request, placeholder):
+    @classmethod
+    def get_extra_placeholder_menu_items(cls, request, placeholder):
         return [
             PluginMenuItem('Extra item - not usable', '/some/url/', 'any-data'),
             PluginMenuItem(
@@ -23,5 +24,6 @@ class EmptyPlugin(CMSPluginBase):
             ),
             PluginMenuItem('Other item - not usable', '/some/other/url/', 'any-data', action='ajax_add'),
         ]
+
 
 plugin_pool.register_plugin(EmptyPlugin)

@@ -1,33 +1,33 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.core.urlresolvers import resolve, Resolver404
 from django.http import Http404
+from django.shortcuts import render
 from django.template.response import TemplateResponse
+from django.urls import Resolver404, resolve, reverse
 
 from cms import __version__
 from cms.cache.page import set_page_cache
 from cms.models import Page
-from cms.utils import get_template_from_request
 from cms.utils.conf import get_cms_setting
+from cms.utils.page import get_page_template_from_request
+from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 
 
 def render_page(request, page, current_language, slug):
     """
     Renders a page
     """
-    template_name = get_template_from_request(request, page, no_current_page=True)
-    # fill the context
     context = {}
     context['lang'] = current_language
     context['current_page'] = page
-    context['has_change_permissions'] = page.has_change_permission(request)
-    context['has_view_permissions'] = page.has_view_permission(request)
+    context['has_change_permissions'] = user_can_change_page(request.user, page)
+    context['has_view_permissions'] = user_can_view_page(request.user, page)
 
     if not context['has_view_permissions']:
-        return _handle_no_page(request, slug)
+        return _handle_no_page(request)
 
-    response = TemplateResponse(request, template_name, context)
-
+    template = get_page_template_from_request(request)
+    response = TemplateResponse(request, template, context)
     response.add_post_render_callback(set_page_cache)
 
     # Add headers for X Frame Options - this really should be changed upon moving to class based views
@@ -51,13 +51,15 @@ def render_page(request, page, current_language, slug):
     return response
 
 
-def _handle_no_page(request, slug):
-    context = {}
-    context['cms_version'] = __version__
-    context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+def render_object_structure(request, obj):
+    context = {
+        'object': obj,
+        'cms_toolbar': request.toolbar,
+    }
+    return render(request, 'cms/toolbar/structure.html', context)
 
-    if not slug and settings.DEBUG:
-        return TemplateResponse(request, "cms/welcome.html", context)
+
+def _handle_no_page(request):
     try:
         #add a $ to the end of the url (does not match on the cms anymore)
         resolve('%s$' % request.path)
@@ -67,3 +69,12 @@ def _handle_no_page(request, slug):
         raise exc
     raise Http404('CMS Page not found: %s' % request.path)
 
+
+def _render_welcome_page(request):
+    context = {
+        'cms_version': __version__,
+        'cms_edit_on': get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'),
+        'django_debug': settings.DEBUG,
+        'next_url': reverse('pages-root'),
+    }
+    return TemplateResponse(request, "cms/welcome.html", context)

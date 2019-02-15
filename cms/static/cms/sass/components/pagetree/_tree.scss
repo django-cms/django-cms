@@ -6,9 +6,6 @@
 
 .cms-admin-sideframe:not(.djangocms-admin-style) {
     margin-top: $toolbar-height;
-    &.cms-debug {
-        margin-top: $toolbar-height + $toolbar-debug-height;
-    }
 }
 
 // HELPERS
@@ -46,8 +43,9 @@
 //###########################################################
 // CONTAINER
 // general container around the jstree or elements
+.cms-pagetree-root,
 .cms-pagetree-root.filtered {
-    min-height: auto;
+    min-height: 0;
     // important is to fight with admin-style
     padding: 0 !important;
     box-shadow: $pagetree-box-shadow !important;
@@ -97,6 +95,7 @@
 .cms-pagetree-header {
     position: relative;
     display: table;
+    display: flex;
     width: 100%;
     box-sizing: border-box;
     z-index: z(pagetree, header);
@@ -435,6 +434,12 @@
     }
 
 }
+
+.cms-tree-item-disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
 .cms-tree-item-wrapper {
     display: table-row;
     min-width: $pagetree-cell-inner-height;
@@ -461,7 +466,7 @@
 .cms-tree-item-lang .cms-pagetree-dropdown-menu {
     right: 32px;
     top: -5px;
-    width: 180px;
+    min-width: 180px;
 }
 .cms-tree-item-button .cms-pagetree-dropdown-menu {
     right: 40px;
@@ -474,7 +479,7 @@
         bottom: $pagetree-cell-inner-height / 2 + 7px;
     }
 }
-.cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil {
+.cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil:not(.cms-btn-disabled)[data-url] {
     @include icon(cogs);
 }
 
@@ -663,6 +668,7 @@
         list-style-type: none;
         padding: 0;
         margin: 0;
+        transform: translateZ(0);
     }
 
     .jstree-is-dragging {
@@ -672,6 +678,9 @@
             border-top: 1px solid $gray-lighter;
             margin-top: -1px;
         }
+    }
+    .jstree-is-dragging-copy {
+        opacity: 0.9 !important;
     }
 
     // grid settings and resets added by `jstree.grid.js`
@@ -683,6 +692,10 @@
         margin-left: 0 !important;
         border: none;
         background: none;
+    }
+    .jstree-grid-header {
+        z-index: 1;
+        position: relative;
     }
     &.jstree-grid-cell {
         padding: 0;
@@ -798,13 +811,22 @@
         margin-top: -1px;
         border: 1px solid $gray-lighter;
         border-right: none;
-        background: $white url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+        background-color: $white;
+        background-image: url('../../img/pagetree/tree-li-drag.gif');
+        background-repeat: no-repeat;
+        background-position: -1px center;;
         image-rendering: pixelated;
 
         &:hover {
             color: $gray !important;
         }
     }
+
+    .jstree-node[data-move-permission="false"] > .jstree-anchor {
+        cursor: default;
+        background-image: none;
+    }
+
     .jstree-open,
     .jstree-closed,
     .jstree-loading {
@@ -843,7 +865,7 @@
     // hover states
     .jstree-hovered,
     .jstree-clicked {
-        background-color: lighten($gray-lightest, 3%);
+        background-color: lighten($gray-lightest, 3%) !important;
     }
 
     // special case for paste header
@@ -898,6 +920,97 @@
 }
 
 //###########################################################
+// shared pages look
+.jstree-django-cms {
+    $bg-shared: #f2f2f2;
+    .cms-tree-node-shared-true {
+        > .jstree-anchor {
+            border-style: dashed;
+            border-right: none;
+            color: #999;
+            background-color: $bg-shared !important;
+
+            &:hover {
+                color: #999 !important;
+            }
+
+            &.jstree-hovered,
+            &.jstree-clicked {
+                background-color: $bg-shared !important;
+            }
+        }
+    }
+
+    .jstree-grid-cell.jstree-hovered,
+    .jstree-grid-cell.jstree-clicked {
+        background-color: $bg-shared;
+    }
+
+    .cms-tree-node-shared-false {
+        > .jstree-anchor {
+            border-style: solid;
+            border-right: none;
+            background-color: white !important;
+            border-bottom: $pagetree-border;
+
+            &.jstree-hovered,
+            &.jstree-clicked {
+                background-color: lighten($gray-lightest, 3%) !important;
+            }
+        }
+
+        + .cms-tree-node-shared-true {
+            > .jstree-anchor {
+                border-top-style: solid;
+            }
+            &.jstree-hovered,
+            &.jstree-clicked {
+                background-color: $bg-shared;
+            }
+        }
+    }
+
+    .cms-page-tree-cell-shared--true {
+        border-style: dashed;
+        background-color: #f2f2f2;
+
+        &.jstree-grid-cell-regular-options {
+            border-left: none;
+        }
+
+        .cms-btn-no-border {
+            background-color: transparent !important;
+            &:hover {
+                background-color: #fff !important;
+                border: 1px solid #ddd !important;
+            }
+        }
+
+        &.jstree-hovered,
+        &.jstree-clicked {
+            background-color: $bg-shared !important;
+        }
+    }
+
+    .cms-page-tree-cell-shared--false {
+        background-color: white;
+
+        &.jstree-hovered,
+        &.jstree-clicked {
+            background-color: lighten($gray-lightest, 3%) !important;
+        }
+    }
+
+    .cms-page-tree-cell-shared--true + .cms-page-tree-cell-shared--false {
+        border-top: $pagetree-border;
+        margin-top: -1px;
+        padding-top: 8px;
+        height: 47px;
+    }
+
+}
+
+//###########################################################
 // drag & drop item
 #jstree-dnd {
     box-sizing: border-box;
@@ -906,7 +1019,7 @@
     height: $pagetree-cell-height;
     padding: $pagetree-anchor-padding !important;
     margin-left: -$pagetree-marker-size + 1;
-    background: $color-primary url('../img/pagetree/tree-li-drag.gif') no-repeat -1px center;
+    background-color: $color-primary !important;
     color: $white;
     // copy icon triggered when pressing `CMD`
     .jstree-copy {

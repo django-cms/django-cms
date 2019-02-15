@@ -1,0 +1,4 @@
+{% load cms_tags %}<{{ instance.tag_type }} {% if instance.class_name or instance.additional_classes %}class="{% spaceless %}
+        {{ instance.class_name }}
+        {{ instance.get_additional_classes }}
+    {% endspaceless %}"{% endif %}>{% for plugin in instance.child_plugin_instances %}{% render_plugin plugin %}{% endfor %}</{{ instance.tag_type }}>

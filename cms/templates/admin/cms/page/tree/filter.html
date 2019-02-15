@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<h3>{{ title }}</h3>
+<h3>{{ field.label }}</h3>
 <ul>
     {% for choice in choices %}
         <li{% if choice.selected %} class="selected"{% endif %}>

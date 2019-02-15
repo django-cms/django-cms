@@ -1,0 +1,19 @@
+<div class="cms-toolbar-item cms-toolbar-item-dropdown cms-dropdown cms-toolbar-item-buttons {{ extra_classes|join:' ' }}">
+    {% if primary_button.has_no_action %}
+        {{ primary_button.render }}
+    {% else %}
+        <div class="cms-btn-group">
+            {{ primary_button.render }}
+            <a href="javascript: void 0" class="cms-btn cms-dropdown-toggle {{ primary_button.extra_classes|join:' ' }} cms-dropdown-toggle-thin">
+                <span class="cms-dropdown-caret"></span>
+            </a>
+        </div>
+    {% endif %}
+    <ul class="cms-dropdown-menu">
+        {% for button in buttons %}
+            <li>
+                {{ button.render }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>

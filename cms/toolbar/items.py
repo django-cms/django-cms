@@ -159,7 +159,7 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
 
     def add_ajax_item(self, name, action, active=False, disabled=False,
                       extra_classes=None, data=None, question=None,
-                      side=LEFT, position=None, on_success=None):
+                      side=LEFT, position=None, on_success=None, method='POST'):
         item = AjaxItem(name, action, self.csrf_token,
                         active=active,
                         disabled=disabled,
@@ -168,12 +168,14 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
                         question=question,
                         side=side,
                         on_success=on_success,
+                        method=method,
         )
         self.add_item(item, position=position)
         return item
 
 
 class BaseItem(six.with_metaclass(ABCMeta)):
+    toolbar = None
     template = None
 
     def __init__(self, side=LEFT):
@@ -184,6 +186,10 @@ class BaseItem(six.with_metaclass(ABCMeta)):
         return self.side is RIGHT
 
     def render(self):
+        if self.toolbar:
+            template = self.toolbar.templates.get_cached_template(self.template)
+            return template.render(self.get_context())
+        # Backwards compatibility
         return render_to_string(self.template, self.get_context())
 
     def get_context(self):
@@ -191,6 +197,7 @@ class BaseItem(six.with_metaclass(ABCMeta)):
 
 
 class TemplateItem(BaseItem):
+
     def __init__(self, template, extra_context=None, side=LEFT):
         super(TemplateItem, self).__init__(side)
         self.template = template
@@ -225,6 +232,7 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
     def get_items(self):
         items = self.items
         for item in items:
+            item.toolbar = self.toolbar
             if hasattr(item, 'disabled'):
                 item.disabled = self.disabled or item.disabled
         return items
@@ -322,7 +330,7 @@ class AjaxItem(BaseItem):
 
     def __init__(self, name, action, csrf_token, data=None, active=False,
                  disabled=False, extra_classes=None,
-                 question=None, side=LEFT, on_success=None):
+                 question=None, side=LEFT, on_success=None, method='POST'):
         super(AjaxItem, self).__init__(side)
         self.name = name
         self.action = action
@@ -333,24 +341,27 @@ class AjaxItem(BaseItem):
         self.extra_classes = extra_classes or []
         self.question = question
         self.on_success = on_success
+        self.method = method
 
     def __repr__(self):
         return '<AjaxItem:%s>' % force_text(self.name)
 
     def get_context(self):
-        data = {}
-        data.update(self.data)
-        data['csrfmiddlewaretoken'] = self.csrf_token
-        data = json.dumps(data)
+        data = self.data.copy()
+
+        if self.method not in ('GET', 'HEAD', 'OPTIONS', 'TRACE'):
+            data['csrfmiddlewaretoken'] = self.csrf_token
+
         return {
             'action': self.action,
             'name': self.name,
             'active': self.active,
             'disabled': self.disabled,
             'extra_classes': self.extra_classes,
-            'data': data,
+            'data': json.dumps(data),
             'question': self.question,
-            'on_success': self.on_success
+            'on_success': self.on_success,
+            'method': self.method,
         }
 
 
@@ -362,9 +373,14 @@ class Break(BaseItem):
 
 
 class BaseButton(six.with_metaclass(ABCMeta)):
+    toolbar = None
     template = None
 
     def render(self):
+        if self.toolbar:
+            template = self.toolbar.templates.get_cached_template(self.template)
+            return template.render(self.get_context())
+        # Backwards compatibility
         return render_to_string(self.template, self.get_context())
 
     def get_context(self):
@@ -474,8 +490,68 @@ class ButtonList(BaseItem):
         self.buttons.append(item)
         return item
 
+    def get_buttons(self):
+        for button in self.buttons:
+            button.toolbar = self.toolbar
+            yield button
+
+    def get_context(self):
+        context = {
+            'buttons': list(self.get_buttons()),
+            'extra_classes': self.extra_classes
+        }
+
+        if self.toolbar:
+            context['cms_structure_on'] = self.toolbar.structure_mode_url_on
+        return context
+
+
+class Dropdown(ButtonList):
+
+    template = "cms/toolbar/items/dropdown.html"
+
+    def __init__(self, *args, **kwargs):
+        super(Dropdown, self).__init__(*args, **kwargs)
+        self.primary_button = None
+
+    def __repr__(self):
+        return '<Dropdown:%s>' % force_text(self.name)
+
+    def add_primary_button(self, button):
+        self.primary_button = button
+
+    def get_buttons(self):
+        for button in self.buttons:
+            button.toolbar = self.toolbar
+            button.is_in_dropdown = True
+            yield button
+
     def get_context(self):
         return {
-            'buttons': self.buttons,
-            'extra_classes': self.extra_classes
+            'primary_button': self.primary_button,
+            'buttons': list(self.get_buttons()),
+            'extra_classes': self.extra_classes,
+        }
+
+
+class DropdownToggleButton(BaseButton):
+    template = "cms/toolbar/items/dropdown_button.html"
+    has_no_action = True
+
+    def __init__(self, name, active=False, disabled=False,
+                 extra_classes=None):
+        self.name = name
+        self.active = active
+        self.disabled = disabled
+        self.extra_classes = extra_classes or []
+
+    def __repr__(self):
+        return '<DropdownToggleButton:%s>' % force_text(self.name)
+
+    def get_context(self):
+        return {
+            'name': self.name,
+            'active': self.active,
+            'disabled': self.disabled,
+            'extra_classes': self.extra_classes,
         }

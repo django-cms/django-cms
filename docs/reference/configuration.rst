@@ -7,6 +7,7 @@ Configuration
 django CMS has a number of settings to configure its behaviour. These should
 be available in your ``settings.py`` file.
 
+
 .. _installed_apps:
 
 ******************************
@@ -43,7 +44,7 @@ the classes as possible.
 Custom User Requirements
 ************************
 
-.. setting:: AUTH_USER_MODEL
+..  setting:: AUTH_USER_MODEL
 
 When using a custom user model (i.e. the ``AUTH_USER_MODEL`` Django setting), there are a few
 requirements that must be met.
@@ -68,13 +69,11 @@ Additionally, the application in which the model is defined **must** be loaded b
     only at the beginning of a project, before the database is created.
 
 
-
-
 *****************
 Required Settings
 *****************
 
-.. setting:: CMS_TEMPLATES
+..  setting:: CMS_TEMPLATES
 
 CMS_TEMPLATES
 =============
@@ -95,9 +94,8 @@ Example::
 
 .. note::
 
-    All templates defined in :setting:`CMS_TEMPLATES` **must** contain at least
-    the ``js`` and ``css`` sekizai namespaces. For more information, see
-    :ref:`sekizai-namespaces`.
+    All templates defined in :setting:`CMS_TEMPLATES` **must** contain at least the ``js`` and ``css`` sekizai
+    namespaces. For an example, see :ref:`basic_template`.
 
 .. note::
 
@@ -115,7 +113,7 @@ Example::
 Basic Customisation
 *******************
 
-.. setting:: CMS_TEMPLATE_INHERITANCE
+..  setting:: CMS_TEMPLATE_INHERITANCE
 
 CMS_TEMPLATE_INHERITANCE
 ========================
@@ -129,7 +127,7 @@ When enabled, pages' ``Template`` options will include a new default: *Inherit
 from the parent page* (unless the page is a root page).
 
 
-.. setting:: CMS_TEMPLATES_DIR
+..  setting:: CMS_TEMPLATES_DIR
 
 CMS_TEMPLATES_DIR
 =================
@@ -167,7 +165,7 @@ as keys and template names as values::::
 Being a normal python file, templates labels can be passed through gettext
 for translation.
 
-.. note::
+..  note::
 
     As templates are still loaded by the Django template loader, the given
     directory **must** be reachable by the template loading system.
@@ -175,7 +173,7 @@ for translation.
     supported.
 
 
-.. setting:: CMS_PLACEHOLDER_CONF
+..  setting:: CMS_PLACEHOLDER_CONF
 
 CMS_PLACEHOLDER_CONF
 ====================
@@ -189,6 +187,10 @@ all placeholders.
 Example::
 
     CMS_PLACEHOLDER_CONF = {
+        None: {
+            "plugins": ['TextPlugin'],
+            'excluded_plugins': ['InheritPlugin'],
+        },
         'content': {
             'plugins': ['TextPlugin', 'PicturePlugin'],
             'text_only_plugins': ['LinkPlugin'],
@@ -232,8 +234,29 @@ Example::
         },
     }
 
+.. _placeholder_conf_precedence:
+
 You can combine template names and placeholder names to define
 plugins in a granular fashion, as shown above with ``base.html content``.
+
+Configuration is retrieved in the following order:
+
+* CMS_PLACEHOLDER_CONF['template placeholder']
+* CMS_PLACEHOLDER_CONF['placeholder']
+* CMS_PLACEHOLDER_CONF['template']
+* CMS_PLACEHOLDER_CONF[None]
+
+The first ``CMS_PLACEHOLDER_CONF`` key that matches for the required configuration attribute
+is used.
+
+E.g: given the example above if the ``plugins`` configuration is retrieved for the ``content``
+placeholder in a page using the ``base.html`` template, the value
+``['TextPlugin', 'PicturePlugin', 'TeaserPlugin']`` will be returned as ``'base.html content'``
+matches; if the same configuration is retrieved for the ``content`` placeholder in a page using
+``fullwidth.html`` template, the returned value will be ``['TextPlugin', 'PicturePlugin']``. If
+``plugins`` configuration is retrieved for ``sidebar_left`` placeholder, ``['TextPlugin']`` from
+``CMS_PLACEHOLDER_CONF`` key ``None`` will be returned.
+
 
 ``plugins``
     A list of plugins that can be added to this placeholder. If not supplied,
@@ -242,6 +265,14 @@ plugins in a granular fashion, as shown above with ``base.html content``.
 ``text_only_plugins``
     A list of additional plugins available only in the TextPlugin, these
     plugins can't be added directly to this placeholder.
+
+``excluded_plugins``
+    A list of plugins that will not be added to the given placeholder; this takes precedence
+    over ``plugins`` configuration: if a plugin is present in both lists, it **will not** be
+    available in the placeholder. This is basically a way to **blacklist** a plugin: even if
+    registered, it will not be available in the placeholder. If set on the ``None`` (default)
+    key, the plugins will not be available in any placeholder (except the ``excluded_plugins``
+    configuration is overridden in more specific ``CMS_PLACEHOLDER_KEYS``.
 
 ``extra_context``
     Extra context that plugins in this placeholder receive.
@@ -352,8 +383,8 @@ plugins in a granular fashion, as shown above with ``base.html content``.
     and just overwrites the ``plugins`` setting to allow ``TeaserPlugin``, thus you
     have not to duplicate the configuration of ``content``.
 
-.. setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
+..  setting:: CMS_PLUGIN_CONTEXT_PROCESSORS
 
 CMS_PLUGIN_CONTEXT_PROCESSORS
 =============================
@@ -365,8 +396,8 @@ A list of plugin context processors. Plugin context processors are callables
 that modify all plugins' context *before* rendering. See
 :doc:`/how_to/custom_plugins` for more information.
 
-.. setting:: CMS_PLUGIN_PROCESSORS
 
+..  setting:: CMS_PLUGIN_PROCESSORS
 
 CMS_PLUGIN_PROCESSORS
 =====================
@@ -378,7 +409,7 @@ A list of plugin processors. Plugin processors are callables that modify all
 plugins' output *after* rendering. See :doc:`/how_to/custom_plugins`
 for more information.
 
-.. setting:: CMS_APPHOOKS
+..  setting:: CMS_APPHOOKS
 
 
 CMS_APPHOOKS
@@ -403,14 +434,17 @@ Example::
     )
 
 
-*************
-I18N and L10N
-*************
+.. _i18n_l10n_reference:
 
-.. setting:: CMS_LANGUAGES
+*****************************************************
+Internationalisation and localisation (I18N and L10N)
+*****************************************************
 
 CMS_LANGUAGES
 =============
+
+..  setting:: CMS_LANGUAGES
+
 
 default
     Value of :setting:`django:LANGUAGES` converted to this format
@@ -489,8 +523,8 @@ language.
 
 What are the properties a language node can have?
 
-.. setting::code
 
+..  setting:: code
 
 code
 ----
@@ -509,7 +543,7 @@ String. The verbose name of the language.
 .. note:: Is required for every language.
 
 
-.. setting::public
+..  setting:: public
 
 public
 ------
@@ -520,8 +554,8 @@ type
 default
     ``True``
 
-.. setting::fallbacks
 
+..  setting:: fallbacks
 
 fallbacks
 ---------
@@ -533,20 +567,26 @@ example
 default
     ``[]``
 
-.. setting::hide_untranslated
 
+..  setting:: hide_untranslated
 
 hide_untranslated
 -----------------
-Hide untranslated pages in menus
+
+Hides untranslated pages in menus.
+
+When applied to the ``default`` directive, if ``False``, all pages in menus will be listed in all languages, including those
+that don't yet have content in a particular language. If ``True``, untranslated pages will be hidden.
+
+When applied to a particular language, hides that language's pages in menus until translations exist for them.
 
 type
     Boolean
 default
     ``True``
 
-.. setting::redirect_on_fallback
 
+.. setting:: redirect_on_fallback
 
 redirect_on_fallback
 --------------------
@@ -569,13 +609,13 @@ default
 Unicode support for automated slugs
 ===================================
 
-django CMS supports automated slug generation from page titles that contain
-Unicode characters via the unihandecode.js project. To enable support for
-unihandecode.js, at least :setting:`CMS_UNIHANDECODE_HOST` and
-:setting:`CMS_UNIHANDECODE_VERSION` must be set.
+If your site has languages which use non-ASCII character sets, :setting:`CMS_UNIHANDECODE_HOST` and
+:setting:`CMS_UNIHANDECODE_VERSION` will allow it to automate slug generation for those languages too.
+
+Support for this is provided by the unihandecode.js project.
 
 
-.. setting:: CMS_UNIHANDECODE_HOST
+..  setting:: CMS_UNIHANDECODE_HOST
 
 CMS_UNIHANDECODE_HOST
 ---------------------
@@ -597,7 +637,7 @@ If set to ``None``, the default, unihandecode.js is not used.
     can be cached by the browser for a very long period.
 
 
-.. setting:: CMS_UNIHANDECODE_VERSION
+..  setting:: CMS_UNIHANDECODE_VERSION
 
 CMS_UNIHANDECODE_VERSION
 ------------------------
@@ -611,7 +651,7 @@ URLs for the javascript files. URLs are built like this:
 ``<CMS_UNIHANDECODE_HOST>-<CMS_UNIHANDECODE_VERSION>.<DECODER>.min.js``.
 
 
-.. setting:: CMS_UNIHANDECODE_DECODERS
+..  setting:: CMS_UNIHANDECODE_DECODERS
 
 CMS_UNIHANDECODE_DECODERS
 -------------------------
@@ -622,7 +662,7 @@ default
 If you add additional decoders to your :setting:`CMS_UNIHANDECODE_HOST`, you can add them to this setting.
 
 
-.. setting:: CMS_UNIHANDECODE_DEFAULT_DECODER
+..  setting:: CMS_UNIHANDECODE_DEFAULT_DECODER
 
 CMS_UNIHANDECODE_DEFAULT_DECODER
 --------------------------------
@@ -657,14 +697,15 @@ Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://githu
                 unihandecode-1.0.0.vn.min.js
                 unihandecode-1.0.0.zh.min.js
 
-More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.org/>`_.
+More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.io/>`_.
 
 
 **************
 Media Settings
 **************
 
-.. setting:: CMS_MEDIA_PATH
+
+..  setting:: CMS_MEDIA_PATH
 
 CMS_MEDIA_PATH
 ==============
@@ -675,7 +716,7 @@ default
 The path from :setting:`django:MEDIA_ROOT` to the media files located in ``cms/media/``
 
 
-.. setting:: CMS_MEDIA_ROOT
+..  setting:: CMS_MEDIA_ROOT
 
 CMS_MEDIA_ROOT
 ==============
@@ -686,7 +727,7 @@ default
 The path to the media root of the cms media files.
 
 
-.. setting:: CMS_MEDIA_URL
+..  setting:: CMS_MEDIA_URL
 
 CMS_MEDIA_URL
 =============
@@ -697,7 +738,7 @@ default
 The location of the media files that are located in ``cms/media/cms/``
 
 
-.. setting:: CMS_PAGE_MEDIA_PATH
+..  setting:: CMS_PAGE_MEDIA_PATH
 
 CMS_PAGE_MEDIA_PATH
 ===================
@@ -717,20 +758,19 @@ user under which Django will be running.
 Advanced Settings
 *****************
 
-.. setting:: CMS_INTERNAL_IPS
+..  setting:: CMS_INTERNAL_IPS
 
 CMS_INTERNAL_IPS
 ================
 
 default
-    settings.INTERNAL_IPS
+    ``[]``
 
-By default ``CMS_INTERNAL_IPS`` takes the same value as the Django setting
-``INTERNAL_IPS`` which has a default value of an empty list.
+By default ``CMS_INTERNAL_IPS`` is an empty list (``[]``).
 
-If left as an empty list (or anything Falsey, really), this setting does not
-add any restrictions to the toolbar. However, if set, the toolbar will only
-appear for client IP addresses that are in this list.
+If left as an empty list, this setting does not add any restrictions to the
+toolbar. However, if set, the toolbar will only appear for client IP addresses
+that are in this list.
 
 This setting may also be set to an `IpRangeList` from the external package
 ``iptools``. This package allows convenient syntax for defining complex IP
@@ -740,13 +780,13 @@ The client IP address is obtained via the :setting:`CMS_REQUEST_IP_RESOLVER`
 in the ``cms.middleware.toolbar.ToolbarMiddleware`` middleware.
 
 
-.. setting:: CMS_REQUEST_IP_RESOLVER
+..  setting:: CMS_REQUEST_IP_RESOLVER
 
 CMS_REQUEST_IP_RESOLVER
 =======================
 
 default
-    'cms.utils.request_ip_resolvers.default_request_ip_resolver'
+    '`cms.utils.request_ip_resolvers.default_request_ip_resolver`'
 
 This setting is used system-wide to provide a consistent and plug-able means
 of extracting a client IP address from the HTTP request. The default
@@ -758,7 +798,7 @@ The supplied method should accept a single argument `request` and return an
 IP address String.
 
 
-.. setting:: CMS_PERMISSION
+..  setting:: CMS_PERMISSION
 
 CMS_PERMISSION
 ==============
@@ -784,7 +824,7 @@ Naturally he can limit the rights of the users he creates even further,
 allowing them to see only a subset of the pages to which he is allowed access.
 
 
-.. setting:: CMS_RAW_ID_USERS
+..  setting:: CMS_RAW_ID_USERS
 
 CMS_RAW_ID_USERS
 ================
@@ -813,10 +853,10 @@ performance.
           benefit from this setting.
 
 .. versionchanged:: 3.2.1: CMS_RAW_ID_USERS also applies to
-                           :class:`cms.model.GlobalPagePermission`` admin.
+                           ``GlobalPagePermission`` admin.
 
 
-.. setting:: CMS_PUBLIC_FOR
+..  setting:: CMS_PUBLIC_FOR
 
 CMS_PUBLIC_FOR
 ==============
@@ -828,7 +868,7 @@ Determines whether pages without any view restrictions are public by default or
 staff only. Possible values are ``all`` and ``staff``.
 
 
-.. setting:: CMS_CACHE_DURATIONS
+..  setting:: CMS_CACHE_DURATIONS
 
 CMS_CACHE_DURATIONS
 ===================
@@ -847,7 +887,7 @@ template tags.
 
 .. note::
 
-    This settings was previously called :setting:`CMS_CONTENT_CACHE_DURATION`
+    This settings was previously called ``CMS_CONTENT_CACHE_DURATION``
 
 
 ``'menus'``
@@ -860,7 +900,7 @@ Cache expiration (in seconds) for the menu tree.
 
 .. note::
 
-    This settings was previously called :setting:`MENU_CACHE_DURATION`
+    This settings was previously called ``MENU_CACHE_DURATION``
 
 
 ``'permissions'``
@@ -872,7 +912,7 @@ default
 Cache expiration (in seconds) for view and other permissions.
 
 
-.. setting:: CMS_CACHE_PREFIX
+..  setting:: CMS_CACHE_PREFIX
 
 CMS_CACHE_PREFIX
 ================
@@ -889,13 +929,13 @@ Example::
 
     CMS_CACHE_PREFIX = 'mysite-live'
 
-.. note::
+..  note::
 
     Django 1.3 introduced a site-wide cache key prefix. See Django's own docs
     on :ref:`cache key prefixing <django:cache_key_prefixing>`
 
 
-.. setting:: CMS_PAGE_CACHE
+..  setting:: CMS_PAGE_CACHE
 
 CMS_PAGE_CACHE
 ==============
@@ -908,7 +948,7 @@ Takes the language, and time zone into account. Pages for logged in users are no
 If the toolbar is visible the page is not cached as well.
 
 
-.. setting:: CMS_PLACEHOLDER_CACHE
+..  setting:: CMS_PLACEHOLDER_CACHE
 
 CMS_PLACEHOLDER_CACHE
 =====================
@@ -921,7 +961,7 @@ Takes the current language and time zone into account. If the toolbar is in edit
 present the placeholders will not be cached.
 
 
-.. setting:: CMS_PLUGIN_CACHE
+..  setting:: CMS_PLUGIN_CACHE
 
 CMS_PLUGIN_CACHE
 ================
@@ -935,45 +975,10 @@ Default value of the ``cache`` attribute of plugins. Should plugins be cached by
     If you disable the plugin cache be sure to restart the server and clear the cache afterwards.
 
 
-.. setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
-
-CMS_MAX_PAGE_HISTORY_REVERSIONS
-===============================
-
-default
-    ``15``
-
-Configures how many undo steps are saved in the db excluding publish steps.
-In the page admin there is a ``History`` button to revert to previous version
-of a page. In the past, databases using django-reversion could grow huge. To
-help address this issue, only a limited number of *edit* revisions will now be saved.
-
-This setting declares how many edit revisions are saved in the database.
-By default the newest 15 edit revisions are kept.
+..  setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 
 
-CMS_MAX_PAGE_PUBLISH_REVERSIONS
-===============================
-
-default
-    ``10``
-
-If `django-reversion`_ is installed everything you do with a page and all
-plugin changes will be saved in a revision.
-
-In the page admin there is a ``History`` button to revert to previous version
-of a page. In the past, databases using django-reversion could grow huge. To
-help address this issue, only a limited number of *published* revisions will now be saved.
-
-This setting declares how many published revisions are saved in the database.
-By default the newest 10 published revisions are kept; all others are deleted
-when you publish a page.
-
-If set to *0* all published revisions are kept, but you will need to ensure
-that the revision table does not grow excessively large.
-
-
-.. setting:: CMS_TOOLBARS
+..  setting:: CMS_TOOLBARS
 
 CMS_TOOLBARS
 ============
@@ -982,22 +987,21 @@ default
     ``None``
 
 If defined, specifies the list of toolbar modifiers to be used to populate the
-toolbar as import paths. Otherwise, all available toolbars from both the CMS and
+toolbar, as import paths. Otherwise, all available toolbars from both the CMS and
 the third-party apps will be loaded.
 
 Example::
 
     CMS_TOOLBARS = [
         # CMS Toolbars
-        'cms.cms_toolbar.PlaceholderToolbar',
-        'cms.cms_toolbar.BasicToolbar',
-        'cms.cms_toolbar.PageToolbar',
+        'cms.cms_toolbars.PlaceholderToolbar',
+        'cms.cms_toolbars.BasicToolbar',
+        'cms.cms_toolbars.PageToolbar',
 
         # third-party Toolbar
-        'aldryn_blog.cms_toolbar.BlogToolbar',
+        'aldryn_blog.cms_toolbars.BlogToolbar',
     ]
 
-.. _django-reversion: https://github.com/etianen/django-reversion
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
 
 
@@ -1018,10 +1022,15 @@ CMS_TOOLBAR_HIDE
 default
     ``False``
 
-If True, the toolbar is hidden in the pages out django CMS.
+By default, the django CMS toolbar is displayed to logged-in admin users on all pages that use the ``{% cms_toolbar
+%}`` template tag. Its appearance can be optionally restricted to django CMS pages only (technically, pages that are
+rendered by a django CMS view).
+
+When this is set to ``True``, all other pages will no longer display the toolbar. This includes pages with apphooks
+applied to them, as they are handled by the other application's views, and not django CMS's.
+
 
 .. versionchanged:: 3.2.1: CMS_APP_NAME has been removed as it's no longer required.
-
 
 CMS_DEFAULT_X_FRAME_OPTIONS
 ===========================
@@ -1036,6 +1045,7 @@ This should be an integer preferably taken from the ``cms.constants`` e.g.
 - X_FRAME_OPTIONS_ALLOW
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
+
 
 .. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
 
@@ -1055,7 +1065,7 @@ Example::
     CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
 
-.. setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
+..  setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
 
 CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
 ================================
@@ -1066,7 +1076,7 @@ default
 This is the path of the template used to create pages in the wizard. It must be
 one of the templates in :setting:`CMS_TEMPLATES`.
 
-.. setting:: CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
+..  setting:: CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
 
 CMS_PAGE_WIZARD_CONTENT_PLACEHOLDER
 ===================================
@@ -1080,7 +1090,8 @@ adding any content supplied in the wizards' "Content" field. If this is left
 unset, then the content will target the first suitable placeholder found on
 the page's template.
 
-.. setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN
+
+..  setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN
 
 CMS_PAGE_WIZARD_CONTENT_PLUGIN
 ==============================
@@ -1092,7 +1103,7 @@ This is the name of the plugin created in the Page Wizard when the "Content"
 field is filled in. There should be no need to change it, unless you
 **don't** use ``djangocms-text-ckeditor`` in your project.
 
-.. setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
+..  setting:: CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 
 CMS_PAGE_WIZARD_CONTENT_PLUGIN_BODY
 ===================================

@@ -2,24 +2,25 @@
  * Copyright https://github.com/divio/django-cms
  */
 
-// #############################################################################
-// NAMESPACES
-var CMS = window.CMS || {};
-var apphooks_configuration = window.apphooks_configuration || {};
+// this essentially makes sure that dynamically required bundles are loaded
+// from the same place
+// eslint-disable-next-line
+__webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.apphookselect');
 
 // #############################################################################
 // APP HOOK SELECT
-(function ($) {
-    'use strict';
+require.ensure([], function (require) {
+    var $ = require('jquery');
+    var apphooks_configuration = window.apphooks_configuration || {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
-        var appHooks = $('#application_urls');
+        var appHooks = $('#application_urls, #id_application_urls');
         var selected = appHooks.find('option:selected');
-        var appNsRow = $('.form-row.application_namespace');
-        var appNs = appNsRow.find('#id_application_namespace');
-        var appCfgsRow = $('.form-row.application_configs');
-        var appCfgs = appCfgsRow.find('#application_configs');
+        var appNsRow = $('.form-row.application_namespace, .form-row.field-application_namespace');
+        var appNs = appNsRow.find('#application_namespace, #id_application_namespace');
+        var appCfgsRow = $('.form-row.application_configs, .form-row.field-application_configs');
+        var appCfgs = appCfgsRow.find('#application_configs, #id_application_configs');
         var appCfgsAdd = appCfgsRow.find('#add_application_configs');
         var original_ns = appNs.val();
 
@@ -91,4 +92,4 @@ var apphooks_configuration = window.apphooks_configuration || {};
         });
 
     });
-})(CMS.$);
+}, 'admin.widget');

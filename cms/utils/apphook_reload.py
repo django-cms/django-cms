@@ -8,7 +8,7 @@ import uuid
 from threading import local
 
 from django.conf import settings
-from django.core.urlresolvers import reverse, clear_url_caches
+from django.urls import reverse, clear_url_caches
 
 # Py2 and Py3 compatible reload
 from imp import reload
@@ -22,7 +22,10 @@ use_threadlocal = False
 def ensure_urlconf_is_up_to_date():
     global_revision = get_global_revision()
     local_revision = get_local_revision()
-    if global_revision != local_revision:
+
+    if not local_revision:
+        set_local_revision(global_revision)
+    elif global_revision != local_revision:
         if settings.DEBUG:
             print("   New revision!!!! RELOAD!\n"
                   "      {0} ({1})\n"

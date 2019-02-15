@@ -12,10 +12,10 @@ class PublisherManager(models.Manager):
         return PublisherQuerySet(self.model)
 
     def drafts(self):
-        return self.filter(publisher_is_draft=True)
+        return self.get_queryset().drafts()
 
     def public(self):
-        return self.filter(publisher_is_draft=False)
+        return self.get_queryset().public()
 
     """
     def all(self):

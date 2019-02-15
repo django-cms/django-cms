@@ -1,6 +1,6 @@
-#############
-Sitemap Guide
-#############
+######################
+How to create sitemaps
+######################
 
 
 *******
@@ -10,7 +10,7 @@ Sitemap
 Sitemaps are XML files used by Google to index your website by using their
 **Webmaster Tools** and telling them the location of your sitemap.
 
-The :class:`CMSSitemap` will create a sitemap with all the published pages of
+The :class:`cms.sitemaps.CMSSitemap` will create a sitemap with all the published pages of
 your CMS.
 
 
@@ -21,7 +21,8 @@ Configuration
  * add :mod:`django.contrib.sitemaps` to your project's :setting:`django:INSTALLED_APPS`
    setting
  * add ``from cms.sitemaps import CMSSitemap`` to the top of your main ``urls.py``
- * add ``url(r'^sitemap\.xml$', 'django.contrib.sitemaps.views.sitemap', {'sitemaps': {'cmspages': CMSSitemap}}),``
+ * add ``from django.contrib.sitemaps.views import sitemap`` to ``urls.py```
+ * add ``url(r'^sitemap\.xml$', sitemap, {'sitemaps': {'cmspages': CMSSitemap}}),``
    to your ``urlpatterns``
 
 

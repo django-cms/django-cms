@@ -2,19 +2,16 @@
 from contextlib import contextmanager
 import inspect
 from itertools import chain
-import os
 
 from django.conf import settings
-from django.template.base import Lexer, TOKEN_BLOCK
 from django.utils.decorators import method_decorator
 from django.utils.termcolors import colorize
 from sekizai.helpers import validate_template
 
 from cms import constants
 from cms.models import AliasPluginModel
-from cms.utils import get_cms_setting
-from cms.utils.compat import DJANGO_1_8
-from cms.utils.compat.dj import is_installed, get_app_paths
+from cms.utils.conf import get_cms_setting
+from cms.utils.compat.dj import is_installed
 
 
 SUCCESS = 1
@@ -220,11 +217,6 @@ def check_i18n(output):
                                          "'en-us' instead of 'en_US'): '%s' provided" % lang['code'])
         else:
             section.error("SITE_ID must be an integer, not %r" % settings.SITE_ID)
-        for deprecated in ['CMS_HIDE_UNTRANSLATED', 'CMS_LANGUAGE_FALLBACK', 'CMS_LANGUAGE_CONF', 'CMS_SITE_LANGUAGES',
-                           'CMS_FRONTEND_LANGUAGES']:
-            if hasattr(settings, deprecated):
-                section.warn("Deprecated setting %s found. This setting is now handled in the new style "
-                             "CMS_LANGUAGES and can be removed" % deprecated)
 
 
 @define_check
@@ -242,8 +234,12 @@ def check_middlewares(output):
             'cms.middleware.toolbar.ToolbarMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
         )
+        if getattr(settings, 'MIDDLEWARE', None):
+            middlewares = settings.MIDDLEWARE
+        else:
+            middlewares = settings.MIDDLEWARE_CLASSES
         for middleware in required_middlewares:
-            if middleware not in settings.MIDDLEWARE_CLASSES:
+            if middleware not in middlewares:
                 section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
 
 @define_check
@@ -257,18 +253,6 @@ def check_context_processors(output):
         for processor in required_processors:
             if processor not in processors:
                 section.error("%s context processor must be in TEMPLATES option context_processors" % processor)
-
-@define_check
-def check_deprecated_settings(output):
-    with output.section("Deprecated settings") as section:
-        found = False
-        for deprecated in ['CMS_FLAT_URLS', 'CMS_MODERATOR']:
-            if hasattr(settings, deprecated):
-                section.warn(
-                    "Deprecated setting %s found. This setting is no longer in use and can be removed" % deprecated)
-                found = True
-        if not found:
-            section.skip("No deprecated settings found")
 
 
 @define_check
@@ -338,18 +322,11 @@ def check_copy_relations(output):
                 # extension... move along...
                 continue
             for rel in extension._meta.many_to_many:
-                if DJANGO_1_8:
-                    section.warn('%s has a many-to-many relation to %s,\n    '
-                                 'but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.related.model),
-                    ))
-                else:
-                    section.warn('%s has a many-to-many relation to %s,\n    '
-                                 'but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.remote_field.model),
-                    ))
+                section.warn('%s has a many-to-many relation to %s,\n    '
+                             'but no "copy_relations" method defined.' % (
+                    c_to_s(extension),
+                    c_to_s(rel.remote_field.model),
+                ))
             for rel in extension._get_related_objects():
                 if rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
@@ -362,48 +339,8 @@ def check_copy_relations(output):
         else:
             section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\n'
                                    'This might lead to data loss when publishing or copying plugins/extensions.\n'
-                                   'See https://django-cms.readthedocs.org/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
-                                   'https://django-cms.readthedocs.org/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
-
-
-def _load_all_templates(directory):
-    """
-    Loads all templates in a directory (recursively) and yields tuples of
-    template tokens and template paths.
-    """
-    if os.path.exists(directory):
-        for name in os.listdir(directory):
-            path = os.path.join(directory, name)
-            if os.path.isdir(path):
-                for template in _load_all_templates(path):
-                    yield template
-            elif path.endswith('.html'):
-                with open(path, 'rb') as fobj:
-                    source = fobj.read().decode(settings.FILE_CHARSET)
-                    if DJANGO_1_8:
-                        lexer = Lexer(source, path)
-                    else:
-                        lexer = Lexer(source)
-                    yield lexer.tokenize(), path
-
-@define_check
-def deprecations(output):
-    # deprecated placeholder_tags scan (1 in 3.1)
-    templates_dirs = getattr(settings, 'TEMPLATES', [])[0]['DIRS']
-    templates_dirs.extend(
-        [os.path.join(path, 'templates') for path in get_app_paths()]
-    )
-    with output.section('Usage of deprecated placeholder_tags') as section:
-        for template_dir in templates_dirs:
-            for tokens, path in _load_all_templates(template_dir):
-                for token in tokens:
-                    if token.token_type == TOKEN_BLOCK:
-                        bits = token.split_contents()
-                        if bits[0] == 'load' and 'placeholder_tags' in bits:
-                            section.warn(
-                                'Usage of deprecated template tag library '
-                                'placeholder tags in template %s' % path
-                            )
+                                   'See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
+                                   'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
 
 
 def check(output):

@@ -30,16 +30,23 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 #extensions = ['sphinx.ext.autodoc']
 
-extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.autodoc']
+extensions = [
+    'djangocms',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.autodoc',
+    'sphinxcontrib.spelling'
+    ]
 intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
-    'django': ('http://readthedocs.org/docs/django/en/latest/', None),
+    'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
     'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
     'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
+    'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
-#templates_path = ['templates']
+# templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = '.rst'
@@ -52,7 +59,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'django cms'
-copyright = u'2009-2015, Patrick Lauber'
+copyright = u'2009-2017, Divio AG and contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -119,13 +126,14 @@ todo_include_todos = True
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-if not on_rtd:  # only import and set the theme if we're building docs locally
-    try:
-        import sphinx_rtd_theme
-        html_theme = 'sphinx_rtd_theme'
-        html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
-    except:
-        html_theme = 'default'
+try:
+    import divio_docs_theme
+    html_theme = 'divio_docs_theme'
+    html_theme_path = [divio_docs_theme.get_html_theme_path()]
+except:
+    html_theme = 'default'
+
+show_cloud_banner = True
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
@@ -158,7 +166,7 @@ if not on_rtd:  # only import and set the theme if we're building docs locally
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['static']
+html_static_path = ['_static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -211,7 +219,7 @@ latex_paper_size = 'a4'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
     ('index', 'djangocms.tex', u'django cms Documentation',
-     u'Patrick Lauber', 'manual'),
+     u'Divio AG and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top
@@ -235,8 +243,11 @@ latex_documents = [
 
 # Spelling check needs an additional module that is not installed by default.
 # Add it only if spelling check is requested so docs can be generated without it.
-if 'spelling' in sys.argv:
-    extensions.append("sphinxcontrib.spelling")
+
+# temporarily disabled because of an issue on RTD. see docs/requirements.txt
+
+# if 'spelling' in sys.argv:
+#     extensions.append("sphinxcontrib.spelling")
 
 # Spelling language.
 spelling_lang = 'en_GB'

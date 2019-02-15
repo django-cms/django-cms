@@ -1,4 +1,13 @@
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var PageTree = require('../../../static/cms/js/modules/cms.pagetree').default;
+var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown').default;
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.PageTree = PageTree;
+CMS.PageTreeDropdowns = PageTreeDropdowns;
+
 
 describe('CMS.PageTree', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -147,13 +156,15 @@ describe('CMS.PageTree', function () {
         var pagetree;
         var paste1;
         var paste2;
+        var paste1wrapper;
 
         beforeEach(function (done) {
             $(function () {
                 paste1 = $('<div class="paste-1 js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled"></div>');
                 paste2 = $('<div class="paste-2 js-cms-tree-item-paste cms-pagetree-dropdown-item-disabled"></div>');
+                paste1wrapper = paste1.wrap('<div class="wrapper"></div>').parent();
                 pagetree = new CMS.PageTree();
-                pagetree.ui.container.append(paste1);
+                pagetree.ui.container.append(paste1wrapper);
                 pagetree.ui.container.append(paste2);
                 done();
             });
@@ -170,7 +181,7 @@ describe('CMS.PageTree', function () {
         it('accepts optional selector', function () {
             expect(paste1).toHaveClass('cms-pagetree-dropdown-item-disabled');
             expect(paste2).toHaveClass('cms-pagetree-dropdown-item-disabled');
-            pagetree._enablePaste('.paste-1');
+            pagetree._enablePaste('.wrapper');
             expect(paste1).not.toHaveClass('cms-pagetree-dropdown-item-disabled');
             expect(paste2).toHaveClass('cms-pagetree-dropdown-item-disabled');
         });
@@ -180,13 +191,15 @@ describe('CMS.PageTree', function () {
         var pagetree;
         var paste1;
         var paste2;
+        var paste1wrapper;
 
         beforeEach(function (done) {
             $(function () {
                 paste1 = $('<div class="paste-1 js-cms-tree-item-paste"></div>');
                 paste2 = $('<div class="paste-2 js-cms-tree-item-paste"></div>');
+                paste1wrapper = paste1.wrap('<div class="wrapper"></div>').parent();
                 pagetree = new CMS.PageTree();
-                pagetree.ui.container.append(paste1);
+                pagetree.ui.container.append(paste1wrapper);
                 pagetree.ui.container.append(paste2);
                 done();
             });
@@ -203,7 +216,7 @@ describe('CMS.PageTree', function () {
         it('accepts optional selector', function () {
             expect(paste1).not.toHaveClass('cms-pagetree-dropdown-item-disabled');
             expect(paste2).not.toHaveClass('cms-pagetree-dropdown-item-disabled');
-            pagetree._disablePaste('.paste-1');
+            pagetree._disablePaste('.wrapper');
             expect(paste1).toHaveClass('cms-pagetree-dropdown-item-disabled');
             expect(paste2).not.toHaveClass('cms-pagetree-dropdown-item-disabled');
         });
@@ -232,7 +245,8 @@ describe('CMS.PageTree', function () {
         it('enables "Paste" action if there is something in the clipboard', function () {
             pagetree.clipboard = {
                 type: 'copy',
-                id: 123
+                id: 123,
+                source_site: 1
             };
 
             pagetree._updatePasteHelpersState();
@@ -245,21 +259,23 @@ describe('CMS.PageTree', function () {
             pagetree.clipboard = {
                 type: 'cut',
                 id: 123,
-                origin: true
+                origin: true,
+                source_site: 1
             };
 
             pagetree._updatePasteHelpersState();
             expect(pagetree._enablePaste).toHaveBeenCalledTimes(1);
             expect(pagetree._getDescendantsIds).toHaveBeenCalledTimes(1);
             expect(pagetree._disablePaste).toHaveBeenCalledTimes(1);
-            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col .js-cms-tree-item-paste');
+            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col');
         });
 
         it('enables "Paste" action only where needed if action is "cut"', function () {
             pagetree.clipboard = {
                 type: 'cut',
                 id: 123,
-                origin: true
+                origin: true,
+                source_site: 1
             };
             pagetree._getDescendantsIds.and.returnValues([111, 104]);
 
@@ -267,9 +283,9 @@ describe('CMS.PageTree', function () {
             expect(pagetree._enablePaste).toHaveBeenCalledTimes(1);
             expect(pagetree._getDescendantsIds).toHaveBeenCalledTimes(1);
             expect(pagetree._disablePaste).toHaveBeenCalledTimes(3);
-            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col .js-cms-tree-item-paste');
-            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_111_col .js-cms-tree-item-paste');
-            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_104_col .js-cms-tree-item-paste');
+            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_123_col');
+            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_111_col');
+            expect(pagetree._disablePaste).toHaveBeenCalledWith('.jsgrid_104_col');
         });
     });
 
@@ -319,8 +335,10 @@ describe('CMS.PageTree', function () {
             spyOn($.fn, 'jstree');
             pagetree.clipboard.type = 'cut';
             pagetree._paste({ currentTarget: 'MOCK' });
-            expect($.fn.jstree).toHaveBeenCalledTimes(2);
-            expect($.fn.jstree).toHaveBeenCalledWith('cut', 'FROM');
+            expect($.fn.jstree).toHaveBeenCalledTimes(3);
+
+            expect($.fn.jstree).toHaveBeenCalledWith('create_node', 'TO', 'Loading', 'last');
+            expect($.fn.jstree).toHaveBeenCalledWith('cut', undefined);
             expect($.fn.jstree).toHaveBeenCalledWith('paste', 'TO', 'last');
         });
 
@@ -328,8 +346,10 @@ describe('CMS.PageTree', function () {
             spyOn($.fn, 'jstree');
             pagetree.clipboard.type = 'copy';
             pagetree._paste({ currentTarget: 'MOCK' });
-            expect($.fn.jstree).toHaveBeenCalledTimes(2);
-            expect($.fn.jstree).toHaveBeenCalledWith('copy', 'FROM');
+            expect($.fn.jstree).toHaveBeenCalledTimes(3);
+
+            expect($.fn.jstree).toHaveBeenCalledWith('create_node', 'TO', 'Loading', 'last');
+            expect($.fn.jstree).toHaveBeenCalledWith('cut', undefined);
             expect($.fn.jstree).toHaveBeenCalledWith('paste', 'TO', 'last');
         });
 

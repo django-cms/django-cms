@@ -3,7 +3,7 @@ from django.utils import lru_cache
 from django.utils.functional import lazy
 
 from cms.utils.conf import get_cms_setting
-from cms.utils import get_template_from_request
+from cms.utils.page import get_page_template_from_request
 
 
 def cms_settings(request):
@@ -27,5 +27,5 @@ def cms_settings(request):
     return {
         'cms_menu_renderer': _get_menu_renderer(),
         'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
-        'CMS_TEMPLATE': lambda: get_template_from_request(request),
+        'CMS_TEMPLATE': lambda: get_page_template_from_request(request),
     }

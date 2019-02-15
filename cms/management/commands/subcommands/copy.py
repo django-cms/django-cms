@@ -63,6 +63,9 @@ class CopyLangCommand(SubcommandsCommand):
                     title.publisher_public_id = None
                     title.publisher_state = 0
                     title.language = to_lang
+
+                    if to_lang not in page.get_languages():
+                        page.update_languages(page.get_languages() + [to_lang])
                     title.save()
                 if copy_content:
                     # copy plugins using API
@@ -118,12 +121,26 @@ class CopySiteCommand(SubcommandsCommand):
         from_site = self.get_site(from_site)
         to_site = self.get_site(to_site)
 
-        pages = Page.objects.drafts().filter(site=from_site, depth=1)
+        pages = (
+            Page
+            .objects
+            .drafts()
+            .on_site(from_site)
+            .filter(node__depth=1)
+            .select_related('node')
+            .order_by('node__path')
+        )
 
         with transaction.atomic():
             for page in pages:
-                page.copy_page(None, to_site)
-            self.stdout.write('Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n'.format(from_site.pk, to_site.pk))
+                new_page = page.copy_with_descendants(
+                    target_node=None,
+                    target_site=to_site,
+                )
+
+                if page.is_home:
+                    new_page.set_as_homepage()
+        self.stdout.write('Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n'.format(from_site.pk, to_site.pk))
 
     def get_site(self, site_id):
         if site_id:

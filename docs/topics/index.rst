@@ -9,13 +9,15 @@ concerned with explaining *how to do things* than with helping you understand
 *how it works*.
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
-    touch
-    menu_system
+    apphooks
     publishing
     multiple_languages
     i18n
     permissions
+    touch
+    menu_system
     commonly_used_plugins
     searchdocs
+    frontend-integration

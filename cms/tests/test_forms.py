@@ -1,15 +1,14 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime
-
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.utils.translation import override as force_language
 
 from cms.admin import forms
-from cms.admin.forms import (PageUserForm, PagePermissionInlineAdminForm,
+from cms.admin.forms import (PagePermissionInlineAdminForm,
                              ViewRestrictionInlineAdminForm, GlobalPagePermissionAdminForm,
                              PageUserGroupForm)
-from cms.api import create_page, create_page_user, assign_user_to_page
+from cms.api import create_page, create_title, assign_user_to_page
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
@@ -19,7 +18,7 @@ from cms.forms.widgets import ApplicationConfigSelect
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
 )
-from cms.utils.permissions import set_current_user
+from cms.utils import get_current_site
 
 
 class Mock_PageSelectFormField(PageSelectFormField):
@@ -42,6 +41,54 @@ class FormsTestCase(CMSTestCase):
     def test_get_page_choices(self):
         result = get_page_choices()
         self.assertEqual(result, [('', '----')])
+
+    def test_page_choices_draft_only(self):
+        """
+        The page choices should always use draft ids
+        """
+        site = get_current_site()
+        pages = [
+            create_page("0001", "nav_playground.html", "en", published=True),
+            create_page("0002", "nav_playground.html", "en", published=True),
+            create_page("0003", "nav_playground.html", "en", published=True),
+            create_page("0004", "nav_playground.html", "en", published=True),
+        ]
+
+        expected = [
+            ('', '----'),
+            (site.name, [
+                (page.pk, page.get_title('en', fallback=False))
+                for page in pages
+            ])
+        ]
+        self.assertSequenceEqual(get_page_choices('en'), expected)
+
+    def test_get_page_choices_with_multiple_translations(self):
+        site = get_current_site()
+        pages = [
+            create_page("0001", "nav_playground.html", "en"),
+            create_page("0002", "nav_playground.html", "en"),
+            create_page("0003", "nav_playground.html", "en"),
+            create_page("0004", "nav_playground.html", "en"),
+        ]
+        languages = ['de', 'fr']
+
+        for page in pages:
+            for language in languages:
+                title = page.get_title('en')
+                create_title(language, title, page=page)
+
+        for language in ['en'] + languages:
+            expected = [
+                ('', '----'),
+                (site.name, [
+                    (page.pk, page.get_title(language, fallback=False))
+                    for page in pages
+                ])
+            ]
+
+            with force_language(language):
+                self.assertSequenceEqual(get_page_choices(), expected)
 
     def test_get_site_choices_without_moderator(self):
         result = get_site_choices()
@@ -191,24 +238,9 @@ class FormsTestCase(CMSTestCase):
 
         self.assertEqual(normal_result, list(lazy_result))
 
-    def test_page_user_form_initial(self):
-        if get_user_model().USERNAME_FIELD == 'email':
-            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org",
-                                                               "myuser@django-cms.org")
-        else:
-            myuser = get_user_model().objects.create_superuser("myuser", "myuser@django-cms.org", "myuser")
-
-        user = create_page_user(myuser, myuser, grant_all=True)
-        puf = PageUserForm(instance=user)
-        names = ['can_add_page', 'can_change_page', 'can_delete_page',
-                 'can_add_pageuser', 'can_change_pageuser',
-                 'can_delete_pageuser', 'can_add_pagepermission',
-                 'can_change_pagepermission', 'can_delete_pagepermission']
-        for name in names:
-            self.assertTrue(puf.initial.get(name, False))
-
 
 class PermissionFormTestCase(CMSTestCase):
+
     def test_permission_forms(self):
         page = create_page("page_b", "nav_playground.html", "en",
                            created_by=self.get_superuser())
@@ -226,12 +258,14 @@ class PermissionFormTestCase(CMSTestCase):
             data = {
                 'page': page.pk,
                 'grant_on': "hello",
+                'user': normal_user.pk,
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
             self.assertFalse(form.is_valid())
             data = {
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE,
+                'user': normal_user.pk,
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
             self.assertTrue(form.is_valid())
@@ -241,16 +275,21 @@ class PermissionFormTestCase(CMSTestCase):
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE_AND_CHILDREN,
                 'can_add': '1',
-                'can_change': ''
+                'can_change': '',
+                'user': normal_user.pk,
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
+
+            error_message = ("<li>Users can&#39;t create a page without permissions "
+                             "to change the created page. Edit permissions required.</li>")
             self.assertFalse(form.is_valid())
-            self.assertTrue('<li>Add page permission also requires edit page '
-                            'permission.</li>' in str(form.errors))
+            self.assertTrue(error_message in str(form.errors))
             data = {
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE,
                 'can_add': '1',
+                'can_change': '1',
+                'user': normal_user.pk,
 
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
@@ -261,23 +300,22 @@ class PermissionFormTestCase(CMSTestCase):
 
     def test_inlines(self):
         user = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
+        current_user = self.get_superuser()
         page = create_page("page_b", "nav_playground.html", "en",
-                           created_by=self.get_superuser())
+                           created_by=current_user)
         data = {
             'page': page.pk,
             'grant_on': ACCESS_PAGE_AND_CHILDREN,
             'can_view': 'True',
-            'user': '',
+            'user': user.pk,
             'group': '',
         }
-        set_current_user(self.get_superuser())
         form = ViewRestrictionInlineAdminForm(data=data, files=None)
         self.assertTrue(form.is_valid())
         data = {
             'page': page.pk,
             'grant_on': ACCESS_PAGE_AND_CHILDREN,
             'can_view': 'True',
-            'user': '',
             'group': ''
         }
         form = GlobalPagePermissionAdminForm(data=data, files=None)
@@ -288,48 +326,22 @@ class PermissionFormTestCase(CMSTestCase):
             'grant_on': ACCESS_PAGE_AND_CHILDREN,
             'can_view': 'True',
             'user': user.pk,
-
         }
         form = GlobalPagePermissionAdminForm(data=data, files=None)
         self.assertTrue(form.is_valid())
 
     def test_user_forms(self):
         user = self.get_superuser()
-        user2 = self._create_user("randomuser", is_staff=True, add_default_permissions=True)
-        set_current_user(user)
-        data = {'username': "test",
-                'password': 'hello',
-                'password1': 'hello',
-                'password2': 'hello',
-                'created_by': user.pk,
-                'last_login': datetime.now(),
-                'date_joined': datetime.now(),
-                'email': 'test@example.com',
-        }
 
-        form = PageUserForm(data=data, files=None)
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
-        data = {'username': "test2",
-                'password': 'hello',
-                'password1': 'hello',
-                'password2': 'hello',
-                'email': 'test2@example.com',
-                'created_by': user.pk,
-                'last_login': datetime.now(),
-                'date_joined': datetime.now(),
-                'notify_user': 'on',
-        }
-        form = PageUserForm(data=data, files=None, instance=user2)
-        self.assertTrue(form.is_valid(), form.errors)
-        form.save()
         data = {
             'name': 'test_group'
         }
         form = PageUserGroupForm(data=data, files=None)
+        form._current_user = user
         self.assertTrue(form.is_valid(), form.errors)
         instance = form.save()
 
         form = PageUserGroupForm(data=data, files=None, instance=instance)
+        form._current_user = user
         self.assertTrue(form.is_valid(), form.errors)
         form.save()

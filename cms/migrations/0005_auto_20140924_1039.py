@@ -12,6 +12,7 @@ ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
 class MP_AddHandler(object):
+
     def __init__(self):
         self.stmts = []
 
@@ -126,9 +127,12 @@ class MP_AddChildHandler(MP_AddHandler):
 
 
 def move_to_mp(apps, schema_editor):
+    db_alias = schema_editor.connection.alias
+
     Page = apps.get_model("cms", "Page")
     CMSPlugin = apps.get_model("cms", "CMSPlugin")
-    pages = Page.objects.all().order_by('tree_id', 'level', 'lft')
+
+    pages = Page.objects.using(db_alias).order_by('tree_id', 'level', 'lft')
 
     cache = {}
     last_root = None
@@ -146,7 +150,7 @@ def move_to_mp(apps, schema_editor):
         cache[page.pk] = page
 
 
-    plugins = CMSPlugin.objects.all().order_by('tree_id', 'level', 'lft')
+    plugins = CMSPlugin.objects.using(db_alias).order_by('tree_id', 'level', 'lft')
 
     cache = {}
     last_root = None

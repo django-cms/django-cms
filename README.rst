@@ -2,10 +2,8 @@
 django CMS
 ##########
 .. image:: https://travis-ci.org/divio/django-cms.svg?branch=develop
-    :target: http://travis-ci.org/divio/django-cms
+    :target: https://travis-ci.org/divio/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
-    :target: https://pypi.python.org/pypi/django-cms/
-.. image:: https://img.shields.io/pypi/dm/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/badge/wheel-yes-green.svg
     :target: https://pypi.python.org/pypi/django-cms/
@@ -17,9 +15,9 @@ django CMS
 
 Open source enterprise content management system based on the Django framework.
 
-.. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-aldryn.png
-   :target: http://demo.django-cms.org/
-   :alt: Try demo with Aldryn Cloud
+.. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-divio.png
+   :target: http://try.django-cms.org/
+   :alt: Try demo with Divio Cloud
 
 .. ATTENTION::
 
@@ -50,20 +48,33 @@ Features
 
 Developing applications that integrate with and take advantage of django CMS features is easy and well-documented.
 
-More information on `our website <http://www.django-cms.org>`_.
+More information on `our website <https://www.django-cms.org>`_.
 
 ************
 Requirements
 ************
 
-django CMS requires Django 1.8, and Python 2.7, 3.3 or 3.4.
+See the `Python/Django requirements for the current release version
+<http://docs.django-cms.org/en/latest/#software-version-requirements-and-release-notes>`_ in our documentation.
+
+See the `installation how-to guide for an overview of some other requirements and dependencies of the current release
+<http://docs.django-cms.org/en/latest/how_to/install.html>`_
 
 *************
 Documentation
 *************
 
-Please head over to our `documentation <http://docs.django-cms.org/>`_ for all
-the details on how to install, extend and use the django CMS.
+We maintain documentation for several versions of the project. Key versions are:
+
+* `stable <http://docs.django-cms.org>`_ (default), for the **current release** version
+* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **release-3.4.x branch**
+* `develop <http://docs.django-cms.org/en/develop/>`_, representing the latest build of the **develop branch**
+
+For more information about our branch policy, see `Branches
+<http://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
+
+Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
+
 
 ********
 Tutorial
@@ -75,7 +86,7 @@ http://docs.django-cms.org/en/latest/introduction/index.html
 Quick Start
 ***********
 
-You can use the `django CMS installer <http://djangocms-installer.readthedocs.org>`_::
+You can use the `django CMS installer <https://djangocms-installer.readthedocs.io>`_::
 
     $ pip install --upgrade virtualenv
     $ virtualenv env
@@ -111,7 +122,7 @@ Credits
 * Includes icons from `FamFamFam <http://www.famfamfam.com>`_.
 * Python tree engine powered by
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
-* JavaScript tree in admin uses `jsTree <http://www.jstree.com>`_.
+* JavaScript tree in admin uses `jsTree <https://www.jstree.com>`_.
 * Many thanks to the
-  `over 515 contributors <https://github.com/divio/django-cms/blob/master/AUTHORS>`_
+  `over 515 contributors <https://github.com/divio/django-cms/blob/develop/AUTHORS>`_
   to the django CMS!

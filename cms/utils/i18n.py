@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
-from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
 from django.conf import settings
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
+from django.urls import get_resolver
 
 from cms.exceptions import LanguageError
+from cms.utils.compat.dj import LocalePrefixPattern
 from cms.utils.conf import get_cms_setting, get_site_id
 
 
@@ -33,15 +34,36 @@ def get_languages(site_id=None):
     return result
 
 
-def get_language_code(language_code):
+def get_site_language_from_request(request, site_id=None):
+    from cms.utils import get_current_site
+
+    language = request.GET.get('language', None)
+
+    if site_id is None:
+        site_id = get_current_site().pk
+
+    if is_valid_site_language(language, site_id=site_id):
+        return language
+
+    language = getattr(request, 'LANGUAGE_CODE', None)
+
+    if is_valid_site_language(language, site_id=site_id):
+        return language
+    return get_default_language_for_site(site_id=site_id)
+
+
+def get_language_code(language_code, site_id=None):
     """
     Returns language code while making sure it's in LANGUAGES
     """
     if not language_code:
         return None
-    languages = get_language_list()
+
+    languages = get_language_list(site_id)
+
     if language_code in languages: # direct hit
         return language_code
+
     for lang in languages:
         if language_code.split('-')[0] == lang: # base language hit
             return lang
@@ -116,7 +138,6 @@ def get_default_language(language_code=None, site_id=None):
 
     Returns: language_code
     """
-
     if not language_code:
         language_code = get_language_code(settings.LANGUAGE_CODE)
 
@@ -133,6 +154,10 @@ def get_default_language(language_code=None, site_id=None):
         return settings.LANGUAGE_CODE
 
     return language_code
+
+
+def get_default_language_for_site(site_id):
+    return get_language_list(site_id)[0]
 
 
 def get_fallback_languages(language, site_id=None):
@@ -170,8 +195,17 @@ def hide_untranslated(language, site_id=None):
 
 def is_language_prefix_patterns_used():
     """
-    Returns `True` if the `LocaleRegexURLResolver` is used
-    at root level of the urlpatterns, else it returns `False`.
+    Returns `True` if the `LocaleRegexURLResolver` or `LocalePrefixPattern` is
+    used at root level of the urlpatterns, else it returns `False`.
     """
-    return any(isinstance(url_pattern, LocaleRegexURLResolver)
-               for url_pattern in get_resolver(None).url_patterns)
+    return any(
+        isinstance(
+            getattr(url_pattern, 'pattern', url_pattern),
+            LocalePrefixPattern
+        )
+        for url_pattern in get_resolver(None).url_patterns
+    )
+
+
+def is_valid_site_language(language, site_id):
+    return language in get_language_list(site_id)

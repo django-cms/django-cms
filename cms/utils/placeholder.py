@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import operator
 import warnings
+from collections import OrderedDict
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -10,12 +11,11 @@ from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from django.utils import six
-from django.utils.encoding import force_text
 
-from sekizai.helpers import get_varname, is_variable_extend_node
+from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 
 
 def _get_nodelist(tpl):
@@ -39,32 +39,44 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
     Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins' or 'name'.
 
-    If a template is given, it will try
-    CMS_PLACEHOLDER_CONF['template placeholder'] and
-    CMS_PLACEHOLDER_CONF['placeholder'], if no template is given only the latter
-    is checked.
+    Resulting value will be the last from:
+
+    CMS_PLACEHOLDER_CONF[None] (global)
+    CMS_PLACEHOLDER_CONF['template'] (if template is given)
+    CMS_PLACEHOLDER_CONF['placeholder']
+    CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
     """
+
     if placeholder:
         keys = []
+        placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
+        # 1st level
         if template:
-            keys.append("%s %s" % (template, placeholder))
+            keys.append(u'%s %s' % (template, placeholder))
+        # 2nd level
         keys.append(placeholder)
+        # 3rd level
+        if template:
+            keys.append(template)
+        # 4th level
+        keys.append(None)
         for key in keys:
-            conf = get_cms_setting('PLACEHOLDER_CONF').get(key)
-            if not conf:
-                continue
-            value = conf.get(setting)
-            if value is not None:
-                return value
-            inherit = conf.get('inherit')
-            if inherit:
-                if ' ' in inherit:
-                    inherit = inherit.split(' ')
-                else:
-                    inherit = (None, inherit,)
-                value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
+            try:
+                conf = placeholder_conf[key]
+                value = conf.get(setting, None)
                 if value is not None:
                     return value
+                inherit = conf.get('inherit')
+                if inherit:
+                    if ' ' in inherit:
+                        inherit = inherit.split(' ')
+                    else:
+                        inherit = (None, inherit)
+                    value = get_placeholder_conf(setting, inherit[1], inherit[0], default)
+                    if value is not None:
+                        return value
+            except KeyError:
+                continue
     return default
 
 
@@ -95,8 +107,8 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
     # It's added on registration. TIL.
     for plugin in plugins:
         main_list.append({'value': plugin.value,
-                          'name': force_text(names.get(plugin.value, plugin.name)),
-                          'module': force_text(modules.get(plugin.value, plugin.module))})
+                          'name': names.get(plugin.value, plugin.name),
+                          'module': modules.get(plugin.value, plugin.module)})
     return sorted(main_list, key=operator.itemgetter("module"))
 
 
@@ -156,10 +168,14 @@ def restore_sekizai_context(context, changes):
             sekizai_namespace.append(value)
 
 
-def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
+def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blocks=None):
     from cms.templatetags.cms_tags import Placeholder
 
-    placeholders = []
+    if not node_class:
+        node_class = Placeholder
+
+    nodes = []
+
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.
         # This is important to avoid processing overriden block nodes.
@@ -167,8 +183,8 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
 
     for node in nodelist:
         # check if this is a placeholder first
-        if isinstance(node, Placeholder):
-            placeholders.append(node.get_name())
+        if isinstance(node, node_class):
+            nodes.append(node)
         elif isinstance(node, IncludeNode):
             # if there's an error in the to-be-included template, node.template becomes None
             if node.template:
@@ -183,16 +199,16 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                         template = get_template(node.template.var)
                 else:
                     template = node.template
-                placeholders += _scan_placeholders(_get_nodelist(template), current_block)
+                nodes += _scan_placeholders(_get_nodelist(template), node_class, current_block)
         # handle {% extends ... %} tags
         elif isinstance(node, ExtendsNode):
-            placeholders += _extend_nodelist(node)
+            nodes += _get_placeholder_nodes_from_extend(node, node_class)
         # in block nodes we have to scan for super blocks
         elif isinstance(node, VariableNode) and current_block:
             if node.filter_expression.token == 'block.super':
                 if not hasattr(current_block.super, 'nodelist'):
                     raise TemplateSyntaxError("Cannot render block.super for blocks without a parent.")
-                placeholders += _scan_placeholders(_get_nodelist(current_block.super), current_block.super)
+                nodes += _scan_placeholders(_get_nodelist(current_block.super), node_class, current_block.super)
         # ignore nested blocks which are already handled
         elif isinstance(node, BlockNode) and node.name in ignore_blocks:
             continue
@@ -205,7 +221,7 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                     if isinstance(subnodelist, NodeList):
                         if isinstance(node, BlockNode):
                             current_block = node
-                        placeholders += _scan_placeholders(subnodelist, current_block, ignore_blocks)
+                        nodes += _scan_placeholders(subnodelist, node_class, current_block, ignore_blocks)
         # else just scan the node for nodelist instance attributes
         else:
             for attr in dir(node):
@@ -213,45 +229,101 @@ def _scan_placeholders(nodelist, current_block=None, ignore_blocks=None):
                 if isinstance(obj, NodeList):
                     if isinstance(node, BlockNode):
                         current_block = node
-                    placeholders += _scan_placeholders(obj, current_block, ignore_blocks)
-    return placeholders
+                    nodes += _scan_placeholders(obj, node_class, current_block, ignore_blocks)
+    return nodes
+
+
+def _scan_static_placeholders(nodelist):
+    from cms.templatetags.cms_tags import StaticPlaceholderNode
+
+    return _scan_placeholders(nodelist, node_class=StaticPlaceholderNode)
 
 
 def get_placeholders(template):
     compiled_template = get_template(template)
-    placeholders = _scan_placeholders(_get_nodelist(compiled_template))
+
+    placeholders = []
+    nodes = _scan_placeholders(_get_nodelist(compiled_template))
     clean_placeholders = []
-    for placeholder in placeholders:
-        if placeholder in clean_placeholders:
+
+    for node in nodes:
+        placeholder = node.get_declaration()
+        slot = placeholder.slot
+
+        if slot in clean_placeholders:
             warnings.warn("Duplicate {{% placeholder \"{0}\" %}} "
                           "in template {1}."
-                          .format(placeholder, template, placeholder),
+                          .format(slot, template, slot),
                           DuplicatePlaceholderWarning)
         else:
-            validate_placeholder_name(placeholder)
-            clean_placeholders.append(placeholder)
-    return clean_placeholders
+            validate_placeholder_name(slot)
+            placeholders.append(placeholder)
+            clean_placeholders.append(slot)
+    return placeholders
 
 
-def _extend_nodelist(extend_node):
+def get_static_placeholders(template, context):
+    compiled_template = get_template(template)
+    nodes = _scan_static_placeholders(_get_nodelist(compiled_template))
+    placeholders = [node.get_declaration(context) for node in nodes]
+    placeholders_with_code = []
+
+    for placeholder in placeholders:
+        if placeholder.slot:
+            placeholders_with_code.append(placeholder)
+        else:
+            warnings.warn('Unable to resolve static placeholder '
+                          'name in template "{}"'.format(template),
+                          Warning)
+    return placeholders_with_code
+
+
+def _get_block_nodes(extend_node):
+    parent = extend_node.get_parent(get_context())
+    parent_nodelist = _get_nodelist(parent)
+    parent_nodes = parent_nodelist.get_nodes_by_type(BlockNode)
+    parent_extend_nodes = parent_nodelist.get_nodes_by_type(ExtendsNode)
+
+    if parent_extend_nodes:
+        # Start at the top
+        # Scan the extends node from the parent (if any)
+        nodes = _get_block_nodes(parent_extend_nodes[0])
+    else:
+        nodes = OrderedDict()
+
+    # Continue with the parent template nodes
+    for node in parent_nodes:
+        nodes[node.name] = node
+
+    # Move on to the current template nodes
+    current_nodes = _get_nodelist(extend_node).get_nodes_by_type(BlockNode)
+
+    for node in current_nodes:
+        if node.name in nodes:
+            # set this node as the super node (for {{ block.super }})
+            node.super = nodes[node.name]
+        nodes[node.name] = node
+    return nodes
+
+
+def _get_placeholder_nodes_from_extend(extend_node, node_class):
     """
     Returns a list of placeholders found in the parent template(s) of this
     ExtendsNode
     """
-    # we don't support variable extensions
-    if is_variable_extend_node(extend_node):
-        return []
-        # This is a dictionary mapping all BlockNode instances found in the template that contains extend_node
-    blocks = dict(extend_node.blocks)
-    _extend_blocks(extend_node, blocks)
+    # This is a dictionary mapping all BlockNode instances found
+    # in the template that contains the {% extends %} tag
+    block_nodes = _get_block_nodes(extend_node)
+    block_names = list(block_nodes.keys())
+
     placeholders = []
 
-    for block in blocks.values():
-        placeholders += _scan_placeholders(_get_nodelist(block), block, blocks.keys())
+    for block in block_nodes.values():
+        placeholders.extend(_scan_placeholders(_get_nodelist(block), node_class, block, block_names))
 
     # Scan topmost template for placeholder outside of blocks
     parent_template = _find_topmost_template(extend_node)
-    placeholders += _scan_placeholders(_get_nodelist(parent_template), None, blocks.keys())
+    placeholders += _scan_placeholders(_get_nodelist(parent_template), node_class, None, block_names)
     return placeholders
 
 
@@ -262,29 +334,3 @@ def _find_topmost_template(extend_node):
         return _find_topmost_template(node)
         # No ExtendsNode
     return extend_node.get_parent(get_context())
-
-
-def _extend_blocks(extend_node, blocks):
-    """
-    Extends the dictionary `blocks` with *new* blocks in the parent node (recursive)
-    """
-    # we don't support variable extensions
-    if is_variable_extend_node(extend_node):
-        return
-    parent = extend_node.get_parent(get_context())
-    # Search for new blocks
-    for node in _get_nodelist(parent).get_nodes_by_type(BlockNode):
-        if not node.name in blocks:
-            blocks[node.name] = node
-        else:
-            # set this node as the super node (for {{ block.super }})
-            block = blocks[node.name]
-            seen_supers = []
-            while hasattr(block.super, 'nodelist') and block.super not in seen_supers:
-                seen_supers.append(block.super)
-                block = block.super
-            block.super = node
-        # search for further ExtendsNodes
-    for node in _get_nodelist(parent).get_nodes_by_type(ExtendsNode):
-        _extend_blocks(node, blocks)
-        break

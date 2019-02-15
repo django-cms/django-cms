@@ -4,15 +4,12 @@ import hashlib
 
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.functional import cached_property
 
-from django.utils.translation import (
-    override as force_language,
-    force_text,
-    ugettext as _
-)
+from django.utils.translation import override as force_language, ugettext as _
 
-from cms.utils import get_cms_setting
+from cms.utils.conf import get_cms_setting
 
 
 class WizardBase(object):
@@ -93,10 +90,16 @@ class Wizard(WizardBase):
         return ""
 
     def __str__(self):
-        return self.title
+        return force_text(self.title)
 
     def __repr__(self):
-        return 'Wizard: "{0}"'.format(force_text(self.title))
+        display = '<{module}.{class_name} id={id} object at {location}>'.format(
+            module=self.__module__,
+            class_name=self.__class__.__name__,
+            id=self.id,
+            location=hex(id(self)),
+        )
+        return display
 
     def user_has_add_permission(self, user, **kwargs):
         """
@@ -138,3 +141,15 @@ class Wizard(WizardBase):
                 return model
         raise ImproperlyConfigured(u"Please set entry 'model' attribute or use "
                                    u"ModelForm subclass as a form")
+
+    @cached_property
+    def widget_attributes(self):
+        return {
+            'description': self.get_description(),
+            'title': self.get_title(),
+            'weight': self.get_weight(),
+            'id': self.id,
+            'form': self.form,
+            'model': self.model,
+            'template_name': self.template_name
+        }

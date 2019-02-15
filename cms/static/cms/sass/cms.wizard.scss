@@ -51,6 +51,8 @@ $wizard-input-size: 16px;
         input {
             position: absolute;
             left: -9999px;
+            opacity: 0;
+            visibility: hidden;
         }
 
         strong {

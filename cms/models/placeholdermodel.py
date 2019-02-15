@@ -5,19 +5,15 @@ import warnings
 from datetime import datetime, timedelta
 
 from django.contrib import admin
-from django.contrib.auth import get_permission_codename
 from django.db import models
-from django.db.models import ManyToManyField
 from django.template.defaultfilters import title
 from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _, force_text
+from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.translation import ugettext_lazy as _
 
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils import get_site_id
-from cms.utils.compat import DJANGO_1_8
-from cms.utils.helpers import reversion_register
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
 from cms.constants import (
@@ -26,6 +22,7 @@ from cms.constants import (
     PUBLISHER_STATE_DIRTY,
 )
 from cms.utils import get_language_from_request
+from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
 
@@ -51,6 +48,16 @@ class Placeholder(models.Model):
     def __str__(self):
         return self.slot
 
+    def __repr__(self):
+        display = "<{module}.{class_name} id={id} slot='{slot}' object at {location}>".format(
+            module=self.__module__,
+            class_name=self.__class__.__name__,
+            id=self.pk,
+            slot=self.slot,
+            location=hex(id(self)),
+        )
+        return display
+
     def clear(self, language=None):
         if language:
             qs = self.cmsplugin_set.filter(language=language)
@@ -69,9 +76,15 @@ class Placeholder(models.Model):
 
     def get_label(self):
         from cms.utils.placeholder import get_placeholder_conf
-        name = get_placeholder_conf("name", self.slot, default=title(self.slot))
+
+        template = self.page.get_template() if self.page else None
+        name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
         name = _(name)
         return name
+
+    def get_extra_context(self, template=None):
+        from cms.utils.placeholder import get_placeholder_conf
+        return get_placeholder_conf("extra_context", self.slot, template, {})
 
     def get_add_url(self):
         return self._get_url('add_plugin')
@@ -110,65 +123,103 @@ class Placeholder(models.Model):
             model_name = model.__name__.lower()
             return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
 
-    def _get_permission(self, request, key):
+    def has_change_permission(self, user):
         """
-        Generic method to check the permissions for a request for a given key,
-        the key can be: 'add', 'change' or 'delete'. For each attached object
-        permission has to be granted either on attached model or on attached object.
-          * 'add' and 'change' permissions on placeholder need either on add or change
-            permission on attached object to be granted.
-          * 'delete' need either on add, change or delete
+        Returns True if user has permission
+        to change all models attached to this placeholder.
         """
-        if getattr(request, 'user', None) and request.user.is_superuser:
-            return True
-        perm_keys = {
-            'add': ('add', 'change',),
-            'change': ('add', 'change',),
-            'delete': ('add', 'change', 'delete'),
-        }
-        if key not in perm_keys:
-            raise Exception("%s is not a valid perm key. "
-                            "'Only 'add', 'change' and 'delete' are allowed" % key)
-        objects = [self.page] if self.page else self._get_attached_objects()
-        obj_perm = None
-        for obj in objects:
-            obj_perm = False
-            for key in perm_keys[key]:
-                if self._get_object_permission(obj, request, key):
-                    obj_perm = True
-                    break
-            if not obj_perm:
+        from cms.utils.permissions import get_model_permission_codename
+
+        attached_models = self._get_attached_models()
+
+        if not attached_models:
+            # technically if placeholder is not attached to anything,
+            # user should not be able to change it but if is superuser
+            # then we "should" allow it.
+            return user.is_superuser
+
+        attached_objects = self._get_attached_objects()
+
+        for obj in attached_objects:
+            try:
+                perm = obj.has_placeholder_change_permission(user)
+            except AttributeError:
+                model = type(obj)
+                change_perm = get_model_permission_codename(model, 'change')
+                perm = user.has_perm(change_perm)
+
+            if not perm:
                 return False
-        return obj_perm
+        return True
 
-    def _get_object_permission(self, obj, request, key):
-        if not getattr(request, 'user', None):
+    def has_add_plugin_permission(self, user, plugin_type):
+        if not permissions.has_plugin_permission(user, plugin_type, "add"):
             return False
-        opts = obj._meta
-        perm_code = '%s.%s' % (opts.app_label, get_permission_codename(key, opts))
-        return request.user.has_perm(perm_code) or request.user.has_perm(perm_code, obj)
 
-    def has_change_permission(self, request):
-        return self._get_permission(request, 'change')
+        if not self.has_change_permission(user):
+            return False
+        return True
 
-    def has_add_permission(self, request):
-        return self._get_permission(request, 'add')
+    def has_add_plugins_permission(self, user, plugins):
+        if not self.has_change_permission(user):
+            return False
 
-    def has_delete_permission(self, request):
-        return self._get_permission(request, 'delete')
+        for plugin in plugins:
+            if not permissions.has_plugin_permission(user, plugin.plugin_type, "add"):
+                return False
+        return True
 
-    def render(self, context, width, lang=None, editable=True, use_cache=True):
-        '''
-        Set editable = False to disable front-end rendering for this render.
-        '''
-        from cms.plugin_rendering import render_placeholder
-        if not 'request' in context:
-            return '<!-- missing request -->'
-        width = width or self.default_width
-        if width:
-            context['width'] = width
-        return render_placeholder(self, context, lang=lang, editable=editable,
-                                  use_cache=use_cache)
+    def has_change_plugin_permission(self, user, plugin):
+        if not permissions.has_plugin_permission(user, plugin.plugin_type, "change"):
+            return False
+
+        if not self.has_change_permission(user):
+            return False
+        return True
+
+    def has_delete_plugin_permission(self, user, plugin):
+        if not permissions.has_plugin_permission(user, plugin.plugin_type, "delete"):
+            return False
+
+        if not self.has_change_permission(user):
+            return False
+        return True
+
+    def has_move_plugin_permission(self, user, plugin, target_placeholder):
+        if not permissions.has_plugin_permission(user, plugin.plugin_type, "change"):
+            return False
+
+        if not target_placeholder.has_change_permission(user):
+            return False
+
+        if self != target_placeholder and not self.has_change_permission(user):
+            return False
+        return True
+
+    def has_clear_permission(self, user, languages):
+        if not self.has_change_permission(user):
+            return False
+        return self.has_delete_plugins_permission(user, languages)
+
+    def has_delete_plugins_permission(self, user, languages):
+        plugin_types = (
+            self
+            .cmsplugin_set
+            .filter(language__in=languages)
+            # exclude the clipboard plugin
+            .exclude(plugin_type='PlaceholderPlugin')
+            .values_list('plugin_type', flat=True)
+            .distinct()
+            # remove default ordering
+            .order_by()
+        )
+
+        has_permission = permissions.has_plugin_permission
+
+        for plugin_type in plugin_types.iterator():
+            if not has_permission(user, plugin_type, "delete"):
+                return False
+        return True
 
     def _get_related_objects(self):
         fields = self._meta._get_fields(
@@ -176,13 +227,13 @@ class Placeholder(models.Model):
             include_parents=True,
             include_hidden=False,
         )
-        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+        return list(obj for obj in fields)
 
     def _get_attached_fields(self):
         """
-        Returns an ITERATOR of all non-cmsplugin reverse foreign key related fields.
+        Returns an ITERATOR of all non-cmsplugin reverse related fields.
         """
-        from cms.models import CMSPlugin
+        from cms.models import CMSPlugin, UserSettings
         if not hasattr(self, '_attached_fields_cache'):
             self._attached_fields_cache = []
             relations = self._get_related_objects()
@@ -190,11 +241,25 @@ class Placeholder(models.Model):
                 if issubclass(rel.model, CMSPlugin):
                     continue
                 from cms.admin.placeholderadmin import PlaceholderAdminMixin
-                parent = rel.related_model
-                if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
+                related_model = rel.related_model
+
+                try:
+                    admin_class = admin.site._registry[related_model]
+                except KeyError:
+                    admin_class = None
+
+                # UserSettings is a special case
+                # Attached objects are used to check permissions
+                # and we filter out any attached object that does not
+                # inherit from PlaceholderAdminMixin
+                # Because UserSettings does not (and shouldn't) inherit
+                # from PlaceholderAdminMixin, we add a manual exception.
+                is_user_settings = related_model == UserSettings
+
+                if is_user_settings or isinstance(admin_class, PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
-                        if field.count():
+                        if field.exists():
                             self._attached_fields_cache.append(rel.field)
                     except:
                         pass
@@ -217,7 +282,7 @@ class Placeholder(models.Model):
                 if parent in admin.site._registry and isinstance(admin.site._registry[parent], PlaceholderAdminMixin):
                     field = getattr(self, rel.get_accessor_name())
                     try:
-                        if field.count():
+                        if field.exists():
                             self._attached_field_cache = rel.field
                             break
                     except:
@@ -233,7 +298,7 @@ class Placeholder(models.Model):
     def _get_attached_model(self):
         if hasattr(self, '_attached_model_cache'):
             return self._attached_model_cache
-        if self.page or self.page_set.all().count():
+        if self.page or self.page_set.exists():
             from cms.models import Page
             self._attached_model_cache = Page
             return Page
@@ -243,6 +308,18 @@ class Placeholder(models.Model):
             return field.model
         self._attached_model_cache = None
         return None
+
+    def _get_attached_admin(self, admin_site=None):
+        from django.contrib.admin import site
+
+        if not admin_site:
+            admin_site = site
+
+        model = self._get_attached_model()
+
+        if not model:
+            return
+        return admin_site._registry.get(model)
 
     def _get_attached_models(self):
         """
@@ -257,12 +334,8 @@ class Placeholder(models.Model):
         """
         Returns a list of objects attached to this placeholder.
         """
-        if DJANGO_1_8:
-            return [obj for field in self._get_attached_fields()
-                    for obj in getattr(self, field.related.get_accessor_name()).all()]
-        else:
-            return [obj for field in self._get_attached_fields()
-                    for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
+        return [obj for field in self._get_attached_fields()
+                for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
 
     def page_getter(self):
         if not hasattr(self, '_page'):
@@ -294,6 +367,7 @@ class Placeholder(models.Model):
 
         This is not cached as it's meant to eb used in the frontend editor.
         """
+
         languages = []
         for lang_code in set(self.get_plugins().values_list('language', flat=True)):
             try:
@@ -406,6 +480,11 @@ class Placeholder(models.Model):
 
         return min_ttl
 
+    def clear_cache(self, language, site_id=None):
+        if not site_id and self.page:
+            site_id = self.page.node.site_id
+        clear_placeholder_cache(self, language, get_site_id(site_id))
+
     def mark_as_dirty(self, language, clear_cache=True):
         """
         Utility method to mark the attached object of this placeholder
@@ -416,7 +495,7 @@ class Placeholder(models.Model):
         from cms.models import Page, StaticPlaceholder, Title
 
         if clear_cache:
-            clear_placeholder_cache(self, language, get_site_id(getattr(self.page, 'site_id', None)))
+            self.clear_cache(language)
 
         # Find the attached model for this placeholder
         # This can be a static placeholder, page or none.
@@ -430,6 +509,20 @@ class Placeholder(models.Model):
 
         elif attached_model is StaticPlaceholder:
             StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
+
+    def get_plugin_tree_order(self, language, parent_id=None):
+        """
+        Returns a list of plugin ids matching the given language
+        ordered by plugin position.
+        """
+        plugin_tree_order = (
+            self
+            .get_plugins(language)
+            .filter(parent=parent_id)
+            .order_by('position')
+            .values_list('pk', flat=True)
+        )
+        return list(plugin_tree_order)
 
     def get_vary_cache_on(self, request):
         """
@@ -477,4 +570,13 @@ class Placeholder(models.Model):
 
         return sorted(list(vary_list))
 
-reversion_register(Placeholder)
+    def copy_plugins(self, target_placeholder, language=None, root_plugin=None):
+        from cms.utils.plugins import copy_plugins_to_placeholder
+
+        new_plugins = copy_plugins_to_placeholder(
+            plugins=self.get_plugins_list(language),
+            placeholder=target_placeholder,
+            language=language,
+            root_plugin=root_plugin,
+        )
+        return new_plugins

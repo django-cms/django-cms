@@ -6,7 +6,6 @@ from django.utils.six.moves import input
 
 from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
-from cms.plugin_pool import plugin_pool
 
 from .base import SubcommandsCommand
 
@@ -24,16 +23,16 @@ class UninstallApphooksCommand(LabelCommand):
         if number_of_apphooks > 0:
             if options.get('interactive'):
                 confirm = input("""
-You have requested to remove %d %r apphooks.
+You have requested to remove %d '%s' apphooks.
 Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (number_of_apphooks, label))
             else:
                 confirm = 'yes'
             if confirm == 'yes':
                 queryset.update(application_urls=None)
-                self.stdout.write('%d %r apphooks uninstalled\n' % (number_of_apphooks, label))
+                self.stdout.write("%d '%s' apphooks uninstalled\n" % (number_of_apphooks, label))
         else:
-            self.stdout.write('no %r apphooks found\n' % label)
+            self.stdout.write("no '%s' apphooks found\n" % label)
 
 
 class UninstallPluginsCommand(LabelCommand):
@@ -44,25 +43,24 @@ class UninstallPluginsCommand(LabelCommand):
     missing_args_message = 'foo bar'
 
     def handle_label(self, label, **options):
-        plugin_pool.get_all_plugins()
         queryset = CMSPlugin.objects.filter(plugin_type=label)
         number_of_plugins = queryset.count()
 
         if number_of_plugins > 0:
             if options.get('interactive'):
                 confirm = input("""
-You have requested to remove %d %r plugins.
+You have requested to remove %d '%s' plugins.
 Are you sure you want to do this?
 Type 'yes' to continue, or 'no' to cancel: """ % (number_of_plugins, label))
             else:
                 confirm = 'yes'
             if confirm == 'yes':
                 queryset.delete()
-                self.stdout.write('%d %r plugins uninstalled\n' % (number_of_plugins, label))
+                self.stdout.write("%d '%s' plugins uninstalled\n" % (number_of_plugins, label))
             else:
                 self.stdout.write('Aborted')
         else:
-            self.stdout.write('no %r plugins found\n' % label)
+            self.stdout.write("no '%s' plugins found\n" % label)
 
 
 class UninstallCommand(SubcommandsCommand):

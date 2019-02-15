@@ -24,8 +24,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PageUser',
             fields=[
-                (user_ptr_name, models.OneToOneField(primary_key=True, to=settings.AUTH_USER_MODEL, auto_created=True, parent_link=True, serialize=False)),
-                ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='created_users')),
+                (user_ptr_name, models.OneToOneField(primary_key=True, to=settings.AUTH_USER_MODEL, auto_created=True, parent_link=True, serialize=False, on_delete=models.CASCADE)),
+                ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='created_users', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'User (page)',
@@ -36,8 +36,8 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='PageUserGroup',
             fields=[
-                ('group_ptr', models.OneToOneField(primary_key=True, to='auth.Group', auto_created=True, parent_link=True, serialize=False)),
-                ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='created_usergroups')),
+                ('group_ptr', models.OneToOneField(primary_key=True, to='auth.Group', auto_created=True, parent_link=True, serialize=False, on_delete=models.CASCADE)),
+                ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL, related_name='created_usergroups', on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'User group (page)',
@@ -69,19 +69,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='cmsplugin',
             name='placeholder',
-            field=models.ForeignKey(null=True, to='cms.Placeholder', editable=False),
+            field=models.ForeignKey(null=True, to='cms.Placeholder', editable=False, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='aliaspluginmodel',
             name='alias_placeholder',
-            field=models.ForeignKey(null=True, to='cms.Placeholder', related_name='alias_placeholder', editable=False),
+            field=models.ForeignKey(null=True, to='cms.Placeholder', related_name='alias_placeholder', editable=False, on_delete=models.CASCADE),
             preserve_default=True,
         ),
         migrations.CreateModel(
             name='PlaceholderReference',
             fields=[
-                ('cmsplugin_ptr', models.OneToOneField(primary_key=True, to='cms.CMSPlugin', auto_created=True, parent_link=True, serialize=False)),
+                ('cmsplugin_ptr', models.OneToOneField(primary_key=True, to='cms.CMSPlugin', auto_created=True, parent_link=True, serialize=False, on_delete=models.CASCADE)),
                 ('name', models.CharField(max_length=255)),
                 ('placeholder_ref', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', slotname='clipboard', editable=False)),
             ],
@@ -99,7 +99,7 @@ class Migration(migrations.Migration):
                 ('creation_method', models.CharField(max_length=20, default='code', blank=True, verbose_name='creation_method', choices=cms.models.static_placeholder.StaticPlaceholder.CREATION_METHODS)),
                 ('draft', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', verbose_name='placeholder content', related_name='static_draft', slotname=cms.models.static_placeholder.static_slotname, editable=False)),
                 ('public', cms.models.fields.PlaceholderField(null=True, to='cms.Placeholder', slotname=cms.models.static_placeholder.static_slotname, related_name='static_public', editable=False)),
-                ('site', models.ForeignKey(null=True, to='sites.Site', blank=True)),
+                ('site', models.ForeignKey(null=True, to='sites.Site', blank=True, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'static placeholder',
@@ -128,8 +128,8 @@ class Migration(migrations.Migration):
                 ('published', models.BooleanField(default=False, verbose_name='is published')),
                 ('publisher_is_draft', models.BooleanField(db_index=True, default=True, editable=False)),
                 ('publisher_state', models.SmallIntegerField(db_index=True, default=0, editable=False)),
-                ('page', models.ForeignKey(to='cms.Page', verbose_name='page', related_name='title_set')),
-                ('publisher_public', models.OneToOneField(null=True, to='cms.Title', related_name='publisher_draft', editable=False)),
+                ('page', models.ForeignKey(to='cms.Page', verbose_name='page', related_name='title_set', on_delete=models.CASCADE)),
+                ('publisher_public', models.OneToOneField(null=True, to='cms.Title', related_name='publisher_draft', editable=False, on_delete=models.CASCADE)),
             ],
             options={
             },
@@ -144,8 +144,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('language', models.CharField(max_length=10, choices=settings.LANGUAGES, help_text='The language for the admin interface and toolbar', verbose_name='Language')),
-                ('clipboard', models.ForeignKey(null=True, to='cms.Placeholder', blank=True, editable=False)),
-                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, unique=True, related_name='djangocms_usersettings', editable=False)),
+                ('clipboard', models.ForeignKey(null=True, to='cms.Placeholder', blank=True, editable=False, on_delete=models.CASCADE)),
+                ('user', models.ForeignKey(to=settings.AUTH_USER_MODEL, unique=True, related_name='djangocms_usersettings', editable=False, on_delete=models.CASCADE)),
             ],
             options={
                 'verbose_name': 'user setting',

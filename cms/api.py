@@ -11,9 +11,9 @@ import datetime
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.exceptions import FieldError
-from django.core.exceptions import ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils import six
@@ -31,49 +31,17 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
-from cms.utils import copy_plugins
+from cms.utils import copy_plugins, get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.compat.dj import is_installed
 from cms.utils.i18n import get_language_list
-from cms.utils.permissions import _thread_locals, current_user, has_page_change_permission
+from cms.utils.page import get_available_slug
+from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
 
 
 #===============================================================================
 # Helpers/Internals
 #===============================================================================
-
-def generate_valid_slug(source, parent, language):
-    """
-    Generate a valid slug for a page from source for the given language.
-    Parent is passed so we can make sure the slug is unique for this level in
-    the page tree.
-    """
-    if parent:
-        qs = Title.objects.filter(language=language, page__parent=parent)
-    else:
-        qs = Title.objects.filter(language=language, page__parent__isnull=True)
-    used = list(qs.values_list('slug', flat=True))
-    baseslug = slugify(source)
-    slug = baseslug
-    i = 1
-    if used:
-        while slug in used:
-            slug = '%s-%s' % (baseslug, i)
-            i += 1
-    return slug
-
-
-def _create_revision(obj, user=None, message=None):
-    from cms.utils.helpers import make_revision_with_plugins
-    from cms.utils.reversion_hacks import create_revision
-
-    with create_revision():
-        make_revision_with_plugins(
-            obj=obj,
-            user=user,
-            message=message,
-        )
 
 
 def _verify_apphook(apphook, namespace):
@@ -104,14 +72,6 @@ def _verify_apphook(apphook, namespace):
     return apphook_name
 
 
-def _verify_revision_support():
-    if not is_installed('reversion'):
-        raise ImproperlyConfigured(
-            "You have requested to create a revision "
-            "but the reversion app is not in settings.INSTALLED_APPS"
-        )
-
-
 def _verify_plugin_type(plugin_type):
     """
     Verifies the given plugin_type is valid and returns a tuple of
@@ -119,7 +79,6 @@ def _verify_plugin_type(plugin_type):
     """
     if (hasattr(plugin_type, '__module__') and
             issubclass(plugin_type, CMSPluginBase)):
-        plugin_pool.set_plugin_meta()
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
@@ -139,6 +98,7 @@ def _verify_plugin_type(plugin_type):
 # Public API
 #===============================================================================
 
+@transaction.atomic
 def create_page(title, template, language, menu_title=None, slug=None,
                 apphook=None, apphook_namespace=None, redirect=None, meta_description=None,
                 created_by='python-api', parent=None,
@@ -147,25 +107,12 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None,
-                xframe_options=Page.X_FRAME_OPTIONS_INHERIT, with_revision=False):
+                xframe_options=Page.X_FRAME_OPTIONS_INHERIT, page_title=None):
     """
     Create a CMS Page and it's title for the given language
 
     See docs/extending_cms/api_reference.rst for more info
     """
-    if with_revision:
-        # fail fast if revision is requested
-        # but not enabled on the project.
-        _verify_revision_support()
-
-    # ugly permissions hack
-    if created_by and isinstance(created_by, get_user_model()):
-        _thread_locals.user = created_by
-
-        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
-    else:
-        _thread_locals.user = None
-
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
         assert template in [tpl[0] for tpl in get_cms_setting('TEMPLATES')]
@@ -173,21 +120,17 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate site
     if not site:
-        site = Site.objects.get_current()
+        site = get_current_site()
     else:
         assert isinstance(site, Site)
 
     # validate language:
     assert language in get_language_list(site), get_cms_setting('LANGUAGES').get(site.pk)
 
-    # set default slug:
-    if not slug:
-        slug = generate_valid_slug(title, parent, language)
-
     # validate parent
     if parent:
         assert isinstance(parent, Page)
-        parent = Page.objects.get(pk=parent.pk)
+        assert parent.publisher_is_draft
 
     # validate publication date
     if publication_date:
@@ -208,27 +151,28 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
-    if parent:
-        if position in ('last-child', 'first-child'):
-            parent_id = parent.pk
-        else:
-            parent_id = parent.parent_id
-    else:
-        parent_id = None
+    target_node = parent.node if parent else None
+
     # validate and normalize apphook
     if apphook:
         application_urls = _verify_apphook(apphook, apphook_namespace)
     else:
         application_urls = None
 
+    # ugly permissions hack
+    if created_by and isinstance(created_by, get_user_model()):
+        _thread_locals.user = created_by
+        created_by = getattr(created_by, get_user_model().USERNAME_FIELD)
+    else:
+        _thread_locals.user = None
+
     if reverse_id:
-        if Page.objects.drafts().filter(reverse_id=reverse_id, site=site).count():
+        if Page.objects.drafts().filter(reverse_id=reverse_id, node__site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(
         created_by=created_by,
         changed_by=created_by,
-        parent_id=parent_id,
         publication_date=publication_date,
         publication_end_date=publication_end_date,
         in_navigation=in_navigation,
@@ -238,19 +182,18 @@ def create_page(title, template, language, menu_title=None, slug=None,
         template=template,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
-        site=site,
         login_required=login_required,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-    page = page.add_root(instance=page)
-
-    if parent:
-        page = page.move(target=parent, pos=position)
+    page.set_tree_node(site=site, target=target_node, position=position)
+    page.save()
+    page.rescan_placeholders()
 
     create_title(
         language=language,
         title=title,
+        page_title=page_title,
         menu_title=menu_title,
         slug=slug,
         redirect=redirect,
@@ -262,22 +205,17 @@ def create_page(title, template, language, menu_title=None, slug=None,
     if published:
         page.publish(language)
 
-    if with_revision:
-        from cms.constants import REVISION_INITIAL_COMMENT
-
-        _create_revision(
-            obj=page,
-            user=_thread_locals.user,
-            message=REVISION_INITIAL_COMMENT,
-        )
+    if parent and position in ('last-child', 'first-child'):
+        parent._clear_node_cache()
 
     del _thread_locals.user
-    return page.reload()
+    return page
 
 
+@transaction.atomic
 def create_title(language, title, page, menu_title=None, slug=None,
-                 redirect=None, meta_description=None,
-                 parent=None, overwrite_url=None, with_revision=False):
+                 redirect=None, meta_description=None, parent=None,
+                 overwrite_url=None, page_title=None, path=None):
     """
     Create a title.
 
@@ -289,37 +227,39 @@ def create_title(language, title, page, menu_title=None, slug=None,
     assert isinstance(page, Page)
 
     # validate language:
-    assert language in get_language_list(page.site_id)
-
-    if with_revision:
-        # fail fast if revision is requested
-        # but not enabled on the project.
-        _verify_revision_support()
+    assert language in get_language_list(page.node.site_id)
 
     # set default slug:
     if not slug:
-        slug = generate_valid_slug(title, parent, language)
+        base = page.get_path_for_slug(slugify(title), language)
+        slug = get_available_slug(page.node.site, base, language)
+
+    if overwrite_url:
+        path = overwrite_url.strip('/')
+    elif path is None:
+        path = page.get_path_for_slug(slug, language)
 
     title = Title.objects.create(
         language=language,
         title=title,
         menu_title=menu_title,
+        page_title=page_title,
         slug=slug,
+        path=path,
         redirect=redirect,
         meta_description=meta_description,
-        page=page
+        page=page,
+        has_url_overwrite=bool(overwrite_url),
     )
 
-    if overwrite_url:
-        title.has_url_overwrite = True
-        title.path = overwrite_url
-        title.save()
+    page_languages = page.get_languages()
 
-    if with_revision:
-        _create_revision(obj=page)
+    if language not in page_languages:
+        page.update_languages(page_languages + [language])
     return title
 
 
+@transaction.atomic
 def add_plugin(placeholder, plugin_type, language, position='last-child',
                target=None, **data):
     """
@@ -468,7 +408,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
         page_permission = GlobalPagePermission(
             user=user, can_recover_page=can_recover_page, **data)
         page_permission.save()
-        page_permission.sites.add(Site.objects.get_current())
+        page_permission.sites.add(get_current_site())
     return page_permission
 
 
@@ -481,12 +421,7 @@ def publish_page(page, user, language):
     """
     page = page.reload()
 
-    class FakeRequest(object):
-        def __init__(self, user):
-            self.user = user
-
-    request = FakeRequest(user)
-    if not page.has_publish_permission(request):
+    if not page.has_publish_permission(user):
         raise PermissionDenied()
     # Set the current_user to have the page's changed_by
     # attribute set correctly.
@@ -501,10 +436,12 @@ def publish_pages(include_unpublished=False, language=None, site=None):
     Create published public version of selected drafts.
     """
     qs = Page.objects.drafts()
+
     if not include_unpublished:
         qs = qs.filter(title_set__published=True).distinct()
+
     if site:
-        qs = qs.filter(site=site)
+        qs = qs.filter(node__site=site)
 
     output_language = None
     for i, page in enumerate(qs):
@@ -537,7 +474,7 @@ def get_page_draft(page):
         if page.publisher_is_draft:
             return page
         else:
-            return page.publisher_draft
+            return page.publisher_public
     else:
         return None
 
@@ -568,9 +505,9 @@ def copy_plugins_to_language(page, source_language, target_language,
     for placeholder in placeholders:
         # only_empty is True we check if the placeholder already has plugins and
         # we skip it if has some
-        if not only_empty or not placeholder.cmsplugin_set.filter(language=target_language).exists():
+        if not only_empty or not placeholder.get_plugins(language=target_language).exists():
             plugins = list(
-                placeholder.cmsplugin_set.filter(language=source_language).order_by('path'))
+                placeholder.get_plugins(language=source_language).order_by('path'))
             copied_plugins = copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
             copied += len(copied_plugins)
     return copied
@@ -583,9 +520,13 @@ def can_change_page(request):
     This will work across all permission-related setting, with a unified interface
     to permission checking.
     """
-    # check global permissions if CMS_PERMISSION is active
-    global_permission = get_cms_setting('PERMISSION') and has_page_change_permission(request)
-    # check if user has page edit permission
-    page_permission = request.current_page and request.current_page.has_change_permission(request)
+    from cms.utils import page_permissions
 
-    return global_permission or page_permission
+    user = request.user
+    current_page = request.current_page
+
+    if current_page:
+        return page_permissions.user_can_change_page(user, current_page)
+
+    site = Site.objects.get_current(request)
+    return page_permissions.user_can_change_all_pages(user, site)

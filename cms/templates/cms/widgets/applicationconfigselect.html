@@ -1,0 +1,4 @@
+{% load i18n static %}
+{% include 'django/forms/widgets/select.html' %}
+{{ widget.script_init|safe }}
+<a href="" class="add-another" id="add_{{ widget.name }}" onclick="return showAddAnotherPopup(this);" title="{% trans 'Add Another' %}"></a>

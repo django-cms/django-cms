@@ -3,39 +3,51 @@ from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, include
-from django.db.models import signals
 from django.template.defaultfilters import slugify
 from django.utils import six
 from django.utils.encoding import force_text
+from django.utils.functional import cached_property
+from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
-from cms.models import CMSPlugin
-from cms.utils.django_load import load
-from cms.utils.helpers import reversion_register, normalize_name
-from cms.utils.compat.dj import is_installed
+from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import normalize_name
 
 
 class PluginPool(object):
+
     def __init__(self):
         self.plugins = {}
         self.discovered = False
-        self.patched = False
+
+    def _clear_cached(self):
+        if 'registered_plugins' in self.__dict__:
+            del self.__dict__['registered_plugins']
+
+        if 'plugins_with_extra_menu' in self.__dict__:
+            del self.__dict__['plugins_with_extra_menu']
+
+        if 'plugins_with_extra_placeholder_menu' in self.__dict__:
+            del self.__dict__['plugins_with_extra_placeholder_menu']
 
     def discover_plugins(self):
         if self.discovered:
             return
         from cms.cache import invalidate_cms_page_cache
-        invalidate_cms_page_cache()
-        load('cms_plugins')
+
+        if get_cms_setting("PAGE_CACHE"):
+            invalidate_cms_page_cache()
+
+        autodiscover_modules('cms_plugins')
         self.discovered = True
 
     def clear(self):
         self.discovered = False
         self.plugins = {}
-        self.patched = False
+        self._clear_cached()
 
     def validate_templates(self, plugin=None):
         """
@@ -51,7 +63,6 @@ class PluginPool(object):
                     or hasattr(plugin.model, 'render_template')
                     or hasattr(plugin, 'get_render_template')):
                 if (plugin.render_template is None and
-                        not hasattr(plugin.model, 'render_template') and
                         not hasattr(plugin, 'get_render_template')):
                     raise ImproperlyConfigured(
                         "CMS Plugins must define a render template, "
@@ -65,9 +76,7 @@ class PluginPool(object):
                 elif not hasattr(plugin, 'get_render_template'):
                     from django.template import loader
 
-                    template = ((hasattr(plugin.model, 'render_template') and
-                                plugin.model.render_template) or
-                                plugin.render_template)
+                    template = plugin.render_template
                     if isinstance(template, six.string_types) and template:
                         try:
                             loader.get_template(template)
@@ -114,21 +123,6 @@ class PluginPool(object):
 
         plugin.value = plugin_name
         self.plugins[plugin_name] = plugin
-        from cms.signals import pre_save_plugins, post_delete_plugins, pre_delete_plugins
-
-        signals.pre_save.connect(pre_save_plugins, sender=plugin.model,
-                                 dispatch_uid='cms_pre_save_plugin_%s' % plugin_name)
-        signals.post_delete.connect(post_delete_plugins, sender=CMSPlugin,
-                                    dispatch_uid='cms_post_delete_plugin_%s' % plugin_name)
-        signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin,
-                                   dispatch_uid='cms_pre_delete_plugin_%s' % plugin_name)
-        if is_installed('reversion'):
-            from cms.utils.reversion_hacks import RegistrationError
-            try:
-                reversion_register(plugin.model)
-            except RegistrationError:
-                pass
-
         return plugin
 
     def unregister_plugin(self, plugin):
@@ -144,30 +138,20 @@ class PluginPool(object):
             )
         del self.plugins[plugin_name]
 
-    def set_plugin_meta(self):
-        """
-        Patches a plugin model by forcing a specifc db_table whether the
-        'new style' table name exists or not. The same goes for all the
-        ManyToMany attributes.
-        This method must be run whenever a plugin model is accessed
-        directly.
-
-        The model is modified in place; a 'patched' attribute is added
-        to the model to check whether it's already been modified.
-        """
-        if self.patched:
-            return
-        self.patched = True
-
     def get_all_plugins(self, placeholder=None, page=None, setting_key="plugins", include_page_only=True):
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
-        self.set_plugin_meta()
         plugins = sorted(self.plugins.values(), key=attrgetter('name'))
-        template = page and page.get_template() or None
+        template = page.get_template() if page else None
+
         allowed_plugins = get_placeholder_conf(
             setting_key,
+            placeholder,
+            template,
+        ) or ()
+        excluded_plugins = get_placeholder_conf(
+            'excluded_plugins',
             placeholder,
             template,
         ) or ()
@@ -178,17 +162,23 @@ class PluginPool(object):
             plugins = (plugin for plugin in plugins if not plugin.page_only)
 
         if allowed_plugins:
+            # Check that plugins are in the list of the allowed ones
             plugins = (plugin for plugin in plugins if plugin.__name__ in allowed_plugins)
+
+        if excluded_plugins:
+            # Check that plugins are not in the list of the excluded ones
+            plugins = (plugin for plugin in plugins if plugin.__name__ not in excluded_plugins)
 
         if placeholder:
             # Filters out any plugin that requires a parent or has set parent classes
-            plugins = (plugin for plugin in plugins if not plugin.requires_parent_plugin(placeholder, page))
+            plugins = (plugin for plugin in plugins
+                       if not plugin.requires_parent_plugin(placeholder, page))
         return sorted(plugins, key=attrgetter('module'))
 
     def get_text_enabled_plugins(self, placeholder, page):
-        plugins = self.get_all_plugins(placeholder, page)
-        plugins += self.get_all_plugins(placeholder, page, 'text_only_plugins')
-        return sorted((p for p in set(plugins) if p.text_enabled),
+        plugins = set(self.get_all_plugins(placeholder, page))
+        plugins.update(self.get_all_plugins(placeholder, page, 'text_only_plugins'))
+        return sorted((p for p in plugins if p.text_enabled),
                       key=attrgetter('module', 'name'))
 
     def get_plugin(self, name):
@@ -196,7 +186,6 @@ class PluginPool(object):
         Retrieve a plugin from the cache.
         """
         self.discover_plugins()
-        self.set_plugin_meta()
         return self.plugins[name]
 
     def get_patterns(self):
@@ -208,7 +197,7 @@ class PluginPool(object):
 
         try:
             url_patterns = []
-            for plugin in self.get_all_plugins():
+            for plugin in self.registered_plugins:
                 p = plugin()
                 slug = slugify(force_text(normalize_name(p.__class__.__name__)))
                 url_patterns += [
@@ -222,7 +211,23 @@ class PluginPool(object):
 
     def get_system_plugins(self):
         self.discover_plugins()
-        self.set_plugin_meta()
         return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
+
+    @cached_property
+    def registered_plugins(self):
+        return self.get_all_plugins()
+
+    @cached_property
+    def plugins_with_extra_menu(self):
+        plugin_classes = [cls for cls in self.registered_plugins
+                          if cls._has_extra_plugin_menu_items]
+        return plugin_classes
+
+    @cached_property
+    def plugins_with_extra_placeholder_menu(self):
+        plugin_classes = [cls for cls in self.registered_plugins
+                          if cls._has_extra_placeholder_menu_items]
+        return plugin_classes
+
 
 plugin_pool = PluginPool()

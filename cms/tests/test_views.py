@@ -1,13 +1,13 @@
 import re
 import sys
 
-from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import clear_url_caches
+from django.core.cache import cache
 from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings
+from django.urls import clear_url_caches
 
 from cms.api import create_page, create_title, publish_page
 from cms.models import PagePermission, UserSettings, Placeholder
@@ -32,18 +32,29 @@ class ViewTests(CMSTestCase):
     def setUp(self):
         clear_url_caches()
 
+    def tearDown(self):
+        super(ViewTests, self).tearDown()
+        clear_url_caches()
+
+    def test_welcome_screen_debug_on(self):
+        clear_url_caches()
+        with self.settings(DEBUG=True):
+            response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.template_name, 'cms/welcome.html')
+
+    def test_welcome_screen_debug_off(self):
+        with self.settings(DEBUG=False):
+            response = self.client.get('/en/')
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.template_name, 'cms/welcome.html')
+
     def test_handle_no_page(self):
         """
         Test handle nopage correctly works with DEBUG=True
         """
-        request = self.get_request('/')
-        slug = ''
-        self.assertRaises(Http404, _handle_no_page, request, slug)
-        with self.settings(DEBUG=True):
-            request = self.get_request('/en/')
-            slug = ''
-            response = _handle_no_page(request, slug)
-            self.assertEqual(response.status_code, 200)
+        request = self.get_request('/not-existing/')
+        self.assertRaises(Http404, _handle_no_page, request)
 
     def test_apphook_not_hooked(self):
         """
@@ -55,10 +66,10 @@ class ViewTests(CMSTestCase):
         apphooks = (
             '%s.%s' % (APP_MODULE, APP_NAME),
         )
-        create_page("page2", "nav_playground.html", "en", published=True)
+        page = create_page("page2", "nav_playground.html", "en", published=True)
         with self.settings(CMS_APPHOOKS=apphooks):
             self.apphook_clear()
-            response = self.client.get('/en/')
+            response = self.client.get(page.get_absolute_url())
             self.assertEqual(response.status_code, 200)
             self.apphook_clear()
 
@@ -95,15 +106,15 @@ class ViewTests(CMSTestCase):
                           redirect=redirect_one)
         three = create_page("three", "nav_playground.html", "en", parent=one,
                             published=True, redirect=redirect_three)
-        url = three.get_slug()
+        url = three.get_absolute_url()
         request = self.get_request(url)
-        response = details(request, url.strip('/'))
+        response = details(request, three.get_path())
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], redirect_three)
 
     def test_redirect_to_self(self):
         one = create_page("one", "nav_playground.html", "en", published=True,
-                          redirect='/')
+                          redirect='/one/')
         url = one.get_absolute_url()
         request = self.get_request(url)
         response = details(request, one.get_path())
@@ -111,37 +122,39 @@ class ViewTests(CMSTestCase):
 
     def test_redirect_to_self_with_host(self):
         one = create_page("one", "nav_playground.html", "en", published=True,
-                          redirect='http://testserver/en/')
+                          redirect='http://testserver/en/one/')
         url = one.get_absolute_url()
         request = self.get_request(url)
         response = details(request, one.get_path())
         self.assertEqual(response.status_code, 200)
 
     def test_redirect_with_toolbar(self):
-        create_page("one", "nav_playground.html", "en", published=True,
+        page = create_page("one", "nav_playground.html", "en", published=True,
                     redirect='/en/page2')
+        page_url = page.get_absolute_url()
+        page_edit_on_url = self.get_edit_on_url(page_url)
+
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(page_edit_on_url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'This page has no preview')
 
-            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            response = self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+            self.client.get(page_edit_on_url)
+            response = self.client.get(self.get_edit_off_url(page_url))
             self.assertEqual(response.status_code, 302)
 
-            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            response = self.client.get('/en/?%s' % get_cms_setting('TOOLBAR_URL__BUILD'))
+            self.client.get(page_edit_on_url)
+            response = self.client.get(self.get_obj_structure_url(page_url))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, 'This page has no preview')
 
-            self.client.get('/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            response = self.client.get('/en/?%s' % get_cms_setting('TOOLBAR_URL__DISABLE'))
+            self.client.get(page_edit_on_url)
+            response = self.client.get(self.get_toolbar_disable_url(page_url))
             self.assertEqual(response.status_code, 302)
 
     def test_login_required(self):
-        create_page("page", "nav_playground.html", "en", published=True,
-                    login_required=True)
+        self.create_homepage("page", "nav_playground.html", "en", published=True, login_required=True)
         plain_url = '/accounts/'
         login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
         with self.settings(LOGIN_URL=plain_url + '?signin'):
@@ -158,14 +171,15 @@ class ViewTests(CMSTestCase):
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en", published=True)
+        page_url = page.get_absolute_url()
         # Anon user
-        response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+        response = self.client.get(self.get_edit_on_url(page_url))
         self.assertNotContains(response, "cms_toolbar-item-switch-save-edit", 200)
 
         # Superuser
         user = self.get_superuser()
         with self.login_user_context(user):
-            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(self.get_edit_on_url(page_url))
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
         # Admin but with no permission
@@ -173,12 +187,12 @@ class ViewTests(CMSTestCase):
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
 
         with self.login_user_context(user):
-            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(self.get_edit_on_url(page_url))
         self.assertNotContains(response, "cms-toolbar-item-switch-save-edit", 200)
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
-            response = self.client.get("/en/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
+            response = self.client.get(self.get_edit_on_url(page_url))
         self.assertContains(response, "cms-toolbar-item-switch-save-edit", 1, 200)
 
     def test_toolbar_switch_urls(self):
@@ -193,11 +207,58 @@ class ViewTests(CMSTestCase):
         create_title("fr", "french home", page)
         publish_page(page, user, "fr")
 
+        page.set_as_homepage()
+
+        edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+
         with self.login_user_context(user):
-            response = self.client.get("/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
-            self.assertContains(response, "/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'), 1, 200)
-            response = self.client.get("/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
-            self.assertContains(response, "/fr/?%s" % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'), 1, 200)
+            response = self.client.get("/fr/?{}".format(edit_on))
+            expected = """
+                <a href="?structure" class="cms-btn cms-btn-disabled" title="Toggle structure"
+                data-cms-structure-btn='{ "url": "/fr/?structure", "name": "Structure" }'
+                data-cms-content-btn='{ "url": "/fr/?edit", "name": "Content" }'>
+                <span class="cms-icon cms-icon-plugins"></span></a>
+            """
+            self.assertContains(
+                response,
+                expected,
+                count=1,
+                html=True,
+            )
+            self.assertContains(
+                response,
+                '<a class="cms-btn cms-btn-switch-save" href="/fr/?preview&{}">'
+                '<span>View published</span></a>'.format(edit_off),
+                count=1,
+                html=True,
+            )
+            response = self.client.get("/fr/?preview&{}".format(edit_off))
+            self.assertContains(
+                response,
+                expected,
+                count=1,
+                html=True,
+            )
+            self.assertContains(
+                response,
+                '<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="/fr/?{}">Edit</a>'.format(edit_on),
+                count=1,
+                html=True,
+            )
+
+    def test_incorrect_slug_for_language(self):
+        """
+        Test details view when page slug and current language don't match.
+        In this case we refer to the user's current language and the page slug we have for that language.
+        """
+        create_page("home", "nav_playground.html", "en", published=True)
+        cms_page = create_page("stevejobs", "nav_playground.html", "en", published=True)
+        create_title("de", "jobs", cms_page)
+        cms_page.publish('de')
+        response = self.client.get('/de/stevejobs/')
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, '/de/jobs/')
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
@@ -212,7 +273,7 @@ class ContextTests(CMSTestCase):
 
         page_template = "nav_playground.html"
         original_context = {'TEMPLATES': settings.TEMPLATES}
-        page = create_page("page", page_template, "en", published=True)
+        page = self.create_homepage("page", page_template, "en", published=True)
         page_2 = create_page("page-2", page_template, "en", published=True,
                              parent=page)
 
@@ -245,7 +306,7 @@ class ContextTests(CMSTestCase):
 
         # Number of queries when context processors is enabled
         with self.settings(**original_context):
-            with self.assertNumQueries(FuzzyInt(13, 25)) as context:
+            with self.assertNumQueries(FuzzyInt(13, 26)) as context:
                 response = self.client.get("/en/page-2/")
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)

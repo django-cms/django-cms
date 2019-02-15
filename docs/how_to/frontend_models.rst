@@ -1,8 +1,8 @@
 .. _frontend-editable-fields:
 
-###########################################
-Frontend editing for Page and Django models
-###########################################
+#########################################################
+How to enable frontend editing for Page and Django models
+#########################################################
 
 .. versionadded:: 3.0
 
@@ -17,15 +17,6 @@ hint on hover. Double-clicking opens a pop-up window containing the change form 
 
     This interface is not currently available for touch-screen users, but will be improved in
     future releases.
-
-.. warning::
-
-    By default and for consistency with previous releases, templatetags used
-    by this feature mark as safe the content of the rendered
-    model attribute. This may be a security risk if used on fields which may
-    hold non-trusted content. Be aware, and use the templatetags accordingly.
-    To change this behaviour, set the setting: :setting:`CMS_UNESCAPED_RENDER_MODEL_TAGS` to False.
-
 
 .. warning::
 
@@ -104,13 +95,13 @@ Will render to:
 
 .. code-block:: html+django
 
-    <div class="cms-plugin cms-plugin-cms-page-changelist-1">
+    <template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-1"></tempate>
         <h3>Menu</h3>
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/another">another</a></li>
             [...]
-    </div>
+    <template class="cms-plugin cms-plugin-end cms-plugin-cms-page-changelist-1"></tempate>
 
 .. warning:
 
@@ -154,7 +145,7 @@ template tag::
     <h1>{% render_model instance "some_attribute" %}</h1>
     {% endblock content %}
 
-See :ttag:`templatetag reference <render_model>` for arguments documentation.
+See :ttag:`template tag reference <render_model>` for arguments documentation.
 
 
 Selected fields edit
@@ -215,7 +206,7 @@ evaluated with ``request`` as parameter.
 The custom view does not need to obey any specific interface; it will get
 ``edit_fields`` value as a ``GET`` parameter.
 
-See :ttag:`templatetag reference <render_model>` for arguments documentation.
+See :ttag:`template tag reference <render_model>` for arguments documentation.
 
 Example ``view_url``::
 

@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from django.contrib.sitemaps import Sitemap
-from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.utils import translation
 
 from cms.models import Title
+from cms.utils import get_current_site
+from cms.utils.i18n import get_public_languages
 
 
 def from_iterable(iterables):
@@ -45,12 +46,14 @@ class CMSSitemap(Sitemap):
         # If, for some reason, you require redirecting pages (Titles) to be
         # included, simply create a new class inheriting from this one, and
         # supply a new items() method which doesn't filter out the redirects.
-        #
+        site = get_current_site()
+        languages = get_public_languages(site_id=site.pk)
         all_titles = Title.objects.public().filter(
             Q(redirect='') | Q(redirect__isnull=True),
+            language__in=languages,
             page__login_required=False,
-            page__site=Site.objects.get_current(),
-        ).order_by('page__path')
+            page__node__site=site,
+        ).order_by('page__node__path')
         return all_titles
 
     def lastmod(self, title):

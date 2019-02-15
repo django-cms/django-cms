@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 
 from cms.signals.apphook import debug_server_restart, trigger_server_restart
-from cms.signals.page import pre_save_page, post_save_page, pre_delete_page, post_delete_page, post_moved_page
 from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
-from cms.signals.placeholder import pre_delete_placeholder_ref, post_delete_placeholder_ref
-from cms.signals.plugins import post_delete_plugins, pre_save_plugins, pre_delete_plugins
-from cms.signals.reversion_signals import post_revision
-from cms.signals.title import pre_save_title, post_save_title, pre_delete_title, post_delete_title
-from cms.utils.compat.dj import is_installed
 from cms.utils.conf import get_cms_setting
 
 from django.db.models import signals
 from django.dispatch import Signal
 
-from cms.models import Page, Title, CMSPlugin, PagePermission, GlobalPagePermission, PageUser, PageUserGroup, PlaceholderReference
+from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserGroup
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 
@@ -30,6 +24,49 @@ post_unpublish = Signal(providing_args=["instance", "language"])
 # fired if a public page with an apphook is added or changed
 urls_need_reloading = Signal(providing_args=[])
 
+# *disclaimer*
+# The generic object operation signals are very likely to change
+# as their usage evolves.
+# As a result, rely on these at your own risk
+pre_obj_operation = Signal(
+    providing_args=[
+        "operation",
+        "request",
+        "token",
+        "obj",
+    ]
+)
+
+post_obj_operation = Signal(
+    providing_args=[
+        "operation",
+        "request",
+        "token",
+        "obj",
+    ]
+)
+
+pre_placeholder_operation = Signal(
+    providing_args=[
+        "operation",
+        "request",
+        "language",
+        "token",
+        "origin",
+    ]
+)
+
+post_placeholder_operation = Signal(
+    providing_args=[
+        "operation",
+        "request",
+        "language",
+        "token",
+        "origin",
+    ]
+)
+
+
 ################### apphook reloading ###################
 
 if settings.DEBUG:
@@ -40,34 +77,6 @@ urls_need_reloading.connect(
     trigger_server_restart,
     dispatch_uid='aldryn-apphook-reload-handle-urls-need-reloading'
 )
-
-######################### plugins #######################
-
-signals.pre_delete.connect(pre_delete_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_delete_plugin')
-signals.post_delete.connect(post_delete_plugins, sender=CMSPlugin, dispatch_uid='cms_post_delete_plugin')
-signals.pre_save.connect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
-
-########################## page #########################
-
-signals.pre_save.connect(pre_save_page, sender=Page, dispatch_uid='cms_pre_save_page')
-signals.post_save.connect(post_save_page, sender=Page, dispatch_uid='cms_post_save_page')
-signals.pre_delete.connect(pre_delete_page, sender=Page, dispatch_uid='cms_pre_delete_page')
-signals.post_delete.connect(post_delete_page, sender=Page, dispatch_uid='cms_post_delete_page')
-page_moved.connect(post_moved_page, sender=Page, dispatch_uid='cms_post_move_page')
-
-######################### title #########################
-
-signals.pre_save.connect(pre_save_title, sender=Title, dispatch_uid='cms_pre_save_page')
-signals.post_save.connect(post_save_title, sender=Title, dispatch_uid='cms_post_save_page')
-signals.pre_delete.connect(pre_delete_title, sender=Title, dispatch_uid='cms_pre_delete_page')
-signals.post_delete.connect(post_delete_title, sender=Title, dispatch_uid='cms_post_delete_page')
-
-###################### placeholder #######################
-
-signals.pre_delete.connect(pre_delete_placeholder_ref, sender=PlaceholderReference,
-                           dispatch_uid='cms_pre_delete_placeholder_ref')
-signals.post_delete.connect(post_delete_placeholder_ref, sender=PlaceholderReference,
-                            dispatch_uid='cms_post_delete_placeholder_ref')
 
 ###################### permissions #######################
 
@@ -95,10 +104,3 @@ if get_cms_setting('PERMISSION'):
                              dispatch_uid='cms_pre_save_globalpagepermission')
     signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission,
                                dispatch_uid='cms_pre_delete_globalpagepermission')
-
-###################### reversion #########################
-
-if is_installed('reversion'):
-    from cms.utils.reversion_hacks import post_revision_commit
-
-    post_revision_commit.connect(post_revision, dispatch_uid='cms_post_revision')

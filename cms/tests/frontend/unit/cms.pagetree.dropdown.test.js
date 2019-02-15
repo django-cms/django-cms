@@ -1,5 +1,12 @@
 /* global document */
 'use strict';
+var CMS = require('../../../static/cms/js/modules/cms.base').default;
+var PageTreeDropdowns = require('../../../static/cms/js/modules/cms.pagetree.dropdown').default;
+var $ = require('jquery');
+
+window.CMS = window.CMS || CMS;
+CMS.PageTreeDropdowns = PageTreeDropdowns;
+
 
 describe('CMS.PageTreeDropdowns', function () {
     fixture.setBase('cms/tests/frontend/unit/fixtures');
@@ -151,10 +158,10 @@ describe('CMS.PageTreeDropdowns', function () {
                 dropdowns = new CMS.PageTreeDropdowns({
                     container: $('.cms-pagetree')
                 });
-                dropdowns.ui.container.append(trigger1);
-                dropdowns.ui.container.append(trigger2);
                 dropdowns.ui.container.append(menu1);
                 dropdowns.ui.container.append(menu2);
+                menu1.append(trigger1);
+                menu2.append(trigger2);
                 done();
             });
         });

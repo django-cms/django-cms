@@ -1,0 +1,182 @@
+.. _upgrade-to-3.4:
+
+#################
+3.4 release notes
+#################
+
+The most significant change in this release is the removal of revision support
+(i.e. undo/redo/recover functionality on pages) from the core django CMS. This
+functionality will be reinstated as an optional addon in due course, but in the
+meantime, that functionality is not available.
+
+.. _whats_new_3.4:
+
+*****************
+What's new in 3.4
+*****************
+
+* Changed the way CMS plugins are rendered. The HTML ``div`` with
+  ``cms-plugin`` class is no longer rendered around every CMS plugin. Instead a
+  combination of ``template`` tags and JavaScript is used to add event handlers
+  and plugin data directly to the plugin markup. This fixes most of the
+  rendering issues caused by the extra markup.
+* Changed asset cache-busting implementation, which is now handled by a path change,
+  rather than the ``GET`` parameter.
+* Added the option to copy pages in the page tree using the drag and drop
+  interface.
+* Made it possible to use multi-table inheritance for Page/Title extensions.
+* Refactored plugin rendering functionality to speed up loading time in both
+  structure and content modes.
+* Added a new ``Shift`` + ``Space`` shortcut to switch between structure and
+  content mode while highlighting the current plugin, revealing its position.
+* Improved keyboard navigation
+* Added help modal about available short-cuts
+* Added fuzzy matching to the plugin picker.
+* Changed the ``downcast_plugins`` utility to return a generator instead of a
+  list.
+* Fixed a bug that caused an aliased placeholder to show in structure mode.
+* Fixed a bug that prevented aliased content from showing correctly without
+  publishing the page first.
+* Added help text to an ``Alias`` plugin change form when attached to a page
+  to show the content editor where the content is aliased from.
+* Removed revision support from django CMS core.
+  As a result both ``CMS_MAX_PAGE_HISTORY_REVERSIONS`` and ``CMS_MAX_PAGE_PUBLISH_REVERSIONS``
+  settings are no longer supported, as well as the ``with_revision`` parameter
+  in ``cms.api.create_page`` and ``cms.api.create_title``.
+* In ``cms.plugin_base.CMSPluginBase`` methods ``get_child_classes`` and ``get_parent_classes`` now
+  are implemented as a ``@classmethod``.
+
+.. _backward_incompatible_3.4:
+
+****************
+Upgrading to 3.4
+****************
+
+A database migration is required because the default value of CMSPlugin.position was set to 0 instead of null.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate
+    python manage.py cms fix-tree
+
+
+*****************************
+Backward incompatible changes
+*****************************
+
+Apphooks & Toolbars
+===================
+
+As per our deprecation policy we've now removed the backwards compatible shim
+for ``cms_app.py`` and ``cms_toolbar.py``.
+If you have not done so already, please rename these to ``cms_apps.py`` and ``cms_toolbars.py``.
+
+
+Permissions
+===========
+
+The permissions system was heavily refactored. As a result, several internal
+functions and methods have been removed or changed.
+
+Functions removed:
+
+ * ``user_has_page_add_perm``
+ * ``has_page_add_permission``
+ * ``has_page_add_permission_from_request``
+ * ``has_any_page_change_permissions``
+ * ``has_auth_page_permission``
+ * ``has_page_change_permission``
+ * ``has_global_page_permission``
+ * ``has_global_change_permissions_permission``
+ * ``has_generic_permission``
+ * ``load_view_restrictions``
+ * ``get_any_page_view_permissions``
+
+
+The following methods were changed to require a user parameter instead of a request:
+
+ * ``Page.has_view_permission``
+ * ``Page.has_add_permission``
+ * ``Page.has_change_permission``
+ * ``Page.has_delete_permission``
+ * ``Page.has_delete_translation_permission``
+ * ``Page.has_publish_permission``
+ * ``Page.has_advanced_settings_permission``
+ * ``Page.has_change_permissions_permission``
+ * ``Page.has_move_page_permission``
+
+These are also deprecated in favour of their counterparts in ``cms.utils.page_permissions``.
+
+To keep consistency with both django CMS permissions and Django permissions,
+we've modified the vanilla permissions system (``CMS_PERMISSIONS = False``)
+to require users to have certain Django permissions to perform an action.
+
+Here's an overview:
+
+============ ==================================
+Action       Permission required
+============ ==================================
+Add Page     Can Add Page & Can Change Page
+Change Page  Can Change Page
+Delete Page  Can Change Page & Can Delete Page
+Move Page    Can Change Page
+Publish Page Can Change Page & Can Publish Page
+============ ==================================
+
+This change will only affect non-superuser staff members.
+
+.. warning::
+
+    If you have a custom ``Page`` extension with a configured toolbar,
+    please see the updated :ref:`example <complete_toolbar_api>`.
+    It uses the new permission internals.
+
+
+Manual plugin rendering
+=======================
+
+We've rewritten the way plugins and placeholders are rendered.
+As a result, if you're manually rendering plugins and placeholders
+you'll have to adapt your code to match the new rendering mechanism.
+
+To render a plugin programmatically, you will need a context and request object.
+
+.. warning:: Manual plugin rendering is not a public API, and as such it's subject to change without notice.
+
+         ::
+
+             from django.template import RequestContext
+             from cms.plugin_rendering import ContentRenderer
+
+             def render_plugin(request, plugin):
+                 renderer = ContentRenderer(request)
+                 context = RequestContext(request)
+                 # Avoid errors if plugin require a request object
+                 # when rendering.
+                 context['request'] = request
+                 return renderer.render_plugin(plugin, context)
+
+Like a plugin, to render a placeholder programmatically, you will need a context and request object.
+
+
+.. warning:: Manual placeholder rendering is not a public API, and as such it's subject to change without notice.
+
+             ::
+
+                 from django.template import RequestContext
+                 from cms.plugin_rendering import ContentRenderer
+
+                 def render_placeholder(request, placeholder):
+                     renderer = ContentRenderer(request)
+                     context = RequestContext(request)
+                     # Avoid errors if plugin require a request object
+                     # when rendering.
+                     context['request'] = request
+                     content = renderer.render_placeholder(
+                        placeholder,
+                        context=context,
+                     )
+                     return content

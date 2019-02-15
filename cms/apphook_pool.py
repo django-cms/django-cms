@@ -2,12 +2,12 @@
 import warnings
 
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import autodiscover_modules, import_string
 from django.utils.translation import ugettext as _
 
 from cms.app_base import CMSApp
 from cms.exceptions import AppAlreadyRegistered
 from cms.utils.conf import get_cms_setting
-from cms.utils.django_load import load, iterload_objects
 
 
 class ApphookPool(object):
@@ -27,11 +27,6 @@ class ApphookPool(object):
         # allow use as a decorator
         if app is None:
             return lambda app: self.register(app, discovering_apps)
-
-        if app.__module__.split('.')[-1] == 'cms_app':
-            warnings.warn('cms_app.py filename is deprecated, '
-                          'and it will be removed in version 3.4; '
-                          'please rename it to cms_apps.py', DeprecationWarning)
 
         if self.apphooks and not discovering_apps:
             return app
@@ -57,16 +52,15 @@ class ApphookPool(object):
         self.apphooks = get_cms_setting('APPHOOKS')
 
         if self.apphooks:
-            for cls in iterload_objects(self.apphooks):
+            for path in self.apphooks:
+                cls = import_string(path)
                 try:
                     self.register(cls, discovering_apps=True)
                 except AppAlreadyRegistered:
                     pass
 
         else:
-            # FIXME: Remove in 3.4
-            load('cms_app')
-            load('cms_apps')
+            autodiscover_modules('cms_apps')
 
         self.discovered = True
 

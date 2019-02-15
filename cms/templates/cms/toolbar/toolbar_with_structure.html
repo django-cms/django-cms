@@ -1,0 +1,90 @@
+{% extends "cms/toolbar/toolbar.html" %}
+{% load i18n l10n %}
+
+{% block toolbar_top %}
+    <div class="cms-tooltip">{% trans "Double-click to edit" %}<span></span></div>
+    <div class="cms-tooltip-touch">{% trans "Tap to edit" %}<span></span></div>
+{% endblock %}
+
+{% block toolbar_bottom %}
+    {# start: messages #}
+    <div class="cms-messages">
+        <div class="cms-messages-close" title="{% trans 'Close' %}"><span class="cms-icon cms-icon-close"></span></div>
+        <div class="cms-messages-inner"></div>
+    </div>
+    {# end: messages #}
+
+    <div class="cms-sideframe">
+        <div class="cms-sideframe-frame"></div>
+        <div class="cms-sideframe-shim"></div>
+        <div class="cms-sideframe-dimmer"></div>
+        <div class="cms-sideframe-copy"></div>
+        {% spaceless %}
+            <div class="cms-sideframe-controls">
+                <div class="cms-sideframe-history">
+                    <span class="cms-icon cms-icon-arrow cms-icon-arrow-back cms-icon-disabled" title="{% trans 'Click to go back' %}"></span>
+                    <span class="cms-icon cms-icon-arrow cms-icon-arrow-forward cms-icon-disabled" title="{% trans 'Click to go forward' %}"></span>
+                </div>
+                <div class="cms-sideframe-close"><span class="cms-icon cms-icon-close"></span></div>
+            </div>
+        {% endspaceless %}
+    </div>
+
+    {% if cms_toolbar.edit_mode_active %}
+        {% include 'cms/toolbar/clipboard.html' with clipboard_plugin=cms_toolbar.clipboard_plugin %}
+    {% endif %}
+
+    <div class="cms-modal" tabindex="-1" data-touch-action="none">
+        <div class="cms-modal-head" data-touch-action="none">
+            <span class="cms-modal-title" data-touch-action="none">
+                <span class="cms-modal-title-prefix"></span>
+                <span class="cms-modal-title-suffix"></span>
+            </span>
+            <span tabindex="0" class="cms-modal-minimize cms-icon cms-icon-minus" title="{% trans 'Minimize' %}"></span>
+            <span tabindex="0" class="cms-modal-maximize cms-icon cms-icon-window" title="{% trans 'Maximize' %}"></span>
+            <span tabindex="0" class="cms-modal-close cms-icon cms-icon-close" title="{% trans 'Close' %}"></span>
+        </div>
+        <div class="cms-modal-breadcrumb" data-touch-action="pan-x"></div>
+        <div class="cms-modal-body">
+            <div class="cms-modal-shim"></div>
+            <div class="cms-modal-frame"></div>
+        </div>
+        <div class="cms-modal-foot">
+            <div class="cms-modal-buttons"></div>
+            <div class="cms-modal-resize"><span class="cms-icon cms-icon-handler"></span></div>
+        </div>
+    </div>
+    {# start: structure #}
+    <div class="cms-structure">
+        <div class="cms-structure-content" data-touch-action="pan-y">
+        {% if cms_renderer.load_structure %}
+            {% for placeholder in cms_renderer.get_rendered_editable_placeholders %}
+            <div class="cms-dragarea cms-dragarea-{{ placeholder.pk|unlocalize }}{% if placeholder.is_static %} cms-dragarea-static{% endif %}">
+                {% include cms_toolbar.templates.dragbar_template with placeholder=placeholder %}
+
+                <div class="cms-draggables cms-draggables-root">
+                    <div class="cms-draggables-empty">{% trans "Drop a plugin here" %}</div>
+                    {% for plugin in placeholder.get_cached_plugins %}
+                        {% include cms_toolbar.templates.drag_item_template with plugin=plugin %}
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+        </div>
+    </div>
+    {# end: structure #}
+
+    {% if cms_toolbar.redirect_url %}
+        <div class="cms-screenblock">
+            <div class="cms-screenblock-inner">
+                <h1>{% trans "This page has no preview!" %}</h1>
+                <p>{% trans "It is being redirected to:" %} <a href="{{ cms_toolbar.redirect_url }}">{{ cms_toolbar.redirect_url }}</a></p>
+            </div>
+        </div>
+    {% endif %}
+    <script type="text/javascript" data-cms>
+        var CMS = CMS || {};
+        CMS._plugins = CMS._plugins || [];
+    </script>
+{% endblock toolbar_bottom %}

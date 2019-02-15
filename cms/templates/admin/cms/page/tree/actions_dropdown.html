@@ -1,0 +1,118 @@
+{% load i18n admin_urls %}
+{% spaceless %}
+<ul class="cms-pagetree-dropdown-menu-inner">
+    {% block actions %}
+        <li
+            {% if has_copy_page_permission %}
+                class="js-cms-tree-item-copy"
+                data-id="{{ page.pk }}"
+                data-node-id="{{ node.pk }}"
+                data-apphook="{{ page.application_urls|default_if_none:"" }}"
+            {% endif %}
+        >
+            <a{% if not has_copy_page_permission %} class="cms-pagetree-dropdown-item-disabled"{% endif %} href="#" title="{% filter escapejs %}{% trans "Copy" %}{% endfilter %}">
+                <span class="cms-icon cms-icon-copy"></span>
+                <span>{% filter escapejs %}{% trans "Copy" %}{% endfilter %}<span>
+            </a>
+        </li>
+        <li
+            {% if has_move_page_permission %}
+                class="js-cms-tree-item-cut"
+                data-id="{{ page.pk }}"
+                data-node-id="{{ node.pk }}"
+            {% endif %}
+        >
+            <a{% if not has_move_page_permission %} class="cms-pagetree-dropdown-item-disabled"{% endif %}
+                href="#"                 title="{% filter escapejs %}{% trans "Cut" %}{% endfilter %}">
+                <span class="cms-icon cms-icon-scissors"></span>
+                <span>{% filter escapejs %}{% trans "Cut" %}{% endfilter %}<span>
+            </a>
+        </li>
+        <li>
+            <a href="#" data-id="{{ page.pk }}"
+                data-node-id="{{ node.pk }}"
+                class="{% if has_add_permission %}js-cms-tree-item-paste{% endif %}
+                {% if not has_add_permission or not paste_enabled %} cms-pagetree-dropdown-item-disabled{% endif %}">
+                <span class="cms-icon cms-icon-alias"></span>
+                <span>{% filter escapejs %}{% trans "Paste" %}{% endfilter %}</span>
+            </a>
+        </li>
+        <li>
+            {% if has_delete_permission %}
+                <a href="{% url opts|admin_urlname:'delete' page.id %}?language={{ preview_language }}" title="{% filter escapejs %}{% trans "Delete" %}{% endfilter %}">
+            {% else %}
+                <a href="#" class="cms-pagetree-dropdown-item-disabled">
+            {% endif %}
+                    <span class="cms-icon cms-icon-bin"></span>
+                    <span>{% filter escapejs %}{% trans "Delete" %}...{% endfilter %}</span>
+                </a>
+        </li>
+        {% if has_change_permission and page.is_potential_home %}
+            <li class="js-cms-tree-item-set-home">
+                <a href="{% url opts|admin_urlname:'set_home' page.id %}" title="{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}">
+                    <span class="cms-icon cms-icon-home"></span>
+                    <span>{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}</span>
+                </a>
+            </li>
+        {% else %}
+            <li class="js-cms-tree-item-set-home">
+                <a href="#" class="cms-pagetree-dropdown-item-disabled">
+                    <span class="cms-icon cms-icon-home"></span>
+                    <span>{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}</span>
+                </a>
+            </li>
+        {% endif %}
+        <li>
+            {% if has_change_advanced_settings_permission %}
+                <a href="{% url opts|admin_urlname:'advanced' page.id %}" title="{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}">
+            {% else %}
+                <a href="#" class="cms-pagetree-dropdown-item-disabled">
+            {% endif %}
+                    <span class="cms-icon cms-icon-cogs"></span>
+                    <span>{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}</span>
+                </a>
+        </li>
+        {% if CMS_PERMISSION %}
+            <li>
+                {% if has_change_permissions_permission %}
+                    <a href="{% url opts|admin_urlname:'permissions' page.id %}" title="{% filter escapejs %}{% trans "Permissions" %}{% endfilter %}">
+                {% else %}
+                    <a href="#" class="cms-pagetree-dropdown-item-disabled">
+                {% endif %}
+                        <span class="cms-icon cms-icon-lock"></span>
+                        <span>{% filter escapejs %}{% trans "Permissions" %}{% endfilter %}</span>
+                    </a>
+            </li>
+        {% endif %}
+    {% endblock actions %}
+    <li class="cms-pagetree-dropdown-separator">&nbsp;</li>
+    <li>
+        {% if page.publication_date %}
+            <p title="{% filter escapejs %}{% trans "publication date" %}{% endfilter %}: {{ page.publication_date|date:"Y-m-d" }}"><strong>{% filter escapejs %}{% trans "publication date" %}{% endfilter %}:</strong> {{ page.publication_date|date:"Y-m-d" }}</p>
+        {% endif %}
+        {% if page.publication_end_date %}
+            <p title="{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}: {{ page.publication_end_date|date:"Y-m-d" }}"><strong>{% filter escapejs %}{% trans "publication end date" %}{% endfilter %}:</strong> {{ page.publication_end_date|date:"Y-m-d" }}</p>
+        {% endif %}
+        <p title="{% filter escapejs %}{% trans "is restricted" %}: {% if page_is_restricted %}{% trans "Yes" %}{% else %}{% trans "No" %}{% endif %}{% endfilter %}">
+            <strong>{% filter escapejs %}{% trans "is restricted" %}{% endfilter %}:</strong>
+            {% if page_is_restricted %}
+                {% filter escapejs %}{% trans "Yes" %}{% endfilter %}
+            {% else %}
+                {% filter escapejs %}{% trans "No" %}{% endfilter %}
+            {% endif %}
+        </p>
+        {% if page.changed_by %}
+            <p title="{% filter escapejs %}{% trans "last change by" %}{% endfilter %}: {{ page.changed_by }}"><strong>{% filter escapejs %}{% trans "last change by" %}{% endfilter %}:</strong> {{ page.changed_by }}</p>
+        {% endif %}
+        {% if page.get_template_display %}
+            <p title="{% filter escapejs %}{% trans "template" %}{% endfilter %}: {{ page.get_template_display }}"><strong>{% filter escapejs %}{% trans "template" %}{% endfilter %}:</strong> {{ page.get_template_display }}</p>
+        {% endif %}
+        {% if metadata %}
+            <p title="{% filter escapejs %}{% trans "meta" %}{% endfilter %}: {{ metadata }}"><strong>{% filter escapejs %}{% trans "meta" %}{% endfilter %}:</strong> {{ metadata }}</p>
+        {% endif %}
+        {% if page.site %}
+            <p title="{% filter escapejs %}{% trans "site" %}{% endfilter %}: {{ page.site }}"><strong>{% filter escapejs %}{% trans "site" %}{% endfilter %}:</strong> {{ page.site }}</p>
+        {% endif %}
+    </li>
+</ul>
+{% endspaceless %}

@@ -1,25 +1,22 @@
 # -*- coding: utf-8 -*-
-import warnings
 from functools import partial
 from logging import getLogger
 
-from django.conf import settings
 from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import NoReverseMatch
-from django.utils.translation import get_language
-from django.utils.translation import ugettext_lazy as _
+from django.urls import NoReverseMatch
+from django.utils.functional import cached_property
+from django.utils.module_loading import autodiscover_modules
+from django.utils.translation import get_language_from_request, ugettext_lazy as _
 
-from cms.utils import get_cms_setting
-from cms.utils.django_load import load
+from cms.utils.conf import get_cms_setting
+from cms.utils.moderator import use_draft
 
 from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
 from menus.models import CacheKey
-
-import copy
 
 logger = getLogger('menus')
 
@@ -105,8 +102,35 @@ class MenuRenderer(object):
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
+        self.request_language = get_language_from_request(request, check_path=True)
+        self.site = Site.objects.get_current(request)
+        self.draft_mode_active = use_draft(request)
 
-    def _build_nodes(self, site_id):
+    @property
+    def cache_key(self):
+        prefix = get_cms_setting('CACHE_PREFIX')
+
+        key = '%smenu_nodes_%s_%s' % (prefix, self.request_language, self.site.pk)
+
+        if self.request.user.is_authenticated:
+            key += '_%s_user' % self.request.user.pk
+
+        if self.draft_mode_active:
+            key += ':draft'
+        else:
+            key += ':public'
+        return key
+
+    @cached_property
+    def is_cached(self):
+        db_cache_key_lookup = CacheKey.objects.filter(
+            key=self.cache_key,
+            language=self.request_language,
+            site=self.site.pk,
+        )
+        return db_cache_key_lookup.exists()
+
+    def _build_nodes(self):
         """
         This is slow. Caching must be used.
         One menu is built per language and per site.
@@ -123,19 +147,19 @@ class MenuRenderer(object):
             else:
                 the node is put at the bottom of the list
         """
-        # Before we do anything, make sure that the menus are expanded.
-        # Cache key management
-        lang = get_language()
-        prefix = getattr(settings, "CMS_CACHE_PREFIX", "menu_cache_")
-        key = "%smenu_nodes_%s_%s" % (prefix, lang, site_id)
-        if self.request.user.is_authenticated():
-            key += "_%s_user" % self.request.user.pk
+        key = self.cache_key
+
         cached_nodes = cache.get(key, None)
-        if cached_nodes:
+
+        if cached_nodes and self.is_cached:
+            # Only use the cache if the key is present in the database.
+            # This prevents a condition where keys which have been removed
+            # from the database due to a change in content, are still used.
             return cached_nodes
 
         final_nodes = []
         toolbar = getattr(self.request, 'toolbar', None)
+
         for menu_class_name in self.menus:
             menu = self.get_menu(menu_class_name)
 
@@ -153,38 +177,25 @@ class MenuRenderer(object):
                 logger.error("Menu %s could not be loaded." %
                     menu_class_name, exc_info=True)
             # nodes is a list of navigation nodes (page tree in cms + others)
-            final_nodes += _build_nodes_inner_for_one_menu(
-                nodes, menu_class_name)
+            final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
 
         cache.set(key, final_nodes, get_cms_setting('CACHE_DURATIONS')['menus'])
-        # We need to have a list of the cache keys for languages and sites that
-        # span several processes - so we follow the Django way and share through
-        # the database. It's still cheaper than recomputing every time!
-        # This way we can selectively invalidate per-site and per-language,
-        # since the cache shared but the keys aren't
-        CacheKey.objects.get_or_create(key=key, language=lang, site=site_id)
+
+        if not self.is_cached:
+            # No need to invalidate the internal lookup cache,
+            # just set the value directly.
+            self.__dict__['is_cached'] = True
+            # We need to have a list of the cache keys for languages and sites that
+            # span several processes - so we follow the Django way and share through
+            # the database. It's still cheaper than recomputing every time!
+            # This way we can selectively invalidate per-site and per-language,
+            # since the cache is shared but the keys aren't
+            CacheKey.objects.create(key=key, language=self.request_language, site=self.site.pk)
         return final_nodes
 
     def _mark_selected(self, nodes):
-        # There /may/ be two nodes that get marked with selected. A published
-        # and a draft version of the node. We'll mark both, later, the unused
-        # one will be removed anyway.
-        sel = []
         for node in nodes:
-            node.sibling = False
-            node.ancestor = False
-            node.descendant = False
-            node_abs_url = node.get_absolute_url()
-            if node_abs_url == self.request.path[:len(node_abs_url)]:
-                if sel:
-                    if len(node_abs_url) > len(sel[0].get_absolute_url()):
-                        sel = [node]
-                    elif len(node_abs_url) == len(sel[0].get_absolute_url()):
-                        sel.append(node)
-                else:
-                    sel = [node]
-        for node in nodes:
-            node.selected = (node in sel)
+            node.selected = node.is_selected(self.request)
         return nodes
 
     def apply_modifiers(self, nodes, namespace=None, root_id=None,
@@ -201,11 +212,8 @@ class MenuRenderer(object):
                 self.request, nodes, namespace, root_id, post_cut, breadcrumb)
         return nodes
 
-    def get_nodes(self, namespace=None, root_id=None, site_id=None, breadcrumb=False):
-        if not site_id:
-            site_id = Site.objects.get_current().pk
-        nodes = self._build_nodes(site_id)
-        nodes = copy.deepcopy(nodes)
+    def get_nodes(self, namespace=None, root_id=None, breadcrumb=False):
+        nodes = self._build_nodes()
         nodes = self.apply_modifiers(
             nodes=nodes,
             namespace=namespace,
@@ -237,9 +245,7 @@ class MenuPool(object):
     def discover_menus(self):
         if self.discovered:
             return
-        # FIXME: Remove in 3.4
-        load('menu')
-        load('cms_menus')
+        autodiscover_modules('cms_menus')
         from menus.modifiers import register
         register()
         self.discovered = True
@@ -303,18 +309,14 @@ class MenuPool(object):
             cache_keys = CacheKey.objects.get_keys()
         else:
             cache_keys = CacheKey.objects.get_keys(site_id, language)
+
         to_be_deleted = cache_keys.distinct().values_list('key', flat=True)
+
         if to_be_deleted:
             cache.delete_many(to_be_deleted)
             cache_keys.delete()
 
     def register_menu(self, menu_cls):
-        import warnings
-
-        if menu_cls.__module__.split('.')[-1] == 'menu':
-            warnings.warn('menu.py filename is deprecated, '
-                          'and it will be removed in version 3.4; '
-                          'please rename it to cms_menus.py', DeprecationWarning)
         from menus.base import Menu
         assert issubclass(menu_cls, Menu)
         if menu_cls.__name__ in self.menus:
@@ -325,14 +327,6 @@ class MenuPool(object):
         self.menus[menu_cls.__name__] = menu_cls
 
     def register_modifier(self, modifier_class):
-        import os
-        import inspect
-        import warnings
-        source_file = os.path.basename(inspect.stack()[1][1])
-        if source_file == 'menu.py':
-            warnings.warn('menu.py filename is deprecated, '
-                          'and it will be removed in version 3.4; '
-                          'please rename it to cms_menus.py', DeprecationWarning)
         from menus.base import Modifier
         assert issubclass(modifier_class, Modifier)
         if modifier_class not in self.modifiers:
@@ -356,35 +350,6 @@ class MenuPool(object):
 
     def get_nodes_by_attribute(self, nodes, name, value):
         return [node for node in nodes if node.attr.get(name, None) == value]
-
-    def apply_modifiers(self, nodes, request, namespace=None, root_id=None,
-            post_cut=False, breadcrumb=False):
-        warnings.warn('menu_pool.apply_modifiers is deprecated '
-                      'and it will be removed in version 3.4; '
-                      'please use the menu renderer instead.', DeprecationWarning)
-        renderer = self.get_renderer(request)
-        nodes = renderer.apply_modifiers(
-            nodes=nodes,
-            namespace=namespace,
-            root_id=root_id,
-            post_cut=post_cut,
-            breadcrumb=breadcrumb,
-        )
-        return nodes
-
-    def get_nodes(self, request, namespace=None, root_id=None, site_id=None,
-                  breadcrumb=False):
-        warnings.warn('menu_pool.get_nodes is deprecated '
-                      'and it will be removed in version 3.4; '
-                      'please use the menu renderer instead.', DeprecationWarning)
-        renderer = self.get_renderer(request)
-        nodes = renderer.get_nodes(
-            namespace=namespace,
-            root_id=root_id,
-            site_id=site_id,
-            breadcrumb=breadcrumb,
-        )
-        return nodes
 
 
 menu_pool = MenuPool()

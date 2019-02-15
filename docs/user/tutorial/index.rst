@@ -30,5 +30,5 @@ step builds on the previous one.
     support. You will be able to complete the tutorial using a touch-screen device, but please
     consult :ref:`touch`, and see the notes on :ref:`device-support`.
 
-.. _django-cms-developers: http://groups.google.com/group/django-cms-developers
+.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _freenode : http://freenode.net/

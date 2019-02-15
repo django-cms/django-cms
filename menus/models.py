@@ -3,8 +3,8 @@ from django.db import models
 
 
 class CacheKeyManager(models.Manager):
+
     def get_keys(self, site_id=None, language=None):
-        ret = self.none()
         if not site_id and not language:
             # Both site and language are None - return everything
             ret = self.all()
@@ -16,15 +16,6 @@ class CacheKeyManager(models.Manager):
             # Filter by site_id *and* by language.
             ret = self.filter(site=site_id).filter(language=language)
         return ret
-
-    def get_or_create(self, **kwargs):
-        try:
-            return super(CacheKeyManager, self).get_or_create(**kwargs)
-        except CacheKey.MultipleObjectsReturned:
-            # Truncate the table, we don't want a funny cache object to cause
-            # mayhem!
-            CacheKey.objects.all().delete()
-            return super(CacheKeyManager, self).get_or_create(**kwargs)
 
 
 class CacheKey(models.Model):

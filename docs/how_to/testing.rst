@@ -1,6 +1,6 @@
-#######################
-Testing Your Extensions
-#######################
+###########################
+How to test your extensions
+###########################
 
 ************
 Testing Apps
@@ -11,7 +11,7 @@ Resolving View Names
 
 Your apps need testing, but in your live site they aren't in ``urls.py`` as
 they are attached to a CMS page.  So if you want to be able to use
-:func:`~django.core.urlresolvers.reverse` in your tests, or test templates that
+:func:`~django.urls.reverse()` in your tests, or test templates that
 use the :ttag:`url` template tag, you need to hook up your app to a special
 test version of ``urls.py`` and tell your tests to use that.
 
@@ -21,13 +21,13 @@ So you could create ``myapp/tests/urls.py`` with the following code::
     from django.conf.urls import url, include
 
     urlpatterns = [
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),
         url(r'^myapp/', include('myapp.urls')),
         url(r'', include('cms.urls')),
     ]
 
 And then in your tests you can plug this in with the
-:func:`~django.test.utils.override_settings` decorator::
+:func:`~django.test.override_settings` decorator::
 
     from django.test.utils import override_settings
     from cms.test_utils.testcases import CMSTestCase
@@ -58,6 +58,7 @@ CMSTestCase
 Django CMS includes ``CMSTestCase`` which has various utility methods that
 might be useful for testing your CMS app and manipulating CMS pages.
 
+
 ***************
 Testing Plugins
 ***************
@@ -68,9 +69,11 @@ it or the context provided to its template::
 
 
     from django.test import TestCase
+    from django.test.client import RequestFactory
 
     from cms.api import add_plugin
     from cms.models import Placeholder
+    from cms.plugin_rendering import ContentRenderer
 
     from myapp.cms_plugins import MyPlugin
     from myapp.models import MyappPlugin
@@ -95,6 +98,7 @@ it or the context provided to its template::
                 MyPlugin,
                 'en',
             )
-            html = model_instance.render_plugin({})
+            renderer = ContentRenderer(request=RequestFactory())
+            html = renderer.render_plugin(model_instance, {})
             self.assertEqual(html, '<strong>Test</strong>')
 

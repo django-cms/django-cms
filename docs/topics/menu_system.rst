@@ -101,7 +101,7 @@ There is one in cms for example, which examines the Pages in the database and ad
 
 These classes are sub-classes of :py:class:`menus.base.Menu`. The one in cms is :py:class:`cms.menu.CMSMenu`.
 
-In order to use a generator, its :py:meth:`get_nodes` method must be called.
+In order to use a generator, its :py:meth:`~menus.base.Menu.get_nodes()` method must be called.
 
 Modifiers
 ---------
@@ -112,23 +112,23 @@ An important one in cms (:py:class:`cms.menu.SoftRootCutter`) removes the nodes 
 
 These classes are sub-classes of :py:class:`menus.base.Modifier`. Examples are :py:class:`cms.menu.NavExtender` and :py:class:`cms.menu.SoftRootCutter`.
 
-In order to use a modifier, its :py:meth:`modify()` method must be called.
+In order to use a modifier, its :py:meth:`~menus.base.Modifier.modify()` method must be called.
 
-Note that each Modifier's :py:meth:`modify()` method can be called *twice*, before and after the menu has been trimmed.
+Note that each Modifier's :py:meth:`~menus.base.Modifier.modify()` method can be called *twice*, before and after the menu has been trimmed.
 
-For example when using the {% show_menu %} template tag, it's called:
+For example when using the ``{% show_menu %}`` template tag, it's called:
 
-* first, by :py:meth:`menus.menu_pool.MenuPool.get_nodes()`, with the argument post_cut = False
-* later, by the template tag, with the argument post_cut = True
+* first, by :py:meth:`menus.menu_pool.MenuPool.get_nodes()`, with the argument ``post_cut = False``
+* later, by the template tag, with the argument ``post_cut = True``
 
-This corresponds to the state of the nodes list before and after :py:meth:`menus.templatetags.menu_tags.cut_levels()`, which removes nodes from the menu according to the arguments provided by the template tag.
+This corresponds to the state of the nodes list before and after :py:func:`menus.templatetags.menu_tags.cut_levels()`, which removes nodes from the menu according to the arguments provided by the template tag.
 
 This is because some modification might be required on *all* nodes, and some might only be required on the subset of nodes left after cutting.
 
 Nodes
 =====
 
-Nodes are assembled in a tree. Each node is an instance of the :py:class:`menus.base.NavigationNode` class.
+Nodes are assembled in a tree. Each node is an instance of the :class:`menus.base.NavigationNode` class.
 
 A NavigationNode has attributes such as URL, title, parent and children - as one would expect in a navigation tree.
 
@@ -138,51 +138,97 @@ to, rather than placing them directly on the node itself, where they might clash
 .. warning::
     You can't assume that a :py:class:`menus.base.NavigationNode` represents a django CMS Page. Firstly, some nodes may
     represent objects from other applications. Secondly, you can't expect to be able to access Page objects via
-    NavigationNodes. To check if node represents a CMS Page, check for 'is_page' in :py:attr:`menus.base.NavigationNode.attr`
-    and that it is True.
+    NavigationNodes. To check if node represents a CMS Page, check for ``is_page`` in :py:attr:`menus.base.NavigationNode.attr`
+    and that it is ``True``.
 
 *****************
 Menu system logic
 *****************
 
-Let's look at an example using the {% show_menu %} template tag. It will be different for other template tags, and your applications might have their own menu classes. But this should help explain what's going on and what the menu system is doing.
+Let's look at an example using the ``{% show_menu %}`` template tag. It will be different for other
+template tags, and your applications might have their own menu classes. But this should help
+explain what's going on and what the menu system is doing.
 
-One thing to understand is that the system passes around a list of ``nodes``, doing various things to it.
+One thing to understand is that the system passes around a list of ``nodes``, doing various things
+to it.
 
-Many of the methods below pass this list of nodes to the ones it calls, and return them to the ones that they were in turn called by.
+Many of the methods below pass this list of nodes to the ones it calls, and return them to the ones
+that they were in turn called by.
 
-Don't forget that show_menu recurses - so it will do *all* of the below for *each level* in the menu.
 
-* ``{% show_menu %}`` - the template tag in the template
-    * :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()`
-        * :py:meth:`menus.menu_pool.MenuPool.get_nodes()`
-            * :py:meth:`menus.menu_pool.MenuPool.discover_menus()` checks every application's ``cms_menus.py``, and registers:
-                * Menu classes, placing them in the ``self.menus`` dict
-                * Modifier classes, placing them in the self.modifiers list
-            * :py:meth:`menus.menu_pool.MenuPool._build_nodes()`
-                * checks the cache to see if it should return cached nodes
-                * loops over the Menus in self.menus (note: by default the only generator is :py:class:`cms.menu.CMSMenu`); for each:
-                    * call its :py:meth:`get_nodes()` - the menu generator
-                    * :py:meth:`menus.menu_pool._build_nodes_inner_for_one_menu()`
-                    * adds all nodes into a big list
-            * :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()`
-                * :py:meth:`menus.menu_pool.MenuPool._mark_selected()`
-                * loops over each node, comparing its URL with the request.path_info, and marks the best match as ``selected``
-                * loops over the Modifiers in self.modifiers calling each one's :py:meth:`modify(post_cut=False)`. The default Modifiers are:
-                    * :py:class:`cms.menu.NavExtender`
-                    * :py:class:`cms.menu.SoftRootCutter` removes all nodes below the appropriate soft root
-                    * :py:class:`menus.modifiers.Marker` loops over all nodes; finds selected, marks its ancestors, siblings and children
-                    * :py:class:`menus.modifiers.AuthVisibility` removes nodes that require authorisation to see
-                    * :py:class:`menus.modifiers.Level` loops over all nodes; for each one that is a root node (level = 0) passes it to:
-                        * :py:meth:`menus.modifiers.Level.mark_levels()` recurses over a node's descendants marking their levels
-        * we're now back in :py:meth:`menus.templatetags.menu_tags.ShowMenu.get_context()` again
-        * if we have been provided a root_id, get rid of any nodes other than its descendants
-        * :py:meth:`menus.templatetags.menu_tags.cut_levels()` removes nodes from the menu according to the arguments provided by the template tag
-        * :py:meth:`menu_pool.MenuPool.apply_modifiers(post_cut = True)` loops over all the Modifiers again
-            * :py:class:`cms.menu.NavExtender`
-            * :py:class:`cms.menu.SoftRootCutter`
-            * :py:class:`menus.modifiers.Marker`
-            * :py:class:`menus.modifiers.AuthVisibility`
-            * :py:class:`menus.modifiers.Level`:
-                * :py:meth:`menus.modifiers.Level.mark_levels()`
-        * return the nodes to the context in the variable ``children``
+The ``ShowMenu.get_context()`` method
+=====================================
+
+When the Django template engine encounters the ``{% show_menu %}`` template tag, it calls
+the :py:meth:`get_context() <menus.templatetags.menu_tags.ShowMenu.get_context()>` of the ``ShowMenu`` class. ``get_context()``:
+
+* calls :py:meth:`menus.menu_pool.MenuPool.get_nodes()` (see :ref:`get_nodes_method` below)
+* cuts any nodes other than its descendants (if a ``root_id`` has been provided)
+* calls :py:meth:`menus.templatetags.menu_tags.cut_levels()` to remove unwanted levels
+* calls :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()` with ``post_cut = True``
+* return the nodes to the context in the variable ``children``
+
+
+.. _get_nodes_method:
+
+The ``MenuPool.get_nodes()`` method
+===================================
+
+:py:meth:`menus.menu_pool.MenuPool.get_nodes()` calls three other methods of ``MenuPool`` in turn:
+
+* :py:meth:`menus.menu_pool.MenuPool.discover_menus()`
+
+  Checks every application's ``cms_menus.py``, and registers:
+    * Menu classes, placing them in the ``self.menus`` dict
+    * Modifier classes, placing them in the self.modifiers list
+
+* :py:meth:`menus.menu_pool.MenuPool._build_nodes()`
+
+    * checks the cache to see if it should return cached nodes
+    * loops over the Menus in self.menus (note: by default the only generator is
+      :py:class:`cms.menu.CMSMenu`); for each:
+
+        * calls its :py:meth:`menus.base.Menu.get_nodes()` - the menu generator
+        * :py:func:`menus.menu_pool._build_nodes_inner_for_one_menu()`
+        * adds all nodes into a big list
+
+* :py:meth:`menus.menu_pool.MenuPool.apply_modifiers()`
+
+    * :py:meth:`menus.menu_pool.MenuPool._mark_selected()`
+    * loops over each node, comparing its URL with the request.path_info, and marks the best match
+      as ``selected``
+    * loops over the Modifiers (see :ref:`menu-modifiers` below) in ``self.modifiers`` calling each
+      one's
+      :py:meth:`~menus.base.Modifier.modify()` with ``post_cut=False``.
+
+
+.. _menu-modifiers:
+
+Menu Modifiers
+==============
+
+Each ``Modifier`` manipulates menu nodes and their attributes.
+
+The default Modifiers, in the order they are called, are:
+
+* :py:class:`cms.menu.NavExtender`
+* :py:class:`cms.menu.SoftRootCutter`
+
+  If ``post_cut`` is ``True``, removes all nodes below the appropriate soft root; otherwise,
+  returns immediately.
+
+* :py:class:`menus.modifiers.Marker`
+
+  If ``post_cut`` or ``breadcrumb`` is ``True``, returns immediately; otherwise, loops over all
+  nodes; finds selected, marks its ancestors, siblings and children
+
+* :py:class:`menus.modifiers.AuthVisibility`
+
+  Removes nodes that require authorisation to see
+
+* :py:class:`menus.modifiers.Level`
+
+  Loops over all nodes; for each one that is a root node (``level == 0``) passes it to:
+
+    * :py:meth:`~menus.modifiers.Level.mark_levels()` recurses over a node's descendants marking
+      their levels

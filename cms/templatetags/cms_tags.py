@@ -1,28 +1,26 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict
+from collections import namedtuple, OrderedDict
 from copy import copy
 from datetime import datetime
-from itertools import chain
-from platform import python_version
 
-import django
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
-from django.core.urlresolvers import reverse
 from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
-from django.template import Context
-from django.template.defaultfilters import safe
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import six
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.safestring import mark_safe
 from django.utils.six import string_types
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import (
+    get_language,
+    override as force_language,
+    ugettext_lazy as _,
+)
 
 from classytags.arguments import (Argument, MultiValueArgument,
                                   MultiKeywordArgument)
@@ -30,38 +28,29 @@ from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag, AsTag
 from classytags.parser import Parser
 from classytags.utils import flatten_context
-from classytags.values import StringValue
+from classytags.values import ListValue, StringValue
 
-from cms import __version__
 from cms.cache.page import get_page_url_cache, set_page_url_cache
-from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
-from cms.plugin_rendering import render_placeholder
-from cms.utils.plugins import get_plugins, assign_plugins
-from cms.utils import get_language_from_request, get_site_id
-from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import force_language
+from cms.toolbar.utils import get_toolbar_from_request
+from cms.utils import get_current_site, get_language_from_request, get_site_id
+from cms.utils.compat.dj import get_middleware
 from cms.utils.moderator import use_draft
-from cms.utils.page_resolver import get_page_queryset
-from cms.utils.placeholder import validate_placeholder_name, restore_sekizai_context
+from cms.utils.page import get_page_queryset
+from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
 
-from sekizai.helpers import Watcher
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
-DJANGO_VERSION = django.get_version()
-PYTHON_VERSION = python_version()
+
+NULL = object()
+DeclaredPlaceholder = namedtuple('DeclaredPlaceholder', ['slot', 'inherit'])
+DeclaredStaticPlaceholder = namedtuple('DeclaredStaticPlaceholder', ['slot', 'site_bound'])
+
 
 register = template.Library()
-
-
-def has_permission(page, request):
-    return page.has_change_permission(request)
-
-
-register.filter(has_permission)
 
 
 def _get_page_by_untyped_arg(page_lookup, request, site_id):
@@ -86,10 +75,10 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
-    page_lookup.update({'site': site_id})
+    site = Site.objects._get_site_by_id(site_id)
     try:
         if 'pk' in page_lookup:
-            page = Page.objects.all().get(**page_lookup)
+            page = Page.objects.select_related('node').get(**page_lookup)
             if request and use_draft(request):
                 if page.publisher_is_draft:
                     return page
@@ -101,9 +90,9 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 else:
                     return page
         else:
-            return get_page_queryset(request).get(**page_lookup)
+            pages = get_page_queryset(site, draft=use_draft(request))
+            return pages.select_related('node').get(**page_lookup)
     except Page.DoesNotExist:
-        site = Site.objects.get_current()
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
                  "The URL of the request was: http://%(host)s%(path)s") \
@@ -111,9 +100,10 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
+            mw = get_middleware()
             if getattr(settings, 'SEND_BROKEN_LINK_EMAILS', False):
                 mail_managers(subject, body, fail_silently=True)
-            elif 'django.middleware.common.BrokenLinkEmailsMiddleware' in settings.MIDDLEWARE_CLASSES:
+            elif 'django.middleware.common.BrokenLinkEmailsMiddleware' in mw:
                 middle = BrokenLinkEmailsMiddleware()
                 domain = request.get_host()
                 path = request.get_full_path()
@@ -121,6 +111,94 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 if not middle.is_ignorable_request(request, path, domain, referer):
                     mail_managers(subject, body, fail_silently=True)
             return None
+
+
+def _show_placeholder_by_id(context, placeholder_name, reverse_id,
+                            lang=None, site=None, use_cache=True):
+    validate_placeholder_name(placeholder_name)
+
+    request = context['request']
+    toolbar = get_toolbar_from_request(request)
+    renderer = toolbar.get_content_renderer()
+
+    if site:
+        # Backwards compatibility.
+        # Assume user passed in a pk directly.
+        site_id = getattr(site, 'pk', site)
+    else:
+        site_id = renderer.current_site.pk
+
+    page = _get_page_by_untyped_arg(reverse_id, request, site_id)
+
+    if not page:
+        return ''
+
+    try:
+        placeholder = page.placeholders.get(slot=placeholder_name)
+    except PlaceholderModel.DoesNotExist:
+        if settings.DEBUG:
+            raise
+        return ''
+    else:
+        # save a query. cache the page.
+        placeholder.page = page
+
+    content = renderer.render_placeholder(
+        placeholder=placeholder,
+        context=context,
+        language=lang,
+        page=page,
+        editable=False,
+        use_cache=use_cache,
+    )
+    return content
+
+
+def _show_uncached_placeholder_by_id(context, *args, **kwargs):
+    kwargs['use_cache'] = False
+    return _show_placeholder_by_id(context, *args, **kwargs)
+
+
+@register.simple_tag(takes_context=True)
+def render_extra_menu_items(context, obj, template='cms/toolbar/dragitem_extra_menu.html'):
+    request = context['request']
+    toolbar = get_toolbar_from_request(request)
+    template = toolbar.templates.get_cached_template(template)
+
+    if isinstance(obj, CMSPlugin):
+        items = []
+
+        for plugin_class in plugin_pool.plugins_with_extra_menu:
+            plugin_items = plugin_class.get_extra_plugin_menu_items(request, obj)
+            if plugin_items:
+                items.extend(plugin_items)
+    elif isinstance(obj, PlaceholderModel):
+        items = []
+
+        for plugin_class in plugin_pool.plugins_with_extra_placeholder_menu:
+            plugin_items = plugin_class.get_extra_placeholder_menu_items(request, obj)
+
+            if plugin_items:
+                items.extend(plugin_items)
+    else:
+        items = []
+
+    if not items:
+        return ''
+    return template.render({'items': items})
+
+
+@register.simple_tag(takes_context=True)
+def render_plugin(context, plugin):
+    request = context['request']
+    toolbar = get_toolbar_from_request(request)
+    renderer = toolbar.get_content_renderer()
+    content = renderer.render_plugin(
+        instance=plugin,
+        context=context,
+        editable=renderer._placeholders_are_editable,
+    )
+    return content
 
 
 class PageUrl(AsTag):
@@ -171,79 +249,8 @@ class PageUrl(AsTag):
         return ''
 
 
-register.tag(PageUrl)
-register.tag('page_id_url', PageUrl)
-
-
-def _get_placeholder(current_page, page, context, name):
-    placeholder_cache = getattr(current_page, '_tmp_placeholders_cache', {})
-    if page.pk in placeholder_cache:
-        placeholder = placeholder_cache[page.pk].get(name, None)
-        if placeholder:
-            return placeholder
-    placeholder_cache[page.pk] = {}
-    placeholders = page.rescan_placeholders().values()
-    fetch_placeholders = []
-    request = context['request']
-    site_id = page.site_id
-    if not get_cms_setting('PLACEHOLDER_CACHE') or (hasattr(request, 'toolbar') and request.toolbar.edit_mode):
-        fetch_placeholders = placeholders
-    else:
-        for placeholder in placeholders:
-            cached_value = get_placeholder_cache(placeholder, get_language(), site_id, request)
-            if cached_value is not None:
-                restore_sekizai_context(context, cached_value['sekizai'])
-                placeholder.content_cache = cached_value['content']
-            else:
-                fetch_placeholders.append(placeholder)
-            placeholder.cache_checked = True
-    if fetch_placeholders:
-        assign_plugins(context['request'], fetch_placeholders, page.get_template(),  get_language())
-    for placeholder in placeholders:
-        placeholder_cache[page.pk][placeholder.slot] = placeholder
-        placeholder.page = page
-    current_page._tmp_placeholders_cache = placeholder_cache
-    placeholder = placeholder_cache[page.pk].get(name, None)
-    if page.application_urls and not placeholder:
-        raise PlaceholderNotFound(
-            '"%s" placeholder not found in an apphook application. Please use a static placeholder instead.' % name)
-    return placeholder
-
-
-def get_placeholder_content(context, request, current_page, name, inherit, default):
-    edit_mode = getattr(request, 'toolbar', None) and getattr(request.toolbar, 'edit_mode')
-    pages = [current_page]
-    # don't display inherited plugins in edit mode, so that the user doesn't
-    # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
-    # there for possible enhancements
-    if inherit and not edit_mode:
-        pages = chain([current_page], list(reversed(current_page.get_cached_ancestors())))
-    for page in pages:
-        placeholder = _get_placeholder(current_page, page, context, name)
-        if placeholder is None:
-            continue
-        if not edit_mode and get_cms_setting('PLACEHOLDER_CACHE'):
-            if hasattr(placeholder, 'content_cache'):
-                return mark_safe(placeholder.content_cache)
-            if not hasattr(placeholder, 'cache_checked'):
-                site_id = get_site_id(getattr(page, 'site_id', None))
-                cached_value = get_placeholder_cache(placeholder, get_language(), site_id, request)
-                if cached_value is not None:
-                    restore_sekizai_context(context, cached_value['sekizai'])
-                    return mark_safe(cached_value['content'])
-        if not get_plugins(request, placeholder, page.get_template()):
-            continue
-        content = render_placeholder(placeholder, context, name)
-        if content:
-            return content
-            # if we reach this point, we have an empty or non-existant placeholder
-            # call _get_placeholder again to get the placeholder properly rendered
-            # in frontend editing
-    placeholder = _get_placeholder(current_page, current_page, context, name)
-    return render_placeholder(placeholder, context, name, default=default)
-
-
 class PlaceholderParser(Parser):
+
     def parse_blocks(self):
         for bit in getattr(self.kwargs['extra_bits'], 'value', self.kwargs['extra_bits']):
             if getattr(bit, 'value', bit.var.value) == 'or':
@@ -252,6 +259,7 @@ class PlaceholderParser(Parser):
 
 
 class PlaceholderOptions(Options):
+
     def get_parser_class(self):
         return PlaceholderParser
 
@@ -282,81 +290,43 @@ class Placeholder(Tag):
         MultiValueArgument('extra_bits', required=False, resolve=False),
         blocks=[
             ('endplaceholder', 'nodelist'),
-        ]
+        ],
     )
 
     def render_tag(self, context, name, extra_bits, nodelist=None):
+        request = context.get('request')
+
+        if not request:
+            return ''
+
         validate_placeholder_name(name)
-        inherit = False
-        for bit in extra_bits:
-            if bit == 'inherit':
-                inherit = True
-        if not 'request' in context:
-            return ''
-        request = context['request']
-        page = request.current_page
-        if not page or page == 'dummy':
-            if nodelist:
-                return nodelist.render(context)
-            return ''
-        content = ''
+
+        toolbar = get_toolbar_from_request(request)
+        renderer = toolbar.get_content_renderer()
+        inherit = 'inherit' in extra_bits
+
         try:
-            content = get_placeholder_content(context, request, page, name, inherit, nodelist)
+            content = renderer.render_page_placeholder(
+                slot=name,
+                context=context,
+                inherit=inherit,
+                nodelist=nodelist,
+            )
         except PlaceholderNotFound:
-            if nodelist:
-                return nodelist.render(context)
-        if not content:
-            if nodelist:
-                return nodelist.render(context)
-            return ''
+            content = ''
+
+        if not content and nodelist:
+            return nodelist.render(context)
         return content
 
-    def get_name(self):
-        return self.kwargs['name'].var.value.strip('"').strip("'")
+    def get_declaration(self):
+        flags = self.kwargs['extra_bits']
+        slot = self.kwargs['name'].var.value.strip('"').strip("'")
 
-
-register.tag(Placeholder)
-
-
-class RenderPlugin(Tag):
-    template = 'cms/content.html'
-    name = 'render_plugin'
-    options = Options(
-        Argument('plugin')
-    )
-
-    def get_processors(self, context, plugin, placeholder):
-        #
-        # Prepend frontedit toolbar output if applicable. Moved to its own
-        # method to aide subclassing the whole RenderPlugin if required.
-        #
-        request = context['request']
-        toolbar = getattr(request, 'toolbar', None)
-        if (toolbar and getattr(toolbar, "edit_mode", False) and
-                getattr(toolbar, "show_toolbar", False) and
-                placeholder.has_change_permission(request) and
-                getattr(placeholder, 'is_editable', True)):
-            from cms.middleware.toolbar import toolbar_plugin_processor
-            processors = (toolbar_plugin_processor, )
-        else:
-            processors = None
-        return processors
-
-    def render_tag(self, context, plugin):
-        if not plugin:
-            return ''
-
-        placeholder = plugin.placeholder
-        processors = self.get_processors(context, plugin, placeholder)
-        plugin_content = plugin.render_plugin(
-            context,
-            placeholder=placeholder,
-            processors=processors,
-        )
-        return plugin_content
-
-
-register.tag(RenderPlugin)
+        if isinstance(flags, ListValue):
+            inherit = any(extra.var.value.strip() == 'inherit' for extra in flags)
+            return DeclaredPlaceholder(slot=slot, inherit=inherit)
+        return DeclaredPlaceholder(slot=slot, inherit=False)
 
 
 class RenderPluginBlock(InclusionTag):
@@ -382,47 +352,6 @@ class RenderPluginBlock(InclusionTag):
         context['inner'] = nodelist.render(context)
         context['plugin'] = plugin
         return context
-
-register.tag(RenderPluginBlock)
-
-
-@register.simple_tag(takes_context=True)
-def render_extra_menu_items(context, obj, template='cms/toolbar/dragitem_extra_menu.html'):
-    request = context['request']
-    toolbar = getattr(request, 'toolbar', None)
-
-    if toolbar:
-        template = toolbar.get_cached_template(template)
-    else:
-        template = context.template.engine.get_template(template)
-
-    if isinstance(obj, CMSPlugin):
-        plugin = obj
-        plugin_class_inst = plugin.get_plugin_class_instance()
-        items = plugin_class_inst.get_extra_local_plugin_menu_items(request, plugin) or []
-        plugin_classes = plugin_pool.get_all_plugins()
-
-        for plugin_class in plugin_classes:
-            plugin_items = plugin_class().get_extra_global_plugin_menu_items(request, plugin)
-            if plugin_items:
-                items.extend(plugin_items)
-
-    elif isinstance(obj, PlaceholderModel):
-        items = []
-        plugin_classes = plugin_pool.get_all_plugins()
-
-        for plugin_class in plugin_classes:
-            plugin_class_inst = plugin_class()
-            plugin_items = plugin_class_inst.get_extra_placeholder_menu_items(request, obj)
-
-            if plugin_items:
-                items.extend(plugin_items)
-    else:
-        items = []
-
-    if not items:
-        return ''
-    return template.render(Context({'items': items}))
 
 
 class PageAttribute(AsTag):
@@ -488,8 +417,6 @@ class PageAttribute(AsTag):
         request = context['request']
         lang = get_language_from_request(request)
         page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
-        if page == "dummy":
-            return ''
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
             ret_val = func(language=lang, fallback=True)
@@ -497,104 +424,6 @@ class PageAttribute(AsTag):
                 ret_val = escape(ret_val)
             return ret_val
         return ''
-
-
-register.tag(PageAttribute)
-
-
-def _show_placeholder_for_page(context, placeholder_name, page_lookup, lang=None,
-                               site=None, cache_result=True):
-    """
-    Shows the content of a page with a placeholder name and given lookup
-    arguments in the given language.
-    This is useful if you want to have some more or less static content that is
-    shared among many pages, such as a footer.
-
-    See _get_page_by_untyped_arg() for detailed information on the allowed types
-    and their interpretation for the page_lookup argument.
-    """
-    validate_placeholder_name(placeholder_name)
-
-    request = context.get('request', False)
-
-    site_id = get_site_id(site)
-
-    if not request:
-        return {'content': ''}
-    if lang is None:
-        lang = get_language_from_request(request)
-
-    page = _get_page_by_untyped_arg(page_lookup, request, site_id)
-    if not page:
-        return {'content': ''}
-    try:
-        placeholder = page.placeholders.get(slot=placeholder_name)
-    except PlaceholderModel.DoesNotExist:
-        if settings.DEBUG:
-            raise
-        return {'content': ''}
-
-    if cache_result:
-        cached_value = get_placeholder_cache(placeholder, lang, site_id, request)
-        if cached_value:
-            restore_sekizai_context(context, cached_value['sekizai'])
-            return {'content': mark_safe(cached_value['content'])}
-    watcher = Watcher(context)
-    content = render_placeholder(placeholder, context, placeholder_name, lang=lang,
-                                 use_cache=cache_result)
-    changes = watcher.get_changes()
-
-    edit_mode = hasattr(request, 'toolbar') and getattr(request.toolbar, 'edit_mode', False)
-    if not edit_mode and placeholder and placeholder.cache_placeholder and get_cms_setting('PLACEHOLDER_CACHE') and cache_result:  # noqa
-        set_placeholder_cache(placeholder, lang, site_id, {'content': content, 'sekizai': changes}, request)
-    if content:
-        return {'content': mark_safe(content)}
-    return {'content': ''}
-
-
-class ShowPlaceholderById(InclusionTag):
-    template = 'cms/content.html'
-    name = 'show_placeholder_by_id'
-
-    options = Options(
-        Argument('placeholder_name'),
-        Argument('reverse_id'),
-        Argument('lang', required=False, default=None),
-        Argument('site', required=False, default=None),
-    )
-
-    def get_context(self, *args, **kwargs):
-        return _show_placeholder_for_page(**self.get_kwargs(*args, **kwargs))
-
-    def get_kwargs(self, context, placeholder_name, reverse_id, lang, site):
-        cache_result = True
-        if 'preview' in context['request'].GET:
-            cache_result = False
-        return {
-            'context': context,
-            'placeholder_name': placeholder_name,
-            'page_lookup': reverse_id,
-            'lang': lang,
-            'site': site,
-            'cache_result': cache_result
-        }
-
-
-register.tag(ShowPlaceholderById)
-register.tag('show_placeholder', ShowPlaceholderById)
-
-
-class ShowUncachedPlaceholderById(ShowPlaceholderById):
-    name = 'show_uncached_placeholder_by_id'
-
-    def get_kwargs(self, *args, **kwargs):
-        kwargs = super(ShowUncachedPlaceholderById, self).get_kwargs(*args, **kwargs)
-        kwargs['cache_result'] = False
-        return kwargs
-
-
-register.tag(ShowUncachedPlaceholderById)
-register.tag('show_uncached_placeholder', ShowUncachedPlaceholderById)
 
 
 class CMSToolbar(RenderBlock):
@@ -606,45 +435,17 @@ class CMSToolbar(RenderBlock):
     )
 
     def render_tag(self, context, name, nodelist):
-        # render JS
-        request = context.get('request', None)
-        toolbar = getattr(request, 'toolbar', None)
-        if toolbar:
-            toolbar.init_toolbar(request)
-            toolbar.populate()
-        if request and 'cms-toolbar-login-error' in request.GET:
-            context['cms_toolbar_login_error'] = request.GET['cms-toolbar-login-error'] == '1'
-        context['cms_version'] =  __version__
-        context['django_version'] = DJANGO_VERSION
-        context['python_version'] = PYTHON_VERSION
-        context['cms_edit_on'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
-        context['cms_edit_off'] = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
-        if toolbar and toolbar.show_toolbar:
-            language = toolbar.toolbar_language
-            with force_language(language):
-                # needed to populate the context with sekizai content
-                render_to_string('cms/toolbar/toolbar_javascript.html', flatten_context(context))
-                context['addons'] = mark_safe(toolbar.render_addons(context))
-        else:
-            language = None
-        # render everything below the tag
-        rendered_contents = nodelist.render(context)
-        # sanity checks
-        if not request:
-            return rendered_contents
-        if not toolbar:
-            return rendered_contents
-        if not toolbar.show_toolbar:
-            return rendered_contents
-        # render the toolbar content
-        request.toolbar.post_template_populate()
-        with force_language(language):
-            addons = mark_safe(toolbar.post_template_render_addons(context))
-            toolbar = render_to_string('cms/toolbar/toolbar.html', flatten_context(context))
-        # return the toolbar content and the content below
-        return '%s\n%s\n%s' % (toolbar, addons, rendered_contents)
+        request = context.get('request')
 
-register.tag(CMSToolbar)
+        if not request:
+            return nodelist.render(context)
+
+        toolbar = get_toolbar_from_request(request)
+
+        if toolbar and toolbar.show_toolbar:
+            toolbar.init_toolbar(request)
+            return toolbar.render_with_structure(context, nodelist)
+        return nodelist.render(context)
 
 
 class CMSEditableObject(InclusionTag):
@@ -672,9 +473,7 @@ class CMSEditableObject(InclusionTag):
         super(CMSEditableObject, self).__init__(parser, tokens)
 
     def _is_editable(self, request):
-        return (request and hasattr(request, 'toolbar') and
-                request.toolbar.edit_mode and
-                request.toolbar.show_toolbar)
+        return (request and hasattr(request, 'toolbar') and request.toolbar.edit_mode_active)
 
     def get_template(self, context, **kwargs):
         if self._is_editable(context.get('request', None)):
@@ -706,22 +505,28 @@ class CMSEditableObject(InclusionTag):
             lang = request.toolbar.toolbar_language
         else:
             lang = get_language()
+        opts = instance._meta
+        # Django < 1.10 creates dynamic proxy model subclasses when fields are
+        # deferred using .only()/.exclude(). Make sure to use the underlying
+        # model options when it's the case.
+        if getattr(instance, '_deferred', False):
+            opts = opts.proxy_for_model._meta
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = u"%s %s list" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+                instance.get_plugin_name = u"%s %s list" % (smart_text(_('Edit')), smart_text(opts.verbose_name))
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(instance._meta.verbose_name))
+                instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(opts.verbose_name))
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(edit_fields) \
                                                         if not isinstance('edit_fields', six.string_types) else edit_fields
             else:
-                instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(instance._meta.verbose_name))
+                instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
-            extra_context['generic'] = instance._meta
+            extra_context['generic'] = opts
             # view_method has the precedence and we retrieve the corresponding
             # attribute in the instance class.
             # If view_method refers to a method it will be called passing the
@@ -737,12 +542,12 @@ class CMSEditableObject(InclusionTag):
                 # current instance
                 if not editmode:
                     view_url = 'admin:%s_%s_add' % (
-                        instance._meta.app_label, instance._meta.model_name)
+                        opts.app_label, opts.model_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
                     if not view_url:
                         view_url = 'admin:%s_%s_change' % (
-                            instance._meta.app_label, instance._meta.model_name)
+                            opts.app_label, opts.model_name)
                     if isinstance(instance, Page):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     else:
@@ -750,7 +555,7 @@ class CMSEditableObject(InclusionTag):
                 else:
                     if not view_url:
                         view_url = 'admin:%s_%s_edit_field' % (
-                            instance._meta.app_label, instance._meta.model_name)
+                            opts.app_label, opts.model_name)
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
                     else:
@@ -831,10 +636,7 @@ class CMSEditableObject(InclusionTag):
         # content is for non-edit template content.html
         # rendered_content is for edit template plugin.html
         # in this templatetag both hold the same content
-        if get_cms_setting('UNESCAPED_RENDER_MODEL_TAGS'):
-            extra_context['content'] = mark_safe(extra_context['content'])
-        else:
-            extra_context['content'] = extra_context['content']
+        extra_context['content'] = extra_context['content']
         extra_context['rendered_content'] = extra_context['content']
         return extra_context
 
@@ -885,8 +687,6 @@ class CMSEditableObject(InclusionTag):
         extra_context['render_model'] = True
         return extra_context
 
-register.tag(CMSEditableObject)
-
 
 class CMSEditableObjectIcon(CMSEditableObject):
     """
@@ -914,7 +714,6 @@ class CMSEditableObjectIcon(CMSEditableObject):
         extra_context = self._get_empty_context(context, **kwargs)
         extra_context['render_model_icon'] = True
         return extra_context
-register.tag(CMSEditableObjectIcon)
 
 
 class CMSEditableObjectAdd(CMSEditableObject):
@@ -946,7 +745,6 @@ class CMSEditableObjectAdd(CMSEditableObject):
                                                 view_method, editmode=False)
         extra_context['render_model_add'] = True
         return extra_context
-register.tag(CMSEditableObjectAdd)
 
 
 class CMSEditableObjectAddBlock(CMSEditableObject):
@@ -996,7 +794,6 @@ class CMSEditableObjectAddBlock(CMSEditableObject):
                                                 editmode=False, **kwargs)
         extra_context['render_model_add'] = True
         return extra_context
-register.tag(CMSEditableObjectAddBlock)
 
 
 class CMSEditableObjectBlock(CMSEditableObject):
@@ -1048,7 +845,6 @@ class CMSEditableObjectBlock(CMSEditableObject):
         extra_context['instance'] = kwargs.get('instance')
         extra_context['render_model_block'] = True
         return extra_context
-register.tag(CMSEditableObjectBlock)
 
 
 class StaticPlaceholderNode(Tag):
@@ -1062,44 +858,46 @@ class StaticPlaceholderNode(Tag):
     )
 
     def render_tag(self, context, code, extra_bits, nodelist=None):
-        # TODO: language override (the reason this is not implemented, is that language selection is buried way
-        #       down somewhere in some method called in render_plugins. There it gets extracted from the request
-        #       and a language in request.GET always overrides everything.)
-        if not code:
+        request = context.get('request')
+
+        if not code or not request:
             # an empty string was passed in or the variable is not available in the context
             if nodelist:
                 return nodelist.render(context)
             return ''
-        request = context.get('request', False)
-        if not request:
-            if nodelist:
-                return nodelist.render(context)
-            return ''
+
+        toolbar = get_toolbar_from_request(request)
+        renderer = toolbar.get_content_renderer()
+
         if isinstance(code, StaticPlaceholder):
             static_placeholder = code
         else:
+            kwargs = {
+                'code': code,
+                'defaults': {'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE}
+            }
+
             if 'site' in extra_bits:
-                site = Site.objects.get_current()
-                static_placeholder, __ = StaticPlaceholder.objects.get_or_create(code=code, site_id=site.pk, defaults={'name': code,
-                    'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE})
+                kwargs['site'] = get_current_site()
             else:
-                static_placeholder, __ = StaticPlaceholder.objects.get_or_create(code=code, site_id__isnull=True, defaults={'name': code,
-                    'creation_method': StaticPlaceholder.CREATION_BY_TEMPLATE})
-        if not hasattr(request, 'static_placeholders'):
-            request.static_placeholders = []
-        request.static_placeholders.append(static_placeholder)
-        if hasattr(request, 'toolbar') and request.toolbar.edit_mode:
-            if not request.user.has_perm('cms.edit_static_placeholder'):
-                placeholder = static_placeholder.public
-                placeholder.is_editable = False
-            else:
-                placeholder = static_placeholder.draft
-        else:
-            placeholder = static_placeholder.public
-        placeholder.is_static = True
-        content = render_placeholder(placeholder, context, name_fallback=code, default=nodelist)
+                kwargs['site_id__isnull'] = True
+            static_placeholder = StaticPlaceholder.objects.get_or_create(**kwargs)[0]
+
+        content = renderer.render_static_placeholder(
+            static_placeholder,
+            context=context,
+            nodelist=nodelist,
+        )
         return content
-register.tag(StaticPlaceholderNode)
+
+    def get_declaration(self, context):
+        flags = self.kwargs['extra_bits']
+        slot = self.kwargs['code'].resolve(context)
+
+        if isinstance(flags, ListValue):
+            site_bound = any(extra.var.value.strip() == 'site' for extra in flags)
+            return DeclaredStaticPlaceholder(slot=slot, site_bound=site_bound)
+        return DeclaredStaticPlaceholder(slot=slot, site_bound=False)
 
 
 class RenderPlaceholder(AsTag):
@@ -1119,38 +917,33 @@ class RenderPlaceholder(AsTag):
     )
 
     def _get_value(self, context, editable=True, **kwargs):
-        request = context.get('request', None)
+        request = context['request']
+        toolbar = get_toolbar_from_request(request)
+        renderer = toolbar.get_content_renderer()
         placeholder = kwargs.get('placeholder')
-        width = kwargs.get('width')
         nocache = kwargs.get('nocache', False)
-        language = kwargs.get('language')
-        if not request:
-            return ''
+
         if not placeholder:
             return ''
 
         if isinstance(placeholder, string_types):
             placeholder = PlaceholderModel.objects.get(slot=placeholder)
-        if not hasattr(request, 'placeholders'):
-            request.placeholders = {}
-        perms = (placeholder.has_change_permission(request) or not placeholder.cache_placeholder)
-        if not perms or placeholder.slot not in request.placeholders:
-            request.placeholders[placeholder.slot] = (placeholder, perms)
-        else:
-            request.placeholders[placeholder.slot] = (
-                placeholder, perms and request.placeholders[placeholder.slot][1]
-            )
-        context = copy(context)
-        return safe(placeholder.render(context, width, lang=language,
-                                       editable=editable, use_cache=not nocache))
+
+        content = renderer.render_placeholder(
+            placeholder=placeholder,
+            context=context,
+            language=kwargs.get('language'),
+            editable=editable,
+            use_cache=not nocache,
+            width=kwargs.get('width'),
+        )
+        return content
 
     def get_value_for_context(self, context, **kwargs):
         return self._get_value(context, editable=False, **kwargs)
 
     def get_value(self, context, **kwargs):
         return self._get_value(context, **kwargs)
-
-register.tag(RenderPlaceholder)
 
 
 class RenderUncachedPlaceholder(RenderPlaceholder):
@@ -1164,10 +957,6 @@ class RenderUncachedPlaceholder(RenderPlaceholder):
     def _get_value(self, context, editable=True, **kwargs):
         kwargs['nocache'] = True
         return super(RenderUncachedPlaceholder, self)._get_value(context, editable, **kwargs)
-
-register.tag(RenderUncachedPlaceholder)
-
-NULL = object()
 
 
 class EmptyListValue(list, StringValue):
@@ -1213,4 +1002,40 @@ class CMSAdminURL(AsTag):
     def get_value(self, context, viewname, args, kwargs):
         return admin_reverse(viewname, args=args, kwargs=kwargs)
 
-register.tag(CMSAdminURL)
+
+
+register.tag('page_attribute', PageAttribute)
+register.tag('render_plugin_block', RenderPluginBlock)
+register.tag('placeholder', Placeholder)
+register.tag('cms_toolbar', CMSToolbar)
+register.tag('page_url', PageUrl)
+register.tag('page_id_url', PageUrl)
+register.tag('render_model_block', CMSEditableObjectBlock)
+register.tag('render_model_add_block', CMSEditableObjectAddBlock)
+register.tag('render_model_add', CMSEditableObjectAdd)
+register.tag('render_model_icon', CMSEditableObjectIcon)
+register.tag('render_model', CMSEditableObject)
+register.simple_tag(
+    _show_placeholder_by_id,
+    takes_context=True,
+    name='show_placeholder',
+)
+register.simple_tag(
+    _show_placeholder_by_id,
+    takes_context=True,
+    name='show_placeholder_by_id',
+)
+register.simple_tag(
+    _show_uncached_placeholder_by_id,
+    takes_context=True,
+    name='show_uncached_placeholder',
+)
+register.simple_tag(
+    _show_uncached_placeholder_by_id,
+    takes_context=True,
+    name='show_uncached_placeholder_by_id',
+)
+register.tag('cms_admin_url', CMSAdminURL)
+register.tag('render_placeholder', RenderPlaceholder)
+register.tag('render_uncached_placeholder', RenderUncachedPlaceholder)
+register.tag('static_placeholder', StaticPlaceholderNode)

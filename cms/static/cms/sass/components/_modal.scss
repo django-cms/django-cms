@@ -13,8 +13,13 @@
     background: $modal-bgcolor;
     box-shadow: $modal-shadow;
     user-select: none;
-    transform: scale(0) translateZ(0);
-    transition: transform $speed-base;
+    opacity: 0;
+    transform: translate3d(0, -10%, 0);
+    transition: transform 150ms, opacity 150ms;
+
+    @at-root .cms-structure-mode-structure & {
+        transform: translate3d(10%, 0, 0);
+    }
 
     .cms-modal-maximized & {
         right: 0;
@@ -60,7 +65,11 @@
     transition: all $speed-base;
 }
 .cms-modal-open {
-    transform: scale(1) translateZ(0);
+    opacity: 1;
+    @at-root .cms-structure-mode-structure &,
+    & {
+        transform: translate3d(0, 0, 0);
+    }
 }
 .cms-modal-body {
     position: absolute;

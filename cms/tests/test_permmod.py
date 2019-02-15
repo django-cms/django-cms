@@ -1,38 +1,26 @@
 # -*- coding: utf-8 -*-
-from djangocms_text_ckeditor.models import Text
 from django.contrib.admin.sites import site
-from django.contrib.admin.utils import unquote
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
-from django.core.management import call_command
-from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.utils.http import urlencode
 
 from cms.api import (add_plugin, assign_user_to_page, create_page,
                      create_page_user, publish_page)
 from cms.admin.forms import save_permissions
-from cms.cms_menus import get_visible_pages
-from cms.constants import PUBLISHER_STATE_PENDING
-from cms.management.commands.subcommands.moderator import log
+from cms.cms_menus import get_visible_nodes
 from cms.models import Page, CMSPlugin, Title, ACCESS_PAGE
 from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
                                          ACCESS_PAGE_AND_DESCENDANTS,
                                          PagePermission,
                                          GlobalPagePermission)
-from cms.plugin_pool import plugin_pool
-from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, URL_CMS_PLUGIN_REMOVE,
-                                      URL_CMS_PLUGIN_ADD, CMSTestCase)
-from cms.test_utils.util.context_managers import disable_logger
+from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, CMSTestCase)
 from cms.test_utils.util.fuzzy_int import FuzzyInt
-from cms.utils.i18n import force_language
-from cms.utils.page_resolver import get_page_from_path
-from cms.utils.permissions import (has_page_add_permission_from_request,
-                                   has_page_change_permission,
-                                   has_generic_permission)
+from cms.utils import get_current_site
+from cms.utils.compat import DJANGO_2_0
+from cms.utils.page_permissions import user_can_publish_page, user_can_view_page
 
 
 def fake_tree_attrs(page):
@@ -82,8 +70,10 @@ class PermissionModeratorTests(CMSTestCase):
                                             is_superuser=True)
         self.user_staff = self._create_user("staff", is_staff=True,
                                             add_default_permissions=True)
+        self.add_permission(self.user_staff, 'publish_page')
         self.user_master = self._create_user("master", is_staff=True,
                                              add_default_permissions=True)
+        self.add_permission(self.user_master, 'publish_page')
         self.user_slave = self._create_user("slave", is_staff=True,
                                             add_default_permissions=True)
         self.user_normal = self._create_user("normal", is_staff=False)
@@ -95,7 +85,6 @@ class PermissionModeratorTests(CMSTestCase):
                                          created_by=self.user_super)
 
             # master page & master user
-
             self.master_page = create_page("master", "nav_playground.html", "en")
 
             # create non global, non staff user
@@ -103,7 +92,7 @@ class PermissionModeratorTests(CMSTestCase):
 
             # assign master user under home page
             assign_user_to_page(self.home_page, self.user_master,
-                                grant_on=ACCESS_DESCENDANTS, grant_all=True)
+                                grant_on=ACCESS_PAGE_AND_DESCENDANTS, grant_all=True)
 
             # and to master page
             assign_user_to_page(self.master_page, self.user_master,
@@ -147,12 +136,8 @@ class PermissionModeratorTests(CMSTestCase):
             post_data = {
                 'body': 'Test'
             }
-            url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
-                'plugin_language': 'en',
-                'placeholder_id': placeholder.pk,
-                'plugin_type': 'TextPlugin'
-            })
-            response = self.client.post(url, post_data)
+            endpoint = self.get_add_plugin_uri(placeholder, 'TextPlugin')
+            response = self.client.post(endpoint, post_data)
             self.assertEqual(response.status_code, 302)
             return response.content.decode('utf8')
 
@@ -193,7 +178,7 @@ class PermissionModeratorTests(CMSTestCase):
             self.assertObjectExist(Title.objects, slug="page")
             self.assertObjectDoesNotExist(Title.objects.public(), slug="page")
 
-            self.assertTrue(has_generic_permission(page.pk, self.user_slave, "publish", 1))
+            self.assertTrue(user_can_publish_page(self.user_slave, page))
 
             # publish as slave, published as user_master before
             publish_page(page, self.user_slave, 'en')
@@ -231,7 +216,7 @@ class PermissionModeratorTests(CMSTestCase):
         # must not have public object yet
         self.assertFalse(page.publisher_public)
 
-        self.assertTrue(has_generic_permission(page.pk, self.user_master, "publish", page.site.pk))
+        self.assertTrue(user_can_publish_page(self.user_master, page))
         # should be True user_master should have publish permissions for children as well
         publish_page(self.slave_page, self.user_master, 'en')
         page = publish_page(page, self.user_master, 'en')
@@ -249,50 +234,6 @@ class PermissionModeratorTests(CMSTestCase):
     def test_slave_can_add_plugin(self):
         self._add_plugin(self.user_slave, page=self.slave_page)
 
-    def test_same_order(self):
-        # create 4 pages
-        slugs = []
-        for i in range(0, 4):
-            page = create_page("page", "nav_playground.html", "en",
-                               parent=self.home_page)
-            slug = page.title_set.drafts()[0].slug
-            slugs.append(slug)
-
-        # approve last 2 pages in reverse order
-        for slug in reversed(slugs[2:]):
-            page = self.assertObjectExist(Page.objects.drafts(), title_set__slug=slug)
-            page = publish_page(page, self.user_master, 'en')
-            self.check_published_page_attributes(page)
-
-    def test_create_copy_publish(self):
-        # create new page to copy
-        page = create_page("page", "nav_playground.html", "en",
-                           parent=self.slave_page)
-
-        # copy it under home page...
-        # TODO: Use page.copy_page here
-        with self.login_user_context(self.user_master):
-            copied_page = self.copy_page(page, self.home_page)
-
-        page = publish_page(copied_page, self.user_master, 'en')
-        self.check_published_page_attributes(page)
-
-    def test_create_publish_copy(self):
-        # create new page to copy
-        page = create_page("page", "nav_playground.html", "en",
-                           parent=self.home_page)
-
-        page = publish_page(page, self.user_master, 'en')
-
-        # copy it under master page...
-        # TODO: Use page.copy_page here
-        with self.login_user_context(self.user_master):
-            copied_page = self.copy_page(page, self.master_page)
-
-        self.check_published_page_attributes(page)
-        copied_page = publish_page(copied_page, self.user_master, 'en')
-        self.check_published_page_attributes(copied_page)
-
     def test_subtree_needs_approval(self):
         # create page under slave_page
         page = create_page("parent", "nav_playground.html", "en",
@@ -300,29 +241,22 @@ class PermissionModeratorTests(CMSTestCase):
         self.assertFalse(page.publisher_public)
 
         # create subpage under page
-        subpage = create_page("subpage", "nav_playground.html", "en", parent=page)
-        self.assertFalse(subpage.publisher_public)
+        subpage = create_page("subpage", "nav_playground.html", "en", parent=page, published=False)
 
         # publish both of them in reverse order
         subpage = publish_page(subpage, self.user_master, 'en')
 
         # subpage should not be published, because parent is not published
-        # yet, should be marked as `publish when parent`
-        self.assertFalse(subpage.publisher_public)
+        self.assertNeverPublished(subpage)
 
-        # publish page (parent of subage), so subpage must be published also
+        # publish page (parent of subage)
         page = publish_page(page, self.user_master, 'en')
-        self.assertNotEqual(page.publisher_public, None)
+        self.assertPublished(page)
+        self.assertNeverPublished(subpage)
 
-        # reload subpage, it was probably changed
-        subpage = self.reload(subpage)
+        subpage = publish_page(subpage, self.user_master, 'en')
 
-        # parent was published, so subpage must be also published..
-        self.assertNotEqual(subpage.publisher_public, None)
-
-        #check attributes
-        self.check_published_page_attributes(page)
-        self.check_published_page_attributes(subpage)
+        self.assertPublished(subpage)
 
     def test_subtree_with_super(self):
         # create page under root
@@ -335,25 +269,18 @@ class PermissionModeratorTests(CMSTestCase):
         self.assertFalse(subpage.publisher_public)
 
         # tree id must be the same
-        self.assertEqual(page.path[0:4], subpage.path[0:4])
+        self.assertEqual(page.node.path[0:4], subpage.node.path[0:4])
 
         # publish both of them
         page = self.reload(page)
         page = publish_page(page, self.user_super, 'en')
         # reload subpage, there were an path change
         subpage = self.reload(subpage)
-        self.assertEqual(page.path[0:4], subpage.path[0:4])
+        self.assertEqual(page.node.path[0:4], subpage.node.path[0:4])
 
         subpage = publish_page(subpage, self.user_super, 'en')
         # tree id must stay the same
-        self.assertEqual(page.path[0:4], subpage.path[0:4])
-
-        # published pages must also have the same root-path
-        self.assertEqual(page.publisher_public.path[0:4], subpage.publisher_public.path[0:4])
-
-        #check attributes
-        self.check_published_page_attributes(page)
-        self.check_published_page_attributes(subpage)
+        self.assertEqual(page.node.path[0:4], subpage.node.path[0:4])
 
     def test_super_add_page_to_root(self):
         """Create page which is not under moderation in root, and check if
@@ -364,32 +291,6 @@ class PermissionModeratorTests(CMSTestCase):
 
         # public must not exist
         self.assertFalse(page.publisher_public)
-
-    def test_moderator_flags(self):
-        """Add page under slave_home and check its flag
-        """
-        page = create_page("page", "nav_playground.html", "en",
-                           parent=self.slave_page)
-
-        # No public version
-        self.assertIsNone(page.publisher_public)
-        self.assertFalse(page.publisher_public_id)
-
-        # check publish box
-        page = publish_page(page, self.user_slave, 'en')
-
-        # public page must not exist because of parent
-        self.assertFalse(page.publisher_public)
-
-        # waiting for parents
-        self.assertEqual(page.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
-
-        # publish slave page
-        self.slave_page = self.slave_page.reload()
-        slave_page = publish_page(self.slave_page, self.user_master, 'en')
-
-        self.assertFalse(page.publisher_public)
-        self.assertTrue(slave_page.publisher_public)
 
     def test_plugins_get_published(self):
         # create page under root
@@ -416,9 +317,6 @@ class PermissionModeratorTests(CMSTestCase):
         # only the draft plugin should exist
         self.assertEqual(CMSPlugin.objects.all().count(), 1)
 
-        # page should require approval
-        self.assertEqual(page.get_publisher_state('en'), PUBLISHER_STATE_PENDING)
-
         # master approves and publishes the page
         # first approve slave-home
         slave_page = self.reload(self.slave_page)
@@ -434,8 +332,8 @@ class PermissionModeratorTests(CMSTestCase):
             plugin_data = {
                 'plugin_id': plugin.pk
             }
-            remove_url = URL_CMS_PLUGIN_REMOVE + "%s/" % plugin.pk
-            response = self.client.post(remove_url, plugin_data)
+            endpoint = self.get_delete_plugin_uri(plugin)
+            response = self.client.post(endpoint, plugin_data)
             self.assertEqual(response.status_code, 302)
 
             # there should only be a public plugin - since the draft has been deleted
@@ -501,7 +399,8 @@ class PermissionModeratorTests(CMSTestCase):
         with self.login_user_context(self.user_non_global):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
-            # non logged in user
+
+        # non logged in user
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
@@ -613,7 +512,8 @@ class PatricksMoveTest(CMSTestCase):
 
             # create master user
             self.user_master = self._create_user("master", True)
-            self.user_master.user_permissions.add(Permission.objects.get(codename='publish_page'))
+            self.add_permission(self.user_master, 'change_page')
+            self.add_permission(self.user_master, 'publish_page')
             #self.user_master = create_page_user(self.user_super, master, grant_all=True)
 
             # assign master user under home page
@@ -646,9 +546,11 @@ class PatricksMoveTest(CMSTestCase):
             publish_page(self.master_page, self.user_super, 'en')
 
         with self.login_user_context(self.user_slave):
-            # all of them are under moderation...
+            # 000200010001
             self.pa = create_page("pa", "nav_playground.html", "en", parent=self.slave_page)
+            # 000200010002
             self.pb = create_page("pb", "nav_playground.html", "en", parent=self.pa, position="right")
+            # 000200010003
             self.pc = create_page("pc", "nav_playground.html", "en", parent=self.pb, position="right")
 
             self.pd = create_page("pd", "nav_playground.html", "en", parent=self.pb)
@@ -722,23 +624,16 @@ class PatricksMoveTest(CMSTestCase):
             3. approve E
             4. approve F
         """
-        # TODO: this takes 5 seconds to run on my MBP. That's TOO LONG!
-        self.assertEqual(self.pg.parent_id, self.pe.pk)
-        self.assertEqual(self.pg.publisher_public.parent_id, self.pe.publisher_public_id)
+        self.assertEqual(self.pg.node.parent, self.pe.node)
         # perform moves under slave...
         self.move_page(self.pg, self.pc)
         self.reload_pages()
-        # Draft page is now under PC
-        self.assertEqual(self.pg.parent_id, self.pc.pk)
-        # Public page is under PC
-        self.assertEqual(self.pg.publisher_public.parent_id, self.pc.publisher_public_id)
-        self.assertEqual(self.pg.publisher_public.parent.get_absolute_url(),
-                         self.pc.publisher_public.get_absolute_url())
+        # page is now under PC
+        self.assertEqual(self.pg.node.parent, self.pc.node)
         self.assertEqual(self.pg.get_absolute_url(), self.pg.publisher_public.get_absolute_url())
         self.move_page(self.pe, self.pg)
         self.reload_pages()
-        self.assertEqual(self.pe.parent_id, self.pg.pk)
-        self.assertEqual(self.pe.publisher_public.parent_id, self.pg.publisher_public_id)
+        self.assertEqual(self.pe.node.parent, self.pg.node)
         self.ph = self.ph.reload()
         # check urls - they should stay be the same now after the move
         self.assertEqual(
@@ -749,11 +644,6 @@ class PatricksMoveTest(CMSTestCase):
             self.ph.publisher_public.get_absolute_url(),
             self.ph.get_absolute_url()
         )
-
-        # public parent check after move
-        self.assertEqual(self.pg.publisher_public.parent.pk, self.pc.publisher_public_id)
-        self.assertEqual(self.pe.publisher_public.parent.pk, self.pg.publisher_public_id)
-        self.assertEqual(self.ph.publisher_public.parent.pk, self.pe.publisher_public_id)
 
         # check if urls are correct after move
         self.assertEqual(
@@ -766,63 +656,11 @@ class PatricksMoveTest(CMSTestCase):
         )
 
 
-class ModeratorSwitchCommandTest(CMSTestCase):
-    def test_switch_moderator_on(self):
-        with force_language("en"):
-            pages_root = unquote(reverse("pages-root"))
-        page1 = create_page('page', 'nav_playground.html', 'en', published=True)
-        with disable_logger(log):
-            call_command('cms', 'moderator', 'on')
-        with force_language("en"):
-            path = page1.get_absolute_url()[len(pages_root):].strip('/')
-            page2 = get_page_from_path(path)
-        self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
-
-    def test_table_name_patching(self):
-        """
-        This tests the plugin models patching when publishing from the command line
-        """
-        self.get_superuser()
-        create_page("The page!", "nav_playground.html", "en", published=True)
-        draft = Page.objects.drafts()[0]
-        draft.reverse_id = 'a_test'  # we have to change *something*
-        draft.save()
-        add_plugin(draft.placeholders.get(slot=u"body"),
-                   u"TextPlugin", u"en", body="Test content")
-        draft.publish('en')
-        add_plugin(draft.placeholders.get(slot=u"body"),
-                   u"TextPlugin", u"en", body="Test content")
-
-        # Manually undoing table name patching
-        Text._meta.db_table = 'djangocms_text_ckeditor_text'
-        plugin_pool.patched = False
-
-        with disable_logger(log):
-            call_command('cms', 'moderator', 'on')
-        # Sanity check the database (we should have one draft and one public)
-        not_drafts = len(Page.objects.filter(publisher_is_draft=False))
-        drafts = len(Page.objects.filter(publisher_is_draft=True))
-        self.assertEqual(not_drafts, 1)
-        self.assertEqual(drafts, 1)
-
-    def test_switch_moderator_off(self):
-        with force_language("en"):
-            pages_root = unquote(reverse("pages-root"))
-            page1 = create_page('page', 'nav_playground.html', 'en', published=True)
-            path = page1.get_absolute_url()[len(pages_root):].strip('/')
-            page2 = get_page_from_path(path)
-            self.assertIsNotNone(page2)
-            self.assertEqual(page1.get_absolute_url(), page2.get_absolute_url())
-
-    def tearDown(self):
-        plugin_pool.patched = False
-        plugin_pool.set_plugin_meta()
-
-
 class ViewPermissionBaseTests(CMSTestCase):
 
     def setUp(self):
         self.page = create_page('testpage', 'nav_playground.html', 'en')
+        self.site = get_current_site()
 
     def get_request(self, user=None):
         attrs = {
@@ -833,6 +671,16 @@ class ViewPermissionBaseTests(CMSTestCase):
             'session': {},
         }
         return type('Request', (object,), attrs)
+
+    def assertViewAllowed(self, page, user=None):
+        if not user:
+            user = AnonymousUser()
+        self.assertTrue(user_can_view_page(user, page))
+
+    def assertViewNotAllowed(self, page, user=None):
+        if not user:
+            user = AnonymousUser()
+        self.assertFalse(user_can_view_page(user, page))
 
 
 @override_settings(
@@ -849,53 +697,59 @@ class BasicViewPermissionTests(ViewPermissionBaseTests):
     def test_unauth_public(self):
         request = self.get_request()
         with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))
+            self.assertViewAllowed(self.page)
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
+                         [self.page])
 
     def test_unauth_non_access(self):
         request = self.get_request()
         with self.assertNumQueries(0):
-            self.assertFalse(self.page.has_view_permission(request))
+            self.assertViewNotAllowed(self.page)
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
                          [])
 
     @override_settings(CMS_PUBLIC_FOR="all")
     def test_staff_public_all(self):
-        request = self.get_request(self.get_staff_user_with_no_permissions())
-        with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))
+        user = self.get_staff_user_with_no_permissions()
+        request = self.get_request(user)
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        with self.assertNumQueries(0):
+            self.assertViewAllowed(self.page, user)
+
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
+                         [self.page])
 
     def test_staff_public_staff(self):
-        request = self.get_request(self.get_staff_user_with_no_permissions())
+        user = self.get_staff_user_with_no_permissions()
+        request = self.get_request(user)
+
         with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))
+            self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
+                         [self.page])
 
-    @override_settings(CMS_PUBLIC_FOR="none")
     def test_staff_basic_auth(self):
-        request = self.get_request(self.get_staff_user_with_no_permissions())
+        user = self.get_staff_user_with_no_permissions()
+        request = self.get_request(user)
+
         with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))
+            self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site),
+                         [self.page])
 
-    @override_settings(CMS_PUBLIC_FOR="none")
+    @override_settings(CMS_PUBLIC_FOR="all")
     def test_normal_basic_auth(self):
-        request = self.get_request(self.get_standard_user())
-        with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))
+        user = self.get_standard_user()
+        request = self.get_request(user)
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        with self.assertNumQueries(0):
+            self.assertViewAllowed(self.page, user)
+
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site), [self.page])
 
 
 @override_settings(
@@ -910,37 +764,36 @@ class UnrestrictedViewPermissionTests(ViewPermissionBaseTests):
 
     def test_unauth_non_access(self):
         request = self.get_request()
+
         with self.assertNumQueries(1):
             """
             The query is:
             PagePermission query for the affected page (is the page restricted?)
             """
-            self.assertFalse(self.page.has_view_permission(request))
-        with self.assertNumQueries(0):
-            self.assertFalse(self.page.has_view_permission(request))  # test cache
+            self.assertViewNotAllowed(self.page)
 
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site), [])
 
     def test_global_access(self):
         user = self.get_standard_user()
         GlobalPagePermission.objects.create(can_view=True, user=user)
         request = self.get_request(user)
-        with self.assertNumQueries(2):
+
+        with self.assertNumQueries(4):
             """The queries are:
             PagePermission query for the affected page (is the page restricted?)
+            Generic django permission lookup
+            content type lookup by permission lookup
             GlobalPagePermission query for the page site
             """
-            self.assertTrue(self.page.has_view_permission(request))
+            self.assertViewAllowed(self.page, user)
 
-        with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))  # test cache
-
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [self.page.pk])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site), [self.page])
 
     def test_normal_denied(self):
-        request = self.get_request(self.get_standard_user())
+        user = self.get_standard_user()
+        request = self.get_request(user)
+
         with self.assertNumQueries(4):
             """
             The queries are:
@@ -948,14 +801,10 @@ class UnrestrictedViewPermissionTests(ViewPermissionBaseTests):
             GlobalPagePermission query for the page site
             User permissions query
             Content type query
-             """
-            self.assertFalse(self.page.has_view_permission(request))
+            """
+            self.assertViewNotAllowed(self.page, user)
 
-        with self.assertNumQueries(0):
-            self.assertFalse(self.page.has_view_permission(request))  # test cache
-
-        self.assertEqual(get_visible_pages(request, [self.page], self.page.site),
-                         [])
+        self.assertEqual(get_visible_nodes(request, [self.page], self.site), [])
 
 
 @override_settings(
@@ -971,7 +820,7 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
         super(RestrictedViewPermissionTests, self).setUp()
         self.group = Group.objects.create(name='testgroup')
         self.pages = [self.page]
-        self.expected = [self.page.pk]
+        self.expected = [self.page]
         PagePermission.objects.create(page=self.page, group=self.group, can_view=True, grant_on=ACCESS_PAGE)
 
     def test_unauthed(self):
@@ -980,103 +829,95 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
             """The queries are:
             PagePermission query for the affected page (is the page restricted?)
             """
-            self.assertFalse(self.page.has_view_permission(request))
+            self.assertViewNotAllowed(self.page)
 
-        with self.assertNumQueries(0):
-            self.assertFalse(self.page.has_view_permission(request))  # test cache
-
-        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
-                         [])
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), [])
 
     def test_page_permissions(self):
         user = self.get_standard_user()
         request = self.get_request(user)
         PagePermission.objects.create(can_view=True, user=user, page=self.page, grant_on=ACCESS_PAGE)
-        with self.assertNumQueries(3):
+
+        with self.assertNumQueries(6):
             """
             The queries are:
             PagePermission query (is this page restricted)
+            content type lookup (x2)
             GlobalpagePermission query for user
+            TreeNode lookup
             PagePermission query for this user
             """
-            self.assertTrue(self.page.has_view_permission(request))
+            self.assertViewAllowed(self.page, user)
 
-        with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))  # test cache
-
-        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
-                         self.expected)
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), self.expected)
 
     def test_page_group_permissions(self):
         user = self.get_standard_user()
         user.groups.add(self.group)
         request = self.get_request(user)
-        with self.assertNumQueries(3):
-            self.assertTrue(self.page.has_view_permission(request))
 
-        with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))  # test cache
+        with self.assertNumQueries(6):
+            """
+                The queries are:
+                PagePermission query (is this page restricted)
+                content type lookup (x2)
+                GlobalpagePermission query for user
+                TreeNode lookup
+                PagePermission query for user
+            """
+            self.assertViewAllowed(self.page, user)
 
-        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
-                         self.expected)
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), self.expected)
 
     def test_global_permission(self):
         user = self.get_standard_user()
         GlobalPagePermission.objects.create(can_view=True, user=user)
         request = self.get_request(user)
-        with self.assertNumQueries(2):
+
+        with self.assertNumQueries(4):
             """
             The queries are:
             PagePermission query (is this page restricted)
-            GlobalpagePermission query for user
-            """
-            self.assertTrue(self.page.has_view_permission(request))
-
-        with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))  # test cache
-
-        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
-                         self.expected)
-
-    def test_basic_perm_denied(self):
-        request = self.get_request(self.get_staff_user_with_no_permissions())
-        with self.assertNumQueries(5):
-            """
-            The queries are:
-            PagePermission query (is this page restricted)
-            GlobalpagePermission query for user
-            PagePermission query for this user
             Generic django permission lookup
             content type lookup by permission lookup
+            GlobalpagePermission query for user
             """
-            self.assertFalse(self.page.has_view_permission(request))
+            self.assertViewAllowed(self.page, user)
 
-        with self.assertNumQueries(0):
-            self.assertFalse(self.page.has_view_permission(request))  # test cache
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), self.expected)
 
-        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
-                         [])
+    def test_basic_perm_denied(self):
+        user = self.get_staff_user_with_no_permissions()
+        request = self.get_request(user)
+
+        with self.assertNumQueries(6):
+            """
+            The queries are:
+            PagePermission query (is this page restricted)
+            content type lookup x2
+            GlobalpagePermission query for user
+            TreeNode lookup
+            PagePermission query for this user
+            """
+            self.assertViewNotAllowed(self.page, user)
+
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), [])
 
     def test_basic_perm(self):
         user = self.get_standard_user()
         user.user_permissions.add(Permission.objects.get(codename='view_page'))
         request = self.get_request(user)
-        with self.assertNumQueries(5):
+
+        with self.assertNumQueries(3):
             """
             The queries are:
             PagePermission query (is this page restricted)
-            GlobalpagePermission query for user
-            PagePermission query for this user
             Generic django permission lookup
             content type lookup by permission lookup
             """
-            self.assertTrue(self.page.has_view_permission(request))
+            self.assertViewAllowed(self.page, user)
 
-        with self.assertNumQueries(0):
-            self.assertTrue(self.page.has_view_permission(request))  # test cache
-
-        self.assertEqual(get_visible_pages(request, self.pages, self.page.site),
-                         self.expected)
+        self.assertEqual(get_visible_nodes(request, self.pages, self.site), self.expected)
 
 
 class PublicViewPermissionTests(RestrictedViewPermissionTests):
@@ -1086,27 +927,10 @@ class PublicViewPermissionTests(RestrictedViewPermissionTests):
         super(PublicViewPermissionTests, self).setUp()
         self.page.publish('en')
         self.pages = [self.page.publisher_public]
-        self.expected = [self.page.publisher_public_id]
+        self.expected = [self.page.publisher_public]
 
 
 class GlobalPermissionTests(CMSTestCase):
-
-    def test_sanity_check(self):
-        """ Because we have a new manager, we'll do some basic checks."""
-        # manager is still named the same.
-        self.assertTrue(hasattr(GlobalPagePermission, 'objects'))
-        self.assertEqual(0, GlobalPagePermission.objects.all().count())
-
-        # we are correctly inheriting from BasicPagePermissionManager
-        self.assertTrue(hasattr(GlobalPagePermission.objects, 'with_user'))
-
-        # If we're using the new manager, we have extra methods which ensure
-        # This site access OR all site access.
-        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_permission'))
-        # these are just convienence methods for the above.
-        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_add_permission'))
-        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_change_permission'))
-        self.assertTrue(hasattr(GlobalPagePermission.objects, 'user_has_view_permission'))
 
     def test_emulate_admin_index(self):
         """ Call methods that emulate the adminsite instance's index.
@@ -1160,46 +984,51 @@ class GlobalPermissionTests(CMSTestCase):
 
         with self.settings(CMS_PERMISSION=True):
             # for all users, they should have access to site 1
-            request = RequestFactory().get(path='/', data={'site__exact': site_1.pk})
-            # we need a session attribute for current_site(request), which is
-            # used by has_page_add_permission_from_request and has_page_change_permission
-            request.session = {}
+            request = RequestFactory().get(path='/')
+            request.session = {'cms_admin_site': site_1.pk}
+            request.current_page = None
             for user in USERS:
-                # has_page_add_permission_from_request and has_page_change_permission both test
-                # for this explicitly, to see if it's a superuser.
                 request.user = user
                 # Note, the query count is inflated by doing additional lookups
                 # because there's a site param in the request.
-                with self.assertNumQueries(FuzzyInt(6, 7)):
-                    # PageAdmin swaps out the methods called for permissions
-                    # if the setting is true, it makes use of cms.utils.permissions
-                    self.assertTrue(has_page_add_permission_from_request(request))
-                    self.assertTrue(has_page_change_permission(request))
-                    # internally this calls PageAdmin.has_[add|change|delete]_permission()
-                    self.assertEqual({'add': True, 'change': True, 'delete': False},
-                                     site._registry[Page].get_model_perms(request))
+                # max_queries = 5 for >dj21 because it's introduce default view permissions
+                max_queries = 4 if DJANGO_2_0 else 5
+                with self.assertNumQueries(FuzzyInt(3, max_queries)):
+                    # internally this calls PageAdmin.has_[add|change|delete|view]_permission()
+                    expected_perms = {'add': True, 'change': True, 'delete': False}
+                    if not DJANGO_2_0:
+                        expected_perms.update({'view': True})
+                    self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
 
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
             # to site 1
-            request = RequestFactory().get('/', data={'site__exact': site_2.pk})
-            request.session = {}
+            request = RequestFactory().get(path='/')
+            request.session = {'cms_admin_site': site_2.pk}
+            request.current_page = None
+
+            # Refresh internal user cache
+            USERS[0] = self.reload(USERS[0])
+            USERS[1] = self.reload(USERS[1])
+
             # As before, the query count is inflated by doing additional lookups
             # because there's a site param in the request
-            with self.assertNumQueries(FuzzyInt(11, 20)):
+            with self.assertNumQueries(FuzzyInt(5, 15)):
                 # this user shouldn't have access to site 2
                 request.user = USERS[1]
-                self.assertTrue(not has_page_add_permission_from_request(request))
-                self.assertTrue(not has_page_change_permission(request))
-                self.assertEqual({'add': False, 'change': False, 'delete': False},
-                                 site._registry[Page].get_model_perms(request))
+                expected_perms = {'add': False, 'change': False, 'delete': False}
+                if not DJANGO_2_0:
+                    expected_perms.update({'view': False})
+                self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
                 # but, going back to the first user, they should.
                 request = RequestFactory().get('/', data={'site__exact': site_2.pk})
                 request.user = USERS[0]
-                self.assertTrue(has_page_add_permission_from_request(request))
-                self.assertTrue(has_page_change_permission(request))
-                self.assertEqual({'add': True, 'change': True, 'delete': False},
-                                 site._registry[Page].get_model_perms(request))
+                request.current_page = None
+                request.session = {}
+                expected_perms = {'add': True, 'change': True, 'delete': False}
+                if not DJANGO_2_0:
+                    expected_perms.update({'view': True})
+                self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
 
     def test_has_page_add_permission_with_target(self):
         page = create_page('Test', 'nav_playground.html', 'en')
@@ -1207,5 +1036,5 @@ class GlobalPermissionTests(CMSTestCase):
         request = RequestFactory().get('/', data={'target': page.pk})
         request.session = {}
         request.user = user
-        has_perm = has_page_add_permission_from_request(request)
+        has_perm = site._registry[Page].has_add_permission(request)
         self.assertFalse(has_perm)

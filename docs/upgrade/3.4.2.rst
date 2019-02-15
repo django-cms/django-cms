@@ -1,0 +1,68 @@
+.. _upgrade-to-3.4.2:
+
+###################
+3.4.2 release notes
+###################
+
+django CMS 3.4.2 introduces two key new features: *Revert to live* for pages, and support for Django 1.10
+
+*Revert to live* is in fact being reintroduced in a new form following a complete rewrite of our revision handling
+system, that was removed in :ref:`django CMS 3.4 <upgrade-to-3.4>` to make possible a greatly-improved new
+implementation from scratch.
+
+*Revert to live* is the first step in fully re-implementing revision management on a new basis.
+
+The full set of changes is listed below.
+
+*******************
+What's new in 3.4.2
+*******************
+
+Bug Fixes
+=========
+
+* Escaped strings in ``close_frame`` JS template.
+* Fixed a bug with `text-transform` styles on inputs affecting CMS login
+* Fixed a typo in the confirmation message for copying plugins from a different
+  language
+* Fixed a bug which prevented certain migrations from running in a multi-db setup.
+* Fixed a regression which prevented the ``Page`` model from rendering correctly
+  when used in a ``raw_id_field``.
+* Fixed a regression which caused the CMS to cache the toolbar when ``CMS_PAGE_CACHE``
+  was set to ``True`` and an anonymous user had ``cms_edit`` set to ``True`` on their session.
+* Fixed a regression which prevented users from overriding content in an inherited
+  placeholder.
+* Fixed a bug affecting Firefox for Macintosh users, in which use of the Command key later followed by Return would
+  trigger a plugin save.
+* Fixed a bug where template inheritance setting creates spurious migration (see #3479)
+* Fixed a bug which prevented the page from being marked as dirty (pending changes)
+  when changing the value of the overwrite url field.
+* Fixed a bug where the page tree would not update correctly when a sibling page was moved
+  from left to right or right to left.
+
+Improvements and new features
+=============================
+
+* Added official support for Django 1.10.
+* Rewrote manual installation how-to documentation
+* Re-introduced the "Revert to live" menu option.
+* Added support for django-reversion >= 2 (see #5830)
+* Improved the ``fix-tree`` command so that it also fixes non-root nodes (pages).
+* Introduced placeholder operation signals.
+
+Deprecations
+============
+
+* Removed the deprecated ``add_url()``, ``edit_url()``, ``move_url()``, ``delete_url()``, ``copy_url()`` properties of
+  CMSPlugin model.
+* Added a deprecation warning to method ``render_plugin()`` in class ``CMSPlugin``.
+* Deprecated ``frontend_edit_template`` attribute of ``CMSPluginBase``.
+* The ``post_`` methods in ```PlaceholderAdminMixin`` have been deprecated in favour of
+  placeholder operation signals.
+
+Other changes
+=============
+
+* Adjusted Ajax calls triggered when performing a placeholder operation (add plugin, etc..) to include
+  a GET query called cms_path. This query points to the path where the operation originates from.
+* Changed CMSPlugin.get_parent_classes() from method to classmethod.

@@ -4,18 +4,16 @@ from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
-from cms.plugin_rendering import render_placeholder
 from cms.utils.urlutils import admin_reverse
 from django.conf.urls import url
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
-from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):
     name = _("Placeholder")
-    parent_classes = [0]  # so you will not be able to add it something
+    parent_classes = ['0']  # so you will not be able to add it something
     #require_parent = True
     render_plugin = False
     admin_preview = False
@@ -34,24 +32,13 @@ class AliasPlugin(CMSPluginBase):
     render_template = "cms/plugins/alias.html"
     system = True
 
-    def render(self, context, instance, placeholder):
-        from cms.utils.plugins import downcast_plugins, build_plugin_tree
-        request = context.get('request', None)
-        context['instance'] = instance
-        context['placeholder'] = placeholder
-        if instance.plugin_id:
-            plugins = instance.plugin.get_descendants().order_by('placeholder', 'path')
-            plugins = [instance.plugin] + list(plugins)
-            plugins = downcast_plugins(plugins, request=request)
-            plugins[0].parent_id = None
-            plugins = build_plugin_tree(plugins)
-            context['plugins'] = plugins
-        if instance.alias_placeholder_id:
-            content = render_placeholder(instance.alias_placeholder, context)
-            context['content'] = mark_safe(content)
-        return context
+    @classmethod
+    def get_render_queryset(cls):
+        queryset = super(AliasPlugin, cls).get_render_queryset()
+        return queryset.select_related('plugin', 'alias_placeholder')
 
-    def get_extra_global_plugin_menu_items(self, request, plugin):
+    @classmethod
+    def get_extra_plugin_menu_items(cls, request, plugin):
         return [
             PluginMenuItem(
                 _("Create Alias"),
@@ -60,7 +47,8 @@ class AliasPlugin(CMSPluginBase):
             )
         ]
 
-    def get_extra_placeholder_menu_items(self, request, placeholder):
+    @classmethod
+    def get_extra_placeholder_menu_items(cls, request, placeholder):
         return [
             PluginMenuItem(
                 _("Create Alias"),
@@ -73,6 +61,43 @@ class AliasPlugin(CMSPluginBase):
         return [
             url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
         ]
+
+    @classmethod
+    def get_empty_change_form_text(cls, obj=None):
+        original = super(AliasPlugin, cls).get_empty_change_form_text(obj=obj)
+
+        if not obj:
+            return original
+
+        instance = obj.get_plugin_instance()[0]
+
+        if not instance:
+            # Ghost plugin
+            return original
+
+        aliased_placeholder_id = instance.get_aliased_placeholder_id()
+
+        if not aliased_placeholder_id:
+            # Corrupt (sadly) Alias plugin
+            return original
+
+        aliased_placeholder = Placeholder.objects.get(pk=aliased_placeholder_id)
+
+        origin_page = aliased_placeholder.page
+
+        if not origin_page:
+            # Placeholder is not attached to a page
+            return original
+
+        # I have a feeling this could fail with a NoReverseMatch error
+        # if this is the case, then it's likely a corruption.
+        page_url = origin_page.get_absolute_url(language=obj.language)
+        page_title = origin_page.get_title(language=obj.language)
+
+        message = ugettext('This is an alias reference, '
+                           'you can edit the content only on the '
+                           '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.')
+        return message % {'page_url': page_url, 'page_title': page_title}
 
     def create_alias(self, request):
         if not request.user.is_staff:
@@ -93,7 +118,7 @@ class AliasPlugin(CMSPluginBase):
                 placeholder = Placeholder.objects.get(pk=pk)
             except Placeholder.DoesNotExist:
                 return HttpResponseBadRequest("placeholder with id %s not found." % pk)
-            if not placeholder.has_change_permission(request):
+            if not placeholder.has_change_permission(request.user):
                 return HttpResponseBadRequest("You do not have enough permission to alias this placeholder.")
         clipboard = request.toolbar.clipboard
         clipboard.cmsplugin_set.all().delete()

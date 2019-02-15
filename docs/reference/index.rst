@@ -9,11 +9,17 @@ Technical reference material.
 .. toctree::
     :maxdepth: 1
 
-    configuration
-    navigation
-    plugins
     api_references
-    fields
-    templatetags
     cli
+    configuration
+    fields
+    navigation
+    pages
+    permissions
+    placeholders
+    plugins
+    sitemaps
+    templatetags
+    titles
+    toolbar
     wizards

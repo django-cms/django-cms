@@ -8,9 +8,14 @@ from django.utils.encoding import python_2_unicode_compatible
 
 @python_2_unicode_compatible
 class PlaceholderReference(CMSPlugin):
+    cmsplugin_ptr = models.OneToOneField(
+        CMSPlugin,
+        on_delete=models.CASCADE,
+        related_name='cms_placeholderreference',
+        parent_link=True,
+    )
     name = models.CharField(max_length=255)
     placeholder_ref = PlaceholderField(slotname='clipboard')
-
     class Meta:
         app_label = 'cms'
 
@@ -21,7 +26,8 @@ class PlaceholderReference(CMSPlugin):
         copy_plugins_to(self.placeholder_ref.get_plugins(), placeholder, to_language=language)
 
     def copy_from(self, placeholder, language):
-        copy_plugins_to(placeholder.get_plugins(language), self.placeholder_ref, to_language=self.language)
+        plugins = placeholder.get_plugins(language)
+        return copy_plugins_to(plugins, self.placeholder_ref, to_language=self.language)
 
     def move_to(self, placeholder, language):
         for plugin in self.placeholder_ref.get_plugins():

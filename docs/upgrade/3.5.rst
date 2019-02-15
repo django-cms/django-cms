@@ -1,0 +1,164 @@
+.. _upgrade-to-3.5.0:
+
+###################
+3.5.0 release notes
+###################
+
+This release of django CMS concentrates on usability and user-experience, by improving
+its responsiveness while performing editing operations, particularly those that
+involve updates to plugin trees.
+
+It also continues our move to decouple logical layers in the system. Most significant in this
+release is the new separation of the structure board from page rendering, which allows the
+structure board to be updated without requiring the page to be re-rendered. This vastly
+speeds up page editing, especially when dealing with complex plugin structures.
+
+Another significant example is that the Page model has been decoupled from the site navigation
+hierarchy. The navigation tree now exists independently, offering further speed advantages, as well
+as future benefits for development and extensibility.
+
+Our work to improve separation of concerns can also be seen in the renaming of publishing controls,
+so that they no longer refer to specifically to pages. Ultimately, publishing actions could apply
+to any kind of content, and this is a step in that direction.
+
+
+*******************
+What's new in 3.5.0
+*******************
+
+Improvements and new features
+=============================
+
+* structure board now decoupled from page rendering
+* ``Page`` model decoupled from the site navigation
+* Page copy between sites
+* better behaviour of the language chooser for published/unpublished languages
+* improved handling, refactored code for language fallbacks
+* improved repr for ``Page``, ``Title``, ``Placeholder`` and ``CMSPlugin`` models
+* generic publishing controls no longer refer to "page"
+* improved documentation
+
+
+Bug Fixes
+=========
+
+This release fixes:
+
+* a Page template settings permission issue (failed to check for "Change advanced settings
+  permission")
+* a bug allowing Pages to be pasted without the correct translations for the target site
+* a bug that prevented users from seeing the welcome screen when debug is off
+* a bug allowing aliased plugins to render even if their host page was unpublished
+* a bug where focusing inputs in modal would require two clicks in some browsers
+* minor issues with initialisation of interface widgets.
+* minor clipboard bugs
+
+
+Removal of deprecated functionality
+===================================
+
+Previously deprecated functionality has been removed:
+
+* Menu modules can no longer be named ``menus.py`` (use ``cms_menus.py``).
+* The ``cms.utils.django_load.py`` module has been removed (in favour of standard Django helpers)
+* Support for Django Reversion has been removed.
+* The ``urls`` and ``menus`` attributes are no longer supported on ``CMSApp`` (apphook) classes.
+  All apphook subclasses now need a ``get_urls()`` method. In addition, if your apphook has a
+  ``menus`` attribute, that will need to be replaced by a ``get_menus()`` method.
+* ``Page.revision_id`` has been removed
+* Deprecated content creation wizard settings have been removed.
+
+
+Backward-incompatible changes
+=============================
+
+* The home page is no longer automatically the root page in the tree (since there is no longer a
+  page tree). Instead, the home page is set manually in the page list admin.
+* Previously, ordered pages could be obtained via ``Page.object.order_by('path')``; the equivalent
+  is now ``Page.object.order_by('node__path')``.
+* Pages are no longer ordered by path. For ordering, use ``order_by('node__path')``.
+* Pages no longer have a ``site`` field. Whereas previously you could use ``filter(site=id)``,
+  now use ``filter(node__site==id)``.
+* Pages no longer have a ``parent`` field. Instead a ``parent`` property now returns the new
+  ``parent_page`` attribute, which relies on the node tree.
+* Never-published pages can no longer have a 'pending' publishing state. A data migration,
+  ``cms/migrations/0018_pagenode.py``, removes this.
+* Using ``self.request.path`` or ``self.request.path_info`` in a ``CMSToolbar`` subclass method is
+  no longer reliable and is discouraged. Instead, use ``self.toolbar.request_path``.
+
+
+*********************
+How to upgrade to 3.5
+*********************
+
+We assume you are upgrading from django CMS 3.4.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.
+
+
+***********************************
+Create a new django CMS 3.5 project
+***********************************
+
+On the Divio Cloud
+==================
+
+The Divio Cloud offers an easy way to set up django CMS projects. In the `Divio Cloud Control Panel
+<https://control.divio.com>`_, create a new django CMS project and **Deploy** it.
+
+
+Using the django CMS Installer
+==============================
+
+See our :ref:`installation guide in the tutorial <install-django-cms-tutorial>`. However, make
+sure that you:
+
+* have installed the latest version of django CMS Installer (at least version ``0.9.8``)
+* specify the version to install as ``develop``: ``djangocms --cms-version=develop mysite``
+
+The user name and password will both be ``admin``.
+
+
+****************************
+Contributors to this release
+****************************
+
+* Alexander Paramonov
+* Andras Gyömrey
+* Daniele Procida
+* Gianluca Guarini
+* Iacopo Spalletti
+* Jacob Rief
+* Jens Diemer
+* Júlio R. Lucchese
+* Leon Smith
+* Ludwig Hähne
+* Mark Walker
+* Nicolas PASCAL
+* Nina Zakharenko
+* Paulo Alvarado
+* Robert Stein
+* Salmanul Farzy
+* Sergey Fedoseev
+* Shaun Brady
+* Stefan Foulis
+* Tim Graham
+* Vadim Sikora
+* alskgj

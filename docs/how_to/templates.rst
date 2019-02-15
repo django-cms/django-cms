@@ -1,6 +1,6 @@
-**********************
-Working with templates
-**********************
+##########################
+How to work with templates
+##########################
 
 Application can reuse cms templates by mixing cms template tags and normal django
 templating language.

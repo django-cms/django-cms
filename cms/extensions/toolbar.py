@@ -2,49 +2,13 @@
 from cms.utils.urlutils import admin_reverse
 from cms.api import get_page_draft
 from cms.toolbar_base import CMSToolbar
-from cms.utils import get_cms_setting, get_language_list
-from cms.utils.permissions import has_page_change_permission
-from django.core.urlresolvers import NoReverseMatch
+from cms.utils import get_language_list
+from cms.utils.page_permissions import user_can_change_page
+
+from django.urls import NoReverseMatch
 
 
 class ExtensionToolbar(CMSToolbar):
-    """
-    ExtensionToolbar provides utility functions to handle much of the boilerplate involved in creating a toolbar for
-    PageExtension and TitleExtension.
-
-    The basic implementation of an extension toolbar using this class is::
-
-        @toolbar_pool.register
-        class SampleExtension(ExtensionToolbar):
-            model = ExtModel  # The PageExtension / TitleExtension you are working with
-
-            def populate(self):
-                current_page_menu = self._setup_extension_toolbar()
-                if current_page_menu:
-                    position = 0
-                    page_extension, url = self.get_page_extension_admin()
-                    if url:
-                        current_page_menu.add_modal_item('Item label', url=url,
-                                                         disabled=not self.toolbar.edit_mode,
-                                                         position=position)
-
-    For TitleExtension use ``get_title_extension_admin`` and cycle on the resulting title extensions and urls
-
-        @toolbar_pool.register
-        class SampleExtension(ExtensionToolbar):
-            model = ExtModel  # The PageExtension / TitleExtension you are working with
-
-            def populate(self):
-                current_page_menu = self._setup_extension_toolbar()
-                if current_page_menu:
-                    position = 0
-                    urls = self.get_title_extension_admin()
-                    for title_extension, url in urls:
-                        current_page_menu.add_modal_item('Item label', url=url,
-                                                         disabled=not self.toolbar.edit_mode,
-                                                         position=position)
-
-    """
     model = None
     page = None
 
@@ -58,22 +22,10 @@ class ExtensionToolbar(CMSToolbar):
         It returns the page menu or None if the above conditions are not met
         """
         page = self._get_page()
-        if not page:
-            # Nothing to do
-            return
-        # check global permissions if CMS_PERMISSION is active
-        if get_cms_setting('PERMISSION'):
-            has_global_current_page_change_permission = has_page_change_permission(self.request)
-        else:
-            has_global_current_page_change_permission = True
-            # check if user has page edit permission
-        can_change = (self.request.current_page and
-                      self.request.current_page.has_change_permission(self.request))
-        current_page_menu = self.toolbar.get_or_create_menu('page')
-        if can_change and has_global_current_page_change_permission:
-            return current_page_menu
-        else:
-            return
+
+        if page and user_can_change_page(self.request.user, page=page):
+            return self.toolbar.get_or_create_menu('page')
+        return
 
     def _get_page(self):
         """
@@ -126,7 +78,7 @@ class ExtensionToolbar(CMSToolbar):
         if language:
             titles = page.get_title_obj(language),
         else:
-            titles = page.title_set.filter(language__in=get_language_list(page.site_id))
+            titles = page.title_set.filter(language__in=get_language_list(page.node.site_id))
         # Titles
         for title in titles:
             try:

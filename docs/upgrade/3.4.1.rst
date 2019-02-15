@@ -1,0 +1,27 @@
+.. _upgrade-to-3.4.1:
+
+###################
+3.4.1 release notes
+###################
+
+*******************
+What's new in 3.4.1
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a regression when static placeholder was uneditable if it was present
+  on the page multiple times
+* Removed globally unique constraint for Apphook configs.
+* Fixed a bug when keyboard short-cuts were triggered when form fields were
+  focused
+* Fixed a bug when ``shift + space`` shortcut wouldn't correctly highlight a
+  plugin in the structure board
+* Fixed a bug when plugins that have top-level svg element would break
+  structure board
+* Fixed a bug where output from the ``show_admin_menu_for_pages`` template tag
+  was escaped in Django 1.9
+* Fixed a bug where plugins would be rendered as editable if toolbar was shown
+  but user was not in edit mode.
+* Fixed CSS reset issue with short-cuts modal
