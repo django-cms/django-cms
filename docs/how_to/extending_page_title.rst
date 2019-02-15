@@ -223,7 +223,7 @@ In this example, we need to loop over the titles for the page, and populate the 
                 # we now also need to get the titleset (i.e. different language titles)
                 # for this page
                 page = self._get_page()
-                titleset = page.title_set.filter(language__in=get_language_list(page.site_id))
+                titleset = page.title_set.filter(language__in=get_language_list(page.node.site_id))
 
                 # create a 3-tuple of (title_extension, url, title)
                 nodes = [(title_extension, url, title.title) for (
