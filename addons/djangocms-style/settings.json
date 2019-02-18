@@ -1,5 +1,5 @@
 {
-    "class_names": "stripe-up, stripe-down, stripe-steep-up, stripe-steep-down, container, section-fullwidth", 
-    "tag_types": "", 
+    "class_names": "stripe-up, stripe-down, stripe-steep-up, stripe-steep-down, container, section-fullwidth",
+    "tag_types": "",
     "templates": "stripe"
 }

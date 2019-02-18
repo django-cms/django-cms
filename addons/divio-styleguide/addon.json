@@ -1,6 +1,6 @@
 {
     "installed-apps": [
         "divio_styleguide"
-    ], 
+    ],
     "package-name": "divio-styleguide"
 }

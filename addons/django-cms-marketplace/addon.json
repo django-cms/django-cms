@@ -1,6 +1,6 @@
 {
     "installed-apps": [
         "django_cms_marketplace"
-    ], 
+    ],
     "package-name": "django-cms-marketplace"
 }
