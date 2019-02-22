@@ -29,12 +29,13 @@ export function initIntercom() {
         let data = el.data('intercom');
 
         // event and Intercom are required
-        if (data.event === '' || !window.Intercom) return;
+        if (data.event === '') return;
 
         el.on(data.trigger || 'click', () => {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                window.Intercom('trackEvent', data.track, data.meta || {});
+                // console.log('trackEvent', data.track, data.meta || {});
+                window.Intercom && window.Intercom('trackEvent', data.track, data.meta || {});
             }, data.timeout || 0);
         });
     });
