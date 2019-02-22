@@ -13,4 +13,29 @@ export function initIntercom() {
             window.Intercom && window.Intercom('showNewMessage', decodeURI(intercomMessage));
         }
     });
+
+    // Intercom tracking
+    // https://www.intercom.com/help/configure-intercom-for-your-product-or-site/customize-intercom-to-be-about-your-users/set-up-event-tracking-in-intercom
+    // data-intercom='{
+    //     "trigger": "click",
+    //     "timeout": 1000,
+    //     "track": "business-content",
+    //     "meta": ""
+    // }'
+    let timeout = function () {};
+
+    $('[data-intercom]').each((index, item) => {
+        let el = $(item);
+        let data = el.data('intercom');
+
+        // event and Intercom are required
+        if (data.event === '' || !window.Intercom) return;
+
+        el.on(data.trigger || 'click', () => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                window.Intercom('trackEvent', data.track, data.meta || {});
+            }, data.timeout || 0);
+        });
+    });
 }
