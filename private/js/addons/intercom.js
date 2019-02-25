@@ -34,7 +34,8 @@ export function initIntercom() {
         el.on(data.trigger || 'click', () => {
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                // console.log('trackEvent', data.track, data.meta || {});
+                console.log('trackEvent', data.track, data.meta || {});
+                console.log(window.Intercom)
                 window.Intercom && window.Intercom('trackEvent', data.track, data.meta || {});
             }, data.timeout || 0);
         });
