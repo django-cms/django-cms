@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Translators:
+# Song M. Kim <songmink@hawaii.edu>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"PO-Revision-Date: 2018-11-27 21:50+0000\n"
+"Last-Translator: Song M. Kim <songmink@hawaii.edu>\n"
 "Language-Team: Korean (http://www.transifex.com/divio/django-cms/language/ko/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,65 +20,65 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "All"
-msgstr ""
+msgstr "전부"
 
 msgid "Copy permissions"
-msgstr ""
+msgstr "복사 허가"
 
 msgid "Title"
-msgstr ""
+msgstr "제목"
 
 msgid "The default title"
-msgstr ""
+msgstr "기본 제목"
 
 msgid "Slug"
-msgstr ""
+msgstr "요약문장"
 
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "URL에 사용된 제목의 일부"
 
 msgid "Menu Title"
-msgstr ""
+msgstr "메뉴 제목"
 
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "메뉴에 표시된 것을 덮어 씌웁니다"
 
 msgid "Page Title"
-msgstr ""
+msgstr "페이지 제목"
 
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "당신의 블라우져 가장 상단이나 북마크에 표시되어 있는 것을 덮어 씌웁니다"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "설명 메타 태그 "
 
 msgid "A description of the page used by search engines."
-msgstr ""
+msgstr "검색 엔진들에서 사용되어지는 페이지에 관한 설명"
 
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "슬러그는 비어 있어서는 안됩니다."
 
 msgid "Page type"
-msgstr ""
+msgstr "페이지 타입"
 
 msgid "Page Types"
-msgstr ""
+msgstr "페이지 타입들"
 
 msgid "Application"
-msgstr ""
+msgstr "어플리케이션"
 
 msgid "Hook application to this page."
-msgstr ""
+msgstr "이 페이지로 어플리케이션을 걸어 주세요."
 
 msgid "Overwrite URL"
-msgstr ""
+msgstr "URL을 덮어 씌움니다"
 
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "표준 경로를 사용해야만 하는 경우에는 이 필드를 비워 두세요."
 
 msgid "X Frame Options"
-msgstr ""
+msgstr "X  프레임 옵션들"
 
 msgid "Whether this page can be embedded in other pages or websites"
 msgstr ""
@@ -104,10 +105,17 @@ msgstr ""
 msgid "A page with this reverse URL id exists already."
 msgstr ""
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr ""
 
 msgid "An application instance with this name already exists."
+msgstr ""
+
+msgid "You can't move the home page inside another page"
 msgstr ""
 
 msgid "Yes"
@@ -545,9 +553,6 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add Another"
 msgstr ""
 
 msgid ""
@@ -1426,6 +1431,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr ""
 
+msgid "Add Another"
+msgstr ""
+
 msgid "Back"
 msgstr ""
 
@@ -1524,6 +1532,10 @@ msgid "Articles"
 msgstr ""
 
 msgid "Sample App"
+msgstr ""
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
 msgstr ""
 
 msgid "Sample App with excluded permissions"
