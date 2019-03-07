@@ -45,6 +45,8 @@ matrix:
       env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=3 DJANGO=1.11 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
     # DJANGO 1.11
+    - python: 2.7
+      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 3.4
       env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 3.5
