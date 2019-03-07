@@ -89,7 +89,6 @@ matrix:
     - python: 3.4
     - python: 3.5
     - python: 3.6
-  fast_finish: true
 
 before_script:
   - pip freeze
