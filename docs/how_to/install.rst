@@ -253,8 +253,8 @@ Further required configuration
 URLs
 ====
 
-In the project's ``urls.py``, add ``re_path(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
-other patterns, so that specific URLs for other applications can be detected first.
+In the project's ``urls.py``, add ``url(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
+other patterns, so that specific URLs for other applications can be detected first. Note: when using Django 2.0 or later the syntax is ``re_path(r'^', include('cms.urls'))``
 
 You'll also need to have an import for ``django.conf.urls.include``. For example:
 
