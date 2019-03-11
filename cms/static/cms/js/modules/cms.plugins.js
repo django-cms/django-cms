@@ -7,7 +7,19 @@ import $ from 'jquery';
 import '../polyfills/array.prototype.findindex';
 import nextUntil from './nextuntil';
 
-import { toPairs, isNaN, debounce, findIndex, find, every, uniqWith, once, difference, isEqual } from 'lodash';
+import {
+    includes,
+    toPairs,
+    isNaN,
+    debounce,
+    findIndex,
+    find,
+    every,
+    uniqWith,
+    once,
+    difference,
+    isEqual
+} from 'lodash';
 
 import Class from 'classjs';
 import { Helpers, KEYS, $window, $document, uid } from './cms.base';
@@ -161,9 +173,19 @@ var Plugin = new Class({
                     $(items).filter('template').remove();
 
                     itemContents.each((index, el) => {
+                        // Due to the way browsers interact with plugins and external code, the .data()
+                        // method cannot be used on <object> (unless it's a Flash plugin), <applet> or <embed> elements,
+                        // so we have to wrap them
+                        if (includes(['OBJECT', 'EMBED', 'APPLET'], el.nodeName)) {
+                            const element = $(el);
+
+                            element.wrap('<cms-plugin class="cms-plugin-object-node"></cms-plugin>');
+                            itemContents[index] = element.parent()[0];
+                        }
+
                         // if it's a non-space top-level text node - wrap it in `cms-plugin`
                         if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
-                            var element = $(el);
+                            const element = $(el);
 
                             element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
                             itemContents[index] = element.parent()[0];
