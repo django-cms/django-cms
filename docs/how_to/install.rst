@@ -221,7 +221,7 @@ in the ``TEMPLATES['OPTIONS']['context_processors']``:
 Middleware
 ==========
 
-in your :setting:`django:MIDDLEWARE_CLASSES` you'll need :class:`django:django.middleware.locale.LocaleMiddleware` -
+in your :setting:`django:MIDDLEWARE` you'll need :class:`django:django.middleware.locale.LocaleMiddleware` -
 it's **not** installed in Django projects by default.
 
 Also add::
