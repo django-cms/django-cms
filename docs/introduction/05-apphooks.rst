@@ -61,7 +61,7 @@ You must now remove the entry for the Polls application::
 
 from your project's ``urls.py``.
 
-Not only is it not only no longer even required there, because we reach the polls via the apphook
+Not only is it not required there, because we reach the polls via the apphook
 instead, but if you leave it there, it will conflict with the apphook's URL handling. You'll
 receive a warning in the logs::
 
