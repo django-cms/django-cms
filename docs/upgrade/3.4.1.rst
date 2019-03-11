@@ -14,7 +14,7 @@ Bug Fixes
 * Fixed a regression when static placeholder was uneditable if it was present
   on the page multiple times
 * Removed globally unique constraint for Apphook configs.
-* Fixed a bug when keyboard shortcuts were triggered when form fields were
+* Fixed a bug when keyboard short-cuts were triggered when form fields were
   focused
 * Fixed a bug when ``shift + space`` shortcut wouldn't correctly highlight a
   plugin in the structure board
@@ -24,4 +24,4 @@ Bug Fixes
   was escaped in Django 1.9
 * Fixed a bug where plugins would be rendered as editable if toolbar was shown
   but user was not in edit mode.
-* Fixed CSS reset issue with shortcuts modal
+* Fixed CSS reset issue with short-cuts modal

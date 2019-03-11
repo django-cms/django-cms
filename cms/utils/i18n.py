@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
-from django.core.urlresolvers import get_resolver, LocaleRegexURLResolver
 from django.conf import settings
 from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
+from django.urls import get_resolver
 
 from cms.exceptions import LanguageError
+from cms.utils.compat.dj import LocalePrefixPattern
 from cms.utils.conf import get_cms_setting, get_site_id
 
 
@@ -194,11 +195,16 @@ def hide_untranslated(language, site_id=None):
 
 def is_language_prefix_patterns_used():
     """
-    Returns `True` if the `LocaleRegexURLResolver` is used
-    at root level of the urlpatterns, else it returns `False`.
+    Returns `True` if the `LocaleRegexURLResolver` or `LocalePrefixPattern` is
+    used at root level of the urlpatterns, else it returns `False`.
     """
-    return any(isinstance(url_pattern, LocaleRegexURLResolver)
-               for url_pattern in get_resolver(None).url_patterns)
+    return any(
+        isinstance(
+            getattr(url_pattern, 'pattern', url_pattern),
+            LocalePrefixPattern
+        )
+        for url_pattern in get_resolver(None).url_patterns
+    )
 
 
 def is_valid_site_language(language, site_id):

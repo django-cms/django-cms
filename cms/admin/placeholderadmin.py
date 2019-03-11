@@ -36,8 +36,9 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import pre_placeholder_operation, post_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
 from cms.utils import copy_plugins, get_current_site
+from cms.utils.compat import DJANGO_2_0
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_list, get_language_code
+from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import has_reached_plugin_limit, reorder_plugins
 from cms.utils.urlutils import admin_reverse
 
@@ -342,6 +343,9 @@ class PlaceholderAdminMixin(object):
 
         plugin = getattr(plugin_instance, 'saved_object', None)
 
+        if plugin:
+            plugin.placeholder.mark_as_dirty(plugin.language, clear_cache=False)
+
         if plugin_instance._operation_token:
             tree_order = placeholder.get_plugin_tree_order(plugin.parent_id)
             self._send_post_placeholder_operation(
@@ -528,6 +532,7 @@ class PlaceholderAdminMixin(object):
             language=target_language,
             order=target_tree_order,
         )
+        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
 
         new_plugins = CMSPlugin.objects.filter(pk__in=new_plugin_ids).order_by('path')
         new_plugins = list(new_plugins)
@@ -563,6 +568,9 @@ class PlaceholderAdminMixin(object):
         response = plugin_instance.change_view(request, str(plugin_id))
 
         plugin = getattr(plugin_instance, 'saved_object', None)
+
+        if plugin:
+            plugin.placeholder.mark_as_dirty(plugin.language, clear_cache=False)
 
         if plugin_instance._operation_token:
             self._send_post_placeholder_operation(
@@ -770,6 +778,7 @@ class PlaceholderAdminMixin(object):
             language=target_language,
             order=target_tree_order,
         )
+        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
 
         # Fetch from db to update position and other tree values
         root_plugin.refresh_from_db()
@@ -828,6 +837,7 @@ class PlaceholderAdminMixin(object):
             language=target_language,
             order=target_tree_order,
         )
+        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
 
         new_plugins = (
             CMSPlugin
@@ -925,6 +935,10 @@ class PlaceholderAdminMixin(object):
             language=target_language,
             order=new_target_order,
         )
+        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
+
+        if source_placeholder != target_placeholder:
+            source_placeholder.mark_as_dirty(source_language, clear_cache=False)
 
         # Refresh plugin to get new tree and position values
         updated_plugin.refresh_from_db()
@@ -990,6 +1004,8 @@ class PlaceholderAdminMixin(object):
         new_source_order = list(source_tree_order)
         new_source_order.remove(updated_plugin.pk)
 
+        source_placeholder.mark_as_dirty(target_language, clear_cache=False)
+
         self._send_post_placeholder_operation(
             request,
             operation=operations.CUT_PLUGIN,
@@ -1014,8 +1030,18 @@ class PlaceholderAdminMixin(object):
 
         opts = plugin._meta
         using = router.db_for_write(opts.model)
+        if DJANGO_2_0:
+            get_deleted_objects_additional_kwargs = {
+                'opts': opts,
+                'using': using,
+                'user': request.user,
+            }
+        else:
+            get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
-            [plugin], opts, request.user, self.admin_site, using)
+            [plugin], admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs
+        )
 
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
@@ -1036,6 +1062,12 @@ class PlaceholderAdminMixin(object):
             )
 
             plugin.delete()
+            placeholder.mark_as_dirty(plugin.language, clear_cache=False)
+            reorder_plugins(
+                placeholder=placeholder,
+                parent_id=plugin.parent_id,
+                language=plugin.language,
+            )
 
             self.log_deletion(request, plugin, obj_display)
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
@@ -1096,8 +1128,19 @@ class PlaceholderAdminMixin(object):
         opts = Placeholder._meta
         using = router.db_for_write(Placeholder)
         plugins = placeholder.get_plugins_list(language)
+
+        if DJANGO_2_0:
+            get_deleted_objects_additional_kwargs = {
+                'opts': opts,
+                'using': using,
+                'user': request.user,
+            }
+        else:
+            get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
-            plugins, opts, request.user, self.admin_site, using)
+            plugins, admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs
+        )
 
         obj_display = force_text(placeholder)
 
@@ -1114,7 +1157,7 @@ class PlaceholderAdminMixin(object):
             )
 
             placeholder.clear(language)
-            placeholder.mark_as_dirty(language, clear_cache=True)
+            placeholder.mark_as_dirty(language, clear_cache=False)
 
             self.log_deletion(request, placeholder, obj_display)
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {

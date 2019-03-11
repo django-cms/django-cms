@@ -1,5 +1,0 @@
--r requirements_base.txt
-Django>=1.10,<1.11
-django-reversion==1.10,<1.11
-https://github.com/KristianOellegaard/django-hvad/archive/master.zip
-django-formtools

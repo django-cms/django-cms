@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
 from cms.app_base import CMSApp
@@ -9,6 +9,13 @@ from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu
 from cms.apphook_pool import apphook_pool
 
 from .models import SampleAppConfig
+
+
+class AppWithNoMenu(CMSApp):
+    app_name = 'app_with_no_menu'
+
+    def get_urls(self, page=None, language=None, **kwargs):
+        return ["cms.test_utils.project.sampleapp.urls"]
 
 
 class SampleApp(CMSApp):
@@ -82,7 +89,7 @@ class NamespacedApp(CMSApp):
         return [SampleAppMenu, StaticMenu3]
 
     def get_urls(self, page=None, language=None, **kwargs):
-        return  [
+        return [
             "cms.test_utils.project.sampleapp.ns_urls",
             "cms.test_utils.project.sampleapp.urls"
         ]

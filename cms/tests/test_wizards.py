@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from django import forms
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.template import TemplateSyntaxError
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.encoding import smart_text
 from django.utils.translation import ugettext as _
 
