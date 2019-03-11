@@ -10,7 +10,7 @@ We'll get started by setting up our environment.
 Requirements
 ************
 
-django CMS requires Django 1.8 or newer, and Python 2.7 or 3.3 or newer. This tutorial assumes
+django CMS requires Django 1.11 or newer, and Python 2.7 or 3.3 or newer. This tutorial assumes
 you are using Python 3.
 
 ************************
@@ -44,6 +44,12 @@ Update pip inside the virtual environment
 
 Use the django CMS installer
 ============================
+
+..  note::
+
+    The django CMS Installer is not yet available for django CMS 3.6 or Django 2 or later.
+
+    This section will be updated or removed before the final release of django CMS 3.6.
 
 The `django CMS installer <https://github.com/nephila/djangocms-installer>`_ is
 a helpful script that takes care of setting up a new project.

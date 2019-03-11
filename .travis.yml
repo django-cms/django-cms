@@ -83,6 +83,9 @@ matrix:
       env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
     - python: 3.6
       env: TEST_DOCS=1 DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
+  allow_failures:
+    - python: 2.7
+      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
   exclude:
     - python: 2.7
     - python: 3.4

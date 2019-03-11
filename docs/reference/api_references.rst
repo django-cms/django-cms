@@ -80,8 +80,8 @@ Functions and constants
     :type created_by: str of :class:`django.contrib.auth.models.User` instance
     :param parent: Parent page of this page
     :type parent: :class:`cms.models.Page` instance
-    :param datetime publication_date: Date to publish this page
-    :param datetime publication_end_date: Date to unpublish this page
+    :param datetime.datetime publication_date: Date to publish this page
+    :param datetime.datetime publication_end_date: Date to unpublish this page
     :param bool in_navigation: Whether this page should be in the navigation or not
     :param bool soft_root: Whether this page is a soft root or not
     :param str reverse_id: Reverse ID of this page (for template tags)
@@ -95,7 +95,7 @@ Functions and constants
     :param str position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
     :param str   overwrite_url: Overwritten path for this page
     :param int xframe_options: X Frame Option value for Clickjacking protection
-    :param str page_title: Overriden page title for html title tag
+    :param str page_title: Overridden page title for HTML title tag
 
 
 .. function:: create_title(language, title, page, menu_title=None, slug=None, redirect=None, meta_description=None, parent=None, overwrite_url=None)
@@ -113,7 +113,7 @@ Functions and constants
     :param parent: Used for automated slug generation
     :type parent: :class:`cms.models.Page` instance
     :param str overwrite_url: Overwritten path for this page
-    :param str page_title: Overriden page title for html title tag
+    :param str page_title: Overridden page title for HTML title tag
 
 
 .. function:: add_plugin(placeholder, plugin_type, language, position='last-child', target=None,  **data)
