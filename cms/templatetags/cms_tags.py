@@ -342,15 +342,15 @@ class RenderPluginBlock(InclusionTag):
     """
 
     name = 'render_plugin_block'
-    template = "cms/toolbar/render_plugin_block.html"
+    template = "cms/toolbar/plugin.html"
     options = Options(
         Argument('plugin'),
         blocks=[('endrender_plugin_block', 'nodelist')],
     )
 
     def get_context(self, context, plugin, nodelist):
-        context['inner'] = nodelist.render(context)
-        context['plugin'] = plugin
+        context['content'] = nodelist.render(context)
+        context['instance'] = plugin
         return context
 
 

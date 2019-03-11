@@ -75,7 +75,7 @@ permissions.
 .. note::
 
     If you want to use your own admin class, make sure to exclude the live versions of the
-    extensions by using ``filter(extended_page__publisher_is_draft=True)`` on the queryset.
+    extensions by using ``filter(extended_object__publisher_is_draft=True)`` on the queryset.
 
 Continuing with the example model above, here's a simple corresponding
 ``PageExtensionAdmin`` class::
