@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.encoding import python_2_unicode_compatible
 from treebeard.mp_tree import MP_Node
 
-from cms.models.fields import PlaceholderField
+from cms.models.fields import PageField, PlaceholderField
 
 
 @python_2_unicode_compatible
@@ -33,3 +33,19 @@ class SampleAppConfig(models.Model):
         max_length=100,
         unique=True,
     )
+
+
+class PageOnDeleteCascade(models.Model):
+    page = PageField(null=True)
+
+
+class PageOnDeleteSetNull(models.Model):
+    page = PageField(on_delete=models.SET_NULL, null=True)
+
+
+class PlaceholderOnDeleteCascade(models.Model):
+    placeholder = PlaceholderField('body', null=True)
+
+
+class PlaceholderOnDeleteSetNull(models.Model):
+    placeholder = PlaceholderField('body', on_delete=models.SET_NULL, null=True)

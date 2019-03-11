@@ -414,7 +414,7 @@ you can do this by creating a sub-class of it that implements the required chang
 that instead of the original.
 
 The original can be unregistered using ``toolbar_pool.unregister()``, as in the example below.
-Alternatively if you orginally invoked the toolbar class using :setting:`CMS_TOOLBARS`, you will
+Alternatively if you originally invoked the toolbar class using :setting:`CMS_TOOLBARS`, you will
 need to modify that to refer to the new one instead.
 
 An example, in which we unregister the original and register our own::
