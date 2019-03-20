@@ -7,16 +7,20 @@ from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
-from django.core.urlresolvers import reverse
 from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import six
-from django.utils.encoding import smart_text, force_text
+from django.utils.encoding import force_text, smart_text
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.six import string_types
-from django.utils.translation import get_language, override as force_language, ugettext_lazy as _
+from django.utils.translation import (
+    get_language,
+    override as force_language,
+    ugettext_lazy as _,
+)
 
 from classytags.arguments import (Argument, MultiValueArgument,
                                   MultiKeywordArgument)
@@ -338,15 +342,15 @@ class RenderPluginBlock(InclusionTag):
     """
 
     name = 'render_plugin_block'
-    template = "cms/toolbar/render_plugin_block.html"
+    template = "cms/toolbar/plugin.html"
     options = Options(
         Argument('plugin'),
         blocks=[('endrender_plugin_block', 'nodelist')],
     )
 
     def get_context(self, context, plugin, nodelist):
-        context['inner'] = nodelist.render(context)
-        context['plugin'] = plugin
+        context['content'] = nodelist.render(context)
+        context['instance'] = plugin
         return context
 
 

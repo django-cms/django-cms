@@ -314,8 +314,8 @@ Menu system classes and function
 
     Each node in a menu tree is represented by a ``NavigationNode`` instance.
 
-    :param string title: The title to display this menu item with.
-    :param string url: The URL associated with this menu item.
+    :param str title: The title to display this menu item with.
+    :param str url: The URL associated with this menu item.
     :param id: Unique (for the current tree) ID of this item.
     :param parent_id: Optional, ID of the parent item.
     :param parent_namespace: Optional, namespace of the parent.

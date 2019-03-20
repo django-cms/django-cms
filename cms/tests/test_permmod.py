@@ -19,6 +19,7 @@ from cms.models.permissionmodels import (ACCESS_DESCENDANTS,
 from cms.test_utils.testcases import (URL_CMS_PAGE_ADD, CMSTestCase)
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_current_site
+from cms.utils.compat import DJANGO_2_0
 from cms.utils.page_permissions import user_can_publish_page, user_can_view_page
 
 
@@ -990,10 +991,14 @@ class GlobalPermissionTests(CMSTestCase):
                 request.user = user
                 # Note, the query count is inflated by doing additional lookups
                 # because there's a site param in the request.
-                with self.assertNumQueries(FuzzyInt(3,4)):
-                    # internally this calls PageAdmin.has_[add|change|delete]_permission()
-                    self.assertEqual({'add': True, 'change': True, 'delete': False},
-                                     site._registry[Page].get_model_perms(request))
+                # max_queries = 5 for >dj21 because it's introduce default view permissions
+                max_queries = 4 if DJANGO_2_0 else 5
+                with self.assertNumQueries(FuzzyInt(3, max_queries)):
+                    # internally this calls PageAdmin.has_[add|change|delete|view]_permission()
+                    expected_perms = {'add': True, 'change': True, 'delete': False}
+                    if not DJANGO_2_0:
+                        expected_perms.update({'view': True})
+                    self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
 
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
@@ -1011,15 +1016,19 @@ class GlobalPermissionTests(CMSTestCase):
             with self.assertNumQueries(FuzzyInt(5, 15)):
                 # this user shouldn't have access to site 2
                 request.user = USERS[1]
-                self.assertEqual({'add': False, 'change': False, 'delete': False},
-                                 site._registry[Page].get_model_perms(request))
+                expected_perms = {'add': False, 'change': False, 'delete': False}
+                if not DJANGO_2_0:
+                    expected_perms.update({'view': False})
+                self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
                 # but, going back to the first user, they should.
                 request = RequestFactory().get('/', data={'site__exact': site_2.pk})
                 request.user = USERS[0]
                 request.current_page = None
                 request.session = {}
-                self.assertEqual({'add': True, 'change': True, 'delete': False},
-                                 site._registry[Page].get_model_perms(request))
+                expected_perms = {'add': True, 'change': True, 'delete': False}
+                if not DJANGO_2_0:
+                    expected_perms.update({'view': True})
+                self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
 
     def test_has_page_add_permission_with_target(self):
         page = create_page('Test', 'nav_playground.html', 'en')

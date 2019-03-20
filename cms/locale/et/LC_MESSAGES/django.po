@@ -7,13 +7,14 @@
 # Martin Pajuste <martinpajuste@gmail.com>, 2012,2015-2016
 # Martin Pajuste <martinpajuste@gmail.com>, 2012
 # Martin Pajuste <martinpajuste@gmail.com>, 2016-2017
+# Rivo Zängov <eraser@eraser.ee>, 2018
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"PO-Revision-Date: 2018-11-09 12:08+0000\n"
+"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/divio/django-cms/language/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -107,17 +108,24 @@ msgstr ""
 msgid "A page with this reverse URL id exists already."
 msgstr "Sellise pööratud identifikaatoriga lehekülg on juba olemas."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr ""
 
 msgid "An application instance with this name already exists."
 msgstr ""
 
-msgid "Yes"
+msgid "You can't move the home page inside another page"
 msgstr ""
 
+msgid "Yes"
+msgstr "Jah"
+
 msgid "No"
-msgstr ""
+msgstr "Ei"
 
 msgid "user"
 msgstr "kasutaja"
@@ -188,10 +196,10 @@ msgid "Advanced Settings"
 msgstr "Muud seadistused"
 
 msgid "Publishing dates"
-msgstr ""
+msgstr "Avaldamise kuupäevad"
 
 msgid "Change Permissions"
-msgstr ""
+msgstr "Muuda õiguseid"
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -279,7 +287,7 @@ msgid "You do not have permission to edit this page"
 msgstr ""
 
 msgid "Add Page Copy"
-msgstr ""
+msgstr "Lisa lehe koopia"
 
 msgid "New sub page"
 msgstr "Uus alamlehekülg"
@@ -291,14 +299,14 @@ msgid "The page is not eligible to be home."
 msgstr ""
 
 msgid "View restriction"
-msgstr ""
+msgstr "Vaata piirangut"
 
 msgid "View restrictions"
-msgstr ""
+msgstr "Vaata piiranguid"
 
 #, python-format
 msgid "Field %s not found"
-msgstr ""
+msgstr "Välja %s ei leitud"
 
 msgid "You do not have permission to edit this item"
 msgstr ""
@@ -311,7 +319,7 @@ msgid "You do not have permission to copy this placeholder."
 msgstr ""
 
 msgid "Plugin not found"
-msgstr ""
+msgstr "Pluginat ei leitud"
 
 msgid "You do not have permission to edit this plugin"
 msgstr ""
@@ -389,31 +397,31 @@ msgid ""
 msgstr ""
 
 msgid "Create"
-msgstr ""
+msgstr "Loo"
 
 msgid "Sites"
-msgstr ""
+msgstr "Saidid"
 
 msgid "Admin Sites"
-msgstr ""
+msgstr "Admini saidid"
 
 msgid "Administration"
-msgstr ""
+msgstr "Administreerimine"
 
 msgid "User settings"
-msgstr ""
+msgstr "asutaja seaded"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "Lõikelaud..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Tühjenda lõikelaud"
 
 msgid "Disable toolbar"
 msgstr ""
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Otseteed..."
 
 msgid "Users"
 msgstr "Kasutajad"
@@ -429,10 +437,10 @@ msgid "Language"
 msgstr "Keel"
 
 msgid "Structure"
-msgstr ""
+msgstr "Struktuur"
 
 msgid "Content"
-msgstr ""
+msgstr "Sisu"
 
 #| msgid "Publish changes"
 msgid "Publish page changes"
@@ -450,7 +458,7 @@ msgstr "Lisa tõlge"
 
 #| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
-msgstr ""
+msgstr "Kustuta tõlge"
 
 #| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
@@ -473,7 +481,7 @@ msgstr "Lehekülg"
 
 #| msgid "Create"
 msgid "Create Page"
-msgstr ""
+msgstr "Loo leht"
 
 msgid "New Page"
 msgstr "Uus lehekülg"
@@ -482,13 +490,13 @@ msgid "New Sub Page"
 msgstr "Uus alamlehekülg"
 
 msgid "Duplicate this Page"
-msgstr ""
+msgstr "Tee sellest lehest koopia"
 
 msgid "Edit this Page"
-msgstr ""
+msgstr "Muuda seda lehte"
 
 msgid "Advanced settings"
-msgstr ""
+msgstr "Lisaseaded"
 
 msgid "Templates"
 msgstr "Mallid"
@@ -500,16 +508,16 @@ msgid "Permissions"
 msgstr "Õigused"
 
 msgid "Hide in navigation"
-msgstr ""
+msgstr "Peida menüüs"
 
 msgid "Display in navigation"
-msgstr ""
+msgstr "Näita menüüs"
 
 msgid "Unpublish page"
-msgstr ""
+msgstr "Peida leht"
 
 msgid "Publish page"
-msgstr ""
+msgstr "Näita lehte"
 
 msgid "Are you sure you want to revert to live?"
 msgstr ""
@@ -527,7 +535,7 @@ msgid "Create a page below the current page."
 msgstr ""
 
 msgid "Select a valid site"
-msgstr ""
+msgstr "Vali korrektne sait"
 
 msgid "Select a valid page"
 msgstr "Vali korrektne lehekülg"
@@ -549,9 +557,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Lisa veel üks"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -707,13 +712,13 @@ msgid "pages"
 msgstr ""
 
 msgid "Empty"
-msgstr ""
+msgstr "Tühi"
 
 msgid "default"
-msgstr ""
+msgstr "vaikeväärtus"
 
 msgid "Current page"
-msgstr ""
+msgstr "Praegune lehekülg"
 
 msgid "Page children (immediate)"
 msgstr ""
@@ -861,7 +866,7 @@ msgid "slug"
 msgstr ""
 
 msgid "Path"
-msgstr ""
+msgstr "Asukoht"
 
 msgid "has url overwrite"
 msgstr ""
@@ -876,7 +881,7 @@ msgid "Advanced options"
 msgstr "Täpsemad valikud"
 
 msgid "Generic"
-msgstr ""
+msgstr "Üldine"
 
 #, python-format
 #| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
@@ -905,16 +910,16 @@ msgstr "Parool:"
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "Lisa leht"
 
 msgid "Change a page"
-msgstr ""
+msgstr "Muuda lehte"
 
 msgid "Home"
-msgstr ""
+msgstr "Avahelt"
 
 msgid "View on site"
-msgstr ""
+msgstr "Vaata saidil"
 
 msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
@@ -925,7 +930,7 @@ msgid "All permissions"
 msgstr "Kõik õigused"
 
 msgid "Loading..."
-msgstr ""
+msgstr "Laadimine..."
 
 msgid "Save and continue editing"
 msgstr "Salvesta ja jätka muutmist"
@@ -958,19 +963,19 @@ msgid "Can view"
 msgstr "Võib vaadata"
 
 msgid "(global)"
-msgstr ""
+msgstr "(üldine)"
 
 msgid "(current)"
-msgstr ""
+msgstr "(praegune)"
 
 msgid "Page doesn't inherit any permissions."
 msgstr ""
 
 msgid "Edit model"
-msgstr ""
+msgstr "Muuda mudelit"
 
 msgid "Save as new"
-msgstr ""
+msgstr "Salvesta uuena"
 
 msgid "Save and add another"
 msgstr "Salvesta ja lisa uus"
@@ -985,26 +990,26 @@ msgid "Cut"
 msgstr "Lõika"
 
 msgid "Paste"
-msgstr ""
+msgstr "Aseta"
 
 #| msgid "Save as new"
 msgid "Set as home"
 msgstr ""
 
 msgid "is restricted"
-msgstr ""
+msgstr "on piiratud"
 
 msgid "last change by"
-msgstr ""
+msgstr "viimati muutis"
 
 msgid "meta"
-msgstr ""
+msgstr "meta"
 
 msgid "List of pages"
 msgstr "Lehekülgede loend"
 
 msgid "Search"
-msgstr ""
+msgstr "Otsi"
 
 #| msgid "Page Title"
 msgid "Page Tree"
@@ -1029,11 +1034,11 @@ msgstr ""
 
 #| msgid "in navigation"
 msgid "Main Navigation"
-msgstr ""
+msgstr "Peamenüü"
 
 #| msgid "Actions"
 msgid "Options"
-msgstr ""
+msgstr "Valikud"
 
 msgid "Successfully moved"
 msgstr "Edukalt liigutatud"
@@ -1042,7 +1047,7 @@ msgid "Changes within the tree might require a refresh."
 msgstr ""
 
 msgid "Error:"
-msgstr ""
+msgstr "Viga:"
 
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
@@ -1053,7 +1058,7 @@ msgid "Are you sure you want to § this page?"
 msgstr "Kas oled kindel, et soovid § selle lehekülje?"
 
 msgid "Reload"
-msgstr ""
+msgstr "Laadi uuesti"
 
 #| msgid "New Page"
 msgid "New node"
@@ -1063,10 +1068,10 @@ msgid "nodes"
 msgstr ""
 
 msgid "View"
-msgstr ""
+msgstr "Vaata"
 
 msgid "Menu"
-msgstr ""
+msgstr "Menüü"
 
 #, python-format
 #| msgid ""
@@ -1082,40 +1087,40 @@ msgid ""
 msgstr ""
 
 msgid "Copy options"
-msgstr ""
+msgstr "Kopeeri valikud"
 
 msgid "Choose copy options"
 msgstr ""
 
 msgid "Close"
-msgstr ""
+msgstr "Sulge"
 
 msgid "Legend"
-msgstr ""
+msgstr "Legend"
 
 #| msgid "published"
 msgid "Published"
-msgstr ""
+msgstr "Avaldatud"
 
 #| msgid "Change"
 msgid "Changed"
-msgstr ""
+msgstr "Muudetud"
 
 #| msgid "unpublished"
 msgid "Unpublished"
-msgstr ""
+msgstr "Peidetud"
 
 #| msgid "in menu"
 msgid "In menu"
-msgstr ""
+msgstr "Menüüs"
 
 #| msgid "not in menu"
 msgid "Not in menu"
-msgstr ""
+msgstr "Pole menüüs"
 
 #| msgid "New page"
 msgid "View page"
-msgstr ""
+msgstr "Vaata lehte"
 
 #| msgid "softroot"
 msgid "Softroot"
@@ -1137,19 +1142,19 @@ msgid "Preview"
 msgstr "Eelvaade"
 
 msgid "Publish"
-msgstr ""
+msgstr "äita"
 
 msgid "Unpublish"
-msgstr ""
+msgstr "Peida"
 
 msgid "Configure"
-msgstr ""
+msgstr "Seadista"
 
 msgid "in menu"
-msgstr ""
+msgstr "menüüs"
 
 msgid "not in menu"
-msgstr ""
+msgstr "pole menüüs"
 
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
@@ -1159,16 +1164,16 @@ msgid "Clipboard"
 msgstr ""
 
 msgid "Add plugin"
-msgstr ""
+msgstr "Lisa plugin"
 
 msgid "Copy all"
-msgstr ""
+msgstr "Kopeeri kõik"
 
 msgid "Copy from"
 msgstr ""
 
 msgid "Empty all"
-msgstr ""
+msgstr "Tühjenda kõik"
 
 msgid "Filter plugins..."
 msgstr ""
@@ -1177,13 +1182,13 @@ msgid "This is a static placeholder"
 msgstr ""
 
 msgid "Expand all"
-msgstr ""
+msgstr "Laienda kõiki"
 
 msgid "Collapse all"
-msgstr ""
+msgstr "Sulge kõik"
 
 msgid "Edit"
-msgstr ""
+msgstr "Muuda"
 
 msgid "You cannot add plugins to this plugin."
 msgstr ""
@@ -1192,7 +1197,7 @@ msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr ""
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Lõikelaud on tühi."
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr ""
@@ -1201,10 +1206,10 @@ msgid "This plugin cannot have nested plugins."
 msgstr ""
 
 msgid "Highlight"
-msgstr ""
+msgstr "Tõsta esile"
 
 msgid "Available plugins"
-msgstr ""
+msgstr "aadaolevad pluginad"
 
 #| msgid "Structure"
 msgid "Toggle structure"
@@ -1215,13 +1220,13 @@ msgid "View published"
 msgstr ""
 
 msgid "Login"
-msgstr ""
+msgstr "Logi sisse"
 
 msgid "Add plugin to"
 msgstr ""
 
 msgid "More"
-msgstr ""
+msgstr "Veel"
 
 #, python-format
 #| msgid "Development version using django CMS %(cms_version)s"
@@ -1231,7 +1236,7 @@ msgid ""
 msgstr ""
 
 msgid "Cancel"
-msgstr ""
+msgstr "Loobu"
 
 msgid "The following error occured:"
 msgstr ""
@@ -1255,7 +1260,7 @@ msgstr ""
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "Laadimine"
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
@@ -1268,10 +1273,10 @@ msgstr ""
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "Enim kasutatud"
 
 msgid "Shortcuts"
-msgstr ""
+msgstr "Otseteed"
 
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
@@ -1281,7 +1286,7 @@ msgstr ""
 
 #| msgid "Cancel"
 msgid "Close/cancel"
-msgstr ""
+msgstr "Sulge/Loobu"
 
 msgid "Toggle structure mode"
 msgstr ""
@@ -1308,7 +1313,7 @@ msgstr ""
 
 #| msgid "Add plugin"
 msgid "Edit plugin"
-msgstr ""
+msgstr "Muuda pluginat"
 
 #| msgid "not in menu"
 msgid "Open actions menu"
@@ -1329,7 +1334,7 @@ msgid "Double-click to edit"
 msgstr ""
 
 msgid "Tap to edit"
-msgstr ""
+msgstr "Muumiseks vajuta"
 
 msgid "Click to go back"
 msgstr ""
@@ -1338,13 +1343,13 @@ msgid "Click to go forward"
 msgstr ""
 
 msgid "Minimize"
-msgstr ""
+msgstr "Minimeeri"
 
 msgid "Maximize"
-msgstr ""
+msgstr "Makimeeri"
 
 msgid "Drop a plugin here"
-msgstr ""
+msgstr "Lohista plugin siia"
 
 msgid "This page has no preview!"
 msgstr ""
@@ -1384,13 +1389,13 @@ msgid ""
 msgstr ""
 
 msgid "Installation Notes"
-msgstr ""
+msgstr "Paigaldamise märkmed"
 
 msgid "Support"
-msgstr ""
+msgstr "Kasutajatugi"
 
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentatsioon"
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1430,29 +1435,32 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr ""
 
+msgid "Add Another"
+msgstr "Lisa veel üks"
+
 msgid "Back"
-msgstr ""
+msgstr "Tagasi"
 
 msgid "Please choose an option from below to proceed to the next step."
 msgstr ""
 
 msgid "Next"
-msgstr ""
+msgstr "Edasi"
 
 msgid "unpublished changes"
 msgstr ""
 
 msgid "published"
-msgstr ""
+msgstr "avaldatud"
 
 msgid "unpublished parent"
 msgstr ""
 
 msgid "unpublished"
-msgstr ""
+msgstr "peidetud"
 
 msgid "no content"
-msgstr ""
+msgstr "sisu pole"
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1484,13 +1492,13 @@ msgid "email address"
 msgstr "e-posti aadress"
 
 msgid "staff status"
-msgstr ""
+msgstr "personali staatus"
 
 msgid "Designates whether the user can log into this admin site."
 msgstr ""
 
 msgid "active"
-msgstr ""
+msgstr "aktiivne"
 
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
@@ -1507,7 +1515,7 @@ msgid "Page Extension"
 msgstr ""
 
 msgid "object ID"
-msgstr ""
+msgstr "objekti ID"
 
 msgid "Example1 App"
 msgstr ""
@@ -1519,35 +1527,39 @@ msgid "Example1"
 msgstr ""
 
 msgid "Examples"
-msgstr ""
+msgstr "Näidised"
 
 msgid "Extra Context"
 msgstr ""
 
 msgid "Articles"
-msgstr ""
+msgstr "Artiklid"
 
 msgid "Sample App"
+msgstr "Näidis rakendus"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
 msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr ""
 
 msgid "Sample App 2"
-msgstr ""
+msgstr "Näidis rakendus 2"
 
 #| msgid "Sample App 2"
 msgid "Sample App 3"
-msgstr ""
+msgstr "Näidis rakendus 3"
 
 msgid "Namespaced App"
 msgstr ""
 
 msgid "Parent app"
-msgstr ""
+msgstr "Peamine rakendus"
 
 msgid "Child app"
-msgstr ""
+msgstr "Alamrakendus"
 
 msgid "Variable urls-menus App"
 msgstr ""
@@ -1565,17 +1577,17 @@ msgid "sample my profile page"
 msgstr ""
 
 msgid "Static Menu"
-msgstr ""
+msgstr "Staatiline menüü"
 
 msgid "Static Menu2"
-msgstr ""
+msgstr "Staatiline menüü 2"
 
 msgid "Static Menu3"
-msgstr ""
+msgstr "Staatiline menüü 3"
 
 #| msgid "Static Menu"
 msgid "Static Menu4"
-msgstr ""
+msgstr "Staatiline menüü 4"
 
 msgid "Category"
 msgstr "Kategooria"
@@ -1599,7 +1611,7 @@ msgid "Inherit the template of the nearest ancestor"
 msgstr ""
 
 msgid "UserSettings"
-msgstr ""
+msgstr "Kasutaja seaded"
 
 #, python-format
 #| msgid "Add plugin to placeholder"

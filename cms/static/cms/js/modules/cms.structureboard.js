@@ -10,7 +10,7 @@ import Clipboard from './cms.clipboard';
 import URI from 'urijs';
 import DiffDOM from 'diff-dom';
 import PreventParentScroll from 'prevent-parent-scroll';
-import { find, findIndex, once, remove, compact, isEqual } from 'lodash';
+import { find, findIndex, once, remove, compact, isEqual, zip, every } from 'lodash';
 import ls from 'local-storage';
 
 import './jquery.ui.custom';
@@ -38,6 +38,8 @@ const triggerWindowResize = () => {
         window.dispatchEvent(evt);
     } catch (e) {}
 };
+
+const arrayEquals = (a1, a2) => every(zip(a1, a2), ([a, b]) => a === b);
 
 /**
  * Handles drag & drop, mode switching and collapsables.
@@ -156,6 +158,9 @@ class StructureBoard {
     }
 
     _preloadOppositeMode() {
+        if (CMS.config.settings.legacy_mode) {
+            return;
+        }
         const WAIT_BEFORE_PRELOADING = 2000;
 
         $(Helpers._getWindow()).one('load', () => {
@@ -374,18 +379,16 @@ class StructureBoard {
     }
 
     _loadStructure() {
-        var that = this;
-
         // case when structure mode is already loaded
         if (CMS.config.settings.mode === 'structure' || this._loadedStructure) {
             return Promise.resolve();
         }
 
         showLoader();
-        return that
+        return this
             ._requestMode('structure')
-            .done(function(contentMarkup) {
-                that._requeststructure = null;
+            .done(contentMarkup => {
+                this._requeststructure = null;
                 hideLoader();
 
                 CMS.settings.states = Helpers.getSettings().states;
@@ -400,6 +403,15 @@ class StructureBoard {
 
                     return elem.is('[type="text/cms-template"]'); // cms scripts
                 });
+                const pluginIds = this.getIds(body.find('.cms-draggable'));
+                const pluginDataSource = body.filter('script[data-cms]').toArray()
+                    .map(script => script.textContent || '').join();
+                const pluginData = StructureBoard._getPluginDataFromMarkup(
+                    pluginDataSource,
+                    pluginIds
+                );
+
+                Plugin._updateRegistry(pluginData.map(([, data]) => data));
 
                 CMS.API.Toolbar._refreshMarkup(toolbar);
 
@@ -421,11 +433,11 @@ class StructureBoard {
                     }
                 });
 
-                that.ui.sortables = $('.cms-draggables');
-                that._drag();
+                this.ui.sortables = $('.cms-draggables');
+                this._drag();
                 StructureBoard._initializeDragItemsStates();
 
-                that._loadedStructure = true;
+                this._loadedStructure = true;
             })
             .fail(function() {
                 window.location.href = new URI(window.location.href)
@@ -1137,6 +1149,30 @@ class StructureBoard {
                 }
             }
 
+            // if we _are_ in the correct placeholder we still need to check if the order is correct
+            // since it could be an external update of a plugin moved in the same placeholder. also we are top-level
+            if (draggable.closest('.cms-draggables').parent().is(`.cms-dragarea-${data.placeholder_id}`)) {
+                const placeholderDraggables = $(`.cms-dragarea-${data.placeholder_id} > .cms-draggables`);
+                const actualPluginOrder = this.getIds(
+                    placeholderDraggables.find('> .cms-draggable')
+                );
+
+                if (!arrayEquals(actualPluginOrder, data.plugin_order)) {
+                    // so the plugin order is not correct, means it's an external update and we need to move
+                    const pluginOrder = data.plugin_order;
+                    const index = findIndex(
+                        pluginOrder,
+                        pluginId => Number(pluginId) === Number(data.plugin_id)
+                    );
+
+                    if (index === 0) {
+                        placeholderDraggables.prepend(draggable);
+                    } else if (index !== -1) {
+                        placeholderDraggables.find(`.cms-draggable-${pluginOrder[index - 1]}`).after(draggable);
+                    }
+                }
+            }
+
             if (draggable.length) {
                 // empty the children first because replaceWith takes too much time
                 // when it's trying to remove all the data and event handlers from potentially big tree of plugins
@@ -1462,6 +1498,39 @@ class StructureBoard {
             });
         }
     }
+
+    /**
+     * Get's plugins data from markup
+     *
+     * @method _getPluginDataFromMarkup
+     * @private
+     * @param {String} markup
+     * @param {Array<Number | String>} pluginIds
+     * @returns {Array<[String, Object]>}
+     */
+    static _getPluginDataFromMarkup(markup, pluginIds) {
+        return compact(
+            pluginIds.map(pluginId => {
+                // oh boy
+                const regex = new RegExp(`CMS._plugins.push\\((\\["cms\-plugin\-${pluginId}",[\\s\\S]*?\\])\\)`, 'g');
+                const matches = regex.exec(markup);
+                let settings;
+
+                if (matches) {
+                    try {
+                        settings = JSON.parse(matches[1]);
+                    } catch (e) {
+                        settings = false;
+                    }
+                } else {
+                    settings = false;
+                }
+
+                return settings;
+            })
+        );
+    }
+
 }
 
 /**

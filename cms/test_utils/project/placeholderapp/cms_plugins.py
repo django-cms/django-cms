@@ -25,4 +25,5 @@ class EmptyPlugin(CMSPluginBase):
             PluginMenuItem('Other item - not usable', '/some/other/url/', 'any-data', action='ajax_add'),
         ]
 
+
 plugin_pool.register_plugin(EmptyPlugin)

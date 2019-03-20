@@ -516,7 +516,7 @@ This will render to:
     model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, JavaScript, and CSS Code Injection.
 
-    To change this behavior, the project administrator should carefully review
+    To change this behaviour, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
     to a page using this template tag is cleansed of any potentially harmful
     HTML markup, CSS styles or JavaScript.
@@ -598,7 +598,7 @@ method is available; also template tags and filters are available in the block.
     model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, JavaScript, and CSS Code Injection.
 
-    To change this behavior, the project administrator should carefully review
+    To change this behaviour, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
     to a page using this template tag is cleansed of any potentially harmful
     HTML markup, CSS styles or JavaScript.
@@ -665,7 +665,7 @@ It will render to something like:
     model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, JavaScript, and CSS Code Injection.
 
-    To change this behavior, the project administrator should carefully review
+    To change this behaviour, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
     to a page using this template tag is cleansed of any potentially harmful
     HTML markup, CSS styles or JavaScript.
@@ -728,7 +728,7 @@ It will render to something like:
     model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, JavaScript, and CSS Code Injection.
 
-    To change this behavior, the project administrator should carefully review
+    To change this behaviour, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
     to a page using this template tag is cleansed of any potentially harmful
     HTML markup, CSS styles or JavaScript.

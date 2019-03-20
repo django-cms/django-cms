@@ -154,13 +154,13 @@ def signal_tester(*signals):
     env = SignalTester()
 
     for signal in signals:
-        signal.connect(env, weak=True)
+        signal.connect(env)
 
     try:
         yield env
     finally:
         for signal in signals:
-            signal.disconnect(env, weak=True)
+            signal.disconnect(env)
 
 
 class SignalTester(object):
