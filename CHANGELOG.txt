@@ -1,3 +1,16 @@
+=== 3.7.0 (unreleased) ===
+
+* Introduced Django 2.2 support.
+* Fixed rendering of permission icons
+* Fixed a bug with top-level object/embed/applet tags
+* Fixed `render_plugin_block` template tag
+* Updated documentation middleware section(changed MIDDLEWARE_CLASSES to MIDDLEWARE)
+* Updated install section in documentation to use re_path
+* Fixed documentation typo
+* Removed depreciation warnings for imp package
+* Restored old Django flags in compat file
+
+
 === 3.6.0 (2019-01-29) ===
 
 * Removed the ``cms moderator`` command.
