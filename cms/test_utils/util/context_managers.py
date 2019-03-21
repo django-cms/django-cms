@@ -26,6 +26,7 @@ class StdOverride(object):
     def __exit__(self, type, value, traceback):
         setattr(sys, 'std%s' % self.std, getattr(sys, '__std%s__' % self.std))
 
+
 class StdoutOverride(StdOverride):
     """
     This overrides Python's the standard output and redirects it to a StringIO
