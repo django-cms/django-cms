@@ -5,7 +5,7 @@ import os
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandParser
-from django.core.management.color import no_style, color_style
+from django.core.management.color import no_style
 
 from cms.utils.compat import DJANGO_2_0
 
@@ -87,9 +87,6 @@ class SubcommandsCommand(BaseCommand):
             if options.get('no_color'):
                 command.style = no_style()
                 command.stderr.style_func = None
-            # if options.get('force_color'):
-            #     command.style = color_style()
-            #     command.stderr.style_func = None
             if options.get('stdout'):
                 command.stdout._out = options.get('stdout')
             if options.get('stderr'):
