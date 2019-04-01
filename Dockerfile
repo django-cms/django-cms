@@ -5,7 +5,7 @@
 # </WARNING>
 
 # <DOCKER_FROM>
-FROM aldryn/base-project:py3-3.25.1
+FROM divio/base:4.14-py3.6-slim-stretch
 # </DOCKER_FROM>
 
 # <NODE>
