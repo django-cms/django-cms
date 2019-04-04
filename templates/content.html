@@ -141,18 +141,26 @@
                         <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
                             {% include "includes/icon.html" with icon="email" class="d-xl-none" color="slate" %}
                             <div class="pl-2 pl-xl-0">
-                                <p class="mb-0">Email</p>
+                                <p class="mb-0">Sales</p>
                                 <a href="mailto:sales@divio.com">sales@divio.com</a>
                             </div>
                         </div>
                         <div class="col-6 col-lg-12 col-xl-6 pb-2 flex-row d-flex">
                             {% include "includes/icon.html" with icon="chat" class="d-xl-none" color="slate" %}
                             <div class="pl-2 pl-xl-0">
-                                <p class="mb-0">Chat</p>
-                                <a href="javascript:Intercom('showNewMessage');">Start Chat</a>
+                                <p class="mb-0">Support</p>
+                                {# <a href="javascript:Intercom('showNewMessage');">Start Chat</a> #}
+                                <a href="/get-help/">Get help</a>
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <p class="mb-0"><strong>Current status</strong></p>
+                            <a href="https://status.divio.com" target="_blank">status.divio.com</a>
+                        </div>
+                    </div>
+                    {% comment %}
                     <div class="row">
                         <div class="col-12 mt-4">
                             <a href="tel:+41444801270" class="btn btn-primary btn-sm btn-block">
@@ -161,6 +169,7 @@
                             </a>
                         </div>
                     </div>
+                    {% endcomment %}
                 </div>
             </div>
         </div>
