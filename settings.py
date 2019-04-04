@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 from django.utils.translation import ugettext_lazy as _
-
+from aldryn_addons.utils import boolean_ish
 
 env = os.getenv
 STAGE = env('STAGE', 'local').lower()
@@ -35,13 +35,14 @@ INSTALLED_ADDONS = [
 ]
 
 import aldryn_addons.settings
-aldryn_addons.settings.load(locals())
 
+aldryn_addons.settings.load(locals())
 
 # all django settings can be altered here
 
 INSTALLED_APPS.extend([
     # add your project specific apps here
+    'elasticapm.contrib.django',
     'project',
     'project.banner',
 ])
@@ -50,6 +51,32 @@ MIDDLEWARE_CLASSES.extend([
     # add your own middlewares here
 ])
 
+# =============================================================================
+# Elastic
+# =============================================================================
+ENABLE_ELASTIC_APM = boolean_ish(env('ENABLE_ELASTIC_APM', True))
+if STAGE in {'local', 'test'}:
+    ELASTIC_DEBUG = True
+else:
+    ELASTIC_DEBUG = False
+
+if ENABLE_ELASTIC_APM:
+    MIDDLEWARE_CLASSES.insert(
+        0, 'elasticapm.contrib.django.middleware.TracingMiddleware')
+    ELASTIC_APM = {
+        'DEBUG': ELASTIC_DEBUG,
+        # Set required service name. Allowed characters:
+        # a-z, A-Z, 0-9, -, _, and space
+        'SERVICE_NAME': 'divio2018-{}'.format(STAGE),
+        # Use if APM Server requires a token
+        'SECRET_TOKEN': 'VUYkSeFvuVEElYO5c6',
+        # Set custom APM Server URL (default: http://localhost:8200)
+        'SERVER_URL': 'https://138eff00f6ed466da742b5c7d106e5e2.apm.us-east-1.aws.cloud.es.io:443',
+    }
+
+# =============================================================================
+# django CMS
+# =============================================================================
 # without this the access-control-allow-origin iframes won't work
 CMS_PAGE_CACHE = False
 
@@ -93,7 +120,6 @@ DJANGOCMS_BOOTSTRAP4_COLOR_STYLE_CHOICES = (
 )
 
 TEXT_HTML_SANITIZE = False
-
 
 # =============================================================================
 # Pandadoc Plugin
