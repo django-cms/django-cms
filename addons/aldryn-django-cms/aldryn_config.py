@@ -4,6 +4,7 @@ import os
 
 from aldryn_client import forms
 
+
 SYSTEM_FIELD_WARNING = 'WARNING: this field is auto-written. Please do not change it here.'
 
 
@@ -27,7 +28,7 @@ class Form(forms.BaseForm):
             'overridden if the project supplies a <a href='
             '\'http://docs.django-cms.org/en/stable/reference/configuration.html#cms-templates\''
             'target=\'_blank\'>CMS_TEMPLATES setting</a>. See <a href='
-            '\'http://support.divio.com/project-types/django-cms/manage-templates-in-your-django-cms-project-on-the-divio-cloud\' '
+            '\'http://support.divio.com/project-types/django-cms/manage-templates-in-your-django-cms-project-on-the-divio-cloud\' '  # noqa
             'target=\'_blank\'>Manage templates in your django CMS project</a> for more information.'
         ),
     )
@@ -56,13 +57,9 @@ class Form(forms.BaseForm):
     def to_settings(self, data, settings):
         from functools import partial
         from django.urls import reverse_lazy
-        from aldryn_addons.utils import boolean_ish, djsenv
+        from aldryn_addons.utils import djsenv
 
         env = partial(djsenv, settings=settings)
-
-        # Need to detect if these settings are for Django 1.8+
-        # Is there a better way? Can't import django to check version =(
-        is_django_18_or_later = ('TEMPLATES' in settings)
 
         # Core CMS stuff
         settings['INSTALLED_APPS'].extend([
@@ -130,7 +127,7 @@ class Form(forms.BaseForm):
             with open(old_cms_templates_json) as fobj:
                 templates = json.load(fobj)
         else:
-            templates= settings.get('CMS_TEMPLATES', json.loads(data['cms_templates']))
+            templates = settings.get('CMS_TEMPLATES', json.loads(data['cms_templates']))
 
         settings['CMS_TEMPLATES'] = templates
 
