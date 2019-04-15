@@ -107,7 +107,8 @@ class Form(forms.BaseForm):
                 settings['ALDRYN_SSO_BASICAUTH_PASSWORD'] = basicauth_password
             else:
                 raise ImproperlyConfigured(
-                    'ALDRYN_SSO_ALWAYS_REQUIRE_LOGIN set to "basicauth", but ALDRYN_SSO_BASICAUTH_USER and ALDRYN_SSO_BASICAUTH_PASSWORD not set'
+                    'ALDRYN_SSO_ALWAYS_REQUIRE_LOGIN set to "basicauth", but '
+                    'ALDRYN_SSO_BASICAUTH_USER and ALDRYN_SSO_BASICAUTH_PASSWORD not set'
                 )
             position = MIDDLEWARE.index('django.contrib.auth.middleware.AuthenticationMiddleware') + 1
             MIDDLEWARE.insert(position, 'aldryn_sso.middleware.BasicAuthAccessControlMiddleware')
@@ -127,7 +128,7 @@ class Form(forms.BaseForm):
 
         settings['ALDRYN_SSO_OVERIDE_ADMIN_LOGIN_VIEW'] = env(
             'ALDRYN_SSO_OVERIDE_ADMIN_LOGIN_VIEW',
-                any([
+            any([
                 settings['ALDRYN_SSO_ENABLE_SSO_LOGIN'],
                 settings['ALDRYN_SSO_ENABLE_LOGIN_FORM'],
                 settings['ALDRYN_SSO_ENABLE_LOCALDEV'],
