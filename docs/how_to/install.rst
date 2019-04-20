@@ -280,8 +280,8 @@ do anything very useful with it though.
 Templates
 =========
 
-django CMS requires at least one template for its pages. The first template in the :setting:`CMS_TEMPLATES` list will
-be the project's default template.
+django CMS requires at least one template for its pages, so you'll need to add :setting:`CMS_TEMPLATES` to your
+settings. The first template in the :setting:`CMS_TEMPLATES` list will be the project's default template.
 
 ::
 
