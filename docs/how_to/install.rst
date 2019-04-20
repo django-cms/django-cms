@@ -242,6 +242,8 @@ Context processors
 
 Add ``'cms.context_processors.cms_settings'`` to ``TEMPLATES['OPTIONS']['context_processors']``.
 
+Also add ``'django.template.context_processors.i18n'`` if it's not already present.
+
 ``cms check`` should now be unable to identify any further issues with your project. Some additional configuration is
 required however.
 
