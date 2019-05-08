@@ -110,3 +110,12 @@ class SiteTestCase(CMSTestCase):
                         page_url = page.get_absolute_url(language='de')
                     response = self.client.get(page_url)
                     self.assertEqual(response.status_code, 200)
+
+    def test_create_site_specific_placeholder(self):
+        with self.settings(
+            CMS_TEMPLATES=(('placeholder_tests/static_with_site.html', 'tpl'), ),
+        ):
+            page = create_page('page', 'placeholder_tests/static_with_site.html', language='de')
+
+            response = self.client.get(page.get_absolute_url(language='de') + u'?structure')
+            self.assertEqual(response.status_code, 200)
