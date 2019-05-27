@@ -7,7 +7,7 @@ https://control.divio.com/api/v1/apps/serve/aldryn-forms/4.0.1/099d84c4-390a-4c5
 https://control.divio.com/api/v1/apps/serve/aldryn-newsblog/2.2.1/7fd98d66-b4fb-42b8-b624-671c93642ca3/aldryn-newsblog-2.2.1.tar.gz#egg=aldryn-newsblog==2.2.1
 https://control.divio.com/api/v1/apps/serve/aldryn-redirects/1.3.3/f04164f3-65f0-4bf6-ac94-37a69bdd36c9/aldryn-redirects-1.3.3.tar.gz#egg=aldryn-redirects==1.3.3
 https://control.divio.com/api/v1/apps/serve/divio-styleguide/3.3.0/6974ff53-b786-4c2e-8036-aa43aa1e7d34/divio-styleguide-3.3.0.tar.gz#egg=divio-styleguide==3.3.0
-https://control.divio.com/api/v1/apps/serve/djangocms-bootstrap4/1.3.1/687e1a02-d8a5-470d-9c0b-ea08e0d2f17d/djangocms-bootstrap4-1.3.1.tar.gz#egg=djangocms-bootstrap4==1.3.1
+https://control.divio.com/api/v1/apps/serve/djangocms-bootstrap4/1.4.0/cb0dab10-8bab-41aa-af79-100be338a3fb/djangocms-bootstrap4-1.4.0.tar.gz#egg=djangocms-bootstrap4==1.4.0
 https://control.divio.com/api/v1/apps/serve/djangocms-file/2.3.0/fad831bb-d011-4004-8500-e794eb601bf2/djangocms-file-2.3.0.tar.gz#egg=djangocms-file==2.3.0
 https://control.divio.com/api/v1/apps/serve/djangocms-history/1.0.0/9ced0786-b47c-4df1-8794-6654d618d753/djangocms-history-1.0.0.tar.gz#egg=djangocms-history==1.0.0
 https://control.divio.com/api/v1/apps/serve/djangocms-icon/1.3.0/0127ee22-c86c-429c-aeb4-07c5e1302d2c/djangocms-icon-1.3.0.tar.gz#egg=djangocms-icon==1.3.0
