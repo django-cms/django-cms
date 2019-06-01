@@ -111,11 +111,19 @@ class SiteTestCase(CMSTestCase):
                     response = self.client.get(page_url)
                     self.assertEqual(response.status_code, 200)
 
-    def test_create_site_specific_placeholder(self):
+
+class TestSiteBoundStaticPlaceholder(SiteTestCase):
+    def setUp(self):
+        super(TestSiteBoundStaticPlaceholder, self).setUp()
         with self.settings(
             CMS_TEMPLATES=(('placeholder_tests/static_with_site.html', 'tpl'), ),
         ):
-            page = create_page('page', 'placeholder_tests/static_with_site.html', language='de')
+            self.test_page = create_page('page', 'placeholder_tests/static_with_site.html', language='de')
 
-            response = self.client.get(page.get_absolute_url(language='de') + u'?structure')
+    def tearDown(self):
+        self.test_page.delete()
+        super(TestSiteBoundStaticPlaceholder, self).tearDown()
+
+    def test_create_site_specific_placeholder(self):
+            response = self.client.get(self.test_page.get_absolute_url(language='de') + '?structure')
             self.assertEqual(response.status_code, 200)
