@@ -83,6 +83,24 @@ matrix:
       env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
     - python: 3.6
       env: TEST_DOCS=1 DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
+
+    # DJANGO 2.2
+    - python: 3.5
+      env: DJANGO=2.2 DATABASE_URL='sqlite://localhost/:memory:'
+      dist: xenial
+      sudo: true
+    - python: 3.5
+      env: DJANGO=2.2 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
+    - python: 3.6
+      env: DJANGO=2.2 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+    - python: 3.6
+      env: DJANGO=2.2 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
+    - python: 3.6
+      env: DJANGO=2.2 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+    - python: 3.6
+      env: TEST_DOCS=1 DJANGO=2.2 DATABASE_URL='sqlite://localhost/:memory:'
+      dist: xenial
+      sudo: true
   allow_failures:
     - python: 2.7
       env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
