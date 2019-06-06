@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import mock
 
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
@@ -855,7 +856,8 @@ class ApphooksTestCase(CMSTestCase):
 
         request = self.get_request('/')
         renderer = menu_pool.get_renderer(request)
-        nodes = renderer.get_nodes()
+        with mock.patch("menus.menu_pool.logger.error"):
+            nodes = renderer.get_nodes()
         nodes_urls = [node.url for node in nodes]
         self.assertTrue(reverse('sample-account') in nodes_urls)
         self.assertFalse('/en/child_page/page2/' in nodes_urls)
