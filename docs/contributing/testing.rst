@@ -97,7 +97,7 @@ and it should then run without errors.
 ``ERROR: zlib is required unless explicitly disabled using --disable-zlib, aborting``
 ------------------------------------------------------------------------------------------
 
-If you are running into that issue make sure to install zlib using Homebrew::
+If you run into that issue, make sure to install zlib using Homebrew::
 
     brew install libjpeg zlib && brew link --force zlib
 
