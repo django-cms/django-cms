@@ -1,0 +1,2 @@
+-r requirements_base.txt
+Django>=2.2,<3.0
