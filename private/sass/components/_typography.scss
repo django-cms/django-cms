@@ -9,22 +9,22 @@
 }
 
 .display-1 {
-    color: theme-color($body-color);
+    color: $body-color;
     line-height: rem(70px);
 }
 
 .display-2 {
-    color: theme-color($body-color);
+    color: $body-color;
     line-height: rem(46px);
 }
 
 .display-3 {
-    color: theme-color($body-color);
+    color: $body-color;
     line-height: rem(44px);
 }
 
 .display-4 {
-    color: theme-color($body-color);
+    color: $body-color;
     line-height: rem(32px);
 }
 
@@ -37,7 +37,7 @@ h1, .h1,
 h2, .h2,
 h3, .h3,
 h4, .h4 {
-    color: theme-color($body-color);
+    color: $body-color;
 }
 
 h5, .h5 {

@@ -44,7 +44,7 @@
     font-size: rem(24px);
     line-height: rem(32px);
     font-weight: 700;
-    color: theme-color($body-color);
+    color: $body-color;
 }
 
 .card-small {
