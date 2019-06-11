@@ -43,8 +43,8 @@
 .card-title {
     font-size: rem(24px);
     line-height: rem(32px);
-    font-weight: 600;
-    color: theme-color(primary);
+    font-weight: 700;
+    color: theme-color($body-color);
 }
 
 .card-small {

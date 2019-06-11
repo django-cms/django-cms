@@ -265,27 +265,26 @@ $h4-font-size: rem(32px);
 $h5-font-size: rem(24px);
 $h6-font-size: rem(18px);
 
-
 $headings-margin-bottom: 1rem;
 $headings-font-family:   inherit;
-$headings-font-weight:   normal;
+$headings-font-weight:   900;
 $headings-line-height:   1.1;
-$headings-color:         inherit;
+$headings-color:         $body-color;
 
-$display1-size: rem(50px);
+$display1-size: rem(64px);
 $display2-size: rem(40px);
 $display3-size: rem(35px);
 $display4-size: rem(28px);
 
-$display1-weight:     300;
-$display2-weight:     300;
-$display3-weight:     300;
-$display4-weight:     300;
+$display1-weight:     900;
+$display2-weight:     900;
+$display3-weight:     900;
+$display4-weight:     900;
 
 $display-line-height: 1.2;
 
-$lead-font-size:   rem(22px);
-$lead-font-weight: 300;
+$lead-font-size:   rem(24px);
+$lead-font-weight: 400;
 
 $small-font-size: rem(14px);
 

@@ -44,7 +44,7 @@
 
     {% render_block "css" %}
     {% if request.toolbar and request.toolbar.edit_mode_active %}
-        <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,900&subset=latin" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
         <style type="text/css">
             /* TMP */
@@ -72,7 +72,7 @@
 
 {% if not request.toolbar or not request.toolbar.edit_mode_active %}
     <noscript id="deferred-styles">
-        <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700&subset=latin" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,900&subset=latin" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/base.css' %}">
     </noscript>
     <script>

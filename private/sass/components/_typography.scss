@@ -9,27 +9,27 @@
 }
 
 .display-1 {
-    color: theme-color(primary);
-    line-height: rem(60px);
+    color: theme-color($body-color);
+    line-height: rem(70px);
 }
 
 .display-2 {
-    color: theme-color(primary);
-    line-height: rem(50px);
+    color: theme-color($body-color);
+    line-height: rem(46px);
 }
 
 .display-3 {
-    color: theme-color(primary);
+    color: theme-color($body-color);
     line-height: rem(44px);
 }
 
 .display-4 {
-    color: theme-color(primary);
+    color: theme-color($body-color);
     line-height: rem(32px);
 }
 
 .lead {
-    line-height: rem(32px);
+    line-height: rem(36px);
     color: theme-color(secondary);
 }
 
@@ -37,11 +37,11 @@ h1, .h1,
 h2, .h2,
 h3, .h3,
 h4, .h4 {
-    color: theme-color(primary);
+    color: theme-color($body-color);
 }
 
 h5, .h5 {
-    font-weight: 600;
+    font-weight: 700;
     font-size: rem(24px);
     line-height: rem(30px);
     color: theme-color(primary);
@@ -103,6 +103,10 @@ p:last-child {
     margin-bottom: 0px;
 }
 
+strong {
+    font-weight: 700;
+}
+
 .text-block {
     // 32
     // 28
@@ -135,7 +139,7 @@ p:last-child {
         line-height: 1.1;
         text-transform: uppercase;
         color: $body-color;
-        font-weight: 600;
+        font-weight: 700;
         margin-top: rem(50px);
         margin-bottom: rem(10px);
         letter-spacing: rem(2px);
@@ -150,7 +154,7 @@ p:last-child {
         line-height: 1.1;
         text-transform: uppercase;
         color: $body-color;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: rem(2px);
         margin-top: rem(40px);
         margin-bottom: rem(10px);
@@ -162,7 +166,7 @@ p:last-child {
 
     h6 {
         font-size: rem(16px);
-        font-weight: 600;
+        font-weight: 700;
         margin-top: rem(40px);
         margin-bottom: rem(10px);
     }
@@ -197,7 +201,7 @@ pre {
 }
 
 .blockquote {
-    font-weight: 300;
+    font-weight: 400;
     color: theme-color(secondary);
     font-size: rem(22px);
     line-height: rem(32px);
