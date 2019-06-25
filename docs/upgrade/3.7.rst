@@ -15,6 +15,7 @@ Improvements and new features
 =============================
 
 * introduced support for Django 2.2
+* Fixed test suite.
 
 
 *********************
