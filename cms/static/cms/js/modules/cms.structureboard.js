@@ -1270,6 +1270,8 @@ class StructureBoard {
         }
         var fixedContentMarkup = contentMarkup;
         var newDoc = new DOMParser().parseFromString(fixedContentMarkup, 'text/html');
+        let new_scripts = $(newDoc).find('script');
+        let old_scripts = $(document).find('script');
 
         const structureScrollTop = $('.cms-structure-content').scrollTop();
 
@@ -1294,12 +1296,54 @@ class StructureBoard {
         dd.apply(document.head, headDiff);
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
+        /**
+         * Checks if new scripts with the class 'cms-execute-js-to-render' exist
+         * and if the were present befor. If they weren't present before the will be downloaded
+         * and executed. If ther script also has the class 'cms-trigger-load-events' the
+         * 'load' and 'DOMContentLoaded' events will be triggered
+         */
+        new_scripts.each(function() {
+            let script_exists = false;
+            let new_script = $(this);
+
+            if (new_script.hasClass('cms-execute-js-to-render')) {
+                $(old_scripts).each(function() {
+                    let old_script = $(this);
+
+                    if (new_script.prop('outerHTML') === old_script.prop('outerHTML')) {
+                        script_exists = true;
+                        return false;
+                    }
+                });
+                if (!script_exists) {
+                    if (typeof new_script.prop('src') === 'string' && new_script.prop('src') !== '') {
+                        $.getScript(new_script.prop('src'))
+                        .done(function() {
+                            if (new_script.hasClass('cms-trigger-load-events')) {
+                                document.dispatchEvent(new Event('load'));
+                                document.dispatchEvent(new Event('DOMContentLoaded'));
+                            }
+                        });
+                    } else {
+                        let js_file = document.createElement('script');
+
+                        js_file.textContent = new_script.prop('textContent') || '';
+                        js_file.type = 'text/javascript';
+                        document.body.appendChild(js_file);
+                        if (new_script.hasClass('cms-trigger-load-events')) {
+                            document.dispatchEvent(new Event('load'));
+                            document.dispatchEvent(new Event('DOMContentLoaded'));
+                        }
+                    }
+                }
+            }
+        });
 
         $('.cms-structure-content').scrollTop(structureScrollTop);
 
         Plugin._refreshPlugins();
-
         Helpers._getWindow().dispatchEvent(new Event('load'));
+
         $(Helpers._getWindow()).trigger('cms-content-refresh');
 
         this._loadedContent = true;
