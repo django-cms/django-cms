@@ -1296,12 +1296,31 @@ class StructureBoard {
         dd.apply(document.head, headDiff);
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
-        /**
-         * Checks if new scripts with the class 'cms-execute-js-to-render' exist
-         * and if the were present befor. If they weren't present before the will be downloaded
-         * and executed. If ther script also has the class 'cms-trigger-load-events' the
-         * 'load' and 'DOMContentLoaded' events will be triggered
-         */
+
+        this.addJsCodeNeededForRender(new_scripts, old_scripts);
+
+        $('.cms-structure-content').scrollTop(structureScrollTop);
+
+        Plugin._refreshPlugins();
+        Helpers._getWindow().dispatchEvent(new Event('load'));
+
+        $(Helpers._getWindow()).trigger('cms-content-refresh');
+
+        this._loadedContent = true;
+    }
+
+    /**
+     * Checks if new scripts with the class 'cms-execute-js-to-render' exist
+     * and if the were present befor. If they weren't present before the will be downloaded
+     * and executed. If ther script also has the class 'cms-trigger-load-events' the
+     * 'load' and 'DOMContentLoaded' events will be triggered
+     *
+     * @param {JQuery} new_scripts  JQuery selector of the scripts for the new body content
+     * @param {JQuery} old_scripts  JQuery selector of the scripts for the old body content
+     */
+    addJsCodeNeededForRender(new_scripts, old_scripts) {
+        let triggerDOMContentLoaded = false;
+
         new_scripts.each(function() {
             let script_exists = false;
             let new_script = $(this);
@@ -1331,22 +1350,17 @@ class StructureBoard {
                         js_file.type = 'text/javascript';
                         document.body.appendChild(js_file);
                         if (new_script.hasClass('cms-trigger-load-events')) {
-                            document.dispatchEvent(new Event('load'));
-                            document.dispatchEvent(new Event('DOMContentLoaded'));
+                            triggerDOMContentLoaded = true;
                         }
                     }
                 }
             }
         });
+        if (triggerDOMContentLoaded) {
+            document.dispatchEvent(new Event('load'));
+            document.dispatchEvent(new Event('DOMContentLoaded'));
+        }
 
-        $('.cms-structure-content').scrollTop(structureScrollTop);
-
-        Plugin._refreshPlugins();
-        Helpers._getWindow().dispatchEvent(new Event('load'));
-
-        $(Helpers._getWindow()).trigger('cms-content-refresh');
-
-        this._loadedContent = true;
     }
 
     handleAddPlugin(data) {
