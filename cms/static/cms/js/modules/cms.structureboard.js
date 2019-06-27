@@ -1297,7 +1297,7 @@ class StructureBoard {
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
 
-        this.addJsCodeNeededForRender(new_scripts, old_scripts);
+        this.addJsScriptsNeededForRender(new_scripts, old_scripts);
 
         $('.cms-structure-content').scrollTop(structureScrollTop);
 
@@ -1318,8 +1318,10 @@ class StructureBoard {
      * @param {JQuery} new_scripts  JQuery selector of the scripts for the new body content
      * @param {JQuery} old_scripts  JQuery selector of the scripts for the old body content
      */
-    addJsCodeNeededForRender(new_scripts, old_scripts) {
+    addJsScriptsNeededForRender(new_scripts, old_scripts) {
         let triggerDOMContentLoaded = false;
+        const scriptSrcList = [];
+
 
         new_scripts.each(function() {
             let script_exists = false;
@@ -1336,31 +1338,54 @@ class StructureBoard {
                 });
                 if (!script_exists) {
                     if (typeof new_script.prop('src') === 'string' && new_script.prop('src') !== '') {
-                        $.getScript(new_script.prop('src'))
-                        .done(function() {
-                            if (new_script.hasClass('cms-trigger-load-events')) {
-                                document.dispatchEvent(new Event('load'));
-                                document.dispatchEvent(new Event('DOMContentLoaded'));
-                            }
-                        });
+                        scriptSrcList.push(new_script.prop('src'));
                     } else {
                         let js_file = document.createElement('script');
 
                         js_file.textContent = new_script.prop('textContent') || '';
                         js_file.type = 'text/javascript';
                         document.body.appendChild(js_file);
-                        if (new_script.hasClass('cms-trigger-load-events')) {
-                            triggerDOMContentLoaded = true;
-                        }
+                    }
+                    if (new_script.hasClass('cms-trigger-load-events')) {
+                        triggerDOMContentLoaded = true;
                     }
                 }
             }
         });
-        if (triggerDOMContentLoaded) {
+        if (triggerDOMContentLoaded && scriptSrcList.length === 0) {
             document.dispatchEvent(new Event('load'));
             document.dispatchEvent(new Event('DOMContentLoaded'));
+        } else {
+            this.getMultiScripts(scriptSrcList).done(function() {
+                if (triggerDOMContentLoaded) {
+                    document.dispatchEvent(new Event('load'));
+                    document.dispatchEvent(new Event('DOMContentLoaded'));
+                }
+            });
         }
+    }
 
+    /**
+     * Downloads and executes all scripts given by `scriptSrcList` and returns a
+     * `Promise` when all are done. this is to prevent multiple triggering of
+     * the 'load' and 'DOMContentLoaded' events in `addJsScriptsNeededForRender`.
+     * Original solution from https://stackoverflow.com/a/11803418
+     *
+     * @param {array} scriptSrcList   Array of script sources
+     *
+     * @returns {Promise}
+     */
+    getMultiScripts(scriptSrcList) {
+        let _arr = $.map(scriptSrcList, function(scr) {
+            return $.getScript(scr);
+        });
+
+        // eslint-disable-next-line new-cap
+        _arr.push($.Deferred(function(deferred) {
+            $(deferred.resolve);
+        }));
+
+        return $.when.apply($, _arr);
     }
 
     handleAddPlugin(data) {
