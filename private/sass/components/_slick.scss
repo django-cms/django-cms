@@ -69,7 +69,8 @@
     .video-slide img {
         display: none !important;
     }
-    .video-slide .embed-responsive {
-        margin: 0 0 30px;
+    .slick-slide .embed-responsive,
+    .slick-slide img {
+        margin-bottom: 40px;
     }
 }
