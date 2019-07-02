@@ -33,3 +33,24 @@ export function initBlogCarousel(selector = '.js-carousel') {
         carousel.addClass('carousel-ready');
     });
 }
+
+export function initIframeCarousel(selector = '.js-carousel-iframe') {
+    const carousel = $(selector);
+    const extraSettings = carousel.data();
+    const inner = carousel.find('> .carousel-inner');
+    const prevArrow = carousel.find('.carousel-control-prev');
+    const nextArrow = carousel.find('.carousel-control-next');
+
+    inner.slick({
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        infinite: true,
+        prevArrow,
+        nextArrow,
+        pauseOnHover: true,
+        pauseOnFocus: true,
+        dots: true,
+        ...extraSettings,
+    });
+    carousel.addClass('carousel-ready');
+}

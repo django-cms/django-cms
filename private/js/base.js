@@ -6,7 +6,7 @@ import { initFileInputs } from 'addons/file';
 import svg4everybody from 'svg4everybody';
 import { initLocalScroll } from 'addons/localscroll';
 import { initHeader } from 'addons/header';
-import { initBlogCarousel } from 'addons/carousel';
+import { initBlogCarousel, initIframeCarousel } from 'addons/carousel';
 import { initWaypoints } from 'addons/waypoints';
 import { initFixedHeaderTables, initTableCrossHover } from 'addons/tables';
 import { initPrivacySettings, initAnalyticsIntegrations } from 'addons/privacy';
@@ -46,6 +46,7 @@ $(() => {
     initLocalScroll();
     initHeader();
     initBlogCarousel();
+    initIframeCarousel();
     initWaypoints();
     initFixedHeaderTables();
     initTableCrossHover();

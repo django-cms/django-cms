@@ -1,0 +1,5 @@
+{% load cms_tags thumbnail %}
+
+{% thumbnail instance.carousel_image options.size crop=options.crop upscale=options.upscale subject_location=instance.carousel_image.subject_location as thumbnail %}
+
+<img class="d-block w-100" src="{{ thumbnail.url }}" alt="{{ instance.carousel_image.default_alt_text|default:'' }}" >

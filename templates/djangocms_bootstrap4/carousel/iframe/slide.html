@@ -1,0 +1,23 @@
+{% load cms_tags %}
+
+<{{ instance.tag_type }} {{ instance.attributes_str }}>
+    {% if link %}
+        <a href="{{ link }}"{% if instance.target %} target="{{ instance.target }}"{% endif %}>
+    {% endif %}
+
+    {% if instance.carousel_content %}
+        {{ instance.carousel_content }}
+    {% endif %}
+
+    {% with image=carousel_image.image %}
+        {% include "djangocms_bootstrap4/carousel/default/image.html" %}
+    {% endwith %}
+
+    {% if link %}
+        </a>
+    {% endif %}
+
+    {% for plugin in instance.child_plugin_instances %}
+        {% render_plugin plugin %}
+    {% endfor %}
+</{{ instance.tag_type }}>

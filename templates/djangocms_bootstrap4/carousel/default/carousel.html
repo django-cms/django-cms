@@ -1,0 +1,40 @@
+{% load i18n cms_tags %}
+
+<{{ instance.tag_type }} {{ instance.attributes_str }}
+    id="carousel-{{ instance.pk }}"
+    data-interval="{{ instance.carousel_interval|lower }}"
+    data-keyboard="{{ instance.carousel_keyboard|lower }}"
+    data-pause="{{ instance.carousel_pause|lower }}"
+    data-ride="{{ instance.carousel_ride|lower }}"
+    data-wrap="{{ instance.carousel_wrap|lower }}"
+>
+    {% if instance.carousel_indicators %}
+        <ol class="carousel-indicators">
+            {% for plugin in instance.child_plugin_instances %}
+                <li data-target="#carousel-{{ instance.pk }}"
+                    data-slide-to="{{ forloop.counter0 }}"
+                    {% if forloop.first %} class="active"{% endif %}>
+                </li>
+            {% endfor %}
+        </ol>
+    {% endif %}
+
+    {% with 1024 as width and 768 as height %}
+        <div class="carousel-inner">
+            {% for plugin in instance.child_plugin_instances %}
+                {% render_plugin plugin %}
+            {% endfor %}
+        </div>
+    {% endwith %}
+
+    {% if instance.carousel_controls %}
+        <a class="carousel-control-prev" href="#carousel-{{ instance.pk }}" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">{% trans "Previous" %}</span>
+        </a>
+        <a class="carousel-control-next" href="#carousel-{{ instance.pk }}" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">{% trans "Next" %}</span>
+        </a>
+    {% endif %}
+</{{ instance.tag_type }}>

@@ -51,3 +51,25 @@
         box-shadow: none;
     }
 }
+
+.carousel-iframe {
+    .carousel-indicators {
+        display: none;
+    }
+    .slick-dots li::before {
+        display: none;
+    }
+    .slick-dots li button:before {
+        width: 20px;
+        height: 20px;
+    }
+    .slick-slide img {
+        margin: 0 auto;
+    }
+    .video-slide img {
+        display: none !important;
+    }
+    .video-slide .embed-responsive {
+        margin: 0 0 30px;
+    }
+}
