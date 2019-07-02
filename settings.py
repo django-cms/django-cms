@@ -119,6 +119,11 @@ DJANGOCMS_BOOTSTRAP4_COLOR_STYLE_CHOICES = (
     ('purple', _('Purple')),
 )
 
+DJANGOCMS_BOOTSTRAP4_CAROUSEL_TEMPLATES = (
+    ('default', _('Default')),
+    ('iframe', _('Iframe')),
+)
+
 TEXT_HTML_SANITIZE = False
 
 # =============================================================================
