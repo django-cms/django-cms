@@ -124,6 +124,10 @@ DJANGOCMS_BOOTSTRAP4_CAROUSEL_TEMPLATES = (
     ('iframe', _('Iframe')),
 )
 
+DJANGOCMS_BOOTSTRAP4_CAROUSEL_ASPECT_RATIOS = (
+    (16, 9),
+)
+
 TEXT_HTML_SANITIZE = False
 
 # =============================================================================
