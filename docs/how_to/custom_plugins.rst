@@ -405,7 +405,7 @@ A **bad** example:
         If the javascript code is protected from prematurely executing by
         the EventListener for the event ``'load'`` and/or ``'DOMContentLoaded'``,
         the class ``'cms-trigger-load-events'`` can additionally be added.
-        This will trigger the events ``'load'`` or ``'DOMContentLoaded'``
+        This will trigger the events ``'load'`` and ``'DOMContentLoaded'``
         once after all scripts are successfully injected into the DOM.
 
 
