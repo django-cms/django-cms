@@ -2,6 +2,7 @@
 
 * Introduced Django 2.2 support.
 * Fixed test suite.
+* Page changed date added to the Page tree admin actions dropdown
 
 
 === 3.6.0 (2019-01-29) ===
