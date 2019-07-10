@@ -9,5 +9,14 @@ function append_h2_element_from_src (id) {
 append_h2_element_from_src('from_src_no_trigger');
 
 document.addEventListener('DOMContentLoaded', function() {
-    append_h2_element_from_src('from_src_needs_trigger');
+    append_h2_element_from_src('from_src_needs_trigger_document_DOMContentLoaded');
 });
+
+window.addEventListener('DOMContentLoaded', function() {
+    append_h2_element_from_src('from_src_needs_trigger_window_DOMContentLoaded');
+});
+
+window.addEventListener('load', function() {
+    append_h2_element_from_src('from_src_needs_trigger_window_load');
+});
+console.log("SCRIPT LOADED")

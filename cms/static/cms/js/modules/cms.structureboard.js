@@ -59,6 +59,7 @@ class StructureBoard {
         this.state = false;
         this.dragging = false;
         this.latestAction = [];
+        this.trigger_window_load_event = true;
         ls.remove(storageKey);
 
         dd = new DiffDOM();
@@ -1300,10 +1301,7 @@ class StructureBoard {
         this.addJsScriptsNeededForRender(new_scripts, old_scripts);
 
         $('.cms-structure-content').scrollTop(structureScrollTop);
-
         Plugin._refreshPlugins();
-        Helpers._getWindow().dispatchEvent(new Event('load'));
-
         $(Helpers._getWindow()).trigger('cms-content-refresh');
 
         this._loadedContent = true;
@@ -1319,9 +1317,9 @@ class StructureBoard {
      * @param {JQuery} old_scripts  JQuery selector of the scripts for the old body content
      */
     addJsScriptsNeededForRender(new_scripts, old_scripts) {
-        let triggerDOMContentLoaded = false;
         const scriptSrcList = [];
-
+        let classListCollection = [];
+        const that = this;
 
         new_scripts.each(function() {
             let script_exists = false;
@@ -1337,6 +1335,9 @@ class StructureBoard {
                     }
                 });
                 if (!script_exists) {
+                    let classList = new_script.attr('class').split(' ');
+
+                    classListCollection = classListCollection.concat(classList);
                     if (typeof new_script.prop('src') === 'string' && new_script.prop('src') !== '') {
                         scriptSrcList.push(new_script.prop('src'));
                     } else {
@@ -1346,29 +1347,22 @@ class StructureBoard {
                         js_file.type = 'text/javascript';
                         document.body.appendChild(js_file);
                     }
-                    if (new_script.hasClass('cms-trigger-load-events')) {
-                        triggerDOMContentLoaded = true;
-                    }
                 }
             }
         });
-        if (triggerDOMContentLoaded && scriptSrcList.length === 0) {
-            document.dispatchEvent(new Event('load'));
-            document.dispatchEvent(new Event('DOMContentLoaded'));
+        if (scriptSrcList.length === 0) {
+            that.triggerLoadEventsByClass(classListCollection);
         } else {
-            this.getMultiScripts(scriptSrcList).done(function() {
-                if (triggerDOMContentLoaded) {
-                    document.dispatchEvent(new Event('load'));
-                    document.dispatchEvent(new Event('DOMContentLoaded'));
-                }
+            that.getMultiScripts(scriptSrcList).done(function() {
+                that.triggerLoadEventsByClass(classListCollection);
             });
         }
     }
 
     /**
      * Downloads and executes all scripts given by `scriptSrcList` and returns a
-     * `Promise` when all are done. this is to prevent multiple triggering of
-     * the 'load' and 'DOMContentLoaded' events in `addJsScriptsNeededForRender`.
+     * `Promise` when all are done. This is to prevent multiple triggering of
+     * load events by `triggerLoadEventsByClass` in `addJsScriptsNeededForRender`.
      * Original solution from https://stackoverflow.com/a/11803418
      *
      * @param {array} scriptSrcList   Array of script sources
@@ -1386,6 +1380,24 @@ class StructureBoard {
         }));
 
         return $.when.apply($, _arr);
+    }
+
+    /**
+     * Triggers events if specific classes were in any of the scripts added by
+     * the method addJsScriptsNeededForRender
+     *
+     * @param {object} classListCollection  array of all classes the script tags had
+     */
+    triggerLoadEventsByClass(classListCollection) {
+        if (classListCollection.indexOf('cms-trigger-event-document-DOMContentLoaded') > -1) {
+            Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
+        }
+        if (classListCollection.indexOf('cms-trigger-event-window-DOMContentLoaded') > -1) {
+            Helpers._getWindow().dispatchEvent(new Event('DOMContentLoaded'));
+        }
+        if (classListCollection.indexOf('cms-trigger-event-window-load') > -1) {
+            Helpers._getWindow().dispatchEvent(new Event('load'));
+        }
     }
 
     handleAddPlugin(data) {

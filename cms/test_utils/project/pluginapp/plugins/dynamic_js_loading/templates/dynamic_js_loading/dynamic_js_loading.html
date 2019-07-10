@@ -15,7 +15,15 @@
         append_h2_element_inline('inline_no_trigger');
 
         document.addEventListener('DOMContentLoaded', function() {
-            append_h2_element_inline('inline_needs_trigger');
+            append_h2_element_inline('inline_needs_trigger_document_DOMContentLoaded');
+        });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            append_h2_element_inline('inline_needs_trigger_window_DOMContentLoaded');
+        });
+
+        window.addEventListener('load', function() {
+            append_h2_element_inline('inline_needs_trigger_window_load');
         });
     </script>
 {% endaddtoblock %}
