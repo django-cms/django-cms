@@ -104,6 +104,9 @@
         {% if page.changed_by %}
             <p title="{% filter escapejs %}{% trans "last change by" %}{% endfilter %}: {{ page.changed_by }}"><strong>{% filter escapejs %}{% trans "last change by" %}{% endfilter %}:</strong> {{ page.changed_by }}</p>
         {% endif %}
+        {% if page.changed_date %}
+            <p title="{% filter escapejs %}{% trans "last change on" %}{% endfilter %}: {{ page.changed_date|date:"Y-m-d H:i:s" }}"><strong>{% filter escapejs %}{% trans "last change on" %}{% endfilter %}:</strong> {{ page.changed_date|date:"Y-m-d H:i:s" }}</p>
+        {% endif %}
         {% if page.get_template_display %}
             <p title="{% filter escapejs %}{% trans "template" %}{% endfilter %}: {{ page.get_template_display }}"><strong>{% filter escapejs %}{% trans "template" %}{% endfilter %}:</strong> {{ page.get_template_display }}</p>
         {% endif %}
