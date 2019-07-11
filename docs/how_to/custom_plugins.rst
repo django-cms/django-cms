@@ -404,9 +404,18 @@ A **bad** example:
         when the plugin is first added to the page.
         If the javascript code is protected from prematurely executing by
         the EventListener for the event ``'load'`` and/or ``'DOMContentLoaded'``,
-        the class ``'cms-trigger-load-events'`` can additionally be added.
-        This will trigger the events ``'load'`` and ``'DOMContentLoaded'``
-        once after all scripts are successfully injected into the DOM.
+        the following classes can be added to the script tag:
+
+        ===========================================  ========================================================
+        Classname                                    Corresponding javascript code
+        ===========================================  ========================================================
+        cms-trigger-event-document-DOMContentLoaded  ``document.dispatchEvent(new Event('DOMContentLoaded')``
+        cms-trigger-event-window-DOMContentLoaded    ``window.dispatchEvent(new Event('DOMContentLoaded')``
+        cms-trigger-event-window-load                ``window.dispatchEvent(new Event('load')``
+        ===========================================  ========================================================
+
+
+        The events will be triggered once after all scripts are successfully injected into the DOM.
 
 
 .. _plugin-context-processors:
