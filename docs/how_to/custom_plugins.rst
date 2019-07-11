@@ -399,7 +399,7 @@ A **bad** example:
 
 .. note::
         If the Plugin requires javascript code to be rendered properly,
-        the class``'cms-execute-js-to-render'`` can be added to the script tag.
+        the class ``'cms-execute-js-to-render'`` can be added to the script tag.
         This will download and execute all scripts with this class, which weren't present before,
         when the plugin is first added to the page.
         If the javascript code is protected from prematurely executing by
