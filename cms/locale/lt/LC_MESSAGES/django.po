@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Jelena <jelena.kutalovskaja@gmail.com>, 2014
@@ -11,14 +11,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"POT-Creation-Date: 2019-07-19 11:49+0300\n"
 "PO-Revision-Date: 2018-11-13 10:43+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/divio/django-cms/language/lt/)\n"
+"Language: lt\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: lt\n"
 "Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "All"
@@ -48,8 +48,7 @@ msgstr "Perrašyti tai kas atvaizduojama meniu"
 msgid "Page Title"
 msgstr "Puslapio pavadinimas"
 
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Perrašo tai kas atvaizduojama jūsų naršyklės viršutinėje juostoje ar naršyklės žymėse (bookmarks)"
 
 msgid "Description meta tag"
@@ -107,7 +106,6 @@ msgstr "Prašome nustatyti %(language)s kalbos nuorodą prieš redaguojant jo i�
 msgid "A page with this reverse URL id exists already."
 msgstr "Puslapis su tokia nuoroda jau egzistuoja."
 
-#| msgid "Application configurations"
 msgid "Invalid application config value"
 msgstr "Netinkama aplikacijos konfigūracijos reikšmė"
 
@@ -141,34 +139,22 @@ msgstr "Pakeisti"
 msgid "Delete"
 msgstr "Pašalinti"
 
-msgid ""
-"Users can't create a page without permissions to change the created page. "
-"Edit permissions required."
+msgid "Users can't create a page without permissions to change the created page. Edit permissions required."
 msgstr "Vartotojai negali sukurti puslapio be leidimų keisti sukurtą puslapį. Reikalingi redagavimo leidimai."
 
-msgid ""
-"Users can't delete a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't delete a page without permissions to change the page. Edit permissions required."
 msgstr "Vartotojai negali ištrinti puslapio be leidimų keisti puslapį. Reikalingi redagavimo leidimai."
 
-msgid ""
-"Users can't set page permissions without permissions to change a page. Edit "
-"permissions required."
+msgid "Users can't set page permissions without permissions to change a page. Edit permissions required."
 msgstr "Vartotojai negali nustatyti puslapio leidimų be leidimo keisti puslapį. Reikalingas redagavimo leidimas."
 
-msgid ""
-"Users can't delete page permissions without permissions to change a page. "
-"Edit permissions required."
+msgid "Users can't delete page permissions without permissions to change a page. Edit permissions required."
 msgstr "Vartotojai negali ištrinti puslapio leidimų be leidimo keisti puslapį. Reikalingas redagavimo leidimas."
 
-msgid ""
-"Users can't create page permissions without permissions to change the "
-"created permission. Edit permissions required."
+msgid "Users can't create page permissions without permissions to change the created permission. Edit permissions required."
 msgstr "Vartotojai negali sukurti puslapio leidimų be leidimo keisti sukurtus leidimus. Reikalingas redagavimo leidimas."
 
-msgid ""
-"Users can't delete page permissions without permissions to change "
-"permissions. Edit permissions required."
+msgid "Users can't delete page permissions without permissions to change permissions. Edit permissions required."
 msgstr "Vartotojai negali ištrinti puslapio leidimų be leidimo keisti leidimus. Reikalingas redagavimo leidimas."
 
 #, python-format
@@ -181,14 +167,11 @@ msgstr "Kalba turi būti nustatyta į palaikomą kalbą!"
 msgid "Parent plugin language must be same as language!"
 msgstr "Pradinio įskiepio kalba turi būti tokia pati!"
 
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "Pradinio įskiepo rezervuota vieta turi būti tokia pati kaip rezervuota vieta!"
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Please create the %(language)s page translation before editing it's advanced settings."
 msgstr "Prašome sukurti puslapio %(language)s kalbos vertimą prieš redaguojant jo išplėstinius nustatymus."
 
 msgid "Advanced Settings"
@@ -220,23 +203,18 @@ msgstr "Blogas šablonas"
 msgid "The template was successfully changed"
 msgstr "Šablonas buvo sėkmingai pakeistas"
 
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
+msgid "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Klaida! Jūs neturite teisių perkelti šį puslapį. Perkraukite puslapį"
 
 msgid "You do not have permission to copy these plugins."
 msgstr "Jūs neturite teisių kopijuoti šių įskiepių"
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
 msgstr "Klaida! Jūs neturite teisių kopijuoti šio puslapio."
 
-msgid ""
-"Error! The page you're pasting is not translated in any of the languages "
-"configured by the target site."
+msgid "Error! The page you're pasting is not translated in any of the languages configured by the target site."
 msgstr "Klaida! Puslapis kurį bandote įkopijuoti nėra išverstas jokiomis kalbomis kurios sukonfigūruotos pasirinktame tinklalapyje."
 
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr "Jūs neturite teisės atkurti šio puslapio."
 
@@ -266,7 +244,6 @@ msgstr "Šis puslapis nebuvo publikuotas"
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr "%(language)s kalbos puslapis \"%(page)s\" sėkmingai nebepublikuojamas"
 
-#| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
 msgstr "Jūs neturite teisės pašalinti šio puslapio"
 
@@ -275,7 +252,6 @@ msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Pavadinimas ir įskiepiai su %(language)s kalbomis buvo pašalinti"
 
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr "Jūs neturite teisės peržiūrėti puslapio \"%(title)s\""
 
@@ -313,7 +289,6 @@ msgstr "Jūs neturite teisės redaguoti šio objekto"
 msgid "You do not have permission to add a plugin"
 msgstr "Jūs neturite teisės prideti įskiepį"
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr "Jūs neturite teisės kopijuoti šios rezervuotos vietos"
 
@@ -332,18 +307,15 @@ msgstr "pradinis elementas turi buti toje pačioje rezervuotoje vietoje"
 msgid "parent must be in the same language as plugin_language"
 msgstr "pradinis elementas turi būti tos pačios kalbos kaip įskiepis_kalba"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr "Jūs neturite teisės įkopijuoti šio įskiepio"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr "Jūs neturite teisės įkopijuoti šios rezervuotos vietos"
 
 msgid "You have no permission to move this plugin"
 msgstr "Jūs neturite teisės perkelti šio įskiepio"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr "Jūs neturite teisės iškirpti šio įskiepio"
 
@@ -390,9 +362,7 @@ msgid "Create Alias"
 msgstr "Sukurti alias (kitą varda)"
 
 #, python-format
-msgid ""
-"This is an alias reference, you can edit the content only on the <a "
-"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+msgid "This is an alias reference, you can edit the content only on the <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Tai susijęs paminėjimas, ši turinį galite redaguoti tik <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> puslapyje."
 
 msgid "Create"
@@ -441,7 +411,6 @@ msgstr "Struktūra"
 msgid "Content"
 msgstr "Turinys"
 
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr "Publikuoti puslapio pakeitimus"
 
@@ -451,15 +420,12 @@ msgstr "Publikuoti puslapį"
 msgid "Page settings"
 msgstr "Puslapio nustatymai"
 
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr "Pridėti vertimą"
 
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr "Pašalinti vertimą"
 
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr "Kopijuoti visus įskiepius"
 
@@ -468,7 +434,6 @@ msgid "from %s"
 msgstr "iš %s"
 
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "Ar tikrai norite kopijuoti visus įskiepius iš %s?"
 
@@ -478,7 +443,6 @@ msgstr "Puslapiai"
 msgid "Page"
 msgstr "Puslapis"
 
-#| msgid "Create"
 msgid "Create Page"
 msgstr "Kurti puslapį"
 
@@ -540,25 +504,14 @@ msgid "Select a valid page"
 msgstr "Pasirinkite tinkamą puslapį"
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
-msgid ""
-"Page %(conflict_page)s has the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+msgid "Page %(conflict_page)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr "Puslapis %(conflict_page)s turi tą patį url '%(url)s' kaip dabartinis puslapis \"%(instance)s\"."
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Puslapis %(conflict_page)s turi tą patį url '%(url)s' kaip dabartinis puslapis."
 
-msgid ""
-"Optional. If supplied, will be automatically added within a new text plugin."
+msgid "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr "Nebūtina. Jei suvestas, bus automatiškai pridėtas prie naujo teksto įskiepio."
 
 msgid "Provide a title for the new page."
@@ -567,7 +520,6 @@ msgstr "Sukurkite antraštę naujam puslapiui."
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Palikti tuščią kad nuoroda būtų sugeneruota automatiškai, arba galite pakeisti kaip Jums reikia."
 
-#| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
 msgstr "Jūs neturite teisių reikalingų norint pridėti puslapį."
 
@@ -685,9 +637,7 @@ msgstr "Tik šis tinklalapis"
 msgid "Allow"
 msgstr "Leisti"
 
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Kada puslapis turėtų būti pradedamas atvaizduoti. Būsena turi būti \"Publikuota\" kad puslapis būtų atvaizduojamas."
 
 msgid "When to expire the page. Leave empty to never expire."
@@ -696,9 +646,7 @@ msgstr "Kada puslapis nustos galioti. Palikite tuščią kad galiotų neribotą 
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Visi pirminiai elementai nebus atvaizduojami navigacijoje"
 
-msgid ""
-"A unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "A unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "Unikalus identifikatorius, naudojamas su page_url templatetag nukreipiant į šį puslapį"
 
 msgid "The template used to render the content."
@@ -737,28 +685,19 @@ msgstr "puslapio lygyje"
 msgid "frontend view restriction"
 msgstr "peržiūrėjimo apribojimas"
 
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr "Pasirinkite vartotoją arba grupę."
 
-msgid ""
-"Users can't publish a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't publish a page without permissions to change the page. Edit permissions required."
 msgstr "Vartotojai negali publikuoti puslapio be leidimų keisti puslapį. Reikalingi redagavimo leidimai."
 
-msgid ""
-"Users can't change page advanced settings without permissions to change the "
-"page. Edit permissions required."
+msgid "Users can't change page advanced settings without permissions to change the page. Edit permissions required."
 msgstr "Vartotojai negali keisti puslapio išplėstinių nustatymų be leidimo keisti puslapį. Reikalingi redagavimo leidimai."
 
-msgid ""
-"Users can't change page permissions without permissions to change the page. "
-"Edit permissions required."
+msgid "Users can't change page permissions without permissions to change the page. Edit permissions required."
 msgstr "Vartotojai negali keisti puslapio leidimų be leidimo keisti puslapį. Reikalingi redagavimo leidimai."
 
-msgid ""
-"Users can't move a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't move a page without permissions to change the page. Edit permissions required."
 msgstr "Vartotojai negali perkelti puslapio be leidimų keisti puslapį. Reikalingi redagavimo leidimai."
 
 msgid "can recover any deleted page"
@@ -776,9 +715,7 @@ msgstr "Globalios puslapių teisės"
 msgid "Page permission"
 msgstr "Puslapio teisės"
 
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "Puslapio pridėjimo teisė taip pat reikalauja prieigos prie vidinių elementų, kitaip pridėto puslapio nebus galima redaguoti."
 
 msgid "User (page)"
@@ -820,9 +757,7 @@ msgstr "pagal kodą"
 msgid "static placeholder name"
 msgstr "statinės rezervuotos vietos pavadinimas"
 
-msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to "
-"users."
+msgid "Descriptive name to identify this static placeholder. Not displayed to users."
 msgstr "Apibudinantis pavadinimas atpažinti šią statinę rezervuotą vietą. Nerodoma vartotojams."
 
 msgid "placeholder code"
@@ -883,7 +818,6 @@ msgid "Generic"
 msgstr "Bendrasis"
 
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
 
@@ -907,7 +841,6 @@ msgstr "Vartotojo vardas:"
 msgid "Password:"
 msgstr "Vartotojo slaptažodis:"
 
-#| msgid "Add Page"
 msgid "Add a page"
 msgstr "Pridėti puslapį"
 
@@ -993,7 +926,6 @@ msgstr "Iškirpti"
 msgid "Paste"
 msgstr "Įkopijuoti"
 
-#| msgid "Save as new"
 msgid "Set as home"
 msgstr "Nustatyti kaip pradinį"
 
@@ -1012,7 +944,6 @@ msgstr "Puslapių sąrašas"
 msgid "Search"
 msgstr "Ieškoti"
 
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr "Puslapio medis"
 
@@ -1024,20 +955,22 @@ msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
-msgstr "\nAtkurti pašalintus %(name)s"
+msgstr ""
+"\n"
+"Atkurti pašalintus %(name)s"
 
 #, python-format
 msgid ""
 "\n"
 "                                New %(name)s\n"
 "                            "
-msgstr "\nNaujas %(name)s"
+msgstr ""
+"\n"
+"Naujas %(name)s"
 
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr "Pagrindinė navigacija"
 
-#| msgid "Actions"
 msgid "Options"
 msgstr "Nustatymai"
 
@@ -1050,9 +983,7 @@ msgstr "Pakeitimai medyje gali reikalauti perkrovimo."
 msgid "Error:"
 msgstr "Klaida:"
 
-msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+msgid "This page cannot be copied because an application is attached to it. See the Page's Advanced settings to manage apphooks."
 msgstr "Šis puslapis negali būti kopijuojamas nes su juo yra susieta aplikacija. Žiūrėkite puslapio išplėstinius nustatymus aplikacijų valdymui."
 
 msgid "Are you sure you want to § this page?"
@@ -1061,7 +992,6 @@ msgstr "Ar tikrai norite § šį puslapį?"
 msgid "Reload"
 msgstr "Perkrauti"
 
-#| msgid "New Page"
 msgid "New node"
 msgstr "Naujas mazgas"
 
@@ -1075,17 +1005,18 @@ msgid "Menu"
 msgstr "Meniu"
 
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr "\n                            <em>Kol kas nėra jokių %(object)s.</em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Pridėti %(object)s</a> dabar.\n                        "
+msgstr ""
+"\n"
+"                            <em>Kol kas nėra jokių %(object)s.</em>\n"
+"                            <br>\n"
+"                            <a href=\"%(add_url)s\" class=\"addlink\">Pridėti %(object)s</a> dabar.\n"
+"                        "
 
 msgid "Copy options"
 msgstr "Kopijavimo nustatymai"
@@ -1099,31 +1030,24 @@ msgstr "Uždaryti"
 msgid "Legend"
 msgstr "Legenda"
 
-#| msgid "published"
 msgid "Published"
 msgstr "Publikuota"
 
-#| msgid "Change"
 msgid "Changed"
 msgstr "Pakeistas"
 
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Nepublikuotas"
 
-#| msgid "in menu"
 msgid "In menu"
 msgstr "Yra meniu"
 
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr "Nesantis meniu"
 
-#| msgid "New page"
 msgid "View page"
 msgstr "Žiūrėti puslapį"
 
-#| msgid "softroot"
 msgid "Softroot"
 msgstr "Softroot"
 
@@ -1135,7 +1059,6 @@ msgid "Application: %(apphook)s"
 msgstr "Aplikacija: %(apphook)s"
 
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr "Peržiūrėti šį puslapį %(language)s kalboje"
 
@@ -1157,7 +1080,6 @@ msgstr "yra meniu"
 msgid "not in menu"
 msgstr "nesantis meniu"
 
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Puslapio nustatymai (spauskite SHIFT klavišą kad įjungti išplėstinius nustatymus)"
 
@@ -1212,11 +1134,9 @@ msgstr "Akcentuoti"
 msgid "Available plugins"
 msgstr "Galimi įskiepiai"
 
-#| msgid "Structure"
 msgid "Toggle structure"
 msgstr "Perjungti struktūrą"
 
-#| msgid "View published"
 msgid "View published"
 msgstr "Žiūrėti publikuotą"
 
@@ -1230,10 +1150,7 @@ msgid "More"
 msgstr "Daugiau"
 
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
-msgid ""
-"Development version using django CMS %(cms_version)s, Django "
-"%(django_version)s, Python %(python_version)s"
+msgid "Development version using django CMS %(cms_version)s, Django %(django_version)s, Python %(python_version)s"
 msgstr "Vystymo versija naudojanti django CMS %(cms_version)s, Django %(django_version)s, Python %(python_version)s"
 
 msgid "Cancel"
@@ -1242,7 +1159,6 @@ msgstr "Atšaukti"
 msgid "The following error occured:"
 msgstr "Įvyko tokia klaida:"
 
-#| msgid "Action successfull... reloading."
 msgid "Action successful."
 msgstr "Veiksmas pavyko."
 
@@ -1255,24 +1171,18 @@ msgstr "Ar tikrai norite publikuoti šį puslapį?"
 msgid "Plugin will be added here"
 msgstr "Įskiepis bus pridėtas čia"
 
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr "Jūs turite neišsaugotų pakeitimų."
 
-#| msgid "Loading..."
 msgid "Loading"
 msgstr "Kraunama"
 
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr "Ar tikrai nenorite išsaugoti šių pakeitimų?"
 
-msgid ""
-"The form could not be loaded. Please check that the server is running "
-"correctly."
+msgid "The form could not be loaded. Please check that the server is running correctly."
 msgstr "Formos nepavyko užkrauti. Patikrinkite ar veikia serveris."
 
-#| msgid "Notify user"
 msgid "Most used"
 msgstr "Daugiausia naudojama"
 
@@ -1282,10 +1192,14 @@ msgstr "Nuorodos"
 msgid "The page was changed in the meantime, reloading..."
 msgstr "Puslapis buvo pakeistas, perkraunama..."
 
+#, fuzzy
+#| msgid "Shortcuts"
+msgid "CMS-wide Shortcuts"
+msgstr "Nuorodos"
+
 msgid "Bring up this help dialog"
 msgstr "Atidaryti šį pagalbos dialogą"
 
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr "Uždaryti/atšaukti"
 
@@ -1301,31 +1215,30 @@ msgstr "Atidaryti \"Kūrimo\" dialogą"
 msgid "Focus on Toolbar"
 msgstr "Koncentruotis į įrankių juostą"
 
-#| msgid "static placeholders"
+#, fuzzy
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr "Struktūra"
+
 msgid "Focus on placeholders"
 msgstr "Koncentruotis į rezervuotas vietas"
 
 msgid "Move to next/previous element"
 msgstr "Pereiti į kitą/buvusį elementą"
 
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr "Koncentruotis į rezervuotos vietos įskiepius"
 
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr "Redaguoti įskiepį"
 
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr "Atidaryti veiksmų meniu"
 
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr "Išskleisti/suskleisti"
 
-msgid ""
-"<strong>Login failed.</strong> Please check your credentials and try again."
+msgid "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Prisijungti nepavyko.</strong> Patikrinkite savo duomenis ir bandykit dar kartą."
 
 msgid "This page has unpublished changes."
@@ -1372,14 +1285,18 @@ msgid ""
 "\n"
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
-msgstr "\nSveiki, tai django CMS versija <strong>%(cms_version)s</strong>."
+msgstr ""
+"\n"
+"Sveiki, tai django CMS versija <strong>%(cms_version)s</strong>."
 
 #, python-format
 msgid ""
 "\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
 "                    "
-msgstr "\n<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Pridėkite pirmąjį puslapį</a> į sistema kad galėtumete tęsti."
+msgstr ""
+"\n"
+"<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Pridėkite pirmąjį puslapį</a> į sistema kad galėtumete tęsti."
 
 #, python-format
 msgid ""
@@ -1387,7 +1304,10 @@ msgid ""
 "                        JavaScript seems to be disabled so please\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
-msgstr "\nJavaScript yra išjungtas, prašome\n<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">pridėti puslapį</a> rankiniu būdu."
+msgstr ""
+"\n"
+"JavaScript yra išjungtas, prašome\n"
+"<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">pridėti puslapį</a> rankiniu būdu."
 
 msgid "Installation Notes"
 msgstr "Diegimo užrašai"
@@ -1398,32 +1318,19 @@ msgstr "Palaikymas"
 msgid "Documentation"
 msgstr "Dokumentacija"
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr "\n                <p class=\"cms-welcome-notes\">Jei nematote django CMS logotipo viršuje, įsitikinkite\n                    jog susiejote <code>static/cms</code> aplanką į\n                    statinius failus.</p>\n            "
+msgstr ""
+"\n"
+"                <p class=\"cms-welcome-notes\">Jei nematote django CMS logotipo viršuje, įsitikinkite\n"
+"                    jog susiejote <code>static/cms</code> aplanką į\n"
+"                    statinius failus.</p>\n"
+"            "
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
@@ -1431,7 +1338,13 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr "\n                    <p class=\"cms-welcome-notes\">Jūs matote šia žinutė todėl kad\n                        <code>DEBUG = True</code> nustatymas yra nustatytas jūsų django \n                        nustatymuose ir kol kas nėra sukurti jokie puslapiai.\n                    </p>\n                "
+msgstr ""
+"\n"
+"                    <p class=\"cms-welcome-notes\">Jūs matote šia žinutė todėl kad\n"
+"                        <code>DEBUG = True</code> nustatymas yra nustatytas jūsų django \n"
+"                        nustatymuose ir kol kas nėra sukurti jokie puslapiai.\n"
+"                    </p>\n"
+"                "
 
 msgid "Welcome to django CMS"
 msgstr "Sveiki, tai django CMS"
@@ -1471,7 +1384,9 @@ msgstr "Puslapis nerastas %(domain)s"
 msgid ""
 "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
-msgstr "Šablono žymė negalėjo rasti puslapio su argumentais `%(page_lookup)s\n`. Užklausos URL buvo: http://%(host)s%(path)s"
+msgstr ""
+"Šablono žymė negalėjo rasti puslapio su argumentais `%(page_lookup)s\n"
+"`. Užklausos URL buvo: http://%(host)s%(path)s"
 
 msgid "Two columns"
 msgstr "Du stulpeliai"
@@ -1482,8 +1397,7 @@ msgstr "Trys stulpeliai"
 msgid "username"
 msgstr "vartotojo vardas"
 
-msgid ""
-"Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgid "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "Privalomas. 300 simbolių arba mažiau. Raidės, skaičiai ir @/./+/-/_ simboliai"
 
 msgid "Enter a valid username."
@@ -1501,9 +1415,7 @@ msgstr "Nustato ar vartotojas gali prisijungti prie šio admininistravimo puslap
 msgid "active"
 msgstr "aktyvus"
 
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
+msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
 msgstr "Nustato ar šis vartotojas turi būti traktuojamas kaip aktyvus. Atžymėkite užuot šalinę vartotoją."
 
 msgid "users"
@@ -1539,7 +1451,6 @@ msgstr "Straipsniai"
 msgid "Sample App"
 msgstr "Pavyzdinė aplikacija"
 
-#| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
 msgstr "Pavyzdinė aplikacija su konfigūracija"
 
@@ -1549,7 +1460,6 @@ msgstr "Pavyzdinė aplikacija su panaikintomis teisėmis"
 msgid "Sample App 2"
 msgstr "Pavyzdinė aplikacija 2"
 
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr "Pavyzdinė aplikacija 3"
 
@@ -1586,7 +1496,6 @@ msgstr "Statinis meniu2"
 msgid "Static Menu3"
 msgstr "Statinis meniu3"
 
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr "Statinis meniu4"
 
@@ -1615,12 +1524,10 @@ msgid "UserSettings"
 msgstr "Vartotojo nustatymai"
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "Pridėti įskiepį į rezervuotą vietą \"%(placeholder_label)s\""
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Pridėti įskiepį %(plugin_name)s"
 
@@ -1635,9 +1542,7 @@ msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "Ši rezervuota vieta  jau turi maksimalų skaičių įskiepių (%s)."
 
 #, python-format
-msgid ""
-"This placeholder already has the maximum number (%(limit)s) of allowed "
-"%(plugin_name)s plugins."
+msgid "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
 msgstr "Ši rezervuota vieta  jau turi maksimalų skaičių (%(limit)s) leistinų %(plugin_name)s įskiepių."
 
 #, python-brace-format
@@ -1645,9 +1550,7 @@ msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
 msgstr "Nerastas pateiktas CMS_REQUEST_IP_RESOLVER modulis: \"{0}\"."
 
 #, python-brace-format
-msgid ""
-"Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
-"module \"{1}\"."
+msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in module \"{1}\"."
 msgstr "Nerasta pateikta CMS_REQUEST_IP_RESOLVER funkcija\": \"{0}\" modulyje \"{1}\"."
 
 #, python-format
@@ -1697,12 +1600,8 @@ msgstr "Vedlys jau užregistruotas modeliuil: %s"
 #~ msgid "Recover (any) pages"
 #~ msgstr "Recover (any) pages"
 
-#~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
-#~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ msgid "Send email notification to user about username or password change. Requires user email."
+#~ msgstr "Send email notification to user about username or password change. Requires user email."
 
 #~ msgid "New password"
 #~ msgstr "New password"
@@ -1713,15 +1612,11 @@ msgstr "Vedlys jau užregistruotas modeliuil: %s"
 #~ msgid "Email notification requires valid email address."
 #~ msgstr "Email notification requires valid email address."
 
-#~ msgid ""
-#~ "The permission to add new pages requires the permission to change pages!"
-#~ msgstr ""
-#~ "The permission to add new pages requires the permission to change pages!"
+#~ msgid "The permission to add new pages requires the permission to change pages!"
+#~ msgstr "The permission to add new pages requires the permission to change pages!"
 
-#~ msgid ""
-#~ "The permission to add new users requires the permission to change users!"
-#~ msgstr ""
-#~ "The permission to add new users requires the permission to change users!"
+#~ msgid "The permission to add new users requires the permission to change users!"
+#~ msgstr "The permission to add new users requires the permission to change users!"
 
 #~ msgid "To add permissions you also need to edit them!"
 #~ msgstr "To add permissions you also need to edit them!"
@@ -1732,20 +1627,14 @@ msgstr "Vedlys jau užregistruotas modeliuil: %s"
 #~ msgid "Copied plugins to %(placeholder)s"
 #~ msgstr "Copied plugins to %(placeholder)s"
 
-#~ msgid ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-#~ msgstr ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+#~ msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+#~ msgstr "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 
 #~ msgid "Moved plugins to %(placeholder)s"
 #~ msgstr "Copied plugins to %(placeholder)s"
 
-#~ msgid ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
-#~ msgstr ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
+#~ msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+#~ msgstr "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 
 #~ msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 #~ msgstr "All plugins in the placeholder \"%(name)s\" were deleted."
@@ -1810,12 +1699,8 @@ msgstr "Vedlys jau užregistruotas modeliuil: %s"
 #~ msgid "Path Overflow from: '%s'"
 #~ msgstr "Path Overflow from: '%s'"
 
-#~ msgid ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
-#~ msgstr ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
+#~ msgid "The new node is too deep in the tree, try increasing the path.max_length property and UPDATE your database"
+#~ msgstr "The new node is too deep in the tree, try increasing the path.max_length property and UPDATE your database"
 
 #~ msgid "An error occured. Please reload the page"
 #~ msgstr "An error occured. Please reload the page"
@@ -1857,12 +1742,8 @@ msgstr "Vedlys jau užregistruotas modeliuil: %s"
 #~ msgid "Info"
 #~ msgstr "Info"
 
-#~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
-#~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ msgid "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink\">Add page</a> now."
+#~ msgstr "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"

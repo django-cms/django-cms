@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Jiří Vírava <appukonrad@gmail.com>, 2012-2013
@@ -21,14 +21,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"POT-Creation-Date: 2019-07-19 11:49+0300\n"
 "PO-Revision-Date: 2018-11-09 12:08+0000\n"
 "Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Czech (http://www.transifex.com/divio/django-cms/language/cs/)\n"
+"Language: cs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: cs\n"
 "Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;\n"
 
 msgid "All"
@@ -58,8 +58,7 @@ msgstr "Přepsat to, co se zobrazuje v menu"
 msgid "Page Title"
 msgstr "Název stránky"
 
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Přepsat to, co se zobrazuje v horní části vašeho prohlížeče nebo v záložkách"
 
 msgid "Description meta tag"
@@ -117,7 +116,6 @@ msgstr "Prosím přiřaďte slug pro následující jazykovou mutaci před změn
 msgid "A page with this reverse URL id exists already."
 msgstr "Stránka s takovu hodnotou reverse URL id již existuje."
 
-#| msgid "Application configurations"
 msgid "Invalid application config value"
 msgstr ""
 
@@ -151,34 +149,22 @@ msgstr "Změnit"
 msgid "Delete"
 msgstr "Odstranit"
 
-msgid ""
-"Users can't create a page without permissions to change the created page. "
-"Edit permissions required."
+msgid "Users can't create a page without permissions to change the created page. Edit permissions required."
 msgstr "Uživatelé nemohou vytvořit stránku bez oprávnění k editaci stránek. Nutno provést změnu oprávnění uživatele."
 
-msgid ""
-"Users can't delete a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't delete a page without permissions to change the page. Edit permissions required."
 msgstr "Uživatelé nemohou odstranit stránku bez oprávnění k editaci stránek. Nutno provést změnu oprávnění uživatele."
 
-msgid ""
-"Users can't set page permissions without permissions to change a page. Edit "
-"permissions required."
+msgid "Users can't set page permissions without permissions to change a page. Edit permissions required."
 msgstr "Uživatelé nemohou měnit vlastnosti stránky bez oprávnění k editaci stránek. Nutno provést změnu oprávnění uživatele."
 
-msgid ""
-"Users can't delete page permissions without permissions to change a page. "
-"Edit permissions required."
+msgid "Users can't delete page permissions without permissions to change a page. Edit permissions required."
 msgstr "Uživatelé nemohou odstranit vlastnosti stránky bez oprávnění k editaci stránek. Nutno provést změnu oprávnění uživatele."
 
-msgid ""
-"Users can't create page permissions without permissions to change the "
-"created permission. Edit permissions required."
+msgid "Users can't create page permissions without permissions to change the created permission. Edit permissions required."
 msgstr "Uživatelé nemohou vytvářet vlastnosti stránky bez oprávnění ke změně těchto vlastností. Nutno provést změnu oprávnění uživatele."
 
-msgid ""
-"Users can't delete page permissions without permissions to change "
-"permissions. Edit permissions required."
+msgid "Users can't delete page permissions without permissions to change permissions. Edit permissions required."
 msgstr "Uživatelé nemohou odstranit vlastnosti stránky bez oprávnění k úpravě stránek. Nutno provést změnu oprávnění uživatele."
 
 #, python-format
@@ -191,14 +177,11 @@ msgstr "Zadaný jazyk není podporovaný, zvolte jiný."
 msgid "Parent plugin language must be same as language!"
 msgstr "Jazyk rodičovského pluginu musí být stejný jako jazyk!"
 
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "Placeholder v nadřazeném pluginu musí odpovídat tomuto placeholderu. "
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Please create the %(language)s page translation before editing it's advanced settings."
 msgstr "Prosím vytvořte následující jazykovou mutaci stránky před úpravou jejích pokročilých vlastností:  %(language)s"
 
 msgid "Advanced Settings"
@@ -230,23 +213,18 @@ msgstr "Šablona není platná"
 msgid "The template was successfully changed"
 msgstr "Stránka byla úspěšně schválena."
 
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
+msgid "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Chyba! Nemáte oprávnění k přesunu na tuto stránku. Načtěte si prosím stránku znovu."
 
 msgid "You do not have permission to copy these plugins."
 msgstr "Nemáte oprávnění kopírovat tyto položky obsahu."
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
 msgstr "Chyba! Nemáte oprávnění ke kopírování této stránky."
 
-msgid ""
-"Error! The page you're pasting is not translated in any of the languages "
-"configured by the target site."
+msgid "Error! The page you're pasting is not translated in any of the languages configured by the target site."
 msgstr "Chyba! Stránka, kterou kopírujete, není přeložena v žádném z jazyků nakonfigurovaných cílovou stránkou."
 
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr "Nemáte oprávnění k manipulaci stavu této stránky."
 
@@ -276,7 +254,6 @@ msgstr "Tato stránka nebyla nikdy zveřejněna"
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr "Stránka \"%(page)s\" v jazyce %(language)s byla úspěšně depublikována"
 
-#| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
 msgstr "Nemáte oprávnění k odstranění této stránky."
 
@@ -285,7 +262,6 @@ msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Název a položky obsahu pro jazyk %(language)s byli odstraněny."
 
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr "Nemáte oprávnění k zobrazení stránky \" %(title)s\""
 
@@ -323,7 +299,6 @@ msgstr "Nemáte oprávnění k editování této položky"
 msgid "You do not have permission to add a plugin"
 msgstr "Nemáte oprávnění přidávat položky obsahu"
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr "Nemáte oprávnění ke kopírování tohoto placeholderu."
 
@@ -342,18 +317,15 @@ msgstr "rodič musí být ve stejném placeholderu"
 msgid "parent must be in the same language as plugin_language"
 msgstr "rodič musí být ve stejném jazyce jako jazyk pluginu"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr "Nemáte oprávnění ke vložení tohoto pluginu"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr "Nemáte oprávnění ke vložení tohoto placeholderu"
 
 msgid "You have no permission to move this plugin"
 msgstr "Nemáte oprávnění přesouvat tuto položku obsahu"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr "Nemáte oprávnění k vyjmutí tohoto pluginu"
 
@@ -400,9 +372,7 @@ msgid "Create Alias"
 msgstr "Vytvořit Alias"
 
 #, python-format
-msgid ""
-"This is an alias reference, you can edit the content only on the <a "
-"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+msgid "This is an alias reference, you can edit the content only on the <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Toto je pouze reference odjinud,  obsah lze upravovat pouze na stránce <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>"
 
 msgid "Create"
@@ -451,7 +421,6 @@ msgstr "Struktura"
 msgid "Content"
 msgstr "Obsah"
 
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr "Publikovaná stránka změněna"
 
@@ -461,15 +430,12 @@ msgstr "Publikovat nyní"
 msgid "Page settings"
 msgstr "Nastavení stránky"
 
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr "Přidat překlad"
 
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr "Odstranit překlad"
 
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr "Zkopírovat všechny pluginy"
 
@@ -478,7 +444,6 @@ msgid "from %s"
 msgstr "z %s"
 
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "Opravdu chcete zkopírovat všechny pluginy z %s?"
 
@@ -488,7 +453,6 @@ msgstr "Stránky"
 msgid "Page"
 msgstr "Stránka"
 
-#| msgid "Create"
 msgid "Create Page"
 msgstr "Vytvořit stránku"
 
@@ -550,25 +514,14 @@ msgid "Select a valid page"
 msgstr "Vybrat platnou stránku"
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
-msgid ""
-"Page %(conflict_page)s has the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+msgid "Page %(conflict_page)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr ""
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 
-msgid ""
-"Optional. If supplied, will be automatically added within a new text plugin."
+msgid "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr "Volitelné. Pokud uvedete, text bude automaticky přidán do nového textového modulu."
 
 msgid "Provide a title for the new page."
@@ -577,7 +530,6 @@ msgstr "Uveďte nadpis pro novou stránku."
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Ponechte prázdné pro automatické vyplnění slugu, nebo vyplňte dle potřeby."
 
-#| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
 msgstr ""
 
@@ -695,9 +647,7 @@ msgstr "Jen tento web"
 msgid "Allow"
 msgstr "Povolit"
 
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Kdy má být stránka publikována. Stav musí být \"Publikováno\", aby k publikování došlo."
 
 msgid "When to expire the page. Leave empty to never expire."
@@ -706,9 +656,7 @@ msgstr "Doba vypršení stránky. Prázdné pole = neomezená platnost"
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Potomci nebudou zobrazeni v navigaci"
 
-msgid ""
-"A unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "A unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "Unikátní identifikátor, který je použit s page_url templatetag pro odkazování do této stránky"
 
 msgid "The template used to render the content."
@@ -747,28 +695,19 @@ msgstr "na úrovni stránky"
 msgid "frontend view restriction"
 msgstr "omezení frontend view"
 
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr "Prosím zvolte uživatele či skupinu."
 
-msgid ""
-"Users can't publish a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't publish a page without permissions to change the page. Edit permissions required."
 msgstr "Uživatelé nemohou publikovat stránku bez oprávnění k její editaci. Nutno provést změnu oprávnění."
 
-msgid ""
-"Users can't change page advanced settings without permissions to change the "
-"page. Edit permissions required."
+msgid "Users can't change page advanced settings without permissions to change the page. Edit permissions required."
 msgstr "Uživatel nemůže změnit pokročilé vlastnosti stránky bez oprávnění k její změně. Nuto změnit oprávnění uživatele."
 
-msgid ""
-"Users can't change page permissions without permissions to change the page. "
-"Edit permissions required."
+msgid "Users can't change page permissions without permissions to change the page. Edit permissions required."
 msgstr "Uživatel nemůže změnit vlastnosti stránky bez oprávnění k její změně. Nuto změnit oprávnění uživatele."
 
-msgid ""
-"Users can't move a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't move a page without permissions to change the page. Edit permissions required."
 msgstr "Uživatel nemůže přesunout stránku bez oprávnění k její změně. Nuto změnit oprávnění uživatele."
 
 msgid "can recover any deleted page"
@@ -786,9 +725,7 @@ msgstr "Globální oprávnění stránek"
 msgid "Page permission"
 msgstr "Práva stránky"
 
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "Právo na přidání stránky vyžaduje také přístup k \"vnořeným\" stránkám, jinak tyto stránky nebude moci editovat jejich autor."
 
 msgid "User (page)"
@@ -830,9 +767,7 @@ msgstr "podlé kódu"
 msgid "static placeholder name"
 msgstr "statické jméno umístěnky"
 
-msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to "
-"users."
+msgid "Descriptive name to identify this static placeholder. Not displayed to users."
 msgstr "Popisné jméno identifikující tuto umístěnku. Není zobrazováno uživatelům."
 
 msgid "placeholder code"
@@ -893,7 +828,6 @@ msgid "Generic"
 msgstr "Generic"
 
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Změna úspěšná: %(name)s \" %(obj)s\""
 
@@ -917,7 +851,6 @@ msgstr "Uživatelské jméno:"
 msgid "Password:"
 msgstr "Heslo:"
 
-#| msgid "Add Page"
 msgid "Add a page"
 msgstr ""
 
@@ -1003,7 +936,6 @@ msgstr "Vyjmout"
 msgid "Paste"
 msgstr "Vložit"
 
-#| msgid "Save as new"
 msgid "Set as home"
 msgstr ""
 
@@ -1022,7 +954,6 @@ msgstr "Seznam stránek"
 msgid "Search"
 msgstr "Vyhledat"
 
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr "Strom stránek"
 
@@ -1034,7 +965,9 @@ msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
-msgstr "\nObnovit odstraněnou  %(name)s"
+msgstr ""
+"\n"
+"Obnovit odstraněnou  %(name)s"
 
 #, python-format
 msgid ""
@@ -1043,11 +976,9 @@ msgid ""
 "                            "
 msgstr ""
 
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr "Hlavní navigace"
 
-#| msgid "Actions"
 msgid "Options"
 msgstr "Možnosti"
 
@@ -1060,9 +991,7 @@ msgstr "Změny ve stromu mohou vyžadovat obnovení."
 msgid "Error:"
 msgstr "Chyba:"
 
-msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+msgid "This page cannot be copied because an application is attached to it. See the Page's Advanced settings to manage apphooks."
 msgstr "Tato stránka nemůže být zkopírována protože je k ní připojena aplikace. Tyto přípojky lze spravovat v Pokročilých nastaveních. "
 
 msgid "Are you sure you want to § this page?"
@@ -1071,7 +1000,6 @@ msgstr "Opravdu chcete § tuto stránku?"
 msgid "Reload"
 msgstr "Obnovit"
 
-#| msgid "New Page"
 msgid "New node"
 msgstr "Nový uzel"
 
@@ -1085,10 +1013,6 @@ msgid "Menu"
 msgstr "Menu"
 
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
@@ -1109,31 +1033,24 @@ msgstr "Zavřít"
 msgid "Legend"
 msgstr "Legenda"
 
-#| msgid "published"
 msgid "Published"
 msgstr "Publikováno"
 
-#| msgid "Change"
 msgid "Changed"
 msgstr "Zmeněno"
 
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Nepublikováno"
 
-#| msgid "in menu"
 msgid "In menu"
 msgstr "V menu"
 
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr "Není v menu"
 
-#| msgid "New page"
 msgid "View page"
 msgstr "Zobrazit stránku"
 
-#| msgid "softroot"
 msgid "Softroot"
 msgstr ""
 
@@ -1145,7 +1062,6 @@ msgid "Application: %(apphook)s"
 msgstr "Aplikace: %(apphook)s"
 
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr "Zobrazit náhled v jazyk. mutaci:  %(language)s"
 
@@ -1167,7 +1083,6 @@ msgstr "v menu"
 msgid "not in menu"
 msgstr "není v menu"
 
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Nastavení stránky (SHIFT + kliknutí pro Pokročilé nastavení)"
 
@@ -1222,11 +1137,9 @@ msgstr ""
 msgid "Available plugins"
 msgstr "Dostupné typy obsahu"
 
-#| msgid "Structure"
 msgid "Toggle structure"
 msgstr ""
 
-#| msgid "View published"
 msgid "View published"
 msgstr "Zobrazit publikované"
 
@@ -1240,10 +1153,7 @@ msgid "More"
 msgstr "Více"
 
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
-msgid ""
-"Development version using django CMS %(cms_version)s, Django "
-"%(django_version)s, Python %(python_version)s"
+msgid "Development version using django CMS %(cms_version)s, Django %(django_version)s, Python %(python_version)s"
 msgstr ""
 
 msgid "Cancel"
@@ -1252,7 +1162,6 @@ msgstr "Storno"
 msgid "The following error occured:"
 msgstr "Došlo k následující chybě:"
 
-#| msgid "Action successfull... reloading."
 msgid "Action successful."
 msgstr ""
 
@@ -1265,24 +1174,18 @@ msgstr "Jste si jisti, že chcete publikovat tuto stránku?"
 msgid "Plugin will be added here"
 msgstr "Zde bude přidán plugin"
 
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr "Existují neuložené změny."
 
-#| msgid "Loading..."
 msgid "Loading"
 msgstr ""
 
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr "Chcete zahodit tyto změny?"
 
-msgid ""
-"The form could not be loaded. Please check that the server is running "
-"correctly."
+msgid "The form could not be loaded. Please check that the server is running correctly."
 msgstr "Formulář nelze nahrát. Prosím zkontrolujte že aplikace beží korektně."
 
-#| msgid "Notify user"
 msgid "Most used"
 msgstr ""
 
@@ -1292,10 +1195,14 @@ msgstr "Zkratky"
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+#, fuzzy
+#| msgid "Shortcuts"
+msgid "CMS-wide Shortcuts"
+msgstr "Zkratky"
+
 msgid "Bring up this help dialog"
 msgstr "Zobrazit dialog nápovědy"
 
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr "Zavřít/zrušit"
 
@@ -1311,31 +1218,30 @@ msgstr "Otevřít dialog pro Vytvoření"
 msgid "Focus on Toolbar"
 msgstr ""
 
-#| msgid "static placeholders"
+#, fuzzy
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr "Struktura"
+
 msgid "Focus on placeholders"
 msgstr ""
 
 msgid "Move to next/previous element"
 msgstr "Přesun na následující/předcházející prvek"
 
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr ""
 
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr "Upravit plugin"
 
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr "Otevřít menu akcí"
 
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr "Rozvinout/sbalit"
 
-msgid ""
-"<strong>Login failed.</strong> Please check your credentials and try again."
+msgid "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Přihlášení se nezdařilo.</strong> Zkontrolujte prosím jméno a heslo a zkuste to znovu."
 
 msgid "This page has unpublished changes."
@@ -1382,14 +1288,20 @@ msgid ""
 "\n"
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
-msgstr "\n                    Vítejte v django CMS verze <strong>%(cms_version)s</strong>.\n                "
+msgstr ""
+"\n"
+"                    Vítejte v django CMS verze <strong>%(cms_version)s</strong>.\n"
+"                "
 
 #, python-format
 msgid ""
 "\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
 "                    "
-msgstr "\n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Přidejte první stránku</a> aby jste pokračovali dále.\n                    "
+msgstr ""
+"\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Přidejte první stránku</a> aby jste pokračovali dále.\n"
+"                    "
 
 #, python-format
 msgid ""
@@ -1397,7 +1309,11 @@ msgid ""
 "                        JavaScript seems to be disabled so please\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
-msgstr "\n                        Zdá se, že máte zakázaný JavaScript. Prosím\n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">přidejte stránku</a> ručně.\n                    "
+msgstr ""
+"\n"
+"                        Zdá se, že máte zakázaný JavaScript. Prosím\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">přidejte stránku</a> ručně.\n"
+"                    "
 
 msgid "Installation Notes"
 msgstr "Poznámky instalace"
@@ -1408,15 +1324,6 @@ msgstr "Podpora"
 msgid "Documentation"
 msgstr "Dokumentace"
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1425,15 +1332,6 @@ msgid ""
 "            "
 msgstr ""
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
@@ -1492,8 +1390,7 @@ msgstr "Tři sloupce"
 msgid "username"
 msgstr "uživatelské jméno"
 
-msgid ""
-"Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgid "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "Povinné. 300 znaků nebo méně. Písmena, čísla a znaky @/./+/-/_"
 
 msgid "Enter a valid username."
@@ -1511,9 +1408,7 @@ msgstr "Určuje, zda se uživatel smí přihlásit do administrace."
 msgid "active"
 msgstr "aktivní"
 
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
+msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
 msgstr "Určuje, zda má být uživatel brán jako aktivní. Zrušte toto nastavení namísto mazání účtu."
 
 msgid "users"
@@ -1549,7 +1444,6 @@ msgstr "Články"
 msgid "Sample App"
 msgstr "Ukázková aplikace"
 
-#| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
 msgstr ""
 
@@ -1559,7 +1453,6 @@ msgstr "Vzorová aplikace s vyňatými právy"
 msgid "Sample App 2"
 msgstr "Ukázková aplikace 2"
 
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr ""
 
@@ -1596,7 +1489,6 @@ msgstr "Statické Menu2"
 msgid "Static Menu3"
 msgstr "Statické Menu3"
 
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr "Statické menu4"
 
@@ -1625,12 +1517,10 @@ msgid "UserSettings"
 msgstr "Uživatelské nastavení"
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr ""
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Přidat plugin k  %(plugin_name)s"
 
@@ -1645,9 +1535,7 @@ msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "Tento blok už obsahuje maximální povolený počet položek obsahu (%s)."
 
 #, python-format
-msgid ""
-"This placeholder already has the maximum number (%(limit)s) of allowed "
-"%(plugin_name)s plugins."
+msgid "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
 msgstr "Tento blok už obsahuje maximální povolený počet (%(limit)s) položek typu %(plugin_name)s."
 
 #, python-brace-format
@@ -1655,9 +1543,7 @@ msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
-"module \"{1}\"."
+msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in module \"{1}\"."
 msgstr ""
 
 #, python-format
@@ -1707,12 +1593,8 @@ msgstr "Průvodce již byl přiřazen modelu: %s "
 #~ msgid "Recover (any) pages"
 #~ msgstr "Recover (any) pages"
 
-#~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
-#~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ msgid "Send email notification to user about username or password change. Requires user email."
+#~ msgstr "Send email notification to user about username or password change. Requires user email."
 
 #~ msgid "New password"
 #~ msgstr "New password"
@@ -1723,15 +1605,11 @@ msgstr "Průvodce již byl přiřazen modelu: %s "
 #~ msgid "Email notification requires valid email address."
 #~ msgstr "Email notification requires valid email address."
 
-#~ msgid ""
-#~ "The permission to add new pages requires the permission to change pages!"
-#~ msgstr ""
-#~ "The permission to add new pages requires the permission to change pages!"
+#~ msgid "The permission to add new pages requires the permission to change pages!"
+#~ msgstr "The permission to add new pages requires the permission to change pages!"
 
-#~ msgid ""
-#~ "The permission to add new users requires the permission to change users!"
-#~ msgstr ""
-#~ "The permission to add new users requires the permission to change users!"
+#~ msgid "The permission to add new users requires the permission to change users!"
+#~ msgstr "The permission to add new users requires the permission to change users!"
 
 #~ msgid "To add permissions you also need to edit them!"
 #~ msgstr "To add permissions you also need to edit them!"
@@ -1742,20 +1620,14 @@ msgstr "Průvodce již byl přiřazen modelu: %s "
 #~ msgid "Copied plugins to %(placeholder)s"
 #~ msgstr "Copied plugins to %(placeholder)s"
 
-#~ msgid ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-#~ msgstr ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+#~ msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+#~ msgstr "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 
 #~ msgid "Moved plugins to %(placeholder)s"
 #~ msgstr "Copied plugins to %(placeholder)s"
 
-#~ msgid ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
-#~ msgstr ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
+#~ msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+#~ msgstr "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 
 #~ msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 #~ msgstr "All plugins in the placeholder \"%(name)s\" were deleted."
@@ -1820,12 +1692,8 @@ msgstr "Průvodce již byl přiřazen modelu: %s "
 #~ msgid "Path Overflow from: '%s'"
 #~ msgstr "Path Overflow from: '%s'"
 
-#~ msgid ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
-#~ msgstr ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
+#~ msgid "The new node is too deep in the tree, try increasing the path.max_length property and UPDATE your database"
+#~ msgstr "The new node is too deep in the tree, try increasing the path.max_length property and UPDATE your database"
 
 #~ msgid "An error occured. Please reload the page"
 #~ msgstr "An error occured. Please reload the page"
@@ -1867,12 +1735,8 @@ msgstr "Průvodce již byl přiřazen modelu: %s "
 #~ msgid "Info"
 #~ msgstr "Info"
 
-#~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
-#~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ msgid "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink\">Add page</a> now."
+#~ msgstr "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"

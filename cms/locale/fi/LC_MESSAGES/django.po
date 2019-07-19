@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # paitsi, 2013
@@ -16,14 +16,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"POT-Creation-Date: 2019-07-19 11:49+0300\n"
 "PO-Revision-Date: 2018-11-09 12:08+0000\n"
 "Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Finnish (http://www.transifex.com/divio/django-cms/language/fi/)\n"
+"Language: fi\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fi\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "All"
@@ -53,8 +53,7 @@ msgstr "Yliajaa valikossa näytettävän tekstin"
 msgid "Page Title"
 msgstr "Sivun otsikko"
 
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr "Yliajaa selaimen ylälaidassa ja kirjanmerkeissä näytettävän tekstin"
 
 msgid "Description meta tag"
@@ -112,7 +111,6 @@ msgstr "Aseta %(language)s lyhytosoite ennen lisäasetuksien muokkaamista."
 msgid "A page with this reverse URL id exists already."
 msgstr "Sivu tällä käänteisellä URL tunnuksella on jo olemassa."
 
-#| msgid "Application configurations"
 msgid "Invalid application config value"
 msgstr ""
 
@@ -146,34 +144,22 @@ msgstr "Muokkaa"
 msgid "Delete"
 msgstr "Poista"
 
-msgid ""
-"Users can't create a page without permissions to change the created page. "
-"Edit permissions required."
+msgid "Users can't create a page without permissions to change the created page. Edit permissions required."
 msgstr ""
 
-msgid ""
-"Users can't delete a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't delete a page without permissions to change the page. Edit permissions required."
 msgstr ""
 
-msgid ""
-"Users can't set page permissions without permissions to change a page. Edit "
-"permissions required."
+msgid "Users can't set page permissions without permissions to change a page. Edit permissions required."
 msgstr ""
 
-msgid ""
-"Users can't delete page permissions without permissions to change a page. "
-"Edit permissions required."
+msgid "Users can't delete page permissions without permissions to change a page. Edit permissions required."
 msgstr ""
 
-msgid ""
-"Users can't create page permissions without permissions to change the "
-"created permission. Edit permissions required."
+msgid "Users can't create page permissions without permissions to change the created permission. Edit permissions required."
 msgstr ""
 
-msgid ""
-"Users can't delete page permissions without permissions to change "
-"permissions. Edit permissions required."
+msgid "Users can't delete page permissions without permissions to change permissions. Edit permissions required."
 msgstr ""
 
 #, python-format
@@ -186,14 +172,11 @@ msgstr "Kielen tulee olla tuettu!"
 msgid "Parent plugin language must be same as language!"
 msgstr "Isäntäliitännäisen kielen tulee vastata aktiivista kieltä!"
 
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Please create the %(language)s page translation before editing it's advanced settings."
 msgstr ""
 
 msgid "Advanced Settings"
@@ -225,23 +208,18 @@ msgstr "Virheellinen asettelupohja"
 msgid "The template was successfully changed"
 msgstr "Asettelupohja vaihdettu"
 
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
+msgid "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Virhe! Oikeutesi eivät riitä tämän sivun siirtämiseen. Ole hyvä ja lataa sivu uudelleen."
 
 msgid "You do not have permission to copy these plugins."
 msgstr "Oikeutesi eivät riitä näiden liitännäisten kopiointiin."
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
 msgstr ""
 
-msgid ""
-"Error! The page you're pasting is not translated in any of the languages "
-"configured by the target site."
+msgid "Error! The page you're pasting is not translated in any of the languages configured by the target site."
 msgstr ""
 
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr ""
 
@@ -271,7 +249,6 @@ msgstr "Tätä sivua ei ole koskaan julkaistu"
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr "Sivun \"%(page)s\" kieliversio %(language)s piilotettiin"
 
-#| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
 msgstr ""
 
@@ -280,7 +257,6 @@ msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Otsikko ja liitännäiset kielelle %(language)s poistettu"
 
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr ""
 
@@ -318,7 +294,6 @@ msgstr "Oikeutesi eivät riitä tämän kohteen muokkaamiseen"
 msgid "You do not have permission to add a plugin"
 msgstr "Oikeutesi eivät riitä liitännäisen lisäämiseen"
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr "Oikeutesi eivät riitä tämän sisältöpaikan kopiointiin."
 
@@ -337,18 +312,15 @@ msgstr ""
 msgid "parent must be in the same language as plugin_language"
 msgstr ""
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr "Oikeutesi eivät riitä tämän liitännäisen liittämiseen"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr "Oikeutesi eivät riitä tämän sisältöpaikan liittämiseen"
 
 msgid "You have no permission to move this plugin"
 msgstr "Oikeutesi eivät riitä tämän liitännäisen siirtämiseen"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr "Oikeutesi eivät riitä tämän liitännäisen leikkaamiseen"
 
@@ -395,9 +367,7 @@ msgid "Create Alias"
 msgstr "Luo alias"
 
 #, python-format
-msgid ""
-"This is an alias reference, you can edit the content only on the <a "
-"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+msgid "This is an alias reference, you can edit the content only on the <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
 msgid "Create"
@@ -446,7 +416,6 @@ msgstr "Rakenne"
 msgid "Content"
 msgstr "Sisältö"
 
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr "Julkaise sivun muutokset"
 
@@ -456,15 +425,12 @@ msgstr "Julkaise sivu"
 msgid "Page settings"
 msgstr "Sivun asetukset"
 
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr "Lisää käännös"
 
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr "Poista käännös"
 
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr "Kopioi kaikki liitännäiset"
 
@@ -473,7 +439,6 @@ msgid "from %s"
 msgstr ""
 
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr ""
 
@@ -483,7 +448,6 @@ msgstr "Sivut"
 msgid "Page"
 msgstr "Sivu"
 
-#| msgid "Create"
 msgid "Create Page"
 msgstr "Luo sivu"
 
@@ -545,25 +509,14 @@ msgid "Select a valid page"
 msgstr "Valitse kelvollinen sivu"
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
-msgid ""
-"Page %(conflict_page)s has the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+msgid "Page %(conflict_page)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr ""
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 
-msgid ""
-"Optional. If supplied, will be automatically added within a new text plugin."
+msgid "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr ""
 
 msgid "Provide a title for the new page."
@@ -572,7 +525,6 @@ msgstr "Anna otsikko uudelle sivulle."
 msgid "Leave empty for automatic slug, or override as required."
 msgstr ""
 
-#| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
 msgstr "Oikeutesi eivät riitä sivun lisäämiseen."
 
@@ -690,9 +642,7 @@ msgstr "Vain tämä sivusto"
 msgid "Allow"
 msgstr "Salli"
 
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "Milloin sivun tulisi tulla näkyviin. Sivun tilan tulee olla \"julkaistu\" jotta se tulee näkyviin. "
 
 msgid "When to expire the page. Leave empty to never expire."
@@ -701,9 +651,7 @@ msgstr "Milloin sivu erääntyy. Jätä tyhjäksi jos et halua sivun erääntyv�
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Kaikkia vanhempia ei näytetä navigaatiossa"
 
-msgid ""
-"A unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "A unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr ""
 
 msgid "The template used to render the content."
@@ -742,28 +690,19 @@ msgstr "sivutasolla"
 msgid "frontend view restriction"
 msgstr ""
 
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr "Valitse käyttäjä tai käyttäjäryhmä."
 
-msgid ""
-"Users can't publish a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't publish a page without permissions to change the page. Edit permissions required."
 msgstr ""
 
-msgid ""
-"Users can't change page advanced settings without permissions to change the "
-"page. Edit permissions required."
+msgid "Users can't change page advanced settings without permissions to change the page. Edit permissions required."
 msgstr ""
 
-msgid ""
-"Users can't change page permissions without permissions to change the page. "
-"Edit permissions required."
+msgid "Users can't change page permissions without permissions to change the page. Edit permissions required."
 msgstr ""
 
-msgid ""
-"Users can't move a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't move a page without permissions to change the page. Edit permissions required."
 msgstr ""
 
 msgid "can recover any deleted page"
@@ -781,9 +720,7 @@ msgstr "Sivujen globaalit käyttöoikeudet"
 msgid "Page permission"
 msgstr "Sivun käyttöoikeus"
 
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr "Sivun luontioikeus vaatii pääsyn myös sen jälkeläisiin. Muuten sivun luoja ei voi muokata sitä myöhemmin."
 
 msgid "User (page)"
@@ -825,9 +762,7 @@ msgstr "koodin mukaan"
 msgid "static placeholder name"
 msgstr ""
 
-msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to "
-"users."
+msgid "Descriptive name to identify this static placeholder. Not displayed to users."
 msgstr "Kuvaava nimi tälle staattiselle sisältöpaikalle. Ei näy käyttäjille."
 
 msgid "placeholder code"
@@ -888,7 +823,6 @@ msgid "Generic"
 msgstr "Yleinen"
 
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
@@ -912,7 +846,6 @@ msgstr "Käyttäjänimi:"
 msgid "Password:"
 msgstr "Salasana:"
 
-#| msgid "Add Page"
 msgid "Add a page"
 msgstr "Lisää sivu"
 
@@ -996,7 +929,6 @@ msgstr "Leikkaa"
 msgid "Paste"
 msgstr "Liitä"
 
-#| msgid "Save as new"
 msgid "Set as home"
 msgstr ""
 
@@ -1015,7 +947,6 @@ msgstr "Sivulistaus"
 msgid "Search"
 msgstr "Haku"
 
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr "Sivupuu"
 
@@ -1036,11 +967,9 @@ msgid ""
 "                            "
 msgstr ""
 
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr ""
 
-#| msgid "Actions"
 msgid "Options"
 msgstr "Valinnat"
 
@@ -1053,9 +982,7 @@ msgstr "Puun sisällä tapahtuvat muutokset saattavat vaatia sivun virkistyksen.
 msgid "Error:"
 msgstr "Virhe:"
 
-msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+msgid "This page cannot be copied because an application is attached to it. See the Page's Advanced settings to manage apphooks."
 msgstr ""
 
 msgid "Are you sure you want to § this page?"
@@ -1064,7 +991,6 @@ msgstr "Haluatko varmasti § tämän sivun?"
 msgid "Reload"
 msgstr "Lataa uudelleen"
 
-#| msgid "New Page"
 msgid "New node"
 msgstr "Uusi solmu"
 
@@ -1078,10 +1004,6 @@ msgid "Menu"
 msgstr "Valikko"
 
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
@@ -1102,31 +1024,24 @@ msgstr "Sulje"
 msgid "Legend"
 msgstr "Selite"
 
-#| msgid "published"
 msgid "Published"
 msgstr "Julkaistu"
 
-#| msgid "Change"
 msgid "Changed"
 msgstr "Muokattu"
 
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Julkaisematon"
 
-#| msgid "in menu"
 msgid "In menu"
 msgstr "Valikossa"
 
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr "Ei valikossa"
 
-#| msgid "New page"
 msgid "View page"
 msgstr "Näytä sivu"
 
-#| msgid "softroot"
 msgid "Softroot"
 msgstr ""
 
@@ -1138,7 +1053,6 @@ msgid "Application: %(apphook)s"
 msgstr "Ohjelma: %(apphook)s"
 
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr ""
 
@@ -1160,7 +1074,6 @@ msgstr "valikossa"
 msgid "not in menu"
 msgstr "ei valikossa"
 
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
 
@@ -1215,11 +1128,9 @@ msgstr "Korosta"
 msgid "Available plugins"
 msgstr "Saatavilla olevat liitännäiset"
 
-#| msgid "Structure"
 msgid "Toggle structure"
 msgstr ""
 
-#| msgid "View published"
 msgid "View published"
 msgstr "Näytä julkaistu"
 
@@ -1233,10 +1144,7 @@ msgid "More"
 msgstr "Lisää"
 
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
-msgid ""
-"Development version using django CMS %(cms_version)s, Django "
-"%(django_version)s, Python %(python_version)s"
+msgid "Development version using django CMS %(cms_version)s, Django %(django_version)s, Python %(python_version)s"
 msgstr ""
 
 msgid "Cancel"
@@ -1245,7 +1153,6 @@ msgstr "Peruuta"
 msgid "The following error occured:"
 msgstr "Seuraava virhe tapahtui:"
 
-#| msgid "Action successfull... reloading."
 msgid "Action successful."
 msgstr "Toiminto onnistui"
 
@@ -1258,24 +1165,18 @@ msgstr "Haluatko varmasti julkaista tämän sivun?"
 msgid "Plugin will be added here"
 msgstr "Liitännäinen lisätään tähän"
 
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr "Sinulla on tallentamattomia muutoksia."
 
-#| msgid "Loading..."
 msgid "Loading"
 msgstr "Ladataan"
 
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr "Haluatko varmasti hylätä nämä muutokset?"
 
-msgid ""
-"The form could not be loaded. Please check that the server is running "
-"correctly."
+msgid "The form could not be loaded. Please check that the server is running correctly."
 msgstr ""
 
-#| msgid "Notify user"
 msgid "Most used"
 msgstr ""
 
@@ -1285,10 +1186,14 @@ msgstr "Oikopolut"
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+#, fuzzy
+#| msgid "Shortcuts"
+msgid "CMS-wide Shortcuts"
+msgstr "Oikopolut"
+
 msgid "Bring up this help dialog"
 msgstr ""
 
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr "Sulje/peruuta"
 
@@ -1304,31 +1209,30 @@ msgstr ""
 msgid "Focus on Toolbar"
 msgstr ""
 
-#| msgid "static placeholders"
+#, fuzzy
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr "Rakenne"
+
 msgid "Focus on placeholders"
 msgstr ""
 
 msgid "Move to next/previous element"
 msgstr "Siirry seuraavaan/edelliseen elementtiin"
 
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr ""
 
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr "Muokkaa liitännäistä"
 
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr ""
 
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr "Laajenna/pienennä"
 
-msgid ""
-"<strong>Login failed.</strong> Please check your credentials and try again."
+msgid "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Kirjautuminen epäonnistui.</strong> Tarkista tunnuksesi ja yritä uudelleen."
 
 msgid "This page has unpublished changes."
@@ -1401,15 +1305,6 @@ msgstr "Tuki"
 msgid "Documentation"
 msgstr "Dokumentaatio"
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1418,15 +1313,6 @@ msgid ""
 "            "
 msgstr ""
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
@@ -1485,8 +1371,7 @@ msgstr "Kolme saraketta"
 msgid "username"
 msgstr "käyttäjänimi"
 
-msgid ""
-"Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgid "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr ""
 
 msgid "Enter a valid username."
@@ -1504,9 +1389,7 @@ msgstr ""
 msgid "active"
 msgstr "aktiivinen"
 
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
+msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
 msgstr ""
 
 msgid "users"
@@ -1542,7 +1425,6 @@ msgstr "Artikkelit"
 msgid "Sample App"
 msgstr "Esimerkkiohjelma"
 
-#| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
 msgstr ""
 
@@ -1552,7 +1434,6 @@ msgstr ""
 msgid "Sample App 2"
 msgstr ""
 
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr ""
 
@@ -1589,7 +1470,6 @@ msgstr ""
 msgid "Static Menu3"
 msgstr ""
 
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr ""
 
@@ -1618,12 +1498,10 @@ msgid "UserSettings"
 msgstr ""
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "Lisää liitännäinen sisältöpaikkaan \"%(placeholder_label)s\""
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
@@ -1638,9 +1516,7 @@ msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "Tämä sisältöpaikka sisältää jo enimmäismäärän (%s) liitännäisiä."
 
 #, python-format
-msgid ""
-"This placeholder already has the maximum number (%(limit)s) of allowed "
-"%(plugin_name)s plugins."
+msgid "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
 msgstr "Tämä sisältöpaikka sisältää jo sallitun enimmäismäärän (%(limit)s) %(plugin_name)s-liitännäisiä."
 
 #, python-brace-format
@@ -1648,9 +1524,7 @@ msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
 msgstr ""
 
 #, python-brace-format
-msgid ""
-"Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
-"module \"{1}\"."
+msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in module \"{1}\"."
 msgstr ""
 
 #, python-format
@@ -1700,12 +1574,8 @@ msgstr ""
 #~ msgid "Recover (any) pages"
 #~ msgstr "Recover (any) pages"
 
-#~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
-#~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ msgid "Send email notification to user about username or password change. Requires user email."
+#~ msgstr "Send email notification to user about username or password change. Requires user email."
 
 #~ msgid "New password"
 #~ msgstr "New password"
@@ -1716,15 +1586,11 @@ msgstr ""
 #~ msgid "Email notification requires valid email address."
 #~ msgstr "Email notification requires valid email address."
 
-#~ msgid ""
-#~ "The permission to add new pages requires the permission to change pages!"
-#~ msgstr ""
-#~ "The permission to add new pages requires the permission to change pages!"
+#~ msgid "The permission to add new pages requires the permission to change pages!"
+#~ msgstr "The permission to add new pages requires the permission to change pages!"
 
-#~ msgid ""
-#~ "The permission to add new users requires the permission to change users!"
-#~ msgstr ""
-#~ "The permission to add new users requires the permission to change users!"
+#~ msgid "The permission to add new users requires the permission to change users!"
+#~ msgstr "The permission to add new users requires the permission to change users!"
 
 #~ msgid "To add permissions you also need to edit them!"
 #~ msgstr "To add permissions you also need to edit them!"
@@ -1735,20 +1601,14 @@ msgstr ""
 #~ msgid "Copied plugins to %(placeholder)s"
 #~ msgstr "Copied plugins to %(placeholder)s"
 
-#~ msgid ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-#~ msgstr ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+#~ msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+#~ msgstr "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 
 #~ msgid "Moved plugins to %(placeholder)s"
 #~ msgstr "Copied plugins to %(placeholder)s"
 
-#~ msgid ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
-#~ msgstr ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
+#~ msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+#~ msgstr "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 
 #~ msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 #~ msgstr "All plugins in the placeholder \"%(name)s\" were deleted."
@@ -1813,12 +1673,8 @@ msgstr ""
 #~ msgid "Path Overflow from: '%s'"
 #~ msgstr "Path Overflow from: '%s'"
 
-#~ msgid ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
-#~ msgstr ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
+#~ msgid "The new node is too deep in the tree, try increasing the path.max_length property and UPDATE your database"
+#~ msgstr "The new node is too deep in the tree, try increasing the path.max_length property and UPDATE your database"
 
 #~ msgid "An error occured. Please reload the page"
 #~ msgstr "An error occured. Please reload the page"
@@ -1858,12 +1714,8 @@ msgstr ""
 #~ msgid "Info"
 #~ msgstr "Info"
 
-#~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
-#~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ msgid "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink\">Add page</a> now."
+#~ msgstr "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"

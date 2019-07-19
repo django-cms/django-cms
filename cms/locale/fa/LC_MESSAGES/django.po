@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Translators:
 # Ali Alamshahi <Alamshahi@yahoo.com>, 2015
@@ -28,14 +28,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"POT-Creation-Date: 2019-07-19 11:49+0300\n"
 "PO-Revision-Date: 2019-01-19 23:33+0000\n"
 "Last-Translator: Sina Rezaei <sinarezaei1991@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/divio/django-cms/language/fa/)\n"
+"Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: fa\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "All"
@@ -65,8 +65,7 @@ msgstr "بازنویسی در منوی نمایش داده شده"
 msgid "Page Title"
 msgstr "عنوان صفحه"
 
-msgid ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
 msgstr " عنوان مرورگر یا بوک مارک ها بازنویسی می شوند."
 
 msgid "Description meta tag"
@@ -124,7 +123,6 @@ msgstr "لطفا عنوان %(language)s را ویرایش کنید، قبل ا�
 msgid "A page with this reverse URL id exists already."
 msgstr "صفحه-ای با شناسه-ی این آدرس معکوس وجود دارد."
 
-#| msgid "Application configurations"
 msgid "Invalid application config value"
 msgstr "مقدار تنظیمات برنامه نامعتبر است."
 
@@ -158,34 +156,22 @@ msgstr "تغییر"
 msgid "Delete"
 msgstr "حذف"
 
-msgid ""
-"Users can't create a page without permissions to change the created page. "
-"Edit permissions required."
+msgid "Users can't create a page without permissions to change the created page. Edit permissions required."
 msgstr "کاربران بدون دسترسی تغییر صفحه ساخته شده نمی‌توانند صفحه جدید ایجاد کنند. دسترسی ویرایش لازم است. "
 
-msgid ""
-"Users can't delete a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't delete a page without permissions to change the page. Edit permissions required."
 msgstr "کاربران بدون دسترسی تغییر صفحه  نمی‌توانند صفحه‌ای را حذف کنند. دسترسی ویرایش لازم است. "
 
-msgid ""
-"Users can't set page permissions without permissions to change a page. Edit "
-"permissions required."
+msgid "Users can't set page permissions without permissions to change a page. Edit permissions required."
 msgstr "کاربران بدون دسترسی تغییر صفحه  نمی‌توانند دسترسی‌های صفحه را تنظیم کنند. دسترسی ویرایش لازم است. "
 
-msgid ""
-"Users can't delete page permissions without permissions to change a page. "
-"Edit permissions required."
+msgid "Users can't delete page permissions without permissions to change a page. Edit permissions required."
 msgstr "کاربران بدون دسترسی تغییر صفحه  نمی‌توانند دسترسی‌های صفحه را حذف کنند. دسترسی ویرایش لازم است. "
 
-msgid ""
-"Users can't create page permissions without permissions to change the "
-"created permission. Edit permissions required."
+msgid "Users can't create page permissions without permissions to change the created permission. Edit permissions required."
 msgstr "کاربران بدون دسترسی تغییر دسترسی ایجاد شده  نمی‌توانند دسترسی‌های صفحه ایجاد کنند. دسترسی ویرایش لازم است. "
 
-msgid ""
-"Users can't delete page permissions without permissions to change "
-"permissions. Edit permissions required."
+msgid "Users can't delete page permissions without permissions to change permissions. Edit permissions required."
 msgstr "کاربران بدون دسترسی تغییر دسترسی‌ها نمی توانند دسترسی‌های صفحه را حذف کنند. دسترسی ویرایش لازم است"
 
 #, python-format
@@ -198,14 +184,11 @@ msgstr "یکی از زبانهای پشتیبانی شده را انتخاب ک�
 msgid "Parent plugin language must be same as language!"
 msgstr "زبان افزونه ی پدر باید یکسان باشد! "
 
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "جایگاه پلاگین منبع باید مانند جایگاه باشد!"
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Please create the %(language)s page translation before editing it's advanced settings."
 msgstr "لطفا صفحه‌ی ترجمه‌ی %(language)s را بسازید، قبل از اینکه تنظیمات پیشرفته‌ی آنرا ویرایش کنید."
 
 msgid "Advanced Settings"
@@ -237,23 +220,18 @@ msgstr "قالب معتبر نمی باشد."
 msgid "The template was successfully changed"
 msgstr "قالب با موفقیت تغییر یافت"
 
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
+msgid "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "خطا! شما دسترسى لازم را براى انتقال اين صفحه نداريد."
 
 msgid "You do not have permission to copy these plugins."
 msgstr "شما دسترسى لازم را براى كپى بردارى اين افزونه ها نداريد."
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
 msgstr "خطا! شما اختیارات کپی این صفحه را ندارید."
 
-msgid ""
-"Error! The page you're pasting is not translated in any of the languages "
-"configured by the target site."
+msgid "Error! The page you're pasting is not translated in any of the languages configured by the target site."
 msgstr "خطا! صفحه ای که شما در حال چسباندن آن هستید به هیچ کدام از زبان هایی که سایت هدف پیکربندی کرده ترجمه نشده است."
 
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr "شما دسترسی لازم را برای احیای این صفحه ندارید."
 
@@ -283,7 +261,6 @@ msgstr "این صفحه تا به حال منتشر نشده"
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr " صفحه %(language)s ،\"%(page)s\"، با موفقیت به حالت منتشرنشده تغییر کرد."
 
-#| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
 msgstr "شما فاقد مجوز لازم برای حذف این صفحه می باشید."
 
@@ -292,7 +269,6 @@ msgid "Title and plugins with language %(language)s was deleted"
 msgstr "عنوان و افزونه-ها به زبان %(language)s حذف شدند."
 
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr "شما دسترسی لازم برای دیدن صفحه \"%(title)s\" را ندارید."
 
@@ -330,7 +306,6 @@ msgstr "شما اجازه ویرایش این صفحه را ندارید."
 msgid "You do not have permission to add a plugin"
 msgstr "شما فاقد دسترسى لازم براى اضافه كردن افزونه مى باشيد ."
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr "شما دسترسی لازم برای کپی کردن این نگهدارنه را ندارید."
 
@@ -349,18 +324,15 @@ msgstr "منبع باید در همین جایگاه باشد"
 msgid "parent must be in the same language as plugin_language"
 msgstr "منبع باید در زبانی مشابه زبان پلاگین باشد."
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr "شما دسترسی لازم برای جایگذاری این افزونه را ندارید."
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr "شما دسترسی لازم برای جایگذاری این نگهدارنده را ندارید."
 
 msgid "You have no permission to move this plugin"
 msgstr "شما فاقد دسترسى لازم براى منتقل كردن اين افزونه مى باشيد ."
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr "شما دسترسی لازم برای برداشت این افزونه را ندارید."
 
@@ -407,9 +379,7 @@ msgid "Create Alias"
 msgstr "ایجاد نام مستعار"
 
 #, python-format
-msgid ""
-"This is an alias reference, you can edit the content only on the <a "
-"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+msgid "This is an alias reference, you can edit the content only on the <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "این یک مرجع مستعار است،شما فقط میتوانید محتوا را در صفحه <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> تغییر دهید."
 
 msgid "Create"
@@ -458,7 +428,6 @@ msgstr "ساختار"
 msgid "Content"
 msgstr "محتوا"
 
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr "انتشار تغییرات صفحه"
 
@@ -468,15 +437,12 @@ msgstr "الآن صفحه را منتشر کن"
 msgid "Page settings"
 msgstr "تنظيمات صفحه"
 
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr "اضافه کردن ترجمه"
 
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr "حذف ترجمه"
 
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr "همه‌ی پلاگینها را کپی کن"
 
@@ -485,7 +451,6 @@ msgid "from %s"
 msgstr "از %s"
 
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "آیا مطمئن هستید که می‌خواهید همه افزونه‌ها را از %s کپی کنید؟"
 
@@ -495,7 +460,6 @@ msgstr "صفحات"
 msgid "Page"
 msgstr "صفحه"
 
-#| msgid "Create"
 msgid "Create Page"
 msgstr "ساخت صفحه"
 
@@ -557,25 +521,14 @@ msgid "Select a valid page"
 msgstr "یک صفحه معتبر انتخاب کنید"
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
-msgid ""
-"Page %(conflict_page)s has the same url '%(url)s' as current page "
-"\"%(instance)s\"."
+msgid "Page %(conflict_page)s has the same url '%(url)s' as current page \"%(instance)s\"."
 msgstr "آدرس صفحه %(conflict_page)s با آدرس صفحه فعلی %(url)s یکسان است \"%(instance)s\"."
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "آدرس صفحه %(conflict_page)s با آدرس صفحه فعلی %(url)s یکسان است."
 
-msgid ""
-"Optional. If supplied, will be automatically added within a new text plugin."
+msgid "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr "غیر ضروری، اگر پر شود، به صورت اتوماتیک در داخل پلاگین جدید اضافه میشود."
 
 msgid "Provide a title for the new page."
@@ -584,7 +537,6 @@ msgstr "برای صفحه، یک عنوان ارائه دهید."
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "برای تنظیم نشانک به صورت اتوماتیک، خالی بگذارید."
 
-#| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
 msgstr "شما دسترسی لازم برای اضافه کردن صفحه را ندارید."
 
@@ -702,9 +654,7 @@ msgstr "فقط این وب سایت"
 msgid "Allow"
 msgstr "پذیرفتن"
 
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
+msgid "When the page should go live. Status must be \"Published\" for page to go live."
 msgstr "زمانی که صفحه منتشر می-شود. وضعیت صفحه باید «منتشرشده» باشید تا این رخ دهد."
 
 msgid "When to expire the page. Leave empty to never expire."
@@ -713,9 +663,7 @@ msgstr "زمان انقضای صفحه. خالی بماند اگر هیچ گاه
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "تمامی اجداد در گردش نمایش داده نمی-شوند."
 
-msgid ""
-"A unique identifier that is used with the page_url templatetag for linking "
-"to this page"
+msgid "A unique identifier that is used with the page_url templatetag for linking to this page"
 msgstr "یک شناسه ی منحصر به فرد که با تگ قالب  page_url  استفاده می شود برای لینک دادن به این "
 
 msgid "The template used to render the content."
@@ -754,28 +702,19 @@ msgstr "در سطح صفحه"
 msgid "frontend view restriction"
 msgstr "نمايش ابتدايى محدوديت"
 
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr "لطفا کاربر یا گروه را انتخاب کنید."
 
-msgid ""
-"Users can't publish a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't publish a page without permissions to change the page. Edit permissions required."
 msgstr "کاربران نمیتوانند صفحه ای را ، بدون اجازه ی تغییر صفحات ، تغییر دهند.اجازه ی اصلاح ضروری است."
 
-msgid ""
-"Users can't change page advanced settings without permissions to change the "
-"page. Edit permissions required."
+msgid "Users can't change page advanced settings without permissions to change the page. Edit permissions required."
 msgstr "کاربران نمیتوانند تنظیمات پیشرفته را بدون اجازه ی تغییر در صفحات  تغییر دهند . اجازه ی اصلاح ضروری است."
 
-msgid ""
-"Users can't change page permissions without permissions to change the page. "
-"Edit permissions required."
+msgid "Users can't change page permissions without permissions to change the page. Edit permissions required."
 msgstr "کاربران نمیتوانند اجازه های صفحه را بدون اجازه ی تغییر در صفحات تغییر دهند . اجازه ی اصلاح ضروری است."
 
-msgid ""
-"Users can't move a page without permissions to change the page. Edit "
-"permissions required."
+msgid "Users can't move a page without permissions to change the page. Edit permissions required."
 msgstr "کاربران نمیتوانند صفحه ای را  بدون اجازه ی تغییر در صفحات جا به جا کنند . اجازه ی اصلاح ضروری است."
 
 msgid "can recover any deleted page"
@@ -793,9 +732,7 @@ msgstr "اختیارات سراسری صفحه"
 msgid "Page permission"
 msgstr "اختیار صفحه"
 
-msgid ""
-"Add page permission requires also access to children, or descendants, "
-"otherwise added page can't be changed by its creator."
+msgid "Add page permission requires also access to children, or descendants, otherwise added page can't be changed by its creator."
 msgstr " اجازه دسترسی به اضافه کردن صفحه اجازه دسترسی به صفحات زیرین، و یا صفحات فرزند، را نیز نیاز دارد؛ در غیر اینصورت خود ایجادکننده صفحه قابلیت تغییر آن را نخواهد داشت."
 
 msgid "User (page)"
@@ -837,9 +774,7 @@ msgstr "بر اساس كد"
 msgid "static placeholder name"
 msgstr "نام نگهدارنده ی ثابت"
 
-msgid ""
-"Descriptive name to identify this static placeholder. Not displayed to "
-"users."
+msgid "Descriptive name to identify this static placeholder. Not displayed to users."
 msgstr "نامی توصیف کننده برای شناخت  این نگهدارنده ی ثابت است و به کاربرها نمایش داده نمی شود."
 
 msgid "placeholder code"
@@ -900,7 +835,6 @@ msgid "Generic"
 msgstr "عمومی"
 
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" با موفقیت تغییر کرد."
 
@@ -924,7 +858,6 @@ msgstr "کاربر:"
 msgid "Password:"
 msgstr "رمز عبور:"
 
-#| msgid "Add Page"
 msgid "Add a page"
 msgstr "صفحه ای اضافه کن."
 
@@ -1008,7 +941,6 @@ msgstr "برداشت"
 msgid "Paste"
 msgstr "جایگذاری"
 
-#| msgid "Save as new"
 msgid "Set as home"
 msgstr "تنظیم به عنوان خانه"
 
@@ -1027,7 +959,6 @@ msgstr "فهرست صفحات"
 msgid "Search"
 msgstr "جستجو"
 
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr "لیست درختی صفحه"
 
@@ -1039,20 +970,24 @@ msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
-msgstr "\n                                                %(name)s حذف شده بازیابی شد\n                                            "
+msgstr ""
+"\n"
+"                                                %(name)s حذف شده بازیابی شد\n"
+"                                            "
 
 #, python-format
 msgid ""
 "\n"
 "                                New %(name)s\n"
 "                            "
-msgstr "\n                                %(name)s جدید\n                            "
+msgstr ""
+"\n"
+"                                %(name)s جدید\n"
+"                            "
 
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr "جهت‌یابی اصلی"
 
-#| msgid "Actions"
 msgid "Options"
 msgstr "گزینه‌ها"
 
@@ -1065,9 +1000,7 @@ msgstr "برای اعمال تغییرات در درخت نیاز به بازخ�
 msgid "Error:"
 msgstr "خطا:"
 
-msgid ""
-"This page cannot be copied because an application is attached to it. See the"
-" Page's Advanced settings to manage apphooks."
+msgid "This page cannot be copied because an application is attached to it. See the Page's Advanced settings to manage apphooks."
 msgstr "نمیتوان این صفحه را کپی کرد چون یک نرم‌افزار به آن پیوست شده است. تنظیمات پیشرفته‌ی صفحه را ببینید تا قلاب‌های نرم‌افزاری (apphook) را مدیریت کنید."
 
 msgid "Are you sure you want to § this page?"
@@ -1076,7 +1009,6 @@ msgstr "آیا اطمینان دارید که می‌خواهید این صفح�
 msgid "Reload"
 msgstr "بارگزاری مجدد"
 
-#| msgid "New Page"
 msgid "New node"
 msgstr "گره جدید"
 
@@ -1090,17 +1022,17 @@ msgid "Menu"
 msgstr "منو"
 
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr "\n<em>هیچ %(object)s یافت نشد</em>\n\n<a href=\"%(add_url)s\" class=\"addlink\">همین الان %(object)s اضافه کنید</a>."
+msgstr ""
+"\n"
+"<em>هیچ %(object)s یافت نشد</em>\n"
+"\n"
+"<a href=\"%(add_url)s\" class=\"addlink\">همین الان %(object)s اضافه کنید</a>."
 
 msgid "Copy options"
 msgstr "تنظیمات کپی"
@@ -1114,31 +1046,24 @@ msgstr "بستن"
 msgid "Legend"
 msgstr "شرح"
 
-#| msgid "published"
 msgid "Published"
 msgstr "منتشر شده"
 
-#| msgid "Change"
 msgid "Changed"
 msgstr "تغییر کرده"
 
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr "منتشر نشده"
 
-#| msgid "in menu"
 msgid "In menu"
 msgstr "داخل منو"
 
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr "در منو نباشد"
 
-#| msgid "New page"
 msgid "View page"
 msgstr "نمایش صفحه"
 
-#| msgid "softroot"
 msgid "Softroot"
 msgstr "ریشه‌ی نرم"
 
@@ -1150,7 +1075,6 @@ msgid "Application: %(apphook)s"
 msgstr "ابزار: %(apphook)s"
 
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr "پیشنمایش صفحه در %(language)s "
 
@@ -1172,7 +1096,6 @@ msgstr "داخل منو"
 msgid "not in menu"
 msgstr "در منو نباشد"
 
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "تنظیمات صفحه (دکمه‌ی shift را نگه‌دارید برای تنظیمات پیشرفته)"
 
@@ -1227,11 +1150,9 @@ msgstr "هایلایت"
 msgid "Available plugins"
 msgstr "افزونه‌های موجود"
 
-#| msgid "Structure"
 msgid "Toggle structure"
 msgstr "تغییر ساختار"
 
-#| msgid "View published"
 msgid "View published"
 msgstr "مشاهده منتشر شده"
 
@@ -1245,10 +1166,7 @@ msgid "More"
 msgstr "بیشتر"
 
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
-msgid ""
-"Development version using django CMS %(cms_version)s, Django "
-"%(django_version)s, Python %(python_version)s"
+msgid "Development version using django CMS %(cms_version)s, Django %(django_version)s, Python %(python_version)s"
 msgstr "ورژن تحت توسعه، از نسخه‌ی %(cms_version)s «سیستم مدیریت محتوای جنگو» و نسخه‌ی %(django_version)s «جنگو» و نسخه‌ی %(python_version)s «پایتون» استفاده میکند."
 
 msgid "Cancel"
@@ -1257,7 +1175,6 @@ msgstr "لغو"
 msgid "The following error occured:"
 msgstr "خطای مقابل رخ داده است:"
 
-#| msgid "Action successfull... reloading."
 msgid "Action successful."
 msgstr "اقدام موفقیت آمیز."
 
@@ -1270,24 +1187,18 @@ msgstr "آیا مطمئن هستید که می خواهید این صفحه را
 msgid "Plugin will be added here"
 msgstr "پلاگین اینجا اضافه میشود"
 
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr "شما تغییراتی ذخیره نشده دارید."
 
-#| msgid "Loading..."
 msgid "Loading"
 msgstr "در حال بارگذاری"
 
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr "آیا اطمینان دارید میخواهید این تغییرات را رها کنید؟"
 
-msgid ""
-"The form could not be loaded. Please check that the server is running "
-"correctly."
+msgid "The form could not be loaded. Please check that the server is running correctly."
 msgstr "فورم نمیتواند بارگزاری شود. لطفا اطمینان حاصل کنید که سرور به خوبی کار میکند."
 
-#| msgid "Notify user"
 msgid "Most used"
 msgstr "بیشترین استفاده شده"
 
@@ -1295,12 +1206,18 @@ msgid "Shortcuts"
 msgstr "میانبرها"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr "صفحه در این اثناء تغییر کرد،\nدر حال بارگذاری مجدد ..."
+msgstr ""
+"صفحه در این اثناء تغییر کرد،\n"
+"در حال بارگذاری مجدد ..."
+
+#, fuzzy
+#| msgid "Shortcuts"
+msgid "CMS-wide Shortcuts"
+msgstr "میانبرها"
 
 msgid "Bring up this help dialog"
 msgstr "این گفتگو کمک را بیابید"
 
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr "بستن"
 
@@ -1316,31 +1233,30 @@ msgstr "گفتگوی \"ساختن\" را باز کنید."
 msgid "Focus on Toolbar"
 msgstr "زوم بر روی نوار ابزار"
 
-#| msgid "static placeholders"
+#, fuzzy
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr "ساختار"
+
 msgid "Focus on placeholders"
 msgstr "زوم بر روی نگهدارنده ها"
 
 msgid "Move to next/previous element"
 msgstr "انتقال به المان بعدی/قبلی"
 
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr "زوم بر روی پلاگین نگهدارنده ها"
 
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr "ویرایش افزونه"
 
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr "باز کردن منوی عملیات"
 
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr "بازکردن/جمع کردن"
 
-msgid ""
-"<strong>Login failed.</strong> Please check your credentials and try again."
+msgid "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strongورود شما ناموفق بود.</strong> لطفاً ورودى هاى خود را دوباره بازبينى كنيد."
 
 msgid "This page has unpublished changes."
@@ -1387,14 +1303,20 @@ msgid ""
 "\n"
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
-msgstr "\n                    به سیستم مدیریت «محتوای جنگو» نسخه‌ی <strong>%(cms_version)s خوش آمدید</strong>.\n                "
+msgstr ""
+"\n"
+"                    به سیستم مدیریت «محتوای جنگو» نسخه‌ی <strong>%(cms_version)s خوش آمدید</strong>.\n"
+"                "
 
 #, python-format
 msgid ""
 "\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
 "                    "
-msgstr "\n                        برای ادامه<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">صفحه‌ی اول</a> را به سیستم اضافه کنید.\n                    "
+msgstr ""
+"\n"
+"                        برای ادامه<a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">صفحه‌ی اول</a> را به سیستم اضافه کنید.\n"
+"                    "
 
 #, python-format
 msgid ""
@@ -1402,7 +1324,11 @@ msgid ""
 "                        JavaScript seems to be disabled so please\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
-msgstr "\n                        به نظر میرسد جاوا اسکریپت غیر فعال است پس لطفا\n                        به صورت دستی <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">یک صفحه اضافه کنید</a> manually.\n                    "
+msgstr ""
+"\n"
+"                        به نظر میرسد جاوا اسکریپت غیر فعال است پس لطفا\n"
+"                        به صورت دستی <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">یک صفحه اضافه کنید</a> manually.\n"
+"                    "
 
 msgid "Installation Notes"
 msgstr "یادداشت های نصب"
@@ -1413,32 +1339,18 @@ msgstr "پشتیبانی"
 msgid "Documentation"
 msgstr "مستندات"
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr "\n<p class=\"cms-welcome-notes\">اگر شما نماد «سیستم مدیریت محتوای جنگو» را در بالای صفحه نمی‌بینید، مطمئن شوید\nپوشه‌ی <code>static/cms</code> را به فایل‌های ایستای خود\nلینک کرده‌اید.</p>"
+msgstr ""
+"\n"
+"<p class=\"cms-welcome-notes\">اگر شما نماد «سیستم مدیریت محتوای جنگو» را در بالای صفحه نمی‌بینید، مطمئن شوید\n"
+"پوشه‌ی <code>static/cms</code> را به فایل‌های ایستای خود\n"
+"لینک کرده‌اید.</p>"
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
@@ -1446,7 +1358,9 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr "\n<p class=\"cms-welcome-notes\">شما این پیغام را می‌بینید چون <code>DEBUG = True</code> را در تنظیمات جنگو فعال کرده‌اید.</p>"
+msgstr ""
+"\n"
+"<p class=\"cms-welcome-notes\">شما این پیغام را می‌بینید چون <code>DEBUG = True</code> را در تنظیمات جنگو فعال کرده‌اید.</p>"
 
 msgid "Welcome to django CMS"
 msgstr "به سیستم مدیریت محتوای جنگو خوش آمدید"
@@ -1497,8 +1411,7 @@ msgstr "سه ستون"
 msgid "username"
 msgstr "نام کاربری"
 
-msgid ""
-"Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
+msgid "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
 msgstr "واجب. 300 کاراکتر یا کمتر. حروف، اعداد و کاراکترهای @/./+/-/_"
 
 msgid "Enter a valid username."
@@ -1516,9 +1429,7 @@ msgstr "معین می‌کند که آیا کاربر می‌تواند به ا�
 msgid "active"
 msgstr "فعال"
 
-msgid ""
-"Designates whether this user should be treated as active. Unselect this "
-"instead of deleting accounts."
+msgid "Designates whether this user should be treated as active. Unselect this instead of deleting accounts."
 msgstr "مشخص می‌سازد که آیا با این کاربر باید به عنوان فعال رفتار شود. حذف گزینش این آیتم به جای حذف حساب‌ها"
 
 msgid "users"
@@ -1554,7 +1465,6 @@ msgstr "مقالات"
 msgid "Sample App"
 msgstr "ابزار نمونه"
 
-#| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
 msgstr "اپلیکیشن نمونه همراه با پیکربندی"
 
@@ -1564,7 +1474,6 @@ msgstr "اَپ نمونه با سطح دسترسی‌های محدود"
 msgid "Sample App 2"
 msgstr "ابزار نمونه ۲"
 
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr "برنامه ی نمونه ی شماره ی 3"
 
@@ -1601,7 +1510,6 @@ msgstr "منوی ایستا ۲"
 msgid "Static Menu3"
 msgstr "منوی ایستا ۳"
 
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr "منو‌ی ایستا ۴"
 
@@ -1630,12 +1538,10 @@ msgid "UserSettings"
 msgstr "تنظیمات کاربر"
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "افزودن افزونه به %(placeholder_label)s"
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr "افزودن افزونه به %(plugin_name)s"
 
@@ -1650,9 +1556,7 @@ msgid "This placeholder already has the maximum number of plugins (%s)."
 msgstr "اين منفذ در حال حاضر داراى حداكثر تعداد افزونه ها مى باشد (%s)."
 
 #, python-format
-msgid ""
-"This placeholder already has the maximum number (%(limit)s) of allowed "
-"%(plugin_name)s plugins."
+msgid "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
 msgstr "اين منفذ در حال حاضر داراى حداكثر تعداد(%(limit)s) پذيرفته شده ى %(plugin_name)s افزونه ها مى باشد."
 
 #, python-brace-format
@@ -1660,9 +1564,7 @@ msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
 msgstr "مشکل در یافتن ماژول CMS_REQUEST_IP_RESOLVER تعیین شده: \"{0}\"."
 
 #, python-brace-format
-msgid ""
-"Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
-"module \"{1}\"."
+msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in module \"{1}\"."
 msgstr "مشکل در یافتن تابع  CMS_REQUEST_IP_RESOLVER تعیین شده: \"{0}\" در ماژول \"{1}\"."
 
 #, python-format
@@ -1712,12 +1614,8 @@ msgstr "در حال حاظر یک ویزارد ثبت شده برای : %s"
 #~ msgid "Recover (any) pages"
 #~ msgstr "Recover (any) pages"
 
-#~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
-#~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
+#~ msgid "Send email notification to user about username or password change. Requires user email."
+#~ msgstr "Send email notification to user about username or password change. Requires user email."
 
 #~ msgid "New password"
 #~ msgstr "New password"
@@ -1728,15 +1626,11 @@ msgstr "در حال حاظر یک ویزارد ثبت شده برای : %s"
 #~ msgid "Email notification requires valid email address."
 #~ msgstr "Email notification requires valid email address."
 
-#~ msgid ""
-#~ "The permission to add new pages requires the permission to change pages!"
-#~ msgstr ""
-#~ "The permission to add new pages requires the permission to change pages!"
+#~ msgid "The permission to add new pages requires the permission to change pages!"
+#~ msgstr "The permission to add new pages requires the permission to change pages!"
 
-#~ msgid ""
-#~ "The permission to add new users requires the permission to change users!"
-#~ msgstr ""
-#~ "The permission to add new users requires the permission to change users!"
+#~ msgid "The permission to add new users requires the permission to change users!"
+#~ msgstr "The permission to add new users requires the permission to change users!"
 
 #~ msgid "To add permissions you also need to edit them!"
 #~ msgstr "To add permissions you also need to edit them!"
@@ -1747,20 +1641,14 @@ msgstr "در حال حاظر یک ویزارد ثبت شده برای : %s"
 #~ msgid "Copied plugins to %(placeholder)s"
 #~ msgstr "Copied plugins to %(placeholder)s"
 
-#~ msgid ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-#~ msgstr ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+#~ msgid "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
+#~ msgstr "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 
 #~ msgid "Moved plugins to %(placeholder)s"
 #~ msgstr "Copied plugins to %(placeholder)s"
 
-#~ msgid ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
-#~ msgstr ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
+#~ msgid "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
+#~ msgstr "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was deleted."
 
 #~ msgid "All plugins in the placeholder \"%(name)s\" were deleted."
 #~ msgstr "All plugins in the placeholder \"%(name)s\" were deleted."
@@ -1825,12 +1713,8 @@ msgstr "در حال حاظر یک ویزارد ثبت شده برای : %s"
 #~ msgid "Path Overflow from: '%s'"
 #~ msgstr "Path Overflow from: '%s'"
 
-#~ msgid ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
-#~ msgstr ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
+#~ msgid "The new node is too deep in the tree, try increasing the path.max_length property and UPDATE your database"
+#~ msgstr "The new node is too deep in the tree, try increasing the path.max_length property and UPDATE your database"
 
 #~ msgid "An error occured. Please reload the page"
 #~ msgstr "An error occured. Please reload the page"
@@ -1870,12 +1754,8 @@ msgstr "در حال حاظر یک ویزارد ثبت شده برای : %s"
 #~ msgid "Info"
 #~ msgstr "Info"
 
-#~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
-#~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
+#~ msgid "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink\">Add page</a> now."
+#~ msgstr "<em>There is no page around yet.</em><br /><a href=\"add/\" class=\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"
