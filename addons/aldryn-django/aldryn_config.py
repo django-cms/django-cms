@@ -98,8 +98,6 @@ class Form(forms.BaseForm):
         settings['DATA_ROOT'] = env('DATA_ROOT', os.path.join(settings['BASE_DIR'], 'data'))
         settings['SECRET_KEY'] = env('SECRET_KEY', 'this-is-not-very-random')
         settings['DEBUG'] = boolean_ish(env('DEBUG', False))
-        settings['ENABLE_SYNCING'] = boolean_ish(
-            env('ENABLE_SYNCING', settings['DEBUG']))
         settings['DISABLE_TEMPLATE_CACHE'] = boolean_ish(
             env('DISABLE_TEMPLATE_CACHE', settings['DEBUG']))
 
@@ -150,7 +148,7 @@ class Form(forms.BaseForm):
             'aldryn_django',
         ])
 
-        if settings['ENABLE_SYNCING'] or settings['DISABLE_TEMPLATE_CACHE']:
+        if settings['DISABLE_TEMPLATE_CACHE']:
             loader_list_class = list
         else:
             loader_list_class = CachedLoader
@@ -307,6 +305,7 @@ class Form(forms.BaseForm):
         settings['DJANGO_WEB_WORKERS'] = env('DJANGO_WEB_WORKERS', 3)
         settings['DJANGO_WEB_MAX_REQUESTS'] = env('DJANGO_WEB_MAX_REQUESTS', 500)
         settings['DJANGO_WEB_TIMEOUT'] = env('DJANGO_WEB_TIMEOUT', 120)
+        settings['IS_RUNNING_DEVSERVER'] = 'runserver' in sys.argv
 
         # https://docs.djangoproject.com/en/1.8/ref/settings/#use-x-forwarded-host
         settings['USE_X_FORWARDED_HOST'] = env('USE_X_FORWARDED_HOST', False)
