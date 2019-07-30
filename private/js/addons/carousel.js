@@ -50,8 +50,8 @@ export function initIframeCarousel(selector = '.js-carousel-iframe') {
         pauseOnHover: true,
         pauseOnFocus: true,
         dots: true,
-        autoplay: extraSettings.interval ? true : false,
-        autoplaySpeed: extraSettings.interval,
+        autoplay: (extraSettings && extraSettings.interval) ? true : false,
+        autoplaySpeed: extraSettings ? extraSettings.interval : 0,
         ...extraSettings,
     });
     carousel.addClass('carousel-ready');
