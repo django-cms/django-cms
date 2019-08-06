@@ -10,13 +10,9 @@ python:
 dist: xenial
 sudo: false
 
-addons:
-  apt:
-    packages:
-    - enchant
-
 services:
   - mysql
+  - postgresql
 
 cache:
   directories:
@@ -108,7 +104,7 @@ matrix:
     - python: 3.6
       env: TEST_DOCS=1 DJANGO=2.2 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 3.7
-      env: TEST_DOCS=1 DJANGO=2.2 DATABASE_URL='sqlite://localhost/:memory:'
+      env: DJANGO=2.2 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
   allow_failures:
     - python: 2.7
       env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
