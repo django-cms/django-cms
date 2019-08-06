@@ -17,12 +17,12 @@ from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
-from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE
 from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
@@ -296,6 +296,103 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             [node.get_absolute_url() for node in nodes],
             [page.get_absolute_url() for page in pages],
         )
+
+    def test_show_new_draft_page_in_menu(self):
+        """
+        Test checks if the menu cache is cleaned after create a new draft page.
+        """
+        with self.login_user_context(self.get_superuser()):
+            page_data_1 = self.get_new_page_data()
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data_1)
+            self.assertRedirects(response, URL_CMS_PAGE)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        renderer.get_nodes()
+        self.assertEqual(CacheKey.objects.count(), 1)
+
+        with self.login_user_context(self.get_superuser()):
+            page_data_2 = self.get_new_page_data()
+            self.assertNotEqual(page_data_1['slug'], page_data_2['slug'])
+            response = self.client.post(URL_CMS_PAGE_ADD, page_data_2)
+            self.assertRedirects(response, URL_CMS_PAGE)
+            page = Title.objects.drafts().get(slug=page_data_2['slug']).page
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes = renderer.get_nodes()
+        self.assertEqual(CacheKey.objects.count(), 1)
+        self.assertEqual(page.get_title(), nodes[-1].title)
+
+    def test_show_page_in_menu_after_move_page(self):
+        """
+        Test checks if the menu cache is cleaned after move page.
+        """
+        page = create_page('page to move', 'nav_playground.html', 'en', published=True)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_before = renderer.get_nodes()
+        index_before = [i for i, s in enumerate(nodes_before) if s.title == page.get_title()]
+        self.assertEqual(CacheKey.objects.count(), 1)
+
+        with self.login_user_context(self.get_superuser()):
+            # Moves the page to the second position in the tree
+            data = {'id': page.pk, 'position': 1}
+            endpoint = self.get_admin_url(Page, 'move_page', page.pk)
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(CacheKey.objects.count(), 0)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_after = renderer.get_nodes()
+        index_after = [i for i, s in enumerate(nodes_after) if s.title == page.get_title()]
+
+        self.assertEqual(CacheKey.objects.count(), 1)
+        self.assertNotEqual(
+            index_before,
+            index_after,
+            'Index should not be the same after move page in navigation'
+        )
+
+    def test_show_page_in_menu_after_copy_page(self):
+        """
+        Test checks if the menu cache is cleaned after copy page.
+        """
+        page = create_page('page to copy', 'nav_playground.html', 'en', published=True)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_before = renderer.get_nodes()
+        self.assertEqual(CacheKey.objects.count(), 1)
+
+        with self.login_user_context(self.get_superuser()):
+            # Copy the page
+            data = {
+                'position': 1,
+                'source_site': 1,
+                'copy_permissions': 'on',
+                'copy_moderation': 'on',
+            }
+            endpoint = self.get_admin_url(Page, 'copy_page', page.pk)
+            response = self.client.post(endpoint, data)
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(CacheKey.objects.count(), 0)
+
+        request = self.get_request('/')
+        renderer = menu_pool.get_renderer(request)
+        renderer.draft_mode_active = True
+        nodes_after = renderer.get_nodes()
+
+        self.assertEqual(CacheKey.objects.count(), 1)
+        self.assertGreater(len(nodes_after), len(nodes_before))
+        self.assertEqual(page.get_title(), nodes_after[-1].title)
 
     def test_cms_menu_public_with_multiple_languages(self):
         for page in Page.objects.drafts():

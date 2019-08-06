@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
+import datetime
 import os
 import sys
 
@@ -57,9 +58,10 @@ source_encoding = 'utf-8'
 # The master toctree document.
 master_doc = 'index'
 
+current_year = datetime.datetime.now().year
 # General information about the project.
 project = u'django cms'
-copyright = u'2009-2017, Divio AG and contributors'
+copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

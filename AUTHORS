@@ -21,8 +21,9 @@ Current and previous core designers:
 * Matthias Nüesch
 
 
-Contributors (based on gitlog, 497 unique authors):
+Contributors (based on gitlog, 537 unique authors):
 
+* Антон Евжаков
 * A. Bram Neijt
 * aaloy
 * Aaron Fay
@@ -34,6 +35,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Admin Adminaras
 * Adrien Brunet
 * Adrián Ribao Martínez
+* Aidas Bendoraitis
 * Alberto Paro
 * Ales Kocjancic
 * Ales Zabala Alava (Shagi)
@@ -44,6 +46,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Alexander Paramonov
 * Alexandre Leray
 * Alexey Subbotin
+* Aliaksei Urbanski
 * alskgj
 * Alvin Mites
 * Anatoly Ivanov
@@ -51,11 +54,14 @@ Contributors (based on gitlog, 497 unique authors):
 * Andras Gyömrey
 * Andre Bossard
 * Andrea Stagi
+* Andreas Elvers
 * Andrei Avram
 * Andrei Fokau
 * Andrew Schoen
+* André Cruz
 * Angelo Dini
 * angular_circle
+* Anthony Steinhauser
 * Antoine Catton
 * Anton Parkhomenko
 * AQNOUCH Mohammed
@@ -66,6 +72,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Arthur Debert
 * Artis Avotins
 * Aymeric Augustin
+* Bartosz Płóciennik
 * Basile LEGAL
 * behrooz
 * Behrooz Nobakht
@@ -94,9 +101,12 @@ Contributors (based on gitlog, 497 unique authors):
 * Carlos de Paula
 * casio
 * centralniak
+* Cezar Pendarovski
+* cezar77
 * Chanita Siridechkun
 * Charlie Denton
 * Charpentier Johan
+* Chematronix
 * Cheng-Chia Tseng
 * Chris Adams
 * Chris Franklin
@@ -150,6 +160,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Dmitry Akinin
 * Dmitry Gorelik
 * Dmytro Gorelik
+* Dmytro Litvinov
 * Donatas
 * Donatas Kučinskas
 * Douwe van der Meij
@@ -177,11 +188,13 @@ Contributors (based on gitlog, 497 unique authors):
 * fcurella
 * febsn
 * Filip Kazimierczak
+* Filipe Waitman
 * FinalAngel
 * fivethreeo
 * fj
 * floppya
 * Florian Verdet
+* Frank
 * Frank Bieniek
 * FrankBie
 * frost-nzcr4
@@ -209,6 +222,7 @@ Contributors (based on gitlog, 497 unique authors):
 * hedberg
 * henning
 * Henning Sprang
+* heppstux
 * Herbert Poul
 * hjkelly
 * Horst Gutmann
@@ -224,11 +238,13 @@ Contributors (based on gitlog, 497 unique authors):
 * J. Cliff Dyer
 * Jacob Rief
 * Jakob Hedman
+* Jakub Randák
 * jalaziz
 * Jameel Al-Aziz
 * James Richards
 * James Rutherford
 * Jana Deutschlaender
+* Jannik V
 * Jannis Leidel
 * Janusz Harkot
 * Jared Proffitt
@@ -238,6 +254,8 @@ Contributors (based on gitlog, 497 unique authors):
 * Jason Robinson
 * Jeffrey Goettsch
 * Jens Diemer
+* JensDiemer
+* Jeroen
 * Jeroen Noten
 * Jessica Tallon
 * Jimmy Lam
@@ -252,14 +270,17 @@ Contributors (based on gitlog, 497 unique authors):
 * Jorge Vargas
 * Jos van Velzen
 * Joseph Bergantine
+* Joseph Lin
 * Joseph Melettukunnel
 * Josh Kalderimis
 * Josh Schneier
 * João Luiz Lorencetti
 * Julien Poissonnier
+* Julz
 * Júlio R. Lucchese
 * Kalle Bronsen
 * kater169
+* Katie McLaughlin
 * kblomqvist
 * Kegan Holtzhausen
 * Keryn Knight
@@ -269,12 +290,14 @@ Contributors (based on gitlog, 497 unique authors):
 * Kim Thoenen
 * kochin
 * Kristian Øllegaard
+* Krzysztof Socha
 * kunitoki
 * L-A Iscla
 * Lars Smit
 * Lars van de Kerkhof
-* Leonardo
+* Laurens Bosscher
 * Leon Smith
+* Leonardo
 * Lio Mendonca
 * Lionardo Mendonça
 * littlepea
@@ -295,7 +318,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Marc-Olivier Titeux
 * Marco Badan
 * Marco Bonetti
-* marco federighi
+* Marco Federighi
 * Marco Paolini
 * Marco Rimoldi
 * marcor
@@ -304,7 +327,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Mark Rogers
 * Mark Walker
 * Markus Holtermann
-* Markus Zapke-Gründemann
+* Markus Zapke-Gründemann
 * Marti Raudsepp
 * Martin
 * Martin Bambas
@@ -329,12 +352,12 @@ Contributors (based on gitlog, 497 unique authors):
 * mbouchar
 * mcosta
 * meers
-* meomap
 * Mel Collins
+* meomap
 * MerLex
-* Michal Danilak
 * Michael P. Jung
 * Michael Thornhill
+* Michal Danilak
 * Mike Dory
 * Mike Johnson
 * mikek
@@ -352,6 +375,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Nelson Brochado
 * neoprolog
 * Nick Jones
+* Nicolas
 * Nicolas PASCAL
 * nikolas
 * Nina Zakharenko
@@ -373,6 +397,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Patrick Arminio
 * Patrick Lauber
 * Patrick Toal
+* patricklauber
 * Patryk Zawadzki
 * paul
 * Paul van der Linden
@@ -408,6 +433,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Rajesh P.
 * Rebecca Breu
 * Remco Wendt
+* René Fleschenberg
 * requires.io
 * Restless Being
 * Richard Barran
@@ -440,8 +466,8 @@ Contributors (based on gitlog, 497 unique authors):
 * sealibora
 * Sean Bleier
 * Sebastian Braun
-* Seth Buntin
 * Sergey Fedoseev
+* Seth Buntin
 * Seyhun Akyurek
 * Shahar Or
 * Shatalov Vadim
@@ -464,6 +490,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Stefano Brentegani
 * Stefano Crosta
 * Stefano Morandi
+* Stefano Probst
 * Steffen Jasper
 * Stephan
 * Stephan Hepper
@@ -484,6 +511,7 @@ Contributors (based on gitlog, 497 unique authors):
 * Thomas Parslow
 * Thomas Remmert
 * Thomas Woolford
+* thomas-d
 * Tim Anderegg
 * Tim Davies
 * Tim Graham
@@ -497,9 +525,9 @@ Contributors (based on gitlog, 497 unique authors):
 * Tom S
 * Tom V
 * Tom Wardill
-* thomas-d
 * Ulrich Petri
 * unknown
+* uno
 * User
 * Vadim Lopatyuk
 * Vadim Sikora
@@ -530,7 +558,6 @@ Contributors (based on gitlog, 497 unique authors):
 * Yuri van der Meer
 * zandeez
 * zundoya
+* Žan Anderle
 * Óscar M. Lage
 * Øyvind Saltvik
-* Žan Anderle
-* Антон Евжаков

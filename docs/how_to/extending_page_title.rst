@@ -75,7 +75,7 @@ permissions.
 .. note::
 
     If you want to use your own admin class, make sure to exclude the live versions of the
-    extensions by using ``filter(extended_page__publisher_is_draft=True)`` on the queryset.
+    extensions by using ``filter(extended_object__publisher_is_draft=True)`` on the queryset.
 
 Continuing with the example model above, here's a simple corresponding
 ``PageExtensionAdmin`` class::
@@ -223,7 +223,7 @@ In this example, we need to loop over the titles for the page, and populate the 
                 # we now also need to get the titleset (i.e. different language titles)
                 # for this page
                 page = self._get_page()
-                titleset = page.title_set.filter(language__in=get_language_list(page.site_id))
+                titleset = page.title_set.filter(language__in=get_language_list(page.node.site_id))
 
                 # create a 3-tuple of (title_extension, url, title)
                 nodes = [(title_extension, url, title.title) for (
@@ -401,15 +401,9 @@ Simplified Toolbar API
 The simplified Toolbar API works by deriving your toolbar class from ``ExtensionToolbar``
 which provides the following API:
 
-
-* :meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`: this must be called first to setup
-  the environment and do the permission checking;
-* :py:meth:`~cms.extensions.toolbar.ExtensionToolbar.get_page_extension_admin()`: for page extensions, retrieves the
-  correct admin URL for the related toolbar item; returns the extension instance (or `None` if not exists)
-  and the admin URL for the toolbar item;
-* :py:meth:`~cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin()`: for title extensions, retrieves the
-  correct admin URL for the related toolbar item; returns a list of the extension instances
-  (or `None` if not exists) and the admin urls for each title of the current page;
-
-* :meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu`
-* :meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`
+* ``ExtensionToolbar.get_page_extension_admin()``: for page extensions, retrieves the correct admin
+  URL for the related toolbar item; returns the extension instance (or ``None`` if none exists) and
+  the admin URL for the toolbar item
+* ``ExtensionToolbar.get_title_extension_admin()``: for title extensions, retrieves the correct
+  admin URL for the related toolbar item; returns a list of the extension instances (or ``None`` if
+  none exists) and the admin URLs for each title of the current page
