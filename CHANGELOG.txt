@@ -1,6 +1,7 @@
 === 3.7.0 (unreleased) ===
 
 * Introduced Django 2.2 support.
+* Introduced Python 3.7 support.
 * Fixed test suite.
 
 

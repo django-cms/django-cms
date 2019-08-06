@@ -2,10 +2,6 @@
 Structure and content modes
 ###########################
 
-.. image:: /user/tutorial/images/structure-content.png
-     :align: right
-     :alt: the 'Structure/Content' mode control
-     :width: 71
 
 The *Structure/Content* mode control in the toolbar lets you switch between two different editing
 modes.
