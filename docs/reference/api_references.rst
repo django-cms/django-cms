@@ -221,32 +221,33 @@ add a text plugin with the content ``'hello world'``. This is done in English::
 cms.constants
 *************
 
-.. module:: cms.constants
+..  module:: cms.constants
 
-.. data:: TEMPLATE_INHERITANCE_MAGIC
+..  data:: TEMPLATE_INHERITANCE_MAGIC
 
     The token used to identify when a user selects "inherit" as template for a
     page.
 
-.. data:: LEFT
+..  data:: LEFT
 
     Used as a position indicator in the toolbar.
 
-.. data:: RIGHT
+..  data:: RIGHT
 
     Used as a position indicator in the toolbar.
 
-.. data:: REFRESH
+..  data:: REFRESH
 
     Constant used by the toolbar.
 
-.. data:: EXPIRE_NOW
+..  data:: EXPIRE_NOW
 
     Constant of 0 (zero) used for cache control headers
 
-.. data:: MAX_EXPIRATION_TTL
+..  data:: MAX_EXPIRATION_TTL
 
     Constant of 31536000 or 365 days in seconds used for cache control headers
+
 
 ************
 cms.app_base
