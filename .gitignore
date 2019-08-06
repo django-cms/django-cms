@@ -23,6 +23,7 @@ dist
 .project
 .coverage
 .pydevproject
+.vscode
 .settings
 /*.egg-info/
 /*.egg/

@@ -1,6 +1,5 @@
 <!--
     If this is a security-related patch stop immediately!
-
     See http://docs.django-cms.org/en/latest/contributing/development-policies.html
 -->
 
@@ -10,24 +9,15 @@
 Fixes #
 
 
-
 ### Links to related discussion
-
 
 
 ### Proposed changes in this pull request
 
 
-### Documentation checklist
+### General checklist
 
-* [ ] I have updated CHANGELOG.txt if appropriate
-* [ ] I have updated the release notes document if appropriate, with:
-    * [ ] general notes
-    * [ ] bug-fixes
-    * [ ] improvements/new features
-    * [ ] backwards-incompatible changes
-    * [ ] required upgrade steps
-    * [ ] names of contributors
-* [ ] I have updated other documentation
-* [ ] I have added my name to the AUTHORS file
-* [ ] This PR's documentation has been approved by Daniele Procida
+* [ ] I have updated the CHANGELOG.txt
+* [ ] I have created backports if necessary
+* [ ] I have updated the documentation and/or amended the upgrade section
+      if necessary
