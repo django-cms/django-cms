@@ -4,7 +4,8 @@
 3.7.0 release notes
 ###################
 
-This release of django CMS concentrates on introducing support for Django 2.2 LTS.
+This release of django CMS concentrates on introducing support for Django 2.2 LTS
+and Python 3.7.
 
 
 *******************
@@ -15,6 +16,7 @@ Improvements and new features
 =============================
 
 * introduced support for Django 2.2
+* Introduced Python 3.7 support.
 * Fixed test suite.
 
 
