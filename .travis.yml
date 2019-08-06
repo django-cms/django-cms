@@ -1,23 +1,27 @@
 language: python
 
 python:
-  - 3.7
   - 3.6
   - 3.5
   - 3.4
   - 2.7
 
-dist: xenial
 sudo: false
 
 services:
   - mysql
   - postgresql
 
+addons:
+  apt:
+    packages:
+    - enchant
+
 cache:
   directories:
     - node_modules
     - $HOME/.pip/cache
+
 
 env:
   global:
@@ -57,8 +61,6 @@ matrix:
       env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - python: 3.6
       env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
-    - python: 3.7
-      env: DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
 
     # DJANGO 2.0
     - python: 3.4
@@ -71,8 +73,6 @@ matrix:
       env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - python: 3.6
       env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
-    - python: 3.7
-      env: DJANGO=2.0 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
 
     # DJANGO 2.1
     - python: 3.5
@@ -87,12 +87,12 @@ matrix:
       env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
     - python: 3.6
       env: TEST_DOCS=1 DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
-    - python: 3.7
-      env: DJANGO=2.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
 
     # DJANGO 2.2
     - python: 3.5
       env: DJANGO=2.2 DATABASE_URL='sqlite://localhost/:memory:'
+      dist: xenial
+      sudo: true
     - python: 3.5
       env: DJANGO=2.2 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - python: 3.6
@@ -103,8 +103,8 @@ matrix:
       env: DJANGO=2.2 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
     - python: 3.6
       env: TEST_DOCS=1 DJANGO=2.2 DATABASE_URL='sqlite://localhost/:memory:'
-    - python: 3.7
-      env: DJANGO=2.2 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
+      dist: xenial
+      sudo: true
   allow_failures:
     - python: 2.7
       env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
@@ -113,7 +113,6 @@ matrix:
     - python: 3.4
     - python: 3.5
     - python: 3.6
-    - python: 3.7
   fast_finish: true
 
 before_script:
