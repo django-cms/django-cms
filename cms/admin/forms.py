@@ -294,6 +294,8 @@ class AddPageForm(BasePageForm):
             # its the first page. publish it right away
             new_page.publish(translation.language)
             new_page.set_as_homepage(self._user)
+
+        new_page.clear_cache(menu=True)
         return new_page
 
 
@@ -896,6 +898,7 @@ class CopyPageForm(PageTreeForm):
             copy_permissions=copy_permissions,
             target_site=self._site,
         )
+        new_page.clear_cache(menu=True)
         return new_page
 
     def _get_tree_options_for_root(self, position):

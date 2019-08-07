@@ -5,9 +5,9 @@ import os
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandParser
-from django.core.management.color import no_style
+from django.core.management.color import no_style, color_style
 
-from cms.utils.compat import DJANGO_2_0
+from cms.utils.compat import DJANGO_2_0, DJANGO_2_2
 
 
 def add_builtin_arguments(parser):
@@ -37,6 +37,9 @@ def add_builtin_arguments(parser):
         help='Raise on CommandError exceptions')
     parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
         help="Don't colorize the command output.")
+    if DJANGO_2_2:
+        parser.add_argument('--force-color', action='store_true', dest='force_color', default=False,
+            help="Colorize the command output.")
 
 
 class SubcommandsCommand(BaseCommand):
@@ -85,6 +88,8 @@ class SubcommandsCommand(BaseCommand):
             if options.get('no_color'):
                 command.style = no_style()
                 command.stderr.style_func = None
+            if DJANGO_2_2 and options.get('force_color'):
+                command.style = color_style(force_color=True)
             if options.get('stdout'):
                 command.stdout._out = options.get('stdout')
             if options.get('stderr'):
