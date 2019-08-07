@@ -430,6 +430,15 @@ describe('CMS.Plugin', function() {
                             ' and a text node\n' +
                             '    </cms-plugin>'
                     ]
+                },
+                {
+                    pluginId: 109,
+                    name: 'object node',
+                    expected: [
+                        '<cms-plugin class="cms-plugin-object-node cms-plugin cms-plugin-109">' +
+                            '<object src="xx">109</object>' +
+                        '</cms-plugin>'
+                    ]
                 }
             ];
 
