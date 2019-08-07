@@ -564,7 +564,7 @@ class Page(models.Model):
                 self.publisher_public._update_title_path(language)
                 self.mark_as_published(language)
                 self.mark_descendants_as_published(language)
-        self.clear_cache()
+        self.clear_cache(menu=True)
         return self
 
     def _copy_titles(self, target, language, published):

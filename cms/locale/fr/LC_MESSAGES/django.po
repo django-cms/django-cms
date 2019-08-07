@@ -13,6 +13,7 @@
 # Samir ASNOUN <samir.asnoun@gmail.com>, 2015
 # Assma Buifruri <assma.buifruri@hotmail.com>, 2017
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012-2013,2015
+# bmassot <bmassot@free.fr>, 2019
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012
 # charettes <charette.s@gmail.com>, 2011-2012
 # Chary titouan <>, 2011
@@ -39,9 +40,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 13:20+0100\n"
-"PO-Revision-Date: 2018-11-13 22:45+0000\n"
-"Last-Translator: Nicolas PASCAL <np.pascal@gmail.com>\n"
+"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"PO-Revision-Date: 2019-01-17 09:13+0000\n"
+"Last-Translator: bmassot <bmassot@free.fr>\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1244,7 +1245,7 @@ msgstr "Afficher/masquer la structure"
 
 #| msgid "View published"
 msgid "View published"
-msgstr "Vue publiée"
+msgstr "Voir la page publiée"
 
 msgid "Login"
 msgstr "Connexion"

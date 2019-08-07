@@ -11,6 +11,7 @@
 # Aryan Baghi <aryan@baghi.id.ir>, 2014
 # Aryan Baghi <aryan@baghi.id.ir>, 2014
 # cafe-click <cafeclick@rocketmail.com>, 2013
+# Fariman Ghaedi <farimanghaedi@gmail.com>, 2018
 # farshad <akbari.farshad@gmail.com>, 2014
 # hadiazaddel <hadiazaddel@chmail.ir>, 2014
 # hadiazaddel <hadiazaddel@chmail.ir>, 2014
@@ -22,13 +23,14 @@
 # Mohammad Rafiei <mohammad.rafiei69@gmail.com>, 2017
 # omid zarin <mester.hope.oz@gmail.com>, 2014
 # Pouya Abbassi, 2016
+# Sina Rezaei <sinarezaei1991@gmail.com>, 2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 13:20+0100\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"PO-Revision-Date: 2019-01-19 23:33+0000\n"
+"Last-Translator: Sina Rezaei <sinarezaei1991@gmail.com>\n"
 "Language-Team: Persian (http://www.transifex.com/divio/django-cms/language/fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -124,7 +126,7 @@ msgstr "صفحه-ای با شناسه-ی این آدرس معکوس وجود د�
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "مقدار تنظیمات برنامه نامعتبر است."
 
 msgid "An application instance using this configuration already exists."
 msgstr "یک برنامه موردی با این تنظیمات از پیش وجود دارد."
@@ -133,7 +135,7 @@ msgid "An application instance with this name already exists."
 msgstr "یک برنامه موردی با این نام از پیش وجود دارد."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "شما نمی توانید صفحه خانه را به درون صفحه دیگری منتقل کنید"
 
 msgid "Yes"
 msgstr "بله"
@@ -249,7 +251,7 @@ msgstr "خطا! شما اختیارات کپی این صفحه را ندارید
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "خطا! صفحه ای که شما در حال چسباندن آن هستید به هیچ کدام از زبان هایی که سایت هدف پیکربندی کرده ترجمه نشده است."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -310,7 +312,7 @@ msgid "New page"
 msgstr "صفحه‌ی جدید"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "این صفحه واجد شرایط برای اینکه صفحه خانه باشد نیست."
 
 msgid "View restriction"
 msgstr "مشاهد محدوديت"
@@ -562,7 +564,7 @@ msgstr "یک صفحه معتبر انتخاب کنید"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "آدرس صفحه %(conflict_page)s با آدرس صفحه فعلی %(url)s یکسان است \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -570,7 +572,7 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "آدرس صفحه %(conflict_page)s با آدرس صفحه فعلی %(url)s یکسان است."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -584,7 +586,7 @@ msgstr "برای تنظیم نشانک به صورت اتوماتیک، خالی
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "شما دسترسی لازم برای اضافه کردن صفحه را ندارید."
 
 msgid "ID"
 msgstr "آی دی"
@@ -1008,7 +1010,7 @@ msgstr "جایگذاری"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "تنظیم به عنوان خانه"
 
 msgid "is restricted"
 msgstr "محدود شده"
@@ -1098,7 +1100,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n<em>هیچ %(object)s یافت نشد</em>\n\n<a href=\"%(add_url)s\" class=\"addlink\">همین الان %(object)s اضافه کنید</a>."
 
 msgid "Copy options"
 msgstr "تنظیمات کپی"
@@ -1220,18 +1222,18 @@ msgid "This plugin cannot have nested plugins."
 msgstr "این پلاگین نمیتواند پلاگینهای تو‌در‌تو داشته باشد."
 
 msgid "Highlight"
-msgstr ""
+msgstr "هایلایت"
 
 msgid "Available plugins"
 msgstr "افزونه‌های موجود"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "تغییر ساختار"
 
 #| msgid "View published"
 msgid "View published"
-msgstr ""
+msgstr "مشاهده منتشر شده"
 
 msgid "Login"
 msgstr "ورود"
@@ -1257,7 +1259,7 @@ msgstr "خطای مقابل رخ داده است:"
 
 #| msgid "Action successfull... reloading."
 msgid "Action successful."
-msgstr ""
+msgstr "اقدام موفقیت آمیز."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "آیا شما مطمئن هستید می‌خواهید این افزونه را پاک کنید؟"
@@ -1287,13 +1289,13 @@ msgstr "فورم نمیتواند بارگزاری شود. لطفا اطمینا
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "بیشترین استفاده شده"
 
 msgid "Shortcuts"
 msgstr "میانبرها"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "صفحه در این اثناء تغییر کرد،\nدر حال بارگذاری مجدد ..."
 
 msgid "Bring up this help dialog"
 msgstr "این گفتگو کمک را بیابید"
@@ -1426,7 +1428,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr ""
+msgstr "\n<p class=\"cms-welcome-notes\">اگر شما نماد «سیستم مدیریت محتوای جنگو» را در بالای صفحه نمی‌بینید، مطمئن شوید\nپوشه‌ی <code>static/cms</code> را به فایل‌های ایستای خود\nلینک کرده‌اید.</p>"
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1444,7 +1446,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n<p class=\"cms-welcome-notes\">شما این پیغام را می‌بینید چون <code>DEBUG = True</code> را در تنظیمات جنگو فعال کرده‌اید.</p>"
 
 msgid "Welcome to django CMS"
 msgstr "به سیستم مدیریت محتوای جنگو خوش آمدید"
@@ -1554,7 +1556,7 @@ msgstr "ابزار نمونه"
 
 #| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
-msgstr ""
+msgstr "اپلیکیشن نمونه همراه با پیکربندی"
 
 msgid "Sample App with excluded permissions"
 msgstr "اَپ نمونه با سطح دسترسی‌های محدود"
