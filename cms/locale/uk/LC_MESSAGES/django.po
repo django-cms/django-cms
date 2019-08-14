@@ -16,6 +16,7 @@
 # panasoft <cc072aa3@opayq.com>, 2014-2016
 # Pylyp Dukhlii <pylyp@pylyp.com.ua>, 2014
 # roman_grankin <grankin.roman@hotmail.com>, 2014
+# tarasyyyk <taras.korzhak96@gmail.com>, 2019
 # Volodymyr Vakulenko <wowkalucky@gmail.com>, 2017
 # Vusheslavov Eduard <vey@live.ru>, 2014
 # yakky <i.spalletti@nephila.it>, 2015
@@ -25,9 +26,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2019-02-01 22:48+0000\n"
-"Last-Translator: Петро Романчук <ixer@ixer.org.ua>\n"
+"POT-Creation-Date: 2019-08-14 10:38+0200\n"
+"PO-Revision-Date: 2019-07-20 17:50+0000\n"
+"Last-Translator: tarasyyyk <taras.korzhak96@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -434,7 +435,7 @@ msgid "Disable toolbar"
 msgstr "Відключити панель"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Гарячі клавіші..."
 
 msgid "Users"
 msgstr "Користувачі"
@@ -1099,7 +1100,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n                            <em>Поки що немає %(object)s</em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Додати %(object)s</a>.\n                        "
 
 msgid "Copy options"
 msgstr "Опції копіювання"
@@ -1188,13 +1189,13 @@ msgid "Copy from"
 msgstr "Копіювати з"
 
 msgid "Empty all"
-msgstr "Очистити усе"
+msgstr "Очистити все"
 
 msgid "Filter plugins..."
 msgstr "Фільтрувати плагіни..."
 
 msgid "This is a static placeholder"
-msgstr "Це статичний вказівник місця заповнення"
+msgstr "Це статичний заповнювач"
 
 msgid "Expand all"
 msgstr "Розгорнути все"
@@ -1232,7 +1233,7 @@ msgstr "Увімк./Вимк. структуру"
 
 #| msgid "View published"
 msgid "View published"
-msgstr ""
+msgstr "Переглянути опубліковане"
 
 msgid "Login"
 msgstr "Увійти"
@@ -1288,7 +1289,7 @@ msgstr "Форма не може бути завантажена. Будь ла�
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "Найбільш використовуване"
 
 msgid "Shortcuts"
 msgstr "Гарячі клавіші"
@@ -1364,7 +1365,7 @@ msgid "Maximize"
 msgstr "Розгорнути"
 
 msgid "Drop a plugin here"
-msgstr "Перетягти розширення сюди"
+msgstr "Перетягніть сюди плагін"
 
 msgid "This page has no preview!"
 msgstr "Ця сторінка не має перегляду!"
@@ -1427,7 +1428,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr "\n         <p class=\"cms-welcome-notes\">Якщо Ви не бачите угорі логотип CMS django, переконайтесь,\nщо Ви посилаєтесь на статичні файли у своєму каталозі <code>static/cms</code></p>"
+msgstr "\n         <p class=\"cms-welcome-notes\">Якщо Ви не бачите вгорі логотип CMS django, переконайтесь,\nщо Ви посилаєтесь на статичні файли у своєму каталозі <code>static/cms</code></p>"
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1472,7 +1473,7 @@ msgid "unpublished parent"
 msgstr "неопублікований предок"
 
 msgid "unpublished"
-msgstr "неопубліковані"
+msgstr "неопубліковано"
 
 msgid "no content"
 msgstr "Матеріалів поки немає"
