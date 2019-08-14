@@ -15,7 +15,7 @@ What's new in 3.7.0
 Improvements and new features
 =============================
 
-* introduced support for Django 2.2
+* Introduced Django 2.2 support.
 * Introduced Python 3.7 support.
 * Fixed test suite.
 
@@ -85,3 +85,4 @@ Contributors to this release
 * Frank
 * Jacob Rief
 * Julz
+* Angelo Dini
