@@ -18,6 +18,7 @@ Improvements and new features
 * Introduced Django 2.2 support.
 * Introduced Python 3.7 support.
 * Fixed test suite.
+* Fixed override ``urlconf_module`` so that Django system checks don't crash.
 
 
 *********************
