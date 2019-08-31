@@ -1099,6 +1099,7 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         page = get_page_from_request(request, clean_path=True)
         self.assertEqual(page, None)
         
+        request.path_info = '/PREFIX/en/child_page/child_child_page/extra_1/'
         # test if still work with clean path 
         request._current_page_cache = applications_page_check(request)
         page = get_page_from_request(request)
