@@ -28,6 +28,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
+from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
@@ -1058,3 +1059,48 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         self.assertEqual(url, '/en/child_page/child_child_page/extra_1/')
 
         self.apphook_clear()
+
+    def test_page_url_for_apphook_under_script_name(self):
+
+        self.apphook_clear()
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        page = self.create_homepage("home", "nav_playground.html", "en", created_by=superuser)
+        create_title('de', page.get_title(), page)
+        page.publish('en')
+        page.publish('de')
+
+        child_page = create_page("child_page", "nav_playground.html", "en",
+                                 created_by=superuser, parent=page)
+        child_page.publish('en')
+
+        child_child_page = create_page("child_child_page", "nav_playground.html",
+                                       "en", created_by=superuser, parent=child_page, apphook='SampleApp')
+        child_child_page.publish('en')
+        
+        # publisher_public is set to draft on publish, issue with one to one reverse
+        child_child_page = self.reload(child_child_page)
+        
+        with force_language("en"):
+            path = reverse('extra_first')
+
+        # prefix WSGIrequest is added
+        request = self.get_request(path,script_name=True)
+        self.assertEqual(request.path, '/PREFIX/en/child_page/child_child_page/extra_1/')
+    
+        request.LANGUAGE_CODE = 'en'
+        
+        """
+        Sub_path with script_name in WSGIrequest.
+        Under conditions get_page_from_request should not work in this test, if the page exsite,
+        it would mean that it does not take intoaccount the script_name prefix. 
+        To summarize, it's a positive monkey with a false return.
+        """
+        request.path_info = '/en/child_page/child_child_page/'
+        page = get_page_from_request(request, clean_path=True)
+        self.assertEqual(page, None)
+        
+        # test if still work with clean path 
+        request._current_page_cache = applications_page_check(request)
+        page = get_page_from_request(request)
+        self.assertEqual(page.get_absolute_url(), '/en/child_page/child_child_page/')
+        
