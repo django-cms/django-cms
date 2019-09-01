@@ -1065,9 +1065,7 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.create_homepage("home", "nav_playground.html", "en", created_by=superuser)
-        create_title('de', page.get_title(), page)
         page.publish('en')
-        page.publish('de')
 
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
