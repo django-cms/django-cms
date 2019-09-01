@@ -1089,12 +1089,8 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
     
         request.LANGUAGE_CODE = 'en'
         
-        """
-        Sub_path with script_name in WSGIrequest.
-        Under conditions get_page_from_request should not work in this test, if the page exsite,
-        it would mean that it does not take intoaccount the script_name prefix. 
-        To summarize, it's a positive monkey with a false return.
-        """
+        #Under conditions get_page_from_request should not work in this test, if the page exsite,
+        #it would mean that it does not take intoaccount the script_name prefix. 
         request.path_info = '/en/child_page/child_child_page/'
         page = get_page_from_request(request, clean_path=True)
         self.assertEqual(page, None)
