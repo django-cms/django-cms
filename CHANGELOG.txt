@@ -1,5 +1,5 @@
 === 3.7.0 (unreleased) ===
-
+* Add test ``get_page_from_request`` under wsgi script_name and fixed.
 * Introduced Django 2.2 support.
 * Introduced Python 3.7 support.
 * Fixed test suite.
