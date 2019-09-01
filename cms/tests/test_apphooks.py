@@ -1089,8 +1089,8 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
     
         request.LANGUAGE_CODE = 'en'
         
-        #Under conditions get_page_from_request should not work in this test, if the page exsite,
-        #it would mean that it does not take intoaccount the script_name prefix. 
+        # Under conditions get_page_from_request needed not work in this test, if the page exsite,
+        # it would mean that it does not take intoaccount the script_name prefix. 
         request.path_info = '/en/child_page/child_child_page/'
         page = get_page_from_request(request, clean_path=True)
         self.assertEqual(page, None)
