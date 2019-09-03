@@ -154,7 +154,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     draft = use_draft(request)
     preview = 'preview' in request.GET
     if request.environ.get('SCRIPT_NAME'):
-        path = normpath(request.environ.get('SCRIPT_NAME','') + request.path_info) if use_path is None else use_path
+        path = normpath(request.environ.get('SCRIPT_NAME') + request.path_info) if use_path is None else use_path
     else:
         path = request.path_info if use_path is None else use_path
     if clean_path:
