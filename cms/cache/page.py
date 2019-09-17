@@ -15,6 +15,8 @@ from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
 
+STATUS_CODE_CACHE_KEY = ".status_code"
+
 
 def _page_cache_key(request):
     #sha1 key of current path
@@ -88,6 +90,7 @@ def set_page_cache(response):
                 ttl,
                 version=version
             )
+            cache.set(_page_cache_key(request) + STATUS_CODE_CACHE_KEY, response.status_code, ttl, version=version)
             # See note in invalidate_cms_page_cache()
             _set_cache_version(version)
     return response
@@ -96,6 +99,11 @@ def set_page_cache(response):
 def get_page_cache(request):
     from django.core.cache import cache
     return cache.get(_page_cache_key(request), version=_get_cache_version())
+
+
+def get_page_cache_status_code(request, default_code):
+    from django.core.cache import cache
+    return cache.get(_page_cache_key(request) + STATUS_CODE_CACHE_KEY, default_code, version=_get_cache_version())
 
 
 def get_xframe_cache(page):
