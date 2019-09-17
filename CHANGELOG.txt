@@ -1,6 +1,6 @@
 === 3.8.0 (unreleased) ===
 
-* ...
+* Store page status code into the cache.
 
 
 === 3.7.0 (2019-09-25) ===
