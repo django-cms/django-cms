@@ -273,16 +273,18 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             root = obj
 
         plugins = [root] + list(root.get_descendants().order_by('path'))
+        # simulate the call to the unauthorized CMSPlugin.page property
+        cms_page = obj.placeholder.page if obj.placeholder_id else None
 
         child_classes = self.get_child_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
         parent_classes = self.get_parent_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
