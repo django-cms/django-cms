@@ -5,6 +5,7 @@
 * Improved apphooks documentation
 * Improved CMSPluginBase documentation
 * Improved documentation related to nested plugins
+* Fixed the 'urls.W001' warning with custom apphook urls
 
 === 3.7.0 (2019-09-25) ===
 
