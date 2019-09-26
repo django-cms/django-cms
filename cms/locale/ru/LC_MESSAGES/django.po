@@ -9,9 +9,11 @@
 # Andrew Koltsov <andrewkoltsov@gmail.com>, 2014
 # Andrew Koltsov <andrewkoltsov@gmail.com>, 2014
 # andrey_shipilov <tezro.gb@gmail.com>, 2011
+# SAG <andrschwartz@gmail.com>, 2019
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
+# eXtractor <evg.kirov@gmail.com>, 2019
 # Gleb Chipiga <gleb.chipiga@gmail.com>, 2011
 # ha7y <maxvyaznikov@gmail.com>, 2014
 # koodjo <koodjo@mail.ru>, 2012
@@ -36,9 +38,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2019-07-19 09:42+0000\n"
+"Last-Translator: SAG <andrschwartz@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/divio/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -134,7 +136,7 @@ msgstr "Страница с таким reverse URL уже существует."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Неверное значение в конфигурации"
 
 msgid "An application instance using this configuration already exists."
 msgstr "Приложение, использующее эту конфигурацию, уже существует."
@@ -143,7 +145,7 @@ msgid "An application instance with this name already exists."
 msgstr "Приложение с таким именем уже существует."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Вы не можете переместить домашнюю страницу внутрь другой страницы"
 
 msgid "Yes"
 msgstr "Да"
@@ -254,12 +256,12 @@ msgstr "У вас нет прав на копирование этих плаг�
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Ошибка! У вас недостаточно прав, чтобы копировать эту страницу."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "Ошибка! Страница, которую вы пытаетесь вставить, не имеет переводов ни для одного из языков сайта."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -320,7 +322,7 @@ msgid "New page"
 msgstr "Новая страница"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "Эта страница не может быть домашней."
 
 msgid "View restriction"
 msgstr "Ограничене просмотра"
@@ -445,7 +447,7 @@ msgid "Disable toolbar"
 msgstr "Отключить тулбар"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Горячие клавиши..."
 
 msgid "Users"
 msgstr "Пользователи"
@@ -544,10 +546,10 @@ msgid "Publish page"
 msgstr "публикуется"
 
 msgid "Are you sure you want to revert to live?"
-msgstr "Вы точно хотите оживить?"
+msgstr "Вы точно хотите вернуться к опубликованной версии?"
 
 msgid "Revert to live"
-msgstr "Оживить снова"
+msgstr "Вернуть опубликованную версию"
 
 msgid "Delete page"
 msgstr "Удалить страницу"
@@ -572,7 +574,7 @@ msgstr "Выбрать правильную страницу"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "У страницы %(conflict_page)s такой же путь URL ''%(url)s, как и у текущей страницы \"%(instance)s\"."
 
 #, python-format
 #| msgid ""

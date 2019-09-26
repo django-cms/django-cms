@@ -15,11 +15,12 @@
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012-2013,2015
 # bmassot <bmassot@free.fr>, 2019
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012
-# charettes <charette.s@gmail.com>, 2011-2012
+# Simon Charette <charette.s@gmail.com>, 2011-2012
 # Chary titouan <>, 2011
 # Frigory33 <chironsylvain@orange.fr>, 2016
 # chrisglass <tribaal@gmail.com>, 2011
 # Christophe CHAUVET <christophe.chauvet@gmail.com>, 2013
+# a270031086f2a0d3514bc0cb507b48f6, 2019
 # Dylann CORDEL <cordel.d@free.fr>, 2014-2015
 # Freddy L. <freddy.limpens@gmail.com>, 2014
 # Gabriel Le Breton <lebreton.gabriel@gmail.com>, 2015
@@ -40,9 +41,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2019-01-17 09:13+0000\n"
-"Last-Translator: bmassot <bmassot@free.fr>\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2019-02-03 11:31+0000\n"
+"Last-Translator: a270031086f2a0d3514bc0cb507b48f6\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -267,7 +268,7 @@ msgstr "Erreur ! La page que vous êtes en train de coller n'est traduite dans a
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
-msgstr "Vous n'êtes pas autorisé(e) à retourner sur cette page."
+msgstr "Vous n'êtes pas autorisé à retourner sur cette page."
 
 #, python-format
 msgid "\"%s\" was reverted to the live version."
@@ -344,7 +345,7 @@ msgstr "Vous n'avez pas la permission d'ajouter un plugin"
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
-msgstr "Vous n'êtes pas autorisé(e) à copier cet élément de substitution."
+msgstr "Vous n'êtes pas autorisé à copier cet élément de substitution."
 
 msgid "Plugin not found"
 msgstr "Plugin non trouvé"
@@ -367,14 +368,14 @@ msgstr "Vous n'avez pas l'autorisation de coller ce plugin"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
-msgstr "Vous n'êtes pas autorisé(e) à coller cet  élément de substitution."
+msgstr "Vous n'êtes pas autorisé à coller cet  élément de substitution."
 
 msgid "You have no permission to move this plugin"
 msgstr "Vous n’avez pas la permission de déplacer ce plugin"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
-msgstr "Vous n'êtes pas autorisé(e) à couper ce plugin"
+msgstr "Vous n'êtes pas autorisé à couper ce plugin"
 
 msgid "You do not have permission to delete this plugin"
 msgstr "Vous n’avez pas la permission de supprimer ce plugin"
@@ -499,7 +500,7 @@ msgstr "de %s"
 #, python-format
 #| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr "Êtes-vous sûr(e) de vouloir copier tous les plugins des %s?"
+msgstr "Êtes-vous sûr de vouloir copier tous les plugins des %s?"
 
 msgid "Pages"
 msgstr "Pages"
@@ -576,7 +577,7 @@ msgstr "Choisissez une page valide"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr "La page %(conflict_page)s a le même url (\"%(url)s\") que la page actuelle%(instance)s."
+msgstr "La page %(conflict_page)s a le même url \"%(url)s\" que la page actuelle%(instance)s."
 
 #, python-format
 #| msgid ""
@@ -584,7 +585,7 @@ msgstr "La page %(conflict_page)s a le même url (\"%(url)s\") que la page actue
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr "La page %(conflict_page)s a le même url (\"%(url)s\") que la page actuelle."
+msgstr "La page %(conflict_page)s a le même url \"%(url)s\" que la page actuelle."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1274,7 +1275,7 @@ msgid "Action successful."
 msgstr "Action réussie !"
 
 msgid "Are you sure you want to delete this plugin?"
-msgstr "Êtes-vous sûr(e) de vouloir supprimer ce plugin ?"
+msgstr "Êtes-vous sûr de vouloir supprimer ce plugin ?"
 
 msgid "Are you sure you want to publish this page?"
 msgstr "Êtes-vous sûr de vouloir publier cette page ?"

@@ -9,16 +9,16 @@
 # 5thgfka <5thgfka@gmail.com>, 2014
 # aaffdd11 <chenyuan328@gmail.com>, 2011
 # aaron <aaronwwf@qq.com>, 2015
-# listeng, 2017
+# Aosp T, 2017
 # Felix Lu <lufelixgh@gmail.com>, 2013
 # ofive <glacier_05@yahoo.com.cn>, 2011
 # Guanting Liu <guanting.liu@sv.cmu.edu>, 2015
 # Jinku Hu <jinkuhu@gmail.com>, 2015
 # Joe Shen <sheninter@gmail.com>, 2013
-# listeng, 2017
+# Aosp T, 2017
 # ofive <glacier_05@yahoo.com.cn>, 2011
-# ryanouyang <ouyang.em@gmail.com>, 2013
-# ryanouyang <ouyang.em@gmail.com>, 2013
+# Ryan <ouyang.em@gmail.com>, 2013
+# Ryan <ouyang.em@gmail.com>, 2013
 # spaceoi <zhangzhaoyu@gmail.com>, 2014
 # ufo <user@ufoym.com>, 2015
 # wenze <wangwenze@live.cn>, 2015
@@ -30,7 +30,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2018-11-09 12:08+0000\n"
 "Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/divio/django-cms/language/zh_CN/)\n"
