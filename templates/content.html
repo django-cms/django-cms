@@ -20,7 +20,7 @@
             <div class="collapse navbar-collapse" id="main-nav">
                 <div class="navbar-collapse-container">
                     {% with dropdown="true" %}
-                        <ul class="navbar-nav mr-lg-auto" id="navbarSupportedContent">
+                        <ul class="navbar-nav ml-lg-auto" id="navbarSupportedContent">
                             {% show_menu 0 1 100 100 'includes/navigation.html' %}
                         </ul>
                     {% endwith %}
@@ -91,30 +91,22 @@
                     </div>
                     <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
                         <ul class="list-unstyled footer-links">
-                            <li><p class="footer-links-title">About Divio</p></li>
-                            {% show_menu_below_id "company" 0 0 100 100 %}
-                        </ul>
-                    </div>
-                    {% comment %}
-                    <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
-                        <ul class="list-unstyled footer-links">
-                            <li><p class="footer-links-title">Our Investors</p></li>
-                            {% show_menu_below_id "investors" 0 0 100 100 %}
-                        </ul>
-                    </div>
-                    {% endcomment %}
-                    <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
-                        <ul class="list-unstyled footer-links">
                             <li><p class="footer-links-title">Terms &amp; Policies</p></li>
                             {% show_menu_below_id "legal" 0 0 100 100 %}
                         </ul>
                     </div>
                     <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
                         <ul class="list-unstyled footer-links">
-                            <li><p class="footer-links-title">Investors</p></li>
+                            <li><p class="footer-links-title">Our investors</p></li>
                             {% show_menu_below_id "investors" 0 0 100 100 %}
                             <li><p class="footer-links-title">Technologies</p></li>
                             {% show_menu_below_id "tech" 0 0 100 100 %}
+                        </ul>
+                    </div>
+                    <div class="col-12 col-sm-6 col-md-3 col-lg-3 pt-4">
+                        <ul class="list-unstyled footer-links">
+                            <li><p class="footer-links-title">About Divio</p></li>
+                            {% show_menu_below_id "company" 0 0 100 100 %}
                         </ul>
                     </div>
                 </div>
