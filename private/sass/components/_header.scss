@@ -73,13 +73,13 @@
 
         @include media-breakpoint-up(lg) {
             display: inline-flex;
-            padding-left: 15px !important;
-            padding-right: 15px !important;
+            padding-left: 5px !important;
+            padding-right: 5px !important;
         }
 
         @include media-breakpoint-up(xl) {
-            padding-left: 20px !important;
-            padding-right: 20px !important;
+            padding-left: 15px !important;
+            padding-right: 15px !important;
         }
 
         .icon {
@@ -109,6 +109,7 @@
     .nav-btnlinks {
         display: flex;
         flex-direction: row;
+        padding-left: 30px;
 
         @include media-breakpoint-down(md) {
             flex-direction: column;
