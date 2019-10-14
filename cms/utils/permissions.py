@@ -188,32 +188,38 @@ def get_page_actions_for_user(user, site):
     )
     nodes = [page.node for page in pages]
     pages_by_id = {}
+    page_permissions_chunks = []
 
-    for page in pages:
-        if page.node.is_root():
-            page.node._set_hierarchy(nodes)
-        page.node.__dict__['item'] = page
-        pages_by_id[page.pk] = page
+    for offset in range(0, pages.count(), 500):
+        pages_ids_chunk = []
+        for page in pages[offset:offset + 500]:
+            if page.node.is_root():
+                page.node._set_hierarchy(nodes)
+            page.node.__dict__['item'] = page
+            pages_by_id[page.pk] = page
+            pages_ids_chunk.append(page.pk)
 
-    page_permissions = (
-        PagePermission
-        .objects
-        .with_user(user)
-        .filter(page__in=pages_by_id)
-    )
+        page_permissions_chunks.append(
+            PagePermission
+            .objects
+            .with_user(user)
+            .filter(page_id__in=pages_ids_chunk)
+        )
 
-    for perm in page_permissions.iterator():
-        # set internal fk cache to our page with loaded ancestors and descendants
-        if DJANGO_1_11:
-            perm._page_cache = pages_by_id[perm.page_id]
-        else:
-            # for django >= 2.0
-            PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
+    for page_permissions in page_permissions_chunks:
+        for perm in page_permissions.iterator():
+            # set internal fk cache to our page with loaded ancestors and descendants
+            if DJANGO_1_11:
+                perm._page_cache = pages_by_id[perm.page_id]
+            else:
+                # for django >= 2.0
+                PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
 
-        page_ids = frozenset(perm.get_page_ids())
+            page_ids = frozenset(perm.get_page_ids())
 
-        for action in perm.get_configured_actions():
-            actions[action].update(page_ids)
+            for action in perm.get_configured_actions():
+                actions[action].update(page_ids)
+
     return actions
 
 
