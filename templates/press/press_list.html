@@ -40,7 +40,7 @@
 
                 {% if not request.GET.subscription_success %}
                     <form method="post" action="http://publish.ne.cision.com/Subscription/Subscribe" name="pageForm">
-                        <input type="hidden" name="subscriptionUniqueIdentifier" value="5a80f66bb8"/>
+                        <input type="hidden" name="subscriptionUniqueIdentifier" value="092eb7f849"/>
                         <input type="hidden" name="redirectUrlSubscriptionSuccess" value="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% page_url request.current_page %}?subscription_success=1"/>
                         <input type="hidden" name="redirectUrlSubscriptionFailed" value="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% page_url request.current_page %}?subscription_failure=1"/>
                         <input type="hidden" name="Replylanguage" value="{{ LANGUAGE_CODE }}"/>
