@@ -35,6 +35,10 @@
             &.navbar-light {
                 background-color: white;
             }
+
+            .container {
+                padding: 5px 15px;
+            }
         }
     }
 
@@ -73,13 +77,13 @@
 
         @include media-breakpoint-up(lg) {
             display: inline-flex;
-            padding-left: 5px !important;
-            padding-right: 5px !important;
+            padding-left: 15px !important;
+            padding-right: 15px !important;
         }
 
         @include media-breakpoint-up(xl) {
-            padding-left: 15px !important;
-            padding-right: 15px !important;
+            padding-left: 25px !important;
+            padding-right: 25px !important;
         }
 
         .icon {
@@ -124,16 +128,28 @@
             }
         }
 
-        .nav-link.nav-link-get-started {
-            padding-right: 0 !important;
-            color: $body-color;
-            transition: color 0.5s;
+        .nav-link-get-demo {
+            color: $primary;
+            margin-left: 25px;
+            border-radius: 4px;
+            border: 2px solid $primary;
+            transition: all 0.3s;
+
+            &:hover {
+                color: #fff;
+                background: $primary;
+            }
+
+            @include media-breakpoint-down(lg) {
+                margin-left: 15px;
+            }
 
             @include media-breakpoint-down(md) {
                 order: 1;
                 color: theme-color(primary);
                 padding-left: 30px !important;
                 padding-right: 30px !important;
+                margin-left: 0;
                 border-radius: 30px;
                 font-size: 14px;
                 height: 40px;
@@ -143,12 +159,35 @@
                 @include transition($btn-transition);
 
                 @include button-outline-variant(theme-color(primary));
-
-                .icon {
-                    display: none;
-                }
             }
         }
+
+        // outdated link
+        // .nav-link.nav-link-get-started {
+        //     padding-right: 0 !important;
+        //     color: $body-color;
+        //     transition: color 0.5s;
+
+        //     @include media-breakpoint-down(md) {
+        //         order: 1;
+        //         color: theme-color(primary);
+        //         padding-left: 30px !important;
+        //         padding-right: 30px !important;
+        //         border-radius: 30px;
+        //         font-size: 14px;
+        //         height: 40px;
+        //         user-select: none;
+        //         border: $btn-border-width solid transparent;
+
+        //         @include transition($btn-transition);
+
+        //         @include button-outline-variant(theme-color(primary));
+
+        //         .icon {
+        //             display: none;
+        //         }
+        //     }
+        // }
     }
 
     &.main-nav-scrolled .nav-btnlinks .nav-link.nav-link-get-started {
@@ -203,6 +242,13 @@
         }
     }
 
+    .navbar-logo-wrapper {
+        margin-top: -7px;
+        margin-right: 50px;
+        @include media-breakpoint-down(md) {
+            margin-top: 0;
+        }
+    }
     .navbar-logo-wrapper,
     .navbar-logo {
         @include media-breakpoint-down(md) {
