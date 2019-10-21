@@ -3,6 +3,11 @@
 * ...
 
 
+=== 3.7.1 (unreleased) ===
+* Fix problem with setting page permissions. If a page contains more than 1000 descendants, setting
+  page permissions caused a SQL error on SQLite.
+
+
 === 3.7.0 (2019-09-25) ===
 
 * Introduced Django 2.2 support.
