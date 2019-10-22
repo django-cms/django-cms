@@ -15,10 +15,8 @@
 
 {% block content %}
     <div class="container">
-        <div class="row mt-5 justify-content-between">
-            <aside class="col-12 col-lg-3">
-                <h3 class="sr-only">{% trans "Sidebar" %}</h3>
-
+        <div class="row mt-5">
+            <aside class="col-12 col-lg-4">
                 <div class="sub-menu sub-menu-vertical navbar-expand-lg">
                     <h2 class="h5 sub-menu-title">Navigation</h2>
                     <p class="h5 sub-menu-toggler collapsed"
@@ -30,15 +28,24 @@
                     <ul class="collapse navbar-collapse" id="sub-menu-content">
                         {% show_menu 1 5 0 1 %}
                     </ul>
+
+                    <h2 class="h5 sub-menu-title">Language</h2>
+                    <ul>
+                        <li{% if request.GET.type != "sv" %} style="text-decoration: underline;"{% endif %}><a href="?type=en">
+                            English
+                        </a></li>
+                        <li{% if request.GET.type == "sv" %} style="text-decoration: underline;"{% endif %}><a href="?type=sv">
+                            Swedish
+                        </a></li>
+                    </ul>
                 </div>
 
+                {% comment %}
                 {% if request.GET.subscription_success %}
                     <div class="alert alert-success my-3">
                         {% trans "Thanks for subscribing!" %}
                     </div>
-                {% endif %}
-
-                {% if not request.GET.subscription_success %}
+                {% else %}
                     <form method="post" action="http://publish.ne.cision.com/Subscription/Subscribe" name="pageForm">
                         <input type="hidden" name="subscriptionUniqueIdentifier" value="092eb7f849"/>
                         <input type="hidden" name="redirectUrlSubscriptionSuccess" value="http{% if request.is_secure %}s{% endif %}://{{ request.get_host }}{% page_url request.current_page %}?subscription_success=1"/>
@@ -57,31 +64,29 @@
 
                             <div class="custom-control custom-checkbox">
                                 <input class="custom-control-input" type="checkbox"{% if LANGUAGE_CODE == 'sv' %} checked{% endif %} name="Language" value="sv" id="lang_sv">
-                                <label class="custom-control-label" for="lang_sv">
-                                    Swedish
-                                </label>
+                                <label class="custom-control-label" for="lang_sv">{% trans "Swedish" %}</label>
                             </div>
 
                             <div class="custom-control custom-checkbox">
                                 <input class="custom-control-input" type="checkbox"{% if LANGUAGE_CODE == 'en' %} checked{% endif %} name="Language" value="en" id="lang_en">
-                                <label class="custom-control-label" for="lang_en">English</label>
+                                <label class="custom-control-label" for="lang_en">{% trans "English" %}</label>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Type</label>
+                            <label>{% trans "Type" %}</label>
 
                             <div class="custom-control custom-checkbox">
-                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="kmk,rpt" id="interim"/>
+                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="kmk,rpt" id="interim">
                                 <label class="custom-control-label" id="interim">{% trans "Interim reports" %}</label>
                             </div>
 
                             <div class="custom-control custom-checkbox">
-                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="rdv" id="annual"/>
+                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="rdv" id="annual">
                                 <label class="custom-control-label" id="annual">{% trans "Annual reports" %}</label>
                             </div>
 
                             <div class="custom-control custom-checkbox">
-                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="prm" id="press"/>
+                                <input class="custom-control-input" type="checkbox" name="informationtype" checked value="prm" id="press">
                                 <label class="custom-control-label" id="press">{% trans "Press releases" %}</label>
                             </div>
                         </div>
@@ -104,6 +109,7 @@
                         <input class="btn btn-primary" type="submit" value="{% trans 'Submit' %}"/>
                     </form>
                 {% endif %}
+                {% endcomment %}
             </aside>
             <div class="col-12 col-lg-8">
                 <div class="aldryn aldryn-newsblog press-releases-list"></div>
@@ -114,15 +120,20 @@
     <script id="press-releases-list-tmpl" type="text/template">
         <div class="aldryn-newsblog-list">
             <% Releases.forEach(function (release) { %>
-                <article class="mb-5">
-                    <h2>
-                        <a href="<%= release.CisionWireUrl || release.SyndicatedUrl || release.CanonicalUrl || 'http://publish.ne.cision.com/Release/GetReleaseDetail?releaseId=' + release.EncryptedId %>"><%= release.Title %></a>
-                    </h2>
-                    <p><%= moment(release.PublishDate).format('LL') %></p>
-                    <div class="lead">
-                        <p><%= release.Intro %></p>
-                    </div>
-                </article>
+                <article>
+                    <a href="<%= release.CisionWireUrl || release.SyndicatedUrl || release.CanonicalUrl || 'http://publish.ne.cision.com/Release/GetReleaseDetail?releaseId=' + release.EncryptedId %>">
+                        <h2 class="display-4">
+                            <span class="spitzmarke mb-2"><%= moment(release.PublishDate).format('LL') %></span>
+                            <%= release.Title %>
+                        </h2>
+                    </a>
+                    <p><%= release.Intro %></p>
+                    <p>
+                        <a href="<%= release.CisionWireUrl || release.SyndicatedUrl || release.CanonicalUrl || 'http://publish.ne.cision.com/Release/GetReleaseDetail?releaseId=' + release.EncryptedId %>"
+                            class="">Read more...</a>
+                    </p>
+                    </article>
+                <hr class="my-4" />
             <% }); %>
         </div>
         <ul class="pagination mt-5">
@@ -136,9 +147,37 @@
         </ul>
     </script>
     {% addtoblock "js" %}<script>
-        var ID = 'B6B94687E7F4488FB0DE9168DB52BA06'; // sv
-        var ID = 'FA052C6ED9244D81B8211FAF0420FF0B'; // en
-        var ID = 'A275C0BF733048FFAE9126ACA64DD08F'; // TEST
+        {% if request.GET.type == "sv" %}
+            var Cision = {
+                // responses in JSON
+                // test feed 734556E76B7944D3841C88011A35449E
+                "allReleases": "B6B94687E7F4488FB0DE9168DB52BA06",
+                "pressReleases": "D2911B21708F4921AD72A63032D3858E",
+                "reportReleases": "71D1906CB15A4D28BD901045A21D3158",
+                "regulatoryReleases": "B28018AAE58949D180A79D6A7F22E03B",
+                "modules": {
+                    "share": "8142C82A78CA4D779EB0BC716D8448DF",
+                    "newsFeed": "B6B94687E7F4488FB0DE9168DB52BA06"
+                }
+            };
+        {% else %}
+            var Cision = {
+                "allReleases": "FA052C6ED9244D81B8211FAF0420FF0B",
+                "pressReleases": "856EF29671AA47BBB9F630B7D4536403",
+                "reportReleases": "655036DC36334021B35A89FBE1ABC3CD",
+                "regulatoryReleases": "296A373B94944E4691EF9B55A4BBCDBC",
+                "modules": {
+                    "share": "23BF41CD9CF64C1DABCB8B927088A60A",
+                    "newsFeed": "FA052C6ED9244D81B8211FAF0420FF0B"
+                }
+            };
+        {% endif %}
+        // Cision.moules["shareHistory"] = "04BF3D4F53A5471AB0B40C85AA68A194";
+        // Cision.moules["sharePerformance"] = "F96270AF6EA64AD1886A44EF431B1001";
+        // Cision.moules["shareCalculator"] = "75DDB493E0DD4AB797AB75BA7E3BD8D1";
+        // Cision.moules["ticker"] = "F96270AF6EA64AD1886A44EF431B1001";
+        // Cision.moules["trades"] = "F96270AF6EA64AD1886A44EF431B1001";
+        // Cision.moules["orderBook"] = "F1C02FCDB1F4418DBC0B46EB80A8ACF5";
     </script>{% endaddtoblock %}
-    {% addtoblock "js" %}<script defer src="{% static "js/dist/press.bundle.js" %}"></script>{% endaddtoblock %}
+    {% addtoblock "js" %}<script defer src="{% static 'js/dist/press.bundle.js' %}"></script>{% endaddtoblock %}
 {% endblock %}

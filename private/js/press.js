@@ -7,7 +7,7 @@ $(() => {
     moment.locale($('html').attr('lang'));
     var match = window.location.search.match(/page=(\d+)/) || [null, 1];
     var pageIndex = match[1];
-    var listUrl = 'https://publish.ne.cision.com/papi/NewsFeed/' + window.ID + '?format=json&pageIndex=' + pageIndex;
+    var listUrl = 'https://publish.ne.cision.com/papi/NewsFeed/' + window.Cision.allReleases + '?format=json&pageIndex=' + pageIndex;
 
     var loadPage = function (url) {
         return $.get(url).then(function (r) {
