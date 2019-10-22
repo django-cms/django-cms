@@ -323,3 +323,101 @@
         margin-top: 20px;
     }
 }
+
+// 2019 enterprise first
+.ef-2019 {
+    display: flex;
+    padding-top: 100px;
+    padding-bottom: 150px;
+    margin-bottom: -30px;
+    background: url('../img/pricing/shape-pink.png') no-repeat center bottom;
+
+    .ef-dev {
+        flex: 33%;
+        padding: 40px 10px;
+        margin: 0 50px;
+    }
+    .ef-demo {
+        flex: 67%;
+        padding: 40px 50px;
+        margin: 0 25px;
+
+        background: #fff;
+        box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.25);
+        border-radius: 25px;
+    }
+
+    .ef-heading {
+        font-weight: bold;
+        font-size: 18px;
+        line-height: 25px;
+        letter-spacing: 4px;
+        text-transform: uppercase;
+        padding-bottom: 15px;
+        margin-bottom: 40px;
+
+        border-bottom: 1px solid $gray-400;
+    }
+
+    .ef-dev-title {
+        color: $gray-700;
+        font-style: normal;
+        font-size: 32px;
+        line-height: 35px;
+        font-weight: 900;
+    }
+
+    .ef-def-muted {
+        font-size: 14px;
+        line-height: 20px;
+        color: $gray-600;
+    }
+
+    // right side
+    .ef-catch-demo {
+        font-weight: 500;
+        font-size: 24px;
+        line-height: 36px;
+        color: $gray-600;
+        strong {
+            color: $body-color;
+        }
+    }
+
+    .ef-quote {
+        position: relative;
+        margin-left: 30px;
+        margin-bottom: 0;
+        color: $gray-600;
+
+        &:before {
+            content: "“";
+            position: absolute;
+            left: -28px;
+            top: -2px;
+
+            font-weight: 900;
+            font-size: 38px;
+            line-height: 41px;
+            font-style: normal;
+            color: $gray-700;
+        }
+    }
+
+    .ef-button {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    .ef-video {
+        margin: 30px 0 40px;
+    }
+
+    .list {
+        color: $gray-600;
+        padding: 10px 0 1px;
+        margin: 0;
+        li {
+            margin-bottom: 10px;
+        }
+    }
+}

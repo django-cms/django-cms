@@ -251,6 +251,13 @@ figure {
     }
 }
 
+.list {
+    padding-left: 0;
+    li {
+        list-style-type: none;
+    }
+}
+
 .list-ticks {
     li {
         position: relative;
@@ -268,6 +275,10 @@ figure {
             left: 0;
         }
     }
+}
+
+.list-ticks-green li:before {
+    background-image: url('../img/icons/check-green.svg');
 }
 
 .list-wide li {
