@@ -1,0 +1,153 @@
+// enterprise first home additions
+.display-home {
+    font-size: 64px;
+    line-height: 70px;
+}
+
+.efh-bg {
+    position: relative;
+    z-index: 1;
+    &:before {
+        content: "";
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: url("../img/clouds.png") no-repeat center top;
+    }
+}
+
+.efh-video {
+    width: 650px;
+    height: 660px;
+    padding: 32px;
+    margin: 0 auto;
+    background: url("../img/video.png") no-repeat center top;
+    .embed-responsive {
+        @include media-breakpoint-up(md) {
+            height: 360px;
+        }
+    }
+
+    @include media-breakpoint-down(sm) {
+        width: auto;
+        height: auto;
+        background: none;
+    }
+}
+
+.container-relative {
+    position: relative;
+}
+
+.home-image-hidden {
+    @include media-breakpoint-down(md) {
+        display: none;
+    }
+}
+
+.home-quote {
+    color: $secondary;
+    font-size: 24px;
+    line-height: 36px;
+    position: relative;
+    padding-left: 50px;
+
+    @include media-breakpoint-down(sm) {
+        padding-left: 0;
+        &:before {
+            display: none;
+        }
+    }
+
+    cite {
+        display: block;
+        color: $body-color;
+        font-size: 18px;
+        font-style: normal;
+        font-weight: bold;
+        line-height: 30px;
+        text-transform: uppercase;
+
+        padding-top: 30px;
+    }
+
+    &:before {
+        content: "”";
+        color: $primary;
+        font-size: 190px;
+        line-height: 36px;
+
+        position: absolute;
+        left: -50px;
+        top: 55px;
+    }
+}
+
+.home-logos {
+    @include media-breakpoint-down(md) {
+        min-height: 200px;
+    }
+}
+
+.home-tabs {
+    margin-top: 25px;
+
+    .nav-tabs .nav-item a {
+        color: $body-color;
+        font-size: 16px;
+        font-weight: bold;
+        line-height: 28px;
+        text-transform: uppercase;
+        padding: 15px 40px;
+        border-width: 2px;
+        &:hover {
+            border-bottom-color: transparent;
+        }
+        @include media-breakpoint-down(sm) {
+            padding: 5px 15px;
+        }
+    }
+}
+
+.efh-box {
+    width: 90%;
+    margin: 0 auto;
+    position: relative;
+    @include media-breakpoint-up(md) {
+        width: 60%;
+        margin: 50px auto;
+    }
+
+    .h4 {
+        color: $primary;
+        margin-bottom: 10px;
+    }
+
+    input {
+        @include media-breakpoint-up(sm) {
+            min-width: 300px;
+        }
+    }
+    input,
+    button {
+        margin-top: 15px;
+    }
+
+    padding: 40px 50px;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.25);
+    border-radius: 25px;
+    background: #fff;
+
+    .efh-box-bg {
+        width: 500px;
+        height: 212px;
+        position: absolute;
+        right: -300px;
+        top: -50px;
+        z-index: -1;
+        background: url("../img/shape-dark.png") no-repeat left top;
+    }
+}
