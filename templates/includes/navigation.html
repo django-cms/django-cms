@@ -1,7 +1,7 @@
 {% load menu_tags %}
 
 {% for child in children %}
-    <li class="nav-item {% if child.children and dropdown %}dropdown icon-dropdown{% endif %}{% if child.selected %} active{% endif %}">
+    <li class="nav-item {% if child.children and dropdown %}dropdown icon-dropdown{% endif %}{% if child.selected or child.ancestor %} active{% endif %}">
         <a
             class="nav-link{% if child.children and dropdown %} dropdown-toggle{% endif %}"
             {% if child.children and dropdown %}

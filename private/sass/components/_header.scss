@@ -55,6 +55,10 @@
         }
     }
 
+    .active > .nav-link {
+        color: $primary;
+    }
+
     .nav-link {
         letter-spacing: 0.86px;
         text-transform: uppercase;
@@ -63,6 +67,11 @@
         align-items: center;
         font-weight: bold;
         color: #5F7998;
+        transition: color 0.3s;
+
+        &:hover {
+            color: $primary;
+        }
 
         @include media-breakpoint-down(md) {
             color: $body-color;
