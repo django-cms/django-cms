@@ -1,124 +1,16 @@
-/**********************************************************************************************************************/
-/************************************************** General styles ****************************************************/
-/**********************************************************************************************************************/
-
-a {
-    color: #337ab7;
-}
-
-    a:hover {
-        text-decoration: none;
-    }
-
-.datepicker-dropdown {
-    margin-left: -40px;
-    margin-top: 25px;
-}
-
-.container > div {
-    margin: 20px auto 20px auto;
-}
-
-.clear {
-    clear: both;
-}
-
-.small-content {
-    display: flex;
-    justify-content: center;
-}
-
-.table-sm {
-    margin-top: 20px;
-    border-bottom: 1px solid #dee2e6
-}
-
-    .table thead th {
-        border-top: none;
-    }
-
-    .table td {
-        vertical-align: baseline;
-    }
-
-        .table td > .form-group, .table td p {
-            margin-bottom: 0;
-        }
-
-.tab-content {
-    padding: 10px;
-    padding-right: 50px;
-    padding-left: 20px;
-    border-bottom: 1px solid #dddbdb;
-    border-left: 1px solid #dddbdb;
-    border-right: 1px solid #dddbdb;
-}
-
-.pageIndex {
-    clear: both;
-}
-
-.extras {
-    margin-top: 10px;
-    width: 20%;
-    float: right;
-}
-
-.required, .required-text {
-    margin-right: 10px;
-    color: #ce0202;
-}
-
-.required-text {
-    margin-bottom: 10px;
-}
-
-.card-columns {
-    -webkit-column-count: 5;
-    -moz-column-count: 5;
-    column-count: 5;
-}
-
-.text-small {
-    font-size: 7pt;
-}
-
-
-.subscribeInfo {
-    float: left;
-    margin-right: 25px;
-    margin-bottom: 20px;
-}
-
-.mail {
-    margin-top: 10px;
-    clear: both;
-    padding-right: 50px;
-    margin-bottom: 20px;
-}
-
-    .mail .form-control {
-        margin-bottom: 10px;
-    }
-
-    .mail #sendForm {
-        margin-top: 10px;
-    }
-
 /********************************************* Orderbook styles ****************************************************/
 /* used in several places and are so few so its not necessary to have in its own file */
 .orderbook-table td, .orderbook-table th {
     text-align: right;
 }
 
-    .orderbook-table td:nth-child(1), .orderbook-table td:nth-child(2), .orderbook-table th:nth-child(1), .orderbook-table th:nth-child(2) {
-        text-align: left;
-    }
+.orderbook-table td:nth-child(1), .orderbook-table td:nth-child(2), .orderbook-table th:nth-child(1), .orderbook-table th:nth-child(2) {
+    text-align: left;
+}
 
 
 /********************************************************* Ticker styles *******************************************************/
 /* used in several places and are so few so its not necessary to have in its own file */
-
 #target-ticker img {
     width: 25px;
 }
@@ -129,7 +21,7 @@ a {
 
 .ticker-price {
     font-size: 25pt;
-    color: #569fca; /* default, will not be used if the bootstrap classes are present and working */
+    color: $primary; /* default, will not be used if the bootstrap classes are present and working */
     font-weight: bold;
 }
 
@@ -178,7 +70,7 @@ a {
 }
 
  #horisontal-ticker th {
-     border-bottom: 1px solid #CCC;
+     border-bottom: 1px solid #ccc;
      text-align: left;
  }
 
@@ -199,21 +91,6 @@ a {
 
 /***************************************** Sharegraph extras ***********************************************/
 
-
-.prev:hover, .next:hover {
-    cursor: pointer !important;
-}
-
-.row {
-    padding: 25px 15px 25px 5px;
-    margin-left: 0px;
-}
-
-.dropdown {
-    float: left;
-    margin-right: 10px;
-}
-
 .sharegraph-extras .date-picker {
     float: left;
     margin-right: 10px;
@@ -224,6 +101,18 @@ a {
     min-width: 220px;
     color: #333;
     margin-right: 40px;
+}
+
+#share-download-options,
+#share-options-select {
+    display: inline-block;
+}
+#share-options-select {
+    padding-right: 15px;
+}
+
+.sharegraph-extras {
+    width: 100%;
 }
 
 #share-options-select li.cision-disabled a {
@@ -251,7 +140,6 @@ a {
     margin-top: 10px;
 }
 
-
 /**********************************************************************************************************************/
 /********************************************* Share calculator styles ************************************************/
 /**********************************************************************************************************************/
@@ -262,105 +150,108 @@ a {
     margin-right: auto;
 }
 
-    .sharecalclulator-container input[type=radio] {
-        margin: 4px 0 0;
-    }
+.sharecalclulator-container input[type=radio] {
+    margin: 4px 0 0;
+}
 
-    .sharecalclulator-container fieldset {
-        margin-top: 5px;
-        border: 1px solid #e5e5e5;
-        border-radius: 4px;
-        padding: 10px;
-        clear: both;
-    }
+.sharecalclulator-container fieldset {
+    margin-top: 5px;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 10px;
+    clear: both;
+}
 
-    .sharecalclulator-container legend {
-        margin-bottom: 0px;
-        color: #569fca;
-        width: auto;
-        border-bottom: none;
-    }
+.sharecalclulator-container legend {
+    margin-bottom: 0px;
+    color: $primary;
+    width: auto;
+    border-bottom: none;
+}
 
-    .sharecalclulator-container table td {
-        padding: 4px 10px 4px 0px;
-        /*width: 110px;*/
-    }
+.sharecalclulator-container table td {
+    padding: 4px 10px 4px 0px;
+    /*width: 110px;*/
+}
 
-    .sharecalclulator-container .fullsize {
-        width: 100%;
-    }
+.sharecalclulator-container .fullsize {
+    width: 100%;
+}
 
-    .sharecalclulator-container .bold {
-        font-weight: 700;
-    }
+.sharecalclulator-container .bold {
+    font-weight: 700;
+}
 
-    .sharecalclulator-container .amount {
-        width: 100%;
-    }
+.sharecalclulator-container .amount {
+    width: 100%;
+}
 
-    .sharecalclulator-container .first {
-        width: 200px;
-    }
+.sharecalclulator-container .first {
+    width: 200px;
+}
 
-    .sharecalclulator-container .valuesSeparator {
-        margin-top: 10px;
-    }
+.sharecalclulator-container .valuesSeparator {
+    margin-top: 10px;
+}
 
-    .sharecalclulator-container .helptext {
-        font-style: italic;
-        font-size: 13px;
-    }
+.sharecalclulator-container .helptext {
+    font-style: italic;
+    font-size: 13px;
+}
 
-    .sharecalclulator-container #csvExport {
-        margin-left: 10px;
-    }
+.sharecalclulator-container #csvExport {
+    margin-left: 10px;
+}
 
-    .sharecalclulator-container .history-download {
-        margin-top: -15px;
-    }
+.sharecalclulator-container .history-download {
+    margin-top: -15px;
+}
 
-    .sharecalclulator-container .compute-button {
-        margin-top: 10px;
-    }
+.sharecalclulator-container .compute-button {
+    margin-top: 10px;
+}
 
-    .sharecalclulator-container .share-help-container {
-        margin-top: 15px;
-    }
+.sharecalclulator-container .share-help-container {
+    margin-top: 15px;
+}
+
 .sharecalclulator-container .share-help-container p {
     margin-bottom: 10px;
 }
 
-    .sharecalclulator-container .results-right {
-        width: 49%;
-        float: left;
-    }
+.sharecalclulator-container .results-right {
+    width: 49%;
+    float: left;
+}
 
-    .sharecalclulator-container .results-left {
-        width: 49%;
-        float: left;
-        margin-left: 10px;
-        border-left: 1px solid #e5e5e5;
-    }
+.sharecalclulator-container .results-left {
+    width: 49%;
+    float: left;
+    margin-left: 10px;
+    border-left: 1px solid #e5e5e5;
+}
 
-    .sharecalclulator-container .border {
-        margin-left: 10px;
-    }
+.sharecalclulator-container .border {
+    margin-left: 10px;
+}
 
-    .sharecalclulator-container h4 {
-        margin-bottom: 5px;
-    }
+.sharecalclulator-container h4 {
+    margin-bottom: 5px;
+}
 
 .sharecalclulator-container .row {
     padding: 5px 0;
     margin-left: 0;
 }
-    .sharecalclulator-container .row .col-6, .sharecalclulator-container .row .col {
-        padding-right: 30px;
-        padding-left: 0px;
-    }
-    .sharecalclulator-container .row .col-6:last-child {
-        padding-right: 0;
-    }
+
+.sharecalclulator-container .row .col-6, .sharecalclulator-container .row .col {
+    padding-right: 30px;
+    padding-left: 0px;
+}
+
+.sharecalclulator-container .row .col-6:last-child {
+    padding-right: 0;
+}
 
 #end-value {
     margin-left: 10px;
