@@ -8,10 +8,9 @@ cms/django
 *.DS_Store
 *.svn
 *.xml
-/*env*/
+
 /*docs/env*/
 /*docs/build*/
-*.sqlite
 cms/media/cms_page_media/
 example/run
 example/local_settings.py
