@@ -7,14 +7,14 @@
 # Martin Pajuste <martinpajuste@gmail.com>, 2012,2015-2016
 # Martin Pajuste <martinpajuste@gmail.com>, 2012
 # Martin Pajuste <martinpajuste@gmail.com>, 2016-2017
-# Rivo Zängov <eraser@eraser.ee>, 2018
+# Rivo Zängov <eraser@eraser.ee>, 2018-2019
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2019-04-17 11:35+0000\n"
+"Last-Translator: Rivo Zängov <eraser@eraser.ee>\n"
 "Language-Team: Estonian (http://www.transifex.com/divio/django-cms/language/et/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -93,10 +93,10 @@ msgid "Redirects to this URL."
 msgstr "Suuna ümber sellele internetiaadressile."
 
 msgid "Start typing..."
-msgstr ""
+msgstr "Alusta kirjutamist..."
 
 msgid "Application configurations"
-msgstr ""
+msgstr "Rakenduse seaded"
 
 msgid "Language independent options"
 msgstr ""
@@ -444,10 +444,10 @@ msgstr "Sisu"
 
 #| msgid "Publish changes"
 msgid "Publish page changes"
-msgstr ""
+msgstr "Avalda lehekülje muudatused"
 
 msgid "Publish page now"
-msgstr ""
+msgstr "Avalda lehekülg kohe"
 
 msgid "Page settings"
 msgstr "Lehekülje seadistused"
@@ -462,7 +462,7 @@ msgstr "Kustuta tõlge"
 
 #| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
-msgstr ""
+msgstr "Kopeeri kõik pluginad"
 
 #, python-format
 msgid "from %s"
@@ -576,7 +576,7 @@ msgid "ID"
 msgstr "ID"
 
 msgid "position"
-msgstr ""
+msgstr "asukoht"
 
 msgid "language"
 msgstr "keel"
@@ -606,7 +606,7 @@ msgid "can change permissions"
 msgstr ""
 
 msgid "can move"
-msgstr ""
+msgstr "saab liigutada"
 
 msgid "view restricted"
 msgstr ""
@@ -618,13 +618,13 @@ msgid "group"
 msgstr "grupp"
 
 msgid "sites"
-msgstr ""
+msgstr "saiti"
 
 msgid "created by"
-msgstr ""
+msgstr "lisas"
 
 msgid "changed by"
-msgstr ""
+msgstr "muutis"
 
 msgid "publication date"
 msgstr ""
@@ -660,7 +660,7 @@ msgid "application instance name"
 msgstr ""
 
 msgid "site"
-msgstr ""
+msgstr "ait"
 
 msgid "Grant on"
 msgstr ""
@@ -681,7 +681,7 @@ msgid "Deny"
 msgstr "Keela"
 
 msgid "Only this website"
-msgstr ""
+msgstr "Ainult see veebisait"
 
 msgid "Allow"
 msgstr "Luba"
@@ -709,7 +709,7 @@ msgid "limit when this page is visible in the menu"
 msgstr ""
 
 msgid "pages"
-msgstr ""
+msgstr "leheküge"
 
 msgid "Empty"
 msgstr "Tühi"
@@ -769,13 +769,13 @@ msgid "If none selected, user haves granted permissions to all sites."
 msgstr ""
 
 msgid "Page global permission"
-msgstr ""
+msgstr "Lehekülje üldised õigused"
 
 msgid "Pages global permissions"
-msgstr ""
+msgstr "Lehekülgede üldised õigused"
 
 msgid "Page permission"
-msgstr ""
+msgstr "Lehekülje õigused"
 
 msgid ""
 "Add page permission requires also access to children, or descendants, "
@@ -783,16 +783,16 @@ msgid ""
 msgstr "Õigus lehekülge lisada nõuab ka ligipääsu alamlehekülgede, vastasel juhul ei saa lehekülje looja lisatud lehekülge muuta."
 
 msgid "User (page)"
-msgstr ""
+msgstr "Kasutaja (lehekülg)"
 
 msgid "Users (page)"
-msgstr ""
+msgstr "Kasutajad (lehekülg)"
 
 msgid "User group (page)"
-msgstr ""
+msgstr "Kasutajate grupp (lehekülg)"
 
 msgid "User groups (page)"
-msgstr ""
+msgstr "Kasutajate grupid (lehekülg)"
 
 msgid "slot"
 msgstr ""
@@ -801,22 +801,22 @@ msgid "width"
 msgstr "laius"
 
 msgid "<Empty>"
-msgstr ""
+msgstr "<Empty>"
 
 msgid "The language for the admin interface and toolbar"
 msgstr ""
 
 msgid "user setting"
-msgstr ""
+msgstr "kasutaja seaded"
 
 msgid "user settings"
-msgstr ""
+msgstr "kasutaja seaded"
 
 msgid "by template"
-msgstr ""
+msgstr "malli järgi"
 
 msgid "by code"
-msgstr ""
+msgstr "koodi järgi"
 
 msgid "static placeholder name"
 msgstr ""
@@ -875,7 +875,7 @@ msgid "redirect"
 msgstr ""
 
 msgid "is published"
-msgstr ""
+msgstr "on avaldatud"
 
 msgid "Advanced options"
 msgstr "Täpsemad valikud"
@@ -951,13 +951,13 @@ msgid "Can delete"
 msgstr "Võib kustutada"
 
 msgid "Can publish"
-msgstr ""
+msgstr "Saab avaldada"
 
 msgid "Can change permissions"
 msgstr ""
 
 msgid "Can move"
-msgstr ""
+msgstr "Saab liigutada"
 
 msgid "Can view"
 msgstr "Võib vaadata"
@@ -1013,10 +1013,10 @@ msgstr "Otsi"
 
 #| msgid "Page Title"
 msgid "Page Tree"
-msgstr ""
+msgstr "Lehekülgede puu"
 
 msgid "Reset filter"
-msgstr ""
+msgstr "Nulli filter"
 
 #, python-format
 msgid ""
@@ -1090,7 +1090,7 @@ msgid "Copy options"
 msgstr "Kopeeri valikud"
 
 msgid "Choose copy options"
-msgstr ""
+msgstr "Tee kopeerimise valikud"
 
 msgid "Close"
 msgstr "Sulge"
@@ -1161,7 +1161,7 @@ msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
 
 msgid "Clipboard"
-msgstr ""
+msgstr "Lõikelaud"
 
 msgid "Add plugin"
 msgstr "Lisa plugin"
@@ -1176,7 +1176,7 @@ msgid "Empty all"
 msgstr "Tühjenda kõik"
 
 msgid "Filter plugins..."
-msgstr ""
+msgstr "Filtreeri pluginaid"
 
 msgid "This is a static placeholder"
 msgstr ""
@@ -1223,7 +1223,7 @@ msgid "Login"
 msgstr "Logi sisse"
 
 msgid "Add plugin to"
-msgstr ""
+msgstr "Lisa plugin"
 
 msgid "More"
 msgstr "Veel"
@@ -1252,11 +1252,11 @@ msgid "Are you sure you want to publish this page?"
 msgstr ""
 
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "Plugin lisatakse siia"
 
 #| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Sul on salvestamata muudatusi."
 
 #| msgid "Loading..."
 msgid "Loading"
@@ -1298,7 +1298,7 @@ msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "Fookus tööriistaribal"
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
@@ -1321,7 +1321,7 @@ msgstr ""
 
 #| msgid "Expand all"
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Ava/Sulge"
 
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
@@ -1337,10 +1337,10 @@ msgid "Tap to edit"
 msgstr "Muumiseks vajuta"
 
 msgid "Click to go back"
-msgstr ""
+msgstr "Tagasi minemiseks kliki"
 
 msgid "Click to go forward"
-msgstr ""
+msgstr "Edasi minemiseks kliki"
 
 msgid "Minimize"
 msgstr "Minimeeri"
@@ -1352,19 +1352,19 @@ msgid "Drop a plugin here"
 msgstr "Lohista plugin siia"
 
 msgid "This page has no preview!"
-msgstr ""
+msgstr "Sellel leheküljel pole eelvaadet!"
 
 msgid "It is being redirected to:"
 msgstr ""
 
 msgid "Installation successful!"
-msgstr ""
+msgstr "Paigaldatud!"
 
 msgid "Add your first page"
-msgstr ""
+msgstr "Lisa oma esimene lehekülg"
 
 msgid "Please log in"
-msgstr ""
+msgstr "Palun logi sisse"
 
 #, python-format
 msgid ""
@@ -1433,7 +1433,7 @@ msgid ""
 msgstr ""
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "Teretulemast django CMS-i"
 
 msgid "Add Another"
 msgstr "Lisa veel üks"
@@ -1524,7 +1524,7 @@ msgid "MultilingualExample1 App"
 msgstr ""
 
 msgid "Example1"
-msgstr ""
+msgstr "Näidis1"
 
 msgid "Examples"
 msgstr "Näidised"
@@ -1624,10 +1624,10 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
 msgid "CMS - your user account was created."
-msgstr ""
+msgstr "CMS - sinu kasutajakonto on loodud."
 
 msgid "CMS - your user account was changed."
-msgstr ""
+msgstr "CMS - sinu kasutajakontot on muudetud."
 
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
