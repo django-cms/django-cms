@@ -128,7 +128,6 @@
     }
 
     .h4 {
-        color: $primary;
         margin-bottom: 10px;
     }
 
@@ -140,6 +139,9 @@
     input,
     button {
         margin-top: 15px;
+    }
+    .control-label {
+        display: none !important;
     }
 
     padding: 40px 50px;
