@@ -27,13 +27,13 @@
 
 .efh-video {
     width: 650px;
-    height: 660px;
+    height: 630px;
     padding: 32px;
     margin: 0 auto;
     background: url("../img/video.png") no-repeat center top;
     .embed-responsive {
         @include media-breakpoint-up(md) {
-            height: 360px;
+            height: 330px;
         }
     }
 
