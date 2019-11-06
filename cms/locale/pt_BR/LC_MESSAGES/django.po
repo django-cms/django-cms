@@ -22,6 +22,7 @@
 # Marcelo J. Both <marcelo.both@gmail.com>, 2012
 # Marcelo Soares <marcelo.rs@gmail.com>, 2015
 # Massa <massa_@msn.com>, 2015
+# Rafaela Santos <faelaphoenix@gmail.com>, 2019
 # Rafael Duarte Trevisan <rafa.trevisan@gmail.com>, 2013
 # Rodrigo de Almeida Sottomaior Macedo <rmsolucoeseminformatic4@gmail.com>, 2015
 # Rodrigo <rprior@infranology.com.br>, 2014-2015
@@ -29,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2019-01-23 21:50+0000\n"
-"Last-Translator: Julio Lucchese <juliorieger@gmail.com>\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2019-07-03 17:29+0000\n"
+"Last-Translator: Rafaela Santos <faelaphoenix@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/divio/django-cms/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -182,12 +183,12 @@ msgstr "Usuários não podem deletar as permissões da página sem permissões p
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "Os usuários não podem excluir permissões de página sem permissões para alterar as permissões. Edite as permissões necessárias."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "Os usuários não podem excluir permissões de página sem permissões para alterar as permissões. Edite as permissões necessárias."
 
 #, python-format
 msgid "Invalid plugin type '%s'"
@@ -247,12 +248,12 @@ msgstr "Você não tem permissão para copiar esses plugins."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Erro! Você não tem permissão para copiar essa página."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "Erro! A página que você está colando não está traduzida em nenhum dos idiomas configurados pelo site de destino."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -333,7 +334,7 @@ msgstr "Você não tem permissão para adicionar um plugin."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "Você não tem permissão para copiar este espaço reservado."
 
 msgid "Plugin not found"
 msgstr "Plugin não encontrado"
@@ -356,7 +357,7 @@ msgstr "Você não tem permissão para colar este plugin"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "Você não tem permissão para colar este espaço reservado."
 
 msgid "You have no permission to move this plugin"
 msgstr "Você não tem permissão para mover esse plugin"
@@ -488,7 +489,7 @@ msgstr "de %s"
 #, python-format
 #| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Tem certeza de que deseja copiar todos os plugins%s?"
 
 msgid "Pages"
 msgstr "Páginas"
@@ -565,7 +566,7 @@ msgstr "Selecione uma página válida"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "A página %(conflict_page)s tem a mesma URL '%(url)s' como a página atual \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -573,7 +574,7 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "A página %(conflict_page)s tem a mesma URL '%(url)s' como a página atual."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -762,17 +763,17 @@ msgstr "Por favor, selecione um usuário ou grupo."
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Os usuários não podem publicar uma página sem permissões para alterar a página. Edite as permissões necessárias."
 
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
-msgstr ""
+msgstr "Os usuários não podem alterar as configurações avançadas da página sem permissão para alterar a página. Edite as permissões necessárias."
 
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Os usuários não podem alterar as permissões da página sem permissão para alterar a página. Edite as permissões necessárias."
 
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
@@ -1299,7 +1300,7 @@ msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Abra este diálogo de ajuda"
 
 #| msgid "Cancel"
 msgid "Close/cancel"
@@ -1309,24 +1310,24 @@ msgid "Toggle structure mode"
 msgstr "Alternar modo de estrutura"
 
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "Alternar o modo de estrutura e destacar o hovered-over plug-in"
 
 msgid "Open \"Create\" dialog"
-msgstr ""
+msgstr "Abra a caixa de diálogo \"Criar\""
 
 msgid "Focus on Toolbar"
 msgstr "Foco na barra de ferramentas"
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "Concentre-se em espaço reservado"
 
 msgid "Move to next/previous element"
 msgstr "Mover para o elemento seguinte/anterior"
 
 #| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "Concentre-se em plugins de espaço reservado"
 
 #| msgid "Add plugin"
 msgid "Edit plugin"
