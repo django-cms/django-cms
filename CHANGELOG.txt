@@ -1,8 +1,14 @@
-=== 3.7.0 (unreleased) ===
+=== 3.8.0 (unreleased) ===
+
+* ...
+
+
+=== 3.7.0 (2019-09-25) ===
 
 * Introduced Django 2.2 support.
 * Introduced Python 3.7 support.
 * Fixed test suite.
+* Fixed override ``urlconf_module`` so that Django system checks don't crash.
 
 
 === 3.6.0 (2019-01-29) ===

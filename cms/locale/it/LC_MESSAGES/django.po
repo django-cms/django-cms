@@ -11,7 +11,7 @@
 # geobaldi <geobaldi@gmail.com>, 2018
 # giammi <gian-maria.daffre@giammi.org>, 2017
 # yakky <i.spalletti@nephila.it>, 2011
-# yakky <i.spalletti@nephila.it>, 2013-2016
+# yakky <i.spalletti@nephila.it>, 2013-2016,2019
 # yakky <i.spalletti@nephila.it>, 2012
 # karim79 <karim@gorjux.net>, 2011
 # Marco Badan <marco.badan@gmail.com>, 2011,2017
@@ -28,9 +28,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2018-11-14 09:30+0000\n"
-"Last-Translator: geobaldi <geobaldi@gmail.com>\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2019-08-14 12:36+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: Italian (http://www.transifex.com/divio/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -126,7 +126,7 @@ msgstr "Esiste già una pagina con questo reverse URL id."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Valore della configurazione non valido"
 
 msgid "An application instance using this configuration already exists."
 msgstr "Esiste già un'istanza di applicazione che usa la stessa configurazione."
@@ -135,7 +135,7 @@ msgid "An application instance with this name already exists."
 msgstr "Esiste già un'istanza di applicazione con lo stesso nome."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Non è possibile spostare la home page sotto un'atra pagina"
 
 msgid "Yes"
 msgstr "Sì"
@@ -312,7 +312,7 @@ msgid "New page"
 msgstr "Nuova pagina"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "La pagina non può essere impostata come home"
 
 msgid "View restriction"
 msgstr "Restrizione di visualizzazione"
@@ -564,7 +564,7 @@ msgstr "Seleziona una pagina valida"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "La pagina %(conflict_page)s ha lo stesso URL '%(url)s' della pagina \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -572,7 +572,7 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "La pagina %(conflict_page)s ha lo stesso URL '%(url)s' as della pagina corrente."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -586,7 +586,7 @@ msgstr "Lascia vuoto per slug automatico, o inserisci a seconda delle necessità
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Non hai i permessi necessari per aggiungere una pagina."
 
 msgid "ID"
 msgstr "ID"
@@ -1010,7 +1010,7 @@ msgstr "Incolla"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Imposta come home"
 
 msgid "is restricted"
 msgstr "è limitata"
@@ -1100,7 +1100,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n                            <em>Non è presente alcun %(object)s </em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n                        "
 
 msgid "Copy options"
 msgstr "Copia opzioni"
@@ -1229,7 +1229,7 @@ msgstr "Plugin disponibili"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "Attiva struttura"
 
 #| msgid "View published"
 msgid "View published"
@@ -1259,7 +1259,7 @@ msgstr "Si è verificato il seguente errore:"
 
 #| msgid "Action successfull... reloading."
 msgid "Action successful."
-msgstr ""
+msgstr "Azione eseguita con successo."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Sei sicuro di voler eliminare questo plugin?"
@@ -1276,7 +1276,7 @@ msgstr "Ci sono modifiche non salvate."
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "Caricamento in corso"
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
@@ -1289,13 +1289,13 @@ msgstr "Il form non può essere caricato. Controlla che il server sia attivo."
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "Più usato"
 
 msgid "Shortcuts"
 msgstr "Scorciatoie"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "La pagina è cambiata nel frattempo, aggiornamento in corso ..."
 
 msgid "Bring up this help dialog"
 msgstr "Attiva questa finestra di aiuto"
@@ -1428,7 +1428,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr ""
+msgstr "\n                <p class=\"cms-welcome-notes\">Se non vedi il logo di django CMS in cima alla pagina, verifica di aver collegato la cartella <code>static/cms</code> alla cartella degli static file</p>\n            "
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1446,7 +1446,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n                    <p class=\"cms-welcome-notes\">Vedi questo messaggio perchê è impostato \n                        <code>DEBUG = True</code> nei setting di Django e non sono state ancora aggiunte pagine.\n                    </p>\n                "
 
 msgid "Welcome to django CMS"
 msgstr "Benvenuto in django CMS"

@@ -59,20 +59,28 @@ def applications_page_check(request, current_page=None, path=None):
             pass
     return None
 
-
 class AppRegexURLResolver(URLResolver):
+
     def __init__(self, *args, **kwargs):
         self.page_id = None
         self.url_patterns_dict = {}
         super(AppRegexURLResolver, self).__init__(*args, **kwargs)
 
     @property
+    def urlconf_module(self):
+        # It is valid for urlconf_module to be a list of patterns. So we just
+        # return the list here.
+        #
+        # See https://github.com/django/django/blob/2.2.4/django/urls/resolvers.py#L578
+        #
+        return self.url_patterns_dict.get(get_language(), [])
+
+    # On URLResolver the url_patterns property is cached and thus calls made after
+    # language changes (different return values for get_language()) would not return the
+    # right value. Overriding here prevents caching.
+    @property
     def url_patterns(self):
-        language = get_language()
-        if language in self.url_patterns_dict:
-            return self.url_patterns_dict[language]
-        else:
-            return []
+        return self.urlconf_module
 
     def resolve_page_id(self, path):
         """Resolves requested path similar way how resolve does, but instead
