@@ -14,7 +14,8 @@
 # Diego Romero Pozo <romero.pozo2012@gmail.com>, 2015
 # Adolfo Gómez <dkmaster@dkmon.com>, 2014
 # Eduardo Ludi <eduludi@gmail.com>, 2013
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# Erick Del Castillo Deza <mrff88@gmail.com>, 2018
+# Ernesto Avilés, 2015
 # jorlugaqui <jorlugaqui@gmail.com>, 2017
 # Luis Montiel <luis@aztlansoft.com>, 2016
 # mariocesar <mariocesar.c50@gmail.com>, 2011
@@ -35,9 +36,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2018-11-09 12:08+0000\n"
+"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/divio/django-cms/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -131,11 +132,18 @@ msgstr "Por favor configura el nombre único para %(language)s antes de editar s
 msgid "A page with this reverse URL id exists already."
 msgstr "Ya existe una página con este id de URL inversa."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr "Ya existe una instancia de la aplicación usando esta configuración."
 
 msgid "An application instance with this name already exists."
 msgstr "Ya existe una instancia de la aplicación con este nombre."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "Si"
@@ -573,9 +581,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Añadir otro"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1236,7 +1241,7 @@ msgstr ""
 
 #| msgid "View published"
 msgid "View published"
-msgstr ""
+msgstr "Vista publicada"
 
 msgid "Login"
 msgstr "Iniciar Sesión"
@@ -1279,7 +1284,7 @@ msgstr "Tienes cambios sin guardar."
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "Cargando"
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
@@ -1454,6 +1459,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "Bienvenido a django CMS"
 
+msgid "Add Another"
+msgstr "Añadir otro"
+
 msgid "Back"
 msgstr "Regresar"
 
@@ -1553,6 +1561,10 @@ msgstr "Artículos"
 
 msgid "Sample App"
 msgstr "Aplicación de Ejemplo"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "Aplicación de muestra con permisos excluidos"

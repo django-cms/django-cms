@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
 import sys
+import mock
 
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.core import checks
 from django.core.cache import cache
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
@@ -170,6 +172,17 @@ class ApphooksTestCase(CMSTestCase):
         response = self.client.get('/en/blankapp/')
         self.assertTemplateUsed(response, 'nav_playground.html')
 
+        self.apphook_clear()
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
+    def test_apphook_does_not_crash_django_checks(self):
+        # This test case reproduced the situation causing the error reported in issue #6717.
+        self.apphook_clear()
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        create_page("apphooked-page", "nav_playground.html", "en",
+                    created_by=superuser, published=True, apphook="SampleApp")
+        self.reload_urls()
+        checks.run_checks()
         self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
@@ -855,7 +868,8 @@ class ApphooksTestCase(CMSTestCase):
 
         request = self.get_request('/')
         renderer = menu_pool.get_renderer(request)
-        nodes = renderer.get_nodes()
+        with mock.patch("menus.menu_pool.logger.error"):
+            nodes = renderer.get_nodes()
         nodes_urls = [node.url for node in nodes]
         self.assertTrue(reverse('sample-account') in nodes_urls)
         self.assertFalse('/en/child_page/page2/' in nodes_urls)

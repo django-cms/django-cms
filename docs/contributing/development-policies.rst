@@ -73,7 +73,7 @@ therefore subject to change.
 The `django CMS developers email list <https://groups.google.com/group/django-cms-developers>`_ serves as gathering
 point for developers. We submit ideas and proposals prior to the roadmap goals.
 
-django CMS 3.4 will be the first "LTS" ("Long-Term Support") release of the application. *Long-term support* means that
+django CMS 3.4 was the first "LTS" ("Long-Term Support") release of the application. *Long-term support* means that
 this version will continue to receive security and other critical updates for 24 months after its first release.
 
 Any updates it does receive will be backward-compatible and will not alter functional behaviour. This means that users
@@ -94,18 +94,12 @@ Branches
 
 We maintain a number of branches on `our GitHub repository <https://github.com/divio/django-cms>`_.
 
-the latest (highest-numbered) ``release/x.y.z``
-    This is the branch that will become the next release on PyPI.
-
-    **Fixes and backwards-compatible improvements** (i.e. most pull requests) will be made against
-    this branch.
-
 ``develop``
-    This is the branch that will become the next release that increments the ``x`` or ``y`` of the latest
-    ``release/x.y.z``.
+    The default target branch for on-going development.
 
-    This branch is for **new features and backwards-incompatible changes**. By their nature, these will require more
-    substantial team co-ordination.
+the latest (highest-numbered) ``release/x.y.z``
+    This is the branch that will become the next release on PyPI. ``develop`` will be merged into ``release/x.y.z``
+    regularly.
 
 Older ``release/x.y.z`` branches
      These represent the final point of development (the highest ``y`` of older versions). Releases in the full set of

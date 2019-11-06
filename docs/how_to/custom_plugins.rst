@@ -106,6 +106,7 @@ that are ignored by the CMS are:
 * ``list_per_page``
 * ``ordering``
 * ``paginator``
+* ``prepopulated_fields``
 * ``preserve_fields``
 * ``save_as``
 * ``save_on_top``

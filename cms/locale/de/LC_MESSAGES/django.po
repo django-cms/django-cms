@@ -6,17 +6,17 @@
 # Translators:
 # death_ashaman <admiral_proton@yahoo.de>, 2014
 # Alexander Elvers <alexanderelvers@online.de>, 2017
-# Angelo Dini <finalangeljp@hotmail.com>, 2015-2017
+# Angelo Dini <angelo.dini@divio.ch>, 2015-2017
 # Arne Schauf <transifex@asmaps.de>, 2014
 # Michael P. Jung <michael.jung@terreon.de>, 2013
-# Chive <kim@smuzey.ch>, 2015
+# Kim Thoenen <kim@smuzey.ch>, 2015
 # death_ashaman <admiral_proton@yahoo.de>, 2014
 # Diana Dünki <diana.duenki@divio.ch>, 2015
 # giammi <gian-maria.daffre@giammi.org>, 2017
 # Hendrik Richter <hendrikr@gnome.org>, 2014
-# Jannik V. <me@exploide.net>, 2016
+# Jannik Vieten <me@exploide.net>, 2016
 # Jonas Obrist <me@ojii.ch>, 2011
-# Chive <kim@smuzey.ch>, 2015
+# Kim Thoenen <kim@smuzey.ch>, 2015
 # Martin Koistinen <mkoistinen@gmail.com>, 2015
 # Michael P. Jung <michael.jung@terreon.de>, 2013
 # o.zander <oliver.zander@gmail.com>, 2014
@@ -35,8 +35,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-12 07:32+0000\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2018-11-12 06:05+0000\n"
 "Last-Translator: Peter Wischer <peter.wischer@lwl.org>\n"
 "Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -131,11 +131,18 @@ msgstr "Bitte erstellen Sie zuerst den %(language)s \"Slug\" bevor Sie die erwei
 msgid "A page with this reverse URL id exists already."
 msgstr "Eine andere Seite mit dieser Reverse-URL-ID ist bereits vorhanden."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr "Ungültiger Anwendungskonfigurationswert"
+
 msgid "An application instance using this configuration already exists."
 msgstr "Eine Applikation-Instanz mit dieser Konfiguration existiert bereits."
 
 msgid "An application instance with this name already exists."
 msgstr "Eine Applikation-Instanz mit diesem Namen existiert bereits."
+
+msgid "You can't move the home page inside another page"
+msgstr "Die Startseite kann nicht in ein andere Seite verschoben werden"
 
 msgid "Yes"
 msgstr "Ja"
@@ -573,9 +580,6 @@ msgstr "Die Seite %(conflict_page)s hat die selbe URL '%(url)s' wie die aktuelle
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Die Seite %(conflict_page)s hat die selbe URL '%(url)s' wie die aktuelle Seite."
-
-msgid "Add Another"
-msgstr "Weitere hinzufügen"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1454,6 +1458,9 @@ msgstr "\n<p class=\"cms-welcome-notes\">Sie sehen diese Meldung weil Sie <code>
 msgid "Welcome to django CMS"
 msgstr "Willkommen im django CMS"
 
+msgid "Add Another"
+msgstr "Weitere hinzufügen"
+
 msgid "Back"
 msgstr "Zurück"
 
@@ -1553,6 +1560,10 @@ msgstr "Artikel"
 
 msgid "Sample App"
 msgstr "Beispiel-App"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr "Beispiel Anwendung mit Konfiguration"
 
 msgid "Sample App with excluded permissions"
 msgstr "Beispiel-App mit \"excluded permissions\""
