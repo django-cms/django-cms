@@ -1,6 +1,7 @@
-=== 3.8.0 (unreleased) ===
+=== 3.7.1 (unreleased) ===
 
-* ...
+* Improved and simplified permissions documentation
+* Updated branch policy
 
 
 === 3.7.0 (2019-09-25) ===
