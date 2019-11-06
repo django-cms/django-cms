@@ -12,6 +12,7 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
+import datetime
 import os
 import sys
 
@@ -30,10 +31,16 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 #extensions = ['sphinx.ext.autodoc']
 
-extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.autodoc']
+extensions = [
+    'djangocms',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.autodoc',
+    'sphinxcontrib.spelling'
+    ]
 intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
-    'django': ('https://docs.djangoproject.com/en/1.10/', 'https://docs.djangoproject.com/en/1.10/_objects/'),
+    'django': ('https://docs.djangoproject.com/en/2.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
     'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
     'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
     'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
@@ -51,9 +58,10 @@ source_encoding = 'utf-8'
 # The master toctree document.
 master_doc = 'index'
 
+current_year = datetime.datetime.now().year
 # General information about the project.
 project = u'django cms'
-copyright = u'2009-2017, Divio AG and contributors'
+copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -126,6 +134,8 @@ try:
     html_theme_path = [divio_docs_theme.get_html_theme_path()]
 except:
     html_theme = 'default'
+
+show_cloud_banner = True
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.

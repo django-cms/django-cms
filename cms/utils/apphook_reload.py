@@ -8,10 +8,12 @@ import uuid
 from threading import local
 
 from django.conf import settings
-from django.core.urlresolvers import reverse, clear_url_caches
+from django.urls import reverse, clear_url_caches
 
-# Py2 and Py3 compatible reload
-from imp import reload
+try:
+    from importlib import reload
+except ImportError:
+    from imp import reload
 
 _urlconf_revision = {}
 _urlconf_revision_threadlocal = local()

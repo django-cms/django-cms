@@ -99,12 +99,13 @@ Current core developers
 * Angelo Dini https://github.com/finalangel
 * Daniele Procida https://github.com/evildmp
 * Iacopo Spalletti https://github.com/yakky
-* Jonas Obrist https://github.com/ojii
-* Martin Koistinen https://github.com/mkoistinen
-* Patrick Lauber https://github.com/digi604
 * Paulo Alvarado https://github.com/czpython
 * Stefan Foulis https://github.com/stefanfoulis
 * Vadim Sikora https://github.com/vxsx
+* Dennis Schwertel https://github.com/kinkerl
+* Serhii Sydorenko https://github.com/SydorenkoSergiy
+* Krzysztof Socha https://github.com/chaosk
+* Malinda Perera https://github.com/malindap92
 
 
 Core designers
@@ -122,6 +123,9 @@ Retired core developers
 * Chris Glass https://github.com/chrisglass
 * Øyvind Saltvik https://github.com/fivethreeo
 * Benjamin Wohlwend https://github.com/piquadrat
+* Martin Koistinen https://github.com/mkoistinen
+* Patrick Lauber https://github.com/digi604
+* Jonas Obrist https://github.com/ojii
 
 Following a year or so of inactivity, a core developer will be moved to the
 "Retired" list, with the understanding that they can rejoin the project in the

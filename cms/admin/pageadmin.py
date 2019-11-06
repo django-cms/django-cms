@@ -53,6 +53,7 @@ from cms.admin.forms import (
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
+from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
     EmptyTitle, Page, PageType,
@@ -72,6 +73,7 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.admin import jsonify_request
+from cms.utils.compat import DJANGO_2_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -441,8 +443,19 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
         objs = [obj] + list(obj.get_descendant_pages())
+
+        if DJANGO_2_0:
+            get_deleted_objects_additional_kwargs = {
+                'opts': opts,
+                'using': using,
+                'user': request.user,
+            }
+        else:
+            get_deleted_objects_additional_kwargs = {'request': request}
         (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            objs, opts, request.user, self.admin_site, using)
+            objs, admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs
+        )
 
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
@@ -486,6 +499,19 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             obj=obj,
         )
 
+        cms_pages = [obj]
+
+        if obj.publisher_public:
+            cms_pages.append(obj.publisher_public)
+
+        if obj.node.is_branch:
+            nodes = obj.node.get_descendants()
+            cms_pages.extend(self.model.objects.filter(node__in=nodes))
+
+        for page in cms_pages:
+            page._clear_placeholders()
+            page.get_placeholders().delete()
+
         super(BasePageAdmin, self).delete_model(request, obj)
 
         self._send_post_page_operation(
@@ -494,6 +520,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             token=operation_token,
             obj=obj,
         )
+
+        clear_permission_cache()
+
+        if obj.application_urls:
+            set_restart_trigger()
 
     def get_copy_dialog(self, request, page_id):
         if not get_cms_setting('PERMISSION'):
@@ -643,6 +674,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             use_cache=False,
         )
         return can_change_page
+
+    def has_view_permission(self, request, obj=None):
+        return self.has_change_permission(request, obj)
 
     def has_change_advanced_settings_permission(self, request, obj=None):
         if not obj:
@@ -1251,22 +1285,24 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         pluginopts = CMSPlugin._meta
 
         saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
-
         using = router.db_for_read(self.model)
-        kwargs = {
-            'admin_site': self.admin_site,
-            'user': request.user,
-            'using': using
-        }
 
+        kwargs = {'admin_site': self.admin_site}
+        if DJANGO_2_0:
+            kwargs.update({'using': using, 'opts': titleopts, 'user': request.user})
+        else:
+            kwargs.update({'request': request})
         deleted_objects, __, perms_needed = get_deleted_objects(
             [translation],
-            titleopts,
             **kwargs
         )[:3]
+
+        if DJANGO_2_0:
+            kwargs.update({'using': using, 'opts': pluginopts, 'user': request.user})
+        else:
+            kwargs.update({'request': request})
         to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
             saved_plugins,
-            pluginopts,
             **kwargs
         )[:3]
 

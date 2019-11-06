@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm
 from cms.exceptions import NoPermissionsException
 from cms.models import PagePermission, GlobalPagePermission
-from cms.utils import permissions
+from cms.utils import permissions, page_permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 
@@ -37,6 +37,18 @@ class PagePermissionInlineAdmin(TabularInline):
     classes = ['collapse', 'collapsed']
     extra = 0  # edit page load time boost
     show_with_view_permissions = False
+
+    def has_change_permission(self, request, obj=None):
+        if not obj:
+            return False
+        return page_permissions.user_can_change_page_permissions(
+            request.user,
+            page=obj,
+            site=obj.node.site,
+        )
+
+    def has_add_permission(self, request, obj=None):
+        return self.has_change_permission(request, obj)
 
     @classproperty
     def raw_id_fields(cls):

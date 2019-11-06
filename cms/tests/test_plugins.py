@@ -11,10 +11,10 @@ from django.conf import settings
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
-from django.core import urlresolvers
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.translation import override as force_language
@@ -134,28 +134,28 @@ class PluginsTestBaseCase(CMSTestCase):
 
 
 class PluginsTestCase(PluginsTestBaseCase):
-    def _create_text_plugin_on_page(self, page, slot='col_left'):
-        plugin = api.add_plugin(
-            placeholder=page.placeholders.get(slot=slot),
-            plugin_type='TextPlugin',
-            language=settings.LANGUAGES[0][0],
-            body=''
-        )
-        return plugin.pk
 
-    def _edit_text_plugin(self, plugin_id, text):
+    def _create_link_plugin_on_page(self, page, slot='col_left'):
+        add_url = self.get_add_plugin_uri(
+            placeholder=page.placeholders.get(slot=slot),
+            plugin_type='LinkPlugin',
+            language=settings.LANGUAGES[0][0],
+        )
+        data = {'name': 'A Link', 'external_link': 'https://www.django-cms.org'}
+        response = self.client.post(add_url, data)
+        self.assertEqual(response.status_code, 200)
+        return CMSPlugin.objects.latest('pk').pk
+
+    def __edit_link_plugin(self, plugin_id, text):
         endpoint = self.get_admin_url(Page, 'edit_plugin', plugin_id)
         endpoint += '?cms_path=/en/'
 
         response = self.client.get(endpoint)
         self.assertEqual(response.status_code, 200)
-        data = {
-            "body": text
-        }
+        data = {'name': text, 'external_link': 'https://www.django-cms.org'}
         response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
-        txt = Text.objects.get(pk=plugin_id)
-        return txt
+        return CMSPlugin.objects.get(pk=plugin_id).get_bound_plugin()
 
     def test_add_edit_plugin(self):
         """
@@ -165,10 +165,10 @@ class PluginsTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         self.client.post(URL_CMS_PAGE_ADD, page_data)
         page = Page.objects.drafts().first()
-        created_plugin_id = self._create_text_plugin_on_page(page)
+        created_plugin_id = self._create_link_plugin_on_page(page)
         # now edit the plugin
-        txt = self._edit_text_plugin(created_plugin_id, "Hello World")
-        self.assertEqual("Hello World", txt.body)
+        plugin = self.__edit_link_plugin(created_plugin_id, "Hello World")
+        self.assertEqual("Hello World", plugin.name)
 
     def test_plugin_add_form_integrity(self):
         admin.autodiscover()
@@ -267,14 +267,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = Page.objects.drafts().first()
         response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
         self.assertEqual(response.status_code, 302)
-        created_plugin_id = self._create_text_plugin_on_page(page)
+        created_plugin_id = self._create_link_plugin_on_page(page)
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), True)
         response = self.client.post(URL_CMS_PAGE_PUBLISH % (page.pk, 'en'))
         self.assertEqual(response.status_code, 302)
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), False)
-        self._edit_text_plugin(created_plugin_id, "Hello World")
+        self.__edit_link_plugin(created_plugin_id, "Hello World")
         page = Page.objects.drafts().first()
         self.assertEqual(page.is_dirty('en'), True)
 
@@ -903,13 +903,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(1, len(w))
             self.assertIn('test_plugins.py', w[0].filename)
 
-    def test_set_translatable_content(self):
-        a = self.get_plugin_model('TextPlugin')(body="hello")
-        self.assertTrue(a.set_translatable_content({'body': 'world'}))
-        b = self.get_plugin_model('LinkPlugin')(name="hello")
-        self.assertTrue(b.set_translatable_content({'name': 'world'}))
-
-
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
@@ -917,8 +910,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
-        plugin_id = self._create_text_plugin_on_page(page, slot='body')
-        plugin = self._edit_text_plugin(plugin_id, "fnord")
+        plugin_id = self._create_link_plugin_on_page(page, slot='body')
+        plugin = self.__edit_link_plugin(plugin_id, "fnord")
 
         actual_last_modification_time = CMSSitemap().lastmod(title)
         actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)
@@ -957,7 +950,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             build_plugin_tree(page.placeholders.get(slot='right-column').get_plugins_list())
 
     def test_custom_plugin_urls(self):
-        plugin_url = urlresolvers.reverse('admin:dumbfixtureplugin')
+        plugin_url = reverse('admin:dumbfixtureplugin')
 
         response = self.client.get(plugin_url)
         self.assertEqual(response.status_code, 200)
@@ -1111,33 +1104,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             child_classes = plugin.get_child_classes(placeholder.slot, page)
             self.assertIn('ChildPlugin', child_classes)
             self.assertIn('ParentPlugin', child_classes)
-
-
-    def test_plugin_translatable_content_getter_setter(self):
-        """
-        Test that you can add a text plugin
-        """
-        # add a new text plugin
-        page_data = self.get_new_page_data()
-        self.client.post(URL_CMS_PAGE_ADD, page_data)
-        page = Page.objects.drafts().first()
-        created_plugin_id = self._create_text_plugin_on_page(page)
-
-        # now edit the plugin
-        plugin = self._edit_text_plugin(created_plugin_id, "Hello World")
-        self.assertEqual("Hello World", plugin.body)
-
-        # see if the getter works
-        self.assertEqual({'body': "Hello World"}, plugin.get_translatable_content())
-
-        # change the content
-        self.assertEqual(True, plugin.set_translatable_content({'body': "It works!"}))
-
-        # check if it changed
-        self.assertEqual("It works!", plugin.body)
-
-        # double check through the getter
-        self.assertEqual({'body': "It works!"}, plugin.get_translatable_content())
 
     def test_plugin_pool_register_returns_plugin_class(self):
         @plugin_pool.register_plugin
@@ -1545,28 +1511,28 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
             LessMixedPlugin, NonPluginModel
         )
         # the first concrete class of the following four plugins is TestPluginAlphaModel
-        self.assertEqual(TestPluginAlphaModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(TestPluginAlphaModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')
-        self.assertEqual(TestPluginBetaModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(TestPluginBetaModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')
-        self.assertEqual(ProxiedAlphaPluginModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(ProxiedAlphaPluginModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')
-        self.assertEqual(ProxiedBetaPluginModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(ProxiedBetaPluginModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')
         # Abstract plugins will have the dynamic format for related name
         self.assertEqual(
-            AbstractPluginParent.cmsplugin_ptr.field.rel.related_name,
+            AbstractPluginParent.cmsplugin_ptr.field.remote_field.related_name,
             '%(app_label)s_%(class)s'
         )
         # Concrete plugin of an abstract plugin gets its relatedname
-        self.assertEqual(TestPluginGammaModel.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(TestPluginGammaModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testplugingammamodel')
         # Child plugin gets it's own related name
-        self.assertEqual(MixedPlugin.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(MixedPlugin.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_mixedplugin')
         # If the child plugin inherit straight from CMSPlugin, even if composed with
         # other models, gets its own related_name
-        self.assertEqual(LessMixedPlugin.cmsplugin_ptr.field.rel.related_name,
+        self.assertEqual(LessMixedPlugin.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_lessmixedplugin')
         # Non plugins are skipped
         self.assertFalse(hasattr(NonPluginModel, 'cmsplugin_ptr'))

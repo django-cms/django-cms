@@ -26,6 +26,7 @@ class StdOverride(object):
     def __exit__(self, type, value, traceback):
         setattr(sys, 'std%s' % self.std, getattr(sys, '__std%s__' % self.std))
 
+
 class StdoutOverride(StdOverride):
     """
     This overrides Python's the standard output and redirects it to a StringIO
@@ -154,13 +155,13 @@ def signal_tester(*signals):
     env = SignalTester()
 
     for signal in signals:
-        signal.connect(env, weak=True)
+        signal.connect(env)
 
     try:
         yield env
     finally:
         for signal in signals:
-            signal.disconnect(env, weak=True)
+            signal.disconnect(env)
 
 
 class SignalTester(object):

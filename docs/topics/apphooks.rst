@@ -52,9 +52,15 @@ An :ref:`apphook configuration <apphook_configurations>` class allows the site e
 instances that specify the behaviour. The kind of configuration available is presented in an admin form, and determined by the
 application developer.
 
-..  important:
+..  important::
 
-    It's important to understand that an apphook (and therefore also an apphook configuration) serves no function until it is
-    attached to a page - and until the page is **published**, the application will be unable to fulfil any publishing function.
+    It's important to understand that an apphook (and therefore also an apphook configuration)
+    serves no function until it is attached to a page - and until the page is **published**, the
+    application will be unable to fulfil any publishing function.
+
+    Also note that the apphook "swallows" all URLs below that of the page, handing them over to the
+    attached application. If you have any child pages of the apphooked page, django CMS will not be
+    able to serve them reliably.
+
 
 

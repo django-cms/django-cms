@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch, reverse, resolve
+from django.urls import NoReverseMatch, reverse, resolve
 
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import (

@@ -24,10 +24,6 @@ Placeholders
 placeholder
 -----------
 
-.. versionchanged:: 2.1
-
-    The placeholder name became case sensitive.
-
 The ``placeholder`` template tag defines a placeholder on a page. All
 placeholders in a template will be auto-detected and can be filled with
 plugins when editing a page that is using said template. When rendering, the
@@ -36,6 +32,10 @@ content of these plugins will appear where the ``placeholder`` tag was.
 Example::
 
     {% placeholder "content" %}
+
+.. image:: /reference/images/placeholder.png
+   :alt: a placeholder named 'content'
+   :align: center
 
 If you want additional content to be displayed in case the placeholder is
 empty, use the ``or`` argument and an additional ``{% endplaceholder %}``
@@ -81,8 +81,6 @@ context variables and change some other placeholder behaviour.
 static_placeholder
 ------------------
 
-.. versionadded:: 3.0
-
 The ``{% static_placeholder %}`` template tag can be used anywhere in a template element after
 the ``{% cms_toolbar %}`` tag. A static placeholder instance is not bound to any particular page
 or model - in other words, everywhere it appears, a static placeholder will hold exactly the same
@@ -101,10 +99,14 @@ Example::
 
     {% static_placeholder "footer" %}
 
+.. image:: /reference/images/static-placeholder.png
+   :alt: a static placeholder
+   :align: center
 
-.. warning::
+..  note::
 
-    Static placeholders are not included in the undo/redo and page history pages
+    To reduce clutter in the interface, the plugins in static placeholders are hidden by default.
+    Click or tap on the name of the static placeholder to reveal/hide them.
 
 If you want additional content to be displayed in case the static placeholder is
 empty, use the ``or`` argument and an additional ``{% endstatic_placeholder %}``
@@ -514,7 +516,7 @@ This will render to:
     model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, JavaScript, and CSS Code Injection.
 
-    To change this behavior, the project administrator should carefully review
+    To change this behaviour, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
     to a page using this template tag is cleansed of any potentially harmful
     HTML markup, CSS styles or JavaScript.
@@ -596,7 +598,7 @@ method is available; also template tags and filters are available in the block.
     model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, JavaScript, and CSS Code Injection.
 
-    To change this behavior, the project administrator should carefully review
+    To change this behaviour, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
     to a page using this template tag is cleansed of any potentially harmful
     HTML markup, CSS styles or JavaScript.
@@ -663,7 +665,7 @@ It will render to something like:
     model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, JavaScript, and CSS Code Injection.
 
-    To change this behavior, the project administrator should carefully review
+    To change this behaviour, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
     to a page using this template tag is cleansed of any potentially harmful
     HTML markup, CSS styles or JavaScript.
@@ -726,7 +728,7 @@ It will render to something like:
     model attribute. This helps prevent a range of security vulnerabilities
     stemming from HTML, JavaScript, and CSS Code Injection.
 
-    To change this behavior, the project administrator should carefully review
+    To change this behaviour, the project administrator should carefully review
     each use of this template tag and ensure that all content which is rendered
     to a page using this template tag is cleansed of any potentially harmful
     HTML markup, CSS styles or JavaScript.

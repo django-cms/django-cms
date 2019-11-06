@@ -221,7 +221,7 @@ in the ``TEMPLATES['OPTIONS']['context_processors']``:
 Middleware
 ==========
 
-in your :setting:`django:MIDDLEWARE_CLASSES` you'll need :class:`django:django.middleware.locale.LocaleMiddleware` -
+in your :setting:`django:MIDDLEWARE` you'll need :class:`django:django.middleware.locale.LocaleMiddleware` -
 it's **not** installed in Django projects by default.
 
 Also add::
@@ -242,6 +242,8 @@ Context processors
 
 Add ``'cms.context_processors.cms_settings'`` to ``TEMPLATES['OPTIONS']['context_processors']``.
 
+Also add ``'django.template.context_processors.i18n'`` if it's not already present.
+
 ``cms check`` should now be unable to identify any further issues with your project. Some additional configuration is
 required however.
 
@@ -254,7 +256,7 @@ URLs
 ====
 
 In the project's ``urls.py``, add ``url(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
-other patterns, so that specific URLs for other applications can be detected first.
+other patterns, so that specific URLs for other applications can be detected first. Note: when using Django 2.0 or later the syntax is ``re_path(r'^', include('cms.urls'))``
 
 You'll also need to have an import for ``django.conf.urls.include``. For example:
 
@@ -278,8 +280,8 @@ do anything very useful with it though.
 Templates
 =========
 
-django CMS requires at least one template for its pages. The first template in the :setting:`CMS_TEMPLATES` list will
-be the project's default template.
+django CMS requires at least one template for its pages, so you'll need to add :setting:`CMS_TEMPLATES` to your
+settings. The first template in the :setting:`CMS_TEMPLATES` list will be the project's default template.
 
 ::
 

@@ -1,8 +1,8 @@
 .. _custom-plugins:
 
-############################
-How to create custom Plugins
-############################
+#####################
+How to create Plugins
+#####################
 
 CMS Plugins are reusable content publishers that can be inserted into django
 CMS pages (or indeed into any content that uses django CMS placeholders). They
@@ -106,6 +106,7 @@ that are ignored by the CMS are:
 * ``list_per_page``
 * ``ordering``
 * ``paginator``
+* ``prepopulated_fields``
 * ``preserve_fields``
 * ``save_as``
 * ``save_on_top``

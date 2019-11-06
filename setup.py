@@ -15,24 +15,24 @@ CLASSIFIERS = [
     'Topic :: Software Development',
     'Topic :: Software Development :: Libraries :: Application Frameworks',
     'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7',
     'Framework :: Django',
-    'Framework :: Django :: 1.8',
-    'Framework :: Django :: 1.9',
-    'Framework :: Django :: 1.10',
     'Framework :: Django :: 1.11',
+    'Framework :: Django :: 2.0',
+    'Framework :: Django :: 2.1',
+    'Framework :: Django :: 2.2',
 ]
 
 INSTALL_REQUIREMENTS = [
-    'Django>=1.8,<2.0',
+    'Django>=1.11,<3.0',
     'django-classy-tags>=0.7.2',
-    'django-formtools>=1.0',
-    'django-treebeard>=4.0.1',
+    'django-formtools>=2.1',
+    'django-treebeard>=4.3',
     'django-sekizai>=0.7',
-    'djangocms-admin-style>=1.0',
+    'djangocms-admin-style>=1.2',
 ]
 
 setup(

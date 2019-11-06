@@ -3,7 +3,6 @@ from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, include
-from django.db.models import signals
 from django.template.defaultfilters import slugify
 from django.utils import six
 from django.utils.encoding import force_text
@@ -124,10 +123,6 @@ class PluginPool(object):
 
         plugin.value = plugin_name
         self.plugins[plugin_name] = plugin
-        from cms.signals import pre_save_plugins
-
-        signals.pre_save.connect(pre_save_plugins, sender=plugin.model,
-                                 dispatch_uid='cms_pre_save_plugin_%s' % plugin_name)
         return plugin
 
     def unregister_plugin(self, plugin):
