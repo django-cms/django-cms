@@ -130,8 +130,9 @@ CMSPluginBase Attributes and Methods Reference
 
     .. attribute:: module
 
-        Will group the plugin in the plugin picker. If module is ``None``,
-        plugin is listed in the "Generic" group.
+        Will group the plugin in the plugin picker. If the module
+        attribute is not provided plugin is listed in the "Generic"
+        group.
 
 
     .. attribute:: name
