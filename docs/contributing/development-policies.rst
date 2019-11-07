@@ -98,8 +98,8 @@ We maintain a number of branches on `our GitHub repository <https://github.com/d
     The default target branch for on-going development.
 
 the latest (highest-numbered) ``release/x.y.z``
-    This is the branch that will become the next release on PyPI. ``develop`` will be merged into ``release/x.y.z``
-    regularly.
+    This is the branch that will become the next release on PyPI. Commits will be cherrypicked from ``develop``
+    and merged into ``release/x.y.z`` during the next iterative release.
 
 Older ``release/x.y.z`` branches
      These represent the final point of development (the highest ``y`` of older versions). Releases in the full set of
