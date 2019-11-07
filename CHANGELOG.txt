@@ -1,14 +1,20 @@
 === 3.7.1 (unreleased) ===
 
 * Fixed a bug where creating a page via the ``cms.api.create_page`` ignores
-  left/right positions
-* Fixed documentation example for ``urls.py`` when using multiple languages
-* Mark public static placeholder dirty when published
-* Updated branch policy
-* Improved and simplified permissions documentation
-* Improved apphooks documentation
-* Improved CMSPluginBase documentation
-* Improved documentation related to nested plugins
+  left/right positions.
+* Fixed documentation example for ``urls.py`` when using multiple languages.
+* Mark public static placeholder dirty when published.
+* Fixed a bug where ``request.current_page`` would always be the public page,
+  regardless of the toolbar status (draft / live). This only affected custom
+  urls from an apphook.
+* Fixed a bug where the menu would render draft pages even if the page on
+  the request was a public page. This happens when a user without change
+  permissions requests edit mode.
+* Updated branch policy.
+* Improved and simplified permissions documentation.
+* Improved apphooks documentation.
+* Improved CMSPluginBase documentation.
+* Improved documentation related to nested plugins.
 
 === 3.7.0 (2019-09-25) ===
 
