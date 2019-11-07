@@ -261,9 +261,11 @@ Now let's create the apphook, and set it up with support for multiple instances.
     @apphook_pool.register
     class FaqApp(CMSConfigApp):
         name = _("Faq App")
-        urls = ["faq.urls"]
         app_name = "faq"
         app_config = FaqConfig
+        
+        def get_urls(self, page=None, language=None, **kwargs):
+            return ["faq.urls"]
 
 
 Define a list view for FAQ entries
