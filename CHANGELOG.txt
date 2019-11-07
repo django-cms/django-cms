@@ -1,7 +1,10 @@
-=== 3.8.0 (unreleased) ===
+=== 3.7.1 (unreleased) ===
 
-* ...
-
+* Updated branch policy
+* Improved and simplified permissions documentation
+* Improved apphooks documentation
+* Improved CMSPluginBase documentation
+* Improved documentation related to nested plugins
 
 === 3.7.0 (2019-09-25) ===
 

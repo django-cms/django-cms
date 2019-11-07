@@ -494,7 +494,7 @@ CMSPlugin Attributes and Methods Reference
 
             from djangocms_text_ckeditor.models import Text
 
-            plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+            plugin = Text.objects.get(pk=1).get_bound_plugin()[0]
             plugin.get_translatable_content()
             # returns {'body': u'<p>I am text!</p>\n'}
 
@@ -530,7 +530,7 @@ CMSPlugin Attributes and Methods Reference
 
             from djangocms_text_ckeditor.models import Text
 
-            plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+            plugin = Text.objects.get(pk=1).get_bound_plugin()[0]
             plugin.set_translatable_content({'body': u'<p>This is a different text!</p>\n'})
             # returns True
 
