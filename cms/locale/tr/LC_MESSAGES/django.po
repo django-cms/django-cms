@@ -10,6 +10,7 @@
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2013-2014
 # Cihad GÜNDOĞDU <cihadgundogdu@gmail.com>, 2013
 # Cumhur Korkut <cumhurkorkut@gmail.com>, 2013
+# Hamza SARI <hamza.sari@gmail.com>, 2019
 # İsmail Aslan <iaslan@gmail.com>, 2015
 # Mehmet Özgür Bayhan <mozgurbayhan@gmail.com>, 2013
 # Mehmet Özgür Bayhan <mozgurbayhan@gmail.com>, 2013
@@ -23,9 +24,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2019-07-24 18:28+0000\n"
+"Last-Translator: Hamza SARI <hamza.sari@gmail.com>\n"
 "Language-Team: Turkish (http://www.transifex.com/divio/django-cms/language/tr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -46,7 +47,7 @@ msgid "The default title"
 msgstr "Öntanımlı başlık"
 
 msgid "Slug"
-msgstr "rumuz"
+msgstr "Rumuz(slug)"
 
 msgid "The part of the title that is used in the URL"
 msgstr "Başlığın URL'de kullanılan kısmı"
@@ -71,7 +72,7 @@ msgid "A description of the page used by search engines."
 msgstr "Virgül ile ayrılmış anahtar kelimeler, bazen arama motorları tarafından kullanılır."
 
 msgid "Slug must not be empty."
-msgstr "Slug boş olmamalı"
+msgstr "Rumuz(slug) boş olmamalı"
 
 msgid "Page type"
 msgstr "Sayfa tipi"
@@ -101,10 +102,10 @@ msgid "Redirect"
 msgstr "Yönlendir"
 
 msgid "Redirects to this URL."
-msgstr "Bu URL'ye yönlendir."
+msgstr "Bu URL'e yönlendir."
 
 msgid "Start typing..."
-msgstr "Yazmaya başladı...."
+msgstr "Yazmaya başla...."
 
 msgid "Application configurations"
 msgstr "Uygulama ayarları"
@@ -121,22 +122,22 @@ msgstr "Bu ters URL id'si ile bir sayfa zaten var."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Geçersiz uygulama konfigürasyon değeri"
 
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "Bu konfigurasyonu kullanan bir uygulama oluşumu zaten var."
 
 msgid "An application instance with this name already exists."
-msgstr ""
+msgstr "Bu isimde bir uygulama oluşumu zaten var."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Ana sayfayı başka bir sayfanın içine taşıyamazsınız."
 
 msgid "Yes"
-msgstr ""
+msgstr "Evet"
 
 msgid "No"
-msgstr ""
+msgstr "Hayır"
 
 msgid "user"
 msgstr "kullanıcı"
@@ -156,36 +157,36 @@ msgstr "Sil"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Oluşturulmuş sayfayı düzenleme yetkisi olmayan kullanıcılar sayfa oluşturamazlar. Düzenleme yetkisi gereklidir."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Sayfa düzenleme yetkisi olmayan kullanıcılar sayfa silemezler. Düzenleme yetkisi gereklidir."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Sayfa düzenleme yetkisi olmayan kullanıcılar sayfa yetkilendirmesi yapamazlar. Düzenleme yetkisi gereklidir."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Sayfa düzenleme yetkisi olmayan kullanıcılar sayfa yetkilendirmelerini silemezler. Düzenleme yetkisi gereklidir."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "Oluşturulmuş sayfa yetkisini düzenleme yetkisi olmayan kullanıcılar sayfa yetkisi oluşturamazlar. Düzenleme yetkisi gereklidir."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "Yetki düzenleme yetkisi olmayan kullanıcılar sayfa yetkisi silemezler. Düzenleme yetkisi gereklidir."
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Geçersiz eklenti tipi '%s'"
 
 msgid "Language must be set to a supported language!"
 msgstr "Dil, desteklenen bir dile ayarlanmalı!"
@@ -195,7 +196,7 @@ msgstr "Ana eklentinin dili aynı olmalıdır."
 
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "Üst eklenti yer tutucusu, yer tutucu ile ile benzer olmalıdır."
 
 #, python-format
 msgid ""
@@ -241,7 +242,7 @@ msgstr "Bu eklentileri kopyalamaya yetkiniz yok"
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Hata! Bu sayfayı kopyalama yetkiniz yok."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
@@ -289,7 +290,7 @@ msgstr "%(language)s dilindeki başlık ve eklenti silindi"
 #, python-format
 #| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
+msgstr "\"%(title)s\" sayfasını görme yetkiniz yok"
 
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Bu sayfanın menüde görünürlüğünü düzenleme yetkiniz yok"
@@ -307,7 +308,7 @@ msgid "New page"
 msgstr "Yeni sayfa"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "Bu sayfa ana sayfa olmak için uygun değil."
 
 msgid "View restriction"
 msgstr "Kısıta bak"
@@ -327,7 +328,7 @@ msgstr "Eklenti eklemeye yetkiniz yok."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "Bu yer tutucuyu kopyalama yetkiniz yok."
 
 msgid "Plugin not found"
 msgstr "Eklenti bulunamadı"
@@ -339,25 +340,25 @@ msgid "order parameter references plugins in different trees"
 msgstr ""
 
 msgid "parent must be in the same placeholder"
-msgstr ""
+msgstr "üst öğe aynı yer tutucuda olmalı"
 
 msgid "parent must be in the same language as plugin_language"
-msgstr ""
+msgstr "üst öğe eklenti_dili(plugin_language) ile aynı dilde olmalı"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "Bu eklentiyi yapıştırma yetkiniz yok"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "Bu yer tutucuyu yapıştırma yetkiniz yok"
 
 msgid "You have no permission to move this plugin"
 msgstr "Bu eklentiyi taşımak için yetkiniz yok"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "Bu eklentiyi kesme yetkiniz yok."
 
 msgid "You do not have permission to delete this plugin"
 msgstr "Bu eklentiyi silmek için yetkiniz yok"
@@ -387,7 +388,7 @@ msgstr "Sayfa yetki yönetimi"
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "Kayıtlı apphook(uygulama kancası) \"%r\" bulunamadı"
 
 msgid "django CMS"
 msgstr "django CMS"
@@ -408,7 +409,7 @@ msgid ""
 msgstr ""
 
 msgid "Create"
-msgstr "Yarat"
+msgstr "Oluştur"
 
 msgid "Sites"
 msgstr "Alanlar"
@@ -423,16 +424,16 @@ msgid "User settings"
 msgstr "Kullanıcı ayarları"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "Pano..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Panoyu temizle"
 
 msgid "Disable toolbar"
-msgstr ""
+msgstr "Araç çubuğunu etkisiz hale getir"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Kısayollar..."
 
 msgid "Users"
 msgstr "Kullanıcılar"
@@ -455,7 +456,7 @@ msgstr "İçerik"
 
 #| msgid "Publish changes"
 msgid "Publish page changes"
-msgstr ""
+msgstr "Sayfa değişikliklerini yayınla"
 
 msgid "Publish page now"
 msgstr "Sayfayı şimdi yayınla"
@@ -465,24 +466,24 @@ msgstr "Sayfa ayarları"
 
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
-msgstr ""
+msgstr "Çeviri Ekle"
 
 #| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
-msgstr ""
+msgstr "Çeviri Sil"
 
 #| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
-msgstr ""
+msgstr "Tüm eklentileri kopyala"
 
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "%s lokasyonundan"
 
 #, python-format
 #| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Tüm eklentileri %s lokasyonundan kopyalamak istediğinize emin misiniz?"
 
 msgid "Pages"
 msgstr "Sayfalar"
@@ -492,7 +493,7 @@ msgstr "Sayfa"
 
 #| msgid "Create"
 msgid "Create Page"
-msgstr ""
+msgstr "Sayfa Oluştur"
 
 msgid "New Page"
 msgstr "Yeni Sayfa"
@@ -577,11 +578,11 @@ msgid "Provide a title for the new page."
 msgstr "Yeni sayfa için bir başlık gir"
 
 msgid "Leave empty for automatic slug, or override as required."
-msgstr ""
+msgstr "Otomatik rumuz için boş bırakın veya gerekiyorsa varolanın üstüne yazın."
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Sayfa eklemek için gereken yetkiye sahip değilsiniz."
 
 msgid "ID"
 msgstr "ID"
@@ -668,7 +669,7 @@ msgid "application"
 msgstr "uygulama"
 
 msgid "application instance name"
-msgstr ""
+msgstr "uygulama oluşumu ismi"
 
 msgid "site"
 msgstr "site"
@@ -751,7 +752,7 @@ msgstr "Önyüz görünümü kısıtlamaları"
 
 #| msgid "Please select user or group first."
 msgid "Please select user or group."
-msgstr ""
+msgstr "Lütfen kişi veya grup seçiniz."
 
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
@@ -838,16 +839,16 @@ msgid ""
 msgstr ""
 
 msgid "placeholder code"
-msgstr ""
+msgstr "yer tutucu kodu"
 
 msgid "To render the static placeholder in templates."
-msgstr ""
+msgstr "Şablonlar içindeki sabit yer tutucuyu resmetmek(render etmek) için."
 
 msgid "placeholder content"
 msgstr "yer tutucu içeriği"
 
 msgid "creation_method"
-msgstr ""
+msgstr "olusturma_metodu"
 
 msgid "static placeholder"
 msgstr "statik yer tutucu"
@@ -921,7 +922,7 @@ msgstr "Parola:"
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "Sayfa ekle"
 
 msgid "Change a page"
 msgstr "Bir sayfa düzenle"
@@ -1001,11 +1002,11 @@ msgid "Cut"
 msgstr "Kes"
 
 msgid "Paste"
-msgstr ""
+msgstr "Yapıştır"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Ana sayfa olarak ayarla"
 
 msgid "is restricted"
 msgstr "sınırlandırılmış"
@@ -1024,10 +1025,10 @@ msgstr "Ara"
 
 #| msgid "Page Title"
 msgid "Page Tree"
-msgstr ""
+msgstr "Sayfa Ağacı"
 
 msgid "Reset filter"
-msgstr ""
+msgstr "Filtreyi sıfırla"
 
 #, python-format
 msgid ""
@@ -1045,11 +1046,11 @@ msgstr ""
 
 #| msgid "in navigation"
 msgid "Main Navigation"
-msgstr ""
+msgstr "Ana Navigasyon"
 
 #| msgid "Actions"
 msgid "Options"
-msgstr ""
+msgstr "Seçenekler"
 
 msgid "Successfully moved"
 msgstr "Başarıyla taşındı"
@@ -1058,7 +1059,7 @@ msgid "Changes within the tree might require a refresh."
 msgstr ""
 
 msgid "Error:"
-msgstr ""
+msgstr "Hata:"
 
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
@@ -1069,7 +1070,7 @@ msgid "Are you sure you want to § this page?"
 msgstr "Bu sayfayı § etmek istediğinizden emin misiniz?"
 
 msgid "Reload"
-msgstr ""
+msgstr "Tekrar yükle"
 
 #| msgid "New Page"
 msgid "New node"
@@ -1079,7 +1080,7 @@ msgid "nodes"
 msgstr ""
 
 msgid "View"
-msgstr ""
+msgstr "Görüntüle"
 
 msgid "Menu"
 msgstr "Menü"
@@ -1111,27 +1112,27 @@ msgstr ""
 
 #| msgid "published"
 msgid "Published"
-msgstr ""
+msgstr "Yayınlandı"
 
 #| msgid "Change"
 msgid "Changed"
-msgstr ""
+msgstr "Değiştirildi"
 
 #| msgid "unpublished"
 msgid "Unpublished"
-msgstr ""
+msgstr "Yayınlanmadı"
 
 #| msgid "in menu"
 msgid "In menu"
-msgstr ""
+msgstr "Menüde"
 
 #| msgid "not in menu"
 msgid "Not in menu"
-msgstr ""
+msgstr "Menüde değil"
 
 #| msgid "New page"
 msgid "View page"
-msgstr ""
+msgstr "Sayfayı göster"
 
 #| msgid "softroot"
 msgid "Softroot"
@@ -1159,7 +1160,7 @@ msgid "Unpublish"
 msgstr "Yayından kaldır"
 
 msgid "Configure"
-msgstr ""
+msgstr "Konfigüre et"
 
 msgid "in menu"
 msgstr "Menüde"
@@ -1172,10 +1173,10 @@ msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
 
 msgid "Clipboard"
-msgstr ""
+msgstr "Pano"
 
 msgid "Add plugin"
-msgstr ""
+msgstr "Eklenti ekle"
 
 msgid "Copy all"
 msgstr "Hepsini Kopyala"
@@ -1187,28 +1188,28 @@ msgid "Empty all"
 msgstr "Hepsini boşalt"
 
 msgid "Filter plugins..."
-msgstr ""
+msgstr "Eklentileri filtrele..."
 
 msgid "This is a static placeholder"
-msgstr ""
+msgstr "Bu sabit bir yer tutucudur"
 
 msgid "Expand all"
-msgstr ""
+msgstr "Tümünü genişlet"
 
 msgid "Collapse all"
-msgstr ""
+msgstr "Tümünü daralt"
 
 msgid "Edit"
 msgstr "Düzenle"
 
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "Bu eklentiye başka eklentiler ekleyemezsiniz."
 
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "Bu eklenti üst öğesinin dışına taşınamaz veya üst öğesinin dışında düzenlenemez"
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Pano şu anda boş."
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr ""
@@ -1217,7 +1218,7 @@ msgid "This plugin cannot have nested plugins."
 msgstr ""
 
 msgid "Highlight"
-msgstr ""
+msgstr "Vurgula"
 
 msgid "Available plugins"
 msgstr "Uygun eklentiler"
@@ -1228,7 +1229,7 @@ msgstr ""
 
 #| msgid "View published"
 msgid "View published"
-msgstr ""
+msgstr "Yayınlananları göster"
 
 msgid "Login"
 msgstr "Giriş"
@@ -1237,7 +1238,7 @@ msgid "Add plugin to"
 msgstr ""
 
 msgid "More"
-msgstr ""
+msgstr "Daha fazla"
 
 #, python-format
 #| msgid "Development version using django CMS %(cms_version)s"
@@ -1254,7 +1255,7 @@ msgstr "Şu hata ile karşılaşıldı:"
 
 #| msgid "Action successfull... reloading."
 msgid "Action successful."
-msgstr ""
+msgstr "Aksiyon başarılı."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Bu eklentiyi silmek istediğinize emin misiniz?"
@@ -1263,19 +1264,19 @@ msgid "Are you sure you want to publish this page?"
 msgstr "Bu sayfayı yayınlamak istediğinizde emin misiniz?"
 
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "Eklenti buraya eklenecek"
 
 #| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Kaydedilmemiş değişiklikleriniz bulunuyor."
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "Yükleniyor"
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Yaptığınız değişikliklerden vazgeçmek istediğinize emin misiniz?"
 
 msgid ""
 "The form could not be loaded. Please check that the server is running "
@@ -1284,20 +1285,20 @@ msgstr ""
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "En sık kullanılan"
 
 msgid "Shortcuts"
-msgstr ""
+msgstr "Kısayollar"
 
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Bu yardım diyaloğunu getir"
 
 #| msgid "Cancel"
 msgid "Close/cancel"
-msgstr ""
+msgstr "Kapat/iptal"
 
 msgid "Toggle structure mode"
 msgstr ""
@@ -1306,33 +1307,33 @@ msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""
 
 msgid "Open \"Create\" dialog"
-msgstr ""
+msgstr "\"Oluştur\" diyaloğunu aç"
 
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "Araç çubuğuna odaklan"
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "Yer tutuculara odaklan"
 
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "Sonraki/önceki öğeye hareket et"
 
 #| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "Yer tutucunun eklentilerine odaklan"
 
 #| msgid "Add plugin"
 msgid "Edit plugin"
-msgstr ""
+msgstr "Eklentiyi düzenle"
 
 #| msgid "not in menu"
 msgid "Open actions menu"
-msgstr ""
+msgstr "Aksiyonlar menüsünü aç"
 
 #| msgid "Expand all"
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Genişlet/daralt"
 
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
@@ -1345,19 +1346,19 @@ msgid "Double-click to edit"
 msgstr "Düzenlemek için çift tıklayınız"
 
 msgid "Tap to edit"
-msgstr ""
+msgstr "Düzenlemek için dokunun"
 
 msgid "Click to go back"
-msgstr ""
+msgstr "Geri dönmek için tıklayın"
 
 msgid "Click to go forward"
-msgstr ""
+msgstr "İleri gitmek için tıklayın"
 
 msgid "Minimize"
-msgstr ""
+msgstr "Küçült"
 
 msgid "Maximize"
-msgstr ""
+msgstr "Büyüt"
 
 msgid "Drop a plugin here"
 msgstr "Eklentiyi buraya bırakın"
@@ -1369,20 +1370,20 @@ msgid "It is being redirected to:"
 msgstr "Yöndendiriliyor:"
 
 msgid "Installation successful!"
-msgstr ""
+msgstr "Kurulum başarılı!"
 
 msgid "Add your first page"
-msgstr ""
+msgstr "İlk sayfanızı ekleyin"
 
 msgid "Please log in"
-msgstr ""
+msgstr "Lütfen giriş yapın"
 
 #, python-format
 msgid ""
 "\n"
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
-msgstr ""
+msgstr "\n                    django CMS <strong>%(cms_version)s</strong> versiyonuna hoş geldiniz.\n                "
 
 #, python-format
 msgid ""
@@ -1400,13 +1401,13 @@ msgid ""
 msgstr ""
 
 msgid "Installation Notes"
-msgstr ""
+msgstr "Kurulum Notları"
 
 msgid "Support"
-msgstr ""
+msgstr "Destek"
 
 msgid "Documentation"
-msgstr ""
+msgstr "Dokümantasyon"
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1444,19 +1445,19 @@ msgid ""
 msgstr ""
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "djange CMS'e hoşgeldiniz"
 
 msgid "Add Another"
 msgstr "Bir tane daha ekle"
 
 msgid "Back"
-msgstr ""
+msgstr "Geri"
 
 msgid "Please choose an option from below to proceed to the next step."
-msgstr ""
+msgstr "Lütfen aşağıdaki seçeneklerden birini seçerek sonraki adıma ilerleyiniz."
 
 msgid "Next"
-msgstr ""
+msgstr "Sonraki"
 
 msgid "unpublished changes"
 msgstr "yayınlanmamış değişiklikler"
@@ -1494,7 +1495,7 @@ msgstr "kullanıcı adı"
 
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "Zorunlu. 300 karakter veya daha azı. Harfler, rakamlar ve @/./+/-/_ karakterleri"
 
 msgid "Enter a valid username."
 msgstr "Geçerli bir kullanıcı adı giriniz."
@@ -1551,7 +1552,7 @@ msgstr "Örnek Uygulama"
 
 #| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
-msgstr ""
+msgstr "Konfigürasyonlu örnek uygulama"
 
 msgid "Sample App with excluded permissions"
 msgstr "Dahil edilmeyen yetkilerle Örnek Uygulama"
@@ -1561,16 +1562,16 @@ msgstr "Örnek Uygulama 2"
 
 #| msgid "Sample App 2"
 msgid "Sample App 3"
-msgstr ""
+msgstr "Örnek Uygulama 3"
 
 msgid "Namespaced App"
 msgstr ""
 
 msgid "Parent app"
-msgstr ""
+msgstr "Üst uygulama"
 
 msgid "Child app"
-msgstr ""
+msgstr "Alt uygulama"
 
 msgid "Variable urls-menus App"
 msgstr ""
@@ -1594,11 +1595,11 @@ msgid "Static Menu2"
 msgstr "Statik Menü2"
 
 msgid "Static Menu3"
-msgstr ""
+msgstr "Sabit Menu3"
 
 #| msgid "Static Menu"
 msgid "Static Menu4"
-msgstr ""
+msgstr "Sabit Menu4"
 
 msgid "Category"
 msgstr "Kategori"
@@ -1622,7 +1623,7 @@ msgid "Inherit the template of the nearest ancestor"
 msgstr "En yakın üst sayfanın şablonunu kullan"
 
 msgid "UserSettings"
-msgstr ""
+msgstr "KullanıcıAyarları"
 
 #, python-format
 #| msgid "Add plugin to placeholder"
@@ -1662,11 +1663,11 @@ msgstr ""
 
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "Yeni bir %s oluşumu oluştur."
 
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
+msgstr "Şu model için zaten bir sihirbaz kayıtlıdır: %s"
 
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."

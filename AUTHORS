@@ -21,9 +21,8 @@ Current and previous core designers:
 * Matthias Nüesch
 
 
-Contributors (based on gitlog, 537 unique authors):
+Contributors (based on gitlog, 543 unique authors):
 
-* Антон Евжаков
 * A. Bram Neijt
 * aaloy
 * Aaron Fay
@@ -72,6 +71,7 @@ Contributors (based on gitlog, 537 unique authors):
 * Arthur Debert
 * Artis Avotins
 * Aymeric Augustin
+* Baptiste Darthenay
 * Bartosz Płóciennik
 * Basile LEGAL
 * behrooz
@@ -119,6 +119,7 @@ Contributors (based on gitlog, 537 unique authors):
 * Christof Hagedorn
 * Christopher Grebs
 * Christos Kopanos
+* Christy O'Reilly
 * cip
 * Claudio Bartolini
 * Colin Wirz
@@ -215,6 +216,7 @@ Contributors (based on gitlog, 537 unique authors):
 * Gilles Lenfant
 * Gleb Chipiga
 * Gokmen Gorgen
+* Gourav Chawla(dotgourav)
 * Gregory Klupar
 * guandalino
 * Hamish Downer
@@ -257,6 +259,7 @@ Contributors (based on gitlog, 537 unique authors):
 * JensDiemer
 * Jeroen
 * Jeroen Noten
+* Jeroen Peters
 * Jessica Tallon
 * Jimmy Lam
 * Johannes Bornhold
@@ -364,6 +367,7 @@ Contributors (based on gitlog, 537 unique authors):
 * Mikko Ahlroth
 * Milo Price
 * Mitar
+* mobilepattern
 * Mokys
 * Morgan Wahl
 * Motiejus Jakštys
@@ -405,6 +409,7 @@ Contributors (based on gitlog, 537 unique authors):
 * Paulo Alvarado
 * Pavel Puchkin
 * Pawel Markowski
+* Paweł
 * pbgc
 * pcicman
 * Pedro Gracia
@@ -460,8 +465,10 @@ Contributors (based on gitlog, 537 unique authors):
 * Samuel Lahti
 * Samuel Luescher
 * Samuel Lüscher
+* Sascha Marcel Schmidt
 * sbussetti
 * Schoen
+* schwobaseggl
 * scottbarnham
 * sealibora
 * Sean Bleier
@@ -558,6 +565,7 @@ Contributors (based on gitlog, 537 unique authors):
 * Yuri van der Meer
 * zandeez
 * zundoya
-* Žan Anderle
 * Óscar M. Lage
 * Øyvind Saltvik
+* Žan Anderle
+* Антон Евжаков

@@ -5,7 +5,7 @@
 # Translators:
 # Translators:
 # Jiří Vírava <appukonrad@gmail.com>, 2012-2013
-# grexx xxerg <marhac@seznam.cz>, 2018
+# Martin S. <marhac@seznam.cz>, 2018
 # koren <honza@kekorenum.com>, 2015
 # Jakub Dorňák <jakub.dornak@misli.cz>, 2013
 # Jiří Vírava <appukonrad@gmail.com>, 2014-2015
@@ -21,7 +21,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2018-11-09 12:08+0000\n"
 "Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Czech (http://www.transifex.com/divio/django-cms/language/cs/)\n"

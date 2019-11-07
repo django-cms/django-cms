@@ -15,7 +15,7 @@
 # Adolfo Gómez <dkmaster@dkmon.com>, 2014
 # Eduardo Ludi <eduludi@gmail.com>, 2013
 # Erick Del Castillo Deza <mrff88@gmail.com>, 2018
-# Ernesto Avilés Vázquez <whippiii@gmail.com>, 2015
+# Ernesto Avilés, 2015
 # jorlugaqui <jorlugaqui@gmail.com>, 2017
 # Luis Montiel <luis@aztlansoft.com>, 2016
 # mariocesar <mariocesar.c50@gmail.com>, 2011
@@ -36,7 +36,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
 "PO-Revision-Date: 2018-11-09 12:08+0000\n"
 "Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/divio/django-cms/language/es/)\n"
