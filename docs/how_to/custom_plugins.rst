@@ -706,7 +706,7 @@ achieve this functionality:
 
 
 If you have attributes of the parent plugin which you need to access in the
-child you can access the parent instance using ``get_plugin_instance``:
+child you can access the parent instance using ``get_bound_plugin``:
 
 .. code-block:: django
 
@@ -719,7 +719,7 @@ child you can access the parent instance using ``get_plugin_instance``:
         def __init__(self, *args, **kwargs):
             super(ChildPluginForm, self).__init__(*args, **kwargs)
             if self.instance:
-                parent, parent_cls = self.instance.parent.get_plugin_instance()
+                parent, parent_cls = self.instance.parent.get_bound_plugin()
 
 
 .. _extending_context_menus:
