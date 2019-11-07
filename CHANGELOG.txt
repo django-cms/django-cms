@@ -1,5 +1,7 @@
 === 3.7.1 (unreleased) ===
 
+* Fixed a bug where creating a page via the cms.api.create_page ignores
+  left/right positions
 * Updated branch policy
 * Improved and simplified permissions documentation
 * Improved apphooks documentation
