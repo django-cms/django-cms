@@ -10,11 +10,13 @@
 * Fixed a bug where the menu would render draft pages even if the page on
   the request was a public page. This happens when a user without change
   permissions requests edit mode.
+* Added missing ``{% trans %}?? to toolbar shortcuts.
 * Updated branch policy.
 * Improved and simplified permissions documentation.
 * Improved apphooks documentation.
 * Improved CMSPluginBase documentation.
 * Improved documentation related to nested plugins.
+
 
 === 3.7.0 (2019-09-25) ===
 
