@@ -5,7 +5,7 @@
 # Translators:
 # Translators:
 # Ahmed H <info@draco-003.com>, 2013
-# Bashar Al-Abdulhadi, 2013-2015,2017
+# Bashar Al-Abdulhadi, 2013-2015,2017,2019
 # Bashar Al-Abdulhadi, 2013-2014
 # Bashar Ghadanfar <10.tens@gmail.com>, 2017
 # Jonas Obrist <me@ojii.ch>, 2011
@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2019-01-22 15:34+0000\n"
+"POT-Creation-Date: 2019-09-25 09:43+0200\n"
+"PO-Revision-Date: 2019-02-07 11:07+0000\n"
 "Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/divio/django-cms/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -115,7 +115,7 @@ msgstr "توجد صفحة سابقة بنفس عنوان المعرّف العك
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "قيمة إعدادات التطبيق غير صحيحة"
 
 msgid "An application instance using this configuration already exists."
 msgstr "كيان تطبيق بهذا الإعداد موجود سلفا."
@@ -124,7 +124,7 @@ msgid "An application instance with this name already exists."
 msgstr "كيان تطبيق بهذا الإسم موجود سلفا."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "لا يمكنك تحريك الصفحة الرئيسية داخل صفحة أخرى"
 
 msgid "Yes"
 msgstr "نعم"
@@ -235,12 +235,12 @@ msgstr "ليس لديك الصلاحية لنسخ هذه الملحقات."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "ليس لديك صلاحية لنسخ هذه الصفحة."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "خطأ! الصفحة التي تحاول لصقها غير مترجمة لأي من اللغات المعرّفة الأخرى بموقع الوجهة."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -301,7 +301,7 @@ msgid "New page"
 msgstr "صفحة جديدة"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "هذه الصفحة غير مؤهله لتكون صفحة رئيسية."
 
 msgid "View restriction"
 msgstr "قيد المشاهدة"
@@ -426,7 +426,7 @@ msgid "Disable toolbar"
 msgstr "تعطيل شريط الأدوات"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "الإختصارات"
 
 msgid "Users"
 msgstr "المستخدمون"

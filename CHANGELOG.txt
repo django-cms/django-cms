@@ -1,8 +1,19 @@
-=== 3.7.0 (unreleased) ===
+=== 3.7.1 (unreleased) ===
+
+* Fixed ``ValueError`` when creating a ``Site``-bound ``StaticPlaceholder``
+* Updated branch policy
+* Improved and simplified permissions documentation
+* Improved apphooks documentation
+* Improved CMSPluginBase documentation
+* Improved documentation related to nested plugins
+
+
+=== 3.7.0 (2019-09-25) ===
 
 * Introduced Django 2.2 support.
 * Introduced Python 3.7 support.
 * Fixed test suite.
+* Fixed override ``urlconf_module`` so that Django system checks don't crash.
 
 
 === 3.6.0 (2019-01-29) ===
