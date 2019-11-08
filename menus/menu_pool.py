@@ -104,7 +104,6 @@ class MenuRenderer(object):
         self.request = request
         self.request_language = get_language_from_request(request, check_path=True)
         self.site = Site.objects.get_current(request)
-        self.draft_mode_active = use_draft(request)
 
     @property
     def cache_key(self):
@@ -120,6 +119,17 @@ class MenuRenderer(object):
         else:
             key += ':public'
         return key
+
+    @cached_property
+    def draft_mode_active(self):
+        try:
+            # Under certain conditions, the request page won't match
+            # the requested state.
+            # For example, user requests draft page but gets public.
+            _use_draft = self.request.current_page.publisher_is_draft
+        except AttributeError:
+            _use_draft = use_draft(self.request)
+        return _use_draft
 
     @cached_property
     def is_cached(self):

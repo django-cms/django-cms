@@ -504,6 +504,28 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl.render(context)
         self.assertEqual(CacheKey.objects.count(), 1)
 
+    def test_menu_nodes_request_page_takes_precedence(self):
+        """
+        Tests a condition where the user requests a draft page
+        but the page object on the request is a public page.
+        This can happen when the user has no permissions to edit
+        the requested draft page.
+        """
+        public_page = self.get_page(1)
+        draft_page = public_page.publisher_public
+        edit_on_path = draft_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+
+        with self.login_user_context(self.get_superuser()):
+            context = self.get_context(path=edit_on_path, page=public_page)
+            context['request'].session['cms_edit'] = True
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+        # All nodes should be public nodes because the request page is public
+        nodes = [node for node in context['children']]
+        node_ids = [node.id for node in nodes]
+        page_count = Page.objects.public().filter(pk__in=node_ids).count()
+        self.assertEqual(len(node_ids), page_count, msg='Not all pages in the public menu are public')
+        self.assertEqual(nodes[0].selected, True)
+
     def test_menu_cache_draft_only(self):
         # Tests that the cms uses a separate cache for draft & live
         public_page = self.get_page(1)
