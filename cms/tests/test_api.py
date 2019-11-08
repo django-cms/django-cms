@@ -242,3 +242,12 @@ class PythonAPITests(CMSTestCase):
     def test_create_page_page_title(self):
         page = create_page(**dict(self._get_default_create_page_arguments(), page_title='page title'))
         self.assertEqual(page.get_title_obj_attribute('page_title'), 'page title')
+
+    def test_create_page_with_position_regression_6345(self):
+        # ref: https://github.com/divio/django-cms/issues/6345
+        parent = create_page('p', 'nav_playground.html', 'en')
+        rightmost = create_page('r', 'nav_playground.html', 'en', parent=parent)
+        leftmost = create_page('l', 'nav_playground.html', 'en', parent=rightmost, position='left')
+        create_page('m', 'nav_playground.html', 'en', parent=leftmost, position='right')
+        children_titles = list(p.get_title('de') for p in parent.get_child_pages())
+        self.assertEqual(children_titles, ['l', 'm', 'r'])
