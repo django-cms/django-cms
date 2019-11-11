@@ -2,7 +2,7 @@
 CONTRIBUTING
 ============
 
-First, thank you very much, that you would like to contribute to django CMS. 🎉
+First, thank you very much, that you would like to contribute to django CMS.
 We always welcome contributions, like many other open-source projects. We are
 very thankful to the many `present, past and future contributors <https://github.com/divio/django-cms/graphs/contributors>`_.
 
