@@ -19,6 +19,7 @@ Changelog
 * Fixed a bug where the menu would render draft pages even if the page on
   the request was a public page. This happens when a user without change
   permissions requests edit mode.
+* Fixed the 'urls.W001' warning with custom apphook urls
 * Prevent non-staff users to login with the django CMS toolbar
 * Added missing ``{% trans %}?? to toolbar shortcuts.
 * Updated branch policy.
