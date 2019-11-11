@@ -10,10 +10,12 @@ You can join us online:
   `join our IRC channel using the KiwiIRC web client
   <https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
 * on our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ for
-  **general** django CMS questions and discussion
+  **general discussion** of django CMS
 * on our `django CMS developers email list
   <https://groups.google.com/forum/#!forum/django-cms-developers>`_ for discussions about the
   **development of django CMS**
+* on our `StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_ for
+  general **questions** around django CMS and it's plugin ecosystem
 
 You can also follow:
 
@@ -98,14 +100,12 @@ Current core developers
 
 * Angelo Dini https://github.com/finalangel
 * Daniele Procida https://github.com/evildmp
-* Iacopo Spalletti https://github.com/yakky
-* Paulo Alvarado https://github.com/czpython
-* Stefan Foulis https://github.com/stefanfoulis
-* Vadim Sikora https://github.com/vxsx
 * Dennis Schwertel https://github.com/kinkerl
-* Serhii Sydorenko https://github.com/SydorenkoSergiy
-* Krzysztof Socha https://github.com/chaosk
+* Iacopo Spalletti https://github.com/yakky
 * Malinda Perera https://github.com/malindap92
+* Paulo Alvarado https://github.com/czpython
+* Serhii Sydorenko https://github.com/SydorenkoSergiy
+* Vadim Sikora https://github.com/vxsx
 
 
 Core designers
@@ -120,12 +120,14 @@ design:
 Retired core developers
 =======================
 
-* Chris Glass https://github.com/chrisglass
-* Øyvind Saltvik https://github.com/fivethreeo
 * Benjamin Wohlwend https://github.com/piquadrat
-* Martin Koistinen https://github.com/mkoistinen
-* Patrick Lauber https://github.com/digi604
+* Chris Glass https://github.com/chrisglass
 * Jonas Obrist https://github.com/ojii
+* Krzysztof Socha https://github.com/chaosk
+* Martin Koistinen https://github.com/mkoistinen
+* Øyvind Saltvik https://github.com/fivethreeo
+* Patrick Lauber https://github.com/digi604
+* Stefan Foulis https://github.com/stefanfoulis
 
 Following a year or so of inactivity, a core developer will be moved to the
 "Retired" list, with the understanding that they can rejoin the project in the
@@ -157,7 +159,7 @@ Technical board
 
 Historically, django CMS's development has been led by members of staff from
 Divio. It has been (and will continue to be) a requirement of the CMS that it
-meet Divio's needs.
+meets the highest standards.
 
 However, as the software has matured and its user-base has dramatically
 expanded, it has become increasingly important also to reflect a wider range of
@@ -183,7 +185,7 @@ developers who have retired, or for other reasons.
 Composition of the board
 ========================
 
-The the technical board will include key developers from Divio and others in the
+The the technical board will include key developers from companies and others in the
 django CMS development community - developers who work *with* django CMS, as
 well as developers *of* django CMS - in order to help ensure that all
 perspectives are represented in important decisions about the software and the
@@ -199,9 +201,6 @@ The current members of the technical board are:
 * Christian Bertschy
 * Daniele Procida (Chair)
 * Iacopo Spalletti
-* Jonas Obrist
-* Martin Koistinen
-* Matteo Larghi
 
 The board will co-opt new members as appropriate.
 

@@ -119,6 +119,6 @@ Credits
 * Python tree engine powered by
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
 * JavaScript tree in admin uses `jsTree <https://www.jstree.com>`_.
-* Many thanks to the
-  `over 515 contributors <https://github.com/divio/django-cms/blob/develop/AUTHORS>`_
-  to the django CMS!
+* Many thanks to
+  `all the contributors <https://github.com/divio/django-cms/graphs/contributors>`_
+  to django CMS!

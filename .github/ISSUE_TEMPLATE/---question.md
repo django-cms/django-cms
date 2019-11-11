@@ -8,11 +8,12 @@ assignees: ''
 ---
 
 <!--
-Please use one of the following community channels to ask your questions instead of GitHub:
+For *help with django CMS*, please use our one of the following channels:
 
-* Stackoverflow: https://stackoverflow.com/questions/tagged/django-cms
-* Mailing list: https://groups.google.com/forum/#!forum/django-cms
-* #django-cms on freenode.net 
+* StackOverflow: https://stackoverflow.com/questions/tagged/django-cms
+* Users mailing list: https://groups.google.com/forum/#!forum/django-cms
+* #django-cms on freenode.net
 
-Questions submitted through GitHub will be closed. Our community is very helpful and we try to answer as many questions as you may have.
+Questions submitted through GitHub will be closed. Our community is very
+helpful and we try to answer as many questions as you may have.
 -->
