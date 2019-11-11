@@ -1,8 +1,8 @@
 from django import forms
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.admin.forms import AdminAuthenticationForm
 
 
-class CMSToolbarLoginForm(AuthenticationForm):
+class CMSToolbarLoginForm(AdminAuthenticationForm):
 
     def __init__(self, *args, **kwargs):
         super(CMSToolbarLoginForm, self).__init__(*args, **kwargs)

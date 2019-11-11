@@ -70,6 +70,7 @@ class StaticPlaceholder(models.Model):
     def publish(self, request, language, force=False):
         if force or self.has_publish_permission(request):
             self.public.clear(language=language)
+            self.public.clear_cache(language=language)
             plugins = self.draft.get_plugins_list(language=language)
             copy_plugins_to(plugins, self.public, no_signals=True)
             self.dirty = False
