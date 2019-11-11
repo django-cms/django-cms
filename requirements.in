@@ -20,7 +20,7 @@ https://control.divio.com/api/v1/apps/serve/djangocms-style/2.2.0/a8b508f7-543c-
 https://control.divio.com/api/v1/apps/serve/djangocms-text-ckeditor/3.8.0/b89646ad-5f01-4762-aa29-52600645e6de/djangocms-text-ckeditor-3.8.0.tar.gz#egg=djangocms-text-ckeditor==3.8.0
 https://control.divio.com/api/v1/apps/serve/djangocms-transfer/0.2.0/5ba90c5c-5737-4302-ba6e-fbe3acc55ea0/djangocms-transfer-0.2.0.tar.gz#egg=djangocms-transfer==0.2.0
 https://control.divio.com/api/v1/apps/serve/djangocms-video/2.2.0/facb7d0e-0636-4b44-80e7-351b1faf58fc/djangocms-video-2.2.0.tar.gz#egg=djangocms-video==2.2.0
-https://control.divio.com/api/v1/apps/serve/django-filer/1.5.0/0436c013-652d-4086-9d85-082368a36c5e/django-filer-1.5.0.tar.gz#egg=django-filer==1.5.0
+https://control.divio.com/api/v1/apps/serve/django-filer/1.6.0/ea2f6055-3bc9-4bf7-a341-e1901ac15269/django-filer-1.6.0.tar.gz#egg=django-filer==1.6.0
 https://control.divio.com/api/v1/apps/serve/django-privacy-mgmt/0.0.17/25fc00ea-d21a-4f23-9eb1-60084b5e552e/django-privacy-mgmt-0.0.17.tar.gz#egg=django-privacy-mgmt==0.0.17
 # </INSTALLED_ADDONS>
 
