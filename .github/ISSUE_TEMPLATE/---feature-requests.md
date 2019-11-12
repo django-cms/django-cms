@@ -8,5 +8,6 @@ assignees: ''
 ---
 
 <!--
-Head over to https://groups.google.com/forum/#!forum/django-cms and submit your ideas.
+Please submit any feature requests through our developers email list:
+https://groups.google.com/forum/#!forum/django-cms-developers
 -->
