@@ -117,7 +117,7 @@ We maintain a number of branches on
 
 Please always open PR's against develop and indicate that they should be
 backported to the latest LTS release when necessary. Older branches are not
-supported anymore.
+supported any longer.
 
 
 .. _commit_policy:

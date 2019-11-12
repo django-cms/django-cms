@@ -18,9 +18,12 @@ or any other resource.
 ## Checklist
 
 <!--
-Please check the following items before submitting, otherwise, your pull request will be closed.
+Please check the following items before submitting, otherwise,
+your pull request will be closed.
+
+Use 'x' to check each item: [x] I have ...
 -->
 
-* [x] I have opened this pull request against ``develop``
+* [ ] I have opened this pull request against ``develop``
 * [ ] I have updated the **CHANGELOG.rst**
 * [ ] I have added or modified the tests when changing logic
