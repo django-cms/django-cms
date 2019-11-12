@@ -93,13 +93,15 @@ Our IRC channel, #django-cms, is on ``irc.freenode.net``. If you don't have an I
 
 .. rst-class:: column column3
 
-Our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ is for **general** django CMS questions and discussion
+Our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ is for
+**general discussions** and the `django CMS developers email list
+<https://groups.google.com/forum/#!forum/django-cms-developers>`_ for the
+**development of django CMS**.
 
 .. rst-class:: column column3
 
-Our `django CMS developers email list
-<https://groups.google.com/forum/#!forum/django-cms-developers>`_ is for discussions about the
-**development of django CMS**
+Our `StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_ is for
+**questions** around django CMS and it's plugin ecosystem.
 
 
 ***************

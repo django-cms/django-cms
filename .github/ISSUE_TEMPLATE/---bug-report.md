@@ -8,13 +8,15 @@ assignees: ''
 ---
 
 <!--
-Please fill out each section below, otherwise, your issue will be closed. This info allows django CMS maintainers to diagnose (and fix!) your issue as quickly as possible.
+Please fill in each section below, otherwise, your issue will be closed.
+This info allows django CMS maintainers to diagnose (and fix!) your issue
+as quickly as possible.
 -->
 
 ## Description
 
 <!--
-If this is a security issue stop right here and follow our documentation:
+If this is a security issue stop immediately and follow the instructions at:
 http://docs.django-cms.org/en/latest/contributing/development-policies.html#reporting-security-issues
 -->
 
@@ -39,5 +41,6 @@ A clear and concise description of what is actually happening.
 ## Additional information
 
 <!--
-Add any other context about the problem such as environment, CMS/Python/Django versions, logs etc. here.
+Add any other context about the problem such as environment,
+CMS/Python/Django versions, logs etc. here.
 -->
