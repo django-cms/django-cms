@@ -42,7 +42,7 @@ CMS.config = {
         'unhandledPageChange': '{% filter escapejs %}{% trans "The page was changed in the meantime, reloading..." %}{% endfilter %}',
         'shortcutAreas': [
             {
-                'title': 'CMS-wide Shortcuts',
+                'title': '{% filter escapejs %}{% trans "CMS-wide Shortcuts" %}{% endfilter %}',
                 'shortcuts': {
                     'help': {
                         'shortcut': '?',
@@ -71,7 +71,7 @@ CMS.config = {
                 }
             },
             {
-                'title': 'Structureboard',
+                'title': '{% filter escapejs %}{% trans "Structureboard" %}{% endfilter %}',
                 'shortcuts': {
                     'placeholders': {
                         'shortcut': 'f > p / alt+p',

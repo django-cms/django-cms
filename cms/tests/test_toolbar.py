@@ -187,6 +187,15 @@ class ToolbarTests(ToolbarTestBase):
         self.assertRedirects(response, '/en/admin/')
         self.assertTrue(settings.SESSION_COOKIE_NAME in response.cookies)
 
+    def test_toolbar_login_non_staff(self):
+        admin = self.get_nonstaff()
+        endpoint = reverse('cms_login') + '?next=/en/admin/'
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        password = getattr(admin, get_user_model().USERNAME_FIELD)
+        response = self.client.post(endpoint, data={'username': username, 'password': password})
+        self.assertRedirects(response, '/en/admin/?cms_toolbar_login_error=1', target_status_code=302)
+        self.assertFalse(settings.SESSION_COOKIE_NAME in response.cookies)
+
     def test_toolbar_login_error(self):
         admin = self.get_superuser()
         endpoint = reverse('cms_login') + '?next=/en/admin/'

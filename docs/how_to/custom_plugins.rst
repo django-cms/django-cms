@@ -705,6 +705,23 @@ achieve this functionality:
     </div>
 
 
+If you have attributes of the parent plugin which you need to access in the
+child you can access the parent instance using ``get_bound_plugin``:
+
+.. code-block:: django
+
+    class ChildPluginForm(forms.ModelForm):
+
+        class Meta:
+            model = ChildPlugin
+            exclude = ()
+
+        def __init__(self, *args, **kwargs):
+            super(ChildPluginForm, self).__init__(*args, **kwargs)
+            if self.instance:
+                parent, parent_cls = self.instance.parent.get_bound_plugin()
+
+
 .. _extending_context_menus:
 
 Extending context menus of placeholders or plugins
@@ -734,8 +751,9 @@ Example::
         def render(self, context, instance, placeholder):
             context = super(AliasPlugin, self).render(context, instance, placeholder)
             if instance.plugin_id:
-                plugins = instance.plugin.get_descendants(include_self=True).order_by('placeholder', 'tree_id', 'level',
-                                                                                      'position')
+                plugins = instance.plugin.get_descendants(
+                    include_self=True
+                ).order_by('placeholder', 'tree_id', 'level', 'position')
                 plugins = downcast_plugins(plugins)
                 plugins[0].parent_id = None
                 plugins = build_plugin_tree(plugins)
@@ -751,7 +769,10 @@ Example::
                 PluginMenuItem(
                     _("Create Alias"),
                     reverse("admin:cms_create_alias"),
-                    data={'plugin_id': plugin.pk, 'csrfmiddlewaretoken': get_token(request)},
+                    data={
+                        'plugin_id': plugin.pk,
+                        'csrfmiddlewaretoken': get_token(request)
+                    },
                 )
             ]
 
@@ -760,7 +781,10 @@ Example::
                 PluginMenuItem(
                     _("Create Alias"),
                     reverse("admin:cms_create_alias"),
-                    data={'placeholder_id': placeholder.pk, 'csrfmiddlewaretoken': get_token(request)},
+                    data={
+                        'placeholder_id': placeholder.pk,
+                        'csrfmiddlewaretoken': get_token(request)
+                    },
                 )
             ]
 
@@ -774,7 +798,9 @@ Example::
             if not request.user.is_staff:
                 return HttpResponseForbidden("not enough privileges")
             if not 'plugin_id' in request.POST and not 'placeholder_id' in request.POST:
-                return HttpResponseBadRequest("plugin_id or placeholder_id POST parameter missing.")
+                return HttpResponseBadRequest(
+                    "plugin_id or placeholder_id POST parameter missing."
+                )
             plugin = None
             placeholder = None
             if 'plugin_id' in request.POST:
@@ -782,21 +808,30 @@ Example::
                 try:
                     plugin = CMSPlugin.objects.get(pk=pk)
                 except CMSPlugin.DoesNotExist:
-                    return HttpResponseBadRequest("plugin with id %s not found." % pk)
+                    return HttpResponseBadRequest(
+                        "plugin with id %s not found." % pk
+                    )
             if 'placeholder_id' in request.POST:
                 pk = request.POST['placeholder_id']
                 try:
                     placeholder = Placeholder.objects.get(pk=pk)
                 except Placeholder.DoesNotExist:
-                    return HttpResponseBadRequest("placeholder with id %s not found." % pk)
+                    return HttpResponseBadRequest(
+                        "placeholder with id %s not found." % pk
+                    )
                 if not placeholder.has_change_permission(request):
-                    return HttpResponseBadRequest("You do not have enough permission to alias this placeholder.")
+                    return HttpResponseBadRequest(
+                        "You do not have enough permission to alias this placeholder."
+                    )
             clipboard = request.toolbar.clipboard
             clipboard.cmsplugin_set.all().delete()
             language = request.LANGUAGE_CODE
             if plugin:
                 language = plugin.language
-            alias = AliasPluginModel(language=language, placeholder=clipboard, plugin_type="AliasPlugin")
+            alias = AliasPluginModel(
+                language=language, placeholder=clipboard,
+                plugin_type="AliasPlugin"
+            )
             if plugin:
                 alias.plugin = plugin
             if placeholder:
