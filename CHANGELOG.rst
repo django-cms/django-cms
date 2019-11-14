@@ -27,6 +27,7 @@ Changelog
 * Improved apphooks documentation.
 * Improved CMSPluginBase documentation.
 * Improved documentation related to nested plugins.
+* Updated installation tutorial.
 
 
 3.7.0 (2019-09-25)
