@@ -27,6 +27,8 @@ Changelog
 * Improved apphooks documentation.
 * Improved CMSPluginBase documentation.
 * Improved documentation related to nested plugins.
+* Updated installation tutorial.
+* Fixed a simple typo in the docstring for ``cms.utils.helpers.normalize_name``.
 
 
 3.7.0 (2019-09-25)
