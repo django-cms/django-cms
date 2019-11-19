@@ -21,8 +21,8 @@ Changelog
   permissions requests edit mode.
 * Fixed the 'urls.W001' warning with custom apphook urls
 * Prevent non-staff users to login with the django CMS toolbar
-* Added missing ``{% trans %}?? to toolbar shortcuts.
-* Updated branch and release policy.
+* Added missing ``{% trans %}`` to toolbar shortcuts.
+* Fixed branch and release policy.
 * Improved and simplified permissions documentation.
 * Improved apphooks documentation.
 * Improved CMSPluginBase documentation.
