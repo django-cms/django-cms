@@ -17,9 +17,9 @@ class SendPandadocDocument(View):
     recipients = [
         {
             # our party
-            'email': 'christian.bertschy@divio.com',
-            'first_name': 'Christian',
-            'last_name': 'Bertschy',
+            'email': 'legal@divio.com',
+            'first_name': 'Jon',
+            'last_name': 'Levin',
             'role': 'Divio',
         },
         {
