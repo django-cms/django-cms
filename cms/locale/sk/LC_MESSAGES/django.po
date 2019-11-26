@@ -6,14 +6,15 @@
 # Translators:
 # Juraj Bubniak <translations@jbub.eu>, 2013
 # Juraj Hudak <juraj.hudak@solvere.sk>, 2013
+# Martin Kilian <xmartink01@gmail.com>, 2019
 # Thomas Thomas <tparobok@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-25 09:43+0200\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2019-11-19 11:09+0100\n"
+"PO-Revision-Date: 2019-11-17 15:40+0000\n"
+"Last-Translator: Martin Kilian <xmartink01@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/divio/django-cms/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -102,14 +103,14 @@ msgstr "Jazykovo nezávislé možnosti"
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Prosím zadajte %(language)sslug, pretým než začnete upravovať rozšírené nastavenia."
 
 msgid "A page with this reverse URL id exists already."
 msgstr "Stránka s takouto hodnotou reverse URL id už existuje."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Zlá hodnota aplikačného konfigu"
 
 msgid "An application instance using this configuration already exists."
 msgstr "Inštancia aplikácie, ktorá používa tieto nastavenia už existuje."
@@ -118,13 +119,13 @@ msgid "An application instance with this name already exists."
 msgstr "Inštancia aplikácie s týmto názvom už existuje."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Nemôžete presunúť domovskú stránku dovnútra ďaľšej stránky"
 
 msgid "Yes"
-msgstr ""
+msgstr "Áno"
 
 msgid "No"
-msgstr ""
+msgstr "Nie"
 
 msgid "user"
 msgstr "užívateľ"
@@ -144,22 +145,22 @@ msgstr "Vymazať"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Uživatelia nemôžu vytvoriť stránku bez oprávnenia, ktoré by im túto akciu umožňovalo. Je vyžadované oprávnenia editovať stránku."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Uživatelia nemôžu smazať stránku bez oprávnenia, ktoré by im túto akciu umožňovalo. Je vyžadované oprávnenie editovať stránku."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Uživatelia nemôžu nastaviť oprávnenia stránky  bez oprávnenia, ktoré by im túto akciu umožňovalo. Je vyžadované oprávnenie editovať stránku."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Uživatelia nemôžu vymazať oprávnenia ku stránke bez oprávnenia, ktoré by im túto akciu umožňovalo. Je vyžadované oprávnenie editovať stránku."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
@@ -173,7 +174,7 @@ msgstr ""
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Nevalídny typ pluginu '%s'"
 
 msgid "Language must be set to a supported language!"
 msgstr "Jazyk musí byť medzi podporovanými jazykmi"
@@ -1282,6 +1283,9 @@ msgstr ""
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr ""
 
@@ -1299,6 +1303,10 @@ msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
+msgstr ""
+
+#| msgid "Structure"
+msgid "Structureboard"
 msgstr ""
 
 #| msgid "static placeholders"
@@ -1557,7 +1565,7 @@ msgid "Namespaced App"
 msgstr ""
 
 msgid "Parent app"
-msgstr ""
+msgstr "Rodičovnská app"
 
 msgid "Child app"
 msgstr ""
@@ -1578,51 +1586,51 @@ msgid "sample my profile page"
 msgstr ""
 
 msgid "Static Menu"
-msgstr ""
+msgstr "Statické Menu"
 
 msgid "Static Menu2"
-msgstr ""
+msgstr "Statické Menu2"
 
 msgid "Static Menu3"
-msgstr ""
+msgstr "Statické Menu3"
 
 #| msgid "Static Menu"
 msgid "Static Menu4"
-msgstr ""
+msgstr "Statické Menu4"
 
 msgid "Category"
-msgstr ""
+msgstr "Kategória"
 
 msgid "Categories"
-msgstr ""
+msgstr "Kategórie"
 
 msgid "Add Category"
-msgstr ""
+msgstr "Pridať Kategóriu"
 
 msgid "^account/$"
-msgstr ""
+msgstr "^účet/$"
 
 msgid "Change Category"
-msgstr ""
+msgstr "Zmeniť Kategóriu"
 
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "Ďakujeme, že ste dnes strávili nejaký čas s Web stránkou."
 
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Zdediť šablónu od najbližšieho predchodcu"
 
 msgid "UserSettings"
-msgstr ""
+msgstr "Uživateľské nastavenie"
 
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "Pridať plugin na miesto \"%(placeholder_label)s\""
 
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "Pridať plugin do %(plugin_name)s"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - Vaše užívateľské konto bolo vytvorené."
@@ -1632,31 +1640,31 @@ msgstr "CMS - Vaše užívateľské konto bolo zmenené."
 
 #, python-format
 msgid "This placeholder already has the maximum number of plugins (%s)."
-msgstr ""
+msgstr "Toto miesto už obsahuje maximálny počet pluginov (%s)"
 
 #, python-format
 msgid ""
 "This placeholder already has the maximum number (%(limit)s) of allowed "
 "%(plugin_name)s plugins."
-msgstr ""
+msgstr "Toto miesto už obsahuje maximálny počet (%(limit)s) z %(plugin_name)spovolených pluginov."
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "Nepodarilo sa nájsť špecifikovaný CMS_REQUEST_IP_RESOLVER modul: \"{0}\"."
 
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
-msgstr ""
+msgstr "Nepodarilo sa nájsť špecifikovanu CMS_REQUEST_IP_RESOLVER funkciu: \"{0}\" v module \"{1}\"."
 
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "Vytvoriť novú %sinštanciu."
 
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
+msgstr "Sprievodca už bol registrovaný pre model: %s"
 
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."

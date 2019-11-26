@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-25 09:43+0200\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2019-11-19 11:09+0100\n"
+"PO-Revision-Date: 2019-11-13 08:54+0000\n"
+"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
 "Language-Team: Albanian (http://www.transifex.com/divio/django-cms/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1277,6 +1277,9 @@ msgstr ""
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr ""
 
@@ -1294,6 +1297,10 @@ msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
+msgstr ""
+
+#| msgid "Structure"
+msgid "Structureboard"
 msgstr ""
 
 #| msgid "static placeholders"
