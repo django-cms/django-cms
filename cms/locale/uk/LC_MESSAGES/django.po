@@ -26,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-25 09:43+0200\n"
-"PO-Revision-Date: 2019-07-20 17:50+0000\n"
+"POT-Creation-Date: 2019-11-19 11:09+0100\n"
+"PO-Revision-Date: 2019-11-13 09:16+0000\n"
 "Last-Translator: tarasyyyk <taras.korzhak96@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -1297,6 +1297,9 @@ msgstr "Гарячі клавіші"
 msgid "The page was changed in the meantime, reloading..."
 msgstr "Сторінку було змінено, перезавантаження..."
 
+msgid "CMS-wide Shortcuts"
+msgstr "Гарячі клавіші CMS"
+
 msgid "Bring up this help dialog"
 msgstr "Достати цей діалог допомоги"
 
@@ -1315,6 +1318,10 @@ msgstr "Відкрити діалог \"Створити\""
 
 msgid "Focus on Toolbar"
 msgstr "Зфокусувати на Панелі"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
