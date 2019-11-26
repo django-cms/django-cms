@@ -35,6 +35,10 @@
     {% endif %}
 {% endblock %}
 
+{% block before_body %}
+<div class="entry-meta" hidden><a class="entry-date published">{{ article.publishing_date|date:"F j, Y" }}</a></div>
+{% endblock %}
+
 {% block feature %}
 <div class="page-header">
     <div class="container">

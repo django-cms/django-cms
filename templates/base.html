@@ -1,52 +1,40 @@
 {% load i18n staticfiles cms_tags sekizai_tags privacy %}
-<!doctype html>
+<!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="x-ua-compatible" content="ie=edge">
-    <title>
-        {# TODO proper extension #}
-        {% block title %}
-            {% page_attribute page_title %} - {{ request.site.name }}
-        {% endblock title %}
-    </title>
-    {% block meta_tags %}
-        <meta name="viewport" content="width=device-width,initial-scale=1">
-        {% block meta_description %}
-            {% page_attribute meta_description as meta_description %}
-            {% if meta_description and meta_description != 'None' %}
-            <meta name="description" content="{{ meta_description }}">
-            {% endif %}
-        {% endblock %}
-    {% endblock meta_tags %}
-    {% block canonical %}
-    {% if request and request.current_page %}
-    {# always use https as canonical for google #}
-    <link rel="canonical" href="https://{{ request.get_host }}{% if article %}{{ article.get_absolute_url }}{% else %}{% page_url request.current_page %}{% endif %}">
-    {% endif %}
-    {% endblock %}
-    <link rel="icon" type="image/png" href="{% static 'favicon.png' %}">
-    <!--[if IE]><link rel="shortcut icon" href="{% static 'favicon.ico' %}"><![endif]-->
-    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-icon-180x180.png' %}">
-    <link rel="icon" type="image/png" sizes="192x192"  href="{% static 'android-icon-192x192.png' %}">
-    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
-    <link rel="icon" type="image/png" sizes="96x96" href="{% static 'favicon-96x96.png' %}">
-    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
-    <meta name="msapplication-TileColor" content="#ffffff">
-    <meta name="msapplication-TileImage" content="{% static 'ms-icon-144x144.png' %}">
-    <meta name="theme-color" content="#ffffff">
-    <meta name="google-site-verification" content="nMw81ePBf_YjYHq2mEoj3mzKxwQRl4uy1CnQ2hno7Nc">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge" />
+        <title>
+            {# TODO proper extension #} {% block title %} {% page_attribute page_title %} - {{ request.site.name }} {% endblock title %}
+        </title>
+        {% block meta_tags %}
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        {% block meta_description %} {% page_attribute meta_description as meta_description %} {% if meta_description and meta_description != 'None' %}
+        <meta name="description" content="{{ meta_description }}" />
+        {% endif %} {% endblock %} {% endblock meta_tags %} {% block canonical %} {% if request and request.current_page %} {# always use https as canonical for google #}
+        <link rel="canonical" href="https://{{ request.get_host }}{% if article %}{{ article.get_absolute_url }}{% else %}{% page_url request.current_page %}{% endif %}" />
+        {% endif %} {% endblock %}
+        <link rel="icon" type="image/png" href="{% static 'favicon.png' %}" />
+        <!--[if IE]><link rel="shortcut icon" href="{% static 'favicon.ico' %}"/><![endif]-->
+        <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-icon-180x180.png' %}" />
+        <link rel="icon" type="image/png" sizes="192x192" href="{% static 'android-icon-192x192.png' %}" />
+        <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}" />
+        <link rel="icon" type="image/png" sizes="96x96" href="{% static 'favicon-96x96.png' %}" />
+        <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="msapplication-TileImage" content="{% static 'ms-icon-144x144.png' %}" />
+        <meta name="theme-color" content="#ffffff" />
+        <meta name="google-site-verification" content="nMw81ePBf_YjYHq2mEoj3mzKxwQRl4uy1CnQ2hno7Nc" />
 
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-    <link rel="preconnect" href="https://cdn.segment.com/" crossorigin>
-    <link rel="dns-prefetch" href="{{ MEDIA_URL }}">
-    <link rel="preload" href="{% static "js/dist/base.bundle.js" %}" as="script">
-    <link rel="preload" href="{% static 'css/base.css' %}" as="style">
+        <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin />
+        <link rel="preconnect" href="https://cdn.segment.com/" crossorigin />
+        <link rel="dns-prefetch" href="{{ MEDIA_URL }}" />
+        <link rel="preload" href="{% static "js/dist/base.bundle.js" %}" as="script">
+        <link rel="preload" href="{% static 'css/base.css' %}" as="style" />
 
-    {% render_block "css" %}
-    {% if request.toolbar and request.toolbar.edit_mode_active %}
-        <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,900&subset=latin" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'css/base.css' %}">
+        {% render_block "css" %} {% if request.toolbar and request.toolbar.edit_mode_active %}
+        <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,900&subset=latin" rel="stylesheet" />
+        <link rel="stylesheet" href="{% static 'css/base.css' %}" />
         <style type="text/css">
             /* TMP */
             @media (min-width: 1602px) {
@@ -58,50 +46,33 @@
                 }
             }
         </style>
-    {% else %}
-        {% include 'includes/css.html' %}
-    {% endif %}
-    {% block extrahead %}{% endblock %}
-    {{ ALDRYN_SNAKE.render_head }}
-</head>
-<body id="page-top" class="no-js lang-{{ LANGUAGE_CODE }} {% block body_class %}tpl-root{% endblock %}">
-{% cms_toolbar %}
-
-{% include "includes/banner.html" %}
-
-{% block extend_root %}{% endblock %}
-
-{% if not request.toolbar or not request.toolbar.edit_mode_active %}
-    <noscript id="deferred-styles">
-        <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,900&subset=latin" rel="stylesheet">
-        <link rel="stylesheet" href="{% static 'css/base.css' %}">
-    </noscript>
-    <script>
-        var loadDeferredStyles = function() {
-        var addStylesNode = document.getElementById("deferred-styles");
-        var replacement = document.createElement("div");
-        replacement.innerHTML = addStylesNode.textContent;
-        document.body.appendChild(replacement)
-        addStylesNode.parentElement.removeChild(addStylesNode);
-        };
-        var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-            window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-        if (raf) raf(function() { window.setTimeout(loadDeferredStyles, 0); });
-        else window.addEventListener('load', loadDeferredStyles);
-    </script>
-{% endif %}
-<script defer src="{% static 'js/dist/base.bundle.js' %}"></script>
-{% render_block "js" %}
-{% if request.toolbar and request.toolbar.edit_mode_active %}
-    <script defer src="{% static 'js/dist/cms.bundle.js' %}"></script>
-{% endif %}
-{% block extrafoot %}{% endblock %}
-{{ ALDRYN_SNAKE.render_tail }}
-{% include "includes/browser.html" %}
-{% include 'django_privacy_mgmt/banner.html' %}
-{% render_privacy_settings_modal %}
-{% include "includes/analytics.html" %}
-{% include "includes/tracking_protection_modal.html" %}
-{% render_block "footer" %}
-</body>
+        {% else %} {% include 'includes/css.html' %} {% endif %} {% block extrahead %}{% endblock %} {{ ALDRYN_SNAKE.render_head }}
+    </head>
+    <body id="page-top" class="no-js lang-{{ LANGUAGE_CODE }} {% block body_class %}tpl-root{% endblock %}">
+        {% block before_body %}{% endblock %} {% cms_toolbar %} {% include "includes/banner.html" %} {% block extend_root %}{% endblock %} {% if not request.toolbar or not request.toolbar.edit_mode_active %}
+        <noscript id="deferred-styles">
+            <link href="https://fonts.googleapis.com/css?family=Nunito:400,700,900&subset=latin" rel="stylesheet" />
+            <link rel="stylesheet" href="{% static 'css/base.css' %}" />
+        </noscript>
+        <script>
+            var loadDeferredStyles = function() {
+                var addStylesNode = document.getElementById("deferred-styles");
+                var replacement = document.createElement("div");
+                replacement.innerHTML = addStylesNode.textContent;
+                document.body.appendChild(replacement);
+                addStylesNode.parentElement.removeChild(addStylesNode);
+            };
+            var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
+            if (raf)
+                raf(function() {
+                    window.setTimeout(loadDeferredStyles, 0);
+                });
+            else window.addEventListener("load", loadDeferredStyles);
+        </script>
+        {% endif %}
+        <script defer src="{% static 'js/dist/base.bundle.js' %}"></script>
+        {% render_block "js" %} {% if request.toolbar and request.toolbar.edit_mode_active %}
+        <script defer src="{% static 'js/dist/cms.bundle.js' %}"></script>
+        {% endif %} {% block extrafoot %}{% endblock %} {{ ALDRYN_SNAKE.render_tail }} {% include "includes/browser.html" %} {% include 'django_privacy_mgmt/banner.html' %} {% render_privacy_settings_modal %} {% include "includes/analytics.html" %} {% include "includes/tracking_protection_modal.html" %} {% render_block "footer" %}
+    </body>
 </html>
