@@ -1,16 +1,11 @@
-{% load i18n staticfiles thumbnail apphooks_config_tags %}
-
-{% if author and author.slug %}
+{% load i18n staticfiles thumbnail apphooks_config_tags %} {% if author and author.slug %}
 <span class="author">
-    {% if author.visual %}
-        {% thumbnail author.visual "50x50" crop upscale subject_location=author.visual.subject_location as author_image %}
-        <img class="rounded-circle img-fluid" src="{{ author_image.url }}" alt="{{ author }}">
-    {% else %}
-        <img class="rounded-circle img-fluid" src="{% static "img/aldryn_newsblog/no-photo.png" %}" alt="{{ author }}">
-    {% endif %}
-    <div class="author-meta">
+    {% if author.visual %} {% thumbnail author.visual "50x50" crop upscale subject_location=author.visual.subject_location as author_image %}
+    <img class="rounded-circle img-fluid" src="{{ author_image.url }}" alt="{{ author }}" />
+    {% else %} <img class="rounded-circle img-fluid" src="{% static "img/aldryn_newsblog/no-photo.png" %}" alt="{{ author }}"> {% endif %}
+    <div class="author-meta postmetadata entry-meta">
         <span>{{ author.name }}</span>
-        <span class="text-muted">{{ article.publishing_date|date }}</span>
+        <span class="text-muted updated entry-date published">{{ article.publishing_date|date }}</span>
     </div>
 </span>
 {% endif %}

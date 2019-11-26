@@ -77,7 +77,11 @@
                     {% render_model article "lead_in" %}
                 </div>
                 {% endif %}
-
+                <hr />
+                <div class="postmetadata entry-meta">
+                    {% include "aldryn_newsblog/includes/author.html" with author=article.author %}
+                </div>
+                <hr />
                 <div class="text-block">
                     {% render_placeholder article.content language placeholder_language %}
                 </div>
