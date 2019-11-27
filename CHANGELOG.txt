@@ -2,6 +2,7 @@
 
 * Introduced Django 2.2 support.
 * Fixed test suite.
+* Fixed migrations fail on multiple databases
 
 
 === 3.6.0 (2019-01-29) ===
