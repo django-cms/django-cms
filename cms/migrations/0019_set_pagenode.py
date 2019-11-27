@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations
+from django.db import router
 
 from . import IrreversibleMigration
 
@@ -63,6 +64,8 @@ class Migration(IrreversibleMigration):
 
     def apply(self, project_state, schema_editor, collect_sql=False):
         connection = schema_editor.connection
+        if not router.allow_migrate(connection.alias, self.app_label):
+            return project_state
         column_names = [
             column.name for column in
             connection.introspection.get_table_description(connection.cursor(), 'cms_page')

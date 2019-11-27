@@ -6,6 +6,7 @@ import django
 import django.contrib.auth.models
 from django.db import migrations, models
 import django.db.models.deletion
+from django.db import router
 
 from . import IrreversibleMigration
 
@@ -61,6 +62,8 @@ class Migration(IrreversibleMigration):
 
     def apply(self, project_state, schema_editor, collect_sql=False):
         connection = schema_editor.connection
+        if not router.allow_migrate(connection.alias, self.app_label):
+            return project_state
         column_names = [
             column.name for column in
             connection.introspection.get_table_description(connection.cursor(), 'cms_page')
