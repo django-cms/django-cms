@@ -1352,33 +1352,10 @@ class StructureBoard {
         if (scriptSrcList.length === 0) {
             that.triggerLoadEventsByClass(classListCollection);
         } else {
-            that.getMultiScripts(scriptSrcList).done(function() {
+            Promise.all(scriptSrcList.map(s => $.getScript(s))).then(function() {
                 that.triggerLoadEventsByClass(classListCollection);
             });
         }
-    }
-
-    /**
-     * Downloads and executes all scripts given by `scriptSrcList` and returns a
-     * `Promise` when all are done. This is to prevent multiple triggering of
-     * load events by `triggerLoadEventsByClass` in `addJsScriptsNeededForRender`.
-     * Original solution from https://stackoverflow.com/a/11803418
-     *
-     * @param {String[]} scriptSrcList   Array of script sources
-     *
-     * @returns {Promise}
-     */
-    getMultiScripts(scriptSrcList) {
-        let _arr = $.map(scriptSrcList, function(scr) {
-            return $.getScript(scr);
-        });
-
-        // eslint-disable-next-line new-cap
-        _arr.push($.Deferred(function(deferred) {
-            $(deferred.resolve);
-        }));
-
-        return $.when.apply($, _arr);
     }
 
     /**
