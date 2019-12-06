@@ -1271,8 +1271,8 @@ class StructureBoard {
         }
         var fixedContentMarkup = contentMarkup;
         var newDoc = new DOMParser().parseFromString(fixedContentMarkup, 'text/html');
-        let new_scripts = $(newDoc).find('script');
-        let old_scripts = $(document).find('script');
+        let newScripts = $(newDoc).find('script');
+        let oldScripts = $(document).find('script');
 
         const structureScrollTop = $('.cms-structure-content').scrollTop();
 
@@ -1298,7 +1298,7 @@ class StructureBoard {
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
 
-        this.addJsScriptsNeededForRender(new_scripts, old_scripts);
+        this.addJsScriptsNeededForRender(newScripts, oldScripts);
 
         $('.cms-structure-content').scrollTop(structureScrollTop);
         Plugin._refreshPlugins();
@@ -1309,43 +1309,43 @@ class StructureBoard {
 
     /**
      * Checks if new scripts with the class 'cms-execute-js-to-render' exist
-     * and if the were present befor. If they weren't present before the will be downloaded
-     * and executed. If ther script also has the class 'cms-trigger-load-events' the
+     * and if they were present before. If they weren't present before - they will be downloaded
+     * and executed. If the script also has the class 'cms-trigger-load-events' the
      * 'load' and 'DOMContentLoaded' events will be triggered
      *
-     * @param {JQuery} new_scripts  JQuery selector of the scripts for the new body content
-     * @param {JQuery} old_scripts  JQuery selector of the scripts for the old body content
+     * @param {jQuery} newScripts  jQuery selector of the scripts for the new body content
+     * @param {jQuery} oldScripts  jQuery selector of the scripts for the old body content
      */
-    addJsScriptsNeededForRender(new_scripts, old_scripts) {
+    addJsScriptsNeededForRender(newScripts, oldScripts) {
         const scriptSrcList = [];
         let classListCollection = [];
         const that = this;
 
-        new_scripts.each(function() {
-            let script_exists = false;
-            let new_script = $(this);
+        newScripts.each(function() {
+            let scriptExists = false;
+            let newScript = $(this);
 
-            if (new_script.hasClass('cms-execute-js-to-render')) {
-                $(old_scripts).each(function() {
-                    let old_script = $(this);
+            if (newScript.hasClass('cms-execute-js-to-render')) {
+                $(oldScripts).each(function() {
+                    let oldScript = $(this);
 
-                    if (new_script.prop('outerHTML') === old_script.prop('outerHTML')) {
-                        script_exists = true;
+                    if (newScript.prop('outerHTML') === oldScript.prop('outerHTML')) {
+                        scriptExists = true;
                         return false;
                     }
                 });
-                if (!script_exists) {
-                    let classList = new_script.attr('class').split(' ');
+                if (!scriptExists) {
+                    let classList = newScript.attr('class').split(' ');
 
                     classListCollection = classListCollection.concat(classList);
-                    if (typeof new_script.prop('src') === 'string' && new_script.prop('src') !== '') {
-                        scriptSrcList.push(new_script.prop('src'));
+                    if (typeof newScript.prop('src') === 'string' && newScript.prop('src') !== '') {
+                        scriptSrcList.push(newScript.prop('src'));
                     } else {
-                        let js_file = document.createElement('script');
+                        let jsFile = document.createElement('script');
 
-                        js_file.textContent = new_script.prop('textContent') || '';
-                        js_file.type = 'text/javascript';
-                        document.body.appendChild(js_file);
+                        jsFile.textContent = newScript.prop('textContent') || '';
+                        jsFile.type = 'text/javascript';
+                        document.body.appendChild(jsFile);
                     }
                 }
             }
@@ -1365,7 +1365,7 @@ class StructureBoard {
      * load events by `triggerLoadEventsByClass` in `addJsScriptsNeededForRender`.
      * Original solution from https://stackoverflow.com/a/11803418
      *
-     * @param {array} scriptSrcList   Array of script sources
+     * @param {String[]} scriptSrcList   Array of script sources
      *
      * @returns {Promise}
      */
@@ -1386,7 +1386,7 @@ class StructureBoard {
      * Triggers events if specific classes were in any of the scripts added by
      * the method addJsScriptsNeededForRender
      *
-     * @param {object} classListCollection  array of all classes the script tags had
+     * @param {String[]} classListCollection  array of all classes the script tags had
      */
     triggerLoadEventsByClass(classListCollection) {
         if (classListCollection.indexOf('cms-trigger-event-document-DOMContentLoaded') > -1) {
