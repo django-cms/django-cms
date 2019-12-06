@@ -59,7 +59,6 @@ class StructureBoard {
         this.state = false;
         this.dragging = false;
         this.latestAction = [];
-        this.trigger_window_load_event = true;
         ls.remove(storageKey);
 
         dd = new DiffDOM();
