@@ -440,6 +440,9 @@ class Page(models.Model):
         with force_language(language):
             if self.is_home:
                 return reverse('pages-root')
+            title = self.get_title_obj(language=language, fallback=fallback)
+            if title.redirect:
+                return title.redirect
             path = self.get_path(language, fallback) or self.get_slug(language, fallback)
             return reverse('pages-details-by-slug', kwargs={"slug": path})
 
