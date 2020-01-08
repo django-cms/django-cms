@@ -35,8 +35,14 @@ def add_builtin_arguments(parser):
         help='A directory to add to the Python path, e.g. "/home/djangoprojects/myproject".')
     parser.add_argument('--traceback', action='store_true',
         help='Raise on CommandError exceptions')
-    parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
-        help="Don't colorize the command output.")
+    parser.add_argument(
+        '--no-color', action='store_true', dest='no_color', default=False,
+        help="Don't colorize the command output."
+    )
+    parser.add_argument(
+        '--force-color', action='store_true', dest='force_color', default=False,
+        help="Force colorize of command output."
+    )
 
 
 class SubcommandsCommand(BaseCommand):
