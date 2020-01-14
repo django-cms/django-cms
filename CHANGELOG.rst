@@ -3,11 +3,15 @@ Changelog
 =========
 
 
-3.7.1 (2019-11-26)
+3.8.0 (unreleased)
 ==================
 
 * removed ``python_2_unicode_compatible``
 * migrated from ``django.utils.six`` to the six package
+* render_to_response replaced with TemplateResponse in cms.views
+* migrated from ``django.utils.lru_cache`` to ``functools.lru_cache``
+* added ``cms.utils.compat.dj.available_attrs``
+* replace ``staticfiles`` and ``admin_static`` with ``static``
 
 
 3.7.1 (2019-11-26)
