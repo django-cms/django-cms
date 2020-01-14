@@ -10,11 +10,12 @@ from django.db import models
 from django.db.models import ManyToManyField, Model
 from django.db.models.base import ModelBase
 from django.urls import NoReverseMatch
-from django.utils import six, timezone
+from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _
+
+from six import text_type, with_metaclass
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
@@ -91,7 +92,7 @@ class PluginModelBase(ModelBase):
         return new_class
 
 
-class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
+class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.

@@ -1,5 +1,6 @@
 import os
-from django.utils import six
+
+from six import StringIO
 
 from pyflakes import api
 from pyflakes.checker import Checker
@@ -41,7 +42,7 @@ def pyflakes(packages):
     Checker.___init___ = Checker.__init__
     Checker.__init__ = _pyflakes_no_migrations
     Checker.report = _pyflakes_report_with_nopyflakes
-    out = six.StringIO()
+    out = StringIO()
     reporter = Reporter(out, out)
     paths = [os.path.dirname(package.__file__) for package in packages]
     return _check_recursive(paths, reporter), out.getvalue()

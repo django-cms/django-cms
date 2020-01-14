@@ -6,6 +6,13 @@ Changelog
 3.7.1 (2019-11-26)
 ==================
 
+* removed ``python_2_unicode_compatible``
+* migrated from ``django.utils.six`` to the six package
+
+
+3.7.1 (2019-11-26)
+==================
+
 * Added code of conduct reference file to the root directory
 * Moved contributing file to the root directory
 * Added better templates for new issue requests
