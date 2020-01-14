@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.translation import ugettext_lazy as _
 
 from cms.constants import PUBLISHER_STATE_DIRTY
@@ -9,7 +8,6 @@ from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 
 
-@python_2_unicode_compatible
 class Title(models.Model):
     # These are the fields whose values are compared when saving
     # a Title object to know if it has changed.

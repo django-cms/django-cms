@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 from cms.models import Page
@@ -177,7 +177,6 @@ class AbstractPagePermission(models.Model):
         return permissions_by_action
 
 
-@python_2_unicode_compatible
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
@@ -204,7 +203,6 @@ class GlobalPagePermission(AbstractPagePermission):
         return "%s :: GLOBAL" % self.audience
 
 
-@python_2_unicode_compatible
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
     """

@@ -2,12 +2,10 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from cms.models import CMSPlugin
 
 
-@python_2_unicode_compatible
 class Link(CMSPlugin):
     name = models.CharField(
         verbose_name='Display name',

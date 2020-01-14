@@ -13,7 +13,7 @@ from django.core.exceptions import (
     ValidationError,
 )
 from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
+from django.utils.encoding import force_text, smart_str
 from django.utils.html import escapejs
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -101,7 +101,6 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
-@python_2_unicode_compatible
 class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""

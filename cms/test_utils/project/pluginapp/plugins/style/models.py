@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from cms.models import CMSPlugin
 
@@ -17,7 +16,6 @@ TAG_CHOICES = [
 TAG_CHOICES = tuple((entry, entry) for entry in TAG_CHOICES)
 
 
-@python_2_unicode_compatible
 class Style(CMSPlugin):
     """
     Renders a given ``TAG_CHOICES`` element with additional attributes

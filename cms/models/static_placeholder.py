@@ -4,7 +4,6 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils import six
 from django.utils.translation import ugettext_lazy as _
 
@@ -20,7 +19,6 @@ def static_slotname(instance):
     return instance.code
 
 
-@python_2_unicode_compatible
 class StaticPlaceholder(models.Model):
     CREATION_BY_TEMPLATE = 'template'
     CREATION_BY_CODE = 'code'

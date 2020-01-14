@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
@@ -36,7 +36,6 @@ from treebeard.mp_tree import MP_Node
 logger = getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class TreeNode(MP_Node):
 
     parent = models.ForeignKey(
@@ -145,7 +144,6 @@ class TreeNode(MP_Node):
             child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
-@python_2_unicode_compatible
 class Page(models.Model):
     """
     A simple hierarchical page model

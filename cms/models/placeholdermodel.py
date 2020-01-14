@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.db import models
 from django.template.defaultfilters import title
 from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 from cms.cache.placeholder import clear_placeholder_cache
@@ -26,7 +26,6 @@ from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
 
-@python_2_unicode_compatible
 class Placeholder(models.Model):
     """
     Attributes:
