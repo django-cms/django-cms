@@ -28,15 +28,7 @@ def ensure_urlconf_is_up_to_date():
     if not local_revision:
         set_local_revision(global_revision)
     elif global_revision != local_revision:
-        if settings.DEBUG:
-            print("   New revision!!!! RELOAD!\n"
-                  "      {0} ({1})\n"
-                  "   -> {2} ({3})".format(
-                      global_revision, type(global_revision),
-                      local_revision, type(local_revision),))
-        debug_check_url('my_test_app_view')
         reload_urlconf(new_revision=global_revision)
-        debug_check_url('my_test_app_view')
 
 
 def get_local_revision(default=None):
@@ -52,9 +44,7 @@ def set_local_revision(revision):
     if use_threadlocal:
         if revision:
             _urlconf_revision_threadlocal.value = revision
-            print('======= SET =====    ', get_local_revision())
         else:
-            print('======= DEL =====    ', revision)
             if hasattr(_urlconf_revision_threadlocal, "value"):
                 del _urlconf_revision_threadlocal.value
     else:
@@ -96,14 +86,3 @@ def reload_urlconf(urlconf=None, new_revision=None):
     get_app_patterns()
     if new_revision is not None:
         set_local_revision(new_revision)
-
-
-def debug_check_url(url_name):
-    if settings.DEBUG:
-        try:
-            print("""    reverse('{0}'): {1} """.format(
-                url_name,
-                reverse('my_test_app_view'),
-            ))
-        except Exception as e:
-            print("reverse('{0}'): {1}".format(url_name, e,))
