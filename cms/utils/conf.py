@@ -210,7 +210,7 @@ def _ensure_languages_settings(languages):
                     )
 
             if 'fallbacks' not in language_object:
-                if default_fallbacks:
+                if isinstance(default_fallbacks, list):
                     language_object['fallbacks'] = default_fallbacks
                 else:
                     needs_fallbacks.append((site, language_object))
