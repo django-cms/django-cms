@@ -990,7 +990,7 @@ class Page(models.Model):
             self.mark_descendants_as_published(language)
 
         if language in self.title_cache:
-            del self.title_cache[language]
+            self._clear_internal_cache()
 
         # fire signal after publishing is done
         import cms.signals as cms_signals

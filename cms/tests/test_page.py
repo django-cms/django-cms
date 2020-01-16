@@ -1146,6 +1146,30 @@ class PagesTestCase(TransactionCMSTestCase):
             self.assertContains(resp, public_text)
             self.assertNotContains(resp, draft_text)
 
+    def test_get_title_obj_after_publish(self):
+        """
+        Reproduce issue with internal title cache after publish
+        """
+        override_settings = {
+            "CMS_LANGUAGES": {
+                1: [
+                    {"code": "en", "name": "English", "fallbacks": []},
+                    {"code": "de", "name": "German", "fallbacks": ["en"]},
+                ]
+            }
+        }
+        with self.settings(**override_settings):
+            home_page = create_page("Home", "simple.html", "en")
+            create_title("de", "Hause", home_page)
+            home_page.publish("en")
+            home_page.publish("de")
+            sub_page = create_page("sub", "simple.html", "en")
+            create_title("de", "subde", sub_page)
+
+            self.assertEqual(sub_page.get_title_obj("de").path, "subde")
+            sub_page.publish("de")
+            self.assertEqual(sub_page.get_title_obj("de").path, "subde")
+
 
 class PageTreeTests(CMSTestCase):
 
