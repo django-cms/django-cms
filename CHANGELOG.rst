@@ -6,12 +6,13 @@ Changelog
 3.8.0 (unreleased)
 ==================
 
-* removed ``python_2_unicode_compatible``
 * migrated from ``django.utils.six`` to the six package
-* render_to_response replaced with TemplateResponse in cms.views
 * migrated from ``django.utils.lru_cache`` to ``functools.lru_cache``
+* migrated from ``render_to_response`` to ``TemplateResponse`` in ``cms.views``
 * added ``cms.utils.compat.dj.available_attrs``
-* replace ``staticfiles`` and ``admin_static`` with ``static``
+* added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
+* replaced ``staticfiles`` and ``admin_static`` with ``static``
+* removed ``python_2_unicode_compatible``
 
 
 3.7.1 (2019-11-26)
