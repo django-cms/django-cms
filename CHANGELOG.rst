@@ -8,7 +8,7 @@ Changelog
 
 * migrated from ``django.utils.six`` to the six package
 * migrated from ``django.utils.lru_cache`` to ``functools.lru_cache``
-* migrated from ``render_to_response`` to ``TemplateResponse`` in ``cms.views``
+* migrated from ``render_to_response`` to ``render`` in ``cms.views``
 * added ``cms.utils.compat.dj.available_attrs``
 * added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
 * replaced ``staticfiles`` and ``admin_static`` with ``static``

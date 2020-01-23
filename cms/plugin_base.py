@@ -2,7 +2,7 @@
 import json
 import re
 
-from django.template.response import TemplateResponse
+from django.shortcuts import render as render_to_response
 
 from django import forms
 from django.contrib import admin
@@ -303,8 +303,8 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
         if extra_context:
             context.update(extra_context)
-        return TemplateResponse(
-            'admin/cms/page/plugin/confirm_form.html', context
+        return render_to_response(
+            request, 'admin/cms/page/plugin/confirm_form.html', context
         )
 
     def save_model(self, request, obj, form, change):
