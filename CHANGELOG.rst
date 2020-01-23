@@ -12,7 +12,6 @@ Changelog
 * added ``cms.utils.compat.dj.available_attrs``
 * added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
 * replaced ``staticfiles`` and ``admin_static`` with ``static``
-* removed ``python_2_unicode_compatible``
 
 
 3.7.1 (2019-11-26)

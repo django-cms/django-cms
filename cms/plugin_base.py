@@ -16,7 +16,7 @@ from django.utils.encoding import force_text, smart_str
 from django.utils.html import escapejs
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from six import with_metaclass
+from six import with_metaclass, python_2_unicode_compatible
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -25,6 +25,7 @@ from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
 from cms.utils.conf import get_cms_setting
 
 
+@python_2_unicode_compatible
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     """
     Ensure the CMSPlugin subclasses have sane values and set some defaults if

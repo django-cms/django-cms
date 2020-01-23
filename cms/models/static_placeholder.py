@@ -6,7 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from six import text_type
+from six import text_type, python_2_unicode_compatible
 
 from cms.models.fields import PlaceholderField
 from cms.utils.copy_plugins import copy_plugins_to
@@ -20,6 +20,7 @@ def static_slotname(instance):
     return instance.code
 
 
+@python_2_unicode_compatible
 class StaticPlaceholder(models.Model):
     CREATION_BY_TEMPLATE = 'template'
     CREATION_BY_CODE = 'code'

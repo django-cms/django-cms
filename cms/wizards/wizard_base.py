@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 import hashlib
 
 from django.core.exceptions import ImproperlyConfigured
@@ -11,7 +10,10 @@ from django.utils.translation import override as force_language, ugettext as _
 
 from cms.utils.conf import get_cms_setting
 
+from six import python_2_unicode_compatible
 
+
+@python_2_unicode_compatible
 class WizardBase(object):
     template_name = None
 

@@ -2,7 +2,10 @@ from django.db import models
 
 from cms.models import CMSPlugin
 
+from six import python_2_unicode_compatible
 
+
+@python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=50)
     section = models.ForeignKey('Section', on_delete=models.CASCADE)
@@ -11,6 +14,7 @@ class Article(models.Model):
         return u"%s -- %s" % (self.title, self.section)
 
 
+@python_2_unicode_compatible
 class Section(models.Model):
     name = models.CharField(max_length=50)
 
@@ -18,6 +22,7 @@ class Section(models.Model):
         return self.name
 
 
+@python_2_unicode_compatible
 class ArticlePluginModel(CMSPlugin):
     title = models.CharField(max_length=50)
     sections = models.ManyToManyField('Section')

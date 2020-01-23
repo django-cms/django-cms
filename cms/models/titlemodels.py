@@ -7,7 +7,10 @@ from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 
+from six import python_2_unicode_compatible
 
+
+python_2_unicode_compatible
 class Title(models.Model):
     # These are the fields whose values are compared when saving
     # a Title object to know if it has changed.
