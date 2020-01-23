@@ -17,6 +17,6 @@ sphinxcontrib-spelling
 pyflakes==1.1.0
 pyenchant
 # required to run the server for integration tests
-djangocms-helper
+django-app-helper
 mock>=2.0.0
 django-formtools
