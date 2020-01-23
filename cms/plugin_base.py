@@ -25,7 +25,6 @@ from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
 from cms.utils.conf import get_cms_setting
 
 
-@python_2_unicode_compatible
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     """
     Ensure the CMSPlugin subclasses have sane values and set some defaults if
@@ -103,6 +102,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
+@python_2_unicode_compatible
 class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""

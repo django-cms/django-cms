@@ -10,7 +10,7 @@ from django.template.defaultfilters import title
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
-from six import string_types
+from six import string_types, python_2_unicode_compatible
 
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
@@ -27,6 +27,7 @@ from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
 
+@python_2_unicode_compatible
 class Placeholder(models.Model):
     """
     Attributes:

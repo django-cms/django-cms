@@ -3,8 +3,10 @@ from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
 from cms.utils.copy_plugins import copy_plugins_to
 from django.db import models
+from six import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class PlaceholderReference(CMSPlugin):
     cmsplugin_ptr = models.OneToOneField(
         CMSPlugin,
