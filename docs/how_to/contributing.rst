@@ -86,9 +86,9 @@ Let's start with something simple. We'll assume you have set up your environment
 Let's say you want to test the behaviour of the ``CMSPluginBase.render`` method:
 
 .. code-block:: python
-    import six
+    from six import with_metaclass
 
-    class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
+    class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
         ...
 
