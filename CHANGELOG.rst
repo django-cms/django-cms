@@ -29,6 +29,7 @@ Changelog
 * Improved documentation related to nested plugins.
 * Updated installation tutorial.
 * Fixed a simple typo in the docstring for ``cms.utils.helpers.normalize_name``.
+* Changed pyenchant version in the base_requirement.txt to pre-release 3.0.0a1
 
 
 3.7.0 (2019-09-25)
