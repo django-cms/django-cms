@@ -7,6 +7,7 @@ from django.urls import Resolver404, resolve, reverse
 from cms import __version__
 from cms import constants
 from cms.cache.page import set_page_cache
+from cms.models import EmptyPageContent
 from cms.utils.page import get_page_template_from_request
 from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 
@@ -21,7 +22,11 @@ def render_page(request, page, current_language, slug):
     context['has_change_permissions'] = user_can_change_page(request.user, page)
     context['has_view_permissions'] = user_can_view_page(request.user, page)
 
-    if not context['has_view_permissions']:
+    cant_view_page = any([
+        not context['has_view_permissions'],
+        isinstance(page.get_title_obj(current_language), EmptyPageContent)
+    ])
+    if cant_view_page:
         return _handle_no_page(request)
 
     template = get_page_template_from_request(request)

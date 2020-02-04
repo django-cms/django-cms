@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.cache import cache
+from django.http.response import Http404
 from django.test.utils import override_settings
 
 from sekizai.context import SekizaiContext
@@ -7,7 +8,7 @@ from sekizai.context import SekizaiContext
 from cms import plugin_rendering
 from cms.api import create_page, add_plugin
 from cms.cache.placeholder import get_placeholder_cache
-from cms.models import Page, Placeholder
+from cms.models import EmptyPageContent, Page, Placeholder
 from cms.plugin_rendering import PluginContext
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
@@ -40,6 +41,44 @@ def sample_plugin_context_processor(instance, placeholder, original_context):
     }
 
 
+
+@override_settings(
+    CMS_TEMPLATES=[
+        (TEMPLATE_NAME, TEMPLATE_NAME),
+        ('extra_context.html', 'extra_context.html')
+    ],
+)
+class RenderingEmptyTestCase(CMSTestCase):
+    def setUp(self):
+        super().setUp()
+        self.test_data = {
+            'title': 'RenderingTestCase-title',
+            'slug': 'renderingtestcase-slug',
+            'reverse_id': 'renderingtestcase-reverse-id',
+        }
+
+        self.user = self.get_superuser()
+        self.client.force_login(self.user)
+        self.page = create_page(self.test_data['title'], TEMPLATE_NAME, 'en',
+            slug=self.test_data['slug'], created_by=self.user,
+            reverse_id=self.test_data['reverse_id']
+        )
+        # we need an empty pagecontent for this.
+        self.page.pagecontent_set.all().delete()
+
+    def test_page_with_empty_pagecontent(self):
+        """
+        A page with EmptyPageContent returns 404 when you try to view it.
+        """
+        page_content = self.page.get_title_obj('en', force_reload=True)
+        self.assertEqual(isinstance(page_content, EmptyPageContent), True)
+
+        with self.assertRaises(Http404):
+            details(self.get_request(
+                page=self.page), self.page.get_path('en')
+            )
+
+
 @override_settings(
     CMS_TEMPLATES=[
         (TEMPLATE_NAME, TEMPLATE_NAME),
@@ -52,7 +91,7 @@ class RenderingTestCase(CMSTestCase):
 
     def setUp(self):
         super(RenderingTestCase, self).setUp()
-        self.test_user = self._create_user("test", True, True)
+        self.test_user = self.get_superuser()
 
         with self.login_user_context(self.test_user):
             self.test_data = {
