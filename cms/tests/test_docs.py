@@ -7,7 +7,8 @@ import socket
 import sys
 
 from django.utils.six.moves import StringIO
-from sphinx.application import Sphinx, SphinxWarning
+from sphinx.errors import SphinxWarning
+from sphinx.application import Sphinx
 
 try:
     import enchant
