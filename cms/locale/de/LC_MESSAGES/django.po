@@ -1516,7 +1516,7 @@ msgid ""
 msgstr "Erforderlich. 300 Zeichen oder weniger. Buchstaben, Zahlen und @/./.+/-/_ Zeichen"
 
 msgid "Enter a valid username."
-msgstr "Gib einen gültigen Benutzernamen ein"
+msgstr "Geben Sie einen gültigen Benutzernamen ein"
 
 msgid "email address"
 msgstr "E-Mail-Adresse"
