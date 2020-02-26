@@ -111,3 +111,19 @@ def is_editable_model(model_class):
     except KeyError:
         return False
     return isinstance(admin_class, FrontendEditableAdminMixin)
+
+
+def get_admin_model_object_by_id(model_class, obj_id):
+    """
+    A method to fetch an object by object id.
+
+    3rd party applications may change the queryset by the use of monkey-patching.
+    djangocms-versioning is a prime example of this. By having this helper 3rd
+    party applications can monkeypatch this helper to ensure correct results
+    without monkeypatching entire functions of django-cms or through adding
+    their logic directly to django-cms.
+
+    This helper can be reused by applications that wish to get a model that
+    should be visible to the admin.
+    """
+    return model_class.objects.get(pk=obj_id)
