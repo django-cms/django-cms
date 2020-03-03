@@ -18,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2020-03-03 13:49+0000\n"
+"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Hungarian (http://www.transifex.com/divio/django-cms/language/hu/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -74,23 +74,18 @@ msgstr "Oldal típus"
 msgid "Page Types"
 msgstr "Oldal típusok"
 
-msgid "Application"
-msgstr "Alkalmazás"
-
-msgid "Hook application to this page."
-msgstr "Alkalmazás csatolása az oldalhoz"
-
 msgid "Overwrite URL"
 msgstr "URL felülírása"
 
 msgid "Keep this field empty if standard path should be used."
 msgstr "Hagyja ezt a mezőt üresen, ha az alapértelmezett útvonalat kívánja használni "
 
-msgid "X Frame Options"
-msgstr "X Frame opciók"
+#| msgid "softroot"
+msgid "Soft root"
+msgstr ""
 
-msgid "Whether this page can be embedded in other pages or websites"
-msgstr "Megengedi az oldal beágyazását más oldalakba vagy webhelyekbe?"
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "Nem minden ős fog látszani a navigációban."
 
 msgid "Redirect"
 msgstr "Átirányítás"
@@ -101,23 +96,43 @@ msgstr "Átirányítás erre az URL-re."
 msgid "Start typing..."
 msgstr ""
 
+msgid "menu visibility"
+msgstr "menü láthatósága"
+
+msgid "limit when this page is visible in the menu"
+msgstr "korlátozza, hogy mikor jelenjen meg ez az oldal a menüben"
+
+#| msgid "Copy options"
+msgid "URL options"
+msgstr ""
+
+#| msgid "Copy options"
+msgid "Menu options"
+msgstr ""
+
+msgid "Application"
+msgstr "Alkalmazás"
+
+msgid "Hook application to this page."
+msgstr "Alkalmazás csatolása az oldalhoz"
+
 msgid "Application configurations"
-msgstr ""
-
-msgid "Language independent options"
-msgstr ""
-
-#, python-format
-msgid "Please set the %(language)s slug before editing its advanced settings."
 msgstr ""
 
 msgid "A page with this reverse URL id exists already."
 msgstr "Az adott URL azonosítóval már létezik oldal."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr ""
 
 msgid "An application instance with this name already exists."
+msgstr ""
+
+msgid "You can't move the home page inside another page"
 msgstr ""
 
 msgid "Yes"
@@ -186,19 +201,19 @@ msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Plugin position must be greater than %(position)d"
 msgstr ""
 
 msgid "Advanced Settings"
 msgstr "További beállítások"
 
-msgid "Publishing dates"
-msgstr "Közzététel dátumai"
+msgid "The page is not eligible to be home."
+msgstr ""
 
-msgid "Change Permissions"
-msgstr "Jogosultságok megváltoztatása"
+#, python-format
+#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -211,21 +226,9 @@ msgstr "Biztos benne?"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objektum %(key)r elsődleges kulccsal nem létezik."
 
-msgid "Database error"
-msgstr "Adatbázis hiba"
-
-msgid "Template not valid"
-msgstr "Érvénytelen sablon"
-
-msgid "The template was successfully changed"
-msgstr "A sablon sikeresen megváltozott"
-
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Hiba! Nincs jogosultságod az oldal mozgatásához. Frissítsd az oldalt!"
-
-msgid "You do not have permission to copy these plugins."
-msgstr "Nincs jogosultsága ezen pluginek másolásához."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
@@ -235,52 +238,6 @@ msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
-
-#| msgid "You do not have permission to edit this page"
-msgid "You do not have permission to revert this page."
-msgstr ""
-
-#, python-format
-msgid "\"%s\" was reverted to the live version."
-msgstr ""
-
-msgid "You do not have permission to publish this page"
-msgstr "Nincs joga az oldal publikálásához"
-
-msgid "Page not published! A parent page is not published yet."
-msgstr "Nem tettük közzé az oldalt! Még van közzé nem tett szülő oldal!"
-
-msgid "The content was successfully published."
-msgstr "A tartalom sikeresen publikálva."
-
-msgid "There was a problem publishing your content"
-msgstr "A tartalom publikálása közben hiba lépett fel"
-
-msgid "You do not have permission to unpublish this page"
-msgstr "Nincs jogosultsága az oldal visszavonására."
-
-msgid "This page was never published"
-msgstr "Az oldal még nem volt közzétett"
-
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr "\"%(page)s\" oldal %(language)s nyelvű változatát sikeresen visszavonta."
-
-#| msgid "You do not have permission to delete this plugin"
-msgid "You do not have permission to delete this page"
-msgstr ""
-
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr "%(language)s nyelvű cím és plugin már létezik"
-
-#, python-format
-#| msgid "You do not have permission to change pages."
-msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
-
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Nincs joga az oldal menübeli pozíciójának változtatásához"
 
 msgid "You do not have permission to edit this page"
 msgstr "Nincs jogosultsága az oldal szerkesztéséhez"
@@ -294,8 +251,28 @@ msgstr ""
 msgid "New page"
 msgstr ""
 
-msgid "The page is not eligible to be home."
+msgid "Database error"
+msgstr "Adatbázis hiba"
+
+msgid "Template not valid"
+msgstr "Érvénytelen sablon"
+
+msgid "The template was successfully changed"
+msgstr "A sablon sikeresen megváltozott"
+
+msgid "You do not have permission to copy these plugins."
+msgstr "Nincs jogosultsága ezen pluginek másolásához."
+
+#| msgid "You do not have permission to delete this plugin"
+msgid "You do not have permission to delete this page"
 msgstr ""
+
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "%(language)s nyelvű cím és plugin már létezik"
+
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "Nincs joga az oldal menübeli pozíciójának változtatásához"
 
 msgid "View restriction"
 msgstr "Nézet korlátozás"
@@ -322,15 +299,6 @@ msgstr ""
 
 msgid "You do not have permission to edit this plugin"
 msgstr "Nincs jogosultsága a plugin szerkesztéséhez"
-
-msgid "order parameter references plugins in different trees"
-msgstr ""
-
-msgid "parent must be in the same placeholder"
-msgstr ""
-
-msgid "parent must be in the same language as plugin_language"
-msgstr ""
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
@@ -398,6 +366,18 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
+msgid "Edit"
+msgstr "Szerkesztés"
+
+msgid "Preview"
+msgstr "Előnézet"
+
+msgid "Structure"
+msgstr "Struktúra"
+
+msgid "Content"
+msgstr "Tartalom"
+
 msgid "Sites"
 msgstr "Webhely"
 
@@ -434,22 +414,6 @@ msgstr "Kilépés"
 
 msgid "Language"
 msgstr "Nyelv"
-
-msgid "Structure"
-msgstr "Struktúra"
-
-msgid "Content"
-msgstr "Tartalom"
-
-#| msgid "Publish changes"
-msgid "Publish page changes"
-msgstr ""
-
-msgid "Publish page now"
-msgstr "Oldal publikálása"
-
-msgid "Page settings"
-msgstr "Oldal beállításai"
 
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
@@ -494,35 +458,20 @@ msgstr "Oldal megduplázása"
 msgid "Edit this Page"
 msgstr "Az oldal szerkesztése"
 
+msgid "Page settings"
+msgstr "Oldal beállításai"
+
 msgid "Advanced settings"
 msgstr "További beállítások"
 
 msgid "Templates"
 msgstr "Sablonok"
 
-msgid "Save as Page Type"
-msgstr "Mentés oldal típusként"
-
-msgid "Permissions"
-msgstr "Jogosultságok"
-
 msgid "Hide in navigation"
 msgstr "Elrejtés a navigációban"
 
 msgid "Display in navigation"
 msgstr "Megjelenítés a navigációban"
-
-msgid "Unpublish page"
-msgstr "publikálás visszavonásának kérése"
-
-msgid "Publish page"
-msgstr "publikálás kérése"
-
-msgid "Are you sure you want to revert to live?"
-msgstr "Biztosan elveti a változtatásokat?"
-
-msgid "Revert to live"
-msgstr "Változások elvetése"
 
 msgid "Delete page"
 msgstr "törlés kérése"
@@ -556,9 +505,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Új hozzáadása"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -652,9 +598,6 @@ msgstr "sablon"
 msgid "login required"
 msgstr "bejelentkezés szükséges"
 
-msgid "menu visibility"
-msgstr "menü láthatósága"
-
 msgid "application"
 msgstr "alkalmazás"
 
@@ -670,54 +613,22 @@ msgstr "Engedélyezés"
 msgid "page"
 msgstr "oldal"
 
-msgid "for logged in users only"
-msgstr "csak bejelentkezett felhasználók számára"
-
-msgid "for anonymous users only"
-msgstr "csak névtelen felhasználók számára"
-
-msgid "Inherit from parent page"
-msgstr "A szülő oldal beállításai szerint"
-
-msgid "Deny"
-msgstr "Tiltás"
-
-msgid "Only this website"
-msgstr "Csak ezen az oldalon"
-
-msgid "Allow"
-msgstr "Engedélyezés"
-
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr "Mikor élesedjen az oldal. A státusznak \"Közzétett\" állapotúnak kell lennie az élesítéshez."
-
-msgid "When to expire the page. Leave empty to never expire."
-msgstr "Az oldal lejárati ideje. Hagyd üresen ha sosem jár le."
-
-msgid "All ancestors will not be displayed in the navigation"
-msgstr "Nem minden ős fog látszani a navigációban."
-
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Egyedi azonosító, amelyet az url-ben használunk ennek az oldalnak a hivatkozásánál."
 
-msgid "The template used to render the content."
-msgstr "A tartalom megjelenítéséhez használt sablon."
-
-msgid "limit when this page is visible in the menu"
-msgstr "korlátozza, hogy mikor jelenjen meg ez az oldal a menüben"
-
 msgid "pages"
 msgstr "oldalak"
 
-msgid "Empty"
-msgstr "Üres"
-
 msgid "default"
 msgstr "alapértelmezett"
+
+msgid "slug"
+msgstr "URL aliasz"
+
+msgid "Path"
+msgstr "Útvonal"
 
 msgid "Current page"
 msgstr "Aktuális oldal"
@@ -849,6 +760,24 @@ msgstr "statikus helyőrzők"
 msgid "A static placeholder with the same site and code already exists"
 msgstr ""
 
+msgid "for logged in users only"
+msgstr "csak bejelentkezett felhasználók számára"
+
+msgid "for anonymous users only"
+msgstr "csak névtelen felhasználók számára"
+
+msgid "Inherit from parent page"
+msgstr "A szülő oldal beállításai szerint"
+
+msgid "Deny"
+msgstr "Tiltás"
+
+msgid "Only this website"
+msgstr "Csak ezen az oldalon"
+
+msgid "Allow"
+msgstr "Engedélyezés"
+
 msgid "title"
 msgstr "cím"
 
@@ -864,20 +793,11 @@ msgstr "leírás"
 msgid "The text displayed in search engines."
 msgstr "A szöveg megjelenik a kereső motrokban."
 
-msgid "slug"
-msgstr "URL aliasz"
-
-msgid "Path"
-msgstr "Útvonal"
-
-msgid "has url overwrite"
-msgstr ""
-
 msgid "redirect"
 msgstr "átirányítás"
 
-msgid "is published"
-msgstr "publikálva"
+msgid "The template used to render the content."
+msgstr "A tartalom megjelenítéséhez használt sablon."
 
 msgid "Advanced options"
 msgstr "További beállítások"
@@ -892,6 +812,65 @@ msgstr ""
 
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Ennek a bővítménynek nincs több beállítása. Kérem, nyomja meg a mentés gombot."
+
+msgid "Moved"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed"
+msgstr ""
+
+#| msgid "Delete"
+msgid "Deleted"
+msgstr ""
+
+#| msgid "Add %(language)s Translation"
+msgid "Added Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Changed Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Deleted Page Translation"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Added Plugin"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Moved Plugin"
+msgstr ""
+
+#| msgid "Delete page"
+msgid "Deleted Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Cut Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Paste Plugin"
+msgstr ""
+
+#| msgid "static placeholder"
+msgid "Paste to Placeholder"
+msgstr ""
+
+#| msgid "Copied plugins to %(placeholder)s"
+msgid "Added plugins to placeholder from clipboard"
+msgstr ""
+
+#| msgid "Placeholder"
+msgid "Cleared Placeholder"
+msgstr ""
 
 msgid "Save"
 msgstr "Mentés"
@@ -982,9 +961,6 @@ msgstr "Mentés újként"
 msgid "Save and add another"
 msgstr "Mentés új hozzáadása"
 
-msgid "Basic Settings"
-msgstr "Alapvető beállítások"
-
 msgid "Copy"
 msgstr "Másolás"
 
@@ -1027,10 +1003,9 @@ msgid ""
 "                                            "
 msgstr ""
 
-#, python-format
 msgid ""
 "\n"
-"                                New %(name)s\n"
+"                                New Page\n"
 "                            "
 msgstr ""
 
@@ -1104,13 +1079,12 @@ msgstr ""
 msgid "Published"
 msgstr ""
 
-#| msgid "Change"
-msgid "Changed"
-msgstr ""
-
 #| msgid "unpublished"
 msgid "Unpublished"
 msgstr ""
+
+msgid "Empty"
+msgstr "Üres"
 
 #| msgid "in menu"
 msgid "In menu"
@@ -1135,23 +1109,6 @@ msgstr ""
 msgid "Application: %(apphook)s"
 msgstr "Alkalmazás: %(apphook)s"
 
-#, python-format
-#| msgid "Edit this page in %(language)s "
-msgid "Preview this page in %(language)s "
-msgstr ""
-
-msgid "Preview"
-msgstr "Előnézet"
-
-msgid "Publish"
-msgstr "Publikálás"
-
-msgid "Unpublish"
-msgstr "Publikálás visszavonása"
-
-msgid "Configure"
-msgstr ""
-
 msgid "in menu"
 msgstr "menüben"
 
@@ -1161,6 +1118,9 @@ msgstr ""
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
+
+msgid "Permissions"
+msgstr "Jogosultságok"
 
 msgid "Clipboard"
 msgstr ""
@@ -1189,9 +1149,6 @@ msgstr ""
 msgid "Collapse all"
 msgstr ""
 
-msgid "Edit"
-msgstr "Szerkesztés"
-
 msgid "You cannot add plugins to this plugin."
 msgstr ""
 
@@ -1215,10 +1172,6 @@ msgstr "Elérhető bővítmények"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
-
-#| msgid "View published"
-msgid "View published"
 msgstr ""
 
 msgid "Login"
@@ -1329,9 +1282,6 @@ msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Sikertelen belépés.</strong> Ellenőrizd az adatokat és próbáld újra."
 
-msgid "This page has unpublished changes."
-msgstr "Az oldalnak publikálatlan változásai vannak."
-
 msgid "Double-click to edit"
 msgstr "Dupla kattintás a szerkesztéshez"
 
@@ -1437,6 +1387,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr ""
 
+msgid "Add Another"
+msgstr "Új hozzáadása"
+
 msgid "Back"
 msgstr ""
 
@@ -1446,20 +1399,12 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-msgid "unpublished changes"
-msgstr "közzé nem tett változtatások"
-
-msgid "published"
-msgstr "publikálva"
-
-msgid "unpublished parent"
-msgstr "nem publikus szülő"
-
-msgid "unpublished"
-msgstr "nem közzétett"
-
 msgid "no content"
 msgstr "nincs tartalom"
+
+#| msgid "no content"
+msgid "has contents"
+msgstr ""
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1536,6 +1481,10 @@ msgstr "Cikkek"
 
 msgid "Sample App"
 msgstr "Példa Alkalmazás"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr ""
@@ -1652,6 +1601,121 @@ msgstr ""
 msgid "A wizard has already been registered for model: %s"
 msgstr ""
 
+#~ msgid "X Frame Options"
+#~ msgstr "X Frame Options"
+
+#~ msgid "Whether this page can be embedded in other pages or websites"
+#~ msgstr "Whether this page can be embedded in other pages or websites"
+
+#~ msgid "Language independent options"
+#~ msgstr "Language independent options"
+
+#~ msgid "Publishing dates"
+#~ msgstr "Publishing dates"
+
+#~ msgid "Change Permissions"
+#~ msgstr "Change Permissions"
+
+#~ msgid "You do not have permission to revert this page."
+#~ msgstr "You do not have permission to edit this page"
+
+#~ msgid "You do not have permission to publish this page"
+#~ msgstr "You do not have permission to publish this page"
+
+#~ msgid "Page not published! A parent page is not published yet."
+#~ msgstr "Page not published! A parent page is not published yet."
+
+#~ msgid "The content was successfully published."
+#~ msgstr "The content was successfully published."
+
+#~ msgid "There was a problem publishing your content"
+#~ msgstr "There was a problem publishing your content"
+
+#~ msgid "You do not have permission to unpublish this page"
+#~ msgstr "You do not have permission to unpublish this page"
+
+#~ msgid "This page was never published"
+#~ msgstr "This page was never published"
+
+#~ msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+#~ msgstr "The %(language)s page \"%(page)s\" was successfully unpublished"
+
+#~ msgid "You don't have permissions to see page \"%(title)s\""
+#~ msgstr "You do not have permission to change pages."
+
+#~ msgid "parent must be in the same placeholder"
+#~ msgstr "parent must be in the same placeholder"
+
+#~ msgid "parent must be in the same language as plugin_language"
+#~ msgstr "parent must be in the same language as plugin_language"
+
+#~ msgid "Publish page changes"
+#~ msgstr "Publish changes"
+
+#~ msgid "Publish page now"
+#~ msgstr "Publish page now"
+
+#~ msgid "Save as Page Type"
+#~ msgstr "Save as Page Type"
+
+#~ msgid "Unpublish page"
+#~ msgstr "Unpublish page"
+
+#~ msgid "Publish page"
+#~ msgstr "Publish page"
+
+#~ msgid "Are you sure you want to revert to live?"
+#~ msgstr "Are you sure you want to revert to live?"
+
+#~ msgid "Revert to live"
+#~ msgstr "Revert to live"
+
+#~ msgid ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+#~ msgstr ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+
+#~ msgid "When to expire the page. Leave empty to never expire."
+#~ msgstr "When to expire the page. Leave empty to never expire."
+
+#~ msgid "has url overwrite"
+#~ msgstr "has url overwrite"
+
+#~ msgid "is published"
+#~ msgstr "is published"
+
+#~ msgid "Basic Settings"
+#~ msgstr "Basic Settings"
+
+#~ msgid "Preview this page in %(language)s "
+#~ msgstr "Edit this page in %(language)s "
+
+#~ msgid "Publish"
+#~ msgstr "Publish"
+
+#~ msgid "Unpublish"
+#~ msgstr "Unpublish"
+
+#~ msgid "View published"
+#~ msgstr "View published"
+
+#~ msgid "This page has unpublished changes."
+#~ msgstr "This page has unpublished changes."
+
+#~ msgid "unpublished changes"
+#~ msgstr "unpublished changes"
+
+#~ msgid "published"
+#~ msgstr "published"
+
+#~ msgid "unpublished parent"
+#~ msgstr "unpublished parent"
+
+#~ msgid "unpublished"
+#~ msgstr "unpublished"
+
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."
 
@@ -1730,9 +1794,6 @@ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 #~ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
 
 #~ msgid ""
 #~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "

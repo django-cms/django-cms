@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2020-03-03 13:49+0000\n"
+"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Korean (Korea) (http://www.transifex.com/divio/django-cms/language/ko_KR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,23 +68,18 @@ msgstr "페이지 종류"
 msgid "Page Types"
 msgstr "페이지 종류들"
 
-msgid "Application"
-msgstr "어플리케이션"
-
-msgid "Hook application to this page."
-msgstr "이 페이지에 어플리케이션을 연결"
-
 msgid "Overwrite URL"
 msgstr "URL을 덮어 씀"
 
 msgid "Keep this field empty if standard path should be used."
 msgstr "기본 경로가 사용되면 이 항목을 비워 둠"
 
-msgid "X Frame Options"
-msgstr "X Frame 옵션"
+#| msgid "softroot"
+msgid "Soft root"
+msgstr ""
 
-msgid "Whether this page can be embedded in other pages or websites"
-msgstr "이 페이지가 다른 페이지나 웹사이트에 포함될 수 있는 지"
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "모든 상위 항목은 탐색중에 표시되지 않음."
 
 msgid "Redirect"
 msgstr "리다이렉트"
@@ -95,24 +90,44 @@ msgstr "이 URL 로 리다이렉트"
 msgid "Start typing..."
 msgstr "타이핑 시작..."
 
+msgid "menu visibility"
+msgstr "메뉴 가시성"
+
+msgid "limit when this page is visible in the menu"
+msgstr "페이지가 메뉴에서 보여질 때만 제한 함"
+
+#| msgid "Copy options"
+msgid "URL options"
+msgstr ""
+
+#| msgid "Copy options"
+msgid "Menu options"
+msgstr ""
+
+msgid "Application"
+msgstr "어플리케이션"
+
+msgid "Hook application to this page."
+msgstr "이 페이지에 어플리케이션을 연결"
+
 msgid "Application configurations"
 msgstr "응용프로그램 설정"
 
-msgid "Language independent options"
-msgstr "언어와 관계없는 옵션"
-
-#, python-format
-msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
-
 msgid "A page with this reverse URL id exists already."
 msgstr "이 URL id 가 이미 존재하는 페이지"
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
 
 msgid "An application instance using this configuration already exists."
 msgstr "이 설정을 사용하는 응용 프로그램이 이미 존재합니다."
 
 msgid "An application instance with this name already exists."
 msgstr "이 이름을 가진 응용 프로그램이 이미 존재 합니다. "
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr ""
@@ -180,19 +195,19 @@ msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Plugin position must be greater than %(position)d"
 msgstr ""
 
 msgid "Advanced Settings"
 msgstr "고급 설정"
 
-msgid "Publishing dates"
-msgstr "발행 날짜"
+msgid "The page is not eligible to be home."
+msgstr ""
 
-msgid "Change Permissions"
-msgstr "권한 수정"
+#, python-format
+#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -205,21 +220,9 @@ msgstr "확실 합니까 ?"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "프라이머리 키 %(key)r 를 가진 %(name)s 가 존재하지 않음."
 
-msgid "Database error"
-msgstr "데이터베이스 오류"
-
-msgid "Template not valid"
-msgstr "템플릿이 잘못 됨"
-
-msgid "The template was successfully changed"
-msgstr "템플릿이 잘 바뀌었습니다."
-
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "에러! 이 페이지를 이동 할 수있는 권한이 없습니다.페이지를 다시로드하십시오"
-
-msgid "You do not have permission to copy these plugins."
-msgstr "플러그인을 복사할 권한이 없습니다"
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
@@ -229,52 +232,6 @@ msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
-
-#| msgid "You do not have permission to edit this page"
-msgid "You do not have permission to revert this page."
-msgstr ""
-
-#, python-format
-msgid "\"%s\" was reverted to the live version."
-msgstr ""
-
-msgid "You do not have permission to publish this page"
-msgstr "이 페이지를 게시할 권한이 없습니다."
-
-msgid "Page not published! A parent page is not published yet."
-msgstr "페이지가 발행되지 않았습니다! 부모 페이지가 아직 발행되지 않았습니다."
-
-msgid "The content was successfully published."
-msgstr "컨텐츠가 성공적으로 게시되었습니다."
-
-msgid "There was a problem publishing your content"
-msgstr "컨텐츠를 게시하는 동안 문제가 발생하였습니다"
-
-msgid "You do not have permission to unpublish this page"
-msgstr "이 페이지를 발행 취소할 권한이 없습니다."
-
-msgid "This page was never published"
-msgstr "이 페이지는 게시된 적이 없습니다."
-
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr "%(language)s 페이지 \"%(page)s\" 가 성공적으로 발행 취소 되었습니다."
-
-#| msgid "You do not have permission to delete this plugin"
-msgid "You do not have permission to delete this page"
-msgstr ""
-
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr "%(language)s 언어의 제목과 플러그인은 삭제 되었음"
-
-#, python-format
-#| msgid "You do not have permission to change pages."
-msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
-
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "이 페이지의 '탐색중' 상태를 바꿀 권한이 없습니다."
 
 msgid "You do not have permission to edit this page"
 msgstr "이 페이지를 수정할 권한이 없습니다"
@@ -288,8 +245,28 @@ msgstr ""
 msgid "New page"
 msgstr ""
 
-msgid "The page is not eligible to be home."
+msgid "Database error"
+msgstr "데이터베이스 오류"
+
+msgid "Template not valid"
+msgstr "템플릿이 잘못 됨"
+
+msgid "The template was successfully changed"
+msgstr "템플릿이 잘 바뀌었습니다."
+
+msgid "You do not have permission to copy these plugins."
+msgstr "플러그인을 복사할 권한이 없습니다"
+
+#| msgid "You do not have permission to delete this plugin"
+msgid "You do not have permission to delete this page"
 msgstr ""
+
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "%(language)s 언어의 제목과 플러그인은 삭제 되었음"
+
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "이 페이지의 '탐색중' 상태를 바꿀 권한이 없습니다."
 
 msgid "View restriction"
 msgstr "보기 제한"
@@ -316,15 +293,6 @@ msgstr "플러그인을 찾지 못했습니다"
 
 msgid "You do not have permission to edit this plugin"
 msgstr "이 플러그인을 수정할 권한이 없습니다"
-
-msgid "order parameter references plugins in different trees"
-msgstr ""
-
-msgid "parent must be in the same placeholder"
-msgstr ""
-
-msgid "parent must be in the same language as plugin_language"
-msgstr ""
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
@@ -392,6 +360,18 @@ msgstr ""
 msgid "Create"
 msgstr ""
 
+msgid "Edit"
+msgstr "수정"
+
+msgid "Preview"
+msgstr ""
+
+msgid "Structure"
+msgstr "구조"
+
+msgid "Content"
+msgstr "내용"
+
 msgid "Sites"
 msgstr "사이트들"
 
@@ -428,22 +408,6 @@ msgstr "로그아웃"
 
 msgid "Language"
 msgstr "언어"
-
-msgid "Structure"
-msgstr "구조"
-
-msgid "Content"
-msgstr "내용"
-
-#| msgid "Publish changes"
-msgid "Publish page changes"
-msgstr ""
-
-msgid "Publish page now"
-msgstr "지금 페이지를 게시하세요"
-
-msgid "Page settings"
-msgstr "페이지 설정"
 
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
@@ -488,35 +452,20 @@ msgstr "이 페이지 복제"
 msgid "Edit this Page"
 msgstr "이 페이지를 수정 함"
 
+msgid "Page settings"
+msgstr "페이지 설정"
+
 msgid "Advanced settings"
 msgstr "고급 설정"
 
 msgid "Templates"
 msgstr "템플릿"
 
-msgid "Save as Page Type"
-msgstr "페이지 타입으로 저장"
-
-msgid "Permissions"
-msgstr "권한"
-
 msgid "Hide in navigation"
 msgstr "탐색중에 숨김"
 
 msgid "Display in navigation"
 msgstr "탐색중에 표시"
-
-msgid "Unpublish page"
-msgstr "게시 중지 요청"
-
-msgid "Publish page"
-msgstr "게시 요청"
-
-msgid "Are you sure you want to revert to live?"
-msgstr "라이브로 되돌리길 원하세요 ?"
-
-msgid "Revert to live"
-msgstr "라이브로 되돌리기"
 
 msgid "Delete page"
 msgstr "삭제 요청"
@@ -550,9 +499,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "계속 추가"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -646,9 +592,6 @@ msgstr "템플릿"
 msgid "login required"
 msgstr "로그인이 필요함"
 
-msgid "menu visibility"
-msgstr "메뉴 가시성"
-
 msgid "application"
 msgstr "어플리케이션"
 
@@ -664,54 +607,22 @@ msgstr "허가"
 msgid "page"
 msgstr "페이지"
 
-msgid "for logged in users only"
-msgstr "로그인한 사용자만"
-
-msgid "for anonymous users only"
-msgstr "모르는 사용자만"
-
-msgid "Inherit from parent page"
-msgstr "부모 페이지에서 상속"
-
-msgid "Deny"
-msgstr "거부"
-
-msgid "Only this website"
-msgstr "오직 이 웹사이트만"
-
-msgid "Allow"
-msgstr "허가"
-
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr "페이지를 표시하려면  상태를 '게시'로 해야 합니다."
-
-msgid "When to expire the page. Leave empty to never expire."
-msgstr "페이지의 기한을 설정하려면, '기한 없음'을 비워 두세요."
-
-msgid "All ancestors will not be displayed in the navigation"
-msgstr "모든 상위 항목은 탐색중에 표시되지 않음."
-
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "이 페이지에 링크하는 page_url templatetag에 사용되는 고유 식별자"
 
-msgid "The template used to render the content."
-msgstr "콘텐츠를 렌더링하는 데 사용되는 템플릿"
-
-msgid "limit when this page is visible in the menu"
-msgstr "페이지가 메뉴에서 보여질 때만 제한 함"
-
 msgid "pages"
 msgstr "페이지"
 
-msgid "Empty"
-msgstr "없음"
-
 msgid "default"
 msgstr "기본"
+
+msgid "slug"
+msgstr "슬러그"
+
+msgid "Path"
+msgstr "경로"
 
 msgid "Current page"
 msgstr "현재 페이지"
@@ -843,6 +754,24 @@ msgstr "정적 영역들"
 msgid "A static placeholder with the same site and code already exists"
 msgstr "같은 사이트와 코드의 정적 영역이 이미 존재 합니다."
 
+msgid "for logged in users only"
+msgstr "로그인한 사용자만"
+
+msgid "for anonymous users only"
+msgstr "모르는 사용자만"
+
+msgid "Inherit from parent page"
+msgstr "부모 페이지에서 상속"
+
+msgid "Deny"
+msgstr "거부"
+
+msgid "Only this website"
+msgstr "오직 이 웹사이트만"
+
+msgid "Allow"
+msgstr "허가"
+
 msgid "title"
 msgstr "제목"
 
@@ -858,20 +787,11 @@ msgstr "설명"
 msgid "The text displayed in search engines."
 msgstr "검색 엔진에서 표시되는 글자"
 
-msgid "slug"
-msgstr "슬러그"
-
-msgid "Path"
-msgstr "경로"
-
-msgid "has url overwrite"
-msgstr "URL 덮어쓰기"
-
 msgid "redirect"
 msgstr "리다이렉트"
 
-msgid "is published"
-msgstr "게시 여부"
+msgid "The template used to render the content."
+msgstr "콘텐츠를 렌더링하는 데 사용되는 템플릿"
 
 msgid "Advanced options"
 msgstr "고급 옵션"
@@ -886,6 +806,65 @@ msgstr ""
 
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "더 이상 이 플러그인을 위한 설정이 없습니다. 저장하기를 누르세요"
+
+msgid "Moved"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed"
+msgstr ""
+
+#| msgid "Delete"
+msgid "Deleted"
+msgstr ""
+
+#| msgid "Add %(language)s Translation"
+msgid "Added Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Changed Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Deleted Page Translation"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Added Plugin"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Moved Plugin"
+msgstr ""
+
+#| msgid "Delete page"
+msgid "Deleted Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Cut Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Paste Plugin"
+msgstr ""
+
+#| msgid "static placeholder"
+msgid "Paste to Placeholder"
+msgstr ""
+
+#| msgid "Copied plugins to %(placeholder)s"
+msgid "Added plugins to placeholder from clipboard"
+msgstr ""
+
+#| msgid "Placeholder"
+msgid "Cleared Placeholder"
+msgstr ""
 
 msgid "Save"
 msgstr "저장"
@@ -975,9 +954,6 @@ msgstr "새이름으로 저장"
 msgid "Save and add another"
 msgstr "저장 후 추가"
 
-msgid "Basic Settings"
-msgstr "기본 설정"
-
 msgid "Copy"
 msgstr "복사"
 
@@ -1020,10 +996,9 @@ msgid ""
 "                                            "
 msgstr ""
 
-#, python-format
 msgid ""
 "\n"
-"                                New %(name)s\n"
+"                                New Page\n"
 "                            "
 msgstr ""
 
@@ -1097,13 +1072,12 @@ msgstr ""
 msgid "Published"
 msgstr ""
 
-#| msgid "Change"
-msgid "Changed"
-msgstr ""
-
 #| msgid "unpublished"
 msgid "Unpublished"
 msgstr ""
+
+msgid "Empty"
+msgstr "없음"
 
 #| msgid "in menu"
 msgid "In menu"
@@ -1128,23 +1102,6 @@ msgstr ""
 msgid "Application: %(apphook)s"
 msgstr "Application: %(apphook)s"
 
-#, python-format
-#| msgid "Edit this page in %(language)s "
-msgid "Preview this page in %(language)s "
-msgstr ""
-
-msgid "Preview"
-msgstr ""
-
-msgid "Publish"
-msgstr "게시"
-
-msgid "Unpublish"
-msgstr "게시 중지"
-
-msgid "Configure"
-msgstr ""
-
 msgid "in menu"
 msgstr "메뉴에서"
 
@@ -1154,6 +1111,9 @@ msgstr "메뉴에 없습니다"
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
+
+msgid "Permissions"
+msgstr "권한"
 
 msgid "Clipboard"
 msgstr ""
@@ -1182,9 +1142,6 @@ msgstr ""
 msgid "Collapse all"
 msgstr ""
 
-msgid "Edit"
-msgstr "수정"
-
 msgid "You cannot add plugins to this plugin."
 msgstr ""
 
@@ -1208,10 +1165,6 @@ msgstr "사용가능한 플러그인"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
-
-#| msgid "View published"
-msgid "View published"
 msgstr ""
 
 msgid "Login"
@@ -1322,9 +1275,6 @@ msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>로그인 실패.</strong> 비밀번호를 확인후에 다시 시도하세요."
 
-msgid "This page has unpublished changes."
-msgstr "이 페이지는 게시되지 않은 변경 사항이 있습니다."
-
 msgid "Double-click to edit"
 msgstr "더블클릭으로 수정하기"
 
@@ -1430,6 +1380,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr ""
 
+msgid "Add Another"
+msgstr "계속 추가"
+
 msgid "Back"
 msgstr ""
 
@@ -1439,20 +1392,12 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-msgid "unpublished changes"
-msgstr "발행되지 않은 변경사항들"
-
-msgid "published"
-msgstr "게시"
-
-msgid "unpublished parent"
-msgstr "발행되지 않은 부모"
-
-msgid "unpublished"
-msgstr "발행되지 않은 "
-
 msgid "no content"
 msgstr "내용 없음"
+
+#| msgid "no content"
+msgid "has contents"
+msgstr ""
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1529,6 +1474,10 @@ msgstr "기사"
 
 msgid "Sample App"
 msgstr "같은 어플리케이션"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "권한이 제거된 Sample App"
@@ -1645,6 +1594,121 @@ msgstr ""
 msgid "A wizard has already been registered for model: %s"
 msgstr ""
 
+#~ msgid "X Frame Options"
+#~ msgstr "X Frame Options"
+
+#~ msgid "Whether this page can be embedded in other pages or websites"
+#~ msgstr "Whether this page can be embedded in other pages or websites"
+
+#~ msgid "Language independent options"
+#~ msgstr "Language independent options"
+
+#~ msgid "Publishing dates"
+#~ msgstr "Publishing dates"
+
+#~ msgid "Change Permissions"
+#~ msgstr "Change Permissions"
+
+#~ msgid "You do not have permission to revert this page."
+#~ msgstr "You do not have permission to edit this page"
+
+#~ msgid "You do not have permission to publish this page"
+#~ msgstr "You do not have permission to publish this page"
+
+#~ msgid "Page not published! A parent page is not published yet."
+#~ msgstr "Page not published! A parent page is not published yet."
+
+#~ msgid "The content was successfully published."
+#~ msgstr "The content was successfully published."
+
+#~ msgid "There was a problem publishing your content"
+#~ msgstr "There was a problem publishing your content"
+
+#~ msgid "You do not have permission to unpublish this page"
+#~ msgstr "You do not have permission to unpublish this page"
+
+#~ msgid "This page was never published"
+#~ msgstr "This page was never published"
+
+#~ msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+#~ msgstr "The %(language)s page \"%(page)s\" was successfully unpublished"
+
+#~ msgid "You don't have permissions to see page \"%(title)s\""
+#~ msgstr "You do not have permission to change pages."
+
+#~ msgid "parent must be in the same placeholder"
+#~ msgstr "parent must be in the same placeholder"
+
+#~ msgid "parent must be in the same language as plugin_language"
+#~ msgstr "parent must be in the same language as plugin_language"
+
+#~ msgid "Publish page changes"
+#~ msgstr "Publish changes"
+
+#~ msgid "Publish page now"
+#~ msgstr "Publish page now"
+
+#~ msgid "Save as Page Type"
+#~ msgstr "Save as Page Type"
+
+#~ msgid "Unpublish page"
+#~ msgstr "Unpublish page"
+
+#~ msgid "Publish page"
+#~ msgstr "Publish page"
+
+#~ msgid "Are you sure you want to revert to live?"
+#~ msgstr "Are you sure you want to revert to live?"
+
+#~ msgid "Revert to live"
+#~ msgstr "Revert to live"
+
+#~ msgid ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+#~ msgstr ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+
+#~ msgid "When to expire the page. Leave empty to never expire."
+#~ msgstr "When to expire the page. Leave empty to never expire."
+
+#~ msgid "has url overwrite"
+#~ msgstr "has url overwrite"
+
+#~ msgid "is published"
+#~ msgstr "is published"
+
+#~ msgid "Basic Settings"
+#~ msgstr "Basic Settings"
+
+#~ msgid "Preview this page in %(language)s "
+#~ msgstr "Edit this page in %(language)s "
+
+#~ msgid "Publish"
+#~ msgstr "Publish"
+
+#~ msgid "Unpublish"
+#~ msgstr "Unpublish"
+
+#~ msgid "View published"
+#~ msgstr "View published"
+
+#~ msgid "This page has unpublished changes."
+#~ msgstr "This page has unpublished changes."
+
+#~ msgid "unpublished changes"
+#~ msgstr "unpublished changes"
+
+#~ msgid "published"
+#~ msgstr "published"
+
+#~ msgid "unpublished parent"
+#~ msgstr "unpublished parent"
+
+#~ msgid "unpublished"
+#~ msgstr "unpublished"
+
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."
 
@@ -1723,9 +1787,6 @@ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 #~ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
 
 #~ msgid ""
 #~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "

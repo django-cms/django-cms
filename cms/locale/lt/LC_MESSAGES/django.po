@@ -11,15 +11,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-12 11:00+0000\n"
+"POT-Creation-Date: 2020-03-03 13:49+0000\n"
+"PO-Revision-Date: 2020-03-03 13:33+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/divio/django-cms/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "All"
 msgstr "Visi"
@@ -67,23 +67,18 @@ msgstr "Puslapio tipas"
 msgid "Page Types"
 msgstr "Puslapio tipai"
 
-msgid "Application"
-msgstr "Aplikacija"
-
-msgid "Hook application to this page."
-msgstr "Prikabinti aplikaciją šiam puslapiui."
-
 msgid "Overwrite URL"
 msgstr "Perrašyti URL"
 
 msgid "Keep this field empty if standard path should be used."
 msgstr "Palikite šį lauką tuščią jeigu bus naudojamas standartinis kelias."
 
-msgid "X Frame Options"
-msgstr "X Frame nustatymai"
+#| msgid "softroot"
+msgid "Soft root"
+msgstr ""
 
-msgid "Whether this page can be embedded in other pages or websites"
-msgstr "Ar šis puslapis gali būti įterptas i kitus puslapius ar tinklalapius."
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "Visi pirminiai elementai nebus atvaizduojami navigacijoje"
 
 msgid "Redirect"
 msgstr "Nukreipti"
@@ -94,24 +89,44 @@ msgstr "Nukreipia į šį puslapį."
 msgid "Start typing..."
 msgstr "Pradėkite rašyti..."
 
+msgid "menu visibility"
+msgstr "meniu matomumas"
+
+msgid "limit when this page is visible in the menu"
+msgstr "apriboti, kada šis puslapis yra matomas meniu"
+
+#| msgid "Copy options"
+msgid "URL options"
+msgstr ""
+
+#| msgid "Copy options"
+msgid "Menu options"
+msgstr ""
+
+msgid "Application"
+msgstr "Aplikacija"
+
+msgid "Hook application to this page."
+msgstr "Prikabinti aplikaciją šiam puslapiui."
+
 msgid "Application configurations"
 msgstr "Aplikacijų nustatymai"
 
-msgid "Language independent options"
-msgstr "Nuo kalbos nepriklausomi nustatymai."
-
-#, python-format
-msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr "Prašome nustatyti %(language)s kalbos nuorodą prieš redaguojant jo išplėstinius nustatymus."
-
 msgid "A page with this reverse URL id exists already."
 msgstr "Puslapis su tokia nuoroda jau egzistuoja."
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr "Netinkama aplikacijos konfigūracijos reikšmė"
 
 msgid "An application instance using this configuration already exists."
 msgstr "Aplikacijos objektas naudojantis šiuos nustatymus jau egzistuoja."
 
 msgid "An application instance with this name already exists."
 msgstr "Aplikacijos objektas su tokiu pavadinimu jau egzistuoja."
+
+msgid "You can't move the home page inside another page"
+msgstr "Negalima įkelti pradinio puslapio į kitą puslapį"
 
 msgid "Yes"
 msgstr "Taip"
@@ -179,19 +194,19 @@ msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "Pradinio įskiepo rezervuota vieta turi būti tokia pati kaip rezervuota vieta!"
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
-msgstr "Prašome sukurti puslapio %(language)s kalbos vertimą prieš redaguojant jo išplėstinius nustatymus."
+msgid "Plugin position must be greater than %(position)d"
+msgstr ""
 
 msgid "Advanced Settings"
 msgstr "Papildomi nustatymai"
 
-msgid "Publishing dates"
-msgstr "Publikavimo datos"
+msgid "The page is not eligible to be home."
+msgstr "Šis puslapis negali būti pradiniu puslapiu."
 
-msgid "Change Permissions"
-msgstr "Pakeisti teises"
+#, python-format
+#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -204,21 +219,9 @@ msgstr "Ar jūs esate tikri?"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objektas su pirminiu raktu %(key)r neegzistuoja."
 
-msgid "Database error"
-msgstr "Duomenų bazės klaida"
-
-msgid "Template not valid"
-msgstr "Blogas šablonas"
-
-msgid "The template was successfully changed"
-msgstr "Šablonas buvo sėkmingai pakeistas"
-
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Klaida! Jūs neturite teisių perkelti šį puslapį. Perkraukite puslapį"
-
-msgid "You do not have permission to copy these plugins."
-msgstr "Jūs neturite teisių kopijuoti šių įskiepių"
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
@@ -228,52 +231,6 @@ msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr "Klaida! Puslapis kurį bandote įkopijuoti nėra išverstas jokiomis kalbomis kurios sukonfigūruotos pasirinktame tinklalapyje."
-
-#| msgid "You do not have permission to edit this page"
-msgid "You do not have permission to revert this page."
-msgstr "Jūs neturite teisės atkurti šio puslapio."
-
-#, python-format
-msgid "\"%s\" was reverted to the live version."
-msgstr "\"%s\" buvo atkurtas į publikuotą versiją."
-
-msgid "You do not have permission to publish this page"
-msgstr "Jūs neturite teisės publikuoti šio puslapio"
-
-msgid "Page not published! A parent page is not published yet."
-msgstr "Puslapis nepublikuotas! Pradinis puslapis vis dar nepublikuotas."
-
-msgid "The content was successfully published."
-msgstr "Turinys buvo sėkmingai publikuotas."
-
-msgid "There was a problem publishing your content"
-msgstr "Iškilo problema publikuojant jūsų turinį"
-
-msgid "You do not have permission to unpublish this page"
-msgstr "Jūs neturite teisės nebepublikuoti šio puslapio"
-
-msgid "This page was never published"
-msgstr "Šis puslapis nebuvo publikuotas"
-
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr "%(language)s kalbos puslapis \"%(page)s\" sėkmingai nebepublikuojamas"
-
-#| msgid "You do not have permission to delete this plugin"
-msgid "You do not have permission to delete this page"
-msgstr "Jūs neturite teisės pašalinti šio puslapio"
-
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr "Pavadinimas ir įskiepiai su %(language)s kalbomis buvo pašalinti"
-
-#, python-format
-#| msgid "You do not have permission to change pages."
-msgid "You don't have permissions to see page \"%(title)s\""
-msgstr "Jūs neturite teisės peržiūrėti puslapio \"%(title)s\""
-
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Jūs neturite teisės keisti šio puslapio atvaizdavimo navigacijoje statuso"
 
 msgid "You do not have permission to edit this page"
 msgstr "Jūs neturite teisės redaguoti šio puslapio"
@@ -287,8 +244,28 @@ msgstr "Naujas vidinis puslapis"
 msgid "New page"
 msgstr "Naujas puslapis"
 
-msgid "The page is not eligible to be home."
-msgstr "Šis puslapis negali būti pradiniu puslapiu."
+msgid "Database error"
+msgstr "Duomenų bazės klaida"
+
+msgid "Template not valid"
+msgstr "Blogas šablonas"
+
+msgid "The template was successfully changed"
+msgstr "Šablonas buvo sėkmingai pakeistas"
+
+msgid "You do not have permission to copy these plugins."
+msgstr "Jūs neturite teisių kopijuoti šių įskiepių"
+
+#| msgid "You do not have permission to delete this plugin"
+msgid "You do not have permission to delete this page"
+msgstr "Jūs neturite teisės pašalinti šio puslapio"
+
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "Pavadinimas ir įskiepiai su %(language)s kalbomis buvo pašalinti"
+
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "Jūs neturite teisės keisti šio puslapio atvaizdavimo navigacijoje statuso"
 
 msgid "View restriction"
 msgstr "Peržiūrėjimo apribojimas"
@@ -315,15 +292,6 @@ msgstr "Įskiepis nerastas"
 
 msgid "You do not have permission to edit this plugin"
 msgstr "Jūs neturite teisės redaguoti šio įskiepio"
-
-msgid "order parameter references plugins in different trees"
-msgstr "rikiavimo parametras remiasi įskiepiais skirtinguose medžiuose"
-
-msgid "parent must be in the same placeholder"
-msgstr "pradinis elementas turi buti toje pačioje rezervuotoje vietoje"
-
-msgid "parent must be in the same language as plugin_language"
-msgstr "pradinis elementas turi būti tos pačios kalbos kaip įskiepis_kalba"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
@@ -391,6 +359,18 @@ msgstr "Tai susijęs paminėjimas, ši turinį galite redaguoti tik <a href=\"%(
 msgid "Create"
 msgstr "Kurti"
 
+msgid "Edit"
+msgstr "Redaguoti"
+
+msgid "Preview"
+msgstr "Peržiūra"
+
+msgid "Structure"
+msgstr "Struktūra"
+
+msgid "Content"
+msgstr "Turinys"
+
 msgid "Sites"
 msgstr "Tinklalapiai"
 
@@ -427,22 +407,6 @@ msgstr "Atsijungti"
 
 msgid "Language"
 msgstr "Kalba"
-
-msgid "Structure"
-msgstr "Struktūra"
-
-msgid "Content"
-msgstr "Turinys"
-
-#| msgid "Publish changes"
-msgid "Publish page changes"
-msgstr "Publikuoti puslapio pakeitimus"
-
-msgid "Publish page now"
-msgstr "Publikuoti puslapį"
-
-msgid "Page settings"
-msgstr "Puslapio nustatymai"
 
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
@@ -487,35 +451,20 @@ msgstr "Dublikuoti šį puslapį"
 msgid "Edit this Page"
 msgstr "Redaguoti šį puslapį"
 
+msgid "Page settings"
+msgstr "Puslapio nustatymai"
+
 msgid "Advanced settings"
 msgstr "Papildomi nustatymai"
 
 msgid "Templates"
 msgstr "Šablonai"
 
-msgid "Save as Page Type"
-msgstr "Išsaugoti kaip puslapio tipą"
-
-msgid "Permissions"
-msgstr "Teisės"
-
 msgid "Hide in navigation"
 msgstr "Paslėpti navigacijoje"
 
 msgid "Display in navigation"
 msgstr "Atvaizduoti navigacijoje"
-
-msgid "Unpublish page"
-msgstr "Anuliuoti puslapio publikavimą"
-
-msgid "Publish page"
-msgstr "Publikuoti puslapį"
-
-msgid "Are you sure you want to revert to live?"
-msgstr "Ar tikrai noritę grįžti i aktualų atvaizdavimą?"
-
-msgid "Revert to live"
-msgstr "Grįžti į aktualų"
 
 msgid "Delete page"
 msgstr "Pašalinti puslapį"
@@ -549,9 +498,6 @@ msgstr "Puslapis %(conflict_page)s turi tą patį url '%(url)s' kaip dabartinis 
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Puslapis %(conflict_page)s turi tą patį url '%(url)s' kaip dabartinis puslapis."
-
-msgid "Add Another"
-msgstr "Pridėti papildomą"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -645,9 +591,6 @@ msgstr "šablonas"
 msgid "login required"
 msgstr "būtinas prisijungimas"
 
-msgid "menu visibility"
-msgstr "meniu matomumas"
-
 msgid "application"
 msgstr "aplikacija"
 
@@ -663,54 +606,22 @@ msgstr "Suteikti"
 msgid "page"
 msgstr "puslapis"
 
-msgid "for logged in users only"
-msgstr "tik prisijungusiems vartotojams"
-
-msgid "for anonymous users only"
-msgstr "tik neregistruotiems lankytojams"
-
-msgid "Inherit from parent page"
-msgstr "Paveldėti iš pirminio puslapio"
-
-msgid "Deny"
-msgstr "Atmesti"
-
-msgid "Only this website"
-msgstr "Tik šis tinklalapis"
-
-msgid "Allow"
-msgstr "Leisti"
-
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr "Kada puslapis turėtų būti pradedamas atvaizduoti. Būsena turi būti \"Publikuota\" kad puslapis būtų atvaizduojamas."
-
-msgid "When to expire the page. Leave empty to never expire."
-msgstr "Kada puslapis nustos galioti. Palikite tuščią kad galiotų neribotą laiką."
-
-msgid "All ancestors will not be displayed in the navigation"
-msgstr "Visi pirminiai elementai nebus atvaizduojami navigacijoje"
-
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Unikalus identifikatorius, naudojamas su page_url templatetag nukreipiant į šį puslapį"
 
-msgid "The template used to render the content."
-msgstr "Šablonas naudojamas turinio atvaizdavimui."
-
-msgid "limit when this page is visible in the menu"
-msgstr "apriboti, kada šis puslapis yra matomas meniu"
-
 msgid "pages"
 msgstr "puslapiai"
 
-msgid "Empty"
-msgstr "Valyti"
-
 msgid "default"
 msgstr "pagrindinis"
+
+msgid "slug"
+msgstr "nuoroda"
+
+msgid "Path"
+msgstr "Kelias"
 
 msgid "Current page"
 msgstr "Dabartinis puslapis"
@@ -842,6 +753,24 @@ msgstr "statinės rezervuotos vietos"
 msgid "A static placeholder with the same site and code already exists"
 msgstr "Statinė rezervuota vieta su tuo pačiu tinklalapiu ir kodu jau egzistuoja"
 
+msgid "for logged in users only"
+msgstr "tik prisijungusiems vartotojams"
+
+msgid "for anonymous users only"
+msgstr "tik neregistruotiems lankytojams"
+
+msgid "Inherit from parent page"
+msgstr "Paveldėti iš pirminio puslapio"
+
+msgid "Deny"
+msgstr "Atmesti"
+
+msgid "Only this website"
+msgstr "Tik šis tinklalapis"
+
+msgid "Allow"
+msgstr "Leisti"
+
 msgid "title"
 msgstr "pavadinimas"
 
@@ -857,20 +786,11 @@ msgstr "aprašymas"
 msgid "The text displayed in search engines."
 msgstr "Tekstas atvaizduojamas paieškos sistemose."
 
-msgid "slug"
-msgstr "nuoroda"
-
-msgid "Path"
-msgstr "Kelias"
-
-msgid "has url overwrite"
-msgstr "turi url perrašymą"
-
 msgid "redirect"
 msgstr "nukreipti"
 
-msgid "is published"
-msgstr "publikuotas"
+msgid "The template used to render the content."
+msgstr "Šablonas naudojamas turinio atvaizdavimui."
 
 msgid "Advanced options"
 msgstr "Papildomi nustatymai"
@@ -885,6 +805,65 @@ msgstr "%(name)s \"%(obj)s\" buvo sėkmingai pakeistas."
 
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Daugiau nustatymų šiam įskiepiui nėra. Spauskite išsaugoti."
+
+msgid "Moved"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed"
+msgstr "Pakeistas"
+
+#| msgid "Delete"
+msgid "Deleted"
+msgstr ""
+
+#| msgid "Add %(language)s Translation"
+msgid "Added Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Changed Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Deleted Page Translation"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Added Plugin"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Moved Plugin"
+msgstr ""
+
+#| msgid "Delete page"
+msgid "Deleted Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Cut Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Paste Plugin"
+msgstr ""
+
+#| msgid "static placeholder"
+msgid "Paste to Placeholder"
+msgstr ""
+
+#| msgid "Copied plugins to %(placeholder)s"
+msgid "Added plugins to placeholder from clipboard"
+msgstr ""
+
+#| msgid "Placeholder"
+msgid "Cleared Placeholder"
+msgstr ""
 
 msgid "Save"
 msgstr "Išsaugoti"
@@ -921,6 +900,7 @@ msgid_plural "Please correct the errors below."
 msgstr[0] "Ištaisykite žemiau esančias klaidas."
 msgstr[1] "Ištaisykite žemiau esančias klaidas."
 msgstr[2] "Ištaisykite žemiau esančias klaidas."
+msgstr[3] "Ištaisykite žemiau esančias klaidas."
 
 msgid "All permissions"
 msgstr "Visos teisės"
@@ -976,9 +956,6 @@ msgstr "Išsaugoti kaip naują"
 msgid "Save and add another"
 msgstr "Išsaugoti ir pridėti naują"
 
-msgid "Basic Settings"
-msgstr "Paprasti nustatymai"
-
 msgid "Copy"
 msgstr "Kopijuoti"
 
@@ -1021,12 +998,11 @@ msgid ""
 "                                            "
 msgstr "\nAtkurti pašalintus %(name)s"
 
-#, python-format
 msgid ""
 "\n"
-"                                New %(name)s\n"
+"                                New Page\n"
 "                            "
-msgstr "\nNaujas %(name)s"
+msgstr ""
 
 #| msgid "in navigation"
 msgid "Main Navigation"
@@ -1098,13 +1074,12 @@ msgstr "Legenda"
 msgid "Published"
 msgstr "Publikuota"
 
-#| msgid "Change"
-msgid "Changed"
-msgstr "Pakeistas"
-
 #| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Nepublikuotas"
+
+msgid "Empty"
+msgstr "Valyti"
 
 #| msgid "in menu"
 msgid "In menu"
@@ -1129,23 +1104,6 @@ msgstr "Aplikacija"
 msgid "Application: %(apphook)s"
 msgstr "Aplikacija: %(apphook)s"
 
-#, python-format
-#| msgid "Edit this page in %(language)s "
-msgid "Preview this page in %(language)s "
-msgstr "Peržiūrėti šį puslapį %(language)s kalboje"
-
-msgid "Preview"
-msgstr "Peržiūra"
-
-msgid "Publish"
-msgstr "Publikuoti"
-
-msgid "Unpublish"
-msgstr "Anuliuoti publikavimą"
-
-msgid "Configure"
-msgstr "Konfigūruoti"
-
 msgid "in menu"
 msgstr "yra meniu"
 
@@ -1155,6 +1113,9 @@ msgstr "nesantis meniu"
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Puslapio nustatymai (spauskite SHIFT klavišą kad įjungti išplėstinius nustatymus)"
+
+msgid "Permissions"
+msgstr "Teisės"
 
 msgid "Clipboard"
 msgstr "Iškarpinė"
@@ -1183,9 +1144,6 @@ msgstr "Išskleisti visus"
 msgid "Collapse all"
 msgstr "Sutraukti visus"
 
-msgid "Edit"
-msgstr "Redaguoti"
-
 msgid "You cannot add plugins to this plugin."
 msgstr "Jūs negalite pridėti įskiepių į šį įskiepį."
 
@@ -1210,10 +1168,6 @@ msgstr "Galimi įskiepiai"
 #| msgid "Structure"
 msgid "Toggle structure"
 msgstr "Perjungti struktūrą"
-
-#| msgid "View published"
-msgid "View published"
-msgstr "Žiūrėti publikuotą"
 
 msgid "Login"
 msgstr "Prisijungti"
@@ -1323,9 +1277,6 @@ msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Prisijungti nepavyko.</strong> Patikrinkite savo duomenis ir bandykit dar kartą."
 
-msgid "This page has unpublished changes."
-msgstr "Šis puslapis turi nepublikuotų pakeitimų."
-
 msgid "Double-click to edit"
 msgstr "Redaguoti - dvigubas paspaudimas"
 
@@ -1431,6 +1382,9 @@ msgstr "\n                    <p class=\"cms-welcome-notes\">Jūs matote šia ž
 msgid "Welcome to django CMS"
 msgstr "Sveiki, tai django CMS"
 
+msgid "Add Another"
+msgstr "Pridėti papildomą"
+
 msgid "Back"
 msgstr "Atgal"
 
@@ -1440,20 +1394,12 @@ msgstr "Pasirinkite žemiau esantį nustatymą kad pereiti prie kito žingsnio."
 msgid "Next"
 msgstr "Kitas"
 
-msgid "unpublished changes"
-msgstr "nepublikuoti pakeitimai"
-
-msgid "published"
-msgstr "publikuota"
-
-msgid "unpublished parent"
-msgstr "nepublikuotas pradinis elementas"
-
-msgid "unpublished"
-msgstr "nepublikuotas"
-
 msgid "no content"
 msgstr "turinio nėra"
+
+#| msgid "no content"
+msgid "has contents"
+msgstr ""
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1530,6 +1476,10 @@ msgstr "Straipsniai"
 
 msgid "Sample App"
 msgstr "Pavyzdinė aplikacija"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr "Pavyzdinė aplikacija su konfigūracija"
 
 msgid "Sample App with excluded permissions"
 msgstr "Pavyzdinė aplikacija su panaikintomis teisėmis"
@@ -1646,6 +1596,121 @@ msgstr "Sukurti naują %s objektą."
 msgid "A wizard has already been registered for model: %s"
 msgstr "Vedlys jau užregistruotas modeliuil: %s"
 
+#~ msgid "X Frame Options"
+#~ msgstr "X Frame Options"
+
+#~ msgid "Whether this page can be embedded in other pages or websites"
+#~ msgstr "Whether this page can be embedded in other pages or websites"
+
+#~ msgid "Language independent options"
+#~ msgstr "Language independent options"
+
+#~ msgid "Publishing dates"
+#~ msgstr "Publishing dates"
+
+#~ msgid "Change Permissions"
+#~ msgstr "Change Permissions"
+
+#~ msgid "You do not have permission to revert this page."
+#~ msgstr "You do not have permission to edit this page"
+
+#~ msgid "You do not have permission to publish this page"
+#~ msgstr "You do not have permission to publish this page"
+
+#~ msgid "Page not published! A parent page is not published yet."
+#~ msgstr "Page not published! A parent page is not published yet."
+
+#~ msgid "The content was successfully published."
+#~ msgstr "The content was successfully published."
+
+#~ msgid "There was a problem publishing your content"
+#~ msgstr "There was a problem publishing your content"
+
+#~ msgid "You do not have permission to unpublish this page"
+#~ msgstr "You do not have permission to unpublish this page"
+
+#~ msgid "This page was never published"
+#~ msgstr "This page was never published"
+
+#~ msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+#~ msgstr "The %(language)s page \"%(page)s\" was successfully unpublished"
+
+#~ msgid "You don't have permissions to see page \"%(title)s\""
+#~ msgstr "You do not have permission to change pages."
+
+#~ msgid "parent must be in the same placeholder"
+#~ msgstr "parent must be in the same placeholder"
+
+#~ msgid "parent must be in the same language as plugin_language"
+#~ msgstr "parent must be in the same language as plugin_language"
+
+#~ msgid "Publish page changes"
+#~ msgstr "Publish changes"
+
+#~ msgid "Publish page now"
+#~ msgstr "Publish page now"
+
+#~ msgid "Save as Page Type"
+#~ msgstr "Save as Page Type"
+
+#~ msgid "Unpublish page"
+#~ msgstr "Unpublish page"
+
+#~ msgid "Publish page"
+#~ msgstr "Publish page"
+
+#~ msgid "Are you sure you want to revert to live?"
+#~ msgstr "Are you sure you want to revert to live?"
+
+#~ msgid "Revert to live"
+#~ msgstr "Revert to live"
+
+#~ msgid ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+#~ msgstr ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+
+#~ msgid "When to expire the page. Leave empty to never expire."
+#~ msgstr "When to expire the page. Leave empty to never expire."
+
+#~ msgid "has url overwrite"
+#~ msgstr "has url overwrite"
+
+#~ msgid "is published"
+#~ msgstr "is published"
+
+#~ msgid "Basic Settings"
+#~ msgstr "Basic Settings"
+
+#~ msgid "Preview this page in %(language)s "
+#~ msgstr "Edit this page in %(language)s "
+
+#~ msgid "Publish"
+#~ msgstr "Publish"
+
+#~ msgid "Unpublish"
+#~ msgstr "Unpublish"
+
+#~ msgid "View published"
+#~ msgstr "View published"
+
+#~ msgid "This page has unpublished changes."
+#~ msgstr "This page has unpublished changes."
+
+#~ msgid "unpublished changes"
+#~ msgstr "unpublished changes"
+
+#~ msgid "published"
+#~ msgstr "published"
+
+#~ msgid "unpublished parent"
+#~ msgstr "unpublished parent"
+
+#~ msgid "unpublished"
+#~ msgstr "unpublished"
+
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."
 
@@ -1724,9 +1789,6 @@ msgstr "Vedlys jau užregistruotas modeliuil: %s"
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 #~ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
 
 #~ msgid ""
 #~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -1822,6 +1884,7 @@ msgstr "Vedlys jau užregistruotas modeliuil: %s"
 #~ msgstr[0] "a848884d0af974a125106fa2043a5716_pl_0"
 #~ msgstr[1] "a848884d0af974a125106fa2043a5716_pl_1"
 #~ msgstr[2] "a848884d0af974a125106fa2043a5716_pl_2"
+#~ msgstr[3] "a848884d0af974a125106fa2043a5716_pl_3"
 
 #~ msgid "%(full_result_count)s total"
 #~ msgstr "%(full_result_count)s total"

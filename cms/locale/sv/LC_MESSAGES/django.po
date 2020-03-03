@@ -7,6 +7,7 @@
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
+# Christofer Huynh <christofer.huynh@gmail.com>, 2018
 # hula <fredrik@1px.se>, 2014
 # hannseman <hannseman@gmail.com>, 2011
 # hannseman <hannseman@gmail.com>, 2011
@@ -29,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2020-03-03 13:49+0000\n"
+"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Swedish (http://www.transifex.com/divio/django-cms/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -71,7 +72,7 @@ msgid ""
 msgstr "Anger vad som visas i webbläsarens topp eller i bokmärken"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "Beskrivning metatagg"
 
 msgid "A description of the page used by search engines."
 msgstr "En beskrivning av sidan som används av sökmotorer."
@@ -85,23 +86,18 @@ msgstr "Sidtyp"
 msgid "Page Types"
 msgstr "Sidtyp"
 
-msgid "Application"
-msgstr "Applikation"
-
-msgid "Hook application to this page."
-msgstr "Koppla applikation till denna sida."
-
 msgid "Overwrite URL"
 msgstr "Ändra URL"
 
 msgid "Keep this field empty if standard path should be used."
 msgstr "Lämna tomt om den vanliga sökvägen ska användas."
 
-msgid "X Frame Options"
+#| msgid "softroot"
+msgid "Soft root"
 msgstr ""
 
-msgid "Whether this page can be embedded in other pages or websites"
-msgstr "Om denna sida kan inbäddas i andra sidor eller sajter"
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "Alla ovanstående sidor kommer inte att visas i navigeringen"
 
 msgid "Redirect"
 msgstr "Omdirigera"
@@ -112,24 +108,44 @@ msgstr "Omdirigerar till denna URL"
 msgid "Start typing..."
 msgstr "Börja skriv ..."
 
+msgid "menu visibility"
+msgstr "menysynlighet"
+
+msgid "limit when this page is visible in the menu"
+msgstr "begränsa när denna sida ska vara synlig i menyn"
+
+#| msgid "Copy options"
+msgid "URL options"
+msgstr ""
+
+#| msgid "Copy options"
+msgid "Menu options"
+msgstr ""
+
+msgid "Application"
+msgstr "Applikation"
+
+msgid "Hook application to this page."
+msgstr "Koppla applikation till denna sida."
+
 msgid "Application configurations"
 msgstr "Applikationskonfiguration"
 
-msgid "Language independent options"
-msgstr "Språkoberoende alternativ"
-
-#, python-format
-msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr "URL-rubrik för %(language)s måste sättas innan de avancerade inställningarna kan ändras."
-
 msgid "A page with this reverse URL id exists already."
 msgstr "En sida med detta URL-id finns redan."
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
 
 msgid "An application instance using this configuration already exists."
 msgstr "En instans av applikationen som använder denna konfiguration finns redan."
 
 msgid "An application instance with this name already exists."
 msgstr "En instans av applikationen med detta namn finns redan."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "Ja"
@@ -190,26 +206,26 @@ msgid "Language must be set to a supported language!"
 msgstr "Språket måste vara ett av de som stödjs"
 
 msgid "Parent plugin language must be same as language!"
-msgstr ""
+msgstr "Parent plugin språket måste vara på samma språk!"
 
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "Parent plugin platshållare måste vara samma som platshållare!"
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Plugin position must be greater than %(position)d"
 msgstr ""
 
 msgid "Advanced Settings"
 msgstr "Avancerade inställningar"
 
-msgid "Publishing dates"
-msgstr "Publiceringsdatum"
+msgid "The page is not eligible to be home."
+msgstr ""
 
-msgid "Change Permissions"
-msgstr "Ändra rättigheter"
+#, python-format
+#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -222,76 +238,18 @@ msgstr "Är du säker?"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s objekt med primär nycket %(key)r existerar inte."
 
-msgid "Database error"
-msgstr "Databaserror"
-
-msgid "Template not valid"
-msgstr "Ogiltig mall"
-
-msgid "The template was successfully changed"
-msgstr "Mall ändrad"
-
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Fel: Du har inte rättighet att flytta denna sida. Var god ladda om sidan"
 
-msgid "You do not have permission to copy these plugins."
-msgstr "Du har inte tillåtelse att kopiera dessa plugins"
-
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Fel! Du har inte rättighet att kopiera denna sida."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
-
-#| msgid "You do not have permission to edit this page"
-msgid "You do not have permission to revert this page."
-msgstr "Du har inte rättighet att återställa denna sida"
-
-#, python-format
-msgid "\"%s\" was reverted to the live version."
-msgstr "\"%s\" har återställts till den publicerade versionen."
-
-msgid "You do not have permission to publish this page"
-msgstr "Du har inte tillåtelse att publicera denna sida"
-
-msgid "Page not published! A parent page is not published yet."
-msgstr "Sidan är inte publicerad! En överliggande sida är inte publicerad ännu."
-
-msgid "The content was successfully published."
-msgstr "Innehåll publicerat"
-
-msgid "There was a problem publishing your content"
-msgstr "Ett problem uppstod medans ditt innehåll publicerades"
-
-msgid "You do not have permission to unpublish this page"
-msgstr "Du har inte tillåtelse att avpublicera denna sida"
-
-msgid "This page was never published"
-msgstr "Denna sida har aldrig publicerats"
-
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr "Sidan %(page)s\" på  %(language)s har avpublicerats"
-
-#| msgid "You do not have permission to delete this plugin"
-msgid "You do not have permission to delete this page"
-msgstr "Du har inte rättighet att ta bort denna sida"
-
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr "Rubrik och plugins för språket %(language)s raderades"
-
-#, python-format
-#| msgid "You do not have permission to change pages."
-msgid "You don't have permissions to see page \"%(title)s\""
-msgstr "Du har inte rättighet att se sidan \"%(title)s\""
-
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Du har inte tillåtelse att ändra denna sidas 'i navigation'-status"
 
 msgid "You do not have permission to edit this page"
 msgstr "Du har inte tillåtelse att redigera den här sidan"
@@ -305,8 +263,28 @@ msgstr "Ny undersida"
 msgid "New page"
 msgstr "Ny sida"
 
-msgid "The page is not eligible to be home."
-msgstr ""
+msgid "Database error"
+msgstr "Databaserror"
+
+msgid "Template not valid"
+msgstr "Ogiltig mall"
+
+msgid "The template was successfully changed"
+msgstr "Mall ändrad"
+
+msgid "You do not have permission to copy these plugins."
+msgstr "Du har inte tillåtelse att kopiera dessa plugins"
+
+#| msgid "You do not have permission to delete this plugin"
+msgid "You do not have permission to delete this page"
+msgstr "Du har inte rättighet att ta bort denna sida"
+
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "Rubrik och plugins för språket %(language)s raderades"
+
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "Du har inte tillåtelse att ändra denna sidas 'i navigation'-status"
 
 msgid "View restriction"
 msgstr "Vy-restriktion"
@@ -333,15 +311,6 @@ msgstr "Plugin ej funnet"
 
 msgid "You do not have permission to edit this plugin"
 msgstr "Du har inte behörighet att redigera detta plugin-objekt"
-
-msgid "order parameter references plugins in different trees"
-msgstr ""
-
-msgid "parent must be in the same placeholder"
-msgstr ""
-
-msgid "parent must be in the same language as plugin_language"
-msgstr ""
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
@@ -409,6 +378,18 @@ msgstr ""
 msgid "Create"
 msgstr "Skapa"
 
+msgid "Edit"
+msgstr "Redigera"
+
+msgid "Preview"
+msgstr "Förhandsgranska"
+
+msgid "Structure"
+msgstr "Struktur"
+
+msgid "Content"
+msgstr "Innehåll"
+
 msgid "Sites"
 msgstr "Siter"
 
@@ -422,16 +403,16 @@ msgid "User settings"
 msgstr "Användarinställningar"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "Urklipp..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Rensa urklipp"
 
 msgid "Disable toolbar"
 msgstr "Inaktivera verktygsfält "
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Genvägar..."
 
 msgid "Users"
 msgstr "Användare"
@@ -445,22 +426,6 @@ msgstr "Logga ut"
 
 msgid "Language"
 msgstr "Språk"
-
-msgid "Structure"
-msgstr "Struktur"
-
-msgid "Content"
-msgstr "Innehåll"
-
-#| msgid "Publish changes"
-msgid "Publish page changes"
-msgstr "Publicera ändringar på sida"
-
-msgid "Publish page now"
-msgstr "Publicera sida"
-
-msgid "Page settings"
-msgstr "Sidinställningar"
 
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
@@ -505,35 +470,20 @@ msgstr "Duplicera denna sidan"
 msgid "Edit this Page"
 msgstr "Redigera sida"
 
+msgid "Page settings"
+msgstr "Sidinställningar"
+
 msgid "Advanced settings"
 msgstr "Avancerade inställningar"
 
 msgid "Templates"
 msgstr "Mallar"
 
-msgid "Save as Page Type"
-msgstr "Spara som sidtyp"
-
-msgid "Permissions"
-msgstr "Rättigheter"
-
 msgid "Hide in navigation"
 msgstr "Göm i navigation"
 
 msgid "Display in navigation"
 msgstr "Visa i navigation"
-
-msgid "Unpublish page"
-msgstr "Avpublicera sida"
-
-msgid "Publish page"
-msgstr "Publicera sida"
-
-msgid "Are you sure you want to revert to live?"
-msgstr "Är du säker på att du vill återgå till live?"
-
-msgid "Revert to live"
-msgstr "Återgå till live"
 
 msgid "Delete page"
 msgstr "Radera sida"
@@ -567,9 +517,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Lägg till en till"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -663,9 +610,6 @@ msgstr "mall"
 msgid "login required"
 msgstr "login krävs"
 
-msgid "menu visibility"
-msgstr "menysynlighet"
-
 msgid "application"
 msgstr "applikation"
 
@@ -681,54 +625,22 @@ msgstr "Tillåtelse gäller"
 msgid "page"
 msgstr "sida"
 
-msgid "for logged in users only"
-msgstr "endast för inloggade användare"
-
-msgid "for anonymous users only"
-msgstr "endast för anonyma användare"
-
-msgid "Inherit from parent page"
-msgstr "Ärv från förälder"
-
-msgid "Deny"
-msgstr "Neka"
-
-msgid "Only this website"
-msgstr "Bara denna webbsidan"
-
-msgid "Allow"
-msgstr "Tillåt"
-
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr "När sidan ska gå live. Status måste vara \"Publicerad\" för att sidan ska gå live."
-
-msgid "When to expire the page. Leave empty to never expire."
-msgstr "När sidan ska utgå. Lämna blank för att inaktivera funktionen."
-
-msgid "All ancestors will not be displayed in the navigation"
-msgstr "Alla ovanstående sidor kommer inte att visas i navigeringen"
-
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Ett unikt id som används med mallkommandot page_url för att länka till denna sida"
 
-msgid "The template used to render the content."
-msgstr "Mallen som används för att visa innehållet."
-
-msgid "limit when this page is visible in the menu"
-msgstr "begränsa när denna sida ska vara synlig i menyn"
-
 msgid "pages"
 msgstr "sidor"
 
-msgid "Empty"
-msgstr "Tomt"
-
 msgid "default"
 msgstr "standard"
+
+msgid "slug"
+msgstr "slug"
+
+msgid "Path"
+msgstr "Sökväg"
 
 msgid "Current page"
 msgstr "Denna sida"
@@ -860,6 +772,24 @@ msgstr "statiska placeholders"
 msgid "A static placeholder with the same site and code already exists"
 msgstr "En statisk placeholder med samam sajt och kod finns redan"
 
+msgid "for logged in users only"
+msgstr "endast för inloggade användare"
+
+msgid "for anonymous users only"
+msgstr "endast för anonyma användare"
+
+msgid "Inherit from parent page"
+msgstr "Ärv från förälder"
+
+msgid "Deny"
+msgstr "Neka"
+
+msgid "Only this website"
+msgstr "Bara denna webbsidan"
+
+msgid "Allow"
+msgstr "Tillåt"
+
 msgid "title"
 msgstr "rubrik"
 
@@ -875,20 +805,11 @@ msgstr "beskrivning"
 msgid "The text displayed in search engines."
 msgstr "Texten som visas i sökmotorer"
 
-msgid "slug"
-msgstr "slug"
-
-msgid "Path"
-msgstr "Sökväg"
-
-msgid "has url overwrite"
-msgstr ""
-
 msgid "redirect"
 msgstr "omdirigera"
 
-msgid "is published"
-msgstr "är publicerad"
+msgid "The template used to render the content."
+msgstr "Mallen som används för att visa innehållet."
 
 msgid "Advanced options"
 msgstr "Avancerade inställningar"
@@ -903,6 +824,65 @@ msgstr ""
 
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Det finns inga ytterligare inställningar för detta plugin. Klicka OK för att spara."
+
+msgid "Moved"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed"
+msgstr "Ändrad"
+
+#| msgid "Delete"
+msgid "Deleted"
+msgstr ""
+
+#| msgid "Add %(language)s Translation"
+msgid "Added Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Changed Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Deleted Page Translation"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Added Plugin"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Moved Plugin"
+msgstr ""
+
+#| msgid "Delete page"
+msgid "Deleted Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Cut Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Paste Plugin"
+msgstr ""
+
+#| msgid "static placeholder"
+msgid "Paste to Placeholder"
+msgstr ""
+
+#| msgid "Copied plugins to %(placeholder)s"
+msgid "Added plugins to placeholder from clipboard"
+msgstr ""
+
+#| msgid "Placeholder"
+msgid "Cleared Placeholder"
+msgstr ""
 
 msgid "Save"
 msgstr "Spara"
@@ -993,9 +973,6 @@ msgstr "Spara som ny"
 msgid "Save and add another"
 msgstr "Spara och lägg till"
 
-msgid "Basic Settings"
-msgstr "Grundinställningar"
-
 msgid "Copy"
 msgstr "Kopiera"
 
@@ -1038,12 +1015,11 @@ msgid ""
 "                                            "
 msgstr "\n                                                Återställ borttagen %(name)s\n                                            "
 
-#, python-format
 msgid ""
 "\n"
-"                                New %(name)s\n"
+"                                New Page\n"
 "                            "
-msgstr "\n                                Ny %(name)s\n                            "
+msgstr ""
 
 #| msgid "in navigation"
 msgid "Main Navigation"
@@ -1115,13 +1091,12 @@ msgstr ""
 msgid "Published"
 msgstr "Publicerad"
 
-#| msgid "Change"
-msgid "Changed"
-msgstr "Ändrad"
-
 #| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Opublicerad"
+
+msgid "Empty"
+msgstr "Tomt"
 
 #| msgid "in menu"
 msgid "In menu"
@@ -1146,23 +1121,6 @@ msgstr ""
 msgid "Application: %(apphook)s"
 msgstr "Applikation: %(apphook)s"
 
-#, python-format
-#| msgid "Edit this page in %(language)s "
-msgid "Preview this page in %(language)s "
-msgstr ""
-
-msgid "Preview"
-msgstr "Förhandsgranska"
-
-msgid "Publish"
-msgstr "Publicera"
-
-msgid "Unpublish"
-msgstr "Avpublicera"
-
-msgid "Configure"
-msgstr "Konfigurera"
-
 msgid "in menu"
 msgstr "i menyn"
 
@@ -1173,8 +1131,11 @@ msgstr "ej i menyn"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Inställningar för sida (SHIFT-klicka för avancerade inställningar)"
 
+msgid "Permissions"
+msgstr "Rättigheter"
+
 msgid "Clipboard"
-msgstr ""
+msgstr "Urklipp"
 
 msgid "Add plugin"
 msgstr "Lägg till plugin"
@@ -1200,9 +1161,6 @@ msgstr "Expandera all"
 msgid "Collapse all"
 msgstr "Kollapsa alla"
 
-msgid "Edit"
-msgstr "Redigera"
-
 msgid "You cannot add plugins to this plugin."
 msgstr "Du kan inte lägga till plugins i detta plugin"
 
@@ -1210,7 +1168,7 @@ msgid "This plugin cannot be moved or edited outside of its parent"
 msgstr "Detta plugn kan inte flyttas eller redigeras utanför sitt förälder-plugin"
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Urklippen är tom."
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
 msgstr "Detta plugin tillåter inte andra plugins av denna typ som underplugins"
@@ -1226,10 +1184,6 @@ msgstr "Tillgängliga plugins"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
-
-#| msgid "View published"
-msgid "View published"
 msgstr ""
 
 msgid "Login"
@@ -1340,9 +1294,6 @@ msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Inloggning misslyckades.</strong> Var vänlig kontrollera uppgifterna och försök igen."
 
-msgid "This page has unpublished changes."
-msgstr "Den här sidan har opublicerade ändringar."
-
 msgid "Double-click to edit"
 msgstr "Dubbelklicka för att redigera"
 
@@ -1448,6 +1399,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "Välkommen till django CMS"
 
+msgid "Add Another"
+msgstr "Lägg till en till"
+
 msgid "Back"
 msgstr "Tillbaka"
 
@@ -1457,20 +1411,12 @@ msgstr "Välj ett alternativ från nedan för att gå vidare till nästa steg"
 msgid "Next"
 msgstr "Nästa"
 
-msgid "unpublished changes"
-msgstr "opublicerade ändringar"
-
-msgid "published"
-msgstr "publicera"
-
-msgid "unpublished parent"
-msgstr "opublicerad förälder"
-
-msgid "unpublished"
-msgstr "opublicerad"
-
 msgid "no content"
 msgstr "inget innehåll"
+
+#| msgid "no content"
+msgid "has contents"
+msgstr ""
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1547,6 +1493,10 @@ msgstr "Artiklar"
 
 msgid "Sample App"
 msgstr "Exempel-app"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr ""
@@ -1663,6 +1613,121 @@ msgstr "Skapa en ny %s instans."
 msgid "A wizard has already been registered for model: %s"
 msgstr ""
 
+#~ msgid "X Frame Options"
+#~ msgstr "X Frame Options"
+
+#~ msgid "Whether this page can be embedded in other pages or websites"
+#~ msgstr "Whether this page can be embedded in other pages or websites"
+
+#~ msgid "Language independent options"
+#~ msgstr "Language independent options"
+
+#~ msgid "Publishing dates"
+#~ msgstr "Publishing dates"
+
+#~ msgid "Change Permissions"
+#~ msgstr "Change Permissions"
+
+#~ msgid "You do not have permission to revert this page."
+#~ msgstr "You do not have permission to edit this page"
+
+#~ msgid "You do not have permission to publish this page"
+#~ msgstr "You do not have permission to publish this page"
+
+#~ msgid "Page not published! A parent page is not published yet."
+#~ msgstr "Page not published! A parent page is not published yet."
+
+#~ msgid "The content was successfully published."
+#~ msgstr "The content was successfully published."
+
+#~ msgid "There was a problem publishing your content"
+#~ msgstr "There was a problem publishing your content"
+
+#~ msgid "You do not have permission to unpublish this page"
+#~ msgstr "You do not have permission to unpublish this page"
+
+#~ msgid "This page was never published"
+#~ msgstr "This page was never published"
+
+#~ msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+#~ msgstr "The %(language)s page \"%(page)s\" was successfully unpublished"
+
+#~ msgid "You don't have permissions to see page \"%(title)s\""
+#~ msgstr "You do not have permission to change pages."
+
+#~ msgid "parent must be in the same placeholder"
+#~ msgstr "parent must be in the same placeholder"
+
+#~ msgid "parent must be in the same language as plugin_language"
+#~ msgstr "parent must be in the same language as plugin_language"
+
+#~ msgid "Publish page changes"
+#~ msgstr "Publish changes"
+
+#~ msgid "Publish page now"
+#~ msgstr "Publish page now"
+
+#~ msgid "Save as Page Type"
+#~ msgstr "Save as Page Type"
+
+#~ msgid "Unpublish page"
+#~ msgstr "Unpublish page"
+
+#~ msgid "Publish page"
+#~ msgstr "Publish page"
+
+#~ msgid "Are you sure you want to revert to live?"
+#~ msgstr "Are you sure you want to revert to live?"
+
+#~ msgid "Revert to live"
+#~ msgstr "Revert to live"
+
+#~ msgid ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+#~ msgstr ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+
+#~ msgid "When to expire the page. Leave empty to never expire."
+#~ msgstr "When to expire the page. Leave empty to never expire."
+
+#~ msgid "has url overwrite"
+#~ msgstr "has url overwrite"
+
+#~ msgid "is published"
+#~ msgstr "is published"
+
+#~ msgid "Basic Settings"
+#~ msgstr "Basic Settings"
+
+#~ msgid "Preview this page in %(language)s "
+#~ msgstr "Edit this page in %(language)s "
+
+#~ msgid "Publish"
+#~ msgstr "Publish"
+
+#~ msgid "Unpublish"
+#~ msgstr "Unpublish"
+
+#~ msgid "View published"
+#~ msgstr "View published"
+
+#~ msgid "This page has unpublished changes."
+#~ msgstr "This page has unpublished changes."
+
+#~ msgid "unpublished changes"
+#~ msgstr "unpublished changes"
+
+#~ msgid "published"
+#~ msgstr "published"
+
+#~ msgid "unpublished parent"
+#~ msgstr "unpublished parent"
+
+#~ msgid "unpublished"
+#~ msgstr "unpublished"
+
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."
 
@@ -1741,9 +1806,6 @@ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 #~ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
 
 #~ msgid ""
 #~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
