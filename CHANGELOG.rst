@@ -3,6 +3,13 @@ Changelog
 =========
 
 
+3.7.2
+==================
+* Fix a bug about the slugs of child pages being built incorrectly and
+  returning a 404 error when a user was adding a custom slug
+  for another language of the parent page.
+
+
 3.7.1 (2019-11-26)
 ==================
 

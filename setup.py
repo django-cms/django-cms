@@ -33,6 +33,7 @@ INSTALL_REQUIREMENTS = [
     'django-treebeard>=4.3',
     'django-sekizai>=0.7',
     'djangocms-admin-style>=1.2',
+    'django-fieldsignals>=0.5.0',
 ]
 
 setup(
