@@ -12,15 +12,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2020-03-03 13:49+0000\n"
+"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/divio/django-cms/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: he\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n == 2 && n % 1 == 0) ? 1: (n % 10 == 0 && n % 1 == 0 && n > 10) ? 2 : 3;\n"
 
 msgid "All"
 msgstr ""
@@ -68,22 +68,17 @@ msgstr "סוג דף"
 msgid "Page Types"
 msgstr "סוגי דף"
 
-msgid "Application"
-msgstr "יישום"
-
-msgid "Hook application to this page."
-msgstr ""
-
 msgid "Overwrite URL"
 msgstr "שכתב URL"
 
 msgid "Keep this field empty if standard path should be used."
 msgstr "השאר תיבה זו ריקה אם נדרש שימוש ב-path סטנדרטי"
 
-msgid "X Frame Options"
+#| msgid "softroot"
+msgid "Soft root"
 msgstr ""
 
-msgid "Whether this page can be embedded in other pages or websites"
+msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
 
 msgid "Redirect"
@@ -95,23 +90,43 @@ msgstr "מנתב ל-URL הבא"
 msgid "Start typing..."
 msgstr "התחל לכתוב..."
 
+msgid "menu visibility"
+msgstr ""
+
+msgid "limit when this page is visible in the menu"
+msgstr ""
+
+#| msgid "Copy options"
+msgid "URL options"
+msgstr ""
+
+#| msgid "Copy options"
+msgid "Menu options"
+msgstr ""
+
+msgid "Application"
+msgstr "יישום"
+
+msgid "Hook application to this page."
+msgstr ""
+
 msgid "Application configurations"
 msgstr "הגדרות אפליקציה"
 
-msgid "Language independent options"
-msgstr ""
-
-#, python-format
-msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
-
 msgid "A page with this reverse URL id exists already."
+msgstr ""
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
 msgstr ""
 
 msgid "An application instance using this configuration already exists."
 msgstr ""
 
 msgid "An application instance with this name already exists."
+msgstr ""
+
+msgid "You can't move the home page inside another page"
 msgstr ""
 
 msgid "Yes"
@@ -180,19 +195,19 @@ msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr ""
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Plugin position must be greater than %(position)d"
 msgstr ""
 
 msgid "Advanced Settings"
 msgstr "אפשרויות מתקדמות"
 
-msgid "Publishing dates"
-msgstr "תאריך הפצה"
+msgid "The page is not eligible to be home."
+msgstr ""
 
-msgid "Change Permissions"
-msgstr "שנה הרשאות"
+#, python-format
+#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -205,21 +220,9 @@ msgstr "האם אתה בטוח?"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr ""
 
-msgid "Database error"
-msgstr "שגיאת מסד נתונים"
-
-msgid "Template not valid"
-msgstr "התבנית לא חוקית"
-
-msgid "The template was successfully changed"
-msgstr "התבנית שונתה בהצלחה"
-
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "אזהרה! אין לך הרשאות להזיז את הדף הזה. טען מחדש את הדף."
-
-msgid "You do not have permission to copy these plugins."
-msgstr "אין לך הרשאה להעתיק את התוסף האלה"
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
@@ -229,52 +232,6 @@ msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
-
-#| msgid "You do not have permission to edit this page"
-msgid "You do not have permission to revert this page."
-msgstr ""
-
-#, python-format
-msgid "\"%s\" was reverted to the live version."
-msgstr ""
-
-msgid "You do not have permission to publish this page"
-msgstr "אין לך הרשאה להפיץ דף זה"
-
-msgid "Page not published! A parent page is not published yet."
-msgstr ""
-
-msgid "The content was successfully published."
-msgstr "התוכן פורסם בהצלחה."
-
-msgid "There was a problem publishing your content"
-msgstr "היתה בעייה בפרסום התוכן שלך."
-
-msgid "You do not have permission to unpublish this page"
-msgstr "אין לך הרשאה לבטל את פרסום הדף הזה."
-
-msgid "This page was never published"
-msgstr "הדף מעולם לא פורסם"
-
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr ""
-
-#| msgid "You do not have permission to delete this plugin"
-msgid "You do not have permission to delete this page"
-msgstr ""
-
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr ""
-
-#, python-format
-#| msgid "You do not have permission to change pages."
-msgid "You don't have permissions to see page \"%(title)s\""
-msgstr "אין לך הרשאות לראות את הדף \"%(title)s\""
-
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "אין לך הרשאות לשנות את מצב in_navigation של דף זה"
 
 msgid "You do not have permission to edit this page"
 msgstr "אין לך הרשאה לערוך את הדף הזה"
@@ -288,8 +245,28 @@ msgstr ""
 msgid "New page"
 msgstr ""
 
-msgid "The page is not eligible to be home."
+msgid "Database error"
+msgstr "שגיאת מסד נתונים"
+
+msgid "Template not valid"
+msgstr "התבנית לא חוקית"
+
+msgid "The template was successfully changed"
+msgstr "התבנית שונתה בהצלחה"
+
+msgid "You do not have permission to copy these plugins."
+msgstr "אין לך הרשאה להעתיק את התוסף האלה"
+
+#| msgid "You do not have permission to delete this plugin"
+msgid "You do not have permission to delete this page"
 msgstr ""
+
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr ""
+
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "אין לך הרשאות לשנות את מצב in_navigation של דף זה"
 
 msgid "View restriction"
 msgstr ""
@@ -316,15 +293,6 @@ msgstr "תוסף לא נמצא"
 
 msgid "You do not have permission to edit this plugin"
 msgstr "אין לך הרשאה לערוך את התוסף הזה"
-
-msgid "order parameter references plugins in different trees"
-msgstr ""
-
-msgid "parent must be in the same placeholder"
-msgstr ""
-
-msgid "parent must be in the same language as plugin_language"
-msgstr ""
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
@@ -392,6 +360,18 @@ msgstr ""
 msgid "Create"
 msgstr "צור"
 
+msgid "Edit"
+msgstr ""
+
+msgid "Preview"
+msgstr "תצוגה מקדימה"
+
+msgid "Structure"
+msgstr "מבנה"
+
+msgid "Content"
+msgstr "תוכן"
+
 msgid "Sites"
 msgstr "אתרים"
 
@@ -428,22 +408,6 @@ msgstr "יציאת משתמש"
 
 msgid "Language"
 msgstr "שפה"
-
-msgid "Structure"
-msgstr "מבנה"
-
-msgid "Content"
-msgstr "תוכן"
-
-#| msgid "Publish changes"
-msgid "Publish page changes"
-msgstr ""
-
-msgid "Publish page now"
-msgstr ""
-
-msgid "Page settings"
-msgstr "הגדרות דף"
 
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
@@ -488,34 +452,19 @@ msgstr "שכפל דף זה"
 msgid "Edit this Page"
 msgstr "ערוך דף זה"
 
+msgid "Page settings"
+msgstr "הגדרות דף"
+
 msgid "Advanced settings"
 msgstr "הגדרות מתקדמות"
 
 msgid "Templates"
 msgstr "תבניות"
 
-msgid "Save as Page Type"
-msgstr ""
-
-msgid "Permissions"
-msgstr "הרשאות"
-
 msgid "Hide in navigation"
 msgstr ""
 
 msgid "Display in navigation"
-msgstr ""
-
-msgid "Unpublish page"
-msgstr "הוצא דף מפרסם"
-
-msgid "Publish page"
-msgstr "פרסם דף"
-
-msgid "Are you sure you want to revert to live?"
-msgstr ""
-
-msgid "Revert to live"
 msgstr ""
 
 msgid "Delete page"
@@ -549,9 +498,6 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add Another"
 msgstr ""
 
 msgid ""
@@ -646,9 +592,6 @@ msgstr "תבנית"
 msgid "login required"
 msgstr ""
 
-msgid "menu visibility"
-msgstr ""
-
 msgid "application"
 msgstr "יישום"
 
@@ -664,54 +607,22 @@ msgstr ""
 msgid "page"
 msgstr "עמוד"
 
-msgid "for logged in users only"
-msgstr ""
-
-msgid "for anonymous users only"
-msgstr "למשתמשים אנונימיים בלבד"
-
-msgid "Inherit from parent page"
-msgstr ""
-
-msgid "Deny"
-msgstr ""
-
-msgid "Only this website"
-msgstr ""
-
-msgid "Allow"
-msgstr ""
-
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr ""
-
-msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
-
-msgid "All ancestors will not be displayed in the navigation"
-msgstr ""
-
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr ""
 
-msgid "The template used to render the content."
-msgstr ""
-
-msgid "limit when this page is visible in the menu"
-msgstr ""
-
 msgid "pages"
-msgstr ""
-
-msgid "Empty"
 msgstr ""
 
 msgid "default"
 msgstr "ברירת מחדל"
+
+msgid "slug"
+msgstr ""
+
+msgid "Path"
+msgstr ""
 
 msgid "Current page"
 msgstr "עמוד נוכחי"
@@ -843,6 +754,24 @@ msgstr ""
 msgid "A static placeholder with the same site and code already exists"
 msgstr ""
 
+msgid "for logged in users only"
+msgstr ""
+
+msgid "for anonymous users only"
+msgstr "למשתמשים אנונימיים בלבד"
+
+msgid "Inherit from parent page"
+msgstr ""
+
+msgid "Deny"
+msgstr ""
+
+msgid "Only this website"
+msgstr ""
+
+msgid "Allow"
+msgstr ""
+
 msgid "title"
 msgstr "כותרת"
 
@@ -858,19 +787,10 @@ msgstr "תיאור"
 msgid "The text displayed in search engines."
 msgstr ""
 
-msgid "slug"
-msgstr ""
-
-msgid "Path"
-msgstr ""
-
-msgid "has url overwrite"
-msgstr ""
-
 msgid "redirect"
 msgstr "נתב מחדש"
 
-msgid "is published"
+msgid "The template used to render the content."
 msgstr ""
 
 msgid "Advanced options"
@@ -885,6 +805,65 @@ msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr ""
 
 msgid "There are no further settings for this plugin. Please press save."
+msgstr ""
+
+msgid "Moved"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed"
+msgstr ""
+
+#| msgid "Delete"
+msgid "Deleted"
+msgstr ""
+
+#| msgid "Add %(language)s Translation"
+msgid "Added Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Changed Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Deleted Page Translation"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Added Plugin"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Moved Plugin"
+msgstr ""
+
+#| msgid "Delete page"
+msgid "Deleted Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Cut Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Paste Plugin"
+msgstr ""
+
+#| msgid "static placeholder"
+msgid "Paste to Placeholder"
+msgstr ""
+
+#| msgid "Copied plugins to %(placeholder)s"
+msgid "Added plugins to placeholder from clipboard"
+msgstr ""
+
+#| msgid "Placeholder"
+msgid "Cleared Placeholder"
 msgstr ""
 
 msgid "Save"
@@ -921,6 +900,8 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
+msgstr[3] ""
 
 msgid "All permissions"
 msgstr "כל ההרשאות"
@@ -976,9 +957,6 @@ msgstr "שמור בשם"
 msgid "Save and add another"
 msgstr ""
 
-msgid "Basic Settings"
-msgstr "הגדרות בסיסיות"
-
 msgid "Copy"
 msgstr "העתק"
 
@@ -1021,10 +999,9 @@ msgid ""
 "                                            "
 msgstr ""
 
-#, python-format
 msgid ""
 "\n"
-"                                New %(name)s\n"
+"                                New Page\n"
 "                            "
 msgstr ""
 
@@ -1098,12 +1075,11 @@ msgstr ""
 msgid "Published"
 msgstr ""
 
-#| msgid "Change"
-msgid "Changed"
-msgstr ""
-
 #| msgid "unpublished"
 msgid "Unpublished"
+msgstr ""
+
+msgid "Empty"
 msgstr ""
 
 #| msgid "in menu"
@@ -1129,23 +1105,6 @@ msgstr ""
 msgid "Application: %(apphook)s"
 msgstr ""
 
-#, python-format
-#| msgid "Edit this page in %(language)s "
-msgid "Preview this page in %(language)s "
-msgstr ""
-
-msgid "Preview"
-msgstr "תצוגה מקדימה"
-
-msgid "Publish"
-msgstr "פרסם"
-
-msgid "Unpublish"
-msgstr ""
-
-msgid "Configure"
-msgstr ""
-
 msgid "in menu"
 msgstr ""
 
@@ -1155,6 +1114,9 @@ msgstr ""
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr ""
+
+msgid "Permissions"
+msgstr "הרשאות"
 
 msgid "Clipboard"
 msgstr ""
@@ -1183,9 +1145,6 @@ msgstr ""
 msgid "Collapse all"
 msgstr ""
 
-msgid "Edit"
-msgstr ""
-
 msgid "You cannot add plugins to this plugin."
 msgstr ""
 
@@ -1209,10 +1168,6 @@ msgstr ""
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
-
-#| msgid "View published"
-msgid "View published"
 msgstr ""
 
 msgid "Login"
@@ -1323,9 +1278,6 @@ msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr ""
 
-msgid "This page has unpublished changes."
-msgstr "בדף זה ישנם שינויים שלא פורסמו"
-
 msgid "Double-click to edit"
 msgstr ""
 
@@ -1431,6 +1383,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr ""
 
+msgid "Add Another"
+msgstr ""
+
 msgid "Back"
 msgstr ""
 
@@ -1440,19 +1395,11 @@ msgstr ""
 msgid "Next"
 msgstr "הבא"
 
-msgid "unpublished changes"
-msgstr ""
-
-msgid "published"
-msgstr ""
-
-msgid "unpublished parent"
-msgstr ""
-
-msgid "unpublished"
-msgstr ""
-
 msgid "no content"
+msgstr ""
+
+#| msgid "no content"
+msgid "has contents"
 msgstr ""
 
 #, python-format
@@ -1529,6 +1476,10 @@ msgid "Articles"
 msgstr "מאמרים"
 
 msgid "Sample App"
+msgstr ""
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
 msgstr ""
 
 msgid "Sample App with excluded permissions"
@@ -1646,6 +1597,121 @@ msgstr ""
 msgid "A wizard has already been registered for model: %s"
 msgstr ""
 
+#~ msgid "X Frame Options"
+#~ msgstr "X Frame Options"
+
+#~ msgid "Whether this page can be embedded in other pages or websites"
+#~ msgstr "Whether this page can be embedded in other pages or websites"
+
+#~ msgid "Language independent options"
+#~ msgstr "Language independent options"
+
+#~ msgid "Publishing dates"
+#~ msgstr "Publishing dates"
+
+#~ msgid "Change Permissions"
+#~ msgstr "Change Permissions"
+
+#~ msgid "You do not have permission to revert this page."
+#~ msgstr "You do not have permission to edit this page"
+
+#~ msgid "You do not have permission to publish this page"
+#~ msgstr "You do not have permission to publish this page"
+
+#~ msgid "Page not published! A parent page is not published yet."
+#~ msgstr "Page not published! A parent page is not published yet."
+
+#~ msgid "The content was successfully published."
+#~ msgstr "The content was successfully published."
+
+#~ msgid "There was a problem publishing your content"
+#~ msgstr "There was a problem publishing your content"
+
+#~ msgid "You do not have permission to unpublish this page"
+#~ msgstr "You do not have permission to unpublish this page"
+
+#~ msgid "This page was never published"
+#~ msgstr "This page was never published"
+
+#~ msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+#~ msgstr "The %(language)s page \"%(page)s\" was successfully unpublished"
+
+#~ msgid "You don't have permissions to see page \"%(title)s\""
+#~ msgstr "You do not have permission to change pages."
+
+#~ msgid "parent must be in the same placeholder"
+#~ msgstr "parent must be in the same placeholder"
+
+#~ msgid "parent must be in the same language as plugin_language"
+#~ msgstr "parent must be in the same language as plugin_language"
+
+#~ msgid "Publish page changes"
+#~ msgstr "Publish changes"
+
+#~ msgid "Publish page now"
+#~ msgstr "Publish page now"
+
+#~ msgid "Save as Page Type"
+#~ msgstr "Save as Page Type"
+
+#~ msgid "Unpublish page"
+#~ msgstr "Unpublish page"
+
+#~ msgid "Publish page"
+#~ msgstr "Publish page"
+
+#~ msgid "Are you sure you want to revert to live?"
+#~ msgstr "Are you sure you want to revert to live?"
+
+#~ msgid "Revert to live"
+#~ msgstr "Revert to live"
+
+#~ msgid ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+#~ msgstr ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+
+#~ msgid "When to expire the page. Leave empty to never expire."
+#~ msgstr "When to expire the page. Leave empty to never expire."
+
+#~ msgid "has url overwrite"
+#~ msgstr "has url overwrite"
+
+#~ msgid "is published"
+#~ msgstr "is published"
+
+#~ msgid "Basic Settings"
+#~ msgstr "Basic Settings"
+
+#~ msgid "Preview this page in %(language)s "
+#~ msgstr "Edit this page in %(language)s "
+
+#~ msgid "Publish"
+#~ msgstr "Publish"
+
+#~ msgid "Unpublish"
+#~ msgstr "Unpublish"
+
+#~ msgid "View published"
+#~ msgstr "View published"
+
+#~ msgid "This page has unpublished changes."
+#~ msgstr "This page has unpublished changes."
+
+#~ msgid "unpublished changes"
+#~ msgstr "unpublished changes"
+
+#~ msgid "published"
+#~ msgstr "published"
+
+#~ msgid "unpublished parent"
+#~ msgstr "unpublished parent"
+
+#~ msgid "unpublished"
+#~ msgstr "unpublished"
+
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."
 
@@ -1724,9 +1790,6 @@ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 #~ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
 
 #~ msgid ""
 #~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
@@ -1821,6 +1884,8 @@ msgstr ""
 #~ msgid_plural "%(counter)s results"
 #~ msgstr[0] "a848884d0af974a125106fa2043a5716_pl_0"
 #~ msgstr[1] "a848884d0af974a125106fa2043a5716_pl_1"
+#~ msgstr[2] "a848884d0af974a125106fa2043a5716_pl_2"
+#~ msgstr[3] "a848884d0af974a125106fa2043a5716_pl_3"
 
 #~ msgid "%(full_result_count)s total"
 #~ msgstr "%(full_result_count)s total"

@@ -27,9 +27,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2020-03-03 13:49+0000\n"
+"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/divio/django-cms/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -83,23 +83,18 @@ msgstr "Paginatype"
 msgid "Page Types"
 msgstr "Paginatypes"
 
-msgid "Application"
-msgstr "Applicatie"
-
-msgid "Hook application to this page."
-msgstr "Koppel een applicatie aan deze pagina."
-
 msgid "Overwrite URL"
 msgstr "Overschrijf URL"
 
 msgid "Keep this field empty if standard path should be used."
 msgstr "Laat dit veld leeg als het standaard-pad gebruikt moet worden."
 
-msgid "X Frame Options"
-msgstr "X Frame Opties"
+#| msgid "softroot"
+msgid "Soft root"
+msgstr ""
 
-msgid "Whether this page can be embedded in other pages or websites"
-msgstr "Of deze pagina ingevoegd kan worden in andere pagina's of websites"
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "Alle ouders zullen niet worden weergegeven in de navigatie"
 
 msgid "Redirect"
 msgstr "Doorsturen"
@@ -110,24 +105,44 @@ msgstr "Stuurt door naar deze URL."
 msgid "Start typing..."
 msgstr "Begin met typen..."
 
+msgid "menu visibility"
+msgstr "menu zichtbaarheid"
+
+msgid "limit when this page is visible in the menu"
+msgstr "beperk wanneer deze pagina zichtbaar is in het menu"
+
+#| msgid "Copy options"
+msgid "URL options"
+msgstr ""
+
+#| msgid "Copy options"
+msgid "Menu options"
+msgstr ""
+
+msgid "Application"
+msgstr "Applicatie"
+
+msgid "Hook application to this page."
+msgstr "Koppel een applicatie aan deze pagina."
+
 msgid "Application configurations"
 msgstr "Applicatieconfiguraties"
 
-msgid "Language independent options"
-msgstr "Taalonafhankelijke opties"
-
-#, python-format
-msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr "Maak eerst de %(language)s slug, nog voordat u de geavanceerde settings aanpast"
-
 msgid "A page with this reverse URL id exists already."
 msgstr "Er bestaat al een pagina met dit omgekeerde URL kenmerk."
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
 
 msgid "An application instance using this configuration already exists."
 msgstr "Een applicatie instantie met deze configuratie bestaat al."
 
 msgid "An application instance with this name already exists."
 msgstr "Een applicatie instantie met deze naam bestaat al."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "Ja"
@@ -195,19 +210,19 @@ msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "Parent plugin placeholder moet hetzelfde zijn als placeholder!"
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
-msgstr "Maak eerst de %(language)s pagina, nog voordat u de geavanceerde settings aanpast"
+msgid "Plugin position must be greater than %(position)d"
+msgstr ""
 
 msgid "Advanced Settings"
 msgstr "Geavanceerde instellingen"
 
-msgid "Publishing dates"
-msgstr "Publicatiedatums"
+msgid "The page is not eligible to be home."
+msgstr ""
 
-msgid "Change Permissions"
-msgstr "Rechten aanpassen"
+#, python-format
+#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -220,21 +235,9 @@ msgstr "Weet je het zeker?"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "%(name)s-object met primaire sleutel %(key)r bestaat niet."
 
-msgid "Database error"
-msgstr "Databasefout"
-
-msgid "Template not valid"
-msgstr "Template ongeldig"
-
-msgid "The template was successfully changed"
-msgstr "Het template was succesvol veranderd"
-
 msgid ""
 "Error! You don't have permissions to move this page. Please reload the page"
 msgstr "Fout! Je hebt geen rechten om deze pagina te verplaatsen. Vernieuw de pagina en probeer opnieuw"
-
-msgid "You do not have permission to copy these plugins."
-msgstr "U heeft geen toestemming om deze plugins te kopiëren."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
@@ -244,52 +247,6 @@ msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
 msgstr ""
-
-#| msgid "You do not have permission to edit this page"
-msgid "You do not have permission to revert this page."
-msgstr "U heeft geen toestemming om deze pagina terug te draaien."
-
-#, python-format
-msgid "\"%s\" was reverted to the live version."
-msgstr "\"%s\" is teruggedraaid naar de live versie."
-
-msgid "You do not have permission to publish this page"
-msgstr "Je hebt geen toestemming deze pagina te publiceren"
-
-msgid "Page not published! A parent page is not published yet."
-msgstr "Pagina niet gepubliceerd! Een bovenliggende pagina is nog niet gepubliceerd."
-
-msgid "The content was successfully published."
-msgstr "De inhoud is succesvol gepubliceerd."
-
-msgid "There was a problem publishing your content"
-msgstr "Er is een probleem bij het publiceren van je inhoud."
-
-msgid "You do not have permission to unpublish this page"
-msgstr "Je hebt geen toestemming deze pagina te onpubliceren"
-
-msgid "This page was never published"
-msgstr "Deze pagina is nooit gepubliceerd."
-
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr "De %(language)s pagina \"%(page)s\"  is succesvol ge-onpubliceerd."
-
-#| msgid "You do not have permission to delete this plugin"
-msgid "You do not have permission to delete this page"
-msgstr "U heeft geen toestemming deze pagina te verwijderen."
-
-#, python-format
-msgid "Title and plugins with language %(language)s was deleted"
-msgstr "Titel en plugins voor de taal %(language)s zijn verwijderd"
-
-#, python-format
-#| msgid "You do not have permission to change pages."
-msgid "You don't have permissions to see page \"%(title)s\""
-msgstr "U heeft geen toestemming om de \"%(title)s\"-pagina  te zien"
-
-msgid "You do not have permission to change this page's in_navigation status"
-msgstr "Je bent niet toegestaan om de in_navigatie toestand van deze pagina aan te passen"
 
 msgid "You do not have permission to edit this page"
 msgstr "U heeft geen toestemming om deze pagina te bewerken."
@@ -303,8 +260,28 @@ msgstr "Nieuwe subpagina"
 msgid "New page"
 msgstr "Nieuwe pagina"
 
-msgid "The page is not eligible to be home."
-msgstr ""
+msgid "Database error"
+msgstr "Databasefout"
+
+msgid "Template not valid"
+msgstr "Template ongeldig"
+
+msgid "The template was successfully changed"
+msgstr "Het template was succesvol veranderd"
+
+msgid "You do not have permission to copy these plugins."
+msgstr "U heeft geen toestemming om deze plugins te kopiëren."
+
+#| msgid "You do not have permission to delete this plugin"
+msgid "You do not have permission to delete this page"
+msgstr "U heeft geen toestemming deze pagina te verwijderen."
+
+#, python-format
+msgid "Title and plugins with language %(language)s was deleted"
+msgstr "Titel en plugins voor de taal %(language)s zijn verwijderd"
+
+msgid "You do not have permission to change this page's in_navigation status"
+msgstr "Je bent niet toegestaan om de in_navigatie toestand van deze pagina aan te passen"
 
 msgid "View restriction"
 msgstr "Bekijk beperking"
@@ -331,15 +308,6 @@ msgstr "Plugin niet gevonden"
 
 msgid "You do not have permission to edit this plugin"
 msgstr "U heeft geen toestemming om deze plugins te bewerken."
-
-msgid "order parameter references plugins in different trees"
-msgstr "order parameter refereert naar plugins in verschillende trees"
-
-msgid "parent must be in the same placeholder"
-msgstr "bovenliggende moet in dezelfde placeholder zijn"
-
-msgid "parent must be in the same language as plugin_language"
-msgstr "bovenliggende moet in dezelfde taal zijn als plugin_language"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
@@ -407,6 +375,18 @@ msgstr "Dit is een alias-referentie, je kunt de inhoud alleen aanpassen op de <a
 msgid "Create"
 msgstr "Maken"
 
+msgid "Edit"
+msgstr "Bewerken"
+
+msgid "Preview"
+msgstr "Voorbeeld"
+
+msgid "Structure"
+msgstr "Structuur"
+
+msgid "Content"
+msgstr "Inhoud"
+
 msgid "Sites"
 msgstr "Sites"
 
@@ -443,22 +423,6 @@ msgstr "Uitloggen"
 
 msgid "Language"
 msgstr "Taal"
-
-msgid "Structure"
-msgstr "Structuur"
-
-msgid "Content"
-msgstr "Inhoud"
-
-#| msgid "Publish changes"
-msgid "Publish page changes"
-msgstr "Publiceer veranderingen in de pagina"
-
-msgid "Publish page now"
-msgstr "Publiceer de pagina nu"
-
-msgid "Page settings"
-msgstr "Pagina instellingen"
 
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
@@ -503,35 +467,20 @@ msgstr "Deze pagina dupliceren"
 msgid "Edit this Page"
 msgstr "Bewerk deze pagina"
 
+msgid "Page settings"
+msgstr "Pagina instellingen"
+
 msgid "Advanced settings"
 msgstr "Geavanceerde instellingen"
 
 msgid "Templates"
 msgstr "Sjablonen"
 
-msgid "Save as Page Type"
-msgstr "Opslaan als paginatype"
-
-msgid "Permissions"
-msgstr "Rechten"
-
 msgid "Hide in navigation"
 msgstr "Verberg in navigatie"
 
 msgid "Display in navigation"
 msgstr "Laat zien in navigatie"
-
-msgid "Unpublish page"
-msgstr "Pagina depubliceren"
-
-msgid "Publish page"
-msgstr "Pagina publiceren"
-
-msgid "Are you sure you want to revert to live?"
-msgstr "Weet je zeker dat je terug wilt draaien naar live?"
-
-msgid "Revert to live"
-msgstr "Terugdraaien naar live"
 
 msgid "Delete page"
 msgstr "Pagina verwijderen"
@@ -565,9 +514,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Nog één toevoegen"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -661,9 +607,6 @@ msgstr "sjabloon"
 msgid "login required"
 msgstr "inloggen vereist"
 
-msgid "menu visibility"
-msgstr "menu zichtbaarheid"
-
 msgid "application"
 msgstr "applicatie"
 
@@ -679,54 +622,22 @@ msgstr "Toestemming aan"
 msgid "page"
 msgstr "pagina"
 
-msgid "for logged in users only"
-msgstr "alleen voor aangemelde gebruikers"
-
-msgid "for anonymous users only"
-msgstr "alleen voor anonieme gebruikers"
-
-msgid "Inherit from parent page"
-msgstr "Van bovenliggende pagina erven"
-
-msgid "Deny"
-msgstr "Ontzeggen"
-
-msgid "Only this website"
-msgstr "Alleen deze website"
-
-msgid "Allow"
-msgstr "Toestaan"
-
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr "Wanneer de pagina publiek moet worden. Status moet op \"Gepubliceerd\" staan om publiek te worden."
-
-msgid "When to expire the page. Leave empty to never expire."
-msgstr "Wanneer de pagina verloopt. Laat leeg om nooit te laten verlopen."
-
-msgid "All ancestors will not be displayed in the navigation"
-msgstr "Alle ouders zullen niet worden weergegeven in de navigatie"
-
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Een unieke identificatie die gebruikt wordt door de page_url templatetag voor koppelingen naar deze pagina"
 
-msgid "The template used to render the content."
-msgstr "Het sjabloon dat gebruikt wordt om de inhoud weer te geven."
-
-msgid "limit when this page is visible in the menu"
-msgstr "beperk wanneer deze pagina zichtbaar is in het menu"
-
 msgid "pages"
 msgstr "pagina's"
 
-msgid "Empty"
-msgstr "Leeg"
-
 msgid "default"
 msgstr "standaard"
+
+msgid "slug"
+msgstr "slug"
+
+msgid "Path"
+msgstr "Pad"
 
 msgid "Current page"
 msgstr "Huidige pagina"
@@ -858,6 +769,24 @@ msgstr "statische placeholders"
 msgid "A static placeholder with the same site and code already exists"
 msgstr "Er bestaat al een statische placeholder met dezelfde site en code"
 
+msgid "for logged in users only"
+msgstr "alleen voor aangemelde gebruikers"
+
+msgid "for anonymous users only"
+msgstr "alleen voor anonieme gebruikers"
+
+msgid "Inherit from parent page"
+msgstr "Van bovenliggende pagina erven"
+
+msgid "Deny"
+msgstr "Ontzeggen"
+
+msgid "Only this website"
+msgstr "Alleen deze website"
+
+msgid "Allow"
+msgstr "Toestaan"
+
 msgid "title"
 msgstr "titel"
 
@@ -873,20 +802,11 @@ msgstr "beschrijving"
 msgid "The text displayed in search engines."
 msgstr "De tekst die wordt getoond in zoekmachines."
 
-msgid "slug"
-msgstr "slug"
-
-msgid "Path"
-msgstr "Pad"
-
-msgid "has url overwrite"
-msgstr "heeft overschreven URL"
-
 msgid "redirect"
 msgstr "doorsturen"
 
-msgid "is published"
-msgstr "is gepubliceerd"
+msgid "The template used to render the content."
+msgstr "Het sjabloon dat gebruikt wordt om de inhoud weer te geven."
 
 msgid "Advanced options"
 msgstr "Geavanceerde opties"
@@ -901,6 +821,65 @@ msgstr "De %(name)s \"%(obj)s\" is succesvol aangepast"
 
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Er zijn geen verdere opties meer voor deze plugin. Klik op bewaren."
+
+msgid "Moved"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed"
+msgstr "Aangepast"
+
+#| msgid "Delete"
+msgid "Deleted"
+msgstr ""
+
+#| msgid "Add %(language)s Translation"
+msgid "Added Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Changed Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Deleted Page Translation"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Added Plugin"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Moved Plugin"
+msgstr ""
+
+#| msgid "Delete page"
+msgid "Deleted Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Cut Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Paste Plugin"
+msgstr ""
+
+#| msgid "static placeholder"
+msgid "Paste to Placeholder"
+msgstr ""
+
+#| msgid "Copied plugins to %(placeholder)s"
+msgid "Added plugins to placeholder from clipboard"
+msgstr ""
+
+#| msgid "Placeholder"
+msgid "Cleared Placeholder"
+msgstr ""
 
 msgid "Save"
 msgstr "Opslaan"
@@ -991,9 +970,6 @@ msgstr "Opslaan als nieuw"
 msgid "Save and add another"
 msgstr "Opslaan en nog een toevoegen"
 
-msgid "Basic Settings"
-msgstr "Basisinstelling"
-
 msgid "Copy"
 msgstr "Kopieer"
 
@@ -1036,12 +1012,11 @@ msgid ""
 "                                            "
 msgstr "\nHerstel verwijderde %(name)s"
 
-#, python-format
 msgid ""
 "\n"
-"                                New %(name)s\n"
+"                                New Page\n"
 "                            "
-msgstr "\nNieuwe %(name)s"
+msgstr ""
 
 #| msgid "in navigation"
 msgid "Main Navigation"
@@ -1113,13 +1088,12 @@ msgstr "Legenda"
 msgid "Published"
 msgstr "Gepubliceerd"
 
-#| msgid "Change"
-msgid "Changed"
-msgstr "Aangepast"
-
 #| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Ongepubliceerd"
+
+msgid "Empty"
+msgstr "Leeg"
 
 #| msgid "in menu"
 msgid "In menu"
@@ -1144,23 +1118,6 @@ msgstr "Apphook"
 msgid "Application: %(apphook)s"
 msgstr "Applicatie: %(apphook)s"
 
-#, python-format
-#| msgid "Edit this page in %(language)s "
-msgid "Preview this page in %(language)s "
-msgstr "Preview deze pagina in %(language)s "
-
-msgid "Preview"
-msgstr "Voorbeeld"
-
-msgid "Publish"
-msgstr "Publiceer"
-
-msgid "Unpublish"
-msgstr "Depubliceer"
-
-msgid "Configure"
-msgstr "Configureer"
-
 msgid "in menu"
 msgstr "in menu"
 
@@ -1170,6 +1127,9 @@ msgstr "niet in menu"
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Pagina settings (SHIFT klik voor geadvanceerde settings)"
+
+msgid "Permissions"
+msgstr "Rechten"
 
 msgid "Clipboard"
 msgstr "Klembord"
@@ -1198,9 +1158,6 @@ msgstr "Alles uitvouwen"
 msgid "Collapse all"
 msgstr "Alles invouwen"
 
-msgid "Edit"
-msgstr "Bewerken"
-
 msgid "You cannot add plugins to this plugin."
 msgstr "Je kan geen plugins toevoegen aan deze plugin."
 
@@ -1225,10 +1182,6 @@ msgstr "Beschikbare plugins"
 #| msgid "Structure"
 msgid "Toggle structure"
 msgstr ""
-
-#| msgid "View published"
-msgid "View published"
-msgstr "Bekijk gepubliceerde"
 
 msgid "Login"
 msgstr "Login"
@@ -1338,9 +1291,6 @@ msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Inloggen mislukt.</strong> Controleer je gegevens en probeer nog eens."
 
-msgid "This page has unpublished changes."
-msgstr "Deze pagina heeft ongepubliceerde veranderingen."
-
 msgid "Double-click to edit"
 msgstr "Dubbelklik om te bewerken"
 
@@ -1446,6 +1396,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "Welkom bij django CMS"
 
+msgid "Add Another"
+msgstr "Nog één toevoegen"
+
 msgid "Back"
 msgstr "Terug"
 
@@ -1455,20 +1408,12 @@ msgstr "Kies een van de onderstaande opties om door te gaan naar de volgende sta
 msgid "Next"
 msgstr "Volgende"
 
-msgid "unpublished changes"
-msgstr "ongepubliceerde veranderingen"
-
-msgid "published"
-msgstr "gepubliceerd"
-
-msgid "unpublished parent"
-msgstr "Ongepubliceerde parent"
-
-msgid "unpublished"
-msgstr "ongepubliceerd"
-
 msgid "no content"
 msgstr "geen inhoud"
+
+#| msgid "no content"
+msgid "has contents"
+msgstr ""
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1545,6 +1490,10 @@ msgstr "Artikelen"
 
 msgid "Sample App"
 msgstr "Voorbeeldapplicatie"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "Voorbeeld App met uitgesloten permissies"
@@ -1661,6 +1610,121 @@ msgstr "Maak een nieuwe instantie van %s."
 msgid "A wizard has already been registered for model: %s"
 msgstr "Er is al een wizard geregistreerd voor model: %s"
 
+#~ msgid "X Frame Options"
+#~ msgstr "X Frame Options"
+
+#~ msgid "Whether this page can be embedded in other pages or websites"
+#~ msgstr "Whether this page can be embedded in other pages or websites"
+
+#~ msgid "Language independent options"
+#~ msgstr "Language independent options"
+
+#~ msgid "Publishing dates"
+#~ msgstr "Publishing dates"
+
+#~ msgid "Change Permissions"
+#~ msgstr "Change Permissions"
+
+#~ msgid "You do not have permission to revert this page."
+#~ msgstr "You do not have permission to edit this page"
+
+#~ msgid "You do not have permission to publish this page"
+#~ msgstr "You do not have permission to publish this page"
+
+#~ msgid "Page not published! A parent page is not published yet."
+#~ msgstr "Page not published! A parent page is not published yet."
+
+#~ msgid "The content was successfully published."
+#~ msgstr "The content was successfully published."
+
+#~ msgid "There was a problem publishing your content"
+#~ msgstr "There was a problem publishing your content"
+
+#~ msgid "You do not have permission to unpublish this page"
+#~ msgstr "You do not have permission to unpublish this page"
+
+#~ msgid "This page was never published"
+#~ msgstr "This page was never published"
+
+#~ msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+#~ msgstr "The %(language)s page \"%(page)s\" was successfully unpublished"
+
+#~ msgid "You don't have permissions to see page \"%(title)s\""
+#~ msgstr "You do not have permission to change pages."
+
+#~ msgid "parent must be in the same placeholder"
+#~ msgstr "parent must be in the same placeholder"
+
+#~ msgid "parent must be in the same language as plugin_language"
+#~ msgstr "parent must be in the same language as plugin_language"
+
+#~ msgid "Publish page changes"
+#~ msgstr "Publish changes"
+
+#~ msgid "Publish page now"
+#~ msgstr "Publish page now"
+
+#~ msgid "Save as Page Type"
+#~ msgstr "Save as Page Type"
+
+#~ msgid "Unpublish page"
+#~ msgstr "Unpublish page"
+
+#~ msgid "Publish page"
+#~ msgstr "Publish page"
+
+#~ msgid "Are you sure you want to revert to live?"
+#~ msgstr "Are you sure you want to revert to live?"
+
+#~ msgid "Revert to live"
+#~ msgstr "Revert to live"
+
+#~ msgid ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+#~ msgstr ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+
+#~ msgid "When to expire the page. Leave empty to never expire."
+#~ msgstr "When to expire the page. Leave empty to never expire."
+
+#~ msgid "has url overwrite"
+#~ msgstr "has url overwrite"
+
+#~ msgid "is published"
+#~ msgstr "is published"
+
+#~ msgid "Basic Settings"
+#~ msgstr "Basic Settings"
+
+#~ msgid "Preview this page in %(language)s "
+#~ msgstr "Edit this page in %(language)s "
+
+#~ msgid "Publish"
+#~ msgstr "Publish"
+
+#~ msgid "Unpublish"
+#~ msgstr "Unpublish"
+
+#~ msgid "View published"
+#~ msgstr "View published"
+
+#~ msgid "This page has unpublished changes."
+#~ msgstr "This page has unpublished changes."
+
+#~ msgid "unpublished changes"
+#~ msgstr "unpublished changes"
+
+#~ msgid "published"
+#~ msgstr "published"
+
+#~ msgid "unpublished parent"
+#~ msgstr "unpublished parent"
+
+#~ msgid "unpublished"
+#~ msgstr "unpublished"
+
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."
 
@@ -1739,9 +1803,6 @@ msgstr "Er is al een wizard geregistreerd voor model: %s"
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 #~ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
 
 #~ msgid ""
 #~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "

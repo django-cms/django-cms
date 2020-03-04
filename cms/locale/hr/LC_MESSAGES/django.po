@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Translators:
-# Damir <damir.arbula@gmail.com>, 2013-2015
+# Damir <damir.arbula@gmail.com>, 2013-2015,2018
 # Dino Ilic <dino.ilic@gmail.com>, 2017
 # legendri <legendri@gmail.com>, 2012
 # legendri <legendri@gmail.com>, 2012
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2020-03-03 13:49+0000\n"
+"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"Last-Translator: Damir <damir.arbula@gmail.com>\n"
 "Language-Team: Croatian (http://www.transifex.com/divio/django-cms/language/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -68,23 +68,18 @@ msgstr "Tip stranice"
 msgid "Page Types"
 msgstr "Tipovi stranica"
 
-msgid "Application"
-msgstr "Aplikacija"
-
-msgid "Hook application to this page."
-msgstr "Zakači aplikaciju za ovu stranicu."
-
 msgid "Overwrite URL"
 msgstr "Pregazi URL"
 
 msgid "Keep this field empty if standard path should be used."
 msgstr "Ostavite ovo polje prazno ako treba koristiti standardnu putanju."
 
-msgid "X Frame Options"
-msgstr "X Frame opcije"
+#| msgid "softroot"
+msgid "Soft root"
+msgstr ""
 
-msgid "Whether this page can be embedded in other pages or websites"
-msgstr "Da li ova stranica može biti ugrađena u druge stranice ili sjedišta"
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "svi preci  neće biti prikazani u navigaciji"
 
 msgid "Redirect"
 msgstr "Redirekcija"
@@ -95,18 +90,35 @@ msgstr "Izvedi redirekciju na ovaj URL."
 msgid "Start typing..."
 msgstr "Započnite pisati..."
 
+msgid "menu visibility"
+msgstr "vidljivost izbornika"
+
+msgid "limit when this page is visible in the menu"
+msgstr "ograniči kada je ova stranica vidljiva u izborniku"
+
+#| msgid "Copy options"
+msgid "URL options"
+msgstr ""
+
+#| msgid "Copy options"
+msgid "Menu options"
+msgstr ""
+
+msgid "Application"
+msgstr "Aplikacija"
+
+msgid "Hook application to this page."
+msgstr "Zakači aplikaciju za ovu stranicu."
+
 msgid "Application configurations"
 msgstr "Postavke aplikacije"
 
-msgid "Language independent options"
-msgstr "Postavke neovisne o izabranom jeziku"
-
-#, python-format
-msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
-
 msgid "A page with this reverse URL id exists already."
 msgstr "Stranica sa zadatim inverznim URL-om već postoji."
+
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr "Neispravna vrijednost za postavku aplikacije."
 
 msgid "An application instance using this configuration already exists."
 msgstr "Aplikacija koja koristi ovu konfiguraciju već postoji."
@@ -114,11 +126,14 @@ msgstr "Aplikacija koja koristi ovu konfiguraciju već postoji."
 msgid "An application instance with this name already exists."
 msgstr "Aplikacija s ovim imenom već postoji."
 
+msgid "You can't move the home page inside another page"
+msgstr "Početna stranica ne može se premjestiti kao dijete neke druge stranice."
+
 msgid "Yes"
-msgstr ""
+msgstr "Da"
 
 msgid "No"
-msgstr ""
+msgstr "Ne"
 
 msgid "user"
 msgstr "korisnik"
@@ -138,36 +153,36 @@ msgstr "Izbriši"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno stvaranje stranice bez ovlasti za uređivanje stvorene stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno brisanje stranice bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno postavljanje ovlasti bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno brisanje ovlasti stranice bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno dodavanje ovlasti stranice bez ovlasti za uređivanje dodane ovlasti. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno brisanje ovlasti stranice bez ovlasti za uređivanje ovlasti. Uredite tražene ovlasti."
 
 #, python-format
 msgid "Invalid plugin type '%s'"
-msgstr ""
+msgstr "Neispravan tip plugina '%s'"
 
 msgid "Language must be set to a supported language!"
 msgstr "Jezik mora biti postavljen na jedan od podržanih!"
@@ -177,22 +192,22 @@ msgstr "Jezik nadređenog plugina mora biti isti."
 
 #| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr ""
+msgstr "Roditelj plugina mora biti u istom placeholderu kao i plugin!"
 
 #, python-format
-msgid ""
-"Please create the %(language)s page translation before editing it's advanced"
-" settings."
+msgid "Plugin position must be greater than %(position)d"
 msgstr ""
 
 msgid "Advanced Settings"
 msgstr "Napredne postavke"
 
-msgid "Publishing dates"
-msgstr "Datumi objavljivanja"
+msgid "The page is not eligible to be home."
+msgstr "Stranica nije raspoloživa za postavljanje u ulogu početne stranice."
 
-msgid "Change Permissions"
-msgstr "Promijena ovlasti"
+#, python-format
+#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
+msgid "The %(name)s \"%(obj)s\" was deleted successfully."
+msgstr ""
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -205,6 +220,31 @@ msgstr "Da li ste sigurni?"
 msgid "%(name)s object with primary key %(key)r does not exist."
 msgstr "objekt %(name)s sa primarnim ključem %(key)r ne postoji."
 
+msgid ""
+"Error! You don't have permissions to move this page. Please reload the page"
+msgstr "Pogreška! Nemate ovlasti premjestiti ovu stranicu. Molim, ponovno učitajte stranicu."
+
+#| msgid "You do not have permission to clear this placeholder"
+msgid "Error! You don't have permissions to copy this page."
+msgstr "Greška! Nemate ovlasti za kopiranje ove stranice."
+
+msgid ""
+"Error! The page you're pasting is not translated in any of the languages "
+"configured by the target site."
+msgstr "Greška! Stranica koju želite zalijepiti nije prevedena na nijedan jezik koji je konfiguriran za odredišno sjedište."
+
+msgid "You do not have permission to edit this page"
+msgstr "Nemate ovlasti za uređivanje ove stranice"
+
+msgid "Add Page Copy"
+msgstr "Dodaj kopiju stranice"
+
+msgid "New sub page"
+msgstr "Nova podstranica"
+
+msgid "New page"
+msgstr "Nova stranica"
+
 msgid "Database error"
 msgstr "Greška baze podataka"
 
@@ -214,82 +254,19 @@ msgstr "Predložak nije valjan"
 msgid "The template was successfully changed"
 msgstr "Predložak je uspješno promijenjen"
 
-msgid ""
-"Error! You don't have permissions to move this page. Please reload the page"
-msgstr "Pogreška! Nemate ovlasti premjestiti ovu stranicu. Molim, ponovno učitajte stranicu."
-
 msgid "You do not have permission to copy these plugins."
 msgstr "Nemate ovlasti za kopiranje ovih pluginova."
 
-#| msgid "You do not have permission to clear this placeholder"
-msgid "Error! You don't have permissions to copy this page."
-msgstr ""
-
-msgid ""
-"Error! The page you're pasting is not translated in any of the languages "
-"configured by the target site."
-msgstr ""
-
-#| msgid "You do not have permission to edit this page"
-msgid "You do not have permission to revert this page."
-msgstr ""
-
-#, python-format
-msgid "\"%s\" was reverted to the live version."
-msgstr ""
-
-msgid "You do not have permission to publish this page"
-msgstr "Nemate ovlasti da izbrišete ovu stranicu"
-
-msgid "Page not published! A parent page is not published yet."
-msgstr "Stranica nije objavljena! Nadređena stranica nije još objavljena."
-
-msgid "The content was successfully published."
-msgstr "Sadržaj je uspješno objavljen."
-
-msgid "There was a problem publishing your content"
-msgstr "Dogodio se problem prilikom objave sadržaja"
-
-msgid "You do not have permission to unpublish this page"
-msgstr "Nemate ovlasti za uklanjanje objave ove stranice"
-
-msgid "This page was never published"
-msgstr "Ova stranica nije još bila objavljivana"
-
-#, python-format
-msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr "Objava stranice %(page)s na %(language)s jeziku je uspješno uklonjena"
-
 #| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "Nemate ovlasti za brisanje ove stranice"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
-msgstr "Naslov i plagin na jeziku %(language)s je obrisan"
-
-#, python-format
-#| msgid "You do not have permission to change pages."
-msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
+msgstr "Naslov i plugin na jeziku %(language)s je obrisan"
 
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Nemate ovlasti da izmjenite status ove stranice \"u navigaciji\""
-
-msgid "You do not have permission to edit this page"
-msgstr "Nemate ovlasti za uređivanje ove stranice"
-
-msgid "Add Page Copy"
-msgstr "Dodaj kopiju stranice"
-
-msgid "New sub page"
-msgstr ""
-
-msgid "New page"
-msgstr ""
-
-msgid "The page is not eligible to be home."
-msgstr ""
 
 msgid "View restriction"
 msgstr "Ograničenja pregleda"
@@ -309,7 +286,7 @@ msgstr "Nemate ovlasti dodati plugin"
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
-msgstr ""
+msgstr "Nemate ovlasti za kopiranje placeholdera"
 
 msgid "Plugin not found"
 msgstr "Plugin nije pronađen"
@@ -317,29 +294,20 @@ msgstr "Plugin nije pronađen"
 msgid "You do not have permission to edit this plugin"
 msgstr "Nemate ovlasti za uređivanje ovog plugina"
 
-msgid "order parameter references plugins in different trees"
-msgstr ""
-
-msgid "parent must be in the same placeholder"
-msgstr ""
-
-msgid "parent must be in the same language as plugin_language"
-msgstr ""
-
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
-msgstr ""
+msgstr "Nemate ovlasti za zalijepiti ovaj plugin"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
-msgstr ""
+msgstr "Nemate ovlasti za zalijepiti ovaj placeholder"
 
 msgid "You have no permission to move this plugin"
 msgstr "Nemate ovlasti za premještanje ovog plugina"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
-msgstr ""
+msgstr "Nemate ovlasti za izrezati ovaj plugin"
 
 msgid "You do not have permission to delete this plugin"
 msgstr "Nemate ovlasti za brisanje ovog plugina"
@@ -369,7 +337,7 @@ msgstr "Upravljanje ovlastima nad stranicom"
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
-msgstr ""
+msgstr "Nema registriranog apphooka \"%r\""
 
 msgid "django CMS"
 msgstr "django CMS"
@@ -387,10 +355,22 @@ msgstr "Izradi Alias"
 msgid ""
 "This is an alias reference, you can edit the content only on the <a "
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-msgstr ""
+msgstr "Ovo je alias referenca, sadržaj se može uređivati samo na stranici <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
 msgid "Create"
-msgstr ""
+msgstr "Stvori"
+
+msgid "Edit"
+msgstr "Uredi"
+
+msgid "Preview"
+msgstr "Pregled"
+
+msgid "Structure"
+msgstr "Struktura"
+
+msgid "Content"
+msgstr "Sadržaj"
 
 msgid "Sites"
 msgstr "Sjedišta"
@@ -405,16 +385,16 @@ msgid "User settings"
 msgstr "Postavke za korisnika"
 
 msgid "Clipboard..."
-msgstr ""
+msgstr "Međumemorija..."
 
 msgid "Clear clipboard"
-msgstr ""
+msgstr "Isprazni međumemoriju"
 
 msgid "Disable toolbar"
 msgstr "Deaktivirajte alatnu traku"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Kratice..."
 
 msgid "Users"
 msgstr "Korisnici"
@@ -429,42 +409,26 @@ msgstr "Odjavi se"
 msgid "Language"
 msgstr "Jezik"
 
-msgid "Structure"
-msgstr "Struktura"
-
-msgid "Content"
-msgstr "Sadržaj"
-
-#| msgid "Publish changes"
-msgid "Publish page changes"
-msgstr ""
-
-msgid "Publish page now"
-msgstr "Objavi stranicu sada"
-
-msgid "Page settings"
-msgstr "Postavke za stranicu"
-
 #| msgid "Add %(language)s Translation"
 msgid "Add Translation"
-msgstr ""
+msgstr "Dodaj prijevod"
 
 #| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
-msgstr ""
+msgstr "Izbriši prijevod"
 
 #| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
-msgstr ""
+msgstr "Kopiraj sve pluginove"
 
 #, python-format
 msgid "from %s"
-msgstr ""
+msgstr "iz %s"
 
 #, python-format
 #| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
-msgstr ""
+msgstr "Da li ste sigurni da želite kopirati sve pluginove sa %s?"
 
 msgid "Pages"
 msgstr "Stranice"
@@ -474,7 +438,7 @@ msgstr "Stranica"
 
 #| msgid "Create"
 msgid "Create Page"
-msgstr ""
+msgstr "Stvori stranicu"
 
 msgid "New Page"
 msgstr "Nova stranica"
@@ -488,17 +452,14 @@ msgstr "Dupliciraj stranicu"
 msgid "Edit this Page"
 msgstr "Uredi ovu stranicu"
 
+msgid "Page settings"
+msgstr "Postavke za stranicu"
+
 msgid "Advanced settings"
 msgstr "Napredne postavke"
 
 msgid "Templates"
 msgstr "Predlošci"
-
-msgid "Save as Page Type"
-msgstr "Spremi kao Tip stranice"
-
-msgid "Permissions"
-msgstr "Ovlasti"
 
 msgid "Hide in navigation"
 msgstr "Sakrij u navigaciji"
@@ -506,26 +467,14 @@ msgstr "Sakrij u navigaciji"
 msgid "Display in navigation"
 msgstr "Prikaži u navigaciji"
 
-msgid "Unpublish page"
-msgstr "Zahtjev za obustavljanje objave"
-
-msgid "Publish page"
-msgstr "zahtjev za objavljivanje "
-
-msgid "Are you sure you want to revert to live?"
-msgstr "Da li želite vratiti na Live inačicu stranice?"
-
-msgid "Revert to live"
-msgstr "Povratak na objavljenu verziju stranice"
-
 msgid "Delete page"
 msgstr "Izbriši stranicu"
 
 msgid "Create a new page next to the current page."
-msgstr ""
+msgstr "Izradi novu stranicu uz trenutnu stranicu."
 
 msgid "Create a page below the current page."
-msgstr ""
+msgstr "Izradi stranicu kao dijete trenutne stranice."
 
 msgid "Select a valid site"
 msgstr "Izaberite ispravnu web stranicu"
@@ -541,7 +490,7 @@ msgstr "Izaberite ispravnu stranicu"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "Stranica %(conflict_page)s ima isti url '%(url)s' kao trenutna stranica \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -549,27 +498,24 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
-
-msgid "Add Another"
-msgstr "Dodaj još"
+msgstr "Stranica %(conflict_page)s ima isti url '%(url)s' kao trenutna stranica."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
-msgstr ""
+msgstr "Opcionalno. Ako je definirano, biti će dodano u novi tekst plugin."
 
 msgid "Provide a title for the new page."
-msgstr ""
+msgstr "Definirajte naziv za novu stranicu."
 
 msgid "Leave empty for automatic slug, or override as required."
-msgstr ""
+msgstr "Ostavite prazno za automatski slug ili upišite slug."
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Nemate ovlasti dodati stranicu."
 
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 msgid "position"
 msgstr "pozicija"
@@ -578,7 +524,7 @@ msgid "language"
 msgstr "jezik"
 
 msgid "plugin_name"
-msgstr ""
+msgstr "plugin_name"
 
 msgid "creation date"
 msgstr "datum kreiranja"
@@ -646,9 +592,6 @@ msgstr "predložak"
 msgid "login required"
 msgstr "potrebno prijavljivanje"
 
-msgid "menu visibility"
-msgstr "vidljivost izbornika"
-
 msgid "application"
 msgstr "aplikacija"
 
@@ -664,54 +607,22 @@ msgstr "Postavi ovlasti za"
 msgid "page"
 msgstr "stranica"
 
-msgid "for logged in users only"
-msgstr "samo za prijavljene korisnike"
-
-msgid "for anonymous users only"
-msgstr "samo za anonimne korisnike"
-
-msgid "Inherit from parent page"
-msgstr "Nasljeđeno od nadređene stranice"
-
-msgid "Deny"
-msgstr "Zabrani"
-
-msgid "Only this website"
-msgstr "Samo ovo sjedište"
-
-msgid "Allow"
-msgstr "Dozvoli"
-
-msgid ""
-"When the page should go live. Status must be \"Published\" for page to go "
-"live."
-msgstr "Kako bi se stranica objavila, status joj mora biti \"Objavljeno\""
-
-msgid "When to expire the page. Leave empty to never expire."
-msgstr "Kada ističe objava stranice. Ostavite prazno ako nikad ne ističe."
-
-msgid "All ancestors will not be displayed in the navigation"
-msgstr "svi preci  neće biti prikazani u navigaciji"
-
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
 msgstr "Jedinstveni identifikator korišten sa page_url templatetag-om za povezivanje s ovom stranicom"
 
-msgid "The template used to render the content."
-msgstr " predložak korišten za prikaz sadržaja"
-
-msgid "limit when this page is visible in the menu"
-msgstr "ograniči kada je ova stranica vidljiva u izborniku"
-
 msgid "pages"
 msgstr "stranice"
 
-msgid "Empty"
-msgstr "Prazno"
-
 msgid "default"
 msgstr "uobičajenoa"
+
+msgid "slug"
+msgstr "slug"
+
+msgid "Path"
+msgstr "Putanja"
 
 msgid "Current page"
 msgstr "trenutna stranica"
@@ -736,27 +647,27 @@ msgstr "zabrana prikaza na frontendu"
 
 #| msgid "Please select user or group first."
 msgid "Please select user or group."
-msgstr ""
+msgstr "Molimo izaberite korisnika ili grupu."
 
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno objavljivanje stranice bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
 "page. Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno postavljanje naprednih postavki bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't change page permissions without permissions to change the page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno postavljanje ovlasti za stranicu bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Korisnicima nije dozvoljeno premještanje stranice bez ovlasti za uređivanje stranice. Uredite tražene ovlasti."
 
 msgid "can recover any deleted page"
 msgstr "može povratiti bilo koju obrisanu stranicu"
@@ -832,7 +743,7 @@ msgid "placeholder content"
 msgstr "sadržaj placeholdera"
 
 msgid "creation_method"
-msgstr ""
+msgstr "creation_method"
 
 msgid "static placeholder"
 msgstr "statički placeholder"
@@ -842,6 +753,24 @@ msgstr "statički placeholderi"
 
 msgid "A static placeholder with the same site and code already exists"
 msgstr "Statički placeholder s istim kôdom za isto sjedište već postoji"
+
+msgid "for logged in users only"
+msgstr "samo za prijavljene korisnike"
+
+msgid "for anonymous users only"
+msgstr "samo za anonimne korisnike"
+
+msgid "Inherit from parent page"
+msgstr "Nasljeđeno od nadređene stranice"
+
+msgid "Deny"
+msgstr "Zabrani"
+
+msgid "Only this website"
+msgstr "Samo ovo sjedište"
+
+msgid "Allow"
+msgstr "Dozvoli"
 
 msgid "title"
 msgstr "Naslov"
@@ -858,20 +787,11 @@ msgstr "opis"
 msgid "The text displayed in search engines."
 msgstr "Tekst koji se prikazuje u tražilicama."
 
-msgid "slug"
-msgstr "slug"
-
-msgid "Path"
-msgstr "Putanja"
-
-msgid "has url overwrite"
-msgstr "izabrano prepisivanje url-a"
-
 msgid "redirect"
 msgstr "preusmjeravanje"
 
-msgid "is published"
-msgstr "objavljen je"
+msgid "The template used to render the content."
+msgstr " predložak korišten za prikaz sadržaja"
 
 msgid "Advanced options"
 msgstr "Napredna svojstva"
@@ -882,10 +802,69 @@ msgstr "Generičko"
 #, python-format
 #| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" je/su uspješno uređen/i."
 
 msgid "There are no further settings for this plugin. Please press save."
 msgstr "Nema dodatnih postavki za ovaj plugin. Pritisnite Spremi."
+
+msgid "Moved"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed"
+msgstr "Promijenjeno"
+
+#| msgid "Delete"
+msgid "Deleted"
+msgstr ""
+
+#| msgid "Add %(language)s Translation"
+msgid "Added Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Changed Page Translation"
+msgstr ""
+
+#| msgid "Delete %(language)s Translation"
+msgid "Deleted Page Translation"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Added Plugin"
+msgstr ""
+
+#| msgid "Change"
+msgid "Changed Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Moved Plugin"
+msgstr ""
+
+#| msgid "Delete page"
+msgid "Deleted Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Cut Plugin"
+msgstr ""
+
+#| msgid "Add plugin"
+msgid "Paste Plugin"
+msgstr ""
+
+#| msgid "static placeholder"
+msgid "Paste to Placeholder"
+msgstr ""
+
+#| msgid "Copied plugins to %(placeholder)s"
+msgid "Added plugins to placeholder from clipboard"
+msgstr ""
+
+#| msgid "Placeholder"
+msgid "Cleared Placeholder"
+msgstr ""
 
 msgid "Save"
 msgstr "Spremi"
@@ -906,7 +885,7 @@ msgstr "Lozinka:"
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "Dodaj stranicu"
 
 msgid "Change a page"
 msgstr "Promijeni stranicu"
@@ -977,9 +956,6 @@ msgstr "Spremi kao novi"
 msgid "Save and add another"
 msgstr "Spremi i dodaj još"
 
-msgid "Basic Settings"
-msgstr "Osnovna postavke"
-
 msgid "Copy"
 msgstr "Kopiraj"
 
@@ -987,11 +963,11 @@ msgid "Cut"
 msgstr "Izreži"
 
 msgid "Paste"
-msgstr ""
+msgstr "Zalijepi"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Postavi kao početno"
 
 msgid "is restricted"
 msgstr "ograničeno"
@@ -1000,7 +976,7 @@ msgid "last change by"
 msgstr "zadnja promjena od"
 
 msgid "meta"
-msgstr ""
+msgstr "meta"
 
 msgid "List of pages"
 msgstr "Popis stranica"
@@ -1010,32 +986,31 @@ msgstr "Pretraživanje"
 
 #| msgid "Page Title"
 msgid "Page Tree"
-msgstr ""
+msgstr "Stablo stranica"
 
 msgid "Reset filter"
-msgstr ""
+msgstr "Resetiraj filtar"
 
 #, python-format
 msgid ""
 "\n"
 "                                                Restore deleted %(name)s\n"
 "                                            "
-msgstr ""
+msgstr "\n                                                Vrati obrisano %(name)s\n                                            "
 
-#, python-format
 msgid ""
 "\n"
-"                                New %(name)s\n"
+"                                New Page\n"
 "                            "
 msgstr ""
 
 #| msgid "in navigation"
 msgid "Main Navigation"
-msgstr ""
+msgstr "Osnovna navigacija"
 
 #| msgid "Actions"
 msgid "Options"
-msgstr ""
+msgstr "Opcije"
 
 msgid "Successfully moved"
 msgstr "Uspješno premješteno"
@@ -1044,28 +1019,28 @@ msgid "Changes within the tree might require a refresh."
 msgstr "Promjene u stablu bi mogle zahtijevati osvježavanje."
 
 msgid "Error:"
-msgstr ""
+msgstr "Greška:"
 
 msgid ""
 "This page cannot be copied because an application is attached to it. See the"
 " Page's Advanced settings to manage apphooks."
-msgstr ""
+msgstr "Ova stranica ne može biti kopirana zato što ima  pridruženu aplikaciju. Pogledajte napredne postavke stranice kako bi upravljali pridruženim aplikacijama."
 
 msgid "Are you sure you want to § this page?"
 msgstr "Da li ste sigurni da želite § ovu stranicu?"
 
 msgid "Reload"
-msgstr ""
+msgstr "Ponovno učitaj"
 
 #| msgid "New Page"
 msgid "New node"
-msgstr ""
+msgstr "Novi čvor"
 
 msgid "nodes"
-msgstr ""
+msgstr "čvorovi"
 
 msgid "View"
-msgstr ""
+msgstr "Pogled"
 
 msgid "Menu"
 msgstr "Izborni"
@@ -1081,7 +1056,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n                            <em>Trenutno ne postoji  %(object)s.</em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Dodaj %(object)s</a> sada.\n                        "
 
 msgid "Copy options"
 msgstr "Opcija kopiranja"
@@ -1093,59 +1068,41 @@ msgid "Close"
 msgstr "Zatvori"
 
 msgid "Legend"
-msgstr ""
+msgstr "Legenda"
 
 #| msgid "published"
 msgid "Published"
-msgstr ""
-
-#| msgid "Change"
-msgid "Changed"
-msgstr ""
+msgstr "Objavljeno"
 
 #| msgid "unpublished"
 msgid "Unpublished"
-msgstr ""
+msgstr "Neobjavljeno"
+
+msgid "Empty"
+msgstr "Prazno"
 
 #| msgid "in menu"
 msgid "In menu"
-msgstr ""
+msgstr "U izborniku"
 
 #| msgid "not in menu"
 msgid "Not in menu"
-msgstr ""
+msgstr "Nije u izborniku"
 
 #| msgid "New page"
 msgid "View page"
-msgstr ""
+msgstr "Pogledaj stranicu"
 
 #| msgid "softroot"
 msgid "Softroot"
-msgstr ""
+msgstr "Softroot"
 
 msgid "Apphook"
-msgstr ""
+msgstr "Apphook"
 
 #, python-format
 msgid "Application: %(apphook)s"
 msgstr "Aplikacija: %(apphook)s"
-
-#, python-format
-#| msgid "Edit this page in %(language)s "
-msgid "Preview this page in %(language)s "
-msgstr ""
-
-msgid "Preview"
-msgstr "Pregled"
-
-msgid "Publish"
-msgstr "Objavi"
-
-msgid "Unpublish"
-msgstr "Ukloni objavu"
-
-msgid "Configure"
-msgstr ""
 
 msgid "in menu"
 msgstr "u izborniku"
@@ -1155,13 +1112,16 @@ msgstr "nije u izborniku"
 
 #| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
-msgstr ""
+msgstr "Postavke stranice (SHIFT klik za napredne postavke)"
+
+msgid "Permissions"
+msgstr "Ovlasti"
 
 msgid "Clipboard"
-msgstr ""
+msgstr "Međumemorija"
 
 msgid "Add plugin"
-msgstr ""
+msgstr "Dodaj plugin"
 
 msgid "Copy all"
 msgstr "Kopiraj sve"
@@ -1173,64 +1133,57 @@ msgid "Empty all"
 msgstr "Obriši sve"
 
 msgid "Filter plugins..."
-msgstr ""
+msgstr "Filtriraj pluginove..."
 
 msgid "This is a static placeholder"
-msgstr ""
+msgstr "Ovo je statički placeholder"
 
 msgid "Expand all"
-msgstr ""
+msgstr "Proširi sve"
 
 msgid "Collapse all"
-msgstr ""
-
-msgid "Edit"
-msgstr "Uredi"
+msgstr "Sažmi sve"
 
 msgid "You cannot add plugins to this plugin."
-msgstr ""
+msgstr "Ne možete dodavati pluginove u ovaj plugin."
 
 msgid "This plugin cannot be moved or edited outside of its parent"
-msgstr ""
+msgstr "Ovaj plugin ne može biti premješten niti uređivan izvan svog roditelja."
 
 msgid "Clipboard is empty."
-msgstr ""
+msgstr "Međumemorija je prazna"
 
 msgid "This plugin does not allow plugins of this type as nested plugins."
-msgstr ""
+msgstr "Ovaj plugin ne omogućava pluginove ovog tipa kao djecu."
 
 msgid "This plugin cannot have nested plugins."
-msgstr ""
+msgstr "Ovaj plugin ne može imati djecu."
 
 msgid "Highlight"
-msgstr ""
+msgstr "Označi"
 
 msgid "Available plugins"
 msgstr "Dostupni pluginovi"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
-
-#| msgid "View published"
-msgid "View published"
-msgstr ""
+msgstr "Prebaci na strukturu"
 
 msgid "Login"
 msgstr "Prijavi se"
 
 msgid "Add plugin to"
-msgstr ""
+msgstr "Dodaj plugin u"
 
 msgid "More"
-msgstr ""
+msgstr "Više"
 
 #, python-format
 #| msgid "Development version using django CMS %(cms_version)s"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
-msgstr ""
+msgstr "Razvojna verzija koristi django CMS %(cms_version)s, Django %(django_version)s, Python %(python_version)s"
 
 msgid "Cancel"
 msgstr "Odustani"
@@ -1240,7 +1193,7 @@ msgstr "Došlo je do sljedeće pogreške:"
 
 #| msgid "Action successfull... reloading."
 msgid "Action successful."
-msgstr ""
+msgstr "Akcija uspješna."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Da li ste sigurni da želite izbrisati ovaj plugin?"
@@ -1249,101 +1202,98 @@ msgid "Are you sure you want to publish this page?"
 msgstr "Da li želite objaviti ovu stranicu?"
 
 msgid "Plugin will be added here"
-msgstr ""
+msgstr "Plugin će biti dodan ovdje"
 
 #| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
-msgstr ""
+msgstr "Imate promjene koje još nisu spremljene."
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "Učitavanje"
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
-msgstr ""
+msgstr "Da li ste sigurni da ne želite spremiti ove promjene?"
 
 msgid ""
 "The form could not be loaded. Please check that the server is running "
 "correctly."
-msgstr ""
+msgstr "Formular ne može biti učitan. Molimo provjerite ako poslužitelj radi ispravno."
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "Najkorištenije"
 
 msgid "Shortcuts"
-msgstr ""
+msgstr "Kratice"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "Stranica je u međuvremenu promijenjena, ponovno učitavam..."
 
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Prikaži ovaj dijalog za pomoć"
 
 #| msgid "Cancel"
 msgid "Close/cancel"
-msgstr ""
+msgstr "Zatvori/Odustani"
 
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "Prebaci u prikaz strukture"
 
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "Prebaci u prikaz strukture i označi plugin iznad kojeg se nalazi pokazivač"
 
 msgid "Open \"Create\" dialog"
-msgstr ""
+msgstr "Otvori dijalog za izradu"
 
 msgid "Focus on Toolbar"
-msgstr ""
+msgstr "Fokusiraj na toolbar"
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
-msgstr ""
+msgstr "Fokusiraj na placholdere"
 
 msgid "Move to next/previous element"
-msgstr ""
+msgstr "Premjesti u sljedeći/prethodni element"
 
 #| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
-msgstr ""
+msgstr "Fokusiraj na pluginove placeholdera"
 
 #| msgid "Add plugin"
 msgid "Edit plugin"
-msgstr ""
+msgstr "Uredi plugin"
 
 #| msgid "not in menu"
 msgid "Open actions menu"
-msgstr ""
+msgstr "Otvori izbornik akcija"
 
 #| msgid "Expand all"
 msgid "Expand/collapse"
-msgstr ""
+msgstr "Proširi/sažmi"
 
 msgid ""
 "<strong>Login failed.</strong> Please check your credentials and try again."
 msgstr "<strong>Prijava neuspješna.</strong> Molim provjerite pristupne podatke i pokušajte ponovno."
 
-msgid "This page has unpublished changes."
-msgstr "Ova stranica sadrži još neobjavljene promjene."
-
 msgid "Double-click to edit"
 msgstr "Dvostruki klik za uređivanje"
 
 msgid "Tap to edit"
-msgstr ""
+msgstr "Tap za uređivanje"
 
 msgid "Click to go back"
-msgstr ""
+msgstr "Klik za povratak"
 
 msgid "Click to go forward"
-msgstr ""
+msgstr "Klik za naprijed"
 
 msgid "Minimize"
-msgstr ""
+msgstr "Minimiziraj"
 
 msgid "Maximize"
-msgstr ""
+msgstr "Maksimiziraj"
 
 msgid "Drop a plugin here"
 msgstr "Ispusti plugin ovdje"
@@ -1355,27 +1305,27 @@ msgid "It is being redirected to:"
 msgstr "Preusmjerena je na:"
 
 msgid "Installation successful!"
-msgstr ""
+msgstr "Instalacija uspješna!"
 
 msgid "Add your first page"
-msgstr ""
+msgstr "Dodaj svoju prvu stranicu"
 
 msgid "Please log in"
-msgstr ""
+msgstr "Molimo prijavite se"
 
 #, python-format
 msgid ""
 "\n"
 "                    Welcome to django CMS version <strong>%(cms_version)s</strong>.\n"
 "                "
-msgstr ""
+msgstr "\n                    Dobrodošli u django CMS verzija <strong>%(cms_version)s</strong>.\n                "
 
 #, python-format
 msgid ""
 "\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Add the first page</a> to the system to continue.\n"
 "                    "
-msgstr ""
+msgstr "\n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">Dodaj prvu stranicu</a> u sustav za nastavak.\n                    "
 
 #, python-format
 msgid ""
@@ -1383,16 +1333,16 @@ msgid ""
 "                        JavaScript seems to be disabled so please\n"
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">add a page</a> manually.\n"
 "                    "
-msgstr ""
+msgstr "\n                        JavaScript je onemogućena stoga molimo\n                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add\">dodajte stranicu</a> ručno.\n                    "
 
 msgid "Installation Notes"
-msgstr ""
+msgstr "Zabilješke za instalaciju"
 
 msgid "Support"
-msgstr ""
+msgstr "Podrška"
 
 msgid "Documentation"
-msgstr ""
+msgstr "Dokumentacija"
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1409,7 +1359,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr ""
+msgstr "\n                <p class=\"cms-welcome-notes\">Ako ne vidite django CMS logo na vrhu, osigurajte\n                    vezu na <code>static/cms</code> direktorij u vašim\n                    static datotekama.</p>\n            "
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1427,34 +1377,29 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n                    <p class=\"cms-welcome-notes\">Vidite ovu stranicu zato što imate\n                        <code>DEBUG = True</code> django u postavkama i\n                        niste još dodali nijednu stranicu.\n                    </p>\n                "
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "Dobrodošli u django CMS"
+
+msgid "Add Another"
+msgstr "Dodaj još"
 
 msgid "Back"
-msgstr ""
+msgstr "Povratak"
 
 msgid "Please choose an option from below to proceed to the next step."
-msgstr ""
+msgstr "Molimo odaberite jednu opciju od ispod ponuđenih kako bi nastavili na sljedeći korak."
 
 msgid "Next"
-msgstr ""
-
-msgid "unpublished changes"
-msgstr "neobjavljene promjene"
-
-msgid "published"
-msgstr "objavljeno"
-
-msgid "unpublished parent"
-msgstr "neobjavljena nadređena stranica"
-
-msgid "unpublished"
-msgstr "neobjavljeno"
+msgstr "Sljedeći"
 
 msgid "no content"
 msgstr "bez sadržaja"
+
+#| msgid "no content"
+msgid "has contents"
+msgstr ""
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1477,7 +1422,7 @@ msgstr "korisničko ime"
 
 msgid ""
 "Required. 300 characters or fewer. Letters, numbers and @/./+/-/_ characters"
-msgstr ""
+msgstr "Obavezno. 300 znakova ili manje. Slova, znamenke i @/./+/-/_"
 
 msgid "Enter a valid username."
 msgstr "Unesite valjano korisničko ime"
@@ -1532,6 +1477,10 @@ msgstr "Članci"
 msgid "Sample App"
 msgstr "Ogledna Aplikacija"
 
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr "Ogledna aplikacija sa konfiguracijom"
+
 msgid "Sample App with excluded permissions"
 msgstr "Primjer aplikacije bez uključenih ovlasti"
 
@@ -1540,19 +1489,19 @@ msgstr "Ogledna Aplikacija 2"
 
 #| msgid "Sample App 2"
 msgid "Sample App 3"
-msgstr ""
+msgstr "Ogledna aplikacija 3"
 
 msgid "Namespaced App"
-msgstr ""
+msgstr "Aplikacija sa prostorom imena"
 
 msgid "Parent app"
-msgstr ""
+msgstr "Roditeljska aplikacija"
 
 msgid "Child app"
-msgstr ""
+msgstr "Aplikacija dijete"
 
 msgid "Variable urls-menus App"
-msgstr ""
+msgstr "Variable urls-menus App"
 
 msgid "sample root page"
 msgstr "ogledna korijenska stranica"
@@ -1573,11 +1522,11 @@ msgid "Static Menu2"
 msgstr "Statički Izbornik2"
 
 msgid "Static Menu3"
-msgstr ""
+msgstr "Static Menu3"
 
 #| msgid "Static Menu"
 msgid "Static Menu4"
-msgstr ""
+msgstr "Static Menu4"
 
 msgid "Category"
 msgstr "Kategorija"
@@ -1589,7 +1538,7 @@ msgid "Add Category"
 msgstr "Dodaj kategoriju"
 
 msgid "^account/$"
-msgstr ""
+msgstr "^account/$"
 
 msgid "Change Category"
 msgstr "Promijeni kategoriju"
@@ -1601,17 +1550,17 @@ msgid "Inherit the template of the nearest ancestor"
 msgstr "Nasljedi predložak najbližeg pretka"
 
 msgid "UserSettings"
-msgstr ""
+msgstr "UserSettings"
 
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "Dodaj plugin u placeholder \"%(placeholder_label)s\""
 
 #, python-format
 #| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
-msgstr ""
+msgstr "Dodaj plugin u %(plugin_name)s"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - Vaš korisnički račun je kreiran."
@@ -1631,21 +1580,136 @@ msgstr "Ovaj placeholder veći ima najveći dozvoljeni broj (%(limit)s) pluginov
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
-msgstr ""
+msgstr "Ne može se pronaći specificirani CMS_REQUEST_IP_RESOLVER modul: \"{0}\"."
 
 #, python-brace-format
 msgid ""
 "Unable to find the specified CMS_REQUEST_IP_RESOLVER function: \"{0}\" in "
 "module \"{1}\"."
-msgstr ""
+msgstr "Ne može se pronaći specificirana CMS_REQUEST_IP_RESOLVER funkcija: \"{0}\" u modulu \"{1}\"."
 
 #, python-format
 msgid "Create a new %s instance."
-msgstr ""
+msgstr "Izradi novu %s instancu."
 
 #, python-format
 msgid "A wizard has already been registered for model: %s"
-msgstr ""
+msgstr "Čarobnjak je već registriran za model: %s"
+
+#~ msgid "X Frame Options"
+#~ msgstr "X Frame Options"
+
+#~ msgid "Whether this page can be embedded in other pages or websites"
+#~ msgstr "Whether this page can be embedded in other pages or websites"
+
+#~ msgid "Language independent options"
+#~ msgstr "Language independent options"
+
+#~ msgid "Publishing dates"
+#~ msgstr "Publishing dates"
+
+#~ msgid "Change Permissions"
+#~ msgstr "Change Permissions"
+
+#~ msgid "You do not have permission to revert this page."
+#~ msgstr "You do not have permission to edit this page"
+
+#~ msgid "You do not have permission to publish this page"
+#~ msgstr "You do not have permission to publish this page"
+
+#~ msgid "Page not published! A parent page is not published yet."
+#~ msgstr "Page not published! A parent page is not published yet."
+
+#~ msgid "The content was successfully published."
+#~ msgstr "The content was successfully published."
+
+#~ msgid "There was a problem publishing your content"
+#~ msgstr "There was a problem publishing your content"
+
+#~ msgid "You do not have permission to unpublish this page"
+#~ msgstr "You do not have permission to unpublish this page"
+
+#~ msgid "This page was never published"
+#~ msgstr "This page was never published"
+
+#~ msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
+#~ msgstr "The %(language)s page \"%(page)s\" was successfully unpublished"
+
+#~ msgid "You don't have permissions to see page \"%(title)s\""
+#~ msgstr "You do not have permission to change pages."
+
+#~ msgid "parent must be in the same placeholder"
+#~ msgstr "parent must be in the same placeholder"
+
+#~ msgid "parent must be in the same language as plugin_language"
+#~ msgstr "parent must be in the same language as plugin_language"
+
+#~ msgid "Publish page changes"
+#~ msgstr "Publish changes"
+
+#~ msgid "Publish page now"
+#~ msgstr "Publish page now"
+
+#~ msgid "Save as Page Type"
+#~ msgstr "Save as Page Type"
+
+#~ msgid "Unpublish page"
+#~ msgstr "Unpublish page"
+
+#~ msgid "Publish page"
+#~ msgstr "Publish page"
+
+#~ msgid "Are you sure you want to revert to live?"
+#~ msgstr "Are you sure you want to revert to live?"
+
+#~ msgid "Revert to live"
+#~ msgstr "Revert to live"
+
+#~ msgid ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+#~ msgstr ""
+#~ "When the page should go live. Status must be \"Published\" for page to go "
+#~ "live."
+
+#~ msgid "When to expire the page. Leave empty to never expire."
+#~ msgstr "When to expire the page. Leave empty to never expire."
+
+#~ msgid "has url overwrite"
+#~ msgstr "has url overwrite"
+
+#~ msgid "is published"
+#~ msgstr "is published"
+
+#~ msgid "Basic Settings"
+#~ msgstr "Basic Settings"
+
+#~ msgid "Preview this page in %(language)s "
+#~ msgstr "Edit this page in %(language)s "
+
+#~ msgid "Publish"
+#~ msgstr "Publish"
+
+#~ msgid "Unpublish"
+#~ msgstr "Unpublish"
+
+#~ msgid "View published"
+#~ msgstr "View published"
+
+#~ msgid "This page has unpublished changes."
+#~ msgstr "This page has unpublished changes."
+
+#~ msgid "unpublished changes"
+#~ msgstr "unpublished changes"
+
+#~ msgid "published"
+#~ msgstr "published"
+
+#~ msgid "unpublished parent"
+#~ msgstr "unpublished parent"
+
+#~ msgid "unpublished"
+#~ msgstr "unpublished"
 
 #~ msgid "The current language of the content fields."
 #~ msgstr "The current language of the content fields."
@@ -1725,9 +1789,6 @@ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
 #~ msgstr ""
 #~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
 
 #~ msgid ""
 #~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
