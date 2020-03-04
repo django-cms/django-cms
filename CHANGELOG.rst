@@ -2,6 +2,10 @@
 Changelog
 =========
 
+3.7.2
+==================
+* Fixed a bug that didn't allow to publish changes related to static placeholders.
+
 
 3.7.1 (2019-11-26)
 ==================
