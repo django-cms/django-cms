@@ -18,11 +18,12 @@ from django.views.decorators.http import require_POST
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
-from cms.models.pagemodel import TreeNode
+from cms.models import PageContent, TreeNode
 from cms.page_rendering import _handle_no_page, _render_welcome_page, render_pagecontent
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from cms.utils import helpers
 from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             get_redirect_on_fallback, get_language_list,
@@ -168,6 +169,9 @@ def details(request, slug):
     # use the page object with populated cache
     content.page = page
     if hasattr(request, 'toolbar'):
+        content = helpers.filter_admin_model(
+            PageContent, page_id=page.pk, language=request_language
+        ).first()
         request.toolbar.set_object(content)
 
     return render_pagecontent(request, content)

@@ -127,3 +127,19 @@ def get_admin_model_object_by_id(model_class, obj_id):
     should be visible to the admin.
     """
     return model_class.objects.get(pk=obj_id)
+
+
+def filter_admin_model(model_class, **kwargs):
+    """
+    A method to filter a Model with keyword arguments.
+
+    3rd party applications may change the queryset by the use of monkey-patching.
+    djangocms-versioning is a prime example of this. By having this helper 3rd
+    party applications can monkeypatch this helper to ensure correct results
+    without monkeypatching entire functions of django-cms or through adding
+    their logic directly to django-cms.
+
+    This helper can be reused by applications that wish to get a model that
+    should be visible to the admin.
+    """
+    return model_class.filter(**kwargs)
