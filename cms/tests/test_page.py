@@ -922,3 +922,19 @@ class PageTreeTests(CMSTestCase):
         child.move_page(parent.node)
         child = child.reload()
         self.assertEqual(child.get_absolute_url(language='en'), '/en/parent/child/')
+
+
+class PageContentTests(CMSTestCase):
+
+    def setUp(self):
+        self.page = create_page("english-page", "nav_playground.html", "en")
+        self.german_content = create_title("de", "german content", self.page)
+        self.english_content = self.page.get_title_obj('en')
+
+    def test_get_title_obj(self):
+        """
+        Cache partially populated, if no hit it should try to populate it
+        """
+        del self.page.title_cache['de']
+        german_content = self.page.get_title_obj('de')
+        self.assertEqual(german_content.pk, self.german_content.pk)
