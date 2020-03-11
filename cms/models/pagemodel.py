@@ -199,6 +199,8 @@ class Page(models.Model):
         super(Page, self).__init__(*args, **kwargs)
         self.urls_cache = {}
         self.title_cache = {}
+        # to pre-emptive usage from get_admin_title_obj
+        self.admin_title_cache = {}
 
     def __str__(self):
         try:
@@ -775,6 +777,16 @@ class Page(models.Model):
         from cms.models import EmptyPageContent
 
         return EmptyPageContent(language)
+
+    def get_admin_title_obj(self, language=None, fallback=True, force_reload=False):
+        """
+        Used in places where it is ok to fetch pagecontent that is not yet
+        publically available.
+
+        In vanilla django-cms it is an alias for get_title_obj. But this can
+        be monkeypatched by other packages such as djangocms-versioning.
+        """
+        return self.get_title_obj(language=language, fallback=fallback, force_reload=force_reload)
 
     def get_page_content_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
         """Helper function for getting attribute or None from wanted/current title.

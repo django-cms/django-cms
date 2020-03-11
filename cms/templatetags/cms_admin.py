@@ -27,7 +27,7 @@ def get_admin_url_for_language(page, language):
         admin_url += '?cms_page={}&language={}'.format(page.pk, language)
         return admin_url
 
-    page_content = page.get_title_obj(language, fallback=False)
+    page_content = page.get_admin_title_obj(language, fallback=False)
     return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
 
 
