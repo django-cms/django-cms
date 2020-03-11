@@ -727,7 +727,7 @@ class PageAdmin(admin.ModelAdmin):
 
     def edit_title_fields(self, request, page_id, language):
         page = self.get_object(page_id)
-        translation = page.get_title_obj(language, fallback=False)
+        translation = page.get_admin_title_obj(language, fallback=False)
 
         if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(force_text(_("You do not have permission to edit this page")))
@@ -946,7 +946,6 @@ class PageContentAdmin(admin.ModelAdmin):
     def add_view(self, request, form_url='', extra_context=None):
         site = get_site(request)
         language = get_site_language_from_request(request, site_id=site.pk)
-
         if extra_context is None:
             extra_context = {}
 
@@ -1222,7 +1221,7 @@ class PageContentAdmin(admin.ModelAdmin):
         if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
             return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
 
-        target_page_content = page.get_title_obj(target_language, fallback=False)
+        target_page_content = page.get_admin_title_obj(target_language, fallback=False)
 
         for placeholder in source_page_content.get_placeholders():
             # TODO: Handle missing placeholder
@@ -1468,7 +1467,7 @@ class PageContentAdmin(admin.ModelAdmin):
                 'opts': self.opts,
                 'site': site,
                 'page': page,
-                'page_content': page.get_title_obj(language, fallback=True),
+                'page_content': page.get_admin_title_obj(language, fallback=True),
                 'page_content_type': page_content_type,
                 'node': page.node,
                 'ancestors': [node.item for node in page.node.get_cached_ancestors()],

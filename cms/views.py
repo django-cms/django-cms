@@ -164,11 +164,12 @@ def details(request, slug):
     if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
 
-    content = page.get_title_obj(language=request_language)
+    content = page.get_title_obj(language=request_language, fallback=False)
     # use the page object with populated cache
     content.page = page
     if hasattr(request, 'toolbar'):
-        request.toolbar.set_object(content)
+        toolbar_content = page.get_admin_title_obj(language=request_language)
+        request.toolbar.set_object(toolbar_content)
 
     return render_pagecontent(request, content)
 
@@ -258,6 +259,7 @@ def render_object_preview(request, content_type_id, object_id):
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     toolbar = get_toolbar_from_request(request)
+
     toolbar.set_object(content_type_obj)
     render_func = extension.toolbar_enabled_models[model]
     return render_func(request, content_type_obj)
