@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
+from functools import lru_cache
+
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.utils.functional import LazyObject
+from django.urls import resolve
+from django.contrib.contenttypes.models import ContentType
+from django.urls.exceptions import Resolver404
 
 from cms.utils.conf import get_site_id  # nopyflakes
 from cms.utils.i18n import get_default_language
@@ -16,6 +21,29 @@ def get_current_site():
     return Site.objects.get_current()
 
 
+@lru_cache(512)
+def get_object_language(request):
+    try:
+        resolved = resolve(request.path)
+    except Resolver404:
+        return None
+
+    args = resolved.args
+    if len(args) != 2 or not all([a.isnumeric() for a in args]):
+        return None
+
+    content_type_id, object_id = args
+
+    try:
+        content_type = ContentType.objects.get_for_id(content_type_id)
+        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+        language = content_type_obj.language
+    except (ContentType.DoesNotExist, AttributeError):
+        return None
+
+    return language
+
+
 def get_language_from_request(request, current_page=None):
     """
     Return the most obvious language according the request
@@ -23,8 +51,12 @@ def get_language_from_request(request, current_page=None):
     language = None
     if hasattr(request, 'POST'):
         language = request.POST.get('language', None)
-    if hasattr(request, 'GET') and not language:
+    elif hasattr(request, 'GET'):
         language = request.GET.get('language', None)
+
+    if not language:
+        language = get_object_language(request)
+
     site_id = current_page.node.site_id if current_page else None
     if language:
         language = get_language_code(language)
