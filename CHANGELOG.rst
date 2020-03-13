@@ -2,6 +2,10 @@
 Changelog
 =========
 
+Unreleased
+==================
+Fix rendering AliasPlugin in static_placerholder in edit mode.
+
 
 3.7.1 (2019-11-26)
 ==================
