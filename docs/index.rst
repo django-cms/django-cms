@@ -180,8 +180,8 @@ project.
 
     introduction/index
     how_to/index
-    topics/index
     reference/index
+    topics/index
     contributing/index
     upgrade/index
     user/index
