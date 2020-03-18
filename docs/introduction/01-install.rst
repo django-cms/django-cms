@@ -4,32 +4,22 @@
 Installing django CMS
 #####################
 
-We'll get started by setting up our environment.
+We'll get started by setting up our environment. This tutorial assumes you are using Python 3.
 
-************
-Requirements
-************
-
-django CMS requires Django 1.11 or newer, and Python 2.7 or 3.3 or newer. This tutorial assumes
-you are using Python 3.
 
 ************************
 Your working environment
 ************************
-
-We're going to assume that you have a reasonably recent version of virtualenv
-installed and that you have some basic familiarity with it.
-
 
 Create and activate a virtual environment
 =========================================
 
 ::
 
-    python3.6 -m venv env   # Python 2 usage: virtualenv env
+    python3 -m venv env
     source env/bin/activate
 
-Note that if you're using Windows, to activate the virtualenv you'll need::
+Note that if you're using Windows, to activate the virtualenv you may need::
 
     env\Scripts\activate
 
@@ -100,8 +90,7 @@ Start up the runserver
 
     python manage.py runserver
 
-Open http://localhost:8000/ in your browser, where you should be invited to login, and then create
-a new page.
+Open http://localhost:8000/ in your browser, where you will be invited to log in. Use the credentials above.
 
 .. image:: /introduction/images/welcome.png
    :alt: a django CMS home page
@@ -113,5 +102,4 @@ Congratulations, you now have installed a fully functional CMS.
 If you need to log in at any time, append ``?edit`` to the URL and hit Return. This will enable the
 toolbar, from where you can log in and manage your website.
 
-If you are not already familiar with django CMS, you can take a few minutes to run through the
-basics of the :ref:`django CMS tutorial for users <user-tutorial>`.
+In the next section, we'll introduce the basics of django CMS usage.

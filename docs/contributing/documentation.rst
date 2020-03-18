@@ -156,17 +156,20 @@ Documentation structure
 
 Our documentation is divided into the following main sections:
 
-* :doc:`/introduction/index` (``introduction``): step-by-step, beginning-to-end tutorials to get
+* :doc:`/introduction/index`: step-by-step, beginning-to-end tutorials to get
   you up and running
-* :doc:`/how_to/index` (``how_to``): step-by-step guides covering more advanced development
-* :doc:`/topics/index` (``topics``): explanations of key parts of the system
-* :doc:`/reference/index` (``reference``): technical reference for APIs, key
-  models
-  and so on
-* :doc:`/contributing/index` (``contributing``)
-* :doc:`/upgrade/index` (``upgrade``)
-* :doc:`/user/index` (``user``): guides for *using* rather than setting up or developing for the
-  CMS
+* :doc:`/how_to/index`: guides focused on common tasks and problems
+* :doc:`/reference/index`: technical reference for APIs, key models and so on
+* :doc:`/topics/index`: explanations of key parts of the system
+
+This structure is based on the principles outlined in the article `What nobody tells you about
+documentation <https://www.divio.com/en/blog/documentation/>`_, and is key to its quality and
+usability.
+
+In addition, the documentation contains:
+
+* :doc:`/contributing/index` - information about the django CMS project, community and developmemt
+* :doc:`/upgrade/index`
 
 
 ********************

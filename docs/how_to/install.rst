@@ -522,8 +522,6 @@ done so already.
 Next steps
 **********
 
-If this is your first django CMS project, read through the :ref:`user-tutorial` for a walk-through of some basics.
-
 The :ref:`tutorials for developers <tutorials>` will help you understand how to approach django CMS as a developer.
 Note that the tutorials assume you have installed the CMS using the django CMS Installer, but with a little
 adaptation you'll be able to use it as a basis.

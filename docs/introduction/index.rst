@@ -28,14 +28,17 @@ in the order presented here.
     :numbered:
 
     01-install
-    02-templates_placeholders
-    03-integrating_applications
-    04-plugins
-    05-apphooks
-    06-toolbar
-    07-menu
-    08-wizards
-    09-third_party
+    02-basic-usage
+    03-page-admin
+    04-structure-content-modes
+    05-templates_placeholders
+    06-integrating_applications
+    07-plugins
+    08-apphooks
+    09-toolbar
+    10-menu
+    11-wizards
+    12-third_party
 
 If you want to install django CMS into an existing project, or prefer to configure django CMS by
 hand, rather than using the automated installer, see :doc:`/how_to/install` and then follow the

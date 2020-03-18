@@ -2,7 +2,6 @@
 Structure and content modes
 ###########################
 
-
 The *Structure/Content* mode control in the toolbar lets you switch between two different editing
 modes.
 
@@ -13,14 +12,14 @@ In *Structure* mode, you can manage the placement of content within the page str
 Switch to *Structure* mode. This reveals the *structure board* containing the *placeholders*
 available on the page, and the *plugins* in them:
 
-.. image:: /user/tutorial/images/structure-board.png
+.. image:: /introduction/images/structure-board.png
      :align: right
      :alt: the structure board
 
 Here there is just one placeholder, called *Content*, containing one plugin - a text plugin that
 begins *Lorem ipsum dolor...*.
 
-.. image:: /user/tutorial/images/add-plugin.png
+.. image:: /introduction/images/add-plugin.png
      :alt: the 'Add plugin' icon
      :width: 308
 
@@ -33,7 +32,7 @@ Let's add another plugin.
 
 Select the **Add plugin** icon (**+**) and choose *Text* from the list of available plugin types.
 
-.. image:: /user/tutorial/images/text-plugin.png
+.. image:: /introduction/images/text-plugin.png
      :alt: the list of plugin types
      :width: 165
 
@@ -49,8 +48,10 @@ plugins.
 Each plugin in the structure board is available for editing by double-clicking or selecting the
 edit icon.
 
-.. image:: /user/tutorial/images/structure-board-with-two-plugins.png
+.. image:: /introduction/images/structure-board-with-two-plugins.png
    :alt: the structure board with two plugins
 
 You can switch back to content mode to see the effect of your changes, and **Publish** the page to
 make them public.
+
+Next we will see how to add new placeholders to a template.
