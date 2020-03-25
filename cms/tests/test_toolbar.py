@@ -463,6 +463,36 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
 
+    def test_change_language_menu_two_languages(self):
+        """
+        Only english language is active. German and English is not disabled.
+        The language link points to the preview url instead of live url.
+        """
+        page = create_page("english-page", "nav_playground.html", "en")
+        german_content = create_title("de", "german content", page)
+        english_content = page.get_title_obj('en')
+        staff = self.get_staff()
+        self.client.force_login(staff)
+
+        response = self.client.get(page.get_absolute_url())
+        menus = response.context['cms_toolbar'].menus
+        language_menu = menus['language-menu']
+        english = language_menu.items[0]
+        english_url = get_object_preview_url(english_content)
+        not_disabled_languages = [i for i in language_menu.items if i.disabled == False]
+
+        german = language_menu.items[1]
+        german_url = get_object_preview_url(german_content)
+
+        self.assertEqual(german.active, False)
+        self.assertEqual(german.disabled, False)
+        self.assertEqual(german.url, german_url)
+
+        self.assertEqual(english.active, True)
+        self.assertEqual(english.disabled, False)
+        self.assertEqual(english.url, english_url)
+        self.assertEqual(len(not_disabled_languages), 2, 'Only two languages are not disabled')
+
     def test_show_toolbar_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
         page_content = self.get_page_title_obj(page)

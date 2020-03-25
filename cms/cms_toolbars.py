@@ -313,13 +313,16 @@ class BasicToolbar(CMSToolbar):
     def add_language_menu(self):
         if settings.USE_I18N and not self._language_menu:
             self._language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1)
-            language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
+            page = self.request.current_page
             for code, name in get_language_tuple(self.current_site.pk):
                 try:
-                    url = language_changer(code)
-                except NoReverseMatch:
+                    content = page.get_title_obj(code, fallback=False)
+                    url = get_object_preview_url(content)
+                    disabled = False
+                except (NoReverseMatch, AttributeError):
                     url = DefaultLanguageChanger(self.request)(code)
-                self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+                    disabled = True
+                self._language_menu.add_link_item(name, url=url, active=self.current_lang == code, disabled=disabled)
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
