@@ -26,13 +26,14 @@ Django settings
 ``INSTALLED_APPS``
 ==================
 
-Add the application and any of its requirements that are not there already to
-``INSTALLED_APPS`` in ``settings.py``. Some *will* be already present; it's up
-to you to check them because you need to avoid duplication:
+Add the application and any of its requirements that are not yet there to the
+``INSTALLED_APPS`` in ``settings.py``. Some *will* already be present; check carefully
+to avoid duplication:
 
 .. code-block:: python
 
     # you will probably need to add:
+
     'aldryn_apphooks_config',
     'aldryn_boilerplates',
     'aldryn_categories',
@@ -44,6 +45,7 @@ to you to check them because you need to avoid duplication:
     'taggit',
 
     # and you will probably find the following already listed:
+    
     'easy_thumbnails',
     'filer',
 

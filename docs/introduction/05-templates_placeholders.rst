@@ -65,7 +65,7 @@ placeholder "splashbox" %}`` inside the ``{% block content %}`` section. For exa
 
 If you switch to *Structure* mode, you'll see the new placeholders available for use.
 
-.. image:: /introduction/images/new-placeholder.png
+.. image:: /introduction/images/new-placeholder-new.png
    :alt: the new 'splashbox' placeholder
    :align: center
 
@@ -105,7 +105,7 @@ single page, we should add it to our **base template**
 Save the template and return to your browser. Refresh any page in Structure mode, and you'll
 see the new static placeholder.
 
-.. image:: /introduction/images/static-placeholder.png
+.. image:: /introduction/images/static-placeholder-new.png
    :alt: a static placeholder
    :align: center
 

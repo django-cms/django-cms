@@ -50,9 +50,10 @@ Create a new directory to work in, and ``cd`` into it::
     mkdir tutorial-project
     cd tutorial-project
 
-Run it to create a new Django project called ``mysite``::
+Run ``djangocms`` to create a new Django project called ``mysite`` and ``cd`` into it::
 
     djangocms mysite
+    cd mysite
 
 This means:
 

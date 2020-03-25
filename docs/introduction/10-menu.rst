@@ -56,9 +56,10 @@ What's happening here:
 * we define a ``PollsMenu`` class, and register it
 * we give the class a ``name`` attribute (will be displayed in admin)
 * in its ``get_nodes()`` method, we build and return a list of nodes, where:
-* first we get all the ``Poll`` objects
-* ... and then create a ``NavigationNode`` object from each one
-* ... and return a list of these ``NavigationNodes``
+
+    * first we get all the ``Poll`` objects,
+    * then create a ``NavigationNode`` object from each one, and
+    * return a list of these ``NavigationNodes``
 
 This menu class won't actually do anything until attached to a page. In the *Advanced settings* of the page to which
 you attached the apphook earlier, select "Polls Menu" from the list of *Attached menu* options, and save once more.

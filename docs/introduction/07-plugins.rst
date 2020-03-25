@@ -123,7 +123,7 @@ visit http://localhost:8000/.
 You can now drop the ``Poll Plugin`` into any placeholder on any page, just as
 you would any other plugin.
 
-.. image:: /introduction/images/poll-plugin-in-menu.png
+.. image:: /introduction/images/poll-plugin-in-menu-new.png
    :alt: the 'Poll plugin' in the plugin selector
    :width: 400
    :align: center

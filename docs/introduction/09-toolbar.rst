@@ -89,6 +89,10 @@ method to add an item that allows us to see the full list of polls in the sidefr
 After refreshing the page to load the changes, you can now see the list of polls directly from
 the menu.
 
+.. image:: /introduction/images/menu-add-sideframe-new.png
+   :alt: Added sideframe in the Polls menu
+   :width: 200
+
 Also useful would be an option to create new polls. We'll use a modal window for this, invoked with
 :meth:`add_modal_item() <cms.toolbar.items.ToolbarAPIMixin.add_modal_item()>`. Add the new code to the
 end of the ``populate()`` method:
@@ -106,6 +110,9 @@ end of the ``populate()`` method:
                 url=admin_reverse('polls_poll_add'),  # the URL it should open with
             )
 
+.. image:: /introduction/images/menu-sideframe-added-modal-new.png
+   :alt: modal added to the sideframe of the Polls menu
+   :width: 200
 
 Add buttons to the toolbar
 ==========================
@@ -129,6 +136,10 @@ As well as menus, you can add buttons to the toolbar in a very similar way. Rewr
             name='Add a new poll',
             url=admin_reverse('polls_poll_add'),
         )
+
+.. image:: /introduction/images/poll-list-Add-a-new-poll-button-new.png
+   :alt: Poll list and Add a new poll buttons added to the toolbar
+   :width: 630
 
 
 *******************

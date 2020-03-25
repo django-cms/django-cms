@@ -49,7 +49,7 @@ Add the ``poll`` URL configuration to ``urlpatterns`` in the project's ``urls.py
     :emphasize-lines: 3
 
     urlpatterns += i18n_patterns(
-        url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', admin.site.urls),  # NOQA
         url(r'^polls/', include('polls.urls')),
         url(r'^', include('cms.urls')),
     )
@@ -72,7 +72,7 @@ admin - ``http://localhost:8000/admin/`` - and find the Polls application.
    :width: 400
    :align: center
 
-Create a new **Poll**, for example:
+Add a new **Poll**, for example:
 
 * **Question**: *Which browser do you prefer?*
 
@@ -114,7 +114,7 @@ In ``mysite/templates``, add ``polls/base.html``, containing:
 
 Refresh the ``/polls/`` page again, which should now be properly integrated into the site.
 
-.. image:: /introduction/images/polls-integrated.png
+.. image:: /introduction/images/polls-integrated-new.png
    :alt: the polls application, integrated
    :width: 400
    :align: center
@@ -168,7 +168,7 @@ integrating Polls with django CMS. We'll start by :ref:`developing a Polls plugi
 
     **Adding templates to the project or to the application?**
 
-    Earlier, we added new templates to the project. We could equally well have have added ``templates/polls/base.html``
+    Earlier, we added new templates to the project. We could equally well have added ``templates/polls/base.html``
     inside ``polls_cms_integration``. After all, that's where we're going to be doing all the other integration work.
 
     However, we'd now have an application that makes assumptions about the name of the template it should extend (see

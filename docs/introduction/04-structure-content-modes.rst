@@ -12,12 +12,12 @@ In *Structure* mode, you can manage the placement of content within the page str
 Switch to *Structure* mode. This reveals the *structure board* containing the *placeholders*
 available on the page, and the *plugins* in them:
 
-.. image:: /introduction/images/structure-board.png
+.. image:: /introduction/images/structure-board-new.png
      :align: right
      :alt: the structure board
 
 Here there is just one placeholder, called *Content*, containing one plugin - a text plugin that
-begins *Lorem ipsum dolor...*.
+begins *This is my...*.
 
 .. image:: /introduction/images/add-plugin.png
      :alt: the 'Add plugin' icon
@@ -48,10 +48,14 @@ plugins.
 Each plugin in the structure board is available for editing by double-clicking or selecting the
 edit icon.
 
-.. image:: /introduction/images/structure-board-with-two-plugins.png
+.. image:: /introduction/images/structure-board-with-two-plugins-new.png
    :alt: the structure board with two plugins
 
-You can switch back to content mode to see the effect of your changes, and **Publish** the page to
+You can switch back to content mode to see the effect of your changes, and hit **Publish page changes** to
 make them public.
+
+.. image:: /introduction/images/publish-page-changes.png
+   :alt: Publish page changes
+
 
 Next we will see how to add new placeholders to a template.
