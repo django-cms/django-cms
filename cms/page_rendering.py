@@ -24,7 +24,7 @@ def render_page(request, page, current_language, slug):
 
     cant_view_page = any([
         not context['has_view_permissions'],
-        isinstance(page.get_title_obj(current_language), EmptyPageContent)
+        isinstance(page.get_title_obj(current_language, fallback=False), EmptyPageContent)
     ])
     if cant_view_page:
         return _handle_no_page(request)
