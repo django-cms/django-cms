@@ -22,9 +22,10 @@ def render_page(request, page, current_language, slug):
     context['has_change_permissions'] = user_can_change_page(request.user, page)
     context['has_view_permissions'] = user_can_view_page(request.user, page)
 
+    use_fallback = user_can_change_page(request.user, page)
     cant_view_page = any([
         not context['has_view_permissions'],
-        isinstance(page.get_title_obj(current_language), EmptyPageContent)
+        isinstance(page.get_title_obj(current_language, fallback=use_fallback), EmptyPageContent)
     ])
     if cant_view_page:
         return _handle_no_page(request)
