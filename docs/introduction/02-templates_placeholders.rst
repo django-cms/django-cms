@@ -136,8 +136,8 @@ The menu we use in ``mysite/templates/base.html`` is:
 
 .. code-block:: html+django
 
-    <ul class="nav navbar-nav">
-        {% show_menu 0 100 100 100 "menu.html" %}
+    <ul class="nav">
+        {% show_menu 0 100 100 100 %}
     </ul>
 
 The options control the levels of the site hierarchy that are displayed in the menu tree - but you don't need to worry about exactly what they do at this stage.
