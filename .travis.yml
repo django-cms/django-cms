@@ -31,6 +31,7 @@ env:
     - secure: CbPfysSncBB2Ue+VOtLDa8xJvwKl73nJO647zt/9UvZ/3PilnZN9aZv2jHxGvCiFXcez+2AddKptMCcx/5EW5UfRkrWUDHrfLCULU2TfOjmufEGM1eOIXhiAun8WQ85LBzTAYy1r9D514cbU3Yzn3xGZwJljPE8JE4cx3MNN/qQ=
     # temporary solution until https://github.com/ariya/phantomjs/issues/13953 is resolved
     - PHANTOMJS_CDNURL=https://s3.amazonaws.com/aldryn-local-assets
+    - DJANGO=1.11
 
 matrix:
   include:
@@ -99,14 +100,16 @@ matrix:
       env: TEST_DOCS=1 DJANGO=2.2 DATABASE_URL='sqlite://localhost/:memory:'
       dist: xenial
       sudo: true
+  exclude:
+    - python: 2.7
+      env: PHANTOMJS_CDNURL=https://s3.amazonaws.com/aldryn-local-assets
+    - python: 3.5
+      env: PHANTOMJS_CDNURL=https://s3.amazonaws.com/aldryn-local-assets
+    - python: 3.6
+      env: PHANTOMJS_CDNURL=https://s3.amazonaws.com/aldryn-local-assets
 
   allow_failures:
     - python: 2.7
-      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
-  exclude:
-    - python: 2.7
-    - python: 3.5
-    - python: 3.6
   fast_finish: true
 
 before_script:
