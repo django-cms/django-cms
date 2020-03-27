@@ -463,6 +463,44 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.show_toolbar)
 
+    def test_remove_and_copy_urls_are_correctly_associated_with_pagecontent(self):
+        """
+        The urls to copy and remove translations should be linked correctly.
+        """
+        def get_delete_url(pk):
+            return admin_reverse('cms_pagecontent_delete', args=(pk,))
+
+        page = create_page("english-page", "nav_playground.html", "en")
+        german_content = create_title("de", "german content", page)
+        english_content = page.get_title_obj('en')
+        edit_url = get_object_edit_url(english_content)
+        staff = self.get_staff()
+        self.client.force_login(staff)
+
+        response = self.client.get(edit_url)
+        menus = response.context['cms_toolbar'].menus
+        language_menu = menus['language-menu']
+        delete = language_menu.items[-2]
+        german_delete = delete.items[0]
+        english_delete = delete.items[1]
+
+        copy = language_menu.items[-1]
+        copy_german = copy.items[0]
+        copy_german_context = copy_german.get_context()
+
+        self.assertEqual(delete.name.lower(), 'delete translation')
+        self.assertEqual(german_delete.name.lower(), 'german...')
+        self.assertEqual(german_delete.url.split('?')[0], get_delete_url(german_content.pk))
+
+        self.assertEqual(english_delete.name.lower(), 'english...')
+        self.assertEqual(english_delete.url.split('?')[0], get_delete_url(english_content.pk))
+
+        self.assertEqual(copy_german.name.lower(), 'from german')
+        self.assertEqual(
+            copy_german_context['action'],
+            admin_reverse('cms_pagecontent_copy_language', args=(german_content.pk,))
+        )
+
     def test_show_toolbar_staff(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
         page_content = self.get_page_title_obj(page)
