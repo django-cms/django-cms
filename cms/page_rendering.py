@@ -21,6 +21,7 @@ def render_page(request, page, current_language, slug):
     context['current_page'] = page
     context['has_change_permissions'] = user_can_change_page(request.user, page)
     context['has_view_permissions'] = user_can_view_page(request.user, page)
+    context['pagecontent'] = page.title_cache[current_language]
 
     cant_view_page = any([
         not context['has_view_permissions'],
