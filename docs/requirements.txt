@@ -7,3 +7,4 @@ pyenchant==3.0.1
 sphinx-autobuild
 divio-docs-theme
 datetime
+coverage
