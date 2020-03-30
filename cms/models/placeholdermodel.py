@@ -728,6 +728,17 @@ class Placeholder(models.Model):
             )
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
             cursor.execute(sql, [self.pk, language])
+        elif db_vendor == 'oracle':
+            sql = (
+                'UPDATE {0} '
+                'SET position = ('
+                'SELECT COUNT(*)+1 FROM (SELECT * FROM {0}) t '
+                'WHERE placeholder_id={0}.placeholder_id AND language={0}.language '
+                'AND {0}.position > t.position'
+                ') WHERE placeholder_id=%s AND language=%s'
+            )
+            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+            cursor.execute(sql, [self.pk, language])
         else:
             raise RuntimeError(
                 '{} is not supported by django-cms'.format(connection.vendor)
