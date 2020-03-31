@@ -152,7 +152,6 @@ HELPER_SETTINGS = dict(
         'menus': None,
         'djangocms_text_ckeditor': None,
     },
-    X_FRAME_OPTIONS='SAMEORIGIN',
 )
 
 
