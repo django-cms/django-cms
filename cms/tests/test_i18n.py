@@ -2,12 +2,12 @@ from importlib import import_module
 
 from django.conf import settings
 from django.test.utils import override_settings
-from django.utils.translation import LANGUAGE_SESSION_KEY
+from django.utils.translation import LANGUAGE_SESSION_KEY, activate
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import i18n, get_language_from_request
-
+from cms.utils.compat import DJANGO_3_0
 
 @override_settings(
     LANGUAGE_CODE='en',
@@ -331,10 +331,10 @@ class TestLanguageFallbacks(CMSTestCase):
         self.create_homepage("home", "nav_playground.html", "fr", published=True)
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
-        # response = self.client.get('/en/')
-        # self.assertRedirects(response, '/fr/')
-        # response = self.client.get('/fr/')
-        # self.assertEqual(response.status_code, 200)
+        response = self.client.get('/en/')
+        self.assertRedirects(response, '/fr/')
+        response = self.client.get('/fr/')
+        self.assertEqual(response.status_code, 200)
 
     @override_settings(
         CMS_LANGUAGES={
@@ -364,9 +364,10 @@ class TestLanguageFallbacks(CMSTestCase):
         session = self.client.session
         session[LANGUAGE_SESSION_KEY] = 'fr'
         session.save()
-        response = self.client.get('/')
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, '/fr/')
+        if not DJANGO_3_0:
+            response = self.client.get('/')
+            self.assertEqual(response.status_code, 302)
+            self.assertRedirects(response, '/fr/')
         self.client.get('/en/')
         self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'en')
         response = self.client.get('/')
