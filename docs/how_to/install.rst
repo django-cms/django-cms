@@ -88,11 +88,13 @@ INSTALLED_APPS
 
 You will need to add the following to its list of ``INSTALLED_APPS``::
 
+    'myproject'
     'django.contrib.sites',
     'cms',
     'menus',
     'treebeard',
 
+* your project ``myproject`` needs to be added for Django CMS to include the extended packages of the project like CSS and templates.
 * django CMS needs to use Django's :mod:`django:django.contrib.sites` framework. You'll need to set a ``SITE_ID``
   in the settings - ``SITE_ID = 1`` will suffice.
 * ``cms`` and ``menus`` are the core django CMS modules.
@@ -479,8 +481,7 @@ rely on a set of well-maintained plugins that cover some general content managem
 
 To install::
 
-    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet
-        djangocms-style djangocms-column
+    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet djangocms-style djangocms-column
 
 and add::
 
@@ -497,7 +498,7 @@ to ``INSTALLED_APPS``.
 
 Then run migrations::
 
-    python manage.py migrate.
+    python manage.py migrate
 
 These and other plugins are described in more detail in :ref:`commonly-used-plugins`. More are listed
 plugins available on the `django CMS Marketplace <https://marketplace.django-cms.org/en/addons/>`_.
