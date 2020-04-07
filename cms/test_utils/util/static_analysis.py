@@ -14,11 +14,11 @@ def _pyflakes_report_with_nopyflakes(self, messageClass, node, *args, **kwargs):
     self.messages.append(messageClass(self.filename, node, *args, **kwargs))
 
 
-def _pyflakes_no_migrations(self, tree, filename='(none)', builtins=None):
+def _pyflakes_no_migrations(self, tree, filename='(none)', builtins=None, file_tokens=()):
     if os.path.basename(os.path.dirname(filename)) == 'migrations':
         self.messages = []
     else:
-        Checker.___init___(self, tree, filename, builtins)
+        Checker.___init___(self, tree, filename, builtins, file_tokens)
 
 
 def _check_recursive(paths, reporter):

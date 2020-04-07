@@ -2,7 +2,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.test.utils import override_settings
-from django.utils.translation import LANGUAGE_SESSION_KEY, activate
+from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase

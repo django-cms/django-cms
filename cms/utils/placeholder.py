@@ -254,7 +254,7 @@ def get_placeholders(template):
         if slot in clean_placeholders:
             warnings.warn("Duplicate {{% placeholder \"{0}\" %}} "
                           "in template {1}."
-                          .format(slot, template, slot),
+                          .format(slot, template),
                           DuplicatePlaceholderWarning)
         else:
             validate_placeholder_name(slot)

@@ -1043,7 +1043,6 @@ class PageTest(PageTestBase):
                 {
                     'code': 'en',
                     'name': 'English',
-                    'fallbacks': ['fr', 'de'],
                     'public': True,
                     'fallbacks': ['fr']
                 },
