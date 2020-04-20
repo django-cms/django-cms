@@ -3,7 +3,8 @@ Pygments==2.0.2
 sphinx
 # temporarily disabled because of an issue on RTD. see also conf.py
 sphinxcontrib-spelling
-pyenchant
+pyenchant==3.0.1
 sphinx-autobuild
 divio-docs-theme
 datetime
+coverage

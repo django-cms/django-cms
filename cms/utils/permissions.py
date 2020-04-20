@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 from collections import defaultdict
 from contextlib import contextmanager
-from functools import wraps
+from functools import wraps, lru_cache
+
 from threading import local
 
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
-from django.utils.decorators import available_attrs
-from django.utils.lru_cache import lru_cache
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, Page, PagePermission
 from cms.utils.compat import DJANGO_1_11
+from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 

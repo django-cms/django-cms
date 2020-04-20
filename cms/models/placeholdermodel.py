@@ -7,9 +7,10 @@ from datetime import datetime, timedelta
 from django.contrib import admin
 from django.db import models
 from django.template.defaultfilters import title
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
+
+from six import string_types, python_2_unicode_compatible
 
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
@@ -550,7 +551,7 @@ class Placeholder(models.Model):
             if not vary_on:
                 # None, or an empty iterable
                 continue
-            if isinstance(vary_on, six.string_types):
+            if isinstance(vary_on, string_types):
                 if vary_on.lower() not in vary_list:
                     vary_list.add(vary_on.lower())
             else:

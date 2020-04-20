@@ -3,6 +3,20 @@ Changelog
 =========
 
 
+3.7.2 (unreleased)
+==================
+
+* Added support for Django 3.0
+* Added support for Python 3.8
+* migrated from ``django.utils.six`` to the six package
+* migrated from ``django.utils.lru_cache`` to ``functools.lru_cache``
+* migrated from ``render_to_response`` to ``render`` in ``cms.views``
+* added ``cms.utils.compat.dj.available_attrs``
+* added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
+* replaced ``staticfiles`` and ``admin_static`` with ``static``
+* replaced djangocms-helper with django-app-helper
+
+
 3.7.1 (2019-11-26)
 ==================
 

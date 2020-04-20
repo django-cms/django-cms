@@ -1,0 +1,27 @@
+.. _upgrade-to-3.7.2:
+
+###################
+3.7.2 release notes
+###################
+
+*******************
+What's new in 3.7.2
+*******************
+
+Bug Fixes
+=========
+
+TBA
+
+Improvements and new features
+=============================
+
+***********************
+How to upgrade to 3.7.2
+***********************
+
+Django 3.0 changed the default behaviour of the ``XFrameOptionsMiddleware`` from
+``SAMEORIGIN`` to ``DENY``. In order for django CMS to function, ``X_FRAME_OPTIONS``
+needs to be set to ``SAMEORIGIN`` in the ``settings.py``::
+
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
