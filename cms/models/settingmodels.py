@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.conf import settings
 from django.db import models
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
+
+from six import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

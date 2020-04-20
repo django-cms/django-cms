@@ -314,5 +314,8 @@ if __name__ == '__main__':
         ALLOWED_HOSTS=['localhost'],
         TEST_RUNNER='django.test.runner.DiscoverRunner',
         MIGRATION_MODULES=MIGRATION_MODULES,
+        # django 3.0
+        X_FRAME_OPTIONS='SAMEORIGIN',
+
         **dynamic_configs
     )

@@ -2,7 +2,8 @@
 from __future__ import unicode_literals
 
 from cms.models import CMSPlugin
-from cms.utils.compat.dj import python_2_unicode_compatible
+
+from six import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

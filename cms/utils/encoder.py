@@ -3,7 +3,7 @@ from django.utils.html import conditional_escape
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.six import iteritems
+from six import iteritems
 
 
 class SafeJSONEncoder(DjangoJSONEncoder):

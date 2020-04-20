@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from html import unescape
+
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -280,10 +282,10 @@ class PermissionFormTestCase(CMSTestCase):
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
 
-            error_message = ("<li>Users can&#39;t create a page without permissions "
+            error_message = ("<li>Users can't create a page without permissions "
                              "to change the created page. Edit permissions required.</li>")
             self.assertFalse(form.is_valid())
-            self.assertTrue(error_message in str(form.errors))
+            self.assertTrue(error_message in unescape(str(form.errors)))
             data = {
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE,
@@ -295,8 +297,8 @@ class PermissionFormTestCase(CMSTestCase):
             form = PagePermissionInlineAdminForm(data=data, files=None)
             self.assertFalse(form.is_valid())
             self.assertTrue('<li>Add page permission requires also access to children, or '
-                            'descendants, otherwise added page can&#39;t be changed by its '
-                            'creator.</li>' in str(form.errors))
+                            'descendants, otherwise added page can\'t be changed by its '
+                            'creator.</li>' in unescape(str(form.errors)))
 
     def test_inlines(self):
         user = self._create_user("randomuser", is_staff=True, add_default_permissions=True)

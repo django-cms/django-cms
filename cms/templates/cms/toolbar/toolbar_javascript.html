@@ -1,4 +1,4 @@
-{% load i18n l10n sekizai_tags admin_static cms_tags cms_js_tags cms_static %}
+{% load i18n l10n sekizai_tags static cms_tags cms_js_tags cms_static %}
 
 {% addtoblock "css" %}<link rel="stylesheet" href="{% static_with_version "cms/css/cms.base.css" %}" />{% endaddtoblock %}
 {% for css in cms_toolbar.media.render_css %}
