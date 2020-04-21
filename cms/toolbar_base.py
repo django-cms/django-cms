@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 from django.forms import MediaDefiningClass
-from django.utils import six
+
+from six import with_metaclass
 
 from cms.exceptions import LanguageError
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import get_language_object
 
 
-class CMSToolbar(six.with_metaclass(MediaDefiningClass)):
+class CMSToolbar(with_metaclass(MediaDefiningClass)):
     supported_apps = None
 
     def __init__(self, request, toolbar, is_current_app, app_path):

@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
@@ -31,6 +31,8 @@ from cms.utils.i18n import get_current_language
 from menus.menu_pool import menu_pool
 
 from treebeard.mp_tree import MP_Node
+
+from six import python_2_unicode_compatible
 
 
 logger = getLogger(__name__)

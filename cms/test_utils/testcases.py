@@ -16,10 +16,11 @@ from django.test import testcases
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.parse import unquote, urljoin
 from django.utils.timezone import now
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
+
+from urllib.parse import unquote, urljoin
 
 from cms.api import create_page
 from cms.constants import (
