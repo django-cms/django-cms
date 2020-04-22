@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from html import unescape
+try:
+    from html import unescape
+except ImportError:
+    def unescape(x): return x
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site

@@ -12,7 +12,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.http.request import QueryDict
 from django.utils.translation import override
 
-from urllib.parse import urlparse
+from six.moves.urllib.parse import urlparse
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings

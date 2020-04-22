@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
 
-from urllib.parse import urlparse
+from six.moves.urllib.parse import urlparse
 
 import cms
 
