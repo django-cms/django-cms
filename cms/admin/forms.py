@@ -1305,7 +1305,8 @@ class PluginAddValidationForm(forms.Form):
                 placeholder,
                 data['plugin_type'],
                 language,
-                template=template
+                template=template,
+                parent_plugin=parent_plugin
             )
         except PluginLimitReached as error:
             self.add_error(None, force_text(error))

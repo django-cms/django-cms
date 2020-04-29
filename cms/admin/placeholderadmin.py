@@ -632,11 +632,16 @@ class PlaceholderAdminMixin(object):
 
         order = request.POST.getlist("plugin_order[]")
 
+        parent_plugin = None
+        if parent_id != None:
+            parent_plugin = self._get_plugin_from_id(parent_id)
+
         if placeholder != source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
                 has_reached_plugin_limit(placeholder, plugin.plugin_type,
-                                         target_language, template=template)
+                                         target_language, template=template,
+                                         parent_plugin=parent_plugin)
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
 
