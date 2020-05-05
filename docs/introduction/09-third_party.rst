@@ -55,9 +55,7 @@ to you to check them because you need to avoid duplication:
 ========================
 
 One of the dependencies is Django Filer. It provides a special feature that allows more
-sophisticated image cropping. For this to work it needs its own thumbnail processor
-(``filer.thumbnail_processors.scale_and_crop_with_subject_location``) to be listed in
-``settings.py`` in place of ``easy_thumbnails.processors.scale_and_crop``:
+sophisticated image cropping.
 
 .. code-block:: python
    :emphasize-lines: 4,5

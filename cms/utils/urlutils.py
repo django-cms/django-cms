@@ -5,7 +5,8 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.parse import urlparse
+
+from urllib.parse import urlparse
 
 import cms
 

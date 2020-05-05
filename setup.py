@@ -19,20 +19,23 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.5',
     'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
     'Framework :: Django',
     'Framework :: Django :: 1.11',
     'Framework :: Django :: 2.0',
     'Framework :: Django :: 2.1',
     'Framework :: Django :: 2.2',
+    'Framework :: Django :: 3.0',
 ]
 
 INSTALL_REQUIREMENTS = [
-    'Django>=1.11,<3.0',
+    'Django>=1.11,<4',
     'django-classy-tags>=0.7.2',
     'django-formtools>=2.1',
     'django-treebeard>=4.3',
     'django-sekizai>=0.7',
     'djangocms-admin-style>=1.2',
+    'six',
 ]
 
 setup(

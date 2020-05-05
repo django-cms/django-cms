@@ -5,9 +5,10 @@ from importlib import import_module
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
-from django.utils import six
 from django.utils.translation import get_language, override
 from django.urls import Resolver404, reverse
+
+from six import string_types
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
@@ -170,7 +171,7 @@ def _set_permissions(patterns, exclude_permissions):
 
 def get_app_urls(urls):
     for urlconf in urls:
-        if isinstance(urlconf, six.string_types):
+        if isinstance(urlconf, string_types):
             mod = import_module(urlconf)
             if not hasattr(mod, 'urlpatterns'):
                 raise ImproperlyConfigured(

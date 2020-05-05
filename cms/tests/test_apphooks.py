@@ -12,9 +12,10 @@ from django.core.cache import cache
 from django.core.checks.urls import check_url_config
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
-from django.utils import six
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
+
+from six import string_types
 
 from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_title
@@ -116,7 +117,7 @@ class ApphooksTestCase(CMSTestCase):
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, six.string_types):
+        if isinstance(title_langs, string_types):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
             titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]

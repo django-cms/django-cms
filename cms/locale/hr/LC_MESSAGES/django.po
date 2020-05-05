@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-25 09:43+0200\n"
-"PO-Revision-Date: 2018-11-20 14:35+0000\n"
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
 "Last-Translator: Damir <damir.arbula@gmail.com>\n"
 "Language-Team: Croatian (http://www.transifex.com/divio/django-cms/language/hr/)\n"
 "MIME-Version: 1.0\n"
@@ -517,7 +517,7 @@ msgid "Unpublish page"
 msgstr "Zahtjev za obustavljanje objave"
 
 msgid "Publish page"
-msgstr "zahtjev za objavljivanje "
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Da li želite vratiti na Live inačicu stranice?"
@@ -1282,6 +1282,9 @@ msgstr "Kratice"
 msgid "The page was changed in the meantime, reloading..."
 msgstr "Stranica je u međuvremenu promijenjena, ponovno učitavam..."
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr "Prikaži ovaj dijalog za pomoć"
 
@@ -1300,6 +1303,10 @@ msgstr "Otvori dijalog za izradu"
 
 msgid "Focus on Toolbar"
 msgstr "Fokusiraj na toolbar"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

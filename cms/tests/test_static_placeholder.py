@@ -3,7 +3,8 @@
 from django.contrib.admin.sites import site
 from django.template import Context
 from django.template.base import Template
-from django.utils import six
+
+from six import text_type
 
 from cms.api import add_plugin
 from cms.models import StaticPlaceholder, Placeholder, UserSettings
@@ -178,4 +179,4 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         without_code = StaticPlaceholder.objects.create(site_id=1)
 
         self.assertEqual(without_name.get_name(), without_name.code)
-        self.assertEqual(without_code.get_name(), six.text_type(without_code.pk))
+        self.assertEqual(without_code.get_name(), text_type(without_code.pk))

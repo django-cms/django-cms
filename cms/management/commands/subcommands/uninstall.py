@@ -2,7 +2,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 from django.core.management.base import LabelCommand
-from django.utils.six.moves import input
+
+from six.moves import input
 
 from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin

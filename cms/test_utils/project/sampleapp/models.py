@@ -1,9 +1,10 @@
 from django.db import models
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
 from treebeard.mp_tree import MP_Node
 
 from cms.models.fields import PageField, PlaceholderField
+
+from six import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible
