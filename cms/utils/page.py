@@ -103,7 +103,7 @@ def get_page_from_path(site, path, preview=False, draft=False):
         if published_only and not _page_is_published(title.page):
             continue
 
-        title.page.title_cache = {title.language: title}
+        title.page._get_title_cache( None, False, True )
         return title.page
     return
 
