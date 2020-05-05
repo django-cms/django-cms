@@ -3,14 +3,27 @@ Changelog
 =========
 
 
-(next) - in development
+3.7.3 (unreleased)
 ==================
 
 * Wraps long page titles in Page tree/list view to prevent horizontal scrolling.
 
 
-3.7.1 (unreleased) - in development
+3.7.2 (2020-04-22)
 ==================
+
+* Added support for Django 3.0
+* Added support for Python 3.8
+* migrated from ``django.utils.six`` to the six package
+* migrated from ``django.utils.lru_cache`` to ``functools.lru_cache``
+* migrated from ``render_to_response`` to ``render`` in ``cms.views``
+* added ``cms.utils.compat.dj.available_attrs``
+* added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
+* replaced ``staticfiles`` and ``admin_static`` with ``static``
+* replaced djangocms-helper with django-app-helper
+
+
+3.7.1 (2019-11-26)
 
 * Added code of conduct reference file to the root directory
 * Moved contributing file to the root directory
@@ -27,8 +40,8 @@ Changelog
   permissions requests edit mode.
 * Fixed the 'urls.W001' warning with custom apphook urls
 * Prevent non-staff users to login with the django CMS toolbar
-* Added missing ``{% trans %}?? to toolbar shortcuts.
-* Updated branch and release policy.
+* Added missing ``{% trans %}`` to toolbar shortcuts.
+* Fixed branch and release policy.
 * Improved and simplified permissions documentation.
 * Improved apphooks documentation.
 * Improved CMSPluginBase documentation.

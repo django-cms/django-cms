@@ -3,9 +3,10 @@ from abc import ABCMeta
 from collections import defaultdict
 
 from django.template.loader import render_to_string
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import Promise
+
+from six import with_metaclass
 
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 
@@ -32,7 +33,7 @@ def may_be_lazy(thing):
         return thing
 
 
-class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
+class ToolbarAPIMixin(with_metaclass(ABCMeta)):
     REFRESH_PAGE = REFRESH_PAGE
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
@@ -174,7 +175,7 @@ class ToolbarAPIMixin(six.with_metaclass(ABCMeta)):
         return item
 
 
-class BaseItem(six.with_metaclass(ABCMeta)):
+class BaseItem(with_metaclass(ABCMeta)):
     toolbar = None
     template = None
 
@@ -372,7 +373,7 @@ class Break(BaseItem):
         self.identifier = identifier
 
 
-class BaseButton(six.with_metaclass(ABCMeta)):
+class BaseButton(with_metaclass(ABCMeta)):
     toolbar = None
     template = None
 

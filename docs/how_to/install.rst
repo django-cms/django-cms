@@ -239,6 +239,9 @@ to the list.
 You can also add ``'cms.middleware.utils.ApphookReloadMiddleware'``. It's not absolutely necessary, but it's
 :ref:`useful <reloading_apphooks>`. If included, should be at the start of the list.
 
+add the following configuration to your ``settings.py``::
+
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 Context processors
 ==================

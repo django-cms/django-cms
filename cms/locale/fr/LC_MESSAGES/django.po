@@ -5,7 +5,7 @@
 # Translators:
 # Translators:
 # adrien.delhorme, 2014
-# Adrien Delhorme, 2017
+# Adrien Delhorme, 2017,2019
 # Adrien Delhorme, 2014
 # Alban Tiberghien <alban.tiberghien@gmail.com>, 2017
 # Alexandre Cloquet <Alexandre.cloquet@gmail.com>, 2014-2015
@@ -30,7 +30,7 @@
 # Marc Antoine THEVENET <mat@idimweb.com>, 2016
 # mbi0 <marco@cruncher.ch>, 2013
 # mbi0 <marco@cruncher.ch>, 2013
-# Nicolas PASCAL <np.pascal@gmail.com>, 2018
+# Nicolas PASCAL <np.pascal@gmail.com>, 2018-2019
 # Patrick Lauber <patrick.lauber@divio.ch>, 2014
 # Samuel Sorin, 2016
 # kalvn <screamflydream@gmail.com>, 2014
@@ -41,9 +41,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-25 09:43+0200\n"
-"PO-Revision-Date: 2019-02-03 11:31+0000\n"
-"Last-Translator: a270031086f2a0d3514bc0cb507b48f6\n"
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: Assma Buifruri <assma.buifruri@hotmail.com>\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -275,7 +275,7 @@ msgid "\"%s\" was reverted to the live version."
 msgstr "Les \"%s\" ont été retournés à la version live."
 
 msgid "You do not have permission to publish this page"
-msgstr "Vous n'avez pas la permission de publier cette page"
+msgstr "Vous n'avez pas la permission d'ajouter cette page"
 
 msgid "Page not published! A parent page is not published yet."
 msgstr "La page n'a pas été publiée ! Une des pages parentes n'est pas encore publiée."
@@ -1302,13 +1302,16 @@ msgstr "Le formulaire n'a pas pu être chargé. Veuillez vérifier que le serveu
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr "Plus utilisé"
+msgstr "Fréquemment utilisé"
 
 msgid "Shortcuts"
 msgstr "Raccourcis"
 
 msgid "The page was changed in the meantime, reloading..."
 msgstr "La page a été entre-temps changée, rechargement..."
+
+msgid "CMS-wide Shortcuts"
+msgstr "CMS raccourcis clavier"
 
 msgid "Bring up this help dialog"
 msgstr "Afficher cette fenêtre d'aide"
@@ -1328,6 +1331,10 @@ msgstr "Ouvrir le formulaire « Créer »"
 
 msgid "Focus on Toolbar"
 msgstr "Donner le focus à la barre d'outils"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

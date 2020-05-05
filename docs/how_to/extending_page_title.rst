@@ -261,7 +261,7 @@ page extension model will be available on ``page.iconextension``. From there
 you can access the extra fields you defined in your extension, so you can use
 something like::
 
-    {% load staticfiles %}
+    {% load static %}
 
     {# rest of template omitted ... #}
 

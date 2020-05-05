@@ -1,11 +1,11 @@
-coverage==4.2
+coverage<5
 python-coveralls==2.5.0
 unittest-xml-reporting==1.11.0
 Pillow==5.2.0
 django-treebeard>=4.3
 argparse
 dj-database-url
-djangocms-admin-style>=1.2
+djangocms-admin-style>=1.5
 django-sekizai>=0.7
 django-classy-tags>=0.7.2
 https://github.com/divio/djangocms-text-ckeditor/archive/master.zip
@@ -14,9 +14,7 @@ https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec7600
 iptools
 sphinx==1.8.5
 sphinxcontrib-spelling
-pyflakes==1.1.0
-pyenchant
 # required to run the server for integration tests
-djangocms-helper
+django-app-helper
 mock>=2.0.0
 django-formtools

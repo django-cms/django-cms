@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-25 09:43+0200\n"
-"PO-Revision-Date: 2019-04-17 11:35+0000\n"
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
 "Last-Translator: Rivo Zängov <eraser@eraser.ee>\n"
 "Language-Team: Estonian (http://www.transifex.com/divio/django-cms/language/et/)\n"
 "MIME-Version: 1.0\n"
@@ -1281,6 +1281,9 @@ msgstr "Otseteed"
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr ""
 
@@ -1299,6 +1302,10 @@ msgstr ""
 
 msgid "Focus on Toolbar"
 msgstr "Fookus tööriistaribal"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

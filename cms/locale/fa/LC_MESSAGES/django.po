@@ -7,7 +7,7 @@
 # Ali Alamshahi <Alamshahi@yahoo.com>, 2015
 # Ali Alamshahi <Alamshahi@yahoo.com>, 2015
 # Alireza Savand <alireza.savand@gmail.com>, 2012
-# Ali Sadr <asadr07@gmail.com>, 2017
+# ali sadr <asadr07@gmail.com>, 2017
 # Aryan Baghi <aryan@baghi.id.ir>, 2014
 # Aryan Baghi <aryan@baghi.id.ir>, 2014
 # cafe-click <cafeclick@rocketmail.com>, 2013
@@ -28,9 +28,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-25 09:43+0200\n"
-"PO-Revision-Date: 2019-01-19 23:33+0000\n"
-"Last-Translator: Sina Rezaei <sinarezaei1991@gmail.com>\n"
+"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: Matin M. <moosaei.matin@aol.com>\n"
 "Language-Team: Persian (http://www.transifex.com/divio/django-cms/language/fa/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -530,10 +530,10 @@ msgid "Display in navigation"
 msgstr "نشان دادن در ناوبرى"
 
 msgid "Unpublish page"
-msgstr "نیاز به پایان انتشار"
+msgstr ""
 
 msgid "Publish page"
-msgstr "نیاز به انتشار"
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "آيا شما نسبت به برگرداندن به وضعیت فعلی مطمئن هستيد ؟"
@@ -1297,6 +1297,9 @@ msgstr "میانبرها"
 msgid "The page was changed in the meantime, reloading..."
 msgstr "صفحه در این اثناء تغییر کرد،\nدر حال بارگذاری مجدد ..."
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr "این گفتگو کمک را بیابید"
 
@@ -1315,6 +1318,10 @@ msgstr "گفتگوی \"ساختن\" را باز کنید."
 
 msgid "Focus on Toolbar"
 msgstr "زوم بر روی نوار ابزار"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

@@ -16,14 +16,16 @@ from django.http import (
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
-from django.utils import six
-from django.utils.six.moves.urllib.parse import parse_qsl, urlparse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
+
+from urllib.parse import parse_qsl, urlparse
+
+from six import get_unbound_function, get_method_function
 
 from cms import operations
 from cms.admin.forms import PluginAddValidationForm
@@ -68,7 +70,7 @@ def _instance_overrides_method(base, instance, method_name):
     """
     bound_method = getattr(instance, method_name)
     unbound_method = getattr(base, method_name)
-    return six.get_unbound_function(unbound_method) != six.get_method_function(bound_method)
+    return get_unbound_function(unbound_method) != get_method_function(bound_method)
 
 
 class FrontendEditableAdminMixin(object):

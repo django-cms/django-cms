@@ -2,7 +2,7 @@
 import json
 import re
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render as render_to_response
 
 from django import forms
 from django.contrib import admin
@@ -12,10 +12,11 @@ from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
+from django.utils.encoding import force_text, smart_str
 from django.utils.html import escapejs
 from django.utils.translation import ugettext, ugettext_lazy as _
+
+from six import with_metaclass, python_2_unicode_compatible
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -102,7 +103,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 
 
 @python_2_unicode_compatible
-class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
+class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""
     module = _("Generic")  # To be overridden in child classes
@@ -303,7 +304,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         if extra_context:
             context.update(extra_context)
         return render_to_response(
-            'admin/cms/page/plugin/confirm_form.html', context
+            request, 'admin/cms/page/plugin/confirm_form.html', context
         )
 
     def save_model(self, request, obj, form, change):

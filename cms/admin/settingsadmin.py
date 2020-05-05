@@ -11,7 +11,8 @@ from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
 from django.utils.translation import override
-from django.utils.six.moves.urllib.parse import urlparse
+
+from urllib.parse import urlparse
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
