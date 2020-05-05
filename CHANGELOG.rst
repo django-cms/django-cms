@@ -24,6 +24,7 @@ Changelog
 
 
 3.7.1 (2019-11-26)
+==================
 
 * Added code of conduct reference file to the root directory
 * Moved contributing file to the root directory
