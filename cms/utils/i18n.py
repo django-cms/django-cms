@@ -202,7 +202,7 @@ def is_language_prefix_patterns_used():
     for url_pattern in get_resolver(None).url_patterns:
         pattern = getattr(url_pattern, 'pattern', url_pattern)
         if isinstance(pattern, LocalePrefixPattern):
-            if pattern.language_prefix != '':
+            if pattern.prefix_default_language:
                 return True
     return False
 
