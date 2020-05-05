@@ -2,8 +2,13 @@
 Changelog
 =========
 
+Unreleased
+==================
 
-3.7.2 (unreleased)
+* Fixed redirect issues when i18n_patterns had prefix_default_language = False
+
+
+3.7.2 (2020-04-22)
 ==================
 
 * Added support for Django 3.0
