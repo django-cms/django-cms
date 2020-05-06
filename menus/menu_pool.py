@@ -10,7 +10,9 @@ from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import get_language_from_request, ugettext_lazy as _
-
+from cms.utils import get_current_site
+from cms.utils.i18n import (get_default_language_for_site,
+                        is_language_prefix_patterns_used)
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
 
@@ -102,7 +104,10 @@ class MenuRenderer(object):
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
-        self.request_language = get_language_from_request(request, check_path=True)
+        if is_language_prefix_patterns_used():
+            self.request_language = get_language_from_request(request, check_path=True)
+        else:
+            self.request_language = get_default_language_for_site(get_current_site().pk)
         self.site = Site.objects.get_current(request)
 
     @property
