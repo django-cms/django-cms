@@ -106,8 +106,6 @@ matrix:
       dist: xenial
       sudo: true
 
-  allow_failures:
-    - python: 2.7
   fast_finish: true
 
 before_script:
