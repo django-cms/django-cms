@@ -50,6 +50,7 @@ Changelog
 * Improved documentation related to nested plugins.
 * Updated installation tutorial.
 * Fixed a simple typo in the docstring for ``cms.utils.helpers.normalize_name``.
+* Updated 'How to create Plugins' Tutorial.
 
 
 3.7.0 (2019-09-25)
