@@ -4,12 +4,13 @@ from operator import attrgetter
 from django.core.exceptions import ImproperlyConfigured
 from django.conf.urls import url, include
 from django.template.defaultfilters import slugify
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import get_language, deactivate_all, activate
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
+
+from six import string_types, text_type
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
@@ -77,7 +78,7 @@ class PluginPool(object):
                     from django.template import loader
 
                     template = plugin.render_template
-                    if isinstance(template, six.string_types) and template:
+                    if isinstance(template, string_types) and template:
                         try:
                             loader.get_template(template)
                         except TemplateDoesNotExist as e:
@@ -85,7 +86,7 @@ class PluginPool(object):
                             # TemplateDoesNotExist if the plugin's render_template
                             # does in fact exist, but it includes a template that
                             # doesn't.
-                            if six.text_type(e) == template:
+                            if text_type(e) == template:
                                 raise ImproperlyConfigured(
                                     "CMS Plugins must define a render template (%s) that exists: %s"
                                     % (plugin, template)

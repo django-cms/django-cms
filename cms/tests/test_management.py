@@ -4,12 +4,13 @@ import uuid
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.util.context_managers import apphooks
 
+from six.moves import StringIO
+
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
 from django.test.utils import override_settings
-from django.utils.six.moves import StringIO
 
 from cms.api import create_page, add_plugin, create_title
 from cms.management.commands.subcommands.list import plugin_report

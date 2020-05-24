@@ -11,16 +11,16 @@ from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils import six
 from django.utils.encoding import force_text, smart_text
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.six import string_types
 from django.utils.translation import (
     get_language,
     override as force_language,
     ugettext_lazy as _,
 )
+
+from six import string_types, integer_types
 
 from classytags.arguments import (Argument, MultiValueArgument,
                                   MultiKeywordArgument)
@@ -69,9 +69,9 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if request.current_page and request.current_page.pk == page_lookup.pk:
             return request.current_page
         return page_lookup
-    if isinstance(page_lookup, six.string_types):
+    if isinstance(page_lookup, string_types):
         page_lookup = {'reverse_id': page_lookup}
-    elif isinstance(page_lookup, six.integer_types):
+    elif isinstance(page_lookup, integer_types):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
@@ -521,7 +521,7 @@ class CMSEditableObject(InclusionTag):
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(edit_fields) \
-                                                        if not isinstance('edit_fields', six.string_types) else edit_fields
+                                                        if not isinstance('edit_fields', string_types) else edit_fields
             else:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'

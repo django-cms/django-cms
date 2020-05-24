@@ -6,8 +6,9 @@ from tempfile import template, mkdtemp, _exists
 from cms.apphook_pool import apphook_pool
 
 from django.contrib.auth import get_user_model
-from django.utils.six.moves import StringIO
 from django.utils.translation import get_language, activate
+
+from six.moves import StringIO
 
 
 class NULL:

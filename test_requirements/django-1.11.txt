@@ -1,2 +1,4 @@
 -r requirements_base.txt
+pyflakes>=2.1
 Django>=1.11,<2.0
+pyenchant

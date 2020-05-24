@@ -52,7 +52,7 @@ to you to check them because you need to avoid duplication:
 ========================
 
 One of the dependencies is Django Filer. It provides a special feature that allows more
-sophisticated image cropping. 
+sophisticated image cropping.
 
 .. code-block:: python
    :emphasize-lines: 4,5
@@ -63,8 +63,9 @@ sophisticated image cropping.
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     )
-If ``THUMBNAIL_PROCESSORS`` is not defined in your ``settings.py`` or has different entries, just copy and paste the code
-above.
+
+If ``THUMBNAIL_PROCESSORS`` is not defined in your ``settings.py`` or has different
+entries, just copy and paste the code above.
 
 ``ALDRYN_BOILERPLATE_NAME``
 ===========================

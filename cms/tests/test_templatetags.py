@@ -108,7 +108,7 @@ class TemplatetagTests(CMSTestCase):
         mock_storage.url.side_effect = lambda x: '/static/' + x
 
         template = (
-            """{% load staticfiles cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
+            """{% load static cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
             """type="text/javascript"></script>"""
         )
 

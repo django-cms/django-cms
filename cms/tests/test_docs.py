@@ -6,9 +6,10 @@ import os
 import socket
 import sys
 
-from django.utils.six.moves import StringIO
 from sphinx.application import Sphinx
 from sphinx.errors import SphinxWarning
+
+from six.moves import StringIO
 
 try:
     import enchant
