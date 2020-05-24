@@ -5,7 +5,8 @@
 # Translators:
 # Translators:
 # Ahmed H <info@draco-003.com>, 2013
-# Bashar Al-Abdulhadi, 2013-2015,2017
+# Ali Khalel <ali.khalel@gmail.com>, 2019
+# Bashar Al-Abdulhadi, 2013-2015,2017,2019
 # Bashar Al-Abdulhadi, 2013-2014
 # Bashar Ghadanfar <10.tens@gmail.com>, 2017
 # Jonas Obrist <me@ojii.ch>, 2011
@@ -17,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 13:20+0100\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2019-11-19 11:09+0100\n"
+"PO-Revision-Date: 2019-11-13 08:54+0000\n"
+"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
 "Language-Team: Arabic (http://www.transifex.com/divio/django-cms/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -115,7 +116,7 @@ msgstr "توجد صفحة سابقة بنفس عنوان المعرّف العك
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "قيمة إعدادات التطبيق غير صحيحة"
 
 msgid "An application instance using this configuration already exists."
 msgstr "كيان تطبيق بهذا الإعداد موجود سلفا."
@@ -124,7 +125,7 @@ msgid "An application instance with this name already exists."
 msgstr "كيان تطبيق بهذا الإسم موجود سلفا."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "لا يمكنك تحريك الصفحة الرئيسية داخل صفحة أخرى"
 
 msgid "Yes"
 msgstr "نعم"
@@ -235,12 +236,12 @@ msgstr "ليس لديك الصلاحية لنسخ هذه الملحقات."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "ليس لديك صلاحية لنسخ هذه الصفحة."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "خطأ! الصفحة التي تحاول لصقها غير مترجمة لأي من اللغات المعرّفة الأخرى بموقع الوجهة."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -301,7 +302,7 @@ msgid "New page"
 msgstr "صفحة جديدة"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "هذه الصفحة غير مؤهله لتكون صفحة رئيسية."
 
 msgid "View restriction"
 msgstr "قيد المشاهدة"
@@ -426,7 +427,7 @@ msgid "Disable toolbar"
 msgstr "تعطيل شريط الأدوات"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "الإختصارات"
 
 msgid "Users"
 msgstr "المستخدمون"
@@ -575,7 +576,7 @@ msgstr "لعنوان تفرع تلقائي يُترك فارغاً ، أو تع�
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "ليس لديك الصلاحية لإضافة صفحة."
 
 msgid "ID"
 msgstr "المعرّف"
@@ -915,7 +916,7 @@ msgstr "كلمة المرور:"
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "إضافة صفحة"
 
 msgid "Change a page"
 msgstr "غير صفحة"
@@ -1003,7 +1004,7 @@ msgstr "لصق"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "ضبط كصفحة رئيسية"
 
 msgid "is restricted"
 msgstr "مقيّدة"
@@ -1215,18 +1216,18 @@ msgid "This plugin cannot have nested plugins."
 msgstr "لا يمكن لهذا الملحق أن يكون له ملحقات متداخلة."
 
 msgid "Highlight"
-msgstr ""
+msgstr "تحديد"
 
 msgid "Available plugins"
 msgstr "الملحقات المتوفرة"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "تبديل البُنية"
 
 #| msgid "View published"
 msgid "View published"
-msgstr ""
+msgstr "عرض المنشور"
 
 msgid "Login"
 msgstr "تسجيل الدخول"
@@ -1252,7 +1253,7 @@ msgstr "حدث الخطأ التالي:"
 
 #| msgid "Action successfull... reloading."
 msgid "Action successful."
-msgstr ""
+msgstr "إجراء ناجح"
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "هل أنت متأكد من رغبتك بحذف هذا الملحق؟"
@@ -1269,7 +1270,7 @@ msgstr "لديك بعض التغييرات غير المحفوظة."
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "جارِ التحميل..."
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
@@ -1282,12 +1283,15 @@ msgstr "لم يُتمكن من تحميل النموذج. يرجى التأكد 
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "الأكثر استخداما"
 
 msgid "Shortcuts"
 msgstr "اختصارات"
 
 msgid "The page was changed in the meantime, reloading..."
+msgstr ""
+
+msgid "CMS-wide Shortcuts"
 msgstr ""
 
 msgid "Bring up this help dialog"
@@ -1308,6 +1312,10 @@ msgstr "فتح صندوق \"الإنشاء\""
 
 msgid "Focus on Toolbar"
 msgstr "تركيز على شريط الأدوات"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

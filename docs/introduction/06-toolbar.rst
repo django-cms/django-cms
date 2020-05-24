@@ -125,7 +125,7 @@ As well as menus, you can add buttons to the toolbar in a very similar way. Rewr
             url=admin_reverse('polls_poll_changelist'),
         )
 
-        buttonlist.add_modal_button
+        buttonlist.add_modal_button(
             name='Add a new poll',
             url=admin_reverse('polls_poll_add'),
         )
@@ -208,7 +208,7 @@ For completeness, here is the full example:
                 url=admin_reverse('polls_poll_changelist'),
             )
 
-            buttonlist.add_modal_button
+            buttonlist.add_modal_button(
                 name='Add a new poll',
                 url=admin_reverse('polls_poll_add'),
             )

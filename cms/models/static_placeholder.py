@@ -4,9 +4,9 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils import six
 from django.utils.translation import ugettext_lazy as _
+
+from six import text_type, python_2_unicode_compatible
 
 from cms.models.fields import PlaceholderField
 from cms.utils.copy_plugins import copy_plugins_to
@@ -53,7 +53,7 @@ class StaticPlaceholder(models.Model):
         return self.get_name()
 
     def get_name(self):
-        return self.name or self.code or six.text_type(self.pk)
+        return self.name or self.code or text_type(self.pk)
     get_name.short_description = _(u'static placeholder name')
 
     def clean(self):
@@ -70,6 +70,7 @@ class StaticPlaceholder(models.Model):
     def publish(self, request, language, force=False):
         if force or self.has_publish_permission(request):
             self.public.clear(language=language)
+            self.public.clear_cache(language=language)
             plugins = self.draft.get_plugins_list(language=language)
             copy_plugins_to(plugins, self.public, no_signals=True)
             self.dirty = False

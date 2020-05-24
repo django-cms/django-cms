@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.utils.six.moves import zip
+from six.moves import zip
 
 
 def copy_plugins_to(old_plugins, to_placeholder,

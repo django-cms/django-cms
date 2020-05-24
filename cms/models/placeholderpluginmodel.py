@@ -3,7 +3,7 @@ from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
 from cms.utils.copy_plugins import copy_plugins_to
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from six import python_2_unicode_compatible
 
 
 @python_2_unicode_compatible

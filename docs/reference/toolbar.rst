@@ -380,6 +380,7 @@ django CMS constants used in toolbars
 *************************************
 
 ..  module:: cms.constants
+    :noindex:
 
 ..  data:: REFRESH_PAGE
 

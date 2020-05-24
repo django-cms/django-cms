@@ -9,7 +9,7 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
@@ -31,6 +31,8 @@ from cms.utils.i18n import get_current_language
 from menus.menu_pool import menu_pool
 
 from treebeard.mp_tree import MP_Node
+
+from six import python_2_unicode_compatible
 
 
 logger = getLogger(__name__)
@@ -96,7 +98,7 @@ class TreeNode(MP_Node):
             kwargs['instance'].parent_id = self.parent_id
         else:
             kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(*args, **kwargs)
+        return super(TreeNode, self).add_sibling(pos, *args, **kwargs)
 
     def update(self, **data):
         cls = self.__class__
@@ -564,7 +566,7 @@ class Page(models.Model):
                 self.publisher_public._update_title_path(language)
                 self.mark_as_published(language)
                 self.mark_descendants_as_published(language)
-        self.clear_cache()
+        self.clear_cache(menu=True)
         return self
 
     def _copy_titles(self, target, language, published):

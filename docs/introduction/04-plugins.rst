@@ -22,7 +22,7 @@ In the ``models.py`` of ``polls_cms_integration`` add the following:
 
 
     class PollPluginModel(CMSPlugin):
-        poll = models.ForeignKey(Poll)
+        poll = models.ForeignKey(Poll, on_delete=models.CASCADE)
 
         def __str__(self):
             return self.poll.question

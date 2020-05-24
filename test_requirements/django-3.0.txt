@@ -1,0 +1,5 @@
+-r requirements_base.txt
+# needs to be changed to 2.2.0 once available
+https://github.com/PyCQA/pyflakes/archive/master.zip#egg=pyflakes
+Django>=3.0,<3.1
+pyenchant==3.0.1

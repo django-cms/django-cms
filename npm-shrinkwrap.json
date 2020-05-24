@@ -1,5 +1,5 @@
 {
-  "name": "djangoCMS",
+  "name": "django-cms",
   "dependencies": {
     "abbrev": {
       "version": "1.1.0",

@@ -1,33 +1,29 @@
-<!--
-    If this is a security-related patch stop immediately!
+## Description
 
-    See http://docs.django-cms.org/en/latest/contributing/development-policies.html
+<!--
+If this is a security issue stop right here and follow our documentation:
+http://docs.django-cms.org/en/latest/contributing/development-policies.html#reporting-security-issues
 -->
 
+## Related resources
 
-### Summary
+<!--
+Add here links to existing issues or conversation from GitHub
+or any other resource.
+-->
 
-Fixes #
+* #...
+* #...
 
+## Checklist
 
+<!--
+Please check the following items before submitting, otherwise,
+your pull request will be closed.
 
-### Links to related discussion
+Use 'x' to check each item: [x] I have ...
+-->
 
-
-
-### Proposed changes in this pull request
-
-
-### Documentation checklist
-
-* [ ] I have updated CHANGELOG.txt if appropriate
-* [ ] I have updated the release notes document if appropriate, with:
-    * [ ] general notes
-    * [ ] bug-fixes
-    * [ ] improvements/new features
-    * [ ] backwards-incompatible changes
-    * [ ] required upgrade steps
-    * [ ] names of contributors
-* [ ] I have updated other documentation
-* [ ] I have added my name to the AUTHORS file
-* [ ] This PR's documentation has been approved by Daniele Procida
+* [ ] I have opened this pull request against ``develop``
+* [ ] I have updated the **CHANGELOG.rst**
+* [ ] I have added or modified the tests when changing logic

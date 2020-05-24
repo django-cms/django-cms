@@ -99,8 +99,10 @@ You will need to add the following to its list of ``INSTALLED_APPS``::
 * `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django CMS's page and plugin tree
   structures.
 
-django CMS installs `django CMS admin style <https://github.com/divio/djangocms-admin-style>`_. This provides some styling that helps make django CMS administration components easier to work with. Technically it's an optional
-component and does not need to be enabled in your project, but it's strongly recommended.
+django CMS installs `django CMS admin style <https://github.com/divio/djangocms-admin-style>`_.
+This provides some styling that helps make django CMS administration components easier to work with.
+Technically it's an optional component and does not need to be enabled in your project,
+but it's strongly recommended.
 
 In the ``INSTALLED_APPS``, **before** ``django.contrib.admin``, add::
 
@@ -174,7 +176,8 @@ Create an admin superuser::
 Using ``cms check`` for configuration
 *************************************
 
-Once you have completed the minimum required set-up described above, you can use django CMS's built-in ``cms check`` command to help you identify and install other components. Run::
+Once you have completed the minimum required set-up described above, you can use django CMS's built-in ``cms check``
+command to help you identify and install other components. Run::
 
     python manage.py cms check
 
@@ -221,7 +224,7 @@ in the ``TEMPLATES['OPTIONS']['context_processors']``:
 Middleware
 ==========
 
-in your :setting:`django:MIDDLEWARE_CLASSES` you'll need :class:`django:django.middleware.locale.LocaleMiddleware` -
+in your :setting:`django:MIDDLEWARE` you'll need :class:`django:django.middleware.locale.LocaleMiddleware` -
 it's **not** installed in Django projects by default.
 
 Also add::
@@ -236,11 +239,16 @@ to the list.
 You can also add ``'cms.middleware.utils.ApphookReloadMiddleware'``. It's not absolutely necessary, but it's
 :ref:`useful <reloading_apphooks>`. If included, should be at the start of the list.
 
+add the following configuration to your ``settings.py``::
+
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 Context processors
 ==================
 
 Add ``'cms.context_processors.cms_settings'`` to ``TEMPLATES['OPTIONS']['context_processors']``.
+
+Also add ``'django.template.context_processors.i18n'`` if it's not already present.
 
 ``cms check`` should now be unable to identify any further issues with your project. Some additional configuration is
 required however.
@@ -254,7 +262,8 @@ URLs
 ====
 
 In the project's ``urls.py``, add ``url(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
-other patterns, so that specific URLs for other applications can be detected first.
+other patterns, so that specific URLs for other applications can be detected first. Note: when using Django 2.0 or
+later the syntax is ``re_path(r'^', include('cms.urls'))``
 
 You'll also need to have an import for ``django.conf.urls.include``. For example:
 
@@ -278,8 +287,8 @@ do anything very useful with it though.
 Templates
 =========
 
-django CMS requires at least one template for its pages. The first template in the :setting:`CMS_TEMPLATES` list will
-be the project's default template.
+django CMS requires at least one template for its pages, so you'll need to add :setting:`CMS_TEMPLATES` to your
+settings. The first template in the :setting:`CMS_TEMPLATES` list will be the project's default template.
 
 ::
 
@@ -473,7 +482,8 @@ rely on a set of well-maintained plugins that cover some general content managem
 
 To install::
 
-    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet djangocms-style djangocms-column
+    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet
+        djangocms-style djangocms-column
 
 and add::
 
