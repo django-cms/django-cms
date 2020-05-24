@@ -21,7 +21,7 @@ should come *after* ``cms``.
 .. _middleware:
 
 **********************************
-The ``MIDDLEWARE_CLASSES`` setting
+The ``MIDDLEWARE`` setting
 **********************************
 
 .. _ApphookReloadMiddleware:
@@ -29,7 +29,7 @@ The ``MIDDLEWARE_CLASSES`` setting
 ``cms.middleware.utils.ApphookReloadMiddleware``
 ================================================
 
-Adding ``ApphookReloadMiddleware`` to the ``MIDDLEWARE_CLASSES`` tuple will enable automatic server
+Adding ``ApphookReloadMiddleware`` to the ``MIDDLEWARE`` tuple will enable automatic server
 restarts when changes are made to apphook configurations. It should be placed as near to the top of
 the classes as possible.
 
