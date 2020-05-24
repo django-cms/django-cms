@@ -3,7 +3,13 @@ Changelog
 =========
 
 
-3.7.2 (unreleased)
+3.7.3 (unreleased)
+==================
+
+* Fixed apphooks config select in Firefox
+
+
+3.7.2 (2020-04-22)
 ==================
 
 * Added support for Django 3.0
