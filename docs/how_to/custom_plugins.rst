@@ -263,7 +263,7 @@ it becomes::
         sections = models.ManyToManyField(Section)
 
         def copy_relations(self, oldinstance):
-            self.sections = oldinstance.sections.all()
+            self.sections.set(oldinstance.sections.all())
 
 If your plugins have relational fields of both kinds, you may of course need
 to use *both* the copying techniques described above.
