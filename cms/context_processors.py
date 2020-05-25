@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
-from functools import lru_cache
+try:
+    from functools import lru_cache
+except ImportError:
+    from django.utils.lru_cache import lru_cache
 
 from django.utils.functional import lazy
 

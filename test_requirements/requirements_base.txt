@@ -17,4 +17,3 @@ sphinxcontrib-spelling
 # required to run the server for integration tests
 django-app-helper
 mock>=2.0.0
-django-formtools

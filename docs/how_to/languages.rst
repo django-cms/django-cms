@@ -62,7 +62,7 @@ Store the user's language preference
 
 The user's preferred language is maintained through a browsing session. So that django CMS remembers the user's preference in
 subsequent sessions, it must be stored in a cookie. To enable this, ``cms.middleware.language.LanguageCookieMiddleware`` must
-be added to the project's ``MIDDLEWARE_CLASSES`` setting.
+be added to the project's ``MIDDLEWARE`` setting.
 
 See :ref:`determining_language_preference` for more information about how this works.
 
