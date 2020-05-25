@@ -21,6 +21,7 @@ Changelog
 * added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
 * replaced ``staticfiles`` and ``admin_static`` with ``static``
 * replaced djangocms-helper with django-app-helper
+* Wraps long page titles in Page tree/list view to prevent horizontal scrolling.
 
 
 3.7.1 (2019-11-26)
@@ -49,6 +50,7 @@ Changelog
 * Improved documentation related to nested plugins.
 * Updated installation tutorial.
 * Fixed a simple typo in the docstring for ``cms.utils.helpers.normalize_name``.
+* Updated 'How to create Plugins' Tutorial.
 
 
 3.7.0 (2019-09-25)
