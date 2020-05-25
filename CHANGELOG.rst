@@ -7,6 +7,7 @@ Changelog
 ==================
 
 * Fixed apphooks config select in Firefox
+* Fixed compatibility errors on python 2
 
 
 3.7.2 (2020-04-22)
