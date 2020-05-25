@@ -20,7 +20,7 @@ from django.utils.timezone import now
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
 
-from urllib.parse import unquote, urljoin
+from six.moves.urllib.parse import unquote, urljoin
 
 from cms.api import create_page
 from cms.constants import (
