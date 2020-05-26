@@ -8,7 +8,8 @@ Changelog
 
 * Fixed apphooks config select in Firefox
 * Fixed compatibility errors on python 2
-* Wraps long page titles in Page tree/list view to prevent horizontal scrolling.
+* Fixed long page titles in Page tree/list view to prevent horizontal scrolling
+* Adapted plugin documentations
 
 
 3.7.2 (2020-04-22)
