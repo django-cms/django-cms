@@ -2,3 +2,4 @@
 pyflakes>=2.1
 Django>=1.11,<2.0
 pyenchant
+django-formtools>=2.1,<2.2

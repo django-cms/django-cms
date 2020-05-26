@@ -234,13 +234,10 @@ def check_middlewares(output):
             'cms.middleware.toolbar.ToolbarMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
         )
-        if getattr(settings, 'MIDDLEWARE', None):
-            middlewares = settings.MIDDLEWARE
-        else:
-            middlewares = settings.MIDDLEWARE_CLASSES
+        middlewares = settings.MIDDLEWARE
         for middleware in required_middlewares:
             if middleware not in middlewares:
-                section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
+                section.error("%s middleware must be in MIDDLEWARE" % middleware)
 
 @define_check
 def check_context_processors(output):

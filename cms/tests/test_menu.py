@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import copy
-from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
@@ -19,6 +18,7 @@ from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
@@ -1289,6 +1289,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
     def tearDown(self):
         Page.objects.all().delete()
         menu_pool.clear(all=True)
+        super(AdvancedSoftrootTests, self).tearDown()
 
     def get_page(self, name):
         return Page.objects.public().get(title_set__slug=name)

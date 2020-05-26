@@ -53,6 +53,4 @@ def available_attrs(fn):
         return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
 
 def get_middleware():
-    if getattr(settings, 'MIDDLEWARE', None) is None:
-        return settings.MIDDLEWARE_CLASSES
     return settings.MIDDLEWARE

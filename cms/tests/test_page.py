@@ -1017,18 +1017,11 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_xframe_options_with_cms_page_cache_and_clickjacking_middleware(self):
         # Refs: 6346
-        if getattr(settings, 'MIDDLEWARE', None):
-            override = {
-                'MIDDLEWARE': settings.MIDDLEWARE + [
-                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-                ]
-            }
-        else:
-            override = {
-                'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES + [
-                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-                ]
-            }
+        override = {
+            'MIDDLEWARE': settings.MIDDLEWARE + [
+                'django.middleware.clickjacking.XFrameOptionsMiddleware',
+            ]
+        }
 
         override['CMS_PAGE_CACHE'] = True
 
