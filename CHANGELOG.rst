@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-3.7.3 (unreleased)
+3.7.3 (2020-05-27)
 ==================
 
 * Fixed apphooks config select in Firefox
