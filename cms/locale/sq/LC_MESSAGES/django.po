@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-21 15:37+0200\n"
-"PO-Revision-Date: 2020-04-21 13:27+0000\n"
-"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
+"POT-Creation-Date: 2020-05-26 14:17+0200\n"
+"PO-Revision-Date: 2020-04-21 16:19+0000\n"
+"Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/divio/django-cms/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -77,10 +77,10 @@ msgid "Keep this field empty if standard path should be used."
 msgstr "Mbajeni të zbrazët këtë fushë, nëse duhet përdorur shtegu standard."
 
 msgid "X Frame Options"
-msgstr ""
+msgstr "Mundësi për X Frame"
 
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr ""
+msgstr "Nëse kjo faqe mund të trupëzohet në faqe ose sajte të tjerë"
 
 msgid "Redirect"
 msgstr "Ridrejtoje"
@@ -95,11 +95,11 @@ msgid "Application configurations"
 msgstr "Formësime aplikacioni"
 
 msgid "Language independent options"
-msgstr ""
+msgstr "Mundësi të pavarura nga gjuhët"
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Ju lutemi, përpara se të përpunoni rregullimet e thelluara për të, caktoni identifikuesin %(language)s."
 
 msgid "A page with this reverse URL id exists already."
 msgstr "Ka tashmë një faqe me këtë URL të përmbysur."
@@ -186,16 +186,16 @@ msgstr "Vendmbajtësja e shtojcës mëmë duhet të jetë e njëjtë me vendmbaj
 msgid ""
 "Please create the %(language)s page translation before editing it's advanced"
 " settings."
-msgstr ""
+msgstr "Ju lutemi, përpara se të përpunoni rregullimet e thelluara për të, krijoni faqen %(language)s."
 
 msgid "Advanced Settings"
 msgstr "Rregullime të Mëtejshme"
 
 msgid "Publishing dates"
-msgstr ""
+msgstr "Data botimi"
 
 msgid "Change Permissions"
-msgstr ""
+msgstr "Ndryshoni Leje"
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -235,33 +235,33 @@ msgstr "Gabim! Faqja që po ngjitni s’është e përkthyer në ndonjë nga gju
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
-msgstr ""
+msgstr "S’keni leje për të rikthyer këtë faqe."
 
 #, python-format
 msgid "\"%s\" was reverted to the live version."
-msgstr ""
+msgstr "\"%s\" u rikthye te versioni <em>live</em>."
 
 msgid "You do not have permission to publish this page"
-msgstr ""
+msgstr "S’keni leje të botoni këtë faqe"
 
 msgid "Page not published! A parent page is not published yet."
-msgstr ""
+msgstr "Faqja s’u botua! S’është botuar ende një faqe mëmë."
 
 msgid "The content was successfully published."
-msgstr ""
+msgstr "Lënda u botua me sukses."
 
 msgid "There was a problem publishing your content"
-msgstr ""
+msgstr "Pati një problem me botimin e lëndës tuaj"
 
 msgid "You do not have permission to unpublish this page"
-msgstr ""
+msgstr "S’keni leje për ta hequr këtë faqe nga botimi"
 
 msgid "This page was never published"
-msgstr ""
+msgstr "Kjo faqe s’qe botuar kurrë"
 
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
-msgstr ""
+msgstr "Faqja \"%(page)s\" në %(language)s u hoq me sukses nga botimi"
 
 #| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
@@ -274,7 +274,7 @@ msgstr "Titulli dhe shtojcat me gjuhën %(language)s u fshinë"
 #, python-format
 #| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
+msgstr "S’keni leje të shihni faqen \"%(title)s\""
 
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "S’keni leje të ndryshoni gjendje lëvizjeje të kësaj faqeje"
@@ -324,10 +324,10 @@ msgid "order parameter references plugins in different trees"
 msgstr ""
 
 msgid "parent must be in the same placeholder"
-msgstr ""
+msgstr "mëma duhet të jetë në të njëjtën vendmbajtëse"
 
 msgid "parent must be in the same language as plugin_language"
-msgstr ""
+msgstr "mëma duhet të jetë në të njëjtën gjuhë me plugin_language"
 
 #| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
@@ -440,10 +440,10 @@ msgstr "Lëndë"
 
 #| msgid "Publish changes"
 msgid "Publish page changes"
-msgstr ""
+msgstr "Boto ndryshime faqesh"
 
 msgid "Publish page now"
-msgstr ""
+msgstr "Botoje faqen tani"
 
 msgid "Page settings"
 msgstr "Rregullime faqeje"
@@ -498,7 +498,7 @@ msgid "Templates"
 msgstr "Gjedhe"
 
 msgid "Save as Page Type"
-msgstr ""
+msgstr "Ruaje si Lloj Faqesh"
 
 msgid "Permissions"
 msgstr "Lleje"
@@ -510,16 +510,16 @@ msgid "Display in navigation"
 msgstr "Shfaqe te lëvizja"
 
 msgid "Unpublish page"
-msgstr ""
+msgstr "Hiqe faqen nga botimi"
 
 msgid "Publish page"
-msgstr ""
+msgstr "Botoje faqen"
 
 msgid "Are you sure you want to revert to live?"
-msgstr ""
+msgstr "Jeni i sigurt se doni të rikthehet te live?"
 
 msgid "Revert to live"
-msgstr ""
+msgstr "Riktheje te live"
 
 msgid "Delete page"
 msgstr "Fshije faqen"
@@ -685,10 +685,10 @@ msgstr "Lejoje"
 msgid ""
 "When the page should go live. Status must be \"Published\" for page to go "
 "live."
-msgstr ""
+msgstr "Kur duhet të kalohet live faqja. Që një faqe të kalohet live, gjendja e saj duhet të jetë “E botuar”."
 
 msgid "When to expire the page. Leave empty to never expire."
-msgstr ""
+msgstr "Kur të skadojë faqja. Që të mos skadojë kurrë, lëreni të zbrazët."
 
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Krejt paraardhësit s’do të shfaqen te lëvizja"
@@ -871,7 +871,7 @@ msgid "redirect"
 msgstr "ridrejtim"
 
 msgid "is published"
-msgstr ""
+msgstr "është botuar"
 
 msgid "Advanced options"
 msgstr "Mundësi të mëtejshme"
@@ -977,7 +977,7 @@ msgid "Save and add another"
 msgstr "Ruajeni dhe shtoni një tjetër"
 
 msgid "Basic Settings"
-msgstr ""
+msgstr "Rregullime Bazë"
 
 msgid "Copy"
 msgstr "Kopjoje"
@@ -1026,7 +1026,7 @@ msgid ""
 "\n"
 "                                New %(name)s\n"
 "                            "
-msgstr ""
+msgstr "\n                                %(name)s e re\n                            "
 
 #| msgid "in navigation"
 msgid "Main Navigation"
@@ -1132,19 +1132,19 @@ msgstr "Aplikacion: %(apphook)s"
 #, python-format
 #| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
-msgstr ""
+msgstr "Parashiheni këtë faqe në %(language)s "
 
 msgid "Preview"
 msgstr "Paraparje"
 
 msgid "Publish"
-msgstr ""
+msgstr "Botoje"
 
 msgid "Unpublish"
-msgstr ""
+msgstr "Shbotoje"
 
 msgid "Configure"
-msgstr ""
+msgstr "Formësoni"
 
 msgid "in menu"
 msgstr "në menu"
@@ -1213,7 +1213,7 @@ msgstr "Shfaq/Fshih strukturë"
 
 #| msgid "View published"
 msgid "View published"
-msgstr ""
+msgstr "Shihni të botuarat"
 
 msgid "Login"
 msgstr "Hyrje"
@@ -1278,7 +1278,7 @@ msgid "The page was changed in the meantime, reloading..."
 msgstr "Ndërkohë faqja qe ndryshuar, po ringarkohet…"
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "Shkurtore për krejt CMS-në"
 
 msgid "Bring up this help dialog"
 msgstr "Shfaq këtë dialog ndihme"
@@ -1331,7 +1331,7 @@ msgid ""
 msgstr "<strong>Hyrja dështoi.</strong> Ju lutemi, kontrolloni kredencialet tuaja dhe riprovoni."
 
 msgid "This page has unpublished changes."
-msgstr ""
+msgstr "Kjo faqe ka ndryshime të pabotuara."
 
 msgid "Double-click to edit"
 msgstr "Dyklikojeni që ta përpunoni"
@@ -1451,16 +1451,16 @@ msgid "Next"
 msgstr "Pasuesi"
 
 msgid "unpublished changes"
-msgstr ""
+msgstr "ndryshime të pabotuara"
 
 msgid "published"
-msgstr ""
+msgstr "e botuar"
 
 msgid "unpublished parent"
-msgstr ""
+msgstr "mëmë e pabotuar"
 
 msgid "unpublished"
-msgstr ""
+msgstr "e pabotuar"
 
 msgid "no content"
 msgstr "pa lëndë"

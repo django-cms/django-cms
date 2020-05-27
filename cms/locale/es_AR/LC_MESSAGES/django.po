@@ -11,7 +11,7 @@
 # Pavel Nunez <pndeschamps@gmail.com>, 2013
 # Eduardo Ludi <eduludi@gmail.com>, 2013-2014
 # Eduardo Ludi <eduludi@gmail.com>, 2013
-# Joaquín Tita <carpincho@gmail.com>, 2014
+# Joaquín T <joaquintita@gmail.com>, 2014
 # Juan Carizza <sencillomail@gmail.com>, 2011
 # mariocesar <mariocesar.c50@gmail.com>, 2011
 # Pavel Nunez <pndeschamps@gmail.com>, 2013
@@ -24,7 +24,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-21 15:37+0200\n"
+"POT-Creation-Date: 2020-05-26 14:17+0200\n"
 "PO-Revision-Date: 2020-04-21 13:37+0000\n"
 "Last-Translator: Eduardo Ludi <eduludi@gmail.com>\n"
 "Language-Team: Spanish (Argentina) (http://www.transifex.com/divio/django-cms/language/es_AR/)\n"
