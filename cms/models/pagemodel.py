@@ -19,6 +19,7 @@ from django.utils.translation import (
 )
 
 from cms import constants
+from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
@@ -828,6 +829,7 @@ class Page(models.Model):
         self.changed_by = get_current_user_name()
 
         if created:
+            clear_permission_cache()
             self.created_by = self.changed_by
         super(Page, self).save(**kwargs)
 
