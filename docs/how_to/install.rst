@@ -481,7 +481,7 @@ rely on a set of well-maintained plugins that cover some general content managem
 
 To install::
 
-    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet djangocms-style djangocms-column
+    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet djangocms-style
 
 and add::
 
@@ -492,7 +492,6 @@ and add::
     'djangocms_googlemap',
     'djangocms_snippet',
     'djangocms_style',
-    'djangocms_column',
 
 to ``INSTALLED_APPS``.
 
