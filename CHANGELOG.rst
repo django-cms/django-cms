@@ -6,6 +6,7 @@ Changelog
 3.7.3 (unreleased)
 ==================
 
+* no changes
 * Fixed apphooks config select in Firefox
 * Fixed compatibility errors on python 2
 
