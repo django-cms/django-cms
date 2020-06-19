@@ -3,6 +3,12 @@ Changelog
 =========
 
 
+next
+====
+* Fixed: Missining initialization of jQuery, while opening the dialog box to
+  delete a plugin.
+
+
 3.7.3 (2020-05-27)
 ==================
 
