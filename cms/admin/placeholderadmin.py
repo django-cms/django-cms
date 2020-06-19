@@ -7,6 +7,7 @@ from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
+from django.forms.widgets import Media
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -1105,6 +1106,7 @@ class PlaceholderAdminMixin(object):
             "protected": protected,
             "opts": opts,
             "app_label": opts.app_label,
+            "media": Media(js=['admin/js/vendor/jquery/jquery.min.js', 'admin/js/jquery.init.js'])
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(
