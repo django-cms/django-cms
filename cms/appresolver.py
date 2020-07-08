@@ -138,7 +138,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
 
             regex_pattern = regex
             if not DJANGO_1_11:
-                regex_pattern = RegexPattern(regex, name=pattern.name)
+                regex_pattern = RegexPattern(regex, name=pattern.name, is_endpoint=True)
             resolver = URLPattern(regex_pattern, pattern.callback, args,
                                   pattern.name)
         resolver.page_id = page_id

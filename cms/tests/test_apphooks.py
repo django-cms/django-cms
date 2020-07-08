@@ -7,6 +7,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.core.cache import cache
+from django.core.checks.urls import check_url_config
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
 from django.utils import six
@@ -102,6 +103,15 @@ class ApphooksTestCase(CMSTestCase):
         self.reload_urls()
 
         return titles
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.fourth_urls_for_apphook_tests')
+    def test_check_url_config(self):
+        """
+        Test for urls config check.
+        """
+        self.apphook_clear()
+        result = check_url_config(None)
+        self.assertEqual(len(result), 0)
 
     @override_settings(CMS_APPHOOKS=['%s.%s' % (APP_MODULE, APP_NAME)])
     def test_explicit_apphooks(self):
