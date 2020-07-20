@@ -6,18 +6,19 @@ python:
   - 3.4
   - 2.7
 
-sudo: false
+services:
+  - mysql
+  - postgresql
 
 addons:
   apt:
     packages:
-    - enchant
+      - enchant
 
 cache:
   directories:
     - node_modules
     - $HOME/.pip/cache
-
 
 env:
   global:
@@ -29,6 +30,8 @@ env:
     - secure: CbPfysSncBB2Ue+VOtLDa8xJvwKl73nJO647zt/9UvZ/3PilnZN9aZv2jHxGvCiFXcez+2AddKptMCcx/5EW5UfRkrWUDHrfLCULU2TfOjmufEGM1eOIXhiAun8WQ85LBzTAYy1r9D514cbU3Yzn3xGZwJljPE8JE4cx3MNN/qQ=
     # temporary solution until https://github.com/ariya/phantomjs/issues/13953 is resolved
     - PHANTOMJS_CDNURL=https://s3.amazonaws.com/aldryn-local-assets
+    # make sure travis jobs are recognised
+    - DJANGO=1.11
 
 matrix:
   include:
@@ -100,7 +103,7 @@ before_script:
   - if [ "$DATABASE_URL" == "mysql://root@127.0.0.1/djangocms_test" ]; then mysql -e 'create database IF NOT EXISTS djangocms_test CHARACTER SET utf8 COLLATE utf8_general_ci;'; fi
 
 before_install:
-  - "export TRAVIS_COMMIT_MSG=\"$(git log --format=%B --no-merges -n 1)\""
+  - 'export TRAVIS_COMMIT_MSG="$(git log --format=%B --no-merges -n 1)"'
   - pip install -U pip>=8.0
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[skip saucelabs\]'; export USE_SAUCE_LABS=$?; true
   - echo "$TRAVIS_COMMIT_MSG" | grep '\[ci only docs\]'; export ONLY_DOCS=$?; true
