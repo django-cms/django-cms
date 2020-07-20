@@ -9,16 +9,19 @@ python:
 
 sudo: false
 
+services:
+  - mysql
+  - postgresql
+
 addons:
   apt:
     packages:
-    - enchant
+      - enchant
 
 cache:
   directories:
     - node_modules
     - $HOME/.pip/cache
-
 
 env:
   global:
@@ -30,6 +33,8 @@ env:
     - secure: CbPfysSncBB2Ue+VOtLDa8xJvwKl73nJO647zt/9UvZ/3PilnZN9aZv2jHxGvCiFXcez+2AddKptMCcx/5EW5UfRkrWUDHrfLCULU2TfOjmufEGM1eOIXhiAun8WQ85LBzTAYy1r9D514cbU3Yzn3xGZwJljPE8JE4cx3MNN/qQ=
     # temporary solution until https://github.com/ariya/phantomjs/issues/13953 is resolved
     - PHANTOMJS_CDNURL=https://s3.amazonaws.com/aldryn-local-assets
+    # make sure travis jobs are recognised
+    - DJANGO=1.11
   matrix:
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
@@ -99,7 +104,6 @@ notifications:
 
 matrix:
   exclude:
-
     - python: 2.7
       env: TEST_DOCS=1 DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 2.7
@@ -286,9 +290,7 @@ matrix:
     - python: 3.6
       env: FRONTEND=1 LINT=1
 
-
   allow_failures:
-
     - python: 2.7
       env: DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
 
