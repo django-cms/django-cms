@@ -34,7 +34,7 @@ env:
     # make sure travis jobs are recognised
     - DJANGO=1.11
 
-    matrix:
+  matrix:
     - FRONTEND=1 UNIT=1
     - FRONTEND=1 LINT=1
     - DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
