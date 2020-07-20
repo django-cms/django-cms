@@ -91,7 +91,7 @@ matrix:
     - python: 2.7
       env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
 
-    fast_finish: true
+  fast_finish: true
 
 before_script:
   - pip freeze
