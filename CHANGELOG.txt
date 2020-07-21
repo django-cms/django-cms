@@ -1,3 +1,8 @@
+=== 3.5.4 (2020-07-21) ===
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
 === 3.5.3 (2018-11-20) ===
 
 * Fixed ``TreeNode.DoesNotExist`` exception raised when exporting
