@@ -70,6 +70,12 @@ Changelog
 * Fixed override ``urlconf_module`` so that Django system checks don't crash.
 
 
+3.6.1 (2020-07-21)
+==================
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
 3.6.0 (2019-01-29)
 ==================
 
@@ -82,6 +88,12 @@ Changelog
 * Added ``page_title`` parameter for ``cms.api.create_page()`` and ``cms.api.create_title()``.
 * Introduced Django 2.0 support.
 * Introduced Django 2.1 support.
+
+
+3.5.4 (2020-07-21)
+==================
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
 
 
 3.5.3 (2018-11-20)
@@ -157,6 +169,37 @@ Changelog
 * Removed "View on Site" button when adding a page
 * Welcome page no longer uses multilingual URLs when not required.
 * Prevent users from passing a public page as parent in ``create_page`` api function
+
+
+3.4.7 (2020-07-21)
+==================
+
+* Removed extra quotation mark from the sideframe button template
+* Fixed a bug where xframe options were processed by clickjacking middleware
+  when page was served from cache, rather then get this value from cache
+* Fixed a bug where cached page permissions overrides global permissions
+* Fixed a bug where editing pages with primary keys greater than 9999 would throw an
+  exception.
+* Fixed broken wizard page creation when no language is set within the template context (see #5828).
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
+3.4.6 (2018-03-26)
+==================
+
+* Changed the way drag and drop works in the page tree. The page has to be
+  selected first before moving.
+* Fixed a bug where the cms alias plugin leaks context into the rendered aliased plugins.
+* Fixed a bug where users without the "Change advanced settings" permission could still
+  change a page's template.
+* Added ``on_delete`` to ``ForeignKey`` and ``OneToOneField`` to silence Django
+  deprecation warnings.
+* Fixed a bug where the sitemap would ignore the ``public`` setting of the site languages
+  and thus display hidden languages.
+* Fixed an ``AttributeError`` raised when adding or removing apphooks in Django 1.11.
+* Fixed an ``InconsistentMigrationHistory`` error raised when the contenttypes app
+  has a pending migration after the user has applied the ``0010_migrate_use_structure`` migration.
+* Fixed a bug where plugins rendered multiple times won't be editable
 
 
 3.4.5 (2017-10-12)
