@@ -82,12 +82,6 @@ matrix:
     - python: 3.6
       env: TEST_DOCS=1 DJANGO=2.1 DATABASE_URL='sqlite://localhost/:memory:'
 
-  allow_failures:
-    - python: 2.7
-      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
-    - python: 2.7
-      env: DJANGO=1.11 DATABASE_URL='sqlite://localhost/:memory:'
-
   fast_finish: true
 
 before_script:
