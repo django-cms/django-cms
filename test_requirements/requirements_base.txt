@@ -18,3 +18,4 @@ django-sekizai==0.10.0
 django-classy-tags==0.8.0
 Pillow==5.2.0
 sphinx==1.8.5
+pyflaks==1.1.0
