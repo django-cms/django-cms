@@ -1,4 +1,4 @@
-=== 3.4.7 (unreleased) ===
+=== 3.4.7 (2020-07-21) ===
 
 * Removed extra quotation mark from the sideframe button template
 * Fixed a bug where xframe options were processed by clickjacking middleware
@@ -7,6 +7,7 @@
 * Fixed a bug where editing pages with primary keys greater than 9999 would throw an
   exception.
 * Fixed broken wizard page creation when no language is set within the template context (see #5828).
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
 
 
 === 3.4.6 (2018-03-26) ===
