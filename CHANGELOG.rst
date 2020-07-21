@@ -3,11 +3,19 @@ Changelog
 =========
 
 
-3.7.3 (unreleased)
+3.7.4 (2020-07-21)
+==================
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
+3.7.3 (2020-05-27)
 ==================
 
 * Fixed apphooks config select in Firefox
 * Fixed compatibility errors on python 2
+* Fixed long page titles in Page tree/list view to prevent horizontal scrolling
+* Adapted plugin documentations
 
 
 3.7.2 (2020-04-22)
@@ -22,7 +30,6 @@ Changelog
 * added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
 * replaced ``staticfiles`` and ``admin_static`` with ``static``
 * replaced djangocms-helper with django-app-helper
-* Wraps long page titles in Page tree/list view to prevent horizontal scrolling.
 
 
 3.7.1 (2019-11-26)
