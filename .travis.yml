@@ -42,7 +42,6 @@ env:
     - DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
     - DJANGO=1.11 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
-    - DJANGO=1.10 DATABASE_URL='sqlite://localhost/:memory:'
     - DJANGO=1.10 DATABASE_URL='mysql://root@127.0.0.1/djangocms_test'
     - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test'
     - DJANGO=1.10 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='emailuserapp.EmailUser'
