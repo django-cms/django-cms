@@ -1,20 +1,20 @@
 {
     "latest": {
-        "version": "3.7.2",
-        "url": "http://docs.django-cms.org/en/latest/upgrade/3.7.2.html"
+        "version": "3.7.4",
+        "url": "http://docs.django-cms.org/en/latest/upgrade/3.7.4.html"
     },
     "patches": [
         {
-            "version": "3.6.0",
-            "url": "http://docs.django-cms.org/en/release-3.6.x/upgrade/3.6.html"
+            "version": "3.6.1",
+            "url": "http://docs.django-cms.org/en/release-3.6.x/upgrade/3.6.1.html"
         },
         {
-            "version": "3.5.3",
-            "url": "http://docs.django-cms.org/en/release-3.5.x/upgrade/3.5.3.html"
+            "version": "3.5.4",
+            "url": "http://docs.django-cms.org/en/release-3.5.x/upgrade/3.5.4.html"
         },
         {
-            "version": "3.4.6",
-            "url": "http://docs.django-cms.org/en/release-3.4.x/upgrade/3.4.6.html"
+            "version": "3.4.7",
+            "url": "http://docs.django-cms.org/en/release-3.4.x/upgrade/3.4.7.html"
         },
         {
             "version": "3.3.4",
