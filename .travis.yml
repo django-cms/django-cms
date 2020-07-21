@@ -3,7 +3,6 @@ language: python
 python:
   - 3.6
   - 3.5
-  - 2.7
 
 sudo: false
 
