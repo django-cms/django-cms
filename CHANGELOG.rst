@@ -3,6 +3,12 @@ Changelog
 =========
 
 
+3.7.4 (2020-07-21)
+==================
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
 3.7.3 (2020-05-27)
 ==================
 
