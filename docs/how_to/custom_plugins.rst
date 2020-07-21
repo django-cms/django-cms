@@ -14,7 +14,7 @@ You may use ``python manage.py startapp`` to set up the basic layout for your
 plugin app (remember to add your plugin to ``INSTALLED_APPS``). Alternatively, just add a file called ``cms_plugins.py`` to an
 existing Django application.
 
-In ``cms_plugins.py``, you place your plugins. For our example, include the following code::
+Place your plugins in ``cms_plugins.py``. For our example, include the following code::
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool

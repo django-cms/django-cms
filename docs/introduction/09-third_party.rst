@@ -39,8 +39,6 @@ to you to check them because you need to avoid duplication:
     'aldryn_common',
     'aldryn_newsblog',
     'aldryn_people',
-    'aldryn_reversion',
-    'djangocms_text_ckeditor',
     'parler',
     'sortedm2m',
     'taggit',
@@ -48,7 +46,6 @@ to you to check them because you need to avoid duplication:
     # and you will probably find the following already listed:
     'easy_thumbnails',
     'filer',
-    'reversion',
 
 
 ``THUMBNAIL_PROCESSORS``
@@ -63,11 +60,12 @@ sophisticated image cropping.
     THUMBNAIL_PROCESSORS = (
         'easy_thumbnails.processors.colorspace',
         'easy_thumbnails.processors.autocrop',
-        # 'easy_thumbnails.processors.scale_and_crop',  # disable this one
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     )
 
+If ``THUMBNAIL_PROCESSORS`` is not defined in your ``settings.py`` or has different
+entries, just copy and paste the code above.
 
 ``ALDRYN_BOILERPLATE_NAME``
 ===========================
