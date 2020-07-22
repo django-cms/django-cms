@@ -22,6 +22,7 @@ from django.utils import six
 from django.utils.six.moves.urllib.parse import parse_qsl, urlparse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
+from django.utils.html import conditional_escape
 from django.utils.translation import get_language_from_path, ugettext as _
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
@@ -343,7 +344,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             # errors is s dict mapping fields to a list of errors
             # for that field.
             error = list(form.errors.values())[0][0]
-            return HttpResponseBadRequest(force_text(error))
+            return HttpResponseBadRequest(conditional_escape(force_text(error)))
 
         plugin_data = form.cleaned_data
         placeholder = plugin_data['placeholder_id']
