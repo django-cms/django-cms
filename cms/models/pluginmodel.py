@@ -15,8 +15,6 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from six import with_metaclass
-
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
@@ -92,7 +90,7 @@ class PluginModelBase(ModelBase):
         return new_class
 
 
-class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
+class CMSPlugin(MP_Node, metaclass=PluginModelBase):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.

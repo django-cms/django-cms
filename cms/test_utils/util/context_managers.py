@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import io
 from contextlib import contextmanager
 from shutil import rmtree as _rmtree
 from tempfile import template, mkdtemp, _exists
@@ -7,8 +8,6 @@ from cms.apphook_pool import apphook_pool
 
 from django.contrib.auth import get_user_model
 from django.utils.translation import get_language, activate
-
-from six.moves import StringIO
 
 
 class NULL:
@@ -18,7 +17,7 @@ class NULL:
 class StdOverride(object):
     def __init__(self, std='out', buffer=None):
         self.std = std
-        self.buffer = buffer or StringIO()
+        self.buffer = buffer or io.StringIO()
 
     def __enter__(self):
         setattr(sys, 'std%s' % self.std, self.buffer)

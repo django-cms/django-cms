@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import LabelCommand
 
-from six.moves import input
-
 from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
 

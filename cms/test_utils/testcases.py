@@ -3,6 +3,8 @@ import json
 import sys
 import warnings
 
+from urllib.parse import unquote, urljoin
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -19,8 +21,6 @@ from django.utils.http import urlencode
 from django.utils.timezone import now
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
-
-from six.moves.urllib.parse import unquote, urljoin
 
 from cms.api import create_page
 from cms.constants import (

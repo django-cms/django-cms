@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-from functools import update_wrapper
 import copy
 import json
+
+from functools import update_wrapper
+from urllib.parse import urlparse
 
 from django.urls import re_path
 from django.contrib import admin
@@ -11,8 +13,6 @@ from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
 from django.utils.translation import override
-
-from six.moves.urllib.parse import urlparse
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings

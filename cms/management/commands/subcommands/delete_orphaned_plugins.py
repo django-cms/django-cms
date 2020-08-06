@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from six.moves import input
-
 from cms.management.commands.subcommands.list import plugin_report
 
 from .base import SubcommandsCommand

@@ -2,6 +2,8 @@
 import uuid
 import warnings
 
+from urllib.parse import parse_qsl, urlparse
+
 from django.urls import re_path
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
@@ -23,8 +25,6 @@ from django.utils import translation
 from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
-
-from six.moves.urllib.parse import parse_qsl, urlparse
 
 from six import get_unbound_function, get_method_function
 

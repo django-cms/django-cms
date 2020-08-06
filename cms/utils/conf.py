@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from functools import update_wrapper
 import os
+
+from functools import update_wrapper
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import ugettext_lazy as _
-
-from six.moves.urllib.parse import urljoin
 
 from cms import constants
 from cms import __version__

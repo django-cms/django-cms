@@ -1,14 +1,14 @@
+import io
+
 from django.core.management import call_command
 from django.test import TestCase, override_settings
-
-from six.moves import StringIO
 
 
 class MigrationTestCase(TestCase):
 
     @override_settings(MIGRATION_MODULES={})
     def test_for_missing_migrations(self):
-        output = StringIO()
+        output = io.StringIO()
         options = {
             'interactive': False,
             'dry_run': True,

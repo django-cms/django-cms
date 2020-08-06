@@ -1,6 +1,5 @@
 import os
-
-from six import StringIO
+import io
 
 from pyflakes import api
 from pyflakes.checker import Checker
@@ -42,7 +41,7 @@ def pyflakes(packages):
     Checker.___init___ = Checker.__init__
     Checker.__init__ = _pyflakes_no_migrations
     Checker.report = _pyflakes_report_with_nopyflakes
-    out = StringIO()
+    out = io.StringIO()
     reporter = Reporter(out, out)
     paths = [os.path.dirname(package.__file__) for package in packages]
     return _check_recursive(paths, reporter), out.getvalue()

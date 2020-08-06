@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
+from urllib.parse import unquote
+
 from django import template
 from django.contrib.sites.models import Site
 from django.urls import reverse, NoReverseMatch
 from django.utils.encoding import force_text
 from django.utils.translation import get_language, ugettext
-
-from six.moves.urllib.parse import unquote
 
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
