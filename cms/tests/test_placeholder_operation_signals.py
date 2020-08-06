@@ -14,11 +14,10 @@ from cms.operations import (
 )
 from cms.signals import pre_placeholder_operation, post_placeholder_operation
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.tests import UnittestCompatMixin
 from cms.test_utils.util.context_managers import signal_tester
 
 
-class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
+class PagePlaceholderTestCase(CMSTestCase):
 
     def _add_plugin(self, placeholder=None, plugin_type='LinkPlugin', language='en'):
         placeholder = placeholder or self._placeholder_1

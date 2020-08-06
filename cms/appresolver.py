@@ -6,14 +6,14 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
 from django.utils.translation import get_language, override
-from django.urls import Resolver404, reverse
+from django.urls import Resolver404, reverse, URLResolver
+from django.urls.resolvers import RegexPattern, URLPattern
 
 from six import string_types
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
-from cms.utils.compat.dj import RegexPattern, URLPattern, URLResolver
 from cms.utils.i18n import get_language_list
 from cms.utils.moderator import use_draft
 
