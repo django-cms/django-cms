@@ -263,7 +263,7 @@ Now let's create the apphook, and set it up with support for multiple instances.
         name = _("Faq App")
         app_name = "faq"
         app_config = FaqConfig
-        
+
         def get_urls(self, page=None, language=None, **kwargs):
             return ["faq.urls"]
 
@@ -361,12 +361,12 @@ URLconf
 
 .. code-block:: python
 
-    from django.conf.urls import url
+    from django.urls import re_path
     from . import views
 
 
     urlpatterns = [
-        url(r'^$', views.IndexView.as_view(), name='index'),
+        re_path(r'^$', views.IndexView.as_view(), name='index'),
     ]
 
 

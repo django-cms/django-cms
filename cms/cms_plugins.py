@@ -5,7 +5,7 @@ from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
 from cms.utils.urlutils import admin_reverse
-from django.conf.urls import url
+from django.urls import re_path
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext, ugettext_lazy as _, get_language
@@ -59,7 +59,7 @@ class AliasPlugin(CMSPluginBase):
 
     def get_plugin_urls(self):
         return [
-            url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
+            re_path(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
         ]
 
     @classmethod

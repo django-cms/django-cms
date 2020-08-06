@@ -60,7 +60,7 @@ Create a new project
 
 Create a new project::
 
-    django-admin.py startproject myproject
+    django-admin startproject myproject
 
 If this is new to you, you ought to read the `official Django tutorial
 <https://docs.djangoproject.com/en/dev/intro/tutorial01/>`_, which covers starting a new project.
@@ -270,11 +270,11 @@ You'll also need to have an import for ``django.conf.urls.include``. For example
 ..  code-block:: python
     :emphasize-lines: 1,5
 
-    from django.conf.urls import url, include
+    from django.urls import re_path, include
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
-        url(r'^', include('cms.urls')),
+        re_path(r'^admin/', admin.site.urls),
+        re_path(r'^', include('cms.urls')),
     ]
 
 The django CMS project will now run, as you'll see if you launch it with ``python manage.py runserver``. You'll be able

@@ -150,23 +150,23 @@ What you need to do:
   and that it comes after the SessionMiddleware.
 - Be sure that the ``cms.urls`` is included in a ``i18n_patterns``::
 
-        from django.conf.urls import *
         from django.conf.urls.i18n import i18n_patterns
         from django.contrib import admin
         from django.conf import settings
+        from django.urls import *
 
         admin.autodiscover()
 
         urlpatterns = i18n_patterns('',
-            url(r'^admin/', include(admin.site.urls)),
-            url(r'^', include('cms.urls')),
+            re_path(r'^admin/', include(admin.site.urls)),
+            re_path(r'^', include('cms.urls')),
         )
 
         if settings.DEBUG:
             urlpatterns = patterns('',
-            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-                {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-            url(r'', include('django.contrib.staticfiles.urls')),
+            re_path(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                    {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+            re_path(r'', include('django.contrib.staticfiles.urls')),
         ) + urlpatterns
 
 - Change your url and reverse calls to language namespaces. We now support the django way of

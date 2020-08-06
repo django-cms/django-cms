@@ -663,7 +663,7 @@ Example::
 
         def get_plugin_urls(self):
             urlpatterns = [
-                url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
+                re_path(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
             ]
             return urlpatterns
 
