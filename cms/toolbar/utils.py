@@ -1,10 +1,7 @@
-from __future__ import unicode_literals
 import json
 
 from django.utils.encoding import force_text
 from django.utils.translation import override as force_language, ugettext
-
-from six import text_type
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 
@@ -18,7 +15,7 @@ def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
     data = {
         'type': 'placeholder',
         'name': force_text(label),
-        'placeholder_id': text_type(placeholder.pk),
+        'placeholder_id': str(placeholder.pk),
         'plugin_restriction': allowed_plugins or [],
         'addPluginHelpTitle': force_text(help_text),
         'urls': {

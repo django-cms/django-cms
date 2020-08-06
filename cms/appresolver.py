@@ -9,8 +9,6 @@ from django.utils.translation import get_language, override
 from django.urls import Resolver404, reverse, URLResolver
 from django.urls.resolvers import RegexPattern, URLPattern
 
-from six import string_types
-
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
@@ -166,7 +164,7 @@ def _set_permissions(patterns, exclude_permissions):
 
 def get_app_urls(urls):
     for urlconf in urls:
-        if isinstance(urlconf, string_types):
+        if isinstance(urlconf, str):
             mod = import_module(urlconf)
             if not hasattr(mod, 'urlpatterns'):
                 raise ImproperlyConfigured(

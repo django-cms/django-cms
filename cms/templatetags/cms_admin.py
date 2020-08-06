@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag

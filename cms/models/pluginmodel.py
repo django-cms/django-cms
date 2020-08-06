@@ -15,7 +15,7 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from six import text_type, with_metaclass
+from six import with_metaclass
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
@@ -195,12 +195,12 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         plugin_name = self.get_plugin_name()
         data = {
             'type': 'plugin',
-            'placeholder_id': text_type(self.placeholder_id),
+            'placeholder_id': str(self.placeholder_id),
             'plugin_name': force_text(plugin_name) or '',
             'plugin_type': self.plugin_type,
-            'plugin_id': text_type(self.pk),
+            'plugin_id': str(self.pk),
             'plugin_language': self.language or '',
-            'plugin_parent': text_type(self.parent_id or ''),
+            'plugin_parent': str(self.parent_id or ''),
             'plugin_restriction': children or [],
             'plugin_parent_restriction': parents or [],
             'urls': self.get_action_urls(),

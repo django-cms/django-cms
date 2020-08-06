@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 
 from cms.apphook_pool import apphook_pool
 from cms.models import Page
+
 from menus.base import Menu
 
 

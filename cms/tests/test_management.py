@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import uuid
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.util.context_managers import apphooks
@@ -19,6 +18,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
 from cms.test_utils.testcases import CMSTestCase
+
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 

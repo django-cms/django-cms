@@ -15,8 +15,6 @@ from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
-from six import string_types
-
 from cms import constants
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
@@ -1682,7 +1680,7 @@ class PageTest(PageTestBase):
             document.finalize()
             # Removing ROOT element if it's not necessary
             if len(document.children) == 1:
-                if not isinstance(document.children[0], string_types):
+                if not isinstance(document.children[0], str):
                     document = document.children[0]
             return document
 

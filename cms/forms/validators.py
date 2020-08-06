@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
 from django.utils.encoding import force_text

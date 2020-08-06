@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import cms.models.static_placeholder
 import cms.models.fields
 from django.conf import settings
