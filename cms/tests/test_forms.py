@@ -1,11 +1,5 @@
 # -*- coding: utf-8 -*-
-try:
-    from html import unescape
-except ImportError:  # DJANGO_1_11
-    import HTMLParser
-
-    def unescape(text): return HTMLParser.HTMLParser().unescape(text)
-
+from html import unescape
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site

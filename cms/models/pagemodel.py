@@ -23,7 +23,6 @@ from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBL
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
-from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
@@ -279,12 +278,8 @@ class Page(models.Model):
         return display
 
     def _clear_node_cache(self):
-        if DJANGO_1_11:
-            if hasattr(self, '_node_cache'):
-                del self._node_cache
-        else:
-            if Page.node.is_cached(self):
-                Page.node.field.delete_cached_value(self)
+        if Page.node.is_cached(self):
+            Page.node.field.delete_cached_value(self)
 
     def _clear_internal_cache(self):
         self.title_cache = {}

@@ -39,7 +39,6 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import pre_placeholder_operation, post_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
 from cms.utils import copy_plugins, get_current_site
-from cms.utils.compat import DJANGO_2_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import has_reached_plugin_limit, reorder_plugins
@@ -1033,14 +1032,7 @@ class PlaceholderAdminMixin(object):
 
         opts = plugin._meta
         using = router.db_for_write(opts.model)
-        if DJANGO_2_0:
-            get_deleted_objects_additional_kwargs = {
-                'opts': opts,
-                'using': using,
-                'user': request.user,
-            }
-        else:
-            get_deleted_objects_additional_kwargs = {'request': request}
+        get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
             [plugin], admin_site=self.admin_site,
             **get_deleted_objects_additional_kwargs
@@ -1132,14 +1124,7 @@ class PlaceholderAdminMixin(object):
         using = router.db_for_write(Placeholder)
         plugins = placeholder.get_plugins_list(language)
 
-        if DJANGO_2_0:
-            get_deleted_objects_additional_kwargs = {
-                'opts': opts,
-                'using': using,
-                'user': request.user,
-            }
-        else:
-            get_deleted_objects_additional_kwargs = {'request': request}
+        get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
             plugins, admin_site=self.admin_site,
             **get_deleted_objects_additional_kwargs

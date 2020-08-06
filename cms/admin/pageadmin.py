@@ -73,7 +73,6 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.admin import jsonify_request
-from cms.utils.compat import DJANGO_2_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -444,14 +443,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         # will also be deleted.
         objs = [obj] + list(obj.get_descendant_pages())
 
-        if DJANGO_2_0:
-            get_deleted_objects_additional_kwargs = {
-                'opts': opts,
-                'using': using,
-                'user': request.user,
-            }
-        else:
-            get_deleted_objects_additional_kwargs = {'request': request}
+        get_deleted_objects_additional_kwargs = {'request': request}
         (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
             objs, admin_site=self.admin_site,
             **get_deleted_objects_additional_kwargs
@@ -1288,19 +1280,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         using = router.db_for_read(self.model)
 
         kwargs = {'admin_site': self.admin_site}
-        if DJANGO_2_0:
-            kwargs.update({'using': using, 'opts': titleopts, 'user': request.user})
-        else:
-            kwargs.update({'request': request})
+        kwargs.update({'request': request})
         deleted_objects, __, perms_needed = get_deleted_objects(
             [translation],
             **kwargs
         )[:3]
 
-        if DJANGO_2_0:
-            kwargs.update({'using': using, 'opts': pluginopts, 'user': request.user})
-        else:
-            kwargs.update({'request': request})
+        kwargs.update({'request': request})
         to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
             saved_plugins,
             **kwargs

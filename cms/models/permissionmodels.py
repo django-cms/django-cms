@@ -11,7 +11,6 @@ from django.utils.translation import ugettext_lazy as _
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
-from cms.utils.compat import DJANGO_1_11
 
 from six import python_2_unicode_compatible
 
@@ -283,5 +282,3 @@ class PageUserGroup(Group):
         verbose_name = _('User group (page)')
         verbose_name_plural = _('User groups (page)')
         app_label = 'cms'
-        if DJANGO_1_11:
-            manager_inheritance_from_future = True
