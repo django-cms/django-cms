@@ -31,13 +31,10 @@ from menus.menu_pool import menu_pool
 
 from treebeard.mp_tree import MP_Node
 
-from six import python_2_unicode_compatible
-
 
 logger = getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class TreeNode(MP_Node):
 
     parent = models.ForeignKey(
@@ -146,7 +143,6 @@ class TreeNode(MP_Node):
             child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
-@python_2_unicode_compatible
 class Page(models.Model):
     """
     A simple hierarchical page model

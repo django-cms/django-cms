@@ -16,7 +16,7 @@ from django.utils.encoding import force_text, smart_str
 from django.utils.html import escapejs
 from django.utils.translation import ugettext, ugettext_lazy as _
 
-from six import with_metaclass, python_2_unicode_compatible
+from six import with_metaclass
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -102,7 +102,6 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
-@python_2_unicode_compatible
 class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     name = ""

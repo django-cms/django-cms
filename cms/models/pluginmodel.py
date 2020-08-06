@@ -15,7 +15,7 @@ from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from six import text_type, with_metaclass, python_2_unicode_compatible
+from six import text_type, with_metaclass
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
@@ -92,7 +92,6 @@ class PluginModelBase(ModelBase):
         return new_class
 
 
-@python_2_unicode_compatible
 class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should

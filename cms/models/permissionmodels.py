@@ -12,8 +12,6 @@ from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
                                  GlobalPagePermissionManager)
 
-from six import python_2_unicode_compatible
-
 
 # Cannot use contrib.auth.get_user_model() at compile time.
 user_app_name, user_model_name = settings.AUTH_USER_MODEL.rsplit('.', 1)
@@ -178,7 +176,6 @@ class AbstractPagePermission(models.Model):
         return permissions_by_action
 
 
-@python_2_unicode_compatible
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
@@ -205,7 +202,6 @@ class GlobalPagePermission(AbstractPagePermission):
         return "%s :: GLOBAL" % self.audience
 
 
-@python_2_unicode_compatible
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
     """
