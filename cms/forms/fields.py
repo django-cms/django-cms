@@ -43,6 +43,7 @@ class PageSelectFormField(forms.MultiValueField):
         page_choices = SuperLazyIterator(get_page_choices)
         self.limit_choices_to = limit_choices_to
         kwargs['required'] = required
+        kwargs.pop('blank', None)
         fields = (
             LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
             LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
