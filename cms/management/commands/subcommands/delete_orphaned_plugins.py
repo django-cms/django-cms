@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.management.commands.subcommands.list import plugin_report
 
 from .base import SubcommandsCommand

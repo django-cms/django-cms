@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.models import CMSPlugin, Placeholder
 from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference

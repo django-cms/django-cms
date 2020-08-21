@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db.models import Model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType

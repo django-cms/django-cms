@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 from collections import OrderedDict
 from logging import getLogger

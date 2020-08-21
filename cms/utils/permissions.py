@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import wraps, lru_cache

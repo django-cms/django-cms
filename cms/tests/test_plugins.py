@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import datetime
 import pickle
@@ -94,6 +93,8 @@ class DumbFixturePluginWithUrls(DumbFixturePlugin):
         return [
             re_path(r'^testview/$', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
         ]
+
+
 plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 

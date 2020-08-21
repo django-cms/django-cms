@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.deprecation import MiddlewareMixin
 
 from cms.utils import apphook_reload

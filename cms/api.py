@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Public Python API to create CMS contents.
 

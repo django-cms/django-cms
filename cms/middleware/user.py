@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """This is ugly, but seems there's no other way how to do what we need for
 permission system.
 

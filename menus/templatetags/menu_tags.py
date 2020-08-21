@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from urllib.parse import unquote
 
 from django import template

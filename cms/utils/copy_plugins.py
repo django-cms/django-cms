@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 def copy_plugins_to(old_plugins, to_placeholder,
                     to_language=None, parent_plugin_id=None, no_signals=False):
     """

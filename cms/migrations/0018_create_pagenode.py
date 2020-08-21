@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import django
 import django.contrib.auth.models
 from django.db import migrations, models

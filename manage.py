@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
 import sys
 import warnings
@@ -8,7 +7,9 @@ import app_manage
 
 from cms.exceptions import DontUsePageAttributeWarning
 
-gettext = lambda s: s
+def gettext(s): return s
+
+
 warnings.filterwarnings('ignore', category=DontUsePageAttributeWarning)
 
 

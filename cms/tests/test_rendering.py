@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.core.cache import cache
 from django.test.utils import override_settings
 

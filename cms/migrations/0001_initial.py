@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.models import ACCESS_CHOICES, Page
 from cms.utils.conf import get_cms_setting
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC

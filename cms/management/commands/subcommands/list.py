@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.models import Page
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool

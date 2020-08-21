@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.api import create_page
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 
 from classytags.core import Tag, Options
@@ -86,4 +85,6 @@ class JavascriptString(Tag):
 
         rendered = self.nodelist.render(context)
         return "'%s'" % escapejs(rendered.strip())
+
+
 register.tag(JavascriptString)

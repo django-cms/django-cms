@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.core.management.base import CommandError
 
 from cms.utils.check import FileOutputWrapper, check

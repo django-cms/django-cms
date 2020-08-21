@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
@@ -265,7 +264,7 @@ class CMSMenu(Menu):
 
             for trans in page.filtered_translations:
                 page.title_cache[trans.language] = trans
-            menu_node =  get_menu_node_for_page(
+            menu_node = get_menu_node_for_page(
                 self.renderer,
                 page,
                 language=lang,
@@ -351,6 +350,7 @@ class NavExtender(Modifier):
         for node in removed:
             nodes.remove(node)
         return nodes
+
 
 menu_pool.register_modifier(NavExtender)
 

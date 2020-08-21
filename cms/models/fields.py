@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.forms.fields import PageSelectFormField
 from cms.models.placeholdermodel import Placeholder
 from django.db import models

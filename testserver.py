@@ -1,11 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
 import sys
 
 
 def noop_gettext(s):
     return s
+
 
 permission = True
 cms_toolbar_edit_on = 'edit'
@@ -175,6 +175,7 @@ def run():
     # we use '.runner()', not '.cms()' nor '.run()' because it does not
     # add 'test' argument implicitly
     runner.runner([sys.argv[0], 'cms', '--cms', 'server', '--bind', '0.0.0.0', '--port', str(port)])
+
 
 if __name__ == "__main__":
     run()

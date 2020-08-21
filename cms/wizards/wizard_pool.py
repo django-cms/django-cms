@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import ugettext as _
 
@@ -115,5 +114,6 @@ class WizardPool(object):
         self._discover()
         return [value for (key, value) in sorted(
             self._entries.items(), key=lambda e: getattr(e[1], 'weight'))]
+
 
 wizard_pool = WizardPool()

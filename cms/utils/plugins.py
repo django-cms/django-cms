@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from copy import deepcopy
 from collections import defaultdict
 from itertools import groupby, starmap

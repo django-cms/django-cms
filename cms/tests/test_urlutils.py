@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import urlutils
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 
 from django.contrib.sites.models import Site
@@ -125,5 +124,5 @@ class TestSiteBoundStaticPlaceholder(SiteTestCase):
         super(TestSiteBoundStaticPlaceholder, self).tearDown()
 
     def test_create_site_specific_placeholder(self):
-            response = self.client.get(self.test_page.get_absolute_url(language='de') + '?structure')
-            self.assertEqual(response.status_code, 200)
+        response = self.client.get(self.test_page.get_absolute_url(language='de') + '?structure')
+        self.assertEqual(response.status_code, 200)
