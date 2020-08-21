@@ -14,7 +14,7 @@ class UrlconfRevision(models.Model):
         Simply forces this model to be a singleton.
         """
         self.pk = 1
-        super(UrlconfRevision, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     @classmethod
     def get_or_create_revision(cls, revision=None):

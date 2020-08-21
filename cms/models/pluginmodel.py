@@ -205,7 +205,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         return data
 
     def refresh_from_db(self, *args, **kwargs):
-        super(CMSPlugin, self).refresh_from_db(*args, **kwargs)
+        super().refresh_from_db(*args, **kwargs)
 
         # Delete this internal cache to let the cms populate it
         # on demand.
@@ -264,13 +264,13 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
                                                              placeholder_id=self.placeholder_id).count()
                 self.add_root(instance=self)
             return
-        super(CMSPlugin, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
 
     def move(self, target, pos=None):
-        super(CMSPlugin, self).move(target, pos)
+        super().move(target, pos)
         self = self.reload()
 
         try:
@@ -460,7 +460,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         if no_mp:
             Model.delete(self, *args, **kwargs)
         else:
-            super(CMSPlugin, self).delete(*args, **kwargs)
+            super().delete(*args, **kwargs)
 
     def get_action_urls(self, js_compat=True):
         if js_compat:

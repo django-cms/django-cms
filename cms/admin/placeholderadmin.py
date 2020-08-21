@@ -82,7 +82,7 @@ class FrontendEditableAdminMixin:
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
-        return url_patterns + super(FrontendEditableAdminMixin, self).get_urls()
+        return url_patterns + super().get_urls()
 
     def _get_object_for_single_field(self, object_id, language):
         # Quick and dirty way to retrieve objects for django-hvad
@@ -233,7 +233,7 @@ class PlaceholderAdminMixin:
             pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         ]
-        return url_patterns + super(PlaceholderAdminMixin, self).get_urls()
+        return url_patterns + super().get_urls()
 
     def has_add_plugin_permission(self, request, placeholder, plugin_type):
         return placeholder.has_add_plugin_permission(request.user, plugin_type)

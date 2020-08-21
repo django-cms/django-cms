@@ -113,7 +113,7 @@ class SiteTestCase(CMSTestCase):
 
 class TestSiteBoundStaticPlaceholder(SiteTestCase):
     def setUp(self):
-        super(TestSiteBoundStaticPlaceholder, self).setUp()
+        super().setUp()
         with self.settings(
             CMS_TEMPLATES=(('placeholder_tests/static_with_site.html', 'tpl'), ),
         ):
@@ -121,7 +121,7 @@ class TestSiteBoundStaticPlaceholder(SiteTestCase):
 
     def tearDown(self):
         self.test_page.delete()
-        super(TestSiteBoundStaticPlaceholder, self).tearDown()
+        super().tearDown()
 
     def test_create_site_specific_placeholder(self):
         response = self.client.get(self.test_page.get_absolute_url(language='de') + '?structure')

@@ -86,14 +86,14 @@ class TreeNode(MP_Node):
             kwargs['instance'].parent = self
         else:
             kwargs['parent'] = self
-        return super(TreeNode, self).add_child(**kwargs)
+        return super().add_child(**kwargs)
 
     def add_sibling(self, pos=None, *args, **kwargs):
         if len(kwargs) == 1 and 'instance' in kwargs:
             kwargs['instance'].parent_id = self.parent_id
         else:
             kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(pos, *args, **kwargs)
+        return super().add_sibling(pos, *args, **kwargs)
 
     def update(self, **data):
         cls = self.__class__
@@ -247,7 +247,7 @@ class Page(models.Model):
         app_label = 'cms'
 
     def __init__(self, *args, **kwargs):
-        super(Page, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title_cache = {}
 
     def __str__(self):
@@ -819,7 +819,7 @@ class Page(models.Model):
 
         if created:
             self.created_by = self.changed_by
-        super(Page, self).save(**kwargs)
+        super().save(**kwargs)
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
@@ -834,7 +834,7 @@ class Page(models.Model):
             self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        return super(Page, self).save_base(*args, **kwargs)
+        return super().save_base(*args, **kwargs)
 
     def update(self, refresh=False, draft_only=True, **data):
         assert self.publisher_is_draft

@@ -142,7 +142,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     def __init__(self, model=None, admin_site=None):
         if admin_site:
-            super(CMSPluginBase, self).__init__(self.model, admin_site)
+            super().__init__(self.model, admin_site)
 
         self.object_successfully_changed = False
         self.placeholder = None
@@ -256,7 +256,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
         })
 
-        return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
+        return super().render_change_form(request, context, add, change, form_url, obj)
 
     def render_close_frame(self, request, obj, extra_context=None):
         try:
@@ -332,10 +332,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         # remember the saved object
         self.saved_object = obj
-        return super(CMSPluginBase, self).save_model(request, obj, form, change)
+        return super().save_model(request, obj, form, change)
 
     def save_form(self, request, form, change):
-        obj = super(CMSPluginBase, self).save_form(request, form, change)
+        obj = super().save_form(request, form, change)
 
         for field, value in self._cms_initial_attributes.items():
             # Set the initial attribute hooks (if any)
@@ -388,7 +388,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         Same as from base class except if there are no fields, show an info message.
         """
-        fieldsets = super(CMSPluginBase, self).get_fieldsets(request, obj)
+        fieldsets = super().get_fieldsets(request, obj)
 
         for name, data in fieldsets:
             if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets

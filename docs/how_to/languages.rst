@@ -99,7 +99,7 @@ Example:
             self.object = self.get_object()
             if hasattr(self.request, 'toolbar'):
                 self.request.toolbar.set_object(self.object)
-            response = super(AnswerView, self).get(*args, **kwargs)
+            response = super().get(*args, **kwargs)
             return response
 
 

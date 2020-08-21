@@ -120,7 +120,7 @@ class TitleManager(PublisherManager):
         return None
 
     def public(self):
-        return super(TitleManager, self).public().filter(published=True)
+        return super().public().filter(published=True)
 
     def set_or_create(self, request, page, form, language):
         """

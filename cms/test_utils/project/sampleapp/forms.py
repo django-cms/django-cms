@@ -11,4 +11,4 @@ class LoginForm2(AuthenticationForm):
 
 class LoginForm3(AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
-        super(LoginForm3, self).__init__(request, *args, **kwargs)
+        super().__init__(request, *args, **kwargs)

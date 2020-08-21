@@ -19,9 +19,9 @@ class SafeJSONEncoder(DjangoJSONEncoder):
 
     def encode(self, o):
         value = self._recursive_escape(o)
-        return super(SafeJSONEncoder, self).encode(value)
+        return super().encode(value)
 
     def default(self, o):
         if isinstance(o, Promise):
             return force_text(o)
-        return super(SafeJSONEncoder, self).default(o)
+        return super().default(o)

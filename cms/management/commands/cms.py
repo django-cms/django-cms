@@ -32,4 +32,4 @@ class Command(SubcommandsCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--version', action='version', version=self.get_version())
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)

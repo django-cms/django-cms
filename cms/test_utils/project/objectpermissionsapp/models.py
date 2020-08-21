@@ -54,7 +54,7 @@ class UserObjectPermission(models.Model):
             raise ValidationError("Cannot persist permission not designed for "
                                   "this class (permission's type is %r and object's type is %r)"
                                   % (self.permission.content_type, content_type))
-        return super(UserObjectPermission, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ['user', 'permission', 'object_pk']

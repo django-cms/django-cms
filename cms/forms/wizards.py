@@ -64,7 +64,7 @@ class CreateCMSPageForm(AddPageForm):
         self._site = get_current_site()
         self._user = self.user
         self._language = self.language_code
-        super(CreateCMSPageForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['title'].help_text = _(u"Provide a title for the new page.")
         self.fields['slug'].required = False
         self.fields['slug'].widget = SlugWidget()
@@ -153,7 +153,7 @@ class CreateCMSPageForm(AddPageForm):
     def save(self, **kwargs):
         from cms.api import add_plugin
 
-        new_page = super(CreateCMSPageForm, self).save(**kwargs)
+        new_page = super().save(**kwargs)
 
         if self.cleaned_data.get("page_type"):
             return new_page

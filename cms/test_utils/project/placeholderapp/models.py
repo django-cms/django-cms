@@ -29,7 +29,7 @@ class Example1(models.Model):
     static_admin_url = ''
 
     def __init__(self, *args, **kwargs):
-        super(Example1, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def callable_item(self, request):
         return self.char_1

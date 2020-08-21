@@ -101,7 +101,7 @@ class Title(models.Model):
 
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        return super(Title, self).save_base(*args, **kwargs)
+        return super().save_base(*args, **kwargs)
 
     def is_new_dirty(self):
         if not self.pk:

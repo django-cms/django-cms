@@ -160,7 +160,7 @@ class CMSNavigationNode(NavigationNode):
         self.path = kwargs.pop('path')
         # language is only used when we're dealing with a fallback
         self.language = kwargs.pop('language', None)
-        super(CMSNavigationNode, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def is_selected(self, request):
         try:

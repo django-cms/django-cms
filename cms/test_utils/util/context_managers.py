@@ -38,7 +38,7 @@ class StdoutOverride(StdOverride):
         lines = buffer.getvalue()
     """
     def __init__(self, buffer=None):
-        super(StdoutOverride, self).__init__('out', buffer)
+        super().__init__('out', buffer)
 
 
 class LanguageOverride:

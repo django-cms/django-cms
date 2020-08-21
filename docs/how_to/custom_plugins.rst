@@ -140,7 +140,7 @@ Now we need to change our plugin definition to use this model, so our new
         cache = False
 
         def render(self, context, instance, placeholder):
-            context = super(HelloPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             return context
 
 We changed the ``model`` attribute to point to our newly created ``Hello``
@@ -298,7 +298,7 @@ admin form for your foreign key references::
         inlines = (ItemInlineAdmin,)
 
         def render(self, context, instance, placeholder):
-            context = super(ArticlePlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             items = instance.associated_item.all()
             context.update({
                 'items': items,
@@ -537,7 +537,7 @@ achieve this functionality:
         # child_classes = ['ChildCMSPlugin']
 
         def render(self, context, instance, placeholder):
-            context = super(ParentCMSPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             return context
 
 
@@ -590,7 +590,7 @@ child you can access the parent instance using ``get_bound_plugin``:
             exclude = ()
 
         def __init__(self, *args, **kwargs):
-            super(ChildPluginForm, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             if self.instance:
                 parent, parent_cls = self.instance.parent.get_bound_plugin()
 
@@ -622,7 +622,7 @@ Example::
         render_template = "cms/plugins/alias.html"
 
         def render(self, context, instance, placeholder):
-            context = super(AliasPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             if instance.plugin_id:
                 plugins = instance.plugin.get_descendants(
                     include_self=True

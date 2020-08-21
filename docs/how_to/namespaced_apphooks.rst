@@ -286,7 +286,7 @@ that only displays entries for the currently used namespace. In ``views.py``:
         template_name = 'faq/index.html'
 
         def get_queryset(self):
-            qs = super(IndexView, self).get_queryset()
+            qs = super().get_queryset()
             return qs.namespace(self.namespace)
 
         def get_paginate_by(self, queryset):
