@@ -3,8 +3,8 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.text import slugify
 from django.utils.translation import (
-    ugettext,
-    ugettext_lazy as _,
+    gettext,
+    gettext_lazy as _,
 )
 
 from cms.admin.forms import AddPageForm
@@ -137,7 +137,7 @@ class CreateCMSPageForm(AddPageForm):
             has_perm = user_can_add_page(self.user)
 
         if not has_perm:
-            message = ugettext('You don\'t have the permissions required to add a page.')
+            message = gettext('You don\'t have the permissions required to add a page.')
             raise ValidationError(message)
         return parent_page.node if parent_page else None
 

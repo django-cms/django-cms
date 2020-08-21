@@ -9,7 +9,7 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import api
 from cms.apphook_pool import apphook_pool
@@ -327,7 +327,7 @@ class AddPageTypeForm(AddPageForm):
         if not root_page.has_translation(self._language):
             api.create_title(
                 language=self._language,
-                title=ugettext('Page Types'),
+                title=gettext('Page Types'),
                 page=root_page,
                 slug=PAGE_TYPES_ID,
                 path=PAGE_TYPES_ID,
@@ -1264,7 +1264,7 @@ class PluginAddValidationForm(forms.Form):
         try:
             plugin_pool.get_plugin(plugin_type)
         except KeyError:
-            message = ugettext("Invalid plugin type '%s'") % plugin_type
+            message = gettext("Invalid plugin type '%s'") % plugin_type
             raise ValidationError(message)
         return plugin_type
 
@@ -1281,18 +1281,18 @@ class PluginAddValidationForm(forms.Form):
         parent_plugin = data.get('plugin_parent')
 
         if language not in get_language_list():
-            message = ugettext("Language must be set to a supported language!")
+            message = gettext("Language must be set to a supported language!")
             self.add_error('plugin_language', message)
             return self.cleaned_data
 
         if parent_plugin:
             if parent_plugin.language != language:
-                message = ugettext("Parent plugin language must be same as language!")
+                message = gettext("Parent plugin language must be same as language!")
                 self.add_error('plugin_language', message)
                 return self.cleaned_data
 
             if parent_plugin.placeholder_id != placeholder.pk:
-                message = ugettext("Parent plugin placeholder must be same as placeholder!")
+                message = gettext("Parent plugin placeholder must be same as placeholder!")
                 self.add_error('placeholder_id', message)
                 return self.cleaned_data
 

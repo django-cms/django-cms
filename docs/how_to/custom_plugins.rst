@@ -19,7 +19,7 @@ Place your plugins in ``cms_plugins.py``. For our example, include the following
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
     from cms.models.pluginmodel import CMSPlugin
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     @plugin_pool.register_plugin
     class HelloPlugin(CMSPluginBase):
@@ -54,7 +54,7 @@ There are two required attributes on those classes:
   but a plugin is not registered in that way.
 * ``name``: The name of your plugin as displayed in the admin. It is generally
   good practice to mark this string as translatable using
-  :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
+  :func:`django.utils.translation.gettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
 
 And one of the following **must** be defined if ``render_plugin`` attribute
@@ -128,7 +128,7 @@ Now we need to change our plugin definition to use this model, so our new
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     from .models import Hello
 

@@ -5,7 +5,7 @@ from django.conf import settings
 from django.template import loader, TemplateDoesNotExist
 from django.test.utils import override_settings
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms import constants
 from cms.test_utils.testcases import CMSTestCase

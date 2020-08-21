@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.admin import site
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
 from cms.admin.forms import PageUserChangeForm, PageUserGroupForm
 from cms.exceptions import NoPermissionsException
@@ -124,9 +124,9 @@ class PageUserGroupAdmin(GenericCmsPermissionAdmin, admin.ModelAdmin):
         """
         fieldsets = deepcopy(self.fieldsets)
         perm_models = (
-            (Page, ugettext('Page permissions')),
-            (PageUser, ugettext('User & Group permissions')),
-            (PagePermission, ugettext('Page permissions management')),
+            (Page, gettext('Page permissions')),
+            (PageUser, gettext('User & Group permissions')),
+            (PagePermission, gettext('Page permissions management')),
         )
         for i, perm_model in enumerate(perm_models):
             fields = []

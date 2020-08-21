@@ -1,5 +1,5 @@
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from .wizard_base import Wizard
 

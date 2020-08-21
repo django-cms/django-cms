@@ -180,7 +180,7 @@ In a new file ``cms_appconfig.py`` in the FAQ application:
     from app_data import AppDataForm
     from django.db import models
     from django import forms
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
 
     class FaqConfig(AppHookConfig):
@@ -254,7 +254,7 @@ Now let's create the apphook, and set it up with support for multiple instances.
 
     from aldryn_apphooks_config.app_base import CMSConfigApp
     from cms.apphook_pool import apphook_pool
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from .cms_appconfig import FaqConfig
 
 

@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.db import models
 from django.template.defaultfilters import title
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError

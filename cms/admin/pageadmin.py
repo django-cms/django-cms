@@ -31,7 +31,7 @@ from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext, ugettext_lazy as _, get_language
+from django.utils.translation import gettext, gettext_lazy as _, get_language
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 from django.http import QueryDict
@@ -1374,7 +1374,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             can_see_page = page.is_published(language)
 
         if not can_see_page:
-            message = ugettext('You don\'t have permissions to see page "%(title)s"')
+            message = gettext('You don\'t have permissions to see page "%(title)s"')
             message = message % {'title': force_text(page)}
             self.message_user(request, message, level=messages.ERROR)
             return HttpResponseRedirect(self.get_admin_url('changelist'))

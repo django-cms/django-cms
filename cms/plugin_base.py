@@ -13,7 +13,7 @@ from django.core.exceptions import (
 )
 from django.utils.encoding import force_text, smart_str
 from django.utils.html import escapejs
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -409,7 +409,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Returns the text displayed to the user when editing a plugin
         that requires no configuration.
         """
-        return ugettext('There are no further settings for this plugin. Please press save.')
+        return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
     def get_child_class_overrides(cls, slot, page):

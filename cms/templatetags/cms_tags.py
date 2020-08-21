@@ -16,7 +16,7 @@ from django.utils.http import urlencode
 from django.utils.translation import (
     get_language,
     override as force_language,
-    ugettext_lazy as _,
+    gettext_lazy as _,
 )
 
 from classytags.arguments import (Argument, MultiValueArgument,
