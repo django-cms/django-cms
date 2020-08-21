@@ -3,6 +3,14 @@ Changelog
 =========
 
 
+3.8.0 (unreleased)
+==================
+
+* Introduced support for Django 3.1
+* Dropped support for Python 2.7 and Python 3.4
+* Dropped support for Django < 2.2
+
+
 3.7.4 (2020-07-21)
 ==================
 

@@ -265,7 +265,7 @@ In the project's ``urls.py``, add ``url(r'^', include('cms.urls'))`` to the ``ur
 other patterns, so that specific URLs for other applications can be detected first. Note: when using Django 2.0 or
 later the syntax is ``re_path(r'^', include('cms.urls'))``
 
-You'll also need to have an import for ``django.conf.urls.include``. For example:
+You'll also need to have an import for ``django.urls.include``. For example:
 
 ..  code-block:: python
     :emphasize-lines: 1,5
