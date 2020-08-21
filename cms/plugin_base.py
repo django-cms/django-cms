@@ -512,7 +512,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return self.name
 
 
-class PluginMenuItem(object):
+class PluginMenuItem:
 
     def __init__(self, name, url, data=None, question=None, action='ajax', attributes=None):
         """

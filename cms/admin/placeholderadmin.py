@@ -72,7 +72,7 @@ def _instance_overrides_method(base, instance, method_name):
     return get_unbound_function(unbound_method) != get_method_function(bound_method)
 
 
-class FrontendEditableAdminMixin(object):
+class FrontendEditableAdminMixin:
     frontend_editable_fields = []
 
     def get_urls(self):
@@ -80,7 +80,7 @@ class FrontendEditableAdminMixin(object):
         Register the url for the single field edit view
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
@@ -153,7 +153,7 @@ class FrontendEditableAdminMixin(object):
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
-class PlaceholderAdminMixin(object):
+class PlaceholderAdminMixin:
 
     def _get_attached_admin(self, placeholder):
         return placeholder._get_attached_admin(admin_site=self.admin_site)
@@ -226,7 +226,7 @@ class PlaceholderAdminMixin(object):
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),

@@ -87,7 +87,7 @@ def _get_menu_class_for_instance(menu_class, instance):
     return meta_class(class_name, (menu_class,), attrs)
 
 
-class MenuRenderer(object):
+class MenuRenderer:
     # The main logic behind this class is to decouple
     # the singleton menu pool from the menu rendering logic.
     # By doing this we can be sure that each request has it's
@@ -237,7 +237,7 @@ class MenuRenderer(object):
         return MenuClass(renderer=self)
 
 
-class MenuPool(object):
+class MenuPool:
 
     def __init__(self):
         self.menus = {}

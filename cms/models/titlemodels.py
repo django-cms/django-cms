@@ -143,7 +143,7 @@ class Title(models.Model):
         return old_values != new_values
 
 
-class EmptyTitle(object):
+class EmptyTitle:
     """
     Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.

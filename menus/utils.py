@@ -76,7 +76,7 @@ def language_changer_decorator(language_changer):
     return _decorator
 
 
-class DefaultLanguageChanger(object):
+class DefaultLanguageChanger:
     def __init__(self, request):
         self.request = request
         self._app_path = None

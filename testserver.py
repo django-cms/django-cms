@@ -25,7 +25,7 @@ for arg in sys.argv:
 gettext = noop_gettext
 
 
-class DisableMigrations(object):
+class DisableMigrations:
 
     def __contains__(self, item):
         return True

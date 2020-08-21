@@ -8,7 +8,7 @@ STEPLEN = 4
 ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
 
-class MP_AddHandler(object):
+class MP_AddHandler:
 
     def __init__(self):
         self.stmts = []

@@ -9,7 +9,7 @@ from django.utils.functional import Promise
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 
 
-class ItemSearchResult(object):
+class ItemSearchResult:
     def __init__(self, item, index):
         self.item = item
         self.index = index

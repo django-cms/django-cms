@@ -22,7 +22,7 @@ from cms.utils.urlutils import admin_reverse
 from treebeard.mp_tree import MP_Node
 
 
-class BoundRenderMeta(object):
+class BoundRenderMeta:
     def __init__(self, meta):
         self.index = 0
         self.total = 1

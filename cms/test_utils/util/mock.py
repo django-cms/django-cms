@@ -1,4 +1,4 @@
-class AttributeObject(object):
+class AttributeObject:
     """
     mock = AttributeObject(hello='world')
     mock.hello # 'world'

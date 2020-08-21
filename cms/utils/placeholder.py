@@ -122,7 +122,7 @@ def validate_placeholder_name(name):
                                    "key to specify a verbose name.")
 
 
-class PlaceholderNoAction(object):
+class PlaceholderNoAction:
     can_copy = False
 
     def copy(self, **kwargs):

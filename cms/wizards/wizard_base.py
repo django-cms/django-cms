@@ -10,7 +10,7 @@ from django.utils.translation import override as force_language, ugettext as _
 from cms.utils.conf import get_cms_setting
 
 
-class WizardBase(object):
+class WizardBase:
     template_name = None
 
     def __init__(self, title, weight, form, model=None, template_name=None,

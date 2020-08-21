@@ -9,7 +9,7 @@ from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
 
 
-class SuperLazyIterator(object):
+class SuperLazyIterator:
     def __init__(self, func):
         self.func = func
 

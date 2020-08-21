@@ -18,7 +18,7 @@ def entry_choices(user, page):
             yield (entry.id, entry.title)
 
 
-class WizardPool(object):
+class WizardPool:
     _entries = {}
     _discovered = False
 
