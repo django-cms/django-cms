@@ -25,8 +25,6 @@ from django.utils.translation import ugettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
-from six import get_unbound_function, get_method_function
-
 from cms import operations
 from cms.admin.forms import PluginAddValidationForm
 from cms.constants import SLUG_REGEXP
@@ -67,9 +65,9 @@ def _instance_overrides_method(base, instance, method_name):
     Returns True if instance overrides a method (method_name)
     inherited from base.
     """
-    bound_method = getattr(instance, method_name)
+    bound_method = getattr(instance.__class__, method_name)
     unbound_method = getattr(base, method_name)
-    return get_unbound_function(unbound_method) != get_method_function(bound_method)
+    return unbound_method != bound_method
 
 
 class FrontendEditableAdminMixin:

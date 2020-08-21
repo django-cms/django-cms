@@ -1,5 +1,3 @@
-import six
-
 from functools import WRAPPER_ASSIGNMENTS
 
 from django.apps import apps
