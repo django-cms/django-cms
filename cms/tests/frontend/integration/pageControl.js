@@ -65,7 +65,7 @@ casper.test.begin('Page settings are accessible and can be edited from modal', f
                     this.fill(
                         '#page_form',
                         {
-                            title: UPDATED_TITLE,
+                            title: UPDATED_TITLE
                         },
                         false
                     );
@@ -142,7 +142,7 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
                     this.fill(
                         '#page_form',
                         {
-                            overwrite_url: '/overwritten-url-' + random,
+                            overwrite_url: '/overwritten-url-' + random
                         },
                         false
                     );
@@ -180,7 +180,7 @@ casper.test.begin('Page advanced settings are accessible from modal and can be e
                     this.fill(
                         '#page_form',
                         {
-                            overwrite_url: '',
+                            overwrite_url: ''
                         },
                         false
                     );
