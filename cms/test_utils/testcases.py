@@ -401,7 +401,7 @@ class BaseCMSTestCase:
         request = request or self.get_request()
         return StructureRenderer(request)
 
-    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None):
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None, domain=None):
         factory = RequestFactory()
 
         if not path:
@@ -420,6 +420,9 @@ class BaseCMSTestCase:
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
+        if domain:
+            request.META["SERVER_NAME"] = domain
+            request.SERVER_NAME = domain
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
         if page:
             request.current_page = page
