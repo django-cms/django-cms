@@ -1,10 +1,9 @@
 from functools import WRAPPER_ASSIGNMENTS
 
 from django.apps import apps
-from django.conf import settings
 
 
-__all__ = ['is_installed', 'installed_apps', 'get_apps', 'get_app_paths']
+__all__ = ['is_installed', 'installed_apps']
 
 def is_installed(app_name):
     return apps.is_installed(app_name)

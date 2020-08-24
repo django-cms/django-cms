@@ -1028,7 +1028,7 @@ class PlaceholderAdminMixin:
                 _("You do not have permission to delete this plugin")))
 
         opts = plugin._meta
-        using = router.db_for_write(opts.model)
+        router.db_for_write(opts.model)
         get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
             [plugin], admin_site=self.admin_site,
@@ -1118,7 +1118,7 @@ class PlaceholderAdminMixin:
             return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
 
         opts = Placeholder._meta
-        using = router.db_for_write(Placeholder)
+        router.db_for_write(Placeholder)
         plugins = placeholder.get_plugins_list(language)
 
         get_deleted_objects_additional_kwargs = {'request': request}

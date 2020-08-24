@@ -436,7 +436,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if obj is None:
             raise self._get_404_exception(object_id)
 
-        using = router.db_for_write(self.model)
+        router.db_for_write(self.model)
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
@@ -1273,10 +1273,10 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         titleopts = Title._meta
         app_label = titleopts.app_label
-        pluginopts = CMSPlugin._meta
+        CMSPlugin._meta
 
         saved_plugins = CMSPlugin.objects.filter(placeholder__page__id=object_id, language=language)
-        using = router.db_for_read(self.model)
+        router.db_for_read(self.model)
 
         kwargs = {'admin_site': self.admin_site}
         kwargs.update({'request': request})

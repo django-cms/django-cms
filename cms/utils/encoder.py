@@ -7,7 +7,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 class SafeJSONEncoder(DjangoJSONEncoder):
     def _recursive_escape(self, o, esc=conditional_escape):
         if isinstance(o, dict):
-            return type(o)((esc(k), self._recursive_escape(v)) for (k, v) in items(o))
+            return type(o)((esc(k), self._recursive_escape(v)) for (k, v) in o.items())
         if isinstance(o, (list, tuple)):
             return type(o)(self._recursive_escape(v) for v in o)
         if type(o) is bool:

@@ -52,7 +52,7 @@ class SubcommandsCommand(BaseCommand):
     subcommand_dest = 'subcmd'
 
     def create_parser(self, prog_name, subcommand):
-        kwargs = {'cmd': self}
+        kwargs = {}
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
@@ -70,7 +70,7 @@ class SubcommandsCommand(BaseCommand):
             for command, cls in self.subcommands.items():
                 instance = cls(self.stdout._out, self.stderr._out)
                 instance.style = self.style
-                kwargs = {'cmd': self}
+                kwargs = {}
                 parser_sub = subparsers.add_parser(
                     name=instance.command_name, help=instance.help_string,
                     description=instance.help_string, **kwargs
