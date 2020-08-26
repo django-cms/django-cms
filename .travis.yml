@@ -96,6 +96,9 @@ matrix:
       env: DJANGO=3.1 TEST_DOCS=1 DATABASE_URL='sqlite://localhost/:memory:'
     - python: 3.8
       env: DJANGO=3.1 DATABASE_URL='postgres://postgres@127.0.0.1/djangocms_test' AUTH_USER_MODEL='customuserapp.User'
+  allow_failures:
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=2.2 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
 before_script:
   - pip freeze

@@ -88,7 +88,7 @@ casper.test.begin('Publishing a page with publish button', function(test) {
         .then(cms.logout())
         // open a page and check if it's published for non-logged in user
         .thenOpen(pageUrl, function() {
-            // test.assertTitleMatch(new RegExp(pageTitle), 'The page is published and available');
+            test.assertTitleMatch(new RegExp(pageTitle), 'The page is published and available');
         })
         .then(function() {
             this.removeAllFilters();
@@ -190,7 +190,7 @@ casper.test.begin('Publishing dates', function(test) {
         // trying the same in a minute and a half (to be completely sure)
         .wait(90000)
         .thenOpen(pageUrl, function() {
-            // test.assertTitleMatch(new RegExp(pageTitle), 'The page is published and available');
+            test.assertTitleMatch(new RegExp(pageTitle), 'The page is published and available');
         })
         .run(function() {
             this.removeAllFilters('page.confirm');
