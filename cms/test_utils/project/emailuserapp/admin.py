@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as OriginalUserAdmin
 
@@ -36,5 +35,6 @@ class UserAdmin(OriginalUserAdmin):
     ordering = ('last_name', 'first_name', 'email')
 
 # Now register the emailuser admin
+
 
 admin.site.register(EmailUser, UserAdmin)

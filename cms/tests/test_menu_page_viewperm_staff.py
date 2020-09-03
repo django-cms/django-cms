@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
 

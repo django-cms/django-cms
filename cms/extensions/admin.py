@@ -23,7 +23,7 @@ class PageExtensionAdmin(ExtensionAdmin):
             page = obj.extended_object
         if not user_can_change_page(request.user, page):
             raise PermissionDenied()
-        super(PageExtensionAdmin, self).save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
         if not obj.extended_object.has_change_permission(request.user):
@@ -37,7 +37,7 @@ class PageExtensionAdmin(ExtensionAdmin):
         return {}
 
     def get_queryset(self, request):
-        return super(PageExtensionAdmin, self).get_queryset(request).filter(extended_object__publisher_is_draft=True)
+        return super().get_queryset(request).filter(extended_object__publisher_is_draft=True)
 
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):
@@ -70,7 +70,7 @@ class TitleExtensionAdmin(ExtensionAdmin):
             title = obj.extended_object
         if not user_can_change_page(request.user, page=title.page):
             raise PermissionDenied()
-        super(TitleExtensionAdmin, self).save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
         page = obj.extended_object.page
@@ -86,7 +86,7 @@ class TitleExtensionAdmin(ExtensionAdmin):
         return {}
 
     def get_queryset(self, request):
-        return super(TitleExtensionAdmin, self).get_queryset(request).filter(extended_object__page__publisher_is_draft=True)
+        return super().get_queryset(request).filter(extended_object__page__publisher_is_draft=True)
 
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):

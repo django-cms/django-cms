@@ -1,15 +1,11 @@
-# -*- coding: utf-8 -*-
 from copy import deepcopy
 from collections import defaultdict
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
-try:
-    from functools import lru_cache
-except ImportError:
-    from django.utils.lru_cache import lru_cache
+from functools import lru_cache
 
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin

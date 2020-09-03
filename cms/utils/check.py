@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import inspect
 from itertools import chain
@@ -22,7 +21,7 @@ SKIPPED = 4
 CHECKERS = []
 
 
-class FileOutputWrapper(object):
+class FileOutputWrapper:
     """
     Wraps two file-like objects (that support at the very least the 'write'
     method) into an API to be used by the check function further down in
@@ -124,7 +123,7 @@ class FileSectionWrapper(FileOutputWrapper):
         finish_skip(message): End this (skipped) section
     """
     def __init__(self, wrapper):
-        super(FileSectionWrapper, self).__init__(wrapper.stdout, wrapper.stderr)
+        super().__init__(wrapper.stdout, wrapper.stderr)
         self.wrapper = wrapper
 
     def write_line(self, message=''):
@@ -285,7 +284,7 @@ def check_copy_relations(output):
     from cms.extensions.models import BaseExtension
     from cms.models.pluginmodel import CMSPlugin
 
-    c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
+    def c_to_s(klass): return '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):
         for cls in inspect.getmro(model):

@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
+from urllib.parse import unquote
+
 from django import template
 from django.contrib.sites.models import Site
 from django.urls import reverse, NoReverseMatch
 from django.utils.encoding import force_text
-from django.utils.translation import get_language, ugettext
-
-from six.moves.urllib.parse import unquote
+from django.utils.translation import get_language, gettext
 
 from classytags.arguments import IntegerArgument, Argument, StringArgument
 from classytags.core import Options
@@ -341,11 +340,11 @@ def _raw_language_marker(language, lang_code):
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return force_text(ugettext(language))
+        return force_text(gettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return force_text(ugettext(language))
+    return force_text(gettext(language))
 
 
 def _short_language_marker(language, lang_code):

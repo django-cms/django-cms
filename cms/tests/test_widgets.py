@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.api import create_page
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.test_utils.testcases import CMSTestCase
