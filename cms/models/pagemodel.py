@@ -902,32 +902,34 @@ class Page(models.Model):
         return self.get_page_content_obj_attribute("redirect", language, fallback, force_reload)
 
     def _get_title_cache(self, language, fallback, force_reload):
+        def get_fallback_language(page, language):
+            fallback_langs = i18n.get_fallback_languages(language)
+            for lang in fallback_langs:
+                if page.title_cache.get(lang):
+                    return lang
+
         if not language:
             language = get_language()
 
         force_reload = (force_reload or language not in self.title_cache)
-
-        if fallback and not self.title_cache.get(language):
-            # language can be in the cache but might be an EmptyPageContent instance
-            fallback_langs = i18n.get_fallback_languages(language)
-            for lang in fallback_langs:
-                if self.title_cache.get(lang):
-                    return lang
-
         if force_reload:
             from cms.models import PageContent
-
             titles = PageContent.objects.filter(page=self)
             for title in titles:
                 self.title_cache[title.language] = title
-            if self.title_cache.get(language):
-                return language
-            else:
-                if fallback:
-                    fallback_langs = i18n.get_fallback_languages(language)
-                    for lang in fallback_langs:
-                        if self.title_cache.get(lang):
-                            return lang
+
+        if self.title_cache.get(language):
+            return language
+
+
+        use_fallback = all([
+            fallback,
+            not self.title_cache.get(language),
+            get_fallback_language(self, language)
+        ])
+        if use_fallback:
+            # language can be in the cache but might be an EmptyPageContent instance
+            return get_fallback_language(self, language)
         return language
 
     @property
