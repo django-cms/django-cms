@@ -430,11 +430,11 @@ class PageToolbar(CMSToolbar):
                     add_plugins_menu.add_modal_item(name, url=url)
 
             if remove:
-                translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(self.title.pk,))
-
                 remove_plugins_menu = language_menu.get_or_create_menu('{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation'))
                 disabled = len(remove) == 1
                 for code, name in remove:
+                    pagecontent = self.page.get_title_obj(code)
+                    translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
                     url = add_url_parameters(translation_delete_url, language=code)
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
@@ -443,9 +443,9 @@ class PageToolbar(CMSToolbar):
                 title = _('from %s')
                 question = _('Are you sure you want to copy all plugins from %s?')
 
-                page_copy_url = admin_reverse('cms_pagecontent_copy_language', args=(self.title.pk,))
-
                 for code, name in copy:
+                    pagecontent = self.page.get_title_obj(code)
+                    page_copy_url = admin_reverse('cms_pagecontent_copy_language', args=(pagecontent.pk,))
                     copy_plugins_menu.add_ajax_item(
                         title % name, action=page_copy_url,
                         data={'source_language': code, 'target_language': self.current_lang},
