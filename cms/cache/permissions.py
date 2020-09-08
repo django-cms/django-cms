@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth import get_user_model
 
 from cms.utils.conf import get_cms_setting

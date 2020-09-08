@@ -19,7 +19,7 @@ Place your plugins in ``cms_plugins.py``. For our example, include the following
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
     from cms.models.pluginmodel import CMSPlugin
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     @plugin_pool.register_plugin
     class HelloPlugin(CMSPluginBase):
@@ -54,7 +54,7 @@ There are two required attributes on those classes:
   but a plugin is not registered in that way.
 * ``name``: The name of your plugin as displayed in the admin. It is generally
   good practice to mark this string as translatable using
-  :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
+  :func:`django.utils.translation.gettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
 
 And one of the following **must** be defined if ``render_plugin`` attribute
@@ -128,7 +128,7 @@ Now we need to change our plugin definition to use this model, so our new
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     from .models import Hello
 
@@ -140,7 +140,7 @@ Now we need to change our plugin definition to use this model, so our new
         cache = False
 
         def render(self, context, instance, placeholder):
-            context = super(HelloPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             return context
 
 We changed the ``model`` attribute to point to our newly created ``Hello``
@@ -298,7 +298,7 @@ admin form for your foreign key references::
         inlines = (ItemInlineAdmin,)
 
         def render(self, context, instance, placeholder):
-            context = super(ArticlePlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             items = instance.associated_item.all()
             context.update({
                 'items': items,
@@ -537,7 +537,7 @@ achieve this functionality:
         # child_classes = ['ChildCMSPlugin']
 
         def render(self, context, instance, placeholder):
-            context = super(ParentCMSPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             return context
 
 
@@ -590,7 +590,7 @@ child you can access the parent instance using ``get_bound_plugin``:
             exclude = ()
 
         def __init__(self, *args, **kwargs):
-            super(ChildPluginForm, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             if self.instance:
                 parent, parent_cls = self.instance.parent.get_bound_plugin()
 
@@ -622,7 +622,7 @@ Example::
         render_template = "cms/plugins/alias.html"
 
         def render(self, context, instance, placeholder):
-            context = super(AliasPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             if instance.plugin_id:
                 plugins = instance.plugin.get_descendants(
                     include_self=True
@@ -663,7 +663,7 @@ Example::
 
         def get_plugin_urls(self):
             urlpatterns = [
-                url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
+                re_path(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
             ]
             return urlpatterns
 

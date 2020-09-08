@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from djangocms_text_ckeditor.models import Text
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site

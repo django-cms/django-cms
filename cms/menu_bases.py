@@ -1,12 +1,9 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 from django.db.models import Q
 from django.core.exceptions import ValidationError
 
 from cms.apphook_pool import apphook_pool
 from cms.models import Page
+
 from menus.base import Menu
 
 
@@ -16,7 +13,7 @@ class CMSAttachMenu(Menu):
     name = None
 
     def __init__(self, *args, **kwargs):
-        super(CMSAttachMenu, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.cms_enabled and not self.name:
             raise ValidationError(
                 "the menu %s is a CMSAttachMenu but has no name defined!" %

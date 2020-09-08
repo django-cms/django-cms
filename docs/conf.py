@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # django cms documentation build configuration file, created by
 # sphinx-quickstart on Tue Sep 15 10:47:03 2009.
@@ -12,6 +11,7 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
+import cms
 import datetime
 import os
 import sys
@@ -72,7 +72,6 @@ copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
 path = os.path.split(os.path.dirname(__file__))[0]
 path = os.path.split(path)[0]
 sys.path.insert(0, path)
-import cms
 
 version = cms.__version__
 # The full version, including alpha/beta/rc tags.

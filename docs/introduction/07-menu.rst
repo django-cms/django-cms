@@ -22,7 +22,7 @@ For this we need a file called ``cms_menus.py`` in our application. Add ``cms_me
 .. code-block:: python
 
     from django.urls import reverse
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     from cms.menu_bases import CMSAttachMenu
     from menus.base import NavigationNode

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
@@ -161,7 +160,7 @@ class CMSNavigationNode(NavigationNode):
         self.path = kwargs.pop('path')
         # language is only used when we're dealing with a fallback
         self.language = kwargs.pop('language', None)
-        super(CMSNavigationNode, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def is_selected(self, request):
         try:
@@ -265,7 +264,7 @@ class CMSMenu(Menu):
 
             for trans in page.filtered_translations:
                 page.title_cache[trans.language] = trans
-            menu_node =  get_menu_node_for_page(
+            menu_node = get_menu_node_for_page(
                 self.renderer,
                 page,
                 language=lang,
@@ -351,6 +350,7 @@ class NavExtender(Modifier):
         for node in removed:
             nodes.remove(node)
         return nodes
+
 
 menu_pool.register_modifier(NavExtender)
 

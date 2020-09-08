@@ -33,7 +33,7 @@ class ViewTests(CMSTestCase):
         clear_url_caches()
 
     def tearDown(self):
-        super(ViewTests, self).tearDown()
+        super().tearDown()
         clear_url_caches()
 
     def test_welcome_screen_debug_on(self):

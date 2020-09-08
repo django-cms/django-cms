@@ -1,4 +1,4 @@
-class AttributeObject(object):
+class AttributeObject:
     """
     mock = AttributeObject(hello='world')
     mock.hello # 'world'
@@ -15,4 +15,4 @@ class AttributeObject(object):
 class DefaultAttributeObject(AttributeObject):
     def __init__(self, default, **kwargs):
         self.__default = default
-        super(DefaultAttributeObject, self).__init__(**kwargs)
+        super().__init__(**kwargs)

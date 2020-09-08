@@ -1,7 +1,5 @@
-# -*- coding: utf-8 -*-
+from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
-
-from cms.utils.compat.dj import MiddlewareMixin
 
 
 def get_page(request):
