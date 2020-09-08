@@ -60,7 +60,7 @@ Create a new project
 
 Create a new project::
 
-    django-admin.py startproject myproject
+    django-admin startproject myproject
 
 If this is new to you, you ought to read the `official Django tutorial
 <https://docs.djangoproject.com/en/dev/intro/tutorial01/>`_, which covers starting a new project.
@@ -239,6 +239,9 @@ to the list.
 You can also add ``'cms.middleware.utils.ApphookReloadMiddleware'``. It's not absolutely necessary, but it's
 :ref:`useful <reloading_apphooks>`. If included, should be at the start of the list.
 
+add the following configuration to your ``settings.py``::
+
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 Context processors
 ==================
@@ -262,16 +265,16 @@ In the project's ``urls.py``, add ``url(r'^', include('cms.urls'))`` to the ``ur
 other patterns, so that specific URLs for other applications can be detected first. Note: when using Django 2.0 or
 later the syntax is ``re_path(r'^', include('cms.urls'))``
 
-You'll also need to have an import for ``django.conf.urls.include``. For example:
+You'll also need to have an import for ``django.urls.include``. For example:
 
 ..  code-block:: python
     :emphasize-lines: 1,5
 
-    from django.conf.urls import url, include
+    from django.urls import re_path, include
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
-        url(r'^', include('cms.urls')),
+        re_path(r'^admin/', admin.site.urls),
+        re_path(r'^', include('cms.urls')),
     ]
 
 The django CMS project will now run, as you'll see if you launch it with ``python manage.py runserver``. You'll be able

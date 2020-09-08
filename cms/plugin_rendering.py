@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from collections import OrderedDict
 
 from functools import partial
@@ -36,7 +34,7 @@ def _unpack_plugins(parent_plugin):
     return found_plugins
 
 
-class RenderedPlaceholder(object):
+class RenderedPlaceholder:
     __slots__ = (
         'language',
         'site_id',
@@ -68,7 +66,7 @@ class RenderedPlaceholder(object):
         return hash(self.placeholder)
 
 
-class BaseRenderer(object):
+class BaseRenderer:
 
     load_structure = False
     placeholder_edit_template = ''
@@ -194,7 +192,7 @@ class ContentRenderer(BaseRenderer):
     )
 
     def __init__(self, request):
-        super(ContentRenderer, self).__init__(request)
+        super().__init__(request)
         self._placeholders_are_editable = bool(self.toolbar.edit_mode_active)
 
     def placeholder_cache_is_enabled(self):
@@ -569,7 +567,7 @@ class StructureRenderer(BaseRenderer):
     )
 
     def get_plugins_to_render(self, *args, **kwargs):
-        plugins = super(StructureRenderer, self).get_plugins_to_render(*args, **kwargs)
+        plugins = super().get_plugins_to_render(*args, **kwargs)
 
         for plugin in plugins:
             yield plugin
@@ -655,7 +653,7 @@ class LegacyRenderer(ContentRenderer):
     )
 
     def get_editable_placeholder_context(self, placeholder, page=None):
-        context = super(LegacyRenderer, self).get_editable_placeholder_context(placeholder, page)
+        context = super().get_editable_placeholder_context(placeholder, page)
         context['plugin_menu_js'] = self.get_placeholder_plugin_menu(placeholder, page=page)
         return context
 
@@ -670,7 +668,7 @@ class PluginContext(Context):
 
     def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
         dict_ = flatten_context(dict_)
-        super(PluginContext, self).__init__(dict_)
+        super().__init__(dict_)
 
         if not processors:
             processors = []

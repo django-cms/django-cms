@@ -1,0 +1,36 @@
+.. _upgrade-to-3.7.2:
+
+###################
+3.7.2 release notes
+###################
+
+*******************
+What's new in 3.7.2
+*******************
+
+Bug Fixes
+=========
+
+* migrated from ``django.utils.six`` to the six package
+* migrated from ``django.utils.lru_cache`` to ``functools.lru_cache``
+* migrated from ``render_to_response`` to ``render`` in ``cms.views``
+* added ``cms.utils.compat.dj.available_attrs``
+* added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
+* replaced ``staticfiles`` and ``admin_static`` with ``static``
+* replaced djangocms-helper with django-app-helper
+
+Improvements and new features
+=============================
+
+* Added support for Django 3.0
+* Added support for Python 3.8
+
+***********************
+How to upgrade to 3.7.2
+***********************
+
+Django 3.0 changed the default behaviour of the ``XFrameOptionsMiddleware`` from
+``SAMEORIGIN`` to ``DENY``. In order for django CMS to function, ``X_FRAME_OPTIONS``
+needs to be set to ``SAMEORIGIN`` in the ``settings.py``::
+
+    X_FRAME_OPTIONS = 'SAMEORIGIN'

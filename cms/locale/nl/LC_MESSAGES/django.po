@@ -14,11 +14,11 @@
 # Jacques de Hooge <>, 2012
 # Jonas Obrist <me@ojii.ch>, 2011
 # kurdy <transifex.net@kurdyenviolien.nl>, 2013
-# leonderijke <inactive+leonderijke@transifex.com>, 2012
-# leonderijke <inactive+leonderijke@transifex.com>, 2012
+# 1de368575dc6c0d8d201ce55df5bf6b3_7f263b1 <d9786047fd415516826a50cdd4e7fc0a_10482>, 2012
+# 1de368575dc6c0d8d201ce55df5bf6b3_7f263b1 <d9786047fd415516826a50cdd4e7fc0a_10482>, 2012
 # Maarten Draijer <maarten@madra.nl>, 2013
 # Maarten Draijer <maarten@madra.nl>, 2013
-# René Mulder <inactive+rene_ytec@transifex.com>, 2014-2015
+# 9b534940ba88da102a8b2023ae8b0a5c_833de33 <6eff1839cb13e50fd6e97f7bd38c9dda_152118>, 2014-2015
 # Steven Vande Ryse <vande.ryse.steven@gmail.com>, 2012
 # kurdyma <transifex.com@kurdyenviolien.nl>, 2013-2014,2016
 # kurdy <transifex.net@kurdyenviolien.nl>, 2013
@@ -27,9 +27,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-19 11:09+0100\n"
-"PO-Revision-Date: 2019-11-13 08:54+0000\n"
-"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
+"POT-Creation-Date: 2020-05-26 14:17+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: kurdyma <transifex.com@kurdyenviolien.nl>\n"
 "Language-Team: Dutch (http://www.transifex.com/divio/django-cms/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
