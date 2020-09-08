@@ -478,12 +478,11 @@ rely on a set of well-maintained plugins that cover some general content managem
 * `djangocms-googlemap <https://github.com/divio/djangocms-googlemap>`_
 * `djangocms-snippet <https://github.com/divio/djangocms-snippet>`_
 * `djangocms-style <https://github.com/divio/djangocms-style>`_
-* `djangocms-column <https://github.com/divio/djangocms-column>`_
 
 To install::
 
     pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet
-        djangocms-style djangocms-column
+        djangocms-style
 
 and add::
 
@@ -494,7 +493,6 @@ and add::
     'djangocms_googlemap',
     'djangocms_snippet',
     'djangocms_style',
-    'djangocms_column',
 
 to ``INSTALLED_APPS``.
 
