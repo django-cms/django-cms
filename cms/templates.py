@@ -2,7 +2,7 @@ from django.template.loader import get_template
 from django.utils.functional import cached_property
 
 
-class TemplatesCache(object):
+class TemplatesCache:
 
     def __init__(self):
         self._cached_templates = {}

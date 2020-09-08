@@ -21,7 +21,7 @@ should come *after* ``cms``.
 .. _middleware:
 
 **********************************
-The ``MIDDLEWARE_CLASSES`` setting
+The ``MIDDLEWARE`` setting
 **********************************
 
 .. _ApphookReloadMiddleware:
@@ -29,7 +29,7 @@ The ``MIDDLEWARE_CLASSES`` setting
 ``cms.middleware.utils.ApphookReloadMiddleware``
 ================================================
 
-Adding ``ApphookReloadMiddleware`` to the ``MIDDLEWARE_CLASSES`` tuple will enable automatic server
+Adding ``ApphookReloadMiddleware`` to the ``MIDDLEWARE`` tuple will enable automatic server
 restarts when changes are made to apphook configurations. It should be placed as near to the top of
 the classes as possible.
 
@@ -155,8 +155,7 @@ python module, by creating a ``__init__.py`` file in the templates directory.
 The file contains a single ``TEMPLATES`` dictionary with the list of templates
 as keys and template names as values::::
 
-    # -*- coding: utf-8 -*-
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     TEMPLATES = {
         'col_two.html': _('Two columns'),
         'col_three.html': _('Three columns'),

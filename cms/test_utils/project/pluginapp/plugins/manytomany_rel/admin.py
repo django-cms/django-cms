@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, Section
 from django.contrib import admin
 

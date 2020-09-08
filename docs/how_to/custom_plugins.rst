@@ -4,138 +4,11 @@
 How to create Plugins
 #####################
 
-CMS Plugins are reusable content publishers that can be inserted into django
-CMS pages (or indeed into any content that uses django CMS placeholders). They
-enable the publishing of information automatically, without further
-intervention.
-
-This means that your published web content, whatever it is, is kept
-up-to-date at all times.
-
-It's like magic, but quicker.
-
-Unless you're lucky enough to discover that your needs can be met by the
-built-in plugins, or by the many available third-party plugins, you'll have to
-write your own custom CMS Plugin. Don't worry though - writing a CMS Plugin is
-very straightforward.
-
-
-*************************************
-Why would you need to write a plugin?
-*************************************
-
-A plugin is the most convenient way to integrate content from another Django
-app into a django CMS page.
-
-For example, suppose you're developing a site for a record company in django
-CMS. You might like to have a "Latest releases" box on your site's home page.
-
-Of course, you could every so often edit that page and update the information.
-However, a sensible record company will manage its catalogue in Django too,
-which means Django already knows what this week's new releases are.
-
-This is an excellent opportunity to make use of that information to make your
-life easier - all you need to do is create a django CMS plugin that you can
-insert into your home page, and leave it to do the work of publishing information
-about the latest releases for you.
-
-Plugins are **reusable**. Perhaps your record company is producing a series of
-reissues of seminal Swiss punk records; on your site's page about the series,
-you could insert the same plugin, configured a little differently, that will
-publish information about recent new releases in that series.
-
-********
-Overview
-********
-
-A django CMS plugin is fundamentally composed of three things.
-
-* a plugin **editor**, to configure a plugin each time it is deployed
-* a plugin **publisher**, to do the automated work of deciding what to publish
-* a plugin **template**, to render the information into a web page
-
-These correspond to the familiar Model-View-Template scheme:
-
-* the plugin **model** to store its configuration
-* the plugin **view** that works out what needs to be displayed
-* the plugin **template** to render the information
-
-And so to build your plugin, you'll make it from:
-
-* a sub-class of :class:`cms.models.pluginmodel.CMSPlugin` to
-  **store the configuration** for your plugin instances
-* a sub-class of :class:`cms.plugin_base.CMSPluginBase` that **defines
-  the operating logic** of your plugin
-* a template that **renders your plugin**
-
-A note about :class:`cms.plugin_base.CMSPluginBase`
-===================================================
-
-:class:`cms.plugin_base.CMSPluginBase` is actually a sub-class of
-:class:`django:django.contrib.admin.ModelAdmin`.
-
-Because :class:`~cms.plugin_base.CMSPluginBase` sub-classes ``ModelAdmin`` several important
-``ModelAdmin`` options are also available to CMS plugin developers. These
-options are often used:
-
-* ``exclude``
-* ``fields``
-* ``fieldsets``
-* ``form``
-* ``formfield_overrides``
-* ``inlines``
-* ``radio_fields``
-* ``raw_id_fields``
-* ``readonly_fields``
-
-Please note, however, that not all ``ModelAdmin`` options are effective in a CMS
-plugin. In particular, any options that are used exclusively by the
-``ModelAdmin``'s ``changelist`` will have no effect. These and other notable options
-that are ignored by the CMS are:
-
-* ``actions``
-* ``actions_on_top``
-* ``actions_on_bottom``
-* ``actions_selection_counter``
-* ``date_hierarchy``
-* ``list_display``
-* ``list_display_links``
-* ``list_editable``
-* ``list_filter``
-* ``list_max_show_all``
-* ``list_per_page``
-* ``ordering``
-* ``paginator``
-* ``prepopulated_fields``
-* ``preserve_fields``
-* ``save_as``
-* ``save_on_top``
-* ``search_fields``
-* ``show_full_result_count``
-* ``view_on_site``
-
-
-An aside on models and configuration
-====================================
-
-The plugin **model**, the sub-class of :class:`cms.models.pluginmodel.CMSPlugin`,
-is actually optional.
-
-You could have a plugin that doesn't need to be configured, because it only
-ever does one thing.
-
-For example, you could have a plugin that only publishes information
-about the top-selling record of the past seven days. Obviously, this wouldn't
-be very flexible - you wouldn't be able to use the same plugin for the
-best-selling release of the last *month* instead.
-
-Usually, you find that it is useful to be able to configure your plugin, and this
-will require a model.
-
-
 *******************
 The simplest plugin
 *******************
+
+We'll start with an example of a very simple plugin.
 
 You may use ``python manage.py startapp`` to set up the basic layout for your
 plugin app (remember to add your plugin to ``INSTALLED_APPS``). Alternatively, just add a file called ``cms_plugins.py`` to an
@@ -146,7 +19,7 @@ Place your plugins in ``cms_plugins.py``. For our example, include the following
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
     from cms.models.pluginmodel import CMSPlugin
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     @plugin_pool.register_plugin
     class HelloPlugin(CMSPluginBase):
@@ -181,7 +54,7 @@ There are two required attributes on those classes:
   but a plugin is not registered in that way.
 * ``name``: The name of your plugin as displayed in the admin. It is generally
   good practice to mark this string as translatable using
-  :func:`django.utils.translation.ugettext_lazy`, however this is optional. By
+  :func:`django.utils.translation.gettext_lazy`, however this is optional. By
   default the name is a nicer version of the class name.
 
 And one of the following **must** be defined if ``render_plugin`` attribute
@@ -255,7 +128,7 @@ Now we need to change our plugin definition to use this model, so our new
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
     from .models import Hello
 
@@ -267,7 +140,7 @@ Now we need to change our plugin definition to use this model, so our new
         cache = False
 
         def render(self, context, instance, placeholder):
-            context = super(HelloPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             return context
 
 We changed the ``model`` attribute to point to our newly created ``Hello``
@@ -390,7 +263,7 @@ it becomes::
         sections = models.ManyToManyField(Section)
 
         def copy_relations(self, oldinstance):
-            self.sections = oldinstance.sections.all()
+            self.sections.set(oldinstance.sections.all())
 
 If your plugins have relational fields of both kinds, you may of course need
 to use *both* the copying techniques described above.
@@ -425,7 +298,7 @@ admin form for your foreign key references::
         inlines = (ItemInlineAdmin,)
 
         def render(self, context, instance, placeholder):
-            context = super(ArticlePlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             items = instance.associated_item.all()
             context.update({
                 'items': items,
@@ -664,7 +537,7 @@ achieve this functionality:
         # child_classes = ['ChildCMSPlugin']
 
         def render(self, context, instance, placeholder):
-            context = super(ParentCMSPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             return context
 
 
@@ -717,7 +590,7 @@ child you can access the parent instance using ``get_bound_plugin``:
             exclude = ()
 
         def __init__(self, *args, **kwargs):
-            super(ChildPluginForm, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             if self.instance:
                 parent, parent_cls = self.instance.parent.get_bound_plugin()
 
@@ -749,7 +622,7 @@ Example::
         render_template = "cms/plugins/alias.html"
 
         def render(self, context, instance, placeholder):
-            context = super(AliasPlugin, self).render(context, instance, placeholder)
+            context = super().render(context, instance, placeholder)
             if instance.plugin_id:
                 plugins = instance.plugin.get_descendants(
                     include_self=True
@@ -790,7 +663,7 @@ Example::
 
         def get_plugin_urls(self):
             urlpatterns = [
-                url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
+                re_path(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
             ]
             return urlpatterns
 

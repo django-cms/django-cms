@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.safestring import mark_safe
 
 def plugin_meta_context_processor(instance, placeholder, context):
