@@ -1,6 +1,6 @@
 from cms.apphook_pool import apphook_pool
 from cms.app_base import CMSApp
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class Example1App(CMSApp):

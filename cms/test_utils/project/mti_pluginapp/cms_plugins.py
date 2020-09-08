@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -15,6 +14,7 @@ class TestPluginAlpha(CMSPluginBase):
         context['alpha'] = instance.alpha
         return context
 
+
 plugin_pool.register_plugin(TestPluginAlpha)
 
 
@@ -27,5 +27,6 @@ class TestPluginBeta(CMSPluginBase):
         context['alpha'] = instance.alpha
         context['beta'] = instance.beta
         return context
+
 
 plugin_pool.register_plugin(TestPluginBeta)

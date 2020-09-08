@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 from importlib import import_module
 
@@ -6,15 +5,12 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
 from django.utils.translation import get_language, override
-from django.urls import Resolver404, reverse
-
-from six import string_types
+from django.urls import Resolver404, reverse, URLResolver
+from django.urls.resolvers import RegexPattern, URLPattern
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
-from cms.utils.compat import DJANGO_1_11
-from cms.utils.compat.dj import RegexPattern, URLPattern, URLResolver
 from cms.utils.i18n import get_language_list
 from cms.utils.moderator import use_draft
 
@@ -65,7 +61,7 @@ class AppRegexURLResolver(URLResolver):
     def __init__(self, *args, **kwargs):
         self.page_id = None
         self.url_patterns_dict = {}
-        super(AppRegexURLResolver, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def urlconf_module(self):
@@ -136,9 +132,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
             # see lines 243 and 236 of urlresolvers.py to understand the next line
             urlconf_module = recurse_patterns(regex, pattern.url_patterns, page_id, args, nested=True)
             # this is an 'include', recurse!
-            regex_pattern = regex
-            if not DJANGO_1_11:
-                regex_pattern = RegexPattern(regex)
+            regex_pattern = RegexPattern(regex)
             resolver = URLResolver(regex_pattern, urlconf_module,
                                    pattern.default_kwargs, pattern.app_name,
                                    pattern.namespace)
@@ -148,9 +142,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
             if default_args:
                 args.update(default_args)
 
-            regex_pattern = regex
-            if not DJANGO_1_11:
-                regex_pattern = RegexPattern(regex, name=pattern.name, is_endpoint=True)
+            regex_pattern = RegexPattern(regex, name=pattern.name, is_endpoint=True)
             resolver = URLPattern(regex_pattern, pattern.callback, args,
                                   pattern.name)
         resolver.page_id = page_id
@@ -171,7 +163,7 @@ def _set_permissions(patterns, exclude_permissions):
 
 def get_app_urls(urls):
     for urlconf in urls:
-        if isinstance(urlconf, string_types):
+        if isinstance(urlconf, str):
             mod = import_module(urlconf)
             if not hasattr(mod, 'urlpatterns'):
                 raise ImproperlyConfigured(
@@ -269,7 +261,7 @@ def _get_app_patterns(site):
         for lang in hooked_applications[page_id].keys():
             (app_ns, inst_ns), current_patterns, app = hooked_applications[page_id][lang]  # nopyflakes
             if not resolver:
-                regex_pattern = RegexPattern(r'') if not DJANGO_1_11 else r''
+                regex_pattern = RegexPattern(r'')
                 resolver = AppRegexURLResolver(
                     regex_pattern, 'app_resolver', app_name=app_ns, namespace=inst_ns)
                 resolver.page_id = page_id

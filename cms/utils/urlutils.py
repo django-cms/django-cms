@@ -1,14 +1,12 @@
-# -*- coding: utf-8 -*-
+import cms
 import re
+
+from urllib.parse import urlparse
 
 from django.conf import settings
 from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
-
-from six.moves.urllib.parse import urlparse
-
-import cms
 
 from cms.utils.conf import get_cms_setting
 

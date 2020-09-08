@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 from cms.api import create_page, create_title
 
 
-class TwoPagesFixture(object):
+class TwoPagesFixture:
     def create_fixtures(self):
         defaults = {
             'template': 'nav_playground.html',

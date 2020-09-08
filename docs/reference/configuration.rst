@@ -155,8 +155,7 @@ python module, by creating a ``__init__.py`` file in the templates directory.
 The file contains a single ``TEMPLATES`` dictionary with the list of templates
 as keys and template names as values::::
 
-    # -*- coding: utf-8 -*-
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     TEMPLATES = {
         'col_two.html': _('Two columns'),
         'col_three.html': _('Three columns'),
