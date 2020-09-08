@@ -201,7 +201,7 @@ def _ensure_languages_settings(languages):
             for required_key in required_language_keys:
                 if required_key not in language_object:
                     raise ImproperlyConfigured("CMS_LANGUAGES has a language which is missing the required key %r "
-                                               "in site %r" % (key, site))
+                                               "in site %r" % (required_key, site))
             language_code = language_object['code']
             for key in language_object:
                 if key not in valid_language_keys:
