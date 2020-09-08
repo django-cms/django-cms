@@ -14,6 +14,7 @@ def update_titles(apps, schema_editor):
             changed_by=page.changed_by,
             changed_date=page.changed_date,
             in_navigation=page.in_navigation,
+            soft_root=page.soft_root,
             limit_visibility_in_menu=page.limit_visibility_in_menu,
             template=page.template,
             xframe_options=page.xframe_options,
