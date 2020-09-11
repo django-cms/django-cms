@@ -118,6 +118,12 @@ class AliasTestCase(TransactionCMSTestCase):
         self.assertTrue(alias_plugin.is_recursive())
 
         with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page.get_absolute_url(language='fr') + '?preview&edit_off')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<div class="info_2">', html=True)
+            self.assertContains(response, '<div class="info_1">', html=True)
+        
+        with self.login_user_context(self.get_superuser()):
             response = self.client.get(page.get_absolute_url(language='fr') + '?edit')
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<div class="info_1">', html=True)
