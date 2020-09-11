@@ -92,6 +92,37 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<div class="info">', html=False)
 
+    def test_alias_recursion_across_page_translation(self):
+        page = api.create_page(
+            "Alias plugin",
+            "col_two.html",
+            "en",
+            slug="page_1",
+            published=True,
+            in_navigation=True,
+        )
+
+        ph_1 = page.placeholders.get(slot="col_left")
+        ph_2 = page.placeholders.get(slot="col_sidebar")
+
+        api.add_plugin(ph_1, 'StylePlugin', 'en', tag_type='div', class_name='info_1')
+        source_plugin = api.add_plugin(ph_2, 'StylePlugin', 'en', tag_type='div', class_name='info_2')
+
+        api.create_title("fr", "page_1", page)
+        page.publish('fr')
+
+        alias_placeholder = api.add_plugin(ph_1, 'AliasPlugin', 'fr', alias_placeholder=ph_1)
+        alias_plugin = api.add_plugin(ph_2, 'AliasPlugin', 'fr', plugin=source_plugin)
+
+        self.assertTrue(alias_placeholder.is_recursive())
+        self.assertTrue(alias_plugin.is_recursive())
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page.get_absolute_url(language='fr') + '?edit')
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, '<div class="info_1">', html=True)
+            self.assertContains(response, '<div class="info_2">', html=True)
+
     def test_alias_content_plugin_display(self):
         '''
         In edit mode, content is shown regardless of the source page publish status.
