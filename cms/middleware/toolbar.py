@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Edit Toolbar middleware
 """
@@ -6,11 +5,11 @@ from django import forms
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
 from django.core.exceptions import ValidationError
 from django.urls import resolve
+from django.utils.deprecation import MiddlewareMixin
 
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.compat.dj import MiddlewareMixin
 from cms.utils.request_ip_resolvers import get_request_ip_resolver
 
 

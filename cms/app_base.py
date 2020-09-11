@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 
 
-class CMSApp(object):
+class CMSApp:
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
     _urls = []
     #: list of menu classes: example: ``_menus = [MyAppMenu]``
@@ -37,20 +36,20 @@ class CMSApp(object):
         """
         Returns all the apphook configuration instances.
         """
-        raise NotImplemented('Configurable AppHooks must implement this method')
+        raise NotImplementedError('Configurable AppHooks must implement this method')
 
     def get_config(self, namespace):
         """
         Returns the apphook configuration instance linked to the given namespace
         """
-        raise NotImplemented('Configurable AppHooks must implement this method')
+        raise NotImplementedError('Configurable AppHooks must implement this method')
 
     def get_config_add_url(self):
         """
         Returns the url to add a new apphook configuration instance
         (usually the model admin add view)
         """
-        raise NotImplemented('Configurable AppHooks must implement this method')
+        raise NotImplementedError('Configurable AppHooks must implement this method')
 
     def get_menus(self, page=None, language=None, **kwargs):
         """

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, UserManager
@@ -7,7 +6,7 @@ from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
 from django.utils.http import urlquote
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class CustomUserManager(UserManager):

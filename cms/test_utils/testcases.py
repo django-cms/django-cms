@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
 import json
 import sys
 import warnings
 from io import BytesIO
+
+from urllib.parse import unquote, urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -18,7 +19,6 @@ from django.test import testcases
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.parse import unquote, urljoin
 from django.utils.timezone import now
 from django.utils.translation import activate
 from menus.menu_pool import menu_pool
@@ -68,7 +68,7 @@ URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete-translati
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
-class _Warning(object):
+class _Warning:
     def __init__(self, message, category, filename, lineno):
         self.message = message
         self.category = category
@@ -107,11 +107,11 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-class BaseCMSTestCase(object):
+class BaseCMSTestCase:
     counter = 1
 
     def _fixture_setup(self):
-        super(BaseCMSTestCase, self)._fixture_setup()
+        super()._fixture_setup()
         self.create_fixtures()
         activate("en")
 
@@ -121,7 +121,7 @@ class BaseCMSTestCase(object):
     def _post_teardown(self):
         menu_pool.clear()
         cache.clear()
-        super(BaseCMSTestCase, self)._post_teardown()
+        super()._post_teardown()
         set_current_user(None)
 
     def login_user_context(self, user):
@@ -403,6 +403,7 @@ class BaseCMSTestCase(object):
         request = request or self.get_request()
         return StructureRenderer(request)
 
+
     def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None, script_name=None):
         factory = RequestFactory()
 
@@ -428,13 +429,16 @@ class BaseCMSTestCase(object):
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
+        if domain:
+            request.META["SERVER_NAME"] = domain
+            request.SERVER_NAME = domain
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
         if page:
             request.current_page = page
         else:
             request.current_page = None
 
-        class MockStorage(object):
+        class MockStorage:
 
             def __len__(self):
                 return 0

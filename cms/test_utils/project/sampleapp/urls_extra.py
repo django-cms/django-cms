@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from . import views
 
 urlpatterns = [
-    url(r'extra_2/$', views.extra_view, {'message': 'test included urlconf'}, name='extra_second'),
+    re_path(r'extra_2/$', views.extra_view, {'message': 'test included urlconf'}, name='extra_second'),
 ]

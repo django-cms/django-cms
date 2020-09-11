@@ -87,7 +87,7 @@ class ExtensionsTestCase(CMSTestCase):
         return TestTitleExtension
 
     def get_none_extension_class(self):
-        class TestNoneExtension(object):
+        class TestNoneExtension:
             pass
 
         return TestNoneExtension

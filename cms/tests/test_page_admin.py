@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import datetime
 import json
 import sys
@@ -11,7 +10,6 @@ from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
@@ -1042,7 +1040,6 @@ class PageTest(PageTestBase):
                 {
                     'code': 'en',
                     'name': 'English',
-                    'fallbacks': ['fr', 'de'],
                     'public': True,
                     'fallbacks': ['fr']
                 },
@@ -1682,7 +1679,7 @@ class PageTest(PageTestBase):
             document.finalize()
             # Removing ROOT element if it's not necessary
             if len(document.children) == 1:
-                if not isinstance(document.children[0], six.string_types):
+                if not isinstance(document.children[0], str):
                     document = document.children[0]
             return document
 

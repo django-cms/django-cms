@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.forms.widgets import MultiWidget, Select, TextInput
@@ -29,7 +28,7 @@ class PageSelectWidget(MultiWidget):
         else:
             self.attrs = {}
         self.choices = []
-        super(PageSelectWidget, self).__init__((Select, Select, Select), attrs)
+        super().__init__((Select, Select, Select), attrs)
 
     def decompress(self, value):
         """
@@ -89,7 +88,7 @@ class PageSelectWidget(MultiWidget):
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
-        context = super(PageSelectWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
 
@@ -112,7 +111,7 @@ class PageSmartLinkWidget(TextInput):
         )
 
     def __init__(self, attrs=None, ajax_view=None):
-        super(PageSmartLinkWidget, self).__init__(attrs)
+        super().__init__(attrs)
         self.ajax_url = self.get_ajax_url(ajax_view=ajax_view)
 
     def get_ajax_url(self, ajax_view):
@@ -143,7 +142,7 @@ class PageSmartLinkWidget(TextInput):
         }
 
     def get_context(self, name, value, attrs):
-        context = super(PageSmartLinkWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
 
@@ -157,7 +156,7 @@ class UserSelectAdminWidget(Select):
     attribute.
     """
     def render(self, name, value, attrs=None, choices=(), renderer=None):
-        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, renderer=renderer)]
+        output = [super().render(name, value, attrs, renderer=renderer)]
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
@@ -181,10 +180,10 @@ class AppHookSelect(Select):
 
     def __init__(self, attrs=None, choices=(), app_namespaces={}):
         self.app_namespaces = app_namespaces
-        super(AppHookSelect, self).__init__(attrs, choices)
+        super().__init__(attrs, choices)
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super(AppHookSelect, self).create_option(name, value, label, selected, index, subindex, attrs)
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
         if value in self.app_namespaces:
             option['attrs']['data-namespace'] = escape(self.app_namespaces[value])
         return option
@@ -232,7 +231,7 @@ class ApplicationConfigSelect(Select):
 
     def __init__(self, attrs=None, choices=(), app_configs={}):
         self.app_configs = app_configs
-        super(ApplicationConfigSelect, self).__init__(attrs, choices)
+        super().__init__(attrs, choices)
 
     def _build_script(self, name, value, attrs={}):
         configs = []
@@ -257,6 +256,6 @@ class ApplicationConfigSelect(Select):
         }
 
     def get_context(self, name, value, attrs):
-        context = super(ApplicationConfigSelect, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
