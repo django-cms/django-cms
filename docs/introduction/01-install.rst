@@ -45,11 +45,6 @@ Update pip inside the virtual environment
 Use the django CMS installer
 ============================
 
-..  note::
-
-    The django CMS Installer is not yet available for django CMS 3.6 or Django 2 or later.
-
-    This section will be updated or removed before the final release of django CMS 3.6.
 
 The `django CMS installer <https://github.com/nephila/djangocms-installer>`_ is
 a helpful script that takes care of setting up a new project.
@@ -67,25 +62,16 @@ Create a new directory to work in, and ``cd`` into it::
 
 Run it to create a new Django project called ``mysite``::
 
-    djangocms -f -p . mysite
+    djangocms mysite
 
 This means:
 
 * run the django CMS installer
-* install Django Filer too (``-f``) - **required for this tutorial**
-* use the current directory as the parent of the new project directory (``-p .``)
 * call the new project directory ``mysite``
-
-.. note:: **About Django Filer**
-
-   Django Filer, a useful application for managing files and processing images. Although it's not
-   required for django CMS itself, a vast number of django CMS addons use it, and nearly all django
-   CMS projects have it installed. If you know you won't need it, omit the flag. See the `django
-   CMS installer documentation for more information <https://djangocms-installer.readthedocs.io>`_.
 
 
 .. warning::
-   djangocms-installer expects directory ``.`` to be empty at this stage, and will check for this,
+   djangocms-installer expects current directory to be empty at this stage, and will check for this,
    and will warn if it's not. You can get it to skip the check and go ahead anyway using the ``-s``
    flag; **note that this may overwrite existing files**.
 

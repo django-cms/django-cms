@@ -1,11 +1,91 @@
-=== 3.7.0 (unreleased) ===
+=========
+Changelog
+=========
+
+
+3.8.0 (unreleased)
+==================
+
+* Introduced support for Django 3.1
+* Dropped support for Python 2.7 and Python 3.4
+* Dropped support for Django < 2.2
+
+
+3.7.4 (2020-07-21)
+==================
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
+3.7.3 (2020-05-27)
+==================
+
+* Fixed apphooks config select in Firefox
+* Fixed compatibility errors on python 2
+* Fixed long page titles in Page tree/list view to prevent horizontal scrolling
+* Adapted plugin documentations
+
+
+3.7.2 (2020-04-22)
+==================
+
+* Added support for Django 3.0
+* Added support for Python 3.8
+* migrated from ``django.utils.six`` to the six package
+* migrated from ``django.utils.lru_cache`` to ``functools.lru_cache``
+* migrated from ``render_to_response`` to ``render`` in ``cms.views``
+* added ``cms.utils.compat.dj.available_attrs``
+* added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
+* replaced ``staticfiles`` and ``admin_static`` with ``static``
+* replaced djangocms-helper with django-app-helper
+
+
+3.7.1 (2019-11-26)
+==================
+
+* Added code of conduct reference file to the root directory
+* Moved contributing file to the root directory
+* Added better templates for new issue requests
+* Fixed a bug where creating a page via the ``cms.api.create_page`` ignores
+  left/right positions.
+* Fixed documentation example for ``urls.py`` when using multiple languages.
+* Mark public static placeholder dirty when published.
+* Fixed a bug where ``request.current_page`` would always be the public page,
+  regardless of the toolbar status (draft / live). This only affected custom
+  urls from an apphook.
+* Fixed a bug where the menu would render draft pages even if the page on
+  the request was a public page. This happens when a user without change
+  permissions requests edit mode.
+* Fixed the 'urls.W001' warning with custom apphook urls
+* Prevent non-staff users to login with the django CMS toolbar
+* Added missing ``{% trans %}`` to toolbar shortcuts.
+* Fixed branch and release policy.
+* Improved and simplified permissions documentation.
+* Improved apphooks documentation.
+* Improved CMSPluginBase documentation.
+* Improved documentation related to nested plugins.
+* Updated installation tutorial.
+* Fixed a simple typo in the docstring for ``cms.utils.helpers.normalize_name``.
+* Updated 'How to create Plugins' Tutorial.
+
+
+3.7.0 (2019-09-25)
+==================
 
 * Introduced Django 2.2 support.
 * Introduced Python 3.7 support.
 * Fixed test suite.
+* Fixed override ``urlconf_module`` so that Django system checks don't crash.
 
 
-=== 3.6.0 (2019-01-29) ===
+3.6.1 (2020-07-21)
+==================
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
+3.6.0 (2019-01-29)
+==================
 
 * Removed the ``cms moderator`` command.
 * Dropped Django < 1.11 support.
@@ -18,7 +98,14 @@
 * Introduced Django 2.1 support.
 
 
-=== 3.5.3 (2018-11-20) ===
+3.5.4 (2020-07-21)
+==================
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
+3.5.3 (2018-11-20)
+==================
 
 * Fixed ``TreeNode.DoesNotExist`` exception raised when exporting
   and loading database contents via ``dumpdata`` and ``loaddata``.
@@ -43,7 +130,8 @@
 * Fixed a bug when deleting a modal from changelist inside a modal
 
 
-=== 3.5.2 (2018-04-11) ===
+3.5.2 (2018-04-11)
+==================
 
 * Fixed a bug where shortcuts menu entry would stop working after toolbar reload
 * Fixed a race condition in frontend code that could lead to sideframe being
@@ -56,7 +144,8 @@
 * Fixed a bug where the migration 0018 would fail under certain databases.
 
 
-=== 3.5.1 (2018-03-05) ===
+3.5.1 (2018-03-05)
+==================
 
 * Fixed a bug where editing pages with primary keys greater than 999 would throw an
   exception.
@@ -70,7 +159,8 @@
   tag with a default would raise an exception.
 
 
-=== 3.5.0 (2018-01-31) ===
+3.5.0 (2018-01-31)
+==================
 
 * Fixed a bug which prevented users from seeing the welcome screen when debug is
   turned off.
@@ -89,7 +179,39 @@
 * Prevent users from passing a public page as parent in ``create_page`` api function
 
 
-=== 3.4.5 (2017-10-12) ===
+3.4.7 (2020-07-21)
+==================
+
+* Removed extra quotation mark from the sideframe button template
+* Fixed a bug where xframe options were processed by clickjacking middleware
+  when page was served from cache, rather then get this value from cache
+* Fixed a bug where cached page permissions overrides global permissions
+* Fixed a bug where editing pages with primary keys greater than 9999 would throw an
+  exception.
+* Fixed broken wizard page creation when no language is set within the template context (see #5828).
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.
+
+
+3.4.6 (2018-03-26)
+==================
+
+* Changed the way drag and drop works in the page tree. The page has to be
+  selected first before moving.
+* Fixed a bug where the cms alias plugin leaks context into the rendered aliased plugins.
+* Fixed a bug where users without the "Change advanced settings" permission could still
+  change a page's template.
+* Added ``on_delete`` to ``ForeignKey`` and ``OneToOneField`` to silence Django
+  deprecation warnings.
+* Fixed a bug where the sitemap would ignore the ``public`` setting of the site languages
+  and thus display hidden languages.
+* Fixed an ``AttributeError`` raised when adding or removing apphooks in Django 1.11.
+* Fixed an ``InconsistentMigrationHistory`` error raised when the contenttypes app
+  has a pending migration after the user has applied the ``0010_migrate_use_structure`` migration.
+* Fixed a bug where plugins rendered multiple times won't be editable
+
+
+3.4.5 (2017-10-12)
+==================
 
 * Introduced Django 1.11 compatibility
 * Fixed a bug where slug wouldn't be generated in the creation wizard
@@ -107,7 +229,8 @@
   This only affects Django >= 1.10
 
 
-=== 3.4.4 (2017-06-15) ===
+3.4.4 (2017-06-15)
+==================
 
 * Fixed a bug in which cancelling the publishing dialog wasn't respected.
 * Fixed a bug causing post-login redirection to an incorrect URL on single-language sites.
@@ -139,7 +262,8 @@
 * Fixed a regression which prevented users from setting a redirect to the homepage.
 
 
-=== 3.4.3 (2017-04-24) ===
+3.4.3 (2017-04-24)
+==================
 
 * Fixed a security vulnerability in the page redirect field which allowed users
   to insert JavaScript code.
@@ -147,7 +271,8 @@
   was not sanitised and could point to another domain.
 
 
-=== 3.4.2 (2017-01-23) ===
+3.4.2 (2017-01-23)
+==================
 
 * Escaped strings in ``close_frame`` JS template.
 * Fixed a bug with `text-transform` styles on inputs affecting CMS login
@@ -184,7 +309,8 @@
 * Rewrote manual installation how-to documentation
 
 
-=== 3.4.1 (2016-10-04) ===
+3.4.1 (2016-10-04)
+==================
 
 * Fixed a regression when static placeholder was uneditable if it was present
   on the page multiple times
@@ -202,7 +328,8 @@
 * Fixed css reset issue with shortcuts modal
 
 
-=== 3.4.0 (2016-09-14) ===
+3.4.0 (2016-09-14)
+==================
 
 * Changed the way CMS plugins are rendered. The div with `cms-plugin` class is
   no longer rendered around every CMS plugin, instead a combination of `template`
@@ -232,7 +359,8 @@
   in ``cms.api.create_page`` and ``cms.api.create_title``.
 
 
-=== 3.3.3 (unreleased) ===
+3.3.3 (unreleased)
+==================
 
 * Fixed a bug where where the plugin picker would display the plugin names
   translated in the request language instead of the user's language.
@@ -252,7 +380,8 @@
 * Fixed a bug where a ``Page`` was created with it's languages field set to ``None``.
 
 
-=== 3.3.2 (2016-08-11) ===
+3.3.2 (2016-08-11)
+==================
 
 * Fixed a bug where it wasn't possible to scroll the toolbar menu if scroll
   started on the disabled menu item on small screens.
@@ -264,7 +393,8 @@
   under certain circumstances
 
 
-=== 3.3.1 (2016-07-13) ===
+3.3.1 (2016-07-13)
+==================
 
 * Added a warning for users who are leaving the page or closing the plugin
   modal by pressing ESC to prevent accidental loss of content.
@@ -308,29 +438,17 @@
 * Fixed error in retrieving placeholder label from configuration.
 
 
-=== 3.3.0 (2016-05-26) ===
-
-* [no changes vs. rc4]
-
-
-=== 3.3.0.rc4 (2016-05-24) ===
+3.3.0 (2016-05-26)
+==================
 
 * Fixed regression in management commands
 * Fixed documentation typo
-
-
-=== 3.3.0.rc3 (2016-05-23) ===
-
 * Added contribution policies documentation
 * Corrected documentation in numerous places
 * Corrected an issue where someone could see and use the internal placeholder plugin in the structure board
 * Fixed a regression where the first page created was not automatically published
 * Corrected the instructions for using the ``delete-orphaned-plugins`` command
 * Re-pinned django-treebeard to >=4.0.1
-
-
-=== 3.3.0.rc2 (2016-05-19) ===
-
 * Added CMS_WIZARD_CONTENT_PLACEHOLDER setting
 * Renamed the CMS_WIZARD_* settings to CMS_PAGE_WIZARD_*
 * Deprecated the old-style wizard-related settings
@@ -339,10 +457,6 @@
 * Fixed toolbar placement when foundation is installed
 * Fixed an issue which could lead to an apphook without a slug
 * Fixed numerous frontend issues
-
-
-=== 3.3.0.rc1 (2016-05-16) ===
-
 * Removed support for Django 1.6, 1.7 and python 2.6
 * Changed the default value of CMSPlugin.position to 0 instead of null
 * Refactored the language menu to allow for better integration with many languages
@@ -391,14 +505,16 @@
 * Fixed a bug where clearing clipboard was closing any open modal
 
 
-=== 3.2.5 (2016-04-27) ===
+3.2.5 (2016-04-27)
+==================
 
 - Fixed regression when page couldn't be copied if CMS_PERMISSION was False
 - Improved handling of uninstalled apphooks
 - Fix packaging problem with the wheel distribution
 
 
-=== 3.2.4 (2016-04-26) ===
+3.2.4 (2016-04-26)
+==================
 
 - Fix cache settings
 - Fix user lookup for view restrictions/page permissions when using raw id field
@@ -414,13 +530,15 @@
   escalation of privileges or other security issues.
 
 
-=== 3.2.3 (2016-03-09) ===
+3.2.3 (2016-03-09)
+==================
 
 - Fix the display of hyphenated language codes in the page tree
 - Fix a family of issues relating to unescaped translations in the page tree
 
 
-=== 3.2.2 (2016-03-02) ===
+3.2.2 (2016-03-02)
+==================
 
 - Substantial improvements to the page tree and significant reduction of reloads
 - Update jsTree version to 3.2.1 with slight adaptions to the Pagetree
@@ -435,7 +553,8 @@
 - Numerous other improvements to overall stability and code quality
 
 
-=== 3.2.1 (2016-01-29) ===
+3.2.1 (2016-01-29)
+==================
 
 - Add support for Django 1.9 (with some deprecation warnings).
 - Add support for django-reversion 1.10+ (required by Django 1.9+).
@@ -456,7 +575,8 @@
 - Honor CMS_RAW_ID_USERS in GlobalPagePermissionAdmin.
 
 
-=== 3.2.0 (2015-11-24) ===
+3.2.0 (2015-11-24)
+==================
 
 - Added new wizard to improve content creation
 - Added Aldryn Apphook Reload https://github.com/aldryn/aldryn-apphook-reload/ into core
@@ -511,17 +631,20 @@
 - Fixed an issue where ``allow_children`` and ``disable_child_plugins`` didn't work on dragitems
 
 
-=== 3.1.8 (unreleased) ===
+3.1.8 (unreleased)
+==================
 
 - Removed html5lib from setup.py
 
 
-=== 3.1.7 (2016-04-27) ===
+3.1.7 (2016-04-27)
+==================
 
 - Fix packaging problem with the wheel distribution
 
 
-=== 3.1.6 (2016-04-26) ===
+3.1.6 (2016-04-26)
+==================
 
 - Fix cache settings
 - Fix user lookup for view restrictions/page permissions when using raw id field
@@ -534,7 +657,8 @@
   escalation of privileges or other security issues.
 
 
-=== 3.1.5 (2016-01-29) ===
+3.1.5 (2016-01-29)
+==================
 
 - Fixed a tree corruption when pasting a nested plugin under another plugin.
 - Improve CMSPluginBase.render documentation
@@ -549,7 +673,8 @@
 - Fix CMS_TOOLBAR_HIDE causes 'WSGIRequest' object has no attribute 'toolbar'
 
 
-=== 3.1.4 (2015-11-24) ===
+3.1.4 (2015-11-24)
+==================
 
 - Fixed a problem in ``0010_migrate_use_structure.py`` that broke some migration paths to Django 1.8
 - Fixed ``fix_tree`` command
@@ -561,7 +686,8 @@
 - Fixed some treebeard corruption issues
 
 
-=== 3.1.3 (2015-09-01) ===
+3.1.3 (2015-09-01)
+==================
 
 - Add missing migration
 - Exclude PageUser manager from migrations
@@ -595,13 +721,15 @@
 - Fix extensions copy when using duplicate page/create page type
 
 
-=== 3.1.2 (2015-07-02) ===
+3.1.2 (2015-07-02)
+==================
 
 - Fix placeholder cache invalidation under some circumstances
 - Update translations
 
 
-=== 3.1.1 (2015-06-27) ===
+3.1.1 (2015-06-27)
+==================
 
 - Add Django 1.8 support
 - Tutorial updates and improvements
@@ -638,7 +766,8 @@
 - Fix language chooser template
 
 
-=== 3.1.0 (2015-04-20) ===
+3.1.0 (2015-04-20)
+==================
 
 - Remove django-mptt in favor of django-treebeard
 - Remove compatibility with Django 1.4 / 1.5
@@ -654,7 +783,8 @@
 - Add "Structure mode" permission
 
 
-=== 3.0.17 (unreleased) ===
+3.0.17 (unreleased)
+==================
 
 - Addresses security vulnerabilities in the `render_model` template tag that could
   lead to escalation of privileges or other security issues.
@@ -663,14 +793,16 @@
 - Fix cache settings
 
 
-=== 3.0.16 (2015-11-24) ===
+3.0.16 (2015-11-24)
+==================
 
 - Fixed JavaScript error when using ``PageSelectWidget``
 - Fixed whitespace markup issues in draft mode
 - Added plugin migrations layout detection in tests
 
 
-=== 3.0.15 (2015-09-01) ===
+3.0.15 (2015-09-01)
+==================
 
 - Relax html5lib versions
 - Fix redirect when deleting a page
@@ -688,7 +820,8 @@
 - Fix extensions copy when using duplicate page/create page type
 
 
-=== 3.0.14 (2015-06-27) ===
+3.0.14 (2015-06-27)
+==================
 
 - Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability
 - Fixed an issue related to "Empty all" Placeholder feature
@@ -710,7 +843,8 @@
 - Fix language chooser template
 
 
-=== 3.0.13 (2015-04-15) ===
+3.0.13 (2015-04-15)
+==================
 
 - Numerous documentation including installation and tutorial updates
 - Numerous improvements to translations
@@ -728,12 +862,14 @@
 - Prevent accidental upgrades to Django 1.8, which is not yet supported
 
 
-=== 3.0.12 (2015-03-06) ===
+3.0.12 (2015-03-06)
+==================
 
 - Fixed a typo in JavaScript which prevents page tree from working
 
 
-=== 3.0.11 (2015-03-05) ===
+3.0.11 (2015-03-05)
+==================
 
 - Core support for multiple instances of the same apphook'ed application
 - Fixed the template tag `render_model_add`
@@ -750,7 +886,8 @@
 - Documentation updates
 
 
-=== 3.0.10 (2015-02-14) ===
+3.0.10 (2015-02-14)
+==================
 
 - Improved Py3 compatibility
 - Improved the behavior when changing the operator's language
@@ -765,14 +902,16 @@
 - Fixed issues relating to the logout function
 
 
-==== 3.0.9 (2015-01-11) ===
+3.0.9 (2015-01-11)
+==================
 
 - Revert a change that caused a regression in toolbar login
 - Fix an error in a translated phrase
 - Fix error when moving items in the page tree
 
 
-==== 3.0.8 (2015-01-11) ===
+3.0.8 (2015-01-11)
+==================
 
 - Add require_parent option to CMS_PLACEHOLDER_CONF
 - Fix django-mptt version depenency to be PEP440 compatible
@@ -788,7 +927,8 @@
 - Minor code cleanups
 
 
-==== 3.0.7 (2014-11-27) ===
+3.0.7 (2014-11-27)
+==================
 
 - Complete Django 1.7 support
 - Numerous updates to the documentation
@@ -805,7 +945,8 @@
 - Added branch policy documentaion
 
 
-==== 3.0.6 (2014-10-07) ===
+3.0.6 (2014-10-07)
+==================
 
 - Experimental full Django 1.7 migrations support
 - Add CMSPlugin.get_render_model to get the plugin model at render time
@@ -818,13 +959,15 @@
 - Fix plugin table name generation fixes
 
 
-==== 3.0.5 (2014-08-20) ===
+3.0.5 (2014-08-20)
+==================
 
 - Fixes 2 regressions introduced in 3.0.4
 - apphook and plugins can now be registered via decorator
 
 
-==== 3.0.4 (2014-08-16) ===
+3.0.4 (2014-08-16)
+==================
 
 - Removed file cms/utils/compat/type_checks.py, use django.utils.six module instead
 - Removed file cms/utils/compat/string_io.py, use django.utils.six module instead
@@ -842,7 +985,8 @@
 - some refactoring and simplifications
 
 
-==== 3.0.3 (2014-07-07) ===
+3.0.3 (2014-07-07)
+==================
 
 - Added an alias plugin for referencing plugins and placeholders
 - Added an api to change the context menus of plugins and placeholders from plugins
@@ -858,21 +1002,24 @@
 - Added a automatic dynamic template directory for page templates
 
 
-==== 3.0.2 (2014-05-21) ===
+3.0.2 (2014-05-21)
+==================
 
 - Add 'as' form to render_placeholder templatetag to save the result in context
 - Added changeable strings for "?edit", "?edit_off" and "?build" urls
 - utils.page_resolver was optimized. get_page_from_path() api changed
 
 
-==== 3.0.1 (2014-04-30) ===
+3.0.1 (2014-04-30)
+==================
 
 - Renamed NamespaceAllreadyRegistered to NamespaceAlreadyRegistered in menus/exceptions.py
 - Frontend editor UI fixes
 - Fix in cms fix-mptt command
 
 
-==== 3.0.0 (2014-04-08) ===
+3.0.0 (2014-04-08)
+==================
 
 - Plugins are only editable in frontend
 - PluginEditor has been removed in backend
@@ -935,7 +1082,8 @@
 - Added option to {% static_placeholder %} to render only on the current site.
 
 
-==== 2.4.2 (2013-05-29)===
+2.4.2 (2013-05-29)
+==================
 
 - Apphook edit mode bugfix
 - Added option to render_placeholder tag to set language
@@ -949,7 +1097,8 @@
 - locales updated
 
 
-==== 2.4.1 (2013-04-22)===
+2.4.1 (2013-04-22)
+==================
 
 - USE_I18N=False fixed
 - some frontend css stuff fixed
@@ -957,7 +1106,8 @@
 - non public frontend languages fixed
 
 
-==== 2.4.0 (2013-04-17)===
+2.4.0 (2013-04-17)
+==================
 
 Please see Install/2.4 release notes *before* attempting to upgrade to version 2.4.
 
@@ -979,7 +1129,8 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Added CMS_RAW_ID_USERS
 
 
-==== 2.3.4 (2012-11-09) ====
+2.3.4 (2012-11-09)
+==================
 
 - Fixed WymEditor
 - Fixed Norwegian translations
@@ -988,12 +1139,14 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fixed placeholder field permission checks
 
 
-==== 2.3.3 ====
+2.3.3 (2012-09-21)
+==================
 
  - fixed an incompatibility with Python 2.5
 
 
-==== 2.3.2 ====
+2.3.2 (2012-09-19)
+==================
 
 - MIGRATION: 0036_auto__add_field_cmsplugin_changed_date.py - new field changed_date on CMSPlugin
 - CMS_FRONTEND_LANGUAGES limits django languages as well during language selection
@@ -1014,12 +1167,14 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - JQuery namespace fixes in admin
 
 
-==== 2.3.1 ====
+2.3.1 (2012-08-22)
+==================
 
 - pinned version of django-mptt to 0.5.1 or 0.5.2
 
 
-==== 2.3.0 ====
+2.3.0 (2012-06-29)
+==================
 
 - Compatibility with Django 1.3.1 and 1.4 (1.2 support dropped)
 - Lazy admin page tree loading
@@ -1037,7 +1192,8 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - django-mptt dependency upgraded to 0.5.1 or higher
 
 
-==== 2.2.0 (2011-09-10) ====
+2.2.0 (2011-09-10)
+==================
 
 - Replaced the old plugin media framework with django-sekizai. (This changed some plugin templates which might cause problems with your CSS styling).
 - Made django-mptt a proper dependency
@@ -1046,12 +1202,14 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Google Maps Plugin now uses the version 3 of their API, no longer requiring an API Key.
 
 
-==== 2.1.4 (2011-08-24) ====
+2.1.4 (2011-08-24)
+==================
 
 - Fixed a XSS issue in Text Plugins
 
 
-==== 2.1.3 (2011-02-22) ====
+2.1.3 (2011-02-22)
+==================
 
 - Fixed a serious security issue in PlaceholderAdmin
 - Fixed bug with submenus showing pages that are not 'in_navigation' (#716, thanks to Iacopo Spalletti for the patch)
@@ -1059,19 +1217,22 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - Fixed the double-monkeypatch check for url reversing (thanks to Benjamin Wohlwend for the patch)
 
 
-==== 2.1.2 (2011-02-16) ====
+2.1.2 (2011-02-16)
+==================
 
 - Fixed issues with the CSRF fix from 2.1.1.
 - Updated translation files from transifex.
 
 
-==== 2.1.1 (2011-02-09) ====
+2.1.1 (2011-02-09)
+==================
 
 - Fixed CMS AJAX requests not being CSRF protected, thus not working in Django 1.2.5
 - Fixed toolbar CSS issues in Chrome/Firefox
 
 
-==== 2.1.0 (2011-01-26) ====
+2.1.0 (2011-01-26)
+==================
 
 - language namespaces for apphooks (reverse("de:myview"), reverse("en:myview"))
 - video plugin switch to https://github.com/FlashJunior/OSFlashVideoPlayer
@@ -1095,12 +1256,15 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - placeholder has new option: or and a endpalceholder templatetag
 
 
-==== 2.0.2 (2009-12-14) ====
+2.0.2 (2009-12-14)
+==================
 
 - testsuite working again
 - changelog file added
 
-==== 2.0.1 (2009-12-13) ====
+
+2.0.1 (2009-12-13)
+==================
 
 - mostly bugfixes (18 tickets closed)
 - docs updated

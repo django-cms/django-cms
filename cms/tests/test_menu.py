@@ -1,6 +1,4 @@
-# -*- coding: utf-8 -*-
 import copy
-from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Permission, Group
@@ -19,6 +17,7 @@ from cms.api import create_page, create_title
 from cms.cms_menus import get_visible_nodes
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
 from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
                                            SoftrootFixture, ExtendedMenusFixture)
@@ -45,7 +44,7 @@ class BaseMenuTest(CMSTestCase):
         return tree, nodes
 
     def setUp(self):
-        super(BaseMenuTest, self).setUp()
+        super().setUp()
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
@@ -55,7 +54,7 @@ class BaseMenuTest(CMSTestCase):
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
-        super(BaseMenuTest, self).tearDown()
+        super().tearDown()
 
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
@@ -64,7 +63,7 @@ class BaseMenuTest(CMSTestCase):
 class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
     def setUp(self):
-        super(MenuDiscoveryTest, self).setUp()
+        super().setUp()
         menu_pool.discovered = False
         self.old_menu = menu_pool.menus
         menu_pool.menus = {}
@@ -75,7 +74,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
-        super(MenuDiscoveryTest, self).tearDown()
+        super().tearDown()
 
     def test_menu_registered(self):
         menu_pool.discovered = False
@@ -503,6 +502,28 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(CacheKey.objects.count(), 1)
         tpl.render(context)
         self.assertEqual(CacheKey.objects.count(), 1)
+
+    def test_menu_nodes_request_page_takes_precedence(self):
+        """
+        Tests a condition where the user requests a draft page
+        but the page object on the request is a public page.
+        This can happen when the user has no permissions to edit
+        the requested draft page.
+        """
+        public_page = self.get_page(1)
+        draft_page = public_page.publisher_public
+        edit_on_path = draft_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+
+        with self.login_user_context(self.get_superuser()):
+            context = self.get_context(path=edit_on_path, page=public_page)
+            context['request'].session['cms_edit'] = True
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+        # All nodes should be public nodes because the request page is public
+        nodes = [node for node in context['children']]
+        node_ids = [node.id for node in nodes]
+        page_count = Page.objects.public().filter(pk__in=node_ids).count()
+        self.assertEqual(len(node_ids), page_count, msg='Not all pages in the public menu are public')
+        self.assertEqual(nodes[0].selected, True)
 
     def test_menu_cache_draft_only(self):
         # Tests that the cms uses a separate cache for draft & live
@@ -1267,6 +1288,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
     def tearDown(self):
         Page.objects.all().delete()
         menu_pool.clear(all=True)
+        super().tearDown()
 
     def get_page(self, name):
         return Page.objects.public().get(title_set__slug=name)

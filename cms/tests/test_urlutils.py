@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import urlutils
 
@@ -20,11 +19,11 @@ class UrlutilsTestCase(CMSTestCase):
             self.assertTrue(urlutils.is_media_request(request))
             request = self.get_request('/no-media/')
             self.assertFalse(urlutils.is_media_request(request))
-        with self.settings(MEDIA_URL='http://testserver2.com/'):
-            request = self.get_request('/')
+        with self.settings(MEDIA_URL='http://testserver2.com/', ALLOWED_HOSTS=['testserver2.com', 'testserver.com']):
+            request = self.get_request('/', domain='testserver.com')
             self.assertFalse(urlutils.is_media_request(request))
-        with self.settings(MEDIA_URL='http://testserver/media/'):
-            request = self.get_request('/media/')
+        with self.settings(MEDIA_URL='http://testserver.com/media/', ALLOWED_HOSTS=['testserver.com']):
+            request = self.get_request('/media/', domain='testserver.com')
             self.assertTrue(urlutils.is_media_request(request))
-            request = self.get_request('/no-media/')
+            request = self.get_request('/no-media/', domain='testserver.com')
             self.assertFalse(urlutils.is_media_request(request))

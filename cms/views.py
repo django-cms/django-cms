@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
