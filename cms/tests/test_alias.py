@@ -109,10 +109,11 @@ class AliasTestCase(TransactionCMSTestCase):
         source_plugin = api.add_plugin(ph_2, 'StylePlugin', 'en', tag_type='div', class_name='info_2')
 
         api.create_title("fr", "page_1", page)
-        page.publish('fr')
 
         alias_placeholder = api.add_plugin(ph_1, 'AliasPlugin', 'fr', alias_placeholder=ph_1)
         alias_plugin = api.add_plugin(ph_2, 'AliasPlugin', 'fr', plugin=source_plugin)
+        
+        page.publish('fr')
 
         self.assertTrue(alias_placeholder.is_recursive())
         self.assertTrue(alias_plugin.is_recursive())
