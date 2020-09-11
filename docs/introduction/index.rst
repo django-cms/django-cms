@@ -12,7 +12,7 @@ get it working according to their own requirements.
 These tutorials take you step-by-step through some key aspects of this work.
 They're not intended to explain the :doc:`topics in depth </topics/index>`, or
 provide :doc:`reference material </reference/index>`, but they will leave you
-with a good idea of what it's possible to achieve in just a few steps, and how
+with a good idea of what is possible to achieve in just a few steps, and how
 to go about it.
 
 Once you're familiar with the basics presented in these tutorials, you'll find
@@ -25,16 +25,17 @@ in the order presented here.
 
 .. toctree::
     :maxdepth: 1
+    :numbered:
 
-    install
-    templates_placeholders
-    integrating_applications
-    plugins
-    apphooks
-    toolbar
-    menu
-    wizards
-    third_party
+    01-install
+    02-templates_placeholders
+    03-integrating_applications
+    04-plugins
+    05-apphooks
+    06-toolbar
+    07-menu
+    08-wizards
+    09-third_party
 
 If you want to install django CMS into an existing project, or prefer to configure django CMS by
 hand, rather than using the automated installer, see :doc:`/how_to/install` and then follow the

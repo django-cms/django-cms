@@ -216,6 +216,13 @@ describe('CMS.StructureBoard', function() {
 
             expect(board.ui.toolbarModeSwitcher.find('.cms-btn')).toHaveClass('cms-btn-disabled');
         });
+
+        it('sets loaded content and structure flags if it is a legacy renderer', () => {
+            CMS.config.settings.legacy_mode = true;
+            board = new CMS.StructureBoard();
+            expect(board._loadedStructure).toEqual(true);
+            expect(board._loadedContent).toEqual(true);
+        });
     });
 
     describe('.show()', function() {
@@ -1785,6 +1792,60 @@ describe('CMS.StructureBoard', function() {
                 expect(board._drag).toHaveBeenCalled();
                 expect(board.ui.sortables.filter('.cms-dragarea-2 .new-draggable .cms-draggables')).toExist();
             });
+
+            it('handles top level move update when in same placeholder', () => {
+                const data = {
+                    placeholder_id: 1,
+                    plugin_id: 2,
+                    plugin_order: ['2', '1'],
+                    html: `
+                        <div class="cms-draggable cms-draggable-2 new-cms-draggable-2">
+                        </div>
+                    `,
+                    plugins: [{ plugin_id: 2, otherStuff: true }, { plugin_id: 1, otherStuff: true }]
+                };
+
+                board.handleMovePlugin(data);
+
+                expect($('.cms-draggable-1')).toExist();
+                expect($('.cms-draggable-2')).toExist();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
+                expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.plugins);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(2);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(1);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(2);
+                expect(board._drag).toHaveBeenCalled();
+                expect($('.new-cms-draggable-2')).toExist();
+                expect($('.cms-draggable-2').index()).toEqual(0); // account for "empty" message
+                expect($('.cms-draggable-1').index()).toEqual(2);
+            });
+
+            it('handles top level move update when in same placeholder', () => {
+                const data = {
+                    placeholder_id: 1,
+                    plugin_id: 1,
+                    plugin_order: ['2', '1'],
+                    html: `
+                        <div class="cms-draggable cms-draggable-1 new-cms-draggable-1">
+                        </div>
+                    `,
+                    plugins: [{ plugin_id: 2, otherStuff: true }, { plugin_id: 1, otherStuff: true }]
+                };
+
+                board.handleMovePlugin(data);
+
+                expect($('.cms-draggable-1')).toExist();
+                expect($('.cms-draggable-2')).toExist();
+                expect(StructureBoard.actualizePlaceholders).toHaveBeenCalled();
+                expect(FakePlugin._updateRegistry).toHaveBeenCalledWith(data.plugins);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledTimes(2);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(1);
+                expect(StructureBoard.actualizePluginCollapseStatus).toHaveBeenCalledWith(2);
+                expect(board._drag).toHaveBeenCalled();
+                expect($('.new-cms-draggable-1')).toExist();
+                expect($('.cms-draggable-2').index()).toEqual(1);
+                expect($('.cms-draggable-1').index()).toEqual(2);
+            });
         });
 
         describe('handleAddPlugin', () => {
@@ -2350,6 +2411,51 @@ describe('CMS.StructureBoard', function() {
         });
     });
 
+    describe('_getPluginDataFromMarkup()', () => {
+        [
+            {
+                args: ['', [1, 2, 3]],
+                expected: []
+            },
+            {
+                args: ['whatever', []],
+                expected: []
+            },
+            {
+                args: ['CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);', [1, 2, 3]],
+                expected: []
+            },
+            {
+                args: ['CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);', [1, 2, 4]],
+                expected: [['cms-plugin-4', { plugin_id: '4' }]]
+            },
+            {
+                args: [
+                    `CMS._plugins.push(["cms-plugin-4",{"plugin_id":"4"}]);
+                    CMS._plugins.push(["cms-plugin-10", { "plugin_id": "meh"}]);`, [1, 2, 10]],
+                expected: [['cms-plugin-10', { plugin_id: 'meh' }]]
+            },
+            {
+                args: ['CMS._plugins.push(["cms-plugin-4",{plugin_id:"4"}])', [4]],
+                expected: []
+            },
+            {
+                args: ['CMS._plugins.push(["cms-plugin-4",not a json :(]);', [4]],
+                expected: []
+            },
+            {
+                args: [`CMS._plugins.push(["cms-plugin-4", {
+                    "something": 1
+                }])`, [4]],
+                expected: [['cms-plugin-4', { something: 1 }]]
+            }
+        ].forEach((test, i) => {
+            it(`extracts plugin data from markup ${i}`, () => {
+                expect(StructureBoard._getPluginDataFromMarkup(...test.args)).toEqual(test.expected);
+            });
+        });
+    });
+
     describe('_extractMessages()', () => {
         let board;
 
@@ -2538,6 +2644,36 @@ describe('CMS.StructureBoard', function() {
 
                 StructureBoard.__ResetDependency__('Helpers');
             });
+        });
+
+        it('does not preload the opposite mode (legacy renderer)', () => {
+            const div = document.createElement('div');
+            const _getWindow = jasmine.createSpy().and.returnValue(div);
+
+            StructureBoard.__Rewire__('Helpers', {
+                _getWindow
+            });
+
+            const board = new StructureBoard();
+
+            spyOn(board, '_requestMode');
+
+            jasmine.clock().install();
+
+            CMS.config.settings.legacy_mode = true;
+            board._loadedContent = true;
+            board._loadedStructure = true;
+
+            board._preloadOppositeMode();
+            expect(board._requestMode).not.toHaveBeenCalled();
+            $(div).trigger('load');
+            expect(board._requestMode).not.toHaveBeenCalled();
+            jasmine.clock().tick(2001);
+            expect(board._requestMode).not.toHaveBeenCalled();
+
+            jasmine.clock().uninstall();
+
+            StructureBoard.__ResetDependency__('Helpers');
         });
     });
 

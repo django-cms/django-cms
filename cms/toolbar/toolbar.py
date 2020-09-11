@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 import functools
 import operator
@@ -20,9 +19,9 @@ from cms.utils.i18n import get_site_language_from_request
 from classytags.utils import flatten_context
 
 from django.conf import settings
-from django.core.urlresolvers import resolve, Resolver404
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
+from django.urls import Resolver404, resolve
 from django.utils.functional import cached_property
 from django.utils.translation import override as force_language
 
@@ -109,7 +108,7 @@ class CMSToolbar(BaseToolbar):
     """
 
     def __init__(self, request, request_path=None, _async=False):
-        super(CMSToolbar, self).__init__()
+        super().__init__()
         self._async = _async
         self.right_items = []
         self.left_items = []
@@ -496,4 +495,4 @@ class EmptyToolbar(BaseToolbar):
 
     def __init__(self, request):
         self.request = request
-        super(EmptyToolbar, self).__init__()
+        super().__init__()

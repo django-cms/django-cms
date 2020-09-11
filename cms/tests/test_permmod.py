@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group, Permission
@@ -816,7 +815,7 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
     apply to this specific page
     """
     def setUp(self):
-        super(RestrictedViewPermissionTests, self).setUp()
+        super().setUp()
         self.group = Group.objects.create(name='testgroup')
         self.pages = [self.page]
         self.expected = [self.page]
@@ -923,7 +922,7 @@ class PublicViewPermissionTests(RestrictedViewPermissionTests):
     """ Run the same tests as before, but on the public page instead. """
 
     def setUp(self):
-        super(PublicViewPermissionTests, self).setUp()
+        super().setUp()
         self.page.publish('en')
         self.pages = [self.page.publisher_public]
         self.expected = [self.page.publisher_public]
@@ -990,10 +989,13 @@ class GlobalPermissionTests(CMSTestCase):
                 request.user = user
                 # Note, the query count is inflated by doing additional lookups
                 # because there's a site param in the request.
-                with self.assertNumQueries(FuzzyInt(3,4)):
-                    # internally this calls PageAdmin.has_[add|change|delete]_permission()
-                    self.assertEqual({'add': True, 'change': True, 'delete': False},
-                                     site._registry[Page].get_model_perms(request))
+                # max_queries = 5 for >dj21 because it's introduce default view permissions
+                max_queries = 5
+                with self.assertNumQueries(FuzzyInt(3, max_queries)):
+                    # internally this calls PageAdmin.has_[add|change|delete|view]_permission()
+                    expected_perms = {'add': True, 'change': True, 'delete': False}
+                    expected_perms.update({'view': True})
+                    self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
 
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
@@ -1011,15 +1013,17 @@ class GlobalPermissionTests(CMSTestCase):
             with self.assertNumQueries(FuzzyInt(5, 15)):
                 # this user shouldn't have access to site 2
                 request.user = USERS[1]
-                self.assertEqual({'add': False, 'change': False, 'delete': False},
-                                 site._registry[Page].get_model_perms(request))
+                expected_perms = {'add': False, 'change': False, 'delete': False}
+                expected_perms.update({'view': False})
+                self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
                 # but, going back to the first user, they should.
                 request = RequestFactory().get('/', data={'site__exact': site_2.pk})
                 request.user = USERS[0]
                 request.current_page = None
                 request.session = {}
-                self.assertEqual({'add': True, 'change': True, 'delete': False},
-                                 site._registry[Page].get_model_perms(request))
+                expected_perms = {'add': True, 'change': True, 'delete': False}
+                expected_perms.update({'view': True})
+                self.assertEqual(expected_perms, site._registry[Page].get_model_perms(request))
 
     def test_has_page_add_permission_with_target(self):
         page = create_page('Test', 'nav_playground.html', 'en')

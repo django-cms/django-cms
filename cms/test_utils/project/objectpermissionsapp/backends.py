@@ -1,15 +1,14 @@
-# -*- coding: utf-8 -*-
 from django.db.models import Model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
 
-class ObjectPermissionBackend(object):
+class ObjectPermissionBackend:
     def has_perm(self, user_obj, perm, obj=None):
         if user_obj and user_obj.is_superuser:
             return True
         elif obj is None or not isinstance(obj, Model) or \
-                not user_obj.is_authenticated() or not user_obj.is_active:
+                not user_obj.is_authenticated or not user_obj.is_active:
             return False
         if len(perm.split('.')) > 1:
             app_label, perm = perm.split('.')
@@ -36,5 +35,5 @@ class ObjectPermissionBackend(object):
             .filter(**user_filters) \
             .values_list("codename", flat=True)
 
-    def authenticate(self):
+    def authenticate(self, request=None):
         return True

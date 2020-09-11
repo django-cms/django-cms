@@ -314,8 +314,8 @@ Menu system classes and function
 
     Each node in a menu tree is represented by a ``NavigationNode`` instance.
 
-    :param string title: The title to display this menu item with.
-    :param string url: The URL associated with this menu item.
+    :param str title: The title to display this menu item with.
+    :param str url: The URL associated with this menu item.
     :param id: Unique (for the current tree) ID of this item.
     :param parent_id: Optional, ID of the parent item.
     :param parent_namespace: Optional, namespace of the parent.
@@ -361,15 +361,6 @@ Menu system classes and function
 
         Utility method to return the associated title, using the same naming
         convention used by :class:`cms.models.Page`.
-
-
-    ..  attribute:: attr
-
-        A dictionary, provided in order that arbitrary attributes may be added to the node -
-        placing them directly on the node itself could cause a clash with an existing or future attribute.
-
-        An important key in this dictionary is ``is_page``: if ``True``, the node represents a django CMS ``Page``
-        object.
 
 
 ..  class:: menus.modifiers.Marker

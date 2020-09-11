@@ -1,19 +1,16 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from cms.models import CMSPlugin
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=50)
-    section = models.ForeignKey('Section')
+    section = models.ForeignKey('Section', on_delete=models.CASCADE)
 
     def __str__(self):
         return u"%s -- %s" % (self.title, self.section)
 
 
-@python_2_unicode_compatible
 class Section(models.Model):
     name = models.CharField(max_length=50)
 
@@ -21,7 +18,6 @@ class Section(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class ArticlePluginModel(CMSPlugin):
     title = models.CharField(max_length=50)
     sections = models.ManyToManyField('Section')
@@ -30,14 +26,14 @@ class ArticlePluginModel(CMSPlugin):
         return self.title
 
     def copy_relations(self, oldinstance):
-        self.sections = oldinstance.sections.all()
+        self.sections.set(oldinstance.sections.all())
 
 
 ###
 
 
 class FKModel(models.Model):
-    fk_field = models.ForeignKey('PluginModelWithFKFromModel')
+    fk_field = models.ForeignKey('PluginModelWithFKFromModel', on_delete=models.CASCADE)
 
 
 class M2MTargetModel(models.Model):
@@ -46,7 +42,7 @@ class M2MTargetModel(models.Model):
 
 class PluginModelWithFKFromModel(CMSPlugin):
     title = models.CharField(max_length=50)
-    
+
     def copy_relations(self, oldinstance):
         # Like suggested in the docs
         for associated_item in oldinstance.fkmodel_set.all():
@@ -57,7 +53,7 @@ class PluginModelWithFKFromModel(CMSPlugin):
 
 class PluginModelWithM2MToModel(CMSPlugin):
     m2m_field = models.ManyToManyField(M2MTargetModel)
-    
+
     def copy_relations(self, oldinstance):
         # Like suggested in the docs
-        self.m2m_field = oldinstance.m2m_field.all()
+        self.m2m_field.set(oldinstance.m2m_field.all())

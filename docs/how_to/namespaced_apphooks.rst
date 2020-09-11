@@ -180,7 +180,7 @@ In a new file ``cms_appconfig.py`` in the FAQ application:
     from app_data import AppDataForm
     from django.db import models
     from django import forms
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
 
 
     class FaqConfig(AppHookConfig):
@@ -254,16 +254,18 @@ Now let's create the apphook, and set it up with support for multiple instances.
 
     from aldryn_apphooks_config.app_base import CMSConfigApp
     from cms.apphook_pool import apphook_pool
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from .cms_appconfig import FaqConfig
 
 
     @apphook_pool.register
     class FaqApp(CMSConfigApp):
         name = _("Faq App")
-        urls = ["faq.urls"]
         app_name = "faq"
         app_config = FaqConfig
+
+        def get_urls(self, page=None, language=None, **kwargs):
+            return ["faq.urls"]
 
 
 Define a list view for FAQ entries
@@ -284,7 +286,7 @@ that only displays entries for the currently used namespace. In ``views.py``:
         template_name = 'faq/index.html'
 
         def get_queryset(self):
-            qs = super(IndexView, self).get_queryset()
+            qs = super().get_queryset()
             return qs.namespace(self.namespace)
 
         def get_paginate_by(self, queryset):
@@ -359,12 +361,12 @@ URLconf
 
 .. code-block:: python
 
-    from django.conf.urls import url
+    from django.urls import re_path
     from . import views
 
 
     urlpatterns = [
-        url(r'^$', views.IndexView.as_view(), name='index'),
+        re_path(r'^$', views.IndexView.as_view(), name='index'),
     ]
 
 

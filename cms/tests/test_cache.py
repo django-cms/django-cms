@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import time
 
@@ -41,12 +40,12 @@ from cms.utils.helpers import get_timezone_name
 class CacheTestCase(CMSTestCase):
     def tearDown(self):
         from django.core.cache import cache
-        super(CacheTestCase, self).tearDown()
+        super().tearDown()
         cache.clear()
 
     def setUp(self):
         from django.core.cache import cache
-        super(CacheTestCase, self).setUp()
+        super().setUp()
         cache.clear()
 
     def test_cache_placeholder(self):
@@ -422,7 +421,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1_url, 'en')
 
             # Ensure that user is NOT authenticated
-            self.assertFalse(request.user.is_authenticated())
+            self.assertFalse(request.user.is_authenticated)
 
             # Test that the page is initially uncached
             with self.assertNumQueries(FuzzyInt(1, 24)):
@@ -549,7 +548,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1.get_path(), 'en')
 
             # Ensure that user is NOT authenticated
-            self.assertFalse(request.user.is_authenticated())
+            self.assertFalse(request.user.is_authenticated)
 
             # Test that the page is initially uncached
             with self.assertNumQueries(FuzzyInt(1, 24)):
@@ -658,7 +657,7 @@ class CacheTestCase(CMSTestCase):
 class PlaceholderCacheTestCase(CMSTestCase):
     def setUp(self):
         from django.core.cache import cache
-        super(PlaceholderCacheTestCase, self).setUp()
+        super().setUp()
         cache.clear()
 
         self.page = create_page(
@@ -688,7 +687,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
     def tearDown(self):
         from django.core.cache import cache
-        super(PlaceholderCacheTestCase, self).tearDown()
+        super().tearDown()
         plugin_pool.unregister_plugin(VaryCacheOnPlugin)
         cache.clear()
 

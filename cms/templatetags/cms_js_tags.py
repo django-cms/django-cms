@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 import json
 
 from classytags.core import Tag, Options
@@ -46,7 +43,7 @@ def render_cms_structure_js(context, renderer, obj):
         }
 
         if static_placeholder.site_bound:
-            kwargs['site'] = renderer.current_site.pk
+            kwargs['site'] = renderer.current_site
         else:
             kwargs['site_id__isnull'] = True
 
@@ -84,10 +81,10 @@ class JavascriptString(Tag):
     )
 
     def render_tag(self, context, **kwargs):
-        try:
-            from django.utils.html import escapejs
-        except ImportError:
-            from django.utils.text import javascript_quote as escapejs
+        from django.utils.html import escapejs
+
         rendered = self.nodelist.render(context)
         return "'%s'" % escapejs(rendered.strip())
+
+
 register.tag(JavascriptString)

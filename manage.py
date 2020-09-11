@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
 import sys
 import warnings
@@ -8,7 +7,9 @@ import app_manage
 
 from cms.exceptions import DontUsePageAttributeWarning
 
-gettext = lambda s: s
+def gettext(s): return s
+
+
 warnings.filterwarnings('ignore', category=DontUsePageAttributeWarning)
 
 
@@ -23,7 +24,7 @@ def install_auth_user_model(settings, value):
     settings['AUTH_USER_MODEL'] = value
 
 
-class DisableMigrations(object):
+class DisableMigrations:
 
     def __contains__(self, item):
         return True
@@ -75,7 +76,6 @@ if __name__ == '__main__':
         'cms',
         'menus',
         'sekizai',
-        'hvad',
     ] + PLUGIN_APPS
 
     MIGRATION_MODULES = {
@@ -111,7 +111,6 @@ if __name__ == '__main__':
                 'loaders': (
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.eggs.Loader',
                 )
             }
         }
@@ -316,5 +315,8 @@ if __name__ == '__main__':
         ALLOWED_HOSTS=['localhost'],
         TEST_RUNNER='django.test.runner.DiscoverRunner',
         MIGRATION_MODULES=MIGRATION_MODULES,
+        # django 3.0
+        X_FRAME_OPTIONS='SAMEORIGIN',
+
         **dynamic_configs
     )

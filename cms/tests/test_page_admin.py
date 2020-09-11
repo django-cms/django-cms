@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
 import datetime
 import json
 import sys
 
-from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches
 from django.contrib import admin
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
-from django.utils import six
+from django.urls import clear_url_caches
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
@@ -598,7 +596,7 @@ class PageTest(PageTestBase):
     def test_publish_homepage_with_children(self):
         homepage = create_page("home", "nav_playground.html", "en", published=True)
         homepage.set_as_homepage()
-        pending_child_1 =  create_page(
+        pending_child_1 = create_page(
             "child-1",
             "nav_playground.html",
             language="en",
@@ -1042,15 +1040,14 @@ class PageTest(PageTestBase):
                 {
                     'code': 'en',
                     'name': 'English',
-                    'fallbacks': ['fr', 'de'],
                     'public': True,
-                    'fallbacks':['fr']
+                    'fallbacks': ['fr']
                 },
                 {
                     'code': 'fr',
                     'name': 'French',
                     'public': True,
-                    'fallbacks':['en']
+                    'fallbacks': ['en']
                 },
         ]}
         with self.settings(CMS_LANGUAGES=languages):
@@ -1421,6 +1418,47 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint)
             self.assertContains(response, expected, html=True)
 
+    @override_settings(CMS_PERMISSION=False)
+    def test_rewrite_url_being_corrupted_after_save_basic_settings(self):
+        superuser = self.get_superuser()
+        parent_page = create_page(
+            'parent',
+            'nav_playground.html',
+            language='en',
+            published=True,
+        )
+        child_page = create_page(
+            'child',
+            'nav_playground.html',
+            language='en',
+            published=True,
+            parent=parent_page,
+        )
+
+        with self.login_user_context(superuser):
+            endpoint = self.get_admin_url(Page, 'advanced', child_page.pk)
+            self.client.post(
+                endpoint,
+                {
+                    'overwrite_url': 'rewrited',
+                    'template': child_page.template,
+                },
+            )
+            child_page.publish('en')
+
+            endpoint = self.get_admin_url(Page, 'change', child_page.pk)
+            self.client.post(
+                endpoint,
+                {
+                    'language': 'en',
+                    'title': 'child',
+                    'slug': 'child',
+                },
+            )
+
+        title = child_page.get_title_obj('en', fallback=False)
+        self.assertEqual(title.path, 'rewrited')
+
     def test_advanced_settings_form(self):
         superuser = self.get_superuser()
         page = create_page('Page 1', 'nav_playground.html', 'en')
@@ -1641,7 +1679,7 @@ class PageTest(PageTestBase):
             document.finalize()
             # Removing ROOT element if it's not necessary
             if len(document.children) == 1:
-                if not isinstance(document.children[0], six.string_types):
+                if not isinstance(document.children[0], str):
                     document = document.children[0]
             return document
 

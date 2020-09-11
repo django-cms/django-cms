@@ -16,8 +16,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-15 11:36+0000\n"
+"POT-Creation-Date: 2020-05-26 14:17+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
 "Last-Translator: André Cruz <transifex@cabine.org>\n"
 "Language-Team: Portuguese (http://www.transifex.com/divio/django-cms/language/pt/)\n"
 "MIME-Version: 1.0\n"
@@ -112,11 +112,18 @@ msgstr ""
 msgid "A page with this reverse URL id exists already."
 msgstr "Já existe uma página com esta URL reversa."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr "Já existe uma instância de aplicação com esta configuração."
 
 msgid "An application instance with this name already exists."
 msgstr "Já existe uma instância de aplicação com este nome."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "Sim"
@@ -511,10 +518,10 @@ msgid "Display in navigation"
 msgstr "Exibir na navegação"
 
 msgid "Unpublish page"
-msgstr "req. para despublicar"
+msgstr ""
 
 msgid "Publish page"
-msgstr "req. para publicar"
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Confirma que pretende reverter para a versão live?"
@@ -554,9 +561,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "Adicionar outro"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1281,6 +1285,9 @@ msgstr "Atalhos"
 msgid "The page was changed in the meantime, reloading..."
 msgstr "Esta página foi alterada entretanto, recarregando..."
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr "Mostrar este menu de ajuda"
 
@@ -1298,6 +1305,10 @@ msgid "Open \"Create\" dialog"
 msgstr "Abrir diálogo de \"Criação\""
 
 msgid "Focus on Toolbar"
+msgstr ""
+
+#| msgid "Structure"
+msgid "Structureboard"
 msgstr ""
 
 #| msgid "static placeholders"
@@ -1435,6 +1446,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "Benvindo ao django CMS"
 
+msgid "Add Another"
+msgstr "Adicionar outro"
+
 msgid "Back"
 msgstr "Retroceder"
 
@@ -1534,6 +1548,10 @@ msgstr "Artigos"
 
 msgid "Sample App"
 msgstr "App - exemplo"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "App de exemplo com permissões exluídas"

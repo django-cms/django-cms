@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 from functools import wraps
-
-from django.utils.decorators import available_attrs
 
 from cms.api import get_page_draft
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import GRANT_ALL_PERMISSIONS
 from cms.models import Page, Placeholder
 from cms.utils import get_current_site
+from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import (
     cached_func,
@@ -54,6 +52,9 @@ def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=Tr
         # just return grant all mark
         return GRANT_ALL_PERMISSIONS
 
+    if check_global and has_global_permission(user, site, action=action, use_cache=use_cache):
+        return GRANT_ALL_PERMISSIONS
+
     if use_cache:
         # read from cache if possible
         cached = get_permission_cache(user, action)
@@ -65,9 +66,6 @@ def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=Tr
     if cached is not None:
         return cached
 
-    if check_global and has_global_permission(user, site, action=action, use_cache=use_cache):
-        return GRANT_ALL_PERMISSIONS
-
     page_actions = get_page_actions(user, site)
     page_ids = list(page_actions[action])
     set_permission_cache(user, action, page_ids)
@@ -78,7 +76,7 @@ def auth_permission_required(action):
     def decorator(func):
         @wraps(func, assigned=available_attrs(func))
         def wrapper(user, *args, **kwargs):
-            if not user.is_authenticated():
+            if not user.is_authenticated:
                 return False
 
             permissions = _django_permissions_by_action[action]
@@ -292,7 +290,7 @@ def user_can_view_page(user, page, site=None):
         # Page has no restrictions and project is configured
         # to allow everyone to see unrestricted pages.
         return True
-    elif not user.is_authenticated():
+    elif not user.is_authenticated:
         # Page has restrictions or project is configured
         # to require staff user status to see pages.
         return False
@@ -357,7 +355,7 @@ def user_can_view_all_pages(user, site):
         can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
         return can_see_unrestricted
 
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     if user.has_perm(PAGE_VIEW_CODENAME):

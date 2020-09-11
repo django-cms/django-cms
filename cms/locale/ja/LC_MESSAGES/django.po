@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2020-05-26 14:17+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: tenomoto <takeshi@enomosphere.net>\n"
 "Language-Team: Japanese (http://www.transifex.com/divio/django-cms/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -111,11 +111,18 @@ msgstr "%(language)s スラグを設定してから高度な設定を編集し�
 msgid "A page with this reverse URL id exists already."
 msgstr "この逆引きURLを持っているページが存在します。"
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr ""
+
 msgid "An application instance using this configuration already exists."
 msgstr "この設定を使用しているアプリケーションインスタンスが既に存在します。"
 
 msgid "An application instance with this name already exists."
 msgstr "この名前のアプリケーションインスタンスが既に存在します。"
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr "はい"
@@ -510,10 +517,10 @@ msgid "Display in navigation"
 msgstr "ナビゲーションに表示する"
 
 msgid "Unpublish page"
-msgstr "ページを非公開にする"
+msgstr ""
 
 msgid "Publish page"
-msgstr "ページを公開する"
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "このページをライブに戻してよいですか？"
@@ -553,9 +560,6 @@ msgstr ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
-
-msgid "Add Another"
-msgstr "もう一つ追加"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1279,6 +1283,9 @@ msgstr "ショートカット"
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr "このヘルプダイアログを表示する"
 
@@ -1297,6 +1304,10 @@ msgstr "「作成」ダイアログを開く"
 
 msgid "Focus on Toolbar"
 msgstr "ツールバーにフォーカスする"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
@@ -1433,6 +1444,9 @@ msgstr ""
 msgid "Welcome to django CMS"
 msgstr "django CMSにようこそ"
 
+msgid "Add Another"
+msgstr "もう一つ追加"
+
 msgid "Back"
 msgstr "戻る"
 
@@ -1532,6 +1546,10 @@ msgstr "記事"
 
 msgid "Sample App"
 msgstr "サンプルアプリ"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr ""
 
 msgid "Sample App with excluded permissions"
 msgstr "拡大した権限を使うアプリケーションの見本"

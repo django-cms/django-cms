@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import partial
 from logging import getLogger
 
@@ -6,10 +5,10 @@ from django.contrib import messages
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import NoReverseMatch
+from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language_from_request, ugettext_lazy as _
+from django.utils.translation import get_language_from_request, gettext_lazy as _
 
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
@@ -88,7 +87,7 @@ def _get_menu_class_for_instance(menu_class, instance):
     return meta_class(class_name, (menu_class,), attrs)
 
 
-class MenuRenderer(object):
+class MenuRenderer:
     # The main logic behind this class is to decouple
     # the singleton menu pool from the menu rendering logic.
     # By doing this we can be sure that each request has it's
@@ -104,7 +103,6 @@ class MenuRenderer(object):
         self.request = request
         self.request_language = get_language_from_request(request, check_path=True)
         self.site = Site.objects.get_current(request)
-        self.draft_mode_active = use_draft(request)
 
     @property
     def cache_key(self):
@@ -112,7 +110,7 @@ class MenuRenderer(object):
 
         key = '%smenu_nodes_%s_%s' % (prefix, self.request_language, self.site.pk)
 
-        if self.request.user.is_authenticated():
+        if self.request.user.is_authenticated:
             key += '_%s_user' % self.request.user.pk
 
         if self.draft_mode_active:
@@ -120,6 +118,17 @@ class MenuRenderer(object):
         else:
             key += ':public'
         return key
+
+    @cached_property
+    def draft_mode_active(self):
+        try:
+            # Under certain conditions, the request page won't match
+            # the requested state.
+            # For example, user requests draft page but gets public.
+            _use_draft = self.request.current_page.publisher_is_draft
+        except AttributeError:
+            _use_draft = use_draft(self.request)
+        return _use_draft
 
     @cached_property
     def is_cached(self):
@@ -228,7 +237,7 @@ class MenuRenderer(object):
         return MenuClass(renderer=self)
 
 
-class MenuPool(object):
+class MenuPool:
 
     def __init__(self):
         self.menus = {}

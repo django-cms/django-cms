@@ -11,15 +11,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-11 16:30+0000\n"
-"PO-Revision-Date: 2018-01-12 11:00+0000\n"
+"POT-Creation-Date: 2020-05-26 14:17+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
 "Last-Translator: Matas Dailyda <matas@dailyda.com>\n"
 "Language-Team: Lithuanian (http://www.transifex.com/divio/django-cms/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: lt\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);\n"
 
 msgid "All"
 msgstr "Visi"
@@ -107,11 +107,18 @@ msgstr "Prašome nustatyti %(language)s kalbos nuorodą prieš redaguojant jo i�
 msgid "A page with this reverse URL id exists already."
 msgstr "Puslapis su tokia nuoroda jau egzistuoja."
 
+#| msgid "Application configurations"
+msgid "Invalid application config value"
+msgstr "Netinkama aplikacijos konfigūracijos reikšmė"
+
 msgid "An application instance using this configuration already exists."
 msgstr "Aplikacijos objektas naudojantis šiuos nustatymus jau egzistuoja."
 
 msgid "An application instance with this name already exists."
 msgstr "Aplikacijos objektas su tokiu pavadinimu jau egzistuoja."
+
+msgid "You can't move the home page inside another page"
+msgstr "Negalima įkelti pradinio puslapio į kitą puslapį"
 
 msgid "Yes"
 msgstr "Taip"
@@ -550,9 +557,6 @@ msgstr "Puslapis %(conflict_page)s turi tą patį url '%(url)s' kaip dabartinis 
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Puslapis %(conflict_page)s turi tą patį url '%(url)s' kaip dabartinis puslapis."
 
-msgid "Add Another"
-msgstr "Pridėti papildomą"
-
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
 msgstr "Nebūtina. Jei suvestas, bus automatiškai pridėtas prie naujo teksto įskiepio."
@@ -921,6 +925,7 @@ msgid_plural "Please correct the errors below."
 msgstr[0] "Ištaisykite žemiau esančias klaidas."
 msgstr[1] "Ištaisykite žemiau esančias klaidas."
 msgstr[2] "Ištaisykite žemiau esančias klaidas."
+msgstr[3] "Ištaisykite žemiau esančias klaidas."
 
 msgid "All permissions"
 msgstr "Visos teisės"
@@ -1277,6 +1282,9 @@ msgstr "Nuorodos"
 msgid "The page was changed in the meantime, reloading..."
 msgstr "Puslapis buvo pakeistas, perkraunama..."
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr "Atidaryti šį pagalbos dialogą"
 
@@ -1295,6 +1303,10 @@ msgstr "Atidaryti \"Kūrimo\" dialogą"
 
 msgid "Focus on Toolbar"
 msgstr "Koncentruotis į įrankių juostą"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
@@ -1431,6 +1443,9 @@ msgstr "\n                    <p class=\"cms-welcome-notes\">Jūs matote šia ž
 msgid "Welcome to django CMS"
 msgstr "Sveiki, tai django CMS"
 
+msgid "Add Another"
+msgstr "Pridėti papildomą"
+
 msgid "Back"
 msgstr "Atgal"
 
@@ -1530,6 +1545,10 @@ msgstr "Straipsniai"
 
 msgid "Sample App"
 msgstr "Pavyzdinė aplikacija"
+
+#| msgid "Sample App with excluded permissions"
+msgid "Sample App with config"
+msgstr "Pavyzdinė aplikacija su konfigūracija"
 
 msgid "Sample App with excluded permissions"
 msgstr "Pavyzdinė aplikacija su panaikintomis teisėmis"
@@ -1822,6 +1841,7 @@ msgstr "Vedlys jau užregistruotas modeliuil: %s"
 #~ msgstr[0] "a848884d0af974a125106fa2043a5716_pl_0"
 #~ msgstr[1] "a848884d0af974a125106fa2043a5716_pl_1"
 #~ msgstr[2] "a848884d0af974a125106fa2043a5716_pl_2"
+#~ msgstr[3] "a848884d0af974a125106fa2043a5716_pl_3"
 
 #~ msgid "%(full_result_count)s total"
 #~ msgstr "%(full_result_count)s total"

@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
 import tempfile
 import codecs
 
-try:
-    from cStringIO import StringIO
-except:
-    from io import StringIO
+from io import StringIO
 
 from django.core.management import call_command
 
@@ -41,7 +37,7 @@ class FixtureTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual(0, Placeholder.objects.count())
         # Transaction disable, otherwise the connection it the test would be
         # isolated from the data loaded in the different command connection
-        call_command('loaddata', dump[1], commit=False, stdout=output)
+        call_command('loaddata', dump[1], stdout=output)
         self.assertEqual(10, Page.objects.count())
         self.assertEqual(original_pages, Page.objects.count())
         self.assertEqual(5, TreeNode.objects.count())

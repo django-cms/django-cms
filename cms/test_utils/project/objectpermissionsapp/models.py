@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class UserObjectPermissionManager(models.Manager):
@@ -41,11 +40,11 @@ class UserObjectPermissionManager(models.Manager):
 
 
 class UserObjectPermission(models.Model):
-    permission = models.ForeignKey(Permission)
-    content_type = models.ForeignKey(ContentType)
+    permission = models.ForeignKey(Permission, on_delete=models.CASCADE)
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_pk = models.CharField(_('object ID'), max_length=255)
     content_object = GenericForeignKey(fk_field='object_pk')
-    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'))
+    user = models.ForeignKey(getattr(settings, 'AUTH_USER_MODEL', 'auth.User'), on_delete=models.CASCADE)
 
     objects = UserObjectPermissionManager()
 
@@ -55,7 +54,7 @@ class UserObjectPermission(models.Model):
             raise ValidationError("Cannot persist permission not designed for "
                                   "this class (permission's type is %r and object's type is %r)"
                                   % (self.permission.content_type, content_type))
-        return super(UserObjectPermission, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     class Meta:
         unique_together = ['user', 'permission', 'object_pk']

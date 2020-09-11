@@ -1,20 +1,20 @@
-# -*- coding: utf-8 -*-
 import copy
 from collections import OrderedDict
 from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.db import models
+from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
     get_language,
     override as force_language,
-    ugettext_lazy as _,
+    gettext_lazy as _,
 )
 
 from cms import constants
@@ -34,7 +34,6 @@ from treebeard.mp_tree import MP_Node
 logger = getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class TreeNode(MP_Node):
 
     parent = models.ForeignKey(
@@ -87,14 +86,14 @@ class TreeNode(MP_Node):
             kwargs['instance'].parent = self
         else:
             kwargs['parent'] = self
-        return super(TreeNode, self).add_child(**kwargs)
+        return super().add_child(**kwargs)
 
     def add_sibling(self, pos=None, *args, **kwargs):
         if len(kwargs) == 1 and 'instance' in kwargs:
             kwargs['instance'].parent_id = self.parent_id
         else:
             kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(*args, **kwargs)
+        return super().add_sibling(pos, *args, **kwargs)
 
     def update(self, **data):
         cls = self.__class__
@@ -143,7 +142,6 @@ class TreeNode(MP_Node):
             child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
-@python_2_unicode_compatible
 class Page(models.Model):
     """
     A simple hierarchical page model
@@ -228,7 +226,7 @@ class Page(models.Model):
     is_page_type = models.BooleanField(default=False)
 
     node = models.ForeignKey(
-        'TreeNode',
+        TreeNode,
         related_name='cms_pages',
         on_delete=models.CASCADE,
     )
@@ -237,6 +235,7 @@ class Page(models.Model):
     objects = PageManager()
 
     class Meta:
+        default_permissions = ('add', 'change', 'delete')
         permissions = (
             ('view_page', 'Can view page'),
             ('publish_page', 'Can publish page'),
@@ -248,7 +247,7 @@ class Page(models.Model):
         app_label = 'cms'
 
     def __init__(self, *args, **kwargs):
-        super(Page, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title_cache = {}
 
     def __str__(self):
@@ -274,12 +273,8 @@ class Page(models.Model):
         return display
 
     def _clear_node_cache(self):
-        if hasattr(self, '_node_cache'):
-            del self._node_cache
-
-        if hasattr(self, 'fields_cache'):
-            # Django >= 2.0
-            self.fields_cache = {}
+        if Page.node.is_cached(self):
+            Page.node.field.delete_cached_value(self)
 
     def _clear_internal_cache(self):
         self.title_cache = {}
@@ -561,7 +556,7 @@ class Page(models.Model):
                 self.publisher_public._update_title_path(language)
                 self.mark_as_published(language)
                 self.mark_descendants_as_published(language)
-        self.clear_cache()
+        self.clear_cache(menu=True)
         return self
 
     def _copy_titles(self, target, language, published):
@@ -663,6 +658,7 @@ class Page(models.Model):
             parent_page = None
 
         new_page = copy.copy(self)
+        new_page._state = ModelState()
         new_page._clear_internal_cache()
         new_page.pk = None
         new_page.node = new_node
@@ -823,7 +819,7 @@ class Page(models.Model):
 
         if created:
             self.created_by = self.changed_by
-        super(Page, self).save(**kwargs)
+        super().save(**kwargs)
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
@@ -838,7 +834,7 @@ class Page(models.Model):
             self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        return super(Page, self).save_base(*args, **kwargs)
+        return super().save_base(*args, **kwargs)
 
     def update(self, refresh=False, draft_only=True, **data):
         assert self.publisher_is_draft

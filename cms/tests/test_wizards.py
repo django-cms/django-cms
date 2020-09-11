@@ -1,13 +1,12 @@
-# -*- coding: utf-8 -*-
 
 from django import forms
-from django.core.urlresolvers import reverse
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.template import TemplateSyntaxError
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.encoding import smart_text
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms.api import create_page, publish_page
 from cms.cms_wizards import CMSPageWizard
@@ -48,7 +47,7 @@ class BadModelForm(ModelForm):
         pass
 
 
-class WizardTestMixin(object):
+class WizardTestMixin:
     page_wizard = None
     title_wizard = None
 
