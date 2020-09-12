@@ -155,6 +155,10 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     if clean_path:
         pages_root = reverse("pages-root")
 
+        script_name = request.META['SCRIPT_NAME']
+        if script_name and path.startswith(script_name):
+            path = path[len(script_name):]
+
         if path.startswith(pages_root):
             path = path[len(pages_root):]
 
