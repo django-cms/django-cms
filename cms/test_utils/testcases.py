@@ -1,7 +1,6 @@
 import json
 import sys
 import warnings
-from io import BytesIO
 
 from urllib.parse import unquote, urljoin
 
@@ -11,7 +10,6 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.handlers.wsgi import WSGIRequest
 from django.forms.models import model_to_dict
 from django.template import engines
 from django.template.context import Context
@@ -403,10 +401,12 @@ class BaseCMSTestCase:
         request = request or self.get_request()
         return StructureRenderer(request)
 
-    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None, domain=None,
-                    script_name=None):
-        factory = RequestFactory()
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None, domain=None, use_script_name=None):
 
+        if not use_script_name:
+            factory = RequestFactory()
+        else:
+            factory = RequestFactory(SCRIPT_NAME="/PREFIX")
         if not path:
             path = self.get_pages_root()
 
@@ -415,17 +415,11 @@ class BaseCMSTestCase:
                 language = settings.LANGUAGES[0][0]
             else:
                 language = settings.LANGUAGE_CODE
+
         if post_data:
             request = factory.post(path, post_data)
         else:
             request = factory.get(path)
-        if script_name:
-            request = WSGIRequest({
-            'PATH_INFO': path,
-            'SCRIPT_NAME': '/PREFIX',
-            'REQUEST_METHOD': 'get',
-            'wsgi.input': BytesIO(b''),
-             })
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
