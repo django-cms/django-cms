@@ -1069,7 +1069,6 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         self.apphook_clear()
 
     def test_page_url_for_apphook_under_script_name(self):
-
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.create_homepage("home", "nav_playground.html", "en", created_by=superuser)
@@ -1082,27 +1081,16 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook='SampleApp')
         child_child_page.publish('en')
-        
+
         # publisher_public is set to draft on publish, issue with one to one reverse
         child_child_page = self.reload(child_child_page)
-        
-        with force_language("en"):
-            path = reverse('extra_first')
 
-        # prefix WSGIrequest is added
-        request = self.get_request(path,script_name=True)
-        self.assertEqual(request.path, '/PREFIX/en/child_page/child_child_page/extra_1/')
-    
+        path = child_child_page.get_absolute_url()
+
+        request = self.get_request(path, use_script_name=True)
+        self.assertEqual(request.path, '/PREFIX' + path)
         request.LANGUAGE_CODE = 'en'
-        
-        # Under theses conditions, get_page_from_request needed not work in this test, if the page exsite,
-        # it would mean that it does not take intoaccount the script_name prefix. 
-        request.path_info = '/en/child_page/child_child_page/'
-        page = get_page_from_request(request, clean_path=True)
-        self.assertEqual(page, None)
 
-        # test if still work with clean path 
-        request._current_page_cache = applications_page_check(request)
-        page = get_page_from_request(request)
-        self.assertEqual(page.get_absolute_url(), '/en/child_page/child_child_page/')
-        
+        # Assert ``get_page_from_request`` take the PREFIX of SCRIPT_NAME under apphook.
+        page = get_page_from_request(request, clean_path=True)
+        self.assertEqual(page.get_title(), 'child_child_page')
