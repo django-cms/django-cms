@@ -1089,7 +1089,6 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
 
         request = self.get_request(path, use_script_name=True)
         self.assertEqual(request.path, '/PREFIX' + path)
-        request.LANGUAGE_CODE = 'en'
 
         # Assert ``get_page_from_request`` take the PREFIX of SCRIPT_NAME under apphook.
         page = get_page_from_request(request, clean_path=True)
