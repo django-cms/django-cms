@@ -403,7 +403,6 @@ class BaseCMSTestCase:
         request = request or self.get_request()
         return StructureRenderer(request)
 
-
     def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None, domain=None,
                     script_name=None):
         factory = RequestFactory()
