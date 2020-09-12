@@ -150,14 +150,10 @@ def get_page_from_request(request, use_path=None, clean_path=None):
 
     draft = use_draft(request)
     preview = 'preview' in request.GET
-    path = request.path if use_path is None else use_path
+    path = request.path_info if use_path is None else use_path
 
     if clean_path:
         pages_root = reverse("pages-root")
-
-        script_name = request.META['SCRIPT_NAME']
-        if script_name and path.startswith(script_name):
-            path = path[len(script_name):]
 
         if path.startswith(pages_root):
             path = path[len(pages_root):]
