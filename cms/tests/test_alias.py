@@ -93,9 +93,11 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertContains(response, '<div class="info">', html=False)
 
     def test_alias_plugins_no_recursion_across_page_translation(self):
-        # Test only alias plugins across page translation, sample use case with a menu plugin
-        # in static_placeholder who use translation pages title) 
-        # Alias placeholder across across page translation is not implemented.
+        '''
+        Test only alias plugins across page translation, sample use case with a menu plugin
+        in static_placeholder who use translation pages title) 
+        Alias placeholder across page translation is not implemented.
+        '''
 
         page = api.create_page(
             "Alias plugin",
