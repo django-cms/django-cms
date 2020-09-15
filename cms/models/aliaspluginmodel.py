@@ -58,4 +58,6 @@ class AliasPluginModel(CMSPlugin):
             Q(plugin__placeholder=self.placeholder_id) |
             Q(alias_placeholder=self.placeholder_id)
         )
+        if self.plugin and self.plugin.language != self.language:
+            return False
         return plugins.exists()
