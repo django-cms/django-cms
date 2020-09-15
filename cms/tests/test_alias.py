@@ -92,7 +92,11 @@ class AliasTestCase(TransactionCMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<div class="info">', html=False)
 
-    def test_alias_recursion_across_page_translation(self):
+    def test_alias_plugins_no_recursion_across_page_translation(self):
+        # Test only alias plugins across page translation, sample use case with a menu plugin
+        # in static_placeholder who use translation pages title) 
+        # Alias placeholder across across page translation is not implemented.
+
         page = api.create_page(
             "Alias plugin",
             "col_two.html",
@@ -103,32 +107,26 @@ class AliasTestCase(TransactionCMSTestCase):
         )
 
         ph_1 = page.placeholders.get(slot="col_left")
-        ph_2 = page.placeholders.get(slot="col_sidebar")
 
-        api.add_plugin(ph_1, 'StylePlugin', 'en', tag_type='div', class_name='info_1')
-        source_plugin = api.add_plugin(ph_2, 'StylePlugin', 'en', tag_type='div', class_name='info_2')
-
+        source_plugin = api.add_plugin(ph_1, 'StylePlugin', 'en', tag_type='div', class_name='info_1')
+        page.publish('en')
+       
         api.create_title("fr", "page_1", page)
 
-        alias_placeholder = api.add_plugin(ph_1, 'AliasPlugin', 'fr', alias_placeholder=ph_1)
-        alias_plugin = api.add_plugin(ph_2, 'AliasPlugin', 'fr', plugin=source_plugin)
-        
+        alias_plugin = api.add_plugin(ph_1, 'AliasPlugin', 'fr', plugin=source_plugin)
         page.publish('fr')
 
-        self.assertTrue(alias_placeholder.is_recursive())
-        self.assertTrue(alias_plugin.is_recursive())
+        self.assertFalse(alias_plugin.is_recursive())
 
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(page.get_absolute_url(language='fr') + '?preview&edit_off')
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, '<div class="info_2">', html=True)
             self.assertContains(response, '<div class="info_1">', html=True)
-        
+
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(page.get_absolute_url(language='fr') + '?edit')
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, '<div class="info_1">', html=True)
-            self.assertContains(response, '<div class="info_2">', html=True)
 
     def test_alias_content_plugin_display(self):
         '''
