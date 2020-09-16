@@ -9,6 +9,10 @@ Changelog
 * Introduced support for Django 3.1
 * Dropped support for Python 2.7 and Python 3.4
 * Dropped support for Django < 2.2
+* Removed ``djangocms-column`` from the manual installation instructions
+* Removed duplicate ``attr`` declaration from the documentation
+* Fixed a reference to a wrong variable in log messages in ``utils/conf.py``
+* Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 
 
 3.7.4 (2020-07-21)
