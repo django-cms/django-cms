@@ -94,7 +94,7 @@ You will need to add the following to its list of ``INSTALLED_APPS``::
     'menus',
     'treebeard',
 
-* your project ``myproject`` needs to be added for Django CMS to include the extended packages of the project like CSS and templates.
+* your project ``myproject`` needs to be added for Django to include the extended packages of the project like CSS and templates.
 * django CMS needs to use Django's :mod:`django:django.contrib.sites` framework. You'll need to set a ``SITE_ID``
   in the settings - ``SITE_ID = 1`` will suffice.
 * ``cms`` and ``menus`` are the core django CMS modules.
