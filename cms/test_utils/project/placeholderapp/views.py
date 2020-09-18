@@ -69,9 +69,9 @@ class ClassDetail(DetailView):
             template = engine.from_string(self.template_string)
             return HttpResponse(template.render(context))
         else:
-            return super(ClassDetail, self).render_to_response(context, **response_kwargs)
+            return super().render_to_response(context, **response_kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(ClassDetail, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['instance_class'] = self.model
         return context

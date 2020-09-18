@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Translators:
-# Juraj Bubniak <translations@jbub.eu>, 2013
+# 18f25ad6fa9930fc67cb11aca9d16a27, 2013
 # Juraj Hudak <juraj.hudak@solvere.sk>, 2013
 # Martin Kilian <xmartink01@gmail.com>, 2019
 # Thomas Thomas <tparobok@gmail.com>, 2016
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-19 11:09+0100\n"
-"PO-Revision-Date: 2019-11-17 15:40+0000\n"
-"Last-Translator: Martin Kilian <xmartink01@gmail.com>\n"
+"POT-Creation-Date: 2020-09-16 15:42+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: dellax <michalnebbia@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/divio/django-cms/language/sk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -517,7 +517,7 @@ msgid "Unpublish page"
 msgstr "Odpublikovať stránku"
 
 msgid "Publish page"
-msgstr "publikované"
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Určite chcete zahodiť rozpracované zmeny?"

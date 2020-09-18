@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from django.contrib.sitemaps import Sitemap
 from django.db.models import Q

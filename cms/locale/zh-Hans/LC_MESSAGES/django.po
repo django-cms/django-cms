@@ -4,15 +4,16 @@
 # 
 # Translators:
 # Translators:
+# brad luo <zzcyzzcy@163.com>, 2019
 # leaf fly <flyleaf91@sohu.com>, 2016
 # spaceoi <zhangzhaoyu@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-19 11:09+0100\n"
-"PO-Revision-Date: 2019-11-13 08:54+0000\n"
-"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
+"POT-Creation-Date: 2020-09-16 15:42+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: spaceoi <zhangzhaoyu@gmail.com>\n"
 "Language-Team: Chinese Simplified (http://www.transifex.com/divio/django-cms/language/zh-Hans/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -21,7 +22,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 msgid "All"
-msgstr ""
+msgstr "全部"
 
 msgid "Copy permissions"
 msgstr "复制权限"
@@ -36,56 +37,56 @@ msgid "Slug"
 msgstr ""
 
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "在URL中使用的标题部分"
 
 msgid "Menu Title"
 msgstr "菜单标题"
 
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "覆盖菜单中显示的内容"
 
 msgid "Page Title"
-msgstr ""
+msgstr "页标题"
 
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "覆盖浏览器顶部或书签中显示的内容"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "meta（元）标签描述"
 
 msgid "A description of the page used by search engines."
-msgstr ""
+msgstr "搜索引擎使用的页面描述。"
 
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "Slug不能为空"
 
 msgid "Page type"
 msgstr "页面类型"
 
 msgid "Page Types"
-msgstr ""
+msgstr "页面类型"
 
 msgid "Application"
-msgstr ""
+msgstr "应用程序"
 
 msgid "Hook application to this page."
-msgstr ""
+msgstr "将应用程序连接到此页面。"
 
 msgid "Overwrite URL"
-msgstr ""
+msgstr "重写 URL"
 
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "如果应该使用标准路径，则保持该字段为空。"
 
 msgid "X Frame Options"
-msgstr ""
+msgstr "X框架（X Frame）选项"
 
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr ""
+msgstr "这个页面是否可以嵌入其他页面或网站"
 
 msgid "Redirect"
-msgstr ""
+msgstr "重定向"
 
 msgid "Redirects to this URL."
 msgstr ""
@@ -796,7 +797,7 @@ msgid "slot"
 msgstr ""
 
 msgid "width"
-msgstr ""
+msgstr "款"
 
 msgid "<Empty>"
 msgstr ""

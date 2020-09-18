@@ -5,6 +5,7 @@
 # Translators:
 # Translators:
 # Anastasiadis Stavros <anastasiadis.st00@gmail.com>, 2014
+# Dimitrios Manolopoulos <j.manolopoulos83@gmail.com>, 2020
 # George Giannoulopoulos <vdotoree@yahoo.gr>, 2014
 # George Petsagourakis <petsagouris@gmail.com>, 2013
 # Kostas Papadimitriou <vinilios@gmail.com>, 2011
@@ -16,9 +17,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-19 11:09+0100\n"
-"PO-Revision-Date: 2019-11-13 08:54+0000\n"
-"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
+"POT-Creation-Date: 2020-09-16 15:42+0200\n"
+"PO-Revision-Date: 2020-05-17 22:56+0000\n"
+"Last-Translator: Dimitrios Manolopoulos <j.manolopoulos83@gmail.com>\n"
 "Language-Team: Greek (http://www.transifex.com/divio/django-cms/language/el/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -58,13 +59,13 @@ msgid ""
 msgstr "Αντικαθιστά αυτό που εμφανίζεται στο επάνω μέρος του περιηγητή ιστού σας ή στους σελιδοδείκτες"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "Περιγραφή meta tag"
 
 msgid "A description of the page used by search engines."
 msgstr "Μια λίστα με \"λέξεις κλειδιά\" που χρησιμοποιούνται μερικές φορές από τις μηχανές αναζήτησης."
 
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "Το πεδίο δεν μπορεί να είναι κενό"
 
 msgid "Page type"
 msgstr "Τύπος σελίδας"
@@ -85,10 +86,10 @@ msgid "Keep this field empty if standard path should be used."
 msgstr "Αφήστε αυτό το πεδίο κενό, για να χρησιμοποιηθεί το πρότυπο μονοπάτι (path)."
 
 msgid "X Frame Options"
-msgstr ""
+msgstr "Επιλογές Πλαισίου X"
 
 msgid "Whether this page can be embedded in other pages or websites"
-msgstr ""
+msgstr "Εάν αυτή η σελίδα μπορεί να ενσωματωθεί σε άλλες σελίδες ή ιστοτόπους"
 
 msgid "Redirect"
 msgstr "Ανακατεύθυνση"
@@ -100,21 +101,21 @@ msgid "Start typing..."
 msgstr "Άρχισε να πληκτρολογείς..."
 
 msgid "Application configurations"
-msgstr ""
+msgstr "Παραμετροποιήσεις Εφαρμογής"
 
 msgid "Language independent options"
-msgstr ""
+msgstr "Επιλογές ανεξάρτητες από τη γλώσσα προβολής"
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
-msgstr ""
+msgstr "Παρακαλώ ρυθμίστε το πεδίο %(language)s πριν επεξεργαστείτε τις ρυθμίσεις για προχωρημένους."
 
 msgid "A page with this reverse URL id exists already."
 msgstr "Υπάρχει ήδη σελίδα με το συγκεκριμένο αντίστροφο URL id."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Μη έγκυρη τιμή"
 
 msgid "An application instance using this configuration already exists."
 msgstr ""

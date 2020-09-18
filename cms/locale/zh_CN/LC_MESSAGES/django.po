@@ -15,6 +15,7 @@
 # Guanting Liu <guanting.liu@sv.cmu.edu>, 2015
 # Jinku Hu <jinkuhu@gmail.com>, 2015
 # Joe Shen <sheninter@gmail.com>, 2013
+# libingchao <popil1987@126.com>, 2019
 # Aosp T, 2017
 # ofive <glacier_05@yahoo.com.cn>, 2011
 # Ryan <ouyang.em@gmail.com>, 2013
@@ -30,9 +31,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-19 11:09+0100\n"
-"PO-Revision-Date: 2019-11-13 08:54+0000\n"
-"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
+"POT-Creation-Date: 2020-09-16 15:42+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: spaceoi <zhangzhaoyu@gmail.com>\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/divio/django-cms/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -140,10 +141,10 @@ msgid "You can't move the home page inside another page"
 msgstr ""
 
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 msgid "No"
-msgstr ""
+msgstr "否"
 
 msgid "user"
 msgstr "用户"
@@ -480,7 +481,7 @@ msgstr ""
 
 #| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
-msgstr ""
+msgstr "复制所有插件"
 
 #, python-format
 msgid "from %s"
@@ -532,10 +533,10 @@ msgid "Display in navigation"
 msgstr "在导航栏中显示"
 
 msgid "Unpublish page"
-msgstr "(取消发表)请求"
+msgstr ""
 
 msgid "Publish page"
-msgstr "(发表)请求"
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "您确认要还原到实时版本吗？"
@@ -758,7 +759,7 @@ msgstr "前端视图限制"
 
 #| msgid "Please select user or group first."
 msgid "Please select user or group."
-msgstr ""
+msgstr "请选择用户或组"
 
 msgid ""
 "Users can't publish a page without permissions to change the page. Edit "
@@ -928,7 +929,7 @@ msgstr "密码："
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "添加页面"
 
 msgid "Change a page"
 msgstr "修改一个页面"

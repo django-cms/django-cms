@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.test.utils import override_settings
 
@@ -92,10 +91,10 @@ class SignalTests(CMSTestCase):
                     self.assertEqual(env.call_count, 1)
 
 
-overrides = {
-    'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + settings.MIDDLEWARE
-}
-@override_settings(**overrides)
+@override_settings(**{
+    'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + settings.MIDDLEWARE,
+    'ROOT_URLCONF': "cms.test_utils.project.urls_2"
+})
 class ApphooksReloadTests(CMSTestCase):
     def test_urls_reloaded(self):
         """

@@ -363,15 +363,6 @@ Menu system classes and function
         convention used by :class:`cms.models.Page`.
 
 
-    ..  attribute:: attr
-
-        A dictionary, provided in order that arbitrary attributes may be added to the node -
-        placing them directly on the node itself could cause a clash with an existing or future attribute.
-
-        An important key in this dictionary is ``is_page``: if ``True``, the node represents a django CMS ``Page``
-        object.
-
-
 ..  class:: menus.modifiers.Marker
 
 ..  class:: menus.modifiers.AuthVisibility

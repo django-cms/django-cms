@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import datetime
 import pickle
@@ -8,13 +7,12 @@ from cms.api import create_page
 
 from django import http
 from django.conf import settings
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
-from django.urls import reverse
+from django.urls import reverse, re_path
 from django.utils import timezone
 from django.utils.encoding import force_text
 from django.utils.translation import override as force_language
@@ -93,8 +91,10 @@ class DumbFixturePluginWithUrls(DumbFixturePlugin):
 
     def get_plugin_urls(self):
         return [
-            url(r'^testview/$', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
+            re_path(r'^testview/$', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
         ]
+
+
 plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 
@@ -121,7 +121,7 @@ class PluginsTestBaseCase(CMSTestCase):
         return self.reload_page(page)
 
     def get_request(self, *args, **kwargs):
-        request = super(PluginsTestBaseCase, self).get_request(*args, **kwargs)
+        request = super().get_request(*args, **kwargs)
         request.placeholder_media = Media()
         request.toolbar = CMSToolbar(request)
         return request
@@ -1536,3 +1536,26 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
                          'mti_pluginapp_lessmixedplugin')
         # Non plugins are skipped
         self.assertFalse(hasattr(NonPluginModel, 'cmsplugin_ptr'))
+
+
+class UserInputValidationPluginTest(PluginsTestBaseCase):
+
+    def test_error_response_escapes(self):
+        superuser = self.get_superuser()
+        page = api.create_page(
+            title='error page',
+            template='nav_playground.html',
+            language='en'
+        )
+        url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
+            'plugin_type': 'TextPlugin"><script>alert("hello world")</script>',
+            'placeholder_id': page.placeholders.get(slot='body').id,
+            'cms_path': page.get_path(),
+            'plugin_language': settings.LANGUAGES[0][0],
+        })
+
+        with self.login_user_context(superuser):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('TextPlugin&quot;&gt;&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;', response.content.decode("utf-8"))

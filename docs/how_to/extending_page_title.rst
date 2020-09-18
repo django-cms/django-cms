@@ -119,7 +119,7 @@ selected, it will open a modal dialog in which the *Page icon* field can be edit
 
     from cms.toolbar_pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from .models import IconExtension
 
 
@@ -197,7 +197,7 @@ In this example, we need to loop over the titles for the page, and populate the 
 
     from cms.toolbar_pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from .models import RatingExtension
     from cms.utils import get_language_list  # needed to get the page's languages
     @toolbar_pool.register
@@ -261,7 +261,7 @@ page extension model will be available on ``page.iconextension``. From there
 you can access the extra fields you defined in your extension, so you can use
 something like::
 
-    {% load staticfiles %}
+    {% load static %}
 
     {# rest of template omitted ... #}
 
@@ -352,7 +352,7 @@ low-level API to edit the toolbar according to your needs::
     from cms.utils import get_cms_setting
     from cms.utils.page_permissions import user_can_change_page
     from django.urls import reverse, NoReverseMatch
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from .models import IconExtension
 
 

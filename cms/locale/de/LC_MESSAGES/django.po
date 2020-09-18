@@ -23,7 +23,7 @@
 # o.zander <oliver.zander@gmail.com>, 2014
 # Patrick Lauber <patrick.lauber@divio.ch>, 2012-2015
 # Peter Bittner <django@bittner.it>, 2015
-# Peter Wischer <peter.wischer@lwl.org>, 2017-2018
+# Peter Wischer <peter.wischer@lwl.org>, 2017-2020
 # Roland <rka@beautyparlour.at>, 2013
 # Roland <rka@beautyparlour.at>, 2013
 # SachaMPS <sacha@mllrsohn.com>, 2015
@@ -35,9 +35,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-19 11:09+0100\n"
-"PO-Revision-Date: 2019-11-13 08:54+0000\n"
-"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
+"POT-Creation-Date: 2020-09-16 15:42+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: Jannik Vieten <me@exploide.net>\n"
 "Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1305,7 +1305,7 @@ msgid "The page was changed in the meantime, reloading..."
 msgstr "Die Seite wurde in der Zwischenzeit verändert, lade neu..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "CMS-weite Tastenkürzel"
 
 msgid "Bring up this help dialog"
 msgstr "Diesen Hilfedialog anzeigen"
@@ -1328,7 +1328,7 @@ msgstr "Toolbar fokussieren"
 
 #| msgid "Structure"
 msgid "Structureboard"
-msgstr ""
+msgstr "Strukturansicht"
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 from django.db.models import Model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 
 
-class ObjectPermissionBackend(object):
+class ObjectPermissionBackend:
     def has_perm(self, user_obj, perm, obj=None):
         if user_obj and user_obj.is_superuser:
             return True

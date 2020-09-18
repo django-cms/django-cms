@@ -20,16 +20,16 @@ def time_it(func):
 class TimingSuite(TestSuite):
     def addTest(self, test):
         test = time_it(test)
-        super(TimingSuite, self).addTest(test)
+        super().addTest(test)
 
 
 class TimedTestRunner(DjangoTestSuiteRunner):
     def build_suite(self, test_labels, extra_tests=None, **kwargs):
-        suite = super(TimedTestRunner, self).build_suite(test_labels, extra_tests, **kwargs)
+        suite = super().build_suite(test_labels, extra_tests, **kwargs)
         return TimingSuite(suite)
 
     def teardown_test_environment(self, **kwargs):
-        super(TimedTestRunner, self).teardown_test_environment(**kwargs)
+        super().teardown_test_environment(**kwargs)
         by_time = sorted(
                 TIMINGS.items(),
                 key=operator.itemgetter(1),
