@@ -114,6 +114,5 @@ spelling:
 	@echo "Check finished. Wrong words can be found in " \
 		"build/spelling/output.txt."
 
-
 run:
 	. $(VENV); sphinx-autobuild $(ALLSPHINXOPTS) build/html --host 0.0.0.0 --port $(PORT)
