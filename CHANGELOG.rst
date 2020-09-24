@@ -14,6 +14,7 @@ Changelog
 * Fixed a reference to a wrong variable in log messages in ``utils/conf.py``
 * Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 * Improved documentation building
+* Updated the content for django CMS’s development community
 
 
 3.7.4 (2020-07-21)
