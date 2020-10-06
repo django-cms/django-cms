@@ -268,6 +268,17 @@ class ViewTests(CMSTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/de/jobs/')
 
+    def test_page_sanitisation_xss_attack(self):
+        """
+            Page contents could
+        """
+        test_page = create_page("<script>echo('attack!')</script>", "nav_playground.html", "en")
+        request = self.get_request(test_page.get_absolute_url(()))
+
+        response = details(request, test_page.get_slug("en"))
+
+        self.assertIn(response.content, "&lt;script&gt;echo(&#39;attack!&#39;)&lt;/script&gt;")
+
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
 class ContextTests(CMSTestCase):
