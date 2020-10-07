@@ -270,14 +270,25 @@ class ViewTests(CMSTestCase):
 
     def test_page_sanitisation_xss_attack(self):
         """
-            Page contents could
+            Page contents could be used to inject scripts according to vulnerability tests run on
+            the CMS, confirm this is not an issue.
         """
-        test_page = create_page("<script>echo('attack!')</script>", "nav_playground.html", "en")
-        request = self.get_request(test_page.get_absolute_url(()))
+        test_page_no_redirect = create_page("<script>echo('attack!')</script>", "nav_playground.html", "en")
+        test_page_redirect = create_page(
+            "<script>echo('attack!')</script>", "nav_playground.html", "en", redirect="https://www.example.com"
+        )
+        request = self.get_request(test_page_no_redirect.get_absolute_url(()))
+        request_redirect = self.get_request(test_page_redirect.get_absolute_url(()))
 
-        response = details(request, test_page.get_slug("en"))
+        response = details(request, test_page_no_redirect.get_slug("en"))
+        response_redirect = details(request_redirect, test_page_redirect.get_slug("en"))
 
-        self.assertIn(response.content, "&lt;script&gt;echo(&#39;attack!&#39;)&lt;/script&gt;")
+        # Ensure that the script is sanitised in page render
+        self.assertIn("&lt;script&gt;echo(&#39;attack!&#39;)&lt;/script&gt;", str(response.render().content))
+
+        # Ensure content doesn't contain attack and that response was to redirect
+        self.assertNotIn("<script>echo('attack!')</script>", str(response_redirect.content))
+        self.assertEqual(response_redirect.status_code, 302)
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
