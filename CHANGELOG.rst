@@ -15,6 +15,7 @@ Changelog
 * Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 * Improved documentation building
 * Updated the content for django CMS’s development community
+* Added an example of sqlite database configuration in documentation
 
 
 3.7.4 (2020-07-21)
