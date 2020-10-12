@@ -179,6 +179,8 @@ def login(request):
 
     if not is_safe_url(url=redirect_to, allowed_hosts=request.get_host()):
         redirect_to = reverse("pages-root")
+    else:
+        redirect_to = urlquote(redirect_to)
 
     if request.user.is_authenticated:
         return HttpResponseRedirect(redirect_to)
@@ -188,6 +190,7 @@ def login(request):
     if form.is_valid():
         auth_login(request, form.user_cache)
     else:
+        print(form.errors)
         redirect_to += u'?cms_toolbar_login_error=1'
     return HttpResponseRedirect(redirect_to)
 
