@@ -6,6 +6,7 @@ from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
 from cms.utils.urlutils import admin_reverse
 from django.conf.urls import url
+from django.utils.html import conditional_escape
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
 from django.utils.translation import ugettext, ugettext_lazy as _, get_language
@@ -111,12 +112,14 @@ class AliasPlugin(CMSPluginBase):
             try:
                 plugin = CMSPlugin.objects.get(pk=pk)
             except CMSPlugin.DoesNotExist:
+                pk = conditional_escape(pk)
                 return HttpResponseBadRequest("plugin with id %s not found." % pk)
         if 'placeholder_id' in request.POST:
             pk = request.POST['placeholder_id']
             try:
                 placeholder = Placeholder.objects.get(pk=pk)
             except Placeholder.DoesNotExist:
+                pk = conditional_escape(pk)
                 return HttpResponseBadRequest("placeholder with id %s not found." % pk)
             if not placeholder.has_change_permission(request.user):
                 return HttpResponseBadRequest("You do not have enough permission to alias this placeholder.")
