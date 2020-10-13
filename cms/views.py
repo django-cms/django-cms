@@ -190,7 +190,6 @@ def login(request):
     if form.is_valid():
         auth_login(request, form.user_cache)
     else:
-        print(form.errors)
         redirect_to += u'?cms_toolbar_login_error=1'
     return HttpResponseRedirect(redirect_to)
 

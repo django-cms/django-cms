@@ -291,7 +291,7 @@ class ContextTests(CMSTestCase):
         from django.template import context
 
         page_template = "nav_playground.html"
-        original_context = {'TEMPLATES' : settings.TEMPLATES}
+        original_context = {'TEMPLATES': settings.TEMPLATES}
         page = self.create_homepage("page", page_template, "en")
         page_2 = create_page("page-2", page_template, "en",
                              parent=page)
