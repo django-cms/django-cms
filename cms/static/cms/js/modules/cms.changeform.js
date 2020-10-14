@@ -11,7 +11,7 @@ $(function() {
 
     // all permissions and page states loader
     $('div.loading').each(function() {
-        $(this).load($(this).attr('rel'));
+        $(this).on('load', $(this).attr('rel'));
     });
 
     // hide rows when hidden input fields are added
