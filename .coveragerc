@@ -1,8 +1,8 @@
 [run]
+branch = False
 source =
     cms
     menus
-branch = False
 omit =
     cms/migrations/*
     cms/south_migrations/*

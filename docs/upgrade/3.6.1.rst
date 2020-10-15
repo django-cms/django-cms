@@ -1,0 +1,14 @@
+.. _upgrade-to-3.6.1:
+
+###################
+3.6.1 release notes
+###################
+
+*******************
+What's new in 3.6.1
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a security vulnerability in the plugin_type url parameter to insert JavaScript code.

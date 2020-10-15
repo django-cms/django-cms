@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from djangocms_text_ckeditor.models import Text
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -39,7 +38,7 @@ class PublisherCommandTests(TestCase):
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
             call_command('cms', 'publisher-publish')
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            lines = buffer.getvalue().split('\n')  # NB: readlines() doesn't work
 
         for line in lines:
             if 'Total' in line:
@@ -62,7 +61,7 @@ class PublisherCommandTests(TestCase):
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
             call_command('cms', 'publisher-publish')
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            lines = buffer.getvalue().split('\n')  # NB: readlines() doesn't work
 
         for line in lines:
             if 'Total' in line:
@@ -87,7 +86,7 @@ class PublisherCommandTests(TestCase):
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
             call_command('cms', 'publisher-publish', include_unpublished=True)
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            lines = buffer.getvalue().split('\n')  # NB: readlines() doesn't work
 
         for line in lines:
             if 'Total' in line:
@@ -118,7 +117,7 @@ class PublisherCommandTests(TestCase):
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
             call_command('cms', 'publisher-publish', language='de')
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            lines = buffer.getvalue().split('\n')  # NB: readlines() doesn't work
 
         for line in lines:
             if 'Total' in line:
@@ -152,7 +151,7 @@ class PublisherCommandTests(TestCase):
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
             call_command('cms', 'publisher-publish', language='de', include_unpublished=True)
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            lines = buffer.getvalue().split('\n')  # NB: readlines() doesn't work
 
         for line in lines:
             if 'Total' in line:
@@ -221,7 +220,7 @@ class PublisherCommandTests(TestCase):
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
             call_command('cms', 'publisher-publish')
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            lines = buffer.getvalue().split('\n')  # NB: readlines() doesn't work
 
         for line in lines:
             if 'Total' in line:
@@ -279,7 +278,7 @@ class PublisherCommandTests(TestCase):
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
             call_command('cms', 'publisher-publish', site=siteB.id)
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            lines = buffer.getvalue().split('\n')  # NB: readlines() doesn't work
 
         for line in lines:
             if 'Total' in line:
@@ -310,7 +309,7 @@ class PublisherCommandTests(TestCase):
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
             call_command('cms', 'publisher-publish')
-            lines = buffer.getvalue().split('\n') #NB: readlines() doesn't work
+            lines = buffer.getvalue().split('\n')  # NB: readlines() doesn't work
 
         for line in lines:
             if 'Total' in line:

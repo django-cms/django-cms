@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import datetime
 import iptools
@@ -17,7 +16,7 @@ from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.html import escape
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
@@ -187,6 +186,15 @@ class ToolbarTests(ToolbarTestBase):
         self.assertRedirects(response, '/en/admin/')
         self.assertTrue(settings.SESSION_COOKIE_NAME in response.cookies)
 
+    def test_toolbar_login_non_staff(self):
+        admin = self.get_nonstaff()
+        endpoint = reverse('cms_login') + '?next=/en/admin/'
+        username = getattr(admin, get_user_model().USERNAME_FIELD)
+        password = getattr(admin, get_user_model().USERNAME_FIELD)
+        response = self.client.post(endpoint, data={'username': username, 'password': password})
+        self.assertRedirects(response, '/en/admin/?cms_toolbar_login_error=1', target_status_code=302)
+        self.assertFalse(settings.SESSION_COOKIE_NAME in response.cookies)
+
     def test_toolbar_login_error(self):
         admin = self.get_superuser()
         endpoint = reverse('cms_login') + '?next=/en/admin/'
@@ -217,8 +225,8 @@ class ToolbarTests(ToolbarTestBase):
         with self.login_user_context(self.get_superuser()):
             endpoint = cms_page.get_absolute_url() + '?' + get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
             response = self.client.get(endpoint)
-            self.assertContains(response, '<script type="text/javascript" src="/static/samplemap/js/sampleapp.js"></script>')
-            self.assertContains(response, '<link href="/static/samplemap/css/sampleapp.css"')
+            self.assertContains(response, 'src="/static/samplemap/js/sampleapp.js"')
+            self.assertContains(response, 'href="/static/samplemap/css/sampleapp.css"')
         toolbar_pool.toolbars = old_pool
         toolbar_pool._discovered = True
 
@@ -1166,7 +1174,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def tearDown(self):
         Example1.objects.all().delete()
-        super(EditModelTemplateTagTest, self).tearDown()
+        super().tearDown()
 
     def test_markup_toolbar_url_model(self):
         superuser = self.get_superuser()

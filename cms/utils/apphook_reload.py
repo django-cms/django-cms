@@ -1,7 +1,3 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import
-
 import sys
 import uuid
 
@@ -10,8 +6,7 @@ from threading import local
 from django.conf import settings
 from django.urls import reverse, clear_url_caches
 
-# Py2 and Py3 compatible reload
-from imp import reload
+from importlib import reload
 
 _urlconf_revision = {}
 _urlconf_revision_threadlocal = local()

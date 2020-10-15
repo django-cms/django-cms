@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django import forms
 
 from cms.models import Page
@@ -24,14 +23,14 @@ def step2_form_factory(mixin_cls, entry_form_class, attrs=None):
     return FormClass
 
 
-class BaseFormMixin(object):
+class BaseFormMixin:
     has_separate_optional_fields = False
 
     def __init__(self, *args, **kwargs):
         self.page = kwargs.pop('wizard_page', None)
         self.user = kwargs.pop('wizard_user', None)
         self.language_code = kwargs.pop('wizard_language')
-        super(BaseFormMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def required_fields(self):
@@ -48,7 +47,7 @@ class WizardOptionWidgets(forms.RadioSelect):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         wizard = wizard_pool.get_entry(value)
         attrs.update(wizard.widget_attributes)
-        return super(WizardOptionWidgets, self).create_option(name, value, label, selected, index, subindex, attrs)
+        return super().create_option(name, value, label, selected, index, subindex, attrs)
 
 
 class WizardStep1Form(BaseFormMixin, forms.Form):
@@ -73,7 +72,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     entry = forms.ChoiceField(choices=[], widget=WizardOptionWidgets())
 
     def __init__(self, *args, **kwargs):
-        super(WizardStep1Form, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # set the entries here to get an up to date list of entries.
         self.fields['entry'].choices = entry_choices(
             user=self.user,

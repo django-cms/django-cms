@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.sites.models import Site
 
 from cms.utils.urlutils import urljoin, admin_reverse

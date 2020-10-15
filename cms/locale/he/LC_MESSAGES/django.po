@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Translators:
-# Alex Trost <trostik@gmail.com>, 2013
+# 30a61d5f1156f1c74ae8ac6dfaa6a072, 2013
 # Daniel Braun <dbraun86@gmail.com>, 2013
 # Daniel Braun <dbraun86@gmail.com>, 2013
 # Fishfur A Banter <fishfurbanter@gmail.com>, 2016
@@ -12,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 13:20+0100\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2020-09-16 15:42+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: Fishfur A Banter <fishfurbanter@gmail.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/divio/django-cms/language/he/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1283,6 +1283,9 @@ msgstr "קיצורי דרך"
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr "הצג את דיאלוג העזרה הזה"
 
@@ -1300,6 +1303,10 @@ msgid "Open \"Create\" dialog"
 msgstr ""
 
 msgid "Focus on Toolbar"
+msgstr ""
+
+#| msgid "Structure"
+msgid "Structureboard"
 msgstr ""
 
 #| msgid "static placeholders"

@@ -24,24 +24,24 @@ on the subject.
 
 Here's a full example of ``urls.py``::
 
-    from django.conf import settings
-    from django.conf.urls import include, url
+    from django.conf.urls.i18n import i18n_patterns
     from django.contrib import admin
-    from django.conf.urls.i18n import i18n_patterns, JavascriptCatalog
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    from django.urls import include, re_path
+    from django.views.i18n import JavaScriptCatalog
+
 
     admin.autodiscover()
 
-    urlpatterns = [
-        url(r'^jsi18n/(?P<packages>\S+?)/$', JavascriptCatalog.as_view()),
-    ]
-
+    urlpatterns = i18n_patterns(
+        re_path(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    )
     urlpatterns += staticfiles_urlpatterns()
 
     # note the django CMS URLs included via i18n_patterns
-    urlpatterns += i18n_patterns('',
-        url(r'^admin/', admin.site.urls),
-        url(r'^', include('cms.urls')),
+    urlpatterns += i18n_patterns(
+        re_path(r'^admin/', include(admin.site.urls)),
+        re_path(r'^', include('cms.urls')),
     )
 
 
@@ -51,8 +51,8 @@ Monolingual URLs
 Of course, if you want only monolingual URLs, without a language code, simply don't use :func:`~django.conf.urls.i18n.i18n_patterns`::
 
     urlpatterns += [
-        url(r'^admin/', admin.site.urls),
-        url(r'^', include('cms.urls')),
+        re_path(r'^admin/', admin.site.urls),
+        re_path(r'^', include('cms.urls')),
     ]
 
 
@@ -62,7 +62,7 @@ Store the user's language preference
 
 The user's preferred language is maintained through a browsing session. So that django CMS remembers the user's preference in
 subsequent sessions, it must be stored in a cookie. To enable this, ``cms.middleware.language.LanguageCookieMiddleware`` must
-be added to the project's ``MIDDLEWARE_CLASSES`` setting.
+be added to the project's ``MIDDLEWARE`` setting.
 
 See :ref:`determining_language_preference` for more information about how this works.
 
@@ -99,7 +99,7 @@ Example:
             self.object = self.get_object()
             if hasattr(self.request, 'toolbar'):
                 self.request.toolbar.set_object(self.object)
-            response = super(AnswerView, self).get(*args, **kwargs)
+            response = super().get(*args, **kwargs)
             return response
 
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.sites.models import Site
@@ -58,10 +57,10 @@ class ViewPermissionTests(CMSTestCase):
     def setUp(self):
         self.site = Site()
         self.site.pk = 1
-        super(ViewPermissionTests, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(ViewPermissionTests, self).tearDown()
+        super().tearDown()
 
     def _setup_tree_pages(self):
         stdkwargs = {

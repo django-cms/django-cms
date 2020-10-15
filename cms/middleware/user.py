@@ -1,10 +1,9 @@
-# -*- coding: utf-8 -*-
 """This is ugly, but seems there's no other way how to do what we need for
 permission system.
 
 This middleware is required only when CMS_PERMISSION = True.
 """
-from cms.utils.compat.dj import MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin
 
 
 class CurrentUserMiddleware(MiddlewareMixin):

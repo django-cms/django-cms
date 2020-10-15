@@ -53,7 +53,7 @@ documentation might advise that you when include its URLs, you do it thus:
 
 ..  code-block:: python
 
-    url(r'^myapp/', include('myapp.urls', app_name='myapp'))
+    re_path(r'^myapp/', include('myapp.urls', app_name='myapp'))
 
 If you fail to do this, then any templates in the application that invoke URLs using the form ``{% url
 'myapp:index' %}`` or views that call (for example) ``reverse('myapp:index')`` will throw a
@@ -85,16 +85,16 @@ to return them manually, for example if you need to override the set provided. A
 
 ..  code-block:: python
 
-    from django.conf.urls import url
+    from django.urls import re_path
     from myapp.views import SomeListView, SomeDetailView
 
     class MyApphook(CMSApp):
         # ...
         def get_urls(self, page=None, language=None, **kwargs):
             return [
-                url(r'^$', SomeListView.as_view()),
-                url(r'^(?P<slug>[\w-]+)/?$', SomeDetailView.as_view()),
-                ]
+                re_path(r'^$', SomeListView.as_view()),
+                re_path(r'^(?P<slug>[\w-]+)/?$', SomeDetailView.as_view()),
+            ]
 
 However, it's much neater to keep them in the application's ``urls.py``, where they can easily be
 reused.
@@ -139,8 +139,8 @@ page's own URL, and any lower-level URLs will be on the same URL path.
 So, given an application with the ``urls.py`` for the views ``index_view`` and ``archive_view``::
 
     urlpatterns = [
-        url(r'^$', index_view),
-        url(r'^archive/$', archive_view),
+        re_path(r'^$', index_view),
+        re_path(r'^archive/$', archive_view),
     ]
 
 attached to a page whose URL path is ``/hello/world/``, the views will be exposed as follows:

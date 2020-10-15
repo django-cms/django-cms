@@ -5,7 +5,7 @@
 ###################
 
 This release of django CMS concentrates on introducing support for Django 2.0
-and Django 2.1 and dropping support for Django versions lower than 1.11.
+and Django 2.1, and dropping support for Django versions lower than 1.11.
 
 
 *******************
@@ -19,8 +19,8 @@ Improvements and new features
 * introduced support for Django 2.1
 * removed support for Django versions older than 1.11
 * added ``page_title`` parameter for ``cms.api.create_page()`` and ``cms.api.create_title()``
-* length restriction for ``Title.meta_description`` was moved from model to form.
-  field length was increased to 320 characters.
+* length restriction for ``Title.meta_description`` was moved from model to form; field length was
+  increased to 320 characters.
 
 
 Removal of deprecated functionality
@@ -30,7 +30,7 @@ Previously deprecated functionality has been removed:
 
 * Signal handlers for ``Page``, ``Title``, ``Placeholder`` and ``CMSPlugin`` models was removed.
 * Removed the ``cms moderator`` command.
-* Removed the translatable content get / set methods from ``CMSPlugin`` model.
+* Removed the translatable content ``get``/``set`` methods from ``CMSPlugin`` model.
 
 
 *********************
@@ -50,7 +50,7 @@ Then run::
 Check custom code and third-party applications for use of deprecated or removed functionality or
 APIs (see above). Some third-party components may need to be updated.
 
-Install the new version of django CMS from GitHub.
+Install the new version of django CMS from GitHub or via pip.
 
 Run::
 
@@ -73,13 +73,11 @@ The Divio Cloud offers an easy way to set up django CMS projects. In the `Divio 
 Using the django CMS Installer
 ==============================
 
-See our :ref:`installation guide in the tutorial <install-django-cms-tutorial>`. However, make
-sure that you:
+..  note::
 
-* have installed the latest version of django CMS Installer (at least version ``1.0.2``)
-* specify the version to install as ``develop``: ``djangocms --cms-version=develop mysite``
+    The django CMS Installer is not yet available for django CMS 3.6 or Django 2 or later.
 
-The user name and password will both be ``admin``.
+    This section will be updated or removed before the final release of django CMS 3.6.
 
 
 ****************************
@@ -87,7 +85,6 @@ Contributors to this release
 ****************************
 
 * Daniele Procida
-* Paulo
 * Vadim Sikora
 * Paulo Alvarado
 * Bartosz Płóciennik

@@ -15,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 13:20+0100\n"
-"PO-Revision-Date: 2018-11-09 12:08+0000\n"
-"Last-Translator: Bartosz Płóciennik <thaian@outlook.com>\n"
+"POT-Creation-Date: 2020-09-16 15:42+0200\n"
+"PO-Revision-Date: 2020-04-21 13:37+0000\n"
+"Last-Translator: tenomoto <takeshi@enomosphere.net>\n"
 "Language-Team: Japanese (http://www.transifex.com/divio/django-cms/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -517,10 +517,10 @@ msgid "Display in navigation"
 msgstr "ナビゲーションに表示する"
 
 msgid "Unpublish page"
-msgstr "ページを非公開にする"
+msgstr ""
 
 msgid "Publish page"
-msgstr "ページを公開する"
+msgstr ""
 
 msgid "Are you sure you want to revert to live?"
 msgstr "このページをライブに戻してよいですか？"
@@ -1283,6 +1283,9 @@ msgstr "ショートカット"
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr "このヘルプダイアログを表示する"
 
@@ -1301,6 +1304,10 @@ msgstr "「作成」ダイアログを開く"
 
 msgid "Focus on Toolbar"
 msgstr "ツールバーにフォーカスする"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr ""
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

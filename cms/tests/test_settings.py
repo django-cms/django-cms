@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from classytags.utils import flatten_context
 
 from cms import constants

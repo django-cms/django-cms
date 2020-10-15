@@ -1,9 +1,6 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import absolute_import, unicode_literals
+from django.utils.deprecation import MiddlewareMixin
 
 from cms.utils import apphook_reload
-from cms.utils.compat.dj import MiddlewareMixin
 
 
 class ApphookReloadMiddleware(MiddlewareMixin):

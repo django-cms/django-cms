@@ -15,7 +15,7 @@
 # ksiedlarek <katarzyna@siedlarek.pl>, 2014
 # ksiedlarek <katarzyna@siedlarek.pl>, 2014
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
-# Maciej Kostuch <kostuchmaciek@gmail.com>, 2017-2018
+# Maciej Kostuch <kostuchmaciek@gmail.com>, 2017-2018,2020
 # m_aciek <maciej.olko@gmail.com>, 2016-2018
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
 # Piotr Kilczuk <p.kilczuk@neumea.pl>, 2013
@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-09 13:20+0100\n"
-"PO-Revision-Date: 2018-11-20 21:07+0000\n"
+"POT-Creation-Date: 2020-09-16 15:42+0200\n"
+"PO-Revision-Date: 2020-07-02 20:53+0000\n"
 "Last-Translator: Maciej Kostuch <kostuchmaciek@gmail.com>\n"
 "Language-Team: Polish (http://www.transifex.com/divio/django-cms/language/pl/)\n"
 "MIME-Version: 1.0\n"
@@ -534,10 +534,10 @@ msgid "Display in navigation"
 msgstr "Wyświetl w menu"
 
 msgid "Unpublish page"
-msgstr "do cofnięcia publikacji"
+msgstr "Anuluj publikowanie"
 
 msgid "Publish page"
-msgstr "do publikacji"
+msgstr "Opublikuj stronę"
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Czy na pewno chcesz przywrócić?"
@@ -1303,6 +1303,9 @@ msgstr "Skróty"
 msgid "The page was changed in the meantime, reloading..."
 msgstr "Strona została w międzyczasie zmieniona, przeładowanie…"
 
+msgid "CMS-wide Shortcuts"
+msgstr "Skróty CMS-a"
+
 msgid "Bring up this help dialog"
 msgstr "Wyświetl okno pomocy"
 
@@ -1321,6 +1324,10 @@ msgstr "Otwór okno \"Utwórz\""
 
 msgid "Focus on Toolbar"
 msgstr "Zaznacz pasek narzędzi"
+
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr "Podgląd struktury"
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"

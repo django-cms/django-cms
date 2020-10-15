@@ -1,7 +1,7 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from cms.test_utils.project.sampleapp import views
 
 urlpatterns = [
-    url(r'^(?P<path>.+)$', views.childapp_view, name='childapp_view'),
+    re_path(r'^(?P<path>.+)$', views.childapp_view, name='childapp_view'),
 ]

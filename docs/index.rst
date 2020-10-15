@@ -93,13 +93,15 @@ Our IRC channel, #django-cms, is on ``irc.freenode.net``. If you don't have an I
 
 .. rst-class:: column column3
 
-Our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ is for **general** django CMS questions and discussion
+Our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ is for
+**general discussions** and the `django CMS developers email list
+<https://groups.google.com/forum/#!forum/django-cms-developers>`_ for the
+**development of django CMS**.
 
 .. rst-class:: column column3
 
-Our `django CMS developers email list
-<https://groups.google.com/forum/#!forum/django-cms-developers>`_ is for discussions about the
-**development of django CMS**
+Our `StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_ is for
+**questions** around django CMS and it's plugin ecosystem.
 
 
 ***************
@@ -138,21 +140,29 @@ This document refers to version |release|.
 Django/Python compatibility table
 =================================
 
-===========  =======  =======  ===  ===  ====  ====  ===  ===  ===  ===  ===  ===  ===  ===
-django CMS   Django                                                       Python
------------  ------------------------------------------------  ----------------------------
-\            1.4/1.5  1.6/1.7  1.8  1.9  1.10  1.11  2.0  2.1  2.6  2.7  3.3  3.4  3.5  3.6
+*LTS* in the table indicates a combination of Django and django CMS *both* covered
+by a long-term support policy.
 
-===========  =======  =======  ===  ===  ====  ====  ===  ===  ===  ===  ===  ===  ===  ===
-3.0.18       ✓        ✓        ⨯    ⨯    ⨯     ⨯     ⨯    ⨯    ✓    ✓    ✓    ✓    ⨯    ⨯
-3.1.7        ⨯        ✓        ✓    ⨯    ⨯     ⨯     ⨯    ⨯    ✓    ✓    ✓    ✓    ⨯    ⨯
-3.2.0        ⨯        ✓        ✓    ⨯    ⨯     ⨯     ⨯    ⨯    ✓    ✓    ✓    ✓    ⨯    ⨯
-3.2.1-3.2.5  ⨯        ✓        ✓    ✓    ⨯     ⨯     ⨯    ⨯    ✓    ✓    ✓    ✓    ✓    ⨯
-3.3.0-3.4.1  ⨯        ⨯        ✓    ✓    ⨯     ⨯     ⨯    ⨯    ⨯    ✓    ✓    ✓    ✓    ⨯
-3.4.2-3.4.4  ⨯        ⨯        ✓    ✓    ✓     ⨯     ⨯    ⨯    ⨯    ✓    ✓    ✓    ✓    ⨯
-3.4.5-3.5.x  ⨯        ⨯        ✓    ✓    ✓     ✓     ⨯    ⨯    ⨯    ✓    ✓    ✓    ✓    ✓
-3.6.x        ⨯        ⨯        ⨯    ⨯    ⨯     ✓     ✓    ✓    ⨯    ✓    ✓    ✓    ✓    ✓
-===========  =======  =======  ===  ===  ====  ====  ===  ===  ===  ===  ===  ===  ===  ===
+*✓* indicates that the version has been tested and works. *x* indicates that it has not been tested, or
+is known to be incompatible.
+
+===========  === === === === === === === ===    === === === === ==== ==== === === === ===
+django CMS   Python                             Django
+-----------  -------------------------------    -----------------------------------------
+\            3.8 3.7 3.6 3.5 3.4 3.3 2.7 2.6    3.0 2.2 2.1 2.0 1.11 1.10 1.9 1.8 1.6 1.4
+===========  === === === === === === === ===    === === === === ==== ==== === === === ===
+3.7.x        ✓   ✓   ✓   ✓   ✓   ✓   ✓   ⨯      ✓   LTS ✓   ✓   LTS  ⨯    ⨯   ⨯   ⨯   ⨯
+3.6.x        ⨯   ✓   ✓   ✓   ✓   ✓   ✓   ⨯      x   ✓   ✓   ✓   ✓    ⨯    ⨯   ⨯   ⨯   ⨯
+3.5.x        ⨯   ✓   ✓   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   ✓    ✓    ✓   ✓   ⨯   ⨯
+3.4.5        ⨯   ⨯   ✓   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   LTS  ✓    ✓   LTS ⨯   ⨯
+3.4.2        ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   ⨯    ✓    ✓   ✓   ⨯   ⨯
+3.4.1        ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ✓   ✓   ⨯   ⨯
+3.3.x        ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ✓   ✓   ⨯   ⨯
+3.2.1        ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓   ✓      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ✓   ✓   ✓   ⨯
+3.2.0        ⨯   ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ⨯   ✓   ✓   ⨯
+3.1.7        ⨯   ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ⨯   ✓   ✓   ⨯
+3.0.18       ⨯   ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ⨯   ⨯   ✓   ✓
+===========  === === === === === === === ===    === === === === ==== ==== === === === ===
 
 
 
@@ -173,8 +183,8 @@ project.
 
     introduction/index
     how_to/index
-    topics/index
     reference/index
+    topics/index
     contributing/index
     upgrade/index
     user/index
