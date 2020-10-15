@@ -1536,3 +1536,26 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
                          'mti_pluginapp_lessmixedplugin')
         # Non plugins are skipped
         self.assertFalse(hasattr(NonPluginModel, 'cmsplugin_ptr'))
+
+
+class UserInputValidationPluginTest(PluginsTestBaseCase):
+
+    def test_error_response_escapes(self):
+        superuser = self.get_superuser()
+        page = api.create_page(
+            title='error page',
+            template='nav_playground.html',
+            language='en'
+        )
+        url = URL_CMS_PLUGIN_ADD + '?' + urlencode({
+            'plugin_type': 'TextPlugin"><script>alert("hello world")</script>',
+            'placeholder_id': page.placeholders.get(slot='body').id,
+            'cms_path': page.get_path(),
+            'plugin_language': settings.LANGUAGES[0][0],
+        })
+
+        with self.login_user_context(superuser):
+            response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn('TextPlugin&quot;&gt;&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;', response.content.decode("utf-8"))
