@@ -3,7 +3,7 @@ from abc import ABCMeta
 from collections import defaultdict
 
 from django.template.loader import render_to_string
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
@@ -221,7 +221,7 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
         self.csrf_token = csrf_token
 
     def __repr__(self):
-        return '<Menu:%s>' % force_text(self.name)
+        return '<Menu:%s>' % force_str(self.name)
 
     def add_break(self, identifier=None, position=None):
         item = Break(identifier)
@@ -270,7 +270,7 @@ class LinkItem(BaseItem):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<LinkItem:%s>' % force_text(self.name)
+        return '<LinkItem:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -288,7 +288,7 @@ class FrameItem(BaseItem):
     def __init__(self, name, url, active=False, disabled=False,
                  extra_classes=None, on_close=None, side=LEFT):
         super().__init__(side)
-        self.name = "%s..." % force_text(name)
+        self.name = "%s..." % force_str(name)
         self.url = url
         self.active = active
         self.disabled = disabled

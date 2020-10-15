@@ -10,7 +10,7 @@ from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
@@ -1053,15 +1053,15 @@ class PageTest(PageTestBase):
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
                 page.title_cache = {'en': Title(slug='test', page_title="test2", title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', page_title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', menu_title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2')}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()
