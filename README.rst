@@ -13,11 +13,8 @@ django CMS
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
 
-Open source enterprise content management system based on the Django framework.
+Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association. `Get involved in the dCA! <https://www.django-cms.org/en/contribute/>`_
 
-.. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-divio.png
-   :target: http://try.django-cms.org/
-   :alt: Try demo with Divio Cloud
 
 .. ATTENTION::
 
@@ -92,24 +89,38 @@ You can use the `django CMS installer <https://djangocms-installer.readthedocs.i
     (env) $ djangocms -f -p . my_demo
     (env) $ python manage.py
 
+****
+Demo
+****
+
+.. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-divio.png
+   :target: http://try.django-cms.org/
+   :alt: Try demo with Divio Cloud
 
 ************
 Getting Help
 ************
 
-Please head over to our IRC channel, #django-cms, on irc.freenode.net or write
-to our `mailing list <https://groups.google.com/forum/#!forum/django-cms>`_.
-
-If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
-<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ or our `discourse forum <https://discourse.django-cms.org/>`_ for support. 
 
 ******************
 Commercial support
 ******************
 
-This project is backed by `Divio <https://www.divio.com/en/commercial-support/>`_.
+This project is backed by the `django CMS Association <https://www.django-cms.org/about-us>`_.
 If you need help implementing or hosting django CMS, please contact us:
-sales@divio.com.
+info@django-cms.org.
+
+**********************
+django CMS Association
+**********************
+
+The django CMS Association is a non-profit organization that was founded in 2020 with the goal to drive the success of django CMS, by increasing customer happiness, market share and open-source contributions. We provide infrastructure and guidance for the django CMS project. 
+
+The non-profit django CMS Association is dependent on donations to fulfilf its purpose. The best way to donate is to become a member of the association and pay membership fees. The funding will be funneled back into core development and community projects.
+
+`Join the django CMS Association <https://www.django-cms.org/en/contribute/>`_.
+
 
 *******
 Credits
@@ -120,5 +131,5 @@ Credits
   `django-treebeard <https://tabo.pe/projects/django-treebeard/>`_.
 * JavaScript tree in admin uses `jsTree <https://www.jstree.com>`_.
 * Many thanks to
-  `all the contributors <https://github.com/divio/django-cms/graphs/contributors>`_
+  `all the contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_
   to django CMS!
