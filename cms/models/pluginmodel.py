@@ -423,10 +423,10 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
                 admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
                               args=[self.pk]))
         except NoReverseMatch:
-            url = force_text(
+            url = force_str(
                 admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
                               args=[self.pk]))
-        breadcrumb.append({'title': force_text(self.get_plugin_name()), 'url': url})
+        breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
         return breadcrumb
 
     def get_breadcrumb_json(self):
