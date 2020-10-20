@@ -1064,6 +1064,18 @@ Example::
     CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
 
+..  setting:: CMS_MODAL_DIALOG_WIDTH
+
+CMS_MODAL_DIALOG_WIDTH
+======================
+
+default
+    ``850``
+
+The initial width of all modal dialog popups. As a number, it specifies pixels. If quoted,
+CSS units such as ``em`` or ``rem`` can be used as well.
+
+
 ..  setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
 
 CMS_PAGE_WIZARD_DEFAULT_TEMPLATE

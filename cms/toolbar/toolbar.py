@@ -33,6 +33,7 @@ class BaseToolbar(ToolbarAPIMixin):
     edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
     structure_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+    modal_dialog_width = get_cms_setting('MODAL_DIALOG_WIDTH')
 
     @cached_property
     def site_language(self):
@@ -448,6 +449,7 @@ class CMSToolbar(BaseToolbar):
             'cms_edit_off': self.edit_mode_url_off,
             'cms_structure_on': self.structure_mode_url_on,
             'cms_version': __version__,
+            'modal_dialog_width': self.modal_dialog_width,
             'django_version': DJANGO_VERSION,
             'login_form': CMSToolbarLoginForm(),
             'python_version': PYTHON_VERSION,

@@ -573,7 +573,7 @@ var Plugin = new Class({
             url: url,
             title: name,
             breadcrumbs: breadcrumb,
-            width: 850
+            width: CMS.config.settings.modal_dialog_width
         });
     },
 

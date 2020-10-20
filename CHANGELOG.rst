@@ -2,6 +2,12 @@
 Changelog
 =========
 
+next
+====
+
+* Make the width of modal dialog popups configurable through the settings directive
+  ``CMS_MODAL_DIALOG_WIDTH``.
+
 
 3.8.0 (unreleased)
 ==================
