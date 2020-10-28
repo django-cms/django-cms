@@ -47,6 +47,20 @@ class AliasTestCase(TransactionCMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "I'm the first", html=False)
 
+    def test_add_plugin_sanitise_error_response(self):
+        """
+        In theory it is possible to pass in values to the create_alias method within cms_plugins,
+        it is then used to query the database, which will throw a value error if the value sent is not an integer.
+        """
+        with self.login_user_context(self.get_superuser()):
+            self.assertRaises(
+                ValueError,
+                self.client.post,
+                admin_reverse('cms_create_alias'),
+                {'plugin_id': "<script>alert('Attack!')</script>"}
+            )
+
+
     def test_alias_recursion(self):
         page_en = api.create_page(
             "Alias plugin",
