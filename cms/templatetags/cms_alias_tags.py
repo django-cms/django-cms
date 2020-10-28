@@ -15,7 +15,7 @@ register = template.Library()
 def render_alias_plugin(context, instance):
     warnings.warn(
         'AliasPlugin is deprecated, '
-        'and it will be removed in version 4.1; '
+        'and it will be removed; '
         'please use the package djangocms-alias instead',
         DeprecationWarning
     )
