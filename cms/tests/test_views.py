@@ -21,7 +21,7 @@ from cms.toolbar.utils import (
     get_object_structure_url,
 )
 from cms.utils.conf import get_cms_setting
-from cms.views import details
+from cms.views import details, login
 from menus.menu_pool import menu_pool
 
 
@@ -267,6 +267,17 @@ class ViewTests(CMSTestCase):
         response = self.client.get('/de/stevejobs/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/de/jobs/')
+
+    def test_malicious_content_login_request(self):
+        user = self.get_superuser()
+        request = self.get_request(
+            "/en/admin/login/?q=<script>alert('Attack')</script>",
+            post_data={"username": user.username, "password": user.username}
+        )
+
+        response = login(request)
+
+        self.assertNotIn(response.url, "<script>alert('Attack')</script>")
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
