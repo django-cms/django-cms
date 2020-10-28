@@ -10,7 +10,7 @@ from cms.models import CMSPlugin, Placeholder
 class AliasPluginModel(CMSPlugin):
     """
     AliasPlugin is deprecated,
-    and it will be removed in version 4.1;
+    and it will be removed;
     please use the package djangocms-alias instead
     """
     cmsplugin_ptr = models.OneToOneField(

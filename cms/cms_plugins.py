@@ -30,7 +30,7 @@ plugin_pool.register_plugin(PlaceholderPlugin)
 class AliasPlugin(CMSPluginBase):
     """
     AliasPlugin is deprecated,
-    and it will be removed in version 4.1;
+    and it will be removed;
     please use the package djangocms-alias instead
     """
     name = _("Alias")
@@ -109,7 +109,7 @@ class AliasPlugin(CMSPluginBase):
     def create_alias(self, request):
         warnings.warn(
             'AliasPlugin is deprecated, '
-            'and it will be removed in version 4.1; '
+            'and it will be removed; '
             'please use the package djangocms-alias instead',
             DeprecationWarning
         )
