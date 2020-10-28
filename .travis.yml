@@ -99,6 +99,8 @@ matrix:
   allow_failures:
     - python: 3.6
       env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=2 DJANGO=2.2 DATABASE_URL='sqlite://localhost/testdb.sqlite'
+    - python: 3.6
+      env: FRONTEND=1 INTEGRATION=1 INTEGRATION_TESTS_BUCKET=1 DJANGO=2.2 DATABASE_URL='sqlite://localhost/testdb.sqlite'
 
 before_script:
   - pip freeze
