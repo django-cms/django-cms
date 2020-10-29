@@ -1202,7 +1202,10 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if to_template not in dict(get_cms_setting('TEMPLATES')):
             return HttpResponseBadRequest(force_text(_("Template not valid")))
-        page_content.update(template=to_template)
+
+        page_content.template = to_template
+        page_content.save()
+
         return HttpResponse(force_text(_("The template was successfully changed")))
 
     @require_POST
