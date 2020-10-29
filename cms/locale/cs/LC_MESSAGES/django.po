@@ -7,6 +7,7 @@
 # Jiří Vírava <appukonrad@gmail.com>, 2012-2013
 # Martin S. <marhac@seznam.cz>, 2018
 # koren <honza@kekorenum.com>, 2015
+# Jakub Dorňák <jakub.dornak@misli.cz>, 2020
 # Jakub Dorňák <jakub.dornak@misli.cz>, 2013
 # Jiří Vírava <appukonrad@gmail.com>, 2014-2015
 # Joe Darkless <darkless69@gmail.com>, 2015
@@ -21,8 +22,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
 "Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Czech (http://www.transifex.com/divio/django-cms/language/cs/)\n"
 "MIME-Version: 1.0\n"
@@ -403,7 +404,7 @@ msgid "Disable toolbar"
 msgstr "Vypnout řádek nástrojů"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Zkratky..."
 
 msgid "Users"
 msgstr "Uživatelé"
@@ -499,7 +500,7 @@ msgstr "Vybrat platnou stránku"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "Stránka \"%(conflict_page)s\" má stejnou url \"%(url)s\" jako současná stránka \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -507,7 +508,7 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "Stránka \"%(conflict_page)s\" má stejnou url \"%(url)s\" jako současná stránka."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -521,7 +522,7 @@ msgstr "Ponechte prázdné pro automatické vyplnění slugu, nebo vyplňte dle 
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Nemáte oprávnění přidat stránku."
 
 msgid "ID"
 msgstr "ID"
@@ -894,7 +895,7 @@ msgstr "Heslo:"
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "Přidat stránku"
 
 msgid "Change a page"
 msgstr "Změnit"
@@ -977,7 +978,7 @@ msgstr "Vložit"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Nastavit jako homepage"
 
 msgid "is restricted"
 msgstr "je omezeno"
@@ -1177,7 +1178,7 @@ msgstr "Dostupné typy obsahu"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "Přepnout zobrazení struktury"
 
 msgid "Login"
 msgstr "Přihlášení"
@@ -1249,7 +1250,7 @@ msgid "Close/cancel"
 msgstr "Zavřít/zrušit"
 
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "Přepnout režim struktury"
 
 msgid "Toggle structure mode and highlight hovered-over plugin"
 msgstr ""

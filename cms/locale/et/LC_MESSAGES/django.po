@@ -7,13 +7,13 @@
 # Martin Pajuste <martinpajuste@gmail.com>, 2012,2015-2016
 # Martin Pajuste <martinpajuste@gmail.com>, 2012
 # Martin Pajuste <martinpajuste@gmail.com>, 2016-2017
-# Rivo Zängov <eraser@eraser.ee>, 2018-2019
+# Rivo Zängov <eraser@eraser.ee>, 2018-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
 "Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Estonian (http://www.transifex.com/divio/django-cms/language/et/)\n"
 "MIME-Version: 1.0\n"
@@ -91,7 +91,7 @@ msgid "Start typing..."
 msgstr "Alusta kirjutamist..."
 
 msgid "menu visibility"
-msgstr ""
+msgstr "menüü nähtavus"
 
 msgid "limit when this page is visible in the menu"
 msgstr ""
@@ -539,13 +539,13 @@ msgid "can delete"
 msgstr "võib kustutada"
 
 msgid "can change advanced settings"
-msgstr ""
+msgstr "saab muuta lisaseadeid"
 
 msgid "can publish"
-msgstr ""
+msgstr "saab avaldada"
 
 msgid "can change permissions"
-msgstr ""
+msgstr "saab muuta õiguseid"
 
 msgid "can move"
 msgstr "saab liigutada"
@@ -554,7 +554,7 @@ msgid "view restricted"
 msgstr ""
 
 msgid "can recover pages"
-msgstr ""
+msgstr "saab lehekülgi taastada"
 
 msgid "group"
 msgstr "grupp"
@@ -569,13 +569,13 @@ msgid "changed by"
 msgstr "muutis"
 
 msgid "publication date"
-msgstr ""
+msgstr "avaldamise aeg"
 
 msgid "publication end date"
-msgstr ""
+msgstr "avaldamise lõpetamise aeg"
 
 msgid "in navigation"
-msgstr ""
+msgstr "menüüs"
 
 msgid "soft root"
 msgstr ""
@@ -590,10 +590,10 @@ msgid "template"
 msgstr "mall"
 
 msgid "login required"
-msgstr ""
+msgstr "sisselogimine on nõutud"
 
 msgid "application"
-msgstr ""
+msgstr "rakendus"
 
 msgid "application instance name"
 msgstr ""
@@ -640,7 +640,7 @@ msgid "Page and descendants"
 msgstr ""
 
 msgid "on page level"
-msgstr ""
+msgstr "lehekülje tasemel"
 
 msgid "frontend view restriction"
 msgstr ""
@@ -670,7 +670,7 @@ msgid ""
 msgstr ""
 
 msgid "can recover any deleted page"
-msgstr ""
+msgstr "saab taastada iga kustutatud lehekülje"
 
 msgid "If none selected, user haves granted permissions to all sites."
 msgstr ""
@@ -779,7 +779,7 @@ msgid "overwrite the title (html title tag)"
 msgstr ""
 
 msgid "overwrite the title in the menu"
-msgstr ""
+msgstr "kirjuta pealkiri menüüs üle"
 
 msgid "description"
 msgstr "kirjeldus"
@@ -788,7 +788,7 @@ msgid "The text displayed in search engines."
 msgstr ""
 
 msgid "redirect"
-msgstr ""
+msgstr "ümbersuunamine"
 
 msgid "The template used to render the content."
 msgstr ""
@@ -929,7 +929,7 @@ msgid "Can publish"
 msgstr "Saab avaldada"
 
 msgid "Can change permissions"
-msgstr ""
+msgstr "Saab muuta õiguseid"
 
 msgid "Can move"
 msgstr "Saab liigutada"
@@ -944,7 +944,7 @@ msgid "(current)"
 msgstr "(praegune)"
 
 msgid "Page doesn't inherit any permissions."
-msgstr ""
+msgstr "Lehekülg ei päri ühtki õigust."
 
 msgid "Edit model"
 msgstr "Muuda mudelit"

@@ -4,7 +4,7 @@
 # 
 # Translators:
 # Translators:
-# Alex Trost <trostik@gmail.com>, 2013
+# 30a61d5f1156f1c74ae8ac6dfaa6a072, 2013
 # Daniel Braun <dbraun86@gmail.com>, 2013
 # Daniel Braun <dbraun86@gmail.com>, 2013
 # Fishfur A Banter <fishfurbanter@gmail.com>, 2016
@@ -12,8 +12,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
 "Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Hebrew (http://www.transifex.com/divio/django-cms/language/he/)\n"
 "MIME-Version: 1.0\n"
