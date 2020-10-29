@@ -10,6 +10,7 @@ from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
+from django.utils.html import conditional_escape
 from django.utils.translation import override
 from django.utils.six.moves.urllib.parse import urlparse
 
@@ -65,7 +66,7 @@ class SettingsAdmin(ModelAdmin):
             return HttpResponse(json.dumps(""),
                                 content_type="application/json")
         if request.method == "POST":
-            request.session['cms_settings'] = request.POST['settings']
+            request.session['cms_settings'] = conditional_escape(request.POST['settings'])
             request.session.save()
         return HttpResponse(
             json.dumps(request.session.get('cms_settings', '')),

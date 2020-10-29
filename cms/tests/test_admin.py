@@ -16,7 +16,7 @@ from django.test.utils import override_settings
 from cms import api
 from cms.api import create_page, create_title, add_plugin
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import PageContent, StaticPlaceholder
+from cms.models import PageContent, StaticPlaceholder, UserSettings
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
@@ -1039,3 +1039,25 @@ class AdminPageTreeTests(AdminTestsBase):
         #       ⊢ Beta
         #   ⊢ Delta
         #       ⊢ Gamma
+
+
+class AdminInputSanitationTests(AdminTestsBase):
+
+    @property
+    def settings_admin_class(self):
+        return site._registry[UserSettings]
+
+    def test_admin_session_store(self):
+        """
+        Settings added to admin through session store should be escaped
+        """
+        admin_user, staff = self._get_guys()
+
+        with self.login_user_context(admin_user):
+            request = self.get_request(
+                self.settings_admin_class.urls[0], post_data={
+                    "settings": "<script>alert('hello world')</script>",
+                })
+            response = self.settings_admin_class.session_store(request)
+
+            self.assertEqual(response.content, b'"&lt;script&gt;alert(&#39;hello world&#39;)&lt;/script&gt;"')
