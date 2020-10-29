@@ -282,7 +282,6 @@ class ViewTests(CMSTestCase):
 
         response = get_page_from_request(request)
 
-
         # If this method is passed a parameter which is not a valid primary key
         # for a page object nothing should be returned.
 
