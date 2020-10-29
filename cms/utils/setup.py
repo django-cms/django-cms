@@ -6,6 +6,7 @@ from cms.app_registration import (
     backwards_compatibility_config,
     configure_cms_apps,
     get_cms_extension_apps,
+    ready_cms_apps,
 )
 from cms.utils.compat.dj import is_installed as app_is_installed
 
@@ -56,3 +57,4 @@ def setup_cms_apps():
     cms_apps = get_cms_extension_apps()
     configure_cms_apps(cms_apps)
     backwards_compatibility_config()
+    ready_cms_apps(cms_apps)

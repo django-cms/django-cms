@@ -140,6 +140,14 @@ def configure_cms_apps(apps_with_features):
                 configure_app(app_config.cms_config)
 
 
+def ready_cms_apps(apps_with_features):
+    """Run ready() methods on every registered cms extension,
+    so that final checks can happen after all apps have been configured
+    """
+    for app_with_feature in apps_with_features:
+        app_with_feature.cms_extension.ready()
+
+
 # TODO: Remove this function once backwards compatibility is deprecated
 def backwards_compatibility_config():
     """

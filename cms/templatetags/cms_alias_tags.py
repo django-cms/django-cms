@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import warnings
+
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -11,6 +13,13 @@ register = template.Library()
 
 @register.simple_tag(takes_context=True)
 def render_alias_plugin(context, instance):
+    warnings.warn(
+        'AliasPlugin is deprecated, '
+        'and it will be removed; '
+        'please use the package djangocms-alias instead',
+        DeprecationWarning
+    )
+
     request = context['request']
     toolbar = get_toolbar_from_request(request)
     renderer = toolbar.content_renderer

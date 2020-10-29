@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import warnings
+
 from cms.models import CMSPlugin, Placeholder
 from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
@@ -26,6 +28,11 @@ plugin_pool.register_plugin(PlaceholderPlugin)
 
 
 class AliasPlugin(CMSPluginBase):
+    """
+    AliasPlugin is deprecated,
+    and it will be removed;
+    please use the package djangocms-alias instead
+    """
     name = _("Alias")
     allow_children = False
     model = AliasPluginModel
@@ -100,6 +107,12 @@ class AliasPlugin(CMSPluginBase):
         return message % {'page_url': page_url, 'page_title': page_title}
 
     def create_alias(self, request):
+        warnings.warn(
+            'AliasPlugin is deprecated, '
+            'and it will be removed; '
+            'please use the package djangocms-alias instead',
+            DeprecationWarning
+        )
         if not request.user.is_staff:
             return HttpResponseForbidden("not enough privileges")
         if not 'plugin_id' in request.POST and not 'placeholder_id' in request.POST:
@@ -132,6 +145,3 @@ class AliasPlugin(CMSPluginBase):
             alias.alias_placeholder = placeholder
         alias.save()
         return HttpResponse("ok")
-
-
-plugin_pool.register_plugin(AliasPlugin)
