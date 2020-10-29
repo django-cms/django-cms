@@ -282,7 +282,10 @@ class ViewTests(CMSTestCase):
 
         response = get_page_from_request(request)
 
-        # Ensure that the script is sanitised in page render
+        '''
+        If this method is passed a parameter which is not a valid primary key
+        for a page object nothing should be returned.
+        '''
         self.assertEqual(response, None)
 
     def test_malicious_content_login_request(self):
