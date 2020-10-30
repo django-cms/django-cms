@@ -23,7 +23,7 @@
 # o.zander <oliver.zander@gmail.com>, 2014
 # Patrick Lauber <patrick.lauber@divio.ch>, 2012-2015
 # Peter Bittner <django@bittner.it>, 2015
-# Peter Wischer <peter.wischer@lwl.org>, 2017-2019
+# Peter Wischer <peter.wischer@lwl.org>, 2017-2020
 # Roland <rka@beautyparlour.at>, 2013
 # Roland <rka@beautyparlour.at>, 2013
 # SachaMPS <sacha@mllrsohn.com>, 2015
@@ -35,8 +35,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
 "Last-Translator: Peter Wischer <peter.wischer@lwl.org>\n"
 "Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -230,7 +230,7 @@ msgstr "Die Seite ist nicht berechtigt die Startseite zu sein."
 #, python-format
 #| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" wurde erfolgreich gelöscht."
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -831,7 +831,7 @@ msgid "There are no further settings for this plugin. Please press save."
 msgstr "Es gibt keine weiteren Einstellungen für dieses Plugin. Bitte klicken Sie auf speichern."
 
 msgid "Moved"
-msgstr ""
+msgstr "Verschoben"
 
 #| msgid "Change"
 msgid "Changed"
@@ -839,7 +839,7 @@ msgstr "Geändert"
 
 #| msgid "Delete"
 msgid "Deleted"
-msgstr ""
+msgstr "Gelöscht"
 
 #| msgid "Add %(language)s Translation"
 msgid "Added Page Translation"
@@ -1024,7 +1024,7 @@ msgid ""
 "\n"
 "                                New Page\n"
 "                            "
-msgstr ""
+msgstr "\nNeue Seite"
 
 #| msgid "in navigation"
 msgid "Main Navigation"

@@ -8,6 +8,7 @@
 # Juha-Matti Tapio <jmtapio@verkkotelakka.net>, 2013
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011,2013-2014
+# Kusti Hämäläinen <kusti.hamalainen@aalto.fi>, 2020
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
 # Niklas Jerva <niklas.jerva@gmail.com>, 2016
 # paitsi, 2013
@@ -17,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
 "Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Finnish (http://www.transifex.com/divio/django-cms/language/fi/)\n"
 "MIME-Version: 1.0\n"
@@ -132,7 +133,7 @@ msgid "An application instance with this name already exists."
 msgstr "Saman niminen ohjelma on jo olemassa."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Kotisivua ei voi siirtää toisen sivun sisälle"
 
 msgid "Yes"
 msgstr "Kyllä"
@@ -158,32 +159,32 @@ msgstr "Poista"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi luoda sivua ilman oikeuksia muuttaa luotua sivua. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi poistaa sivua ilman oikeuksia muuttaa sivua. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi asettaa sivuoikeuksia ilman oikeuksia muuttaa sivua. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi poistaa sivuoikeuksia ilman oikeuksia muuttaa sivua. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi luoda sivuoikeuksia ilman oikeuksia muuttaa luotuja sivuoikeuksia. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi poistaa sivuoikeuksia ilman oikeuksia muuttaa oikeuksia. Muokkausoikeudet vaadittu."
 
 #, python-format
 msgid "Invalid plugin type '%s'"
@@ -231,7 +232,7 @@ msgstr "Virhe! Oikeutesi eivät riitä tämän sivun siirtämiseen. Ole hyvä ja
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Virhe! Sinulla ei ole oikeuksia kopioida tätä sivua."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
@@ -264,7 +265,7 @@ msgstr "Oikeutesi eivät riitä näiden liitännäisten kopiointiin."
 
 #| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "Sinulla ei ole oikeuksia poistaa tätä sivua"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
@@ -971,7 +972,7 @@ msgstr "Liitä"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Aseta kotisivuksi"
 
 msgid "is restricted"
 msgstr "rajoitettu"
@@ -1384,7 +1385,7 @@ msgid ""
 msgstr ""
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "Tervetuloa django CMS:ään"
 
 msgid "Add Another"
 msgstr "Lisää uusi"

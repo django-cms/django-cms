@@ -5,6 +5,7 @@
 # Translators:
 # Translators:
 # Anastasiadis Stavros <anastasiadis.st00@gmail.com>, 2014
+# Dimitrios Manolopoulos <j.manolopoulos83@gmail.com>, 2020
 # George Giannoulopoulos <vdotoree@yahoo.gr>, 2014
 # George Petsagourakis <petsagouris@gmail.com>, 2013
 # Kostas Papadimitriou <vinilios@gmail.com>, 2011
@@ -16,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
 "Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Greek (http://www.transifex.com/divio/django-cms/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -58,13 +59,13 @@ msgid ""
 msgstr "Αντικαθιστά αυτό που εμφανίζεται στο επάνω μέρος του περιηγητή ιστού σας ή στους σελιδοδείκτες"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "Περιγραφή meta tag"
 
 msgid "A description of the page used by search engines."
 msgstr "Μια λίστα με \"λέξεις κλειδιά\" που χρησιμοποιούνται μερικές φορές από τις μηχανές αναζήτησης."
 
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "Το πεδίο δεν μπορεί να είναι κενό"
 
 msgid "Page type"
 msgstr "Τύπος σελίδας"
@@ -115,14 +116,14 @@ msgid "Hook application to this page."
 msgstr "Σύνδεση εφαρμογής σε αυτή τη σελίδα."
 
 msgid "Application configurations"
-msgstr ""
+msgstr "Παραμετροποιήσεις Εφαρμογής"
 
 msgid "A page with this reverse URL id exists already."
 msgstr "Υπάρχει ήδη σελίδα με το συγκεκριμένο αντίστροφο URL id."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Μη έγκυρη τιμή"
 
 msgid "An application instance using this configuration already exists."
 msgstr ""

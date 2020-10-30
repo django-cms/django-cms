@@ -26,8 +26,8 @@
 # Oleg Fish <okfish@yandex.ru>, 2014-2017
 # panasoft <cc072aa3@opayq.com>, 2016
 # Pylyp Dukhlii <pylyp@pylyp.com.ua>, 2014
-# Roman Bor <inactive+romans74@transifex.com>, 2013
-# Roman Bor <inactive+romans74@transifex.com>, 2013
+# 7487b6215e92d40054962de25e14af3c_618443c <3e689a7dfaae20c8c957db20acac1f93_108356>, 2013
+# 7487b6215e92d40054962de25e14af3c_618443c <3e689a7dfaae20c8c957db20acac1f93_108356>, 2013
 # Sergey Komarov <sjkomarov@gmail.com>, 2013
 # Sergey Komarov <sjkomarov@gmail.com>, 2013
 # slam <little_pea@list.ru>, 2013
@@ -38,9 +38,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
-"Last-Translator: SAG <andrschwartz@gmail.com>\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
+"Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Russian (http://www.transifex.com/divio/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"

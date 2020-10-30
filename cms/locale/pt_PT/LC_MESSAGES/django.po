@@ -4,13 +4,14 @@
 # 
 # Translators:
 # Translators:
+# Francisco Cunha <franciscocjesus@outlook.com>, 2020
 # Mike C. <miguelmclara@gmail.com>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
 "Last-Translator: Aiky30 <aiky30@yahoo.com>\n"
 "Language-Team: Portuguese (Portugal) (http://www.transifex.com/divio/django-cms/language/pt_PT/)\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 msgid "All"
-msgstr ""
+msgstr "Todos"
 
 msgid "Copy permissions"
 msgstr "Copiar permissões"
@@ -29,47 +30,47 @@ msgid "Title"
 msgstr "Título"
 
 msgid "The default title"
-msgstr "O título pré-definido"
+msgstr "O título predefinido"
 
 msgid "Slug"
 msgstr ""
 
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "A parte do título que é utilizada no URL"
 
 msgid "Menu Title"
 msgstr "Título do Menu"
 
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Alterar o que é mostrado no menu"
 
 msgid "Page Title"
 msgstr "Título da Página"
 
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Altera o que é mostrado no topo do browser ou nos marcadores"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "Meta Tag de descrição"
 
 msgid "A description of the page used by search engines."
-msgstr ""
+msgstr "Uma descrição da página para ser usada por motores de busca."
 
 msgid "Slug must not be empty."
 msgstr ""
 
 msgid "Page type"
-msgstr "Título da página"
+msgstr "Tipo de página"
 
 msgid "Page Types"
 msgstr "Tipos de Página"
 
 msgid "Overwrite URL"
-msgstr ""
+msgstr "Alterar URL"
 
 msgid "Keep this field empty if standard path should be used."
-msgstr ""
+msgstr "Manter este campo vazio para o caminho predefinido ser intencionalmente usado."
 
 #| msgid "softroot"
 msgid "Soft root"
@@ -108,17 +109,17 @@ msgid "Hook application to this page."
 msgstr ""
 
 msgid "Application configurations"
-msgstr ""
+msgstr "Configurações da Aplicação"
 
 msgid "A page with this reverse URL id exists already."
-msgstr ""
+msgstr "Uma página com este id de Reverse URL  já existe."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Valor inválido para configuração de aplicação"
 
 msgid "An application instance using this configuration already exists."
-msgstr ""
+msgstr "Uma aplicação a utilizar esta configuração já existe."
 
 msgid "An application instance with this name already exists."
 msgstr ""

@@ -6,7 +6,7 @@
 # Translators:
 # Ahmed H <info@draco-003.com>, 2013
 # Ali Khalel <ali.khalel@gmail.com>, 2019
-# Bashar Al-Abdulhadi, 2013-2015,2017,2019
+# Bashar Al-Abdulhadi, 2013-2015,2017,2019-2020
 # Bashar Al-Abdulhadi, 2013-2014
 # Bashar Ghadanfar <10.tens@gmail.com>, 2017
 # Jonas Obrist <me@ojii.ch>, 2011
@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
-"PO-Revision-Date: 2020-03-03 13:33+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
+"PO-Revision-Date: 2020-10-29 15:33+0000\n"
 "Last-Translator: Bashar Al-Abdulhadi\n"
 "Language-Team: Arabic (http://www.transifex.com/divio/django-cms/language/ar/)\n"
 "MIME-Version: 1.0\n"
@@ -104,7 +104,7 @@ msgstr "الحدود عندما تكون هذه الصفحة مرئية فى ا�
 
 #| msgid "Copy options"
 msgid "URL options"
-msgstr ""
+msgstr "خيارات الرابط"
 
 #| msgid "Copy options"
 msgid "Menu options"

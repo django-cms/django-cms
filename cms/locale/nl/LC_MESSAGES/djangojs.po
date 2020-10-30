@@ -6,13 +6,13 @@
 # Translators:
 # Chris Wesseling <chris.wesseling@xs4all.nl>, 2011
 # Jacques de Hooge <>, 2012
-# René Mulder <inactive+rene_ytec@transifex.com>, 2014
+# 9b534940ba88da102a8b2023ae8b0a5c_833de33 <6eff1839cb13e50fd6e97f7bd38c9dda_152118>, 2014
 # kurdyma <transifex.com@kurdyenviolien.nl>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-03 13:49+0000\n"
+"POT-Creation-Date: 2020-10-29 15:47+0000\n"
 "PO-Revision-Date: 2018-01-11 16:38+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Dutch (http://www.transifex.com/divio/django-cms/language/nl/)\n"
