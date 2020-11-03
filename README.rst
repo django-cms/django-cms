@@ -94,7 +94,7 @@ Demo
 ****
 
 .. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-divio.png
-   :target: http://try.django-cms.org/
+   :target: https://control.divio.com/demo/get-new/django-cms/
    :alt: Try demo with Divio Cloud
 
 ************
