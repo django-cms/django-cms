@@ -67,7 +67,8 @@ var INTEGRATION_TESTS = [
         'logout',
         'clipboard',
         'link-plugin-content-mode',
-        'add-multiple-plugins'
+        'add-multiple-plugins',
+        'plugin-dynamic-script-loading'
     ],
     [
         'pageTypes',
