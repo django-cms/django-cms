@@ -290,7 +290,7 @@ class ViewTests(CMSTestCase):
         user = self.get_superuser()
         request = self.get_request(
             "/en/admin/login/?q=<script>alert('Attack')</script>",
-            post_data={"username": user.username, "password": user.username}
+            post_data={"username": username, "password": username}
         )
 
         response = login(request)
