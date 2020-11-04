@@ -287,7 +287,7 @@ class ViewTests(CMSTestCase):
         self.assertEqual(response, None)
 
     def test_malicious_content_login_request(self):
-        user = self.get_superuser()
+        username = getattr(self.get_superuser(), get_user_model().USERNAME_FIELD)
         request = self.get_request(
             "/en/admin/login/?q=<script>alert('Attack')</script>",
             post_data={"username": username, "password": username}
