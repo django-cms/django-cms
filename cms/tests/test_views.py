@@ -2,6 +2,7 @@ import re
 import sys
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
 from django.http import Http404
@@ -21,7 +22,10 @@ from cms.toolbar.utils import (
     get_object_structure_url,
 )
 from cms.utils.conf import get_cms_setting
-from cms.views import details
+from cms.utils.page import get_page_from_request
+
+from cms.views import details, login
+
 from menus.menu_pool import menu_pool
 
 
@@ -267,6 +271,32 @@ class ViewTests(CMSTestCase):
         response = self.client.get('/de/stevejobs/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/de/jobs/')
+
+
+    def test_page_sanitisation_xss_attack(self):
+        """
+            When sending a request the CMS uses get_page_from_request to return the appropriate page.
+            None should be returned
+        """
+        request = self.get_request("/")
+        request.path_info = "<script>alert('attack!')</script>"
+
+        response = get_page_from_request(request)
+
+        # If this method is passed a parameter which is not a valid primary key
+        # for a page object nothing should be returned.
+        self.assertEqual(response, None)
+
+    def test_malicious_content_login_request(self):
+        username = getattr(self.get_superuser(), get_user_model().USERNAME_FIELD)
+        request = self.get_request(
+            "/en/admin/login/?q=<script>alert('Attack')</script>",
+            post_data={"username": username, "password": username}
+        )
+
+        response = login(request)
+
+        self.assertNotIn(response.url, "<script>alert('Attack')</script>")
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
