@@ -35,8 +35,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-29 15:47+0000\n"
-"PO-Revision-Date: 2020-10-29 15:33+0000\n"
+"POT-Creation-Date: 2020-11-05 12:20+0000\n"
+"PO-Revision-Date: 2020-10-30 08:30+0000\n"
 "Last-Translator: Peter Wischer <peter.wischer@lwl.org>\n"
 "Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -99,7 +99,7 @@ msgstr "Lassen Sie dieses Feld leer, wenn die automatisch generierte URL verwend
 
 #| msgid "softroot"
 msgid "Soft root"
-msgstr ""
+msgstr "Softroot"
 
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "Alle übergeordneten Seiten werden nicht im Menü dargestellt"
@@ -121,11 +121,11 @@ msgstr "Limitiert, wer diese Seite im Menu sehen kann."
 
 #| msgid "Copy options"
 msgid "URL options"
-msgstr ""
+msgstr "URL Optionen"
 
 #| msgid "Copy options"
 msgid "Menu options"
-msgstr ""
+msgstr "Menu Optionen"
 
 msgid "Application"
 msgstr "Applikation"
@@ -219,7 +219,7 @@ msgstr "Übergerordnetes Plugin muss im selben Platzhalter sein!"
 
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "Plugin Position muss größer sein als %(position)d"
 
 msgid "Advanced Settings"
 msgstr "Erweiterte Einstellungen"
@@ -843,51 +843,51 @@ msgstr "Gelöscht"
 
 #| msgid "Add %(language)s Translation"
 msgid "Added Page Translation"
-msgstr ""
+msgstr "Seiten Übersetzung hinzugefügt"
 
 #| msgid "Delete %(language)s Translation"
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "Seiten Übersetzung bearbeitet"
 
 #| msgid "Delete %(language)s Translation"
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "Seiten Übersetzung gelöscht"
 
 #| msgid "Add plugin"
 msgid "Added Plugin"
-msgstr ""
+msgstr "Plugin hinzugefügt"
 
 #| msgid "Change"
 msgid "Changed Plugin"
-msgstr ""
+msgstr "Plugin bearbeitet"
 
 #| msgid "Add plugin"
 msgid "Moved Plugin"
-msgstr ""
+msgstr "Plugin verschoben"
 
 #| msgid "Delete page"
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "Plugin gelöscht"
 
 #| msgid "Add plugin"
 msgid "Cut Plugin"
-msgstr ""
+msgstr "Plugin ausschneiden"
 
 #| msgid "Add plugin"
 msgid "Paste Plugin"
-msgstr ""
+msgstr "Plugin einfügen"
 
 #| msgid "static placeholder"
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "In Platzhalter einfügen"
 
 #| msgid "Copied plugins to %(placeholder)s"
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "Plugins aus der Zwischenablage wurden dem Platzhalter hinzugefügt"
 
 #| msgid "Placeholder"
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "Platzhalter geleert"
 
 msgid "Save"
 msgstr "Speichern"
@@ -1421,7 +1421,7 @@ msgstr "Kein Inhalt"
 
 #| msgid "no content"
 msgid "has contents"
-msgstr ""
+msgstr "hat Inhalt"
 
 #, python-format
 msgid "Page not found on %(domain)s"
