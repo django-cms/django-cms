@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 from unittest import skipIf, skipUnless
 
 import os
+import io
 import socket
 import sys
 
 from sphinx.application import Sphinx
 from sphinx.errors import SphinxWarning
-
-from six.moves import StringIO
 
 try:
     import enchant
@@ -52,7 +50,7 @@ class DocsTestCase(CMSTestCase):
     """
     @skipIf(has_no_internet(), "No internet")
     def test_html(self):
-        status = StringIO()
+        status = io.StringIO()
         with TemporaryDirectory() as OUT_DIR:
             app = Sphinx(
                 srcdir=DOCS_DIR,
@@ -73,7 +71,7 @@ class DocsTestCase(CMSTestCase):
     @skipIf(enchant is None, "Enchant not installed")
     @skipUnless(os.environ.get('TEST_DOCS') == '1', 'Skipping for simplicity')
     def test_spelling(self):
-        status = StringIO()
+        status = io.StringIO()
         with TemporaryDirectory() as OUT_DIR:
             with tmp_list_append(sys.argv, 'spelling'):
                 try:

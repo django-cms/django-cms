@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
 import os
 
 from collections import OrderedDict
@@ -7,7 +5,7 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand, CommandParser
 from django.core.management.color import no_style, color_style
 
-from cms.utils.compat import DJANGO_2_0, DJANGO_2_2, DJANGO_3_0
+from cms.utils.compat import DJANGO_3_0, DJANGO_3_1
 
 
 def add_builtin_arguments(parser):
@@ -37,10 +35,9 @@ def add_builtin_arguments(parser):
         help='Raise on CommandError exceptions')
     parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
         help="Don't colorize the command output.")
-    if DJANGO_2_2 or DJANGO_3_0:
-        parser.add_argument('--force-color', action='store_true', dest='force_color', default=False,
-            help="Colorize the command output.")
-    if DJANGO_3_0:
+    parser.add_argument('--force-color', action='store_true', dest='force_color', default=False,
+        help="Colorize the command output.")
+    if DJANGO_3_0 or DJANGO_3_1:
         parser.add_argument('--skip-checks', action='store_true', dest='skip_checks', default=False,
             help="Skip the checks.")
 
@@ -55,7 +52,7 @@ class SubcommandsCommand(BaseCommand):
     subcommand_dest = 'subcmd'
 
     def create_parser(self, prog_name, subcommand):
-        kwargs = {'cmd': self} if DJANGO_2_0 else {}
+        kwargs = {}
         parser = CommandParser(
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
             description=self.help or None,
@@ -73,7 +70,7 @@ class SubcommandsCommand(BaseCommand):
             for command, cls in self.subcommands.items():
                 instance = cls(self.stdout._out, self.stderr._out)
                 instance.style = self.style
-                kwargs = {'cmd': self} if DJANGO_2_0 else {}
+                kwargs = {}
                 parser_sub = subparsers.add_parser(
                     name=instance.command_name, help=instance.help_string,
                     description=instance.help_string, **kwargs
@@ -91,7 +88,7 @@ class SubcommandsCommand(BaseCommand):
             if options.get('no_color'):
                 command.style = no_style()
                 command.stderr.style_func = None
-            if DJANGO_2_2 and options.get('force_color'):
+            if options.get('force_color'):
                 command.style = color_style(force_color=True)
             if options.get('stdout'):
                 command.stdout._out = options.get('stdout')

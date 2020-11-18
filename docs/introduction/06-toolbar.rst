@@ -1,3 +1,5 @@
+:sequential_nav: both
+
 .. _toolbar_introduction:
 
 #####################

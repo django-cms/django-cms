@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from copy import deepcopy
 
 from django.conf import settings
@@ -17,7 +16,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 class TestOutput(FileOutputWrapper):
     def __init__(self):
-        super(TestOutput, self).__init__(None, None)
+        super().__init__(None, None)
         self.section_wrapper = TestSectionOutput
 
     def write(self, message):
@@ -35,7 +34,7 @@ class TestSectionOutput(FileSectionWrapper):
         pass
 
 
-class CheckAssertMixin(object):
+class CheckAssertMixin:
     def assertCheck(self, successful, **assertions):
         """
         asserts that checks are successful or not

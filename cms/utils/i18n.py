@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 
 from django.conf import settings
 from django.utils import translation
-from django.utils.translation import ugettext_lazy as _
-from django.urls import get_resolver
+from django.utils.translation import gettext_lazy as _
+from django.urls import get_resolver, LocalePrefixPattern
 
 from cms.exceptions import LanguageError
-from cms.utils.compat.dj import LocalePrefixPattern
 from cms.utils.conf import get_cms_setting, get_site_id
 
 

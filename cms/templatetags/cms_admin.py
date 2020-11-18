@@ -1,18 +1,14 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
 from cms.constants import PUBLISHER_STATE_PENDING
 
-from django import VERSION as DJANGO_VERSION
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 register = template.Library()
@@ -130,7 +126,7 @@ def render_filter_field(request, field):
 @register.filter
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    EXTENSION = 'gif' if DJANGO_VERSION < (1, 9) else 'svg'
+    EXTENSION = 'svg'
     return mark_safe(
         '<img src="%sicon-%s.%s" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), EXTENSION,
                                                  value))

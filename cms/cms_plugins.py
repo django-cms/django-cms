@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
 from cms.models import CMSPlugin, Placeholder
 from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
 from cms.utils.urlutils import admin_reverse
-from django.conf.urls import url
+from django.urls import re_path
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
-from django.utils.translation import ugettext, ugettext_lazy as _, get_language
+from django.utils.translation import gettext, gettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):
@@ -59,7 +58,7 @@ class AliasPlugin(CMSPluginBase):
 
     def get_plugin_urls(self):
         return [
-            url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
+            re_path(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
         ]
 
     @classmethod
@@ -94,7 +93,7 @@ class AliasPlugin(CMSPluginBase):
         page_url = origin_page.get_absolute_url(language=obj.language)
         page_title = origin_page.get_title(language=obj.language)
 
-        message = ugettext('This is an alias reference, '
+        message = gettext('This is an alias reference, '
                            'you can edit the content only on the '
                            '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.')
         return message % {'page_url': page_url, 'page_title': page_title}

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 from collections import OrderedDict
 from logging import getLogger
@@ -15,7 +14,7 @@ from django.utils.timezone import now
 from django.utils.translation import (
     get_language,
     override as force_language,
-    ugettext_lazy as _,
+    gettext_lazy as _,
 )
 
 from cms import constants
@@ -23,7 +22,6 @@ from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBL
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
-from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
@@ -32,13 +30,10 @@ from menus.menu_pool import menu_pool
 
 from treebeard.mp_tree import MP_Node
 
-from six import python_2_unicode_compatible
-
 
 logger = getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class TreeNode(MP_Node):
 
     parent = models.ForeignKey(
@@ -91,14 +86,14 @@ class TreeNode(MP_Node):
             kwargs['instance'].parent = self
         else:
             kwargs['parent'] = self
-        return super(TreeNode, self).add_child(**kwargs)
+        return super().add_child(**kwargs)
 
     def add_sibling(self, pos=None, *args, **kwargs):
         if len(kwargs) == 1 and 'instance' in kwargs:
             kwargs['instance'].parent_id = self.parent_id
         else:
             kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(pos, *args, **kwargs)
+        return super().add_sibling(pos, *args, **kwargs)
 
     def update(self, **data):
         cls = self.__class__
@@ -147,7 +142,6 @@ class TreeNode(MP_Node):
             child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
-@python_2_unicode_compatible
 class Page(models.Model):
     """
     A simple hierarchical page model
@@ -253,7 +247,7 @@ class Page(models.Model):
         app_label = 'cms'
 
     def __init__(self, *args, **kwargs):
-        super(Page, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title_cache = {}
 
     def __str__(self):
@@ -279,12 +273,8 @@ class Page(models.Model):
         return display
 
     def _clear_node_cache(self):
-        if DJANGO_1_11:
-            if hasattr(self, '_node_cache'):
-                del self._node_cache
-        else:
-            if Page.node.is_cached(self):
-                Page.node.field.delete_cached_value(self)
+        if Page.node.is_cached(self):
+            Page.node.field.delete_cached_value(self)
 
     def _clear_internal_cache(self):
         self.title_cache = {}
@@ -829,7 +819,7 @@ class Page(models.Model):
 
         if created:
             self.created_by = self.changed_by
-        super(Page, self).save(**kwargs)
+        super().save(**kwargs)
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
@@ -844,7 +834,7 @@ class Page(models.Model):
             self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        return super(Page, self).save_base(*args, **kwargs)
+        return super().save_base(*args, **kwargs)
 
     def update(self, refresh=False, draft_only=True, **data):
         assert self.publisher_is_draft

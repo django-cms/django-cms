@@ -1,3 +1,5 @@
+:sequential_nav: both
+
 .. _apphooks_introduction:
 
 ########
@@ -57,7 +59,7 @@ Remove the old ``polls`` entry from the project's ``urls.py``
 
 You must now remove the entry for the Polls application::
 
-    url(r'^polls/', include('polls.urls', namespace='polls'))
+    re_path(r'^polls/', include('polls.urls', namespace='polls'))
 
 from your project's ``urls.py``.
 

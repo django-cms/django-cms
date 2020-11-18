@@ -405,7 +405,7 @@ CMSPluginBase Attributes and Methods Reference
         with default values by calling the render method of the super class::
 
             def render(self, context, instance, placeholder):
-                context = super(MyPlugin, self).render(context, instance, placeholder)
+                context = super().render(context, instance, placeholder)
                 ...
                 return context
 

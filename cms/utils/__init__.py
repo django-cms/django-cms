@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from django.conf import settings
 from django.core.files.storage import get_storage_class
@@ -51,11 +50,13 @@ def get_language_from_request(request, current_page=None):
 
     return language
 
+
 default_storage = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 
 class ConfiguredStorage(LazyObject):
     def _setup(self):
         self._wrapped = get_storage_class(getattr(settings, 'STATICFILES_STORAGE', default_storage))()
+
 
 configured_storage = ConfiguredStorage()

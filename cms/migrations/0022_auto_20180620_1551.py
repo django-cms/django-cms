@@ -2,8 +2,6 @@
 
 from django.db import migrations, models
 
-from cms.utils.compat import DJANGO_2_0
-
 
 class Migration(migrations.Migration):
 
@@ -17,11 +15,11 @@ class Migration(migrations.Migration):
             options={'default_permissions': ('add', 'change', 'delete'), 'permissions': (('view_page', 'Can view page'), ('publish_page', 'Can publish page'), ('edit_static_placeholder', 'Can edit static placeholders')), 'verbose_name': 'page', 'verbose_name_plural': 'pages'},
         ),
     ]
-    if not DJANGO_2_0:
-        operations.append(
-            migrations.AlterField(
-                model_name='title',
-                name='published',
-                field=models.BooleanField(blank=True, default=False, verbose_name='is published'),
-            ),
-       )
+
+    operations.append(
+        migrations.AlterField(
+            model_name='title',
+            name='published',
+            field=models.BooleanField(blank=True, default=False, verbose_name='is published'),
+        ),
+    )
