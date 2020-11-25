@@ -1,4 +1,4 @@
 -r requirements_base.txt
 Django>=1.9,<1.10
 django-hvad==1.5
-django-formtools
+djangocms-text-ckeditor<=3.6.1

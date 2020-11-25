@@ -1,5 +1,5 @@
 -r requirements_base.txt
 Django>=1.11,<2.0
-django-reversion>=2.0
+django-reversion>=2.0,<3
 https://github.com/KristianOellegaard/django-hvad/archive/master.zip
-django-formtools
+djangocms-text-ckeditor
