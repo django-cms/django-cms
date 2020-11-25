@@ -1,12 +1,9 @@
-from django.core.urlresolvers import reverse
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
+from django.urls import reverse
 
 from cms.models.fields import PlaceholderField
 from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
-
-from hvad.models import TranslatableModel, TranslatedFields
 
 
 def dynamic_placeholder_1(instance):
@@ -17,7 +14,6 @@ def dynamic_placeholder_2(instance):
     return instance.char_2
 
 
-@python_2_unicode_compatible
 class Example1(models.Model):
     char_1 = models.CharField(u'char_1', max_length=255)
     char_2 = models.CharField(u'char_2', max_length=255)
@@ -33,7 +29,7 @@ class Example1(models.Model):
     static_admin_url = ''
 
     def __init__(self, *args, **kwargs):
-        super(Example1, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def callable_item(self, request):
         return self.char_1
@@ -77,7 +73,6 @@ class DynamicPlaceholderSlotExample(models.Model):
     placeholder_2 = PlaceholderField(dynamic_placeholder_2, related_name='dynamic_pl_2')
 
 
-@python_2_unicode_compatible
 class CharPksExample(models.Model):
     char_1 = models.CharField(u'char_1', max_length=255)
     slug = models.SlugField(u'char_1', max_length=255, primary_key=True)
@@ -85,18 +80,3 @@ class CharPksExample(models.Model):
 
     def __str__(self):
         return "%s - %s" % (self.char_1, self.pk)
-
-
-@python_2_unicode_compatible
-class MultilingualExample1(TranslatableModel):
-    translations = TranslatedFields(
-        char_1=models.CharField(u'char_1', max_length=255),
-        char_2=models.CharField(u'char_2', max_length=255),
-    )
-    placeholder_1 = PlaceholderField('placeholder_1')
-
-    def __str__(self):
-        return self.char_1
-
-    def get_absolute_url(self):
-        return reverse("detail_multi", args=(self.pk,))

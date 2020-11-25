@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models.managers import TitleManager
 from cms.models.pagemodel import Page
 
 
-@python_2_unicode_compatible
 class Title(models.Model):
     # These are the fields whose values are compared when saving
     # a Title object to know if it has changed.
@@ -29,7 +26,7 @@ class Title(models.Model):
                                   help_text=_("overwrite the title (html title tag)"))
     menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True,
                                   help_text=_("overwrite the title in the menu"))
-    meta_description = models.TextField(_("description"), max_length=155, blank=True, null=True,
+    meta_description = models.TextField(_("description"), blank=True, null=True,
                                         help_text=_("The text displayed in search engines."))
     slug = models.SlugField(_("slug"), max_length=255, db_index=True, unique=False)
     path = models.CharField(_("Path"), max_length=255, db_index=True)
@@ -104,7 +101,7 @@ class Title(models.Model):
 
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        return super(Title, self).save_base(*args, **kwargs)
+        return super().save_base(*args, **kwargs)
 
     def is_new_dirty(self):
         if not self.pk:
@@ -146,7 +143,7 @@ class Title(models.Model):
         return old_values != new_values
 
 
-class EmptyTitle(object):
+class EmptyTitle:
     """
     Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.

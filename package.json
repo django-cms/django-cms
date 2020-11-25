@@ -1,5 +1,5 @@
 {
-  "name": "djangoCMS",
+  "name": "django-cms",
   "private": true,
   "devDependencies": {
     "autoprefixer": "^6.3.6",

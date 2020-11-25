@@ -1,8 +1,9 @@
-# -*- coding: utf-8 -*-
 import uuid
 import warnings
 
-from django.conf.urls import url
+from urllib.parse import parse_qsl, urlparse
+
+from django.urls import re_path
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
@@ -16,12 +17,11 @@ from django.http import (
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
-from django.utils import six
-from django.utils.six.moves.urllib.parse import parse_qsl, urlparse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
+from django.utils.html import conditional_escape
 from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
@@ -37,7 +37,7 @@ from cms.signals import pre_placeholder_operation, post_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
 from cms.utils import copy_plugins, get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_list, get_language_code
+from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import has_reached_plugin_limit, reorder_plugins
 from cms.utils.urlutils import admin_reverse
 
@@ -65,12 +65,12 @@ def _instance_overrides_method(base, instance, method_name):
     Returns True if instance overrides a method (method_name)
     inherited from base.
     """
-    bound_method = getattr(instance, method_name)
+    bound_method = getattr(instance.__class__, method_name)
     unbound_method = getattr(base, method_name)
-    return six.get_unbound_function(unbound_method) != six.get_method_function(bound_method)
+    return unbound_method != bound_method
 
 
-class FrontendEditableAdminMixin(object):
+class FrontendEditableAdminMixin:
     frontend_editable_fields = []
 
     def get_urls(self):
@@ -78,11 +78,11 @@ class FrontendEditableAdminMixin(object):
         Register the url for the single field edit view
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
-        return url_patterns + super(FrontendEditableAdminMixin, self).get_urls()
+        return url_patterns + super().get_urls()
 
     def _get_object_for_single_field(self, object_id, language):
         # Quick and dirty way to retrieve objects for django-hvad
@@ -151,7 +151,7 @@ class FrontendEditableAdminMixin(object):
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
-class PlaceholderAdminMixin(object):
+class PlaceholderAdminMixin:
 
     def _get_attached_admin(self, placeholder):
         return placeholder._get_attached_admin(admin_site=self.admin_site)
@@ -224,7 +224,7 @@ class PlaceholderAdminMixin(object):
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
@@ -233,7 +233,7 @@ class PlaceholderAdminMixin(object):
             pat(r'clear-placeholder/(%s)/$' % SLUG_REGEXP, self.clear_placeholder),
             pat(r'move-plugin/$', self.move_plugin),
         ]
-        return url_patterns + super(PlaceholderAdminMixin, self).get_urls()
+        return url_patterns + super().get_urls()
 
     def has_add_plugin_permission(self, request, placeholder, plugin_type):
         return placeholder.has_add_plugin_permission(request.user, plugin_type)
@@ -301,7 +301,7 @@ class PlaceholderAdminMixin(object):
             # errors is s dict mapping fields to a list of errors
             # for that field.
             error = list(form.errors.values())[0][0]
-            return HttpResponseBadRequest(force_text(error))
+            return HttpResponseBadRequest(conditional_escape(force_text(error)))
 
         plugin_data = form.cleaned_data
         placeholder = plugin_data['placeholder_id']
@@ -341,6 +341,9 @@ class PlaceholderAdminMixin(object):
         response = plugin_instance.add_view(request)
 
         plugin = getattr(plugin_instance, 'saved_object', None)
+
+        if plugin:
+            plugin.placeholder.mark_as_dirty(plugin.language, clear_cache=False)
 
         if plugin_instance._operation_token:
             tree_order = placeholder.get_plugin_tree_order(plugin.parent_id)
@@ -528,6 +531,7 @@ class PlaceholderAdminMixin(object):
             language=target_language,
             order=target_tree_order,
         )
+        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
 
         new_plugins = CMSPlugin.objects.filter(pk__in=new_plugin_ids).order_by('path')
         new_plugins = list(new_plugins)
@@ -563,6 +567,9 @@ class PlaceholderAdminMixin(object):
         response = plugin_instance.change_view(request, str(plugin_id))
 
         plugin = getattr(plugin_instance, 'saved_object', None)
+
+        if plugin:
+            plugin.placeholder.mark_as_dirty(plugin.language, clear_cache=False)
 
         if plugin_instance._operation_token:
             self._send_post_placeholder_operation(
@@ -770,6 +777,7 @@ class PlaceholderAdminMixin(object):
             language=target_language,
             order=target_tree_order,
         )
+        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
 
         # Fetch from db to update position and other tree values
         root_plugin.refresh_from_db()
@@ -828,6 +836,7 @@ class PlaceholderAdminMixin(object):
             language=target_language,
             order=target_tree_order,
         )
+        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
 
         new_plugins = (
             CMSPlugin
@@ -925,6 +934,10 @@ class PlaceholderAdminMixin(object):
             language=target_language,
             order=new_target_order,
         )
+        target_placeholder.mark_as_dirty(target_language, clear_cache=False)
+
+        if source_placeholder != target_placeholder:
+            source_placeholder.mark_as_dirty(source_language, clear_cache=False)
 
         # Refresh plugin to get new tree and position values
         updated_plugin.refresh_from_db()
@@ -990,6 +1003,8 @@ class PlaceholderAdminMixin(object):
         new_source_order = list(source_tree_order)
         new_source_order.remove(updated_plugin.pk)
 
+        source_placeholder.mark_as_dirty(target_language, clear_cache=False)
+
         self._send_post_placeholder_operation(
             request,
             operation=operations.CUT_PLUGIN,
@@ -1013,9 +1028,12 @@ class PlaceholderAdminMixin(object):
                 _("You do not have permission to delete this plugin")))
 
         opts = plugin._meta
-        using = router.db_for_write(opts.model)
+        router.db_for_write(opts.model)
+        get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
-            [plugin], opts, request.user, self.admin_site, using)
+            [plugin], admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs
+        )
 
         if request.POST:  # The user has already confirmed the deletion.
             if perms_needed:
@@ -1036,6 +1054,12 @@ class PlaceholderAdminMixin(object):
             )
 
             plugin.delete()
+            placeholder.mark_as_dirty(plugin.language, clear_cache=False)
+            reorder_plugins(
+                placeholder=placeholder,
+                parent_id=plugin.parent_id,
+                language=plugin.language,
+            )
 
             self.log_deletion(request, plugin, obj_display)
             self.message_user(request, _('The %(name)s plugin "%(obj)s" was deleted successfully.') % {
@@ -1094,10 +1118,14 @@ class PlaceholderAdminMixin(object):
             return HttpResponseForbidden(force_text(_("You do not have permission to clear this placeholder")))
 
         opts = Placeholder._meta
-        using = router.db_for_write(Placeholder)
+        router.db_for_write(Placeholder)
         plugins = placeholder.get_plugins_list(language)
+
+        get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
-            plugins, opts, request.user, self.admin_site, using)
+            plugins, admin_site=self.admin_site,
+            **get_deleted_objects_additional_kwargs
+        )
 
         obj_display = force_text(placeholder)
 
@@ -1114,7 +1142,7 @@ class PlaceholderAdminMixin(object):
             )
 
             placeholder.clear(language)
-            placeholder.mark_as_dirty(language, clear_cache=True)
+            placeholder.mark_as_dirty(language, clear_cache=False)
 
             self.log_deletion(request, placeholder, obj_display)
             self.message_user(request, _('The placeholder "%(obj)s" was cleared successfully.') % {

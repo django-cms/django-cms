@@ -1,30 +1,18 @@
-# -*- coding: utf-8 -*-
 from datetime import date
 import json
-from operator import itemgetter
 import os
 import warnings
 
 from django.conf import settings
-from django.core.urlresolvers import NoReverseMatch
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.db.models import signals, Model, ManyToManyField
+from django.db.models import ManyToManyField, Model
 from django.db.models.base import ModelBase
-try:
-    # Django >= 1.8, < 1.9
-    from django.db.models.fields.related import (
-        ReverseSingleRelatedObjectDescriptor as ForwardManyToOneDescriptor
-    )
-except ImportError:
-    # Django >= 1.9
-    from django.db.models.fields.related import ForwardManyToOneDescriptor
-from django.utils import six, timezone
-from django.utils.six import text_type
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.urls import NoReverseMatch
+from django.utils import timezone
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.six.moves import filter
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
@@ -34,72 +22,11 @@ from cms.utils.urlutils import admin_reverse
 from treebeard.mp_tree import MP_Node
 
 
-class BoundRenderMeta(object):
+class BoundRenderMeta:
     def __init__(self, meta):
         self.index = 0
         self.total = 1
         self.text_enabled = getattr(meta, 'text_enabled', False)
-
-
-class ForwardOneToOneDescriptor(ForwardManyToOneDescriptor):
-    """
-    Accessor to the related object on the forward side
-    of a one-to-one relation.
-
-    In the example::
-
-        class MyPlugin(CMSPlugin):
-            cmsplugin_ptr = ForeignKey(CMSPlugin, parent_link=True)
-
-    ``myplugin.cmsplugin_ptr`` is a ``ForwardOneToOneDescriptor`` instance.
-    """
-
-    # This class is necessary to backport the following Django fix
-    # https://github.com/django/django/commit/38575b007a722d6af510ea46d46393a4cda9ca29
-    # into the CMS.
-
-    def get_inherited_object(self, instance):
-        """
-        Returns an instance of the subclassed model
-        in a multi-table inheritance scenario.
-        """
-        # This is an exact copy of the code for get_object()
-        # provided in the commit above.
-        deferred = instance.get_deferred_fields()
-        # Because it's a parent link, all the data is available in the
-        # instance, so populate the parent model with this data.
-        rel_model = self.field.rel.model
-        fields = [field.attname for field in rel_model._meta.concrete_fields]
-
-        # If any of the related model's fields are deferred, fallback to
-        # fetching all fields from the related model. This avoids a query
-        # on the related model for every deferred field.
-        if not any(field in fields for field in deferred):
-            kwargs = {field: getattr(instance, field) for field in fields}
-            return rel_model(**kwargs)
-        return
-
-    def __get__(self, instance, instance_type=None):
-        if instance is None:
-            return self
-
-        if not hasattr(instance, self.cache_name):
-            # No cached object is present on the instance.
-            val = self.field.get_local_related_value(instance)
-
-            if None not in val:
-                # Fetch the inherited object instance
-                # using values from the current instance.
-                # This avoids an extra db call because we already
-                # have the data.
-                # This can be None if a field from the base class (CMSPlugin)
-                # was deferred.
-                rel_obj = self.get_inherited_object(instance)
-
-                if not rel_obj is None:
-                    # Populate the internal relationship cache.
-                    setattr(instance, self.cache_name, rel_obj)
-        return super(ForwardOneToOneDescriptor, self).__get__(instance, instance_type)
 
 
 class PluginModelBase(ModelBase):
@@ -144,17 +71,11 @@ class PluginModelBase(ModelBase):
                     related_name='%(app_label)s_%(class)s',
                     auto_created=True,
                     parent_link=True,
+                    on_delete=models.CASCADE,
                 )
 
         # create a new class (using the super-metaclass)
         new_class = super_new(cls, name, bases, attrs)
-
-        # Skip abstract and proxied classes which are not autonomous ORM objects
-        if parents and not new_class._meta.abstract and not new_class._meta.proxy:
-            # Use our patched descriptor regardless of how the one to one
-            # relationship was defined.
-            parent_link_field = new_class._meta.get_field('cmsplugin_ptr')
-            setattr(new_class, 'cmsplugin_ptr', ForwardOneToOneDescriptor(parent_link_field))
 
         # if there is a RenderMeta in attrs, use this one
         # else try to use the one from the superclass (if present)
@@ -168,8 +89,7 @@ class PluginModelBase(ModelBase):
         return new_class
 
 
-@python_2_unicode_compatible
-class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
+class CMSPlugin(MP_Node, metaclass=PluginModelBase):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -189,7 +109,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
     changed_date = models.DateTimeField(auto_now=True)
     child_plugin_instances = None
-    translatable_content_excluded_fields = []
 
     class Meta:
         app_label = 'cms'
@@ -273,12 +192,12 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         plugin_name = self.get_plugin_name()
         data = {
             'type': 'plugin',
-            'placeholder_id': text_type(self.placeholder_id),
+            'placeholder_id': str(self.placeholder_id),
             'plugin_name': force_text(plugin_name) or '',
             'plugin_type': self.plugin_type,
-            'plugin_id': text_type(self.pk),
+            'plugin_id': str(self.pk),
             'plugin_language': self.language or '',
-            'plugin_parent': text_type(self.parent_id or ''),
+            'plugin_parent': str(self.parent_id or ''),
             'plugin_restriction': children or [],
             'plugin_parent_restriction': parents or [],
             'urls': self.get_action_urls(),
@@ -286,7 +205,7 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         return data
 
     def refresh_from_db(self, *args, **kwargs):
-        super(CMSPlugin, self).refresh_from_db(*args, **kwargs)
+        super().refresh_from_db(*args, **kwargs)
 
         # Delete this internal cache to let the cms populate it
         # on demand.
@@ -345,13 +264,13 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
                                                              placeholder_id=self.placeholder_id).count()
                 self.add_root(instance=self)
             return
-        super(CMSPlugin, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
 
     def move(self, target, pos=None):
-        super(CMSPlugin, self).move(target, pos)
+        super().move(target, pos)
         self = self.reload()
 
         try:
@@ -410,10 +329,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         new_plugin.language = target_language
         new_plugin.plugin_type = self.plugin_type
         if no_signals:
-            from cms.signals import pre_save_plugins
-
-            signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
-            signals.pre_save.disconnect(pre_save_plugins, sender=CMSPlugin)
             new_plugin._no_reorder = True
         new_plugin.save()
         if plugin_instance:
@@ -432,10 +347,6 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
             plugin_instance.save()
             old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
             plugin_instance.copy_relations(old_instance)
-        if no_signals:
-
-            signals.pre_save.connect(pre_save_plugins, sender=CMSPlugin, dispatch_uid='cms_pre_save_plugin')
-
         return new_plugin
 
     @classmethod
@@ -545,30 +456,11 @@ class CMSPlugin(six.with_metaclass(PluginModelBase, MP_Node)):
         """
         pass
 
-    def get_translatable_content(self):
-        """
-        Returns {field_name: field_contents} for translatable fields, where
-        field_contents > ''
-        """
-        fields = (f for f in self._meta.fields
-                  if isinstance(f, (models.CharField, models.TextField)) and
-                     f.editable and not f.choices and
-                     f.name not in self.translatable_content_excluded_fields)
-        return dict(filter(itemgetter(1),
-                           ((f.name, getattr(self, f.name)) for f in fields)))
-
-    def set_translatable_content(self, fields):
-        for field, value in fields.items():
-            setattr(self, field, value)
-        self.save()
-        return all(getattr(self, field) == value
-                   for field, value in fields.items())
-
     def delete(self, no_mp=False, *args, **kwargs):
         if no_mp:
             Model.delete(self, *args, **kwargs)
         else:
-            super(CMSPlugin, self).delete(*args, **kwargs)
+            super().delete(*args, **kwargs)
 
     def get_action_urls(self, js_compat=True):
         if js_compat:

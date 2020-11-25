@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # django cms documentation build configuration file, created by
 # sphinx-quickstart on Tue Sep 15 10:47:03 2009.
@@ -12,6 +11,7 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
+import cms
 import datetime
 import os
 import sys
@@ -31,10 +31,16 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 #extensions = ['sphinx.ext.autodoc']
 
-extensions = ['djangocms', 'sphinx.ext.intersphinx', 'sphinx.ext.todo', 'sphinx.ext.autodoc']
+extensions = [
+    'djangocms',
+    'sphinx.ext.intersphinx',
+    'sphinx.ext.todo',
+    'sphinx.ext.autodoc',
+    'sphinxcontrib.spelling'
+    ]
 intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
-    'django': ('https://docs.djangoproject.com/en/1.10/', 'https://docs.djangoproject.com/en/1.10/_objects/'),
+    'django': ('https://docs.djangoproject.com/en/2.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
     'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
     'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
     'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
@@ -66,7 +72,6 @@ copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
 path = os.path.split(os.path.dirname(__file__))[0]
 path = os.path.split(path)[0]
 sys.path.insert(0, path)
-import cms
 
 version = cms.__version__
 # The full version, including alpha/beta/rc tags.

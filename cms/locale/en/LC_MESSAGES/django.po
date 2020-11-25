@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-11-19 13:44+0100\n"
+"POT-Creation-Date: 2020-10-28 10:45+0100\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -115,6 +115,9 @@ msgstr "An application instance using this configuration already exists."
 
 msgid "An application instance with this name already exists."
 msgstr "An application instance with this name already exists."
+
+msgid "You can't move the home page inside another page"
+msgstr ""
 
 msgid "Yes"
 msgstr ""
@@ -572,9 +575,6 @@ msgstr ""
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
-
-msgid "Add Another"
-msgstr "Add Another"
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -1337,6 +1337,9 @@ msgstr ""
 msgid "The page was changed in the meantime, reloading..."
 msgstr ""
 
+msgid "CMS-wide Shortcuts"
+msgstr ""
+
 msgid "Bring up this help dialog"
 msgstr ""
 
@@ -1356,6 +1359,11 @@ msgstr ""
 
 msgid "Focus on Toolbar"
 msgstr ""
+
+#, fuzzy
+#| msgid "Structure"
+msgid "Structureboard"
+msgstr "Structure"
 
 #, fuzzy
 #| msgid "static placeholders"
@@ -1552,6 +1560,9 @@ msgstr ""
 
 msgid "Welcome to django CMS"
 msgstr "Welcome to django CMS"
+
+msgid "Add Another"
+msgstr "Add Another"
 
 msgid "Back"
 msgstr "Back"

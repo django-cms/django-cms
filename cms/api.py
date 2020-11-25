@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Public Python API to create CMS contents.
 
@@ -16,7 +15,6 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
-from django.utils import six
 from django.utils.translation import activate
 
 from cms import constants
@@ -58,7 +56,7 @@ def _verify_apphook(apphook, namespace):
         apphook_name = apphook.__class__.__name__
     elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         return apphook.__name__
-    elif isinstance(apphook, six.string_types):
+    elif isinstance(apphook, str):
         try:
             assert apphook in apphook_pool.apps
         except AssertionError:
@@ -82,7 +80,7 @@ def _verify_plugin_type(plugin_type):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
-    elif isinstance(plugin_type, six.string_types):
+    elif isinstance(plugin_type, str):
         try:
             plugin_model = plugin_pool.get_plugin(plugin_type).model
         except KeyError:
@@ -107,7 +105,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 navigation_extenders=None, published=False, site=None,
                 login_required=False, limit_visibility_in_menu=constants.VISIBILITY_ALL,
                 position="last-child", overwrite_url=None,
-                xframe_options=Page.X_FRAME_OPTIONS_INHERIT):
+                xframe_options=Page.X_FRAME_OPTIONS_INHERIT, page_title=None):
     """
     Create a CMS Page and it's title for the given language
 
@@ -193,6 +191,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     create_title(
         language=language,
         title=title,
+        page_title=page_title,
         menu_title=menu_title,
         slug=slug,
         redirect=redirect,
@@ -250,6 +249,11 @@ def create_title(language, title, page, menu_title=None, slug=None,
         page=page,
         has_url_overwrite=bool(overwrite_url),
     )
+
+    page_languages = page.get_languages()
+
+    if language not in page_languages:
+        page.update_languages(page_languages + [language])
     return title
 
 

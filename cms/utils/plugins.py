@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
 from copy import deepcopy
 from collections import defaultdict
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
+from functools import lru_cache
 
 from django.utils.encoding import force_text
-from django.utils.lru_cache import lru_cache
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
@@ -301,7 +300,7 @@ def downcast_plugins(plugins,
             yield plugin_lookup[plugin.pk]
 
 
-def reorder_plugins(placeholder, parent_id, language, order):
+def reorder_plugins(placeholder, parent_id, language, order=None):
     """
     Reorder the plugins according the order parameter
 
@@ -316,10 +315,9 @@ def reorder_plugins(placeholder, parent_id, language, order):
         language=language,
     ).order_by('position')
 
-    # Make sure we're dealing with a list
-    order = list(order)
-
     if order:
+        # Make sure we're dealing with a list
+        order = list(order)
         plugins = plugins.filter(pk__in=order)
 
         for plugin in plugins.iterator():

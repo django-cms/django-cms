@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
 import datetime
 import json
 import sys
 
-from django.core.cache import cache
-from django.core.urlresolvers import clear_url_caches
 from django.contrib import admin
 from django.contrib.sites.models import Site
+from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
-from django.utils import six
+from django.urls import clear_url_caches
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
@@ -20,6 +18,7 @@ from cms import constants
 from cms.admin.pageadmin import PageAdmin
 from cms.api import create_page, add_plugin, create_title
 from cms.appresolver import clear_app_resolvers
+from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
 from cms.middleware.user import CurrentUserMiddleware
 from cms.models.pagemodel import Page, PageType
@@ -597,7 +596,7 @@ class PageTest(PageTestBase):
     def test_publish_homepage_with_children(self):
         homepage = create_page("home", "nav_playground.html", "en", published=True)
         homepage.set_as_homepage()
-        pending_child_1 =  create_page(
+        pending_child_1 = create_page(
             "child-1",
             "nav_playground.html",
             language="en",
@@ -1041,15 +1040,14 @@ class PageTest(PageTestBase):
                 {
                     'code': 'en',
                     'name': 'English',
-                    'fallbacks': ['fr', 'de'],
                     'public': True,
-                    'fallbacks':['fr']
+                    'fallbacks': ['fr']
                 },
                 {
                     'code': 'fr',
                     'name': 'French',
                     'public': True,
-                    'fallbacks':['en']
+                    'fallbacks': ['en']
                 },
         ]}
         with self.settings(CMS_LANGUAGES=languages):
@@ -1143,6 +1141,24 @@ class PageTest(PageTestBase):
             self.assertEqual(page2.get_path(), page_data2['slug'])
             page3 = Page.objects.get(pk=page3.pk)
             self.assertEqual(page3.get_path(), page_data2['slug'] + "/" + page_data3['slug'])
+
+    def test_user_cant_nest_home_page(self):
+        """
+        Users should not be able to move the home-page
+        inside another node of the tree.
+        """
+        homepage = create_page("home", "nav_playground.html", "en", published=True)
+        homepage.set_as_homepage()
+        home_sibling_1 = create_page("root-1", "nav_playground.html", "en", published=True)
+
+        payload = {'id': homepage.pk, 'position': 0, 'target': home_sibling_1}
+
+        with self.login_user_context(self.get_superuser()):
+            endpoint = self.get_admin_url(Page, 'move_page', homepage.pk)
+            response = self.client.post(endpoint, payload)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(response.json().get('status', 400), 400)
 
     def test_move_home_page(self):
         """
@@ -1663,7 +1679,7 @@ class PageTest(PageTestBase):
             document.finalize()
             # Removing ROOT element if it's not necessary
             if len(document.children) == 1:
-                if not isinstance(document.children[0], six.string_types):
+                if not isinstance(document.children[0], str):
                     document = document.children[0]
             return document
 
@@ -2965,6 +2981,21 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 403)
             self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
+
+    def test_permissions_cache_invalidation(self):
+        """
+        Test permission cache clearing on page save
+        """
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_std_permissions()
+        endpoint = self.get_admin_url(Page, 'permissions', page.pk) + '?language=en'
+        set_permission_cache(staff_user, "change_page", [page.pk])
+
+        with self.login_user_context(self.get_superuser()):
+            data = self._get_page_permissions_data(page=page.pk, user=staff_user.pk)
+            data['_continue'] = '1'
+            self.client.post(endpoint, data)
+        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
 
     def test_user_can_edit_title_fields(self):
         """

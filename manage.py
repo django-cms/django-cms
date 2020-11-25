@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 import os
 import sys
 import warnings
@@ -7,9 +6,10 @@ import warnings
 import app_manage
 
 from cms.exceptions import DontUsePageAttributeWarning
-from cms.utils.compat import DJANGO_1_9
 
-gettext = lambda s: s
+def gettext(s): return s
+
+
 warnings.filterwarnings('ignore', category=DontUsePageAttributeWarning)
 
 
@@ -24,7 +24,7 @@ def install_auth_user_model(settings, value):
     settings['AUTH_USER_MODEL'] = value
 
 
-class DisableMigrations(object):
+class DisableMigrations:
 
     def __contains__(self, item):
         return True
@@ -76,22 +76,18 @@ if __name__ == '__main__':
         'cms',
         'menus',
         'sekizai',
-        'hvad',
     ] + PLUGIN_APPS
 
-    if DJANGO_1_9:
-        MIGRATION_MODULES = DisableMigrations()
-    else:
-        MIGRATION_MODULES = {
-            'auth': None,
-            'admin': None,
-            'contenttypes': None,
-            'sessions': None,
-            'sites': None,
-            'cms': None,
-            'menus': None,
-            'djangocms_text_ckeditor': None,
-        }
+    MIGRATION_MODULES = {
+        'auth': None,
+        'admin': None,
+        'contenttypes': None,
+        'sessions': None,
+        'sites': None,
+        'cms': None,
+        'menus': None,
+        'djangocms_text_ckeditor': None,
+    }
 
     dynamic_configs = {
         'TEMPLATES': [{
@@ -115,7 +111,6 @@ if __name__ == '__main__':
                 'loaders': (
                     'django.template.loaders.filesystem.Loader',
                     'django.template.loaders.app_directories.Loader',
-                    'django.template.loaders.eggs.Loader',
                 )
             }
         }
@@ -141,10 +136,7 @@ if __name__ == '__main__':
         'cms.middleware.toolbar.ToolbarMiddleware',
         'django.middleware.cache.FetchFromCacheMiddleware',
     ]
-    if not DJANGO_1_9:
-        dynamic_configs['MIDDLEWARE'] = MIDDLEWARES
-    else:
-        dynamic_configs['MIDDLEWARE_CLASSES'] = MIDDLEWARES
+    dynamic_configs['MIDDLEWARE'] = MIDDLEWARES
     app_manage.main(
         ['cms', 'menus'],
         app_manage.Argument(
@@ -323,5 +315,8 @@ if __name__ == '__main__':
         ALLOWED_HOSTS=['localhost'],
         TEST_RUNNER='django.test.runner.DiscoverRunner',
         MIGRATION_MODULES=MIGRATION_MODULES,
+        # django 3.0
+        X_FRAME_OPTIONS='SAMEORIGIN',
+
         **dynamic_configs
     )

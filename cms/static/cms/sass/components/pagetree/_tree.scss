@@ -816,6 +816,7 @@
         background-repeat: no-repeat;
         background-position: -1px center;;
         image-rendering: pixelated;
+        white-space: normal;
 
         &:hover {
             color: $gray !important;

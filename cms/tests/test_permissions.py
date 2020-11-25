@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
@@ -43,16 +42,6 @@ class PermissionCacheTests(CMSTestCase):
         cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
-    def test_cache_invalidation(self):
-        """
-        Test permission cache clearing on page save
-        """
-        set_permission_cache(self.user_normal, "change_page", [self.home_page.id])
-
-        self.home_page.save()
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
-        self.assertIsNone(cached_permissions)
-
     def test_permission_manager(self):
         """
         Test page permission manager working on a subpage
@@ -69,10 +58,6 @@ class PermissionCacheTests(CMSTestCase):
                                                               "change_page")
         self.assertEqual(live_permissions, [page_b.id])
         self.assertEqual(cached_permissions_permissions, live_permissions)
-
-        self.home_page.save()
-        cached_permissions = get_permission_cache(self.user_normal, "change_page")
-        self.assertIsNone(cached_permissions)
 
     def test_cached_permission_precedence(self):
         # refs - https://github.com/divio/django-cms/issues/6335

@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
 import os
 
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandParser
-from django.core.management.color import no_style
+from django.core.management.color import no_style, color_style
+
+from cms.utils.compat import DJANGO_3_0, DJANGO_3_1
 
 
 def add_builtin_arguments(parser):
@@ -35,6 +35,11 @@ def add_builtin_arguments(parser):
         help='Raise on CommandError exceptions')
     parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
         help="Don't colorize the command output.")
+    parser.add_argument('--force-color', action='store_true', dest='force_color', default=False,
+        help="Colorize the command output.")
+    if DJANGO_3_0 or DJANGO_3_1:
+        parser.add_argument('--skip-checks', action='store_true', dest='skip_checks', default=False,
+            help="Skip the checks.")
 
 
 class SubcommandsCommand(BaseCommand):
@@ -42,14 +47,16 @@ class SubcommandsCommand(BaseCommand):
     instances = {}
     help_string = ''
     command_name = ''
+    stealth_options = ('interactive',)
 
     subcommand_dest = 'subcmd'
 
     def create_parser(self, prog_name, subcommand):
+        kwargs = {}
         parser = CommandParser(
-            self,
             prog="%s %s" % (os.path.basename(prog_name), subcommand),
-            description=self.help or None
+            description=self.help or None,
+            **kwargs
         )
         self.add_arguments(parser)
         return parser
@@ -58,18 +65,22 @@ class SubcommandsCommand(BaseCommand):
         self.instances = {}
 
         if self.subcommands:
+            stealth_options = set(self.stealth_options)
             subparsers = parser.add_subparsers(dest=self.subcommand_dest)
             for command, cls in self.subcommands.items():
                 instance = cls(self.stdout._out, self.stderr._out)
                 instance.style = self.style
+                kwargs = {}
                 parser_sub = subparsers.add_parser(
-                    cmd=self, name=instance.command_name, help=instance.help_string,
-                    description=instance.help_string
+                    name=instance.command_name, help=instance.help_string,
+                    description=instance.help_string, **kwargs
                 )
 
                 add_builtin_arguments(parser=parser_sub)
                 instance.add_arguments(parser_sub)
+                stealth_options.update({action.dest for action in parser_sub._actions})
                 self.instances[command] = instance
+            self.stealth_options = tuple(stealth_options)
 
     def handle(self, *args, **options):
         if options[self.subcommand_dest] in self.instances:
@@ -77,6 +88,8 @@ class SubcommandsCommand(BaseCommand):
             if options.get('no_color'):
                 command.style = no_style()
                 command.stderr.style_func = None
+            if options.get('force_color'):
+                command.style = color_style(force_color=True)
             if options.get('stdout'):
                 command.stdout._out = options.get('stdout')
             if options.get('stderr'):

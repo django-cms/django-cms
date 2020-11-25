@@ -1,18 +1,17 @@
-# -*- coding: utf-8 -*-
 from collections import defaultdict
 from contextlib import contextmanager
-from functools import wraps
+from functools import wraps, lru_cache
+
 from threading import local
 
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
-from django.utils.decorators import available_attrs
-from django.utils.lru_cache import lru_cache
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import (Page, PagePermission, GlobalPagePermission)
+from cms.models import GlobalPagePermission, Page, PagePermission
+from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
@@ -61,7 +60,7 @@ def get_model_permission_codename(model, action):
 
 
 def _has_global_permission(user, site, action):
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         return False
 
     if user.is_superuser:
@@ -115,7 +114,7 @@ def get_user_permission_level(user, site):
         2.
 
     """
-    if not user.is_authenticated():
+    if not user.is_authenticated:
         raise NoPermissionsException
 
     if user.is_superuser or not get_cms_setting('PERMISSION'):
@@ -203,7 +202,8 @@ def get_page_actions_for_user(user, site):
 
     for perm in page_permissions.iterator():
         # set internal fk cache to our page with loaded ancestors and descendants
-        perm._page_cache = pages_by_id[perm.page_id]
+        PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
+
         page_ids = frozenset(perm.get_page_ids())
 
         for action in perm.get_configured_actions():
@@ -354,7 +354,7 @@ def get_view_restrictions(pages):
 
     for perm in page_permissions:
         # set internal fk cache to our page with loaded ancestors and descendants
-        perm._page_cache = pages_by_id[perm.page_id]
+        PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
 
         for page_id in perm.get_page_ids():
             restricted_pages[page_id].append(perm)

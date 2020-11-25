@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-from cms.utils.compat import DJANGO_1_10
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
-from django.core.urlresolvers import NoReverseMatch, reverse_lazy
-from django.forms.widgets import Select, MultiWidget, TextInput
+from django.forms.widgets import MultiWidget, Select, TextInput
+from django.urls import NoReverseMatch, reverse_lazy
 from django.utils.encoding import force_text
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
 
 from cms.utils.urlutils import admin_reverse, static_with_version
 from cms.forms.utils import get_site_choices, get_page_choices
@@ -31,7 +28,7 @@ class PageSelectWidget(MultiWidget):
         else:
             self.attrs = {}
         self.choices = []
-        super(PageSelectWidget, self).__init__((Select, Select, Select), attrs)
+        super().__init__((Select, Select, Select), attrs)
 
     def decompress(self, value):
         """
@@ -91,36 +88,9 @@ class PageSelectWidget(MultiWidget):
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
-        context = super(PageSelectWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
-
-    def render(self, name, value, attrs=None, renderer=None):
-        if DJANGO_1_10:
-            # THIS IS A COPY OF django.forms.widgets.MultiWidget.render()
-            # (except for the last line)
-
-            # value is a list of values, each corresponding to a widget
-            # in self.widgets.
-            self._build_widgets()
-
-            if not isinstance(value, list):
-                value = self.decompress(value)
-            output = []
-            final_attrs = self.build_attrs(attrs)
-            id_ = final_attrs.get('id', None)
-            for i, widget in enumerate(self.widgets):
-                try:
-                    widget_value = value[i]
-                except IndexError:
-                    widget_value = None
-                if id_:
-                    final_attrs = dict(final_attrs, id='%s_%s' % (id_, i))
-                output.append(widget.render(name + '_%s' % i, widget_value, final_attrs))
-            output.append(self._build_script(name, value, final_attrs))
-            return mark_safe(self.format_output(output))
-        else:
-            return super(PageSelectWidget, self).render(name, value, attrs, renderer)
 
     def format_output(self, rendered_widgets):
         return u' '.join(rendered_widgets)
@@ -141,7 +111,7 @@ class PageSmartLinkWidget(TextInput):
         )
 
     def __init__(self, attrs=None, ajax_view=None):
-        super(PageSmartLinkWidget, self).__init__(attrs)
+        super().__init__(attrs)
         self.ajax_url = self.get_ajax_url(ajax_view=ajax_view)
 
     def get_ajax_url(self, ajax_view):
@@ -172,18 +142,9 @@ class PageSmartLinkWidget(TextInput):
         }
 
     def get_context(self, name, value, attrs):
-        context = super(PageSmartLinkWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
-
-    def render(self, name, value, attrs=None, renderer=None):
-        if DJANGO_1_10:
-            final_attrs = self.build_attrs(attrs)
-            output = list(self._build_script(name, value, final_attrs))
-            output.append(super(PageSmartLinkWidget, self).render(name, value, attrs))
-            return mark_safe(u''.join(output))
-        else:
-            return super(PageSmartLinkWidget, self).render(name, value, attrs, renderer)
 
 
 class UserSelectAdminWidget(Select):
@@ -194,8 +155,8 @@ class UserSelectAdminWidget(Select):
     Current user should be assigned to widget in form constructor as an user
     attribute.
     """
-    def render(self, name, value, attrs=None, choices=()):
-        output = [super(UserSelectAdminWidget, self).render(name, value, attrs)]
+    def render(self, name, value, attrs=None, choices=(), renderer=None):
+        output = [super().render(name, value, attrs, renderer=renderer)]
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
@@ -219,10 +180,10 @@ class AppHookSelect(Select):
 
     def __init__(self, attrs=None, choices=(), app_namespaces={}):
         self.app_namespaces = app_namespaces
-        super(AppHookSelect, self).__init__(attrs, choices)
+        super().__init__(attrs, choices)
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super(AppHookSelect, self).create_option(name, value, label, selected, index, subindex, attrs)
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
         if value in self.app_namespaces:
             option['attrs']['data-namespace'] = escape(self.app_namespaces[value])
         return option
@@ -270,7 +231,7 @@ class ApplicationConfigSelect(Select):
 
     def __init__(self, attrs=None, choices=(), app_configs={}):
         self.app_configs = app_configs
-        super(ApplicationConfigSelect, self).__init__(attrs, choices)
+        super().__init__(attrs, choices)
 
     def _build_script(self, name, value, attrs={}):
         configs = []
@@ -295,19 +256,6 @@ class ApplicationConfigSelect(Select):
         }
 
     def get_context(self, name, value, attrs):
-        context = super(ApplicationConfigSelect, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
-
-    def render(self, name, value, attrs=None, renderer=None):
-        if DJANGO_1_10:
-            output = list(super(ApplicationConfigSelect, self).render(name, value, attrs))
-            output.append(self._build_script(name, value, attrs))
-
-            related_url = ''
-            output.append('<a href="%s" class="add-another" id="add_%s" title="%s" onclick="return showAddAnotherPopup(this);">'
-                          % (related_url, name, _('Add Another')))
-            output.append('</a>')
-            return mark_safe(''.join(output))
-        else:
-            return super(ApplicationConfigSelect, self).render(name, value, attrs, renderer)

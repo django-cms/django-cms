@@ -119,7 +119,7 @@ selected, it will open a modal dialog in which the *Page icon* field can be edit
 
     from cms.toolbar_pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from .models import IconExtension
 
 
@@ -197,7 +197,7 @@ In this example, we need to loop over the titles for the page, and populate the 
 
     from cms.toolbar_pool import toolbar_pool
     from cms.extensions.toolbar import ExtensionToolbar
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     from .models import RatingExtension
     from cms.utils import get_language_list  # needed to get the page's languages
     @toolbar_pool.register
@@ -261,7 +261,7 @@ page extension model will be available on ``page.iconextension``. From there
 you can access the extra fields you defined in your extension, so you can use
 something like::
 
-    {% load staticfiles %}
+    {% load static %}
 
     {# rest of template omitted ... #}
 
@@ -351,8 +351,8 @@ low-level API to edit the toolbar according to your needs::
     from cms.toolbar_base import CMSToolbar
     from cms.utils import get_cms_setting
     from cms.utils.page_permissions import user_can_change_page
-    from django.core.urlresolvers import reverse, NoReverseMatch
-    from django.utils.translation import ugettext_lazy as _
+    from django.urls import reverse, NoReverseMatch
+    from django.utils.translation import gettext_lazy as _
     from .models import IconExtension
 
 
@@ -401,15 +401,9 @@ Simplified Toolbar API
 The simplified Toolbar API works by deriving your toolbar class from ``ExtensionToolbar``
 which provides the following API:
 
-
-* :meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`: this must be called first to setup
-  the environment and do the permission checking;
-* :py:meth:`~cms.extensions.toolbar.ExtensionToolbar.get_page_extension_admin()`: for page extensions, retrieves the
-  correct admin URL for the related toolbar item; returns the extension instance (or `None` if not exists)
-  and the admin URL for the toolbar item;
-* :py:meth:`~cms.extensions.toolbar.ExtensionToolbar.get_title_extension_admin()`: for title extensions, retrieves the
-  correct admin URL for the related toolbar item; returns a list of the extension instances
-  (or `None` if not exists) and the admin urls for each title of the current page;
-
-* :meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu`
-* :meth:`cms.extensions.toolbar.ExtensionToolbar._setup_extension_toolbar`
+* ``ExtensionToolbar.get_page_extension_admin()``: for page extensions, retrieves the correct admin
+  URL for the related toolbar item; returns the extension instance (or ``None`` if none exists) and
+  the admin URL for the toolbar item
+* ``ExtensionToolbar.get_title_extension_admin()``: for title extensions, retrieves the correct
+  admin URL for the related toolbar item; returns a list of the extension instances (or ``None`` if
+  none exists) and the admin URLs for each title of the current page

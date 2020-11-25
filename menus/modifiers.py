@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from menus.base import Modifier
 from menus.menu_pool import menu_pool
 
@@ -94,9 +93,9 @@ class AuthVisibility(Modifier):
         final = []
         for node in nodes:
             if (node.attr.get('visible_for_authenticated', True) and \
-                 request.user.is_authenticated()) or \
+                 request.user.is_authenticated) or \
                 (node.attr.get('visible_for_anonymous', True) and \
-                 not request.user.is_authenticated()):
+                 not request.user.is_authenticated):
                 final.append(node)
             else:
                 if node.parent and node in node.parent.children:

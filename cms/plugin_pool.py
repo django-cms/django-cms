@@ -1,11 +1,8 @@
-# -*- coding: utf-8 -*-
 from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.conf.urls import url, include
-from django.db.models import signals
+from django.urls import re_path, include
 from django.template.defaultfilters import slugify
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
@@ -18,7 +15,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import normalize_name
 
 
-class PluginPool(object):
+class PluginPool:
 
     def __init__(self):
         self.plugins = {}
@@ -78,7 +75,7 @@ class PluginPool(object):
                     from django.template import loader
 
                     template = plugin.render_template
-                    if isinstance(template, six.string_types) and template:
+                    if isinstance(template, str) and template:
                         try:
                             loader.get_template(template)
                         except TemplateDoesNotExist as e:
@@ -86,7 +83,7 @@ class PluginPool(object):
                             # TemplateDoesNotExist if the plugin's render_template
                             # does in fact exist, but it includes a template that
                             # doesn't.
-                            if six.text_type(e) == template:
+                            if str(e) == template:
                                 raise ImproperlyConfigured(
                                     "CMS Plugins must define a render template (%s) that exists: %s"
                                     % (plugin, template)
@@ -124,10 +121,6 @@ class PluginPool(object):
 
         plugin.value = plugin_name
         self.plugins[plugin_name] = plugin
-        from cms.signals import pre_save_plugins
-
-        signals.pre_save.connect(pre_save_plugins, sender=plugin.model,
-                                 dispatch_uid='cms_pre_save_plugin_%s' % plugin_name)
         return plugin
 
     def unregister_plugin(self, plugin):
@@ -206,7 +199,7 @@ class PluginPool(object):
                 p = plugin()
                 slug = slugify(force_text(normalize_name(p.__class__.__name__)))
                 url_patterns += [
-                    url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                    re_path(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
                 ]
         finally:
             # Reactivate translation

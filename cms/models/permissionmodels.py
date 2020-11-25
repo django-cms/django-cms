@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
-import django
 from django.apps import apps
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_text
+from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
 from cms.models.managers import (PagePermissionManager,
@@ -85,7 +83,7 @@ class AbstractPagePermission(models.Model):
         app_label = 'cms'
 
     def clean(self):
-        super(AbstractPagePermission, self).clean()
+        super().clean()
 
         if not self.user and not self.group:
             raise ValidationError(_('Please select user or group.'))
@@ -134,7 +132,7 @@ class AbstractPagePermission(models.Model):
         if not self.user and not self.group:
             # don't allow `empty` objects
             return
-        return super(AbstractPagePermission, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def get_configured_actions(self):
         actions = [action for action in self.get_permissions_by_action()
@@ -177,7 +175,6 @@ class AbstractPagePermission(models.Model):
         return permissions_by_action
 
 
-@python_2_unicode_compatible
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
@@ -204,7 +201,6 @@ class GlobalPagePermission(AbstractPagePermission):
         return "%s :: GLOBAL" % self.audience
 
 
-@python_2_unicode_compatible
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
     """
@@ -223,7 +219,7 @@ class PagePermission(AbstractPagePermission):
         return "%s :: %s has: %s" % (page, self.audience, force_text(self.get_grant_on_display()))
 
     def clean(self):
-        super(PagePermission, self).clean()
+        super().clean()
 
         if self.can_add and self.grant_on == ACCESS_PAGE:
             # this is a misconfiguration - user can add/move page to current
@@ -281,5 +277,3 @@ class PageUserGroup(Group):
         verbose_name = _('User group (page)')
         verbose_name_plural = _('User groups (page)')
         app_label = 'cms'
-        if (1, 10) <= django.VERSION < (2, 0):
-            manager_inheritance_from_future = True

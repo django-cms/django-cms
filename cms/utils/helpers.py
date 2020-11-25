@@ -1,21 +1,20 @@
-# -*- coding: utf-8 -*-
 import re
 
+from django.utils.encoding import force_text
 from django.utils.timezone import get_current_timezone_name
-from django.utils.translation import force_text
 
 
 def find_placeholder_relation(obj):
     return 'page'
 
 
-class classproperty(object):
+class classproperty:
     """Like @property, but for classes, not just instances.
 
     Example usage:
 
         >>> from cms.utils.helpers import classproperty
-        >>> class A(object):
+        >>> class A:
         ...     @classproperty
         ...     def x(cls):
         ...         return 'x'
@@ -42,7 +41,7 @@ class classproperty(object):
 
 def normalize_name(name):
     """
-    Converts camel-case style names into underscore seperated words. Example::
+    Converts camel-case style names into underscore separated words. Example::
 
         >>> normalize_name('oneTwoThree')
         'one_two_three'

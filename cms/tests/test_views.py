@@ -1,13 +1,13 @@
 import re
 import sys
 
-from django.core.cache import cache
 from django.conf import settings
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import clear_url_caches
+from django.core.cache import cache
 from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings
+from django.urls import clear_url_caches
 
 from cms.api import create_page, create_title, publish_page
 from cms.models import PagePermission, UserSettings, Placeholder
@@ -33,7 +33,7 @@ class ViewTests(CMSTestCase):
         clear_url_caches()
 
     def tearDown(self):
-        super(ViewTests, self).tearDown()
+        super().tearDown()
         clear_url_caches()
 
     def test_welcome_screen_debug_on(self):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import warnings
 
@@ -7,14 +6,12 @@ from datetime import datetime, timedelta
 from django.contrib import admin
 from django.db import models
 from django.template.defaultfilters import title
-from django.utils import six
-from django.utils.encoding import python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _, force_text
+from django.utils.encoding import force_text
+from django.utils.translation import gettext_lazy as _
 
 from cms.cache.placeholder import clear_placeholder_cache
 from cms.exceptions import LanguageError
 from cms.utils import get_site_id
-from cms.utils.compat import DJANGO_1_8
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
 from cms.constants import (
@@ -27,7 +24,6 @@ from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
 
-@python_2_unicode_compatible
 class Placeholder(models.Model):
     """
     Attributes:
@@ -335,12 +331,8 @@ class Placeholder(models.Model):
         """
         Returns a list of objects attached to this placeholder.
         """
-        if DJANGO_1_8:
-            return [obj for field in self._get_attached_fields()
-                    for obj in getattr(self, field.related.get_accessor_name()).all()]
-        else:
-            return [obj for field in self._get_attached_fields()
-                    for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
+        return [obj for field in self._get_attached_fields()
+                for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
 
     def page_getter(self):
         if not hasattr(self, '_page'):
@@ -555,7 +547,7 @@ class Placeholder(models.Model):
             if not vary_on:
                 # None, or an empty iterable
                 continue
-            if isinstance(vary_on, six.string_types):
+            if isinstance(vary_on, str):
                 if vary_on.lower() not in vary_list:
                     vary_list.add(vary_on.lower())
             else:

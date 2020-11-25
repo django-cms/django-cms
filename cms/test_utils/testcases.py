@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
 import json
 import sys
 import warnings
+
+from urllib.parse import unquote, urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -9,16 +10,15 @@ from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.forms.models import model_to_dict
 from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
 from django.utils.translation import activate
-from django.utils.six.moves.urllib.parse import unquote, urljoin
 from menus.menu_pool import menu_pool
 
 from cms.api import create_page
@@ -35,7 +35,6 @@ from cms.models.permissionmodels import (
     PageUser,
 )
 from cms.test_utils.util.context_managers import UserLoginContext
-from cms.utils.compat import DJANGO_1_8
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
@@ -44,10 +43,7 @@ from cms.utils.urlutils import admin_reverse
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
 URL_CMS_PAGE_CHANGE_BASE = urljoin(URL_CMS_PAGE, "%d/")
-if DJANGO_1_8:
-    URL_CMS_PAGE_CHANGE = URL_CMS_PAGE_CHANGE_BASE
-else:
-    URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "change/")
+URL_CMS_PAGE_CHANGE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "change/")
 URL_CMS_PAGE_ADVANCED_CHANGE = urljoin(URL_CMS_PAGE, "%d/advanced-settings/")
 URL_CMS_PAGE_PERMISSION_CHANGE = urljoin(URL_CMS_PAGE, "%d/permission-settings/")
 URL_CMS_PAGE_PERMISSIONS = urljoin(URL_CMS_PAGE, "%d/permissions/")
@@ -70,7 +66,7 @@ URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete-translati
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
-class _Warning(object):
+class _Warning:
     def __init__(self, message, category, filename, lineno):
         self.message = message
         self.category = category
@@ -109,11 +105,11 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-class BaseCMSTestCase(object):
+class BaseCMSTestCase:
     counter = 1
 
     def _fixture_setup(self):
-        super(BaseCMSTestCase, self)._fixture_setup()
+        super()._fixture_setup()
         self.create_fixtures()
         activate("en")
 
@@ -123,7 +119,7 @@ class BaseCMSTestCase(object):
     def _post_teardown(self):
         menu_pool.clear()
         cache.clear()
-        super(BaseCMSTestCase, self)._post_teardown()
+        super()._post_teardown()
         set_current_user(None)
 
     def login_user_context(self, user):
@@ -153,7 +149,7 @@ class BaseCMSTestCase(object):
         options.update(**kwargs)
 
         gpp = GlobalPagePermission.objects.create(**options)
-        gpp.sites = Site.objects.all()
+        gpp.sites.set(Site.objects.all())
         return gpp
 
     def add_page_permission(self, user, page, **kwargs):
@@ -405,7 +401,7 @@ class BaseCMSTestCase(object):
         request = request or self.get_request()
         return StructureRenderer(request)
 
-    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None):
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None, domain=None):
         factory = RequestFactory()
 
         if not path:
@@ -424,13 +420,16 @@ class BaseCMSTestCase(object):
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
+        if domain:
+            request.META["SERVER_NAME"] = domain
+            request.SERVER_NAME = domain
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
         if page:
             request.current_page = page
         else:
             request.current_page = None
 
-        class MockStorage(object):
+        class MockStorage:
 
             def __len__(self):
                 return 0

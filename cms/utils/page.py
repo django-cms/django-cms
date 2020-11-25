@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import re
 
-from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_text
 

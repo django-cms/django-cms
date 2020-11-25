@@ -1,14 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import os
 import sys
-
-from cms.utils.compat import DJANGO_1_9
 
 
 def noop_gettext(s):
     return s
+
 
 permission = True
 cms_toolbar_edit_on = 'edit'
@@ -28,7 +25,7 @@ for arg in sys.argv:
 gettext = noop_gettext
 
 
-class DisableMigrations(object):
+class DisableMigrations:
 
     def __contains__(self, item):
         return True
@@ -120,8 +117,19 @@ HELPER_SETTINGS = dict(
         'cms.test_utils.project.pluginapp.plugins.style',
         'cms.test_utils.project.placeholderapp',
     ],
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
         'cms.middleware.utils.ApphookReloadMiddleware',
+        'django.middleware.http.ConditionalGetMiddleware',
+        'django.contrib.sessions.middleware.SessionMiddleware',
+        'django.contrib.auth.middleware.AuthenticationMiddleware',
+        'django.contrib.messages.middleware.MessageMiddleware',
+        'django.middleware.csrf.CsrfViewMiddleware',
+        'django.middleware.locale.LocaleMiddleware',
+        'django.middleware.common.CommonMiddleware',
+        'cms.middleware.language.LanguageCookieMiddleware',
+        'cms.middleware.user.CurrentUserMiddleware',
+        'cms.middleware.page.CurrentPageMiddleware',
+        'cms.middleware.toolbar.ToolbarMiddleware',
     ],
     TEMPLATE_DIRS=(
         os.path.join(
@@ -133,12 +141,7 @@ HELPER_SETTINGS = dict(
         ('page.html', 'Standard page'),
         ('simple.html', 'Simple page'),
     ),
-)
-
-if DJANGO_1_9:
-    HELPER_SETTINGS['MIGRATION_MODULES'] = DisableMigrations()
-else:
-    HELPER_SETTINGS['MIGRATION_MODULES'] = {
+    MIGRATION_MODULES={
         'auth': None,
         'admin': None,
         'contenttypes': None,
@@ -147,12 +150,13 @@ else:
         'cms': None,
         'menus': None,
         'djangocms_text_ckeditor': None,
-    }
+    },
+)
 
 
 def _helper_patch(*args, **kwargs):
     from django.core.management import call_command
-    from djangocms_helper import utils
+    from app_helper import utils
 
     call_command('migrate', run_syncdb=True)
     utils.create_user('normal', 'normal@normal.normal', 'normal', is_staff=True, base_cms_permissions=True,
@@ -160,17 +164,18 @@ def _helper_patch(*args, **kwargs):
 
 
 def run():
-    from djangocms_helper import runner
-    from djangocms_helper import utils
+    from app_helper import runner
+    from app_helper import utils
 
     os.environ.setdefault('DATABASE_URL', 'sqlite://localhost/testdb.sqlite')
 
-    # Patch djangocms_helper to create tables
+    # Patch app_helper to create tables
     utils._create_db = _helper_patch
 
     # we use '.runner()', not '.cms()' nor '.run()' because it does not
     # add 'test' argument implicitly
     runner.runner([sys.argv[0], 'cms', '--cms', 'server', '--bind', '0.0.0.0', '--port', str(port)])
+
 
 if __name__ == "__main__":
     run()

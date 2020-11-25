@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
-from django.core.urlresolvers import reverse
 from django.db.models.query import Prefetch, prefetch_related_objects
+from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
 from django.utils.translation import override as force_language
 
@@ -8,7 +7,6 @@ from cms import constants
 from cms.api import get_page_draft
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyTitle
-from cms.utils.compat import DJANGO_1_9
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -35,7 +33,7 @@ def get_visible_nodes(request, pages, site):
     public_for = get_cms_setting('PUBLIC_FOR')
     can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
 
-    if not user.is_authenticated() and not can_see_unrestricted:
+    if not user.is_authenticated and not can_see_unrestricted:
         # User is not authenticated and can't see unrestricted pages,
         # no need to check for page restrictions because if there's some,
         # user is anon and if there is not any, user can't see unrestricted.
@@ -55,7 +53,7 @@ def get_visible_nodes(request, pages, site):
 
     user_id = user.pk
     user_groups = SimpleLazyObject(lambda: frozenset(user.groups.values_list('pk', flat=True)))
-    is_auth_user = user.is_authenticated()
+    is_auth_user = user.is_authenticated
 
     def user_can_see_page(page):
         page_id = page.pk if page.publisher_is_draft else page.publisher_public_id
@@ -162,7 +160,7 @@ class CMSNavigationNode(NavigationNode):
         self.path = kwargs.pop('path')
         # language is only used when we're dealing with a fallback
         self.language = kwargs.pop('language', None)
-        super(CMSNavigationNode, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def is_selected(self, request):
         try:
@@ -249,14 +247,7 @@ class CMSMenu(Menu):
             to_attr='filtered_translations',
             queryset=titles,
         )
-
-        if DJANGO_1_9:
-            # This function was made public in django 1.10
-            # and as a result its signature changed
-            prefetch_related_objects(pages, [lookup])
-        else:
-            prefetch_related_objects(pages, lookup)
-
+        prefetch_related_objects(pages, lookup)
         # Build the blank title instances only once
         blank_title_cache = {language: EmptyTitle(language=language) for language in languages}
 
@@ -273,7 +264,7 @@ class CMSMenu(Menu):
 
             for trans in page.filtered_translations:
                 page.title_cache[trans.language] = trans
-            menu_node =  get_menu_node_for_page(
+            menu_node = get_menu_node_for_page(
                 self.renderer,
                 page,
                 language=lang,
@@ -359,6 +350,7 @@ class NavExtender(Modifier):
         for node in removed:
             nodes.remove(node)
         return nodes
+
 
 menu_pool.register_modifier(NavExtender)
 

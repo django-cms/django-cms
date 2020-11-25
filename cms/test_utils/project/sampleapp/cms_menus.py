@@ -1,12 +1,10 @@
 from cms.menu_bases import CMSAttachMenu
 from cms.test_utils.project.sampleapp.models import Category
-from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse, NoReverseMatch
+from django.utils.translation import gettext_lazy as _
 from menus.base import Menu, NavigationNode
 from menus.menu_pool import menu_pool
-try:
-    from django.urls import reverse, NoReverseMatch
-except ImportError:
-    from django.core.urlresolvers import reverse, NoReverseMatch
+
 
 class SampleAppMenu(Menu):
 
@@ -28,6 +26,7 @@ class SampleAppMenu(Menu):
             pass
         return nodes
 
+
 menu_pool.register_menu(SampleAppMenu)
 
 
@@ -46,16 +45,21 @@ class StaticMenu(CMSAttachMenu):
         nodes.append(n4)
         return nodes
 
+
 menu_pool.register_menu(StaticMenu)
 
 
 class StaticMenu2(StaticMenu):
     name = _("Static Menu2")
+
+
 menu_pool.register_menu(StaticMenu2)
 
 
 class StaticMenu3(StaticMenu):
     name = _("Static Menu3")
+
+
 menu_pool.register_menu(StaticMenu3)
 
 
@@ -67,5 +71,6 @@ class StaticMenu4(CMSAttachMenu):
         nodes.append(NavigationNode('static fresh', '/static/fresh/', 'static fresh'))
         nodes.append(NavigationNode('sample2-root', reverse('sample2-root'), 'sample2-root'))
         return nodes
+
 
 menu_pool.register_menu(StaticMenu4)
