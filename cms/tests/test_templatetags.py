@@ -84,7 +84,7 @@ class TemplatetagTests(CMSTestCase):
         self.assertNotEqual(script, output)
         self.assertEqual(escape(script), output)
 
-    def test_page_attribute_tag(self):
+    def test_page_attribute_tag_with_lookup(self):
         page = create_page('My Page', 'nav_playground.html', 'en', published=True)
         request = RequestFactory().get('/')
         request.user = AnonymousUser()
