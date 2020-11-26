@@ -3,6 +3,12 @@ Changelog
 =========
 
 
+next
+====
+
+* Fixes templatetag ``page_attribute`` when extanding with ``as ...``.
+
+
 3.8.0 (2020-10-28)
 ==================
 
