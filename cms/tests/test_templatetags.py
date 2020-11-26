@@ -74,6 +74,21 @@ class TemplatetagTests(CMSTestCase):
         self.assertNotEqual(script, output)
         self.assertEqual(escape(script), output)
 
+    def test_page_attribute_tag_as_var(self):
+        class FakePage:
+            def get_page_title(self, *args, **kwargs):
+                return 'Fake Title'
+
+        class FakeRequest:
+            current_page = FakePage()
+            GET = {'language': 'en'}
+
+        request = FakeRequest()
+        template = '{% load cms_tags %}{% page_attribute page_title as my_title %}<title>{{ my_title }}</title>'
+        output = self.render_template_obj(template, {}, request)
+        expected = '<title>Fake Title</title>'
+        self.assertEqual(expected, output)
+
     def test_json_encoder(self):
         self.assertEqual(json_filter(True), 'true')
         self.assertEqual(json_filter(False), 'false')
