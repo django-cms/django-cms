@@ -57,6 +57,16 @@ class TemplatetagTests(CMSTestCase):
     def test_unicode_placeholder_name_fails_fast(self):
         self.assertRaises(ImproperlyConfigured, get_placeholders, 'unicode_placeholder.html')
 
+    def test_page_attribute_tag(self):
+        page = create_page('My Page', 'nav_playground.html', 'en', published=True)
+        request = RequestFactory().get('/')
+        request.user = AnonymousUser()
+        request.current_page = page
+
+        template = '{% load cms_tags %}{% page_attribute "page_title" %}<title>{{ my_title }}</title>'
+        output = self.render_template_obj(template, {}, request)
+        self.assertEqual(output, '<title>My Page</title>')
+
     def test_page_attribute_tag_escapes_content(self):
         script = '<script>alert("XSS");</script>'
 
@@ -74,20 +84,41 @@ class TemplatetagTests(CMSTestCase):
         self.assertNotEqual(script, output)
         self.assertEqual(escape(script), output)
 
+    def test_page_attribute_tag(self):
+        page = create_page('My Page', 'nav_playground.html', 'en', published=True)
+        request = RequestFactory().get('/')
+        request.user = AnonymousUser()
+        request.current_page = page
+
+        template = '{% load cms_tags %}<title>{% page_attribute "page_title" page %}</title>'
+        output = self.render_template_obj(template, {'page': page}, request)
+        self.assertEqual(output, '<title>My Page</title>')
+        output = self.render_template_obj(template, {'page': 'nopage'}, request)
+        self.assertEqual(output, '<title></title>')  # only for DEBUG=False
+
     def test_page_attribute_tag_as_var(self):
-        class FakePage:
-            def get_page_title(self, *args, **kwargs):
-                return 'Fake Title'
+        page = create_page('My Page', 'nav_playground.html', 'en', published=True)
+        request = RequestFactory().get('/')
+        request.user = AnonymousUser()
+        request.current_page = page
 
-        class FakeRequest:
-            current_page = FakePage()
-            GET = {'language': 'en'}
+        template = '{% load cms_tags %}{% page_attribute "page_title" page as my_title %}<title>{{ my_title }}</title>'
+        output = self.render_template_obj(template, {'page': page}, request)
+        self.assertEqual(output, '<title>My Page</title>')
 
-        request = FakeRequest()
-        template = '{% load cms_tags %}{% page_attribute page_title as my_title %}<title>{{ my_title }}</title>'
-        output = self.render_template_obj(template, {}, request)
-        expected = '<title>Fake Title</title>'
-        self.assertEqual(expected, output)
+    def test_page_attribute_tag_debug_mode(self):
+        page = create_page('My Page', 'nav_playground.html', 'en', published=True)
+        request = RequestFactory().get('/')
+        request.user = AnonymousUser()
+        request.current_page = page
+
+        template1 = '{% load cms_tags %}<title>{% page_attribute "page_title" page %}</title>'
+        template2 = '{% load cms_tags %}{% page_attribute "page_title" page as my_title %}<title>{{ my_title }}</title>'
+        with self.settings(DEBUG=True):
+            with self.assertRaises(Page.DoesNotExist):
+                self.render_template_obj(template1, {'page': 'nopage'}, request)
+            output = self.render_template_obj(template2, {'page': 'nopage'}, request)
+            self.assertEqual(output, '<title></title>')
 
     def test_json_encoder(self):
         self.assertEqual(json_filter(True), 'true')
