@@ -710,6 +710,22 @@ class PagesTestCase(TransactionCMSTestCase):
             resp = self.client.get(page.get_absolute_url('en'))
             self.assertEqual(resp.status_code, 404)
 
+    def test_page_multiple_languages_in_cache(self):
+        root = create_page("root", "nav_playground.html", "en", slug="root", published=True)
+
+        create_title("fr", "french home", root, path="root")
+        create_title("de", "german home", root, path="root")
+
+        root.publish("fr")
+        root.publish("de")
+
+        request = self.get_request(root.get_absolute_url())
+        req_page = get_page_from_request(request)
+
+        self.assertIsNotNone(req_page)
+        self.assertIn("fr", req_page.title_cache)
+        self.assertIn("de", req_page.title_cache)
+
     def test_page_urls(self):
         page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en', published=True)
 

@@ -7,6 +7,7 @@ Unreleased
 ==================
 
 * Fixed builds on RTD
+* Fix multi-language titles in title_cache of a page
 
 3.8.0 (2020-10-28)
 ==================

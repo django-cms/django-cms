@@ -94,6 +94,8 @@ def get_page_from_path(site, path, preview=False, draft=False):
         titles = titles.filter(published=True, publisher_is_draft=False)
     titles = titles.filter(path=(path or ''))
 
+    page = None
+
     for title in titles.iterator():
         if title.page.node.site_id != site.pk:
             continue
@@ -101,9 +103,15 @@ def get_page_from_path(site, path, preview=False, draft=False):
         if published_only and not _page_is_published(title.page):
             continue
 
-        title.page.title_cache = {title.language: title}
-        return title.page
-    return
+        if page is None:
+            page = title.page
+            page.title_cache = {}
+
+        # There might be multiple titles (in different languages) for a single page
+        if page.pk == title.page.pk:
+            page.title_cache.update({title.language: title})
+
+    return page
 
 
 def get_pages_from_path(site, path, preview=False, draft=False):
