@@ -13,7 +13,7 @@ https://github.com/ojii/django-better-test/archive/8aa2407d097fe3789b74682f0e6bd
 https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec760023695b40fe.zip#egg=django-app-manage
 iptools
 sphinx==1.8.5
-sphinxcontrib-spelling
+sphinxcontrib-spelling<7.0.0 # restriction for py35 tests
 # required to run the server for integration tests
 django-app-helper
 mock>=2.0.0
