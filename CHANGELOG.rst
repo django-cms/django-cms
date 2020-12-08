@@ -7,7 +7,7 @@ Unreleased
 ==================
 
 * Fixed builds on RTD
-* Remove debug print from appok_reload
+* Remove debug print from apphook_reload
 
 3.8.0 (2020-10-28)
 ==================
