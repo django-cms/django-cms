@@ -6,6 +6,7 @@ Changelog
 Unreleased
 ==================
 
+* Fixed not checking slug uniqueness when moving a page
 * Fixed builds on RTD
 
 3.8.0 (2020-10-28)
