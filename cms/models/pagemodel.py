@@ -329,9 +329,9 @@ class Page(models.Model):
         return (new_home_tree, old_home_tree)
 
     def _update_title_path(self, language):
-        parent_page = self.get_parent_page()
         from cms.utils.page import get_available_slug
 
+        parent_page = self.get_parent_page()
 
         if parent_page:
             base = parent_page.get_path(language, fallback=True)
