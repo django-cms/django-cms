@@ -1,0 +1,15 @@
+version: 2
+
+sphinx:
+  configuration: docs/conf.py
+  fail_on_warning: false
+
+formats:
+  - epub
+  - pdf
+
+python:
+  version: 3.7
+  install:
+    - requirements: docs/requirements.txt
+  system_packages: false

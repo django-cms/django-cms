@@ -397,6 +397,27 @@ A **bad** example:
     </script>{% endaddtoblock %}
 
 
+.. note::
+        If the Plugin requires javascript code to be rendered properly,
+        the class ``'cms-execute-js-to-render'`` can be added to the script tag.
+        This will download and execute all scripts with this class, which weren't present before,
+        when the plugin is first added to the page.
+        If the javascript code is protected from prematurely executing by
+        the EventListener for the event ``'load'`` and/or ``'DOMContentLoaded'``,
+        the following classes can be added to the script tag:
+
+        ===========================================  ========================================================
+        Classname                                    Corresponding javascript code
+        ===========================================  ========================================================
+        cms-trigger-event-document-DOMContentLoaded  ``document.dispatchEvent(new Event('DOMContentLoaded')``
+        cms-trigger-event-window-DOMContentLoaded    ``window.dispatchEvent(new Event('DOMContentLoaded')``
+        cms-trigger-event-window-load                ``window.dispatchEvent(new Event('load')``
+        ===========================================  ========================================================
+
+
+        The events will be triggered once after all scripts are successfully injected into the DOM.
+
+
 .. _plugin-context-processors:
 
 
