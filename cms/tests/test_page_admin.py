@@ -1199,7 +1199,6 @@ class PageTest(PageTestBase):
             self.assertEqual(response.status_code, 200)
 
             for page, node_path, url_path in expected_tree:
-                print("is home", page.is_home)
                 page._clear_internal_cache()
                 self.assertEqual(page.node.path, node_path)
                 self.assertEqual(page.get_path('en'), url_path)
