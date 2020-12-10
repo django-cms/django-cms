@@ -61,6 +61,7 @@ from cms.models import (
 from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
+from cms.toolbar.utils import get_object_preview_url
 from cms.utils import permissions, get_current_site
 from cms.utils import page_permissions
 from cms.utils.i18n import (
@@ -1000,6 +1001,7 @@ class PageContentAdmin(admin.ModelAdmin):
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
             'can_change': self.has_change_permission(request, obj=obj),
             'language': obj.language,
+            'preview_url': get_object_preview_url(obj),
             'language_tabs': get_language_tuple(site.pk),
             'filled_languages': self.get_filled_languages(request, obj.page)
         }

@@ -31,7 +31,7 @@
         <ul class="object-tools hide-in-modal">
             <li>
                 {% url opts|admin_urlname:'preview_page' cms_page.id language as admin_url %}
-                <a href="{{ admin_url }}" target="_parent">{% trans "View on site" %}</a>
+                <a href="{{ preview_url }}" target="_parent">{% trans "View on site" %}</a>
             </li>
         </ul>
     {% endif %}
