@@ -55,9 +55,11 @@ def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=Tr
     if check_global and has_global_permission(user, site, action=action, use_cache=use_cache):
         return GRANT_ALL_PERMISSIONS
 
+    cache_key = "%s:%s" % (site.id, action)
+
     if use_cache:
         # read from cache if possible
-        cached = get_permission_cache(user, action)
+        cached = get_permission_cache(user, cache_key)
         get_page_actions = get_page_actions_for_user
     else:
         cached = None
@@ -68,7 +70,7 @@ def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=Tr
 
     page_actions = get_page_actions(user, site)
     page_ids = list(page_actions[action])
-    set_permission_cache(user, action, page_ids)
+    set_permission_cache(user, cache_key, page_ids)
     return page_ids
 
 

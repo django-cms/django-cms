@@ -6,6 +6,7 @@ Changelog
 Unreleased
 ==================
 
+* Changed caching of page permissions to handle non-privileged multi-site users
 * Fixed builds on RTD
 
 3.8.0 (2020-10-28)

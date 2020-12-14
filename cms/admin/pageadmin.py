@@ -1496,7 +1496,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 'follow_descendants': follow_descendants,
                 'site_languages': languages,
                 'is_popup': is_popup,
-                'has_add_page_permission': user_can_add(user, target=page),
+                'has_add_page_permission': user_can_add(user, target=page, site=site),
                 'has_change_permission': self.has_change_permission(request, obj=page),
                 'has_publish_permission':  self.has_publish_permission(request, obj=page),
                 'has_change_advanced_settings_permission': self.has_change_advanced_settings_permission(request, obj=page),

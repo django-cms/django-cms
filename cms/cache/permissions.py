@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.sites.models import Site
 
 from cms.utils.conf import get_cms_setting
 
@@ -55,8 +56,9 @@ def clear_user_permission_cache(user):
     Cleans permission cache for given user.
     """
     from django.core.cache import cache
-    for key in PERMISSION_KEYS:
-        cache.delete(get_cache_key(user, key), version=get_cache_permission_version())
+    for site in Site.objects.all():
+        for key in PERMISSION_KEYS:
+            cache.delete(get_cache_key(user, "%s:%s" % (site.id, key)), version=get_cache_permission_version())
 
 
 def clear_permission_cache():
