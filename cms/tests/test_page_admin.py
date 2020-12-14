@@ -1783,14 +1783,15 @@ class PageTest(PageTestBase):
             content = force_str(parsed)
             self.assertIn(tree, content)
 
-    def test_page_changelist_search(self):
+    def test_page_get_tree_endpoint_search(self):
         superuser = self.get_superuser()
-        endpoint = self.get_admin_url(Page, 'changelist')
+        endpoint = self.get_admin_url(Page, 'get_tree')
 
         create_page('Home', 'nav_playground.html', 'en')
         alpha = create_page('Alpha', 'nav_playground.html', 'en')
         create_page('Beta', 'nav_playground.html', 'en', parent=alpha)
-        create_page('Gamma', 'nav_playground.html', 'en')
+        gamma = create_page('Gamma', 'nav_playground.html', 'en')
+        create_page('Alpha-delta', 'nav_playground.html', 'en', parent=gamma)
 
         with self.login_user_context(superuser):
             response = self.client.get(endpoint, data={'q': 'alpha'})
@@ -1798,9 +1799,41 @@ class PageTest(PageTestBase):
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
             content = force_str(parsed)
             self.assertIn('<li>\nAlpha\n</li>', content)
+            self.assertIn('<li>\nAlpha-delta\n</li>', content)
             self.assertNotIn('<li>\nHome\n</li>', content)
             self.assertNotIn('<li>\nBeta\n</li>', content)
             self.assertNotIn('<li>\nGamma\n</li>', content)
+
+    def test_page_get_tree_endpoint_search_with_nested_results(self):
+        superuser = self.get_superuser()
+        endpoint = self.get_admin_url(Page, 'get_tree')
+
+        create_page('Home', 'nav_playground.html', 'en')
+        alpha = create_page('Alpha', 'nav_playground.html', 'en')
+        beta = create_page('Beta', 'nav_playground.html', 'en', parent=alpha)
+        gamma = create_page('Gamma', 'nav_playground.html', 'en', parent=beta)
+        create_page('Delta', 'nav_playground.html', 'en', parent=gamma)
+        create_page('Beta-alpha', 'nav_playground.html', 'en', parent=alpha)
+
+        tree = (
+            '<li>\nBeta'
+            '<ul>\n<li>\nGamma'
+            '<ul>\n<li>\nDelta\n</li>\n</ul>'
+            '\n</li>\n</ul>\n</li>'
+            '<li>\nBeta-alpha\n</li>'
+        )
+
+        data = {
+            'q': 'beta',
+            'openNodes[]': [beta.node.pk, gamma.node.pk]
+        }
+
+        with self.login_user_context(superuser):
+            response = self.client.get(endpoint, data=data)
+            self.assertEqual(response.status_code, 200)
+            parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
+            content = force_str(parsed)
+            self.assertIn(tree, content)
 
     def test_global_limit_on_plugin_move(self):
         superuser = self.get_superuser()

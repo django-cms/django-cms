@@ -171,73 +171,8 @@
                 </div>
 
                 {# INFO: javascript is loaded from cms.pagetree.js #}
-                {% if tree.has_items %}
-                    <div class="cms-pagetree cms-pagetree-container">
-                        <div class="cms-pagetree-jstree js-cms-pagetree" data-json='{
-                            "urls": {
-                                "tree": "{% url opts|admin_urlname:'get_tree' %}",
-                                "move": "./{id}/move-page/",
-                                "copy": "./{id}/copy-page/",
-                                "copyPermission": "./{id}/dialog/copy/",
-                                "theme": "{% static 'cms/css/' %}"
-                            },
-                            "csrf": "{{ csrf_token }}",
-                            "static": "{{ STATIC_URL }}",
-                            "permission": {{ CMS_PERMISSION|bool }},
-                            "debug": {{ DEBUG|bool }},
-                            "filtered": {% if tree.is_filtered %}true{% else %}false{% endif %},
-                            "site": {{ tree.site.pk }},
-                            "hasAddRootPermission": {{ has_add_permission|yesno:"true,false" }},
-                            "lang": {
-                                "code": "{{ preview_language|lower }}",
-                                "success": "{% filter escapejs %}{% trans "Successfully moved" %}{% endfilter %}",
-                                "changes": "{% filter escapejs %}{% trans "Changes within the tree might require a refresh." %}{% endfilter %}",
-                                "error": "{% filter escapejs %}{% trans "Error:" %}{% endfilter %}",
-                                "apphook": "{% filter escapejs %}{% trans "This page cannot be copied because an application is attached to it. See the Page's Advanced settings to manage apphooks." %}{% endfilter %}",
-                                "publish": "{% filter escapejs %}{% trans "Are you sure you want to § this page?" %}{% endfilter %}",
-                                "reload": "{% trans "Reload" %}",
-                                "loading": "{% trans "Loading..." %}",
-                                "newNode": "{% trans 'New node' %}",
-                                "nodes": "{% trans 'nodes' %}"
-                            },
-                            "columns": [{
-                                "title": "&nbsp;",
-                                "key": "",
-                                "width": "100%"
-                            }, {
-                                "title": "&nbsp;",
-                                "key": "view",
-                                "cls": "jstree-grid-cell-regular-options"
-                            }, {
-                                "title": "{{ _('View')|escapejs }}",
-                                "key": "preview"
-                            }, {% for lang in site_languages %}{
-                                "title": "<a href=\"{% url opts|admin_urlname:'changelist' %}?language={{ lang }}\" class=\"js-pagetree-header-lang cms-pagetree-header-lang{% if preview_language == lang %} active{% endif %}\">{{ lang|upper }}</a>",
-                                "key": "{{ lang }}"
-                            }, {% endfor %} {
-                                "title": "{{ _('Menu')|escapejs }}",
-                                "key": "menu"
-                            },
-                            {% block extra_cols %}
-                            {% endblock %}
-                            {
-                                "title": "&nbsp;",
-                                "key": "options"
-                            }]
-                        }' data-settings-url="{% cms_admin_url "cms_usersettings_session_store" %}">
-                            <ul>
-                                {% if tree.is_filtered %}
-                                    {# INFO: load html data source when filtering #}
-                                    {% show_admin_menu_for_pages tree.items depth=0 %}
-                                {% endif %}
-                            </ul>
-                        </div>
-                    </div>
-                    {% include "admin/cms/page/tree/legend.html" %}
-                {% else %}
-                    {# INFO: show add a page button when there are no items #}
-                    <div class="cms-pagetree cms-pagetree-empty js-cms-pagetree" data-json='{
-                        "empty": true,
+                <div class="cms-pagetree cms-pagetree-container">
+                    <div class="cms-pagetree-jstree js-cms-pagetree" data-json='{
                         "urls": {
                             "tree": "{% url opts|admin_urlname:'get_tree' %}",
                             "move": "./{id}/move-page/",
@@ -282,19 +217,24 @@
                             "title": "{{ _('Menu')|escapejs }}",
                             "key": "menu"
                         },
+                        {% block extra_cols %}
+                        {% endblock %}
                         {
                             "title": "&nbsp;",
                             "key": "options"
                         }]
                     }' data-settings-url="{% cms_admin_url "cms_usersettings_session_store" %}">
-                        {% url opts|admin_urlname:'add' as add_url %}
-                        {% blocktrans with object=opts.verbose_name|lower %}
-                            <em>There is no {{ object }} around yet.</em>
-                            <br>
-                            <a href="{{ add_url }}" class="addlink">Add {{ object }}</a> now.
-                        {% endblocktrans %}
                     </div>
-                {% endif %}
+                </div>
+                <div class="cms-pagetree cms-pagetree-noresults">
+                {% url opts|admin_urlname:'add' as add_url %}    
+                {% blocktrans with object=opts.verbose_name|lower %}
+                    <em>There is no {{ object }} around yet.</em>
+                    <br>
+                    <a href="{{ add_url }}" class="addlink">Add {{ object }}</a> now.
+                {% endblocktrans %}
+                </div>
+                {% include "admin/cms/page/tree/legend.html" %}
             </form>
 
             {# INFO: used when copying nodes #}

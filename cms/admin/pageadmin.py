@@ -13,6 +13,7 @@ from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
+from django.contrib.admin.views.main import ERROR_FLAG
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import (ObjectDoesNotExist,
@@ -750,8 +751,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return [site for site in sites if _has_perm(user, site)]
 
     def changelist_view(self, request, extra_context=None):
-        from django.contrib.admin.views.main import ERROR_FLAG
-
         if not self.has_change_permission(request, obj=None):
             raise PermissionDenied
 
@@ -768,41 +767,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if not language:
             language = get_language()
 
-        query = request.GET.get('q', '')
-        pages = self.get_queryset(request)
-        pages, use_distinct = self.get_search_results(request, pages, query)
-
         changelist_form = self.changelist_form(request.GET)
-
-        try:
-            changelist_form.full_clean()
-            pages = changelist_form.run_filters(pages)
-        except (ValueError, ValidationError):
-            # Wacky lookup parameters were given, so redirect to the main
-            # changelist page, without parameters, and pass an 'invalid=1'
-            # parameter via the query string. If wacky parameters were given
-            # and the 'invalid=1' parameter was already in the query string,
-            # something is screwed up with the database, so display an error
-            # page.
-            if ERROR_FLAG in request.GET.keys():
-                return SimpleTemplateResponse('admin/invalid_setup.html', {
-                    'title': _('Database error'),
-                })
-            return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
-
-        if changelist_form.is_filtered():
-            pages = pages.prefetch_related(
-                Prefetch(
-                    'title_set',
-                    to_attr='filtered_translations',
-                    queryset=Title.objects.filter(language__in=get_language_list(site.pk))
-                ),
-            )
-            pages = pages.distinct() if use_distinct else pages
-            # Evaluates the queryset
-            has_items = len(pages) >= 1
-        else:
-            has_items = pages.exists()
+        changelist_form.full_clean()
 
         context = self.admin_site.each_context(request)
         context.update({
@@ -820,10 +786,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             'tree': {
                 'site': site,
                 'sites': self.get_sites_for_user(request.user),
-                'query': query,
+                'query': request.GET.get('q', ''),
                 'is_filtered': changelist_form.is_filtered(),
-                'items': pages,
-                'has_items': has_items,
             },
         })
         context.update(extra_context or {})
@@ -1424,17 +1388,50 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         pages = self.get_queryset(request)
         node_id = request.GET.get('nodeId')
         open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
+        node_page = None
+        root_pages = None
 
+        # Retrieve search parameters if exist
+        query = request.GET.get('q', None)
+        changelist_form = self.changelist_form(request.GET)
+
+        try:
+            changelist_form.full_clean()
+            pages = changelist_form.run_filters(pages)
+        except (ValueError, ValidationError):
+            # Wacky lookup parameters were given, so redirect to the main
+            # changelist page, without parameters, and pass an 'invalid=1'
+            # parameter via the query string. If wacky parameters were given
+            # and the 'invalid=1' parameter was already in the query string,
+            # something is screwed up with the database, so display an error
+            # page.
+            if ERROR_FLAG in request.GET.keys():
+                return SimpleTemplateResponse('admin/invalid_setup.html', {
+                    'title': _('Database error'),
+                })
+            return HttpResponseRedirect(request.path + '?' + ERROR_FLAG + '=1')
+
+        # Prepare queries to get pages
         if node_id:
-            page = get_object_or_404(pages, node_id=int(node_id))
-            pages = page.get_descendant_pages().filter(Q(node__in=open_nodes) |Q(node__parent__in=open_nodes))
+            # Get descendants of node id provided
+            node_page = get_object_or_404(pages, node_id=int(node_id))
+            pages = node_page.get_descendant_pages().filter(Q(node__in=open_nodes) | Q(node__parent__in=open_nodes))
+        elif changelist_form.is_filtered():
+            # Get nodes that match filters
+            search_results, use_distinct = self.get_search_results(request, pages, query)
+            search_results = search_results.distinct() if use_distinct else search_results
+            search_results_node_ids = search_results.values_list('node__id', flat=True)
+            pages = pages.filter(
+                # get all matched nodes
+                Q(node__in=search_results_node_ids)
+                # or children of the open descendants
+                | Q(node__parent__in=open_nodes)
+            )
         else:
-            page = None
+            # Otherwise retrieve root nodes
             pages = pages.filter(
                 # get all root nodes
                 Q(node__depth=1)
-                # or children which were previously open
-                | Q(node__depth=2, node__in=open_nodes)
                 # or children of the open descendants
                 | Q(node__parent__in=open_nodes)
             )
@@ -1445,17 +1442,25 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 queryset=Title.objects.filter(language__in=get_language_list(site.pk))
             ),
         )
+
+        # Select root_pages for the right case
+        if node_id:
+            root_pages = (page for page in pages if page.node.depth == node_page.node.depth + 1)
+        elif changelist_form.is_filtered():
+            root_pages = (page for page in pages if page.node.id in search_results_node_ids)
+        else:
+            root_pages = (page for page in pages if page.node.depth == 1)
+
         rows = self.get_tree_rows(
             request,
             pages=pages,
             language=get_site_language_from_request(request, site_id=site.pk),
-            depth=(page.node.depth + 1 if page else 1),
-            follow_descendants=True,
+            root_pages=root_pages,
+            open_nodes=open_nodes
         )
         return HttpResponse(u''.join(rows))
 
-    def get_tree_rows(self, request, pages, language, depth=1,
-                      follow_descendants=True):
+    def get_tree_rows(self, request, pages, language, root_pages, open_nodes=[]):
         """
         Used for rendering the page tree, inserts into context everything what
         we need for single item
@@ -1497,9 +1502,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 'metadata': metadata,
                 'page_languages': page.get_languages(),
                 'preview_language': language,
-                'follow_descendants': follow_descendants,
                 'site_languages': languages,
                 'is_popup': is_popup,
+                'open_nodes': open_nodes,
                 'has_add_page_permission': user_can_add(user, target=page),
                 'has_change_permission': self.has_change_permission(request, obj=page),
                 'has_publish_permission':  self.has_publish_permission(request, obj=page),
@@ -1508,26 +1513,16 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             }
             return template.render(context)
 
-        if follow_descendants:
-            root_pages = (page for page in pages if page.node.depth == depth)
-        else:
-            # When the tree is filtered, it's displayed as a flat structure
-            root_pages = pages
+        nodes = []
+        for page in pages:
+            page.node.__dict__['item'] = page
+            nodes.append(page.node)
 
-        if depth == 1:
-            nodes = []
+        for page in root_pages:
+            if page.node.id in open_nodes:
+                page.node._set_hierarchy(nodes, [])
 
-            for page in pages:
-                page.node.__dict__['item'] = page
-                nodes.append(page.node)
-
-            for page in root_pages:
-                page.node._set_hierarchy(nodes)
-                yield render_page_row(page)
-        else:
-            for page in root_pages:
-                page.node.__dict__['item'] = page
-                yield render_page_row(page)
+            yield render_page_row(page)
 
     def resolve(self, request):
         if not request.user.is_staff:

@@ -17,21 +17,18 @@ CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 
 @register.simple_tag(takes_context=True)
-def show_admin_menu_for_pages(context, descendants, depth=1):
+def show_admin_menu_for_pages(context, descendants):
     admin = context['admin']
+    node = context['node']
+    children = [descendant for descendant in context['descendants'] if descendant.node.depth == node.depth + 1]
     request = context['request']
-
-    if 'tree' in context:
-        filtered = context['tree']['is_filtered']
-    else:
-        filtered = False
 
     rows = admin.get_tree_rows(
         request,
         pages=descendants,
         language=context['preview_language'],
-        depth=depth,
-        follow_descendants=not bool(filtered),
+        root_pages=children,
+        open_nodes=context['open_nodes']
     )
     return mark_safe(''.join(rows))
 

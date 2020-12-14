@@ -51,7 +51,7 @@ var PageTree = new Class({
             // attach events to paste
             var that = this;
 
-            this.ui.container.on(this.click, this.options.pasteSelector, function(e) {
+            this.ui.container.on(this.click, this.options.pasteSelector, function (e) {
                 e.preventDefault();
                 if ($(this).hasClass('cms-pagetree-dropdown-item-disabled')) {
                     return;
@@ -94,11 +94,14 @@ var PageTree = new Class({
             language: this.options.lang.code,
             openNodes: []
         };
-        var data = false;
+        var data = {
+            url: this.options.urls.tree,
+            cache: false
+        };
 
         // setup column headings
         // eslint-disable-next-line no-shadow
-        $.each(this.options.columns, function(index, obj) {
+        $.each(this.options.columns, function (index, obj) {
             if (obj.key === '') {
                 // the first row is already populated, to avoid overwrites
                 // just leave the "key" param empty
@@ -114,7 +117,7 @@ var PageTree = new Class({
                     wideValueClass: obj.wideValueClass,
                     wideValueClassPrefix: obj.wideValueClassPrefix,
                     header: obj.title,
-                    value: function(node) {
+                    value: function (node) {
                         // it needs to have the "colde" format and not "col-de"
                         // as jstree will convert "col-de" to "colde"
                         // also we strip dashes, in case language code contains it
@@ -132,32 +135,41 @@ var PageTree = new Class({
         });
 
         // prepare data
-        if (!this.options.filtered) {
-            data = {
-                url: this.options.urls.tree,
-                cache: false,
-                data: function(node) {
-                    // '#' is rendered if its the root node, there we only
-                    // care about `obj.openNodes`, in the following case
-                    // we are requesting a specific node
-                    if (node.id === '#') {
-                        obj.nodeId = null;
-                    } else {
-                        obj.nodeId = that._storeNodeId(node.data.nodeId);
-                    }
+        data.data = function (node) {
+            // '#' is rendered if its the root node, there we only
+            // care about `obj.openNodes`, in the following case
+            // we are requesting a specific node
+            if (node.id !== '#') {
+                obj.nodeId = that._storeNodeId(node.data.nodeId);
+            }
 
-                    // we need to store the opened items inside the localstorage
-                    // as we have to load the pagetree with the previous opened
-                    // state
-                    obj.openNodes = that._getStoredNodeIds();
+            // we need to store the opened items inside the localstorage
+            // as we have to load the pagetree with the previous opened
+            // state
+            obj.openNodes = that._getStoredNodeIds();
 
-                    // we need to set the site id to get the correct tree
-                    obj.site = that.options.site;
+            // we need to set the site id to get the correct tree
+            obj.site = that.options.site;
 
-                    return obj;
+            // If we are making a search query, we bind search params to the query
+            if (node.id === '#' && that.options.filtered) {
+                const filterParameters = location.search.substr('1')
+                    .split('&')
+                    .reduce(function (p, e) {
+                        var param = e.split('=');
+
+                        p[param[0]] = decodeURIComponent(param[1]).replace(/\+/g, ' ');
+                        return p;
+                    }, {});
+
+                // eslint-disable-next-line guard-for-in
+                for (var key in filterParameters) {
+                    obj[key] = filterParameters[key];
                 }
-            };
-        }
+            }
+
+            return obj;
+        };
 
         // bind options to the jstree instance
         this.ui.tree.jstree({
@@ -166,7 +178,7 @@ var PageTree = new Class({
                 animation: 0,
                 // core setting to allow actions
                 // eslint-disable-next-line max-params
-                check_callback: function(operation, node, node_parent, node_position, more) {
+                check_callback: function (operation, node, node_parent, node_position, more) {
                     if ((operation === 'move_node' || operation === 'copy_node') && more && more.pos) {
                         if (more.pos === 'i') {
                             $('#jstree-marker').addClass('jstree-marker-child');
@@ -185,7 +197,7 @@ var PageTree = new Class({
                     'New node': this.options.lang.newNode,
                     nodes: this.options.lang.nodes
                 },
-                error: function(error) {
+                error: function (error) {
                     // ignore warnings about dragging parent into child
                     var errorData = JSON.parse(error.data);
 
@@ -208,7 +220,7 @@ var PageTree = new Class({
                 // disable the multi selection of nodes for now
                 drag_selection: false,
                 // disable dragging if filtered
-                is_draggable: function(nodes) {
+                is_draggable: function (nodes) {
                     return that._hasPermission(nodes[0], 'move') && !that.options.filtered;
                 },
                 large_drop_target: true,
@@ -234,11 +246,11 @@ var PageTree = new Class({
         var that = this;
 
         // set events for the nodeId updates
-        this.ui.tree.on('after_close.jstree', function(e, el) {
+        this.ui.tree.on('after_close.jstree', function (e, el) {
             that._removeNodeId(el.node.data.nodeId);
         });
 
-        this.ui.tree.on('after_open.jstree', function(e, el) {
+        this.ui.tree.on('after_open.jstree', function (e, el) {
             that._storeNodeId(el.node.data.nodeId);
 
             // `after_open` event can be triggered when pasting
@@ -249,13 +261,13 @@ var PageTree = new Class({
             }
         });
 
-        this.ui.document.on('keydown.pagetree.alt-mode', function(e) {
+        this.ui.document.on('keydown.pagetree.alt-mode', function (e) {
             if (e.keyCode === KEYS.SHIFT) {
                 that.ui.container.addClass('cms-pagetree-alt-mode');
             }
         });
 
-        this.ui.document.on('keyup.pagetree.alt-mode', function(e) {
+        this.ui.document.on('keyup.pagetree.alt-mode', function (e) {
             if (e.keyCode === KEYS.SHIFT) {
                 that.ui.container.removeClass('cms-pagetree-alt-mode');
             }
@@ -264,7 +276,7 @@ var PageTree = new Class({
         $(window)
             .on(
                 'mousemove.pagetree.alt-mode',
-                debounce(function(e) {
+                debounce(function (e) {
                     if (e.shiftKey) {
                         that.ui.container.addClass('cms-pagetree-alt-mode');
                     } else {
@@ -276,17 +288,17 @@ var PageTree = new Class({
                 that.ui.container.removeClass('cms-pagetree-alt-mode');
             });
 
-        this.ui.document.on('dnd_start.vakata', function(e, data) {
+        this.ui.document.on('dnd_start.vakata', function (e, data) {
             var element = $(data.element);
             var node = element.parent();
 
             that._dropdowns.closeAllDropdowns();
 
             node.addClass('jstree-is-dragging');
-            data.data.nodes.forEach(function(nodeId) {
+            data.data.nodes.forEach(nodeId => {
                 var descendantIds = that._getDescendantsIds(nodeId);
 
-                [nodeId].concat(descendantIds).forEach(function(id) {
+                [nodeId].concat(descendantIds).forEach(id => {
                     $('.jsgrid_' + id + '_col').addClass('jstree-is-dragging');
                 });
             });
@@ -298,7 +310,7 @@ var PageTree = new Class({
 
         var isCopyClassAdded = false;
 
-        this.ui.document.on('dnd_move.vakata', function(e, data) {
+        this.ui.document.on('dnd_move.vakata', function (e, data) {
             var isMovingCopy =
                 data.data.origin &&
                 (data.data.origin.settings.dnd.always_copy ||
@@ -315,24 +327,24 @@ var PageTree = new Class({
             }
         });
 
-        this.ui.document.on('dnd_stop.vakata', function(e, data) {
+        this.ui.document.on('dnd_stop.vakata', function (e, data) {
             var element = $(data.element);
             var node = element.parent();
 
             node.removeClass('jstree-is-dragging jstree-is-dragging-copy');
-            data.data.nodes.forEach(function(nodeId) {
+            data.data.nodes.forEach(function (nodeId) {
                 var descendantIds = that._getDescendantsIds(nodeId);
 
-                [nodeId].concat(descendantIds).forEach(function(id) {
+                [nodeId].concat(descendantIds).forEach(id => {
                     $('.jsgrid_' + id + '_col').removeClass('jstree-is-dragging jstree-is-dragging-copy');
                 });
             });
         });
 
         // store moved position node
-        this.ui.tree.on('move_node.jstree copy_node.jstree', function(e, obj) {
+        this.ui.tree.on('move_node.jstree copy_node.jstree', function (e, obj) {
             if ((!that.clipboard.type && e.type !== 'copy_node') || that.clipboard.type === 'cut') {
-                that._moveNode(that._getNodePosition(obj)).done(function() {
+                that._moveNode(that._getNodePosition(obj)).done(() => {
                     var instance = that.ui.tree.jstree(true);
 
                     instance._hide_grid(instance.get_node(obj.parent));
@@ -353,19 +365,19 @@ var PageTree = new Class({
         });
 
         // set event for cut and paste
-        this.ui.container.on(this.click, '.js-cms-tree-item-cut', function(e) {
+        this.ui.container.on(this.click, '.js-cms-tree-item-cut', function (e) {
             e.preventDefault();
             that._cutOrCopy({ type: 'cut', element: $(this) });
         });
 
         // set event for cut and paste
-        this.ui.container.on(this.click, '.js-cms-tree-item-copy', function(e) {
+        this.ui.container.on(this.click, '.js-cms-tree-item-copy', function (e) {
             e.preventDefault();
             that._cutOrCopy({ type: 'copy', element: $(this) });
         });
 
         // attach events to paste
-        this.ui.container.on(this.click, this.options.pasteSelector, function(e) {
+        this.ui.container.on(this.click, this.options.pasteSelector, function (e) {
             e.preventDefault();
             if ($(this).hasClass('cms-pagetree-dropdown-item-disabled')) {
                 return;
@@ -374,7 +386,7 @@ var PageTree = new Class({
         });
 
         // advanced settings link handling
-        this.ui.container.on(this.click, '.js-cms-tree-advanced-settings', function(e) {
+        this.ui.container.on(this.click, '.js-cms-tree-advanced-settings', function (e) {
             if (e.shiftKey) {
                 e.preventDefault();
                 var link = $(this);
@@ -391,17 +403,17 @@ var PageTree = new Class({
 
             const nodeData = this.ui.tree.jstree('get_node', treeId);
 
-            this._storeNodeId(nodeData.data.id);
+            this._storeNodeId(nodeData.data.nodeId);
         });
 
         // add events for error reload (messagelist)
-        this.ui.document.on(this.click, '.messagelist .cms-tree-reload', function(e) {
+        this.ui.document.on(this.click, '.messagelist .cms-tree-reload', function (e) {
             e.preventDefault();
             that._reloadHelper();
         });
 
         // propagate the sites dropdown "li > a" entries to the hidden sites form
-        this.ui.container.find('.js-cms-pagetree-site-trigger').on(this.click, function(e) {
+        this.ui.container.find('.js-cms-pagetree-site-trigger').on(this.click, function (e) {
             e.preventDefault();
             var el = $(this);
 
@@ -424,7 +436,18 @@ var PageTree = new Class({
         this._setupPageView();
         this._setupStickyHeader();
 
-        this.ui.tree.on('ready.jstree', () => this._getClipboard());
+        this.ui.tree.on('ready.jstree', () => {
+            /*
+                After data fetching, we check if nodes has been found.
+                If not we display a message to create a new page
+            */
+            const results = this.ui.container.find('.jstree-container-ul.jstree-children > *').length;
+
+            if (results === 0) {
+                $('.cms-pagetree-noresults').addClass('visible');
+            }
+            this._getClipboard();
+        });
     },
 
     _getClipboard: function _getClipboard() {
@@ -594,6 +617,16 @@ var PageTree = new Class({
     },
 
     /**
+     * Removes all nodes in local storage.
+     * @method _clearStoredNodes
+     * @private
+     */
+    _clearStoredNodes: function _clearStoredNodes() {
+        CMS.settings.pagetree = [];
+        Helpers.setSettings(CMS.settings);
+    },
+
+    /**
      * Moves a node after drag & drop.
      *
      * @method _moveNode
@@ -619,14 +652,14 @@ var PageTree = new Class({
             url: that.options.urls.move.replace('{id}', obj.id),
             data: obj
         })
-            .done(function(r) {
+            .done(function (r) {
                 if (r.status && r.status === 400) { // eslint-disable-line
                     that.showError(r.content);
                 } else {
                     that._showSuccess(obj.id);
                 }
             })
-            .fail(function(error) {
+            .fail(function (error) {
                 that.showError(error.statusText);
             });
     },
@@ -673,17 +706,17 @@ var PageTree = new Class({
                 // the dialog is loaded via the ajax respons originating from
                 // `templates/admin/cms/page/tree/copy_premissions.html`
             })
-                .done(function(dialog) {
+                .done(function (dialog) {
                     that.ui.dialog.append(dialog);
                 })
-                .fail(function(error) {
+                .fail(function (error) {
                     that.showError(error.statusText);
                 });
 
             // attach events to the permission dialog
             this.ui.dialog
                 .off(this.click, '.cancel')
-                .on(this.click, '.cancel', function(e) {
+                .on(this.click, '.cancel', function (e) {
                     e.preventDefault();
                     // remove just copied node
                     that.ui.tree.jstree('delete_node', obj.node.id);
@@ -691,7 +724,7 @@ var PageTree = new Class({
                     $('.js-cms-dialog-dimmer').remove();
                 })
                 .off(this.click, '.submit')
-                .on(this.click, '.submit', function(e) {
+                .on(this.click, '.submit', function (e) {
                     e.preventDefault();
                     var submitButton = $(this);
                     var formData = submitButton.closest('form').serialize().split('&');
@@ -727,14 +760,14 @@ var PageTree = new Class({
             url: that.options.urls.copy.replace('{id}', data.id),
             data: data
         })
-            .done(function(r) {
+            .done(function (r) {
                 if (r.status && r.status === 400) { // eslint-disable-line
                     that.showError(r.content);
                 } else {
                     that._reloadHelper();
                 }
             })
-            .fail(function(error) {
+            .fail(function (error) {
                 that.showError(error.statusText);
             });
     },
@@ -807,7 +840,7 @@ var PageTree = new Class({
         var win = Helpers._getWindow();
         var parent = win.parent ? win.parent : win;
 
-        this.ui.container.on(this.click, '.js-cms-pagetree-page-view', function() {
+        this.ui.container.on(this.click, '.js-cms-pagetree-page-view', function () {
             parent.CMS.API.Helpers.setSettings(
                 $.extend(true, {}, CMS.settings, {
                     sideframe: {
@@ -826,7 +859,7 @@ var PageTree = new Class({
     _setupStickyHeader: function _setupStickyHeader() {
         var that = this;
 
-        that.ui.tree.on('ready.jstree', function() {
+        that.ui.tree.on('ready.jstree', function () {
             that.header = new PageTreeStickyHeader({
                 container: that.ui.container
             });
@@ -843,7 +876,7 @@ var PageTree = new Class({
     _setAjaxPost: function _setAjaxPost(trigger) {
         var that = this;
 
-        this.ui.container.on(this.click, trigger, function(e) {
+        this.ui.container.on(this.click, trigger, function (e) {
             e.preventDefault();
 
             var element = $(this);
@@ -854,16 +887,16 @@ var PageTree = new Class({
 
             try {
                 window.top.CMS.API.Toolbar.showLoader();
-            } catch (err) {}
+            } catch (err) { }
 
             $.ajax({
                 method: 'post',
                 url: $(this).attr('href')
             })
-                .done(function() {
+                .done(function () {
                     try {
                         window.top.CMS.API.Toolbar.hideLoader();
-                    } catch (err) {}
+                    } catch (err) { }
 
                     if (window.self === window.top) {
                         // simply reload the page
@@ -887,7 +920,7 @@ var PageTree = new Class({
                         Helpers.reloadBrowser('REFRESH_PAGE', false, true, data);
                     }
                 })
-                .fail(function(error) {
+                .fail(function (error) {
                     that.showError(error.statusText);
                 });
         });
@@ -918,15 +951,15 @@ var PageTree = new Class({
         var timeout = 200;
 
         // add active class when focusing the search field
-        searchField.on('focus', function(e) {
+        searchField.on('focus', function (e) {
             e.stopImmediatePropagation();
             pageTreeHeader.addClass(filterClass);
         });
-        searchField.on('blur', function(e) {
+        searchField.on('blur', function (e) {
             e.stopImmediatePropagation();
             // timeout is required to prevent the search field from jumping
             // between enlarging and shrinking
-            setTimeout(function() {
+            setTimeout(function () {
                 if (!filterActive) {
                     pageTreeHeader.removeClass(filterClass);
                 }
@@ -934,8 +967,13 @@ var PageTree = new Class({
             that.ui.document.off(click);
         });
 
+        // Reset stored nodes when a new search is submited
+        visibleForm.on('submit', function () {
+            that._clearStoredNodes();
+        });
+
         // shows/hides filter box
-        filterTrigger.add(filterClose).on(click, function(e) {
+        filterTrigger.add(filterClose).on(click, function (e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             if (filterActive) {
@@ -946,7 +984,7 @@ var PageTree = new Class({
             } else {
                 filterContainer.show();
                 pageTreeHeader.addClass(filterClass);
-                that.ui.document.on(click, function() {
+                that.ui.document.on(click, function () {
                     filterActive = true;
                     filterTrigger.trigger(click);
                 });
@@ -955,9 +993,17 @@ var PageTree = new Class({
         });
 
         // prevent closing when on filter container
-        filterContainer.on('click', function(e) {
+        filterContainer.on('click', function (e) {
             e.stopImmediatePropagation();
         });
+
+        if (this.options.filtered) {
+            var resetButton = this.ui.container.find('.cms-pagetree-header-search-reset');
+
+            resetButton.on(click, function () {
+                that._clearStoredNodes();
+            });
+        }
 
         // add hidden fields to the form to maintain filter params
         visibleForm.append(hiddenForm.find('input[type="hidden"]'));
@@ -1047,7 +1093,7 @@ var PageTree = new Class({
                 nodes = nodes.concat(descendantIds);
             }
 
-            nodes.forEach(function(id) {
+            nodes.forEach(function (id) {
                 that._disablePaste('.jsgrid_' + id + '_col');
             });
         }
@@ -1064,7 +1110,7 @@ var PageTree = new Class({
         var element = this.ui.tree.find('li[data-id="' + id + '"]');
 
         element.addClass('cms-tree-node-success');
-        setTimeout(function() {
+        setTimeout(function () {
             element.removeClass('cms-tree-node-success');
         }, this.successTimer);
         // hide elements
@@ -1144,12 +1190,12 @@ var PageTree = new Class({
     }
 });
 
-PageTree._init = function() {
+PageTree._init = function () {
     new PageTree();
 };
 
 // shorthand for jQuery(document).ready();
-$(function() {
+$(function () {
     // load cms settings beforehand
     // have to set toolbar to "expanded" by default
     // otherwise initialization will be incorrect when you

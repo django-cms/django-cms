@@ -1123,3 +1123,15 @@
         font-weight: bold;
     }
 }
+
+//###########################################################
+// Placeholder when tree is empty
+.cms-pagetree-noresults {
+    display: none;
+    padding: 20px;
+
+    &.visible {
+        display: block;
+    }
+}
+

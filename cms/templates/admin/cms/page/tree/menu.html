@@ -3,7 +3,7 @@
 {# INFO: columns are defined in base.html options #}
 {% spaceless %}
 <li class="cms-tree-node {{ css_class }}
-    {% if follow_descendants %}{% if descendants %} jstree-open{% elif node.is_branch %} jstree-closed{% endif %}{% endif %}
+    {% if descendants %} jstree-open{% elif node.is_branch %} jstree-closed{% endif %}
     {% if page.reverse_id == 'page_types' %} cms-tree-node-pagetype{% endif %}
     {% if node.depth == 0 %} cms-tree-node-top{% endif %}
     {% if filtered %} cms-tree-node-filtered{% endif %}
@@ -275,7 +275,7 @@
     {# INFO render children #}
     {% if descendants %}
         <ul>
-            {% show_admin_menu_for_pages descendants depth=node.depth|add:1 %}
+            {% show_admin_menu_for_pages descendants %}
         </ul>
     {% endif %}
 </li>

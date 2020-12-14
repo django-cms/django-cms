@@ -1503,8 +1503,30 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
         .then(cms.openSideframe())
         // switch to sideframe
         .withFrame(0, function() {
+            // As we create a subpage of Homepage, this node is opened.
+            // So we expect to have this node opened first
             casper
                 .waitUntilVisible('.cms-pagetree-jstree')
+                .then(function() {
+                    test.assertExists(
+                        xPath(
+                            createJSTreeXPathFromTree([
+                                {
+                                    name: 'Homepage',
+                                    children: [
+                                        {
+                                            name: 'Second'
+                                        }
+                                    ]
+                                }
+                            ])
+                        ),
+                        'At first page and subpage freshly created are visibles'
+                    );
+                })
+                .then(function() {
+                    this.click('.jstree-open[data-node-id="' + cms.getPageNodeId('Homepage') + '"] > .jstree-ocl');
+                })
                 .then(function() {
                     test.assertExists(
                         xPath(
@@ -1513,8 +1535,54 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                                     name: 'Homepage'
                                 }
                             ])
+                        )
+                    );
+
+                    test.assertDoesntExist(
+                        xPath(
+                            createJSTreeXPathFromTree([
+                                {
+                                    name: 'Homepage',
+                                    children: [
+                                        {
+                                            name: 'Second'
+                                        }
+                                    ]
+                                }
+                            ])
                         ),
-                        'At first nested page is not visible'
+                        'Root node is fold so subpage is no longer visible'
+                    );
+                })
+                .thenEvaluate(function() {
+                    window.location.reload();
+                })
+                .waitUntilVisible('.cms-pagetree-jstree')
+                .wait(2000, function() {
+                    test.assertExists(
+                        xPath(
+                            createJSTreeXPathFromTree([
+                                {
+                                    name: 'Homepage'
+                                }
+                            ])
+                        )
+                    );
+
+                    test.assertDoesntExist(
+                        xPath(
+                            createJSTreeXPathFromTree([
+                                {
+                                    name: 'Homepage',
+                                    children: [
+                                        {
+                                            name: 'Second'
+                                        }
+                                    ]
+                                }
+                            ])
+                        ),
+                        'Root node is fold so subpage is no longer visible'
                     );
                 })
                 .then(function() {
@@ -1536,7 +1604,7 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                                 }
                             ])
                         ),
-                        'Page nodes can be expanded'
+                        'Root node is fold so subpage is no longer visible'
                     );
                 })
                 .thenEvaluate(function() {
@@ -1557,66 +1625,7 @@ casper.test.begin('Pagetree remembers which nodes are opened and which ones are 
                                 }
                             ])
                         ),
-                        'Expanded state was restored after reload'
-                    );
-                })
-                .then(function() {
-                    this.click('.jstree-open[data-node-id="' + cms.getPageNodeId('Homepage') + '"] > .jstree-ocl');
-                    test.assertExists(
-                        xPath(
-                            createJSTreeXPathFromTree([
-                                {
-                                    name: 'Homepage'
-                                }
-                            ])
-                        ),
-                        'Nested page is no longer visible'
-                    );
-                    test.assertDoesntExist(
-                        xPath(
-                            createJSTreeXPathFromTree([
-                                {
-                                    name: 'Homepage',
-                                    children: [
-                                        {
-                                            name: 'Second'
-                                        }
-                                    ]
-                                }
-                            ])
-                        ),
-                        'Markup is for nested page is removed'
-                    );
-                })
-                .thenEvaluate(function() {
-                    window.location.reload();
-                })
-                .waitUntilVisible('.cms-pagetree-jstree')
-                .wait(2000, function() {
-                    test.assertExists(
-                        xPath(
-                            createJSTreeXPathFromTree([
-                                {
-                                    name: 'Homepage'
-                                }
-                            ])
-                        ),
-                        'Collapsed state was restored'
-                    );
-                    test.assertDoesntExist(
-                        xPath(
-                            createJSTreeXPathFromTree([
-                                {
-                                    name: 'Homepage',
-                                    children: [
-                                        {
-                                            name: 'Second'
-                                        }
-                                    ]
-                                }
-                            ])
-                        ),
-                        'Nested page is not in the markup'
+                        'Root node is fold so subpage is no longer visible'
                     );
                 });
         })
@@ -1631,6 +1640,7 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
         .start()
         .then(cms.addPage({ title: 'Homepage' }))
         .then(cms.addPage({ title: 'Second', parent: 'Homepage' }))
+        .then(cms.addPage({ title: 'Third', parent: 'Second' }))
         .then(cms.addPage({ title: 'Second but top-level' }))
         .thenOpen(globals.baseUrl)
         .then(cms.openSideframe())
@@ -1641,7 +1651,6 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
             casper
                 .waitUntilVisible('.cms-pagetree-jstree')
                 .wait(3000)
-                .then(cms.expandPageTree())
                 .then(function() {
                     test.assertExists(
                         xPath(
@@ -1650,7 +1659,10 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
                                     name: 'Homepage',
                                     children: [
                                         {
-                                            name: 'Second'
+                                            name: 'Second',
+                                            children: [{
+                                                name: 'Third'
+                                            }]
                                         }
                                     ]
                                 },
@@ -1668,16 +1680,23 @@ casper.test.begin('Pages can be filtered and cannot be dragged if pagetree is fi
                         {
                             q: 'seco'
                         },
-                        true
+                        false
                     );
+                    // Click on button will reset open nodes array in local strorage
+                    this.click('.cms-pagetree-header-search-btn');
                 })
                 .waitUntilVisible('.cms-pagetree-jstree')
-                .wait(3000)
-                .then(cms.expandPageTree())
+                .waitForResource(/get-tree/)
+                .wait(2000)
                 .then(function() {
                     test.assertExists(
                         xPath(createJSTreeXPathFromTree([{ name: 'Second' }, { name: 'Second but top-level' }])),
                         'Correct pages are shown after filtering'
+                    );
+
+                    test.assertExists(
+                        '.jstree-node[data-node-id="' + cms.getPageNodeId('Second') + '"] > .jstree-ocl',
+                        'Matched node with children is foldable.'
                     );
                 })
                 .then(function() {

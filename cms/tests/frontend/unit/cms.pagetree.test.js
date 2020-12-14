@@ -314,6 +314,25 @@ describe('CMS.PageTree', function () {
         });
     });
 
+    describe('_clearStoredNodes', function () {
+        var pagetree;
+
+        beforeEach(function (done) {
+            $(function () {
+                pagetree = new CMS.PageTree();
+                pagetree._storeNodeId(1);
+                pagetree._storeNodeId(2);
+                done();
+            });
+        });
+
+        it('clear stored open nodes', function () {
+            expect(pagetree._getStoredNodeIds()).toEqual([1, 2]);
+            pagetree._clearStoredNodes();
+            expect(pagetree._getStoredNodeIds()).toEqual([]);
+        });
+    });
+
     describe('_paste()', function () {
         var pagetree;
 
