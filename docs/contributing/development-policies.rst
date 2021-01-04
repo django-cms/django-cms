@@ -15,8 +15,9 @@ Reporting security issues
     If you think you have discovered a security issue in our code, please report
     it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
 
-        Please **do not** raise it on IRC, GitHub, either of our email lists, StackOverflow
-        or in any other public forum until we have had a chance to deal with it.
+    Please **do not** raise it on Slack, IRC, GitHub, either of our email
+    lists, StackOverflow or in any other public forum until we have had a
+    chance to deal with it.
 
 
 ******

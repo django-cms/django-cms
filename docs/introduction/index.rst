@@ -41,11 +41,7 @@ If you want to install django CMS into an existing project, or prefer to configu
 hand, rather than using the automated installer, see :doc:`/how_to/install` and then follow the
 rest of the tutorials.
 
-Either way, you'll be able to find support and help from the numerous friendly
-members of the django CMS community, either on our `mailinglist`_ or IRC
-channel ``#django-cms`` on the ``irc.freenode.net`` network.
-
-If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
-<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+Either way, you'll be able to find support and help from the numerous friendly members of the django CMS community, either on our
+`mailinglist`_ or `our friendly Slack group <https://www.django-cms.org/slack>`_.
 
 .. _mailinglist: https://groups.google.com/forum/#!forum/django-cms

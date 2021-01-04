@@ -6,7 +6,7 @@ django CMS's development community
 
 You can join us online:
 
-* in our `django CMS Slack channel <www.django-cms.org/slack>`_
+* in our `django CMS Slack channel <https://www.django-cms.org/slack>`_
 * on our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ for
   **general discussion** of django CMS
 * on our `django CMS developers email list

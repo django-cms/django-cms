@@ -105,11 +105,9 @@ coverage will only be accepted with a very good reason; bug-fixing patches
 **must** demonstrate the bug with a test to avoid regressions and to check
 that the fix works.
 
-We have an IRC channel, our `django-cms-developers`_ email list,
-and of course the code reviews mechanism on GitHub - do use them.
+We have `a Slack group <https://www.django-cms.org/slack>`_, our `django-cms-developers`_
+email list, and of course the code reviews mechanism on GitHub - do use them.
 
-If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
-<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
 
 .. _contributing_frontend:
 
