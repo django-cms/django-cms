@@ -99,13 +99,12 @@ other members of the community.
 
 .. rst-class:: column column3
 
-Email
-=====
+Discourse
+=========
 
-Our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ is for
-**general discussions** and the `django CMS developers email list
-<https://groups.google.com/forum/#!forum/django-cms-developers>`_ for the
-**development of django CMS**.
+Our `Discourse forum <https://discourse.django-cms.org>`_ is also used for
+discussion of django CMS, particularly to manage its technical development process.
+
 
 .. rst-class:: column column3
 

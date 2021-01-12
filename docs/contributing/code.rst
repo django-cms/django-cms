@@ -26,7 +26,7 @@ Basic requirements and standards
 ********************************
 
 If you're interested in developing a new feature for the CMS, it is recommended
-that you first discuss it on the `django-cms-developers`_  mailing list so as
+that you first discuss it on the `Discourse forum <https://discourse.django-cms.org>`_ so as
 not to do any work that will not get merged in anyway.
 
 - Code will be reviewed and tested by at least one core developer, preferably
@@ -105,8 +105,8 @@ coverage will only be accepted with a very good reason; bug-fixing patches
 **must** demonstrate the bug with a test to avoid regressions and to check
 that the fix works.
 
-We have `a Slack group <https://www.django-cms.org/slack>`_, our `django-cms-developers`_
-email list, and of course the code reviews mechanism on GitHub - do use them.
+We have `a Slack group <https://www.django-cms.org/slack>`_, a `Discourse forum
+<https://discourse.django-cms.org>`_, and of course the code reviews mechanism on GitHub - do use them.
 
 
 .. _contributing_frontend:
