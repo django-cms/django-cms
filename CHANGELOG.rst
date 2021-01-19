@@ -2,11 +2,17 @@
 Changelog
 =========
 
+fp-6622 (2021-01-19)
+====================
+
+* Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
+
 
 Unreleased
 ==================
 
 * Fixed builds on RTD
+
 
 3.8.0 (2020-10-28)
 ==================
