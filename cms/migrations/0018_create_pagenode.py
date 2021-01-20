@@ -68,50 +68,24 @@ class Migration(IrreversibleMigration):
         migrations.CreateModel(
             name='TreeNode',
             fields=[
-                (
-                    'id',
-                    models.AutoField(
-                        auto_created=True,
-                        primary_key=True,
-                        serialize=False,
-                        verbose_name='ID',
-                    ),
-                ),
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('path', models.CharField(max_length=255, unique=True)),
                 ('depth', models.PositiveIntegerField()),
                 ('numchild', models.PositiveIntegerField(default=0)),
-                (
-                    'parent',
-                    models.ForeignKey(
-                        blank=True,
-                        null=True,
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name='children',
-                        to='cms.TreeNode',
-                    ),
-                ),
-                (
-                    'site',
-                    models.ForeignKey(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name='djangocms_nodes',
-                        to='sites.Site',
-                        verbose_name='site',
-                    ),
-                ),
+                ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='children', to='cms.TreeNode')),
+                ('site', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='djangocms_nodes', to='sites.Site', verbose_name='site')),
             ],
-            options={'ordering': ('path',), 'default_permissions': []},
+            options={
+                'ordering': ('path',),
+                'default_permissions': [],
+            },
         ),
         migrations.RunPython(create_page_nodes, migrations.RunPython.noop),
         migrations.AddField(
             model_name='page',
             name='node',
-            field=models.ForeignKey(
-                null=True,
-                on_delete=django.db.models.deletion.CASCADE,
-                related_name='cms_pages',
-                to='cms.TreeNode',
-            ),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='cms_pages',
+                                    to='cms.TreeNode'),
         ),
         migrations.AddField(
             model_name='page',
@@ -119,10 +93,13 @@ class Migration(IrreversibleMigration):
             field=models.PositiveIntegerField(null=True),
         ),
         migrations.AlterUniqueTogether(
-            name='page', unique_together=set([('node', 'publisher_is_draft')])
+            name='page',
+            unique_together=set([('node', 'publisher_is_draft')]),
         ),
         migrations.AlterModelManagers(
             name='pageusergroup',
-            managers=[('objects', django.contrib.auth.models.GroupManager())],
+            managers=[
+                ('objects', django.contrib.auth.models.GroupManager()),
+            ],
         ),
     ]
