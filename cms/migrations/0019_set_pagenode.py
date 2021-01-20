@@ -53,8 +53,8 @@ class Migration(IrreversibleMigration):
     ]
 
     operations = [
-        migrations.RunPython(unpublish_never_published_pages),
-        migrations.RunPython(set_page_nodes),
+        migrations.RunPython(unpublish_never_published_pages, migrations.RunPython.noop),
+        migrations.RunPython(set_page_nodes, migrations.RunPython.noop),
     ]
 
     def apply(self, project_state, schema_editor, collect_sql=False):
