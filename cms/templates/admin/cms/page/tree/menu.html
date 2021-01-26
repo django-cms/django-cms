@@ -2,8 +2,13 @@
 
 {# INFO: columns are defined in base.html options #}
 {% spaceless %}
-<li class="cms-tree-node {{ css_class }}
-    {% if descendants %} jstree-open{% elif node.is_branch %} jstree-closed{% endif %}
+<li {% if not follow_descendants %}title="{% blocktrans %}There are too many descendants to unfold this page. Please search the page you are looking for.{% endblocktrans %}"{% endif %}class="cms-tree-node {{ css_class }}
+    {% spaceless %}
+    {% if follow_descendants %}
+        {% if descendants %} jstree-open{% elif node.is_branch %} jstree-closed{% endif %}
+    {% else %}
+        jstree-unfoldable
+    {% endif %}{% endspaceless %}
     {% if page.reverse_id == 'page_types' %} cms-tree-node-pagetype{% endif %}
     {% if node.depth == 0 %} cms-tree-node-top{% endif %}
     {% if filtered %} cms-tree-node-filtered{% endif %}

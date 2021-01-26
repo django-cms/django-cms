@@ -1472,7 +1472,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         is_popup = (IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET)
         languages = get_language_list(site.pk)
         user_can_add = page_permissions.user_can_add_subpage
-
+        descendants_limit = get_cms_setting('PAGETREE_DESCENDANTS_LIMIT')
+        print("PAGETREE_DESCENDANTS_LIMIT", descendants_limit)
         def render_page_row(page):
             page.title_cache = {trans.language: trans for trans in page.filtered_translations}
 
@@ -1497,6 +1498,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 'node': page.node,
                 'ancestors': [node.item for node in page.node.get_cached_ancestors()],
                 'descendants': [node.item for node in page.node.get_cached_descendants()],
+                'follow_descendants': True if descendants_limit is None else page.node.numchild <= descendants_limit,
                 'request': request,
                 'lang': language,
                 'metadata': metadata,

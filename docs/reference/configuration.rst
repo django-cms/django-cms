@@ -1115,3 +1115,15 @@ when the "Content" field is filled in. There should be no need to change it,
 unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
 your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
 body field **different** than ``body``.
+
+..  setting:: CMS_PAGETREE_DESCENDANTS_LIMIT
+
+PAGETREE_DESCENDANTS_LIMIT
+===================================
+
+default
+    ``None``
+
+A limit that prevents a node from being unfoldable if it contains too many
+descendants. This setting can be useful for sites with a very large tree
+structure to avoid performance drawbacks.
