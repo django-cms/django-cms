@@ -1171,7 +1171,8 @@ class PagesTestCase(TransactionCMSTestCase):
         When a parent page slug changes,
         the child title path should be regenerated.
         
-        child title path should be regenerated.
+        This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
+        where the slug was not regenerated.
         """
         parent = create_page('BadFoo', "nav_playground.html", 'en',
                              slug = 'badfoo', published=True)
