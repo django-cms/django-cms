@@ -1165,7 +1165,6 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get('/de/de-parent/de-child/')
         self.assertEqual(response.status_code, 200)
 
-
     def  test_subpage_title_path_regeneration_after_parent_slug_change(self):    
         """
         When a parent page slug changes,
