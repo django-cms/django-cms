@@ -1142,6 +1142,7 @@ class PagesTestCase(TransactionCMSTestCase):
         """
         When a child page is created with multiple translations before parent translation,
         child title translation path should be regenerated to take into account parent path.
+
         This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
         where the slug was not regenerated.
         """
