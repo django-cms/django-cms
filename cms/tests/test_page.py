@@ -1169,6 +1169,8 @@ class PagesTestCase(TransactionCMSTestCase):
     def  test_subpage_title_path_regeneration_after_parent_slug_change(self):    
         """
         When a parent page slug changes,
+        the child title path should be regenerated.
+        
         child title path should be regenerated.
         """
         parent = create_page('BadFoo', "nav_playground.html", 'en',
