@@ -1146,7 +1146,6 @@ class PagesTestCase(TransactionCMSTestCase):
         This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
         where the slug was not regenerated.
         """
-
         parent = create_page('en-parent', "nav_playground.html", 'en',
                              slug = 'en-parent', published=True)
         child = create_page('en-child', "nav_playground.html", 'en',
