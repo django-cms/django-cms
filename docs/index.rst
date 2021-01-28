@@ -37,7 +37,7 @@ django CMS documentation
 Overview
 ********
 
-django CMS is a modern web publishing platform built with `Django`_, the web application framework "for
+django CMS is a modern and beautiful web publishing platform built with `Django`_, the web application framework "for
 perfectionists with deadlines".
 
 django CMS offers out-of-the-box support for the common features you'd expect
