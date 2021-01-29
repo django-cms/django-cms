@@ -7,6 +7,7 @@ Unreleased
 ==================
 
 * Fixed builds on RTD
+* Enforce use of coverage > 4 for python 3.8 support
 
 3.8.0 (2020-10-28)
 ==================
