@@ -4,7 +4,7 @@ from cms.models import CMSPlugin
 
 
 class Text(CMSPlugin):
-    body = models.textField()
+    body = models.TextField()
 
     def __str__(self):
         return self.body or str(self.pk)
