@@ -1,8 +1,6 @@
 import json
 import datetime
 
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
@@ -26,6 +24,8 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
+from cms.test_utils.text.cms_plugins import TextPlugin
+from cms.test_utils.text.models import Text
 from cms.test_utils.testcases import (
     CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE,URL_CMS_TRANSLATION_DELETE,
     URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_CHANGE,

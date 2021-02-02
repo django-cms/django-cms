@@ -1,4 +1,3 @@
-from djangocms_text_ckeditor.models import Text
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -13,6 +12,7 @@ from cms.management.commands.subcommands.publisher_publish import PublishCommand
 from cms.models import CMSPlugin, Page, TreeNode, Title
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import CMSTestCase as TestCase
+from cms.test_utils.text.models import Text
 from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.urlutils import admin_reverse
@@ -184,7 +184,7 @@ class PublisherCommandTests(TestCase):
                    u"TextPlugin", u"en", body="Test content")
 
         # Manually undoing table name patching
-        Text._meta.db_table = 'djangocms_text_ckeditor_text'
+        # Text._meta.db_table = 'djangocms_text_ckeditor_text'
         plugin_pool.patched = False
 
         with StdoutOverride():

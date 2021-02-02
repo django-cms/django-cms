@@ -6,8 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import FieldError
 from django.core.exceptions import PermissionDenied
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
+
 from menus.menu_pool import menu_pool
 
 from cms.api import (
@@ -21,6 +20,8 @@ from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.plugin_base import CMSPluginBase
+from cms.test_utils.text.cms_plugins import TextPlugin
+from cms.test_utils.text.models import Text
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME

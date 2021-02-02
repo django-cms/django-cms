@@ -386,6 +386,8 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
                 expected = '<div class="sub-content">{0}</div>'.format(content)
                 unexpected = '<div class="content">{0}</div>'.format(content)
                 response = self.client.get(url)
+                import pdb
+                pdb.set_trace()
                 self.assertContains(response, expected, status_code=200)
                 self.assertNotContains(response, unexpected, status_code=200)
 

@@ -10,7 +10,6 @@ from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils.timezone import now
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 from mock import patch
 
@@ -26,6 +25,7 @@ from cms.templatetags.cms_tags import (
 from cms.templatetags.cms_js_tags import json_filter
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.text.cms_plugins import TextPlugin
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_site_id
 from cms.utils.conf import get_cms_setting
