@@ -45,8 +45,8 @@ from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.plugins import get_plugins
 from django.utils.http import urlencode
 
-from cms.test_utils.text.models import Text
-from cms.test_utils.text.utils import plugin_to_tag
+from cms.test_utils.project.pluginapp.plugins.text.models import Text
+from cms.test_utils.project.pluginapp.plugins.text import plugin_to_tag
 
 
 @contextmanager

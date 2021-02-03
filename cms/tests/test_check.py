@@ -11,7 +11,7 @@ from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Artic
 from cms.test_utils.project.extensionapp.models import MyPageExtension
 from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
 
-from cms.test_utils.text.cms_plugins import TextPlugin
+from cms.test_utils.project.pluginapp.plugins.text.cms_plugins import TextPlugin
 
 
 class TestOutput(FileOutputWrapper):

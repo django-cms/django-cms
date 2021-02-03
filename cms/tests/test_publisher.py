@@ -12,7 +12,6 @@ from cms.management.commands.subcommands.publisher_publish import PublishCommand
 from cms.models import CMSPlugin, Page, TreeNode, Title
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import CMSTestCase as TestCase
-from cms.test_utils.text.models import Text
 from cms.test_utils.util.context_managers import StdoutOverride
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.urlutils import admin_reverse

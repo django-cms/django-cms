@@ -2,7 +2,7 @@ from cms.api import create_page, add_plugin
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
-from cms.test_utils.text.models import Text
+from cms.test_utils.project.pluginapp.plugins.text import Text
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.copy_plugins import copy_plugins_to
 from cms.utils.plugins import reorder_plugins

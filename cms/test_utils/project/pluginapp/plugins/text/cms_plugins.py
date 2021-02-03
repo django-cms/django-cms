@@ -4,9 +4,10 @@ from cms.plugin_pool import plugin_pool
 from .models import Text
 
 
-@plugin_pool.register_plugin
 class TextPlugin(CMSPluginBase):
     model = Text
-    name = "SimpleText"
+    name = "Text"
     allow_children = False
     render_template = "text/text.html"
+
+plugin_pool.register_plugin(TextPlugin)

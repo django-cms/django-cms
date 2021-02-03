@@ -20,8 +20,8 @@ from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.plugin_base import CMSPluginBase
-from cms.test_utils.text.cms_plugins import TextPlugin
-from cms.test_utils.text.models import Text
+from cms.test_utils.project.pluginapp.plugins.text.cms_plugins import TextPlugin
+from cms.test_utils.project.pluginapp.plugins.text.models import Text
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME

@@ -17,7 +17,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.text.cms_plugins import TextPlugin
+from cms.test_utils.project.pluginapp.plugins.text import TextPlugin
 
 
 APPHOOK = "SampleApp"

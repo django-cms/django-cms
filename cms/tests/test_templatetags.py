@@ -25,7 +25,7 @@ from cms.templatetags.cms_tags import (
 from cms.templatetags.cms_js_tags import json_filter
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.text.cms_plugins import TextPlugin
+from cms.test_utils.project.pluginapp.plugins.text.cms_plugins import TextPlugin
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils import get_site_id
 from cms.utils.conf import get_cms_setting
