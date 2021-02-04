@@ -18,8 +18,12 @@ from cms.utils.page_permissions import (
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import static_with_version
 
-
-text_widget = forms.Textarea
+try:
+    # djangocms_text_ckeditor is not guaranteed to be available
+    from djangocms_text_ckeditor.widgets import TextEditorWidget
+    text_widget = TextEditorWidget
+except ImportError:
+    text_widget = forms.Textarea
 
 
 class SlugWidget(forms.widgets.TextInput):

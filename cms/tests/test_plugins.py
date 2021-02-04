@@ -439,6 +439,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             language=settings.LANGUAGES[0][0],
             body='<script>var bar="hacked"</script>'
         )
+        import pdb
+        pdb.set_trace()
         self.assertEqual(
             plugin.body,
             '&lt;script&gt;var bar="hacked"&lt;/script&gt;'
