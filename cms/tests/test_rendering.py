@@ -254,7 +254,7 @@ class RenderingTestCase(CMSTestCase):
         in settings and are working and that extra plugin context processors can be
         passed to PluginContext.
         """
-        from cms.test_utils.project.pluginapp.plugins.text import TextPlugin
+        from cms.test_utils.project.pluginapp.plugins.text.cms_plugins import TextPlugin
         from cms.plugin_pool import plugin_pool
 
         instance = CMSPlugin.objects.all()[0].get_plugin_instance()[0]
@@ -288,6 +288,7 @@ class RenderingTestCase(CMSTestCase):
             self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' +
             self.test_data['text_main'] + '|main|original_context_var_ok'
         )
+
         self.assertEqual(r, expected)
         plugin_rendering._standard_processors = {}
 

@@ -7,7 +7,8 @@ from .models import Text
 class TextPlugin(CMSPluginBase):
     model = Text
     name = "Text"
-    allow_children = False
-    render_template = "text/text.html"
+    allow_children = True
+    search_fields = ('body')
+    render_template = "pluginapp/text/text.html"
 
 plugin_pool.register_plugin(TextPlugin)

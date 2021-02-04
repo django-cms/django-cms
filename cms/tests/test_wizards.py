@@ -384,10 +384,9 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             with self.login_user_context(superuser):
                 url = page.get_absolute_url('en')
                 expected = '<div class="sub-content">{0}</div>'.format(content)
+
                 unexpected = '<div class="content">{0}</div>'.format(content)
                 response = self.client.get(url)
-                import pdb
-                pdb.set_trace()
                 self.assertContains(response, expected, status_code=200)
                 self.assertNotContains(response, unexpected, status_code=200)
 

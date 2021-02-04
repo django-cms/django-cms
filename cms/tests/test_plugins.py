@@ -46,7 +46,7 @@ from cms.utils.plugins import get_plugins
 from django.utils.http import urlencode
 
 from cms.test_utils.project.pluginapp.plugins.text.models import Text
-from cms.test_utils.project.pluginapp.plugins.text import plugin_to_tag
+from cms.test_utils.project.pluginapp.plugins.text.utils import plugin_to_tag
 
 
 @contextmanager
@@ -805,6 +805,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         text = Text(body="hello", language="en", placeholder=placeholder, plugin_type="TextPlugin", position=1)
         text.save()
         page.publish('en')
+
         self.assertEqual(Page.objects.search("hi").count(), 0)
         self.assertEqual(Page.objects.search("hello").count(), 1)
 

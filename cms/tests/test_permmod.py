@@ -136,6 +136,8 @@ class PermissionModeratorTests(CMSTestCase):
             }
             endpoint = self.get_add_plugin_uri(placeholder, 'TextPlugin')
             response = self.client.post(endpoint, post_data)
+            import pdb
+            pdb.set_trace()
             self.assertEqual(response.status_code, 302)
             return response.content.decode('utf8')
 
