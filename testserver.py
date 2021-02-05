@@ -110,11 +110,11 @@ HELPER_SETTINGS = dict(
         }
     },
     INSTALLED_APPS=[
-        'djangocms_text_ckeditor',
         'cms.test_utils.project.pluginapp.plugins.link',
         'cms.test_utils.project.pluginapp.plugins.multicolumn',
         'cms.test_utils.project.pluginapp.plugins.multiwrap',
         'cms.test_utils.project.pluginapp.plugins.style',
+        'cms.test_utils.project.pluginapp.plugins.text',
         'cms.test_utils.project.pluginapp.plugins.dynamic_js_loading',
         'cms.test_utils.project.placeholderapp',
     ],
@@ -150,7 +150,7 @@ HELPER_SETTINGS = dict(
         'sites': None,
         'cms': None,
         'menus': None,
-        'djangocms_text_ckeditor': None,
+        'text': None,
     },
 )
 

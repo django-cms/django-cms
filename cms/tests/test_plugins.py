@@ -423,28 +423,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         )
         self.assertEqual(plugin.body, '<div class="someclass"></div><p>foo</p>')
 
-    def test_add_text_plugin_html_sanitizer(self):
-        """
-        Test that you can add a text plugin
-        """
-        # add a new text plugin
-        page = api.create_page(
-            title='test page',
-            template='nav_playground.html',
-            language=settings.LANGUAGES[0][0],
-        )
-        plugin = api.add_plugin(
-            placeholder=page.placeholders.get(slot='body'),
-            plugin_type='TextPlugin',
-            language=settings.LANGUAGES[0][0],
-            body='<script>var bar="hacked"</script>'
-        )
-        import pdb
-        pdb.set_trace()
-        self.assertEqual(
-            plugin.body,
-            '&lt;script&gt;var bar="hacked"&lt;/script&gt;'
-        )
 
     def test_copy_plugins_method(self):
         """

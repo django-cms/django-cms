@@ -11,4 +11,5 @@ class TextPlugin(CMSPluginBase):
     search_fields = ('body')
     render_template = "pluginapp/text/text.html"
 
+
 plugin_pool.register_plugin(TextPlugin)
