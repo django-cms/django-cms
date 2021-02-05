@@ -54,6 +54,7 @@ if __name__ == '__main__':
         'cms.test_utils.project.pluginapp.plugins.meta',
         'cms.test_utils.project.pluginapp.plugins.one_thing',
         'cms.test_utils.project.pluginapp.plugins.revdesc',
+        'cms.test_utils.project.pluginapp.plugins.text',
         'cms.test_utils.project.fakemlng',
         'cms.test_utils.project.objectpermissionsapp',
         'cms.test_utils.project.bunch_of_plugins',
