@@ -9,6 +9,7 @@ Unreleased
 * Fixed builds on RTD
 * Enforce use of coverage > 4 for python 3.8 support
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
+* Fixed 6973 bag with unexpected behavior get_page_from_request
 
 3.8.0 (2020-10-28)
 ==================
