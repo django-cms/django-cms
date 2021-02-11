@@ -83,25 +83,36 @@ Technical reference material, for classes, methods, APIs, commands.
 Join us online
 **************
 
-django CMS is supported by a friendly and very knowledgeable community.
+The `django CMS Association <https://www.django-cms.org/en/about-us/>`_ is a non-profit
+organisation that exists to support the development of django CMS and its community.
+
 
 .. rst-class:: column column3
 
-Our IRC channel, #django-cms, is on ``irc.freenode.net``. If you don't have an IRC client, you can
-`join our IRC channel using the KiwiIRC web client
-<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+Slack
+=====
+
+Join `our friendly Slack group <https:/https://www.django-cms.org/slack>`_ for
+**support** and to **share ideas** and **discuss technical questions** with
+other members of the community.
+
 
 .. rst-class:: column column3
 
-Our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ is for
-**general discussions** and the `django CMS developers email list
-<https://groups.google.com/forum/#!forum/django-cms-developers>`_ for the
-**development of django CMS**.
+Discourse
+=========
+
+Our `Discourse forum <https://discourse.django-cms.org>`_ is also used for
+discussion of django CMS, particularly to manage its technical development process.
+
 
 .. rst-class:: column column3
 
-Our `StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_ is for
-**questions** around django CMS and it's plugin ecosystem.
+StackOverflow
+=============
+
+`StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_ is also a good place
+for questions around django CMS and its plugin ecosystem.
 
 
 ***************

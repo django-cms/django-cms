@@ -22,13 +22,14 @@ Raising an issue
     If you think you have discovered a security issue in our code, please report
     it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
 
-        Please **do not** raise it on IRC, GitHub, either of our email lists, StackOverflow
-        or in any other public forum until we have had a chance to deal with it.
+    Please **do not** raise it in any public forum until we have had a
+    chance to deal with it.
 
 
-Except in the case of security matters, of course, you're welcome to raise issues in any way that
-suits you - :ref:`on one of our email lists, or the IRC channel <development-community>` or in person
-if you happen to meet another django CMS developer.
+Except in the case of security matters, of course, you're welcome to raise
+issues in any way that suits you - :ref:`using Discourse, or the Slack group
+<development-community>` or in person if you happen to meet another django CMS
+developer.
 
 It's very helpful though if you don't just raise an issue by mentioning it to people, but actually
 file it too, and that means creating a `new issue on GitHub
