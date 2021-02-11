@@ -4,7 +4,7 @@
 Running and writing tests
 #########################
 
-Good code needs tests.
+Good code needs tests and faith. 
 
 A project like django CMS simply can't afford to incorporate new code that
 doesn't come with its own tests.
