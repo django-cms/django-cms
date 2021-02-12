@@ -12,7 +12,7 @@ You can join us online:
 
 You can also follow:
 
-* the `Travis Continuous Integration build reports <https://travis-ci.org/divio/django-cms>`_
+* the `Travis Continuous Integration build reports <https://travis-ci.com/django-cms/django-cms>`_
 * the `@djangocms <https://twitter.com/djangocms>`_ Twitter account for general announcements
 * the `django CMS Association LinkedIn <https://www.linkedin.com/company/django-cms-association>`_ account
 
@@ -48,7 +48,7 @@ The dCA’s role in steering the project’s development is formalised in the
 `django CMS technical comittee <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_,
 whose members are drawn from the django CMS community and the dCA.
 
-The dCA maintains overall control of the `django CMS repository <https://github.com/divio/django-cms>`_.
+The dCA maintains overall control of the `django CMS repository <https://github.com/django-cms/django-cms>`_.
 As the chief backer of django CMS, and in order to ensure a consistent and
 long-term approach to the project, the dCA reserves the right of final say in
 any decisions concerning its development.
