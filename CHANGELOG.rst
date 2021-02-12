@@ -28,9 +28,6 @@ unreleased
 * Backported from develop: Remove travis integration from the project as the project has moved to Github Actions.
 * Fixed usage of ``get_object`` in ``edit_title_fields`` of the page admin.
 
-
-
-
 3.6.0 (2019-01-29)
 ==================
 
