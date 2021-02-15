@@ -1,6 +1,6 @@
 ---
 name: "\U0001F4A1 Feature requests"
-about: Please submit and discuss feature requests via google groups.
+about: Please submit and discuss feature requests via discourse forum.
 title: "[FEATURE]"
 labels: 'status: marked for rejection'
 assignees: ''
