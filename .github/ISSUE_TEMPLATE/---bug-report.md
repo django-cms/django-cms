@@ -20,7 +20,7 @@ If this is a security issue stop immediately and follow the instructions at:
 http://docs.django-cms.org/en/latest/contributing/development-policies.html#reporting-security-issues
 -->
 
-## Steps to reproduce
+## Steps to reproduce
 
 <!--
 Clear steps describing how to reproduce the issue.
