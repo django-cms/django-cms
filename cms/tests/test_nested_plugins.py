@@ -826,6 +826,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             msg = u"child plugin id differs to parent in body"
             # linked child is in body
             self.assertTrue(org_nested_text_plugin.body.find(needle % (org_link_child_plugin.id)) != -1, msg)
+            import pdb
+            pdb.set_trace()
             msg = u"copy: child plugin id differs to parent in body"
             self.assertTrue(copied_nested_text_plugin.body.find(needle % (copied_link_child_plugin.id)) != -1, msg)
             # really nothing else
