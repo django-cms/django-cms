@@ -7,7 +7,9 @@ assignees: ''
 
 ---
 
+## Feature request 
+
 <!--
-Please submit any feature requests through our developers email list:
-https://groups.google.com/forum/#!forum/django-cms-developers
+Please submit any feature requests through our discourse forum:
+https://discourse.django-cms.org/c/feature-requests/6
 -->
