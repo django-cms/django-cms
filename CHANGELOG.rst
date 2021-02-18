@@ -2,11 +2,12 @@
 Changelog
 =========
 
-Unreleased (2021-02-18)
-=======================
+Unreleased
+==========
 * Pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
 * Enforce use of coverage > 4 for python 3.8 support
 * Set sphinxcontrib-spelling requirement to be <7.0.0
+* Enforce use of django-classy-tags >=0.7.2,<2 for python 2.7 support
 
 3.7.4 (2020-07-21)
 ==================
