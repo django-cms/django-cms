@@ -10,7 +10,7 @@ Unreleased
 * Remove debug print from apphook_reload
 * Enforce use of coverage > 4 for python 3.8 support
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
-* Pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
+* Temporarily pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
 
 3.8.0 (2020-10-28)
 ==================
