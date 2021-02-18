@@ -13,7 +13,7 @@ django CMS
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
 
-Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association. `Get involved in the dCA! <https://www.django-cms.org/en/contribute/>`_
+Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association. `Get involved in the dCA <https://www.django-cms.org/en/contribute/>`_ and `win rewards! <https://www.django-cms.org/en/bounty-program/>`_
 
 
 .. ATTENTION::
@@ -68,6 +68,11 @@ For more information about our branch policy, see `Branches
 
 Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
 
+************************
+Developer Bounty Program
+************************
+
+Win rewards for creating Pull Requests. Take part in our `developer bounty program <https://www.django-cms.org/en/bounty-program/>`_
 
 ********
 Tutorial
