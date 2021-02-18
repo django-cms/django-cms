@@ -2,6 +2,9 @@
 Changelog
 =========
 
+Unreleased (2021-02-18)
+=======================
+* Pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
 
 3.8.0 (2020-10-28)
 ==================
