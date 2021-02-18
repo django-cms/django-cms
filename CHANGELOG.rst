@@ -2,7 +2,8 @@
 Changelog
 =========
 
-Unreleased (2021-02-18)
+Unreleased
+========
 =======================
 * Pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
 * Enforce use of coverage > 4 for python 3.8 support
