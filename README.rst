@@ -1,8 +1,8 @@
 ##########
 django CMS
 ##########
-.. image:: https://travis-ci.org/divio/django-cms.svg?branch=develop
-    :target: https://travis-ci.org/divio/django-cms
+.. image:: https://travis-ci.org/django-cms/django-cms.svg?branch=develop
+    :target: https://travis-ci.org/django-cms/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/badge/wheel-yes-green.svg
@@ -13,7 +13,7 @@ django CMS
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
 
-Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association. `Get involved in the dCA! <https://www.django-cms.org/en/contribute/>`_
+Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association. `Get involved in the dCA <https://www.django-cms.org/en/contribute/>`_ and `win rewards! <https://www.django-cms.org/en/bounty-program/>`_
 
 
 .. ATTENTION::
@@ -68,6 +68,11 @@ For more information about our branch policy, see `Branches
 
 Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
 
+************************
+Developer Bounty Program
+************************
+
+Win rewards for creating Pull Requests. Take part in our `developer bounty program <https://www.django-cms.org/en/bounty-program/>`_
 
 ********
 Tutorial
@@ -94,7 +99,7 @@ Demo
 ****
 
 .. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-divio.png
-   :target: http://try.django-cms.org/
+   :target: https://control.divio.com/demo/get-new/django-cms/
    :alt: Try demo with Divio Cloud
 
 ************
@@ -117,7 +122,7 @@ django CMS Association
 
 The django CMS Association is a non-profit organization that was founded in 2020 with the goal to drive the success of django CMS, by increasing customer happiness, market share and open-source contributions. We provide infrastructure and guidance for the django CMS project. 
 
-The non-profit django CMS Association is dependent on donations to fulfilf its purpose. The best way to donate is to become a member of the association and pay membership fees. The funding will be funneled back into core development and community projects.
+The non-profit django CMS Association is dependent on donations to fulfill its purpose. The best way to donate is to become a member of the association and pay membership fees. The funding will be funneled back into core development and community projects.
 
 `Join the django CMS Association <https://www.django-cms.org/en/contribute/>`_.
 

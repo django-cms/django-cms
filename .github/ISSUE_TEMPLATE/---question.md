@@ -10,9 +10,9 @@ assignees: ''
 <!--
 For *help with django CMS*, please use our one of the following channels:
 
-* StackOverflow: https://stackoverflow.com/questions/tagged/django-cms
-* Users mailing list: https://groups.google.com/forum/#!forum/django-cms
-* #django-cms on freenode.net
+* Slack: https://www.django-cms.org/slack (#support channel)
+* Discourse Forum: https://discourse.django-cms.org
+* Discord Server: https://discord.gg/PGEDT44h8A
 
 Questions submitted through GitHub will be closed. Our community is very
 helpful and we try to answer as many questions as you may have.

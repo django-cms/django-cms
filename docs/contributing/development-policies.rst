@@ -15,8 +15,8 @@ Reporting security issues
     If you think you have discovered a security issue in our code, please report
     it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
 
-        Please **do not** raise it on IRC, GitHub, either of our email lists, StackOverflow
-        or in any other public forum until we have had a chance to deal with it.
+    Please **do not** raise it in any public forum until we have had a
+    chance to deal with it.
 
 
 ******
@@ -47,8 +47,7 @@ the author of the pull request.
 Proposal and discussion of significant changes
 **********************************************
 
-New features and backward-incompatible changes should be proposed using the `django CMS developers email list
-<https://groups.google.com/group/django-cms-developers>`_. Discussion should take place there before any pull requests
+New features and backward-incompatible changes should be proposed using the `Discourse forum <https://discourse.django-cms.org>`_. Discussion should take place there before any pull requests
 are made.
 
 This is in the interests of openness and transparency, and to give the community a chance to participate in and
@@ -68,7 +67,7 @@ The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our webs
 We are planning releases according to **key principles and aims**. Issues within milestones are
 therefore subject to change.
 
-The `django CMS developers email list <https://groups.google.com/group/django-cms-developers>`_ serves as gathering
+The `django CMS Discourse forum <https://discourse.django-cms.org>`_ serves as gathering
 point for developers. We submit ideas and proposals prior to the roadmap goals.
 
 django CMS 3.4, surpassed by 3.7, was the first "LTS" ("Long-Term Support")
@@ -215,5 +214,4 @@ New lines should be added to the top of the list.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
-.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _freenode: http://freenode.net/
