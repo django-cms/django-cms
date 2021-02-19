@@ -6,7 +6,7 @@ django-treebeard>=4.3,<4.5
 argparse
 dj-database-url
 djangocms-admin-style>=1.5
-django-sekizai>=0.7
+django-sekizai>=0.7,<=1.10
 django-classy-tags>=0.7.2,<2
 djangocms-text-ckeditor<4
 https://github.com/ojii/django-better-test/archive/8aa2407d097fe3789b74682f0e6bd7d15d449416.zip#egg=django-better-test
