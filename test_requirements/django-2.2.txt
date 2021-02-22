@@ -3,3 +3,9 @@ pyflakes>=2.1
 Django>=2.2,<3.0
 pyenchant==3.0.1
 django-formtools==2.2
+django-sekizai>=0.7
+django-classy-tags>=0.7.2,<2
+djangocms-text-ckeditor<4
+sphinxcontrib-spelling<7.0.0 # restriction for py35 tests
+# required to run the server for integration tests
+django-app-helper<3.0.0
