@@ -4,6 +4,7 @@ Changelog
 
 Unreleased
 ==========
+
 * Pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
 * Enforce use of coverage > 4 for python 3.8 support
 * For testing python 2.7 and django 2.2 support enforced: django-sekizai >=0.7,<=1.10
