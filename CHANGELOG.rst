@@ -5,6 +5,7 @@ Changelog
 Unreleased
 ==========
 * Pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
+
 * Enforce use of coverage > 4 for python 3.8 support
 * Enforce use of django-sekizai >=0.7,<=1.10 for python 2.7 support
 * Enforced use of django-app-helper < 3.0.0
