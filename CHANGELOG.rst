@@ -7,8 +7,10 @@ Unreleased
 ==================
 
 * Fixed builds on RTD
+* Remove debug print from apphook_reload
 * Enforce use of coverage > 4 for python 3.8 support
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
+* Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
 * Updated documentation links
 
 3.8.0 (2020-10-28)
