@@ -24,7 +24,7 @@ Review
 ******
 
 All patches should be made as pull requests **against develop** to
-`the GitHub repository <https://github.com/divio/django-cms>`_. Patches should
+`the GitHub repository <https://github.com/django-cms/django-cms>`_. Patches should
 never be pushed directly.
 
 **Nothing** may enter the code-base, *including the documentation*, without
@@ -98,7 +98,7 @@ Branches
     against ``develop``.
 
 We maintain a number of branches on
-`our GitHub repository <https://github.com/divio/django-cms>`_:
+`our GitHub repository <https://github.com/django-cms/django-cms>`_:
 
 ``develop``
     The default target branch for on-going development and new pull requests.
@@ -112,7 +112,7 @@ We maintain a number of branches on
     as the highest released version.
 
 ``releases`` hosts the `releases.json` file to indicate the availability of new
-    django CMS versions when using `djangocms-admin-style <https://github.com/divio/djangocms-admin-style#configuration>`_.
+    django CMS versions when using `djangocms-admin-style <https://github.com/django-cms/djangocms-admin-style#configuration>`_.
 
 Please always open PR's against develop and indicate that they should be
 backported to the latest LTS release when necessary. Older branches are not
@@ -198,7 +198,7 @@ Changelog
 .. versionadded:: 3.3
 
 **Every new feature, bugfix or other change of substance** must be represented in the `CHANGELOG
-<https://github.com/divio/django-cms/blob/develop/CHANGELOG.rst>`_. This includes documentation, but **doesn't** extend
+<https://github.com/django-cms/django-cms/blob/develop/CHANGELOG.rst>`_. This includes documentation, but **doesn't** extend
 to things like reformatting code, tidying-up, correcting typos and so on.
 
 Each line in the changelog should begin with a verb in the past tense, for example::
