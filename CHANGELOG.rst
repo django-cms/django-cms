@@ -5,10 +5,10 @@ Changelog
 Unreleased
 ==========
 * Pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
+
 * Enforce use of coverage > 4 for python 3.8 support
-* Set sphinxcontrib-spelling requirement to be <7.0.0
-* Enforce use of django-classy-tags >=0.7.2,<2 for python 2.7 support
-* Enforce use of django-sekizai >=0.7,<=1.10 for python 2.7 support
+* For testing python 2.7 and django 2.2 support enforced: django-sekizai >=0.7,<=1.10
+* For testing django 2.2 support enforced: django-app-helper<3.0.0 and sphinxcontrib-spelling<7.0.0
 * Enforced use of django-app-helper < 3.0.0
 
 3.7.4 (2020-07-21)
