@@ -10,3 +10,4 @@ https://github.com/divio/djangocms-text-ckeditor/archive/master.zip
 sphinxcontrib-spelling
 # required to run the server for integration tests
 django-app-helper
+
