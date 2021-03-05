@@ -4,3 +4,10 @@ https://github.com/PyCQA/pyflakes/archive/master.zip#egg=pyflakes
 Django>=3.0,<3.1
 pyenchant==3.0.1
 django-formtools==2.2
+django-sekizai>=0.7
+django-classy-tags>=0.7.2
+https://github.com/divio/djangocms-text-ckeditor/archive/master.zip
+sphinxcontrib-spelling
+# required to run the server for integration tests
+django-app-helper
+
