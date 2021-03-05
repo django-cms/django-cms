@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Unreleased
+========
+* Pinned django-treebeard to avoid breaking changes in django-treebeard 4.5
+* Enforce use of coverage > 4 for python 3.8 support
+* For testing django 2.2 support enforced: sphinxcontrib-spelling<7.0.0
 
 3.8.0 (2020-10-28)
 ==================
