@@ -121,6 +121,7 @@ class PageContent(models.Model):
             new = not old
 
         self.update(in_navigation=new)
+        self.save()
 
         # If there was a change, invalidate the cms page cache
         if new != old:
