@@ -12,6 +12,7 @@ Unreleased
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
 * Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
 * Updated documentation links
+* Changed readthedocs conf file name from .readthedocs.yml to .readthedocs.yaml
 
 3.8.0 (2020-10-28)
 ==================
