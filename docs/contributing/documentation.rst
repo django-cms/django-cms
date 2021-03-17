@@ -138,7 +138,7 @@ caught by the spelling checker.
     You may well find that some words that pass the spelling test on one system but not on another.
     Dictionaries on different systems contain different words and even behave differently. The
     important thing is that the spelling tests pass on `Travis
-    <https://travis-ci.org/divio/django-cms>`_ when you submit a pull request.
+    <https://travis-ci.com/django-cms/django-cms>`_ when you submit a pull request.
 
 
 *********************
