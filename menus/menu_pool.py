@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language_from_request, gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
@@ -101,7 +101,7 @@ class MenuRenderer:
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
-        self.request_language = get_language_from_request(request, check_path=True)
+        self.request_language = get_language()
         self.site = Site.objects.get_current(request)
 
     @property
