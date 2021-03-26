@@ -1,16 +1,10 @@
-name: Python package
+name: django CMS frontend.yml
 
 on: [push]
 
 jobs:
   frontend:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [
-          ubuntu-20.04,
-        ]
+    runs-on: ubuntu-20.04
     steps:
       - name: run frontend tests
         # TODO: add integrations from https://github.com/django-cms/django-cms/blob/develop/.travis.yml

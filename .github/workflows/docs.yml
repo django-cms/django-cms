@@ -1,16 +1,10 @@
-name: Python package
+name: django CMS docs.yml
 
 on: [push]
 
 jobs:
   docs:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [
-          ubuntu-20.04,
-        ]
+    runs-on: ubuntu-20.04
     steps:
       - name: run docs test
         run: |
