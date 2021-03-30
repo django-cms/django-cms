@@ -19,7 +19,7 @@ Issues and pull requests
 ========================
 
 * Please report **any bugs** through `GitHub issues <https://github.com/divio/django-cms/issues>`_.
-* Use our `Discourse forum <https://discourse.django-cms.org>`_ to discuss pull requests
+* Use our `Slack <https://www.django-cms.org/slack>`_ and join #workgroup-pr-review to discuss pull requests. 
 * For *security issues* please see further below.
 
 
