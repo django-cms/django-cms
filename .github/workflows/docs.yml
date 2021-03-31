@@ -1,16 +1,39 @@
-name: django CMS docs.yml
+name: Docs
 
 on: [push]
 
+# commenting now for testing, but ideally,
+# this is the best approach
+# on:
+#   pull_request:
+#     paths:
+#       - 'docs/**'
+#   push:
+#     branches:
+#       - main
+#     paths:
+#       - 'docs/**'
+
 jobs:
   docs:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    name: docs
     steps:
-      - name: run docs test
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('docs/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - run: python -m pip install -r docs/requirements.txt
+      - name: Build docs
         run: |
-          nvm install 6 && nvm use 6
-          npm config set spin false
-          npm install -g gulp@3.9.1
-          scripts/install-npm-dependencies.sh
-          gulp tests:unit
-          gulp lint
+          cd docs
+          sphinx-build -b spelling -n -q -W --keep-going -d _build/doctrees -D language=en_US -j auto . _build/spelling

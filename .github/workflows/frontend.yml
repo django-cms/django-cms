@@ -5,9 +5,18 @@ on: [push]
 jobs:
   frontend:
     runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: [15.x]
+
     steps:
-      - name: run frontend tests
-        # TODO: add integrations from https://github.com/django-cms/django-cms/blob/develop/.travis.yml
-        run: |
+    - uses: actions/checkout@v2
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install
+    - run: npm install -g gulp
+    - run: |
           gulp tests:unit
           gulp lint
