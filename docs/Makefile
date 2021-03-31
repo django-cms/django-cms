@@ -37,6 +37,7 @@ html:
 	. $(VENV); $(SPHINXBUILD) -b html $(ALLSPHINXOPTS) build/html
 	@echo
 	@echo "Build finished. The HTML pages are in build/html."
+	sphinx-build -b html  -n -d build/doctrees -D latex_paper_size=a4  -D latex_paper_size=letter build/html
 
 install:
 	@echo "... setting up virtualenv"
