@@ -128,9 +128,8 @@ jobs:
         pip install -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
-    - name: Test with pytest
+    - name: Test with django test runner
       run: |
-        # check actual test command in .travis.yml
         python manage.py test
       env:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
