@@ -47,7 +47,6 @@ jobs:
 
    - name: Test with django test runner
       run: |
-        # check actual test command in .travis.yml
         python manage.py test
 
   database-mysql:
