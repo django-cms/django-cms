@@ -36,4 +36,4 @@ jobs:
       - name: Build docs
         run: |
           cd docs
-          sphinx-build -b html  -n -d build/doctrees -D latex_paper_size=a4  -D latex_paper_size=letter build/html
+          sphinx-build -b dirhtml -n -d build/doctrees   . build/dirhtml
