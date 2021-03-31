@@ -2,9 +2,10 @@
 from django.contrib.admin.sites import site
 from django.template import Context
 from django.template.base import Template
+from django.test.utils import override_settings
 
-from cms.api import add_plugin
-from cms.models import StaticPlaceholder, Placeholder, UserSettings
+from cms.api import add_plugin, create_page
+from cms.models import CMSPlugin, StaticPlaceholder, Placeholder, UserSettings
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.urlutils import admin_reverse
 
@@ -177,3 +178,47 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
 
         self.assertEqual(without_name.get_name(), without_name.code)
         self.assertEqual(without_code.get_name(), str(without_code.pk))
+
+    @override_settings(
+        CMS_PLACEHOLDER_CONF={
+            'logo': {
+                'default_plugins': [
+                    {
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
+                        },
+                    },
+                ]
+            },
+        },
+    )
+    def test_default_plugins(self):
+        user = self.get_superuser()
+        page = create_page("page", "static.html", "en", created_by=user)
+        self.assertEqual(CMSPlugin.objects.count(), 0)
+        response = self.client.get(page.get_absolute_url(), {'edit': 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(CMSPlugin.objects.count(), 1)
+
+    @override_settings(
+        CMS_PLACEHOLDER_CONF={
+            'static.html logo': {
+                'default_plugins': [
+                    {
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
+                        },
+                    },
+                ]
+            },
+        },
+    )
+    def test_default_plugins_template_specific(self):
+        user = self.get_superuser()
+        page = create_page("page", "static.html", "en", created_by=user)
+        self.assertEqual(CMSPlugin.objects.count(), 0)
+        response = self.client.get(page.get_absolute_url(), {'edit': 1})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(CMSPlugin.objects.count(), 1)

@@ -401,6 +401,7 @@ class ContentRenderer(BaseRenderer):
             editable=editable,
             use_cache=use_cache,
             nodelist=nodelist,
+            page=self.current_page,
         )
 
         if static_placeholder.pk not in self._rendered_static_placeholders:
@@ -617,7 +618,7 @@ class StructureRenderer(BaseRenderer):
         # I really don't like these impromptu flags...
         placeholder.is_static = True
 
-        content = self.render_placeholder(placeholder, language=language)
+        content = self.render_placeholder(placeholder, language=language, page=self.current_page)
 
         if static_placeholder.pk not in self._rendered_static_placeholders:
             # First time this static placeholder is rendered
