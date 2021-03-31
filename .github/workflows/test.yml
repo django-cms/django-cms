@@ -45,9 +45,10 @@ jobs:
         pip install -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
-   - name: Test with django test runner
+    - name: Test with django test runner
       run: |
         python manage.py test
+
 
   database-mysql:
     runs-on: ${{ matrix.os }}
@@ -90,7 +91,8 @@ jobs:
         pip install -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
-   - name: Test with django test runner
+
+    - name: Test with django test runner
       run: |
         python manage.py test
       env:
