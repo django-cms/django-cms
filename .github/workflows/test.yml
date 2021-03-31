@@ -92,7 +92,6 @@ jobs:
 
    - name: Test with django test runner
       run: |
-        # check actual test command in .travis.yml
         python manage.py test
       env:
         DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
