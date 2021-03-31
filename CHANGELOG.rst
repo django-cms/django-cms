@@ -12,6 +12,8 @@ Unreleased
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
 * Fixed 6973 bag with unexpected behavior get_page_from_request
 * Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
+* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
+* Updated documentation links
 
 3.8.0 (2020-10-28)
 ==================

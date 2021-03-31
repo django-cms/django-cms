@@ -31,7 +31,7 @@ In addition, the system now offer two editing views:
 
 Page titles can also be modified directly from the frontend.
 
-.. _djangocms_admin_style: https://github.com/divio/djangocms-admin-style
+.. _djangocms_admin_style: https://github.com/django-cms/djangocms-admin-style
 
 New Toolbar
 ===========
@@ -117,7 +117,7 @@ choices about what to install upon its adopters.
 The most significant of these removals is ``cms.plugins.text``.
 
 We provide ``djangocms-text-ckeditor``, a CKEditor-based Text Plugin. It's
-available from https://github.com/divio/djangocms-text-ckeditor. You may of
+available from https://github.com/django-cms/djangocms-text-ckeditor. You may of
 course use your preferred editor; others are available.
 
 Furthermore, we removed the following plugins from the core and moved them into
@@ -135,7 +135,7 @@ File Plugin
 
 We removed the file plugin (``cms.plugins.file``). Its new location is at:
 
-* https://github.com/divio/djangocms-file
+* https://github.com/django-cms/djangocms-file
 
 As an alternative, you could also use the following (yet you will not be able
 to keep your existing files from the old ``cms.plugins.file``!)
@@ -157,7 +157,7 @@ Googlemap Plugin
 We removed the Googlemap plugin (``cms.plugins.googlemap``).
 Its new location is at:
 
-* https://github.com/divio/djangocms-googlemap
+* https://github.com/django-cms/djangocms-googlemap
 
 
 Inherit Plugin
@@ -175,7 +175,7 @@ Picture Plugin
 We removed the picture plugin (``cms.plugins.picture``).
 Its new location is at:
 
-* https://github.com/divio/djangocms-picture
+* https://github.com/django-cms/djangocms-picture
 
 
 Teaser Plugin
@@ -192,7 +192,7 @@ Video Plugin
 
 We removed the video plugin (``cms.plugins.video``). Its new location is at:
 
-* https://github.com/divio/djangocms-video
+* https://github.com/django-cms/djangocms-video
 
 
 Link Plugin
@@ -200,7 +200,7 @@ Link Plugin
 
 We removed the link plugin (``cms.plugins.link``). Its new location is at:
 
-* https://github.com/divio/djangocms-link
+* https://github.com/django-cms/djangocms-link
 
 
 Snippet Plugin
@@ -209,7 +209,7 @@ Snippet Plugin
 We removed the snippet plugin (``cms.plugins.snippet``).
 Its new location is at:
 
-* https://github.com/divio/djangocms-snippet
+* https://github.com/django-cms/djangocms-snippet
 
 As an alternative, you could also use the following (yet you will not be able
 to keep your existing files from the old ``cms.plugins.snippet``!)

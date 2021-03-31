@@ -14,7 +14,7 @@ In a nutshell
 
 Here's what the contribution process looks like in brief:
 
-#. Fork our `GitHub`_ repository, https://github.com/divio/django-cms
+#. Fork our `GitHub`_ repository, https://github.com/django-cms/django-cms
 #. Work locally and push your changes to your repository.
 #. When you feel your code is good enough for inclusion, send us a pull request.
 
@@ -192,7 +192,7 @@ CMS in external applications, you can only use bundles distributed by CMS, not
 the source modules.
 
 
-.. _fork: https://github.com/divio/django-cms
+.. _fork: https://github.com/django-cms/django-cms
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
 .. _Aldryn Boilerplate: https://aldryn-boilerplate-bootstrap3.readthedocs.io/en/latest/guidelines/index.html
 .. _django-cms-developers: https://groups.google.com/group/django-cms-developers
