@@ -1,18 +1,18 @@
 name: Docs
 
-on: [push]
 
-# commenting now for testing, but ideally,
-# this is the best approach
-# on:
-#   pull_request:
-#     paths:
-#       - 'docs/**'
-#   push:
-#     branches:
-#       - main
-#     paths:
-#       - 'docs/**'
+# Build this only on the the develop, master and release branches
+on:
+  pull_request:
+    paths:
+      - 'docs/**'
+  push:
+    branches:
+      - develop
+      - main
+      - 'release/**'
+    paths:
+      - 'docs/**'
 
 jobs:
   docs:
