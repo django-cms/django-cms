@@ -1,18 +1,6 @@
 name: Docs
 
-
-# Build this only on the the develop, master and release branches
-on:
-  pull_request:
-    paths:
-      - 'docs/**'
-  push:
-    branches:
-      - develop
-      - main
-      - 'release/**'
-    paths:
-      - 'docs/**'
+on: [push, pull_request]
 
 jobs:
   docs:
