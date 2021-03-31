@@ -19,5 +19,5 @@ jobs:
         with:
           linters: flake8
           run: |
-            flake8
+            flake8 --exit-zero
 
