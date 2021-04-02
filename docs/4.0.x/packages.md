@@ -24,7 +24,7 @@
 | Django CMS CKEditor 4.x     | Djangocms_text_ckeditor    | https://github.com/divio/djangocms-text-ckeditor/tree/support/4.0.x | https://github.com/divio/djangocms-text-ckeditor/blob/support/4.0.x/README.rst |
 | Django CMS Alias            | djangocms_alias            | https://github.com/divio/djangocms-alias                            | https://github.com/divio/djangocms-alias/blob/master/README.rst                |
 | Django CMS Url Manager      | djangocms_url_manager      | https://github.com/divio/djangocms-url-manager                      | https://github.com/divio/djangocms-url-manager/blob/master/README.rst          |
-| Django CMS Versioning       | djangocms_versioning       | https://github.com/divio/djangocms-versioning                       | https://github.com/divio/djangocms-versioning/tree/master/docs                 |
+| Django CMS Versioning       | djangocms_versioning       | https://github.com/divio/djangocms-versioning                       | https://divio-djangocms-versioning.readthedocs-hosted.com/en/latest/           |
 
 ### Optional Packages
 

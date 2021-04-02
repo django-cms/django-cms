@@ -36,11 +36,13 @@ https://github.com/divio/django-cms/pull/6421 app registration docs in the descr
 
 ## Versioning
 
-- The is no longer the concept of publishing baked into the core of the CMS. By default any content changes are instantly live with no option to unpublish other than to remove altogether.
+- There is no longer the concept of publishing baked into the core of the CMS. By default any content changes are instantly live with no option to unpublish other than to remove altogether.
 - To enable publishing the package djangocms-versioning or other similar package that is Django CMS 4.0+ compatible should be installed.
 - The reason that publishing was removed from the core is because the solution baked in made a lot of assumptions that enforced various limitations on developers. By not providing a publishing method it allows developers to provide their own solutions to the publishing
   paradigm.
 - Goal is to migrate the monkey patching of versioning into the core to allow a "simple" mode in djangocns-versioning that replaces the 3.x draft/live mode when installing (default option).
+
+djangocms-versioning documentation: https://divio-djangocms-versioning.readthedocs-hosted.com/en/latest/
 
 ### djangocms-versioning overrides queries from PageContent
 
