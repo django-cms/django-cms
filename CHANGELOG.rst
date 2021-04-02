@@ -13,6 +13,9 @@ Unreleased
 * Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
 * Updated documentation links
 * Fixed migrations with multiple databases
+* Added support for Github Actions based CI.
+* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
+* Remove travis integration from the project as the project has moved to Github Actions.
 
 
 3.8.0 (2020-10-28)
