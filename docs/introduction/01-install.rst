@@ -15,6 +15,8 @@ Requirements
 django CMS requires Django 1.11 or newer, and Python 2.7 or 3.3 or newer. This tutorial assumes
 you are using Python 3.
 
+You can find compatibility table for particular python version `here <https://docs.django-cms.org/en/latest/index.html#software-version-requirements-and-release-notes>`_
+
 ************************
 Your working environment
 ************************
