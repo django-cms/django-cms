@@ -92,7 +92,7 @@ By default, the installer runs in `Batch mode
 <https://djangocms-installer.readthedocs.io/en/latest/usage.html#batch-mode-default>`_, and sets up your new project
 with some default values.
 
-Later, you may wish to manage some of these yourself, in which case you need to run it in `Wizard mode
+Later, you may wish to manage some of these by yourself, in which case you need to run it in `Wizard mode
 <https://djangocms-installer.readthedocs.io/en/latest/usage.html#wizard-mode>`_. The default in *Batch mode* is to set
 up an English-only project, which will be sufficient for the purposes of this tutorial. You can of course simply edit
 the new project's ``settings.py`` file at any time to change or add site languages or amend other settings.
