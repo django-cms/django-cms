@@ -105,6 +105,7 @@ Start up the runserver
 
 ::
 
+    cd mysite
     python manage.py runserver
 
 Open http://localhost:8000/ in your browser, where you should be invited to login, and then create
