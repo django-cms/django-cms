@@ -28,13 +28,16 @@ installed and that you have some basic familiarity with it.
 Create and activate a virtual environment
 =========================================
 
+Linux
 ::
 
     python3.6 -m venv env   # Python 2 usage: virtualenv env
     source env/bin/activate
 
-Note that if you're using Windows, to activate the virtualenv you'll need::
+Windows
+::
 
+    py -m venv env
     env\Scripts\activate
 
 
