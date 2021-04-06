@@ -35,6 +35,7 @@ your site may have.
 
     tutorial/index
     reference/index
+    user/index
 
 
 .. _django-cms-developers: https://groups.google.com/group/django-cms-developers
