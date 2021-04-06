@@ -15,6 +15,8 @@ Unreleased
 * Added support for Github Actions based CI.
 * Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
 * Remove travis integration from the project as the project has moved to Github Actions.
+* Fixed missing builtin arguments on main ``cms`` management command causing it
+  to crash
 
 
 3.8.0 (2020-10-28)
