@@ -198,3 +198,4 @@ project.
     topics/index
     contributing/index
     upgrade/index
+    user/index

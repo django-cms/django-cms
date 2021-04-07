@@ -1,6 +1,6 @@
 name: django CMS test.yml
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   database-postgres:
