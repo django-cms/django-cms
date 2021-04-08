@@ -15,8 +15,8 @@ Reporting security issues
     If you think you have discovered a security issue in our code, please report
     it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
 
-        Please **do not** raise it on IRC, GitHub, either of our email lists, StackOverflow
-        or in any other public forum until we have had a chance to deal with it.
+    Please **do not** raise it in any public forum until we have had a
+    chance to deal with it.
 
 
 ******
@@ -24,7 +24,7 @@ Review
 ******
 
 All patches should be made as pull requests **against develop** to
-`the GitHub repository <https://github.com/divio/django-cms>`_. Patches should
+`the GitHub repository <https://github.com/django-cms/django-cms>`_. Patches should
 never be pushed directly.
 
 **Nothing** may enter the code-base, *including the documentation*, without
@@ -47,8 +47,7 @@ the author of the pull request.
 Proposal and discussion of significant changes
 **********************************************
 
-New features and backward-incompatible changes should be proposed using the `django CMS developers email list
-<https://groups.google.com/group/django-cms-developers>`_. Discussion should take place there before any pull requests
+New features and backward-incompatible changes should be proposed using the `Discourse forum <https://discourse.django-cms.org>`_. Discussion should take place there before any pull requests
 are made.
 
 This is in the interests of openness and transparency, and to give the community a chance to participate in and
@@ -68,7 +67,7 @@ The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our webs
 We are planning releases according to **key principles and aims**. Issues within milestones are
 therefore subject to change.
 
-The `django CMS developers email list <https://groups.google.com/group/django-cms-developers>`_ serves as gathering
+The `django CMS Discourse forum <https://discourse.django-cms.org>`_ serves as gathering
 point for developers. We submit ideas and proposals prior to the roadmap goals.
 
 django CMS 3.4, surpassed by 3.7, was the first "LTS" ("Long-Term Support")
@@ -99,7 +98,7 @@ Branches
     against ``develop``.
 
 We maintain a number of branches on
-`our GitHub repository <https://github.com/divio/django-cms>`_:
+`our GitHub repository <https://github.com/django-cms/django-cms>`_:
 
 ``develop``
     The default target branch for on-going development and new pull requests.
@@ -113,7 +112,7 @@ We maintain a number of branches on
     as the highest released version.
 
 ``releases`` hosts the `releases.json` file to indicate the availability of new
-    django CMS versions when using `djangocms-admin-style <https://github.com/divio/djangocms-admin-style#configuration>`_.
+    django CMS versions when using `djangocms-admin-style <https://github.com/django-cms/djangocms-admin-style#configuration>`_.
 
 Please always open PR's against develop and indicate that they should be
 backported to the latest LTS release when necessary. Older branches are not
@@ -199,7 +198,7 @@ Changelog
 .. versionadded:: 3.3
 
 **Every new feature, bugfix or other change of substance** must be represented in the `CHANGELOG
-<https://github.com/divio/django-cms/blob/develop/CHANGELOG.rst>`_. This includes documentation, but **doesn't** extend
+<https://github.com/django-cms/django-cms/blob/develop/CHANGELOG.rst>`_. This includes documentation, but **doesn't** extend
 to things like reformatting code, tidying-up, correcting typos and so on.
 
 Each line in the changelog should begin with a verb in the past tense, for example::
@@ -215,5 +214,4 @@ New lines should be added to the top of the list.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
-.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _freenode: http://freenode.net/
