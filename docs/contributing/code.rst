@@ -1,8 +1,8 @@
 ..  _contributing-code:
 
-#################
+##########################
 Contributing code
-#################
+##########################
 
 Like every open-source project, django CMS is always looking for motivated
 individuals to contribute to its source code.

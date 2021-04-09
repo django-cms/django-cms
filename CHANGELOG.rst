@@ -12,6 +12,11 @@ Unreleased
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
 * Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
 * Updated documentation links
+* Added support for Github Actions based CI.
+* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
+* Remove travis integration from the project as the project has moved to Github Actions.
+* Fix all GitHub actions tests run on pull requests
+* Repair broken docs link to users/index.rst
 
 3.8.0 (2020-10-28)
 ==================
