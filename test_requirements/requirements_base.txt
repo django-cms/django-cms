@@ -1,5 +1,5 @@
-coverage==3.7.1
-python-coveralls==2.5.0
+coverage<5
+python-coveralls>2.5.0
 unittest-xml-reporting==1.11.0
 Pillow==3.3
 django-treebeard>=4.3
@@ -14,6 +14,7 @@ https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec7600
 iptools
 sphinx==1.8.5
 sphinxcontrib-spelling<7.0.0 # restriction for py35 tests
+pyflakes>=2.1
 pyenchant
 # required to run the server for integration tests
 djangocms-helper
