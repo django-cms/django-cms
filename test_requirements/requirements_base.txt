@@ -1,4 +1,4 @@
-coverage==4.2
+coverage==3.7.1
 python-coveralls==2.5.0
 unittest-xml-reporting==1.11.0
 Pillow==3.3
