@@ -40,11 +40,11 @@ extensions = [
     'sphinxcontrib.spelling'
 ]
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/3/', None),
+    'python': ('https://docs.python.org/3/', None),
     'django': ('https://docs.djangoproject.com/en/2.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
-    'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
-    'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
-    'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
+    'classytags': ('https://django-classy-tags.readthedocs.io/en/latest/', None),
+    'sekizai': ('https://django-sekizai.readthedocs.io/en/latest/', None),
+    'treebeard': ('https://django-treebeard.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
