@@ -14,6 +14,7 @@ from cms.utils.conf import get_cms_setting
 @python_2_unicode_compatible
 class PageContent(models.Model):
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
+        (constants.VISIBILITY_ALL, _('for all users')),
         (constants.VISIBILITY_USERS, _('for logged in users only')),
         (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
     )
