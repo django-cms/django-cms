@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 2.7, 3.5, 3.6, ]
+        python-version: [ 3.5, 3.6, 3.7, 3.8]
         requirements-file: [
             django-1.11.txt,
             django-2.2.txt,
@@ -55,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 2.7, 3.5, 3.6, ]
+        python-version: [ 3.5, 3.6, 3.7, 3.8]
         requirements-file: [
             django-1.11.txt,
             django-2.2.txt,
@@ -87,7 +87,7 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
+        pip install pytest mysqlclient==2.0.3
         pip install -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
@@ -103,7 +103,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 2.7, 3.5, 3.6, ]
+        python-version: [ 3.5, 3.6, 3.7, 3.8]
         requirements-file: [
           django-1.11.txt,
           django-2.2.txt,
