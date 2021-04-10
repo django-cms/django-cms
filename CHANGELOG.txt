@@ -1,4 +1,11 @@
 
+=== 4.0.0 (unreleased) ===
+
+* Backported from develop: Added support for Github Actions based CI.
+* Backported from develop: Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
+* Backported from develop: Remove travis integration from the project as the project has moved to Github Actions.
+
+
 === 3.6.0 (unreleased) ===
 
 * Introduced Django 2.2 support.
