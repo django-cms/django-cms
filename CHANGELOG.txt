@@ -1,6 +1,7 @@
 
 === 4.0.0 (unreleased) ===
 
+* Allow Pagecontent.limit_visibility_in_menu to be reset once it has been set
 * Backported from develop: Added support for Github Actions based CI.
 * Backported from develop: Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
 * Backported from develop: Remove travis integration from the project as the project has moved to Github Actions.
