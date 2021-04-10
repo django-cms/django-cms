@@ -74,6 +74,7 @@ from cms.utils.i18n import (
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
+from cms.utils.compat import DJANGO_3_2
 
 require_POST = method_decorator(require_POST)
 
@@ -416,9 +417,15 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         response = super().change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
-        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
-            location = response._headers['location']
-            response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+        if not DJANGO_3_2:
+            if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
+                location = response._headers['location']
+                response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+        else:
+            if tab_language and response.status_code == 302 and response.headers['location'][1] == request.path_info:
+                location = response.headers['location']
+                response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+
         return response
 
     @transaction.atomic
