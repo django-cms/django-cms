@@ -37,7 +37,7 @@ To learn more about basic requirements and standards of code contribution, pleas
 Receive rewards for submitting pull requests
 --------------------------------------------
 
-Sign up for our `Bounty program <https://docs.django-cms.org/en/latest/contributing/code.html#>`_.
+Sign up for our `Bounty program <https://www.django-cms.org/en/bounty-program/>`_.
 
 Join a work group 
 -----------------
