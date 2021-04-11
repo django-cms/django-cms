@@ -72,7 +72,7 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.admin import jsonify_request
-from cms.utils.compat import DJANGO_3_1
+from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -417,14 +417,14 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         response = super().change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
-        if DJANGO_3_1:
+        if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
             if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
                 location = response._headers['location']
                 response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
         else:
-            if tab_language and response.status_code == 302 and response.headers['location'][1] == request.path_info:
-                location = response.headers['location']
-                response.headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+            if tab_language and response.status_code == 302 and response.headers['Location'] == request.path_info:
+                location = response.headers['Location']
+                response.headers['Location'] = ("%s?language=%s" % (location, tab_language))
         return response
 
     @transaction.atomic

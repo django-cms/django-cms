@@ -5,7 +5,7 @@ from django.contrib.sites.models import Site
 from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE
-from cms.utils.compat import DJANGO_3_1
+from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -64,11 +64,11 @@ class SiteTestCase(CMSTestCase):
             # simulate user clicks on preview icon
             response = self.client.get(admin_reverse('cms_page_preview_page', args=[page.pk, 'de']))
             self.assertEqual(response.status_code, 302)
-            if DJANGO_3_1:
+            if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
                 self.assertEqual(response._headers['location'][1],
                                  'http://sample2.com{}&language=de'.format(page_edit_url_on))
             else:
-                self.assertEqual(response.headers['location'][1],
+                self.assertEqual(response.headers['Location'],
                                  'http://sample2.com{}&language=de'.format(page_edit_url_on))
 
     def test_site_publish(self):
