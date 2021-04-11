@@ -24,7 +24,7 @@ from cms.utils.i18n import (get_fallback_languages, get_public_languages,
                             is_language_prefix_patterns_used)
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_change_page
-from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1, DJANGO_3_2
+from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 
 
 def _clean_redirect_url(redirect_url, language):
@@ -55,7 +55,8 @@ def details(request, slug):
             response.xframe_options_exempt = True
             if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
                 response._headers = headers
-            elif DJANGO_3_2:
+            else:
+                #  for django3.2 and above. response.headers replace response._headers in earlier versions of django
                 response.headers = headers
             # Recalculate the max-age header for this cached response
             max_age = int(

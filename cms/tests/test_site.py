@@ -7,7 +7,7 @@ from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
-from cms.utils.compat import DJANGO_3_2, DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
+from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
 
 
 class SiteTestCase(CMSTestCase):
@@ -66,7 +66,8 @@ class SiteTestCase(CMSTestCase):
             self.assertEqual(response.status_code, 302)
             if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
                 self.assertEqual(response._headers['location'][1], 'http://sample2.com{}&language=de'.format(page_edit_url_on))
-            elif DJANGO_3_2:
+            else:
+                #  for django3.2 and above. response.headers replace response._headers in earlier versions of django
                 self.assertEqual(response.headers['Location'], 'http://sample2.com{}&language=de'.format(page_edit_url_on))
 
 

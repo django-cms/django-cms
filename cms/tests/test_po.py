@@ -6,7 +6,7 @@ import os
 import shutil
 import subprocess
 import sys
-from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0, DJANGO_3_2
+from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
 from pathlib import Path
 
 THIS_DIR = os.path.dirname(__file__)
@@ -37,7 +37,8 @@ def compile_messages():
                 if f.endswith('.po'):
                     if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
                         pfn = os.path.join(dirpath, f)
-                    elif DJANGO_3_2:
+                    else:
+                        # for django3.2 and above. The change happened in djang3.2 to pathlib.
                         pfn = Path(dirpath) / f
                     if has_bom(pfn):
                         raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % pfn)
