@@ -1,6 +1,6 @@
 name: django CMS linters.yml
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   flake8:
