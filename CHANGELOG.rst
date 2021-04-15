@@ -19,6 +19,7 @@ Unreleased
 * Repair broken docs link to users/index.rst
 * Fixed missing builtin arguments on main ``cms`` management command causing it
   to crash
+* Fixed template label nested translation
 
 3.8.0 (2020-10-28)
 ==================
