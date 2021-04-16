@@ -99,7 +99,7 @@ You will need to add the following to its list of ``INSTALLED_APPS``::
 * `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django CMS's page and plugin tree
   structures.
 
-django CMS installs `django CMS admin style <https://github.com/divio/djangocms-admin-style>`_.
+django CMS installs `django CMS admin style <https://github.com/django-cms/djangocms-admin-style>`_.
 This provides some styling that helps make django CMS administration components easier to work with.
 Technically it's an optional component and does not need to be enabled in your project,
 but it's strongly recommended.
@@ -454,7 +454,7 @@ Django CMS CKEditor
 
 `Django CMS CKEditor`_ is the default text editor for django CMS.
 
-.. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
+.. _Django CMS CKEditor: https://github.com/django-cms/djangocms-text-ckeditor
 
 Install: ``pip install djangocms-text-ckeditor``.
 
@@ -471,13 +471,13 @@ Miscellaneous plugins
 There are plugins for django CMS that cover a vast range of functionality. To get started, it's useful to be able to
 rely on a set of well-maintained plugins that cover some general content management needs.
 
-* `djangocms-link <https://github.com/divio/djangocms-link>`_
-* `djangocms-file <https://github.com/divio/djangocms-file>`_
-* `djangocms-picture <https://github.com/divio/djangocms-picture>`_
-* `djangocms-video <https://github.com/divio/djangocms-video>`_
-* `djangocms-googlemap <https://github.com/divio/djangocms-googlemap>`_
-* `djangocms-snippet <https://github.com/divio/djangocms-snippet>`_
-* `djangocms-style <https://github.com/divio/djangocms-style>`_
+* `djangocms-link <https://github.com/django-cms/djangocms-link>`_
+* `djangocms-file <https://github.com/django-cms/djangocms-file>`_
+* `djangocms-picture <https://github.com/django-cms/djangocms-picture>`_
+* `djangocms-video <https://github.com/django-cms/djangocms-video>`_
+* `djangocms-googlemap <https://github.com/django-cms/djangocms-googlemap>`_
+* `djangocms-snippet <https://github.com/django-cms/djangocms-snippet>`_
+* `djangocms-style <https://github.com/django-cms/djangocms-style>`_
 
 To install::
 
