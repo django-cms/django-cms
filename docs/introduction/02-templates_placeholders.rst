@@ -65,7 +65,7 @@ placeholder "splashbox" %}`` inside the ``{% block content %}`` section. For exa
         {% placeholder "splashbox" %}
     {% endblock content %}
 
-If you switch to *Structure* mode, you'll see the new placeholders available for use.
+If you switch to *Structure* mode (*button in the upper-right corner of the page*), you'll see the new placeholders available for use.
 
 .. image:: /introduction/images/new-placeholder.png
    :alt: the new 'splashbox' placeholder
