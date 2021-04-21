@@ -92,7 +92,7 @@ organisation that exists to support the development of django CMS and its commun
 Slack
 =====
 
-Join `our friendly Slack group <https:/https://www.django-cms.org/slack>`_ for
+Join `our friendly Slack group <https://www.django-cms.org/slack>`_ for
 **support** and to **share ideas** and **discuss technical questions** with
 other members of the community.
 

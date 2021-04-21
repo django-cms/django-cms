@@ -163,7 +163,7 @@ class Page(models.Model):
         (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+    template_choices = [(x, y) for x, y in get_cms_setting('TEMPLATES')]
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
@@ -340,7 +340,7 @@ class Page(models.Model):
         title_obj.path = title_obj.get_path_for_base(base)
         title_obj.save()
 
-    def _update_title_path_recursive(self, language):
+    def _update_title_path_recursive(self, language, slug=None):
         assert self.publisher_is_draft
         from cms.models import Title
 
@@ -348,7 +348,10 @@ class Page(models.Model):
             return
 
         pages = self.get_child_pages()
-        base = self.get_path(language, fallback=True)
+        if slug:
+            base = self.get_path_for_slug(slug, language)
+        else:
+            base = self.get_path(language, fallback=True)
 
         if base:
             new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
