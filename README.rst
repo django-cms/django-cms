@@ -92,7 +92,7 @@ You can use the `django CMS installer <https://djangocms-installer.readthedocs.i
     (env) $ pip install djangocms-installer
     (env) $ mkdir myproject && cd myproject
     (env) $ djangocms -f -p . my_demo
-    (env) $ python manage.py
+    (env) $ python manage.py runserver
 
 ****
 Demo
