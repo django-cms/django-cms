@@ -418,13 +418,12 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         response = super().change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
         if not DJANGO_3_2:
-            if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
-                location = response._headers['location']
-                response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+            response_headers = response._headers
         else:
-            if tab_language and response.status_code == 302 and response.headers['location'][1] == request.path_info:
-                location = response.headers['location']
-                response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+            response_headers = response.headers
+        if tab_language and response.status_code == 302 and response_headers['location'][1] == request.path_info:
+            location = response_headers['location']
+            response_headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
 
         return response
 

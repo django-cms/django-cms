@@ -79,27 +79,19 @@ def set_page_cache(response):
             # recomputing it on cache-reads.
             expires_datetime = timestamp + timedelta(seconds=ttl)
             if not DJANGO_3_2:
-                cache.set(
-                    _page_cache_key(request),
-                    (
-                        response.content,
-                        response._headers,
-                        expires_datetime,
-                    ),
-                    ttl,
-                    version=version
-                )
+                response_headers = response._headers
             else:
-                cache.set(
-                    _page_cache_key(request),
-                    (
-                        response.content,
-                        response.headers,
-                        expires_datetime,
-                    ),
-                    ttl,
-                    version=version
-                )
+                response_headers = response.headers
+            cache.set(
+                _page_cache_key(request),
+                (
+                    response.content,
+                    response_headers,
+                    expires_datetime,
+                ),
+                ttl,
+                version=version
+            )
             # See note in invalidate_cms_page_cache()
             _set_cache_version(version)
     return response
