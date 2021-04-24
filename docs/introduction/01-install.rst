@@ -15,6 +15,8 @@ Requirements
 django CMS requires Django 1.11 or newer, and Python 2.7 or 3.3 or newer. This tutorial assumes
 you are using Python 3.
 
+You can find compatibility table for particular python version `here <https://docs.django-cms.org/en/latest/index.html#software-version-requirements-and-release-notes>`_
+
 ************************
 Your working environment
 ************************
@@ -26,13 +28,16 @@ installed and that you have some basic familiarity with it.
 Create and activate a virtual environment
 =========================================
 
+Linux
 ::
 
     python3.6 -m venv env   # Python 2 usage: virtualenv env
     source env/bin/activate
 
-Note that if you're using Windows, to activate the virtualenv you'll need::
+Windows
+::
 
+    py -m venv env
     env\Scripts\activate
 
 
@@ -87,7 +92,7 @@ By default, the installer runs in `Batch mode
 <https://djangocms-installer.readthedocs.io/en/latest/usage.html#batch-mode-default>`_, and sets up your new project
 with some default values.
 
-Later, you may wish to manage some of these yourself, in which case you need to run it in `Wizard mode
+Later, you may wish to manage some of these by yourself, in which case you need to run it in `Wizard mode
 <https://djangocms-installer.readthedocs.io/en/latest/usage.html#wizard-mode>`_. The default in *Batch mode* is to set
 up an English-only project, which will be sufficient for the purposes of this tutorial. You can of course simply edit
 the new project's ``settings.py`` file at any time to change or add site languages or amend other settings.
@@ -108,6 +113,7 @@ Start the server using following command
 
 ::
 
+    cd mysite
     python manage.py runserver
 
 Open http://localhost:8000/ in your browser, where you should be invited to login, and then create
