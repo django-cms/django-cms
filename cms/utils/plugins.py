@@ -194,6 +194,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
             new_plugin = deepcopy(source_plugin)
             new_plugin.pk = None
             new_plugin.id = None
+            new_plugin._state.adding = True
             new_plugin.language = language or new_plugin.language
             new_plugin.placeholder = placeholder
             new_plugin.parent = parent

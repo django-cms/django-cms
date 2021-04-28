@@ -2,7 +2,7 @@ coverage>=4
 python-coveralls>2.5.0
 unittest-xml-reporting==1.11.0
 Pillow==5.2.0
-django-treebeard>=4.3,<4.5
+django-treebeard>=4.3
 argparse
 dj-database-url
 djangocms-admin-style>=1.5
@@ -17,3 +17,4 @@ sphinxcontrib-spelling<7.0.0 # restriction for py35 tests
 # required to run the server for integration tests
 django-app-helper
 mock>=2.0.0
+mysqlclient==2.0.3

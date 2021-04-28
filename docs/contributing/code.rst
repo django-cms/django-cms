@@ -14,9 +14,11 @@ In a nutshell
 
 Here's what the contribution process looks like in brief:
 
-#. Fork our `GitHub`_ repository, https://github.com/divio/django-cms
+#. Fork our `GitHub`_ repository, https://github.com/django-cms/django-cms
 #. Work locally and push your changes to your repository.
 #. When you feel your code is good enough for inclusion, send us a pull request.
+#. After that, please join the `Slack Channel`_ of our Pull Request Review work group (#workgroup-pr-review). This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
+#. Get acknowledged by the django CMS community for your contribution
 
 See the :ref:`contributing_patch` how-to document for a walk-through of this process.
 
@@ -105,7 +107,7 @@ coverage will only be accepted with a very good reason; bug-fixing patches
 **must** demonstrate the bug with a test to avoid regressions and to check
 that the fix works.
 
-We have `a Slack group <https://www.django-cms.org/slack>`_, a `Discourse forum
+We have a `Slack Channel`_, a `Discourse forum
 <https://discourse.django-cms.org>`_, and of course the code reviews mechanism on GitHub - do use them.
 
 
@@ -192,7 +194,7 @@ CMS in external applications, you can only use bundles distributed by CMS, not
 the source modules.
 
 
-.. _fork: https://github.com/divio/django-cms
+.. _fork: https://github.com/django-cms/django-cms
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
 .. _Aldryn Boilerplate: https://aldryn-boilerplate-bootstrap3.readthedocs.io/en/latest/guidelines/index.html
 .. _django-cms-developers: https://groups.google.com/group/django-cms-developers
@@ -201,3 +203,4 @@ the source modules.
 .. _freenode: http://freenode.net/
 .. _pull request: http://help.github.com/send-pull-requests/
 .. _git: http://git-scm.com/
+.. _Slack Channel: https://django-cmsworkspace.slack.com/
