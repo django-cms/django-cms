@@ -405,7 +405,7 @@ CMSPluginBase Attributes and Methods Reference
         with default values by calling the render method of the super class::
 
             def render(self, context, instance, placeholder):
-                context = super(MyPlugin, self).render(context, instance, placeholder)
+                context = super().render(context, instance, placeholder)
                 ...
                 return context
 
@@ -435,7 +435,7 @@ CMSPluginBase Attributes and Methods Reference
         your text editor plugin.
 
         This requires support from the text plugin; support for this is currently planned
-        for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
+        for `djangocms-text-ckeditor <https://github.com/django-cms/djangocms-text-ckeditor/>`_ 2.5.0.
 
         See also: :attr:`text_enabled`.
 

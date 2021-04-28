@@ -1,3 +1,5 @@
+:sequential_nav: both
+
 .. _plugins_tutorial:
 
 #######
@@ -58,7 +60,7 @@ For our poll plugin, we're going to write the following plugin class:
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
     from polls_cms_integration.models import PollPluginModel
-    from django.utils.translation import ugettext as _
+    from django.utils.translation import gettext as _
 
 
     @plugin_pool.register_plugin  # register the plugin

@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*-
-try:
-    from html import unescape
-except ImportError:  # DJANGO_1_11
-    import HTMLParser
-
-    def unescape(text): return HTMLParser.HTMLParser().unescape(text)
-
+from html import unescape
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -189,7 +182,7 @@ class FormsTestCase(CMSTestCase):
         self.assertEqual(site_choices, [(site.pk, site.name)])
 
     def test_app_config_select_escaping(self):
-        class FakeAppConfig(object):
+        class FakeAppConfig:
             def __init__(self, pk, config):
                 self.pk = pk
                 self.config = config
@@ -197,7 +190,7 @@ class FormsTestCase(CMSTestCase):
             def __str__(self):
                 return self.config
 
-        class FakeApp(object):
+        class FakeApp:
             def __init__(self, name, configs=()):
                 self.name = name
                 self.configs = configs

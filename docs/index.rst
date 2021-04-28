@@ -83,25 +83,36 @@ Technical reference material, for classes, methods, APIs, commands.
 Join us online
 **************
 
-django CMS is supported by a friendly and very knowledgeable community.
+The `django CMS Association <https://www.django-cms.org/en/about-us/>`_ is a non-profit
+organisation that exists to support the development of django CMS and its community.
+
 
 .. rst-class:: column column3
 
-Our IRC channel, #django-cms, is on ``irc.freenode.net``. If you don't have an IRC client, you can
-`join our IRC channel using the KiwiIRC web client
-<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
+Slack
+=====
+
+Join `our friendly Slack group <https://www.django-cms.org/slack>`_ for
+**support** and to **share ideas** and **discuss technical questions** with
+other members of the community.
+
 
 .. rst-class:: column column3
 
-Our `django CMS users email list <https://groups.google.com/forum/#!forum/django-cms>`_ is for
-**general discussions** and the `django CMS developers email list
-<https://groups.google.com/forum/#!forum/django-cms-developers>`_ for the
-**development of django CMS**.
+Discourse
+=========
+
+Our `Discourse forum <https://discourse.django-cms.org>`_ is also used for
+discussion of django CMS, particularly to manage its technical development process.
+
 
 .. rst-class:: column column3
 
-Our `StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_ is for
-**questions** around django CMS and it's plugin ecosystem.
+StackOverflow
+=============
+
+`StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_ is also a good place
+for questions around django CMS and its plugin ecosystem.
 
 
 ***************
@@ -143,7 +154,7 @@ Django/Python compatibility table
 *LTS* in the table indicates a combination of Django and django CMS *both* covered
 by a long-term support policy.
 
-*✓* indicates that the version has been tested and works. *x* indicates that it has not been tested, or
+*✓* indicates that the version has been tested and works. *×* indicates that it has not been tested, or
 is known to be incompatible.
 
 ===========  === === === === === === === ===    === === === === ==== ==== === === === ===
@@ -151,18 +162,17 @@ django CMS   Python                             Django
 -----------  -------------------------------    -----------------------------------------
 \            3.8 3.7 3.6 3.5 3.4 3.3 2.7 2.6    3.0 2.2 2.1 2.0 1.11 1.10 1.9 1.8 1.6 1.4
 ===========  === === === === === === === ===    === === === === ==== ==== === === === ===
-3.7.2        ✓   ✓   ✓   ✓   ✓   ✓   ✓   ⨯      ✓   LTS ✓   ✓   LTS  ⨯    ⨯   ⨯   ⨯   ⨯
-3.7.0        ⨯   ✓   ✓   ✓   ✓   ✓   ✓   ⨯      x   LTS ✓   ✓   LTS  ⨯    ⨯   ⨯   ⨯   ⨯
-3.6.x        ⨯   ✓   ✓   ✓   ✓   ✓   ✓   ⨯      x   ✓   ✓   ✓   ✓    ⨯    ⨯   ⨯   ⨯   ⨯
-3.5.x        ⨯   ✓   ✓   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   ✓    ✓    ✓   ✓   ⨯   ⨯
-3.4.5        ⨯   ⨯   ✓   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   LTS  ✓    ✓   LTS ⨯   ⨯
-3.4.2        ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   ⨯    ✓    ✓   ✓   ⨯   ⨯
-3.4.1        ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ✓   ✓   ⨯   ⨯
-3.3.x        ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓   ⨯      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ✓   ✓   ⨯   ⨯
-3.2.1        ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓   ✓      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ✓   ✓   ✓   ⨯
-3.2.0        ⨯   ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ⨯   ✓   ✓   ⨯
-3.1.7        ⨯   ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ⨯   ✓   ✓   ⨯
-3.0.18       ⨯   ⨯   ⨯   ⨯   ✓   ✓   ✓   ✓      ⨯   ⨯   ⨯   ⨯   ⨯    ⨯    ⨯   ⨯   ✓   ✓
+3.7.x        ✓   ✓   ✓   ✓   ✓   ✓   ✓   ×      ✓   LTS ✓   ✓   LTS  ×    ×   ×   ×   ×
+3.6.x        ×   ✓   ✓   ✓   ✓   ✓   ✓   ×      x   ✓   ✓   ✓   ✓    ×    ×   ×   ×   ×
+3.5.x        ×   ✓   ✓   ✓   ✓   ✓   ✓   ×      ×   ×   ×   ×   ✓    ✓    ✓   ✓   ×   ×
+3.4.5        ×   ×   ✓   ✓   ✓   ✓   ✓   ×      ×   ×   ×   ×   LTS  ✓    ✓   LTS ×   ×
+3.4.2        ×   ×   ×   ✓   ✓   ✓   ✓   ×      ×   ×   ×   ×   ×    ✓    ✓   ✓   ×   ×
+3.4.1        ×   ×   ×   ✓   ✓   ✓   ✓   ×      ×   ×   ×   ×   ×    ×    ✓   ✓   ×   ×
+3.3.x        ×   ×   ×   ✓   ✓   ✓   ✓   ×      ×   ×   ×   ×   ×    ×    ✓   ✓   ×   ×
+3.2.1        ×   ×   ×   ✓   ✓   ✓   ✓   ✓      ×   ×   ×   ×   ×    ×    ✓   ✓   ✓   ×
+3.2.0        ×   ×   ×   ×   ✓   ✓   ✓   ✓      ×   ×   ×   ×   ×    ×    ×   ✓   ✓   ×
+3.1.7        ×   ×   ×   ×   ✓   ✓   ✓   ✓      ×   ×   ×   ×   ×    ×    ×   ✓   ✓   ×
+3.0.18       ×   ×   ×   ×   ✓   ✓   ✓   ✓      ×   ×   ×   ×   ×    ×    ×   ×   ✓   ✓
 ===========  === === === === === === === ===    === === === === ==== ==== === === === ===
 
 

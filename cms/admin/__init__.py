@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import cms.admin.pageadmin
 import cms.admin.useradmin
 import cms.admin.permissionadmin

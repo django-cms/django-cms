@@ -1,17 +1,14 @@
-# -*- coding: utf-8 -*-
 import datetime
 
-from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
 from django.conf import settings
-
-from cms.utils.compat import DJANGO_2_2
-from cms.utils.compat.dj import MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin
+from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
 
 
 class LanguageCookieMiddleware(MiddlewareMixin):
     def process_response(self, request, response):
         language = get_language()
-        if hasattr(request, 'session') and DJANGO_2_2:
+        if hasattr(request, 'session'):
             session_language = request.session.get(LANGUAGE_SESSION_KEY, None)
             if session_language and not session_language == language:
                 request.session[LANGUAGE_SESSION_KEY] = language

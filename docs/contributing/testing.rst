@@ -39,7 +39,7 @@ There's more than one way to do this, but here's one to help you get started::
     source bin/activate
 
     # get django CMS from GitHub
-    git clone git@github.com:divio/django-cms.git
+    git clone https://github.com/django-cms/django-cms.git
 
     # install the dependencies for testing
     # note that requirements files for other Django versions are also provided
@@ -65,7 +65,7 @@ We are working to improve the performance and reliability of our test suite. We'
 problems, but need feedback from people using a wide range of systems and configurations in order
 to benefit from their experience.
 
-Please report any issues on our `GitHub repository <https://github.com/divio/django-cms/issues>`_.
+Please report any issues on our `GitHub repository <https://github.com/django-cms/django-cms/issues>`_.
 
 If you can help *improve* the test suite, your input will be especially valuable.
 

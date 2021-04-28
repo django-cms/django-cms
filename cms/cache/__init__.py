@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import re
 from cms.utils.conf import get_cms_setting
 

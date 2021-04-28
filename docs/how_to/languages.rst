@@ -24,24 +24,24 @@ on the subject.
 
 Here's a full example of ``urls.py``::
 
-    from django.conf.urls import include, url
     from django.conf.urls.i18n import i18n_patterns
     from django.contrib import admin
     from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+    from django.urls import include, re_path
     from django.views.i18n import JavaScriptCatalog
 
 
     admin.autodiscover()
 
     urlpatterns = i18n_patterns(
-        url(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+        re_path(r'^jsi18n/$', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     )
     urlpatterns += staticfiles_urlpatterns()
 
     # note the django CMS URLs included via i18n_patterns
     urlpatterns += i18n_patterns(
-        url(r'^admin/', include(admin.site.urls)),
-        url(r'^', include('cms.urls')),
+        re_path(r'^admin/', include(admin.site.urls)),
+        re_path(r'^', include('cms.urls')),
     )
 
 
@@ -51,8 +51,8 @@ Monolingual URLs
 Of course, if you want only monolingual URLs, without a language code, simply don't use :func:`~django.conf.urls.i18n.i18n_patterns`::
 
     urlpatterns += [
-        url(r'^admin/', admin.site.urls),
-        url(r'^', include('cms.urls')),
+        re_path(r'^admin/', admin.site.urls),
+        re_path(r'^', include('cms.urls')),
     ]
 
 
@@ -99,7 +99,7 @@ Example:
             self.object = self.get_object()
             if hasattr(self.request, 'toolbar'):
                 self.request.toolbar.set_object(self.object)
-            response = super(AnswerView, self).get(*args, **kwargs)
+            response = super().get(*args, **kwargs)
             return response
 
 

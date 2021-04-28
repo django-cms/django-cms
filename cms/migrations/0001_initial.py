@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from cms.models import ACCESS_CHOICES, Page
 from cms.utils.conf import get_cms_setting
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from django.conf import settings
 from django.db import models, migrations
 import django.utils.timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
 
