@@ -103,6 +103,14 @@ The installer creates an admin user for you, with username/password ``admin``/``
 Start up the runserver
 ======================
 
+Go to mysite directory
+
+::
+
+    cd mysite
+
+Start the server using following command
+
 ::
 
     cd mysite
