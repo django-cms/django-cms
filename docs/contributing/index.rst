@@ -1,5 +1,5 @@
 #######################
-Development & community
+Contribute
 #######################
 
 django CMS is an open-source project, and relies on its community of users to
@@ -19,9 +19,7 @@ proposing improvements, contributing code or documentation, and testing the
 
     development-community
     development-policies
-    code
-    documentation
-    translations
+    how-to-contribute
     management
     testing
     code_of_conduct
