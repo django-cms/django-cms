@@ -49,6 +49,7 @@
     // important is to fight with admin-style
     padding: 0 !important;
     box-shadow: $pagetree-box-shadow !important;
+    flex-direction: column;
 }
 .cms-pagetree {
     border: $pagetree-border;
@@ -349,6 +350,11 @@
 .djangocms-admin-style .cms-pagetree-breadcrumbs {
     margin-bottom: -30px !important;
     border: none !important;
+}
+
+// MAIN TREE
+#changelist-form {
+    width: 100%;
 }
 
 //###########################################################
