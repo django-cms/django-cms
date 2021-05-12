@@ -13,7 +13,7 @@ from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
-from cms.utils.compat import DJANGO_3_2
+from cms.utils.compat.response import get_response_headers
 
 
 def _page_cache_key(request):
@@ -78,10 +78,7 @@ def set_page_cache(response):
             # We also store the absolute expiration timestamp to avoid
             # recomputing it on cache-reads.
             expires_datetime = timestamp + timedelta(seconds=ttl)
-            if not DJANGO_3_2:
-                response_headers = response._headers
-            else:
-                response_headers = response.headers
+            response_headers = get_response_headers(response)
             cache.set(
                 _page_cache_key(request),
                 (
