@@ -1270,6 +1270,8 @@ class StructureBoard {
         }
         var fixedContentMarkup = contentMarkup;
         var newDoc = new DOMParser().parseFromString(fixedContentMarkup, 'text/html');
+        let newScripts = $(newDoc).find('script');
+        let oldScripts = $(document).find('script');
 
         const structureScrollTop = $('.cms-structure-content').scrollTop();
 
@@ -1295,14 +1297,83 @@ class StructureBoard {
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
 
+        this.addJsScriptsNeededForRender(newScripts, oldScripts);
+
         $('.cms-structure-content').scrollTop(structureScrollTop);
-
         Plugin._refreshPlugins();
-
-        Helpers._getWindow().dispatchEvent(new Event('load'));
         $(Helpers._getWindow()).trigger('cms-content-refresh');
 
         this._loadedContent = true;
+    }
+
+    /**
+     * Checks if new scripts with the class 'cms-execute-js-to-render' exist
+     * and if they were present before. If they weren't present before - they will be downloaded
+     * and executed. If the script also has the class 'cms-trigger-load-events' the
+     * 'load' and 'DOMContentLoaded' events will be triggered
+     *
+     * @param {jQuery} newScripts  jQuery selector of the scripts for the new body content
+     * @param {jQuery} oldScripts  jQuery selector of the scripts for the old body content
+     */
+    addJsScriptsNeededForRender(newScripts, oldScripts) {
+        const scriptSrcList = [];
+        let classListCollection = [];
+        const that = this;
+
+        newScripts.each(function() {
+            let scriptExists = false;
+            let newScript = $(this);
+
+            if (newScript.hasClass('cms-execute-js-to-render')) {
+                $(oldScripts).each(function() {
+                    let oldScript = $(this);
+
+                    if (newScript.prop('outerHTML') === oldScript.prop('outerHTML')) {
+                        scriptExists = true;
+                        return false;
+                    }
+                });
+                if (!scriptExists) {
+                    let classList = newScript.attr('class').split(' ');
+
+                    classListCollection = classListCollection.concat(classList);
+                    if (typeof newScript.prop('src') === 'string' && newScript.prop('src') !== '') {
+                        scriptSrcList.push(newScript.prop('src'));
+                    } else {
+                        let jsFile = document.createElement('script');
+
+                        jsFile.textContent = newScript.prop('textContent') || '';
+                        jsFile.type = 'text/javascript';
+                        document.body.appendChild(jsFile);
+                    }
+                }
+            }
+        });
+        if (scriptSrcList.length === 0) {
+            that.triggerLoadEventsByClass(classListCollection);
+        } else {
+            Promise.all(scriptSrcList.map(s => $.getScript(s))).then(function() {
+                that.triggerLoadEventsByClass(classListCollection);
+            });
+        }
+    }
+
+    /**
+     * Triggers events if specific classes were in any of the scripts added by
+     * the method addJsScriptsNeededForRender
+     *
+     * @param {String[]} classListCollection  array of all classes the script tags had
+     */
+    triggerLoadEventsByClass(classListCollection) {
+        if (classListCollection.indexOf('cms-trigger-event-document-DOMContentLoaded') > -1) {
+            Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
+        }
+        if (classListCollection.indexOf('cms-trigger-event-window-DOMContentLoaded') > -1) {
+            Helpers._getWindow().dispatchEvent(new Event('DOMContentLoaded'));
+        }
+        if (classListCollection.indexOf('cms-trigger-event-window-load') > -1) {
+            Helpers._getWindow().dispatchEvent(new Event('load'));
+        }
     }
 
     handleAddPlugin(data) {

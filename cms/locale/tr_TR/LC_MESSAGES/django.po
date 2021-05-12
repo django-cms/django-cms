@@ -5,13 +5,14 @@
 # Translators:
 # Translators:
 # Bilal Tonga <bilaltonga@gmail.com>, 2017
+# Ender <endertopaloglu@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-26 14:17+0200\n"
-"PO-Revision-Date: 2020-04-21 13:27+0000\n"
-"Last-Translator: Angelo Dini <angelo.dini@divio.ch>\n"
+"POT-Creation-Date: 2020-10-28 10:45+0100\n"
+"PO-Revision-Date: 2020-05-26 12:31+0000\n"
+"Last-Translator: Ender <endertopaloglu@gmail.com>\n"
 "Language-Team: Turkish (Turkey) (http://www.transifex.com/divio/django-cms/language/tr_TR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,7 +21,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 msgid "All"
-msgstr ""
+msgstr "Hepsi"
 
 msgid "Copy permissions"
 msgstr "Yetkileri kopyala"
@@ -35,35 +36,35 @@ msgid "Slug"
 msgstr "Kısa ad"
 
 msgid "The part of the title that is used in the URL"
-msgstr ""
+msgstr "Başlığın URL'de kullanılan kısmı"
 
 msgid "Menu Title"
 msgstr "Menü Başlığı"
 
 msgid "Overwrite what is displayed in the menu"
-msgstr ""
+msgstr "Görüntülenen menünün üzerine yaz"
 
 msgid "Page Title"
 msgstr "Sayfa Başlığı"
 
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
+msgstr "Tarayıcınızın üst kısmında veya yer işaretlerinde görüntülenenlerin üzerine yazar"
 
 msgid "Description meta tag"
-msgstr ""
+msgstr "Meta etiketi açıklaması"
 
 msgid "A description of the page used by search engines."
-msgstr ""
+msgstr "Arama motorları tarafından kullanılan sayfanın açıklaması."
 
 msgid "Slug must not be empty."
-msgstr ""
+msgstr "Slug boş olmamalı"
 
 msgid "Page type"
 msgstr "Sayfa Tipi"
 
 msgid "Page Types"
-msgstr ""
+msgstr "Sayfa Tipleri"
 
 msgid "Application"
 msgstr "Uygulama"

@@ -24,15 +24,16 @@
 # Massa <massa_@msn.com>, 2015
 # Rafaela Santos <faelaphoenix@gmail.com>, 2019
 # Rafael Duarte Trevisan <rafa.trevisan@gmail.com>, 2013
-# Rodrigo de Almeida Sottomaior Macedo <rmsolucoeseminformatic4@gmail.com>, 2015
+# Rodrigo de Almeida Sottomaior Macedo <rmsolucoeseminformatica@protonmail.com>, 2015
 # Rodrigo <rprior@infranology.com.br>, 2014-2015
+# Welligton Miguel <miguelwelligton@gmail.com>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-26 14:17+0200\n"
-"PO-Revision-Date: 2020-04-21 13:37+0000\n"
-"Last-Translator: Guilherme Vierno <guilhermevierno@gmail.com>\n"
+"POT-Creation-Date: 2020-10-28 10:45+0100\n"
+"PO-Revision-Date: 2020-05-26 22:11+0000\n"
+"Last-Translator: Welligton Miguel <miguelwelligton@gmail.com>\n"
 "Language-Team: Portuguese (Brazil) (http://www.transifex.com/divio/django-cms/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -412,7 +413,7 @@ msgstr "Criar Pseudônimo"
 msgid ""
 "This is an alias reference, you can edit the content only on the <a "
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-msgstr ""
+msgstr "Esta é uma referência do pseudônimo, você pode editar o conteúdo apenas na página <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>"
 
 msgid "Create"
 msgstr "Criar"
@@ -532,10 +533,10 @@ msgid "Display in navigation"
 msgstr "Exibir na navegação"
 
 msgid "Unpublish page"
-msgstr ""
+msgstr "Cancelar publicação da página"
 
 msgid "Publish page"
-msgstr ""
+msgstr "Publicar a página"
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Tem certeza que deseja reverter ao original?"
@@ -778,7 +779,7 @@ msgstr "Os usuários não podem alterar as permissões da página sem permissão
 msgid ""
 "Users can't move a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Usuários não podem mover uma página sem permissões para alterar a página. Permissões de edição necessárias."
 
 msgid "can recover any deleted page"
 msgstr "pode recuperar qualquer página excluída"
@@ -1102,7 +1103,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n<em>Ainda não há %(object)sao redor ainda</em>\n<br>\n<a href=\"%(add_url)s\" class=\"addlink\">Adicionar %(object)s</a>agora."
 
 msgid "Copy options"
 msgstr "Opções de cópia"
@@ -1297,10 +1298,10 @@ msgid "Shortcuts"
 msgstr "Atalhos"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "A página foi alterada enquanto isso, recarregando .."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "CMS-wide atalhos"
 
 msgid "Bring up this help dialog"
 msgstr "Abra este diálogo de ajuda"

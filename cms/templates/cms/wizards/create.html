@@ -11,7 +11,7 @@
 
         {% if form.errors %}
             <p class="errornote">
-                {% trans "Please correct the error below." %}
+                {% blocktrans count form.errors|length as counter %}Please correct the error below.{% plural %}Please correct the errors below.{% endblocktrans %}
             </p>
         {% endif %}
 

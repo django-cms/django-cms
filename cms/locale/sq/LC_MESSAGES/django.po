@@ -4,12 +4,13 @@
 # 
 # Translators:
 # Translators:
+# Besnik Bleta <besnik@programeshqip.org>, 2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-26 14:17+0200\n"
-"PO-Revision-Date: 2020-04-21 16:19+0000\n"
+"POT-Creation-Date: 2020-10-28 10:45+0100\n"
+"PO-Revision-Date: 2020-09-17 09:18+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/divio/django-cms/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -68,7 +69,7 @@ msgid "Application"
 msgstr "Aplikacion"
 
 msgid "Hook application to this page."
-msgstr ""
+msgstr "Lidhe aplikacionin me këtë faqe."
 
 msgid "Overwrite URL"
 msgstr "Mbishkruaje URL-në"

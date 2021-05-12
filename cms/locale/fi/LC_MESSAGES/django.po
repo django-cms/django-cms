@@ -8,6 +8,7 @@
 # Juha-Matti Tapio <jmtapio@verkkotelakka.net>, 2013
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011,2013-2014
+# Kusti Hämäläinen <kusti.hamalainen@aalto.fi>, 2020
 # Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
 # Niklas Jerva <niklas.jerva@gmail.com>, 2016
 # paitsi, 2013
@@ -17,9 +18,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-26 14:17+0200\n"
-"PO-Revision-Date: 2020-04-21 13:37+0000\n"
-"Last-Translator: Transifex Bot <>\n"
+"POT-Creation-Date: 2020-10-28 10:45+0100\n"
+"PO-Revision-Date: 2020-05-26 12:51+0000\n"
+"Last-Translator: Kusti Hämäläinen <kusti.hamalainen@aalto.fi>\n"
 "Language-Team: Finnish (http://www.transifex.com/divio/django-cms/language/fi/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -124,7 +125,7 @@ msgid "An application instance with this name already exists."
 msgstr "Saman niminen ohjelma on jo olemassa."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Kotisivua ei voi siirtää toisen sivun sisälle"
 
 msgid "Yes"
 msgstr "Kyllä"
@@ -150,32 +151,32 @@ msgstr "Poista"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi luoda sivua ilman oikeuksia muuttaa luotua sivua. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi poistaa sivua ilman oikeuksia muuttaa sivua. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi asettaa sivuoikeuksia ilman oikeuksia muuttaa sivua. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi poistaa sivuoikeuksia ilman oikeuksia muuttaa sivua. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi luoda sivuoikeuksia ilman oikeuksia muuttaa luotuja sivuoikeuksia. Muokkausoikeudet vaadittu."
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr ""
+msgstr "Käyttäjät eivät voi poistaa sivuoikeuksia ilman oikeuksia muuttaa oikeuksia. Muokkausoikeudet vaadittu."
 
 #, python-format
 msgid "Invalid plugin type '%s'"
@@ -235,7 +236,7 @@ msgstr "Oikeutesi eivät riitä näiden liitännäisten kopiointiin."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Virhe! Sinulla ei ole oikeuksia kopioida tätä sivua."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
@@ -274,7 +275,7 @@ msgstr "Sivun \"%(page)s\" kieliversio %(language)s piilotettiin"
 
 #| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "Sinulla ei ole oikeuksia poistaa tätä sivua"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
@@ -283,7 +284,7 @@ msgstr "Otsikko ja liitännäiset kielelle %(language)s poistettu"
 #, python-format
 #| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
-msgstr ""
+msgstr "Sinulla ei ole oikeuksia nähdä sivua \"%(title)s\""
 
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "Sinulla ei ole oikeutta vaihtaa tämän sivun valikkonäkyvyyttä"
@@ -999,7 +1000,7 @@ msgstr "Liitä"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Aseta kotisivuksi"
 
 msgid "is restricted"
 msgstr "rajoitettu"
@@ -1153,7 +1154,7 @@ msgid "Unpublish"
 msgstr "Piilota"
 
 msgid "Configure"
-msgstr ""
+msgstr "Konfiguroi"
 
 msgid "in menu"
 msgstr "valikossa"
@@ -1445,7 +1446,7 @@ msgid ""
 msgstr ""
 
 msgid "Welcome to django CMS"
-msgstr ""
+msgstr "Tervetuloa django CMS:ään"
 
 msgid "Add Another"
 msgstr "Lisää uusi"

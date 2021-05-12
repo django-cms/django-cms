@@ -26,6 +26,7 @@
 # Pablo, 2015
 # Pavel Nunez <pndeschamps@gmail.com>, 2013
 # Pedro Gracia <lasarux@neuroomante.com>, 2011
+# Pier Jose Gotta Perez <piegope@protonmail.com>, 2020
 # rafadev <rafadev@gmail.com>, 2011
 # rafadev <rafadev@gmail.com>, 2011
 # 2lopez <roberto.lopez.lopez@gmail.com>, 2013
@@ -37,9 +38,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-26 14:17+0200\n"
-"PO-Revision-Date: 2020-04-21 13:37+0000\n"
-"Last-Translator: jorlugaqui <jorlugaqui@gmail.com>\n"
+"POT-Creation-Date: 2020-10-28 10:45+0100\n"
+"PO-Revision-Date: 2020-06-08 13:18+0000\n"
+"Last-Translator: Pier Jose Gotta Perez <piegope@protonmail.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/divio/django-cms/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -260,7 +261,7 @@ msgstr "¡Error! Usted no tiene permisos para copiar esta página"
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "¡Error! La página que está pegando no está traducida a ninguno de los idiomas configurados por el sitio de destino."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -419,7 +420,7 @@ msgstr "Crear Alias"
 msgid ""
 "This is an alias reference, you can edit the content only on the <a "
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-msgstr ""
+msgstr "Esta es una referencia de alias, puede editar el contenido solo en <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> página."
 
 msgid "Create"
 msgstr "Crear"
@@ -539,10 +540,10 @@ msgid "Display in navigation"
 msgstr "Mostrar en navegación"
 
 msgid "Unpublish page"
-msgstr ""
+msgstr "página sin publicar"
 
 msgid "Publish page"
-msgstr ""
+msgstr "Publicar la página"
 
 msgid "Are you sure you want to revert to live?"
 msgstr "¿Seguro que desea revertir a publico?"
@@ -573,7 +574,7 @@ msgstr "Elija una página válida"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "La página %(conflict_page)s tiene la misma url '%(url)s' que la página actual \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -581,7 +582,7 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "La página %(conflict_page)s tiene la misma url '%(url)s' que la página actual."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -595,7 +596,7 @@ msgstr "Dejar en blanco para un slug automático, o configurar como sea necesari
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "No tiene los permisos necesarios para agregar una página."
 
 msgid "ID"
 msgstr "ID"
@@ -1109,7 +1110,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n                            <em>Todavía no hay %(object)s alrededor.</em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Agregar %(object)s</a> ahora.\n                        "
 
 msgid "Copy options"
 msgstr "Opciones de copia"
@@ -1149,10 +1150,10 @@ msgstr "Ver página"
 
 #| msgid "softroot"
 msgid "Softroot"
-msgstr ""
+msgstr "Softroot"
 
 msgid "Apphook"
-msgstr ""
+msgstr "Apphook"
 
 #, python-format
 msgid "Application: %(apphook)s"
@@ -1231,14 +1232,14 @@ msgid "This plugin cannot have nested plugins."
 msgstr "Este complemento no puede tener complementos anidados."
 
 msgid "Highlight"
-msgstr ""
+msgstr "Destacar"
 
 msgid "Available plugins"
 msgstr "Plugins disponibles"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "Cambiar estructura"
 
 #| msgid "View published"
 msgid "View published"
@@ -1268,7 +1269,7 @@ msgstr "Ha ocurrido el siguiente error:"
 
 #| msgid "Action successfull... reloading."
 msgid "Action successful."
-msgstr ""
+msgstr "Acción exitosa."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "¿Seguro que desea eliminar este plugin?"
@@ -1298,29 +1299,29 @@ msgstr "El formulario no pudo ser cargado. Por favor revisa que el servidor est�
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "Más utilizado"
 
 msgid "Shortcuts"
-msgstr ""
+msgstr "Atajos"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "La página fue cambiada mientras tanto, volviendo a cargar..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "Atajos de CMS-wide"
 
 msgid "Bring up this help dialog"
-msgstr ""
+msgstr "Abrir este diálogo de ayuda"
 
 #| msgid "Cancel"
 msgid "Close/cancel"
 msgstr "Cerrar/cancelar"
 
 msgid "Toggle structure mode"
-msgstr ""
+msgstr "Cambiar modo de estructura"
 
 msgid "Toggle structure mode and highlight hovered-over plugin"
-msgstr ""
+msgstr "Alternar el modo de estructura y resaltar el complemento suspendido"
 
 msgid "Open \"Create\" dialog"
 msgstr "Abrir \"Crear\" diálogo."
@@ -1330,7 +1331,7 @@ msgstr "Foco en la barra de herramientas"
 
 #| msgid "Structure"
 msgid "Structureboard"
-msgstr ""
+msgstr "Structureboard"
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
@@ -1444,7 +1445,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr ""
+msgstr "\n                <p class=\"cms-welcome-notes\">Si no puedes ver el logo de django CMS en la parte superior, revisa que\n                    hayas asociado la carpeta <code>static/cms</code> a tus\n                    archivos estáticos.</p>\n            "
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1462,7 +1463,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n                    <p class=\"cms-welcome-notes\">Estás viendo este mensaje porque tienes\n                        <code>DEBUG = True</code> en su archivo de configuración de django y\n                        no he agregado ninguna página todavía.\n                    </p>\n                "
 
 msgid "Welcome to django CMS"
 msgstr "Bienvenido a django CMS"
@@ -1572,7 +1573,7 @@ msgstr "Aplicación de Ejemplo"
 
 #| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
-msgstr ""
+msgstr "Aplicación de Ejemplo con config"
 
 msgid "Sample App with excluded permissions"
 msgstr "Aplicación de muestra con permisos excluidos"
@@ -1582,7 +1583,7 @@ msgstr "Aplicación de Ejemplo 2"
 
 #| msgid "Sample App 2"
 msgid "Sample App 3"
-msgstr ""
+msgstr "Aplicación de Ejemplo 3"
 
 msgid "Namespaced App"
 msgstr "Applicación de Espacio de Nombre"
