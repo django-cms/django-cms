@@ -13,6 +13,7 @@
 # Evelijn Saaltink <evelijnsaaltink@gmail.com>, 2016-2017
 # Jacques de Hooge <>, 2012
 # Jonas Obrist <me@ojii.ch>, 2011
+# Koen Molenaar <koen.molenaar26@gmail.com>, 2020
 # kurdy <transifex.net@kurdyenviolien.nl>, 2013
 # 1de368575dc6c0d8d201ce55df5bf6b3_7f263b1 <d9786047fd415516826a50cdd4e7fc0a_10482>, 2012
 # 1de368575dc6c0d8d201ce55df5bf6b3_7f263b1 <d9786047fd415516826a50cdd4e7fc0a_10482>, 2012
@@ -27,9 +28,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-05-26 14:17+0200\n"
-"PO-Revision-Date: 2020-04-21 13:37+0000\n"
-"Last-Translator: kurdyma <transifex.com@kurdyenviolien.nl>\n"
+"POT-Creation-Date: 2020-10-28 10:45+0100\n"
+"PO-Revision-Date: 2020-06-04 22:31+0000\n"
+"Last-Translator: Koen Molenaar <koen.molenaar26@gmail.com>\n"
 "Language-Team: Dutch (http://www.transifex.com/divio/django-cms/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -125,7 +126,7 @@ msgstr "Er bestaat al een pagina met dit omgekeerde URL kenmerk."
 
 #| msgid "Application configurations"
 msgid "Invalid application config value"
-msgstr ""
+msgstr "Ongeldig toepassingsconfiguratiewaarde"
 
 msgid "An application instance using this configuration already exists."
 msgstr "Een applicatie instantie met deze configuratie bestaat al."
@@ -134,7 +135,7 @@ msgid "An application instance with this name already exists."
 msgstr "Een applicatie instantie met deze naam bestaat al."
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "Je kan de startpagina niet binnen een andere pagina plaatsen"
 
 msgid "Yes"
 msgstr "Ja"
@@ -245,12 +246,12 @@ msgstr "U heeft geen toestemming om deze plugins te kopiëren."
 
 #| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "Foutmelding! Je hebt geen rechten om deze pagina te kopiëren."
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "Foutmelding! De pagina die je probeert te plakken is niet vertaald in een van de talen geconfigureerd door de doelsite."
 
 #| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
@@ -311,7 +312,7 @@ msgid "New page"
 msgstr "Nieuwe pagina"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "De pagina is niet geschikt om de startpagina te zijn."
 
 msgid "View restriction"
 msgstr "Bekijk beperking"
@@ -436,7 +437,7 @@ msgid "Disable toolbar"
 msgstr "De werkbalk uitzetten"
 
 msgid "Shortcuts..."
-msgstr ""
+msgstr "Sneltoetsen"
 
 msgid "Users"
 msgstr "Gebruikers"
@@ -563,7 +564,7 @@ msgstr "Selecteer een geldige pagina"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
-msgstr ""
+msgstr "Pagina %(conflict_page)s heeft dezelfde url '%(url)s' als huidige pagina \"%(instance)s\"."
 
 #, python-format
 #| msgid ""
@@ -571,7 +572,7 @@ msgstr ""
 #| msgid_plural ""
 #| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "Pagina %(conflict_page)s heeft dezelfde url '%(url)s' als de huidige pagina."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -585,7 +586,7 @@ msgstr "Laat leeg voor een automatische slug, of overschrijf zoals benodigd."
 
 #| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
-msgstr ""
+msgstr "Je hebt niet de benodigde rechten om een pagina toe te voegen."
 
 msgid "ID"
 msgstr "ID"
@@ -925,7 +926,7 @@ msgstr "Wachtwoord:"
 
 #| msgid "Add Page"
 msgid "Add a page"
-msgstr ""
+msgstr "Voeg een pagina toe"
 
 msgid "Change a page"
 msgstr "Bewerk een pagina"
@@ -1009,7 +1010,7 @@ msgstr "Plakken"
 
 #| msgid "Save as new"
 msgid "Set as home"
-msgstr ""
+msgstr "Instellen als startpagina"
 
 msgid "is restricted"
 msgstr "is beperkt"
@@ -1099,7 +1100,7 @@ msgid ""
 "                            <br>\n"
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
-msgstr ""
+msgstr "\n                            <em>Er is nog geen %(object)s aanwezig.</em>\n                            <br>\n                            <a href=\"%(add_url)s\" class=\"addlink\">Voeg %(object)s</a> nu toe.\n                        "
 
 msgid "Copy options"
 msgstr "Kopieer-opties"
@@ -1221,14 +1222,14 @@ msgid "This plugin cannot have nested plugins."
 msgstr "Deze plugin kan geen geneste plugins bevatten."
 
 msgid "Highlight"
-msgstr ""
+msgstr "Markeer"
 
 msgid "Available plugins"
 msgstr "Beschikbare plugins"
 
 #| msgid "Structure"
 msgid "Toggle structure"
-msgstr ""
+msgstr "Wissel structuur"
 
 #| msgid "View published"
 msgid "View published"
@@ -1258,7 +1259,7 @@ msgstr "De volgende fout is ontstaan:"
 
 #| msgid "Action successfull... reloading."
 msgid "Action successful."
-msgstr ""
+msgstr "Actie geslaagd."
 
 msgid "Are you sure you want to delete this plugin?"
 msgstr "Weet je zeker dat je deze plugin wilt verwijderen?"
@@ -1275,7 +1276,7 @@ msgstr "U heeft onbewaarde aanpassingen."
 
 #| msgid "Loading..."
 msgid "Loading"
-msgstr ""
+msgstr "Bezig met laden..."
 
 #| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
@@ -1288,16 +1289,16 @@ msgstr "Het formulier kon niet geladen worden. Check of de server correct loopt.
 
 #| msgid "Notify user"
 msgid "Most used"
-msgstr ""
+msgstr "Meest gebruikt"
 
 msgid "Shortcuts"
 msgstr "Sneltoetsen"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "De pagina is ondertussen gewijzigd, herladen..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "CMS-brede Sneltoetsen"
 
 msgid "Bring up this help dialog"
 msgstr "Haal deze help-dialoog omhoog"
@@ -1320,7 +1321,7 @@ msgstr "Focus op toolbar"
 
 #| msgid "Structure"
 msgid "Structureboard"
-msgstr ""
+msgstr "Structuurbord"
 
 #| msgid "static placeholders"
 msgid "Focus on placeholders"
@@ -1434,7 +1435,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr ""
+msgstr "\n                <p class=\"cms-welcome-notes\">Als je niet het django CMS logo ziet bovenaan de pagina, zorg dan\n                    dat je de <code>static/cms</code> folder aan je\n                    static files. hebt gekoppeld.</p>\n            "
 
 #| msgid ""
 #| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
@@ -1452,7 +1453,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n                    <p class=\"cms-welcome-notes\">Je ziet dit bericht omdat je\n                        <code>DEBUG = True</code> in je django settings bestand hebt staan en\n                        en je nog geen pagina's hebt toegevoegd.\n                    </p>\n                "
 
 msgid "Welcome to django CMS"
 msgstr "Welkom bij django CMS"
@@ -1562,7 +1563,7 @@ msgstr "Voorbeeldapplicatie"
 
 #| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
-msgstr ""
+msgstr "Voorbeeldapplicatie met configuratie"
 
 msgid "Sample App with excluded permissions"
 msgstr "Voorbeeld App met uitgesloten permissies"

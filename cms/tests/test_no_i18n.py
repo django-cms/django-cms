@@ -1,9 +1,11 @@
+from django.utils.translation import trans_null
 from django.contrib.auth import get_user_model
 from django.template import Template
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
 
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.api import create_page
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, CMSPlugin
@@ -12,6 +14,8 @@ from cms.test_utils.testcases import (CMSTestCase,
                                       URL_CMS_PAGE_CHANGE_TEMPLATE)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
+
+from mock import patch
 
 overrides = dict(
     LANGUAGE_CODE='en-us',
@@ -183,3 +187,11 @@ class TestNoI18N(CMSTestCase):
         toolbar = CMSToolbar(request)
         toolbar.set_object(sub)
         self.assertEqual(toolbar.get_object_public_url(), '/test/sub/')
+
+    @patch('django.utils.translation._trans', new=trans_null)
+    def test_inherit_label(self):
+        page = create_page('test', 'nav_playground.html', 'en-us', published=True)
+        with self.login_user_context(self.get_superuser()):
+            endpoint = self.get_admin_url(Page, 'advanced', page.pk)
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<option value="%s">' % TEMPLATE_INHERITANCE_MAGIC)

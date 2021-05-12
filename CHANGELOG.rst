@@ -3,12 +3,38 @@ Changelog
 =========
 
 
-3.8.0 (unreleased)
+Unreleased
+==================
+
+* Fixed builds on RTD
+* Remove debug print from apphook_reload
+* Enforce use of coverage > 4 for python 3.8 support
+* Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
+* Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
+* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
+* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
+* Updated documentation links
+* Added support for Github Actions based CI.
+* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
+* Remove travis integration from the project as the project has moved to Github Actions.
+* Fix all GitHub actions tests run on pull requests
+* Repair broken docs link to users/index.rst
+* Fixed missing builtin arguments on main ``cms`` management command causing it to crash
+* Fixed template label nested translation
+* Few changes in docs/contributing/code.rst
+
+3.8.0 (2020-10-28)
 ==================
 
 * Introduced support for Django 3.1
 * Dropped support for Python 2.7 and Python 3.4
 * Dropped support for Django < 2.2
+* Removed ``djangocms-column`` from the manual installation instructions
+* Removed duplicate ``attr`` declaration from the documentation
+* Fixed a reference to a wrong variable in log messages in ``utils/conf.py``
+* Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
+* Improved documentation building
+* Updated the content for django CMS’s development community
 
 
 3.7.4 (2020-07-21)
