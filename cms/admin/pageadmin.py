@@ -74,7 +74,7 @@ from cms.utils.i18n import (
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
-from cms.utils.compat import DJANGO_3_2
+from cms.utils.compat.response import get_response_headers
 
 require_POST = method_decorator(require_POST)
 
@@ -417,15 +417,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         response = super().change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
-        if not DJANGO_3_2:
-            response_headers = response._headers
-        else:
-            response_headers = response.headers
+        response_headers = get_response_headers(response)
         if tab_language and response.status_code == 302 and response_headers['location'][1] == request.path_info:
             location = response_headers['location']
             response_headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
 
         return response
+
 
     @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
