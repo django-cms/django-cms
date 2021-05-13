@@ -1,5 +1,6 @@
 import io
 import uuid
+import mock
 
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.util.context_managers import apphooks
@@ -149,7 +150,10 @@ class ManagementTestCase(CMSTestCase):
         bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
         bogus_plugin.save()
 
-        management.call_command('cms', 'list', 'plugins', interactive=False, stdout=out)
+        with mock.patch('cms.management.commands.subcommands.list.plugin_report') as report_fn:
+            management.call_command('cms', 'list', 'plugins', interactive=False, stdout=out)
+            report_fn.assert_called_once()
+
         report = plugin_report()
 
         # there should be reports for three plugin types
