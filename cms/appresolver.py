@@ -23,12 +23,10 @@ def clear_app_resolvers():
     APP_RESOLVERS = []
 
 
-def applications_page_check(request, current_page=None, path=None):
+def applications_page_check(request, path=None):
     """Tries to find if given path was resolved over application.
     Applications have higher priority than other cms pages.
     """
-    if current_page:
-        return current_page
     if path is None:
         # We should get in this branch only if an apphook is active on /
         # This removes the non-CMS part of the URL.
