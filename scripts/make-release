@@ -1,5 +1,14 @@
 #!/bin/bash
 
+#
+# This script is only meant to be used by release managers.
+# It assumes the following:
+# 1. you have a github fork on the ready where you can push&pull
+# 2. you can push new refs to djangoCMS origin
+# 3. you have a transifex account with access to djangoCMS project
+#
+# License: MIT
+
 set -e
 
 base_branch=develop
@@ -28,8 +37,8 @@ success() {
 review() {
     echo -e "** Please ${BLUE}review ${YELLOW}$1${NORMAL}"
     echo -e "${BLUE}Press enter${NORMAL} to continue in ${EDITOR}"
-    read
-    ${EDITOR} $1
+    read -r
+    ${EDITOR} "$1"
 }
 
 # Preparations:
@@ -37,7 +46,7 @@ review() {
 # checking we have all necessary tools
 CMDS="git awk sed pip npm xargs ${EDITOR}"
 for cmd in ${CMDS}; do
-    if ! command -v ${cmd} &> /dev/null; then
+    if ! command -v "${cmd}" &> /dev/null; then
         error "Can not find command ${cmd}, please install the tool before startinrg this script"
         exit 1
     fi
@@ -88,7 +97,7 @@ fi
 
 FULL_VERSION=${VERSION}${VERSUFFIX}
 
-BRANCH_SUFFIX=`echo ${FULL_VERSION} | awk -F '.' -e '{print $1 "." $2 ".x"}'`
+BRANCH_SUFFIX=$(echo "${FULL_VERSION}" | awk -F '.' -e '{print $1 "." $2 ".x"}')
 BRANCH="release/${BRANCH_SUFFIX}"
 TAG="${FULL_VERSION}"
 
@@ -96,12 +105,12 @@ COMMIT_PREFIX="[${FULL_VERSION} release process] "
 
 # Sanity checks:
 
-if [ ! -d .git -o ! -d "cms" ]; then
+if [ ! -d .git ] || [ ! -d "cms" ]; then
     error "Must be a django-cms source repo, can not find .git or 'cms'... aborting"
     exit 1
 fi
 
-origin=`git remote -v | grep push | grep origin | awk '{print $2}'`
+origin=$(git remote -v | grep push | grep origin | awk '{print $2}')
 
 if [ -z "${origin}" ]; then
     error "no 'origin' remote configured, please configure the origin to your fork"
@@ -116,7 +125,7 @@ fi
 if [ -z "${VIRTUAL_ENV}" ]; then
     error "Please run this script within a virtualenv!"
     echo "you can create an environment with the following command: "
-    echo "virtualenv -p python3 --prompt "django-cms-release " env ${env}"
+    echo "virtualenv -p python3 --prompt "django-cms-release " env"
     exit 1
 fi
 
@@ -124,7 +133,7 @@ fi
 OLDVER=$(python -c "import cms; print(cms.__version__)" )
 
 # check if the tag does not already exist
-if [ -n "`git tag | grep \"\<${TAG}\>\"`" ]; then
+if git tag | grep -q "\<${TAG}\>"; then
     error "It appears tag ${TAG} already exists! aborting"
     exit 1
 fi
@@ -145,16 +154,16 @@ echo -e "Preparing to create a release ${GREEN}${FULL_VERSION}${NORMAL} from con
 echo "using fork: ${origin}"
 echo ""
 status "(Ctrl-C to abort, ${BLUE}Enter${YELLOW} to continue)"
-read
+read -r
 
 
 # ensuring we have the proper env installed in pip
 status "- Installing needed python & node packages"
-cat docs/requirements.txt | grep -v django-cms | xargs pip install django-admin transifex-client
+grep -v django-cms docs/requirements.txt | xargs pip install django-admin transifex-client
 
 CMDS="django-admin "
 for cmd in ${CMDS}; do
-    if ! command -v ${cmd} &> /dev/null; then
+    if ! command -v "${cmd}" &> /dev/null; then
         error "Can not find command ${cmd}, please install the tool before startinrg this script"
         exit 1
     fi
@@ -163,7 +172,7 @@ done
 # checkinrg upstream really point to djangoCMS
 status "- Setting up upstream to ${upstream_source}"
 
-upstream=`git remote -v | grep fetch | grep upstream | awk '{print $2}'`
+upstream=$(git remote -v | grep fetch | grep upstream | awk '{print $2}')
 if [ "${upstream_source}" != "${upstream}" ]; then
     if [ -z "${upstream}" ]; then
         git remote remove upstream
@@ -173,11 +182,11 @@ fi
 
 status "- Cleaning the environment:"
 # first go to develop and ensure we got the latest and greatest
-git checkout ${base_branch}
+git checkout "${base_branch}"
 git clean -dfx
 git restore --staged .
 git checkout .
-git pull upstream ${base_branch}
+git pull upstream "${base_branch}"
 
 # installing needed nodejs module
 cd cms
@@ -193,14 +202,13 @@ git push -u origin ${base_branch}
 
 status "- preparing branch ${BRANCH}"
 # checking if the branch exists?
-if [ -z "`git branch -a | grep remotes/upstream/${BRANCH}`" ]; then
-    git checkout -b ${BRANCH}
-    # TODO
-    echo "git push upstream ${BRANCH}"
+if ! git branch -a | grep -q "remotes/upstream/${BRANCH}"; then
+    git checkout -b "${BRANCH}"
+    git push upstream "${BRANCH}"
 else
     echo "You appear to already have a ${BRANCH} created, using it"
-    git checkout ${BRANCH}
-    git pull upstream ${BRANCH}
+    git checkout "${BRANCH}"
+    git pull upstream "${BRANCH}"
 fi
 
 # cleaning on the branch
@@ -215,10 +223,10 @@ django-admin makemessages -l en -d djangojs --no-location
 
 # reverting files without modifications
 
-for file in `git status | grep modified | awk -e '{print $2}' `; do
-    if [ -z "`git diff ${file} | grep -v '^---' | grep -v '+++' | grep '^[-+]' | grep -v '^.\"POT-Creation-Date:.*n\"'`" ] ; then
+for file in $(git status | grep modified | awk -e '{print $2}' ); do
+    if ! git diff "${file}" |  grep -v '^---\|^+++\|^.\"POT-Creation-Date:.*n\"' | grep -q '^[-+]'; then
         echo -e " * ${GREEN}reverting${NORMAL} $file (no significant modifications)"
-        git checkout ${file}
+        git checkout "${file}"
     fi
 done
 
@@ -228,7 +236,7 @@ git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Buil
 status "** Preparing the actual release."
 echo -e " This is your ${RED}LAST CHANCE TOCANCEL${NORMAL}"
 echo -e "(Ctrl-C to cancel, ${BLUE}Enter${NORMAL} to continue)"
-read
+read -r
 
 
 # 2.3 Check sphinx configuration (check the doc for version or things should not be there)
@@ -243,10 +251,10 @@ status "- Fetching strings from transifex"
 tx pull -f -a
 django-admin compilemessages
 
-for file in `git status | grep modified | awk -e '{print $2}' `; do
-    if [ -z "`git diff ${file} | grep -v '^---' | grep -v '+++' | grep '^[-+]' | grep -v '^.\"POT-Creation-Date:.*n\"'`" ] ; then
+for file in $(git status | grep modified | awk -e '{print $2}' ); do
+    if ! git diff "${file}" |  grep -v '^---\|^+++\|^.\"POT-Creation-Date:.*n\"' | grep -q '^[-+]'; then
         echo -e " * ${GREEN}reverting${NORMAL} $file (no significant modifications)"
-        git checkout ${file}
+        git checkout "${file}"
     fi
 done
 
@@ -263,20 +271,20 @@ gulp bundle
 
 
 # remove old versions 
-git rm -rf cms/static/cms/css/${OLDVER} cms/static/cms/fonts/${OLDVER} 
-git add cms/static/cms/css/${FULL_VERSION} cms/static/cms/fonts/${FULL_VERSION}
+git rm -rf "cms/static/cms/css/${OLDVER}" "cms/static/cms/fonts/${OLDVER}" 
+git add "cms/static/cms/css/${FULL_VERSION}" "cms/static/cms/fonts/${FULL_VERSION}"
 git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 
 
 status "- preparing documentation"
-if [ -n "`echo ${VERSUFFIX} | grep -i '^rc'`" ]; then
+if echo "${VERSUFFIX}" | grep -qi '^rc'; then
     DATE="unpublished"
 else
-    DATE=`date +"%Y-%m-%d"`
+    DATE=$(date +"%Y-%m-%d")
 fi
 
 title="${FULL_VERSION} (${DATE})"
-line=`echo "${title}" | sed 's/./=/g'`
+line=$(echo "${title}" | sed 's/./=/g')
 
 sed -i CHANGELOG.rst \
     -e "/^Unreleased$/a${title}" \
@@ -291,29 +299,29 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
 
     # looking for last upgrade by version number:
     needle=$OLDVER
-    while [ -n "${needle}" -a ! -f docs/upgrade/${needle}.rst ]; do
-        last=`echo ${needle} | awk -F '.' '{print $NF}'`
+    while [ -n "${needle}" ] && [ ! -f "docs/upgrade/${needle}.rst" ]; do
+        last=$(echo "${needle}" | awk -F '.' '{print $NF}')
         echo "looking for docs/upgrade/${needle}.rst as base template"
         if [ "${last}" -gt 0 ]; then
-            last=$(( ${last} - 1 ))
-            needle=`echo ${needle} | sed -e "s/\.[0-9]\+\$/.${last}/"`
+            last=$(( last - 1 ))
+            needle=$(echo "${needle}" | sed -e "s/\.[0-9]\+\$/.${last}/")
         else
-            needle=`echo ${needle} | sed -e 's/\.[0-9]\+$//'`
+            needle=$(echo "${needle}" | sed -e 's/\.[0-9]\+$//')
         fi
     done
 
-    while [ ! -f docs/upgrade/${needle}.rst ]; do
+    while [ ! -f "docs/upgrade/${needle}.rst" ]; do
         error "Can not find docs/upgrade/${needle}.rst"
         status "Can not find base version to create upgrade instructions (from $OLDVER)"
         echo  -e "Please ${BLUE}enter base version${NORMAL} to use (ex: 3.8) (Ctrl-C to abort)"
         ls docs/upgrades/
-        read needle
+        read -r needle
     done
 
-    cp docs/upgrade/${needle}.rst ${upgrade_doc}
-    git add docs/upgrade/${VERSION}.rst
+    cp "docs/upgrade/${needle}.rst" "${upgrade_doc}"
+    git add "docs/upgrade/${VERSION}.rst"
 
-    sed -i ${upgrade_doc} \
+    sed -i "${upgrade_doc}" \
         -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to--${VERSION}/" \
         -e "s/^${needle}.* release notes$/${VERSION} release notes/i" \
         -e "s/^What's new in ${needle}.*$/What's new in ${VERSION}/i" \
@@ -321,28 +329,28 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
         -e "s/^We assume you are upgrading from django CMS.*\.$/We assume you are upgrading from django CMS ${needle}./"
 fi
 
-if [ -z "`grep " *${VERSION}$" docs/upgrade/index.rst`" ]; then
+if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
     status "Adding ${VERSION} to doc index"
     # note: the new line in the following command is not a mistake, it is needed for sed to process the command
     sed -i docs/upgrade/index.rst -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
 }"
 fi
 
-review ${upgrade_doc}
+review "${upgrade_doc}"
 review CHANGELOG.rst
 review docs/upgrade/index.rst
 review docs/conf.py
 
 # commit documentations
-git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX}updating latest docs" ${upgrade_doc} CHANGELOG.rst docs/upgrade/index.rst docs/conf.py
+git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX}updating latest docs" "${upgrade_doc}" CHANGELOG.rst docs/upgrade/index.rst docs/conf.py
 
 # update the blog post using the What's new section
 status "Uploading to fork"
-git push -u origin ${BRANCH}
+git push -u origin "${BRANCH}"
 
 success "Release process complete on the fork"
 echo -e "To complete the process:"
-echo -e "1. ${BLUE}Please create a Pull Request${NORMAL} from your fork to ${YELLOW}${branch}${NORMAL}"
+echo -e "1. ${BLUE}Please create a Pull Request${NORMAL} from your fork to ${YELLOW}${BRANCH}${NORMAL}"
 echo -e "2. When the PR is merged in target branch, execute: ${BLUE}git tag ${TAG}; git push upstream ${TAG}"
-echo -e "3. Create a PR from ${branch} to ${base_branch}"
+echo -e "3. Create a PR from ${BRANCH} to ${base_branch}"
 success "Enjoy!"
