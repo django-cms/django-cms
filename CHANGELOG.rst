@@ -23,6 +23,7 @@ Unreleased
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
 * Few changes in docs/contributing/code.rst
+* removed zh and zh_hans translation (keep zh_CN and zh_TW)
 
 3.8.0 (2020-10-28)
 ==================
