@@ -12,7 +12,8 @@
 set -e
 
 base_branch=develop
-upstream_source=https://github.com/django-cms/django-cms.git
+upstream_source=git@github.com:django-cms/django-cms.git
+upstream_pattern='github\.com.django-cms/django-cms\.git$'
 
 RED="\033[31;1m"
 GREEN="\033[32;1m"
@@ -21,6 +22,8 @@ BLUE="\033[34;1m"
 NORMAL="\033[0m"
 
 EDITOR=vim
+
+SCRIPTS=$(dirname "$0")
 
 status() {
     echo -e "${YELLOW}$1${NORMAL}"
@@ -110,6 +113,17 @@ if [ ! -d .git ] || [ ! -d "cms" ]; then
     exit 1
 fi
 
+# check that git is configured for commit
+if ! git config user.name || ! git config user.email; then
+    error "Git must be configured for commit, please run the following commands first:"
+    echo ""
+    echo 'git config --local user.email "you@example.com"'
+    echo 'git config --local user.name "Your Name"'
+    echo ""
+    echo "or use --global to configure your git for all repo by default"
+    exit 1
+fi
+
 origin=$(git remote -v | grep push | grep origin | awk '{print $2}')
 
 if [ -z "${origin}" ]; then
@@ -117,8 +131,8 @@ if [ -z "${origin}" ]; then
     exit 1
 fi
 
-if [ "${origin}" = "${upstream_source}"  ]; then
-    error "please configure the origin to your fork, not djanog origin ${origin}"
+if echo "${origin}" | grep -q "${upstream_pattern}"; then
+    error "please configure the origin to your fork, not official django CMS origin ${origin}"
     exit 1
 fi
 
@@ -159,7 +173,7 @@ read -r
 
 # ensuring we have the proper env installed in pip
 status "- Installing needed python & node packages"
-grep -v django-cms docs/requirements.txt | xargs pip install django-admin transifex-client
+grep -v django-cms docs/requirements.txt | xargs pip install --quiet django-admin transifex-client
 
 CMDS="django-admin "
 for cmd in ${CMDS}; do
@@ -174,7 +188,7 @@ status "- Setting up upstream to ${upstream_source}"
 
 upstream=$(git remote -v | grep fetch | grep upstream | awk '{print $2}')
 if [ "${upstream_source}" != "${upstream}" ]; then
-    if [ -z "${upstream}" ]; then
+    if [ -n "${upstream}" ]; then
         git remote remove upstream
     fi
     git remote add upstream ${upstream_source}
@@ -192,8 +206,8 @@ git pull upstream "${base_branch}"
 cd cms
 nvm install 6
 nvm use 6
-npm install
-npm install gulp
+npm install --loglevel warn
+npm install gulp --loglevel warn
 
 status "- syncing fork"
 # updating the local repository, and pushing this to fork
@@ -218,23 +232,17 @@ git checkout .
 # 2.2: make messages and push them
 
 status "- Creating transifex messages!"
-django-admin makemessages -l en --no-location
-django-admin makemessages -l en -d djangojs --no-location
 
-# reverting files without modifications
+"$SCRIPTS/transifex-send-strings"
 
-for file in $(git status | grep modified | awk -e '{print $2}' ); do
-    if ! git diff "${file}" |  grep -v '^---\|^+++\|^.\"POT-Creation-Date:.*n\"' | grep -q '^[-+]'; then
-        echo -e " * ${GREEN}reverting${NORMAL} $file (no significant modifications)"
-        git checkout "${file}"
-    fi
-done
-
-tx push -s -l en
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
 
-status "** Preparing the actual release."
-echo -e " This is your ${RED}LAST CHANCE TOCANCEL${NORMAL}"
+echo ""
+status "****************************************************************************************"
+status "***                      Preparing for actual release!!                              ***"
+status "****************************************************************************************"
+echo ""
+echo -e " This is your ${RED}LAST CHANCE TO CANCEL${NORMAL}"
 echo -e "(Ctrl-C to cancel, ${BLUE}Enter${NORMAL} to continue)"
 read -r
 
@@ -248,15 +256,7 @@ sed -i __init__.py -e "s/__version__ = '.*'/__version__ = '$FULL_VERSION'/"
 git commit __init__.py -m "${COMMIT_PREFIX}Bumped version to ${FULL_VERSION}"
 
 status "- Fetching strings from transifex"
-tx pull -f -a
-django-admin compilemessages
-
-for file in $(git status | grep modified | awk -e '{print $2}' ); do
-    if ! git diff "${file}" |  grep -v '^---\|^+++\|^.\"POT-Creation-Date:.*n\"' | grep -q '^[-+]'; then
-        echo -e " * ${GREEN}reverting${NORMAL} $file (no significant modifications)"
-        git checkout "${file}"
-    fi
-done
+"${SCRIPTS}/transifex-pull-strings"
 
 # Before compiling:
 # ignore changesets that only involeves "^POT-Creation-Date:" "^PO-Revision-Date:"
