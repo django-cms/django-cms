@@ -5,7 +5,7 @@
 # Translators:
 # Translators:
 # Edwin Caldon <edycop@gmail.com>, 2011
-# Ernesto Avilés, 2015
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"

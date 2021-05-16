@@ -4,16 +4,16 @@
 # 
 # Translators:
 # Translators:
-# Martin Pajuste <martinpajuste@gmail.com>, 2012,2015-2016
-# Martin Pajuste <martinpajuste@gmail.com>, 2012
-# Martin Pajuste <martinpajuste@gmail.com>, 2016-2017
+# Martin <martinpajuste@gmail.com>, 2012,2015-2016
+# Martin <martinpajuste@gmail.com>, 2012
+# Martin <martinpajuste@gmail.com>, 2016-2017
 # Rivo Zängov <eraser@eraser.ee>, 2018-2020
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-10-28 10:45+0100\n"
-"PO-Revision-Date: 2020-10-06 07:37+0000\n"
+"PO-Revision-Date: 2021-05-14 13:03+0000\n"
 "Last-Translator: Rivo Zängov <eraser@eraser.ee>\n"
 "Language-Team: Estonian (http://www.transifex.com/divio/django-cms/language/et/)\n"
 "MIME-Version: 1.0\n"
