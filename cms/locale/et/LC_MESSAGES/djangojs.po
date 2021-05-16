@@ -4,8 +4,8 @@
 # 
 # Translators:
 # Translators:
-# Martin Pajuste <martinpajuste@gmail.com>, 2012
-# Martin Pajuste <martinpajuste@gmail.com>, 2016
+# Martin <martinpajuste@gmail.com>, 2012
+# Martin <martinpajuste@gmail.com>, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
