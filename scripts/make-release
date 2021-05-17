@@ -23,7 +23,7 @@ NORMAL="\033[0m"
 
 EDITOR=vim
 
-SCRIPTS=$(dirname $(realpath "$0"))
+SCRIPTS=$(dirname "$(realpath "$0")")
 
 status() {
     echo -e "${YELLOW}$1${NORMAL}"
@@ -70,6 +70,7 @@ if ! declare -f nvm &> /dev/null; then
         echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash"
         exit 1
     fi
+    # shellcheck disable=SC1090
     source "$NVM_DIR/nvm.sh"  # This loads nvm
 fi
 
@@ -284,6 +285,7 @@ else
 fi
 
 title="${FULL_VERSION} (${DATE})"
+#shellcheck disable=SC2001
 line=$(echo "${title}" | sed 's/./=/g')
 
 sed -i CHANGELOG.rst \
@@ -304,8 +306,10 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
         echo "looking for docs/upgrade/${needle}.rst as base template"
         if [ "${last}" -gt 0 ]; then
             last=$(( last - 1 ))
+            #shellcheck disable=SC2001
             needle=$(echo "${needle}" | sed -e "s/\.[0-9]\+\$/.${last}/")
         else
+            #shellcheck disable=SC2001
             needle=$(echo "${needle}" | sed -e 's/\.[0-9]\+$//')
         fi
     done
