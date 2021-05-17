@@ -14,7 +14,7 @@ https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec7600
 iptools
 sphinx==1.8.5
 sphinxcontrib-spelling<7.0.0 # restriction for py35 tests
-pyflakes==1.1.0
+pyflakes>2,<3
 pyenchant
 # required to run the server for integration tests
 djangocms-helper
