@@ -2,7 +2,7 @@
 
 set -e 
 
-SCRIPTS=$(dirname "$0")
+SCRIPTS=$(dirname $(realpath "$0"))
 ROOT=$(git rev-parse --show-toplevel)
 
 cd "${ROOT}/cms"

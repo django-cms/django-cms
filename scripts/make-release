@@ -23,7 +23,7 @@ NORMAL="\033[0m"
 
 EDITOR=vim
 
-SCRIPTS=$(dirname "$0")
+SCRIPTS=$(dirname $(realpath "$0"))
 
 status() {
     echo -e "${YELLOW}$1${NORMAL}"
@@ -322,7 +322,7 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
     git add "docs/upgrade/${VERSION}.rst"
 
     sed -i "${upgrade_doc}" \
-        -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to--${VERSION}/" \
+        -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to-${VERSION}/" \
         -e "s/^${needle}.* release notes$/${VERSION} release notes/i" \
         -e "s/^What's new in ${needle}.*$/What's new in ${VERSION}/i" \
         -e "s/^How to upgrade to ${needle}.*$/How to upgrade to ${VERSION}/i" \
