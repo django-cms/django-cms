@@ -3,8 +3,8 @@ Changelog
 =========
 
 
-Unreleased
-==================
+3.9.0rc1 (unpublished)
+======================
 
 * Fixed builds on RTD
 * Remove debug print from apphook_reload
