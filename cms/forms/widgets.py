@@ -2,7 +2,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.forms.widgets import MultiWidget, Select, TextInput
 from django.urls import NoReverseMatch, reverse_lazy
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 
@@ -59,7 +59,7 @@ class PageSelectWidget(MultiWidget):
             initial_value = u''
         else:
             initial_value = initial
-        if force_text(initial_value) != force_text(data_value):
+        if force_str(initial_value) != force_str(data_value):
             return True
         return False
 
@@ -138,7 +138,7 @@ class PageSmartLinkWidget(TextInput):
             'element_id': attrs.get('id', ''),
             'placeholder_text': attrs.get('placeholder_text', ''),
             'language_code': self.language,
-            'ajax_url': force_text(self.ajax_url)
+            'ajax_url': force_str(self.ajax_url)
         }
 
     def get_context(self, name, value, attrs):
@@ -191,7 +191,7 @@ class AppHookSelect(Select):
     def _build_option(self, selected_choices, option_value, option_label):
         if option_value is None:
             option_value = ''
-        option_value = force_text(option_value)
+        option_value = force_str(option_value)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
             if not self.allow_multiple_selected:
@@ -204,7 +204,7 @@ class AppHookSelect(Select):
             data_html = mark_safe(' data-namespace="%s"' % escape(self.app_namespaces[option_value]))
         else:
             data_html = ''
-        return option_value, selected_html, data_html, force_text(option_label)
+        return option_value, selected_html, data_html, force_str(option_label)
 
     def render_option(self, selected_choices, option_value, option_label):
         option_data = self._build_option(selected_choices, option_value, option_label)

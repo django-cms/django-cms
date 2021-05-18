@@ -5,7 +5,7 @@ from django.forms.models import ModelForm
 from django.template import TemplateSyntaxError
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
 
 from cms.api import create_page, publish_page
@@ -120,7 +120,7 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             title="Sample Page",
             template=TEMPLATE_INHERITANCE_MAGIC,
             language="en",
-            created_by=smart_text(user),
+            created_by=smart_str(user),
             parent=None,
             in_navigation=True,
             published=False

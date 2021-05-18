@@ -13,6 +13,7 @@ jobs:
           django-2.2.txt,
           django-3.0.txt,
           django-3.1.txt,
+          django-3.2.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -43,11 +44,14 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
       run: |
         python manage.py test
+      env:
+        DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
 
   database-mysql:
@@ -89,6 +93,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install -r test_requirements/databases.txt
         python setup.py install
 
 

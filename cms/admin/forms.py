@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import api
@@ -582,7 +582,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
                 if page_data.get('application_urls', False) and page_data['application_urls'] in app_configs:
                     configs = app_configs[page_data['application_urls']].get_configs()
-                    self.fields['application_configs'].widget.choices = [(config.pk, force_text(config)) for config in configs]
+                    self.fields['application_configs'].widget.choices = [(config.pk, force_str(config)) for config in configs]
 
                     try:
                         config = configs.get(namespace=self.initial['application_namespace'])
@@ -852,7 +852,7 @@ class MovePageForm(PageTreeForm):
         cleaned_data = super().clean()
 
         if self.page.is_home and cleaned_data.get('target'):
-            self.add_error('target', force_text(_('You can\'t move the home page inside another page')))
+            self.add_error('target', force_str(_('You can\'t move the home page inside another page')))
         return cleaned_data
 
     def get_tree_options(self):
@@ -1308,7 +1308,7 @@ class PluginAddValidationForm(forms.Form):
                 template=template
             )
         except PluginLimitReached as error:
-            self.add_error(None, force_text(error))
+            self.add_error(None, force_str(error))
         return self.cleaned_data
 
 

@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
@@ -163,7 +163,7 @@ class Page(models.Model):
         (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+    template_choices = [(x, y) for x, y in get_cms_setting('TEMPLATES')]
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
@@ -260,7 +260,7 @@ class Page(models.Model):
                 title = None
         if title is None:
             title = u""
-        return force_text(title)
+        return force_str(title)
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
