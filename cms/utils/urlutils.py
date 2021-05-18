@@ -5,7 +5,7 @@ from urllib.parse import urlparse
 
 from django.conf import settings
 from django.urls import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.http import urlencode
 
 from cms.utils.conf import get_cms_setting
@@ -49,7 +49,7 @@ def urljoin(*segments):
     u'/a/'
     """
     url  = '/' if segments[0].startswith('/') else ''
-    url += '/'.join(filter(None, (force_text(s).strip('/') for s in segments)))
+    url += '/'.join(filter(None, (force_str(s).strip('/') for s in segments)))
     return url + '/' if settings.APPEND_SLASH else url
 
 
