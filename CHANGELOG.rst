@@ -25,6 +25,7 @@ Unreleased
 * Few changes in docs/contributing/code.rst
 * Add support for Django 3.2 LTS version
 * removed zh and zh_hans translation (keep zh_CN and zh_TW)
+* Cleaned-up unmaintained translations
 
 3.8.0 (2020-10-28)
 ==================
