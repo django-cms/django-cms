@@ -37,23 +37,23 @@ The django CMS Core Addons are:
 
 * `Django Filer <http://github.com/divio/django-filer>`_ - a file management application for
   images and other documents.
-* `django CMS Admin Style <https://github.com/divio/djangocms-admin-style>`_ - a CSS theme for the
+* `django CMS Admin Style <https://github.com/django-cms/djangocms-admin-style>`_ - a CSS theme for the
   Django admin
-* `django CMS Text CKEditor <https://github.com/divio/djangocms-text-ckeditor>`_ - our default rich
+* `django CMS Text CKEditor <https://github.com/django-cms/djangocms-text-ckeditor>`_ - our default rich
   text WYSIYG editor
-* `django CMS Link <https://github.com/divio/djangocms-link>`_ - add links to content
-* `django CMS Picture <https://github.com/divio/djangocms-picture>`_ - add images to your site
+* `django CMS Link <https://github.com/django-cms/djangocms-link>`_ - add links to content
+* `django CMS Picture <https://github.com/django-cms/djangocms-picture>`_ - add images to your site
   (Filer-compatible)
-* `django CMS File <https://github.com/divio/djangocms-file>`_ - add files or an entire folder to
+* `django CMS File <https://github.com/django-cms/djangocms-file>`_ - add files or an entire folder to
   your pages (Filer-compatible)
-* `django CMS Style <https://github.com/divio/djangocms-style>`_ - create HTML containers with
+* `django CMS Style <https://github.com/django-cms/djangocms-style>`_ - create HTML containers with
   classes, styles, ids and other attributes
-* `django CMS Snippet <https://github.com/divio/djangocms-snippet>`_ - insert arbitrary HTML content
-* `django CMS Audio <https://github.com/divio/djangocms-audio>`_ - publish audio files
+* `django CMS Snippet <https://github.com/django-cms/djangocms-snippet>`_ - insert arbitrary HTML content
+* `django CMS Audio <https://github.com/django-cms/djangocms-audio>`_ - publish audio files
   (Filer-compatible)
-* `django CMS Video <https://github.com/divio/djangocms-video>`_ - embed videos from YouTube, Vimeo
+* `django CMS Video <https://github.com/django-cms/djangocms-video>`_ - embed videos from YouTube, Vimeo
   and other services, or use uploaded videos (Filer-compatible)
-* `django CMS GoogleMap <http://github.com/divio/djangocms-googlemap>`_ - displays a map of an
+* `django CMS GoogleMap <http://github.com/django-cms/djangocms-googlemap>`_ - displays a map of an
   address on your page. Supports addresses and co-ordinates. Zoom level and route planner options
   can also be set.
 

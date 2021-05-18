@@ -4,7 +4,7 @@ from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
 from functools import lru_cache
 
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
@@ -194,6 +194,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
             new_plugin = deepcopy(source_plugin)
             new_plugin.pk = None
             new_plugin.id = None
+            new_plugin._state.adding = True
             new_plugin.language = language or new_plugin.language
             new_plugin.placeholder = placeholder
             new_plugin.parent = parent
@@ -351,7 +352,7 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
                 .count()
             )
             if type_count >= type_limit:
-                plugin_name = force_text(plugin_pool.get_plugin(plugin_type).name)
+                plugin_name = force_str(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(
                     "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
                                          % {'limit': type_limit, 'plugin_name': plugin_name})

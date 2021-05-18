@@ -7,7 +7,7 @@ from django.utils.translation import LANGUAGE_SESSION_KEY
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import i18n, get_language_from_request
-from cms.utils.compat import DJANGO_3_0, DJANGO_3_1
+from cms.utils.compat import DJANGO_3_0, DJANGO_3_1, DJANGO_3_2
 
 @override_settings(
     LANGUAGE_CODE='en',
@@ -362,7 +362,7 @@ class TestLanguageFallbacks(CMSTestCase):
 
         #   ugly and long set of session
         session = self.client.session
-        if DJANGO_3_0 or DJANGO_3_1:
+        if DJANGO_3_0 or DJANGO_3_1 or DJANGO_3_2:
             self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'fr'
         else:
             session[LANGUAGE_SESSION_KEY] = 'fr'
@@ -371,7 +371,7 @@ class TestLanguageFallbacks(CMSTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/fr/')
         self.client.get('/en/')
-        if DJANGO_3_0 or DJANGO_3_1:
+        if DJANGO_3_0 or DJANGO_3_1 or DJANGO_3_2:
             self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'en')
         else:
             self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'en')

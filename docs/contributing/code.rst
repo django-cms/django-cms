@@ -14,9 +14,11 @@ In a nutshell
 
 Here's what the contribution process looks like in brief:
 
-#. Fork our `GitHub`_ repository, https://github.com/divio/django-cms
+#. Fork our `GitHub`_ repository, https://github.com/django-cms/django-cms
 #. Work locally and push your changes to your repository.
 #. When you feel your code is good enough for inclusion, send us a pull request.
+#. After that, please join the `Slack Channel`_ of our Pull Request Review work group (#workgroup-pr-review). This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
+#. Get acknowledged by the django CMS community for your contribution
 
 See the :ref:`contributing_patch` how-to document for a walk-through of this process.
 
@@ -26,7 +28,7 @@ Basic requirements and standards
 ********************************
 
 If you're interested in developing a new feature for the CMS, it is recommended
-that you first discuss it on the `django-cms-developers`_  mailing list so as
+that you first discuss it on the `Discourse forum <https://discourse.django-cms.org>`_ so as
 not to do any work that will not get merged in anyway.
 
 - Code will be reviewed and tested by at least one core developer, preferably
@@ -105,11 +107,9 @@ coverage will only be accepted with a very good reason; bug-fixing patches
 **must** demonstrate the bug with a test to avoid regressions and to check
 that the fix works.
 
-We have an IRC channel, our `django-cms-developers`_ email list,
-and of course the code reviews mechanism on GitHub - do use them.
+We have a `Slack Channel`_, a `Discourse forum
+<https://discourse.django-cms.org>`_, and of course the code reviews mechanism on GitHub - do use them.
 
-If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
-<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
 
 .. _contributing_frontend:
 
@@ -194,7 +194,7 @@ CMS in external applications, you can only use bundles distributed by CMS, not
 the source modules.
 
 
-.. _fork: https://github.com/divio/django-cms
+.. _fork: https://github.com/django-cms/django-cms
 .. _PEP8: http://www.python.org/dev/peps/pep-0008/
 .. _Aldryn Boilerplate: https://aldryn-boilerplate-bootstrap3.readthedocs.io/en/latest/guidelines/index.html
 .. _django-cms-developers: https://groups.google.com/group/django-cms-developers
@@ -203,3 +203,4 @@ the source modules.
 .. _freenode: http://freenode.net/
 .. _pull request: http://help.github.com/send-pull-requests/
 .. _git: http://git-scm.com/
+.. _Slack Channel: https://django-cmsworkspace.slack.com/

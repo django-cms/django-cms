@@ -33,17 +33,18 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 
 extensions = [
     'djangocms',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinx.ext.autodoc',
     'sphinxcontrib.spelling'
-    ]
+]
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/3/', None),
+    'python': ('https://docs.python.org/3/', None),
     'django': ('https://docs.djangoproject.com/en/2.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
-    'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
-    'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
-    'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
+    'classytags': ('https://django-classy-tags.readthedocs.io/en/latest/', None),
+    'sekizai': ('https://django-sekizai.readthedocs.io/en/latest/', None),
+    'treebeard': ('https://django-treebeard.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -131,8 +132,21 @@ try:
     import divio_docs_theme
     html_theme = 'divio_docs_theme'
     html_theme_path = [divio_docs_theme.get_html_theme_path()]
+    html_theme_options = {
+        'show_cloud_banner': True,
+        'cloud_banner_markup': """
+            <div class="divio-cloud">
+                <span class="divio-cloud-caption">The django CMS Association</span>
+                <p>The django CMS Association is a non-profit organisation that funds and
+                steers the development of django CMS, and nurtures its world-wide
+                community of developers and users.</p>
+                <a class="btn-neutral divio-cloud-btn" target="_blank" href="https://www.django-cms.org/en/about-us/">Join us</a>
+            </div>
+        """,
+    }
 except:
     html_theme = 'default'
+
 
 show_cloud_banner = True
 
