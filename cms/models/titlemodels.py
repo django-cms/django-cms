@@ -14,6 +14,7 @@ from cms.utils.conf import get_cms_setting
 @python_2_unicode_compatible
 class PageContent(models.Model):
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
+        (constants.VISIBILITY_ALL, _('no limit set')),
         (constants.VISIBILITY_USERS, _('for logged in users only')),
         (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
     )
@@ -66,9 +67,9 @@ class PageContent(models.Model):
     template = models.CharField(_("template"), max_length=100, choices=template_choices,
                                 help_text=_('The template used to render the content.'),
                                 default=TEMPLATE_DEFAULT)
-    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=None, null=True, blank=True,
-                                                        choices=LIMIT_VISIBILITY_IN_MENU_CHOICES, db_index=True,
-                                                        help_text=_("limit when this page is visible in the menu"))
+    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=constants.VISIBILITY_ALL,
+                                                        null=True, blank=True, choices=LIMIT_VISIBILITY_IN_MENU_CHOICES,
+                                                        db_index=True, help_text=_("limit when this page is visible in the menu"))
 
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(

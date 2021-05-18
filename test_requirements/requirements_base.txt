@@ -1,5 +1,5 @@
-coverage==4.2
-python-coveralls==2.5.0
+coverage<5
+python-coveralls>2.5.0
 unittest-xml-reporting==1.11.0
 Pillow==3.3
 django-treebeard>=4.3
@@ -20,3 +20,4 @@ pyenchant
 djangocms-helper
 mock>=2.0.0
 django-formtools
+mysqlclient==2.0.3
