@@ -10,8 +10,9 @@ Unreleased
 * Remove debug print from apphook_reload
 * Enforce use of coverage > 4 for python 3.8 support
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
-* Improved performance of ``cms list plugins`` command
+* Fixed 6973 bag with unexpected behavior ``get_page_from_request``
 * Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
+* Improved performance of ``cms list plugins`` command
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
 * Updated documentation links
