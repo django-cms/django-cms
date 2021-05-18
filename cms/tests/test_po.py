@@ -6,6 +6,8 @@ import os
 import shutil
 import subprocess
 import sys
+from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
+from pathlib import Path
 
 THIS_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'locale'))
@@ -33,10 +35,14 @@ def compile_messages():
         for dirpath, dirnames, filenames in os.walk(basedir):
             for f in filenames:
                 if f.endswith('.po'):
-                    fn = os.path.join(dirpath, f)
-                    if has_bom(fn):
-                        raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % fn)
-                    pf = os.path.splitext(fn)[0]
+                    if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
+                        pfn = os.path.join(dirpath, f)
+                    else:
+                        # for django3.2 and above. The change happened in djang3.2 to pathlib.
+                        pfn = Path(dirpath) / f
+                    if has_bom(pfn):
+                        raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % pfn)
+                    pf = os.path.splitext(pfn)[0]
                     # Store the names of the .mo and .po files in an environment
                     # variable, rather than doing a string replacement into the
                     # command, so that we can take advantage of shell quoting, to

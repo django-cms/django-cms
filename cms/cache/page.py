@@ -13,6 +13,7 @@ from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
+from cms.utils.compat.response import get_response_headers
 
 
 def _page_cache_key(request):
@@ -77,11 +78,12 @@ def set_page_cache(response):
             # We also store the absolute expiration timestamp to avoid
             # recomputing it on cache-reads.
             expires_datetime = timestamp + timedelta(seconds=ttl)
+            response_headers = get_response_headers(response)
             cache.set(
                 _page_cache_key(request),
                 (
                     response.content,
-                    response._headers,
+                    response_headers,
                     expires_datetime,
                 ),
                 ttl,
