@@ -17,4 +17,3 @@ sphinxcontrib-spelling<7.0.0 # restriction for py35 tests
 # required to run the server for integration tests
 django-app-helper
 mock>=2.0.0
-mysqlclient==2.0.3
