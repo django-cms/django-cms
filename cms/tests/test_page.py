@@ -682,6 +682,12 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNotNone(found_page)
         self.assertFalse(found_page.publisher_is_draft)
 
+    def test_get_page_from_request_without_cache_when_has_use_path_argument(self):
+        request = self.get_request('/test')
+        request._current_page_cache = True
+        found_page = get_page_from_request(request, 'page_path')
+        self.assertIsNone(found_page)
+
     def test_ancestor_expired(self):
         yesterday = tz_now() - datetime.timedelta(days=1)
         tomorrow = tz_now() + datetime.timedelta(days=1)
