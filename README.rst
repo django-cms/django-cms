@@ -1,8 +1,8 @@
 ##########
 django CMS
 ##########
-.. image:: https://travis-ci.org/divio/django-cms.svg?branch=develop
-    :target: https://travis-ci.org/divio/django-cms
+.. image:: https://travis-ci.org/django-cms/django-cms.svg?branch=develop
+    :target: https://travis-ci.org/django-cms/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/badge/wheel-yes-green.svg
@@ -13,7 +13,7 @@ django CMS
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
 
-Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association. `Get involved in the dCA! <https://www.django-cms.org/en/contribute/>`_
+Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association. `Get involved in the dCA <https://www.django-cms.org/en/contribute/>`_ and `win rewards! <https://www.django-cms.org/en/bounty-program/>`_
 
 
 .. ATTENTION::
@@ -68,6 +68,11 @@ For more information about our branch policy, see `Branches
 
 Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
 
+************************
+Developer Bounty Program
+************************
+
+Win rewards for creating Pull Requests. Take part in our `developer bounty program <https://www.django-cms.org/en/bounty-program/>`_
 
 ********
 Tutorial
@@ -87,7 +92,7 @@ You can use the `django CMS installer <https://djangocms-installer.readthedocs.i
     (env) $ pip install djangocms-installer
     (env) $ mkdir myproject && cd myproject
     (env) $ djangocms -f -p . my_demo
-    (env) $ python manage.py
+    (env) $ python manage.py runserver
 
 ****
 Demo

@@ -6,9 +6,9 @@ from cms.utils.conf import get_cms_setting
 from django.db.models import signals
 from django.dispatch import Signal
 
-from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserGroup
+from cms.models import PagePermission, GlobalPagePermission, User, PageUser, PageUserGroup
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 
 #################### Our own signals ###################
 

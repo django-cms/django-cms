@@ -339,6 +339,31 @@ def check_copy_relations(output):
                                    'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
 
 
+@define_check
+def check_placeholder_fields(output):
+    """
+    ModelAdmin instances that are using PlaceholderField fields
+    should be also a subclass of PlaceholderAdminMixin
+    """
+    from django.contrib.admin import site
+    from cms.models.fields import PlaceholderField
+    from cms.admin.placeholderadmin import PlaceholderAdminMixin
+
+    with output.section("PlaceholderField") as section:
+        for model, model_admin in site._registry.items():
+            ph_fields = [field for field in model._meta.get_fields() if isinstance(field, PlaceholderField)]
+            if len(ph_fields) == 0:
+                continue
+
+            if not isinstance(model_admin, PlaceholderAdminMixin):
+                section.error(
+                    "%s does not subclass of PlaceholderAdminMixin" % model_admin
+                )
+
+        if section.successful:
+            section.finish_success("PlaceholderField configuration okay")
+
+
 def check(output):
     """
     Checks the configuration/environment of this django CMS installation.

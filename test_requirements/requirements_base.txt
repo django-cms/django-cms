@@ -1,5 +1,5 @@
-coverage<5
-python-coveralls==2.5.0
+coverage>=4
+python-coveralls>2.5.0
 unittest-xml-reporting==1.11.0
 Pillow==5.2.0
 django-treebeard>=4.3

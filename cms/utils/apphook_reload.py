@@ -1,12 +1,15 @@
+import logging
 import sys
 import uuid
 
 from threading import local
 
 from django.conf import settings
-from django.urls import reverse, clear_url_caches
+from django.urls import clear_url_caches
 
 from importlib import reload
+
+logger = logging.getLogger("cms")
 
 _urlconf_revision = {}
 _urlconf_revision_threadlocal = local()
@@ -22,14 +25,11 @@ def ensure_urlconf_is_up_to_date():
         set_local_revision(global_revision)
     elif global_revision != local_revision:
         if settings.DEBUG:
-            print("   New revision!!!! RELOAD!\n"
-                  "      {0} ({1})\n"
-                  "   -> {2} ({3})".format(
-                      global_revision, type(global_revision),
-                      local_revision, type(local_revision),))
-        debug_check_url('my_test_app_view')
+            log_reloading_apphook(global_revision, local_revision)
+            debug_check_url('my_test_app_view')
         reload_urlconf(new_revision=global_revision)
-        debug_check_url('my_test_app_view')
+        if settings.DEBUG:
+            debug_check_url('my_test_app_view')
 
 
 def get_local_revision(default=None):
@@ -41,13 +41,10 @@ def get_local_revision(default=None):
 
 
 def set_local_revision(revision):
-    # print '======= SETTING =====', revision
     if use_threadlocal:
         if revision:
             _urlconf_revision_threadlocal.value = revision
-            print('======= SET =====    ', get_local_revision())
         else:
-            print('======= DEL =====    ', revision)
             if hasattr(_urlconf_revision_threadlocal, "value"):
                 del _urlconf_revision_threadlocal.value
     else:
@@ -91,12 +88,25 @@ def reload_urlconf(urlconf=None, new_revision=None):
         set_local_revision(new_revision)
 
 
+def log_reloading_apphook(global_revision, local_revision):
+    debug_msg = "   New revision!!!! RELOAD!\n      {0} ({1})\n   -> {2} ({3})".format(
+        global_revision, type(global_revision),
+        local_revision, type(local_revision),
+    )
+    logger.debug(debug_msg)
+
+
 def debug_check_url(url_name):
-    if settings.DEBUG:
-        try:
-            print("""    reverse('{0}'): {1} """.format(
-                url_name,
-                reverse('my_test_app_view'),
-            ))
-        except Exception as e:
-            print("reverse('{0}'): {1}".format(url_name, e,))
+    from django.urls import reverse
+
+    try:
+        debug_msg = "    reverse('{0}'): {1} ".format(
+            url_name,
+            reverse('my_test_app_view'),
+        )
+    except Exception as e:
+        debug_msg = "    ERROR: reverse('{0}'): {1}".format(
+            url_name,
+            e,
+        )
+    logger.debug(debug_msg)
