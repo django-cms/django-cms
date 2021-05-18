@@ -83,9 +83,10 @@ class ListPluginsCommand(SubcommandsCommand):
     command_name = 'plugins'
 
     def handle(self, *args, **options):
+        report = plugin_report()
         self.stdout.write('==== Plugin report ==== \n\n')
-        self.stdout.write('There are %s plugin types in your database \n' % len(plugin_report()))
-        for plugin in plugin_report():
+        self.stdout.write('There are %s plugin types in your database \n' % len(report))
+        for plugin in report:
             self.stdout.write('\n%s \n' % plugin['type'])
 
             plugin_model = plugin['model']
