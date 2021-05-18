@@ -472,8 +472,9 @@ class ChangePageForm(BasePageForm):
 
         if update_count == 0:
             api.create_title(language=self._language, page=cms_page, **translation_data)
-        else:
-            cms_page._update_title_path_recursive(self._language)
+        # _update_title_path_recursive should be called if the new page is the parent
+        # of already created children in multilingual sites.
+        cms_page._update_title_path_recursive(self._language, slug=self.data['slug'])
         cms_page.clear_cache(menu=True)
         return cms_page
 

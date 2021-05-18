@@ -58,6 +58,7 @@ class SubcommandsCommand(BaseCommand):
             description=self.help or None,
             **kwargs
         )
+        add_builtin_arguments(parser)
         self.add_arguments(parser)
         return parser
 
