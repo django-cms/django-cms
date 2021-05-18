@@ -43,7 +43,7 @@ class ToolbarMiddleware(MiddlewareMixin):
         except:
             return False
 
-        return match.url_name in ('pages-root', 'pages-details-by-slug')
+        return match.url_name in ('pages-root', 'pages-details-by-slug', 'cms_page_edit_plugin')
 
     def process_request(self, request):
         """

@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
@@ -163,7 +163,7 @@ class Page(models.Model):
         (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+    template_choices = [(x, y) for x, y in get_cms_setting('TEMPLATES')]
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
@@ -260,7 +260,7 @@ class Page(models.Model):
                 title = None
         if title is None:
             title = u""
-        return force_text(title)
+        return force_str(title)
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
@@ -340,7 +340,7 @@ class Page(models.Model):
         title_obj.path = title_obj.get_path_for_base(base)
         title_obj.save()
 
-    def _update_title_path_recursive(self, language):
+    def _update_title_path_recursive(self, language, slug=None):
         assert self.publisher_is_draft
         from cms.models import Title
 
@@ -348,7 +348,10 @@ class Page(models.Model):
             return
 
         pages = self.get_child_pages()
-        base = self.get_path(language, fallback=True)
+        if slug:
+            base = self.get_path_for_slug(slug, language)
+        else:
+            base = self.get_path(language, fallback=True)
 
         if base:
             new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))

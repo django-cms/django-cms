@@ -352,7 +352,7 @@ CMSPluginBase Attributes and Methods Reference
         The default implementation is as follows::
 
             def icon_alt(self, instance):
-                return "%s - %s" % (force_text(self.name), force_text(instance))
+                return "%s - %s" % (force_str(self.name), force_str(instance))
 
         See also: :attr:`text_enabled`, :meth:`icon_src`.
 
@@ -435,7 +435,7 @@ CMSPluginBase Attributes and Methods Reference
         your text editor plugin.
 
         This requires support from the text plugin; support for this is currently planned
-        for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
+        for `djangocms-text-ckeditor <https://github.com/django-cms/djangocms-text-ckeditor/>`_ 2.5.0.
 
         See also: :attr:`text_enabled`.
 
