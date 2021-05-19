@@ -330,7 +330,7 @@ def reorder_plugins(placeholder, parent_id, language, order=None):
     return plugins
 
 
-def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
+def has_reached_plugin_limit(placeholder, plugin_type, language, template=None, parent_plugin=None):
     """
     Checks if placeholder has reached it's global plugin limit,
     if not then it checks if it has reached it's plugin_type limit.
@@ -356,4 +356,8 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
                 raise PluginLimitReached(_(
                     "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
                                          % {'limit': type_limit, 'plugin_name': plugin_name})
+        global_children_limit = limits.get("global_children")
+        children_count = placeholder.get_child_plugins(language=language).count()
+        if not parent_plugin and global_children_limit and children_count >= global_children_limit:
+            raise PluginLimitReached(_("This placeholder already has the maximum number of child plugins (%s)." % children_count))
     return False

@@ -357,6 +357,12 @@ class Placeholder(models.Model):
         else:
             return self.cmsplugin_set.all().order_by('path')
 
+    def get_child_plugins(self, language=None):
+        if language:
+            return self.cmsplugin_set.filter(language=language, parent__isnull=True).order_by('path')
+        else:
+            return self.cmsplugin_set.filter(parent__isnull=True).order_by('path')
+
     def get_filled_languages(self):
         """
         Returns language objects for every language for which the placeholder
