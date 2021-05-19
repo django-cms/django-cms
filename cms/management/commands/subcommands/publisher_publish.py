@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.management.base import CommandError
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cms.api import publish_pages
 from cms.utils.permissions import set_current_user
@@ -41,7 +41,7 @@ class PublishCommand(SubcommandsCommand):
         index = 0
         for page, add in publish_pages(include_unpublished, language, site):
             m = '*' if add else ' '
-            self.stdout.write('%d.\t%s  %s [%d]\n' % (index + 1, m, force_text(page), page.id))
+            self.stdout.write('%d.\t%s  %s [%d]\n' % (index + 1, m, force_str(page), page.id))
             pages_total += 1
             if add:
                 pages_published += 1

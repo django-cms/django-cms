@@ -3,7 +3,7 @@ from operator import attrgetter
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import re_path, include
 from django.template.defaultfilters import slugify
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import get_language, deactivate_all, activate
@@ -197,7 +197,7 @@ class PluginPool:
             url_patterns = []
             for plugin in self.registered_plugins:
                 p = plugin()
-                slug = slugify(force_text(normalize_name(p.__class__.__name__)))
+                slug = slugify(force_str(normalize_name(p.__class__.__name__)))
                 url_patterns += [
                     re_path(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
                 ]
