@@ -9,6 +9,7 @@ Unreleased
 * Fixed builds on RTD
 * Remove debug print from apphook_reload
 * Enforce use of coverage > 4 for python 3.8 support
+* Fixed the cache not being invalidated when updating a PlaceholderField in a custom model
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
 * Fixed 6973 bag with unexpected behavior ``get_page_from_request``
 * Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
