@@ -278,21 +278,7 @@ git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 
 
 status "- preparing documentation"
-if echo "${VERSUFFIX}" | grep -qi '^rc'; then
-    DATE="unpublished"
-else
-    DATE=$(date +"%Y-%m-%d")
-fi
-
-title="${FULL_VERSION} (${DATE})"
-#shellcheck disable=SC2001
-line=$(echo "${title}" | sed 's/./=/g')
-
-sed -i CHANGELOG.rst \
-    -e "/^Unreleased$/a${title}" \
-    -e "/^Unreleased$/a${line}" \
-    -e "/^Unreleased$/,+1d" \
-    -e "s/(unpublished)/(${DATE})/"
+"${SCRIPTS}/make-changelog" "${FULL_VERSION}"
 
 upgrade_doc="docs/upgrade/${VERSION}.rst"
 
