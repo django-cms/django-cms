@@ -2,10 +2,16 @@
 Changelog
 =========
 
+Unreleased
+==================
+
+* Fixed redirect issues when i18n_patterns had prefix_default_language = False
+
 
 Unreleased
 ==================
 
+* Fixed not checking slug uniqueness when moving a page
 * Fixed builds on RTD
 * Remove debug print from apphook_reload
 * Enforce use of coverage > 4 for python 3.8 support
