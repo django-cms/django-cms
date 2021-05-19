@@ -32,6 +32,7 @@ Unreleased
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
 * Few changes in docs/contributing/code.rst
+* Fixed an issue when running migrations on a multi database project
 * Add support for Django 3.2 LTS version
 * removed zh and zh_hans translation (keep zh_CN and zh_TW)
 * Cleaned-up unmaintained translations
