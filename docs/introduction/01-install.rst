@@ -1,3 +1,5 @@
+:sequential_nav: next
+
 .. _install-django-cms-tutorial:
 
 #####################
@@ -13,6 +15,8 @@ Requirements
 django CMS requires Django 1.11 or newer, and Python 2.7 or 3.3 or newer. This tutorial assumes
 you are using Python 3.
 
+You can find compatibility table for particular python version `here <https://docs.django-cms.org/en/latest/index.html#software-version-requirements-and-release-notes>`_
+
 ************************
 Your working environment
 ************************
@@ -24,13 +28,16 @@ installed and that you have some basic familiarity with it.
 Create and activate a virtual environment
 =========================================
 
+Linux
 ::
 
     python3.6 -m venv env   # Python 2 usage: virtualenv env
     source env/bin/activate
 
-Note that if you're using Windows, to activate the virtualenv you'll need::
+Windows
+::
 
+    py -m venv env
     env\Scripts\activate
 
 
@@ -45,11 +52,6 @@ Update pip inside the virtual environment
 Use the django CMS installer
 ============================
 
-..  note::
-
-    The django CMS Installer is not yet available for django CMS 3.6 or Django 2 or later.
-
-    This section will be updated or removed before the final release of django CMS 3.6.
 
 The `django CMS installer <https://github.com/nephila/djangocms-installer>`_ is
 a helpful script that takes care of setting up a new project.
@@ -67,25 +69,16 @@ Create a new directory to work in, and ``cd`` into it::
 
 Run it to create a new Django project called ``mysite``::
 
-    djangocms -f -p . mysite
+    djangocms mysite
 
 This means:
 
 * run the django CMS installer
-* install Django Filer too (``-f``) - **required for this tutorial**
-* use the current directory as the parent of the new project directory (``-p .``)
 * call the new project directory ``mysite``
-
-.. note:: **About Django Filer**
-
-   Django Filer, a useful application for managing files and processing images. Although it's not
-   required for django CMS itself, a vast number of django CMS addons use it, and nearly all django
-   CMS projects have it installed. If you know you won't need it, omit the flag. See the `django
-   CMS installer documentation for more information <https://djangocms-installer.readthedocs.io>`_.
 
 
 .. warning::
-   djangocms-installer expects directory ``.`` to be empty at this stage, and will check for this,
+   djangocms-installer expects current directory to be empty at this stage, and will check for this,
    and will warn if it's not. You can get it to skip the check and go ahead anyway using the ``-s``
    flag; **note that this may overwrite existing files**.
 
@@ -99,7 +92,7 @@ By default, the installer runs in `Batch mode
 <https://djangocms-installer.readthedocs.io/en/latest/usage.html#batch-mode-default>`_, and sets up your new project
 with some default values.
 
-Later, you may wish to manage some of these yourself, in which case you need to run it in `Wizard mode
+Later, you may wish to manage some of these by yourself, in which case you need to run it in `Wizard mode
 <https://djangocms-installer.readthedocs.io/en/latest/usage.html#wizard-mode>`_. The default in *Batch mode* is to set
 up an English-only project, which will be sufficient for the purposes of this tutorial. You can of course simply edit
 the new project's ``settings.py`` file at any time to change or add site languages or amend other settings.
@@ -110,8 +103,17 @@ The installer creates an admin user for you, with username/password ``admin``/``
 Start up the runserver
 ======================
 
+Go to mysite directory
+
 ::
 
+    cd mysite
+
+Start the server using following command
+
+::
+
+    cd mysite
     python manage.py runserver
 
 Open http://localhost:8000/ in your browser, where you should be invited to login, and then create

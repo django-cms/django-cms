@@ -60,11 +60,11 @@ class TemplatetagTests(CMSTestCase):
     def test_page_attribute_tag_escapes_content(self):
         script = '<script>alert("XSS");</script>'
 
-        class FakePage(object):
+        class FakePage:
             def get_page_title(self, *args, **kwargs):
                 return script
 
-        class FakeRequest(object):
+        class FakeRequest:
             current_page = FakePage()
             GET = {'language': 'en'}
 
@@ -108,7 +108,7 @@ class TemplatetagTests(CMSTestCase):
         mock_storage.url.side_effect = lambda x: '/static/' + x
 
         template = (
-            """{% load staticfiles cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
+            """{% load static cms_static %}<script src="{% static_with_version "cms/css/cms.base.css" %}" """
             """type="text/javascript"></script>"""
         )
 

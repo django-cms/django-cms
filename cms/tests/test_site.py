@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 
 from django.contrib.sites.models import Site
@@ -8,6 +7,7 @@ from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
+from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
 
 
 class SiteTestCase(CMSTestCase):
@@ -64,7 +64,12 @@ class SiteTestCase(CMSTestCase):
             # simulate user clicks on preview icon
             response = self.client.get(admin_reverse('cms_page_preview_page', args=[page.pk, 'de']))
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response._headers['location'][1], 'http://sample2.com{}&language=de'.format(page_edit_url_on))
+            if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
+                self.assertEqual(response._headers['location'][1], 'http://sample2.com{}&language=de'.format(page_edit_url_on))
+            else:
+                #  for django3.2 and above. response.headers replace response._headers in earlier versions of django
+                self.assertEqual(response.headers['Location'], 'http://sample2.com{}&language=de'.format(page_edit_url_on))
+
 
     def test_site_publish(self):
         self._login_context.__exit__(None, None, None)
@@ -110,3 +115,20 @@ class SiteTestCase(CMSTestCase):
                         page_url = page.get_absolute_url(language='de')
                     response = self.client.get(page_url)
                     self.assertEqual(response.status_code, 200)
+
+
+class TestSiteBoundStaticPlaceholder(SiteTestCase):
+    def setUp(self):
+        super().setUp()
+        with self.settings(
+            CMS_TEMPLATES=(('placeholder_tests/static_with_site.html', 'tpl'), ),
+        ):
+            self.test_page = create_page('page', 'placeholder_tests/static_with_site.html', language='de')
+
+    def tearDown(self):
+        self.test_page.delete()
+        super().tearDown()
+
+    def test_create_site_specific_placeholder(self):
+        response = self.client.get(self.test_page.get_absolute_url(language='de') + '?structure')
+        self.assertEqual(response.status_code, 200)

@@ -1,3 +1,5 @@
+:sequential_nav: both
+
 .. _integrating_applications:
 
 ########################
@@ -49,9 +51,9 @@ Add the ``poll`` URL configuration to ``urlpatterns`` in the project's ``urls.py
     :emphasize-lines: 3
 
     urlpatterns += i18n_patterns(
-        url(r'^admin/', include(admin.site.urls)),
-        url(r'^polls/', include('polls.urls')),
-        url(r'^', include('cms.urls')),
+        re_path(r'^admin/', include(admin.site.urls)),
+        re_path(r'^polls/', include('polls.urls')),
+        re_path(r'^', include('cms.urls')),
     )
 
 Note that it must be included **before** the line for the django CMS URLs. django CMS's URL pattern

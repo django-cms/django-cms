@@ -130,8 +130,9 @@ CMSPluginBase Attributes and Methods Reference
 
     .. attribute:: module
 
-        Will group the plugin in the plugin picker. If module is ``None``,
-        plugin is listed in the "Generic" group.
+        Will group the plugin in the plugin picker. If the module
+        attribute is not provided plugin is listed in the "Generic"
+        group.
 
 
     .. attribute:: name
@@ -351,7 +352,7 @@ CMSPluginBase Attributes and Methods Reference
         The default implementation is as follows::
 
             def icon_alt(self, instance):
-                return "%s - %s" % (force_text(self.name), force_text(instance))
+                return "%s - %s" % (force_str(self.name), force_str(instance))
 
         See also: :attr:`text_enabled`, :meth:`icon_src`.
 
@@ -404,7 +405,7 @@ CMSPluginBase Attributes and Methods Reference
         with default values by calling the render method of the super class::
 
             def render(self, context, instance, placeholder):
-                context = super(MyPlugin, self).render(context, instance, placeholder)
+                context = super().render(context, instance, placeholder)
                 ...
                 return context
 
@@ -434,7 +435,7 @@ CMSPluginBase Attributes and Methods Reference
         your text editor plugin.
 
         This requires support from the text plugin; support for this is currently planned
-        for `djangocms-text-ckeditor <https://github.com/divio/djangocms-text-ckeditor/>`_ 2.5.0.
+        for `djangocms-text-ckeditor <https://github.com/django-cms/djangocms-text-ckeditor/>`_ 2.5.0.
 
         See also: :attr:`text_enabled`.
 
@@ -493,7 +494,7 @@ CMSPlugin Attributes and Methods Reference
 
             from djangocms_text_ckeditor.models import Text
 
-            plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+            plugin = Text.objects.get(pk=1).get_bound_plugin()[0]
             plugin.get_translatable_content()
             # returns {'body': u'<p>I am text!</p>\n'}
 
@@ -529,7 +530,7 @@ CMSPlugin Attributes and Methods Reference
 
             from djangocms_text_ckeditor.models import Text
 
-            plugin = Text.objects.get(pk=1).get_plugin_instance()[0]
+            plugin = Text.objects.get(pk=1).get_bound_plugin()[0]
             plugin.set_translatable_content({'body': u'<p>This is a different text!</p>\n'})
             # returns True
 

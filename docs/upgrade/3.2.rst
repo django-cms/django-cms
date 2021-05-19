@@ -170,7 +170,7 @@ Automated spelling checks for documentation
 
 Documentation is now checked for spelling. A ``make spelling`` command is available now when
 working on documentation, and our `Travis Continuous Integration server
-<https://travis-ci.org/divio/django-cms>`_ also runs these checks.
+<https://travis-ci.com/django-cms/django-cms>`_ also runs these checks.
 
 See the :ref:`spelling` section in the documentation.
 
@@ -209,7 +209,7 @@ Known issues
 ************
 
 The `sub-pages of a page with an apphook will be unreachable
-<https://github.com/divio/django-cms/issues/4758>`_ (``404 page not found``), due to internal URL
+<https://github.com/django-cms/django-cms/issues/4758>`_ (``404 page not found``), due to internal URL
 resolution mechanisms in the CMS. Though it's unlikely that most users will need sub-pages of this
 kind (typically, an apphooked page will create its own sub-pages) this issue will be addressed in a
 forthcoming release.

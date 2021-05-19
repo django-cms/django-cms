@@ -4,7 +4,7 @@
 Code and project management
 ###########################
 
-We use our `GitHub project <https://github.com/divio/django-cms>`_ for managing both django CMS code
+We use our `GitHub project <https://github.com/django-cms/django-cms>`_ for managing both django CMS code
 and development activity.
 
 This document describes how we manage tickets on GitHub. By "tickets", we mean GitHub issues and
@@ -20,23 +20,20 @@ Raising an issue
 .. ATTENTION::
 
     If you think you have discovered a security issue in our code, please report
-    it **privately**, by emailing us at `security@django-cms.org`_.
+    it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
 
-        Please **do not** raise it on:
+    Please **do not** raise it in any public forum until we have had a
+    chance to deal with it.
 
-        * IRC
-        * GitHub
-        * either of our email lists
 
-        or in any other public forum until we have had a chance to deal with it.
-
-Except in the case of security matters, of course, you're welcome to raise issues in any way that
-suits you - :ref:`on one of our email lists, or the IRC channel <development-community>` or in person
-if you happen to meet another django CMS developer.
+Except in the case of security matters, of course, you're welcome to raise
+issues in any way that suits you - :ref:`using Discourse, or the Slack group
+<development-community>` or in person if you happen to meet another django CMS
+developer.
 
 It's very helpful though if you don't just raise an issue by mentioning it to people, but actually
 file it too, and that means creating a `new issue on GitHub
-<https://github.com/divio/django-cms/issues/new>`_.
+<https://github.com/django-cms/django-cms/issues/new>`_.
 
 There's an art to creating a good issue report.
 

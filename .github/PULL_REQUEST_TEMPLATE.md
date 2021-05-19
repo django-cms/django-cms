@@ -1,23 +1,30 @@
+## Description
+
 <!--
-    If this is a security-related patch stop immediately!
-    See http://docs.django-cms.org/en/latest/contributing/development-policies.html
+If this is a security issue stop right here and follow our documentation:
+http://docs.django-cms.org/en/latest/contributing/development-policies.html#reporting-security-issues
 -->
 
+## Related resources
 
-### Summary
+<!--
+Add here links to existing issues or conversation from GitHub
+or any other resource.
+-->
 
-Fixes #
+* #...
+* #...
 
+## Checklist
 
-### Links to related discussion
+<!--
+Please check the following items before submitting, otherwise,
+your pull request will be closed.
 
+Use 'x' to check each item: [x] I have ...
+-->
 
-### Proposed changes in this pull request
-
-
-### General checklist
-
-* [ ] I have updated the CHANGELOG.txt
-* [ ] I have created backports if necessary
-* [ ] I have updated the documentation and/or amended the upgrade section
-      if necessary
+* [ ] I have opened this pull request against ``develop``
+* [ ] I have added or modified the tests when changing logic
+* [ ] I have followed [the conventionnal commits guidelines](http://conventionnalcommits.org/) to add meaningful information into the changelog
+* [ ] I have read the [contribution guidelines ](https://github.com/django-cms/django-cms/blob/develop/CONTRIBUTING.rst) and I have joined #workgroup-pr-review on [Slack](https://www.django-cms.org/slack) to find a “pr review buddy” who is going to review my pull request.

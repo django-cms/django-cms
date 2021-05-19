@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 
 from cms.api import create_page, create_title

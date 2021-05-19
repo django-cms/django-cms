@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from cms.api import create_page
 from cms.models.pagemodel import Page
 
 
-class NavextendersFixture(object):
+class NavextendersFixture:
     def create_fixtures(self):
         """
         Tree from fixture:

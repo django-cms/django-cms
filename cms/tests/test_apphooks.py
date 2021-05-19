@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import sys
 import mock
 
@@ -9,9 +8,9 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core import checks
 from django.core.cache import cache
+from django.core.checks.urls import check_url_config
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
-from django.utils import six
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 
@@ -115,7 +114,7 @@ class ApphooksTestCase(CMSTestCase):
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, six.string_types):
+        if isinstance(title_langs, str):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
             titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]
@@ -123,6 +122,15 @@ class ApphooksTestCase(CMSTestCase):
         self.reload_urls()
 
         return titles
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.fourth_urls_for_apphook_tests')
+    def test_check_url_config(self):
+        """
+        Test for urls config check.
+        """
+        self.apphook_clear()
+        result = check_url_config(None)
+        self.assertEqual(len(result), 0)
 
     @override_settings(CMS_APPHOOKS=['%s.%s' % (APP_MODULE, APP_NAME)])
     def test_explicit_apphooks(self):

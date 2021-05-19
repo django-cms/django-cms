@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 import json
 import re
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render as render_to_response
 
 from django import forms
 from django.contrib import admin
@@ -12,10 +11,9 @@ from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
+from django.utils.encoding import force_str
 from django.utils.html import escapejs
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -101,8 +99,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
-@python_2_unicode_compatible
-class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
+class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     name = ""
     module = _("Generic")  # To be overridden in child classes
@@ -145,7 +142,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
     def __init__(self, model=None, admin_site=None):
         if admin_site:
-            super(CMSPluginBase, self).__init__(self.model, admin_site)
+            super().__init__(self.model, admin_site)
 
         self.object_successfully_changed = False
         self.placeholder = None
@@ -259,7 +256,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
         })
 
-        return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
+        return super().render_change_form(request, context, add, change, form_url, obj)
 
     def render_close_frame(self, request, obj, extra_context=None):
         try:
@@ -293,7 +290,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
             children=child_classes,
             parents=parent_classes,
         )
-        data['plugin_desc'] = escapejs(force_text(obj.get_short_description()))
+        data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
 
         context = {
             'plugin': obj,
@@ -305,7 +302,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         if extra_context:
             context.update(extra_context)
         return render_to_response(
-            'admin/cms/page/plugin/confirm_form.html', context
+            request, 'admin/cms/page/plugin/confirm_form.html', context
         )
 
     def save_model(self, request, obj, form, change):
@@ -337,10 +334,10 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
 
         # remember the saved object
         self.saved_object = obj
-        return super(CMSPluginBase, self).save_model(request, obj, form, change)
+        return super().save_model(request, obj, form, change)
 
     def save_form(self, request, form, change):
-        obj = super(CMSPluginBase, self).save_form(request, form, change)
+        obj = super().save_form(request, form, change)
 
         for field, value in self._cms_initial_attributes.items():
             # Set the initial attribute hooks (if any)
@@ -358,7 +355,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     def response_change(self, request, obj):
         self.object_successfully_changed = True
         opts = self.model._meta
-        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        msg_dict = {'name': force_str(opts.verbose_name), 'obj': force_str(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
         return self.render_close_frame(request, obj)
@@ -387,13 +384,13 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (force_text(self.name), force_text(instance))
+        return "%s - %s" % (force_str(self.name), force_str(instance))
 
     def get_fieldsets(self, request, obj=None):
         """
         Same as from base class except if there are no fields, show an info message.
         """
-        fieldsets = super(CMSPluginBase, self).get_fieldsets(request, obj)
+        fieldsets = super().get_fieldsets(request, obj)
 
         for name, data in fieldsets:
             if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets
@@ -414,7 +411,7 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
         Returns the text displayed to the user when editing a plugin
         that requires no configuration.
         """
-        return ugettext('There are no further settings for this plugin. Please press save.')
+        return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
     def get_child_class_overrides(cls, slot, page):
@@ -510,14 +507,11 @@ class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)
     def get_extra_plugin_menu_items(cls, request, plugin):
         pass
 
-    def __repr__(self):
-        return smart_str(self.name)
-
     def __str__(self):
-        return self.name
+        return force_str(self.name)
 
 
-class PluginMenuItem(object):
+class PluginMenuItem:
 
     def __init__(self, name, url, data=None, question=None, action='ajax', attributes=None):
         """

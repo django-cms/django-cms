@@ -13,26 +13,22 @@ Reporting security issues
 .. ATTENTION::
 
     If you think you have discovered a security issue in our code, please report
-    it **privately**, by emailing us at `security@django-cms.org`_.
+    it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
 
-        Please **do not** raise it on:
-
-        * IRC
-        * GitHub
-        * either of our email lists
-
-        or in any other public forum until we have had a chance to deal with it.
+    Please **do not** raise it in any public forum until we have had a
+    chance to deal with it.
 
 
 ******
 Review
 ******
 
-All patches should be made as pull requests to `the GitHub repository <https://github.com/divio/django-cms>`_. Patches
-should never be pushed directly.
+All patches should be made as pull requests **against develop** to
+`the GitHub repository <https://github.com/django-cms/django-cms>`_. Patches should
+never be pushed directly.
 
-**Nothing** may enter the code-base, *including the documentation*, without proper review and formal approval from the
-core team.
+**Nothing** may enter the code-base, *including the documentation*, without
+proper review and formal approval from the core team.
 
 Reviews are welcomed by all members of the community. You don't need to be a core developer, or even an experienced
 programmer, to contribute usefully to code review. Even noting that you don't understand something in a pull request
@@ -42,19 +38,16 @@ is valuable feedback and will be taken seriously.
 Formal approval
 ===============
 
-Formal approval means "OK to merge" comments, following review, from at least two different members of the core team
-who have expertise in the relevant areas, and excluding the author of the pull request.
-
-The exceptions to this are frontend code and documentation, where one "OK to merge" comment will suffice, at least
-until the team has more expert developers in those areas.
+Formal approval means "OK to merge" comments, following review, from at least
+one member of the core team who has expertise in the relevant areas, and excluding
+the author of the pull request.
 
 
 **********************************************
 Proposal and discussion of significant changes
 **********************************************
 
-New features and backward-incompatible changes should be proposed using the `django CMS developers email list
-<https://groups.google.com/group/django-cms-developers>`_. Discussion should take place there before any pull requests
+New features and backward-incompatible changes should be proposed using the `Discourse forum <https://discourse.django-cms.org>`_. Discussion should take place there before any pull requests
 are made.
 
 This is in the interests of openness and transparency, and to give the community a chance to participate in and
@@ -65,16 +58,22 @@ understand the decisions taken by the project.
 Release schedule
 ****************
 
+..  versionchanged:: 3.7
+
+    django CMS 3.7 is the new active long term release.
+
 The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website.
 
 We are planning releases according to **key principles and aims**. Issues within milestones are
 therefore subject to change.
 
-The `django CMS developers email list <https://groups.google.com/group/django-cms-developers>`_ serves as gathering
+The `django CMS Discourse forum <https://discourse.django-cms.org>`_ serves as gathering
 point for developers. We submit ideas and proposals prior to the roadmap goals.
 
-django CMS 3.4 will be the first "LTS" ("Long-Term Support") release of the application. *Long-term support* means that
-this version will continue to receive security and other critical updates for 24 months after its first release.
+django CMS 3.4, surpassed by 3.7, was the first "LTS" ("Long-Term Support")
+release of the application. *Long-term support* means that this version will
+continue to receive security and other critical updates for 24 months after its
+first release.
 
 Any updates it does receive will be backward-compatible and will not alter functional behaviour. This means that users
 can deploy this version confident that keeping it up-to-date requires only easily-applied security and other critical
@@ -92,31 +91,32 @@ Branches
     Previously, we maintained a ``master`` branch (now deleted), and a set of ``support`` branches (now pruned, and
     renamed ``release``).
 
-We maintain a number of branches on `our GitHub repository <https://github.com/divio/django-cms>`_.
+..  versionchanged:: 3.7
 
-the latest (highest-numbered) ``release/x.y.z``
-    This is the branch that will become the next release on PyPI.
+    Simplified the description of the release branches and added additional
+    information for ``releases`` and ``release/4.0.x``. In general open PRs
+    against ``develop``.
 
-    **Fixes and backwards-compatible improvements** (i.e. most pull requests) will be made against
-    this branch.
+We maintain a number of branches on
+`our GitHub repository <https://github.com/django-cms/django-cms>`_:
 
 ``develop``
-    This is the branch that will become the next release that increments the ``x`` or ``y`` of the latest
-    ``release/x.y.z``.
+    The default target branch for on-going development and new pull requests.
 
-    This branch is for **new features and backwards-incompatible changes**. By their nature, these will require more
-    substantial team co-ordination.
+``release/x.y.z`` are the latest released versions of django CMS. Commits
+    are cherry-picked from ``develop`` and merged into ``release/x.y.z``
+    when suitable. We **officially support** the latest, highest released version
+    and the latest LTS (currently 3.7).
 
-Older ``release/x.y.z`` branches
-     These represent the final point of development (the highest ``y`` of older versions). Releases in the full set of
-     older versions have been tagged (use Git Tags to retrieve them).
+``release/4.0.x`` is an experimental branch and should not be considered
+    as the highest released version.
 
-     These branches will only rarely be patched, with security fixes representing the main reason for a patch.
+``releases`` hosts the `releases.json` file to indicate the availability of new
+    django CMS versions when using `djangocms-admin-style <https://github.com/django-cms/djangocms-admin-style#configuration>`_.
 
-Commits in ``release/x.y.z`` will be merged forward into ``develop`` periodically by the core developers.
-
-If in doubt about which branch to work from, ask on the #django-cms IRC channel on `freenode`_ or the
-`django-cms-developers`_ email list!
+Please always open PR's against develop and indicate that they should be
+backported to the latest LTS release when necessary. Older branches are not
+supported any longer.
 
 
 .. _commit_policy:
@@ -198,7 +198,7 @@ Changelog
 .. versionadded:: 3.3
 
 **Every new feature, bugfix or other change of substance** must be represented in the `CHANGELOG
-<https://github.com/divio/django-cms/blob/develop/CHANGELOG.txt>`_. This includes documentation, but **doesn't** extend
+<https://github.com/django-cms/django-cms/blob/develop/CHANGELOG.rst>`_. This includes documentation, but **doesn't** extend
 to things like reformatting code, tidying-up, correcting typos and so on.
 
 Each line in the changelog should begin with a verb in the past tense, for example::
@@ -214,5 +214,4 @@ New lines should be added to the top of the list.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
-.. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _freenode: http://freenode.net/

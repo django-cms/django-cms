@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.core.cache import cache
 from django.test.utils import override_settings
 
@@ -50,7 +49,7 @@ def sample_plugin_context_processor(instance, placeholder, original_context):
 class RenderingTestCase(CMSTestCase):
 
     def setUp(self):
-        super(RenderingTestCase, self).setUp()
+        super().setUp()
         self.test_user = self._create_user("test", True, True)
 
         with self.login_user_context(self.test_user):
