@@ -1423,27 +1423,19 @@ class Page(models.Model):
 
         force_reload = (force_reload or language not in self.title_cache)
 
-        if fallback and not self.title_cache.get(language):
-            # language can be in the cache but might be an EmptyTitle instance
-            fallback_langs = i18n.get_fallback_languages(language)
-            for lang in fallback_langs:
-                if self.title_cache.get(lang):
-                    return lang
-
         if force_reload:
             from cms.models.titlemodels import Title
 
             titles = Title.objects.filter(page=self)
             for title in titles:
                 self.title_cache[title.language] = title
-            if self.title_cache.get(language):
-                return language
-            else:
-                if fallback:
-                    fallback_langs = i18n.get_fallback_languages(language)
-                    for lang in fallback_langs:
-                        if self.title_cache.get(lang):
-                            return lang
+
+        if fallback and not self.title_cache.get(language):
+            fallback_langs = i18n.get_fallback_languages(language)
+            for lang in fallback_langs:
+                if self.title_cache.get(lang):
+                    return lang
+
         return language
 
     def get_template(self):
