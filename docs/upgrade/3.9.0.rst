@@ -30,9 +30,9 @@ Bug Fixes
 * Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 
 
-*********************
+***********************
 How to upgrade to 3.9.0
-*********************
+***********************
 
 We assume you are upgrading from django CMS 3.8.
 
