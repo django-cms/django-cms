@@ -74,6 +74,7 @@ Unreleased
 * added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
 * replaced ``staticfiles`` and ``admin_static`` with ``static``
 * replaced djangocms-helper with django-app-helper
+* Added ability to set placeholder global limit on children only
 
 
 3.7.1 (2019-11-26)
