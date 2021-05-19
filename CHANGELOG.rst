@@ -9,6 +9,8 @@ unreleased
 * feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
 * Introduce dropdown menus in the page tree for status indicators
+* Fixed redirect issues when i18n_patterns had prefix_default_language = False
+
 
 4.0.0 (unreleased)
 ==================
