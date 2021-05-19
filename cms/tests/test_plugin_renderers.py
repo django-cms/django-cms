@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.test.utils import override_settings
 
 from cms.api import add_plugin, create_page

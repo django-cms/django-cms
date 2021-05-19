@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # django cms documentation build configuration file, created by
 # sphinx-quickstart on Tue Sep 15 10:47:03 2009.
@@ -12,6 +11,7 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
+import cms
 import datetime
 import os
 import sys
@@ -33,17 +33,18 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 
 extensions = [
     'djangocms',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinx.ext.autodoc',
     'sphinxcontrib.spelling'
-    ]
+]
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/3/', None),
+    'python': ('https://docs.python.org/3/', None),
     'django': ('https://docs.djangoproject.com/en/2.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
-    'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
-    'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
-    'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
+    'classytags': ('https://django-classy-tags.readthedocs.io/en/latest/', None),
+    'sekizai': ('https://django-sekizai.readthedocs.io/en/latest/', None),
+    'treebeard': ('https://django-treebeard.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -72,7 +73,6 @@ copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
 path = os.path.split(os.path.dirname(__file__))[0]
 path = os.path.split(path)[0]
 sys.path.insert(0, path)
-import cms
 
 version = cms.__version__
 # The full version, including alpha/beta/rc tags.
@@ -132,8 +132,21 @@ try:
     import divio_docs_theme
     html_theme = 'divio_docs_theme'
     html_theme_path = [divio_docs_theme.get_html_theme_path()]
+    html_theme_options = {
+        'show_cloud_banner': True,
+        'cloud_banner_markup': """
+            <div class="divio-cloud">
+                <span class="divio-cloud-caption">The django CMS Association</span>
+                <p>The django CMS Association is a non-profit organisation that funds and
+                steers the development of django CMS, and nurtures its world-wide
+                community of developers and users.</p>
+                <a class="btn-neutral divio-cloud-btn" target="_blank" href="https://www.django-cms.org/en/about-us/">Join us</a>
+            </div>
+        """,
+    }
 except:
     html_theme = 'default'
+
 
 show_cloud_banner = True
 

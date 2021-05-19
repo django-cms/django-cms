@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import date
 import json
 import os
@@ -11,11 +10,9 @@ from django.db.models import ManyToManyField, Model
 from django.db.models.base import ModelBase
 from django.urls import NoReverseMatch
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
-
-from six import text_type, with_metaclass, python_2_unicode_compatible
+from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
@@ -25,7 +22,7 @@ from cms.utils.urlutils import admin_reverse
 from treebeard.mp_tree import MP_Node
 
 
-class BoundRenderMeta(object):
+class BoundRenderMeta:
     def __init__(self, meta):
         self.index = 0
         self.total = 1
@@ -92,8 +89,7 @@ class PluginModelBase(ModelBase):
         return new_class
 
 
-@python_2_unicode_compatible
-class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
+class CMSPlugin(MP_Node, metaclass=PluginModelBase):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
@@ -123,7 +119,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         text_enabled = False
 
     def __str__(self):
-        return force_text(self.pk)
+        return force_str(self.pk)
 
     def __repr__(self):
         display = "<{module}.{class_name} id={id} plugin_type='{plugin_type}' object at {location}>".format(
@@ -143,7 +139,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
         if instance is not None:
-            return force_text(instance)
+            return force_str(instance)
         return _("<Empty>")
 
     def get_plugin_class(self):
@@ -196,12 +192,12 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         plugin_name = self.get_plugin_name()
         data = {
             'type': 'plugin',
-            'placeholder_id': text_type(self.placeholder_id),
-            'plugin_name': force_text(plugin_name) or '',
+            'placeholder_id': str(self.placeholder_id),
+            'plugin_name': force_str(plugin_name) or '',
             'plugin_type': self.plugin_type,
-            'plugin_id': text_type(self.pk),
+            'plugin_id': str(self.pk),
             'plugin_language': self.language or '',
-            'plugin_parent': text_type(self.parent_id or ''),
+            'plugin_parent': str(self.parent_id or ''),
             'plugin_restriction': children or [],
             'plugin_parent_restriction': parents or [],
             'urls': self.get_action_urls(),
@@ -209,7 +205,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         return data
 
     def refresh_from_db(self, *args, **kwargs):
-        super(CMSPlugin, self).refresh_from_db(*args, **kwargs)
+        super().refresh_from_db(*args, **kwargs)
 
         # Delete this internal cache to let the cms populate it
         # on demand.
@@ -249,7 +245,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         Get alt text for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return force_text(plugin.icon_alt(instance)) if instance else u''
+        return force_str(plugin.icon_alt(instance)) if instance else u''
 
     def update(self, refresh=False, **fields):
         CMSPlugin.objects.filter(pk=self.pk).update(**fields)
@@ -268,13 +264,13 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
                                                              placeholder_id=self.placeholder_id).count()
                 self.add_root(instance=self)
             return
-        super(CMSPlugin, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def reload(self):
         return CMSPlugin.objects.get(pk=self.pk)
 
     def move(self, target, pos=None):
-        super(CMSPlugin, self).move(target, pos)
+        super().move(target, pos)
         self = self.reload()
 
         try:
@@ -414,23 +410,23 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         breadcrumb = []
         for parent in self.get_ancestors():
             try:
-                url = force_text(
+                url = force_str(
                     admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
                                   args=[parent.pk]))
             except NoReverseMatch:
-                url = force_text(
+                url = force_str(
                     admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
                                   args=[parent.pk]))
-            breadcrumb.append({'title': force_text(parent.get_plugin_name()), 'url': url})
+            breadcrumb.append({'title': force_str(parent.get_plugin_name()), 'url': url})
         try:
-            url = force_text(
+            url = force_str(
                 admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
                               args=[self.pk]))
         except NoReverseMatch:
-            url = force_text(
+            url = force_str(
                 admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
                               args=[self.pk]))
-        breadcrumb.append({'title': force_text(self.get_plugin_name()), 'url': url})
+        breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
         return breadcrumb
 
     def get_breadcrumb_json(self):
@@ -464,7 +460,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, MP_Node)):
         if no_mp:
             Model.delete(self, *args, **kwargs)
         else:
-            super(CMSPlugin, self).delete(*args, **kwargs)
+            super().delete(*args, **kwargs)
 
     def get_action_urls(self, js_compat=True):
         if js_compat:

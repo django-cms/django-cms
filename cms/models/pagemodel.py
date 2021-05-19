@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 from collections import OrderedDict
 from logging import getLogger
@@ -9,13 +8,13 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
     get_language,
     override as force_language,
-    ugettext_lazy as _,
+    gettext_lazy as _,
 )
 
 from cms import constants
@@ -23,7 +22,6 @@ from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBL
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
-from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
@@ -32,13 +30,10 @@ from menus.menu_pool import menu_pool
 
 from treebeard.mp_tree import MP_Node
 
-from six import python_2_unicode_compatible
-
 
 logger = getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class TreeNode(MP_Node):
 
     parent = models.ForeignKey(
@@ -91,14 +86,14 @@ class TreeNode(MP_Node):
             kwargs['instance'].parent = self
         else:
             kwargs['parent'] = self
-        return super(TreeNode, self).add_child(**kwargs)
+        return super().add_child(**kwargs)
 
     def add_sibling(self, pos=None, *args, **kwargs):
         if len(kwargs) == 1 and 'instance' in kwargs:
             kwargs['instance'].parent_id = self.parent_id
         else:
             kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(pos, *args, **kwargs)
+        return super().add_sibling(pos, *args, **kwargs)
 
     def update(self, **data):
         cls = self.__class__
@@ -147,7 +142,6 @@ class TreeNode(MP_Node):
             child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
-@python_2_unicode_compatible
 class Page(models.Model):
     """
     A simple hierarchical page model
@@ -169,7 +163,7 @@ class Page(models.Model):
         (constants.X_FRAME_OPTIONS_ALLOW, _('Allow'))
     )
 
-    template_choices = [(x, _(y)) for x, y in get_cms_setting('TEMPLATES')]
+    template_choices = [(x, y) for x, y in get_cms_setting('TEMPLATES')]
 
     created_by = models.CharField(
         _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
@@ -253,7 +247,7 @@ class Page(models.Model):
         app_label = 'cms'
 
     def __init__(self, *args, **kwargs):
-        super(Page, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title_cache = {}
 
     def __str__(self):
@@ -266,7 +260,7 @@ class Page(models.Model):
                 title = None
         if title is None:
             title = u""
-        return force_text(title)
+        return force_str(title)
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
@@ -279,12 +273,8 @@ class Page(models.Model):
         return display
 
     def _clear_node_cache(self):
-        if DJANGO_1_11:
-            if hasattr(self, '_node_cache'):
-                del self._node_cache
-        else:
-            if Page.node.is_cached(self):
-                Page.node.field.delete_cached_value(self)
+        if Page.node.is_cached(self):
+            Page.node.field.delete_cached_value(self)
 
     def _clear_internal_cache(self):
         self.title_cache = {}
@@ -350,7 +340,7 @@ class Page(models.Model):
         title_obj.path = title_obj.get_path_for_base(base)
         title_obj.save()
 
-    def _update_title_path_recursive(self, language):
+    def _update_title_path_recursive(self, language, slug=None):
         assert self.publisher_is_draft
         from cms.models import Title
 
@@ -358,7 +348,10 @@ class Page(models.Model):
             return
 
         pages = self.get_child_pages()
-        base = self.get_path(language, fallback=True)
+        if slug:
+            base = self.get_path_for_slug(slug, language)
+        else:
+            base = self.get_path(language, fallback=True)
 
         if base:
             new_path = Concat(models.Value(base), models.Value('/'), models.F('slug'))
@@ -829,7 +822,7 @@ class Page(models.Model):
 
         if created:
             self.created_by = self.changed_by
-        super(Page, self).save(**kwargs)
+        super().save(**kwargs)
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
@@ -844,7 +837,7 @@ class Page(models.Model):
             self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        return super(Page, self).save_base(*args, **kwargs)
+        return super().save_base(*args, **kwargs)
 
     def update(self, refresh=False, draft_only=True, **data):
         assert self.publisher_is_draft

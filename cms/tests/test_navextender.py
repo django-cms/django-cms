@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.models import Page
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
 from cms.test_utils.testcases import CMSTestCase

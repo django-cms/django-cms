@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import inspect
 from itertools import chain
@@ -22,7 +21,7 @@ SKIPPED = 4
 CHECKERS = []
 
 
-class FileOutputWrapper(object):
+class FileOutputWrapper:
     """
     Wraps two file-like objects (that support at the very least the 'write'
     method) into an API to be used by the check function further down in
@@ -124,7 +123,7 @@ class FileSectionWrapper(FileOutputWrapper):
         finish_skip(message): End this (skipped) section
     """
     def __init__(self, wrapper):
-        super(FileSectionWrapper, self).__init__(wrapper.stdout, wrapper.stderr)
+        super().__init__(wrapper.stdout, wrapper.stderr)
         self.wrapper = wrapper
 
     def write_line(self, message=''):
@@ -234,13 +233,10 @@ def check_middlewares(output):
             'cms.middleware.toolbar.ToolbarMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
         )
-        if getattr(settings, 'MIDDLEWARE', None):
-            middlewares = settings.MIDDLEWARE
-        else:
-            middlewares = settings.MIDDLEWARE_CLASSES
+        middlewares = settings.MIDDLEWARE
         for middleware in required_middlewares:
             if middleware not in middlewares:
-                section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
+                section.error("%s middleware must be in MIDDLEWARE" % middleware)
 
 @define_check
 def check_context_processors(output):
@@ -288,7 +284,7 @@ def check_copy_relations(output):
     from cms.extensions.models import BaseExtension
     from cms.models.pluginmodel import CMSPlugin
 
-    c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
+    def c_to_s(klass): return '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):
         for cls in inspect.getmro(model):
@@ -341,6 +337,31 @@ def check_copy_relations(output):
                                    'This might lead to data loss when publishing or copying plugins/extensions.\n'
                                    'See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
                                    'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
+
+
+@define_check
+def check_placeholder_fields(output):
+    """
+    ModelAdmin instances that are using PlaceholderField fields
+    should be also a subclass of PlaceholderAdminMixin
+    """
+    from django.contrib.admin import site
+    from cms.models.fields import PlaceholderField
+    from cms.admin.placeholderadmin import PlaceholderAdminMixin
+
+    with output.section("PlaceholderField") as section:
+        for model, model_admin in site._registry.items():
+            ph_fields = [field for field in model._meta.get_fields() if isinstance(field, PlaceholderField)]
+            if len(ph_fields) == 0:
+                continue
+
+            if not isinstance(model_admin, PlaceholderAdminMixin):
+                section.error(
+                    "%s does not subclass of PlaceholderAdminMixin" % model_admin
+                )
+
+        if section.successful:
+            section.finish_success("PlaceholderField configuration okay")
 
 
 def check(output):

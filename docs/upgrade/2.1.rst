@@ -62,7 +62,7 @@ The following changes will need to be made in your ``settings.py`` file::
     django.core.context_processors.static
     sekizai.context_processors.sekizai
 
-**Remove** the following from :setting:`django:MIDDLEWARE_CLASSES`::
+**Remove** the following from ``MIDDLEWARE_CLASSES``::
 
     cms.middleware.media.PlaceholderMediaMiddleware
 
@@ -121,15 +121,11 @@ Add the following to ``urls.py`` to serve static media when developing::
 
     if settings.DEBUG:
         urlpatterns = patterns('',
-        url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-        url(r'', include('django.contrib.staticfiles.urls')),
+        re_path(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+        re_path(r'', include('django.contrib.staticfiles.urls')),
     ) + urlpatterns
 
 Also run this command to collect static files into your :setting:`django:STATIC_ROOT`::
 
     python manage.py collectstatic
-
-
-
-

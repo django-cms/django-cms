@@ -1,0 +1,16 @@
+.. _upgrade-to-3.7.3:
+
+###################
+3.7.3 release notes
+###################
+
+*******************
+What's new in 3.7.3
+*******************
+
+Bug Fixes
+=========
+
+* Fixed apphooks config select in Firefox
+* Fixed compatibility errors on python 2
+* Fixed long page titles in Page tree/list view to prevent horizontal scrolling

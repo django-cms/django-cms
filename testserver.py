@@ -1,12 +1,11 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import os
 import sys
 
 
 def noop_gettext(s):
     return s
+
 
 permission = True
 cms_toolbar_edit_on = 'edit'
@@ -26,7 +25,7 @@ for arg in sys.argv:
 gettext = noop_gettext
 
 
-class DisableMigrations(object):
+class DisableMigrations:
 
     def __contains__(self, item):
         return True
@@ -116,6 +115,7 @@ HELPER_SETTINGS = dict(
         'cms.test_utils.project.pluginapp.plugins.multicolumn',
         'cms.test_utils.project.pluginapp.plugins.multiwrap',
         'cms.test_utils.project.pluginapp.plugins.style',
+        'cms.test_utils.project.pluginapp.plugins.dynamic_js_loading',
         'cms.test_utils.project.placeholderapp',
     ],
     MIDDLEWARE=[
@@ -176,6 +176,7 @@ def run():
     # we use '.runner()', not '.cms()' nor '.run()' because it does not
     # add 'test' argument implicitly
     runner.runner([sys.argv[0], 'cms', '--cms', 'server', '--bind', '0.0.0.0', '--port', str(port)])
+
 
 if __name__ == "__main__":
     run()

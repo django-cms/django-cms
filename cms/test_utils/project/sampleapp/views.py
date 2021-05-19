@@ -1,7 +1,7 @@
 # Create your views here.
 from django.http import Http404
 from django.shortcuts import render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.base import TemplateView
 
@@ -58,7 +58,7 @@ def notfound(request):
     raise Http404
 
 
-class ClassView(object):
+class ClassView:
     def __call__(self, request, *args, **kwargs):
         context = {'content': 'plain text'}
         return render(request, "sampleapp/plain.html", context)

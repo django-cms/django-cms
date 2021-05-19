@@ -4,9 +4,7 @@ from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-
-from six import text_type, python_2_unicode_compatible
+from django.utils.translation import gettext_lazy as _
 
 from cms.models.fields import PlaceholderField
 from cms.utils.copy_plugins import copy_plugins_to
@@ -20,7 +18,6 @@ def static_slotname(instance):
     return instance.code
 
 
-@python_2_unicode_compatible
 class StaticPlaceholder(models.Model):
     CREATION_BY_TEMPLATE = 'template'
     CREATION_BY_CODE = 'code'
@@ -53,7 +50,7 @@ class StaticPlaceholder(models.Model):
         return self.get_name()
 
     def get_name(self):
-        return self.name or self.code or text_type(self.pk)
+        return self.name or self.code or str(self.pk)
     get_name.short_description = _(u'static placeholder name')
 
     def clean(self):

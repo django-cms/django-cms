@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import lru_cache
 
 from django.utils.functional import lazy

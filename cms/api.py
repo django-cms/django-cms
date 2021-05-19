@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Public Python API to create CMS contents.
 
@@ -17,8 +16,6 @@ from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
 from django.utils.translation import activate
-
-from six import string_types
 
 from cms import constants
 from cms.app_base import CMSApp
@@ -59,7 +56,7 @@ def _verify_apphook(apphook, namespace):
         apphook_name = apphook.__class__.__name__
     elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         return apphook.__name__
-    elif isinstance(apphook, string_types):
+    elif isinstance(apphook, str):
         try:
             assert apphook in apphook_pool.apps
         except AssertionError:
@@ -83,7 +80,7 @@ def _verify_plugin_type(plugin_type):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
-    elif isinstance(plugin_type, string_types):
+    elif isinstance(plugin_type, str):
         try:
             plugin_model = plugin_pool.get_plugin(plugin_type).model
         except KeyError:
