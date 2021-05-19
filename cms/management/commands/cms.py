@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from collections import OrderedDict
 
 import cms
@@ -35,4 +32,4 @@ class Command(SubcommandsCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--version', action='version', version=self.get_version())
-        super(Command, self).add_arguments(parser)
+        super().add_arguments(parser)

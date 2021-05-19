@@ -60,7 +60,7 @@ Create a new project
 
 Create a new project::
 
-    django-admin.py startproject myproject
+    django-admin startproject myproject
 
 If this is new to you, you ought to read the `official Django tutorial
 <https://docs.djangoproject.com/en/dev/intro/tutorial01/>`_, which covers starting a new project.
@@ -99,7 +99,7 @@ You will need to add the following to its list of ``INSTALLED_APPS``::
 * `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django CMS's page and plugin tree
   structures.
 
-django CMS installs `django CMS admin style <https://github.com/divio/djangocms-admin-style>`_.
+django CMS installs `django CMS admin style <https://github.com/django-cms/djangocms-admin-style>`_.
 This provides some styling that helps make django CMS administration components easier to work with.
 Technically it's an optional component and does not need to be enabled in your project,
 but it's strongly recommended.
@@ -134,7 +134,14 @@ django CMS requires a relational database backend. Each django CMS installation 
 
 You can use SQLite, which is included in Python and doesn't need to be installed separately or configured further. You
 are unlikely to be using that for a project in production, but it's ideal for development and exploration, especially
-as it is configured by default in a new Django project's :setting:`django:DATABASES`.
+as it is configured by default in a new Django project's :setting:`django:DATABASES`::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR , 'db.sqlite3'),
+        }
+    }
 
 ..  note::
 
@@ -239,6 +246,9 @@ to the list.
 You can also add ``'cms.middleware.utils.ApphookReloadMiddleware'``. It's not absolutely necessary, but it's
 :ref:`useful <reloading_apphooks>`. If included, should be at the start of the list.
 
+add the following configuration to your ``settings.py``::
+
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 Context processors
 ==================
@@ -262,16 +272,16 @@ In the project's ``urls.py``, add ``url(r'^', include('cms.urls'))`` to the ``ur
 other patterns, so that specific URLs for other applications can be detected first. Note: when using Django 2.0 or
 later the syntax is ``re_path(r'^', include('cms.urls'))``
 
-You'll also need to have an import for ``django.conf.urls.include``. For example:
+You'll also need to have an import for ``django.urls.include``. For example:
 
 ..  code-block:: python
     :emphasize-lines: 1,5
 
-    from django.conf.urls import url, include
+    from django.urls import re_path, include
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
-        url(r'^', include('cms.urls')),
+        re_path(r'^admin/', admin.site.urls),
+        re_path(r'^', include('cms.urls')),
     ]
 
 The django CMS project will now run, as you'll see if you launch it with ``python manage.py runserver``. You'll be able
@@ -451,7 +461,7 @@ Django CMS CKEditor
 
 `Django CMS CKEditor`_ is the default text editor for django CMS.
 
-.. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
+.. _Django CMS CKEditor: https://github.com/django-cms/djangocms-text-ckeditor
 
 Install: ``pip install djangocms-text-ckeditor``.
 
@@ -468,19 +478,18 @@ Miscellaneous plugins
 There are plugins for django CMS that cover a vast range of functionality. To get started, it's useful to be able to
 rely on a set of well-maintained plugins that cover some general content management needs.
 
-* `djangocms-link <https://github.com/divio/djangocms-link>`_
-* `djangocms-file <https://github.com/divio/djangocms-file>`_
-* `djangocms-picture <https://github.com/divio/djangocms-picture>`_
-* `djangocms-video <https://github.com/divio/djangocms-video>`_
-* `djangocms-googlemap <https://github.com/divio/djangocms-googlemap>`_
-* `djangocms-snippet <https://github.com/divio/djangocms-snippet>`_
-* `djangocms-style <https://github.com/divio/djangocms-style>`_
-* `djangocms-column <https://github.com/divio/djangocms-column>`_
+* `djangocms-link <https://github.com/django-cms/djangocms-link>`_
+* `djangocms-file <https://github.com/django-cms/djangocms-file>`_
+* `djangocms-picture <https://github.com/django-cms/djangocms-picture>`_
+* `djangocms-video <https://github.com/django-cms/djangocms-video>`_
+* `djangocms-googlemap <https://github.com/django-cms/djangocms-googlemap>`_
+* `djangocms-snippet <https://github.com/django-cms/djangocms-snippet>`_
+* `djangocms-style <https://github.com/django-cms/djangocms-style>`_
 
 To install::
 
     pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet
-        djangocms-style djangocms-column
+        djangocms-style
 
 and add::
 
@@ -491,7 +500,6 @@ and add::
     'djangocms_googlemap',
     'djangocms_snippet',
     'djangocms_style',
-    'djangocms_column',
 
 to ``INSTALLED_APPS``.
 

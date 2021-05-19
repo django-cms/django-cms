@@ -1,9 +1,9 @@
-from django.conf.urls import url
-from django.utils.translation import ugettext_lazy as _
+from django.urls import re_path
+from django.utils.translation import gettext_lazy as _
 
 from . import views
 
 urlpatterns = [
-    url(r'^current-app/$', views.current_app, name='current-app'),
-    url(_('page'), views.current_app, name='translated-url'),
+    re_path(r'^current-app/$', views.current_app, name='current-app'),
+    re_path(_('page'), views.current_app, name='translated-url'),
 ]

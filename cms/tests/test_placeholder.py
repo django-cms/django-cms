@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -7,7 +6,7 @@ from django.template import TemplateSyntaxError, Template
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
 
@@ -31,7 +30,6 @@ from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    get_placeholder_conf, get_placeholders, _get_nodelist,
@@ -51,7 +49,7 @@ def _render_placeholder(placeholder, context, **kwargs):
     return content_renderer.render_placeholder(placeholder, context, **kwargs)
 
 
-class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
+class PlaceholderTestCase(TransactionCMSTestCase):
     def setUp(self):
         u = self._create_user("test", True, True)
 
@@ -400,16 +398,16 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         }
 
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
-            self.assertEqual(force_text(placeholder_1.get_label()), 'left column')
-            self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
-            self.assertEqual(force_text(placeholder_3.get_label()), 'fallback')
+            self.assertEqual(force_str(placeholder_1.get_label()), 'left column')
+            self.assertEqual(force_str(placeholder_2.get_label()), 'renamed left column')
+            self.assertEqual(force_str(placeholder_3.get_label()), 'fallback')
 
         del TEST_CONF[None]
 
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
-            self.assertEqual(force_text(placeholder_1.get_label()), 'left column')
-            self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
-            self.assertEqual(force_text(placeholder_3.get_label()), 'No_Name')
+            self.assertEqual(force_str(placeholder_1.get_label()), 'left column')
+            self.assertEqual(force_str(placeholder_2.get_label()), 'renamed left column')
+            self.assertEqual(force_str(placeholder_3.get_label()), 'No_Name')
 
     def test_placeholders_from_blocks_order(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_with_block.html')
@@ -959,7 +957,7 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = force_text(ph)
+        result = force_str(ph)
         self.assertEqual(result, u'test')
 
     def test_excercise_get_attached_model(self):

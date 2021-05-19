@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import partial
 from logging import getLogger
 
@@ -9,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language_from_request, ugettext_lazy as _
+from django.utils.translation import get_language_from_request, gettext_lazy as _
 
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
@@ -88,7 +87,7 @@ def _get_menu_class_for_instance(menu_class, instance):
     return meta_class(class_name, (menu_class,), attrs)
 
 
-class MenuRenderer(object):
+class MenuRenderer:
     # The main logic behind this class is to decouple
     # the singleton menu pool from the menu rendering logic.
     # By doing this we can be sure that each request has it's
@@ -238,7 +237,7 @@ class MenuRenderer(object):
         return MenuClass(renderer=self)
 
 
-class MenuPool(object):
+class MenuPool:
 
     def __init__(self):
         self.menus = {}

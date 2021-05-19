@@ -1,0 +1,33 @@
+{% load sekizai_tags static %}
+<h1 id="dynamic_js_loading_heading">Test dynamic loading of testcase {{instance.testcase}}</h1>
+
+
+{% addtoblock "js" %}
+    <script class="{{js_test_classes}}">
+        function append_h2_element_inline(id) {
+            var h2_elem = document.createElement('h2');
+
+            h2_elem.id = id;
+            h2_elem.textContent = 'id=' + id;
+            document.body.appendChild(h2_elem);
+        }
+
+        append_h2_element_inline('inline_no_trigger');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            append_h2_element_inline('inline_needs_trigger_document_DOMContentLoaded');
+        });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            append_h2_element_inline('inline_needs_trigger_window_DOMContentLoaded');
+        });
+
+        window.addEventListener('load', function() {
+            append_h2_element_inline('inline_needs_trigger_window_load');
+        });
+    </script>
+{% endaddtoblock %}
+
+{% addtoblock "js" %}
+    <script src="{% static '/dynamic_js_loading/js/test_script.js' %}" class="{{js_test_classes}}"></script>
+{% endaddtoblock %}

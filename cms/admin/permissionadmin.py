@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from copy import deepcopy
 
 from django.contrib import admin
@@ -104,7 +103,7 @@ class PagePermissionInlineAdmin(TabularInline):
                 exclude.append('can_move_page')
 
         kwargs['exclude'] = exclude
-        formset_cls = super(PagePermissionInlineAdmin, self).get_formset(request, obj=obj, **kwargs)
+        formset_cls = super().get_formset(request, obj=obj, **kwargs)
         qs = self.get_queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)

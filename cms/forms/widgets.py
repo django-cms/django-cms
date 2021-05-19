@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.forms.widgets import MultiWidget, Select, TextInput
 from django.urls import NoReverseMatch, reverse_lazy
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 
@@ -29,7 +28,7 @@ class PageSelectWidget(MultiWidget):
         else:
             self.attrs = {}
         self.choices = []
-        super(PageSelectWidget, self).__init__((Select, Select, Select), attrs)
+        super().__init__((Select, Select, Select), attrs)
 
     def decompress(self, value):
         """
@@ -60,7 +59,7 @@ class PageSelectWidget(MultiWidget):
             initial_value = u''
         else:
             initial_value = initial
-        if force_text(initial_value) != force_text(data_value):
+        if force_str(initial_value) != force_str(data_value):
             return True
         return False
 
@@ -89,7 +88,7 @@ class PageSelectWidget(MultiWidget):
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
-        context = super(PageSelectWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
 
@@ -112,7 +111,7 @@ class PageSmartLinkWidget(TextInput):
         )
 
     def __init__(self, attrs=None, ajax_view=None):
-        super(PageSmartLinkWidget, self).__init__(attrs)
+        super().__init__(attrs)
         self.ajax_url = self.get_ajax_url(ajax_view=ajax_view)
 
     def get_ajax_url(self, ajax_view):
@@ -139,11 +138,11 @@ class PageSmartLinkWidget(TextInput):
             'element_id': attrs.get('id', ''),
             'placeholder_text': attrs.get('placeholder_text', ''),
             'language_code': self.language,
-            'ajax_url': force_text(self.ajax_url)
+            'ajax_url': force_str(self.ajax_url)
         }
 
     def get_context(self, name, value, attrs):
-        context = super(PageSmartLinkWidget, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context
 
@@ -157,7 +156,7 @@ class UserSelectAdminWidget(Select):
     attribute.
     """
     def render(self, name, value, attrs=None, choices=(), renderer=None):
-        output = [super(UserSelectAdminWidget, self).render(name, value, attrs, renderer=renderer)]
+        output = [super().render(name, value, attrs, renderer=renderer)]
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
@@ -181,10 +180,10 @@ class AppHookSelect(Select):
 
     def __init__(self, attrs=None, choices=(), app_namespaces={}):
         self.app_namespaces = app_namespaces
-        super(AppHookSelect, self).__init__(attrs, choices)
+        super().__init__(attrs, choices)
 
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super(AppHookSelect, self).create_option(name, value, label, selected, index, subindex, attrs)
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
         if value in self.app_namespaces:
             option['attrs']['data-namespace'] = escape(self.app_namespaces[value])
         return option
@@ -192,7 +191,7 @@ class AppHookSelect(Select):
     def _build_option(self, selected_choices, option_value, option_label):
         if option_value is None:
             option_value = ''
-        option_value = force_text(option_value)
+        option_value = force_str(option_value)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
             if not self.allow_multiple_selected:
@@ -205,7 +204,7 @@ class AppHookSelect(Select):
             data_html = mark_safe(' data-namespace="%s"' % escape(self.app_namespaces[option_value]))
         else:
             data_html = ''
-        return option_value, selected_html, data_html, force_text(option_label)
+        return option_value, selected_html, data_html, force_str(option_label)
 
     def render_option(self, selected_choices, option_value, option_label):
         option_data = self._build_option(selected_choices, option_value, option_label)
@@ -232,7 +231,7 @@ class ApplicationConfigSelect(Select):
 
     def __init__(self, attrs=None, choices=(), app_configs={}):
         self.app_configs = app_configs
-        super(ApplicationConfigSelect, self).__init__(attrs, choices)
+        super().__init__(attrs, choices)
 
     def _build_script(self, name, value, attrs={}):
         configs = []
@@ -257,6 +256,6 @@ class ApplicationConfigSelect(Select):
         }
 
     def get_context(self, name, value, attrs):
-        context = super(ApplicationConfigSelect, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context['widget']['script_init'] = self._build_script(name, value, context['widget']['attrs'])
         return context

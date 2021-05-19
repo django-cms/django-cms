@@ -1,16 +1,16 @@
 from cms.apphook_pool import apphook_pool
 from cms.views import details
 from django.conf import settings
-from django.conf.urls import url
+from django.urls import re_path
 
 if settings.APPEND_SLASH:
-    reg = url(r'^(?P<slug>[0-9A-Za-z-_.//]+)/$', details, name='pages-details-by-slug')
+    reg = re_path(r'^(?P<slug>[0-9A-Za-z-_.//]+)/$', details, name='pages-details-by-slug')
 else:
-    reg = url(r'^(?P<slug>[0-9A-Za-z-_.//]+)$', details, name='pages-details-by-slug')
+    reg = re_path(r'^(?P<slug>[0-9A-Za-z-_.//]+)$', details, name='pages-details-by-slug')
 
 urlpatterns = [
     # Public pages
-    url(r'^$', details, {'slug':''}, name='pages-root'),
+    re_path(r'^$', details, {'slug':''}, name='pages-root'),
     reg,
 ]
 

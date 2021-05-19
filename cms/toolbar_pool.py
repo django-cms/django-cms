@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 
 from django.core.exceptions import ImproperlyConfigured
@@ -8,7 +7,7 @@ from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.utils.conf import get_cms_setting
 
 
-class ToolbarPool(object):
+class ToolbarPool:
     def __init__(self):
         self.toolbars = OrderedDict()
         self._discovered = False

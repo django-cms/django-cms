@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import time
 
@@ -41,12 +40,12 @@ from cms.utils.helpers import get_timezone_name
 class CacheTestCase(CMSTestCase):
     def tearDown(self):
         from django.core.cache import cache
-        super(CacheTestCase, self).tearDown()
+        super().tearDown()
         cache.clear()
 
     def setUp(self):
         from django.core.cache import cache
-        super(CacheTestCase, self).setUp()
+        super().setUp()
         cache.clear()
 
     def test_cache_placeholder(self):
@@ -654,11 +653,64 @@ class CacheTestCase(CMSTestCase):
         text = content_renderer.render_placeholder(ph1, context)
         self.assertEqual(text, "Other text")
 
+    def test_render_placeholderfield_cache_in_custom_model(self):
+        """
+        Regression test for #6912
+
+        Assert that placeholder of a placeholderfield in custom model has its cache cleared correctly when mark_as_dirty is called in the admin
+        """
+
+        invalidate_cms_page_cache()
+
+        # Create an instance of a custom model containing a placeholderfield
+        ex = Example1(char_1="one", char_2="two", char_3="tree", char_4="four")
+        ex.save()
+        ph1 = ex.placeholder
+
+        # Add a first plugin
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some text")
+        test_plugin.save()
+
+        # Create a first request using render_placeholder to ensure that the content is equal to the first plugin content
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some text")
+
+        # Add a second plugin in the placeholder
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some other text")
+        test_plugin.save()
+
+        # Clear plugins cache to ensure that cms.utils.plugins.get_plugins() will refetch the plugins
+        del ph1._plugins_cache
+
+        # Create a second request using render_placeholder to ensure that the content is still equal to the first plugin content as cache was not cleared yet
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some text")
+
+        # Mark placeholder as dirty as it is done in cms.admin.placeholderadmin file
+        ph1.mark_as_dirty("en", clear_cache=False)
+
+        # Create a last request to ensure that rendered content contains the two plugins content
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some textSome other text")
+        
 
 class PlaceholderCacheTestCase(CMSTestCase):
     def setUp(self):
         from django.core.cache import cache
-        super(PlaceholderCacheTestCase, self).setUp()
+        super().setUp()
         cache.clear()
 
         self.page = create_page(
@@ -688,7 +740,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
     def tearDown(self):
         from django.core.cache import cache
-        super(PlaceholderCacheTestCase, self).tearDown()
+        super().tearDown()
         plugin_pool.unregister_plugin(VaryCacheOnPlugin)
         cache.clear()
 
