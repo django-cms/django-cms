@@ -12,7 +12,7 @@ from sekizai.context import SekizaiContext
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
-from cms.exceptions import DuplicatePlaceholderWarning
+from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -34,7 +34,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    get_placeholder_conf, get_placeholders, _get_nodelist,
                                    _scan_placeholders)
-from cms.utils.plugins import assign_plugins
+from cms.utils.plugins import assign_plugins, has_reached_plugin_limit
 from cms.utils.urlutils import admin_reverse
 
 
@@ -1049,3 +1049,36 @@ class PlaceholderConfTests(TestCase):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
+
+    def test_plugins_limit_global(self):
+        """ Tests placeholder limit configuration for nested plugins"""
+        page = create_page('page', 'col_two.html', 'en')
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_left': {
+                'limits': {
+                    'global': 1,
+                },
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            add_plugin(placeholder, 'LinkPlugin', 'en', name='name', external_link='http://example.com/en')
+            self.assertRaises(PluginLimitReached, has_reached_plugin_limit, placeholder=placeholder, plugin_type='LinkPlugin', language='en', template=None, parent_plugin=None)
+
+
+    def test_plugins_limit_global_children(self):
+        """ Tests placeholder limit configuration for nested plugins"""
+        page = create_page('page', 'col_two.html', 'en')
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_left': {
+                'limits': {
+                    'global_children': 1,
+                },
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            link = add_plugin(placeholder, 'LinkPlugin', 'en', name='name', external_link='http://example.com/en')
+            add_plugin(placeholder, 'TextPlugin', 'en', target=link)
+            add_plugin(placeholder, 'TextPlugin', 'en', target=link)
+            self.assertRaises(PluginLimitReached, has_reached_plugin_limit, placeholder=placeholder, plugin_type='LinkPlugin', language='en', template=None, parent_plugin=None)
