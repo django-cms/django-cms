@@ -2,15 +2,13 @@
 Changelog
 =========
 
-Unreleased
-==================
+3.9.0rc1 (unpublished)
+======================
+
+Highlights:
+-----------
 
 * Fixed redirect issues when i18n_patterns had prefix_default_language = False
-
-
-Unreleased
-==================
-
 * Fixed not checking slug uniqueness when moving a page
 * Fixed builds on RTD
 * Remove debug print from apphook_reload
@@ -39,6 +37,96 @@ Unreleased
 * removed zh and zh_hans translation (keep zh_CN and zh_TW)
 * Cleaned-up unmaintained translations
 
+
+Features:
+---------
+* Allow recursive template extending in placeholders (#6564) (fed6fe54d) -- Stefan Wehrmeyer
+* Added ability to set placeholder global limit on children only (#6847) (18e146495) -- G3RB3N
+* Replaced Travis.CI with Github Actions (#7000) (0f33b5839) -- Vinit Kumar
+
+Bug Fixes:
+----------
+* Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
+* Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
+* Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
+* Fixed issue where default fallbacks is not used when it's an empty list (#6795) (5d21fa5eb) -- Arjan de Pooter
+* prefix_default_language = False redirect behavior fixes (#6851) (34a26bd1b) -- Radek Stępień
+* Fix not checking slug uniqueness on page move (#6958) (5976d393a) -- Iacopo Spalletti
+* Fixed DontUsePageAttributeWarning message (#6734) (45383888e) -- carmenkow
+* Cache not invalidated when using a PlaceholderField outside the CMS #6912 (#6956) (3ce63d7d3) -- Benjamin PIERRE
+* #6973 fixed unexpected behavior get_page_from_request (#6974) (52f926e0d) -- Yuriy Mamaev
+* django treebeard 4.5.1 compatibility (#6988) (eeb86fd70) -- Aiky30
+* Bad Title.path in Multilanguage sites if parent slug is created or modified (#6968) (6e7b0ae48) -- fp4code
+
+Refactoring and Cleanups:
+-------------------------
+* Remove unmaintained translations (#7039) (97ffa2481) -- Florian Delizy
+
+Internal Tools:
+---------------
+* updating PR template and contribution guideline, we don't need to modify the CHANGELOG.rst manually (this creates too much conflicts) (#7041) (6c2b057c0) -- Florian Delizy
+
+Statistics:
+-----------
+
+This release includes 72 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Abdur-Rahmaan Janhangeer (1 pull requests)
+* Aiky30 (3 pull requests)
+* Alexandre Joly (1 pull requests)
+* Anatoliy (3 pull requests)
+* Angelo Dini (3 pull requests)
+* Arjan de Pooter (1 pull requests)
+* Benbb96 (1 pull requests)
+* Benjamin PIERRE (1 pull requests)
+* BrijeshVP (1 pull requests)
+* carmenkow (1 pull requests)
+* Daniele Procida (3 pull requests)
+* Florian Delizy (6 pull requests)
+* fp4code (3 pull requests)
+* Frank (1 pull requests)
+* G3RB3N (1 pull requests)
+* greengoaxe (1 pull requests)
+* Iacopo Spalletti (3 pull requests)
+* Jacob Rief (3 pull requests)
+* Jean-Baptiste PENRATH (1 pull requests)
+* John Bazik (1 pull requests)
+* Mark Walker (2 pull requests)
+* Michael Anckaert (1 pull requests)
+* Munim Munna (2 pull requests)
+* Nicolai (15 pull requests)
+* Petr Glotov (1 pull requests)
+* Radek Stępień (1 pull requests)
+* Sebastian Weigand (2 pull requests)
+* sin-ack (1 pull requests)
+* Stefan Wehrmeyer (1 pull requests)
+* victor-yunenko (1 pull requests)
+* Vinit Kumar (4 pull requests)
+* Vytis Banaitis (1 pull requests)
+* Yuriy Mamaev (1 pull requests)
+
+With the review help of the following contributors:
+
+* Aiky30
+* Angelo Dini
+* Benjamin PIERRE
+* Daniele Procida
+* Éric Araujo
+* Florian Delizy
+* Francesco Verde
+* greengoaxe
+* John Bazik
+* Mario Colombo
+* Mark Walker
+* Nicolai
+* Petr Glotov
+* Radosław Stępień
+* sin-ack
+* Stuart Axon
+* Vinit
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
 
 3.8.0 (2020-10-28)
 ==================
