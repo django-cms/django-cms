@@ -329,6 +329,8 @@ class Page(models.Model):
         return (new_home_tree, old_home_tree)
 
     def _update_title_path(self, language):
+        from cms.utils.page import get_available_slug
+
         parent_page = self.get_parent_page()
 
         if parent_page:
@@ -337,7 +339,9 @@ class Page(models.Model):
             base = ''
 
         title_obj = self.get_title_obj(language, fallback=False)
-        title_obj.path = title_obj.get_path_for_base(base)
+        title_obj.slug = get_available_slug(title_obj.page.node.site, title_obj.slug, title_obj.language, current=title_obj.page)
+        if not title_obj.page.is_home:
+            title_obj.path = '%s/%s' % (base, title_obj.slug) if base else title_obj.slug
         title_obj.save()
 
     def _update_title_path_recursive(self, language, slug=None):
