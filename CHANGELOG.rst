@@ -6,11 +6,6 @@ Unreleased
 ==================
 
 * Fixed redirect issues when i18n_patterns had prefix_default_language = False
-
-
-Unreleased
-==================
-
 * Fixed not checking slug uniqueness when moving a page
 * Fixed builds on RTD
 * Remove debug print from apphook_reload
@@ -38,6 +33,7 @@ Unreleased
 * Add support for Django 3.2 LTS version
 * removed zh and zh_hans translation (keep zh_CN and zh_TW)
 * Cleaned-up unmaintained translations
+* Page changed date added to the Page tree admin actions dropdown
 
 
 3.8.0 (2020-10-28)
