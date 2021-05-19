@@ -357,6 +357,12 @@ class Placeholder(models.Model):
         else:
             return self.cmsplugin_set.all().order_by('path')
 
+    def get_child_plugins(self, language=None):
+        if language:
+            return self.cmsplugin_set.filter(language=language, parent__isnull=True).order_by('path')
+        else:
+            return self.cmsplugin_set.filter(parent__isnull=True).order_by('path')
+
     def get_filled_languages(self):
         """
         Returns language objects for every language for which the placeholder
@@ -506,6 +512,10 @@ class Placeholder(models.Model):
 
         elif attached_model is StaticPlaceholder:
             StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
+
+        # Force to clear cache when attached model is not a Page or a StaticPlaceholder, otherwise cache is never invalidated when using PlaceholderField
+        elif clear_cache is False:
+            self.clear_cache(language)
 
     def get_plugin_tree_order(self, language, parent_id=None):
         """

@@ -1,0 +1,16 @@
+{% extends "placeholder_tests/base.html" %}
+
+{% load cms_tags %}
+
+{% comment %}
+This file should result in following placeholders:
+
+    - recursed_one (from 'placeholder_tests/recursive_extend.html' in templates dir)
+    - recursed_two (from this)
+    - three (from base.html)
+
+{% endcomment %}
+
+{% block two %}
+    {% placeholder "recursed_two" %}
+{% endblock %}
