@@ -109,6 +109,10 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         placeholders = _get_placeholder_slots('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
 
+    def test_placeholder_recursive_extend(self):
+        placeholders = _get_placeholder_slots('placeholder_tests/recursive_extend.html')
+        self.assertEqual(sorted(placeholders), sorted([u'recursed_one', u'recursed_two', u'three']))
+
     def test_placeholder_scanning_sekizai_extend_outside_block(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_sekizai.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
