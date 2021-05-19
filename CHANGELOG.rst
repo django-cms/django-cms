@@ -23,6 +23,7 @@ Unreleased
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
 * Updated documentation links
+* Fixed migrations with multiple databases
 * documentation: Added an example of sqlite database configuration in documentation
 * Added support for Github Actions based CI.
 * Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.

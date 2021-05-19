@@ -61,6 +61,10 @@ class Migration(IrreversibleMigration):
     ]
 
     def apply(self, project_state, schema_editor, collect_sql=False):
+        model = project_state.apps.get_model('cms', 'page')
+        if not all(op.allow_migrate_model(schema_editor.connection.alias, model) for op in self.operations):
+            return project_state
+
         connection = schema_editor.connection
         if router.allow_migrate(connection.alias, 'cms', model_name='cms_page'):
             column_names = [
