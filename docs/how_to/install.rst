@@ -134,7 +134,14 @@ django CMS requires a relational database backend. Each django CMS installation 
 
 You can use SQLite, which is included in Python and doesn't need to be installed separately or configured further. You
 are unlikely to be using that for a project in production, but it's ideal for development and exploration, especially
-as it is configured by default in a new Django project's :setting:`django:DATABASES`.
+as it is configured by default in a new Django project's :setting:`django:DATABASES`::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR , 'db.sqlite3'),
+        }
+    }
 
 ..  note::
 

@@ -507,6 +507,10 @@ class Placeholder(models.Model):
         elif attached_model is StaticPlaceholder:
             StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
 
+        # Force to clear cache when attached model is not a Page or a StaticPlaceholder, otherwise cache is never invalidated when using PlaceholderField
+        elif clear_cache is False:
+            self.clear_cache(language)
+
     def get_plugin_tree_order(self, language, parent_id=None):
         """
         Returns a list of plugin ids matching the given language
