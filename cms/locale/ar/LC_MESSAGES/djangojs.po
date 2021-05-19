@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Abdelkader Maarouf <dep2g2@gmail.com>, 2015
 # Ahmed H <info@draco-003.com>, 2013
 # Bashar Al-Abdulhadi, 2017
@@ -12,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 10:46+0100\n"
+"POT-Creation-Date: 2021-05-19 21:14+0800\n"
 "PO-Revision-Date: 2018-01-11 16:38+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Arabic (http://www.transifex.com/divio/django-cms/language/ar/)\n"

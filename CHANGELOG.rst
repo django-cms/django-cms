@@ -2,39 +2,139 @@
 Changelog
 =========
 
-Unreleased
-==================
+3.9.0rc1 (unpublished)
+======================
 
+Highlights:
+-----------
+
+This release of django CMS (first community driven release) introduces support for Django 3.2, and bugfix.
+We tried to catch up with as many long waited feature/bugfix requests as possible.
+
+3.9.0 will be the 3.x LTS version of django CMS. Future development efforts will be focused on the 4.x release.
+We encourage all user and developers to plan for the upcoming upgrade.
+
+Features:
+---------
+* Add support for Django 3.2 LTS version
+* Page changed_date added to the Page tree admin actions dropdown template #6701 (#7046) (73cbbdb00) -- Vladimir Kuvandjiev
+* Allow recursive template extending in placeholders (#6564) (fed6fe54d) -- Stefan Wehrmeyer
+* Added ability to set placeholder global limit on children only (#6847) (18e146495) -- G3RB3N
+* Replaced Travis.CI with Github Actions (#7000) (0f33b5839) -- Vinit Kumar
+* Added support for Github Actions based CI.
+* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
+* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
+* Improved performance of ``cms list plugins`` command
+* Page changed date added to the Page tree admin actions dropdown
+
+Bug Fixes:
+----------
+* Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
+* Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
+* Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
+* Fixed issue where default fallbacks is not used when it's an empty list (#6795) (5d21fa5eb) -- Arjan de Pooter
+* Fixed prefix_default_language = False redirect behavior (#6851) (34a26bd1b) -- Radek Stępień
+* Fix not checking slug uniqueness on page move (#6958) (5976d393a) -- Iacopo Spalletti
+* Fixed DontUsePageAttributeWarning message (#6734) (45383888e) -- carmenkow
+* Fixed Cache not invalidated when using a PlaceholderField outside the CMS #6912 (#6956) (3ce63d7d3) -- Benjamin PIERRE
+* Fixed unexpected behavior get_page_from_request (#6974) (#6073) (52f926e0d) -- Yuriy Mamaev
+* Fixed django treebeard 4.5.1 compatibility (#6988) (eeb86fd70) -- Aiky30
+* Fixed Bad Title.path in Multilanguage sites if parent slug is created or modified (#6968) (6e7b0ae48) -- fp4code
 * Fixed redirect issues when i18n_patterns had prefix_default_language = False
 * Fixed not checking slug uniqueness when moving a page
 * Fixed builds on RTD
-* Remove debug print from apphook_reload
-* Enforce use of coverage > 4 for python 3.8 support
 * Fixed the cache not being invalidated when updating a PlaceholderField in a custom model
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
 * Fixed 6973 bag with unexpected behavior ``get_page_from_request``
-* Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
-* Improved performance of ``cms list plugins`` command
-* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
-* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
-* Updated documentation links
 * Fixed migrations with multiple databases
-* documentation: Added an example of sqlite database configuration in documentation
-* Added support for Github Actions based CI.
-* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
-* Remove travis integration from the project as the project has moved to Github Actions.
-* Fix all GitHub actions tests run on pull requests
-* Repair broken docs link to users/index.rst
+* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
-* Few changes in docs/contributing/code.rst
 * Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
 * Fixed an issue when running migrations on a multi database project
-* Add support for Django 3.2 LTS version
-* removed zh and zh_hans translation (keep zh_CN and zh_TW)
-* Cleaned-up unmaintained translations
-* Page changed date added to the Page tree admin actions dropdown
 
+Refactoring and Cleanups:
+-------------------------
+* Remove unmaintained translations (#7039) (97ffa2481) -- Florian Delizy
+* Remove debug print from apphook_reload
+* Removed zh and zh_hans translation (keep zh_CN and zh_TW) -- Florian Delizy
+* Cleaned-up unmaintained translations -- Florian Delizy
+* Few changes in docs/contributing/code.rst
+* Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
+* Updated documentation links
+* documentation: Added an example of sqlite database configuration in documentation
+* Repair broken docs link to users/index.rst
+
+Internal Tools:
+---------------
+* adding django CMS release script (will be used starting 3.9.0 release) (#7036) (c95aacf14) -- Florian Delizy
+* updating PR template and contribution guideline, no need to modify CHANGELOG.rst manually (#7041) (6c2b057c0) -- Florian Delizy
+* Enforce use of coverage > 4 for python 3.8 support
+* Fix all GitHub actions tests run on pull requests
+* Remove travis integration from the project as the project has moved to Github Actions.
+
+Statistics:
+-----------
+
+This release includes 74 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Abdur-Rahmaan Janhangeer (1 pull request)
+* Aiky30 (3 pull requests)
+* Alexandre Joly (1 pull request)
+* Anatoliy (3 pull requests)
+* Angelo Dini (3 pull requests)
+* Arjan de Pooter (1 pull request)
+* Benbb96 (1 pull request)
+* Benjamin PIERRE (1 pull request)
+* BrijeshVP (1 pull request)
+* carmenkow (1 pull request)
+* Daniele Procida (3 pull requests)
+* Florian Delizy (8 pull requests)
+* fp4code (3 pull requests)
+* Frank (1 pull request)
+* G3RB3N (1 pull request)
+* greengoaxe (1 pull request)
+* Iacopo Spalletti (3 pull requests)
+* Jacob Rief (3 pull requests)
+* Jean-Baptiste PENRATH (1 pull request)
+* John Bazik (1 pull request)
+* Mark Walker (2 pull requests)
+* Michael Anckaert (1 pull request)
+* Munim Munna (2 pull requests)
+* Nicolai (15 pull requests)
+* Petr Glotov (1 pull request)
+* Radek Stępień (1 pull request)
+* Sebastian Weigand (2 pull requests)
+* sin-ack (1 pull request)
+* Stefan Wehrmeyer (1 pull request)
+* victor-yunenko (1 pull request)
+* Vinit Kumar (4 pull requests)
+* Vladimir Kuvandjiev (1 pull request)
+* Vytis Banaitis (1 pull request)
+* Yuriy Mamaev (1 pull request)
+
+With the review help of the following contributors:
+
+* Aiky30
+* Angelo Dini
+* Benjamin PIERRE
+* Daniele Procida
+* Éric Araujo
+* Florian Delizy
+* Francesco Verde
+* greengoaxe
+* John Bazik
+* Mario Colombo
+* Mark Walker
+* Nicolai
+* Petr Glotov
+* Radosław Stępień
+* sin-ack
+* Stuart Axon
+* Vinit
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
 
 3.8.0 (2020-10-28)
 ==================
