@@ -2,6 +2,11 @@
 Changelog
 =========
 
+Unreleased
+==================
+
+* Fixed redirect issues when i18n_patterns had prefix_default_language = False
+
 
 Unreleased
 ==================
