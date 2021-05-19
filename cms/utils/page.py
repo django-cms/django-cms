@@ -141,7 +141,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     """
     from cms.utils.page_permissions import user_can_view_page_draft
 
-    if hasattr(request, '_current_page_cache'):
+    if not bool(use_path) and hasattr(request, '_current_page_cache'):
         # The following is set by CurrentPageMiddleware
         return request._current_page_cache
 
