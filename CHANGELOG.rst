@@ -17,6 +17,7 @@ Unreleased
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
 * Updated documentation links
+* documentation: Added an example of sqlite database configuration in documentation
 * Added support for Github Actions based CI.
 * Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
 * Remove travis integration from the project as the project has moved to Github Actions.
@@ -43,6 +44,7 @@ Unreleased
 * Updated the content for django CMS’s development community
 * Replaced all occurences of ``force_text`` and ``smart_text`` against
   ``force_str``and ``smart_str``.
+
 
 
 3.7.4 (2020-07-21)
