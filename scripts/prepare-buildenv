@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e
-set +x
 
 SCRIPTS=$(dirname "$(realpath "$0")")
 #shellcheck disable=SC1090
