@@ -2,7 +2,7 @@
 Changelog
 =========
 
-3.9.0rc1 (unpublished)
+3.9.0rc2 (unpublished)
 ======================
 
 Highlights:
@@ -16,6 +16,10 @@ We encourage all user and developers to plan for the upcoming upgrade.
 
 Features:
 ---------
+* Page changed_date added to the Page tree admin actions dropdown template #6701 (#7046) (73cbbdb00) -- Florian Delizy
+* Allow recursive template extending in placeholders (#6564) (fed6fe54d) -- Stefan Wehrmeyer
+* Added ability to set placeholder global limit on children only (#6847) (18e146495) -- G3RB3N
+* Replaced Travis.CI with Github Actions (#7000) (0f33b5839) -- Vinit Kumar
 * Add support for Django 3.2 LTS version
 * Page changed_date added to the Page tree admin actions dropdown template #6701 (#7046) (73cbbdb00) -- Vladimir Kuvandjiev
 * Allow recursive template extending in placeholders (#6564) (fed6fe54d) -- Stefan Wehrmeyer
@@ -29,6 +33,17 @@ Features:
 
 Bug Fixes:
 ----------
+* Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
+* Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
+* Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
+* Fixed issue where default fallbacks is not used when it's an empty list (#6795) (5d21fa5eb) -- Arjan de Pooter
+* prefix_default_language = False redirect behavior fixes (#6851) (34a26bd1b) -- Radek Stępień
+* Fix not checking slug uniqueness on page move (#6958) (5976d393a) -- Iacopo Spalletti
+* Fixed DontUsePageAttributeWarning message (#6734) (45383888e) -- carmenkow
+* Cache not invalidated when using a PlaceholderField outside the CMS #6912 (#6956) (3ce63d7d3) -- Benjamin PIERRE
+* #6973 fixed unexpected behavior get_page_from_request (#6974) (52f926e0d) -- Yuriy Mamaev
+* django treebeard 4.5.1 compatibility (#6988) (eeb86fd70) -- Aiky30
+* Bad Title.path in Multilanguage sites if parent slug is created or modified (#6968) (6e7b0ae48) -- fp4code
 * Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
 * Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
 * Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
@@ -56,6 +71,7 @@ Bug Fixes:
 Refactoring and Cleanups:
 -------------------------
 * Remove unmaintained translations (#7039) (97ffa2481) -- Florian Delizy
+* Remove unmaintained translations (#7039) (97ffa2481) -- Florian Delizy
 * Remove debug print from apphook_reload
 * Removed zh and zh_hans translation (keep zh_CN and zh_TW) -- Florian Delizy
 * Cleaned-up unmaintained translations -- Florian Delizy
@@ -68,6 +84,8 @@ Refactoring and Cleanups:
 Internal Tools:
 ---------------
 * adding django CMS release script (will be used starting 3.9.0 release) (#7036) (c95aacf14) -- Florian Delizy
+* updating PR template and contribution guideline, we don't need to modify the CHANGELOG.rst manually (this creates too much conflicts) (#7041) (6c2b057c0) -- Florian Delizy
+* adding django CMS release script (will be used starting 3.9.0 release) (#7036) (c95aacf14) -- Florian Delizy
 * updating PR template and contribution guideline, no need to modify CHANGELOG.rst manually (#7041) (6c2b057c0) -- Florian Delizy
 * Enforce use of coverage > 4 for python 3.8 support
 * Fix all GitHub actions tests run on pull requests
@@ -76,42 +94,41 @@ Internal Tools:
 Statistics:
 -----------
 
-This release includes 74 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 76 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Abdur-Rahmaan Janhangeer (1 pull request)
+* Abdur-Rahmaan Janhangeer (1 pull requests)
 * Aiky30 (3 pull requests)
-* Alexandre Joly (1 pull request)
+* Alexandre Joly (1 pull requests)
 * Anatoliy (3 pull requests)
 * Angelo Dini (3 pull requests)
-* Arjan de Pooter (1 pull request)
-* Benbb96 (1 pull request)
-* Benjamin PIERRE (1 pull request)
-* BrijeshVP (1 pull request)
-* carmenkow (1 pull request)
+* Arjan de Pooter (1 pull requests)
+* Benbb96 (1 pull requests)
+* Benjamin PIERRE (1 pull requests)
+* BrijeshVP (1 pull requests)
+* carmenkow (1 pull requests)
 * Daniele Procida (3 pull requests)
-* Florian Delizy (8 pull requests)
+* Florian Delizy (10 pull requests)
 * fp4code (3 pull requests)
-* Frank (1 pull request)
-* G3RB3N (1 pull request)
-* greengoaxe (1 pull request)
+* Frank (1 pull requests)
+* G3RB3N (1 pull requests)
+* greengoaxe (1 pull requests)
 * Iacopo Spalletti (3 pull requests)
 * Jacob Rief (3 pull requests)
-* Jean-Baptiste PENRATH (1 pull request)
-* John Bazik (1 pull request)
+* Jean-Baptiste PENRATH (1 pull requests)
+* John Bazik (1 pull requests)
 * Mark Walker (2 pull requests)
-* Michael Anckaert (1 pull request)
+* Michael Anckaert (1 pull requests)
 * Munim Munna (2 pull requests)
 * Nicolai (15 pull requests)
-* Petr Glotov (1 pull request)
-* Radek Stępień (1 pull request)
+* Petr Glotov (1 pull requests)
+* Radek Stępień (1 pull requests)
 * Sebastian Weigand (2 pull requests)
-* sin-ack (1 pull request)
-* Stefan Wehrmeyer (1 pull request)
-* victor-yunenko (1 pull request)
+* sin-ack (1 pull requests)
+* Stefan Wehrmeyer (1 pull requests)
+* victor-yunenko (1 pull requests)
 * Vinit Kumar (4 pull requests)
-* Vladimir Kuvandjiev (1 pull request)
-* Vytis Banaitis (1 pull request)
-* Yuriy Mamaev (1 pull request)
+* Vytis Banaitis (1 pull requests)
+* Yuriy Mamaev (1 pull requests)
 
 With the review help of the following contributors:
 
@@ -133,6 +150,7 @@ With the review help of the following contributors:
 * Stuart Axon
 * Vinit
 * Vinit Kumar
+* Vladimir Kuvandjiev
 
 Thanks to all contributors for their efforts!
 
