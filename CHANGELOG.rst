@@ -2,7 +2,7 @@
 Changelog
 =========
 
-3.9.0rc1 (unpublished)
+3.9.0rc2 (unpublished)
 ======================
 
 Highlights:
@@ -76,7 +76,7 @@ Internal Tools:
 Statistics:
 -----------
 
-This release includes 74 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 77 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Abdur-Rahmaan Janhangeer (1 pull request)
 * Aiky30 (3 pull requests)
@@ -89,7 +89,7 @@ This release includes 74 pull requests, and was created with the help of the fol
 * BrijeshVP (1 pull request)
 * carmenkow (1 pull request)
 * Daniele Procida (3 pull requests)
-* Florian Delizy (8 pull requests)
+* Florian Delizy (11 pull requests)
 * fp4code (3 pull requests)
 * Frank (1 pull request)
 * G3RB3N (1 pull request)
@@ -927,7 +927,7 @@ Thanks to all contributors for their efforts!
 
 
 3.0.17 (unreleased)
-==================
+===================
 
 - Addresses security vulnerabilities in the `render_model` template tag that could
   lead to escalation of privileges or other security issues.
@@ -937,7 +937,7 @@ Thanks to all contributors for their efforts!
 
 
 3.0.16 (2015-11-24)
-==================
+===================
 
 - Fixed JavaScript error when using ``PageSelectWidget``
 - Fixed whitespace markup issues in draft mode
@@ -945,7 +945,7 @@ Thanks to all contributors for their efforts!
 
 
 3.0.15 (2015-09-01)
-==================
+===================
 
 - Relax html5lib versions
 - Fix redirect when deleting a page
@@ -964,7 +964,7 @@ Thanks to all contributors for their efforts!
 
 
 3.0.14 (2015-06-27)
-==================
+===================
 
 - Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability
 - Fixed an issue related to "Empty all" Placeholder feature
@@ -987,7 +987,7 @@ Thanks to all contributors for their efforts!
 
 
 3.0.13 (2015-04-15)
-==================
+===================
 
 - Numerous documentation including installation and tutorial updates
 - Numerous improvements to translations
@@ -1006,13 +1006,13 @@ Thanks to all contributors for their efforts!
 
 
 3.0.12 (2015-03-06)
-==================
+===================
 
 - Fixed a typo in JavaScript which prevents page tree from working
 
 
 3.0.11 (2015-03-05)
-==================
+===================
 
 - Core support for multiple instances of the same apphook'ed application
 - Fixed the template tag `render_model_add`
@@ -1030,7 +1030,7 @@ Thanks to all contributors for their efforts!
 
 
 3.0.10 (2015-02-14)
-==================
+===================
 
 - Improved Py3 compatibility
 - Improved the behavior when changing the operator's language
