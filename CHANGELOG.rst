@@ -2,7 +2,7 @@
 Changelog
 =========
 
-3.9.0rc1 (unpublished)
+3.9.0rc2 (unpublished)
 ======================
 
 Highlights:
@@ -76,7 +76,7 @@ Internal Tools:
 Statistics:
 -----------
 
-This release includes 74 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 76 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Abdur-Rahmaan Janhangeer (1 pull request)
 * Aiky30 (3 pull requests)
@@ -89,7 +89,7 @@ This release includes 74 pull requests, and was created with the help of the fol
 * BrijeshVP (1 pull request)
 * carmenkow (1 pull request)
 * Daniele Procida (3 pull requests)
-* Florian Delizy (8 pull requests)
+* Florian Delizy (10 pull requests)
 * fp4code (3 pull requests)
 * Frank (1 pull request)
 * G3RB3N (1 pull request)
@@ -109,7 +109,6 @@ This release includes 74 pull requests, and was created with the help of the fol
 * Stefan Wehrmeyer (1 pull request)
 * victor-yunenko (1 pull request)
 * Vinit Kumar (4 pull requests)
-* Vladimir Kuvandjiev (1 pull request)
 * Vytis Banaitis (1 pull request)
 * Yuriy Mamaev (1 pull request)
 
@@ -133,6 +132,7 @@ With the review help of the following contributors:
 * Stuart Axon
 * Vinit
 * Vinit Kumar
+* Vladimir Kuvandjiev
 
 Thanks to all contributors for their efforts!
 
