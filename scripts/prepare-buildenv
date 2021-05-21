@@ -11,7 +11,7 @@ check_command_exists python git awk sed pip npm xargs grep
 
 check_virtual_env
 
-status "- Installing needed python & node packages"
+status "- Installing needed python"
 grep -v django-cms docs/requirements.txt | xargs pip install --quiet django-admin transifex-client
 
 check_command_exists django-admin
@@ -31,6 +31,7 @@ if ! nvm current | grep -q "^v6" ; then
     nvm use 6
 fi
 
+status "- Installing required node packages"
 npm install --loglevel warn
 
 if ! command -v gulp; then
