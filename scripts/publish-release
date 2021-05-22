@@ -46,4 +46,4 @@ fi
 status "building the archive:"
 python setup.py sdist bdist_wheel
 
-twine upload dist/*
+twine upload "dist/django_cms-${version}*"

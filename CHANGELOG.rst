@@ -11,9 +11,6 @@ Highlights:
 This release of django CMS (first community driven release) introduces support for Django 3.2, and bugfix.
 We tried to catch up with as many long waited feature/bugfix requests as possible.
 
-3.9.0 will be the 3.x LTS version of django CMS. Future development efforts will be focused on the 4.x release.
-We encourage all user and developers to plan for the upcoming upgrade.
-
 Features:
 ---------
 * Add support for Django 3.2 LTS version
