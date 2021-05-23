@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Marco Badan <marco.badan@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
@@ -28,9 +27,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 10:45+0100\n"
-"PO-Revision-Date: 2020-04-21 13:37+0000\n"
-"Last-Translator: yakky <i.spalletti@nephila.it>\n"
+"POT-Creation-Date: 2021-05-19 21:14+0800\n"
+"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Italian (http://www.transifex.com/divio/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -124,7 +123,6 @@ msgstr "Imposta lo slug per la lingua %(language)s prima di modificare le impost
 msgid "A page with this reverse URL id exists already."
 msgstr "Esiste già una pagina con questo reverse URL id."
 
-#| msgid "Application configurations"
 msgid "Invalid application config value"
 msgstr "Valore della configurazione non valido"
 
@@ -198,7 +196,6 @@ msgstr "La lingua deve essere scelta tra le lingue supportate!"
 msgid "Parent plugin language must be same as language!"
 msgstr "Il linguaggio del plugin di livello superiore deve essere lo stesso!"
 
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "Il placeholder del plugin genitore deve essere identico!"
 
@@ -244,7 +241,6 @@ msgstr "Errore! Non hai il permesso per spostare questa pagina. Ricarica la pagi
 msgid "You do not have permission to copy these plugins."
 msgstr "Non hai i permessi per copiare questi plugin."
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
 msgstr "Errore! Non hai il permesso di copiare questa pagina"
 
@@ -253,7 +249,6 @@ msgid ""
 "configured by the target site."
 msgstr "Errore! la pagina che stai incollando non è tradotta in nessuna delle lingue configurate sul sito di destinazione"
 
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr "Non hai il permesso di resettare questa pagina."
 
@@ -283,7 +278,6 @@ msgstr "Questa pagina non è mai stata pubblicata."
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr "La lingua %(language)s per la pagina \"%(page)s\" è stata depubblicata"
 
-#| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
 msgstr "Non sei autorizzato/a a cancellare questa pagina"
 
@@ -292,7 +286,6 @@ msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Il titolo e i plugin con lingua %(language)s sono stati eliminati"
 
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr "Non disponi del permesso per visualizzare la pagina \"%(title)s\""
 
@@ -330,7 +323,6 @@ msgstr "Non hai i permessi per modificare questo elemento"
 msgid "You do not have permission to add a plugin"
 msgstr "Non sei autorizzato/a ad aggiungere un plugin"
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr "Non hai il permesso di copiare questo metacarattere."
 
@@ -349,18 +341,15 @@ msgstr "il contenitore deve essere nello stesso placeholder"
 msgid "parent must be in the same language as plugin_language"
 msgstr "il contenitore deve avere la stessa lingua del plugin"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr "Non hai i permessi per incollare questo plugin"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr "Non hai il permesso di incollare questo metacarattere"
 
 msgid "You have no permission to move this plugin"
 msgstr "Non hai i permessi per spostare questo plugin"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr "Non hai il permesso di tagliare questo plugin."
 
@@ -458,7 +447,6 @@ msgstr "Struttura"
 msgid "Content"
 msgstr "Contenuto"
 
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr "Pubblica le modifiche della pagina"
 
@@ -468,15 +456,12 @@ msgstr "Pubblica pagina"
 msgid "Page settings"
 msgstr "Impostazioni pagina"
 
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr "Aggiungi traduzione"
 
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr "Elimina traduzione"
 
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr "Copia tutti i plugin"
 
@@ -485,7 +470,6 @@ msgid "from %s"
 msgstr "da %s"
 
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "Sei sicuro di volere copiare tutti i plugins da %s?"
 
@@ -495,7 +479,6 @@ msgstr "Pagine"
 msgid "Page"
 msgstr "Pagina"
 
-#| msgid "Create"
 msgid "Create Page"
 msgstr "Crea pagina"
 
@@ -557,20 +540,12 @@ msgid "Select a valid page"
 msgstr "Seleziona una pagina valida"
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr "La pagina %(conflict_page)s ha lo stesso URL '%(url)s' della pagina \"%(instance)s\"."
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "La pagina %(conflict_page)s ha lo stesso URL '%(url)s' as della pagina corrente."
 
@@ -584,7 +559,6 @@ msgstr "Inserisci un titolo per la nuova pagina."
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Lascia vuoto per slug automatico, o inserisci a seconda delle necessità."
 
-#| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
 msgstr "Non hai i permessi necessari per aggiungere una pagina."
 
@@ -754,7 +728,6 @@ msgstr "il livello di pagina"
 msgid "frontend view restriction"
 msgstr "Restrizione visualizzazione frontend"
 
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr "Sei pregato di selezionare un utente o un gruppo."
 
@@ -900,7 +873,6 @@ msgid "Generic"
 msgstr "Generico"
 
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "Il %(name)s \"%(obj)s\" è stato modificato con successo."
 
@@ -924,7 +896,6 @@ msgstr "Nome utente:"
 msgid "Password:"
 msgstr "Password:"
 
-#| msgid "Add Page"
 msgid "Add a page"
 msgstr "Aggiungi una pagina"
 
@@ -1008,7 +979,6 @@ msgstr "Taglia"
 msgid "Paste"
 msgstr "Incolla"
 
-#| msgid "Save as new"
 msgid "Set as home"
 msgstr "Imposta come home"
 
@@ -1017,6 +987,9 @@ msgstr "è limitata"
 
 msgid "last change by"
 msgstr "ultima modifica di"
+
+msgid "last change on"
+msgstr ""
 
 msgid "meta"
 msgstr "Meta"
@@ -1027,7 +1000,6 @@ msgstr "Elenco pagine"
 msgid "Search"
 msgstr "Cerca"
 
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr "Albero delle pagine"
 
@@ -1048,11 +1020,9 @@ msgid ""
 "                            "
 msgstr "\n                                Nuovo %(name)s\n                            "
 
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr "Navigazione principale"
 
-#| msgid "Actions"
 msgid "Options"
 msgstr "Opzioni"
 
@@ -1076,7 +1046,6 @@ msgstr "Confermi di voler § questa pagina?"
 msgid "Reload"
 msgstr "Ricarica"
 
-#| msgid "New Page"
 msgid "New node"
 msgstr "Nuovo nodo"
 
@@ -1090,10 +1059,6 @@ msgid "Menu"
 msgstr "Menu"
 
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
@@ -1114,31 +1079,24 @@ msgstr "Chiudi"
 msgid "Legend"
 msgstr "Legenda"
 
-#| msgid "published"
 msgid "Published"
 msgstr "Pubblicata"
 
-#| msgid "Change"
 msgid "Changed"
 msgstr "Modificata"
 
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Non pubblicata"
 
-#| msgid "in menu"
 msgid "In menu"
 msgstr "In navigazione"
 
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr "Non in navigazione"
 
-#| msgid "New page"
 msgid "View page"
 msgstr "Visualizza pagina"
 
-#| msgid "softroot"
 msgid "Softroot"
 msgstr "Softroot"
 
@@ -1150,7 +1108,6 @@ msgid "Application: %(apphook)s"
 msgstr "Applicazione: %(apphook)s"
 
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr "Anteprima della pagina in %(language)s"
 
@@ -1172,7 +1129,6 @@ msgstr "Nei menu"
 msgid "not in menu"
 msgstr "non nel menu"
 
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Impostazioni pagina (Maiusc-clic per impostazioni avanzate)"
 
@@ -1227,11 +1183,9 @@ msgstr "Evidenzia"
 msgid "Available plugins"
 msgstr "Plugin disponibili"
 
-#| msgid "Structure"
 msgid "Toggle structure"
 msgstr "Attiva struttura"
 
-#| msgid "View published"
 msgid "View published"
 msgstr "Mostra pubblicata"
 
@@ -1245,7 +1199,6 @@ msgid "More"
 msgstr "approfondisci"
 
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
@@ -1257,7 +1210,6 @@ msgstr "Annulla"
 msgid "The following error occured:"
 msgstr "Si è verificato il seguente errore:"
 
-#| msgid "Action successfull... reloading."
 msgid "Action successful."
 msgstr "Azione eseguita con successo."
 
@@ -1270,15 +1222,12 @@ msgstr "Sei sicuro di voler pubblicare questa pagina?"
 msgid "Plugin will be added here"
 msgstr "Il plugin sarà aggiunto qui"
 
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr "Ci sono modifiche non salvate."
 
-#| msgid "Loading..."
 msgid "Loading"
 msgstr "Caricamento in corso"
 
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr "Sicuro di voler annullare queste modifiche?"
 
@@ -1287,7 +1236,6 @@ msgid ""
 "correctly."
 msgstr "Il form non può essere caricato. Controlla che il server sia attivo."
 
-#| msgid "Notify user"
 msgid "Most used"
 msgstr "Più usato"
 
@@ -1303,7 +1251,6 @@ msgstr ""
 msgid "Bring up this help dialog"
 msgstr "Attiva questa finestra di aiuto"
 
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr "Chiudi/annulla"
 
@@ -1319,30 +1266,24 @@ msgstr "Apri finestra \"Crea\""
 msgid "Focus on Toolbar"
 msgstr "Focus sulla toolbar"
 
-#| msgid "Structure"
 msgid "Structureboard"
 msgstr ""
 
-#| msgid "static placeholders"
 msgid "Focus on placeholders"
 msgstr "Focus sui segnaposto"
 
 msgid "Move to next/previous element"
 msgstr "Vai all'elemento successivo/precedente"
 
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr "Focus sui plugin del segnaposto"
 
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr "Modifica plugin"
 
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr "Apri il menù delle azioni"
 
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr "Espandi/chiudi"
 
@@ -1420,15 +1361,6 @@ msgstr "Supporto"
 msgid "Documentation"
 msgstr "Documentazione"
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1437,15 +1369,6 @@ msgid ""
 "            "
 msgstr "\n                <p class=\"cms-welcome-notes\">Se non vedi il logo di django CMS in cima alla pagina, verifica di aver collegato la cartella <code>static/cms</code> alla cartella degli static file</p>\n            "
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
@@ -1561,7 +1484,6 @@ msgstr "Articoli"
 msgid "Sample App"
 msgstr "App d'esempio"
 
-#| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
 msgstr "App di esempio con configurazione"
 
@@ -1571,7 +1493,6 @@ msgstr "App di prova con permessi esclusi"
 msgid "Sample App 2"
 msgstr "App di esempio 2"
 
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr "App di esempio 3"
 
@@ -1608,7 +1529,6 @@ msgstr "Menu2 statico"
 msgid "Static Menu3"
 msgstr "Static Menu3"
 
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr "Static Menu4"
 
@@ -1637,12 +1557,10 @@ msgid "UserSettings"
 msgstr "UserSettings"
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "Aggiungi plugin al segnaposto \"%(placeholder_label)s\""
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Aggiungi plugin a %(plugin_name)s"
 
@@ -1662,6 +1580,10 @@ msgid ""
 "%(plugin_name)s plugins."
 msgstr "Questo placeholder contiene già il numero massimo contentito (%(limit)s) di plugin %(plugin_name)s."
 
+#, python-format
+msgid "This placeholder already has the maximum number of child plugins (%s)."
+msgstr ""
+
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
 msgstr "Impossibile trovare il seguente modulo CMS_REQUEST_IP_RESOLVER: \"{0}\""
@@ -1679,282 +1601,3 @@ msgstr "Crea una nuova istanza di %s."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "E' già stato registrato uno wizard per il model: %s"
-
-#~ msgid "The current language of the content fields."
-#~ msgstr "The current language of the content fields."
-
-#~ msgid "Another page with this slug already exists"
-#~ msgstr "Another page with this slug already exists"
-
-#~ msgid "Add Page Type"
-#~ msgstr "Add Page Type"
-
-#~ msgid "You do not have permission to change the template"
-#~ msgstr "You do not have permission to change the template"
-
-#~ msgid "You do not have permission to change this page"
-#~ msgstr "You do not have permission to change this page"
-
-#~ msgid "There only exists one translation for this page"
-#~ msgstr "There only exists one translation for this page"
-
-#~ msgid "User does not have permission to add page."
-#~ msgstr "User does not have permission to add page."
-
-#~ msgid "The site the page is accessible at."
-#~ msgstr "The site the page is accessible at."
-
-#~ msgid "Edit page"
-#~ msgstr "Edit this Page"
-
-#~ msgid "Toggle toolbar"
-#~ msgstr "Toggle toolbar"
-
-#~ msgid "Invalid URL, use /my/url format."
-#~ msgstr "Invalid URL, use /my/url format."
-
-#~ msgid "Add page permission also requires edit page permission."
-#~ msgstr "Add page permission also requires edit page permission."
-
-#~ msgid "Recover (any) pages"
-#~ msgstr "Recover (any) pages"
-
-#~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
-#~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
-
-#~ msgid "New password"
-#~ msgstr "New password"
-
-#~ msgid "New password confirmation"
-#~ msgstr "New password confirmation"
-
-#~ msgid "Email notification requires valid email address."
-#~ msgstr "Email notification requires valid email address."
-
-#~ msgid ""
-#~ "The permission to add new pages requires the permission to change pages!"
-#~ msgstr ""
-#~ "The permission to add new pages requires the permission to change pages!"
-
-#~ msgid ""
-#~ "The permission to add new users requires the permission to change users!"
-#~ msgstr ""
-#~ "The permission to add new users requires the permission to change users!"
-
-#~ msgid "To add permissions you also need to edit them!"
-#~ msgstr "To add permissions you also need to edit them!"
-
-#~ msgid "%(plugin_name)s plugin added to %(placeholder)s"
-#~ msgstr "%(plugin_name)s plugin added to %(placeholder)s"
-
-#~ msgid "Copied plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
-
-#~ msgid ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-#~ msgstr ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
-
-#~ msgid ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
-#~ msgstr ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
-
-#~ msgid "All plugins in the placeholder \"%(name)s\" were deleted."
-#~ msgstr "All plugins in the placeholder \"%(name)s\" were deleted."
-
-#~ msgid "Page reverted but slug stays the same because of url collisions."
-#~ msgstr "Page reverted but slug stays the same because of url collisions."
-
-#~ msgid "Template changed to %s"
-#~ msgstr "Template changed to %s"
-
-#~ msgid "Page moved"
-#~ msgstr "Page moved"
-
-#~ msgid "Copied plugins from %(source_language)s to %(target_language)s"
-#~ msgstr "Copied plugins from %(source_language)s to %(target_language)s"
-
-#~ msgid "The page \"%s\" was successfully reverted."
-#~ msgstr "The page \"%s\" was successfully reverted."
-
-#~ msgid "History"
-#~ msgstr "History"
-
-#~ msgid "Undo"
-#~ msgstr "Undo"
-
-#~ msgid "Redo"
-#~ msgstr "Redo"
-
-#~ msgid "View history"
-#~ msgstr "View history"
-
-#~ msgid ""
-#~ "\n"
-#~ "                Recover deleted %(verbose_name)s\n"
-#~ "            "
-#~ msgstr "Recover deleted %(verbose_name)s"
-
-#~ msgid "Press the save button below to recover this version of the object."
-#~ msgstr "Press the save button below to recover this version of the object."
-
-#~ msgid "Revert %(verbose_name)s"
-#~ msgstr "Revert %(verbose_name)s"
-
-#~ msgid "Press the save button below to revert to this version of the object."
-#~ msgstr "Press the save button below to revert to this version of the object."
-
-#~ msgid "home"
-#~ msgstr "home"
-
-#~ msgid "softroot"
-#~ msgstr "softroot"
-
-#~ msgid "({1}) plugin is empty. Remove it?"
-#~ msgstr "({1}) plugin is empty. Remove it?"
-
-#~ msgid "sample second page"
-#~ msgstr "sample account page"
-
-#~ msgid "Plugins were moved"
-#~ msgstr "Plugins were moved"
-
-#~ msgid "Path Overflow from: '%s'"
-#~ msgstr "Path Overflow from: '%s'"
-
-#~ msgid ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
-#~ msgstr ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
-
-#~ msgid "An error occured. Please reload the page"
-#~ msgstr "An error occured. Please reload the page"
-
-#~ msgid "Recover deleted %(name)s"
-#~ msgstr "Recover deleted %(name)s"
-
-#~ msgid "Add %(name)s"
-#~ msgstr "Add %(name)s"
-
-#~ msgid "Pages on:"
-#~ msgstr "Pages on:"
-
-#~ msgid "%(counter)s result"
-#~ msgid_plural "%(counter)s results"
-#~ msgstr[0] "a848884d0af974a125106fa2043a5716_pl_0"
-#~ msgstr[1] "a848884d0af974a125106fa2043a5716_pl_1"
-
-#~ msgid "%(full_result_count)s total"
-#~ msgstr "%(full_result_count)s total"
-
-#~ msgid "Show all"
-#~ msgstr "Show all"
-
-#~ msgid "Filter:"
-#~ msgstr "Filter:"
-
-#~ msgid "on"
-#~ msgstr "on"
-
-#~ msgid "off"
-#~ msgstr "off"
-
-#~ msgid "Filter"
-#~ msgstr "Filter"
-
-#~ msgid "Info"
-#~ msgstr "Info"
-
-#~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
-#~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
-
-#~ msgid "insert above"
-#~ msgstr "insert above"
-
-#~ msgid "insert below"
-#~ msgstr "insert below"
-
-#~ msgid "insert inside"
-#~ msgstr "insert inside"
-
-#~ msgid "Pick an action:"
-#~ msgstr "Pick an action:"
-
-#~ msgid "page settings"
-#~ msgstr "page settings"
-
-#~ msgid "copy"
-#~ msgstr "copy"
-
-#~ msgid "Add Child"
-#~ msgstr "Add Child"
-
-#~ msgid "add"
-#~ msgstr "add"
-
-#~ msgid "cut"
-#~ msgstr "cut"
-
-#~ msgid "delete"
-#~ msgstr "delete"
-
-#~ msgid "info"
-#~ msgstr "info"
-
-#~ msgid "Information"
-#~ msgstr "Information"
-
-#~ msgid "<span>%(icon)s</span>"
-#~ msgstr "<span>%(icon)s</span>"
-
-#~ msgid "English"
-#~ msgstr "English"
-
-#~ msgid "French"
-#~ msgstr "French"
-
-#~ msgid "German"
-#~ msgstr "German"
-
-#~ msgid "Brazilian Portuguese"
-#~ msgstr "Brazilian Portuguese"
-
-#~ msgid "Dutch"
-#~ msgstr "Dutch"
-
-#~ msgid "two columns"
-#~ msgstr "two columns"
-
-#~ msgid "three columns"
-#~ msgstr "three columns"
-
-#~ msgid "navigation examples"
-#~ msgstr "navigation examples"
-
-#~ msgid "sidebar column"
-#~ msgstr "sidebar column"
-
-#~ msgid "left column"
-#~ msgstr "left column"
-
-#~ msgid "Add a link"
-#~ msgstr "Add a link"
-
-#~ msgid "right column"
-#~ msgstr "right column"

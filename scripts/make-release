@@ -15,91 +15,42 @@ base_branch=develop
 upstream_source=git@github.com:django-cms/django-cms.git
 upstream_pattern='github\.com.django-cms/django-cms\.git$'
 
-RED="\033[31;1m"
-GREEN="\033[32;1m"
-YELLOW="\033[33;1m"
-BLUE="\033[34;1m"
-NORMAL="\033[0m"
-
-EDITOR=vim
-
 SCRIPTS=$(dirname "$(realpath "$0")")
-
-status() {
-    echo -e "${YELLOW}$1${NORMAL}"
-}
-
-error() {
-    echo -e "${RED}$*${NORMAL}"
-}
-
-success() {
-    echo -e "${GREEN}$*${NORMAL}"
-}
-
-review() {
-    echo -e "** Please ${BLUE}review ${YELLOW}$1${NORMAL}"
-    echo -e "${BLUE}Press enter${NORMAL} to continue in ${EDITOR}"
-    read -r
-    ${EDITOR} "$1"
-}
+#shellcheck disable=SC1090
+source "${SCRIPTS}/functions"
 
 # Preparations:
 
 # checking we have all necessary tools
-CMDS="git awk sed pip npm xargs ${EDITOR}"
-for cmd in ${CMDS}; do
-    if ! command -v "${cmd}" &> /dev/null; then
-        error "Can not find command ${cmd}, please install the tool before startinrg this script"
-        exit 1
-    fi
-done
-
-# Check for NVM:
-if ! declare -f nvm &> /dev/null; then
-    if [ -z "${NVM_DIR}" ]; then
-        error "Can not find nvm directory variable.... please install nvm and/or set NVM_DIR"
-        echo "to install nvm:"
-        echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash"
-        exit 1
-    fi
-
-    if [ ! -s "$NVM_DIR/nvm.sh" ]; then 
-        error "Can not find nvm script, please install NVM first"
-        echo "to install nvm:"
-        echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash"
-        exit 1
-    fi
-    # shellcheck disable=SC1090
-    source "$NVM_DIR/nvm.sh"  # This loads nvm
-fi
-
-if ! declare -f nvm &> /dev/null; then
-    error "Failed to load nvm??"
-    exit 1
-fi
-
+check_command_exists python git awk sed pip npm xargs grep "${EDITOR}"
+load_nvm
 
 # -- argument checks
 
-VERSION=$1
+FULL_VERSION=$1
 if [ -z "$1" ]; then
     error "Missing version argument:"
     echo "Usage: "
     echo ""
-    echo "$0 <VERSION> [suffix]"
+    echo "$0 <VERSION>[suffix] [branch]"
     echo ""
     echo "example:"
     echo "$0 3.9.0 rc1"
     exit 1
 fi
 
-VERSUFFIX=""
 if [ -n "$2" ]; then
-    VERSUFFIX=$2
+    base_branch="$2"
+    if ! git branch -a | grep -q "${base_branch}\$"; then
+        error "Can not find specified base branch ${base_branch}"
+        exit 1
+    fi
 fi
 
-FULL_VERSION=${VERSION}${VERSUFFIX}
+check_version_string "${FULL_VERSION}"
+
+VERSION=$(get_main_version "${FULL_VERSION}")
+VERSUFFIX=$(get_version_suffix "${FULL_VERSION}")
 
 BRANCH_SUFFIX=$(echo "${FULL_VERSION}" | awk -F '.' -e '{print $1 "." $2 ".x"}')
 BRANCH="release/${BRANCH_SUFFIX}"
@@ -115,7 +66,7 @@ if [ ! -d .git ] || [ ! -d "cms" ]; then
 fi
 
 # check that git is configured for commit
-if ! git config user.name || ! git config user.email; then
+if ! git config user.name >/dev/null || ! git config user.email >/dev/null; then
     error "Git must be configured for commit, please run the following commands first:"
     echo ""
     echo 'git config --local user.email "you@example.com"'
@@ -137,23 +88,32 @@ if echo "${origin}" | grep -q "${upstream_pattern}"; then
     exit 1
 fi
 
-if [ -z "${VIRTUAL_ENV}" ]; then
-    error "Please run this script within a virtualenv!"
-    echo "you can create an environment with the following command: "
-    echo "virtualenv -p python3 --prompt "django-cms-release " env"
-    exit 1
-fi
+check_virtual_env
 
 # bump the version
+current_branch=$(git branch --show-current)
+if [ "${current_branch}" != "${base_branch}" ]; then
+    echo -e "${RED}**WARNING**: ${NORMAL}Branch mismatch:"
+    echo -e "You appear to be on branch ${RED}${current_branch}${NORMAL} but will create the release from ${YELLOW}${base_branch}${NORMAL}"
+    echo "do you want to checkout ${base_branch}?"
+    echo -e "${BLUE}Enter${NORMAL} to checkout ${base_branch} now, Ctrl-C to abort"
+    read -r
+
+    git checkout "${base_branch}"
+fi
+
 OLDVER=$(python -c "import cms; print(cms.__version__)" )
+
+if [ -z "$(git tag -l "${OLDVER}")" ]; then
+    error "Can not find tag for version ${OLDVER} aborting ..."
+    exit 1
+fi
 
 # check if the tag does not already exist
 if git tag | grep -q "\<${TAG}\>"; then
     error "It appears tag ${TAG} already exists! aborting"
     exit 1
 fi
-
-
 
 ##
 ## Let's roll it
@@ -165,24 +125,12 @@ status "************************************************************************
 echo ""
 echo -e "${RED}WARNING!${NORMAL} This script will ${RED}REVERT ALL LOCAL MODIFICATIONS!${NORMAL}"
 echo ""
-echo -e "Preparing to create a release ${GREEN}${FULL_VERSION}${NORMAL} from content of ${YELLOW}${base_branch}${NORMAL} (currently version ${YELLOW}${OLDVER}${NORMAL})"
+echo -e "Preparing to create a release ${GREEN}${VERSION}${VERSUFFIX}${NORMAL} from content of ${YELLOW}${base_branch}${NORMAL} (currently version ${YELLOW}${OLDVER}${NORMAL})"
 echo "using fork: ${origin}"
 echo ""
 status "(Ctrl-C to abort, ${BLUE}Enter${YELLOW} to continue)"
 read -r
 
-
-# ensuring we have the proper env installed in pip
-status "- Installing needed python & node packages"
-grep -v django-cms docs/requirements.txt | xargs pip install --quiet django-admin transifex-client
-
-CMDS="django-admin "
-for cmd in ${CMDS}; do
-    if ! command -v "${cmd}" &> /dev/null; then
-        error "Can not find command ${cmd}, please install the tool before startinrg this script"
-        exit 1
-    fi
-done
 
 # checkinrg upstream really point to djangoCMS
 status "- Setting up upstream to ${upstream_source}"
@@ -196,28 +144,21 @@ if [ "${upstream_source}" != "${upstream}" ]; then
 fi
 
 status "- Cleaning the environment:"
-# first go to develop and ensure we got the latest and greatest
-git checkout "${base_branch}"
+# first go to ${base_branch} (default is develop) and ensure we got the latest and greatest
 git clean -dfx
 git restore --staged .
 git checkout .
 git pull upstream "${base_branch}"
 
 # installing needed nodejs module
-cd cms
-nvm install 6
-nvm use 6
-npm install --loglevel warn
-npm install gulp --loglevel warn
-
 status "- syncing fork"
 # updating the local repository, and pushing this to fork
-git pull upstream ${base_branch}
-git push -u origin ${base_branch}
+git pull upstream "${base_branch}"
+git push -u origin "${base_branch}"
 
 status "- preparing branch ${BRANCH}"
 # checking if the branch exists?
-if ! git branch -a | grep -q "remotes/upstream/${BRANCH}"; then
+if ! git branch -a | grep -q "remotes/upstream/${BRANCH}\$"; then
     git checkout -b "${BRANCH}"
     git push upstream "${BRANCH}"
 else
@@ -229,6 +170,10 @@ fi
 # cleaning on the branch
 git clean -f
 git checkout .
+
+# ensuring we have the proper env installed in pip
+"${SCRIPTS}/prepare-buildenv"
+cd cms
 
 # 2.2: make messages and push them
 
@@ -272,8 +217,8 @@ gulp bundle
 
 
 # remove old versions 
-git rm -rf "cms/static/cms/css/${OLDVER}" "cms/static/cms/fonts/${OLDVER}" 
-git add "cms/static/cms/css/${FULL_VERSION}" "cms/static/cms/fonts/${FULL_VERSION}"
+git rm -rf "cms/static/cms/css/${OLDVER}" "cms/static/cms/fonts/${OLDVER}" "cms/static/cms/js/dist/${OLDVER}"
+git add "cms/static/cms/css/${FULL_VERSION}" "cms/static/cms/fonts/${FULL_VERSION}" "cms/static/cms/js/dist/${FULL_VERSION}"
 git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 
 
@@ -326,8 +271,8 @@ if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
 }"
 fi
 
-review "${upgrade_doc}"
 review CHANGELOG.rst
+review "${upgrade_doc}"
 review docs/upgrade/index.rst
 review docs/conf.py
 
@@ -342,5 +287,5 @@ success "Release process complete on the fork"
 echo -e "To complete the process:"
 echo -e "1. ${BLUE}Please create a Pull Request${NORMAL} from your fork to ${YELLOW}${BRANCH}${NORMAL}"
 echo -e "2. When the PR is merged in target branch, execute: ${BLUE}git tag ${TAG}; git push upstream ${TAG}"
-echo -e "3. Create a PR from ${BRANCH} to ${base_branch}"
+echo -e "3. Create a PR from ${BRANCH} to ${base_branch} then to develop when golden release is accepted"
 success "Enjoy!"

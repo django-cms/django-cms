@@ -8,7 +8,6 @@ ROOT=$(git rev-parse --show-toplevel)
 cd "${ROOT}/cms"
 
 tx pull -f 
-tx pull -f -a --minimum-perc=75
 django-admin compilemessages
 
 "${SCRIPTS}/filter-locale-changes"
