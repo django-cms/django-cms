@@ -8,7 +8,7 @@ class Compatibility4xTestCase(testcases.TestCase):
     def test_ensure_no_migration_is_added(self):
         """
         to ensure the next version is compatible with the 4.x branch, we need to make sure
-        no new migration is added (otherwise, this will thnn conflicts with what is present in the 4.x
+        no new migration is added (otherwise, this will then conflicts with what is present in the 4.x
         branch
         """
 
