@@ -1,11 +1,11 @@
 coverage<5
 python-coveralls>2.5.0
 unittest-xml-reporting==1.11.0
-Pillow==3.3
+Pillow==5.2.0
 django-treebeard>=4.3
 argparse
 dj-database-url
-djangocms-admin-style>=1.2
+djangocms-admin-style>=1.5
 django-sekizai>=0.7
 django-classy-tags>=0.7.2
 https://github.com/divio/djangocms-text-ckeditor/archive/support/4.0.x.zip
@@ -20,4 +20,3 @@ pyenchant
 djangocms-helper
 mock>=2.0.0
 django-formtools
-mysqlclient==2.0.3
