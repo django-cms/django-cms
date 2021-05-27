@@ -49,7 +49,6 @@ Bug Fixes:
 * Fixed template label nested translation
 * Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
 * Fixed an issue when running migrations on a multi database project
-* Add COLLATE "C" into the database table and column cms_cmsplugin.path.
 
 Refactoring and Cleanups:
 -------------------------
