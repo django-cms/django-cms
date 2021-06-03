@@ -121,23 +121,21 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     return (child_classes, parent_classes)
 
 
-def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugins, plugins_by_id):
+def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_list, plugins_by_id):
     """
     Handle plugins where the parent hasn't yet been copied (child seen before the parent)
-    yet (parent -> child position mapping issue)
 
     CAVEAT: The only reason this exists is because the plugin position is not
-           sequential through children when the user moves plugins.
-           It's now too late as content already has this issue, needs to be handled gracefully.
+           sequential through children when the user nests plugins.
+           It's now too late as content already has this issue, it would be a very expensive
+           calculation to recalculate every placeholders positions, needs to be handled gracefully
+           so that it doesn't actually matter :-).
     """
-    for new_plugin_id, plugins in orphaned_plugins.items():
-        old_plugin_parent_id = plugins[0]
-        new_plugin = plugins[1]
+    for old_plugin_parent_id, new_plugin in orphaned_plugin_list:
         new_parent = plugins_by_id.get(old_plugin_parent_id, root_plugin)
         if new_parent:
             new_plugin.parent = new_parent
             new_plugin.save()
-    return
 
 
 def copy_plugins_to_placeholder(plugins, placeholder, language=None,
@@ -146,7 +144,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
     plugins_by_id = OrderedDict()
     # Keeps track of the next available position per language.
     positions_by_language = {}
-    orphaned_plugins = {}
+    orphaned_plugin_list = []
 
     if start_positions:
         positions_by_language.update(start_positions)
@@ -202,10 +200,13 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
 
         # Rescue any orphaned plugins
         if not parent and source_plugin.parent_id:
-            orphaned_plugins[new_plugin.pk] = (source_plugin.parent_id, new_plugin)
+            orphaned_plugin_list.append(
+                (source_plugin.parent_id, new_plugin)
+            )
 
     # Reunite any orphaned plugins with the parent
-    _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugins, plugins_by_id)
+    if orphaned_plugin_list:
+        _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_list, plugins_by_id)
 
     # Backwards compatibility
     # This magic is needed for advanced plugins like Text Plugins that can have
