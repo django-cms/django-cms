@@ -15,7 +15,6 @@ import { Helpers, KEYS } from './cms.base';
 
 var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
-var dd;
 
 export const getPlaceholderIds = pluginRegistry =>
     uniq(filter(pluginRegistry, ([, opts]) => opts.type === 'placeholder').map(([, opts]) => opts.placeholder_id));
@@ -99,18 +98,6 @@ var Toolbar = new Class({
 
         // set a state to determine if we need to reinitialize this._events();
         this.ui.toolbar.data('ready', true);
-
-        dd = new DiffDOM({
-            preDiffApply(info) {
-                if (
-                    (info.diff.action === 'removeAttribute' || info.diff.action === 'modifyAttribute') &&
-                    info.diff.name === 'style' &&
-                    $('.cms-toolbar').is(info.node)
-                ) {
-                    return true;
-                }
-            }
-        });
     },
 
     /**
