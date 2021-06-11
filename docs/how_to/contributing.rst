@@ -28,7 +28,7 @@ The basics
 
 The basic workflow for a code contribution will typically run as follows:
 
-#. Fork the `django CMS project <https://github.com/divio/django-cms>`_ GitHub repository to your
+#. Fork the `django CMS project <https://github.com/django-cms/django-cms>`_ GitHub repository to your
    own GitHub account
 #. Clone your fork locally::
 
@@ -87,7 +87,7 @@ Let's say you want to test the behaviour of the ``CMSPluginBase.render`` method:
 
 .. code-block:: python
 
-    class CMSPluginBase(six.with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
+    class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         ...
 

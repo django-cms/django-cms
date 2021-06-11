@@ -1,26 +1,10 @@
-
-
-
-#
-#
-#
-#
-#					Important
-# Different systems, have different ideas of correct spelling, so a reported
-# error, or an accepted spelling, might not be seen on a different system, or
-# indeed on Travis.
-# Please keep the two sections below separate.
-# review by Daniele Procida.
-# Until further notice please do not commit changes to this file before a
-#### accepted entries ####
-#### entries that need to be checked for various different reasons        ####
-#### for example because different operating systems' dictionaries differ ####
 addon
 addons
 Admin
 admin
 ajax
 Aldryn
+Aliaksei
 alskgj
 alt
 Alvarado
@@ -38,6 +22,7 @@ auth
 backport
 backported
 backticks
+Bartosz
 basilelegal
 Bertschy
 blog
@@ -48,9 +33,11 @@ casper
 changelist
 Changelog
 checkboxes
+Chematronix
 cleanup
 clickable
 Clickjacking
+clickjacking
 CMS
 cms
 codebase
@@ -102,6 +89,7 @@ Google
 Googlemap
 Guarini
 Gyömrey
+heppstux
 Homebrew
 Html5lib
 hvad
@@ -109,9 +97,11 @@ Hähne
 i
 Iacopo
 iframe
+iframes
 ikudryavtsev
 Indices
 inline
+inlines
 introspected
 iOS
 iPad
@@ -127,8 +117,11 @@ jrief
 js
 jsma
 jsTree
+Julz
 Júlio
+Kamycki
 Koistinen
+Krzysztof
 kwarg
 kwargs
 Larghi
@@ -147,7 +140,9 @@ Lorem
 lowercased
 Lucchese
 m
+Malinda
 maqnouch
+Mateusz
 Matteo
 max
 Mediaeval
@@ -171,6 +166,7 @@ olarcheveque
 online
 Paramonov
 Paulo
+Perera
 peterfarrell
 Placeholder
 placeholder
@@ -179,9 +175,11 @@ plugin
 plugins
 practices
 pre
+preload
 prized
 Procida
 programmatically
+Płóciennik
 queryset
 rc
 rebase
@@ -199,17 +197,20 @@ sam
 Samsung
 Sass
 Schoen
+Schwertel
 screenshots
 searchable
 Sekizai
 sekizai
 sephii
 Sergey
+Serhii
 sideframe
 Sikora
 sitemap
 sitemaps
 slugified
+Socha
 Spalletti
 src
 stefanw
@@ -217,6 +218,7 @@ Steinhauser
 structureboard
 stylesheets
 svg
+Sydorenko
 Sylvain
 templatetags
 templating
@@ -252,6 +254,7 @@ unoverridden
 unpublish
 unregister
 upgraders
+Urbanski
 url
 urlconf
 urlconfs
@@ -268,6 +271,7 @@ whitespace
 Wohlwend
 workflows
 writeable
+WSGIRequest
 xframe
 Xperia
 YouTube

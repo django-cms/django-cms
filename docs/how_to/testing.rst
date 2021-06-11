@@ -18,12 +18,12 @@ test version of ``urls.py`` and tell your tests to use that.
 So you could create ``myapp/tests/urls.py`` with the following code::
 
     from django.contrib import admin
-    from django.conf.urls import url, include
+    from django.urls import re_path, include
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
-        url(r'^myapp/', include('myapp.urls')),
-        url(r'', include('cms.urls')),
+        re_path(r'^admin/', admin.site.urls),
+        re_path(r'^myapp/', include('myapp.urls')),
+        re_path(r'', include('cms.urls')),
     ]
 
 And then in your tests you can plug this in with the
