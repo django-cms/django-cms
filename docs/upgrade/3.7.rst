@@ -1,0 +1,90 @@
+.. _upgrade-to-3.7.0:
+
+###################
+3.7.0 release notes
+###################
+
+
+This release of django CMS concentrates on introducing support for Django 2.2 LTS
+and Python 3.7.
+
+
+*******************
+What's new in 3.7.0
+*******************
+
+Improvements and new features
+=============================
+
+* Introduced Django 2.2 support.
+* Introduced Python 3.7 support.
+* Fixed test suite.
+* Fixed override ``urlconf_module`` so that Django system checks don't crash.
+
+
+*********************
+How to upgrade to 3.7
+*********************
+
+We assume you are upgrading from django CMS 3.6.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.
+
+
+***********************************
+Create a new django CMS 3.7 project
+***********************************
+
+On the Divio Cloud
+==================
+
+The Divio Cloud offers an easy way to set up django CMS projects. In the `Divio Cloud Control Panel
+<https://control.divio.com>`_, create a new django CMS project and **Deploy** it.
+
+
+Using the django CMS Installer
+==============================
+
+..  note::
+
+    The django CMS Installer is not yet available for django CMS 3.6 or Django 2 or later.
+
+    This section will be updated or removed before the final release of django CMS 3.6.
+
+
+****************************
+Contributors to this release
+****************************
+
+* Daniele Procida
+* Vadim Sikora
+* Paulo Alvarado
+* Bartosz Płóciennik
+* Katie McLaughlin
+* Krzysztof Socha
+* Mateusz Kamycki
+* Sergey Fedoseev
+* Aliaksei Urbanski
+* heppstux
+* Chematronix
+* Frank
+* Jacob Rief
+* Julz
+* Angelo Dini

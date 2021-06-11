@@ -1,0 +1,40 @@
+.. _upgrade-to-3.7.1:
+
+###################
+3.7.1 release notes
+###################
+
+*******************
+What's new in 3.7.1
+*******************
+
+Bug Fixes
+=========
+
+* Fixed a bug where creating a page via the ``cms.api.create_page`` ignores
+  left/right positions.
+* Fixed documentation example for ``urls.py`` when using multiple languages.
+* Fixed a bug where ``request.current_page`` would always be the public page,
+  regardless of the toolbar status (draft / live). This only affected custom
+  urls from an apphook.
+* Fixed a bug where the menu would render draft pages even if the page on
+  the request was a public page. This happens when a user without change
+  permissions requests edit mode.
+* Fixed the 'urls.W001' warning with custom apphook urls
+* Fixed missing ``{% trans %}`` to toolbar shortcuts.
+* Fixed a simple typo in the docstring for ``cms.utils.helpers.normalize_name``.
+
+Improvements and new features
+=============================
+
+* Added code of conduct reference file to the root directory
+* Moved contributing file to the root directory
+* Added better templates for new issue requests
+* Mark public static placeholder dirty when published.
+* Prevent non-staff users to login with the django CMS toolbar
+* Improved and simplified permissions documentation.
+* Improved apphooks documentation.
+* Improved CMSPluginBase documentation.
+* Improved documentation related to nested plugins.
+* Updated installation tutorial.
+* Updated branch and release policy.

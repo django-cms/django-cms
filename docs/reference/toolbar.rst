@@ -4,234 +4,245 @@
 The Toolbar
 ###########
 
+The toolbar can contain various items, some of which in turn can contain other items. These items
+are represented by the classes listed in :mod:`cms.toolbar.items`, and created using the various
+APIs described below.
 
-All methods taking a ``side`` argument expect either
-:data:`cms.constants.LEFT` or :data:`cms.constants.RIGHT` for that
-argument.
+..  admonition:: Do not instantiate these classes manually
 
-Methods accepting the ``position`` argument can insert items at a specific
-position. This can be either ``None`` to insert at the end, an integer
-index at which to insert the item, a :class:`cms.toolbar.items.ItemSearchResult` to insert
-it *before* that search result or a :class:`cms.toolbar.items.BaseItem` instance to insert
-it *before* that item.
+    **These classes are described here for reference purposes only.** It is strongly recommended
+    that you do not create instances yourself, but use the methods listed here.
 
 
-cms.toolbar.toolbar
-===================
+*******************
+Classes and methods
+*******************
+
+:ref:`Common parameters <toolbar_parameters>` (``key``, ``verbose_name``, ``position``,
+``on_close``, ``disabled``, ``active``) and options are described at the end of this document.
 
 ..  module:: cms.toolbar.toolbar
 
 ..  class:: CMSToolbar
 
-    The toolbar class providing a Python API to manipulate the toolbar. Note
-    that some internal attributes are not documented here.
+    The toolbar is an instance of the ``cms.toolbar.toolbar.CMSToolbar`` class. This should not be
+    confused with the :class:`~cms.toolbar_base.CMSToolbar`, the base class for *toolbar modifier
+    classes* in other applications, that add items to and otherwise manipulates the toolbar.
 
-    All methods taking a ``position`` argument expect either
-    :data:`cms.constants.LEFT` or :data:`cms.constants.RIGHT` for that
-    argument.
+    It is strongly recommended that you **only** interact with the toolbar in your own code via:
 
-    This class inherits :class:`cms.toolbar.items.ToolbarMixin`, so please
-    check that reference as well.
+    * the APIs documented here
+    * toolbar modifier classes based on ``cms.toolbar_base.CMSToolbar``
 
-    .. attribute:: is_staff
+    You will notice that some of the methods documented here do not include some arguments present
+    in the code. This is the *public* reference documentation, while the code may be subject to
+    change without warning.
 
-        Whether the current user is a staff user or not.
+    Several of the following methods to create and add objects other objects to the toolbar are
+    inherited from :class:`~cms.toolbar.items.ToolbarAPIMixin`.
 
-    .. attribute:: edit_mode_active
+    ..  method:: add_link_item
 
-        Whether the toolbar is in edit mode.
+        See :meth:`ToolbarAPIMixin.add_link_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_link_item>`
 
-    .. attribute:: build_mode
+    ..  method:: add_sideframe_item
 
-        Whether the toolbar is in build mode.
+        See :meth:`ToolbarAPIMixin.add_sideframe_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_sideframe_item>`
 
-    .. attribute:: show_toolbar
+    ..  method:: add_modal_item
 
-        Whether the toolbar should be shown or not.
+        See :meth:`ToolbarAPIMixin.add_modal_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_modal_item>`
 
-    .. attribute:: csrf_token
+    ..  method:: add_ajax_item
 
-        The CSRF token of this request
+        See :meth:`ToolbarAPIMixin.add_ajax_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_ajax_item>`
 
-    .. attribute:: toolbar_language
+    ..  method:: add_item
 
-        Language used by the toolbar.
+        See :meth:`ToolbarAPIMixin.add_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_item>`
 
-    .. attribute:: watch_models
+    ..  method:: get_or_create_menu(key, verbose_name, position=None, disabled=False)
 
-        A list of models this toolbar works on; used for redirection after editing
-        (:ref:`url_changes`).
+        If a :class:`~cms.toolbar.items.Menu` with :option:`key` already exists, this method will
+        return that menu. Otherwise it will create a menu with the ``key`` identifier.
 
-    .. method:: add_item(item, position=None)
+    ..  method:: get_menu(key)
 
-        Low level API to add items.
+        Will return the ``Menu`` identified with :option:`key`, or ``None``.
 
-        Adds an item, which must be an instance of
-        :class:`cms.toolbar.items.BaseItem`, to the toolbar.
+    ..  method:: add_button(name, url, active=False, disabled=False, position=None)
 
-        This method should only be used for custom item classes, as all built-in
-        item classes have higher level APIs.
+        Adds a :class:`~cms.toolbar.items.Button` to the toolbar.
 
-        Read above for information on ``position``.
+    ..  method:: add_sideframe_button(name, url, active=False, disabled=False, on_close=None)
 
-    .. method:: remove_item(item)
+        Adds a :class:`~cms.toolbar.items.SideframeButton` to the toolbar.
 
-        Removes an item from the toolbar or raises a :exc:`KeyError` if it's
-        not found.
+    ..  method:: add_modal_button(name, url, active=False, disabled=False, on_close=REFRESH_PAGE)
 
-    .. method:: get_or_create_menu(key, verbose_name, side=LEFT, position=None)
+        Adds a :class:`~cms.toolbar.items.ModalButton` to the toolbar.
 
-        If a menu with ``key`` already exists, this method will return that
-        menu. Otherwise it will create a menu for that ``key`` with the given
-        ``verbose_name`` on ``side`` at ``position`` and return it.
+    ..  method:: add_button_list(position=None)
 
+        Adds an (empty) :class:`~cms.toolbar.items.ButtonList` to the toolbar and returns it.
 
-    ..  method:: get_menu(self, key, verbose_name=None, side=LEFT, position=None)
+    ..  method:: edit_mode_active
 
-        If a menu with ``key`` already exists, this method will return that
-        menu.
+        Property; returns ``True`` if the content or structure board editing modes are active.
 
+    ..  method:: watch_models
 
-    .. method:: add_button(name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None, side=LEFT, position=None)
+        Property; a list of models that the toolbar :ref:`watches for URL changes <url_changes>`,
+        so it can redirect to the new URL on saving.
 
-        Adds a button to the toolbar. ``extra_wrapper_classes`` will be applied
-        to the wrapping ``div`` while ``extra_classes`` are applied to the
-        ``<a>``.
 
-    .. method:: add_button_list(extra_classes=None, side=LEFT, position=None)
+..  module:: cms.toolbar.items
 
-        Adds an (empty) button list to the toolbar and returns it. See
-        :class:`cms.toolbar.items.ButtonList` for further information.
+..  class:: Menu
 
+    Provides a menu in the toolbar. Use a :meth:`CMSToolbar.get_or_create_menu
+    <cms.toolbar.toolbar.CMSToolbar.get_or_create_menu>` method to create a ``Menu`` instance. Can
+    be added to :class:`~cms.toolbar.toolbar.CMSToolbar`.
 
+    Inherits from :class:`SubMenu` below, so shares all of its methods, but in addition has:
 
-cms.toolbar.items
-=================
+    ..  method:: get_or_create_menu(key, verbose_name, disabled=False, position=None)
 
-.. important:: **Overlay** and **sideframe**
+        Adds a new sub-menu, at :option:`position`, and returns a :class:`SubMenu`.
 
-    Then django CMS *sideframe* has been replaced with an *overlay* mechanism. The API still refers
-    to the ``sideframe``, because it is invoked in the same way, and what has changed is merely the
-    behaviour in the user's browser.
 
-    In other words, *sideframe* and the *overlay* refer to different versions of the same thing.
+..  class:: SubMenu
 
-.. module:: cms.toolbar.items
+    A child of a :class:`Menu`. Use a :meth:`Menu.get_or_create_menu
+    <cms.toolbar.items.Menu.get_or_create_menu>` method to create a ``SubMenu`` instance. Can be
+    added to ``Menu``.
 
+    Several of the following methods to create and add objects are inherited from
+    :class:`~cms.toolbar.items.ToolbarAPIMixin`.
 
-.. class:: ItemSearchResult
+    ..  method:: add_link_item
 
-    Used for the find APIs in :class:`ToolbarMixin`. Supports addition and
-    subtraction of numbers. Can be cast to an integer.
+        See :meth:`ToolbarAPIMixin.add_link_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_link_item>`
 
-    .. attribute:: item
+    ..  method:: add_sideframe_item
 
-        The item found.
+        See :meth:`ToolbarAPIMixin.add_sideframe_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_sideframe_item>`
 
-    .. attribute:: index
+    ..  method:: add_modal_item
 
-        The index of the item.
+        See :meth:`ToolbarAPIMixin.add_modal_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_modal_item>`
 
-.. class:: ToolbarMixin
+    ..  method:: add_ajax_item
 
-    Provides APIs shared between :class:`cms.toolbar.toolbar.CMSToolbar` and
-    :class:`Menu`.
+        See :meth:`ToolbarAPIMixin.add_ajax_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_ajax_item>`
 
-    The ``active`` and ``disabled`` flags taken by all methods of this class
-    specify the state of the item added.
+    ..  method:: add_item
 
-    ``extra_classes`` should be either ``None`` or a list of class names as
-    strings.
+        See :meth:`ToolbarAPIMixin.add_item
+        <cms.toolbar.items.ToolbarAPIMixin.add_item>`
 
-    .. attribute:: REFRESH_PAGE
+    ..  method:: get_item_count
 
-        Constant to be used with ``on_close`` to refresh the current page when
-        the frame is closed.
+        Returns the number of items in the menu.
 
-    .. attribute:: LEFT
+    Other methods:
 
-        Constant to be used with ``side``.
+    ..  method:: add_break(identifier=None, position=None)
 
-    .. attribute:: RIGHT
+        Adds a visual break in the menu, at :option:`position`, and returns it. ``identifier`` may
+        be used to make this item searchable.
 
-        Constant to be used with ``side``.
 
-    .. method:: get_item_count
+..  class:: LinkItem
 
-        Returns the number of items in the toolbar or menu.
+    Sends a GET request. Use an :class:`~ToolbarAPIMixin.add_link_item` method to create a
+    ``LinkItem`` instance. Can be added to :class:`~cms.toolbar.toolbar.CMSToolbar`,
+    :class:`~cms.toolbar.items.Menu`, :class:`~cms.toolbar.items.SubMenu`.
 
-    ..  method:: get_alphabetical_insert_position(self, new_menu_name, item_type, default=0)
+..  class:: SideframeItem
 
-    .. method:: add_item(item, position=None)
+    Sends a GET request; loads response in a sideframe. Use an
+    :class:`~ToolbarAPIMixin.add_sideframe_item` method to create a ``SideframeItem`` instance. Can
+    be added to :class:`~cms.toolbar.toolbar.CMSToolbar`, :class:`~cms.toolbar.items.Menu`,
+    :class:`~cms.toolbar.items.SubMenu`.
 
-        Low level API to add items, adds the ``item`` to the toolbar or menu
-        and makes it searchable. ``item`` must be an instance of
-        :class:`BaseItem`. Read above for information about the ``position``
-        argument.
+..  class:: ModalItem
 
-    .. method:: remove_item(item)
+    Sends a GET request; loads response in a modal window. Use an
+    :class:`~ToolbarAPIMixin.add_modal_item` method to create a ``ModalItem`` instance. Can be
+    added to :class:`~cms.toolbar.toolbar.CMSToolbar`, :class:`~cms.toolbar.items.Menu`,
+    :class:`~cms.toolbar.items.SubMenu`.
 
-        Removes ``item`` from the toolbar or menu. If the item can't be found,
-        a :exc:`KeyError` is raised.
+..  class:: AjaxItem
 
-    .. method:: find_items(item_type, **attributes)
+    Sends a POST request. Use an :class:`~ToolbarAPIMixin.add_ajax_item` method to create a
+    ``AjaxItem`` instance. Can be added to :class:`~cms.toolbar.toolbar.CMSToolbar`,
+    :class:`~cms.toolbar.items.Menu`, :class:`~cms.toolbar.items.SubMenu`.
 
-        Returns a list of :class:`ItemSearchResult` objects matching all items
-        of ``item_type``, which must be a sub-class of :class:`BaseItem`, where
-        all attributes in ``attributes`` match.
+..  class:: Break
 
-    .. method:: find_first(item_type, **attributes)
+    A visual break in a menu. Use an :class:`~cms.toolbar.items.SubMenu.add_break` method to create
+    a ``Break`` instance. Can be added to :class:`~cms.toolbar.items.Menu`,
+    :class:`~cms.toolbar.items.SubMenu`.
 
-        Returns the first :class:`ItemSearchResult` that matches the search or
-        ``None``. The search strategy is the same as in :meth:`find_items`.
-        Since positional insertion allows ``None``, it's safe to use the return
-        value of this method as the position argument to insertion APIs.
+..  class:: ButtonList
 
-    .. method:: add_sideframe_item(name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT, position=None)
+    A visually-connected list of one or more buttons. Use an
+    :meth:`~cms.toolbar.toolbar.CMSToolbar.add_button_list` method to create a ``Button`` instance.
+    Can be added to :class:`~cms.toolbar.toolbar.CMSToolbar`.
 
-        Adds an item which opens ``url`` in the sideframe and returns it.
+    ..  method:: add_button(name, url, active=False, disabled=False)
 
-        ``on_close`` can be set to ``None`` to do nothing when the sideframe
-        closes, :attr:`REFRESH_PAGE` to refresh the page when it
-        closes or a URL to open once it closes.
+        Adds a :class:`Button` to the list of buttons and returns it.
 
-    .. method:: add_modal_item(name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE, side=LEFT, position=None)
+    ..  method:: add_sideframe_button(name, url, active=False, disabled=False, on_close=None)
 
-        The same as :meth:`add_sideframe_item`, but opens the ``url`` in a
-        modal dialog instead of the sideframe.
+        Adds a :class:`~cms.toolbar.items.ModalButton` to the toolbar.
 
-        ``on_close`` can be set to ``None`` to do nothing when the side modal
-        closes, :attr:`REFRESH_PAGE` to refresh the page when it
-        closes or a URL to open once it closes.
+    ..  method:: add_modal_button(name, url, active=False, disabled=False, on_close=REFRESH_PAGE)
 
-        Note: The default value for ``on_close`` is different in :meth:`add_sideframe_item` then in :meth:`add_modal_item`
+        Adds an (empty) :class:`~cms.toolbar.items.ButtonList` to the toolbar and returns it.
 
-    .. method:: add_link_item(name, url, active=False, disabled=False, extra_classes=None, side=LEFT, position=None)
+    ..  method:: get_buttons
 
-        Adds an item that simply opens ``url`` and returns it.
+..  class:: Button
 
-    .. method:: add_ajax_item(name, action, active=False, disabled=False, extra_classes=None, data=None, question=None, side=LEFT, position=None)
+    Sends a GET request. Use a :meth:`CMSToolbar.add_button
+    <cms.toolbar.toolbar.CMSToolbar.add_button>` or :meth:`ButtonList.add_button` method to create
+    a ``Button`` instance. Can be added to :class:`~cms.toolbar.toolbar.CMSToolbar`,
+    :class:`~cms.toolbar.items.ButtonList`.
 
-        Adds an item which sends a POST request to ``action`` with ``data``.
-        ``data`` should be ``None`` or a dictionary, the CSRF token will
-        automatically be added to it.
+..  class:: SideframeButton
 
-        If ``question`` is set to a string, it will be asked before the
-        request is sent to confirm the user wants to complete this action.
+    Sends a GET request. Use a :meth:`CMSToolbar.add_sideframe_button
+    <cms.toolbar.toolbar.CMSToolbar.add_sideframe_button>` or
+    :meth:`ButtonList.add_sideframe_button` method to create a ``SideframeButton`` instance. Can be
+    added to :class:`~cms.toolbar.toolbar.CMSToolbar`, :class:`~cms.toolbar.items.ButtonList`.
 
+..  class:: ModalButton
 
-.. class:: BaseItem(position)
+    Sends a GET request. Use a :meth:`CMSToolbar.add_modal_button
+    <cms.toolbar.toolbar.CMSToolbar.add_modal_button>` or :meth:`ButtonList.add_modal_button`
+    method to create a ``ModalButton`` instance. Can be added to
+    :class:`~cms.toolbar.toolbar.CMSToolbar`, :class:`~cms.toolbar.items.ButtonList`.
 
-    Base item class.
+..  class:: BaseItem
+
+    All toolbar items inherit from ``BaseItem``. If you need to create a custom toolbar item,
+    sub-class ``BaseItem``.
 
     .. attribute:: template
 
         Must be set by sub-classes and point to a Django template
-
-    .. attribute:: side
-
-        Must be either :data:`cms.constants.LEFT` or
-        :data:`cms.constants.RIGHT`.
 
     .. method:: render()
 
@@ -244,93 +255,154 @@ cms.toolbar.items
         Returns the context (as dictionary) for this item.
 
 
-.. class:: Menu(name, csrf_token, side=LEFT, position=None)
+..  class:: ToolbarAPIMixin
 
-    The menu item class. Inherits :class:`ToolbarMixin` and provides the APIs
-    documented on it.
+    Provides APIs used by :class:`~cms.toolbar.toolbar.CMSToolbar` and :class:`Menu`.
 
-    The ``csrf_token`` must be set as this class provides high level APIs to
-    add items to it.
+    ..  method:: add_link_item(name, url, active=False, disabled=False, position=None)
 
-    .. method:: get_or_create_menu(key, verbose_name, side=LEFT, position=None)
+        Adds a :class:`LinkItem` that opens ``url``, and returns it.
 
-        The same as :meth:`cms.toolbar.toolbar.CMSToolbar.get_or_create_menu` but adds
-        the menu as a sub menu and returns a :class:`SubMenu`.
+    ..  method:: add_sideframe_item(name, url, active=False, disabled=False, on_close=None, position=None)
 
-    .. method:: add_break(identifier=None, position=None)
+        Adds a :class:`SideframeItem` that opens ``url`` in the sideframe and returns it.
 
-        Adds a visual break in the menu, useful for grouping items, and
-        returns it. ``identifier`` may be used to make this item searchable.
+    ..  method:: add_modal_item(name, url, active=False, disabled=False, on_close=REFRESH_PAGE, position=None)
 
+        Similar to :meth:`add_sideframe_item`, but adds a :class:`ModalItem` that opens opens the
+        ``url`` in a modal dialog instead of the sideframe, and returns it.
 
-.. class:: SubMenu(name, csrf_token, side=LEFT, position=None)
+    ..  method:: add_ajax_item(name, action, active=False, disabled=False, \
+                     data=None, question=None, position=None)
 
-    Same as :class:`Menu` but without the :meth:`Menu.get_or_create_menu` method.
+        Adds :class:`AjaxItem` that sends a POST request to ``action`` with ``data``, and returns
+        it. ``data`` should be ``None`` or a dictionary. The CSRF token will automatically be added
+        to the item.
 
+        If a string is provided for ``question``, it will be presented to the user to allow
+        confirmation before the request is sent.
 
-.. class:: LinkItem(name, url, active=False, disabled=False, extra_classes=None, side=LEFT)
+    ..  method:: add_item(item, position=None)
 
-    Simple link item.
+        Adds an item (which must be a sub-class of :class:`~cms.toolbar.items.BaseItem`), and
+        returns it. This is a low-level API, and you should always use one of the built-in
+        object-specific methods to add items in preference if possible, using this method **only**
+        for custom item classes.
 
+    ..  method:: find_items(item_type)
 
-.. class:: SideframeItem(name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT)
+        Returns a list of :class:`ItemSearchResult` objects matching all items of ``item_type``
+        (e.g. ``LinkItem``).
 
-    Item that opens ``url`` in sideframe.
+    ..  method:: find_first(item_type, **attributes)
 
-
-.. class:: AjaxItem(name, action, csrf_token, data=None, active=False, disabled=False, extra_classes=None, question=None, side=LEFT)
-
-    An item which posts ``data`` to ``action``.
-
-
-.. class:: ModalItem(name, url, active=False, disabled=False, extra_classes=None, on_close=None, side=LEFT)
-
-    Item that opens ``url`` in the modal.
-
-
-.. class:: Break(identifier=None)
-
-    A visual break for menus. ``identifier`` may be provided to make this item
-    searchable. Since breaks can only be within menus, they have no ``side``
-    attribute.
+        Returns the first :class:`ItemSearchResult` that matches the search, or ``None``. The
+        search strategy is the same as in :meth:`find_items`. The return value of this method is
+        safe to use as the :option:`position` argument of the various APIs to add items.
 
 
-.. class:: ButtonList(identifier=None, extra_classes=None, side=LEFT)
+..  class:: ItemSearchResult
 
-    A list of one or more buttons.
+    Returned by the find APIs in :class:`ToolbarAPIMixin`.
 
-    The ``identifier`` may be provided to make this item searchable.
+    An ``ItemSearchResult`` will have two useful attributes:
 
-    .. method:: add_item(item)
+    .. attribute:: item
 
-        Adds ``item`` to the list of buttons. ``item`` must be an instance of
-        :class:`Button`.
+        The item found.
 
-    .. method:: add_button(name, url, active=False, disabled=False, extra_classes=None)
+    .. attribute:: index
 
-        Adds a :class:`Button` to the list of buttons and returns it.
+        The index of the item (its position amongst the other items).
 
-
-.. class:: Button(name, url, active=False, disabled=False, extra_classes=None)
-
-    A button to be used with :class:`ButtonList`. Opens ``url`` when selected.
+    The ``ItemSearchResult`` itself can be cast to an integer, and supports addition and
+    subtraction of numbers. See the :option:`position` parameter for more details, and
+    :ref:`toolbar_control_item_position` for examples.
 
 
-..  module:: cms.toolbar_pool
+..  module:: cms.toolbar_base.CMSToolbar
 
-..  class:: ToolbarPool
+..  class:: CMSToolbar
 
-    ..  method:: register(self, toolbar)
+    The base class for toolbar modifiers.
 
-        Register this toolbar.
+    See :ref:`toolbar_how_to` for more information.
 
 
-..  module:: cms.extensions.toolbar
+.. _toolbar_parameters:
 
-..  class:: ExtensionToolbar
+**********
+Parameters
+**********
 
-    ..  method:: get_page_extension_admin()
+The methods described below for creating/modifying toolbar items share a number of common
+parameters:
 
-    ..  method:: _setup_extension_toolbar()
+..  option:: key
 
-    ..  method:: get_title_extension_admin()
+    a unique identifier (typically a string)
+
+..  option:: verbose_name
+
+    the displayed text in the item
+
+..  option:: position
+
+    The position index of the new item in the list of items. May be:
+
+    * ``None`` - appends the item to the list
+    * an integer - inserts the item at that index in the list
+    * an object already in the list - Inserts the item into the list immediately before the object;
+      must be a sub-class of :class:`~cms.toolbar.items.BaseItem`, and must exist in the list
+    * an :class:`~cms.toolbar.items.ItemSearchResult` - inserts the item into the list immediately
+      before the ``ItemSearchResult``. ``ItemSearchResult`` may be treated as an integer.
+
+..  option:: on_close:
+
+    Determines what happens after closing a frame (sideframe or modal) that has been opened by a
+    menu item. May be:
+
+    * ``None`` - does nothing when the sideframe closes
+    * :const:`~cms.constants.REFRESH_PAGE` - refreshes the page when the frame closes
+    * a URL - opens the URLS when the frame is closed.
+
+..  option:: disabled
+
+    Greys out the item and renders it inoperable.
+
+..  option::  active
+
+    Applies to buttons only; renders the button it its 'activated' state.
+
+
+*************************************
+django CMS constants used in toolbars
+*************************************
+
+..  module:: cms.constants
+    :noindex:
+
+..  data:: REFRESH_PAGE
+
+    Supplied to ``on_close`` arguments to refresh the current page when the frame is closed, for
+    example:
+
+    ..  code-block:: python
+
+        from cms.constants import REFRESH_PAGE
+
+        self.toolbar.add_modal_item(
+            'Modal item',
+            url=modal_url,
+            on_close=REFRESH_PAGE
+            )
+
+
+..  module:: cms.cms_toolbars
+
+..  data:: ADMIN_MENU_IDENTIFIER
+
+    The *Site* menu (that usually shows the project's domain name, *example.com* by default).
+    ``ADMIN_MENU_IDENTIFIER`` allows you to get hold of this object easily. See
+    :ref:`finding_toolbar_items` for an example of usage.
+
