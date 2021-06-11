@@ -12,7 +12,7 @@ get it working according to their own requirements.
 These tutorials take you step-by-step through some key aspects of this work.
 They're not intended to explain the :doc:`topics in depth </topics/index>`, or
 provide :doc:`reference material </reference/index>`, but they will leave you
-with a good idea of what it's possible to achieve in just a few steps, and how
+with a good idea of what is possible to achieve in just a few steps, and how
 to go about it.
 
 Once you're familiar with the basics presented in these tutorials, you'll find
@@ -41,11 +41,6 @@ If you want to install django CMS into an existing project, or prefer to configu
 hand, rather than using the automated installer, see :doc:`/how_to/install` and then follow the
 rest of the tutorials.
 
-Either way, you'll be able to find support and help from the numerous friendly
-members of the django CMS community, either on our `mailinglist`_ or IRC
-channel ``#django-cms`` on the ``irc.freenode.net`` network.
-
-If you don't have an IRC client, you can `join our IRC channel using the KiwiIRC web client
-<https://kiwiirc.com/client/irc.freenode.net/django-cms>`_, which works pretty well.
-
-.. _mailinglist: https://groups.google.com/forum/#!forum/django-cms
+Either way, you'll be able to find support and help from the numerous friendly members of the
+django CMS community, either on our `Discourse forum <https://discourse.django-cms.org>`_ or `our
+Slack group <https://www.django-cms.org/slack>`_.

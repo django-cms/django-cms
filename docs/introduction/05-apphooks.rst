@@ -1,3 +1,5 @@
+:sequential_nav: both
+
 .. _apphooks_introduction:
 
 ########
@@ -16,6 +18,10 @@ Create an apphook
 We do this with an **apphook**, created using a :class:`CMSApp
 <cms.app_base.CMSApp>` sub-class, which tells the CMS how to include that application.
 
+
+Create the apphook class
+========================
+
 Apphooks live in a file called ``cms_apps.py``, so create one in your Polls/CMS Integration
 application, i.e. in ``polls_cms_integration``.
 
@@ -25,13 +31,12 @@ This is a very basic example of an apphook for a django CMS application:
 
     from cms.app_base import CMSApp
     from cms.apphook_pool import apphook_pool
-    from django.utils.translation import ugettext_lazy as _
 
 
     @apphook_pool.register  # register the application
     class PollsApphook(CMSApp):
         app_name = "polls"
-        name = _("Polls Application")
+        name = "Polls Application"
 
         def get_urls(self, page=None, language=None, **kwargs):
             return ["polls.urls"]
@@ -39,12 +44,34 @@ This is a very basic example of an apphook for a django CMS application:
 
 In this ``PollsApphook`` class, we have done several key things:
 
-* ``app_name`` attribute gives the system a unique way to refer to the apphook - see
-  :ref:`multi_apphook` for details on why this matters.
+* ``app_name`` attribute gives the system a unique way to refer to the apphook. You can see from
+  `Django Polls <https://github.com/divio/django-polls/blob/master/polls/urls.py#L6>`_ that the
+  application namespace ``polls`` is hard-coded into the application, so this attribute **must**
+  also be ``polls``.
 * ``name`` is a human-readable name, and will be displayed to the admin user.
 * ``get_urls()`` method is what actually hooks the application in, returning a
   list of URL configurations that will be made active wherever the apphook is used - in this case,
   it will use the ``urls.py`` from ``polls``.
+
+
+Remove the old ``polls`` entry from the project's ``urls.py``
+=============================================================
+
+You must now remove the entry for the Polls application::
+
+    re_path(r'^polls/', include('polls.urls', namespace='polls'))
+
+from your project's ``urls.py``.
+
+Not only is it not required there, because we reach the polls via the apphook
+instead, but if you leave it there, it will conflict with the apphook's URL handling. You'll
+receive a warning in the logs::
+
+    URL namespace 'polls' isn't unique. You may not be able to reverse all URLs in this namespace.
+
+
+Restart the runserver
+=====================
 
 **Restart the runserver**. This is necessary because we have created a new file containing Python
 code that won't be loaded until the server restarts. You only have to do this the first time the
@@ -73,13 +100,6 @@ Application" from the *Application* pop-up menu, and save once more.
 
 Refresh the page, and you'll find that the Polls application is now available
 directly from the new django CMS page.
-
-You can now remove the mention of the Polls application (``url(r'^polls/', include('polls.urls',
-namespace='polls'))``) from your project's ``urls.py`` - it's no longer even required there,
-because we reach the polls via the apphook instead. If you leave it there, then you'll receive a
-warning in the logs::
-
-    URL namespace 'polls' isn't unique. You may not be able to reverse all URLs in this namespace.
 
 ..  important::
 
