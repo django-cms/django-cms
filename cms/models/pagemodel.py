@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
@@ -260,7 +260,7 @@ class Page(models.Model):
                 title = None
         if title is None:
             title = u""
-        return force_text(title)
+        return force_str(title)
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
@@ -329,6 +329,8 @@ class Page(models.Model):
         return (new_home_tree, old_home_tree)
 
     def _update_title_path(self, language):
+        from cms.utils.page import get_available_slug
+
         parent_page = self.get_parent_page()
 
         if parent_page:
@@ -337,7 +339,9 @@ class Page(models.Model):
             base = ''
 
         title_obj = self.get_title_obj(language, fallback=False)
-        title_obj.path = title_obj.get_path_for_base(base)
+        title_obj.slug = get_available_slug(title_obj.page.node.site, title_obj.slug, title_obj.language, current=title_obj.page)
+        if not title_obj.page.is_home:
+            title_obj.path = '%s/%s' % (base, title_obj.slug) if base else title_obj.slug
         title_obj.save()
 
     def _update_title_path_recursive(self, language, slug=None):
@@ -1419,27 +1423,19 @@ class Page(models.Model):
 
         force_reload = (force_reload or language not in self.title_cache)
 
-        if fallback and not self.title_cache.get(language):
-            # language can be in the cache but might be an EmptyTitle instance
-            fallback_langs = i18n.get_fallback_languages(language)
-            for lang in fallback_langs:
-                if self.title_cache.get(lang):
-                    return lang
-
         if force_reload:
             from cms.models.titlemodels import Title
 
             titles = Title.objects.filter(page=self)
             for title in titles:
                 self.title_cache[title.language] = title
-            if self.title_cache.get(language):
-                return language
-            else:
-                if fallback:
-                    fallback_langs = i18n.get_fallback_languages(language)
-                    for lang in fallback_langs:
-                        if self.title_cache.get(lang):
-                            return lang
+
+        if fallback and not self.title_cache.get(language):
+            fallback_langs = i18n.get_fallback_languages(language)
+            for lang in fallback_langs:
+                if self.title_cache.get(lang):
+                    return lang
+
         return language
 
     def get_template(self):

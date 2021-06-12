@@ -10,7 +10,7 @@ from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_str, smart_str
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.translation import (
@@ -103,7 +103,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 middle = BrokenLinkEmailsMiddleware()
                 domain = request.get_host()
                 path = request.get_full_path()
-                referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+                referer = force_str(request.META.get('HTTP_REFERER', ''), errors='replace')
                 if not middle.is_ignorable_request(request, path, domain, referer):
                     mail_managers(subject, body, fail_silently=True)
             return None
@@ -511,16 +511,16 @@ class CMSEditableObject(InclusionTag):
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = u"%s %s list" % (smart_text(_('Edit')), smart_text(opts.verbose_name))
+                instance.get_plugin_name = u"%s %s list" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = u"%s %s" % (smart_text(_('Edit')), smart_text(opts.verbose_name))
+                instance.get_plugin_name = u"%s %s" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(edit_fields) \
                                                         if not isinstance('edit_fields', str) else edit_fields
             else:
-                instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(opts.verbose_name))
+                instance.get_plugin_name = u"%s %s" % (smart_str(_('Add')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
             extra_context['generic'] = opts

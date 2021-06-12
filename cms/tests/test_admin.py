@@ -12,7 +12,7 @@ from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.http import (Http404, HttpResponseBadRequest,
                          HttpResponseNotFound)
-from django.utils.encoding import force_text, smart_str
+from django.utils.encoding import force_str, smart_str
 from django.utils import timezone
 
 from cms import api
@@ -644,6 +644,40 @@ class AdminTests(AdminTestsBase):
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
+    def test_too_many_plugins_global_children(self):
+        from urllib.parse import urlencode
+        conf = {
+            'body': {
+                'limits': {
+                    'global_children': 1,
+                },
+            },
+        }
+        admin_user = self.get_admin()
+        url = admin_reverse('cms_page_add_plugin')
+        with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('somepage', 'nav_playground.html', 'en')
+            body = page.placeholders.get(slot='body')
+            link = add_plugin(body, 'LinkPlugin', 'en', name='text', external_link='http://test.test/')
+            with self.login_user_context(admin_user):
+                data = {
+                    'plugin_type': 'TextPlugin',
+                    'placeholder_id': body.pk,
+                    'plugin_language': 'en',
+                }
+                url = admin_reverse('cms_page_add_plugin')
+                response = self.client.post('{}?{}'.format(url,urlencode(data)))
+                self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+            with self.login_user_context(admin_user):
+                data = {
+                    'plugin_type': 'TextPlugin',
+                    'placeholder_id': body.pk,
+                    'plugin_parent': link.pk,
+                    'plugin_language': 'en',
+                }
+                response = self.client.post('{}?{}'.format(url,urlencode(data)))
+                self.assertEqual(response.status_code, 302)
+
     def test_edit_title_dirty_bit(self):
         language = "en"
         admin_user = self.get_admin()
@@ -769,7 +803,7 @@ class PluginPermissionTests(AdminTestsBase):
         url = '%s/edit-plugin/%s/' % (admin_reverse('cms_page_edit_plugin', args=[plugin.id]), plugin.id)
         response = self.client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-        self.assertTrue("Plugin not found" in force_text(response.content))
+        self.assertTrue("Plugin not found" in force_str(response.content))
 
 
 class AdminFormsTests(AdminTestsBase):
@@ -1021,7 +1055,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
-            output = force_text(
+            output = force_str(
                 self.client.get(
                     '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
                 ).content
@@ -1031,7 +1065,7 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            output = force_text(
+            output = force_str(
                 self.client.get(
                     '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
                 ).content
@@ -1050,7 +1084,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         with self.login_user_context(user):
             with self.assertNumQueries(9):
-                force_text(self.client.get(self.get_admin_url(Page, 'changelist')))
+                force_str(self.client.get(self.get_admin_url(Page, 'changelist')))
 
     def test_smart_link_published_pages(self):
         admin, staff_guy = self._get_guys()

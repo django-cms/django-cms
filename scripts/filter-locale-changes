@@ -1,0 +1,14 @@
+#!/bin/bash
+
+GREEN="\033[32;1m"
+NORMAL="\033[0m"
+
+# reverting files without modifications
+ROOT=$(git rev-parse --show-toplevel)
+
+for file in $(git status "${ROOT}/cms/locale" | grep modified | awk -e '{print $2}' ); do
+    if ! git diff "${file}" | grep -v '^---\|^+++\|^.\"POT-Creation-Date:.*n\"\|[+-]\"PO-Revision-Date:.*n\"' | grep -q '^[-+]'; then
+        echo -e " * ${GREEN}reverting${NORMAL} $file (no significant modifications)"
+        git checkout "${file}"
+    fi
+done

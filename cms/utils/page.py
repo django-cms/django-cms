@@ -3,7 +3,7 @@ import re
 from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cms.constants import PAGE_USERNAME_MAX_LENGTH
 from cms.utils import get_current_site
@@ -51,7 +51,7 @@ def get_page_template_from_request(request):
 
 def get_clean_username(user):
     try:
-        username = force_text(user)
+        username = force_str(user)
     except AttributeError:
         # AnonymousUser may not have USERNAME_FIELD
         username = "anonymous"
@@ -141,7 +141,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     """
     from cms.utils.page_permissions import user_can_view_page_draft
 
-    if hasattr(request, '_current_page_cache'):
+    if not bool(use_path) and hasattr(request, '_current_page_cache'):
         # The following is set by CurrentPageMiddleware
         return request._current_page_cache
 
@@ -191,13 +191,15 @@ def get_all_pages_from_path(site, path, language):
     return pages.filter(title_set__language=language)
 
 
-def get_available_slug(site, path, language, suffix='copy', modified=False):
+def get_available_slug(site, path, language, suffix='copy', modified=False, current=None):
     """
     Generates slug for path.
     If path is used, appends the value of suffix to the end.
     """
     base, _, slug = path.rpartition('/')
     pages = get_all_pages_from_path(site, path, language)
+    if current:
+        pages = pages.exclude(Q(pk=current.pk) | Q(publisher_public_id=current.pk) | Q(publisher_draft__pk=current.pk))
 
     if pages.exists():
         match = SUFFIX_REGEX.match(slug)

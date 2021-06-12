@@ -209,6 +209,14 @@ class PagesTestCase(TransactionCMSTestCase):
         new_slug = get_available_slug(site, 'test-copy', 'en')
         self.assertTrue(new_slug, 'test-copy-11')
 
+    def test_get_available_slug_recursion_exclude_current(self):
+        """ Checks cms.utils.page.get_available_slug for excluding the current page
+        """
+        site = get_current_site()
+        base = create_page('test', 'nav_playground.html', 'en', published=True)
+        new_slug = get_available_slug(site, 'test', 'en', current=base)
+        self.assertTrue(new_slug, 'test')
+
     def test_path_collisions_api_1(self):
         """ Checks for slug collisions on sibling pages - uses API to create pages
         """
@@ -674,6 +682,12 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNotNone(found_page)
         self.assertFalse(found_page.publisher_is_draft)
 
+    def test_get_page_from_request_without_cache_when_has_use_path_argument(self):
+        request = self.get_request('/test')
+        request._current_page_cache = True
+        found_page = get_page_from_request(request, 'page_path')
+        self.assertIsNone(found_page)
+
     def test_ancestor_expired(self):
         yesterday = tz_now() - datetime.timedelta(days=1)
         tomorrow = tz_now() + datetime.timedelta(days=1)
@@ -758,6 +772,16 @@ class PagesTestCase(TransactionCMSTestCase):
         page3 = self.move_page(page3, page4)
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'test-page-4/test-page-3/')
+
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            copied = self.copy_page(page2, page2)
+            self.assertEqual(copied.get_absolute_url(),
+                             self.get_pages_root() + 'test-page-2/test-page-2/')
+            copied = self.move_page(copied, page2, position='left')
+            copied.reload()
+            self.assertEqual(copied.get_absolute_url(),
+                             self.get_pages_root() + 'test-page-2-copy-2/')
 
     def test_page_and_title_repr(self):
         non_saved_page = Page()

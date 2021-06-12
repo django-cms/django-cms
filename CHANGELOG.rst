@@ -2,18 +2,24 @@
 Changelog
 =========
 
-
 Unreleased
 ==================
 
+* Fixed redirect issues when i18n_patterns had prefix_default_language = False
+* Fixed not checking slug uniqueness when moving a page
 * Fixed builds on RTD
 * Remove debug print from apphook_reload
 * Enforce use of coverage > 4 for python 3.8 support
+* Fixed the cache not being invalidated when updating a PlaceholderField in a custom model
 * Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
+* Fixed 6973 bag with unexpected behavior ``get_page_from_request``
 * Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
+* Improved performance of ``cms list plugins`` command
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
 * Updated documentation links
+* Fixed migrations with multiple databases
+* documentation: Added an example of sqlite database configuration in documentation
 * Added support for Github Actions based CI.
 * Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
 * Remove travis integration from the project as the project has moved to Github Actions.
@@ -22,6 +28,13 @@ Unreleased
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
 * Few changes in docs/contributing/code.rst
+* Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
+* Fixed an issue when running migrations on a multi database project
+* Add support for Django 3.2 LTS version
+* removed zh and zh_hans translation (keep zh_CN and zh_TW)
+* Cleaned-up unmaintained translations
+* Page changed date added to the Page tree admin actions dropdown
+
 
 3.8.0 (2020-10-28)
 ==================
@@ -35,6 +48,9 @@ Unreleased
 * Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 * Improved documentation building
 * Updated the content for django CMS’s development community
+* Replaced all occurences of ``force_text`` and ``smart_text`` against
+  ``force_str``and ``smart_str``.
+
 
 
 3.7.4 (2020-07-21)
@@ -64,6 +80,7 @@ Unreleased
 * added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
 * replaced ``staticfiles`` and ``admin_static`` with ``static``
 * replaced djangocms-helper with django-app-helper
+* Added ability to set placeholder global limit on children only
 
 
 3.7.1 (2019-11-26)

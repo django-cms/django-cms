@@ -90,12 +90,12 @@ class CacheTestCase(CMSTestCase):
         with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(13, 25)):
                 self.client.get(page1_url)
-            with self.assertNumQueries(FuzzyInt(5, 11)):
+            with self.assertNumQueries(FuzzyInt(5, 14)):
                 self.client.get(page1_url)
 
         overrides['CMS_PLACEHOLDER_CACHE'] = False
         with self.settings(**overrides):
-            with self.assertNumQueries(FuzzyInt(7, 15)):
+            with self.assertNumQueries(FuzzyInt(7, 18)):
                 self.client.get(page1_url)
 
     def test_no_cache_plugin(self):
@@ -171,7 +171,7 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(5):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
-                with self.assertNumQueries(FuzzyInt(8, 14)):
+                with self.assertNumQueries(FuzzyInt(8, 17)):
                     response = self.client.get(page1_url)
                     resp2 = response.content.decode('utf8').split("$$$")[1]
             self.assertNotEqual(output, output2)
@@ -653,6 +653,59 @@ class CacheTestCase(CMSTestCase):
         text = content_renderer.render_placeholder(ph1, context)
         self.assertEqual(text, "Other text")
 
+    def test_render_placeholderfield_cache_in_custom_model(self):
+        """
+        Regression test for #6912
+
+        Assert that placeholder of a placeholderfield in custom model has its cache cleared correctly when mark_as_dirty is called in the admin
+        """
+
+        invalidate_cms_page_cache()
+
+        # Create an instance of a custom model containing a placeholderfield
+        ex = Example1(char_1="one", char_2="two", char_3="tree", char_4="four")
+        ex.save()
+        ph1 = ex.placeholder
+
+        # Add a first plugin
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some text")
+        test_plugin.save()
+
+        # Create a first request using render_placeholder to ensure that the content is equal to the first plugin content
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some text")
+
+        # Add a second plugin in the placeholder
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some other text")
+        test_plugin.save()
+
+        # Clear plugins cache to ensure that cms.utils.plugins.get_plugins() will refetch the plugins
+        del ph1._plugins_cache
+
+        # Create a second request using render_placeholder to ensure that the content is still equal to the first plugin content as cache was not cleared yet
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some text")
+
+        # Mark placeholder as dirty as it is done in cms.admin.placeholderadmin file
+        ph1.mark_as_dirty("en", clear_cache=False)
+
+        # Create a last request to ensure that rendered content contains the two plugins content
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some textSome other text")
+        
 
 class PlaceholderCacheTestCase(CMSTestCase):
     def setUp(self):

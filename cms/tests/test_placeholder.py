@@ -6,13 +6,13 @@ from django.template import TemplateSyntaxError, Template
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
-from cms.exceptions import DuplicatePlaceholderWarning
+from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -34,7 +34,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    get_placeholder_conf, get_placeholders, _get_nodelist,
                                    _scan_placeholders)
-from cms.utils.plugins import assign_plugins
+from cms.utils.plugins import assign_plugins, has_reached_plugin_limit
 from cms.utils.urlutils import admin_reverse
 
 
@@ -108,6 +108,10 @@ class PlaceholderTestCase(TransactionCMSTestCase):
     def test_placeholder_scanning_extend_outside_block(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside.html')
         self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+
+    def test_placeholder_recursive_extend(self):
+        placeholders = _get_placeholder_slots('placeholder_tests/recursive_extend.html')
+        self.assertEqual(sorted(placeholders), sorted([u'recursed_one', u'recursed_two', u'three']))
 
     def test_placeholder_scanning_sekizai_extend_outside_block(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_sekizai.html')
@@ -398,16 +402,16 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         }
 
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
-            self.assertEqual(force_text(placeholder_1.get_label()), 'left column')
-            self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
-            self.assertEqual(force_text(placeholder_3.get_label()), 'fallback')
+            self.assertEqual(force_str(placeholder_1.get_label()), 'left column')
+            self.assertEqual(force_str(placeholder_2.get_label()), 'renamed left column')
+            self.assertEqual(force_str(placeholder_3.get_label()), 'fallback')
 
         del TEST_CONF[None]
 
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
-            self.assertEqual(force_text(placeholder_1.get_label()), 'left column')
-            self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
-            self.assertEqual(force_text(placeholder_3.get_label()), 'No_Name')
+            self.assertEqual(force_str(placeholder_1.get_label()), 'left column')
+            self.assertEqual(force_str(placeholder_2.get_label()), 'renamed left column')
+            self.assertEqual(force_str(placeholder_3.get_label()), 'No_Name')
 
     def test_placeholders_from_blocks_order(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_with_block.html')
@@ -957,7 +961,7 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = force_text(ph)
+        result = force_str(ph)
         self.assertEqual(result, u'test')
 
     def test_excercise_get_attached_model(self):
@@ -1045,3 +1049,36 @@ class PlaceholderConfTests(TestCase):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
+
+    def test_plugins_limit_global(self):
+        """ Tests placeholder limit configuration for nested plugins"""
+        page = create_page('page', 'col_two.html', 'en')
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_left': {
+                'limits': {
+                    'global': 1,
+                },
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            add_plugin(placeholder, 'LinkPlugin', 'en', name='name', external_link='http://example.com/en')
+            self.assertRaises(PluginLimitReached, has_reached_plugin_limit, placeholder=placeholder, plugin_type='LinkPlugin', language='en', template=None, parent_plugin=None)
+
+
+    def test_plugins_limit_global_children(self):
+        """ Tests placeholder limit configuration for nested plugins"""
+        page = create_page('page', 'col_two.html', 'en')
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_left': {
+                'limits': {
+                    'global_children': 1,
+                },
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            link = add_plugin(placeholder, 'LinkPlugin', 'en', name='name', external_link='http://example.com/en')
+            add_plugin(placeholder, 'TextPlugin', 'en', target=link)
+            add_plugin(placeholder, 'TextPlugin', 'en', target=link)
+            self.assertRaises(PluginLimitReached, has_reached_plugin_limit, placeholder=placeholder, plugin_type='LinkPlugin', language='en', template=None, parent_plugin=None)

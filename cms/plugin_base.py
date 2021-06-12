@@ -11,7 +11,7 @@ from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
-from django.utils.encoding import force_text, smart_str
+from django.utils.encoding import force_str
 from django.utils.html import escapejs
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -270,16 +270,18 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             root = obj
 
         plugins = [root] + list(root.get_descendants().order_by('path'))
+        # simulate the call to the unauthorized CMSPlugin.page property
+        cms_page = obj.placeholder.page if obj.placeholder_id else None
 
         child_classes = self.get_child_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
         parent_classes = self.get_parent_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
@@ -288,7 +290,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             children=child_classes,
             parents=parent_classes,
         )
-        data['plugin_desc'] = escapejs(force_text(obj.get_short_description()))
+        data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
 
         context = {
             'plugin': obj,
@@ -353,7 +355,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def response_change(self, request, obj):
         self.object_successfully_changed = True
         opts = self.model._meta
-        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        msg_dict = {'name': force_str(opts.verbose_name), 'obj': force_str(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
         return self.render_close_frame(request, obj)
@@ -382,7 +384,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (force_text(self.name), force_text(instance))
+        return "%s - %s" % (force_str(self.name), force_str(instance))
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -505,11 +507,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def get_extra_plugin_menu_items(cls, request, plugin):
         pass
 
-    def __repr__(self):
-        return smart_str(self.name)
-
     def __str__(self):
-        return self.name
+        return force_str(self.name)
 
 
 class PluginMenuItem:

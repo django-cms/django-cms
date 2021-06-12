@@ -3,6 +3,7 @@ from copy import deepcopy
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import isolate_apps
 
 from cms.api import add_plugin
 from cms.models.pluginmodel import CMSPlugin
@@ -116,6 +117,19 @@ class CheckTests(CheckAssertMixin, TestCase):
         self.assertCheck(True, warnings=0, errors=0)
         with self.settings(SITE_ID='broken'):
             self.assertCheck(False, warnings=0, errors=1)
+
+    @isolate_apps("test_app")
+    def test_placeholder_field(self):
+        from django.db import models
+        from django.contrib import admin
+        from cms.models.fields import PlaceholderField
+
+        class ModelTest(models.Model):
+            field_a = PlaceholderField(slotname="test")
+
+        admin.site.register(ModelTest)
+        self.assertCheck(False, warnings=0, errors=1)
+        admin.site.unregister(ModelTest)
 
 
 class CheckWithDatabaseTests(CheckAssertMixin, TestCase):

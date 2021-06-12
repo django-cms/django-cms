@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import api
@@ -17,7 +17,8 @@ from cms.cache.permissions import clear_permission_cache
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
-from cms.forms.validators import validate_relative_url, validate_url_uniqueness
+from cms.forms.validators import (validate_relative_url, validate_url_uniqueness,
+                                  validate_overwrite_url)
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
 from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, Title,
                         Placeholder, GlobalPagePermission, TreeNode)
@@ -582,7 +583,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
                 if page_data.get('application_urls', False) and page_data['application_urls'] in app_configs:
                     configs = app_configs[page_data['application_urls']].get_configs()
-                    self.fields['application_configs'].widget.choices = [(config.pk, force_text(config)) for config in configs]
+                    self.fields['application_configs'].widget.choices = [(config.pk, force_str(config)) for config in configs]
 
                     try:
                         config = configs.get(namespace=self.initial['application_namespace'])
@@ -617,6 +618,14 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        if cleaned_data.get("overwrite_url"):
+            # Assuming that the user enters a full URL in the overwrite_url input.
+            # Here we validate it before publishing the page and if it contains
+            # reserved characters (e.g. $?:#), we add error in the form.
+            # issue 6934
+            url = cleaned_data.get("overwrite_url")
+            if url and not validate_overwrite_url(value=url):
+                self._errors['overwrite_url'] = self.error_class([_('You entered an invalid URL.')])
 
         if self._errors:
             # Fail fast if there's errors in the form
@@ -852,7 +861,7 @@ class MovePageForm(PageTreeForm):
         cleaned_data = super().clean()
 
         if self.page.is_home and cleaned_data.get('target'):
-            self.add_error('target', force_text(_('You can\'t move the home page inside another page')))
+            self.add_error('target', force_str(_('You can\'t move the home page inside another page')))
         return cleaned_data
 
     def get_tree_options(self):
@@ -1305,10 +1314,11 @@ class PluginAddValidationForm(forms.Form):
                 placeholder,
                 data['plugin_type'],
                 language,
-                template=template
+                template=template,
+                parent_plugin=parent_plugin
             )
         except PluginLimitReached as error:
-            self.add_error(None, force_text(error))
+            self.add_error(None, force_str(error))
         return self.cleaned_data
 
 
