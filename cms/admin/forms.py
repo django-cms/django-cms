@@ -17,7 +17,8 @@ from cms.cache.permissions import clear_permission_cache
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
-from cms.forms.validators import validate_relative_url, validate_url_uniqueness
+from cms.forms.validators import (validate_relative_url, validate_url_uniqueness,
+                                  validate_overwrite_url)
 from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
 from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, Title,
                         Placeholder, GlobalPagePermission, TreeNode)
@@ -617,6 +618,14 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        if cleaned_data.get("overwrite_url"):
+            # Assuming that the user enters a full URL in the overwrite_url input.
+            # Here we validate it before publishing the page and if it contains
+            # reserved characters (e.g. $?:#), we add error in the form.
+            # issue 6934
+            url = cleaned_data.get("overwrite_url")
+            if url and not validate_overwrite_url(value=url):
+                self._errors['overwrite_url'] = self.error_class([_('You entered an invalid URL.')])
 
         if self._errors:
             # Fail fast if there's errors in the form

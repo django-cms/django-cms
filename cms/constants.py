@@ -26,6 +26,7 @@ X_FRAME_OPTIONS_ALLOW = 3
 PAGE_USERNAME_MAX_LENGTH = 255
 
 SLUG_REGEXP = '[0-9A-Za-z-_.//]+'
+NEGATE_SLUG_REGEXP = '[^0-9A-Za-z-_.//]+'
 
 EXPIRE_NOW = 0
 # HTTP Specification says max caching should only be up to one year.

@@ -1340,6 +1340,25 @@ class PageTest(PageTestBase):
         page = get_page_from_request(request)
         self.assertEqual(page, mock_page)
 
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_set_overwrite_url_with_invalid_value(self):
+        # User cannot add reserved characters in the "overwrite_url" input.
+        superuser = self.get_superuser()
+        cms_page = create_page('page', 'nav_playground.html', 'en', published=True)
+        expected_error_message = "You entered an invalid URL"
+
+        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+
+        with self.login_user_context(superuser):
+            page_data = {
+                'overwrite_url': 'https://django-cms.org',
+                'template': cms_page.template,
+            }
+            response = self.client.post(endpoint, page_data)
+            self.assertContains(response, expected_error_message)
+
+
     @override_settings(CMS_PERMISSION=False)
     def test_set_overwrite_url(self):
         superuser = self.get_superuser()
