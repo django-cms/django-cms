@@ -63,8 +63,8 @@ master_doc = 'index'
 
 current_year = datetime.datetime.now().year
 # General information about the project.
-project = u'django cms'
-copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
+project = 'django cms'
+copyright = '2009-{}, Divio AG and contributors'.format(current_year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -140,36 +140,7 @@ try:
 except ImportError:
     html_theme = 'default'
 
-
 show_cloud_banner = True
-
-# The theme to use for HTML and HTML Help pages.  Major themes that come with
-# Sphinx are currently 'default' and 'sphinxdoc'.
-# html_theme = 'default'
-
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#html_theme_options = {}
-
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
-
-# The name for this set of Sphinx documents.  If None, it defaults to
-# "<project> v<release> documentation".
-#html_title = None
-
-# A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
-
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-#html_logo = None
-
-# The name of an image file (within the static path) to use as favicon of the
-# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
-# pixels large.
-#html_favicon = None
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -226,8 +197,8 @@ latex_paper_size = 'a4'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'djangocms.tex', u'django cms Documentation',
-     u'Divio AG and contributors', 'manual'),
+    ('index', 'djangocms.tex', 'django cms Documentation',
+     'Divio AG and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top
