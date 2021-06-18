@@ -4,6 +4,7 @@ from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 
+from cms.constants import NEGATE_SLUG_REGEXP
 from cms.utils.page import get_all_pages_from_path
 from cms.utils.urlutils import admin_reverse, relative_url_regex
 
@@ -19,6 +20,14 @@ def validate_url(value):
     except ValidationError:
         # Fallback to absolute urls
         URLValidator()(value)
+
+
+def validate_overwrite_url(value):
+    try:
+        RegexValidator(regex=NEGATE_SLUG_REGEXP)(value)
+    except:
+        return True
+    return False
 
 
 def validate_url_uniqueness(site, path, language, exclude_page=None):
