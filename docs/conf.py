@@ -37,7 +37,9 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinxcontrib.spelling'
+    'sphinxcontrib.spelling',
+    "sphinx_copybutton",
+    "sphinxext.opengraph",
 ]
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
@@ -129,22 +131,13 @@ todo_include_todos = True
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 try:
-    import divio_docs_theme
-    html_theme = 'divio_docs_theme'
-    html_theme_path = [divio_docs_theme.get_html_theme_path()]
+    import furo
+
+    html_theme = 'furo'
     html_theme_options = {
-        'show_cloud_banner': True,
-        'cloud_banner_markup': """
-            <div class="divio-cloud">
-                <span class="divio-cloud-caption">The django CMS Association</span>
-                <p>The django CMS Association is a non-profit organisation that funds and
-                steers the development of django CMS, and nurtures its world-wide
-                community of developers and users.</p>
-                <a class="btn-neutral divio-cloud-btn" target="_blank" href="https://www.django-cms.org/en/about-us/">Join us</a>
-            </div>
-        """,
+        "navigation_with_keys": True,
     }
-except:
+except ImportError:
     html_theme = 'default'
 
 
