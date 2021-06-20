@@ -2,7 +2,7 @@
 Changelog
 =========
 
-3.9.0rc2 (unpublished)
+3.9.0rc3 (unpublished)
 ======================
 
 Highlights:
@@ -26,6 +26,7 @@ Features:
 
 Bug Fixes:
 ----------
+* Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
 * Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
 * Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
 * Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
@@ -64,6 +65,7 @@ Refactoring and Cleanups:
 
 Internal Tools:
 ---------------
+* Fixing release information and publish script (#7055) (0cfc42ba3) -- Florian Delizy
 * adding django CMS release script (will be used starting 3.9.0 release) (#7036) (c95aacf14) -- Florian Delizy
 * updating PR template and contribution guideline, no need to modify CHANGELOG.rst manually (#7041) (6c2b057c0) -- Florian Delizy
 * Enforce use of coverage > 4 for python 3.8 support
@@ -73,7 +75,7 @@ Internal Tools:
 Statistics:
 -----------
 
-This release includes 77 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 82 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Abdur-Rahmaan Janhangeer (1 pull request)
 * Aiky30 (3 pull requests)
@@ -86,7 +88,7 @@ This release includes 77 pull requests, and was created with the help of the fol
 * BrijeshVP (1 pull request)
 * carmenkow (1 pull request)
 * Daniele Procida (3 pull requests)
-* Florian Delizy (11 pull requests)
+* Florian Delizy (13 pull requests)
 * fp4code (3 pull requests)
 * Frank (1 pull request)
 * G3RB3N (1 pull request)
@@ -95,7 +97,8 @@ This release includes 77 pull requests, and was created with the help of the fol
 * Jacob Rief (3 pull requests)
 * Jean-Baptiste PENRATH (1 pull request)
 * John Bazik (1 pull request)
-* Mark Walker (2 pull requests)
+* Marco Bonetti (1 pull request)
+* Mark Walker (3 pull requests)
 * Michael Anckaert (1 pull request)
 * Munim Munna (2 pull requests)
 * Nicolai (15 pull requests)
