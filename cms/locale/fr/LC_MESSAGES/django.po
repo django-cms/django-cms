@@ -41,8 +41,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"POT-Creation-Date: 2021-06-20 22:17+0800\n"
+"PO-Revision-Date: 2021-06-02 16:35+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -1003,7 +1003,7 @@ msgid "last change by"
 msgstr "dernière modification par"
 
 msgid "last change on"
-msgstr ""
+msgstr "Dernnière modification le"
 
 msgid "meta"
 msgstr "méta"
@@ -1596,7 +1596,7 @@ msgstr "Cette zone contient déjà le nombre maximum (%(limit)s) de blocs autori
 
 #, python-format
 msgid "This placeholder already has the maximum number of child plugins (%s)."
-msgstr ""
+msgstr "Cette zone à contient déjà le nombre maximal de blocs (%s)"
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."

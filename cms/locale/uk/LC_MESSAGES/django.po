@@ -16,7 +16,7 @@
 # Pylyp Dukhlii <pylyp@pylyp.com.ua>, 2014
 # roman_grankin <grankin.roman@hotmail.com>, 2014
 # tarasyyyk <taras.korzhak96@gmail.com>, 2019
-# Volodymyr Vakulenko <wowkalucky@gmail.com>, 2017
+# Volodymyr Bergman <wowkalucky@gmail.com>, 2017
 # Vusheslavov Eduard <vey@live.ru>, 2014
 # yakky <i.spalletti@nephila.it>, 2015
 # Maxym Lynnyk <yakudzam@gmail.com>, 2013
@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
+"POT-Creation-Date: 2021-06-20 22:17+0800\n"
 "PO-Revision-Date: 2021-05-19 13:14+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"
