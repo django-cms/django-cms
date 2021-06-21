@@ -64,7 +64,7 @@ master_doc = 'index'
 current_year = datetime.datetime.now().year
 # General information about the project.
 project = 'django cms'
-copyright = '2009-{}, djangoCMS Association and contributors'.format(current_year)
+copyright = '2009-{}, django CMS Association and contributors'.format(current_year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -198,7 +198,7 @@ latex_paper_size = 'a4'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
     ('index', 'djangocms.tex', 'django cms Documentation',
-     'djangoCMS Association and contributors', 'manual'),
+     'django CMS Association and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top
