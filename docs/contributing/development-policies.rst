@@ -13,7 +13,7 @@ Reporting security issues
 .. ATTENTION::
 
     If you think you have discovered a security issue in our code, please report
-    it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
+    it **privately**, by emailing us at `security@django-cms.org <security@django-cms.org>`_.
 
     Please **do not** raise it in any public forum until we have had a
     chance to deal with it.

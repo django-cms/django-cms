@@ -1,10 +1,12 @@
 MarkupSafe==0.23
 Pygments==2.0.2
-sphinx
+furo
+Sphinx>4
+sphinx-copybutton
+sphinxext-opengraph
 sphinxcontrib-spelling
 pyenchant==3.0.1
 sphinx-autobuild
-divio-docs-theme
 datetime
 coverage
 django-cms
