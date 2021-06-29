@@ -2,8 +2,8 @@
 Changelog
 =========
 
-3.9.0rc3 (unpublished)
-======================
+3.9.0 (2021-06-30)
+==================
 
 Highlights:
 -----------
@@ -23,10 +23,10 @@ Features:
 * Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
 * Improved performance of ``cms list plugins`` command
 * Page changed date added to the Page tree admin actions dropdown
+* add django3.2 in the framework identifier for setup.py (#7081) (8ef90fefa) -- Vinit Kumar
 
 Bug Fixes:
 ----------
-* Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
 * Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
 * Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
 * Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
@@ -50,6 +50,7 @@ Bug Fixes:
 * Fixed template label nested translation
 * Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
 * Fixed an issue when running migrations on a multi database project
+* Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
 
 Refactoring and Cleanups:
 -------------------------
@@ -65,17 +66,17 @@ Refactoring and Cleanups:
 
 Internal Tools:
 ---------------
-* Fixing release information and publish script (#7055) (0cfc42ba3) -- Florian Delizy
 * adding django CMS release script (will be used starting 3.9.0 release) (#7036) (c95aacf14) -- Florian Delizy
 * updating PR template and contribution guideline, no need to modify CHANGELOG.rst manually (#7041) (6c2b057c0) -- Florian Delizy
 * Enforce use of coverage > 4 for python 3.8 support
 * Fix all GitHub actions tests run on pull requests
 * Remove travis integration from the project as the project has moved to Github Actions.
+* Fixing release information and publish script (#7055) (0cfc42ba3) -- Florian Delizy
 
 Statistics:
 -----------
 
-This release includes 82 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 89 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Abdur-Rahmaan Janhangeer (1 pull request)
 * Aiky30 (3 pull requests)
@@ -88,7 +89,7 @@ This release includes 82 pull requests, and was created with the help of the fol
 * BrijeshVP (1 pull request)
 * carmenkow (1 pull request)
 * Daniele Procida (3 pull requests)
-* Florian Delizy (13 pull requests)
+* Florian Delizy (19 pull requests)
 * fp4code (3 pull requests)
 * Frank (1 pull request)
 * G3RB3N (1 pull request)
@@ -108,7 +109,7 @@ This release includes 82 pull requests, and was created with the help of the fol
 * sin-ack (1 pull request)
 * Stefan Wehrmeyer (1 pull request)
 * victor-yunenko (1 pull request)
-* Vinit Kumar (4 pull requests)
+* Vinit Kumar (5 pull requests)
 * Vladimir Kuvandjiev (1 pull request)
 * Vytis Banaitis (1 pull request)
 * Yuriy Mamaev (1 pull request)

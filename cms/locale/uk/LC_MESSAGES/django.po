@@ -6,8 +6,8 @@
 # d89e266cdb3589c6cb4ff79f3d6c5a21_99f0368 <7b4e3d2be999b12dc043e4885915d37c_97387>, 2013
 # d89e266cdb3589c6cb4ff79f3d6c5a21_99f0368 <7b4e3d2be999b12dc043e4885915d37c_97387>, 2013
 # Anton Linevich <linevich@swebion.com>, 2016
-# asteryx <asteryx82@gmail.com>, 2015
-# asteryx <asteryx82@gmail.com>, 2015
+# Nick Nck <asteryx82@gmail.com>, 2015
+# Nick Nck <asteryx82@gmail.com>, 2015
 # roman_grankin <grankin.roman@hotmail.com>, 2014
 # yakky <i.spalletti@nephila.it>, 2015
 # Maxym Lynnyk <yakudzam@gmail.com>, 2013
@@ -25,7 +25,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-20 22:17+0800\n"
+"POT-Creation-Date: 2021-06-30 00:09+0800\n"
 "PO-Revision-Date: 2021-05-19 13:14+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"
