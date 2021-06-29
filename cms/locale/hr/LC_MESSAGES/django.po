@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Damir <damir.arbula@gmail.com>, 2013-2015,2018
 # Dino Ilic <dino.ilic@gmail.com>, 2017
 # legendri <legendri@gmail.com>, 2012
@@ -12,9 +11,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 10:45+0100\n"
-"PO-Revision-Date: 2020-04-21 13:37+0000\n"
-"Last-Translator: Damir <damir.arbula@gmail.com>\n"
+"POT-Creation-Date: 2021-05-19 21:14+0800\n"
+"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Croatian (http://www.transifex.com/divio/django-cms/language/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -108,7 +107,6 @@ msgstr "Postavite %(language)s slug prije uređivanja naprednih postavki"
 msgid "A page with this reverse URL id exists already."
 msgstr "Stranica sa zadatim inverznim URL-om već postoji."
 
-#| msgid "Application configurations"
 msgid "Invalid application config value"
 msgstr "Neispravna vrijednost za postavku aplikacije."
 
@@ -182,7 +180,6 @@ msgstr "Jezik mora biti postavljen na jedan od podržanih!"
 msgid "Parent plugin language must be same as language!"
 msgstr "Jezik nadređenog plugina mora biti isti."
 
-#| msgid "Parent plugin language must be same as language!"
 msgid "Parent plugin placeholder must be same as placeholder!"
 msgstr "Roditelj plugina mora biti u istom placeholderu kao i plugin!"
 
@@ -228,7 +225,6 @@ msgstr "Pogreška! Nemate ovlasti premjestiti ovu stranicu. Molim, ponovno učit
 msgid "You do not have permission to copy these plugins."
 msgstr "Nemate ovlasti za kopiranje ovih pluginova."
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "Error! You don't have permissions to copy this page."
 msgstr "Greška! Nemate ovlasti za kopiranje ove stranice."
 
@@ -237,7 +233,6 @@ msgid ""
 "configured by the target site."
 msgstr "Greška! Stranica koju želite zalijepiti nije prevedena na nijedan jezik koji je konfiguriran za odredišno sjedište."
 
-#| msgid "You do not have permission to edit this page"
 msgid "You do not have permission to revert this page."
 msgstr "Nemate ovlasti za povrat ove stranice."
 
@@ -267,7 +262,6 @@ msgstr "Ova stranica nije još bila objavljivana"
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr "Objava stranice %(page)s na %(language)s jeziku je uspješno uklonjena"
 
-#| msgid "You do not have permission to delete this plugin"
 msgid "You do not have permission to delete this page"
 msgstr "Nemate ovlasti za brisanje ove stranice"
 
@@ -276,7 +270,6 @@ msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Naslov i plugin na jeziku %(language)s je obrisan"
 
 #, python-format
-#| msgid "You do not have permission to change pages."
 msgid "You don't have permissions to see page \"%(title)s\""
 msgstr "Nemate ovlasti pregleda stranice \"%(title)s\""
 
@@ -314,7 +307,6 @@ msgstr "Nemate ovlasti za uređivanje ove stavke"
 msgid "You do not have permission to add a plugin"
 msgstr "Nemate ovlasti dodati plugin"
 
-#| msgid "You do not have permission to clear this placeholder"
 msgid "You do not have permission to copy this placeholder."
 msgstr "Nemate ovlasti za kopiranje placeholdera"
 
@@ -333,18 +325,15 @@ msgstr "roditelj mora biti u istom placeholderu"
 msgid "parent must be in the same language as plugin_language"
 msgstr "roditelj mora biti definiran za isti jezik kao plugin_language"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this plugin"
 msgstr "Nemate ovlasti za zalijepiti ovaj plugin"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to paste this placeholder"
 msgstr "Nemate ovlasti za zalijepiti ovaj placeholder"
 
 msgid "You have no permission to move this plugin"
 msgstr "Nemate ovlasti za premještanje ovog plugina"
 
-#| msgid "You have no permission to move this plugin"
 msgid "You have no permission to cut this plugin"
 msgstr "Nemate ovlasti za izrezati ovaj plugin"
 
@@ -442,7 +431,6 @@ msgstr "Struktura"
 msgid "Content"
 msgstr "Sadržaj"
 
-#| msgid "Publish changes"
 msgid "Publish page changes"
 msgstr "Objavi promjene"
 
@@ -452,15 +440,12 @@ msgstr "Objavi stranicu sada"
 msgid "Page settings"
 msgstr "Postavke za stranicu"
 
-#| msgid "Add %(language)s Translation"
 msgid "Add Translation"
 msgstr "Dodaj prijevod"
 
-#| msgid "Delete %(language)s Translation"
 msgid "Delete Translation"
 msgstr "Izbriši prijevod"
 
-#| msgid "Copy all plugins from %s"
 msgid "Copy all plugins"
 msgstr "Kopiraj sve pluginove"
 
@@ -469,7 +454,6 @@ msgid "from %s"
 msgstr "iz %s"
 
 #, python-format
-#| msgid "Are you sure you want copy all plugins from %s?"
 msgid "Are you sure you want to copy all plugins from %s?"
 msgstr "Da li ste sigurni da želite kopirati sve pluginove sa %s?"
 
@@ -479,7 +463,6 @@ msgstr "Stranice"
 msgid "Page"
 msgstr "Stranica"
 
-#| msgid "Create"
 msgid "Create Page"
 msgstr "Stvori stranicu"
 
@@ -541,20 +524,12 @@ msgid "Select a valid page"
 msgstr "Izaberite ispravnu stranicu"
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr "Stranica %(conflict_page)s ima isti url '%(url)s' kao trenutna stranica \"%(instance)s\"."
 
 #, python-format
-#| msgid ""
-#| "(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| msgid_plural ""
-#| "%(pages)s have the same url '%(url)s' as current page \"%(instance)s"
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr "Stranica %(conflict_page)s ima isti url '%(url)s' kao trenutna stranica."
 
@@ -568,7 +543,6 @@ msgstr "Definirajte naziv za novu stranicu."
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Ostavite prazno za automatski slug ili upišite slug."
 
-#| msgid "You do not have permission to add a plugin"
 msgid "You don't have the permissions required to add a page."
 msgstr "Nemate ovlasti dodati stranicu."
 
@@ -738,7 +712,6 @@ msgstr "na nivou stranice"
 msgid "frontend view restriction"
 msgstr "zabrana prikaza na frontendu"
 
-#| msgid "Please select user or group first."
 msgid "Please select user or group."
 msgstr "Molimo izaberite korisnika ili grupu."
 
@@ -884,7 +857,6 @@ msgid "Generic"
 msgstr "Generičko"
 
 #, python-format
-#| msgid "The %(name)s plugin \"%(obj)s\" was deleted successfully."
 msgid "The %(name)s \"%(obj)s\" was changed successfully."
 msgstr "%(name)s \"%(obj)s\" je/su uspješno uređen/i."
 
@@ -908,7 +880,6 @@ msgstr "Korisničko ime:"
 msgid "Password:"
 msgstr "Lozinka:"
 
-#| msgid "Add Page"
 msgid "Add a page"
 msgstr "Dodaj stranicu"
 
@@ -993,7 +964,6 @@ msgstr "Izreži"
 msgid "Paste"
 msgstr "Zalijepi"
 
-#| msgid "Save as new"
 msgid "Set as home"
 msgstr "Postavi kao početno"
 
@@ -1002,6 +972,9 @@ msgstr "ograničeno"
 
 msgid "last change by"
 msgstr "zadnja promjena od"
+
+msgid "last change on"
+msgstr ""
 
 msgid "meta"
 msgstr "meta"
@@ -1012,7 +985,6 @@ msgstr "Popis stranica"
 msgid "Search"
 msgstr "Pretraživanje"
 
-#| msgid "Page Title"
 msgid "Page Tree"
 msgstr "Stablo stranica"
 
@@ -1033,11 +1005,9 @@ msgid ""
 "                            "
 msgstr "\n                                Novo %(name)s\n                            "
 
-#| msgid "in navigation"
 msgid "Main Navigation"
 msgstr "Osnovna navigacija"
 
-#| msgid "Actions"
 msgid "Options"
 msgstr "Opcije"
 
@@ -1061,7 +1031,6 @@ msgstr "Da li ste sigurni da želite § ovu stranicu?"
 msgid "Reload"
 msgstr "Ponovno učitaj"
 
-#| msgid "New Page"
 msgid "New node"
 msgstr "Novi čvor"
 
@@ -1075,10 +1044,6 @@ msgid "Menu"
 msgstr "Izborni"
 
 #, python-format
-#| msgid ""
-#| "                  JavaScript seems to be disabled so please\n"
-#| "                  <a href=\"%(admin_add_page)s\" class=\"js-welcome-\">add a page</a> manually.\n"
-#| "              "
 msgid ""
 "\n"
 "                            <em>There is no %(object)s around yet.</em>\n"
@@ -1099,31 +1064,24 @@ msgstr "Zatvori"
 msgid "Legend"
 msgstr "Legenda"
 
-#| msgid "published"
 msgid "Published"
 msgstr "Objavljeno"
 
-#| msgid "Change"
 msgid "Changed"
 msgstr "Promijenjeno"
 
-#| msgid "unpublished"
 msgid "Unpublished"
 msgstr "Neobjavljeno"
 
-#| msgid "in menu"
 msgid "In menu"
 msgstr "U izborniku"
 
-#| msgid "not in menu"
 msgid "Not in menu"
 msgstr "Nije u izborniku"
 
-#| msgid "New page"
 msgid "View page"
 msgstr "Pogledaj stranicu"
 
-#| msgid "softroot"
 msgid "Softroot"
 msgstr "Softroot"
 
@@ -1135,7 +1093,6 @@ msgid "Application: %(apphook)s"
 msgstr "Aplikacija: %(apphook)s"
 
 #, python-format
-#| msgid "Edit this page in %(language)s "
 msgid "Preview this page in %(language)s "
 msgstr "Pregledaj stranicu na jeziku %(language)s"
 
@@ -1157,7 +1114,6 @@ msgstr "u izborniku"
 msgid "not in menu"
 msgstr "nije u izborniku"
 
-#| msgid "Page settings (SHIFT-click for advanced settings)"
 msgid "Page settings (SHIFT click for advanced settings)"
 msgstr "Postavke stranice (SHIFT klik za napredne postavke)"
 
@@ -1212,11 +1168,9 @@ msgstr "Označi"
 msgid "Available plugins"
 msgstr "Dostupni pluginovi"
 
-#| msgid "Structure"
 msgid "Toggle structure"
 msgstr "Prebaci na strukturu"
 
-#| msgid "View published"
 msgid "View published"
 msgstr "Pogledaj objavljeno"
 
@@ -1230,7 +1184,6 @@ msgid "More"
 msgstr "Više"
 
 #, python-format
-#| msgid "Development version using django CMS %(cms_version)s"
 msgid ""
 "Development version using django CMS %(cms_version)s, Django "
 "%(django_version)s, Python %(python_version)s"
@@ -1242,7 +1195,6 @@ msgstr "Odustani"
 msgid "The following error occured:"
 msgstr "Došlo je do sljedeće pogreške:"
 
-#| msgid "Action successfull... reloading."
 msgid "Action successful."
 msgstr "Akcija uspješna."
 
@@ -1255,15 +1207,12 @@ msgstr "Da li želite objaviti ovu stranicu?"
 msgid "Plugin will be added here"
 msgstr "Plugin će biti dodan ovdje"
 
-#| msgid "This page has unpublished changes."
 msgid "You have unsaved changes."
 msgstr "Imate promjene koje još nisu spremljene."
 
-#| msgid "Loading..."
 msgid "Loading"
 msgstr "Učitavanje"
 
-#| msgid "Are you sure you want to § this page?"
 msgid "Are you sure you want to abandon these changes?"
 msgstr "Da li ste sigurni da ne želite spremiti ove promjene?"
 
@@ -1272,7 +1221,6 @@ msgid ""
 "correctly."
 msgstr "Formular ne može biti učitan. Molimo provjerite ako poslužitelj radi ispravno."
 
-#| msgid "Notify user"
 msgid "Most used"
 msgstr "Najkorištenije"
 
@@ -1288,7 +1236,6 @@ msgstr ""
 msgid "Bring up this help dialog"
 msgstr "Prikaži ovaj dijalog za pomoć"
 
-#| msgid "Cancel"
 msgid "Close/cancel"
 msgstr "Zatvori/Odustani"
 
@@ -1304,30 +1251,24 @@ msgstr "Otvori dijalog za izradu"
 msgid "Focus on Toolbar"
 msgstr "Fokusiraj na toolbar"
 
-#| msgid "Structure"
 msgid "Structureboard"
 msgstr ""
 
-#| msgid "static placeholders"
 msgid "Focus on placeholders"
 msgstr "Fokusiraj na placholdere"
 
 msgid "Move to next/previous element"
 msgstr "Premjesti u sljedeći/prethodni element"
 
-#| msgid "Add plugin to placeholder"
 msgid "Focus on plugins of placeholder"
 msgstr "Fokusiraj na pluginove placeholdera"
 
-#| msgid "Add plugin"
 msgid "Edit plugin"
 msgstr "Uredi plugin"
 
-#| msgid "not in menu"
 msgid "Open actions menu"
 msgstr "Otvori izbornik akcija"
 
-#| msgid "Expand all"
 msgid "Expand/collapse"
 msgstr "Proširi/sažmi"
 
@@ -1405,15 +1346,6 @@ msgstr "Podrška"
 msgid "Documentation"
 msgstr "Dokumentacija"
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1422,15 +1354,6 @@ msgid ""
 "            "
 msgstr "\n                <p class=\"cms-welcome-notes\">Ako ne vidite django CMS logo na vrhu, osigurajte\n                    vezu na <code>static/cms</code> direktorij u vašim\n                    static datotekama.</p>\n            "
 
-#| msgid ""
-#| "          <p class=\"cms-welcome-notes\">If you don't see the ngo CMS logo at the top, make sure\n"
-#| "              you linked the <code>static/cms</code> folder to r\n"
-#| "              static files.</p>\n"
-#| "          <p class=\"cms-welcome-notes\">You're seeing this message ause you have\n"
-#| "              <code>DEBUG = True</code> in your django settings e and\n"
-#| "              haven't added any pages yet.\n"
-#| "          </p>\n"
-#| "      "
 msgid ""
 "\n"
 "                    <p class=\"cms-welcome-notes\">You're seeing this message because you have\n"
@@ -1546,7 +1469,6 @@ msgstr "Članci"
 msgid "Sample App"
 msgstr "Ogledna Aplikacija"
 
-#| msgid "Sample App with excluded permissions"
 msgid "Sample App with config"
 msgstr "Ogledna aplikacija sa konfiguracijom"
 
@@ -1556,7 +1478,6 @@ msgstr "Primjer aplikacije bez uključenih ovlasti"
 msgid "Sample App 2"
 msgstr "Ogledna Aplikacija 2"
 
-#| msgid "Sample App 2"
 msgid "Sample App 3"
 msgstr "Ogledna aplikacija 3"
 
@@ -1593,7 +1514,6 @@ msgstr "Statički Izbornik2"
 msgid "Static Menu3"
 msgstr "Static Menu3"
 
-#| msgid "Static Menu"
 msgid "Static Menu4"
 msgstr "Static Menu4"
 
@@ -1622,12 +1542,10 @@ msgid "UserSettings"
 msgstr "UserSettings"
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
 msgstr "Dodaj plugin u placeholder \"%(placeholder_label)s\""
 
 #, python-format
-#| msgid "Add plugin to placeholder"
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Dodaj plugin u %(plugin_name)s"
 
@@ -1647,6 +1565,10 @@ msgid ""
 "%(plugin_name)s plugins."
 msgstr "Ovaj placeholder veći ima najveći dozvoljeni broj (%(limit)s) pluginova %(plugin_name)s."
 
+#, python-format
+msgid "This placeholder already has the maximum number of child plugins (%s)."
+msgstr ""
+
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
 msgstr "Ne može se pronaći specificirani CMS_REQUEST_IP_RESOLVER modul: \"{0}\"."
@@ -1664,283 +1586,3 @@ msgstr "Izradi novu %s instancu."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "Čarobnjak je već registriran za model: %s"
-
-#~ msgid "The current language of the content fields."
-#~ msgstr "The current language of the content fields."
-
-#~ msgid "Another page with this slug already exists"
-#~ msgstr "Another page with this slug already exists"
-
-#~ msgid "Add Page Type"
-#~ msgstr "Add Page Type"
-
-#~ msgid "You do not have permission to change the template"
-#~ msgstr "You do not have permission to change the template"
-
-#~ msgid "You do not have permission to change this page"
-#~ msgstr "You do not have permission to change this page"
-
-#~ msgid "There only exists one translation for this page"
-#~ msgstr "There only exists one translation for this page"
-
-#~ msgid "User does not have permission to add page."
-#~ msgstr "User does not have permission to add page."
-
-#~ msgid "The site the page is accessible at."
-#~ msgstr "The site the page is accessible at."
-
-#~ msgid "Edit page"
-#~ msgstr "Edit this Page"
-
-#~ msgid "Toggle toolbar"
-#~ msgstr "Toggle toolbar"
-
-#~ msgid "Invalid URL, use /my/url format."
-#~ msgstr "Invalid URL, use /my/url format."
-
-#~ msgid "Add page permission also requires edit page permission."
-#~ msgstr "Add page permission also requires edit page permission."
-
-#~ msgid "Recover (any) pages"
-#~ msgstr "Recover (any) pages"
-
-#~ msgid ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
-#~ msgstr ""
-#~ "Send email notification to user about username or password change. Requires "
-#~ "user email."
-
-#~ msgid "New password"
-#~ msgstr "New password"
-
-#~ msgid "New password confirmation"
-#~ msgstr "New password confirmation"
-
-#~ msgid "Email notification requires valid email address."
-#~ msgstr "Email notification requires valid email address."
-
-#~ msgid ""
-#~ "The permission to add new pages requires the permission to change pages!"
-#~ msgstr ""
-#~ "The permission to add new pages requires the permission to change pages!"
-
-#~ msgid ""
-#~ "The permission to add new users requires the permission to change users!"
-#~ msgstr ""
-#~ "The permission to add new users requires the permission to change users!"
-
-#~ msgid "To add permissions you also need to edit them!"
-#~ msgstr "To add permissions you also need to edit them!"
-
-#~ msgid "%(plugin_name)s plugin added to %(placeholder)s"
-#~ msgstr "%(plugin_name)s plugin added to %(placeholder)s"
-
-#~ msgid "Copied plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
-
-#~ msgid ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-#~ msgstr ""
-#~ "%(plugin_name)s plugin edited at position %(position)s in %(placeholder)s"
-
-#~ msgid "Moved plugins to %(placeholder)s"
-#~ msgstr "Copied plugins to %(placeholder)s"
-
-#~ msgid ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
-#~ msgstr ""
-#~ "%(plugin_name)s plugin at position %(position)s in %(placeholder)s was "
-#~ "deleted."
-
-#~ msgid "All plugins in the placeholder \"%(name)s\" were deleted."
-#~ msgstr "All plugins in the placeholder \"%(name)s\" were deleted."
-
-#~ msgid "Page reverted but slug stays the same because of url collisions."
-#~ msgstr "Page reverted but slug stays the same because of url collisions."
-
-#~ msgid "Template changed to %s"
-#~ msgstr "Template changed to %s"
-
-#~ msgid "Page moved"
-#~ msgstr "Page moved"
-
-#~ msgid "Copied plugins from %(source_language)s to %(target_language)s"
-#~ msgstr "Copied plugins from %(source_language)s to %(target_language)s"
-
-#~ msgid "The page \"%s\" was successfully reverted."
-#~ msgstr "The page \"%s\" was successfully reverted."
-
-#~ msgid "History"
-#~ msgstr "History"
-
-#~ msgid "Undo"
-#~ msgstr "Undo"
-
-#~ msgid "Redo"
-#~ msgstr "Redo"
-
-#~ msgid "View history"
-#~ msgstr "View history"
-
-#~ msgid ""
-#~ "\n"
-#~ "                Recover deleted %(verbose_name)s\n"
-#~ "            "
-#~ msgstr "Recover deleted %(verbose_name)s"
-
-#~ msgid "Press the save button below to recover this version of the object."
-#~ msgstr "Press the save button below to recover this version of the object."
-
-#~ msgid "Revert %(verbose_name)s"
-#~ msgstr "Revert %(verbose_name)s"
-
-#~ msgid "Press the save button below to revert to this version of the object."
-#~ msgstr "Press the save button below to revert to this version of the object."
-
-#~ msgid "home"
-#~ msgstr "home"
-
-#~ msgid "softroot"
-#~ msgstr "softroot"
-
-#~ msgid "({1}) plugin is empty. Remove it?"
-#~ msgstr "({1}) plugin is empty. Remove it?"
-
-#~ msgid "sample second page"
-#~ msgstr "sample account page"
-
-#~ msgid "Plugins were moved"
-#~ msgstr "Plugins were moved"
-
-#~ msgid "Path Overflow from: '%s'"
-#~ msgstr "Path Overflow from: '%s'"
-
-#~ msgid ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
-#~ msgstr ""
-#~ "The new node is too deep in the tree, try increasing the path.max_length "
-#~ "property and UPDATE your database"
-
-#~ msgid "An error occured. Please reload the page"
-#~ msgstr "An error occured. Please reload the page"
-
-#~ msgid "Recover deleted %(name)s"
-#~ msgstr "Recover deleted %(name)s"
-
-#~ msgid "Add %(name)s"
-#~ msgstr "Add %(name)s"
-
-#~ msgid "Pages on:"
-#~ msgstr "Pages on:"
-
-#~ msgid "%(counter)s result"
-#~ msgid_plural "%(counter)s results"
-#~ msgstr[0] "a848884d0af974a125106fa2043a5716_pl_0"
-#~ msgstr[1] "a848884d0af974a125106fa2043a5716_pl_1"
-#~ msgstr[2] "a848884d0af974a125106fa2043a5716_pl_2"
-
-#~ msgid "%(full_result_count)s total"
-#~ msgstr "%(full_result_count)s total"
-
-#~ msgid "Show all"
-#~ msgstr "Show all"
-
-#~ msgid "Filter:"
-#~ msgstr "Filter:"
-
-#~ msgid "on"
-#~ msgstr "on"
-
-#~ msgid "off"
-#~ msgstr "off"
-
-#~ msgid "Filter"
-#~ msgstr "Filter"
-
-#~ msgid "Info"
-#~ msgstr "Info"
-
-#~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
-#~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
-#~ "class=\"addlink\">Add page</a> now."
-
-#~ msgid "insert above"
-#~ msgstr "insert above"
-
-#~ msgid "insert below"
-#~ msgstr "insert below"
-
-#~ msgid "insert inside"
-#~ msgstr "insert inside"
-
-#~ msgid "Pick an action:"
-#~ msgstr "Pick an action:"
-
-#~ msgid "page settings"
-#~ msgstr "page settings"
-
-#~ msgid "copy"
-#~ msgstr "copy"
-
-#~ msgid "Add Child"
-#~ msgstr "Add Child"
-
-#~ msgid "add"
-#~ msgstr "add"
-
-#~ msgid "cut"
-#~ msgstr "cut"
-
-#~ msgid "delete"
-#~ msgstr "delete"
-
-#~ msgid "info"
-#~ msgstr "info"
-
-#~ msgid "Information"
-#~ msgstr "Information"
-
-#~ msgid "<span>%(icon)s</span>"
-#~ msgstr "<span>%(icon)s</span>"
-
-#~ msgid "English"
-#~ msgstr "English"
-
-#~ msgid "French"
-#~ msgstr "French"
-
-#~ msgid "German"
-#~ msgstr "German"
-
-#~ msgid "Brazilian Portuguese"
-#~ msgstr "Brazilian Portuguese"
-
-#~ msgid "Dutch"
-#~ msgstr "Dutch"
-
-#~ msgid "two columns"
-#~ msgstr "two columns"
-
-#~ msgid "three columns"
-#~ msgstr "three columns"
-
-#~ msgid "navigation examples"
-#~ msgstr "navigation examples"
-
-#~ msgid "sidebar column"
-#~ msgstr "sidebar column"
-
-#~ msgid "left column"
-#~ msgstr "left column"
-
-#~ msgid "Add a link"
-#~ msgstr "Add a link"
-
-#~ msgid "right column"
-#~ msgstr "right column"
