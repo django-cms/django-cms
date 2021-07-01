@@ -736,7 +736,7 @@ var Toolbar = new Class({
     _refreshMarkup: function(newToolbar) {
         const switcher = this.ui.toolbarSwitcher.detach();
 
-        $(this.ui.toolbar[0]).replaceWith(newToolbar[0]);
+        this._updateOldToolbar(this.ui.toolbar, newToolbar);
 
         $('.cms-toolbar-item-cms-mode-switcher').replaceWith(switcher);
 
@@ -756,6 +756,22 @@ var Toolbar = new Class({
         CMS.API.Clipboard.ui.triggers = $('.cms-clipboard-trigger a');
         CMS.API.Clipboard.ui.triggerRemove = $('.cms-clipboard-empty a');
         CMS.API.Clipboard._toolbarEvents();
+    },
+
+    _updateOldToolbar: function(oldToolbar, newToolbar) {
+        this._replaceToolbarContents(oldToolbar, newToolbar);
+        this._replaceToolbarAttributes(oldToolbar, newToolbar);
+    },
+
+    _replaceToolbarContents: function(oldToolbar, newToolbar) {
+        oldToolbar.empty();
+        oldToolbar.append(newToolbar.contents());
+    },
+
+    _replaceToolbarAttributes: function(oldToolbar, newToolbar) {
+        $.each(newToolbar.prop('attributes'), function() {
+            oldToolbar.attr(this.name, this.value);
+        });
     }
 });
 
