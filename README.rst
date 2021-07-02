@@ -68,6 +68,8 @@ For more information about our branch policy, see `Branches
 
 Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
 
+The dependencies for the docs are compiled by `pip-tools <https://github.com/jazzband/pip-tools>`_.
+
 ************************
 Developer Bounty Program
 ************************
