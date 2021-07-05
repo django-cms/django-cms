@@ -68,6 +68,8 @@ For more information about our branch policy, see `Branches
 
 Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>`_.
 
+The dependencies for the docs are compiled by `pip-tools <https://github.com/jazzband/pip-tools>`_.
+
 ************************
 Developer Bounty Program
 ************************
@@ -98,7 +100,7 @@ You can use the `django CMS installer <https://djangocms-installer.readthedocs.i
 Demo
 ****
 
-.. image:: https://raw.githubusercontent.com/divio/django-cms/develop/docs/images/try-with-divio.png
+.. image:: https://raw.githubusercontent.com/django-cms/django-cms/develop/docs/images/try-with-divio.png
    :target: https://control.divio.com/demo/get-new/django-cms/
    :alt: Try demo with Divio Cloud
 
@@ -106,7 +108,7 @@ Demo
 Getting Help
 ************
 
-Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ or our `discourse forum <https://discourse.django-cms.org/>`_ for support. 
+Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ or our `discourse forum <https://discourse.django-cms.org/>`_ for support.
 
 ******************
 Commercial support
@@ -120,7 +122,7 @@ info@django-cms.org.
 django CMS Association
 **********************
 
-The django CMS Association is a non-profit organization that was founded in 2020 with the goal to drive the success of django CMS, by increasing customer happiness, market share and open-source contributions. We provide infrastructure and guidance for the django CMS project. 
+The django CMS Association is a non-profit organization that was founded in 2020 with the goal to drive the success of django CMS, by increasing customer happiness, market share and open-source contributions. We provide infrastructure and guidance for the django CMS project.
 
 The non-profit django CMS Association is dependent on donations to fulfill its purpose. The best way to donate is to become a member of the association and pay membership fees. The funding will be funneled back into core development and community projects.
 

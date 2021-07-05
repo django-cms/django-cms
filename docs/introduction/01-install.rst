@@ -97,11 +97,13 @@ Later, you may wish to manage some of these by yourself, in which case you need 
 up an English-only project, which will be sufficient for the purposes of this tutorial. You can of course simply edit
 the new project's ``settings.py`` file at any time to change or add site languages or amend other settings.
 
-The installer creates an admin user for you, with username/password ``admin``/``admin``.
-
-
 Start up the runserver
 ======================
+
+The installer creates an admin user for you, with these credentials:
+
+Username: ``admin``
+Password ``admin``
 
 Go to mysite directory
 
