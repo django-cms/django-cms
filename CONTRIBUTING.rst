@@ -18,10 +18,10 @@ All participants in our community and its various forums are expected to abide b
 Issues
 ======
 
-* Please report **any bugs** through `GitHub issues <https://github.com/divio/django-cms/issues>`_.
+* Please report **any bugs** through `GitHub issues <https://github.com/django-cms/django-cms/issues>`_.
 * For *security issues* please see further below.
 
-Contributing Code 
+Contributing Code
 ================
 
 Here’s what the pull request process looks like in brief:
@@ -29,22 +29,29 @@ Here’s what the pull request process looks like in brief:
 1. Fork our GitHub repository, https://github.com/django-cms/django-cms
 2. Work locally and push your changes to your repository.
 3. When you feel your code is good enough for inclusion, send us a pull request.
-4. After that, please join the `Slack Channel <https://www.django-cms.org/slack>`_ of our Pull Request Review work group (#workgroup-pr-review). This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request. 
+4. After that, please join the `Slack Channel <https://www.django-cms.org/slack>`_ of our Pull Request Review work group (#workgroup-pr-review). This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
 5. Get acknowledged by the django CMS community for your contribution :-)
 
-To learn more about basic requirements and standards of code contribution, please familiarize yourself with our comprehensive `documentation <https://docs.django-cms.org/en/latest/contributing/code.html#>`_. 
+To learn more about basic requirements and standards of code contribution, please familiarize yourself with our comprehensive `documentation <https://docs.django-cms.org/en/latest/contributing/code.html#>`_.
 
-django CMS commits follow the [Conventionnal Commits Guideline](http://conventionnalcommits.org/), please try to follow the Guidelines in your commit messages to ease our review&merge process.
+django CMS commits follow the `Conventionnal Commits Guideline <http://conventionnalcommits.org/>`_ , please try to follow the Guidelines in your commit messages to ease our review&merge process.
 
-Receive rewards for submitting pull requests
---------------------------------------------
 
-Sign up for our `Bounty program <https://www.django-cms.org/en/bounty-program/>`_.
+Proposing large feature additions
+=================================
 
-Join a work group 
------------------
+In terms of proposing large feature additions, we follow the best practice of `DEPS <https://github.com/django/deps>`_.
 
-As part of the django CMS Association we have formed several `work groups <https://docs.django-cms.org/en/latest/contributing/code.html#>`_ to work together on different django CMS development topics. If you want to become part of contributor team, feel free to join one of our groups. You will meet friendly people and improve your programing skills and make a real difference in the django CMS open source project. 
+To create a proposal...
+
+1. please use this `DEP <https://github.com/django/deps/blob/main/template.rst>`_ template
+
+2. create a discussion in the main `django CMS repository <https://github.com/django-cms/django-cms/discussions>`_
+
+3. join the `Tech Committee <https:/github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_ `Slack Channel <https://www.django-cms.org/slack>`_ (#technical-committee) and ask for a RFC.
+
+4. After RFC is completed, add the proposal to the `agenda <https://hackmd.io/ddhvq_aqS6my9gwhLddyPg>`_ of the TC for approval.
+
 
 Contribution documentation
 ==========================
@@ -63,7 +70,7 @@ If you think you have discovered a security issue in our code, please do not rai
 forum until we have had a chance to deal with it.
 
 
-Community & Association 
+Community & Association
 =======================
 
 You can join us online:
@@ -83,3 +90,14 @@ You can become a member of the django CMS Association and receive benefits
 
 * `Membership <https://www.django-cms.org/en/memberships/>`_
 
+
+Receive rewards for submitting pull requests
+--------------------------------------------
+
+Sign up for our `Bounty program <https://www.django-cms.org/en/bounty-program/>`_.
+
+
+Join a work group
+=================
+
+As part of the django CMS Association we have formed several `work groups <https://docs.django-cms.org/en/latest/contributing/code.html#>`_ to work together on different django CMS development topics. If you want to become part of contributor team, feel free to join one of our groups. You will meet friendly people and improve your programing skills and make a real difference in the django CMS open source project.

@@ -1,12 +1,14 @@
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
 from cms.api import create_page, assign_user_to_page
 from cms.cache.permissions import (get_permission_cache, set_permission_cache,
                                    clear_user_permission_cache)
-from cms.models.permissionmodels import GlobalPagePermission
-from cms.test_utils.testcases import CMSTestCase
-from cms.utils.page_permissions import get_change_id_list, user_can_publish_page
+from cms.models import Page
+from cms.models.permissionmodels import GlobalPagePermission, ACCESS_PAGE_AND_DESCENDANTS
+from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD
+from cms.utils.page_permissions import get_change_id_list, user_can_publish_page, user_can_view_page, user_can_add_subpage
 
 
 @override_settings(
@@ -82,3 +84,56 @@ class PermissionCacheTests(CMSTestCase):
             Site.objects.get_current(),
         )
         self.assertTrue(can_publish)
+
+    def test_visibility_after_move_page(self):
+        superuser = self.get_superuser()
+        user1 = self._create_user("user1", is_staff=True, is_superuser=False)
+
+        visible = create_page("visible", "nav_playground.html", "en", published=True)
+        visible_child = create_page("visible_child", "nav_playground.html", "en", parent=visible, published=True)
+        invisible_for_user1 = create_page("invisible", "nav_playground.html", "en", published=True)
+
+        assign_user_to_page(visible, user1, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_view=True)
+        assign_user_to_page(invisible_for_user1, superuser, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_view=True)
+
+        with self.login_user_context(user1):
+            response = self.client.get(visible_child.get_public_object().get_absolute_url())
+            self.assertEqual(response.status_code, 200)
+
+            response = self.client.get(invisible_for_user1.get_public_object().get_absolute_url())
+            self.assertEqual(response.status_code, 404)
+
+        with self.login_user_context(superuser):
+            move_url = self.get_admin_url(Page, 'move_page', visible_child.pk)
+            response = self.client.post(move_url, {
+                'id': visible_child.pk,
+                'position': 0,
+                'target': invisible_for_user1.pk,
+            })
+            self.assertEqual(response.status_code, 200)
+            visible_child = visible_child.reload()
+            self.assertEqual(visible_child.parent_page.pk, invisible_for_user1.pk)
+
+        # Ignore cached_func
+        User = get_user_model()
+        user1 = User.objects.get(pk=user1.pk)
+        self.assertFalse(user_can_view_page(user=user1, page=visible_child))
+
+    def test_add_page_twice(self):
+        user1 = self._create_user("user1", is_staff=True, is_superuser=False, add_default_permissions=True)
+
+        home = create_page("home", "nav_playground.html", "en", published=True)
+        home.set_as_homepage()
+        assign_user_to_page(home, user1, grant_on=ACCESS_PAGE_AND_DESCENDANTS, can_add=True, can_change=True, can_publish=True)
+
+        with self.login_user_context(user1):
+            response = self.client.post(f'{URL_CMS_PAGE_ADD}?parent_node={home.node.pk}', self.get_new_page_data(parent_id=home.node.pk))
+            self.assertEqual(response.status_code, 302)
+
+        child = home.reload().get_child_pages().first()
+        self.assertIsNotNone(child)
+
+        # Ignore cached_func
+        User = get_user_model()
+        user1 = User.objects.get(pk=user1.pk)
+        self.assertTrue(user_can_add_subpage(user1, child))

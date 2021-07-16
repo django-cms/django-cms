@@ -1,0 +1,13 @@
+MarkupSafe
+Pygments
+furo
+Sphinx>4
+sphinx-copybutton
+sphinxext-opengraph
+sphinxcontrib-spelling
+pyenchant>3
+sphinx-autobuild
+datetime
+coverage
+django-cms
+pip-tools
