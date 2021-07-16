@@ -29,6 +29,7 @@ from menus.utils import DefaultLanguageChanger
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
 LANGUAGE_MENU_IDENTIFIER = 'language-menu'
+HELP_MENU_IDENTIFIER = 'help-menu'
 TEMPLATE_MENU_BREAK = 'Template Menu Break'
 PAGE_MENU_IDENTIFIER = 'page'
 PAGE_MENU_ADD_IDENTIFIER = 'add_page'
@@ -104,6 +105,7 @@ class BasicToolbar(CMSToolbar):
             self.clipboard = self.request.toolbar.user_settings.clipboard
             self.add_admin_menu()
             self.add_language_menu()
+            self.add_help_menu()
 
     def add_admin_menu(self):
         if not self._admin_menu:
@@ -206,6 +208,14 @@ class BasicToolbar(CMSToolbar):
                 except NoReverseMatch:
                     url = DefaultLanguageChanger(self.request)(code)
                 self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+
+    def add_help_menu(self):
+        """ Adds the help menu if it's enabled in settings """
+        if get_cms_setting('ENABLE_HELP'):
+            self._help_menu = self.toolbar.get_or_create_menu(HELP_MENU_IDENTIFIER, _('Help'), position=-1)
+            menu_items = get_cms_setting('HELP_MENU_ITEMS')
+            for label, url in menu_items:
+                self._help_menu.add_link_item(label, url=url)
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
