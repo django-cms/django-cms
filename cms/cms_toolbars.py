@@ -230,6 +230,7 @@ class BasicToolbar(CMSToolbar):
         """ Adds the help menu if it's enabled in settings """
         if get_cms_setting('ENABLE_HELP'):
             self._help_menu = self.toolbar.get_or_create_menu(HELP_MENU_IDENTIFIER, _('Help'), position=-1)
+            self._help_menu.items = []  # reset the items so we don't duplicate
             for label, url in DEFAULT_HELP_MENU_ITEMS:
                 self._help_menu.add_link_item(label, url=url)
 

@@ -21,7 +21,7 @@ from django.utils.translation import gettext_lazy as _
 from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
 from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
-                              LANGUAGE_MENU_IDENTIFIER)
+                              DEFAULT_HELP_MENU_ITEMS, HELP_MENU_IDENTIFIER, LANGUAGE_MENU_IDENTIFIER)
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.models import Page, UserSettings, PagePermission
@@ -330,8 +330,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.populate()
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + admin-menu + logout
-        self.assertEqual(len(items), 3, items)
+        # Logo + admin-menu + help-menu + logout
+        self.assertEqual(len(items), 4, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 12, admin_items)
 
@@ -342,7 +342,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
         # Logo + edit-mode + admin-menu + logout
-        self.assertEqual(len(items), 3)
+        self.assertEqual(len(items), 4)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 13, admin_items)
 
@@ -660,7 +660,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.post_template_populate()
         self.assertTrue(toolbar.edit_mode_active)
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        self.assertEqual(len(items), 7)
+        self.assertEqual(len(items), 8)
 
     def test_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
@@ -673,8 +673,8 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(page.has_publish_permission(request.user))
         self.assertTrue(toolbar.edit_mode_active)
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 5)
+        # Logo + templates + page-menu + admin-menu + help-menu + logout
+        self.assertEqual(len(items), 6)
 
         # adding back structure mode permission
         permission = Permission.objects.get(codename='use_structure')
@@ -685,8 +685,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.populate()
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + edit mode + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 6)
+        # Logo + edit mode + templates + page-menu + admin-menu + help-menu + logout
+        self.assertEqual(len(items), 7)
 
     def test_no_change_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)
@@ -700,8 +700,8 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(page.has_publish_permission(request.user))
 
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 4, items)
+        # Logo + page-menu + admin-menu + help-menu + logout
+        self.assertEqual(len(items), 5, items)
         page_items = items[1].get_items()
         # The page menu should only have the "Create page" item enabled.
         self.assertFalse(page_items[0].disabled)
@@ -721,14 +721,14 @@ class ToolbarTests(ToolbarTestBase):
         en_toolbar = CMSToolbar(en_request)
         en_toolbar.populate()
         en_toolbar.post_template_populate()
-        # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5)
+        # Logo + templates + page-menu + admin-menu + help-menu + logout
+        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)
         de_request = self.get_page_request(cms_page, user, path='/de/', edit=True, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         de_toolbar.populate()
         de_toolbar.post_template_populate()
-        # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5)
+        # Logo + templates + page-menu + admin-menu + help-menu + logout
+        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
 
     def test_double_menus(self):
         """
@@ -743,9 +743,11 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.populate()
         toolbar.populated = False
         toolbar.post_template_populate()
-        admin = toolbar.get_left_items()[0]
-        lang = toolbar.get_left_items()[1]
+        admin = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
+        help = toolbar.get_or_create_menu(HELP_MENU_IDENTIFIER)
+        lang = toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER)
         self.assertEqual(len(admin.get_items()), 15)
+        self.assertEqual(len(help.get_items()), len(DEFAULT_HELP_MENU_ITEMS))
         self.assertEqual(len(lang.get_items()), len(get_language_tuple(1)))
 
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
