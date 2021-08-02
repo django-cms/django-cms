@@ -501,7 +501,7 @@ class PageToolbar(CMSToolbar):
             languages = get_language_dict(self.current_site.pk)
 
             remove = [(code, languages.get(code, code)) for code in self.page.get_languages() if code in languages]
-            add = [l for l in languages.items() if l not in remove]
+            add = [lang for lang in languages.items() if lang not in remove]
             copy = [(code, name) for code, name in languages.items() if code != self.current_lang and (code, name) in remove]
 
             if add or remove or copy:

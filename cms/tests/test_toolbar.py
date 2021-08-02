@@ -1073,10 +1073,10 @@ class ToolbarTests(ToolbarTestBase):
             return default
 
     def test_toolbar_logout(self):
-        '''
+        """
         Tests that the Logout menu item includes the user's full name, if the
         relevant fields were populated in auth.User, else the user's username.
-        '''
+        """
         superuser = self.get_superuser()
 
         # Ensure that some other test hasn't set the name fields
