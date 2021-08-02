@@ -281,8 +281,11 @@ def get_subordinate_users(user, site):
     # normal query
     qs = get_user_model().objects.distinct().filter(
         Q(is_staff=True) &
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
-        | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
+        (
+            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+        ) | (
+            Q(pageuser__created_by=user) & Q(pagepermission__page=None)
+        )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
     return qs
@@ -320,8 +323,11 @@ def get_subordinate_groups(user, site):
     page_id_allow_list = get_change_permissions_id_list(user, site, check_global=False)
 
     return Group.objects.distinct().filter(
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
-        | (Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True))
+        (
+            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+        ) | (
+            Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
+        )
     )
 
 

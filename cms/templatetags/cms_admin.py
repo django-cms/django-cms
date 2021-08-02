@@ -170,8 +170,7 @@ class PageSubmitRow(InclusionTag):
 
         context = {
             # TODO check this (old code: opts.get_ordered_objects() )
-            'onclick_attrib': (opts and change
-                               and 'onclick="submitOrderForm();"' or ''),
+            'onclick_attrib': (opts and change and 'onclick="submitOrderForm();"' or ''),
             'show_delete_link': False,
             'show_save_as_new': not is_popup and change and save_as,
             'show_save_and_add_another': False,
@@ -202,7 +201,8 @@ in_filtered = register.filter('in_filtered', in_filtered)
 @register.simple_tag
 def admin_static_url():
     """
-    If set, returns the string contained in the setting ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
+    If set, returns the string contained in the setting
+    ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
     """
     return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
 

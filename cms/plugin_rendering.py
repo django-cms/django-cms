@@ -342,16 +342,15 @@ class ContentRenderer(BaseRenderer):
             )
         parent_page = current_page.parent_page
         should_inherit = (
-            inherit
-            and not content and parent_page
+            inherit and not content and parent_page  # noqa: W503
             # The placeholder cache is primed when the first placeholder
             # is loaded. If the current page's parent is not in there,
             # it means its cache was never primed as it wasn't necessary.
-            and parent_page.pk in placeholder_cache
+            and parent_page.pk in placeholder_cache  # noqa: W503
             # don't display inherited plugins in edit mode, so that the user doesn't
             # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
             # there for possible enhancements
-            and not self.toolbar.edit_mode_active
+            and not self.toolbar.edit_mode_active  # noqa: W503
         )
 
         if should_inherit:

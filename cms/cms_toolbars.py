@@ -720,10 +720,7 @@ class PageToolbar(CMSToolbar):
                 revert_question = _('Are you sure you want to revert to live?')
                 # Only show this action if the page has pending changes and a public version
                 is_enabled = (
-                    edit_mode
-                    and can_change
-                    and self.page.is_dirty(self.current_lang)
-                    and self.page.publisher_public
+                    edit_mode and can_change and self.page.is_dirty(self.current_lang) and self.page.publisher_public
                 )
                 current_page_menu.add_ajax_item(
                     _('Revert to live'),

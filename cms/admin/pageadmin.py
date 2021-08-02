@@ -1436,9 +1436,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 # get all root nodes
                 Q(node__depth=1)
                 # or children which were previously open
-                | Q(node__depth=2, node__in=open_nodes)
+                | Q(node__depth=2, node__in=open_nodes)  # noqa: W503
                 # or children of the open descendants
-                | Q(node__parent__in=open_nodes)
+                | Q(node__parent__in=open_nodes)  # noqa: W503
             )
         pages = pages.prefetch_related(
             Prefetch(
@@ -1742,10 +1742,15 @@ class PageAdmin(BasePageAdmin):
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
             matching_published_pages = self.model.objects.published().public().filter(
-                Q(title_set__title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__path__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
+                Q(
+                    title_set__title__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__path__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__menu_title__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__page_title__icontains=query_term, title_set__language=language_code
+                )
             ).distinct()
 
             results = []

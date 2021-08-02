@@ -454,9 +454,9 @@ class BaseCMSTestCase:
             self.fail("No warnings emitted")
         first = warningsShown[0]
         for other in warningsShown[1:]:
-            if ((other.message, other.category)
-                != (first.message, first.category)):
+            if ((other.message, other.category) != (first.message, first.category)):
                 self.fail("Can't handle different warnings")
+
         self.assertEqual(first.message, message)
         self.assertTrue(first.category is category)
 

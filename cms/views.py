@@ -18,18 +18,18 @@ from cms.page_rendering import _handle_no_page, render_page, render_object_struc
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import (get_fallback_languages, get_public_languages,
-                            get_redirect_on_fallback, get_language_list,
-                            get_default_language_for_site,
-                            is_language_prefix_patterns_used)
+from cms.utils.i18n import (
+    get_fallback_languages, get_public_languages, get_redirect_on_fallback, get_language_list,
+    get_default_language_for_site, is_language_prefix_patterns_used
+)
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_change_page
 from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 
 
 def _clean_redirect_url(redirect_url, language):
-    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/"
-            and not redirect_url.startswith('/%s/' % language)):
+    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and
+            not redirect_url.startswith('/%s/' % language)):
         # add language prefix to url
         redirect_url = "/%s/%s" % (language, redirect_url.lstrip("/"))
     return redirect_url

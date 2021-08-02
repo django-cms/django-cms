@@ -19,7 +19,9 @@ from django.utils.translation import (
 
 from cms import constants
 from cms.cache.permissions import clear_permission_cache
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import (
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
+)
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
@@ -125,9 +127,10 @@ class TreeNode(MP_Node):
 
     def _set_hierarchy(self, nodes, ancestors=None):
         if self.is_branch:
-            self._descendants = [node for node in nodes
-                           if node.path.startswith(self.path)
-                           and node.depth > self.depth]
+            self._descendants = [
+                node for node in nodes
+                if node.path.startswith(self.path) and node.depth > self.depth
+            ]
         else:
             self._descendants = []
 

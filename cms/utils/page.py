@@ -176,8 +176,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
             page
             .get_ancestor_pages()
             .filter(
-                Q(publication_date__gt=now)
-                | Q(publication_end_date__lt=now),
+                Q(publication_date__gt=now) | Q(publication_end_date__lt=now),
             )
         )
         if unpublished_ancestors.exists():
