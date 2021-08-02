@@ -370,8 +370,8 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
                         placeholder_id=placeholder.pk,
                         language=language).order_by('depth', 'path'):
                     order = CMSPlugin.objects.filter(
-                            parent_id=plugin.pk
-                        ).order_by('position', 'path').values_list('pk', flat=True)
+                        parent_id=plugin.pk
+                    ).order_by('position', 'path').values_list('pk', flat=True)
                     reorder_plugins(placeholder, plugin.pk, language, order)
 
     def post_copy(self, old_instance, new_old_ziplist):

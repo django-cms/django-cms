@@ -12,7 +12,8 @@ from cms.models import Page, PageUser
 
 
 class PageSelectWidget(MultiWidget):
-    """A widget that allows selecting a page by first selecting a site and then
+    """
+    A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
     """
     template_name = 'cms/widgets/pageselectwidget.html'
