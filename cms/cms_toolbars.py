@@ -303,8 +303,9 @@ class PageToolbar(CMSToolbar):
         return self.page_change_permission
 
     def page_is_pending(self, page, language):
-        return (page.publisher_public_id and
-                page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING)
+        return (
+            page.publisher_public_id and page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING
+        )
 
     def in_apphook(self):
         with force_language(self.toolbar.request_language):

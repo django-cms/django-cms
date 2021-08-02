@@ -28,8 +28,8 @@ from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 
 
 def _clean_redirect_url(redirect_url, language):
-    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and
-            not redirect_url.startswith('/%s/' % language)):
+    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
+            '/%s/' % language)):
         # add language prefix to url
         redirect_url = "/%s/%s" % (language, redirect_url.lstrip("/"))
     return redirect_url
@@ -43,9 +43,9 @@ def details(request, slug):
     response_timestamp = now()
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
-            not request.toolbar.edit_mode_active and
-            not request.toolbar.show_toolbar and
-            not request.user.is_authenticated
+            not request.toolbar.edit_mode_active
+            and not request.toolbar.show_toolbar
+            and not request.user.is_authenticated
         )
     ):
         cache_content = get_page_cache(request)

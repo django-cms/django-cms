@@ -482,8 +482,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             opts=opts,
             app_label=app_label,
             preserved_filters=self.get_preserved_filters(request),
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
+            is_popup=(
+                IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET
+            ),
             to_field=None,
         )
         context.update(extra_context or {})

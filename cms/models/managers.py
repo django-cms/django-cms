@@ -62,8 +62,7 @@ class PageManager(PublisherManager):
         for plugin in plugins:
             cmsplugin = plugin.model
             if not (
-                hasattr(cmsplugin, 'search_fields') and
-                hasattr(cmsplugin, 'cmsplugin_ptr')
+                hasattr(cmsplugin, 'search_fields') and hasattr(cmsplugin, 'cmsplugin_ptr')
             ):
                 continue
             field = cmsplugin.cmsplugin_ptr.field

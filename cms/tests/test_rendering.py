@@ -284,9 +284,12 @@ class RenderingTestCase(CMSTestCase):
         content_renderer = self.get_content_renderer()
         r = content_renderer.render_plugin(instance, context, self.test_placeholders['main'])
         expected = (
-            self.test_data['text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
-            self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' +
-            self.test_data['text_main'] + '|main|original_context_var_ok'
+            self.test_data['text_main'] +  # noqa: W504
+            '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +  # noqa: W504
+            self.test_data['text_main'] +  # noqa: W504
+            '|main|original_context_var_ok|test_plugin_processor_ok|' +  # noqa: W504
+            self.test_data['text_main'] +  # noqa: W504
+            '|main|original_context_var_ok'  # noqa: W504
         )
         self.assertEqual(r, expected)
         plugin_rendering._standard_processors = {}
