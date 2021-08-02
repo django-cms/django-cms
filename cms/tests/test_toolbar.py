@@ -1169,6 +1169,28 @@ class ToolbarTests(ToolbarTestBase):
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
+    @override_settings(CMS_EXTRA_HELP_MENU_ITEMS=(('google', 'www.google.com'),))
+    def test_help_menu(self):
+        page = create_page("help-page", "nav_playground.html", "en", published=True)
+        staff = self.get_staff()
+        assert staff.user_permissions.get().name == 'Can change page'
+        request = self.get_page_request(page, staff, '/')
+        toolbar = CMSToolbar(request)
+        help_menu = toolbar.get_menu(HELP_MENU_IDENTIFIER)
+        custom_link = help_menu.get_items()[-1]
+        self.assertEqual(custom_link.name, 'google')
+        self.assertEqual(custom_link.url, 'www.google.com')
+
+    @override_settings(CMS_ENABLE_HELP=False)
+    def test_help_menu_disabled(self):
+        page = create_page("help-page", "nav_playground.html", "en", published=True)
+        staff = self.get_staff()
+        assert staff.user_permissions.get().name == 'Can change page'
+        request = self.get_page_request(page, staff, '/')
+        toolbar = CMSToolbar(request)
+        help_menu = toolbar.get_menu(HELP_MENU_IDENTIFIER)
+        self.assertIsNone(help_menu)
+
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
 class EditModelTemplateTagTest(ToolbarTestBase):
