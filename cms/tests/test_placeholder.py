@@ -271,9 +271,9 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         )
         ex.save()
         ph1 = ex.placeholder
-        ###
+        #
         # add the test plugin
-        ###
+        #
         test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
         endpoint = self.get_change_plugin_uri(test_plugin, container=Example1)
@@ -288,9 +288,9 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         """
         page = create_page('page', 'col_two.html', 'en')
         ph1 = page.placeholders.get(slot='col_left')
-        ###
+        #
         # add the test plugin
-        ###
+        #
         test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
 
@@ -491,11 +491,11 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         context_de['request'] = self.get_request(language="de", page=page_en)
 
         # First test the default (fallback) behavior)
-        ## English page should have the text plugin
+        # English page should have the text plugin
         content_en = _render_placeholder(placeholder_en, context_en)
         self.assertRegexpMatches(content_en, "^en body$")
 
-        ## Deutsch page have text due to fallback
+        # Deutsch page have text due to fallback
         content_de = _render_placeholder(placeholder_de, context_de)
         self.assertRegexpMatches(content_de, "^en body$")
         self.assertEqual(len(content_de), 7)
@@ -507,11 +507,11 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         }
         # configure non fallback
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            ## Deutsch page should have no text
+            # Deutsch page should have no text
             del(placeholder_de._plugins_cache)
             cache.clear()
             content_de = _render_placeholder(placeholder_de, context_de)
-            ## Deutsch page should inherit english content
+            # Deutsch page should inherit english content
             self.assertNotRegex(content_de, "^en body$")
             context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
@@ -594,12 +594,12 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         context_de['request'] = self.get_request(language="de", page=page_en)
 
         # First test the default (fallback) behavior)
-        ## Deutsch page should have the text plugin
+        # Deutsch page should have the text plugin
         content_de = _render_placeholder(placeholder_en, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
         del(placeholder_en._plugins_cache)
         cache.clear()
-        ## English page should have no text
+        # English page should have no text
         content_en = _render_placeholder(placeholder_en, context_en)
         self.assertRegexpMatches(content_en, "^de body$")
         self.assertEqual(len(content_en), 7)
@@ -612,7 +612,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         }
         # configure non-fallback
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            ## English page should have deutsch text
+            # English page should have deutsch text
             content_en = _render_placeholder(placeholder_en, context_en)
             self.assertNotRegex(content_en, "^de body$")
 
@@ -774,14 +774,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             char_4='four'
         )
         ex.save()
-        ###
+        #
         # add the test plugin
-        ###
+        #
         for lang in avail_langs:
             add_plugin(ex.placeholder, "EmptyPlugin", lang)
         # reload instance from database
         ex = Example1.objects.get(pk=ex.pk)
-        #get languages
+        # get languages
         langs = [lang['code'] for lang in ex.placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
 
@@ -797,9 +797,9 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             if lang != 'en':
                 create_title(lang, 'test page %s' % lang, page)
         placeholder = page.placeholders.get(slot='col_sidebar')
-        ###
+        #
         # add the test plugin
-        ###
+        #
         for lang in avail_langs:
             add_plugin(placeholder, "EmptyPlugin", lang)
         # reload placeholder from database
