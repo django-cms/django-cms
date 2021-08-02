@@ -42,7 +42,6 @@ def find_selected(nodes):
 
 def set_language_changer(request, func):
     """
-
     Sets a language chooser function that accepts one parameter: language
     The function should return a url in the supplied language
     normally you would want to give it the get_absolute_url function with an optional language parameter
@@ -147,7 +146,7 @@ class DefaultLanguageChanger:
                     return self.request.toolbar.obj.get_absolute_url()
                 except:
                     pass
-        elif view and not view.url_name in ('pages-details-by-slug', 'pages-root'):
+        elif view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
                 view_name = "%s:%s" % (view.namespace, view_name)
