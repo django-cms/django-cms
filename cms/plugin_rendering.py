@@ -474,7 +474,7 @@ class ContentRenderer(BaseRenderer):
                 request=self.request,
             )
 
-            if cached_value != None:
+            if cached_value is not None:
                 # None means nothing in the cache
                 # Anything else is a valid value
                 language_cache[placeholder.pk] = cached_value
@@ -512,7 +512,8 @@ class ContentRenderer(BaseRenderer):
             # has not been cached.
             placeholders_to_fetch = [
                 placeholder for placeholder in placeholders
-                if _cached_content(placeholder, self.request_language) == None]
+                if _cached_content(placeholder, self.request_language) is None
+            ]
         else:
             # cache is disabled, prefetch plugins for all
             # placeholders in the page.
