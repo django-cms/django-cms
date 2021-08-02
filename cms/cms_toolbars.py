@@ -52,10 +52,11 @@ TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 SHORTCUTS_BREAK = 'Shortcuts Break'
 
 DEFAULT_HELP_MENU_ITEMS = (
-    (gettext('Community forum'), 'https://discourse.django-cms.org/'),
-    (gettext('Documentation'), 'https://docs.django-cms.org/en/latest/'),
-    (gettext('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
-    (gettext('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    (gettext("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
+    (gettext("Documentation"), 'https://docs.django-cms.org/en/latest/'),
+    (gettext("Support Forum"), 'https://discourse.django-cms.org/'),
+    (gettext("Support Slack"), 'https://www.django-cms.org/slack'),
+    (gettext("What's new"), 'https://www.django-cms.org/en/blog/'),
 )
 
 
