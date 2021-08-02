@@ -85,7 +85,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 ]
         # Set default name
         if not new_plugin.name:
-            new_plugin.name = re.sub("([a-z])([A-Z])", "\g<1> \g<2>", name)
+            new_plugin.name = re.sub("([a-z])([A-Z])", r"\g<1> \g<2>", name)
 
         # By flagging the plugin class, we avoid having to call these class
         # methods for every plugin all the time.

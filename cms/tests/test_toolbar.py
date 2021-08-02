@@ -1170,7 +1170,7 @@ class ToolbarTests(ToolbarTestBase):
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
 class EditModelTemplateTagTest(ToolbarTestBase):
-    edit_fields_rx = "(\?|&amp;)edit_fields=%s"
+    edit_fields_rx = r"(\?|&amp;)edit_fields=%s"
 
     def tearDown(self):
         Example1.objects.all().delete()
@@ -1179,8 +1179,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
     def test_markup_toolbar_url_model(self):
         superuser = self.get_superuser()
         page = create_page('Test', 'col_two.html', 'en', published=True)
-        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3",
-                       char_4="char_4")
+        ex1 = Example1(char_1="char_1", char_2="char_2", char_3="char_3", char_4="char_4")
         ex1.save()
         # object
         # check when in draft mode
