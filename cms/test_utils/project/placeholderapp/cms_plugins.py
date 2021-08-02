@@ -12,7 +12,7 @@ class EmptyPlugin(CMSPluginBase):
         return context
 
     def icon_src(self, instance):
-        return settings.STATIC_URL + u"cms/img/icons/plugins/image.png"
+        return settings.STATIC_URL + "cms/img/icons/plugins/image.png"
 
     @classmethod
     def get_extra_placeholder_menu_items(cls, request, placeholder):
