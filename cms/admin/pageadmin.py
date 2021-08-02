@@ -174,7 +174,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
@@ -1679,10 +1681,13 @@ class PageAdmin(BasePageAdmin):
         return queryset.exclude(is_page_type=True)
 
     def get_urls(self):
-        """Get the admin urls
+        """
+        Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^([0-9]+)/set-home/$', self.set_home),
