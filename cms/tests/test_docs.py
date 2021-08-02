@@ -35,13 +35,13 @@ def has_no_internet():
 
 
 @contextmanager
-def tmp_list_append(l, x):
-    l.append(x)
+def tmp_list_append(lst, x):
+    lst.append(x)
     try:
         yield
     finally:
-        if x in l:
-            l.remove(x)
+        if x in lst:
+            lst.remove(x)
 
 
 class DocsTestCase(CMSTestCase):

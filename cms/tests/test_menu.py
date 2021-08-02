@@ -1833,24 +1833,26 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         B1     B2
         C1 C2  C3 C4
         """
-        l = 'nav_playground.html'
+        template = 'nav_playground.html'
         kw = dict(published=True, in_navigation=True)
-        a = create_page('a', l, 'en', **kw)
-        b1 = create_page('b1', l, 'en', parent=a, **kw)
-        b2 = create_page('b2', l, 'en', parent=a, **kw)
-        c1 = create_page('c1', l, 'en', parent=b1, **kw)
-        c2 = create_page('c2', l, 'en', parent=b1, **kw)
-        c3 = create_page('c3', l, 'en', parent=b2, **kw)
-        c4 = create_page('c4', l, 'en', parent=b2, **kw)
+        a = create_page('a', template, 'en', **kw)
+        b1 = create_page('b1', template, 'en', parent=a, **kw)
+        b2 = create_page('b2', template, 'en', parent=a, **kw)
+        c1 = create_page('c1', template, 'en', parent=b1, **kw)
+        c2 = create_page('c2', template, 'en', parent=b1, **kw)
+        c3 = create_page('c3', template, 'en', parent=b2, **kw)
+        c4 = create_page('c4', template, 'en', parent=b2, **kw)
         self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
         self.site = get_current_site()
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
         self.other = self._create_user("other", is_staff=False, is_superuser=False)
-        PagePermission.objects.create(page=b1, user=self.user, can_view=True,
-                                      grant_on=ACCESS_PAGE_AND_DESCENDANTS)
-        PagePermission.objects.create(page=b2, user=self.other, can_view=True,
-                                      grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        PagePermission.objects.create(
+            page=b1, user=self.user, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS
+        )
+        PagePermission.objects.create(
+            page=b2, user=self.other, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS
+        )
         attrs = {
             'user': self.user,
             'REQUEST': {},
