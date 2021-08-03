@@ -7,7 +7,6 @@ from threading import local
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
-from django.utils.lru_cache import lru_cache
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
@@ -17,6 +16,8 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
 from cms.utils.compat.dj import available_attrs
+
+from functools import lru_cache
 
 
 # thread local support

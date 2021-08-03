@@ -10,7 +10,6 @@ from django.db.models.base import ModelBase
 from django.urls import NoReverseMatch
 from django.utils import timezone
 from django.utils.encoding import force_text
-from django.utils.lru_cache import lru_cache
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
@@ -18,6 +17,8 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
+
+from functools import lru_cache
 
 from six import python_2_unicode_compatible, text_type, with_metaclass
 
