@@ -159,26 +159,26 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
         # child of plugin_1
         plugin_1 = self.reload(plugin_1)
-        plugin_2 = add_plugin(
-            placeholder, "TextPlugin", "en",  # nopyflakes
+        plugin_2 = add_plugin(  # nopyflakes noqa
+            placeholder, "TextPlugin", "en",
             body="02", target=plugin_1,
         )
 
         # create a second child of plugin_1
         plugin_1 = self.reload(plugin_1)
-        plugin_3 = add_plugin(
-            placeholder, "TextPlugin", "en",  # nopyflakes
+        plugin_3 = add_plugin(  # nopyflakes noqa
+            placeholder, "TextPlugin", "en",
             body="03", target=plugin_1
         )
 
         # child of plugin_2
         plugin_2 = self.reload(plugin_2)
-        plugin_4 = add_plugin(
-            placeholder, "TextPlugin", "en",  # nopyflakes
+        plugin_4 = add_plugin(  # nopyflakes noqa
+            placeholder, "TextPlugin", "en",
             body="04", target=plugin_2
         )
 
-        plugin_1 = self.reload(plugin_1)  # nopyflakes
+        plugin_1 = self.reload(plugin_1)  # nopyflakes noqa
         # create a second root plugin
         plugin_5 = add_plugin(placeholder, "TextPlugin", "en", body="05")
         left = CMSPlugin.objects.filter(parent__isnull=True).order_by('path')[0]

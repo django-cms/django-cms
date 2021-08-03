@@ -1567,7 +1567,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                         obj = None
                     try:
                         force_str(obj.get_absolute_url())
-                    except [AttributeError, NoReverseMatch, TypeError]:
+                    except:
                         obj = None
         if obj:
             if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode_active', False):
