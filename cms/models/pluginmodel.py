@@ -361,17 +361,27 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         for placeholder in Placeholder.objects.all():
             for language, __ in settings.LANGUAGES:
                 order = CMSPlugin.objects.filter(
-                        placeholder_id=placeholder.pk, language=language,
-                        parent_id__isnull=True
-                    ).order_by('position', 'path').values_list('pk', flat=True)
+                    placeholder_id=placeholder.pk,
+                    language=language,
+                    parent_id__isnull=True
+                ).order_by(
+                    'position', 'path'
+                ).values_list(
+                    'pk', flat=True
+                )
                 reorder_plugins(placeholder, None, language, order)
 
                 for plugin in CMSPlugin.objects.filter(
-                        placeholder_id=placeholder.pk,
-                        language=language).order_by('depth', 'path'):
+                    placeholder_id=placeholder.pk, language=language
+                ).order_by('depth', 'path'):
+
                     order = CMSPlugin.objects.filter(
                         parent_id=plugin.pk
-                    ).order_by('position', 'path').values_list('pk', flat=True)
+                    ).order_by(
+                        'position', 'path'
+                    ).values_list(
+                        'pk', flat=True
+                    )
                     reorder_plugins(placeholder, plugin.pk, language, order)
 
     def post_copy(self, old_instance, new_old_ziplist):
@@ -411,21 +421,33 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         for parent in self.get_ancestors():
             try:
                 url = force_str(
-                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
-                                  args=[parent.pk]))
+                    admin_reverse(
+                        "%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                        args=[parent.pk]
+                    )
+                )
             except NoReverseMatch:
                 url = force_str(
-                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
-                                  args=[parent.pk]))
+                    admin_reverse(
+                        "%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                        args=[parent.pk]
+                    )
+                )
             breadcrumb.append({'title': force_str(parent.get_plugin_name()), 'url': url})
         try:
             url = force_str(
-                admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
-                              args=[self.pk]))
+                admin_reverse(
+                    "%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                    args=[self.pk]
+                )
+            )
         except NoReverseMatch:
             url = force_str(
-                admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
-                              args=[self.pk]))
+                admin_reverse(
+                    "%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                    args=[self.pk]
+                )
+            )
         breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
         return breadcrumb
 
