@@ -12,7 +12,7 @@ from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
-from django.utils.encoding import force_text, python_2_unicode_compatible, smart_str
+from django.utils.encoding import force_text, smart_str
 from django.utils.html import escapejs
 from django.utils.translation import ugettext, ugettext_lazy as _
 
@@ -22,7 +22,7 @@ from cms.models import CMSPlugin
 from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
 from cms.utils.conf import get_cms_setting
 
-from six import with_metaclass
+from six import python_2_unicode_compatible, with_metaclass
 
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):

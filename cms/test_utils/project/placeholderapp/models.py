@@ -1,10 +1,11 @@
 from django.db import models
 from django.urls import reverse
-from django.utils.encoding import python_2_unicode_compatible
 
 from cms.models.fields import PlaceholderField
 from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
+
+from six import python_2_unicode_compatible
 
 
 def dynamic_placeholder_1(instance):

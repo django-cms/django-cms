@@ -9,7 +9,7 @@ from django.db import connection, connections, models, router
 from django.db.models.base import ModelBase
 from django.urls import NoReverseMatch
 from django.utils import timezone
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.lru_cache import lru_cache
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -19,7 +19,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
-from six import text_type, with_metaclass
+from six import python_2_unicode_compatible, text_type, with_metaclass
 
 
 @lru_cache(maxsize=None)

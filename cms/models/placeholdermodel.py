@@ -8,7 +8,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models
 from django.template.defaultfilters import title
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 
 from cms.cache import invalidate_cms_page_cache
@@ -25,7 +25,7 @@ from cms.utils import get_language_from_request
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
-from six import string_types
+from six import python_2_unicode_compatible, string_types
 
 
 @python_2_unicode_compatible
