@@ -1,6 +1,8 @@
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
+from django.urls import NoReverseMatch
+
 from cms.constants import PUBLISHER_STATE_PENDING
 
 from django import template
@@ -144,7 +146,7 @@ def preview_link(page, language):
         try:
             # attempt to retrieve the localized path/slug and return
             return page.get_absolute_url(language, fallback=False)
-        except:
+        except NoReverseMatch:
             # no localized path/slug. therefore nothing to preview. stay on the same page.
             # perhaps the user should be somehow notified for this.
             return ''

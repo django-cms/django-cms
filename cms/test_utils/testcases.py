@@ -87,7 +87,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
         if v is not None:
             try:
                 v.__warningregistry__ = None
-            except:
+            except:  # noqa: E722
                 # Don't specify a particular exception type to handle in case
                 # some wacky object raises some wacky exception in response to
                 # the setattr attempt.

@@ -4,7 +4,7 @@ from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
@@ -453,7 +453,7 @@ class Page(models.Model):
         """
         try:
             return self.get_public_object().get_absolute_url(language, fallback)
-        except:
+        except [AttributeError, NoReverseMatch, TypeError]:
             return ''
 
     def get_draft_url(self, language=None, fallback=True):
@@ -463,7 +463,7 @@ class Page(models.Model):
         """
         try:
             return self.get_draft_object().get_absolute_url(language, fallback)
-        except:
+        except [AttributeError, NoReverseMatch, TypeError]:
             return ''
 
     def set_tree_node(self, site, target=None, position='first-child'):

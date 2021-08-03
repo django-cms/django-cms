@@ -8,15 +8,16 @@ import uuid
 import django
 from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
-from django.urls import re_path
+from django.urls import re_path, NoReverseMatch
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import (ObjectDoesNotExist,
-                                    PermissionDenied, ValidationError)
+from django.core.exceptions import (
+    ObjectDoesNotExist, PermissionDenied, ValidationError
+)
 from django.db import router, transaction
 from django.db.models import Q, Prefetch
 from django.http import (
@@ -1549,7 +1550,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 # In case it can't, object it's not taken into account
                 try:
                     force_str(obj.get_absolute_url())
-                except:
+                except [AttributeError, NoReverseMatch, TypeError]:
                     obj = None
             else:
                 obj = None
@@ -1566,7 +1567,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                         obj = None
                     try:
                         force_str(obj.get_absolute_url())
-                    except:
+                    except [AttributeError, NoReverseMatch, TypeError]:
                         obj = None
         if obj:
             if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode_active', False):

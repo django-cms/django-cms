@@ -63,7 +63,7 @@ class DocsTestCase(CMSTestCase):
             )
             try:
                 app.build()
-            except:
+            except:  # noqa: E722
                 print(status.getvalue())
                 raise
 
@@ -96,6 +96,6 @@ class DocsTestCase(CMSTestCase):
                 except SphinxWarning:
                     # while normally harmless, causes a test failure
                     pass
-                except:
+                except:  # noqa: E722
                     print(status.getvalue())
                     raise

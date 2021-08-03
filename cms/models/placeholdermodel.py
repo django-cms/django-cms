@@ -258,7 +258,7 @@ class Placeholder(models.Model):
                     try:
                         if field.exists():
                             self._attached_fields_cache.append(rel.field)
-                    except:
+                    except:  # noqa: E722
                         pass
         return self._attached_fields_cache
 
@@ -282,7 +282,7 @@ class Placeholder(models.Model):
                         if field.exists():
                             self._attached_field_cache = rel.field
                             break
-                    except:
+                    except:  # noqa: E722
                         pass
         return self._attached_field_cache
 

@@ -324,16 +324,16 @@ class AdminTestCase(AdminTestsBase):
             'level21', "nav_playground.html", "en",
             created_by=admin_user, published=True, parent=first_level_page
         )
-        second_level_page_bottom = create_page(  # noqa: F841
-            'level22', "nav_playground.html", "en",  # nopyflakes
+        second_level_page_bottom = create_page(  # noqa
+            'level22', "nav_playground.html", "en",
             created_by=admin_user, published=True, parent=self.reload(first_level_page)
         )
-        third_level_page = create_page(  # noqa: F841
-            'level3', "nav_playground.html", "en",  # nopyflakes
+        third_level_page = create_page(  # noqa
+            'level3', "nav_playground.html", "en",
             created_by=admin_user, published=True, parent=second_level_page_top
         )
-        fourth_level_page = create_page(  # noqa: F841
-            'level23', "nav_playground.html", "en",  # nopyflakes
+        fourth_level_page = create_page(  # noqa
+            'level23', "nav_playground.html", "en",
             created_by=admin_user, parent=self.reload(first_level_page)
         )
         self.assertEqual(Page.objects.all().count(), 9)
