@@ -1170,11 +1170,14 @@ class PagesTestCase(TransactionCMSTestCase):
         This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
         where the slug was not regenerated.
         """
-        parent = create_page('en-parent', "nav_playground.html", 'en',
-                             slug = 'en-parent', published=True)
-        child = create_page('en-child', "nav_playground.html", 'en',
-                            slug = 'en-child', parent=parent, published=True)
-        
+        parent = create_page(
+            'en-parent', "nav_playground.html", 'en',
+            slug='en-parent', published=True
+        )
+        child = create_page(
+            'en-child', "nav_playground.html", 'en',
+            slug='en-child', parent=parent, published=True
+        )
         create_title('de', 'de-child', child, slug='de-child')
 
         # Parent 'de' title created after child translation
@@ -1188,11 +1191,11 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get('/de/de-parent/de-child/')
         self.assertEqual(response.status_code, 200)
 
-    def  test_subpage_title_path_regeneration_after_parent_slug_change(self):    
+    def test_subpage_title_path_regeneration_after_parent_slug_change(self):
         """
         When a parent page slug changes,
         the child title path should be regenerated.
-        
+
         This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
         where the slug was not regenerated.
         """
