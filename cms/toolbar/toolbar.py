@@ -318,7 +318,7 @@ class CMSToolbar(BaseToolbar):
             with force_language(self.request_language):
                 try:
                     return self.obj.get_public_url()
-                except:
+                except:  # noqa: E722
                     pass
         return ''
 

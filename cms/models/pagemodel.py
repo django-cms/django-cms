@@ -453,7 +453,7 @@ class Page(models.Model):
         """
         try:
             return self.get_public_object().get_absolute_url(language, fallback)
-        except:
+        except:  # noqa: E722
             return ''
 
     def get_draft_url(self, language=None, fallback=True):

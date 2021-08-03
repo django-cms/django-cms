@@ -145,7 +145,7 @@ class DefaultLanguageChanger:
             with force_language(lang):
                 try:
                     return self.request.toolbar.obj.get_absolute_url()
-                except:
+                except:  # noqa: E722
                     pass
         elif view and not view.url_name in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
