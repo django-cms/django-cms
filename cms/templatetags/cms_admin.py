@@ -68,7 +68,8 @@ class TreePublishRow(Tag):
                 text = _("no content")
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
-            'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
+            'data-cms-tooltip="%s"></span>' % (cls, force_str(text))
+        )
 
 
 register.tag(TreePublishRow)
@@ -128,8 +129,10 @@ def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
     EXTENSION = 'svg'
     return mark_safe(
-        '<img src="%sicon-%s.%s" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), EXTENSION,
-                                                 value))
+        '<img src="%sicon-%s.%s" alt="%s" />' % (
+            CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), EXTENSION, value
+        )
+    )
 
 
 @register.filter
