@@ -16,7 +16,6 @@ from django.test import testcases
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.parse import unquote, urljoin
 from django.utils.timezone import now
 from django.utils.translation import activate, get_language
 from menus.menu_pool import menu_pool
@@ -34,6 +33,8 @@ from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
+
+from six.moves.urllib.parse import unquote, urljoin
 
 
 # Page urls

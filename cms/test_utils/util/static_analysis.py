@@ -4,7 +4,7 @@ from pyflakes import api
 from pyflakes.checker import Checker
 from pyflakes.reporter import Reporter
 
-from six import StringIO
+from six.moves import StringIO
 
 
 def _pyflakes_report_with_nopyflakes(self, messageClass, node, *args, **kwargs):

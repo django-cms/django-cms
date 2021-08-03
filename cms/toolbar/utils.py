@@ -4,11 +4,12 @@ import json
 
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_text
-from django.utils.six import text_type
 from django.utils.translation import get_language, override as force_language, ugettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.utils.urlutils import admin_reverse
+
+from six import text_type
 
 
 def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):

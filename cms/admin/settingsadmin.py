@@ -12,13 +12,14 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadReque
 from django.http.request import QueryDict
 from django.utils.html import conditional_escape
 from django.utils.translation import override
-from django.utils.six.moves.urllib.parse import urlparse
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
+
+from six.moves.urllib.parse import urlparse
 
 
 class SettingsAdmin(ModelAdmin):

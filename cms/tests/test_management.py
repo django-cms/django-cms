@@ -9,7 +9,6 @@ from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
 from django.test.utils import override_settings
-from django.utils.six.moves import StringIO
 
 from cms.api import create_page, add_plugin, create_title
 from cms.management.commands.subcommands.list import plugin_report
@@ -18,7 +17,10 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
 from cms.test_utils.testcases import CMSTestCase
+
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
+
+from six.moves import StringIO
 
 
 APPHOOK = "SampleApp"
