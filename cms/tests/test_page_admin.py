@@ -11,7 +11,6 @@ from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
-from django.utils import six
 from django.utils.encoding import force_text
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
@@ -35,6 +34,8 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import installed_apps
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
+
+from six import string_types
 
 
 class PageTreeLiParser(Parser):
@@ -1310,7 +1311,7 @@ class PageTest(PageTestBase):
             document.finalize()
             # Removing ROOT element if it's not necessary
             if len(document.children) == 1:
-                if not isinstance(document.children[0], six.string_types):
+                if not isinstance(document.children[0], string_types):
                     document = document.children[0]
             return document
 

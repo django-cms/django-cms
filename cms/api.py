@@ -15,7 +15,6 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
-from django.utils import six
 
 from cms import constants
 from cms.app_base import CMSApp
@@ -37,6 +36,8 @@ from cms.utils.permissions import _thread_locals
 from cms.utils.plugins import copy_plugins_to_placeholder
 from menus.menu_pool import menu_pool
 
+from six import string_types
+
 
 #===============================================================================
 # Helpers/Internals
@@ -57,7 +58,7 @@ def _verify_apphook(apphook, namespace):
         apphook_name = apphook.__class__.__name__
     elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         return apphook.__name__
-    elif isinstance(apphook, six.string_types):
+    elif isinstance(apphook, string_types):
         try:
             assert apphook in apphook_pool.apps
         except AssertionError:
@@ -81,7 +82,7 @@ def _verify_plugin_type(plugin_type):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
-    elif isinstance(plugin_type, six.string_types):
+    elif isinstance(plugin_type, string_types):
         try:
             plugin_model = plugin_pool.get_plugin(plugin_type).model
         except KeyError:

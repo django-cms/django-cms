@@ -1,7 +1,7 @@
-from django.utils import six
+from six import PY3
 
 
-if six.PY3:
+if PY3:
     class UnittestCompatMixin(object):
         pass
 else:

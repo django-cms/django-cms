@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
 
-from django.utils import six
+from six import with_metaclass
 
 
 class CMSApp(object):
@@ -105,7 +105,7 @@ class CMSAppConfig(object):
         self.app_config = django_app_config
 
 
-class CMSAppExtension(six.with_metaclass(ABCMeta)):
+class CMSAppExtension(with_metaclass(ABCMeta)):
     """Base class that all cms app extensions should inherit from"""
 
     @abstractmethod
