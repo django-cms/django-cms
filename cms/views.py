@@ -44,8 +44,8 @@ def details(request, slug):
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
             not request.toolbar.edit_mode_active
-            and not request.toolbar.show_toolbar
-            and not request.user.is_authenticated
+            and not request.toolbar.show_toolbar  # noqa: W503
+            and not request.user.is_authenticated  # noqa: W503
         )
     ):
         cache_content = get_page_cache(request)
