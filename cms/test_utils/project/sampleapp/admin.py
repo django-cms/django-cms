@@ -11,5 +11,6 @@ class PictureInline(admin.StackedInline):
 class CategoryAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     inlines = [PictureInline]
 
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(SampleAppConfig)
