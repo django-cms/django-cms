@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 
-from django.utils.decorators import available_attrs
-
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import GRANT_ALL_PERMISSIONS
 from cms.models import Page
@@ -14,6 +12,8 @@ from cms.utils.permissions import (
     get_page_actions_for_user,
     has_global_permission,
 )
+
+from cms.utils.compat.dj import available_attrs
 
 
 PAGE_ADD_CODENAME = get_model_permission_codename(Page, 'add')
