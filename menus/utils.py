@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import NoReverseMatch, reverse, resolve
+from django.urls import NoReverseMatch, reverse, resolve, Resolver404
 
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import (
@@ -139,13 +139,13 @@ class DefaultLanguageChanger:
         with force_language(page_language):
             try:
                 view = resolve(self.request.path_info)
-            except:
+            except Resolver404:
                 view = None
         if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
             with force_language(lang):
                 try:
                     return self.request.toolbar.obj.get_absolute_url()
-                except:
+                except [AttributeError, NoReverseMatch]:
                     pass
         elif view and not view.url_name in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
