@@ -189,36 +189,36 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
         # child of plugin_5
         plugin_5 = self.reload(plugin_5)
-        plugin_6 = add_plugin(  # nopyflakes noqa: F841
+        plugin_6 = add_plugin(  # noqa
             placeholder, "TextPlugin", "en",
             body="06", target=plugin_5
         )
 
         # child of plugin_6
         plugin_5 = self.reload(plugin_5)
-        plugin_7 = add_plugin(  # nopyflakes noqa: F841
+        plugin_7 = add_plugin(  # noqa
             placeholder, "TextPlugin", "en",
             body="07", target=plugin_5
         )
 
         # another child of plugin_2
         plugin_2 = self.reload(plugin_2)
-        plugin_8 = add_plugin(  # noqa: F841
-            placeholder, "TextPlugin", "en",  # nopyflakes
+        plugin_8 = add_plugin(  # noqa
+            placeholder, "TextPlugin", "en",
             body="08", target=plugin_2
         )
 
         # child of plugin_3
         plugin_3 = self.reload(plugin_3)
-        plugin_9 = add_plugin(  # noqa: F841
-            placeholder, "TextPlugin", "en",  # nopyflakes
+        plugin_9 = add_plugin(  # noqa
+            placeholder, "TextPlugin", "en",
             body="09", target=plugin_3
         )
 
         # child of plugin_4
         plugin_4 = self.reload(plugin_4)
-        plugin_10 = add_plugin(  # noqa: F841
-            placeholder, "TextPlugin", "en",  # nopyflakes
+        plugin_10 = add_plugin(  # noqa
+            placeholder, "TextPlugin", "en",
             body="10", target=plugin_4
         )
 

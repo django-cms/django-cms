@@ -94,7 +94,7 @@ class FileOutputWrapper:
         wrapper = self.section_wrapper(self)
         try:
             yield wrapper
-        except:
+        except:  # noqa: E722
             self.error('Checker failed, see traceback')
             raise
         self.errors += wrapper.errors
