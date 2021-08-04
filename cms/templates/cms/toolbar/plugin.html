@@ -1,4 +1,4 @@
-{% spaceless %}{% load i18n l10n sekizai_tags staticfiles cms_tags %}
+{% spaceless %}{% load i18n l10n sekizai_tags static cms_tags %}
 
 <template class="cms-plugin cms-plugin-start cms-plugin-{% if generic %}{{ generic.app_label }}-{{ generic.model_name }}-{% if attribute_name %}{{ attribute_name|slugify }}-{% endif %}{% endif %}{{ instance.pk|unlocalize }}{% if render_model_icon %} cms-render-model-icon{% elif render_model %} cms-render-model{% elif render_model_block %} cms-render-model cms-render-model-block{% elif render_model_add %} cms-render-model-add{% endif %}"></template>
 {% endspaceless %}{% if content %}{{ content }}{% elif render_model_icon %}<img src="{% static 'cms/img/toolbar/render_model_placeholder.png' %}">{% elif render_model_add %}<img src="{% static 'cms/img/toolbar/render_model_placeholder.png' %}">{% else %}{{ rendered_content }}{% endif %}{% spaceless %}
