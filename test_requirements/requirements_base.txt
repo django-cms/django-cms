@@ -16,7 +16,6 @@ iptools
 sphinx==1.8.5
 sphinxcontrib-spelling<7.0.0 # restriction for py35 tests
 pyflakes>=2.1
-pyenchant
 # required to run the server for integration tests
 djangocms-helper
 mock>=2.0.0
