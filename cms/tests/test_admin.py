@@ -1056,8 +1056,8 @@ class AdminInputSanitationTests(AdminTestsBase):
         with self.login_user_context(admin_user):
             request = self.get_request(
                 self.settings_admin_class.urls[0], post_data={
-                    "settings": "<script>alert('hello world')</script>",
+                    "settings": "<script>alert(\"hello world\")</script>",
                 })
             response = self.settings_admin_class.session_store(request)
 
-            self.assertEqual(response.content, b'"&lt;script&gt;alert(&#39;hello world&#39;)&lt;/script&gt;"')
+            self.assertEqual(response.content, b'"&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;"')
