@@ -1060,4 +1060,4 @@ class AdminInputSanitationTests(AdminTestsBase):
                 })
             response = self.settings_admin_class.session_store(request)
 
-            self.assertEqual(response.content, b'"&lt;script&gt;alert(&#39;hello world&#39;)&lt;/script&gt;"')
+            self.assertEqual(response.content, b'"&lt;script&gt;alert(&#x27;hello world&#x27;)&lt;/script&gt;"')
