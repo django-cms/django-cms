@@ -20,3 +20,4 @@ pyflakes>=2.1
 djangocms-helper
 mock>=2.0.0
 django-formtools
+mysqlclient==2.0.3
