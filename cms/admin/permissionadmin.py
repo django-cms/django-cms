@@ -12,7 +12,6 @@ from cms.admin.forms import GlobalPagePermissionAdminForm, PagePermissionInlineA
 from cms.exceptions import NoPermissionsException
 from cms.models import PagePermission, GlobalPagePermission
 from cms.utils import permissions, page_permissions
-from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import classproperty
 
@@ -38,8 +37,6 @@ class PagePermissionInlineAdmin(TabularInline):
     show_with_view_permissions = False
 
     def has_change_permission(self, request, obj=None):
-        if DJANGO_1_11:
-            return super().has_change_permission(request, obj)
         if not obj:
             return False
         return page_permissions.user_can_change_page_permissions(
@@ -49,8 +46,6 @@ class PagePermissionInlineAdmin(TabularInline):
         )
 
     def has_add_permission(self, request, obj=None):
-        if DJANGO_1_11:
-            return super().has_add_permission(request)
         return self.has_change_permission(request, obj)
 
     @classproperty

@@ -13,7 +13,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import (ObjectDoesNotExist,
                                     PermissionDenied, ValidationError)
-from django.db import router, transaction
+from django.db import transaction
 from django.db.models import Q, Prefetch
 from django.db.models.query import QuerySet
 from django.forms.fields import IntegerField
@@ -53,7 +53,6 @@ from cms.models import (
     Page,
     PageContent,
     PagePermission,
-    PageUrl,
     Placeholder,
     GlobalPagePermission,
 )
@@ -70,7 +69,6 @@ from cms.utils.i18n import (
 )
 from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.admin import jsonify_request
-from cms.utils.compat import DJANGO_2_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -352,20 +350,11 @@ class PageAdmin(admin.ModelAdmin):
         if obj is None:
             raise self._get_404_exception(object_id)
 
-        using = router.db_for_write(self.model)
-
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
         objs = [obj] + list(obj.get_descendant_pages())
 
-        if DJANGO_2_0:
-            get_deleted_objects_additional_kwargs = {
-                'opts': opts,
-                'using': using,
-                'user': request.user,
-            }
-        else:
-            get_deleted_objects_additional_kwargs = {'request': request}
+        get_deleted_objects_additional_kwargs = {'request': request}
         (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
             objs, admin_site=self.admin_site,
             **get_deleted_objects_additional_kwargs
@@ -1260,46 +1249,21 @@ class PageContentAdmin(admin.ModelAdmin):
             placeholder__in=placeholders,
             language=language,
         )
-        using = router.db_for_read(self.model)
-
-        if DJANGO_2_0:
-            to_delete_urls, __, perms_needed_url = get_deleted_objects(
-                [page_url],
-                using=using,
-                opts=PageUrl._meta,
-                user=request.user,
-                admin_site=self.admin_site,
-            )[:3]
-            to_delete_translations, __, perms_needed_translation = get_deleted_objects(
-                [page_content],
-                using=using,
-                opts=titleopts,
-                user=request.user,
-                admin_site=self.admin_site,
-            )[:3]
-            to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
-                saved_plugins,
-                using=using,
-                opts=CMSPlugin._meta,
-                user=request.user,
-                admin_site=self.admin_site,
-            )[:3]
-        else:
-            to_delete_urls, __, perms_needed_url = get_deleted_objects(
-                [page_url],
-                request=request,
-                admin_site=self.admin_site,
-            )[:3]
-            to_delete_translations, __, perms_needed_translation = get_deleted_objects(
-                [page_content],
-                request=request,
-                admin_site=self.admin_site,
-            )[:3]
-            to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
-                saved_plugins,
-                request=request,
-                admin_site=self.admin_site,
-            )[:3]
+        to_delete_urls, __, perms_needed_url = get_deleted_objects(
+            [page_url],
+            request=request,
+            admin_site=self.admin_site,
+        )[:3]
+        to_delete_translations, __, perms_needed_translation = get_deleted_objects(
+            [page_content],
+            request=request,
+            admin_site=self.admin_site,
+        )[:3]
+        to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
+            saved_plugins,
+            request=request,
+            admin_site=self.admin_site,
+        )[:3]
 
         to_delete_objects = [to_delete_urls, to_delete_plugins, to_delete_translations]
         perms_needed = set(

@@ -18,7 +18,6 @@ from cms.toolbar.utils import (
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
-from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (
@@ -528,10 +527,7 @@ class ContentRenderer(BaseRenderer):
         else:
             title = page.get_title_obj(self.request_language, fallback=False)
 
-            if DJANGO_1_11:
-                title._page_cache = page
-            else:
-                PageContent.page.field.set_cached_value(title, page)
+            PageContent.page.field.set_cached_value(title, page)
             # Creates any placeholders missing on the page
             placeholders = title.rescan_placeholders().values()
 

@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
-from django.db import router, transaction
+from django.db import transaction
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -36,7 +36,6 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import pre_placeholder_operation, post_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
 from cms.utils import get_current_site
-from cms.utils.compat import DJANGO_2_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_language_code
 from cms.utils.plugins import (
@@ -960,15 +959,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
             raise PermissionDenied(message)
 
         opts = plugin._meta
-        using = router.db_for_write(opts.model)
-        if DJANGO_2_0:
-            get_deleted_objects_additional_kwargs = {
-                'opts': opts,
-                'using': using,
-                'user': request.user,
-            }
-        else:
-            get_deleted_objects_additional_kwargs = {'request': request}
+        get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
             [plugin], admin_site=self.admin_site,
             **get_deleted_objects_additional_kwargs
@@ -1049,17 +1040,9 @@ class PlaceholderAdmin(admin.ModelAdmin):
             raise PermissionDenied(message)
 
         opts = Placeholder._meta
-        using = router.db_for_write(Placeholder)
         plugins = placeholder.get_plugins_list(language)
 
-        if DJANGO_2_0:
-            get_deleted_objects_additional_kwargs = {
-                'opts': opts,
-                'using': using,
-                'user': request.user,
-            }
-        else:
-            get_deleted_objects_additional_kwargs = {'request': request}
+        get_deleted_objects_additional_kwargs = {'request': request}
         deleted_objects, __, perms_needed, protected = get_deleted_objects(
             plugins, admin_site=self.admin_site,
             **get_deleted_objects_additional_kwargs
