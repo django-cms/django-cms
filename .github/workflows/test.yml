@@ -10,9 +10,9 @@ jobs:
       matrix:
         python-version: [ 3.6, 3.7, 3.8, ]  # latest release minus two
         requirements-file: [
-          django-1.11.txt,
           django-2.2.txt,
           django-3.0.txt,
+          django-3.1.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -57,9 +57,9 @@ jobs:
       matrix:
         python-version: [ 3.6, 3.7, 3.8, ]  # latest release minus two
         requirements-file: [
-          django-1.11.txt,
           django-2.2.txt,
           django-3.0.txt,
+          django-3.1.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -105,9 +105,9 @@ jobs:
       matrix:
         python-version: [ 3.6, 3.7, 3.8 ]  # latest release minus two
         requirements-file: [
-          django-1.11.txt,
           django-2.2.txt,
           django-3.0.txt,
+          django-3.1.txt,
         ]
         os: [
           ubuntu-20.04,
