@@ -39,7 +39,7 @@ class PagePermissionInlineAdmin(TabularInline):
 
     def has_change_permission(self, request, obj=None):
         if DJANGO_1_11:
-            return super(PagePermissionInlineAdmin, self).has_change_permission(request, obj)
+            return super().has_change_permission(request, obj)
         if not obj:
             return False
         return page_permissions.user_can_change_page_permissions(
@@ -50,7 +50,7 @@ class PagePermissionInlineAdmin(TabularInline):
 
     def has_add_permission(self, request, obj=None):
         if DJANGO_1_11:
-            return super(PagePermissionInlineAdmin, self).has_add_permission(request)
+            return super().has_add_permission(request)
         return self.has_change_permission(request, obj)
 
     @classproperty
@@ -107,7 +107,7 @@ class PagePermissionInlineAdmin(TabularInline):
                 exclude.append('can_move_page')
 
         kwargs['exclude'] = exclude
-        formset_cls = super(PagePermissionInlineAdmin, self).get_formset(request, obj=obj, **kwargs)
+        formset_cls = super().get_formset(request, obj=obj, **kwargs)
         qs = self.get_queryset(request)
         if obj is not None:
             qs = qs.filter(page=obj)

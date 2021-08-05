@@ -214,7 +214,7 @@ class PageUrl(AsTag):
         # settings.DEBUG=False.
         #
         try:
-            return super(PageUrl, self).get_value_for_context(context, **kwargs)
+            return super().get_value_for_context(context, **kwargs)
         except Page.DoesNotExist:
             return ''
 
@@ -245,7 +245,7 @@ class PlaceholderParser(Parser):
     def parse_blocks(self):
         for bit in getattr(self.kwargs['extra_bits'], 'value', self.kwargs['extra_bits']):
             if getattr(bit, 'value', bit.var.value) == 'or':
-                return super(PlaceholderParser, self).parse_blocks()
+                return super().parse_blocks()
         return
 
 
@@ -461,7 +461,7 @@ class CMSEditableObject(InclusionTag):
 
     def __init__(self, parser, tokens):
         self.parser = parser
-        super(CMSEditableObject, self).__init__(parser, tokens)
+        super().__init__(parser, tokens)
 
     def _is_editable(self, request):
         return (request and hasattr(request, 'toolbar') and request.toolbar.edit_mode_active)
@@ -947,7 +947,7 @@ class RenderUncachedPlaceholder(RenderPlaceholder):
 
     def _get_value(self, context, editable=True, **kwargs):
         kwargs['nocache'] = True
-        return super(RenderUncachedPlaceholder, self)._get_value(context, editable, **kwargs)
+        return super()._get_value(context, editable, **kwargs)
 
 
 class EmptyListValue(list, StringValue):
@@ -972,7 +972,7 @@ class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
             if self.name not in kwargs:
                 kwargs[self.name] = self.sequence_class()
             return False
-        return super(MultiValueArgumentBeforeKeywordArgument, self).parse(
+        return super().parse(
             parser,
             token,
             tagname,

@@ -137,7 +137,7 @@ class PageAdmin(admin.ModelAdmin):
         the "Save" page redirect
         """
         site = get_site(request)
-        preserved_filters_encoded = super(PageAdmin, self).get_preserved_filters(request)
+        preserved_filters_encoded = super().get_preserved_filters(request)
         preserved_filters = QueryDict(preserved_filters_encoded).copy()
         lang = get_site_language_from_request(request, site_id=site.pk)
 
@@ -147,7 +147,7 @@ class PageAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         site = get_site(request)
-        queryset = super(PageAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         queryset = queryset.filter(node__site=site)
         return queryset.select_related('node')
 
@@ -180,7 +180,7 @@ class PageAdmin(admin.ModelAdmin):
 
         if plugin_pool.registered_plugins:
             url_patterns += plugin_pool.get_patterns()
-        return url_patterns + super(PageAdmin, self).get_urls()
+        return url_patterns + super().get_urls()
 
     def get_inline_instances(self, request, obj=None):
         if obj and get_cms_setting('PERMISSION'):
@@ -189,7 +189,7 @@ class PageAdmin(admin.ModelAdmin):
             can_change_perms = False
 
         if can_change_perms:
-            return super(PageAdmin, self).get_inline_instances(request, obj)
+            return super().get_inline_instances(request, obj)
         return []
 
     def get_form(self, request, obj=None, **kwargs):
@@ -197,7 +197,7 @@ class PageAdmin(admin.ModelAdmin):
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
-        form = super(PageAdmin, self).get_form(request, obj, **kwargs)
+        form = super().get_form(request, obj, **kwargs)
         form._site = get_site(request)
         form._request = request
         return form
@@ -469,7 +469,7 @@ class PageAdmin(admin.ModelAdmin):
         QuerySet.delete(plugins)
         placeholders.delete()
 
-        super(PageAdmin, self).delete_model(request, obj)
+        super().delete_model(request, obj)
 
         send_post_page_operation(
             request=request,
@@ -825,7 +825,7 @@ class PageContentAdmin(admin.ModelAdmin):
         key is used if no field is provided. Return ``None`` if no match is
         found or the object_id fails validation.
         """
-        obj = super(PageContentAdmin, self).get_object(request, object_id, from_field)
+        obj = super().get_object(request, object_id, from_field)
 
         if obj:
             obj.page.title_cache[obj.language] = obj
@@ -845,7 +845,7 @@ class PageContentAdmin(admin.ModelAdmin):
         the "Save" page redirect
         """
         site = get_site(request)
-        preserved_filters_encoded = super(PageContentAdmin, self).get_preserved_filters(request)
+        preserved_filters_encoded = super().get_preserved_filters(request)
         preserved_filters = QueryDict(preserved_filters_encoded).copy()
         lang = get_site_language_from_request(request, site_id=site.pk)
 
@@ -856,7 +856,7 @@ class PageContentAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         site = get_site(request)
         languages = get_language_list(site.pk)
-        queryset = super(PageContentAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         queryset = queryset.filter(language__in=languages, page__node__site=site)
         return queryset.select_related('page__node')
 
@@ -873,7 +873,7 @@ class PageContentAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/change-navigation/$', self.change_innavigation),
             pat(r'^([0-9]+)/change-template/$', self.change_template),
         ]
-        return url_patterns + super(PageContentAdmin, self).get_urls()
+        return url_patterns + super().get_urls()
 
     def get_fieldsets(self, request, obj=None):
         form = self.get_form(request, obj, fields=None)
@@ -897,7 +897,7 @@ class PageContentAdmin(admin.ModelAdmin):
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
-        form = super(PageContentAdmin, self).get_form(
+        form = super().get_form(
             request,
             obj,
             form=self.get_form_class(request, obj),
@@ -976,7 +976,7 @@ class PageContentAdmin(admin.ModelAdmin):
             extra_context['show_language_tabs'] = len(extra_context['language_tabs'])
         extra_context['language'] = language
         extra_context.update(self.get_unihandecode_context(language))
-        return super(PageContentAdmin, self).add_view(request, form_url, extra_context=extra_context)
+        return super().add_view(request, form_url, extra_context=extra_context)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         """
@@ -1011,7 +1011,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         tab_language = get_site_language_from_request(request, site_id=site.pk)
         context.update(self.get_unihandecode_context(tab_language))
-        return super(PageContentAdmin, self).change_view(request, object_id, form_url=form_url, extra_context=context)
+        return super().change_view(request, object_id, form_url=form_url, extra_context=context)
 
     def get_filled_languages(self, request, page):
         site_id = get_site(request).pk

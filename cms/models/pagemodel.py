@@ -88,14 +88,14 @@ class TreeNode(MP_Node):
             kwargs['instance'].parent = self
         else:
             kwargs['parent'] = self
-        return super(TreeNode, self).add_child(**kwargs)
+        return super().add_child(**kwargs)
 
     def add_sibling(self, pos=None, *args, **kwargs):
         if len(kwargs) == 1 and 'instance' in kwargs:
             kwargs['instance'].parent_id = self.parent_id
         else:
             kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(*args, **kwargs)
+        return super().add_sibling(*args, **kwargs)
 
     def update(self, **data):
         cls = self.__class__
@@ -197,7 +197,7 @@ class Page(models.Model):
         app_label = 'cms'
 
     def __init__(self, *args, **kwargs):
-        super(Page, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.urls_cache = {}
         self.title_cache = {}
 
@@ -621,7 +621,7 @@ class Page(models.Model):
         if created:
             self.created_by = self.changed_by
 
-        super(Page, self).save(**kwargs)
+        super().save(**kwargs)
 
     def update(self, refresh=False, **data):
         cls = self.__class__

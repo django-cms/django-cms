@@ -14,7 +14,7 @@ class MultiWrapPlugin(CMSPluginBase):
     form = MultiWrapForm
 
     def save_model(self, request, obj, form, change):
-        response = super(MultiWrapPlugin, self).save_model(
+        response = super().save_model(
             request, obj, form, change
         )
         for x in range(int(form.cleaned_data['create'])):

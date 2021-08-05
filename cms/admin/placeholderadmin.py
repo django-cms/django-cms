@@ -92,7 +92,7 @@ class FrontendEditableAdminMixin(object):
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
-        return url_patterns + super(FrontendEditableAdminMixin, self).get_urls()
+        return url_patterns + super().get_urls()
 
     def _get_object_for_single_field(self, object_id, language):
         # Quick and dirty way to retrieve objects for django-hvad
@@ -164,7 +164,7 @@ class FrontendEditableAdminMixin(object):
 class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
 
     def __new__(cls, name, bases, attrs):
-        super_new = super(PlaceholderAdminMixinBase, cls).__new__
+        super_new = super().__new__
         parents = [b for b in bases if isinstance(b, PlaceholderAdminMixinBase)]
 
         if not parents:

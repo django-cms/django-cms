@@ -30,7 +30,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     they're not given.
     """
     def __new__(cls, name, bases, attrs):
-        super_new = super(CMSPluginBaseMetaclass, cls).__new__
+        super_new = super().__new__
         parents = [base for base in bases if isinstance(base, CMSPluginBaseMetaclass)]
         if not parents:
             # If this is CMSPluginBase itself, and not a subclass, don't do anything
@@ -145,7 +145,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     def __init__(self, model=None, admin_site=None):
         if admin_site:
-            super(CMSPluginBase, self).__init__(self.model, admin_site)
+            super().__init__(self.model, admin_site)
 
         self.object_successfully_changed = False
         self.placeholder = None
@@ -259,7 +259,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
         })
 
-        return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
+        return super().render_change_form(request, context, add, change, form_url, obj)
 
     def render_close_frame(self, request, obj, extra_context=None):
         try:
@@ -338,7 +338,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         pl.clear_cache(obj.language)
 
     def save_form(self, request, form, change):
-        obj = super(CMSPluginBase, self).save_form(request, form, change)
+        obj = super().save_form(request, form, change)
 
         for field, value in self._cms_initial_attributes.items():
             # Set the initial attribute hooks (if any)
@@ -391,7 +391,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         """
         Same as from base class except if there are no fields, show an info message.
         """
-        fieldsets = super(CMSPluginBase, self).get_fieldsets(request, obj)
+        fieldsets = super().get_fieldsets(request, obj)
 
         for name, data in fieldsets:
             if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets

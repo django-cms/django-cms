@@ -108,7 +108,7 @@ class PageContent(models.Model):
         # delete template cache
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
-        super(PageContent, self).save(**kwargs)
+        super().save(**kwargs)
 
     def toggle_in_navigation(self, set_to=None):
         '''

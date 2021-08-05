@@ -3,7 +3,7 @@ from abc import ABCMeta, abstractmethod
 from six import with_metaclass
 
 
-class CMSApp(object):
+class CMSApp():
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
     _urls = []
     #: list of menu classes: example: ``_menus = [MyAppMenu]``
@@ -33,7 +33,7 @@ class CMSApp(object):
                     )
                 )
             cls.app_config.cmsapp = cls
-        return super(CMSApp, cls).__new__(cls)
+        return super().__new__(cls)
 
     def get_configs(self):
         """

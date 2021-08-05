@@ -45,32 +45,32 @@ class GenericCmsPermissionAdmin(object):
         return True
 
     def get_form(self, request, obj=None, **kwargs):
-        form_class = super(GenericCmsPermissionAdmin, self).get_form(request, obj, **kwargs)
+        form_class = super().get_form(request, obj, **kwargs)
         form_class._current_user = request.user
         return form_class
 
     def get_queryset(self, request):
-        queryset = super(GenericCmsPermissionAdmin, self).get_queryset(request)
+        queryset = super().get_queryset(request)
         site = Site.objects.get_current(request)
         user_ids = self.get_subordinates(request.user, site).values_list('pk', flat=True)
         return queryset.filter(pk__in=user_ids)
 
     def has_add_permission(self, request):
-        has_model_perm = super(GenericCmsPermissionAdmin, self).has_add_permission(request)
+        has_model_perm = super().has_add_permission(request)
 
         if not has_model_perm:
             return False
         return self._has_change_permissions_permission(request)
 
     def has_change_permission(self, request, obj=None):
-        has_model_perm = super(GenericCmsPermissionAdmin, self).has_change_permission(request, obj)
+        has_model_perm = super().has_change_permission(request, obj)
 
         if not has_model_perm:
             return False
         return self._has_change_permissions_permission(request)
 
     def has_delete_permission(self, request, obj=None):
-        has_model_perm = super(GenericCmsPermissionAdmin, self).has_delete_permission(request, obj)
+        has_model_perm = super().has_delete_permission(request, obj)
 
         if not has_model_perm:
             return False
@@ -91,7 +91,7 @@ class PageUserAdmin(GenericCmsPermissionAdmin, admin_class):
         return get_subordinate_users(user, site).values_list('pk', flat=True)
 
     def get_readonly_fields(self, request, obj=None):
-        fields = super(PageUserAdmin, self).get_readonly_fields(request, obj)
+        fields = super().get_readonly_fields(request, obj)
 
         if not request.user.is_superuser:
             # Non superusers can't set superuser status on
@@ -106,7 +106,7 @@ class PageUserAdmin(GenericCmsPermissionAdmin, admin_class):
             obj.is_staff = True
             # Set the created_by field to the current user
             obj.created_by = request.user
-        super(PageUserAdmin, self).save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
 
 class PageUserGroupAdmin(GenericCmsPermissionAdmin, admin.ModelAdmin):

@@ -200,7 +200,7 @@ class BaseItem(with_metaclass(ABCMeta)):
 class TemplateItem(BaseItem):
 
     def __init__(self, template, extra_context=None, side=LEFT):
-        super(TemplateItem, self).__init__(side)
+        super().__init__(side)
         self.template = template
         self.extra_context = extra_context
 
@@ -264,7 +264,7 @@ class LinkItem(BaseItem):
     template = "cms/toolbar/items/item_link.html"
 
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, side=LEFT):
-        super(LinkItem, self).__init__(side)
+        super().__init__(side)
         self.name = name
         self.url = url
         self.active = active
@@ -289,7 +289,7 @@ class FrameItem(BaseItem):
 
     def __init__(self, name, url, active=False, disabled=False,
                  extra_classes=None, on_close=None, side=LEFT):
-        super(FrameItem, self).__init__(side)
+        super().__init__(side)
         self.name = "%s..." % force_text(name)
         self.url = url
         self.active = active
@@ -332,7 +332,7 @@ class AjaxItem(BaseItem):
     def __init__(self, name, action, csrf_token, data=None, active=False,
                  disabled=False, extra_classes=None,
                  question=None, side=LEFT, on_success=None, method='POST'):
-        super(AjaxItem, self).__init__(side)
+        super().__init__(side)
         self.name = name
         self.action = action
         self.active = active
@@ -448,7 +448,7 @@ class ButtonList(BaseItem):
     template = "cms/toolbar/items/button_list.html"
 
     def __init__(self, identifier=None, extra_classes=None, side=LEFT):
-        super(ButtonList, self).__init__(side)
+        super().__init__(side)
         self.extra_classes = extra_classes or []
         self.buttons = []
         self.identifier = identifier
@@ -512,7 +512,7 @@ class Dropdown(ButtonList):
     template = "cms/toolbar/items/dropdown.html"
 
     def __init__(self, *args, **kwargs):
-        super(Dropdown, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.primary_button = None
 
     def __repr__(self):

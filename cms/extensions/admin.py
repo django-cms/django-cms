@@ -23,7 +23,7 @@ class PageExtensionAdmin(ExtensionAdmin):
             page = obj.extended_object
         if not user_can_change_page(request.user, page):
             raise PermissionDenied()
-        super(PageExtensionAdmin, self).save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
         if not obj.extended_object.has_change_permission(request.user):
@@ -54,7 +54,7 @@ class PageExtensionAdmin(ExtensionAdmin):
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass
-        return super(ExtensionAdmin, self).add_view(request, form_url, extra_context)
+        return super().add_view(request, form_url, extra_context)
 
 
 class TitleExtensionAdmin(ExtensionAdmin):
@@ -67,7 +67,7 @@ class TitleExtensionAdmin(ExtensionAdmin):
             title = obj.extended_object
         if not user_can_change_page(request.user, page=title.page):
             raise PermissionDenied()
-        super(TitleExtensionAdmin, self).save_model(request, obj, form, change)
+        super().save_model(request, obj, form, change)
 
     def delete_model(self, request, obj):
         page = obj.extended_object.page
@@ -100,4 +100,4 @@ class TitleExtensionAdmin(ExtensionAdmin):
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass
-        return super(ExtensionAdmin, self).add_view(request, form_url, extra_context)
+        return super().add_view(request, form_url, extra_context)

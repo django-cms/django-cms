@@ -13,7 +13,7 @@ class LinkPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         context['link'] = instance.get_link()
-        return super(LinkPlugin, self).render(context, instance, placeholder)
+        return super().render(context, instance, placeholder)
 
 
 plugin_pool.register_plugin(LinkPlugin)

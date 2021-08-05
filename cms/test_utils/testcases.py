@@ -91,7 +91,7 @@ class BaseCMSTestCase(object):
     counter = 1
 
     def _fixture_setup(self):
-        super(BaseCMSTestCase, self)._fixture_setup()
+        super()._fixture_setup()
         self.create_fixtures()
         activate("en")
 
@@ -101,7 +101,7 @@ class BaseCMSTestCase(object):
     def _post_teardown(self):
         menu_pool.clear()
         cache.clear()
-        super(BaseCMSTestCase, self)._post_teardown()
+        super()._post_teardown()
         set_current_user(None)
 
     def login_user_context(self, user):

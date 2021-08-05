@@ -430,7 +430,7 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
     apply to this specific page
     """
     def setUp(self):
-        super(RestrictedViewPermissionTests, self).setUp()
+        super().setUp()
         self.group = Group.objects.create(name='testgroup')
         self.pages = [self.page]
         self.expected = [self.page]

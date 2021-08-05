@@ -44,10 +44,10 @@ class TestNoI18N(CMSTestCase):
 
     def setUp(self):
         clear_url_caches()
-        super(TestNoI18N, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(TestNoI18N, self).tearDown()
+        super().tearDown()
         clear_url_caches()
 
     def test_language_chooser(self):

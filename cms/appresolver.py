@@ -53,7 +53,7 @@ class AppRegexURLResolver(URLResolver):
     def __init__(self, *args, **kwargs):
         self.page_id = None
         self.url_patterns_dict = {}
-        super(AppRegexURLResolver, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def urlconf_module(self):

@@ -94,7 +94,7 @@ class PluginModelBase(ModelBase):
     """
 
     def __new__(cls, name, bases, attrs):
-        super_new = super(PluginModelBase, cls).__new__
+        super_new = super().__new__
         # remove RenderMeta from the plugin class
         attr_meta = attrs.pop('RenderMeta', None)
 
@@ -270,7 +270,7 @@ class CMSPlugin(with_metaclass(PluginModelBase, models.Model)):
         return data
 
     def refresh_from_db(self, *args, **kwargs):
-        super(CMSPlugin, self).refresh_from_db(*args, **kwargs)
+        super().refresh_from_db(*args, **kwargs)
 
         # Delete this internal cache to let the cms populate it
         # on demand.

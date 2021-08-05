@@ -46,7 +46,7 @@ class PageSelectFormField(forms.MultiValueField):
             LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
             LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
-        super(PageSelectFormField, self).__init__(fields, *args, **kwargs)
+        super().__init__(fields, *args, **kwargs)
 
     def compress(self, data_list):
         if data_list:
@@ -70,7 +70,7 @@ class PageSelectFormField(forms.MultiValueField):
             # this will cause django to always return True because of the '1'
             # so we simply follow django's default behavior when initial is None and data is "empty"
             data = ['' for x in range(0, len(data))]
-        return super(PageSelectFormField, self).has_changed(initial, data)
+        return super().has_changed(initial, data)
 
     def _has_changed(self, initial, data):
         return self.has_changed(initial, data)
@@ -84,14 +84,14 @@ class PageSmartLinkField(forms.CharField):
                  ajax_view=None, *args, **kwargs):
         self.placeholder_text = placeholder_text
         widget = self.widget(ajax_view=ajax_view)
-        super(PageSmartLinkField, self).__init__(max_length=max_length, min_length=min_length,
+        super().__init__(max_length=max_length, min_length=min_length,
                                                  widget=widget, *args, **kwargs)
 
     def widget_attrs(self, widget):
-        attrs = super(PageSmartLinkField, self).widget_attrs(widget)
+        attrs = super().widget_attrs(widget)
         attrs.update({'placeholder_text': self.placeholder_text})
         return attrs
 
     def clean(self, value):
         value = self.to_python(value).strip()
-        return super(PageSmartLinkField, self).clean(value)
+        return super().clean(value)

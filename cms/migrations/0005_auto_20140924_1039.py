@@ -66,7 +66,7 @@ def _inc_path(obj):
 
 class MP_AddRootHandler(MP_AddHandler):
     def __init__(self, **kwargs):
-        super(MP_AddRootHandler, self).__init__()
+        super().__init__()
         self.kwargs = kwargs
 
     def process(self):
@@ -92,7 +92,7 @@ class MP_AddRootHandler(MP_AddHandler):
 
 class MP_AddChildHandler(MP_AddHandler):
     def __init__(self, node, model, **kwargs):
-        super(MP_AddChildHandler, self).__init__()
+        super().__init__()
         self.node = node
         self.node_cls = node.__class__
         self.kwargs = kwargs

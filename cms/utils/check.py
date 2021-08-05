@@ -123,7 +123,7 @@ class FileSectionWrapper(FileOutputWrapper):
         finish_skip(message): End this (skipped) section
     """
     def __init__(self, wrapper):
-        super(FileSectionWrapper, self).__init__(wrapper.stdout, wrapper.stderr)
+        super().__init__(wrapper.stdout, wrapper.stderr)
         self.wrapper = wrapper
 
     def write_line(self, message=''):

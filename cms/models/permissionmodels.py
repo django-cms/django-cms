@@ -86,7 +86,7 @@ class AbstractPagePermission(models.Model):
         app_label = 'cms'
 
     def clean(self):
-        super(AbstractPagePermission, self).clean()
+        super().clean()
 
         if not self.user and not self.group:
             raise ValidationError(_('Please select user or group.'))
@@ -135,7 +135,7 @@ class AbstractPagePermission(models.Model):
         if not self.user and not self.group:
             # don't allow `empty` objects
             return
-        return super(AbstractPagePermission, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def get_configured_actions(self):
         actions = [action for action in self.get_permissions_by_action()
@@ -224,7 +224,7 @@ class PagePermission(AbstractPagePermission):
         return "%s :: %s has: %s" % (page, self.audience, force_text(self.get_grant_on_display()))
 
     def clean(self):
-        super(PagePermission, self).clean()
+        super().clean()
 
         if self.can_add and self.grant_on == ACCESS_PAGE:
             # this is a misconfiguration - user can add/move page to current

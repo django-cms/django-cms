@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 
 
 def use_draft(request):

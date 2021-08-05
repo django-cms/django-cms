@@ -1,4 +1,4 @@
-
+# -*- coding: utf-8 -*-
 
 import datetime
 import iptools
@@ -937,7 +937,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def tearDown(self):
         Example1.objects.all().delete()
-        super(EditModelTemplateTagTest, self).tearDown()
+        super().tearDown()
 
     def test_markup_toolbar_url_model(self):
         superuser = self.get_superuser()

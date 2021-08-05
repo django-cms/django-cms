@@ -89,7 +89,7 @@ class RenderingEmptyTestCase(CMSTestCase):
 class RenderingTestCase(CMSTestCase):
 
     def setUp(self):
-        super(RenderingTestCase, self).setUp()
+        super().setUp()
         self.test_user = self.get_superuser()
 
         with self.login_user_context(self.test_user):

@@ -63,7 +63,7 @@ class PlaceholderToolbar(CMSToolbar):
         self.page = self.request.current_page
 
     def post_template_populate(self):
-        super(PlaceholderToolbar, self).post_template_populate()
+        super().post_template_populate()
         self.add_wizard_button()
         self.render_object_editable_buttons()
 

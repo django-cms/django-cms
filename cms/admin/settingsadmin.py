@@ -55,7 +55,7 @@ class SettingsAdmin(ModelAdmin):
             obj = model.objects.get(user=request.user)
         except model.DoesNotExist:
             return self.add_view(request)
-        return super(SettingsAdmin, self).change_view(request, str(obj.pk))
+        return super().change_view(request, str(obj.pk))
 
     def session_store(self, request):
         """

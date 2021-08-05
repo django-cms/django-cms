@@ -105,7 +105,7 @@ class PluginsTestBaseCase(CMSTestCase):
         self._login_context.__exit__(None, None, None)
 
     def get_request(self, *args, **kwargs):
-        request = super(PluginsTestBaseCase, self).get_request(*args, **kwargs)
+        request = super().get_request(*args, **kwargs)
         request.placeholder_media = Media()
         request.toolbar = CMSToolbar(request)
         return request
