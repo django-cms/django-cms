@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 """
 This module manages placeholder caching. We use a cache-versioning strategy

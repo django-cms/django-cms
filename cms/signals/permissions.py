@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 from cms.cache.permissions import clear_user_permission_cache
 from cms.models import PageUser, PageUserGroup

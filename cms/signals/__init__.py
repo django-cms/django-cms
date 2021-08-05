@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 from cms.signals.apphook import debug_server_restart, trigger_server_restart
 from cms.signals.log_entries import log_page_operations, log_placeholder_operations

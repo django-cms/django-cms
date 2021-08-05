@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from classytags.core import Tag
 from classytags.helpers import InclusionTag
 
