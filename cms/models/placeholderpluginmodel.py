@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
 from django.db import models

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from html import unescape
 
 from django.contrib.auth import get_user_model

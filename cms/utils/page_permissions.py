@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import wraps
 
 from cms.cache.permissions import get_permission_cache, set_permission_cache

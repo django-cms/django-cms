@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.functional import SimpleLazyObject
 
 from cms.utils.compat.dj import MiddlewareMixin

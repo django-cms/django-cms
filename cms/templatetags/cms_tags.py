@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import namedtuple, OrderedDict
 from copy import copy
 from datetime import datetime

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from mock import call, Mock, patch
 
 from django.forms.models import model_to_dict

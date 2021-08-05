@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 from logging import getLogger
 from os.path import join

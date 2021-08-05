@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.forms import MediaDefiningClass
 
 from cms.exceptions import LanguageError

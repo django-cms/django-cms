@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import sys
 from contextlib import contextmanager
 from shutil import rmtree as _rmtree

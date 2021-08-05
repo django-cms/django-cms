@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django import forms
 from django.apps import apps
 from django.contrib.auth import get_user_model, get_permission_codename

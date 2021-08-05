@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 import datetime
 import pickle

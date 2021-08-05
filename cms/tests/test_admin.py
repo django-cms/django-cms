@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin

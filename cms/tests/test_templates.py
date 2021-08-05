@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from imp import load_module, PY_SOURCE
 import os.path
 

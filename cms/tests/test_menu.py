@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import OrderedDict
 
 from django.core.exceptions import ImproperlyConfigured

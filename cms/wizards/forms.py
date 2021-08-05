@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django import forms
 
 from cms.models import Page

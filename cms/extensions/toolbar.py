@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.utils.urlutils import admin_reverse
 from cms.toolbar_base import CMSToolbar
 from cms.utils import get_language_list

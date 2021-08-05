@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django import template
 from django.contrib.sites.models import Site
 from django.urls import reverse, NoReverseMatch

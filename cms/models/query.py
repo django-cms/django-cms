@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db.models.query import QuerySet
 
 from treebeard.mp_tree import MP_NodeQuerySet

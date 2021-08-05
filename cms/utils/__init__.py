@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from django.conf import settings
 from django.core.files.storage import get_storage_class

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import uuid
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.forms.fields import EMPTY_VALUES

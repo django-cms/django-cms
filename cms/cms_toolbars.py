@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model

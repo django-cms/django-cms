@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
 
 from cms.cms_toolbars import ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK

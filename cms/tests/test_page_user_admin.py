@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.messages.storage.cookie import CookieStorage
 from django.forms.models import model_to_dict

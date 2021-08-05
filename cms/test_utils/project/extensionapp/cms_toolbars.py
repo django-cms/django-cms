@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.test_utils.project.extensionapp.models import MyTitleExtension, MyPageExtension
 from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse

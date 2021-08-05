@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 

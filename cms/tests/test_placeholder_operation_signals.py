@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.api import add_plugin
 from cms.models import Placeholder, UserSettings
 from cms.operations import (

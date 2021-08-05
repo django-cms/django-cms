@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
