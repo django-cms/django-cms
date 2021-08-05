@@ -1,5 +1,5 @@
 from django.apps import apps
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms.wizards.helpers import get_entries, get_entry
 from cms.wizards.wizard_base import Wizard

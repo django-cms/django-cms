@@ -3,7 +3,7 @@
 import importlib
 
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms.utils.conf import get_cms_setting
 

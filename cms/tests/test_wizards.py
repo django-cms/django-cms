@@ -9,7 +9,7 @@ from django.template import TemplateSyntaxError
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.encoding import smart_text
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms import app_registration
 from cms.api import create_page

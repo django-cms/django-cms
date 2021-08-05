@@ -2,7 +2,7 @@ from copy import deepcopy
 from collections import defaultdict, deque, OrderedDict
 
 from django.utils.encoding import force_text
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin

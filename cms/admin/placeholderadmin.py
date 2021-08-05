@@ -20,7 +20,7 @@ from django.template.response import TemplateResponse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import conditional_escape
-from django.utils.translation import get_language_from_path, ugettext as _
+from django.utils.translation import get_language_from_path, gettext as _
 
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
