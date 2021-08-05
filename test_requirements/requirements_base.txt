@@ -17,7 +17,7 @@ sphinx==1.8.5
 sphinxcontrib-spelling<7.0.0 # restriction for py35 tests
 pyflakes>=2.1
 # required to run the server for integration tests
-djangocms-helper
+django-app-helper
 mock>=2.0.0
 django-formtools
 mysqlclient==2.0.3
