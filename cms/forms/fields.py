@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
-from django.forms.fields import EMPTY_VALUES
+from django.core.validators import EMPTY_VALUES
 from django.utils.translation import ugettext_lazy as _
 
 from cms.forms.utils import get_site_choices, get_page_choices
