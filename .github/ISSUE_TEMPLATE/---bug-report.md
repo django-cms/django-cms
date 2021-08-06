@@ -2,7 +2,7 @@
 name: "\U0001F41E Bug report"
 about: Something isn't working as expected? Here is the right place to report.
 title: "[BUG]"
-labels: 'priority: high, type: bug'
+labels:
 assignees: ''
 
 ---
