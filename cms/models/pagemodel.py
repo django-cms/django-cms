@@ -1429,10 +1429,7 @@ class Page(models.Model):
         force_reload = (force_reload or language not in self.title_cache)
 
         if force_reload:
-            from cms.models.titlemodels import Title
-
-            titles = Title.objects.filter(page=self)
-            for title in titles:
+            for title in self.title_set.all():
                 self.title_cache[title.language] = title
 
         if fallback and not self.title_cache.get(language):
