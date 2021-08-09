@@ -34,8 +34,6 @@ from cms.utils.compat.dj import installed_apps
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
-from six import string_types
-
 
 class PageTreeLiParser(Parser):
 
@@ -1310,7 +1308,7 @@ class PageTest(PageTestBase):
             document.finalize()
             # Removing ROOT element if it's not necessary
             if len(document.children) == 1:
-                if not isinstance(document.children[0], string_types):
+                if not isinstance(document.children[0], str):
                     document = document.children[0]
             return document
 

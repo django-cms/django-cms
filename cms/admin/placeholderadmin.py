@@ -47,7 +47,7 @@ from cms.views import render_object_edit, render_object_structure, render_object
 
 from urllib.parse import parse_qsl, urlparse
 
-from six import add_metaclass, get_unbound_function, get_method_function
+from six import get_unbound_function, get_method_function
 
 
 _no_default = object()
@@ -175,8 +175,7 @@ class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
         return super_new(cls, name, bases, attrs)
 
 
-@add_metaclass(PlaceholderAdminMixinBase)
-class PlaceholderAdminMixin(object):
+class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
     pass
 
 

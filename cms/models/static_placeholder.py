@@ -8,8 +8,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms.models.fields import PlaceholderField
 
-from six import text_type
-
 
 def static_slotname(instance):
     """
@@ -51,7 +49,7 @@ class StaticPlaceholder(models.Model):
         return self.get_name()
 
     def get_name(self):
-        return self.name or self.code or text_type(self.pk)
+        return self.name or self.code or str(self.pk)
     get_name.short_description = _(u'static placeholder name')
 
     def clean(self):

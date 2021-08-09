@@ -25,8 +25,6 @@ from cms.utils import get_language_from_request
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
-from six import string_types
-
 
 class Placeholder(models.Model):
     """
@@ -460,7 +458,7 @@ class Placeholder(models.Model):
             if not vary_on:
                 # None, or an empty iterable
                 continue
-            if isinstance(vary_on, string_types):
+            if isinstance(vary_on, str):
                 if vary_on.lower() not in vary_list:
                     vary_list.add(vary_on.lower())
             else:

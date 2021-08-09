@@ -12,8 +12,6 @@ from cms.utils import get_current_site
 from cms.utils.compat.dj import RegexPattern, URLPattern, URLResolver
 from cms.utils.i18n import get_language_list
 
-from six import string_types
-
 
 APP_RESOLVERS = []
 
@@ -156,7 +154,7 @@ def _set_permissions(patterns, exclude_permissions):
 
 def get_app_urls(urls):
     for urlconf in urls:
-        if isinstance(urlconf, string_types):
+        if isinstance(urlconf, str):
             mod = import_module(urlconf)
             if not hasattr(mod, 'urlpatterns'):
                 raise ImproperlyConfigured(

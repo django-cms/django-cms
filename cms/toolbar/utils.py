@@ -8,8 +8,6 @@ from django.utils.translation import get_language, override as force_language, g
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.utils.urlutils import admin_reverse
 
-from six import text_type
-
 
 def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
     label = placeholder.get_label() or ''
@@ -20,7 +18,7 @@ def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
     data = {
         'type': 'placeholder',
         'name': force_text(label),
-        'placeholder_id': text_type(placeholder.pk),
+        'placeholder_id': str(placeholder.pk),
         'plugin_restriction': allowed_plugins or [],
         'addPluginHelpTitle': force_text(help_text),
         'urls': {

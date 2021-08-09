@@ -40,7 +40,7 @@ from cms.utils.urlutils import admin_reverse
 
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
-from six import string_types, integer_types
+from six import integer_types
 
 
 NULL = object()
@@ -67,7 +67,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if request.current_page and request.current_page.pk == page_lookup.pk:
             return request.current_page
         return page_lookup
-    if isinstance(page_lookup, string_types):
+    if isinstance(page_lookup, str):
         page_lookup = {'reverse_id': page_lookup}
     elif isinstance(page_lookup, integer_types):
         page_lookup = {'pk': page_lookup}
@@ -512,7 +512,7 @@ class CMSEditableObject(InclusionTag):
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(edit_fields) \
-                                                        if not isinstance('edit_fields', string_types) else edit_fields
+                                                        if not isinstance('edit_fields', str) else edit_fields
             else:
                 instance.get_plugin_name = u"%s %s" % (smart_text(_('Add')), smart_text(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
@@ -917,7 +917,7 @@ class RenderPlaceholder(AsTag):
         if not placeholder:
             return ''
 
-        if isinstance(placeholder, string_types):
+        if isinstance(placeholder, str):
             placeholder = PlaceholderModel.objects.get(slot=placeholder)
 
         content = renderer.render_placeholder(
