@@ -19,7 +19,7 @@ from cms.utils.urlutils import admin_reverse
 
 from functools import lru_cache
 
-from six import python_2_unicode_compatible, text_type
+from six import text_type
 
 
 @lru_cache(maxsize=None)
@@ -147,7 +147,6 @@ class PluginModelBase(ModelBase):
         return new_class
 
 
-@python_2_unicode_compatible
 class CMSPlugin(models.Model, metaclass=PluginModelBase):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should

@@ -4,10 +4,7 @@ from django.utils.encoding import force_text
 
 from cms.models import CMSPlugin, Placeholder
 
-from six import python_2_unicode_compatible
 
-
-@python_2_unicode_compatible
 class AliasPluginModel(CMSPlugin):
     """
     AliasPlugin is deprecated,

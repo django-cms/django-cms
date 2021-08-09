@@ -25,10 +25,9 @@ from cms.utils import get_language_from_request
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
-from six import python_2_unicode_compatible, string_types
+from six import string_types
 
 
-@python_2_unicode_compatible
 class Placeholder(models.Model):
     """
     Attributes:

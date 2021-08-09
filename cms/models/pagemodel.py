@@ -26,15 +26,12 @@ from cms.utils.i18n import get_current_language
 
 from menus.menu_pool import menu_pool
 
-from six import python_2_unicode_compatible
-
 from treebeard.mp_tree import MP_Node
 
 
 logger = getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class TreeNode(MP_Node):
 
     parent = models.ForeignKey(
@@ -143,7 +140,6 @@ class TreeNode(MP_Node):
             child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
-@python_2_unicode_compatible
 class Page(models.Model):
     """
     A simple hierarchical page model
@@ -1057,7 +1053,6 @@ class Page(models.Model):
         return self.get_page_content_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
 
 
-@python_2_unicode_compatible
 class PageUrl(models.Model):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True)
     path = models.CharField(_("Path"), max_length=255, db_index=True, null=True)

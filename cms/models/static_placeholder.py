@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from cms.models.fields import PlaceholderField
 
-from six import python_2_unicode_compatible, text_type
+from six import text_type
 
 
 def static_slotname(instance):
@@ -19,7 +19,6 @@ def static_slotname(instance):
     return instance.code
 
 
-@python_2_unicode_compatible
 class StaticPlaceholder(models.Model):
     CREATION_BY_TEMPLATE = 'template'
     CREATION_BY_CODE = 'code'

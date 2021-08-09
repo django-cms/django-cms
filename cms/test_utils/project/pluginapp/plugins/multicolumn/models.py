@@ -1,9 +1,6 @@
 from cms.models import CMSPlugin
 
-from six import python_2_unicode_compatible
 
-
-@python_2_unicode_compatible
 class MultiColumns(CMSPlugin):
     """
     A plugin that has sub Column classes
