@@ -4,10 +4,8 @@ from cms.exceptions import LanguageError
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import get_language_object
 
-from six import with_metaclass
 
-
-class CMSToolbar(with_metaclass(MediaDefiningClass)):
+class CMSToolbar(metaclass=MediaDefiningClass):
     supported_apps = None
 
     def __init__(self, request, toolbar, is_current_app, app_path):

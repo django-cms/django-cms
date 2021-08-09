@@ -8,8 +8,6 @@ from django.utils.functional import Promise
 
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 
-from six import with_metaclass
-
 
 class ItemSearchResult(object):
     def __init__(self, item, index):
@@ -33,7 +31,7 @@ def may_be_lazy(thing):
         return thing
 
 
-class ToolbarAPIMixin(with_metaclass(ABCMeta)):
+class ToolbarAPIMixin(metaclass=ABCMeta):
     REFRESH_PAGE = REFRESH_PAGE
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
@@ -175,7 +173,7 @@ class ToolbarAPIMixin(with_metaclass(ABCMeta)):
         return item
 
 
-class BaseItem(with_metaclass(ABCMeta)):
+class BaseItem(metaclass=ABCMeta):
     toolbar = None
     template = None
 
@@ -373,7 +371,7 @@ class Break(BaseItem):
         self.identifier = identifier
 
 
-class BaseButton(with_metaclass(ABCMeta)):
+class BaseButton(metaclass=ABCMeta):
     toolbar = None
     template = None
 

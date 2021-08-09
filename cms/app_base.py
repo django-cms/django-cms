@@ -1,7 +1,5 @@
 from abc import ABCMeta, abstractmethod
 
-from six import with_metaclass
-
 
 class CMSApp():
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
@@ -104,7 +102,7 @@ class CMSAppConfig(object):
         self.app_config = django_app_config
 
 
-class CMSAppExtension(with_metaclass(ABCMeta)):
+class CMSAppExtension(metaclass=ABCMeta):
     """Base class that all cms app extensions should inherit from"""
 
     @abstractmethod

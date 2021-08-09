@@ -19,7 +19,7 @@ from cms.utils.urlutils import admin_reverse
 
 from functools import lru_cache
 
-from six import python_2_unicode_compatible, text_type, with_metaclass
+from six import python_2_unicode_compatible, text_type
 
 
 @lru_cache(maxsize=None)
@@ -148,7 +148,7 @@ class PluginModelBase(ModelBase):
 
 
 @python_2_unicode_compatible
-class CMSPlugin(with_metaclass(PluginModelBase, models.Model)):
+class CMSPlugin(models.Model, metaclass=PluginModelBase):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
