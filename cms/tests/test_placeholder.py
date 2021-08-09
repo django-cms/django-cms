@@ -34,7 +34,6 @@ from cms.toolbar.utils import (
     get_object_structure_url,
     get_toolbar_from_request,
 )
-from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
                                    get_placeholder_conf, get_placeholders, _get_nodelist,
                                    _scan_placeholders)
@@ -52,7 +51,7 @@ def _render_placeholder(placeholder, context, **kwargs):
     return content_renderer.render_placeholder(placeholder, context, **kwargs)
 
 
-class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
+class PlaceholderTestCase(TransactionCMSTestCase):
     def setUp(self):
         u = self._create_user("test", True, True)
 
