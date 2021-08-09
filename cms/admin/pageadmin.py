@@ -301,7 +301,7 @@ class PageAdmin(admin.ModelAdmin):
         """
         request = args[0]
 
-        if request.is_ajax():
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             query_term = request.GET.get('q', '').strip('/')
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
