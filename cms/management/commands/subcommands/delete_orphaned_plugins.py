@@ -1,7 +1,5 @@
 from cms.management.commands.subcommands.list import plugin_report
 
-from six.moves import input
-
 from .base import SubcommandsCommand
 
 

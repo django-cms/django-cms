@@ -1,4 +1,7 @@
 import sys
+
+from io import StringIO
+
 from contextlib import contextmanager
 from shutil import rmtree as _rmtree
 from tempfile import template, mkdtemp, _exists
@@ -6,8 +9,6 @@ from cms.apphook_pool import apphook_pool
 
 from django.contrib.auth import get_user_model
 from django.utils.translation import get_language, activate
-
-from six.moves import StringIO
 
 
 class NULL:

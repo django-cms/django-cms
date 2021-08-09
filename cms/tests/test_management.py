@@ -1,4 +1,7 @@
 import uuid
+
+from io import StringIO
+
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.util.context_managers import apphooks
 
@@ -17,8 +20,6 @@ from cms.test_utils.fixtures.navextenders import NavextendersFixture
 from cms.test_utils.testcases import CMSTestCase
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-
-from six.moves import StringIO
 
 
 APPHOOK = "SampleApp"

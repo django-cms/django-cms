@@ -52,10 +52,7 @@ def get_apps():
 
 
 def available_attrs(fn):
-    if six.PY3:
-        return WRAPPER_ASSIGNMENTS
-    else:
-        return tuple(a for a in WRAPPER_ASSIGNMENTS if hasattr(fn, a))
+    return WRAPPER_ASSIGNMENTS
 
 
 def get_middleware():

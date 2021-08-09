@@ -40,8 +40,6 @@ from cms.utils.urlutils import admin_reverse
 
 from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
 
-from six import integer_types
-
 
 NULL = object()
 DeclaredPlaceholder = namedtuple('DeclaredPlaceholder', ['slot', 'inherit'])
@@ -69,7 +67,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         return page_lookup
     if isinstance(page_lookup, str):
         page_lookup = {'reverse_id': page_lookup}
-    elif isinstance(page_lookup, integer_types):
+    elif isinstance(page_lookup, int):
         page_lookup = {'pk': page_lookup}
     elif not isinstance(page_lookup, dict):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')

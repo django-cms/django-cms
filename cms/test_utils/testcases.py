@@ -2,6 +2,8 @@ import json
 import sys
 import warnings
 
+from urllib.parse import unquote, urljoin
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -32,8 +34,6 @@ from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
-
-from six.moves.urllib.parse import unquote, urljoin
 
 
 # Page urls

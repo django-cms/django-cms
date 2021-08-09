@@ -2,6 +2,8 @@ from functools import update_wrapper
 import copy
 import json
 
+from urllib.parse import urlparse
+
 from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
@@ -17,8 +19,6 @@ from cms.models import UserSettings
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
-
-from six.moves.urllib.parse import urlparse
 
 
 class SettingsAdmin(ModelAdmin):
