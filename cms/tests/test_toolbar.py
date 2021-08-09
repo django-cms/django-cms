@@ -179,8 +179,10 @@ class ToolbarTests(ToolbarTestBase):
 
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<script type="text/javascript" src="/static/samplemap/js/sampleapp.js"></script>')
-            self.assertContains(response, '<link href="/static/samplemap/css/sampleapp.css"')
+
+        self.assertContains(response, 'src="/static/samplemap/js/sampleapp.js"')
+        self.assertContains(response, 'href="/static/samplemap/css/sampleapp.css"')
+
         toolbar_pool.toolbars = old_pool
         toolbar_pool._discovered = True
 
