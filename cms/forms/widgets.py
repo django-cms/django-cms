@@ -1,3 +1,5 @@
+from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.forms.widgets import MultiWidget, Select, TextInput
@@ -159,11 +161,14 @@ class UserSelectAdminWidget(Select):
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
-            add_url = admin_reverse('cms_pageuser_add')
+            if settings.AUTH_USER_MODEL:
+                auth_model = apps.get_model(settings.AUTH_USER_MODEL)
+                add_url = admin_reverse(f"{auth_model._meta.app_label}_{auth_model._meta.model_name}_add")
+            else:
+                add_url = admin_reverse('cms_pageuser_add')
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
         return mark_safe(u''.join(output))
-
 
 class AppHookSelect(Select):
 
