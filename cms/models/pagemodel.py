@@ -18,6 +18,7 @@ from django.utils.translation import (
 )
 
 from cms import constants
+from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
@@ -564,6 +565,8 @@ class Page(models.Model):
                 self.mark_as_published(language)
                 self.mark_descendants_as_published(language)
         self.clear_cache(menu=True)
+        if get_cms_setting('PERMISSION'):
+            clear_permission_cache()
         return self
 
     def _copy_titles(self, target, language, published):
@@ -827,6 +830,8 @@ class Page(models.Model):
         if created:
             self.created_by = self.changed_by
         super().save(**kwargs)
+        if created and get_cms_setting('PERMISSION'):
+            clear_permission_cache()
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
