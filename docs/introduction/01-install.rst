@@ -2,16 +2,16 @@
 
 .. _install-django-cms-tutorial:
 
-#####################
+######################
 Installing django CMS
-#####################
+######################
 
 The setup is incredibly simple, and in this django CMS tutorial, we’ll take you through
 the first five steps to help get you started.
 
-****************************
+*****************************
 What you need to get started
-****************************
+*****************************
 
 First of all, you don’t need to be a senior developer or have prior experience as a developer
 with Django or Python to create your first django CMS demo website. The added benefit of django CMS, is it’s free.
@@ -33,9 +33,9 @@ Setup Docker (Step 1)
 
 Install docker from `here <https://docs.docker.com/get-docker/>`_
 
-***************************************
+****************************************
 Run the demo project in docker (Step 2)
-***************************************
+****************************************
 
 Info: The `demo project <https://github.com/django-cms/django-cms-quickstart>`_ is a minimal
 django project with some additional requirements in the requirements.txt.
@@ -56,9 +56,9 @@ Open your browser and insert http://localhost:8000/; there you should be invited
 and continue with Step 4: create your first page
 
 
-*******************************
+********************************
 Create your first page (Step 3)
-*******************************
+********************************
 
 * Once you login you can press Create on the top right.
 * Then you will see a pop-up window where the “New page” is marked blue.
@@ -80,9 +80,9 @@ click Create.
 
 Here is your newly created page.
 
-*******************************
+*********************************
 Publish your first page (Step 4)
-*******************************
+*********************************
 
 The page we just created is just a draft and needs to be published once you finish.
 As an editor, only you can see and edit your drafts, other visitors to your site will only see your published pages.
