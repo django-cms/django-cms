@@ -64,7 +64,7 @@ Create your first page (Step 3)
 * Then you will see a pop-up window where the “New page” is marked blue.
 * Press New Page and select Next.
 
-.. image:: /introduction/images/create_page_with_django_cms.png
+.. image:: /introduction/images/create_page_with_django_cms1.png
    :alt: create a page with django cms
    :width: 400
    :align: center
@@ -73,7 +73,7 @@ Create your first page (Step 3)
 After selecting Next, you will add in your title and some basic text content for the new page,
 click Create.
 
-.. image:: /introduction/images/create_page_with_django2_cms.png
+.. image:: /introduction/images/create_page_with_django_cms2.png
    :alt: create a page with django cms
    :width: 400
    :align: center
