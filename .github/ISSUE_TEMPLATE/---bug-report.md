@@ -2,7 +2,7 @@
 name: "\U0001F41E Bug report"
 about: Something isn't working as expected? Here is the right place to report.
 title: "[BUG]"
-labels: 'priority: high, type: bug'
+labels:
 assignees: ''
 
 ---
@@ -54,3 +54,12 @@ A clear and concise description of what is actually happening.
 Add any other context about the problem such as environment,
 CMS/Python/Django versions, logs etc. here.
 -->
+
+## Do you want to help fix this issue?
+
+<!-- 
+The django CMS project is managed and kept alive by its open source community and is backed by the [django CMS Association](https://www.django-cms.org/en/about-us/). We therefore welcome any help and are grateful if people contribute to the project. Please use 'x' to check the items below.
+-->
+
+* [ ] Yes, I want to help fix this issue and I will join #workgroup-pr-review on [Slack](https://www.django-cms.org/slack) to confirm with the community that a PR is welcome. 
+* [ ] No, I only want to report the issue. 
