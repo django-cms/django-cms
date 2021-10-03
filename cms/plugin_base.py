@@ -9,7 +9,6 @@ from django.contrib import messages
 from django.core.exceptions import (
     ImproperlyConfigured,
     ObjectDoesNotExist,
-    ValidationError,
 )
 from django.utils.encoding import force_str
 from django.utils.html import escapejs
@@ -162,7 +161,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             template = None
 
         if not template:
-            raise ValidationError("plugin has no render_template: %s" % self.__class__)
+            raise ImproperlyConfigured("plugin has no render_template: %s" % self.__class__)
         return template
 
     @classmethod
