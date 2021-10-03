@@ -47,10 +47,11 @@ Open the terminal application on your computer and go to a safe folder (i.e. cd 
 
       git clone git@github.com:django-cms/django-cms-quickstart.git
       cd django-cms-quickstart
-      docker-compose build
-      docker-compose up -d
-      docker-compose run web python manage.py migrate
-      docker-compose run web python manage.py createsuperuser
+      docker compose build web
+      docker compose up -d database_default
+      docker compose run web python manage.py migrate
+      docker compose run web python manage.py createsuperuser
+      docker compose up -d
 
 Open your browser and insert http://localhost:8000/; there you should be invited to login
 and continue with Step 4: create your first page
