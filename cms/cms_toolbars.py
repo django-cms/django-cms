@@ -303,8 +303,9 @@ class PageToolbar(CMSToolbar):
         return self.page_change_permission
 
     def page_is_pending(self, page, language):
-        return (page.publisher_public_id and
-                page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING)
+        return (
+            page.publisher_public_id and page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING
+        )
 
     def in_apphook(self):
         with force_language(self.toolbar.request_language):
@@ -468,14 +469,19 @@ class PageToolbar(CMSToolbar):
             languages = get_language_dict(self.current_site.pk)
 
             remove = [(code, languages.get(code, code)) for code in self.page.get_languages() if code in languages]
-            add = [l for l in languages.items() if l not in remove]
-            copy = [(code, name) for code, name in languages.items() if code != self.current_lang and (code, name) in remove]
+            add = [lang for lang in languages.items() if lang not in remove]
+            copy = [
+                (code, name) for code, name in languages.items()
+                if code != self.current_lang and (code, name) in remove
+            ]
 
             if add or remove or copy:
                 language_menu.add_break(ADD_PAGE_LANGUAGE_BREAK)
 
             if add:
-                add_plugins_menu = language_menu.get_or_create_menu('{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation'))
+                add_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation')
+                )
 
                 if self.page.is_page_type:
                     page_change_url = admin_reverse('cms_pagetype_change', args=(self.page.pk,))
@@ -492,14 +498,18 @@ class PageToolbar(CMSToolbar):
                 else:
                     translation_delete_url = admin_reverse('cms_page_delete_translation', args=(self.page.pk,))
 
-                remove_plugins_menu = language_menu.get_or_create_menu('{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation'))
+                remove_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation')
+                )
                 disabled = len(remove) == 1
                 for code, name in remove:
                     url = add_url_parameters(translation_delete_url, language=code)
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
-                copy_plugins_menu = language_menu.get_or_create_menu('{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins'))
+                copy_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins')
+                )
                 title = _('from %s')
                 question = _('Are you sure you want to copy all plugins from %s?')
 
@@ -552,7 +562,9 @@ class PageToolbar(CMSToolbar):
             # when the Content Manager is at the root of the app-hook,
             # some of the page options still make sense.
             current_page_menu = self.toolbar.get_or_create_menu(
-                PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
+                PAGE_MENU_IDENTIFIER, _('Page'),
+                position=1, disabled=self.in_apphook() and not self.in_apphook_root()
+            )
 
             new_page_params = {'edit': 1}
             new_sub_page_params = {'edit': 1, 'parent_node': self.page.node_id}
@@ -649,13 +661,16 @@ class PageToolbar(CMSToolbar):
                         active = self.page.template == path
                         if path == TEMPLATE_INHERITANCE_MAGIC:
                             templates_menu.add_break(TEMPLATE_MENU_BREAK)
-                        templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
-                                                     on_success=refresh)
+                        templates_menu.add_ajax_item(
+                            name, action=action, data={'template': path}, active=active, on_success=refresh
+                        )
 
             # page type
             if not self.page.is_page_type:
                 page_type_url = admin_reverse('cms_pagetype_add')
-                page_type_url = add_url_parameters(page_type_url, source=self.page.pk, language=self.toolbar.request_language)
+                page_type_url = add_url_parameters(
+                    page_type_url, source=self.page.pk, language=self.toolbar.request_language
+                )
                 page_type_disabled = not edit_mode or not can_add_root_page
                 current_page_menu.add_modal_item(_('Save as Page Type'), page_type_url, disabled=page_type_disabled)
 
@@ -720,10 +735,7 @@ class PageToolbar(CMSToolbar):
                 revert_question = _('Are you sure you want to revert to live?')
                 # Only show this action if the page has pending changes and a public version
                 is_enabled = (
-                    edit_mode
-                    and can_change
-                    and self.page.is_dirty(self.current_lang)
-                    and self.page.publisher_public
+                    edit_mode and can_change and self.page.is_dirty(self.current_lang) and self.page.publisher_public
                 )
                 current_page_menu.add_ajax_item(
                     _('Revert to live'),
@@ -744,5 +756,6 @@ class PageToolbar(CMSToolbar):
                 delete_url = admin_reverse('cms_page_delete', args=(self.page.pk,))
             delete_disabled = not edit_mode or not user_can_delete_page(self.request.user, page=self.page)
             on_delete_redirect_url = self.get_on_delete_redirect_url()
-            current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
-                                             disabled=delete_disabled)
+            current_page_menu.add_modal_item(
+                _('Delete page'), url=delete_url, on_close=on_delete_redirect_url, disabled=delete_disabled
+            )

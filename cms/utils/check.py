@@ -94,7 +94,7 @@ class FileOutputWrapper:
         wrapper = self.section_wrapper(self)
         try:
             yield wrapper
-        except:
+        except:  # noqa: E722
             self.error('Checker failed, see traceback')
             raise
         self.errors += wrapper.errors
@@ -271,10 +271,12 @@ def check_plugin_instances(output):
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
         else:
-            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if "
-                                 "your site works, you should run the 'manage.py cms list plugins' \ncommand and then "
-                                 "the 'manage.py cms delete-orphaned-plugins' command. \nThis will alter your "
-                                 "database; read the documentation before using it.")
+            section.finish_error(
+                "There are potentially serious problems with the plugins in your database. \nEven if "
+                "your site works, you should run the 'manage.py cms list plugins' \ncommand and then "
+                "the 'manage.py cms delete-orphaned-plugins' command. \nThis will alter your "
+                "database; read the documentation before using it."
+            )
 
 
 @define_check
@@ -284,7 +286,8 @@ def check_copy_relations(output):
     from cms.extensions.models import BaseExtension
     from cms.models.pluginmodel import CMSPlugin
 
-    def c_to_s(klass): return '%s.%s' % (klass.__module__, klass.__name__)
+    def c_to_s(klass):
+        return '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):
         for cls in inspect.getmro(model):

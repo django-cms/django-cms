@@ -78,7 +78,10 @@ class FrontendEditableAdminMixin:
         Register the url for the single field edit view
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
@@ -224,7 +227,10 @@ class PlaceholderAdminMixin:
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
         url_patterns = [
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
@@ -622,23 +628,25 @@ class PlaceholderAdminMixin:
         parent_id = get_int(request.POST.get('plugin_parent', ""), None)
         target_language = request.POST['target_language']
         move_a_copy = request.POST.get('move_a_copy')
-        move_a_copy = (move_a_copy and move_a_copy != "0" and
-                       move_a_copy.lower() != "false")
+        move_a_copy = (
+            move_a_copy and move_a_copy != "0" and move_a_copy.lower() != "false"
+        )
         move_to_clipboard = placeholder == request.toolbar.clipboard
         source_placeholder = plugin.placeholder
 
         order = request.POST.getlist("plugin_order[]")
 
         parent_plugin = None
-        if parent_id != None:
+        if parent_id is not None:
             parent_plugin = self._get_plugin_from_id(parent_id)
 
         if placeholder != source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
-                has_reached_plugin_limit(placeholder, plugin.plugin_type,
-                                         target_language, template=template,
-                                         parent_plugin=parent_plugin)
+                has_reached_plugin_limit(
+                    placeholder, plugin.plugin_type, target_language,
+                    template=template, parent_plugin=parent_plugin
+                )
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
 

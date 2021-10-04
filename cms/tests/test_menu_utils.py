@@ -10,7 +10,8 @@ from menus.utils import find_selected, language_changer_decorator, DefaultLangua
 
 
 class DumbPageLanguageUrl(PageLanguageUrl):
-    def __init__(self): pass
+    def __init__(self):
+        pass
 
 
 class MenuUtilsTests(CMSTestCase):

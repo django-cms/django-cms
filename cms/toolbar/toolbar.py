@@ -21,7 +21,7 @@ from classytags.utils import flatten_context
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
-from django.urls import Resolver404, resolve
+from django.urls import Resolver404, resolve, NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.translation import override as force_language
 
@@ -318,7 +318,7 @@ class CMSToolbar(BaseToolbar):
             with force_language(self.request_language):
                 try:
                     return self.obj.get_public_url()
-                except:
+                except:  # noqa: E722
                     pass
         return ''
 
@@ -327,10 +327,10 @@ class CMSToolbar(BaseToolbar):
             with force_language(self.request_language):
                 try:
                     return self.obj.get_draft_url()
-                except:
+                except NoReverseMatch:
                     try:
                         return self.obj.get_absolute_url()
-                    except:
+                    except NoReverseMatch:
                         pass
         return ''
 

@@ -16,13 +16,14 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
 
     def fill_placeholder(self, placeholder=None):
         if placeholder is None:
-            placeholder = Placeholder(slot=u"some_slot")
+            placeholder = Placeholder(slot="some_slot")
             placeholder.save()  # a good idea, if not strictly necessary
 
 
         # plugin in placeholder
-        plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"01",
+        plugin_1 = add_plugin(
+            placeholder, "TextPlugin", "en",
+            body="01",
         )
         plugin_1.save()
 
@@ -31,8 +32,9 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         # properly.
 
         # child of plugin_1
-        plugin_2 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"02",
+        plugin_2 = add_plugin(
+            placeholder, "TextPlugin", "en",
+            body="02",
         )
         plugin_1 = self.reload(plugin_1)
         plugin_2.parent = plugin_1

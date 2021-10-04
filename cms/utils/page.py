@@ -176,8 +176,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
             page
             .get_ancestor_pages()
             .filter(
-                Q(publication_date__gt=now)
-                | Q(publication_end_date__lt=now),
+                Q(publication_date__gt=now) | Q(publication_end_date__lt=now),
             )
         )
         if unpublished_ancestors.exists():
@@ -199,14 +198,16 @@ def get_available_slug(site, path, language, suffix='copy', modified=False, curr
     base, _, slug = path.rpartition('/')
     pages = get_all_pages_from_path(site, path, language)
     if current:
-        pages = pages.exclude(Q(pk=current.pk) | Q(publisher_public_id=current.pk) | Q(publisher_draft__pk=current.pk))
+        pages = pages.exclude(
+            Q(pk=current.pk) | Q(publisher_public_id=current.pk) | Q(publisher_draft__pk=current.pk)
+        )
 
     if pages.exists():
         match = SUFFIX_REGEX.match(slug)
 
         if match and modified:
             _next = int(match.groups()[-1]) + 1
-            slug = SUFFIX_REGEX.sub('\g<1>-{}'.format(_next), slug)
+            slug = SUFFIX_REGEX.sub(r'\g<1>-{}'.format(_next), slug)
         elif suffix:
             slug += '-' + suffix + '-2'
         else:

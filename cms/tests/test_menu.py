@@ -19,8 +19,9 @@ from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
-from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
-                                           SoftrootFixture, ExtendedMenusFixture)
+from cms.test_utils.fixtures.menus import (
+    MenusFixture, SubMenusFixture, SoftrootFixture, ExtendedMenusFixture
+)
 from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE
 from cms.test_utils.util.context_managers import apphooks, LanguageOverride
 from cms.test_utils.util.mock import AttributeObject
@@ -1472,17 +1473,25 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         A
         |-B
           |-C
-          \-D (not in nav)
+          |-D (not in nav)
     """
     def test_not_in_navigation(self):
-        a = create_page('A', 'nav_playground.html', 'en', published=True,
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', parent=b,
-                        published=True, in_navigation=True)
-        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
-                    published=True, in_navigation=False)
+        a = create_page(
+            'A', 'nav_playground.html', 'en',
+            published=True, in_navigation=True, reverse_id='a'
+        )
+        b = create_page(
+            'B', 'nav_playground.html', 'en',
+            parent=a, published=True, in_navigation=True
+        )
+        c = create_page(
+            'C', 'nav_playground.html', 'en',
+            parent=b, published=True, in_navigation=True
+        )
+        create_page(
+            'D', 'nav_playground.html', 'en',
+            parent=self.reload(b), published=True, in_navigation=False
+        )
         context = self.get_context(a.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
         tpl.render(context)
@@ -1608,16 +1617,24 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             A
             |-B
               |-C
-              \-D (not in nav)
+              |-D (not in nav)
         """
-        a = create_page('A', 'nav_playground.html', 'en', published=True,
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                        published=True, in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', parent=b,
-                        published=True, in_navigation=True)
-        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
-                    published=True, in_navigation=False)
+        a = create_page(
+            'A', 'nav_playground.html', 'en',
+            published=True, in_navigation=True, reverse_id='a'
+        )
+        b = create_page(
+            'B', 'nav_playground.html', 'en',
+            parent=a, published=True, in_navigation=True
+        )
+        c = create_page(
+            'C', 'nav_playground.html', 'en',
+            parent=b, published=True, in_navigation=True
+        )
+        create_page(
+            'D', 'nav_playground.html', 'en',
+            parent=self.reload(b), published=True, in_navigation=False
+        )
 
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
@@ -1633,6 +1650,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                 # Actually seems to run:
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
                 tpl.render(context)
+
             nodes = context['children']
             self.assertEqual(len(nodes), 1, nodes)
             node = nodes[0]
@@ -1652,12 +1670,18 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             |-B
             C (soft_root)
         """
-        a = create_page('A', 'nav_playground.html', 'en', published=True,
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', published=True,
-                        in_navigation=True, soft_root=True)
+        a = create_page(
+            'A', 'nav_playground.html', 'en',
+            published=True, in_navigation=True, reverse_id='a'
+        )
+        b = create_page(
+            'B', 'nav_playground.html', 'en',
+            parent=a, published=True, in_navigation=True
+        )
+        c = create_page(
+            'C', 'nav_playground.html', 'en',
+            published=True, in_navigation=True, soft_root=True
+        )
         context = self.get_context(a.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' %}")
         tpl.render(context)
@@ -1833,24 +1857,26 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         B1     B2
         C1 C2  C3 C4
         """
-        l = 'nav_playground.html'
+        template = 'nav_playground.html'
         kw = dict(published=True, in_navigation=True)
-        a = create_page('a', l, 'en', **kw)
-        b1 = create_page('b1', l, 'en', parent=a, **kw)
-        b2 = create_page('b2', l, 'en', parent=a, **kw)
-        c1 = create_page('c1', l, 'en', parent=b1, **kw)
-        c2 = create_page('c2', l, 'en', parent=b1, **kw)
-        c3 = create_page('c3', l, 'en', parent=b2, **kw)
-        c4 = create_page('c4', l, 'en', parent=b2, **kw)
+        a = create_page('a', template, 'en', **kw)
+        b1 = create_page('b1', template, 'en', parent=a, **kw)
+        b2 = create_page('b2', template, 'en', parent=a, **kw)
+        c1 = create_page('c1', template, 'en', parent=b1, **kw)
+        c2 = create_page('c2', template, 'en', parent=b1, **kw)
+        c3 = create_page('c3', template, 'en', parent=b2, **kw)
+        c4 = create_page('c4', template, 'en', parent=b2, **kw)
         self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
         self.site = get_current_site()
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
         self.other = self._create_user("other", is_staff=False, is_superuser=False)
-        PagePermission.objects.create(page=b1, user=self.user, can_view=True,
-                                      grant_on=ACCESS_PAGE_AND_DESCENDANTS)
-        PagePermission.objects.create(page=b2, user=self.other, can_view=True,
-                                      grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        PagePermission.objects.create(
+            page=b1, user=self.user, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS
+        )
+        PagePermission.objects.create(
+            page=b2, user=self.other, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS
+        )
         attrs = {
             'user': self.user,
             'REQUEST': {},

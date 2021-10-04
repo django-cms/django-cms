@@ -9,4 +9,5 @@ class StaticPlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     exclude = ('creation_method',)
     list_filter = ('creation_method', 'site')
 
+
 admin.site.register(StaticPlaceholder, StaticPlaceholderAdmin)

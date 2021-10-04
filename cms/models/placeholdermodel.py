@@ -39,7 +39,7 @@ class Placeholder(models.Model):
     class Meta:
         app_label = 'cms'
         permissions = (
-            (u"use_structure", u"Can use Structure mode"),
+            ("use_structure", "Can use Structure mode"),
         )
 
     def __str__(self):
@@ -258,7 +258,7 @@ class Placeholder(models.Model):
                     try:
                         if field.exists():
                             self._attached_fields_cache.append(rel.field)
-                    except:
+                    except:  # noqa: E722
                         pass
         return self._attached_fields_cache
 
@@ -282,7 +282,7 @@ class Placeholder(models.Model):
                         if field.exists():
                             self._attached_field_cache = rel.field
                             break
-                    except:
+                    except:  # noqa: E722
                         pass
         return self._attached_field_cache
 
