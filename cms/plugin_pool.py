@@ -50,18 +50,17 @@ class PluginPool:
     def validate_templates(self, plugin=None):
         """
         Plugins templates are validated at this stage
-
         """
         if plugin:
             plugins = [plugin]
         else:
             plugins = self.plugins.values()
         for plugin in plugins:
-            if (plugin.render_plugin and not type(plugin.render_plugin) == property
-                    or hasattr(plugin.model, 'render_template')
-                    or hasattr(plugin, 'get_render_template')):
-                if (plugin.render_template is None and
-                        not hasattr(plugin, 'get_render_template')):
+            if (plugin.render_plugin and not type(
+                    plugin.render_plugin) == property or hasattr(
+                    plugin.model, 'render_template') or hasattr(plugin, 'get_render_template')):
+
+                if (plugin.render_template is None and not hasattr(plugin, 'get_render_template')):
                     raise ImproperlyConfigured(
                         "CMS Plugins must define a render template, "
                         "a get_render_template method or "

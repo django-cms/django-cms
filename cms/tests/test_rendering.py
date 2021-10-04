@@ -215,7 +215,7 @@ class RenderingTestCase(CMSTestCase):
         self.test_page10 = self.reload(p10.publisher_public)
 
     def strip_rendered(self, content):
-        return content.strip().replace(u"\n", u"")
+        return content.strip().replace("\n", "")
 
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def render(self, page, template=None, context_vars=None, request=None):
@@ -284,9 +284,12 @@ class RenderingTestCase(CMSTestCase):
         content_renderer = self.get_content_renderer()
         r = content_renderer.render_plugin(instance, context, self.test_placeholders['main'])
         expected = (
-            self.test_data['text_main'] + '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +
-            self.test_data['text_main'] + '|main|original_context_var_ok|test_plugin_processor_ok|' +
-            self.test_data['text_main'] + '|main|original_context_var_ok'
+            self.test_data['text_main'] +  # noqa: W504
+            '|test_passed_plugin_context_processor_ok|test_plugin_context_processor_ok|' +  # noqa: W504
+            self.test_data['text_main'] +  # noqa: W504
+            '|main|original_context_var_ok|test_plugin_processor_ok|' +  # noqa: W504
+            self.test_data['text_main'] +  # noqa: W504
+            '|main|original_context_var_ok'  # noqa: W504
         )
         self.assertEqual(r, expected)
         plugin_rendering._standard_processors = {}
@@ -354,7 +357,7 @@ class RenderingTestCase(CMSTestCase):
                        char_4="char_4")
         ex1.save()
 
-        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+        add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_placeholder_body)
 
         t = '''{% extends "base.html" %}
 {% load cms_tags %}
@@ -390,7 +393,7 @@ class RenderingTestCase(CMSTestCase):
                        char_4="char_4")
         ex1.save()
 
-        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
+        add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_uncached_placeholder_body)
 
         t = '''{% extends "base.html" %}
 {% load cms_tags %}
@@ -425,7 +428,7 @@ class RenderingTestCase(CMSTestCase):
                        char_4="char_4")
         ex1.save()
         request = self.get_request('/')
-        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
+        add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_uncached_placeholder_body)
 
         template = '{% load cms_tags %}<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>'
 
@@ -445,7 +448,7 @@ class RenderingTestCase(CMSTestCase):
                        char_4="char_4")
         ex1.save()
         request = self.get_request('/')
-        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+        add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_placeholder_body)
 
         template = '{% load cms_tags %}<h1>{% render_placeholder ex1.placeholder %}</h1>'
 

@@ -18,8 +18,7 @@ jobs:
         uses: liskin/gh-problem-matcher-wrap@v1
         with:
           linters: flake8
-          run: |
-            flake8 --exit-zero
+          run: flake8
 
 # TODO: re-enable it in another PR, want to keep
 # the actions Pr clean

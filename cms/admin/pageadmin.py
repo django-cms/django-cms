@@ -8,15 +8,16 @@ import uuid
 import django
 from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
-from django.urls import re_path
+from django.urls import re_path, NoReverseMatch
 from django.contrib import admin, messages
 from django.contrib.admin.models import LogEntry, CHANGE
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import (ObjectDoesNotExist,
-                                    PermissionDenied, ValidationError)
+from django.core.exceptions import (
+    ObjectDoesNotExist, PermissionDenied, ValidationError
+)
 from django.db import router, transaction
 from django.db.models import Q, Prefetch
 from django.http import (
@@ -174,7 +175,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
@@ -480,8 +483,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             opts=opts,
             app_label=app_label,
             preserved_filters=self.get_preserved_filters(request),
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
+            is_popup=(
+                IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET
+            ),
             to_field=None,
         )
         context.update(extra_context or {})
@@ -1434,9 +1438,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 # get all root nodes
                 Q(node__depth=1)
                 # or children which were previously open
-                | Q(node__depth=2, node__in=open_nodes)
+                | Q(node__depth=2, node__in=open_nodes)  # noqa: W503
                 # or children of the open descendants
-                | Q(node__parent__in=open_nodes)
+                | Q(node__parent__in=open_nodes)  # noqa: W503
             )
         pages = pages.prefetch_related(
             Prefetch(
@@ -1546,7 +1550,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 # In case it can't, object it's not taken into account
                 try:
                     force_str(obj.get_absolute_url())
-                except:
+                except [AttributeError, NoReverseMatch, TypeError]:
                     obj = None
             else:
                 obj = None
@@ -1563,7 +1567,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                         obj = None
                     try:
                         force_str(obj.get_absolute_url())
-                    except:
+                    except:  # noqa: E722
                         obj = None
         if obj:
             if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode_active', False):
@@ -1679,10 +1683,13 @@ class PageAdmin(BasePageAdmin):
         return queryset.exclude(is_page_type=True)
 
     def get_urls(self):
-        """Get the admin urls
+        """
+        Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^([0-9]+)/set-home/$', self.set_home),
@@ -1737,10 +1744,15 @@ class PageAdmin(BasePageAdmin):
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
             matching_published_pages = self.model.objects.published().public().filter(
-                Q(title_set__title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__path__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
+                Q(
+                    title_set__title__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__path__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__menu_title__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__page_title__icontains=query_term, title_set__language=language_code
+                )
             ).distinct()
 
             results = []

@@ -25,7 +25,7 @@ def validate_url(value):
 def validate_overwrite_url(value):
     try:
         RegexValidator(regex=NEGATE_SLUG_REGEXP)(value)
-    except:
+    except ValidationError:
         return True
     return False
 

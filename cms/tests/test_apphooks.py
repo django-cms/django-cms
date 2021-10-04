@@ -98,17 +98,23 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         self.superuser = superuser
-        page = create_page("home", "nav_playground.html", "en",
-                           created_by=superuser, published=True)
+        page = create_page(
+            "home", "nav_playground.html", "en",
+            created_by=superuser, published=True
+        )
         create_title('de', page.get_title(), page)
         page.publish('de')
-        child_page = create_page("child_page", "nav_playground.html", "en",
-                                 created_by=superuser, published=True, parent=page)
+        child_page = create_page(
+            "child_page", "nav_playground.html", "en",
+            created_by=superuser, published=True, parent=page
+        )
         create_title('de', child_page.get_title(), child_page)
         child_page.publish('de')
-        child_child_page = create_page("child_child_page", "nav_playground.html",
-                                       "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
-                                       apphook_namespace=namespace)
+        child_child_page = create_page(
+            "child_child_page", "nav_playground.html",
+            "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
+            apphook_namespace=namespace
+        )
         create_title("de", child_child_page.get_title(), child_child_page)
         child_child_page.publish('de')
         # publisher_public is set to draft on publish, issue with onetoone reverse
@@ -117,7 +123,7 @@ class ApphooksTestCase(CMSTestCase):
         if isinstance(title_langs, str):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
-            titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]
+            titles = [child_child_page.publisher_public.get_title_obj(lang) for lang in title_langs]
 
         self.reload_urls()
 

@@ -74,12 +74,10 @@ def _has_global_permission(user, site, action):
     if not get_cms_setting('PERMISSION'):
         return True
 
-    has_perm = (
-        GlobalPagePermission
-        .objects
-        .get_with_change_permissions(user, site.pk)
-        .exists()
-    )
+    has_perm = GlobalPagePermission.objects.get_with_change_permissions(
+        user, site.pk
+    ).exists()
+
     return has_perm
 
 
@@ -120,23 +118,20 @@ def get_user_permission_level(user, site):
     if user.is_superuser or not get_cms_setting('PERMISSION'):
         return ROOT_USER_LEVEL
 
-    has_global_perms = (
-        GlobalPagePermission
-        .objects
-        .get_with_change_permissions(user, site.pk)
-        .exists()
-    )
+    has_global_perms = GlobalPagePermission.objects.get_with_change_permissions(
+        user, site.pk
+    ).exists()
 
     if has_global_perms:
         return ROOT_USER_LEVEL
 
     try:
         permission = (
-            PagePermission
-            .objects
-            .get_with_change_permissions(user, site)
-            .select_related('page')
-            .order_by('page__node__path')
+            PagePermission.objects.get_with_change_permissions(
+                user, site
+            ).select_related(
+                'page'
+            ).order_by('page__node__path')
         )[0]
     except IndexError:
         # user isn't assigned to any node
@@ -162,11 +157,7 @@ def cached_func(func):
 @cached_func
 def get_global_actions_for_user(user, site):
     actions = set()
-    global_perms = (
-        GlobalPagePermission
-        .objects
-        .get_with_site(user, site.pk)
-    )
+    global_perms = GlobalPagePermission.objects.get_with_site(user, site.pk)
 
     for global_perm in global_perms.iterator():
         actions.update(global_perm.get_configured_actions())
@@ -177,12 +168,11 @@ def get_global_actions_for_user(user, site):
 def get_page_actions_for_user(user, site):
     actions = defaultdict(set)
     pages = (
-        Page
-        .objects
-        .drafts()
-        .on_site(site)
-        .select_related('node')
-        .order_by('node__path')
+        Page.objects.drafts().on_site(
+            site
+        ).select_related(
+            'node'
+        ).order_by('node__path')
     )
     nodes = [page.node for page in pages]
     pages_by_id = {}
@@ -194,10 +184,7 @@ def get_page_actions_for_user(user, site):
         pages_by_id[page.pk] = page
 
     page_permissions = (
-        PagePermission
-        .objects
-        .with_user(user)
-        .filter(page__in=pages_by_id)
+        PagePermission.objects.with_user(user).filter(page__in=pages_by_id)
     )
 
     for perm in page_permissions.iterator():
@@ -266,9 +253,7 @@ def get_subordinate_users(user, site):
         # return only staff users created by user
         # whose page permission record has no page attached.
         qs = get_user_model().objects.distinct().filter(
-                Q(is_staff=True) &
-                Q(pageuser__created_by=user) &
-                Q(pagepermission__page=None)
+            Q(is_staff=True) & Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
         qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
         return qs
@@ -280,9 +265,11 @@ def get_subordinate_users(user, site):
 
     # normal query
     qs = get_user_model().objects.distinct().filter(
-        Q(is_staff=True) &
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
-        | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
+        Q(is_staff=True) & (
+            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+        ) | (
+            Q(pageuser__created_by=user) & Q(pagepermission__page=None)
+        )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
     return qs
@@ -302,13 +289,9 @@ def get_subordinate_groups(user, site):
         # return only groups created by user
         # whose page permission record has no page attached.
         groups = (
-            Group
-            .objects
-            .filter(
-                Q(pageusergroup__created_by=user) &
-                Q(pagepermission__page__isnull=True)
-            )
-            .distinct()
+            Group.objects.filter(
+                Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
+            ).distinct()
         )
         # no permission no records
         # page_id_allow_list is empty
@@ -320,8 +303,11 @@ def get_subordinate_groups(user, site):
     page_id_allow_list = get_change_permissions_id_list(user, site, check_global=False)
 
     return Group.objects.distinct().filter(
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
-        | (Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True))
+        (
+            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+        ) | (
+            Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
+        )
     )
 
 

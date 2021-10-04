@@ -633,7 +633,7 @@ class CacheTestCase(CMSTestCase):
         ###
         # add the test plugin
         ##
-        test_plugin = add_plugin(ph1, u"TextPlugin", u"en", body="Some text")
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some text")
         test_plugin.save()
 
         request = self.get_request()
@@ -705,7 +705,7 @@ class CacheTestCase(CMSTestCase):
 
         text = content_renderer.render_placeholder(ph1, context, use_cache=True)
         self.assertEqual(text, "Some textSome other text")
-        
+
 
 class PlaceholderCacheTestCase(CMSTestCase):
     def setUp(self):
