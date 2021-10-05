@@ -1,4 +1,4 @@
-name: django CMS test.yml
+name: django 4.0 CMS test.yml
 
 on: [push, pull_request]
 
@@ -8,12 +8,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.6, 3.7, 3.8, 3.9, ]  # latest release minus three
+        python-version: [ 3.8, 3.9, 3.10.0]  # latest release minus three
         requirements-file: [
-          django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
-          django-3.2.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -60,12 +57,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, ]  # latest release minus two
+        python-version: [ 3.8, 3.9, 3.10.0]  # latest release minus three
         requirements-file: [
-          django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
-          django-3.2.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -111,12 +105,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, ]  # latest release minus two
+        python-version: [ 3.8, 3.9, 3.10.0]  # latest release minus three
         requirements-file: [
-          django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
-          django-3.2.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
