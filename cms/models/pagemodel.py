@@ -4,7 +4,7 @@ from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
@@ -19,7 +19,9 @@ from django.utils.translation import (
 
 from cms import constants
 from cms.cache.permissions import clear_permission_cache
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import (
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
+)
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
@@ -125,9 +127,10 @@ class TreeNode(MP_Node):
 
     def _set_hierarchy(self, nodes, ancestors=None):
         if self.is_branch:
-            self._descendants = [node for node in nodes
-                           if node.path.startswith(self.path)
-                           and node.depth > self.depth]
+            self._descendants = [
+                node for node in nodes
+                if node.path.startswith(self.path) and node.depth > self.depth
+            ]
         else:
             self._descendants = []
 
@@ -450,7 +453,7 @@ class Page(models.Model):
         """
         try:
             return self.get_public_object().get_absolute_url(language, fallback)
-        except:
+        except:  # noqa: E722
             return ''
 
     def get_draft_url(self, language=None, fallback=True):
@@ -460,7 +463,7 @@ class Page(models.Model):
         """
         try:
             return self.get_draft_object().get_absolute_url(language, fallback)
-        except:
+        except [AttributeError, NoReverseMatch, TypeError]:
             return ''
 
     def set_tree_node(self, site, target=None, position='first-child'):
@@ -1429,10 +1432,7 @@ class Page(models.Model):
         force_reload = (force_reload or language not in self.title_cache)
 
         if force_reload:
-            from cms.models.titlemodels import Title
-
-            titles = Title.objects.filter(page=self)
-            for title in titles:
+            for title in self.title_set.all():
                 self.title_cache[title.language] = title
 
         if fallback and not self.title_cache.get(language):

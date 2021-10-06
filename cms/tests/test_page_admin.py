@@ -550,7 +550,7 @@ class PageTest(PageTestBase):
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute changed_by %} changed "
                 "on {% page_attribute changed_date as page_change %}"
-                "{{ page_change|date:'Y-m-d\TH:i:s' }}"
+                "{{ page_change|date:'Y-m-d\TH:i:s' }}"  # noqa: W605
             )
             req = HttpRequest()
             page.save()

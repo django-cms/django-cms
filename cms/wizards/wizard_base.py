@@ -53,8 +53,8 @@ class Wizard(WizardBase):
         """
         if not self._hash_cache:
             full_path = force_str(
-                    ".".join([self.__module__, self.__class__.__name__])
-                ).encode('utf-8')
+                ".".join([self.__module__, self.__class__.__name__])
+            ).encode('utf-8')
             hash = hashlib.sha1()
             hash.update(full_path)
             self._hash_cache = hash.hexdigest()

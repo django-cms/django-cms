@@ -10,7 +10,7 @@ from cms.models import PagePermission, GlobalPagePermission, User, PageUser, Pag
 from django.conf import settings
 from django.contrib.auth.models import Group
 
-#################### Our own signals ###################
+# ---------------- Our own signals ---------------- #
 
 # fired after page location is changed - is moved from one node to other
 page_moved = Signal(providing_args=["instance"])
@@ -66,7 +66,7 @@ post_placeholder_operation = Signal(
 )
 
 
-################### apphook reloading ###################
+# ---------------- apphook reloading ---------------- #
 
 if settings.DEBUG:
     urls_need_reloading.connect(debug_server_restart)
@@ -77,7 +77,7 @@ urls_need_reloading.connect(
     dispatch_uid='aldryn-apphook-reload-handle-urls-need-reloading'
 )
 
-###################### permissions #######################
+# ---------------- permissions ---------------- #
 
 if get_cms_setting('PERMISSION'):
     # only if permissions are in use
@@ -96,10 +96,16 @@ if get_cms_setting('PERMISSION'):
     signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup, dispatch_uid='cms_pre_delete_pageusergroup')
 
     signals.pre_save.connect(pre_save_pagepermission, sender=PagePermission, dispatch_uid='cms_pre_save_pagepermission')
-    signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission,
-                               dispatch_uid='cms_pre_delete_pagepermission')
 
-    signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission,
-                             dispatch_uid='cms_pre_save_globalpagepermission')
-    signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission,
-                               dispatch_uid='cms_pre_delete_globalpagepermission')
+    signals.pre_delete.connect(
+        pre_delete_pagepermission, sender=PagePermission,
+        dispatch_uid='cms_pre_delete_pagepermission'
+    )
+    signals.pre_save.connect(
+        pre_save_globalpagepermission, sender=GlobalPagePermission,
+        dispatch_uid='cms_pre_save_globalpagepermission'
+    )
+    signals.pre_delete.connect(
+        pre_delete_globalpagepermission, sender=GlobalPagePermission,
+        dispatch_uid='cms_pre_delete_globalpagepermission'
+    )

@@ -55,7 +55,7 @@ class Title(models.Model):
         app_label = 'cms'
 
     def __str__(self):
-        return u"%s (%s, %s)" % (self.title, self.slug, self.language)
+        return "%s (%s, %s)" % (self.title, self.slug, self.language)
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(

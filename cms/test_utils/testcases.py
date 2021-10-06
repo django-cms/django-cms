@@ -87,7 +87,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
         if v is not None:
             try:
                 v.__warningregistry__ = None
-            except:
+            except:  # noqa: E722
                 # Don't specify a particular exception type to handle in case
                 # some wacky object raises some wacky exception in response to
                 # the setattr attempt.
@@ -304,7 +304,7 @@ class BaseCMSTestCase:
         """
         for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
+            print("%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
             page.pk, page.path, page.depth, page.numchild))
 
     def print_node_structure(self, nodes, *extra):
@@ -313,7 +313,7 @@ class BaseCMSTestCase:
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print(u"%s%s: %s" % (ident, node.title, attrs))
+                print("%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
 
         _rec(nodes)
@@ -454,9 +454,9 @@ class BaseCMSTestCase:
             self.fail("No warnings emitted")
         first = warningsShown[0]
         for other in warningsShown[1:]:
-            if ((other.message, other.category)
-                != (first.message, first.category)):
+            if ((other.message, other.category) != (first.message, first.category)):
                 self.fail("Can't handle different warnings")
+
         self.assertEqual(first.message, message)
         self.assertTrue(first.category is category)
 

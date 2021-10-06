@@ -51,10 +51,11 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     fallbacks = defaultdict(list)
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (not is_fallback and
-        not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active)):
-        disjoint_placeholders = (ph for ph in placeholders
-                                 if all(ph.pk != p.placeholder_id for p in plugins))
+    if not is_fallback and not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active):
+        disjoint_placeholders = (
+            ph for ph in placeholders
+            if all(ph.pk != p.placeholder_id for p in plugins)
+        )
         for placeholder in disjoint_placeholders:
             if get_placeholder_conf("language_fallback", placeholder.slot, template, True):
                 for fallback_language in get_fallback_languages(lang):
