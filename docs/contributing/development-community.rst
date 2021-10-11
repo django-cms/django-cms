@@ -100,7 +100,7 @@ independent groups of volunteers who have come together to work on a project.
 
 It is entirely up to you whether you want to join such a `work group <https://www.django-cms.org/en/join-work-group/>`_
 and join other django CMS enthusiasts or if you want to work on topics on your own.
-By the way, you can also create your own work group. Find out more `here <https://github.com/django-cms/django-cms-mgmt/blob/master/work%20contribution/work%20groups.md`_.
+By the way, you can also create your own work group. Find out more `here <https://github.com/django-cms/django-cms-mgmt/blob/master/work%20contribution/work%20groups.md>`_.
 
 Are you interested in knowledge sharing and improving your skills? Then a workgroup might be
 the right choice for you. Would you rather decide for yourself when and what you work on? Then you
