@@ -53,7 +53,7 @@ Are you new to django CMS?
 ******************************************
 
 If you are new to django CMS, then we recommend you to first familiarize yourself with the CMS
-and start with the :doc:`01-install` section.
+and start with the `install <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ section.
 After that, you can have a go at issues on Github that are marked `Good first issue <https://github.com/django-cms/django-cms/labels/good%20first%20issues>`_.
 These issues are especially good if you're just starting out but still want to contribute.
 Beginners can also contribute to the project, for example by helping to improve the documentation,
