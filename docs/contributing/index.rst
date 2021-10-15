@@ -18,8 +18,8 @@ proposing improvements, contributing code or documentation, and testing the
     :maxdepth: 1
 
     development-community
-    development-policies
     how-to-contribute
+    development-policies
     management
     testing
     code_of_conduct
