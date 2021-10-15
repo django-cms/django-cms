@@ -39,7 +39,7 @@ There's more than one way to do this, but here's one to help you get started::
     source bin/activate
 
     # get django CMS from GitHub
-    git clone git@github.com:divio/django-cms.git
+    git clone https://github.com/django-cms/django-cms.git
 
     # install the dependencies for testing
     # note that requirements files for other Django versions are also provided
@@ -65,9 +65,7 @@ We are working to improve the performance and reliability of our test suite. We'
 problems, but need feedback from people using a wide range of systems and configurations in order
 to benefit from their experience.
 
-Please use the open issue `#3684 Test suite is error-prone
-<https://github.com/divio/django-cms/issues/3684>`_ on our GitHub repository to report such
-problems.
+Please report any issues on our `GitHub repository <https://github.com/django-cms/django-cms/issues>`_.
 
 If you can help *improve* the test suite, your input will be especially valuable.
 
@@ -94,6 +92,14 @@ when the entire suite is run. To work around this you can invoke the test class 
     manage.py test cms.PlaceholderBasicTests
 
 and it should then run without errors.
+
+
+``ERROR: zlib is required unless explicitly disabled using --disable-zlib, aborting``
+------------------------------------------------------------------------------------------
+
+If you run into that issue, make sure to install zlib using Homebrew::
+
+    brew install libjpeg zlib && brew link --force zlib
 
 
 Advanced testing options
@@ -169,7 +175,7 @@ Integration tests
 =================
 
 In order to run integration tests you'll have to install at least the version
-of django CMS from the current directory and djangocms-helper into into your virtualenv.
+of django CMS from the current directory and django-app-helper into into your virtualenv.
 All commands should be run from the root of the repository. If you do not have
 virtualenv yet, create and activate it first::
 

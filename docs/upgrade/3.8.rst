@@ -1,0 +1,56 @@
+.. _upgrade-to-3.8:
+
+###################
+3.8.0 release notes
+###################
+
+
+This release of django CMS concentrates on introducing support for Django 3.1
+and dropps support for Python 2.7 and 3.4. It also removes support for Django
+versions below 2.2.
+
+
+*******************
+What's new in 3.8.0
+*******************
+
+Improvements and new features
+=============================
+
+* Introduced Django 3.1 support.
+* Dropped support for Python 2.7 and Python 3.4
+* Dropped support for Django < 2.2
+
+Bug Fixes
+=========
+
+* Removed ``djangocms-column`` from the manual installation instructions
+* Removed duplicate ``attr`` declaration from the documentation
+* Fixed a reference to a wrong variable in log messages in ``utils/conf.py``
+* Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
+
+
+*********************
+How to upgrade to 3.8
+*********************
+
+We assume you are upgrading from django CMS 3.7.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.
