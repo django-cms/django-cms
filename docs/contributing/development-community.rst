@@ -10,7 +10,7 @@ support of our `association members <https://www.django-cms.org/en/our-members/>
 it would not be possible to maintain the django CMS project.
 The community is the backbone of django CMS.
 
-Our contributors come from across the world, and have a wide range and
+Our contributors come from all over the world and have different
 levels of skills and expertise. No matter if you are a developer, usability
 enthusiast, designer or copywriter. Young or old. Experienced or inexperienced.
 Every contribution, however small, is valued.
@@ -30,18 +30,22 @@ All activity in the community is governed by our :doc:`code_of_conduct`.
 3 Reasons Why You Should Contribute
 ******************************************
 
+
 1. Boost your reputation
+=========================
 Through your involvement as a contributor, other people become aware of your work.
 In this way, you make a name for yourself in the community and your reputation grows. This
 can also help you in your professional career. Add your contribution to your resume or LinkedIn profile.
 
 2. Find a mentor and improve your skills
+==================================================
 When you join a workgroup, you will receive guidance and support from the workgroup leader.
 Our working group leaders are professionals in their field and often in leading positions in
 their respective companies. Take advantage of this unique opportunity for personal development!
 
 3. Meet new people and increase your network
-Let's face it. Ultimately, it's the people who bring the django CMS project to life and fill it with joy.
+==================================================
+Let's face it: Ultimately, it's the people who bring the django CMS project to life and fill it with joy.
 Through your involvement, you'll meet new people and maybe even make new friends. As a community,
 it's important to us to create a pleasant atmosphere where everyone feels welcome!
 
