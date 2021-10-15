@@ -13,7 +13,11 @@ django CMS
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
 
-Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association. 
+Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association (`Sponsor us! <https://www.django-cms.org/en/memberships/>`_). 
+
+*******************************************
+Contribute to this project and win rewards
+*******************************************
 
 Because django CMS is a community-driven project, we welcome everyone to `get involved in the project <https://www.django-cms.org/en/contribute/>`_ and `receive a reward <https://www.django-cms.org/en/bounty-program/>`_ for their contribution. Become part of a fantastic community and help us make django CMS the best open source CMS in the world.  
 
@@ -55,6 +59,14 @@ See the `Python/Django requirements for the current release version
 See the `installation how-to guide for an overview of some other requirements and dependencies of the current release
 <http://docs.django-cms.org/en/latest/how_to/install.html>`_.
 
+
+***************
+Getting started
+***************
+
+These `tutorials <http://docs.django-cms.org/en/latest/introduction/index.html>`_ take you step-by-step through some key aspects of django CMS.
+
+
 *************
 Documentation
 *************
@@ -72,23 +84,6 @@ Our documentation is hosted courtesy of `Read the Docs <https://readthedocs.org>
 
 The dependencies for the docs are compiled by `pip-tools <https://github.com/jazzband/pip-tools>`_.
 
-*****************************************
-Contribute to the project and win rewards
-*****************************************
-
-This project owes its existence to the many helpers and supporters. Apart from fame and glory, you can also win prizes for creating Pull Requests. Interested? Then take part in our `developer bounty program <https://www.django-cms.org/en/bounty-program/>`_. 
-
-***********************************************
-5 step installation tutorial for new developers 
-***********************************************
-
-Please check out our `quickstart installation tutorial <https://www.django-cms.org/en/blog/2020/07/07/5-step-django-cms-tutorial-for-new-developers/>`_.
-
-***************
-Getting started
-***************
-
-These `tutorials <http://docs.django-cms.org/en/latest/introduction/index.html>`_ take you step-by-step through some key aspects of django CMS.
 
 ***************************
 Test django CMS in our demo 
