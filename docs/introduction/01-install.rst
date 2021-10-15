@@ -105,6 +105,3 @@ Congratulations, you now have installed django CMS and created your first page.
 
 If you need to log in at any time, append ``?edit`` to the URL and hit Return. This will enable the
 toolbar, from where you can log in and manage your website.
-
-If you are not already familiar with django CMS, you can take a few minutes to run through the
-basics of the :ref:`django CMS tutorial for users <user-tutorial>`.
