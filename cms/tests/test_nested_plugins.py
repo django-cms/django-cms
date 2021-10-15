@@ -929,3 +929,55 @@ class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
         link_plugin = CMSPlugin.objects.get(parent_id=text_plugin_en.pk)
         self.assertEqual(link_plugin.parent_id, text_plugin_en.pk)
         self.assertEqual(link_plugin.position, text_plugin_en.position + 1)
+
+    def test_plugin_deep_nesting_and_copying_issue_position_parent_child_discrepency(self):
+        """
+        Captures an edge case issue where plugins have been seen to have a higher
+        position than their parent. When the placeholder is
+        copied the parent defaults to None because the plugin is not yet created / remapped.
+
+        Plugins first created in this order:
+
+            Plugin 1 (pk1, position 1)
+            Plugin 2 (pk2, position 2)
+            Plugin 3 (pk3, position 3)
+
+        Then a top level plugin is made a child of another.
+        The result is a child with a lower id and higher position that it's parent.
+
+            Plugin 1 (pk1, position 1)
+            Plugin 3 has children (pk3, position 3)
+                Plugin 2 (pk2, position 2)
+        """
+        placeholder = Placeholder(slot="some_slot")
+        placeholder.save()
+        # plugins in placeholder
+        plugin_1 = add_plugin(placeholder, "TextPlugin", "en", body="01")
+        plugin_2 = add_plugin(placeholder, "TextPlugin", "en", body="02")
+        plugin_3 = add_plugin(placeholder, "TextPlugin", "en", body="03")
+
+        expected_tree = [
+            (plugin_1.pk, None),
+            (plugin_2.pk, None),
+            (plugin_3.pk, None),
+        ]
+
+        self.copy_placeholders_and_check_results([placeholder])
+        self.compare_plugin_tree(expected_tree, placeholder)
+
+        plugin_2.parent = plugin_3
+        plugin_2.save()
+
+        self.reload(plugin_2)
+        self.reload(plugin_3)
+
+        expected_tree = [
+            (plugin_1.pk, None),
+            (plugin_2.pk, plugin_3.pk),
+            (plugin_3.pk, None),
+        ]
+
+        placeholder._recalculate_plugin_positions("en")
+
+        self.copy_placeholders_and_check_results([placeholder])
+        self.compare_plugin_tree(expected_tree, placeholder)
