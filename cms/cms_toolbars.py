@@ -54,6 +54,7 @@ SHORTCUTS_BREAK = 'Shortcuts Break'
 DEFAULT_HELP_MENU_ITEMS = (
     (gettext("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
     (gettext("Documentation"), 'https://docs.django-cms.org/en/latest/'),
+    (gettext("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/'),
     (gettext("Support Forum"), 'https://discourse.django-cms.org/'),
     (gettext("Support Slack"), 'https://www.django-cms.org/slack'),
     (gettext("What's new"), 'https://www.django-cms.org/en/blog/'),
