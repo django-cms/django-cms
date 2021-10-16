@@ -10,8 +10,10 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import get_language_from_request, gettext_lazy as _
 from cms.utils import get_current_site
-from cms.utils.i18n import (get_default_language_for_site,
-                        is_language_prefix_patterns_used)
+from cms.utils.i18n import (
+    get_default_language_for_site,
+    is_language_prefix_patterns_used
+)
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
 
@@ -23,10 +25,10 @@ logger = getLogger('menus')
 
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
-    '''
+    """
     This is an easier to test "inner loop" building the menu tree structure
     for one menu (one language, one site)
-    '''
+    """
     done_nodes = {}  # Dict of node.id:Node
     final_nodes = []
 
@@ -184,12 +186,15 @@ class MenuRenderer:
                 # exist, skip them instead of crashing
                 nodes = []
                 if toolbar and toolbar.is_staff:
-                    messages.error(self.request,
+                    messages.error(
+                        self.request,
                         _('Menu %s cannot be loaded. Please, make sure all '
-                          'its urls exist and can be resolved.') %
-                        menu_class_name)
-                logger.error("Menu %s could not be loaded." %
-                    menu_class_name, exc_info=True)
+                          'its urls exist and can be resolved.') % menu_class_name
+                    )
+                logger.error(
+                    "Menu %s could not be loaded." % menu_class_name,
+                    exc_info=True
+                )
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
 
@@ -316,9 +321,9 @@ class MenuPool:
         return self.modifiers
 
     def clear(self, site_id=None, language=None, all=False):
-        '''
+        """
         This invalidates the cache for a given menu (site_id and language)
-        '''
+        """
         if all:
             cache_keys = CacheKey.objects.get_keys()
         else:

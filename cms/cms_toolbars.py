@@ -5,7 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
-from django.utils.translation import override as force_language, gettext_lazy as _
+from django.utils.translation import override as force_language, gettext, gettext_lazy as _
 
 from cms.api import get_page_draft, can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
@@ -29,6 +29,8 @@ from menus.utils import DefaultLanguageChanger
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
 LANGUAGE_MENU_IDENTIFIER = 'language-menu'
+HELP_MENU_IDENTIFIER = 'help-menu'
+HELP_MENU_BREAK = 'Help Menu Break'
 TEMPLATE_MENU_BREAK = 'Template Menu Break'
 PAGE_MENU_IDENTIFIER = 'page'
 PAGE_MENU_ADD_IDENTIFIER = 'add_page'
@@ -48,6 +50,15 @@ REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 SHORTCUTS_BREAK = 'Shortcuts Break'
+
+DEFAULT_HELP_MENU_ITEMS = (
+    (gettext("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
+    (gettext("Documentation"), 'https://docs.django-cms.org/en/latest/'),
+    (gettext("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/'),
+    (gettext("Support Forum"), 'https://discourse.django-cms.org/'),
+    (gettext("Support Slack"), 'https://www.django-cms.org/slack'),
+    (gettext("What's new"), 'https://www.django-cms.org/en/blog/'),
+)
 
 
 @toolbar_pool.register
@@ -69,7 +80,7 @@ class PlaceholderToolbar(CMSToolbar):
 
         if self.page:
             user = self.request.user
-            page_pk  = self.page.pk
+            page_pk = self.page.pk
             disabled = len(list(entry_choices(user, self.page))) == 0
         else:
             page_pk = ''
@@ -104,6 +115,7 @@ class BasicToolbar(CMSToolbar):
             self.clipboard = self.request.toolbar.user_settings.clipboard
             self.add_admin_menu()
             self.add_language_menu()
+            self.add_help_menu()
 
     def add_admin_menu(self):
         if not self._admin_menu:
@@ -119,7 +131,7 @@ class BasicToolbar(CMSToolbar):
                 sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
                 sites_menu.add_break(ADMIN_SITES_BREAK)
                 for site in sites_queryset:
-                    sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
+                    sites_menu.add_link_item(site.name, url='https://%s' % site.domain,
                                              active=site.pk == self.current_site.pk)
 
             # admin
@@ -135,19 +147,28 @@ class BasicToolbar(CMSToolbar):
                 # True if the clipboard exists and there's plugins in it.
                 clipboard_is_bound = self.toolbar.clipboard_plugin
 
-                self._admin_menu.add_link_item(_('Clipboard...'), url='#',
-                        extra_classes=['cms-clipboard-trigger'],
-                        disabled=not clipboard_is_bound)
-                self._admin_menu.add_link_item(_('Clear clipboard'), url='#',
-                        extra_classes=['cms-clipboard-empty'],
-                        disabled=not clipboard_is_bound)
+                self._admin_menu.add_link_item(
+                    _('Clipboard...'), url='#',
+                    extra_classes=['cms-clipboard-trigger'],
+                    disabled=not clipboard_is_bound
+                )
+                self._admin_menu.add_link_item(
+                    _('Clear clipboard'), url='#',
+                    extra_classes=['cms-clipboard-empty'],
+                    disabled=not clipboard_is_bound
+                )
                 self._admin_menu.add_break(CLIPBOARD_BREAK)
 
             # Disable toolbar
-            self._admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
+            self._admin_menu.add_link_item(
+                _('Disable toolbar'),
+                url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+            )
             self._admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
-            self._admin_menu.add_link_item(_('Shortcuts...'), url='#',
-                    extra_classes=('cms-show-shortcuts',))
+            self._admin_menu.add_link_item(
+                _('Shortcuts...'), url='#',
+                extra_classes=('cms-show-shortcuts',)
+            )
             self._admin_menu.add_break(SHORTCUTS_BREAK)
 
             # logout
@@ -206,6 +227,20 @@ class BasicToolbar(CMSToolbar):
                 except NoReverseMatch:
                     url = DefaultLanguageChanger(self.request)(code)
                 self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+
+    def add_help_menu(self):
+        """ Adds the help menu if it's enabled in settings """
+        if get_cms_setting('ENABLE_HELP'):
+            self._help_menu = self.toolbar.get_or_create_menu(HELP_MENU_IDENTIFIER, _('Help'), position=-1)
+            self._help_menu.items = []  # reset the items so we don't duplicate
+            for label, url in DEFAULT_HELP_MENU_ITEMS:
+                self._help_menu.add_link_item(label, url=url)
+
+            extra_menu_items = get_cms_setting('EXTRA_HELP_MENU_ITEMS')
+            if extra_menu_items:
+                self._help_menu.add_break(HELP_MENU_BREAK)
+                for label, url in extra_menu_items:
+                    self._help_menu.add_link_item(label, url=url)
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
