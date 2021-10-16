@@ -1004,6 +1004,30 @@ Example::
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
 
 
+CMS_ENABLE_HELP
+===============
+
+default
+    ``True``
+
+This setting controls if the help menu appears in the toolbar.
+
+
+CMS_EXTRA_HELP_MENU_ITEMS
+=========================
+
+Example::
+
+    CMS_EXTRA_HELP_MENU_ITEMS = (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    )
+
+This setting adds to the default links of the support menu allowing project or company support links.
+
+
 CMS_TOOLBAR_ANONYMOUS_ON
 ========================
 
