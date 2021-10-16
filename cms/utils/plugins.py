@@ -282,7 +282,7 @@ def downcast_plugins(plugins,
 
         # put them in a map so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_qs.iterator():
+        for instance in plugin_qs.all():
             placeholder = placeholders_by_id.get(instance.placeholder_id)
 
             if placeholder:
