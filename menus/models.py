@@ -18,13 +18,13 @@ class CacheKeyManager(models.Manager):
 
 
 class CacheKey(models.Model):
-    '''
+    """
     This is to store a "set" of cache keys in a fashion where it's accessible
     by multiple processes / machines.
     Multiple Django instances will then share the keys.
     This allows for selective invalidation of the menu trees (per site, per
     language), in the cache.
-    '''
+    """
     language = models.CharField(max_length=255)
     site = models.PositiveIntegerField()
     key = models.CharField(max_length=255)
