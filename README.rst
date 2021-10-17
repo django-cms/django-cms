@@ -1,5 +1,5 @@
 ##########
-django CMS
+Django CMS
 ##########
 .. image:: https://travis-ci.org/django-cms/django-cms.svg?branch=develop
     :target: https://travis-ci.org/django-cms/django-cms
@@ -111,7 +111,7 @@ Choose a `trusted web host <https://www.django-cms.org/en/hosting-services/>`_ f
 
 
 **************************
-The django CMS Association
+The Django CMS Association
 **************************
 
 The django CMS Association is a non-profit organization that was founded in 2020 with the goal to drive the success of django CMS, by increasing customer happiness, market share and open-source contributions. We provide infrastructure and guidance for the django CMS project.
