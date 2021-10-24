@@ -15,6 +15,7 @@ from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.utils import translation
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
@@ -408,10 +409,7 @@ class BaseCMSTestCase:
             path = self.get_pages_root()
 
         if not language:
-            if settings.USE_I18N:
-                language = settings.LANGUAGES[0][0]
-            else:
-                language = settings.LANGUAGE_CODE
+            language = translation.get_language()
 
         if post_data:
             request = factory.post(path, post_data)
