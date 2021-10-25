@@ -35,6 +35,8 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
 
+from six.moves.urllib.parse import unquote, urljoin
+
 
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"

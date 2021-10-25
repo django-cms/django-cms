@@ -4,6 +4,8 @@ from treebeard.mp_tree import MP_Node
 
 from cms.models.fields import PlaceholderField
 
+from six import python_2_unicode_compatible
+
 
 class Category(MP_Node):
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)

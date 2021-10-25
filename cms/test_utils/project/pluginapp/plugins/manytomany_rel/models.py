@@ -2,6 +2,8 @@ from django.db import models
 
 from cms.models import CMSPlugin
 
+from six import python_2_unicode_compatible
+
 
 class Article(models.Model):
     title = models.CharField(max_length=50)

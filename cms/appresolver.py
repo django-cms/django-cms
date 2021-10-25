@@ -132,7 +132,6 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
             if default_args:
                 args.update(default_args)
 
-            regex_pattern = regex
             regex_pattern = RegexPattern(regex, name=pattern.name, is_endpoint=True)
             resolver = URLPattern(regex_pattern, pattern.callback, args,
                                   pattern.name)

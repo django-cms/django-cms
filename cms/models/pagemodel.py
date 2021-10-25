@@ -26,6 +26,8 @@ from cms.utils.i18n import get_current_language
 
 from menus.menu_pool import menu_pool
 
+from six import python_2_unicode_compatible
+
 from treebeard.mp_tree import MP_Node
 
 

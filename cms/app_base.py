@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 
 
-class CMSApp():
+class CMSApp:
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
     _urls = []
     #: list of menu classes: example: ``_menus = [MyAppMenu]``

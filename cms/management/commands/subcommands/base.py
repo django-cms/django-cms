@@ -35,7 +35,6 @@ def add_builtin_arguments(parser):
         help='Raise on CommandError exceptions')
     parser.add_argument('--no-color', action='store_true', dest='no_color', default=False,
         help="Don't colorize the command output.")
-
     parser.add_argument('--force-color', action='store_true', dest='force_color', default=False,
         help="Colorize the command output.")
     if DJANGO_3_0 or DJANGO_3_1:
