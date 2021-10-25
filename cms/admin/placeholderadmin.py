@@ -18,8 +18,6 @@ from django.http import (
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
-from django.utils import six
-from django.utils.six.moves.urllib.parse import parse_qsl, urlparse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import conditional_escape
@@ -49,6 +47,10 @@ from cms.utils.plugins import (
 from cms.utils.urlutils import admin_reverse
 from cms.views import render_object_edit, render_object_structure, render_object_preview
 
+from urllib.parse import parse_qsl, urlparse
+
+from six import add_metaclass, get_unbound_function, get_method_function
+
 
 _no_default = object()
 
@@ -76,7 +78,7 @@ def _instance_overrides_method(base, instance, method_name):
     """
     bound_method = getattr(instance, method_name)
     unbound_method = getattr(base, method_name)
-    return six.get_unbound_function(unbound_method) != six.get_method_function(bound_method)
+    return get_unbound_function(unbound_method) != get_method_function(bound_method)
 
 
 class FrontendEditableAdminMixin(object):
@@ -175,7 +177,7 @@ class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
         return super_new(cls, name, bases, attrs)
 
 
-@six.add_metaclass(PlaceholderAdminMixinBase)
+@add_metaclass(PlaceholderAdminMixinBase)
 class PlaceholderAdminMixin(object):
     pass
 

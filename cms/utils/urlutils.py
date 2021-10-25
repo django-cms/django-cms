@@ -5,11 +5,13 @@ from django.conf import settings
 from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.parse import urlparse
 
 import cms
 
 from cms.utils.conf import get_cms_setting
+
+from six.moves.urllib.parse import urlparse
+
 
 # checks validity of absolute / relative url
 any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')

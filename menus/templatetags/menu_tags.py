@@ -3,7 +3,6 @@ from django import template
 from django.contrib.sites.models import Site
 from django.urls import reverse, NoReverseMatch
 from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import unquote
 from django.utils.translation import get_language, ugettext
 
 from classytags.arguments import IntegerArgument, Argument, StringArgument
@@ -19,6 +18,8 @@ from cms.utils.i18n import (
 
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
+
+from six.moves.urllib.parse import unquote
 
 
 register = template.Library()

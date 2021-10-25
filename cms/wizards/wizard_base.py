@@ -4,10 +4,11 @@ import hashlib
 
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
-from django.utils.encoding import force_text, python_2_unicode_compatible
+from django.utils.encoding import force_text
 from django.utils.functional import cached_property
-
 from django.utils.translation import override as force_language, ugettext as _
+
+from six import python_2_unicode_compatible
 
 
 class WizardBase(object):

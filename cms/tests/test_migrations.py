@@ -1,7 +1,8 @@
 from django.core.management import call_command
 from django.test import TestCase, override_settings
-from django.utils.six import text_type
-from django.utils.six.moves import StringIO
+
+from six import text_type
+from six.moves import StringIO
 
 
 class MigrationTestCase(TestCase):

@@ -4,7 +4,6 @@ from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
-from django.utils import six
 from django.utils.translation import get_language, override
 from django.urls import Resolver404, reverse
 
@@ -14,6 +13,8 @@ from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_1_11
 from cms.utils.compat.dj import RegexPattern, URLPattern, URLResolver
 from cms.utils.i18n import get_language_list
+
+from six import string_types
 
 
 APP_RESOLVERS = []
@@ -159,7 +160,7 @@ def _set_permissions(patterns, exclude_permissions):
 
 def get_app_urls(urls):
     for urlconf in urls:
-        if isinstance(urlconf, six.string_types):
+        if isinstance(urlconf, string_types):
             mod = import_module(urlconf)
             if not hasattr(mod, 'urlpatterns'):
                 raise ImproperlyConfigured(

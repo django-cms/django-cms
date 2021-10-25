@@ -8,17 +8,19 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
 from django.db.models.base import ModelBase
 from django.urls import NoReverseMatch
-from django.utils import six, timezone
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.lru_cache import lru_cache
+from django.utils import timezone
+from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.six import text_type
 from django.utils.translation import ugettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
+
+from functools import lru_cache
+
+from six import python_2_unicode_compatible, text_type, with_metaclass
 
 
 @lru_cache(maxsize=None)
@@ -147,7 +149,7 @@ class PluginModelBase(ModelBase):
 
 
 @python_2_unicode_compatible
-class CMSPlugin(six.with_metaclass(PluginModelBase, models.Model)):
+class CMSPlugin(with_metaclass(PluginModelBase, models.Model)):
     '''
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class.
