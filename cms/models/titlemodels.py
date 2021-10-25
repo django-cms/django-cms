@@ -8,8 +8,6 @@ from cms.models.managers import PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
 
-from six import python_2_unicode_compatible
-
 
 class PageContent(models.Model):
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (

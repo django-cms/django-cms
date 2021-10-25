@@ -21,8 +21,6 @@ from cms.test_utils.testcases import CMSTestCase
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
-from six.moves import StringIO
-
 
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"

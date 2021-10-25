@@ -20,8 +20,6 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
-from six.moves.urllib.parse import urlparse
-
 
 class SettingsAdmin(ModelAdmin):
 

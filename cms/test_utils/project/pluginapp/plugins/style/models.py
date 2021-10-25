@@ -2,8 +2,6 @@ from django.db import models
 
 from cms.models import CMSPlugin
 
-from six import python_2_unicode_compatible
-
 
 CLASS_CHOICES = ['container', 'content', 'teaser']
 CLASS_CHOICES = tuple((entry, entry) for entry in CLASS_CHOICES)
