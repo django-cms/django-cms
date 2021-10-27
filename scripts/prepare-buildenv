@@ -11,7 +11,7 @@ check_command_exists python git awk sed pip npm xargs grep
 check_virtual_env
 
 status "- Installing needed python modules"
-grep -v django-cms docs/requirements.txt | xargs pip install --quiet django-admin transifex-client
+grep -v django-cms docs/requirements.txt | grep -v '#' | xargs pip install --quiet django-admin transifex-client
 
 check_command_exists django-admin
 
