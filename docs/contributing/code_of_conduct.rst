@@ -22,8 +22,8 @@ Raising a concern
 *****************
 
 If you have a concern about the behaviour of any member of the django CMS
-community, please contact one of the members of the :ref:`core development team
-<core_developers>`.
+community, please contact us via info@django-cms.org and our Community Manager
+will reach out to you. 
 
 Your concerns will be taken seriously, treated as confidential and
 investigated. You will be informed, in writing and as promptly as possible, of
