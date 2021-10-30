@@ -1,4 +1,4 @@
-.. image:: /images/django-cms-logo.png
+.. image:: https://raw.githubusercontent.com/django-cms/django-cms/develop/docs/images/django-cms-logo.png
 
     This is the official django CMS Documentation.
 
