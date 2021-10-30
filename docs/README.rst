@@ -6,7 +6,7 @@ django CMS Documentation
 Run the documentation locally
 -----------------------------
 
-Install the Enchant libary
+**Install the Enchant libary:**
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will need to install the
@@ -22,21 +22,21 @@ macOS:
 
 After that:
 
-Clone the repository:
+**Clone the repository:**
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: bash
 
     git@github.com:django-cms/django-cms.git
 
-Switch to the django-cms directory:
+**Switch to the django-cms directory:**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: bash
 
     cd django-cms/docs
 
-Install the dependencies:
+**Install the dependencies:**
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: bash
@@ -46,7 +46,7 @@ Install the dependencies:
 This command creates a virtual environment and installs the required
 dependencies there.
 
-Start the development server:
+**Start the development server:**
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: bash
