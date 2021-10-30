@@ -1,6 +1,6 @@
-` <https://raw.githubusercontent.com/crydotsnake/django-cms/feature/sphinx-docs/docs/images/django-cms-logo.png>`__
+.. image:: https://raw.githubusercontent.com/crydotsnake/django-cms/feature/sphinx-docs/docs/images/django-cms-logo.png?sanitize=true
 
-    This is the official django CMS Documentation.
+This is the official django CMS Documentation.
 
 Run the documentation locally
 -----------------------------
@@ -42,8 +42,8 @@ Install the dependencies:
 
     make install
 
-    This command creates a virtual environment and installs the required
-    dependencies there.
+This command creates a virtual environment and installs the required
+dependencies there.
 
 Start the development server:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
