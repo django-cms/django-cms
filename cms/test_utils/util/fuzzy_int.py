@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+
 
 class FuzzyInt(int):
     def __new__(cls, lowest, highest):
