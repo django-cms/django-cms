@@ -3,7 +3,7 @@ permission system.
 
 This middleware is required only when CMS_PERMISSION = True.
 """
-from cms.utils.compat.dj import MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin
 
 
 class CurrentUserMiddleware(MiddlewareMixin):
