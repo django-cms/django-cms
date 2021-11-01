@@ -8,7 +8,7 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
-from django.utils.http import url_has_allowed_host_and_scheme, urlquote
+from django.utils.http import is_safe_url, urlquote
 from django.utils.timezone import now
 from django.utils.translation import get_language_from_request
 from django.views.decorators.http import require_POST
@@ -175,7 +175,7 @@ def details(request, slug):
 def login(request):
     redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
 
-    if not url_has_allowed_host_and_scheme(url=redirect_to, allowed_hosts=request.get_host()):
+    if not is_safe_url(url=redirect_to, allowed_hosts=request.get_host()):
         redirect_to = reverse("pages-root")
     else:
         redirect_to = urlquote(redirect_to)
