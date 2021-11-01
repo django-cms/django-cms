@@ -21,7 +21,7 @@ SKIPPED = 4
 CHECKERS = []
 
 
-class FileOutputWrapper(object):
+class FileOutputWrapper():
     """
     Wraps two file-like objects (that support at the very least the 'write'
     method) into an API to be used by the check function further down in

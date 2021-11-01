@@ -15,7 +15,8 @@ from django.utils.encoding import (  # nopyflakes
 try:
     from django.utils.deprecation import MiddlewareMixin
 except ImportError:
-    class MiddlewareMixin(object): pass
+    class MiddlewareMixin():
+        pass
 
 try:
     from django.urls import URLResolver  # nopyflakes
@@ -23,7 +24,8 @@ try:
 except ImportError:
     # django 1.11 support
     from django.core.urlresolvers import RegexURLResolver as URLResolver, RegexURLPattern as URLPattern  # nopyflakes
-    class RegexPattern: pass
+    class RegexPattern:
+        pass
 
 try:
     from django.urls import LocalePrefixPattern  # nopyflakes

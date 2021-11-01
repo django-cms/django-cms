@@ -59,7 +59,7 @@ class BadModelForm(ModelForm):
         pass
 
 
-class WizardTestMixin(object):
+class WizardTestMixin():
     page_wizard = None
     title_wizard = None
 

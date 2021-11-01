@@ -77,7 +77,7 @@ def _instance_overrides_method(base, instance, method_name):
     return unbound_method != bound_method
 
 
-class FrontendEditableAdminMixin(object):
+class FrontendEditableAdminMixin():
     frontend_editable_fields = []
 
     def get_urls(self):

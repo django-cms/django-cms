@@ -15,7 +15,7 @@ class NULL:
     pass
 
 
-class StdOverride(object):
+class StdOverride():
     def __init__(self, std='out', buffer=None):
         self.std = std
         self.buffer = buffer or StringIO()
@@ -43,7 +43,7 @@ class StdoutOverride(StdOverride):
         super().__init__('out', buffer)
 
 
-class LanguageOverride(object):
+class LanguageOverride():
     def __init__(self, language):
         self.newlang = language
 
@@ -81,7 +81,7 @@ class TemporaryDirectory:
         self.cleanup()
 
 
-class UserLoginContext(object):
+class UserLoginContext():
     def __init__(self, testcase, user):
         self.testcase = testcase
         self.user = user
@@ -100,7 +100,7 @@ class UserLoginContext(object):
         self.testcase.client.logout()
 
 
-class ChangeModel(object):
+class ChangeModel():
     """
     Changes attributes on a model while within the context.
 
@@ -165,7 +165,7 @@ def signal_tester(*signals):
             signal.disconnect(env)
 
 
-class SignalTester(object):
+class SignalTester():
 
     def __init__(self):
         self.call_count = 0

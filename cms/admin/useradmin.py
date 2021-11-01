@@ -26,7 +26,7 @@ for model, admin_instance in site._registry.items():
         admin_class = admin_instance.__class__
 
 
-class GenericCmsPermissionAdmin(object):
+class GenericCmsPermissionAdmin():
 
     def get_subordinates(self, user, site):
         raise NotImplementedError

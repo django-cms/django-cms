@@ -78,7 +78,7 @@ def plugin_supports_cte():
     return not (db_vendor == 'mysql' and connection.mysql_version < (8, 0))
 
 
-class BoundRenderMeta(object):
+class BoundRenderMeta():
     def __init__(self, meta):
         self.index = 0
         self.total = 1

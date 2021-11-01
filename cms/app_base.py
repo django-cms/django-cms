@@ -95,7 +95,7 @@ class CMSApp:
         return self._urls
 
 
-class CMSAppConfig(object):
+class CMSAppConfig():
     """Base class that all cms app configurations should inherit from"""
 
     def __init__(self, django_app_config):

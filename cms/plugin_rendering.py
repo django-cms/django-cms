@@ -39,7 +39,7 @@ def _unpack_plugins(parent_plugin):
     return found_plugins
 
 
-class RenderedPlaceholder(object):
+class RenderedPlaceholder():
     __slots__ = (
         'language',
         'site_id',
@@ -71,7 +71,7 @@ class RenderedPlaceholder(object):
         return hash(self.placeholder)
 
 
-class BaseRenderer(object):
+class BaseRenderer():
 
     load_structure = False
     placeholder_edit_template = ''
