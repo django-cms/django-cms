@@ -27,7 +27,7 @@ if [ -z "$1" ] ; then
     echo "Usage $0 <version> [base_version]"
     echo
     echo "Update the CHANGELOG.rst to create <version>"
-    echo "Version can be X.Y.Zsuffix"
+    echo "Version can be X.Y.Z suffix"
     echo "suffix can be rc, or anything, X,Y,Z are numbers"
     exit 1
 fi
@@ -146,7 +146,7 @@ r${content}
    rm "${content}"
 done
 
-# generating statistics 
+# generating statistics
 
 PR_NUMBER=$(git log --pretty=oneline "${OLD_FULL_VERSION}.." | wc -l)
 

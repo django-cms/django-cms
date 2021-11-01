@@ -205,7 +205,7 @@ status "- Fetching strings from transifex"
 "${SCRIPTS}/transifex-pull-strings"
 
 # Before compiling:
-# ignore changesets that only involeves "^POT-Creation-Date:" "^PO-Revision-Date:"
+# ignore changesets that only involves "^POT-Creation-Date:" "^PO-Revision-Date:"
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}compilemessages"
 cd ..
 
