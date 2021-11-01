@@ -1,6 +1,6 @@
-.. image:: https://raw.githubusercontent.com/crydotsnake/django-cms/feature/sphinx-docs/docs/images/django-cms-logo.png?sanitize=true
-
-This is the official django CMS Documentation.
+=========================
+django CMS Documentation
+=========================
 
 Run the documentation locally
 -----------------------------
