@@ -195,4 +195,3 @@ project.
     contributing/index
     upgrade/index
     whoisbehind/index
-    readme
