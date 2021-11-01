@@ -2,7 +2,7 @@ from contextlib import contextmanager
 
 from django.conf import settings
 from django.utils import translation
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.urls import get_resolver
 
 from cms.exceptions import LanguageError

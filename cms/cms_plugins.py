@@ -9,7 +9,7 @@ from cms.utils.urlutils import admin_reverse
 from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
 from django.middleware.csrf import get_token
 from django.urls import re_path
-from django.utils.translation import gettext, ugettext_lazy as _, get_language
+from django.utils.translation import gettext, gettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):

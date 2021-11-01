@@ -1,6 +1,6 @@
 from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
 from django.forms.models import model_to_dict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.api import add_plugin, create_page, create_title
 from cms.forms.wizards import CreateCMSPageForm

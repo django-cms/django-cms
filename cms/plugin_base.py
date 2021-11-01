@@ -13,7 +13,7 @@ from django.core.exceptions import (
 )
 from django.utils.encoding import force_text, smart_str
 from django.utils.html import escapejs
-from django.utils.translation import gettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError

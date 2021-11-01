@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse

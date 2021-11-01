@@ -13,7 +13,7 @@ from django.urls import reverse
 from django.utils.encoding import force_text
 from django.utils.functional import lazy
 from django.utils.html import escape
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
