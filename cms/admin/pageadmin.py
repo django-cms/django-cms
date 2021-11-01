@@ -5,7 +5,6 @@ import json
 import django
 from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
-from django.conf.urls import url
 from django.contrib import admin, messages
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
@@ -29,6 +28,7 @@ from django.shortcuts import render, get_object_or_404
 from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
+from django.urls import re_path
 from django.utils.encoding import force_text
 from django.utils.translation import ugettext_lazy as _
 from django.utils.decorators import method_decorator
@@ -162,7 +162,7 @@ class PageAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^list/$', self.get_list),
@@ -853,7 +853,7 @@ class PageContentAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^get-tree/$', self.get_tree),

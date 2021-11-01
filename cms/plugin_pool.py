@@ -1,8 +1,8 @@
 from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.conf.urls import url, include
 from django.template.defaultfilters import slugify
+from django.urls import include, re_path
 from django.utils.encoding import force_text
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
@@ -199,7 +199,7 @@ class PluginPool(object):
                 p = plugin()
                 slug = slugify(force_text(normalize_name(p.__class__.__name__)))
                 url_patterns += [
-                    url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                    re_path(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
                 ]
         finally:
             # Reactivate translation

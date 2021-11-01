@@ -2,7 +2,6 @@ import uuid
 import warnings
 
 from django import forms
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
@@ -17,6 +16,7 @@ from django.http import (
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
+from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_text
 from django.utils.html import conditional_escape
@@ -85,7 +85,7 @@ class FrontendEditableAdminMixin(object):
         Register the url for the single field edit view
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
@@ -196,7 +196,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: url(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
         url_patterns = [
             pat(r'^copy-plugins/$', self.copy_plugins),
             pat(r'^add-plugin/$', self.add_plugin),
