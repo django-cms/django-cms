@@ -2,7 +2,7 @@ from collections import defaultdict, deque
 import json
 
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import get_language, override as force_language, gettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
@@ -17,10 +17,10 @@ def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
 
     data = {
         'type': 'placeholder',
-        'name': force_text(label),
+        'name': force_str(label),
         'placeholder_id': str(placeholder.pk),
         'plugin_restriction': allowed_plugins or [],
-        'addPluginHelpTitle': force_text(help_text),
+        'addPluginHelpTitle': force_str(help_text),
         'urls': {
             'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
             'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
@@ -36,7 +36,7 @@ def get_plugin_toolbar_info(plugin, children=None, parents=None):
     ) % {'plugin_name': data['plugin_name']}
 
     data['onClose'] = False
-    data['addPluginHelpTitle'] = force_text(help_text)
+    data['addPluginHelpTitle'] = force_str(help_text)
     data['plugin_order'] = ''
     data['plugin_restriction'] = children or []
     data['plugin_parent_restriction'] = parents or []

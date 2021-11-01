@@ -8,7 +8,7 @@ __all__ = ['is_installed', 'installed_apps', 'get_apps', 'get_app_paths']
 
 # import these directly from Django!
 from django.utils.encoding import (  # nopyflakes
-    force_text as force_unicode,
+    force_str as force_unicode,
 )
 
 

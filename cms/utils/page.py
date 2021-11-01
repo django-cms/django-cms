@@ -1,7 +1,7 @@
 import re
 
 from django.urls import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cms.constants import PAGE_USERNAME_MAX_LENGTH
 from cms.utils import get_current_site
@@ -36,7 +36,7 @@ def get_page_template_from_request(request):
 
 def get_clean_username(user):
     try:
-        username = force_text(user)
+        username = force_str(user)
     except AttributeError:
         # AnonymousUser may not have USERNAME_FIELD
         username = "anonymous"

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
@@ -126,7 +126,7 @@ class AbstractPagePermission(models.Model):
         """Return audience by priority, so: All or User, Group
         """
         targets = filter(lambda item: item, (self.user, self.group,))
-        return ", ".join([force_text(t) for t in targets]) or 'No one'
+        return ", ".join([force_str(t) for t in targets]) or 'No one'
 
     def save(self, *args, **kwargs):
         if not self.user and not self.group:
@@ -215,8 +215,8 @@ class PagePermission(AbstractPagePermission):
         app_label = 'cms'
 
     def __str__(self):
-        page = self.page_id and force_text(self.page) or "None"
-        return "%s :: %s has: %s" % (page, self.audience, force_text(self.get_grant_on_display()))
+        page = self.page_id and force_str(self.page) or "None"
+        return "%s :: %s has: %s" % (page, self.audience, force_str(self.get_grant_on_display()))
 
     def clean(self):
         super().clean()

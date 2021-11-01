@@ -4,7 +4,7 @@ from classytags.helpers import InclusionTag
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
@@ -91,7 +91,7 @@ def tree_publish_row(context, page, language):
 
     return mark_safe(
         '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
-        'data-cms-tooltip="%s"></span>' % (cls, force_text(text)))
+        'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
 
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')

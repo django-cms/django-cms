@@ -4,7 +4,7 @@ import os.path
 from django.conf import settings
 from django.template import loader, TemplateDoesNotExist
 from django.test.utils import override_settings
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 from cms import constants
@@ -41,14 +41,14 @@ class TemplatesConfig(CMSTestCase):
         config_path = os.path.join(settings.CMS_TEMPLATES_DIR, '__init__.py')
         with open(config_path, 'r') as openfile:
             mod = load_module("mod", openfile, config_path, ('m', 'r', PY_SOURCE))
-        original_labels = [force_text(_(template[1])) for template in mod.TEMPLATES.items()]
+        original_labels = [force_str(_(template[1])) for template in mod.TEMPLATES.items()]
         original_files = [os.path.join(PATH_PREFIX, template[0].strip()) for template in mod.TEMPLATES.items()]
         templates = get_cms_setting('TEMPLATES')
         self.assertEqual(len(templates), 3)
-        labels = [force_text(template[1]) for template in templates]
+        labels = [force_str(template[1]) for template in templates]
         files = [template[0] for template in templates]
         if get_cms_setting('TEMPLATE_INHERITANCE'):
-            original_labels.append(force_text(_('Inherit the template of the nearest ancestor')))
+            original_labels.append(force_str(_('Inherit the template of the nearest ancestor')))
             original_files.append(constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(set(labels), set(original_labels))
         self.assertEqual(set(files), set(original_files))

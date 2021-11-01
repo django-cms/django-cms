@@ -14,7 +14,7 @@ from django.forms.widgets import Media
 from django.test.testcases import TestCase
 from django.urls import re_path, reverse
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import override as force_language
 
 from cms import api
@@ -773,12 +773,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         style_config = style_config[0]
 
         with force_language('en'):
-            self.assertEqual(force_text(style_config['module']), expected_struct_en['module'])
-            self.assertEqual(force_text(style_config['name']), expected_struct_en['name'])
+            self.assertEqual(force_str(style_config['module']), expected_struct_en['module'])
+            self.assertEqual(force_str(style_config['name']), expected_struct_en['name'])
 
         with force_language('de'):
-            self.assertEqual(force_text(style_config['module']), expected_struct_de['module'])
-            self.assertEqual(force_text(style_config['name']), expected_struct_de['name'])
+            self.assertEqual(force_str(style_config['module']), expected_struct_de['module'])
+            self.assertEqual(force_str(style_config['name']), expected_struct_de['name'])
 
     def test_plugin_toolbar_struct_permissions(self):
         page = self.get_permissions_test_page()

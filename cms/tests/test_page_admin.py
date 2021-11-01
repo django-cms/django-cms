@@ -10,7 +10,7 @@ from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
@@ -1336,7 +1336,7 @@ class PageTest(PageTestBase):
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
                 parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
-                content = force_text(parsed)
+                content = force_str(parsed)
                 self.assertIn(u'(Shift-Klick für erweiterte Einstellungen)', content)
 
     def test_page_get_tree_endpoint_flat(self):
@@ -1358,7 +1358,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn(tree, content)
             self.assertNotIn('<li>\nBeta\n</li>', content)
 
@@ -1390,7 +1390,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn(tree, content)
 
     def test_page_changelist_search(self):
@@ -1406,7 +1406,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint, data={'q': 'alpha'})
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn('<li>\nAlpha\n</li>', content)
             self.assertNotIn('<li>\nHome\n</li>', content)
             self.assertNotIn('<li>\nBeta\n</li>', content)

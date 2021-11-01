@@ -1,6 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 
@@ -48,7 +48,7 @@ def validate_url_uniqueness(site, path, language, user_language=None, exclude_pa
 
     conflict_url = '<a href="%(change_url)s" target="_blank">%(page_title)s</a>' % {
         'change_url': change_url,
-        'page_title': force_text(conflict_page),
+        'page_title': force_str(conflict_page),
     }
 
     if exclude_page:

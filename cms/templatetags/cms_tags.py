@@ -10,7 +10,7 @@ from django.db.models import Model
 from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.encoding import force_text, smart_text
+from django.utils.encoding import force_str, smart_text
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.translation import (
@@ -93,7 +93,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 middle = BrokenLinkEmailsMiddleware()
                 domain = request.get_host()
                 path = request.get_full_path()
-                referer = force_text(request.META.get('HTTP_REFERER', ''), errors='replace')
+                referer = force_str(request.META.get('HTTP_REFERER', ''), errors='replace')
                 if not middle.is_ignorable_request(request, path, domain, referer):
                     mail_managers(subject, body, fail_silently=True)
             return None

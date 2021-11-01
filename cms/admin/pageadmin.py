@@ -29,7 +29,7 @@ from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
@@ -275,7 +275,7 @@ class PageAdmin(admin.ModelAdmin):
             raise self._get_404_exception(object_id)
 
         if not page.is_potential_home():
-            return HttpResponseBadRequest(force_text(_("The page is not eligible to be home.")))
+            return HttpResponseBadRequest(force_str(_("The page is not eligible to be home.")))
 
         new_home_tree, old_home_tree = page.set_as_homepage(request.user)
 
@@ -370,7 +370,7 @@ class PageAdmin(admin.ModelAdmin):
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
-            obj_display = force_text(obj)
+            obj_display = force_str(obj)
             obj_id = obj.serializable_value(opts.pk.attname)
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
@@ -389,8 +389,8 @@ class PageAdmin(admin.ModelAdmin):
             self.message_user(
                 request,
                 _('The %(name)s "%(obj)s" was deleted successfully.') % {
-                    'name': force_text(opts.verbose_name),
-                    'obj': force_text(obj_display),
+                    'name': force_str(opts.verbose_name),
+                    'obj': force_str(obj_display),
                 },
                 messages.SUCCESS,
             )
@@ -408,7 +408,7 @@ class PageAdmin(admin.ModelAdmin):
                 post_url = admin_reverse('index')
             return HttpResponseRedirect(post_url)
 
-        object_name = force_text(opts.verbose_name)
+        object_name = force_str(opts.verbose_name)
 
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
@@ -522,7 +522,7 @@ class PageAdmin(admin.ModelAdmin):
 
     def _get_404_exception(self, object_id):
         exception = Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-            'name': force_text(self.opts.verbose_name),
+            'name': force_str(self.opts.verbose_name),
             'key': escape(object_id),
         })
         return exception
@@ -591,7 +591,7 @@ class PageAdmin(admin.ModelAdmin):
 
         # Does the user have permissions to do this...?
         if not can_move_page or (target and not target.has_add_permission(user)):
-            message = force_text(_("Error! You don't have permissions "
+            message = force_str(_("Error! You don't have permissions "
                                    "to move this page. Please reload the page"))
             return jsonify_request(HttpResponseForbidden(message))
 
@@ -699,14 +699,14 @@ class PageAdmin(admin.ModelAdmin):
             can_copy_page = page_permissions.user_can_add_page(user, site)
 
         if not can_copy_page:
-            message = force_text(_("Error! You don't have permissions to copy this page."))
+            message = force_str(_("Error! You don't have permissions to copy this page."))
             return jsonify_request(HttpResponseForbidden(message))
 
         page_languages = page.get_languages()
         site_languages = get_language_list(site_id=site.pk)
 
         if not any(lang in  page_languages for lang in site_languages):
-            message = force_text(_("Error! The page you're pasting is not "
+            message = force_str(_("Error! The page you're pasting is not "
                                    "translated in any of the languages configured by the target site."))
             return jsonify_request(HttpResponseBadRequest(message))
 
@@ -718,7 +718,7 @@ class PageAdmin(admin.ModelAdmin):
         translation = page.get_title_obj(language, fallback=False)
 
         if not self.has_change_permission(request, obj=page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to edit this page")))
+            return HttpResponseForbidden(force_str(_("You do not have permission to edit this page")))
 
         if page is None:
             raise self._get_404_exception(page_id)
@@ -1010,7 +1010,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
     def _get_404_exception(self, object_id):
         exception = Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-            'name': force_text(self.opts.verbose_name),
+            'name': force_str(self.opts.verbose_name),
             'key': escape(object_id),
         })
         return exception
@@ -1159,7 +1159,7 @@ class PageContentAdmin(admin.ModelAdmin):
             'changelist_form': changelist_form,
             'cms_current_site': site,
             'has_add_permission': self.has_add_permission(request),
-            'module_name': force_text(self.model._meta.verbose_name_plural),
+            'module_name': force_str(self.model._meta.verbose_name_plural),
             'admin': self,
             'tree': {
                 'site': site,
@@ -1189,12 +1189,12 @@ class PageContentAdmin(admin.ModelAdmin):
         to_template = request.POST.get("template", None)
 
         if to_template not in dict(get_cms_setting('TEMPLATES')):
-            return HttpResponseBadRequest(force_text(_("Template not valid")))
+            return HttpResponseBadRequest(force_str(_("Template not valid")))
 
         page_content.template = to_template
         page_content.save()
 
-        return HttpResponse(force_text(_("The template was successfully changed")))
+        return HttpResponse(force_str(_("The template was successfully changed")))
 
     @require_POST
     @transaction.atomic
@@ -1211,7 +1211,7 @@ class PageContentAdmin(admin.ModelAdmin):
         page = source_page_content.page
 
         if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
-            return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
+            return HttpResponseBadRequest(force_str(_("Language must be set to a supported language!")))
 
         target_page_content = page.get_title_obj(target_language, fallback=False)
 
@@ -1221,7 +1221,7 @@ class PageContentAdmin(admin.ModelAdmin):
             plugins = placeholder.get_plugins_list(source_page_content.language)
 
             if not target.has_add_plugins_permission(request.user, plugins):
-                return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
+                return HttpResponseForbidden(force_str(_('You do not have permission to copy these plugins.')))
             copy_plugins_to_placeholder(plugins, target, language=target_language)
         return HttpResponse("ok")
 
@@ -1234,7 +1234,7 @@ class PageContentAdmin(admin.ModelAdmin):
         request_language = get_site_language_from_request(request, site_id=page.node.site_id)
 
         if not self.has_delete_translation_permission(request, language, page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to delete this page")))
+            return HttpResponseForbidden(force_str(_("You do not have permission to delete this page")))
 
         if page is None:
             raise self._get_404_exception(object_id)
@@ -1292,7 +1292,7 @@ class PageContentAdmin(admin.ModelAdmin):
             )
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': force_text(get_language_object(language)['name'])
+                'language': force_str(get_language_object(language)['name'])
             }
             messages.success(request, message)
 
@@ -1321,7 +1321,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         context = {
             "title": _("Are you sure?"),
-            "object_name": force_text(titleopts.verbose_name),
+            "object_name": force_str(titleopts.verbose_name),
             "object": page_content,
             "deleted_objects": to_delete_objects,
             "perms_lacking": perms_needed,
@@ -1346,7 +1346,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if not self.has_change_permission(request, obj=page_content):
             message = _("You do not have permission to change this page's in_navigation status")
-            return HttpResponseForbidden(force_text(message))
+            return HttpResponseForbidden(force_str(message))
 
         if page_content is None:
             raise self._get_404_exception(object_id)

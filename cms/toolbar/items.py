@@ -3,7 +3,7 @@ from abc import ABCMeta
 from collections import defaultdict
 
 from django.template.loader import render_to_string
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
@@ -221,7 +221,7 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
         self.csrf_token = csrf_token
 
     def __repr__(self):
-        return '<Menu:%s>' % force_text(self.name)
+        return '<Menu:%s>' % force_str(self.name)
 
     def add_break(self, identifier=None, position=None):
         item = Break(identifier)
@@ -270,7 +270,7 @@ class LinkItem(BaseItem):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<LinkItem:%s>' % force_text(self.name)
+        return '<LinkItem:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -288,7 +288,7 @@ class FrameItem(BaseItem):
     def __init__(self, name, url, active=False, disabled=False,
                  extra_classes=None, on_close=None, side=LEFT):
         super().__init__(side)
-        self.name = "%s..." % force_text(name)
+        self.name = "%s..." % force_str(name)
         self.url = url
         self.active = active
         self.disabled = disabled
@@ -297,7 +297,7 @@ class FrameItem(BaseItem):
 
     def __repr__(self):
         # Should be overridden
-        return '<FrameItem:%s>' % force_text(self.name)
+        return '<FrameItem:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -314,14 +314,14 @@ class SideframeItem(FrameItem):
     template = "cms/toolbar/items/item_sideframe.html"
 
     def __repr__(self):
-        return '<SideframeItem:%s>' % force_text(self.name)
+        return '<SideframeItem:%s>' % force_str(self.name)
 
 
 class ModalItem(FrameItem):
     template = "cms/toolbar/items/item_modal.html"
 
     def __repr__(self):
-        return '<ModalItem:%s>' % force_text(self.name)
+        return '<ModalItem:%s>' % force_str(self.name)
 
 
 class AjaxItem(BaseItem):
@@ -343,7 +343,7 @@ class AjaxItem(BaseItem):
         self.method = method
 
     def __repr__(self):
-        return '<AjaxItem:%s>' % force_text(self.name)
+        return '<AjaxItem:%s>' % force_str(self.name)
 
     def get_context(self):
         data = self.data.copy()
@@ -398,7 +398,7 @@ class Button(BaseButton):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<Button:%s>' % force_text(self.name)
+        return '<Button:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -422,7 +422,7 @@ class ModalButton(Button):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<ModalButton:%s>' % force_text(self.name)
+        return '<ModalButton:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -439,7 +439,7 @@ class SideframeButton(ModalButton):
     template = "cms/toolbar/items/button_sideframe.html"
 
     def __repr__(self):
-        return '<SideframeButton:%s>' % force_text(self.name)
+        return '<SideframeButton:%s>' % force_str(self.name)
 
 
 class ButtonList(BaseItem):
@@ -514,7 +514,7 @@ class Dropdown(ButtonList):
         self.primary_button = None
 
     def __repr__(self):
-        return '<Dropdown:%s>' % force_text(self.name)
+        return '<Dropdown:%s>' % force_str(self.name)
 
     def add_primary_button(self, button):
         self.primary_button = button
@@ -545,7 +545,7 @@ class DropdownToggleButton(BaseButton):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<DropdownToggleButton:%s>' % force_text(self.name)
+        return '<DropdownToggleButton:%s>' % force_str(self.name)
 
     def get_context(self):
         return {

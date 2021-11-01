@@ -6,7 +6,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models
 from django.template.defaultfilters import title
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 from cms.cache import invalidate_cms_page_cache
@@ -377,7 +377,7 @@ class Placeholder(models.Model):
                             'ignoring.' % {
                                 'plugin_class': plugin.__class__.__name__,
                                 'pk': instance.pk,
-                                'value': force_text(plugin_expiration),
+                                'value': force_str(plugin_expiration),
                             })
                         continue
                 else:
@@ -395,7 +395,7 @@ class Placeholder(models.Model):
                         'get_cache_expiration(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
-                            'value': force_text(plugin_expiration),
+                            'value': force_str(plugin_expiration),
                         })
                     continue
 
@@ -471,7 +471,7 @@ class Placeholder(models.Model):
                         'get_vary_cache_on(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
-                            'value': force_text(vary_on),
+                            'value': force_str(vary_on),
                         })
 
         return sorted(list(vary_list))
