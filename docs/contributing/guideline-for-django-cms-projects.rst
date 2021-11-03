@@ -1,10 +1,17 @@
 ..  _move-existing-projects:
 
-##################################################################################################################
-Guidelines for creating a new django CMS project under the django-cms umbrella or move an existing one to it
-##################################################################################################################
+#####################################
+Guidelines for django CMS projects
+#####################################
 
-.. note::  Disclaimer: These guidelines are based on the best practice established by the Jazzband project, a community of contributors that shares the responsibility of maintaining Python-based projects.
+.. note:: These guidelines are based on the best practice established by the Jazzband project, a community of contributors that shares the responsibility of maintaining Python-based projects.
+
+The django CMS ecosystem consists of many custom projects. Often these projects are maintained by the author himself.
+However, sometimes it can make sense to put a project in the care of the django CMS project.
+Either because it is of interest to the entire community, or because the author can no longer devote time to maintain the project himself.
+
+Whether an existing project is transferred to the django CMS Github organization,
+or a new project is set up within the django CMS Github organization, it is important that certain standards are followed.
 
 **********************************************************
 Acceptance criteria for new projects or existing ones
@@ -27,7 +34,7 @@ Viability
 Projects to be maintained by the django CMS project must have a certain maturity (No proof of concepts,
 one-off toys or code snippet hosts) and cover a profound functionality.
 They should also be transferred to django CMS with the agreement of the previous maintainer and in
-consultation with the Tech Committee.
+consultation with the Tech Committee (see `Tech Committee <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_).
 
 Documentation
 *****************
@@ -43,12 +50,12 @@ Tests
 ********
 Your contributions and fixes are more than welcome as for your tests. We do not want to compromise our codebase.
 Therefore, you are going to have to include tests if you want to contribute. Automatic testing based on GitHub Actions
-is also strongly encouraged. For more information about running and writing tests `please see here <https://docs.django-cms.org/en/latest/contributing/testing.html>`_.
+is also strongly encouraged. For more information about running and writing tests please `see here <https://docs.django-cms.org/en/latest/contributing/testing.html>`_.
 
 Conduct
 ********
 
-Projects are required to adopt and follow the django CMS code of conduct <https://docs.django-cms.org/en/latest/contributing/code_of_conduct.html>`_.
+Projects are required to adopt and follow the django CMS `code of conduct <https://docs.django-cms.org/en/latest/contributing/code_of_conduct.html>`_.
 Please see the Contributor Code of Conduct for more information about what that entails and how to report conduct violations.
 
 Contributing Guidelines
@@ -84,4 +91,4 @@ Of course extending the contributing document with your project’s contributing
 Move an existing project to the django CMS Github organization
 *****************************************************************
 
-To initiate the transfer to django CMS, you should use Github’s Transfer Feature to transfer the repository to the django CMS organization.
+To initiate the transfer to django CMS, you should use Github’s `Transfer Feature <https://docs.github.com/en/repositories/creating-and-managing-repositories/transferring-a-repository>`_ to transfer the repository to the django CMS organization.
