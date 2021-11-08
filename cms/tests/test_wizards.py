@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from mock import patch, Mock
 
 from django import forms
@@ -9,8 +8,8 @@ from django.forms.models import ModelForm
 from django.template import TemplateSyntaxError
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.encoding import smart_text
-from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext as _
 
 from cms import app_registration
 from cms.api import create_page
@@ -60,7 +59,7 @@ class BadModelForm(ModelForm):
         pass
 
 
-class WizardTestMixin(object):
+class WizardTestMixin():
     page_wizard = None
     title_wizard = None
 
@@ -76,7 +75,7 @@ class WizardTestMixin(object):
 
     @classmethod
     def setUpClass(cls):
-        super(WizardTestMixin, cls).setUpClass()
+        super().setUpClass()
         # This prevents auto-discovery, which would otherwise occur as soon as
         # tests start, creating unexpected starting conditions.
         wizard_pool._discovered = True
@@ -133,7 +132,7 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             title="Sample Page",
             template=TEMPLATE_INHERITANCE_MAGIC,
             language="en",
-            created_by=smart_text(user),
+            created_by=smart_str(user),
             parent=None,
             in_navigation=True,
         )

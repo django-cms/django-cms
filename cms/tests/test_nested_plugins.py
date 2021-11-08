@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import create_page, add_plugin
@@ -6,11 +5,10 @@ from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.tests.test_plugins import PluginsTestBaseCase
-from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.plugins import copy_plugins_to_placeholder
 
 
-class NestedPluginsTestCase(PluginsTestBaseCase, UnittestCompatMixin):
+class NestedPluginsTestCase(PluginsTestBaseCase):
 
     def compare_plugin_tree(self, tree, placeholder):
         counter = 1

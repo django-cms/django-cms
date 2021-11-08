@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import warnings
 
 from datetime import datetime, timedelta
@@ -8,8 +6,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models
 from django.template.defaultfilters import title
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 
 from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import clear_placeholder_cache
@@ -25,10 +23,7 @@ from cms.utils import get_language_from_request
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 
-from six import python_2_unicode_compatible, string_types
 
-
-@python_2_unicode_compatible
 class Placeholder(models.Model):
     """
     Attributes:
@@ -382,7 +377,7 @@ class Placeholder(models.Model):
                             'ignoring.' % {
                                 'plugin_class': plugin.__class__.__name__,
                                 'pk': instance.pk,
-                                'value': force_text(plugin_expiration),
+                                'value': force_str(plugin_expiration),
                             })
                         continue
                 else:
@@ -400,7 +395,7 @@ class Placeholder(models.Model):
                         'get_cache_expiration(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
-                            'value': force_text(plugin_expiration),
+                            'value': force_str(plugin_expiration),
                         })
                     continue
 
@@ -461,7 +456,7 @@ class Placeholder(models.Model):
             if not vary_on:
                 # None, or an empty iterable
                 continue
-            if isinstance(vary_on, string_types):
+            if isinstance(vary_on, str):
                 if vary_on.lower() not in vary_list:
                     vary_list.add(vary_on.lower())
             else:
@@ -476,7 +471,7 @@ class Placeholder(models.Model):
                         'get_vary_cache_on(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
-                            'value': force_text(vary_on),
+                            'value': force_str(vary_on),
                         })
 
         return sorted(list(vary_list))

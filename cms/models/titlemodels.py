@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms import constants
 from cms.models.fields import PlaceholderRelationField
@@ -9,10 +8,7 @@ from cms.models.managers import PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
 
-from six import python_2_unicode_compatible
 
-
-@python_2_unicode_compatible
 class PageContent(models.Model):
     LIMIT_VISIBILITY_IN_MENU_CHOICES = (
         (constants.VISIBILITY_ALL, _('no limit set')),
@@ -109,7 +105,7 @@ class PageContent(models.Model):
         # delete template cache
         if hasattr(self, '_template_cache'):
             delattr(self, '_template_cache')
-        super(PageContent, self).save(**kwargs)
+        super().save(**kwargs)
 
     def toggle_in_navigation(self, set_to=None):
         '''
@@ -212,7 +208,7 @@ class PageContent(models.Model):
         return self.page.get_absolute_url(language=language)
 
 
-class EmptyPageContent(object):
+class EmptyPageContent():
     """
     Empty title object, can be returned from Page.get_title_obj() if required
     title object doesn't exists.

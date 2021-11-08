@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
 import json
 import sys
 import warnings
+
+from urllib.parse import unquote, urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -34,8 +35,6 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
 
-from six.moves.urllib.parse import unquote, urljoin
-
 
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -49,7 +48,7 @@ URL_CMS_TRANSLATION_DELETE = urljoin('/en/admin/cms/pagecontent/', "delete-trans
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
-class _Warning(object):
+class _Warning():
     def __init__(self, message, category, filename, lineno):
         self.message = message
         self.category = category
@@ -88,11 +87,11 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-class BaseCMSTestCase(object):
+class BaseCMSTestCase():
     counter = 1
 
     def _fixture_setup(self):
-        super(BaseCMSTestCase, self)._fixture_setup()
+        super()._fixture_setup()
         self.create_fixtures()
         activate("en")
 
@@ -102,7 +101,7 @@ class BaseCMSTestCase(object):
     def _post_teardown(self):
         menu_pool.clear()
         cache.clear()
-        super(BaseCMSTestCase, self)._post_teardown()
+        super()._post_teardown()
         set_current_user(None)
 
     def login_user_context(self, user):
@@ -419,7 +418,7 @@ class BaseCMSTestCase(object):
         else:
             request.current_page = None
 
-        class MockStorage(object):
+        class MockStorage():
 
             def __len__(self):
                 return 0

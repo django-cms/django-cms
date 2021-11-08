@@ -3,7 +3,7 @@ from cms.exceptions import SubClassNeededError
 from .models import PageExtension, TitleExtension
 
 
-class ExtensionPool(object):
+class ExtensionPool():
     def __init__(self):
         self.page_extensions = set()
         self.title_extensions = set()

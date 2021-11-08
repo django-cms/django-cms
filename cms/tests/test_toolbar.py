@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import datetime
 import iptools
 import re
@@ -12,10 +10,10 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
@@ -135,7 +133,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def get_page_item(self, toolbar):
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        page_item = [item for item in items if force_text(item.name) == 'Page']
+        page_item = [item for item in items if force_str(item.name) == 'Page']
         self.assertEqual(len(page_item), 1)
         return page_item[0]
 
@@ -179,8 +177,10 @@ class ToolbarTests(ToolbarTestBase):
 
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<script type="text/javascript" src="/static/samplemap/js/sampleapp.js"></script>')
-            self.assertContains(response, '<link href="/static/samplemap/css/sampleapp.css"')
+
+        self.assertContains(response, 'src="/static/samplemap/js/sampleapp.js"')
+        self.assertContains(response, 'href="/static/samplemap/css/sampleapp.css"')
+
         toolbar_pool.toolbars = old_pool
         toolbar_pool._discovered = True
 
@@ -317,7 +317,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         page_item = self.get_page_item(toolbar)
         template_item = [item for item in page_item.items
-                         if force_text(getattr(item, 'name', '')) == 'Templates']
+                         if force_str(getattr(item, 'name', '')) == 'Templates']
         self.assertEqual(len(template_item), 0)
 
         # Give the user change advanced settings permission
@@ -333,7 +333,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         page_item = self.get_page_item(toolbar)
         template_item = [item for item in page_item.items
-                         if force_text(getattr(item, 'name', '')) == 'Templates']
+                         if force_str(getattr(item, 'name', '')) == 'Templates']
         self.assertEqual(len(template_item), 1)
 
     def test_markup(self):
@@ -738,13 +738,13 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         toolbar.populate()
         menu = dict(
-            (force_text(getattr(item, 'name', '|')), item)
+            (force_str(getattr(item, 'name', '|')), item)
             for item in toolbar.get_menu(menu_id).get_items()
         )
         self.assertIn(name, list(menu))
         if items is not None:
             sub_menu = list(
-                force_text(getattr(item, 'name', '|')) for item in menu[name].get_items()
+                force_str(getattr(item, 'name', '|')) for item in menu[name].get_items()
             )
             self.assertEqual(sorted(sub_menu), sorted(items))
 
@@ -937,7 +937,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
     def tearDown(self):
         Example1.objects.all().delete()
-        super(EditModelTemplateTagTest, self).tearDown()
+        super().tearDown()
 
     def test_markup_toolbar_url_model(self):
         superuser = self.get_superuser()

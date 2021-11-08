@@ -1,11 +1,10 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
-from django.utils.translation import override as force_language, ugettext_lazy as _
+from django.utils.translation import override as force_language, gettext_lazy as _
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
@@ -64,7 +63,7 @@ class PlaceholderToolbar(CMSToolbar):
         self.page = self.request.current_page
 
     def post_template_populate(self):
-        super(PlaceholderToolbar, self).post_template_populate()
+        super().post_template_populate()
         self.add_wizard_button()
         self.render_object_editable_buttons()
 

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 import re
 
@@ -12,17 +11,15 @@ from django.core.exceptions import (
     ObjectDoesNotExist,
     ValidationError,
 )
-from django.utils.encoding import force_text, smart_str
+from django.utils.encoding import force_str, smart_str
 from django.utils.html import escapejs
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
 from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
 from cms.utils.conf import get_cms_setting
-
-from six import python_2_unicode_compatible, with_metaclass
 
 
 class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
@@ -31,7 +28,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     they're not given.
     """
     def __new__(cls, name, bases, attrs):
-        super_new = super(CMSPluginBaseMetaclass, cls).__new__
+        super_new = super().__new__
         parents = [base for base in bases if isinstance(base, CMSPluginBaseMetaclass)]
         if not parents:
             # If this is CMSPluginBase itself, and not a subclass, don't do anything
@@ -102,8 +99,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
-@python_2_unicode_compatible
-class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
+class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     name = ""
     module = _("Generic")  # To be overridden in child classes
@@ -146,7 +142,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
 
     def __init__(self, model=None, admin_site=None):
         if admin_site:
-            super(CMSPluginBase, self).__init__(self.model, admin_site)
+            super().__init__(self.model, admin_site)
 
         self.object_successfully_changed = False
         self.placeholder = None
@@ -260,7 +256,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
         })
 
-        return super(CMSPluginBase, self).render_change_form(request, context, add, change, form_url, obj)
+        return super().render_change_form(request, context, add, change, form_url, obj)
 
     def render_close_frame(self, request, obj, extra_context=None):
         try:
@@ -292,7 +288,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
             children=child_classes,
             parents=parent_classes,
         )
-        data['plugin_desc'] = escapejs(force_text(obj.get_short_description()))
+        data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
 
         context = {
             'plugin': obj,
@@ -339,7 +335,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         pl.clear_cache(obj.language)
 
     def save_form(self, request, form, change):
-        obj = super(CMSPluginBase, self).save_form(request, form, change)
+        obj = super().save_form(request, form, change)
 
         for field, value in self._cms_initial_attributes.items():
             # Set the initial attribute hooks (if any)
@@ -357,7 +353,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
     def response_change(self, request, obj):
         self.object_successfully_changed = True
         opts = self.model._meta
-        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        msg_dict = {'name': force_str(opts.verbose_name), 'obj': force_str(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
         return self.render_close_frame(request, obj)
@@ -386,13 +382,13 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (force_text(self.name), force_text(instance))
+        return "%s - %s" % (force_str(self.name), force_str(instance))
 
     def get_fieldsets(self, request, obj=None):
         """
         Same as from base class except if there are no fields, show an info message.
         """
-        fieldsets = super(CMSPluginBase, self).get_fieldsets(request, obj)
+        fieldsets = super().get_fieldsets(request, obj)
 
         for name, data in fieldsets:
             if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets
@@ -413,7 +409,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         Returns the text displayed to the user when editing a plugin
         that requires no configuration.
         """
-        return ugettext('There are no further settings for this plugin. Please press save.')
+        return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
     def get_child_class_overrides(cls, slot, page):
@@ -516,7 +512,7 @@ class CMSPluginBase(with_metaclass(CMSPluginBaseMetaclass, admin.ModelAdmin)):
         return self.name
 
 
-class PluginMenuItem(object):
+class PluginMenuItem():
 
     def __init__(self, name, url, data=None, question=None, action='ajax', attributes=None):
         """

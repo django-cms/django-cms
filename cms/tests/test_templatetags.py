@@ -8,7 +8,7 @@ from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import escape
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
@@ -60,16 +60,16 @@ class TemplatetagTests(CMSTestCase):
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
                 page.title_cache = {'en': PageContent(page_title="test2", title="test2")}
-                self.assertEqual('test2', force_text(get_page_display_name(page)))
+                self.assertEqual('test2', force_str(get_page_display_name(page)))
                 page.title_cache = {'en': PageContent(page_title="test2")}
-                self.assertEqual('test2', force_text(get_page_display_name(page)))
+                self.assertEqual('test2', force_str(get_page_display_name(page)))
                 page.title_cache = {'en': PageContent(menu_title="test2")}
-                self.assertEqual('test2', force_text(get_page_display_name(page)))
+                self.assertEqual('test2', force_str(get_page_display_name(page)))
                 page.title_cache = {'en': PageContent()}
                 page.urls_cache = {'en': PageUrl(slug='test2')}
-                self.assertEqual('test2', force_text(get_page_display_name(page)))
+                self.assertEqual('test2', force_str(get_page_display_name(page)))
                 page.title_cache = {'en': PageContent(), 'fr': EmptyPageContent('fr')}
-                self.assertEqual('test2', force_text(get_page_display_name(page)))
+                self.assertEqual('test2', force_str(get_page_display_name(page)))
 
     def test_get_site_id_from_nothing(self):
         with self.settings(SITE_ID=10):
@@ -96,11 +96,11 @@ class TemplatetagTests(CMSTestCase):
     def test_page_attribute_tag_escapes_content(self):
         script = '<script>alert("XSS");</script>'
 
-        class FakePage(object):
+        class FakePage():
             def get_page_title(self, *args, **kwargs):
                 return script
 
-        class FakeRequest(object):
+        class FakeRequest():
             current_page = FakePage()
             GET = {'language': 'en'}
 

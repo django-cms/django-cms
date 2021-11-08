@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.sites.models import Site
 
 from cms.api import create_page

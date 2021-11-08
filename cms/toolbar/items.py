@@ -3,15 +3,13 @@ from abc import ABCMeta
 from collections import defaultdict
 
 from django.template.loader import render_to_string
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
 from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
 
-from six import with_metaclass
 
-
-class ItemSearchResult(object):
+class ItemSearchResult():
     def __init__(self, item, index):
         self.item = item
         self.index = index
@@ -33,7 +31,7 @@ def may_be_lazy(thing):
         return thing
 
 
-class ToolbarAPIMixin(with_metaclass(ABCMeta)):
+class ToolbarAPIMixin(metaclass=ABCMeta):
     REFRESH_PAGE = REFRESH_PAGE
     URL_CHANGE = URL_CHANGE
     LEFT = LEFT
@@ -175,7 +173,7 @@ class ToolbarAPIMixin(with_metaclass(ABCMeta)):
         return item
 
 
-class BaseItem(with_metaclass(ABCMeta)):
+class BaseItem(metaclass=ABCMeta):
     toolbar = None
     template = None
 
@@ -200,7 +198,7 @@ class BaseItem(with_metaclass(ABCMeta)):
 class TemplateItem(BaseItem):
 
     def __init__(self, template, extra_context=None, side=LEFT):
-        super(TemplateItem, self).__init__(side)
+        super().__init__(side)
         self.template = template
         self.extra_context = extra_context
 
@@ -223,7 +221,7 @@ class SubMenu(ToolbarAPIMixin, BaseItem):
         self.csrf_token = csrf_token
 
     def __repr__(self):
-        return '<Menu:%s>' % force_text(self.name)
+        return '<Menu:%s>' % force_str(self.name)
 
     def add_break(self, identifier=None, position=None):
         item = Break(identifier)
@@ -264,7 +262,7 @@ class LinkItem(BaseItem):
     template = "cms/toolbar/items/item_link.html"
 
     def __init__(self, name, url, active=False, disabled=False, extra_classes=None, side=LEFT):
-        super(LinkItem, self).__init__(side)
+        super().__init__(side)
         self.name = name
         self.url = url
         self.active = active
@@ -272,7 +270,7 @@ class LinkItem(BaseItem):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<LinkItem:%s>' % force_text(self.name)
+        return '<LinkItem:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -289,8 +287,8 @@ class FrameItem(BaseItem):
 
     def __init__(self, name, url, active=False, disabled=False,
                  extra_classes=None, on_close=None, side=LEFT):
-        super(FrameItem, self).__init__(side)
-        self.name = "%s..." % force_text(name)
+        super().__init__(side)
+        self.name = "%s..." % force_str(name)
         self.url = url
         self.active = active
         self.disabled = disabled
@@ -299,7 +297,7 @@ class FrameItem(BaseItem):
 
     def __repr__(self):
         # Should be overridden
-        return '<FrameItem:%s>' % force_text(self.name)
+        return '<FrameItem:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -316,14 +314,14 @@ class SideframeItem(FrameItem):
     template = "cms/toolbar/items/item_sideframe.html"
 
     def __repr__(self):
-        return '<SideframeItem:%s>' % force_text(self.name)
+        return '<SideframeItem:%s>' % force_str(self.name)
 
 
 class ModalItem(FrameItem):
     template = "cms/toolbar/items/item_modal.html"
 
     def __repr__(self):
-        return '<ModalItem:%s>' % force_text(self.name)
+        return '<ModalItem:%s>' % force_str(self.name)
 
 
 class AjaxItem(BaseItem):
@@ -332,7 +330,7 @@ class AjaxItem(BaseItem):
     def __init__(self, name, action, csrf_token, data=None, active=False,
                  disabled=False, extra_classes=None,
                  question=None, side=LEFT, on_success=None, method='POST'):
-        super(AjaxItem, self).__init__(side)
+        super().__init__(side)
         self.name = name
         self.action = action
         self.active = active
@@ -345,7 +343,7 @@ class AjaxItem(BaseItem):
         self.method = method
 
     def __repr__(self):
-        return '<AjaxItem:%s>' % force_text(self.name)
+        return '<AjaxItem:%s>' % force_str(self.name)
 
     def get_context(self):
         data = self.data.copy()
@@ -373,7 +371,7 @@ class Break(BaseItem):
         self.identifier = identifier
 
 
-class BaseButton(with_metaclass(ABCMeta)):
+class BaseButton(metaclass=ABCMeta):
     toolbar = None
     template = None
 
@@ -400,7 +398,7 @@ class Button(BaseButton):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<Button:%s>' % force_text(self.name)
+        return '<Button:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -424,7 +422,7 @@ class ModalButton(Button):
         self.on_close = on_close
 
     def __repr__(self):
-        return '<ModalButton:%s>' % force_text(self.name)
+        return '<ModalButton:%s>' % force_str(self.name)
 
     def get_context(self):
         return {
@@ -441,14 +439,14 @@ class SideframeButton(ModalButton):
     template = "cms/toolbar/items/button_sideframe.html"
 
     def __repr__(self):
-        return '<SideframeButton:%s>' % force_text(self.name)
+        return '<SideframeButton:%s>' % force_str(self.name)
 
 
 class ButtonList(BaseItem):
     template = "cms/toolbar/items/button_list.html"
 
     def __init__(self, identifier=None, extra_classes=None, side=LEFT):
-        super(ButtonList, self).__init__(side)
+        super().__init__(side)
         self.extra_classes = extra_classes or []
         self.buttons = []
         self.identifier = identifier
@@ -512,11 +510,11 @@ class Dropdown(ButtonList):
     template = "cms/toolbar/items/dropdown.html"
 
     def __init__(self, *args, **kwargs):
-        super(Dropdown, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.primary_button = None
 
     def __repr__(self):
-        return '<Dropdown:%s>' % force_text(self.name)
+        return '<Dropdown:%s>' % force_str(self.name)
 
     def add_primary_button(self, button):
         self.primary_button = button
@@ -547,7 +545,7 @@ class DropdownToggleButton(BaseButton):
         self.extra_classes = extra_classes or []
 
     def __repr__(self):
-        return '<DropdownToggleButton:%s>' % force_text(self.name)
+        return '<DropdownToggleButton:%s>' % force_str(self.name)
 
     def get_context(self):
         return {

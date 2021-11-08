@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import json
 
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -10,7 +9,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 from django.http import (Http404, HttpResponseBadRequest,
                          HttpResponseNotFound)
-from django.utils.encoding import force_text, smart_str
+from django.utils.encoding import force_str, smart_str
 from django.test.utils import override_settings
 
 from cms import api
@@ -552,7 +551,7 @@ class PluginPermissionTests(AdminTestsBase):
         response = self.client.post(endpoint, dict())
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-        self.assertTrue("Page not found" in force_text(response.content))
+        self.assertTrue("Page not found" in force_str(response.content))
 
 
 class AdminFormsTests(AdminTestsBase):
@@ -715,14 +714,14 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(homepage.get_placeholders('en').count(), 2)
         with self.login_user_context(user):
-            output = force_text(
+            output = force_str(
                 self.client.get('/en/').content
             )
             self.assertIn('<b>Test</b>', output)
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in homepage.get_placeholders('en'):
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            output = force_text(
+            output = force_str(
                 self.client.get('/en/').content
             )
             self.assertIn('<b>Test</b>', output)
@@ -739,7 +738,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         with self.login_user_context(user):
             with self.assertNumQueries(6):
-                force_text(self.client.get(self.get_pages_admin_list_uri('en')))
+                force_str(self.client.get(self.get_pages_admin_list_uri('en')))
 
     def test_smart_link_pages(self):
         admin, staff_guy = self._get_guys()

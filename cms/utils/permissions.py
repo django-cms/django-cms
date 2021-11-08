@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import wraps
@@ -11,7 +10,6 @@ from django.db.models import Q
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, Page, PagePermission
-from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
@@ -204,12 +202,7 @@ def get_page_actions_for_user(user, site):
     )
 
     for perm in page_permissions.iterator():
-        # set internal fk cache to our page with loaded ancestors and descendants
-        if DJANGO_1_11:
-            perm._page_cache = pages_by_id[perm.page_id]
-        else:
-            # for django >= 2.0
-            PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
+        PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
 
         page_ids = frozenset(perm.get_page_ids())
 
@@ -361,11 +354,7 @@ def get_view_restrictions(pages):
 
     for perm in page_permissions:
         # set internal fk cache to our page with loaded ancestors and descendants
-        if DJANGO_1_11:
-            perm._page_cache = pages_by_id[perm.page_id]
-        else:
-            # for django >= 2.0
-            PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
+        PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
 
         for page_id in perm.get_page_ids():
             restricted_pages[page_id].append(perm)

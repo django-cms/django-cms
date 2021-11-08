@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import operator
 import warnings
 from collections import OrderedDict
@@ -15,8 +14,6 @@ from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.utils.conf import get_cms_setting
-
-from six import string_types
 
 
 def _get_nodelist(tpl):
@@ -114,7 +111,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
 
 
 def validate_placeholder_name(name):
-    if not isinstance(name, string_types):
+    if not isinstance(name, str):
         raise ImproperlyConfigured("Placeholder identifier names need to be of type string. ")
 
     if not all(ord(char) < 128 for char in name):
@@ -125,7 +122,7 @@ def validate_placeholder_name(name):
                                    "key to specify a verbose name.")
 
 
-class PlaceholderNoAction(object):
+class PlaceholderNoAction():
     can_copy = False
 
     def copy(self, **kwargs):

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 import datetime
 
 from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
 from django.conf import settings
-
-from cms.utils.compat.dj import MiddlewareMixin
+from django.utils.deprecation import MiddlewareMixin
 
 
 class LanguageCookieMiddleware(MiddlewareMixin):

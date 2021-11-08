@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.text import slugify
 from django.utils.translation import (
-    ugettext,
-    ugettext_lazy as _,
+    gettext,
+    gettext_lazy as _,
 )
 
 from cms.admin.forms import AddPageForm
@@ -64,7 +60,7 @@ class CreateCMSPageForm(AddPageForm):
         )
 
     def __init__(self, *args, **kwargs):
-        super(CreateCMSPageForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['title'].help_text = _(u"Provide a title for the new page.")
         self.fields['slug'].required = False
         self.fields['slug'].widget = SlugWidget()
@@ -139,7 +135,7 @@ class CreateCMSPageForm(AddPageForm):
             has_perm = user_can_add_page(self._user)
 
         if not has_perm:
-            message = ugettext('You don\'t have the permissions required to add a page.')
+            message = gettext('You don\'t have the permissions required to add a page.')
             raise ValidationError(message)
         return parent_page.node if parent_page else None
 
@@ -155,7 +151,7 @@ class CreateCMSPageForm(AddPageForm):
     def save(self, **kwargs):
         from cms.api import add_plugin
 
-        new_translation = super(CreateCMSPageForm, self).save(**kwargs)
+        new_translation = super().save(**kwargs)
         new_page = new_translation.page
 
         if self.cleaned_data.get("page_type"):

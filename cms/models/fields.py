@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from itertools import chain
 
 from django.contrib.contenttypes.fields import GenericRelation
@@ -29,10 +28,10 @@ class PlaceholderField(models.ForeignKey):
         # since a PlaceholderField can only be a ForeignKey to a Placeholder
         kwargs['to'] = 'cms.Placeholder'
         kwargs['on_delete'] = models.CASCADE
-        super(PlaceholderField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def deconstruct(self):
-        name, path, args, kwargs = super(PlaceholderField, self).deconstruct()
+        name, path, args, kwargs = super().deconstruct()
         kwargs['slotname'] = self.slotname
         return name, path, args, kwargs
 
@@ -61,16 +60,16 @@ class PlaceholderField(models.ForeignKey):
             if placeholder.slot != slot:
                 placeholder.slot = slot
                 placeholder.save()
-        return super(PlaceholderField, self).pre_save(model_instance, add)
+        return super().pre_save(model_instance, add)
 
     def save_form_data(self, instance, data):
         data = getattr(instance, self.name, '')
         if not isinstance(data, Placeholder):
             data = self._get_new_placeholder(instance)
-        super(PlaceholderField, self).save_form_data(instance, data)
+        super().save_form_data(instance, data)
 
     def contribute_to_class(self, cls, name):
-        super(PlaceholderField, self).contribute_to_class(cls, name)
+        super().contribute_to_class(cls, name)
         if not hasattr(cls._meta, 'placeholder_field_names'):
             cls._meta.placeholder_field_names = []
         if not hasattr(cls._meta, 'placeholder_fields'):
@@ -88,14 +87,14 @@ class PageField(models.ForeignKey):
         # since a PageField can only be a ForeignKey to a Page
         kwargs['to'] = 'cms.Page'
         kwargs['on_delete'] = models.CASCADE
-        super(PageField, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def formfield(self, **kwargs):
         defaults = {
             'form_class': self.default_form_class,
         }
         defaults.update(kwargs)
-        return super(PageField, self).formfield(**defaults)
+        return super().formfield(**defaults)
 
 
 class PlaceholderRelationField(GenericRelation):
@@ -105,7 +104,7 @@ class PlaceholderRelationField(GenericRelation):
         self._checks = checks or ()
         kwargs.pop('object_id_field', None)
         kwargs.pop('content_type_field', None)
-        super(PlaceholderRelationField, self).__init__(
+        super().__init__(
             Placeholder,
             object_id_field='object_id',
             content_type_field='content_type',

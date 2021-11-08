@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 
@@ -45,7 +44,7 @@ class BaseMenuTest(CMSTestCase):
         return tree, nodes
 
     def setUp(self):
-        super(BaseMenuTest, self).setUp()
+        super().setUp()
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
@@ -55,7 +54,7 @@ class BaseMenuTest(CMSTestCase):
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
-        super(BaseMenuTest, self).tearDown()
+        super().tearDown()
 
     def get_page(self, num):
         return Page.objects.get(pagecontent_set__title='P%s' % num)
@@ -64,7 +63,7 @@ class BaseMenuTest(CMSTestCase):
 class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
     def setUp(self):
-        super(MenuDiscoveryTest, self).setUp()
+        super().setUp()
         menu_pool.discovered = False
         self.old_menu = menu_pool.menus
         menu_pool.menus = {}
@@ -75,7 +74,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
-        super(MenuDiscoveryTest, self).tearDown()
+        super().tearDown()
 
     def test_menu_registered(self):
         menu_pool.discovered = False

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 
 from django.contrib.sites.models import Site

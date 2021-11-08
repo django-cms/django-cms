@@ -1,5 +1,3 @@
-
-# -*- coding: utf-8 -*-
 import sys
 
 from django.contrib.auth import get_user_model
@@ -26,8 +24,6 @@ from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
-
-from six import string_types
 
 
 APP_NAME = 'SampleApp'
@@ -96,7 +92,7 @@ class ApphooksTestCase(CMSTestCase):
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, string_types):
+        if isinstance(title_langs, str):
             titles = child_child_page.get_title_obj(title_langs)
         else:
             titles = [child_child_page.get_title_obj(l) for l in title_langs]

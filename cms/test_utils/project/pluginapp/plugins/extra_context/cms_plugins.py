@@ -1,8 +1,9 @@
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
+
 
 class ExtraContextPlugin(CMSPluginBase):
     model = CMSPlugin

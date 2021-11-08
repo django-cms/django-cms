@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
 from copy import deepcopy
 from collections import defaultdict, deque, OrderedDict
 
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
@@ -318,7 +317,7 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
                 .count()
             )
             if type_count >= type_limit:
-                plugin_name = force_text(plugin_pool.get_plugin(plugin_type).name)
+                plugin_name = force_str(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(
                     "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
                                          % {'limit': type_limit, 'plugin_name': plugin_name})

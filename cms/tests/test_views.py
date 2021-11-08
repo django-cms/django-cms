@@ -43,7 +43,7 @@ class ViewTests(CMSTestCase):
         clear_url_caches()
 
     def tearDown(self):
-        super(ViewTests, self).tearDown()
+        super().tearDown()
         clear_url_caches()
 
     def test_welcome_screen_debug_on(self):
@@ -197,7 +197,7 @@ class ViewTests(CMSTestCase):
         )
 
     def test_toolbar_switch_urls(self):
-        from django.utils.translation import ugettext_lazy as _
+        from django.utils.translation import gettext_lazy as _
 
         user = self.get_superuser()
         user_settings = UserSettings(language="en", user=user)

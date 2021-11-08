@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.template import Template
 
 from cms.api import create_page

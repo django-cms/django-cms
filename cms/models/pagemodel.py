@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import copy
 from logging import getLogger
 from os.path import join
@@ -8,27 +7,24 @@ from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
     get_language,
     override as force_language,
-    ugettext_lazy as _,
+    gettext_lazy as _,
 )
 
 from cms import constants
 from cms.exceptions import LanguageError
 from cms.models.managers import PageManager, PageNodeManager, PageUrlManager
 from cms.utils import i18n
-from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
 
 from menus.menu_pool import menu_pool
-
-from six import python_2_unicode_compatible
 
 from treebeard.mp_tree import MP_Node
 
@@ -36,7 +32,6 @@ from treebeard.mp_tree import MP_Node
 logger = getLogger(__name__)
 
 
-@python_2_unicode_compatible
 class TreeNode(MP_Node):
 
     parent = models.ForeignKey(
@@ -89,14 +84,14 @@ class TreeNode(MP_Node):
             kwargs['instance'].parent = self
         else:
             kwargs['parent'] = self
-        return super(TreeNode, self).add_child(**kwargs)
+        return super().add_child(**kwargs)
 
     def add_sibling(self, pos=None, *args, **kwargs):
         if len(kwargs) == 1 and 'instance' in kwargs:
             kwargs['instance'].parent_id = self.parent_id
         else:
             kwargs['parent_id'] = self.parent_id
-        return super(TreeNode, self).add_sibling(*args, **kwargs)
+        return super().add_sibling(*args, **kwargs)
 
     def update(self, **data):
         cls = self.__class__
@@ -145,7 +140,6 @@ class TreeNode(MP_Node):
             child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
-@python_2_unicode_compatible
 class Page(models.Model):
     """
     A simple hierarchical page model
@@ -198,7 +192,7 @@ class Page(models.Model):
         app_label = 'cms'
 
     def __init__(self, *args, **kwargs):
-        super(Page, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.urls_cache = {}
         self.title_cache = {}
 
@@ -212,7 +206,7 @@ class Page(models.Model):
                 title = None
         if title is None:
             title = u""
-        return force_text(title)
+        return force_str(title)
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} object at {location}>'.format(
@@ -224,12 +218,8 @@ class Page(models.Model):
         return display
 
     def _clear_node_cache(self):
-        if DJANGO_1_11:
-            if hasattr(self, '_node_cache'):
-                del self._node_cache
-        else:
-            if Page.node.is_cached(self):
-                Page.node.field.delete_cached_value(self)
+        if Page.node.is_cached(self):
+            Page.node.field.delete_cached_value(self)
 
     def _clear_internal_cache(self):
         self.urls_cache = {}
@@ -622,7 +612,7 @@ class Page(models.Model):
         if created:
             self.created_by = self.changed_by
 
-        super(Page, self).save(**kwargs)
+        super().save(**kwargs)
 
     def update(self, refresh=False, **data):
         cls = self.__class__
@@ -1063,7 +1053,6 @@ class Page(models.Model):
         return self.get_page_content_obj_attribute("limit_visibility_in_menu", language, fallback, force_reload)
 
 
-@python_2_unicode_compatible
 class PageUrl(models.Model):
     slug = models.SlugField(_("slug"), max_length=255, db_index=True)
     path = models.CharField(_("Path"), max_length=255, db_index=True, null=True)

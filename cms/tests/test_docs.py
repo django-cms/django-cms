@@ -1,10 +1,11 @@
-# -*- coding: utf-8 -*-
 from contextlib import contextmanager
 from unittest import skipIf, skipUnless
 
 import os
 import socket
 import sys
+
+from io import StringIO
 
 from sphinx.errors import SphinxWarning
 from sphinx.application import Sphinx
@@ -17,8 +18,6 @@ except ImportError:
 import cms
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
-
-from six.moves import StringIO
 
 
 ROOT_DIR = os.path.dirname(cms.__file__)

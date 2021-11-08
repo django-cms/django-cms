@@ -1,15 +1,16 @@
-# -*- coding: utf-8 -*-
 from functools import update_wrapper
 import copy
 import json
 
-from django.conf.urls import url
+from urllib.parse import urlparse
+
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
+from django.urls import re_path
 from django.utils.html import conditional_escape
 from django.utils.translation import override
 
@@ -18,8 +19,6 @@ from cms.models import UserSettings
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
-
-from six.moves.urllib.parse import urlparse
 
 
 class SettingsAdmin(ModelAdmin):
@@ -34,16 +33,16 @@ class SettingsAdmin(ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
 
         return [
-            url(r'^session_store/$',
+            re_path(r'^session_store/$',
                 self.session_store,
                 name='%s_%s_session_store' % info),
-            url(r'^cms-toolbar/$',
+            re_path(r'^cms-toolbar/$',
                 wrap(self.get_toolbar),
                 name='%s_%s_get_toolbar' % info),
-            url(r'^$',
+            re_path(r'^$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
-            url(r'^(.+)/$',
+            re_path(r'^(.+)/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
         ]
@@ -56,7 +55,7 @@ class SettingsAdmin(ModelAdmin):
             obj = model.objects.get(user=request.user)
         except model.DoesNotExist:
             return self.add_view(request)
-        return super(SettingsAdmin, self).change_view(request, str(obj.pk))
+        return super().change_view(request, str(obj.pk))
 
     def session_store(self, request):
         """

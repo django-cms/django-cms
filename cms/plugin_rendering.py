@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from collections import OrderedDict
 
 from functools import partial
@@ -20,7 +18,6 @@ from cms.toolbar.utils import (
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
-from cms.utils.compat import DJANGO_1_11
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (
@@ -42,7 +39,7 @@ def _unpack_plugins(parent_plugin):
     return found_plugins
 
 
-class RenderedPlaceholder(object):
+class RenderedPlaceholder():
     __slots__ = (
         'language',
         'site_id',
@@ -74,7 +71,7 @@ class RenderedPlaceholder(object):
         return hash(self.placeholder)
 
 
-class BaseRenderer(object):
+class BaseRenderer():
 
     load_structure = False
     placeholder_edit_template = ''
@@ -200,7 +197,7 @@ class ContentRenderer(BaseRenderer):
     )
 
     def __init__(self, request):
-        super(ContentRenderer, self).__init__(request)
+        super().__init__(request)
         self._placeholders_are_editable = bool(self.toolbar.edit_mode_active)
 
     def placeholder_cache_is_enabled(self):
@@ -530,10 +527,7 @@ class ContentRenderer(BaseRenderer):
         else:
             title = page.get_title_obj(self.request_language, fallback=False)
 
-            if DJANGO_1_11:
-                title._page_cache = page
-            else:
-                PageContent.page.field.set_cached_value(title, page)
+            PageContent.page.field.set_cached_value(title, page)
             # Creates any placeholders missing on the page
             placeholders = title.rescan_placeholders().values()
 
@@ -609,7 +603,7 @@ class StructureRenderer(BaseRenderer):
     )
 
     def get_plugins_to_render(self, *args, **kwargs):
-        plugins = super(StructureRenderer, self).get_plugins_to_render(*args, **kwargs)
+        plugins = super().get_plugins_to_render(*args, **kwargs)
 
         for plugin in plugins:
             yield plugin
@@ -695,7 +689,7 @@ class LegacyRenderer(ContentRenderer):
     )
 
     def get_editable_placeholder_context(self, placeholder, page=None):
-        context = super(LegacyRenderer, self).get_editable_placeholder_context(placeholder, page)
+        context = super().get_editable_placeholder_context(placeholder, page)
         context['plugin_menu_js'] = self.get_placeholder_plugin_menu(placeholder, page=page)
         return context
 
@@ -710,7 +704,7 @@ class PluginContext(Context):
 
     def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
         dict_ = flatten_context(dict_)
-        super(PluginContext, self).__init__(dict_)
+        super().__init__(dict_)
 
         if not processors:
             processors = []

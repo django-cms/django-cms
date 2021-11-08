@@ -20,3 +20,4 @@ pyflakes>=2.1
 django-app-helper
 mock>=2.0.0
 django-formtools
+docutils<0.18  # Fix for: https://github.yuuza.net/sphinx-doc/sphinx/issues/9727

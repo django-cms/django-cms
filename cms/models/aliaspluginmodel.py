@@ -1,14 +1,10 @@
-# -*- coding: utf-8 -*-
 from django.db import models
 from django.db.models import Q
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cms.models import CMSPlugin, Placeholder
 
-from six import python_2_unicode_compatible
 
-
-@python_2_unicode_compatible
 class AliasPluginModel(CMSPlugin):
     """
     AliasPlugin is deprecated,
@@ -41,9 +37,9 @@ class AliasPluginModel(CMSPlugin):
 
     def __str__(self):
         if self.plugin_id:
-            return "(%s) %s" % (force_text(self.plugin.get_plugin_name()), self.plugin.get_plugin_instance()[0])
+            return "(%s) %s" % (force_str(self.plugin.get_plugin_name()), self.plugin.get_plugin_instance()[0])
         else:
-            return force_text(self.alias_placeholder.get_label())
+            return force_str(self.alias_placeholder.get_label())
 
     def get_aliased_placeholder_id(self):
         if self.plugin_id:

@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+
 
 class FuzzyInt(int):
     def __new__(cls, lowest, highest):
-        obj = super(FuzzyInt, cls).__new__(cls, highest)
+        obj = super().__new__(cls, highest)
         obj.lowest = lowest
         obj.highest = highest
         return obj

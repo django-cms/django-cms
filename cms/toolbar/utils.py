@@ -1,29 +1,26 @@
-from __future__ import unicode_literals
 from collections import defaultdict, deque
 import json
 
 from django.contrib.contenttypes.models import ContentType
-from django.utils.encoding import force_text
-from django.utils.translation import get_language, override as force_language, ugettext
+from django.utils.encoding import force_str
+from django.utils.translation import get_language, override as force_language, gettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.utils.urlutils import admin_reverse
 
-from six import text_type
-
 
 def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
     label = placeholder.get_label() or ''
-    help_text = ugettext(
+    help_text = gettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
     ) % {'placeholder_label': label}
 
     data = {
         'type': 'placeholder',
-        'name': force_text(label),
-        'placeholder_id': text_type(placeholder.pk),
+        'name': force_str(label),
+        'placeholder_id': str(placeholder.pk),
         'plugin_restriction': allowed_plugins or [],
-        'addPluginHelpTitle': force_text(help_text),
+        'addPluginHelpTitle': force_str(help_text),
         'urls': {
             'add_plugin': admin_reverse('cms_placeholder_add_plugin'),
             'copy_plugin': admin_reverse('cms_placeholder_copy_plugins'),
@@ -34,12 +31,12 @@ def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
 
 def get_plugin_toolbar_info(plugin, children=None, parents=None):
     data = plugin.get_plugin_info(children=children, parents=parents)
-    help_text = ugettext(
+    help_text = gettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': data['plugin_name']}
 
     data['onClose'] = False
-    data['addPluginHelpTitle'] = force_text(help_text)
+    data['addPluginHelpTitle'] = force_str(help_text)
     data['plugin_order'] = ''
     data['plugin_restriction'] = children or []
     data['plugin_parent_restriction'] = parents or []

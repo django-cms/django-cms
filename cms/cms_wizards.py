@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage

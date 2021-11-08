@@ -1,14 +1,8 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import models
 
 from cms.models import CMSPlugin
 
-from six import python_2_unicode_compatible
 
-
-@python_2_unicode_compatible
 class Link(CMSPlugin):
     name = models.CharField(
         verbose_name='Display name',

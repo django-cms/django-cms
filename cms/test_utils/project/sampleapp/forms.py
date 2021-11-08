@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
@@ -15,7 +14,7 @@ class LoginForm2(AuthenticationForm):
 
 class LoginForm3(AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
-        super(LoginForm3, self).__init__(request, *args, **kwargs)
+        super().__init__(request, *args, **kwargs)
 
 
 class SampleWizardForm(forms.ModelForm):

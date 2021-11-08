@@ -1,12 +1,8 @@
-# -*- coding: utf-8 -*-
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
 from django.db import models
 
-from six import python_2_unicode_compatible
 
-
-@python_2_unicode_compatible
 class PlaceholderReference(CMSPlugin):
     cmsplugin_ptr = models.OneToOneField(
         CMSPlugin,

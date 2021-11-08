@@ -1,10 +1,10 @@
 import os
 
+from io import StringIO
+
 from pyflakes import api
 from pyflakes.checker import Checker
 from pyflakes.reporter import Reporter
-
-from six.moves import StringIO
 
 
 def _pyflakes_report_with_nopyflakes(self, messageClass, node, *args, **kwargs):

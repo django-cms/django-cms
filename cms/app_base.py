@@ -1,10 +1,7 @@
-# -*- coding: utf-8 -*-
 from abc import ABCMeta, abstractmethod
 
-from six import with_metaclass
 
-
-class CMSApp(object):
+class CMSApp:
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
     _urls = []
     #: list of menu classes: example: ``_menus = [MyAppMenu]``
@@ -34,7 +31,7 @@ class CMSApp(object):
                     )
                 )
             cls.app_config.cmsapp = cls
-        return super(CMSApp, cls).__new__(cls)
+        return super().__new__(cls)
 
     def get_configs(self):
         """
@@ -98,14 +95,14 @@ class CMSApp(object):
         return self._urls
 
 
-class CMSAppConfig(object):
+class CMSAppConfig():
     """Base class that all cms app configurations should inherit from"""
 
     def __init__(self, django_app_config):
         self.app_config = django_app_config
 
 
-class CMSAppExtension(with_metaclass(ABCMeta)):
+class CMSAppExtension(metaclass=ABCMeta):
     """Base class that all cms app extensions should inherit from"""
 
     @abstractmethod
