@@ -20,6 +20,7 @@ from cms.models.pagemodel import TreeNode
 from cms.page_rendering import _handle_no_page, _render_welcome_page, render_pagecontent
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
+from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import (get_fallback_languages, get_public_languages,
@@ -55,7 +56,11 @@ def details(request, slug):
             content, headers, expires_datetime = cache_content
             response = HttpResponse(content)
             response.xframe_options_exempt = True
-            response._headers = headers
+            if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
+                response._headers = headers
+            else:
+                #  for django3.2 and above. response.headers replaces response._headers in earlier versions of django
+                response.headers = headers
             # Recalculate the max-age header for this cached response
             max_age = int(
                 (expires_datetime - response_timestamp).total_seconds() + 0.5)
