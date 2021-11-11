@@ -1,36 +1,72 @@
 {
     "latest": {
-        "version": "3.8.0",
-        "url": "http://docs.django-cms.org/en/latest/upgrade/3.8.0.html"
+        "version": "3.9.0",
+        "url": "https://docs.django-cms.org/en/latest/upgrade/3.9.0.html"
     },
     "patches": [
         {
+            "version": "3.8.0",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.8.html"
+        },
+        {
             "version": "3.7.4",
-            "url": "http://docs.django-cms.org/en/release-3.7.x/upgrade/3.7.4.html"
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.7.4.html"
+        },
+        {
+            "version": "3.7.3",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.7.3.html"
+        },
+        {
+            "version": "3.7.2",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.7.2.html"
+        },
+        {
+            "version": "3.7.1",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.7.1.html"
+        },
+        {
+            "version": "3.7.0",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.7.html"
         },
         {
             "version": "3.6.1",
-            "url": "http://docs.django-cms.org/en/release-3.6.x/upgrade/3.6.1.html"
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.6.1.html"
+        },
+        {
+            "version": "3.6.0",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.6.html"
         },
         {
             "version": "3.5.4",
-            "url": "http://docs.django-cms.org/en/release-3.5.x/upgrade/3.5.4.html"
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.5.4.html"
+        },
+        {
+            "version": "3.5.3",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.5.3.html"
+        },
+        {
+            "version": "3.5.2",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.5.2.html"
+        },
+        {
+            "version": "3.5.1",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.5.1.html"
+        },
+        {
+            "version": "3.5.0",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.5.html"
         },
         {
             "version": "3.4.7",
-            "url": "http://docs.django-cms.org/en/release-3.4.x/upgrade/3.4.7.html"
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.4.7.html"
         },
         {
-            "version": "3.3.4",
-            "url": "http://docs.django-cms.org/en/release-3.3.x/upgrade/3.3.4.html"
+            "version": "3.4.6",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.4.6.html"
         },
         {
-            "version": "3.2.6",
-            "url": "http://docs.django-cms.org/en/release-3.2.x/upgrade/3.2.6.html"
-        },
-        {
-            "version": "3.1.6",
-            "url": "http://docs.django-cms.org/en/release-3.1.x/upgrade/3.1.6.html"
+            "version": "3.4.5",
+            "url": "https://docs.django-cms.org/en/latest/upgrade/3.4.5.html"
         }
     ]
 }
