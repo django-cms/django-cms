@@ -214,7 +214,6 @@ listed in ``INSTALLED_APPS``, and::
 in the ``TEMPLATES['OPTIONS']['context_processors']``:
 
 ..  code-block:: python
-    :emphasize-lines: 7
 
     TEMPLATES = [
         {
@@ -275,7 +274,6 @@ other patterns, so that specific URLs for other applications can be detected fir
 You'll also need to have an import for ``django.urls.include``. For example:
 
 ..  code-block:: python
-    :emphasize-lines: 1,5
 
     from django.urls import re_path, include
 
@@ -287,7 +285,6 @@ You'll also need to have an import for ``django.urls.include``. For example:
 The django CMS project will now run, as you'll see if you launch it with
 
 ..  code-block:: bash
-    :emphasize-lines: 1,5
 
     python manage.py runserver
 
@@ -345,7 +342,6 @@ This is worth explaining in a little detail:
 Django needs to be know where to look for its templates, so add ``templates`` to the ``TEMPLATES['DIRS']`` list:
 
 ..  code-block:: python
-    :emphasize-lines: 4
 
     TEMPLATES = [
         {
@@ -389,7 +385,6 @@ For deployment, you need to configure suitable media file serving. **For develop
 work in your ``urls.py``:
 
 ..  code-block:: python
-    :emphasize-lines: 1,2,6
 
     from django.conf import settings
     from django.conf.urls.static import static
