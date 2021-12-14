@@ -21,12 +21,12 @@ macOS:
 
 After that:
 
-Clone the repository:
+Fork & Clone the repository:
 ^^^^^^^^^^^^^^^^^^^^^
 
 .. code:: bash
 
-    git@github.com:django-cms/django-cms.git
+    git@github.com:your-github-username/django-cms.git
 
 Switch to the django-cms directory:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -60,7 +60,7 @@ Open the local docs instance in your browser:
     open http://0.0.0.0:8001/
 
 The documentation uses livereload. This means, that every time something
-is changed, the documentation will automatically reloaded in the
+is changed, the documentation will automatically reload in your
 browser.
 
 Contribute

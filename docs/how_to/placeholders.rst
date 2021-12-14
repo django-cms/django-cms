@@ -75,7 +75,13 @@ PlaceholderFields in it will **only be available for editing from the frontend**
 
 To provide admin support for a model with a ``PlaceholderField`` in your application's admin, you
 need to use the mixin :class:`~cms.admin.placeholderadmin.PlaceholderAdminMixin` along with the
-:class:`~django.contrib.admin.ModelAdmin`. Note that the ``PlaceholderAdminMixin`` **must** precede
+:class:`~django.contrib.admin.ModelAdmin`.
+
+.. note::
+
+    Using this mixin is mandatory for permission check to work properly.
+
+Note that the ``PlaceholderAdminMixin`` **must** precede
 the ``ModelAdmin`` in the class definition::
 
     from django.contrib import admin

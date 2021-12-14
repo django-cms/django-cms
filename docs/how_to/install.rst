@@ -32,14 +32,14 @@ django CMS also has other requirements, which it lists as dependencies in its ``
 ..  important::
 
     We strongly recommend doing all of the following steps in a virtual environment. You ought to know how to create,
-    activate and dispose of virtual environments using `virtualenv <https://virtualenv.pypa.io>`_. If you don't, you
+    activate and dispose of virtual environments using `venv <https://docs.python.org/3.9/library/venv.html>`_. If you don't, you
     can use the steps below to get started, but you are advised to take a few minutes to learn the basics of using
     virtualenv before proceeding further.
 
     ..  code-block:: bash
 
-        virtualenv django-cms-site  # create a virtualenv
-        source django-cms-site/bin/activate  # activate it
+        python3 -m venv venv # create a virtualenv
+        source venv/bin/activate  # activate it
 
 In an activated virtualenv, run::
 
@@ -63,13 +63,14 @@ Create a new project::
     django-admin startproject myproject
 
 If this is new to you, you ought to read the `official Django tutorial
-<https://docs.djangoproject.com/en/dev/intro/tutorial01/>`_, which covers starting a new project.
+<https://docs.djangoproject.com/en/3.2/intro/tutorial01/>`_, which covers starting a new project.
 
 Your new project will look like this::
 
     myproject
         myproject
             __init__.py
+            asgi.py
             settings.py
             urls.py
             wsgi.py
@@ -139,7 +140,7 @@ as it is configured by default in a new Django project's :setting:`django:DATABA
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR , 'db.sqlite3'),
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
 
@@ -213,7 +214,6 @@ listed in ``INSTALLED_APPS``, and::
 in the ``TEMPLATES['OPTIONS']['context_processors']``:
 
 ..  code-block:: python
-    :emphasize-lines: 7
 
     TEMPLATES = [
         {
@@ -268,14 +268,12 @@ Further required configuration
 URLs
 ====
 
-In the project's ``urls.py``, add ``url(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
-other patterns, so that specific URLs for other applications can be detected first. Note: when using Django 2.0 or
-later the syntax is ``re_path(r'^', include('cms.urls'))``
+In the project's ``urls.py``, add ``re_path(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
+other patterns, so that specific URLs for other applications can be detected first.
 
 You'll also need to have an import for ``django.urls.include``. For example:
 
 ..  code-block:: python
-    :emphasize-lines: 1,5
 
     from django.urls import re_path, include
 
@@ -284,8 +282,14 @@ You'll also need to have an import for ``django.urls.include``. For example:
         re_path(r'^', include('cms.urls')),
     ]
 
-The django CMS project will now run, as you'll see if you launch it with ``python manage.py runserver``. You'll be able
-to reach it at http://localhost:8000/, and the admin at http://localhost:8000/admin/. You won't yet actually be able to
+The django CMS project will now run, as you'll see if you launch it with
+
+..  code-block:: bash
+
+    python manage.py runserver
+
+
+You'll be able to reach it at http://localhost:8000/, and the admin at http://localhost:8000/admin/. You won't yet actually be able to
 do anything very useful with it though.
 
 
@@ -338,7 +342,6 @@ This is worth explaining in a little detail:
 Django needs to be know where to look for its templates, so add ``templates`` to the ``TEMPLATES['DIRS']`` list:
 
 ..  code-block:: python
-    :emphasize-lines: 4
 
     TEMPLATES = [
         {
@@ -382,7 +385,6 @@ For deployment, you need to configure suitable media file serving. **For develop
 work in your ``urls.py``:
 
 ..  code-block:: python
-    :emphasize-lines: 1,2,6
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -488,8 +490,7 @@ rely on a set of well-maintained plugins that cover some general content managem
 
 To install::
 
-    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet
-        djangocms-style
+    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet djangocms-style
 
 and add::
 
