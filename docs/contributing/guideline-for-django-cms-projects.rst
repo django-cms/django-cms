@@ -61,31 +61,17 @@ Please see the Contributor Code of Conduct for more information about what that 
 Contributing Guidelines
 ***************************
 
-Projects have to add a CONTRIBUTING.md or CONTRIBUTING.rst file to their repository so it’s automatically displayed
+Projects have to add a CONTRIBUTING.md ( `Markdown <https://daringfireball.net/projects/markdown/syntax>`_ ) or CONTRIBUTING.rst ( `reStructuredText <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html>`_ ) file to their repository so it’s automatically displayed
 when new issues and pull requests are created.
 
-A CONTRIBUTING.md (`Markdown <https://daringfireball.net/projects/markdown/syntax>`_) file needs to contain this header::
-First of all, thank you for wanting to contribute to the django CMS.
-We always welcome contributions, like many other open-source projects.
-We are very thankful to the many
-[present, past and future contributors](https://github.com/django-cms/django-cms/graphs/contributors),
-to our [community heros](https://github.com/django-cms/django-cms-mgmt/blob/master/community%20heros/list%20of%20community%20heros.md ) and to the [members of the django CMS Association] (https://github.com/django-cms/django-cms-mgmt/blob/master/association/members.md).
-This is a [django CMS](https://www.django-cms.org) project.
-By contributing you agree to
-abide by the [Contributor Code of Conduct](https://docs.django-cms.org/en/latest/contributing/code_of_conduct.html)
-and follow the [guidelines](https://docs.django-cms.org/en/latest/contributing/index.html).
+The respective file needs to contain this text:
 
-A CONTRIBUTING.rst (`reStructuredText <http://docutils.sourceforge.net/docs/ref/rst/restructuredtext.html>`_) file needs to contain this header::
 First of all, thank you for wanting to contribute to the django CMS.
-We always welcome contributions, like many other open-source projects.
-We are very thankful to the many `present, past and future contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_,
-to our `community heros <https://github.com/django-cms/django-cms-mgmt/blob/master/community%20heros/list%20of%20community%20heros.md>`_ and
-to the `members of the django CMS Association <https://github.com/django-cms/django-cms-mgmt/blob/master/association/members.md>`_.
-This is a `django CMS <https://www.django-cms.org>`_ project. By contributing you agree to abide
-by the `Contributor Code of Conduct <https://docs.django-cms.org/en/latest/contributing/code_of_conduct.html>`_ and
-follow the `guidelines <https://docs.django-cms.org/en/latest/contributing/index.html>`_.
-
-Of course extending the contributing document with your project’s contributing guide is highly encouraged, too. See GitHub’s documentation on contributing guidelines for more information.
+We always welcome contributions, like many other open-source projects. We are very thankful to the many
+`present, past and future contributors <https://github.com/django-cms/django-cms/graphs/contributors>`_,
+to our `community heros <https://github.com/django-cms/django-cms-mgmt/blob/master/community%20heros/list%20of%20community%20heros.md>`_ and to the [members of the `django CMS Association <https://github.com/django-cms/django-cms-mgmt/blob/master/association/members.md>`_.
+This is a `django CMS <https://www.django-cms.org>`_ project.
+By contributing you agree to abide by the `Contributor Code of Conduct <https://docs.django-cms.org/en/latest/contributing/code_of_conduct.html>`_ and follow the `guidelines <https://docs.django-cms.org/en/latest/contributing/index.html>`_. Of course extending the contributing document with your project’s contributing guide is highly encouraged, too. See GitHub’s documentation on contributing guidelines for more information.
 
 *****************************************************************
 Move an existing project to the django CMS Github organization
