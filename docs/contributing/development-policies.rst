@@ -47,7 +47,7 @@ the author of the pull request.
 Proposal and discussion of significant changes
 **********************************************
 
-New features and backward-incompatible changes should follow the best practice of DEPS and
+New features and backward-incompatible changes should follow the best practice of `DEPS <https://github.com/django/deps>`_ and
 should be discussed in the community first. After your proposal has been reviewed by the community,
 it needs to be finally approved by the `Tech Committee <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_.
 This is in the interests of openness and transparency,
