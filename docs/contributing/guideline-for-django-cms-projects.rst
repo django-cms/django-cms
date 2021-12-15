@@ -6,9 +6,9 @@ Guidelines for django CMS projects
 
 .. note:: These guidelines are based on the best practice established by the Jazzband project, a community of contributors that shares the responsibility of maintaining Python-based projects.
 
-The django CMS ecosystem consists of many custom projects. Often these projects are maintained by the author himself.
+The django CMS ecosystem consists of many custom projects. Often these projects are maintained by the author themselves.
 However, sometimes it can make sense to put a project in the care of the django CMS project.
-Either because it is of interest to the entire community, or because the author can no longer devote time to maintain the project himself.
+Either because it is of interest to the entire community, or because the author can no longer devote time to maintain the project themselves.
 
 Whether an existing project is transferred to the django CMS Github organization,
 or a new project is set up within the django CMS Github organization, it is important that certain standards are followed.
@@ -32,7 +32,7 @@ Viability
 ***********
 
 Projects to be maintained by the django CMS project must have a certain maturity (No proof of concepts,
-one-off toys or code snippet hosts) and cover a profound functionality.
+one-off toys or code snippet hosts) and provide useful functionality.
 They should also be transferred to django CMS with the agreement of the previous maintainer and in
 consultation with the Tech Committee (see `Tech Committee <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_).
 
@@ -48,9 +48,8 @@ More information about how to contribute software documentation can be found `he
 
 Tests
 ********
-Your contributions and fixes are more than welcome as for your tests. We do not want to compromise our codebase.
-Therefore, you are going to have to include tests if you want to contribute. Automatic testing based on GitHub Actions
-is also strongly encouraged. For more information about running and writing tests please `see here <https://docs.django-cms.org/en/latest/contributing/testing.html>`_.
+Your contributions and fixes are more than welcome as are your tests. We do not want to compromise our codebase.
+Therefore, you are going to have to include tests if you want to contribute. For more information about running and writing tests please `see here <https://docs.django-cms.org/en/latest/contributing/testing.html>`_.
 
 Conduct
 ********
