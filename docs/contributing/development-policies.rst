@@ -47,28 +47,50 @@ the author of the pull request.
 Proposal and discussion of significant changes
 **********************************************
 
-New features and backward-incompatible changes should be proposed using the `Discourse forum <https://discourse.django-cms.org>`_. Discussion should take place there before any pull requests
-are made.
+New features and backward-incompatible changes should follow the best practice of `DEPS <https://github.com/django/deps>`_ and
+should be discussed in the community first. After your proposal has been reviewed by the community,
+it needs to be finally approved by the `Tech Committee <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_.
+This is in the interests of openness and transparency,
+and to give the community a chance to participate in and understand the decisions taken by the project.
 
-This is in the interests of openness and transparency, and to give the community a chance to participate in and
-understand the decisions taken by the project.
+So before submitting pull requests with significant changes, please make sure that the community agrees and the
+Technical Committee approves.
+
+
+To create a proposal...
+
+1. please use this `DEP template <https://github.com/django/deps/blob/main/template.rst>`_
+2. create a discussion in the main `Github repository <https://github.com/django-cms/django-cms/discussions>`_
+3. discuss, discuss, discuss
+4. join the Tech Committee `Slack Channel <https://www.django-cms.org/slack>`_ (#technical-committee) and make the team aware of your proposal after the proposal has been reviewed by the Technical Committee, it is put to a vote at one of the weekly meetings of the technical committee
 
 
 ****************
 Release schedule
 ****************
 
+The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website. The release schedule is
+managed by the release management workgroup. The plan is to release quarterly and according to a retrospectice approach.
+
+Example of retrospective approach.
+
+* Q1 2021 -> 3.9 Release
+* End of Q1 2021 -> freeze
+* Check what’s available
+* Merge in anything that’s been approved
+* Q2 2021 Release -> 3.10
+* ...
+* Unscheduled Releases -> e.g. bug fix -> 3.x.x
+
+The release management workgroup can be found on `Slack <https://www.django-cms.org/slack>`_ in #release-management channel.
+For questions regarding the release process please join the channel and reach out. We're happy to help.
+
+Long-Term Support Release
+===========================
+
 ..  versionchanged:: 3.7
 
-    django CMS 3.7 is the new active long term release.
-
-The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website.
-
-We are planning releases according to **key principles and aims**. Issues within milestones are
-therefore subject to change.
-
-The `django CMS Discourse forum <https://discourse.django-cms.org>`_ serves as gathering
-point for developers. We submit ideas and proposals prior to the roadmap goals.
+    django CMS 3.7 is the current active long term release.
 
 django CMS 3.4, surpassed by 3.7, was the first "LTS" ("Long-Term Support")
 release of the application. *Long-term support* means that this version will

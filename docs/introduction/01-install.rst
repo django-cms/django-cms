@@ -53,9 +53,9 @@ Open the terminal application on your computer and go to a safe folder (i.e. cd 
       docker compose run web python manage.py createsuperuser
       docker compose up -d
 
+During the installation process, you will be prompted to enter your email address and set a username and password.
 Open your browser and insert http://localhost:8000/; there you should be invited to login
 and continue with Step 4: create your first page
-
 
 ********************************
 Create your first page (Step 3)

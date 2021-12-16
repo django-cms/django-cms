@@ -20,6 +20,7 @@ proposing improvements, contributing code or documentation, and testing the
     development-community
     how-to-contribute
     development-policies
+    guideline-for-django-cms-projects
     management
     testing
     code_of_conduct
