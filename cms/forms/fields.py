@@ -50,7 +50,7 @@ class PageSelectFormField(forms.MultiValueField):
         # Remove the unexpected blank kwarg if it's supplied,
         # causes an error where the MultiValueField doesn't expect it
         # https://github.com/django/django/commit/da79ee472d803963dc3ea81ee67767dc06068aac
-        if hasattr(kwargs, 'blank'):
+        if 'blank' in kwargs:
             del(kwargs['blank'])
 
         super().__init__(fields, *args, **kwargs)
