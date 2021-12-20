@@ -46,6 +46,12 @@ class PageSelectFormField(forms.MultiValueField):
             LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
             LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
+
+        # Remove the unexpected blank kwarg if it's supplied,
+        # causes an error where the MultiValueField doesn't expect it
+        if hasattr(kwargs, 'blank'):
+            del(kwargs['blank'])
+
         super().__init__(fields, *args, **kwargs)
 
     def compress(self, data_list):
