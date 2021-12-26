@@ -47,11 +47,11 @@ Open the terminal application on your computer and go to a safe folder (i.e. cd 
 
       git clone git@github.com:django-cms/django-cms-quickstart.git
       cd django-cms-quickstart
-      docker compose build web
-      docker compose up -d database_default
-      docker compose run web python manage.py migrate
-      docker compose run web python manage.py createsuperuser
-      docker compose up -d
+      docker-compose build web
+      docker-compose up -d database_default
+      docker-compose run web python manage.py migrate
+      docker-compose run web python manage.py createsuperuser
+      docker-compose up -d
 
 During the installation process, you will be prompted to enter your email address and set a username and password.
 Open your browser and insert http://localhost:8000/; there you should be invited to login
