@@ -18,7 +18,12 @@ def post_save_user(instance, raw, created, **kwargs):
     if not creator or not created or creator.is_anonymous:
         return
 
-    page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
+    options = {
+        # handle custom auth user model with a different model name
+        instance._meta.model_name + "_ptr_id": instance.pk,
+        "created_by": creator
+    }
+    page_user = PageUser(**options)
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
