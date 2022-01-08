@@ -67,9 +67,9 @@ After you have acquainted yourself with django CMS and maybe already created you
 you should start looking at contributing to the django CMS codebase.
 
 
-##################################
+******************************************
 Contributor Community
-##################################
+******************************************
 
 But before you start getting your hands dirty, you should make sure to join us online in order
 to stay updated with the latest news and to connect with other users across the world.
