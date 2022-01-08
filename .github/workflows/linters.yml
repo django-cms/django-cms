@@ -20,21 +20,18 @@ jobs:
           linters: flake8
           run: |
             flake8 --exit-zero
-
-# TODO: re-enable it in another PR, want to keep
-# the actions Pr clean
-#   isort:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout
-#         uses: actions/checkout@v2
-#       - name: Set up Python
-#         uses: actions/setup-python@v2
-#         with:
-#           python-version: 3.9
-#       - run: python -m pip install isort
-#       - name: isort
-#         uses: liskin/gh-problem-matcher-wrap@v1
-#         with:
-#           linters: isort
-#           run: isort --check --diff cms
+ isort:
+   runs-on: ubuntu-latest
+   steps:
+     - name: Checkout
+       uses: actions/checkout@v2
+     - name: Set up Python
+       uses: actions/setup-python@v2
+       with:
+         python-version: 3.9
+     - run: python -m pip install isort
+     - name: isort
+       uses: liskin/gh-problem-matcher-wrap@v1
+       with:
+         linters: isort
+         run: isort --check --diff cms
