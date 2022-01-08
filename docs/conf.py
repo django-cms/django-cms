@@ -43,7 +43,7 @@ extensions = [
 ]
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3/', None),
-    'django': ('https://docs.djangoproject.com/en/2.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
+    'django': ('https://docs.djangoproject.com/en/3.2/', 'https://docs.djangoproject.com/en/3.2/_objects/'),
     'classytags': ('https://django-classy-tags.readthedocs.io/en/latest/', None),
     'sekizai': ('https://django-sekizai.readthedocs.io/en/latest/', None),
     'treebeard': ('https://django-treebeard.readthedocs.io/en/latest/', None),
@@ -86,7 +86,7 @@ language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['build', 'env']
+exclude_patterns = ['build', 'env', 'README.rst']
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
