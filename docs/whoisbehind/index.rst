@@ -43,7 +43,6 @@ community projects.
 
 * `Sign up for more information about becoming a member of the dCA <https://www.django-cms.org/en/sign-up/>`_
 
-.. _core_developers:
 
 **********************
 The dCA Tech Committee
