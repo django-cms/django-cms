@@ -21,6 +21,60 @@ class ToolbarMiddleware(MiddlewareMixin):
     Middleware to set up CMS Toolbar.
     """
 
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if not self.is_cms_request(request):
+            return
+
+        edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+        edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
+        disable = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+        anonymous_on = get_cms_setting('TOOLBAR_ANONYMOUS_ON')
+        edit_enabled = edit_on in request.GET and 'preview' not in request.GET
+        edit_disabled = edit_off in request.GET or 'preview' in request.GET
+
+        if disable in request.GET:
+            request.session['cms_toolbar_disabled'] = True
+
+        if edit_enabled:
+            # If we actively enter edit mode, we should show the toolbar in any case
+            request.session['cms_toolbar_disabled'] = False
+
+        toolbar_enabled = not request.session.get('cms_toolbar_disabled', False)
+        can_see_toolbar = request.user.is_staff or (anonymous_on and request.user.is_anonymous)
+        show_toolbar = (toolbar_enabled and can_see_toolbar)
+
+        if edit_enabled and show_toolbar and not request.session.get('cms_edit'):
+            # User has explicitly enabled mode
+            # AND can see the toolbar
+            request.session['cms_edit'] = True
+            request.session['cms_preview'] = False
+
+        if edit_disabled or not show_toolbar and request.session.get('cms_edit'):
+            # User has explicitly disabled the toolbar
+            # OR user has explicitly turned off edit mode
+            # OR user can't see toolbar
+            request.session['cms_edit'] = False
+
+        if 'preview' in request.GET and not request.session.get('cms_preview'):
+            # User has explicitly requested a preview of the live page.
+            request.session['cms_preview'] = True
+
+        if request.user.is_staff:
+            try:
+                request.cms_latest_entry = LogEntry.objects.filter(
+                    user=request.user,
+                    action_flag__in=(ADDITION, CHANGE)
+                ).only('pk').order_by('-pk')[0].pk
+            except IndexError:
+                request.cms_latest_entry = -1
+        request.toolbar = CMSToolbar(request)
+        return response
+
     def is_cms_request(self, request):
         toolbar_hide = get_cms_setting('TOOLBAR_HIDE')
         internal_ips = get_cms_setting('INTERNAL_IPS')
