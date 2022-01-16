@@ -891,20 +891,17 @@ class PluginsTestCase(PluginsTestBaseCase):
         def get_page(plugin):
             return plugin.page
 
-
-        # fails due to issue with django
-        # todo: rewrite it or upgrade django
-        # self.assertWarns(
-        #     DontUsePageAttributeWarning,
-        #     "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
-        #     get_page, a
-        # )
-        # same as above
-        # with warnings.catch_warnings(record=True) as w:
-        #     warnings.simplefilter('always')
-        #     a.page
-        #     self.assertEqual(1, len(w))
-        #     self.assertIn('test_plugins.py', w[0].filename)
+        print(DontUsePageAttributeWarning)
+        self.assertWarns(
+            DontUsePageAttributeWarning,
+            "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
+            get_page, a
+        )
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            a.page
+            self.assertEqual(1, len(w))
+            self.assertIn('test_plugins.py', w[0].filename)
 
     def test_editing_plugin_changes_page_modification_time_in_sitemap(self):
         now = timezone.now()
