@@ -1923,10 +1923,10 @@ class PageTest(PageTestBase):
                                created_by=admin_user, published=True, parent=root,
                                slug="child-page-{}".format(i),)
 
-        last_child = create_page("grand-child-page-{}".format(page.pk),
-                                "nav_playground.html", "fr",
-                               created_by=admin_user, published=True, parent=page,
-                               slug="grand-child-page-{}".format(page.pk),)
+        create_page("grand-child-page-{}".format(page.pk),
+                    "nav_playground.html", "fr",
+                    created_by=admin_user, published=True, parent=page,
+                    slug="grand-child-page-{}".format(page.pk),)
 
         self.assertTrue(page.pk > 1000)
 
