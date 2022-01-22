@@ -1912,6 +1912,54 @@ class PageTest(PageTestBase):
             self.assertEqual(page.reload().get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
 
+    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+    def test_page_tree_render_localized_page_ids(self):
+        admin_user = self.get_superuser()
+        root = create_page("home", "nav_playground.html", "fr",
+                           created_by=admin_user, published=True)
+
+        for i in range(1, 1001):
+            page = create_page("child-page-{}".format(i), "nav_playground.html", "fr",
+                               created_by=admin_user, published=True, parent=root,
+                               slug="child-page-{}".format(i),)
+
+        last_child = create_page("grand-child-page-{}".format(page.pk),
+                                "nav_playground.html", "fr",
+                               created_by=admin_user, published=True, parent=page,
+                               slug="grand-child-page-{}".format(page.pk),)
+
+        self.assertTrue(page.pk > 1000)
+
+        # make sure the rendered page tree doesn't
+        # localize page or node ids
+        with self.login_user_context(admin_user):
+            data = {
+                'openNodes[]': [root.node.pk, page.node.pk],
+                'language': 'fr'
+            }
+
+            endpoint = self.get_admin_url(Page, 'get_tree')
+            response = self.client.get(endpoint, data=data)
+
+            self.assertEqual(response.status_code, 200)
+            content = force_str(response.content)
+            self.assertFalse(f'parent_node={page.node.pk:,}"' in content)
+            self.assertTrue(f'parent_node={page.node.pk}"' in content)
+
+        # if per chance we have localized node ids in our localstorage,
+        # make sure DjangoCMS doesn't choke on them when they are passed
+        # into the view
+        with self.login_user_context(admin_user):
+            data = {
+                'openNodes[]': [root.node.pk, f'{page.node.pk:,}'],
+                'language': 'fr'
+            }
+            endpoint = self.get_admin_url(Page, 'get_tree')
+            response = self.client.get(endpoint, data=data)
+            self.assertEqual(response.status_code, 200)
+
+
+
 class PermissionsTestCase(PageTestBase):
 
     def _add_translation_to_page(self, page):
