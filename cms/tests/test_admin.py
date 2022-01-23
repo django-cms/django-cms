@@ -1,23 +1,22 @@
-import json
 import datetime
+import json
 
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
+from django.http import Http404, HttpResponseBadRequest, HttpResponseNotFound
 from django.urls import reverse
-from django.http import (Http404, HttpResponseBadRequest,
-                         HttpResponseNotFound)
-from django.utils.encoding import force_str, smart_str
 from django.utils import timezone
+from django.utils.encoding import force_str, smart_str
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
 
 from cms import api
-from cms.api import create_page, create_title, add_plugin, publish_page
 from cms.admin.pageadmin import PageAdmin
+from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
 from cms.models.pagemodel import Page, PageType
@@ -27,9 +26,9 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE,URL_CMS_TRANSLATION_DELETE,
-    URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_CHANGE,
-    URL_CMS_PAGE_PUBLISHED,
+    URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_CHANGE_LANGUAGE,
+    URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED, URL_CMS_TRANSLATION_DELETE,
+    CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse

@@ -4,17 +4,15 @@ from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
-from cms.api import create_page, create_title, publish_page, add_plugin
-from cms.forms.utils import update_site_and_page_choices
+from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.exceptions import LanguageError
-from cms.models import Title, EmptyTitle
-from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
-from cms.utils.conf import get_cms_setting
-from cms.utils.conf import get_languages
-
+from cms.forms.utils import update_site_and_page_choices
+from cms.models import EmptyTitle, Title
+from cms.test_utils.testcases import (
+    URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH, CMSTestCase,
+)
+from cms.utils.conf import get_cms_setting, get_languages
 from menus.menu_pool import menu_pool
-
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 

@@ -1,6 +1,8 @@
 from collections import defaultdict
 
 from django.template import Template
+from sekizai.data import UniqueSequence
+from sekizai.helpers import get_varname
 
 from cms import api
 from cms.models import Placeholder
@@ -8,9 +10,6 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import TransactionCMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.urlutils import admin_reverse
-
-from sekizai.data import UniqueSequence
-from sekizai.helpers import get_varname
 
 
 class AliasTestCase(TransactionCMSTestCase):

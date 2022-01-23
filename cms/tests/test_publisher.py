@@ -1,16 +1,20 @@
-from djangocms_text_ckeditor.models import Text
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.urls import reverse
 from django.utils.translation import override as force_language
+from djangocms_text_ckeditor.models import Text
 
-from cms.api import create_page, add_plugin, create_title
-from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
-from cms.management.commands.subcommands.publisher_publish import PublishCommand
-from cms.models import CMSPlugin, Page, TreeNode, Title
+from cms.api import add_plugin, create_page, create_title
+from cms.constants import (
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING,
+)
+from cms.management.commands.subcommands.publisher_publish import (
+    PublishCommand,
+)
+from cms.models import CMSPlugin, Page, Title, TreeNode
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride

@@ -1,9 +1,8 @@
-from django.db.models import Q
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from cms.apphook_pool import apphook_pool
 from cms.models import Page
-
 from menus.base import Menu
 
 

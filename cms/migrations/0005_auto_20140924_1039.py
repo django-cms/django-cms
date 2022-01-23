@@ -1,8 +1,6 @@
 from django.db import migrations
 from django.db.models import F
-
 from treebeard.numconv import NumConv
-
 
 STEPLEN = 4
 ALPHABET = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'

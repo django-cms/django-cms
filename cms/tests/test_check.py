@@ -4,15 +4,16 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.utils import isolate_apps
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 from cms.api import add_plugin
-from cms.models.pluginmodel import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
-from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.extensionapp.models import MyPageExtension
-from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
-
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
+    ArticlePluginModel,
+)
+from cms.utils.check import FileOutputWrapper, FileSectionWrapper, check
 
 
 class TestOutput(FileOutputWrapper):
@@ -120,8 +121,9 @@ class CheckTests(CheckAssertMixin, TestCase):
 
     @isolate_apps("test_app")
     def test_placeholder_field(self):
-        from django.db import models
         from django.contrib import admin
+        from django.db import models
+
         from cms.models.fields import PlaceholderField
 
         class ModelTest(models.Model):

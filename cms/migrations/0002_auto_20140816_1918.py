@@ -1,9 +1,10 @@
-import cms.models.static_placeholder
-import cms.models.fields
+import django.utils.timezone
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.db import models, migrations
-import django.utils.timezone
+from django.db import migrations, models
+
+import cms.models.fields
+import cms.models.static_placeholder
 
 User = get_user_model()
 

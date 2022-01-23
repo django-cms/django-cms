@@ -1,7 +1,7 @@
 import django
 import django.contrib.auth.models
-from django.db import migrations, models, router
 import django.db.models.deletion
+from django.db import migrations, models, router
 
 from . import IrreversibleMigration
 

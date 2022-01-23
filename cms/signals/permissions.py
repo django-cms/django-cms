@@ -12,6 +12,7 @@ def post_save_user(instance, raw, created, **kwargs):
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user
+
     # read current user from thread locals
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous:
@@ -31,6 +32,7 @@ def post_save_user_group(instance, raw, created, **kwargs):
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user
+
     # read current user from thread locals
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous:

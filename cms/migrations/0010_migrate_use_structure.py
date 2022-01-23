@@ -1,8 +1,8 @@
-import warnings
 import functools
+import warnings
 
 from django.conf import settings
-from django.db import models, migrations
+from django.db import migrations, models
 
 
 def _get_manager(model, db_alias):

@@ -8,15 +8,16 @@ from django.core.exceptions import ValidationError
 from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language_from_request, gettext_lazy as _
-from cms.utils import get_current_site
-from cms.utils.i18n import (
-    get_default_language_for_site,
-    is_language_prefix_patterns_used
+from django.utils.translation import (
+    get_language_from_request, gettext_lazy as _,
 )
-from cms.utils.conf import get_cms_setting
-from cms.utils.moderator import use_draft
 
+from cms.utils import get_current_site
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import (
+    get_default_language_for_site, is_language_prefix_patterns_used,
+)
+from cms.utils.moderator import use_draft
 from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
 from menus.models import CacheKey
