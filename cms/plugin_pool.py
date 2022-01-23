@@ -1,13 +1,13 @@
 from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import re_path, include
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import slugify
+from django.urls import include, re_path
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language, deactivate_all, activate
-from django.template import TemplateDoesNotExist, TemplateSyntaxError
+from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase

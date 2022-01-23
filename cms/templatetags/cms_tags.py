@@ -1,7 +1,15 @@
-from collections import namedtuple, OrderedDict
+from collections import OrderedDict, namedtuple
 from copy import copy
 from datetime import datetime
 
+from classytags.arguments import (
+    Argument, MultiKeywordArgument, MultiValueArgument,
+)
+from classytags.core import Options, Tag
+from classytags.helpers import AsTag, InclusionTag
+from classytags.parser import Parser
+from classytags.utils import flatten_context
+from classytags.values import ListValue, StringValue
 from django import template
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -14,22 +22,15 @@ from django.utils.encoding import force_str, smart_str
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.translation import (
-    get_language,
-    override as force_language,
-    gettext_lazy as _,
+    get_language, gettext_lazy as _, override as force_language,
 )
-
-from classytags.arguments import (Argument, MultiValueArgument,
-                                  MultiKeywordArgument)
-from classytags.core import Options, Tag
-from classytags.helpers import InclusionTag, AsTag
-from classytags.parser import Parser
-from classytags.utils import flatten_context
-from classytags.values import ListValue, StringValue
+from sekizai.templatetags.sekizai_tags import RenderBlock, SekizaiParser
 
 from cms.cache.page import get_page_url_cache, set_page_url_cache
 from cms.exceptions import PlaceholderNotFound
-from cms.models import Page, Placeholder as PlaceholderModel, CMSPlugin, StaticPlaceholder
+from cms.models import (
+    CMSPlugin, Page, Placeholder as PlaceholderModel, StaticPlaceholder,
+)
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request, get_site_id
@@ -37,9 +38,6 @@ from cms.utils.moderator import use_draft
 from cms.utils.page import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
-
-from sekizai.templatetags.sekizai_tags import SekizaiParser, RenderBlock
-
 
 NULL = object()
 DeclaredPlaceholder = namedtuple('DeclaredPlaceholder', ['slot', 'inherit'])

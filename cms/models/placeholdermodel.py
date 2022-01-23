@@ -1,6 +1,5 @@
 
 import warnings
-
 from datetime import datetime, timedelta
 
 from django.contrib import admin
@@ -10,18 +9,12 @@ from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 from cms.cache.placeholder import clear_placeholder_cache
+from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL, PUBLISHER_STATE_DIRTY
 from cms.exceptions import LanguageError
-from cms.utils import get_site_id
+from cms.utils import get_language_from_request, get_site_id, permissions
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
-from cms.constants import (
-    EXPIRE_NOW,
-    MAX_EXPIRATION_TTL,
-    PUBLISHER_STATE_DIRTY,
-)
-from cms.utils import get_language_from_request
-from cms.utils import permissions
-from cms.utils.conf import get_cms_setting
 
 
 class Placeholder(models.Model):
@@ -263,7 +256,7 @@ class Placeholder(models.Model):
         return self._attached_fields_cache
 
     def _get_attached_field(self):
-        from cms.models import CMSPlugin, StaticPlaceholder, Page
+        from cms.models import CMSPlugin, Page, StaticPlaceholder
         if not hasattr(self, '_attached_field_cache'):
             self._attached_field_cache = None
             relations = self._get_related_objects()

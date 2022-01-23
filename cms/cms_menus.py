@@ -9,16 +9,13 @@ from cms.apphook_pool import apphook_pool
 from cms.models import EmptyTitle
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_fallback_languages,
-    get_public_languages,
-    hide_untranslated,
+    get_fallback_languages, get_public_languages, hide_untranslated,
     is_valid_site_language,
 )
-from cms.utils.permissions import get_view_restrictions
 from cms.utils.page import get_page_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
-
-from menus.base import Menu, NavigationNode, Modifier
+from cms.utils.permissions import get_view_restrictions
+from menus.base import Menu, Modifier, NavigationNode
 from menus.menu_pool import menu_pool
 
 

@@ -1,6 +1,5 @@
-import tempfile
 import codecs
-
+import tempfile
 from io import StringIO
 
 from django.core.management import call_command

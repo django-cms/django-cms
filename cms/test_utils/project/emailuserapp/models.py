@@ -1,9 +1,10 @@
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+from django.contrib.auth.models import (
+    AbstractBaseUser, BaseUserManager, PermissionsMixin,
+)
 from django.core.mail import send_mail
 from django.db import models
-from django.utils.http import urlquote
 from django.utils import timezone
+from django.utils.http import urlquote
 
 
 class EmailUserManager(BaseUserManager):
