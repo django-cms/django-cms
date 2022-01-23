@@ -3,8 +3,55 @@ Changelog
 =========
 
 
-unreleased
-==========
+3.10.0-RC1 (2022-01-23)
+=======================
+
+Bug Fixes:
+----------
+* Cap django requirement at <4 (#7182) (c6c278497) -- Mark Walker
+* Set the default_auto_field on the AppConfigs (#7181) (272d62ced) -- Jeffrey de Lange
+* do not convert & URL query separator to &amp; (#7114) (c0c10e051) -- nichoski
+* discrepancy around python 3.6 compatibility between `setup.py`, docs and tests (#7095) (70970061f) -- Mark Walker
+* update permission cache when moving pages and adding pages. (#7090) (53dddb106) -- Ryo Shimada
+* https://github.com/django-cms/django-cms/projects/6#card-63761457 (#7085) (a5159d3a6) -- Gabriel Andrade
+* missing tests of django3.2 for mysql and sqlite (#7082) (c7fd7c0c5) -- Vinit Kumar
+* Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (#7062) (f4043cd75) -- Vinit Kumar
+
+Statistics:
+-----------
+
+This release includes 48 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Anatoliy (3 pull requests)
+* Angelo Dini (1 pull request)
+* Dmytro Litvinov (1 pull request)
+* Florian Delizy (6 pull requests)
+* Gabriel Andrade (1 pull request)
+* Halit Çelik (1 pull request)
+* Jean-Baptiste PENRATH (1 pull request)
+* Jeffrey de Lange (1 pull request)
+* Jens-Erik Weber (1 pull request)
+* Kaushal Dhungel (1 pull request)
+* Marco Bonetti (2 pull requests)
+* Mark Walker (6 pull requests)
+* Nebojsa Knezevic (2 pull requests)
+* nichoski (2 pull requests)
+* Nicolai (11 pull requests)
+* Ryo Shimada (1 pull request)
+* Simon Krull (4 pull requests)
+* Stefan van den Eertwegh (1 pull request)
+* Vinit Kumar (2 pull requests)
+
+With the review help of the following contributors:
+
+* Gabriel Andrade
+* Marco Bonetti
+* Nicolai
+* TiredFingers
+* victor-yunenko
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
 
 3.9.0 (2021-06-30)
 ==================
