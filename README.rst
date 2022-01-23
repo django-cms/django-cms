@@ -13,13 +13,13 @@ django CMS
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
 
-Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association (`Sponsor us! <https://www.django-cms.org/en/memberships/>`_). 
+Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association (`Sponsor us! <https://www.django-cms.org/en/memberships/>`_).
 
 *******************************************
 Contribute to this project and win rewards
 *******************************************
 
-Because django CMS is a community-driven project, we welcome everyone to `get involved in the project <https://www.django-cms.org/en/contribute/>`_ and `receive a reward <https://www.django-cms.org/en/bounty-program/>`_ for their contribution. Become part of a fantastic community and help us make django CMS the best open source CMS in the world.  
+Because django CMS is a community-driven project, we welcome everyone to `get involved in the project <https://www.django-cms.org/en/contribute/>`_ and `receive a reward <https://www.django-cms.org/en/bounty-program/>`_ for their contribution. Become part of a fantastic community and help us make django CMS the best open source CMS in the world.
 
 
 .. ATTENTION::
@@ -86,7 +86,7 @@ The dependencies for the docs are compiled by `pip-tools <https://github.com/jaz
 
 
 ***************************
-Test django CMS in our demo 
+Test django CMS in our demo
 ***************************
 
 The demo platform is kindly provided by Divio, platinum member of the django CMS Association.
@@ -105,7 +105,7 @@ Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ or o
 Professional support
 ********************
 
-Choose from a list of `trusted tech partner <https://www.django-cms.org/en/tech-partners/>`_ of the django CMS Association to get your website project delivered successfully. 
+Choose from a list of `trusted tech partner <https://www.django-cms.org/en/tech-partners/>`_ of the django CMS Association to get your website project delivered successfully.
 
 Choose a `trusted web host <https://www.django-cms.org/en/hosting-services/>`_ for your django CMS project and get your website online today.
 
