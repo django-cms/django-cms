@@ -35,7 +35,7 @@ if [ -z "$1" ]; then
     echo "$0 <VERSION>[suffix] [branch]"
     echo ""
     echo "example:"
-    echo "$0 3.9.0 rc1"
+    echo "$0 3.9.0rc1"
     exit 1
 fi
 
@@ -216,7 +216,7 @@ gulp sass
 gulp bundle
 
 
-# remove old versions 
+# remove old versions
 git rm -rf "cms/static/cms/css/${OLDVER}" "cms/static/cms/fonts/${OLDVER}" "cms/static/cms/js/dist/${OLDVER}"
 git add "cms/static/cms/css/${FULL_VERSION}" "cms/static/cms/fonts/${FULL_VERSION}" "cms/static/cms/js/dist/${FULL_VERSION}"
 git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
