@@ -8,6 +8,6 @@ class CMSConfig(AppConfig):
     default_auto_field = 'django.db.models.AutoField'
 
     def ready(self):
+        from cms import signals  # NOQA
         from cms.utils.setup import setup
-
         setup()
