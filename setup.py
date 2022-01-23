@@ -49,6 +49,7 @@ setup(
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
     long_description_content_type='text/x-rst',
     packages=find_packages(exclude=['project', 'project.*']),
+    python_requires='>=3.7',
     include_package_data=True,
     zip_safe=False,
     install_requires=REQUIREMENTS,
