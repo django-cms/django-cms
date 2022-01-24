@@ -108,13 +108,13 @@ else
     # This is a first release (RC or equivalent),
     # let's add some headings to be sure we got all of them right for next steps
     sed -i "${current}" \
-        -e "/^Unreleased$/a${title}" \
-        -e "/^Unreleased$/a${line}" \
-        -e "/^Unreleased$/a
+        -e "/^unreleased$/a${title}" \
+        -e "/^unreleased$/a${line}" \
+        -e "/^unreleased$/a
 " \
-        -e "/^Unreleased$/aHighlights:" \
-        -e "/^Unreleased$/a-----------" \
-        -e "/^Unreleased$/,+1d" \
+        -e "/^unreleased$/aHighlights:" \
+        -e "/^unreleased$/a-----------" \
+        -e "/^unreleased$/,+1d" \
         -e "s/(unpublished)/(${DATE})/"
 fi
 
