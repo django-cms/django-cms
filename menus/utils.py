@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import NoReverseMatch, reverse, resolve
+from django.urls import NoReverseMatch, reverse, resolve, Resolver404
 
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import (
@@ -42,7 +42,6 @@ def find_selected(nodes):
 
 def set_language_changer(request, func):
     """
-
     Sets a language chooser function that accepts one parameter: language
     The function should return a url in the supplied language
     normally you would want to give it the get_absolute_url function with an optional language parameter
@@ -139,15 +138,15 @@ class DefaultLanguageChanger:
         with force_language(page_language):
             try:
                 view = resolve(self.request.path_info)
-            except:
+            except Resolver404:
                 view = None
         if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
             with force_language(lang):
                 try:
                     return self.request.toolbar.obj.get_absolute_url()
-                except:
+                except:  # noqa: E722
                     pass
-        elif view and not view.url_name in ('pages-details-by-slug', 'pages-root'):
+        elif view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
                 view_name = "%s:%s" % (view.namespace, view_name)

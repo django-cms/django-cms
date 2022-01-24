@@ -139,15 +139,16 @@ gulp.task('icons', function() {
         .pipe(
             iconfontCss({
                 fontName: 'django-cms-iconfont',
-                fontPath: '../../fonts/' + CMS_VERSION + '/',
                 path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
-                targetPath: '../../sass/components/_iconography.scss'
+                targetPath: '../../sass/components/_iconography.scss',
+                fontPath: '../../fonts/' + CMS_VERSION + '/'
             })
         )
         .pipe(
             iconfont({
                 fontName: 'django-cms-iconfont',
-                normalize: true
+                normalize: true,
+                formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
             })
         )
         .on('glyphs', function(glyphs, opts) {

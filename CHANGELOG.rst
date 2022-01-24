@@ -3,31 +3,143 @@ Changelog
 =========
 
 
-Unreleased
+unreleased
+==========
+
+3.9.0 (2021-06-30)
 ==================
 
-* Fixed builds on RTD
-* Fix multi-language titles in title_cache of a page
-* Remove debug print from apphook_reload
-* Enforce use of coverage > 4 for python 3.8 support
-* Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
-* Fixed 6973 bag with unexpected behavior ``get_page_from_request``
-* Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
-* Improved performance of ``cms list plugins`` command
-* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
-* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
-* Updated documentation links
+Highlights:
+-----------
+
+This release of django CMS (first community driven release) introduces support for Django 3.2, and bugfix.
+We tried to catch up with as many long waited feature/bugfix requests as possible.
+
+Features:
+---------
+* Add support for Django 3.2 LTS version
+* Page changed_date added to the Page tree admin actions dropdown template #6701 (#7046) (73cbbdb00) -- Vladimir Kuvandjiev
+* Allow recursive template extending in placeholders (#6564) (fed6fe54d) -- Stefan Wehrmeyer
+* Added ability to set placeholder global limit on children only (#6847) (18e146495) -- G3RB3N
+* Replaced Travis.CI with Github Actions (#7000) (0f33b5839) -- Vinit Kumar
 * Added support for Github Actions based CI.
 * Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
-* Remove travis integration from the project as the project has moved to Github Actions.
-* Fix all GitHub actions tests run on pull requests
-* Repair broken docs link to users/index.rst
+* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
+* Improved performance of ``cms list plugins`` command
+* Page changed date added to the Page tree admin actions dropdown
+* add django3.2 in the framework identifier for setup.py (#7081) (8ef90fefa) -- Vinit Kumar
+
+Bug Fixes:
+----------
+* Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
+* Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
+* Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
+* Fixed issue where default fallbacks is not used when it's an empty list (#6795) (5d21fa5eb) -- Arjan de Pooter
+* Fixed prefix_default_language = False redirect behavior (#6851) (34a26bd1b) -- Radek Stępień
+* Fix not checking slug uniqueness on page move (#6958) (5976d393a) -- Iacopo Spalletti
+* Fixed DontUsePageAttributeWarning message (#6734) (45383888e) -- carmenkow
+* Fixed Cache not invalidated when using a PlaceholderField outside the CMS #6912 (#6956) (3ce63d7d3) -- Benjamin PIERRE
+* Fixed unexpected behavior get_page_from_request (#6974) (#6073) (52f926e0d) -- Yuriy Mamaev
+* Fixed django treebeard 4.5.1 compatibility (#6988) (eeb86fd70) -- Aiky30
+* Fixed Bad Title.path in Multilanguage sites if parent slug is created or modified (#6968) (6e7b0ae48) -- fp4code
+* Fixed redirect issues when i18n_patterns had prefix_default_language = False
+* Fixed not checking slug uniqueness when moving a page
+* Fixed builds on RTD
+* Fixed the cache not being invalidated when updating a PlaceholderField in a custom model
+* Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
+* Fixed 6973 bag with unexpected behavior ``get_page_from_request``
+* Fixed migrations with multiple databases
+* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
+* Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
+* Fixed an issue when running migrations on a multi database project
+* Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
+
+Refactoring and Cleanups:
+-------------------------
+* Remove unmaintained translations (#7039) (97ffa2481) -- Florian Delizy
+* Remove debug print from apphook_reload
+* Removed zh and zh_hans translation (keep zh_CN and zh_TW) -- Florian Delizy
+* Cleaned-up unmaintained translations -- Florian Delizy
 * Few changes in docs/contributing/code.rst
-* Add support for Django 3.2 LTS version
-* removed zh and zh_hans translation (keep zh_CN and zh_TW)
-* Cleaned-up unmaintained translations
+* Temporarily pinned django-treebeard to < 4.5, this avoids breaking changes introduced
+* Updated documentation links
+* documentation: Added an example of sqlite database configuration in documentation
+* Repair broken docs link to users/index.rst
+
+Internal Tools:
+---------------
+* adding django CMS release script (will be used starting 3.9.0 release) (#7036) (c95aacf14) -- Florian Delizy
+* updating PR template and contribution guideline, no need to modify CHANGELOG.rst manually (#7041) (6c2b057c0) -- Florian Delizy
+* Enforce use of coverage > 4 for python 3.8 support
+* Fix all GitHub actions tests run on pull requests
+* Remove travis integration from the project as the project has moved to Github Actions.
+* Fixing release information and publish script (#7055) (0cfc42ba3) -- Florian Delizy
+
+Statistics:
+-----------
+
+This release includes 89 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Abdur-Rahmaan Janhangeer (1 pull request)
+* Aiky30 (3 pull requests)
+* Alexandre Joly (1 pull request)
+* Anatoliy (3 pull requests)
+* Angelo Dini (3 pull requests)
+* Arjan de Pooter (1 pull request)
+* Benbb96 (1 pull request)
+* Benjamin PIERRE (1 pull request)
+* BrijeshVP (1 pull request)
+* carmenkow (1 pull request)
+* Daniele Procida (3 pull requests)
+* Florian Delizy (19 pull requests)
+* fp4code (3 pull requests)
+* Frank (1 pull request)
+* G3RB3N (1 pull request)
+* greengoaxe (1 pull request)
+* Iacopo Spalletti (3 pull requests)
+* Jacob Rief (3 pull requests)
+* Jean-Baptiste PENRATH (1 pull request)
+* John Bazik (1 pull request)
+* Marco Bonetti (1 pull request)
+* Mark Walker (3 pull requests)
+* Michael Anckaert (1 pull request)
+* Munim Munna (2 pull requests)
+* Nicolai (15 pull requests)
+* Petr Glotov (1 pull request)
+* Radek Stępień (1 pull request)
+* Sebastian Weigand (2 pull requests)
+* sin-ack (1 pull request)
+* Stefan Wehrmeyer (1 pull request)
+* victor-yunenko (1 pull request)
+* Vinit Kumar (5 pull requests)
+* Vladimir Kuvandjiev (1 pull request)
+* Vytis Banaitis (1 pull request)
+* Yuriy Mamaev (1 pull request)
+
+With the review help of the following contributors:
+
+* Aiky30
+* Angelo Dini
+* Benjamin PIERRE
+* Daniele Procida
+* Éric Araujo
+* Florian Delizy
+* Francesco Verde
+* greengoaxe
+* John Bazik
+* Mario Colombo
+* Mark Walker
+* Nicolai
+* Petr Glotov
+* Radosław Stępień
+* sin-ack
+* Stuart Axon
+* Vinit
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
 
 3.8.0 (2020-10-28)
 ==================
@@ -43,6 +155,7 @@ Unreleased
 * Updated the content for django CMS’s development community
 * Replaced all occurences of ``force_text`` and ``smart_text`` against
   ``force_str``and ``smart_str``.
+
 
 
 3.7.4 (2020-07-21)
@@ -72,6 +185,7 @@ Unreleased
 * added ``--force-color`` and ``--skip-checks`` in base commands when using Django 3
 * replaced ``staticfiles`` and ``admin_static`` with ``static``
 * replaced djangocms-helper with django-app-helper
+* Added ability to set placeholder global limit on children only
 
 
 3.7.1 (2019-11-26)
@@ -818,7 +932,7 @@ Unreleased
 
 
 3.0.17 (unreleased)
-==================
+===================
 
 - Addresses security vulnerabilities in the `render_model` template tag that could
   lead to escalation of privileges or other security issues.
@@ -828,7 +942,7 @@ Unreleased
 
 
 3.0.16 (2015-11-24)
-==================
+===================
 
 - Fixed JavaScript error when using ``PageSelectWidget``
 - Fixed whitespace markup issues in draft mode
@@ -836,7 +950,7 @@ Unreleased
 
 
 3.0.15 (2015-09-01)
-==================
+===================
 
 - Relax html5lib versions
 - Fix redirect when deleting a page
@@ -855,7 +969,7 @@ Unreleased
 
 
 3.0.14 (2015-06-27)
-==================
+===================
 
 - Fixed an issue where privileged users could be tricked into performing actions without their knowledge via a CSRF vulnerability
 - Fixed an issue related to "Empty all" Placeholder feature
@@ -878,7 +992,7 @@ Unreleased
 
 
 3.0.13 (2015-04-15)
-==================
+===================
 
 - Numerous documentation including installation and tutorial updates
 - Numerous improvements to translations
@@ -897,13 +1011,13 @@ Unreleased
 
 
 3.0.12 (2015-03-06)
-==================
+===================
 
 - Fixed a typo in JavaScript which prevents page tree from working
 
 
 3.0.11 (2015-03-05)
-==================
+===================
 
 - Core support for multiple instances of the same apphook'ed application
 - Fixed the template tag `render_model_add`
@@ -921,7 +1035,7 @@ Unreleased
 
 
 3.0.10 (2015-02-14)
-==================
+===================
 
 - Improved Py3 compatibility
 - Improved the behavior when changing the operator's language

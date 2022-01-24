@@ -1,7 +1,7 @@
-from django.utils.html import conditional_escape
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import force_str
 from django.utils.functional import Promise
-from django.core.serializers.json import DjangoJSONEncoder
+from django.utils.html import conditional_escape
 
 
 class SafeJSONEncoder(DjangoJSONEncoder):

@@ -1,6 +1,6 @@
 import sys
-import mock
 
+import mock
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -18,10 +18,12 @@ from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
+from cms.appresolver import (
+    applications_page_check, clear_app_resolvers, get_app_patterns,
+)
 from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.models import Title, Page
 from cms.middleware.page import get_page
+from cms.models import Page, Title
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
@@ -30,7 +32,6 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
-
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
@@ -98,17 +99,23 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         self.superuser = superuser
-        page = create_page("home", "nav_playground.html", "en",
-                           created_by=superuser, published=True)
+        page = create_page(
+            "home", "nav_playground.html", "en",
+            created_by=superuser, published=True
+        )
         create_title('de', page.get_title(), page)
         page.publish('de')
-        child_page = create_page("child_page", "nav_playground.html", "en",
-                                 created_by=superuser, published=True, parent=page)
+        child_page = create_page(
+            "child_page", "nav_playground.html", "en",
+            created_by=superuser, published=True, parent=page
+        )
         create_title('de', child_page.get_title(), child_page)
         child_page.publish('de')
-        child_child_page = create_page("child_child_page", "nav_playground.html",
-                                       "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
-                                       apphook_namespace=namespace)
+        child_child_page = create_page(
+            "child_child_page", "nav_playground.html",
+            "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
+            apphook_namespace=namespace
+        )
         create_title("de", child_child_page.get_title(), child_child_page)
         child_child_page.publish('de')
         # publisher_public is set to draft on publish, issue with onetoone reverse
@@ -117,7 +124,7 @@ class ApphooksTestCase(CMSTestCase):
         if isinstance(title_langs, str):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
-            titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]
+            titles = [child_child_page.publisher_public.get_title_obj(lang) for lang in title_langs]
 
         self.reload_urls()
 

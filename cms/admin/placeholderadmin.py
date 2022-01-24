@@ -1,26 +1,22 @@
 import uuid
 import warnings
-
 from urllib.parse import parse_qsl, urlparse
 
-from django.urls import re_path
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import (
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
-    HttpResponseNotFound,
-    HttpResponseRedirect,
+    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+    HttpResponseNotFound, HttpResponseRedirect,
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
+from django.urls import re_path
+from django.utils import translation
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
-from django.utils import translation
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
@@ -33,7 +29,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.signals import pre_placeholder_operation, post_placeholder_operation
+from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
 from cms.utils import copy_plugins, get_current_site
 from cms.utils.conf import get_cms_setting
@@ -78,7 +74,10 @@ class FrontendEditableAdminMixin:
         Register the url for the single field edit view
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
@@ -224,7 +223,10 @@ class PlaceholderAdminMixin:
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
         url_patterns = [
             pat(r'copy-plugins/$', self.copy_plugins),
             pat(r'add-plugin/$', self.add_plugin),
@@ -622,18 +624,25 @@ class PlaceholderAdminMixin:
         parent_id = get_int(request.POST.get('plugin_parent', ""), None)
         target_language = request.POST['target_language']
         move_a_copy = request.POST.get('move_a_copy')
-        move_a_copy = (move_a_copy and move_a_copy != "0" and
-                       move_a_copy.lower() != "false")
+        move_a_copy = (
+            move_a_copy and move_a_copy != "0" and move_a_copy.lower() != "false"
+        )
         move_to_clipboard = placeholder == request.toolbar.clipboard
         source_placeholder = plugin.placeholder
 
         order = request.POST.getlist("plugin_order[]")
 
+        parent_plugin = None
+        if parent_id is not None:
+            parent_plugin = self._get_plugin_from_id(parent_id)
+
         if placeholder != source_placeholder:
             try:
                 template = self.get_placeholder_template(request, placeholder)
-                has_reached_plugin_limit(placeholder, plugin.plugin_type,
-                                         target_language, template=template)
+                has_reached_plugin_limit(
+                    placeholder, plugin.plugin_type, target_language,
+                    template=template, parent_plugin=parent_plugin
+                )
             except PluginLimitReached as er:
                 return HttpResponseBadRequest(er)
 

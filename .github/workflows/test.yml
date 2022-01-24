@@ -8,10 +8,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, ]  # latest release minus two
+        python-version: [ '3.7', '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
           django-3.1.txt,
           django-3.2.txt,
         ]
@@ -38,6 +37,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
@@ -45,6 +45,7 @@ jobs:
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
+        pip install -r docs/requirements.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -59,11 +60,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, ]  # latest release minus two
+        python-version: [ '3.7', '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
           django-3.1.txt,
+          django-3.2.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -87,6 +88,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
@@ -94,6 +96,7 @@ jobs:
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
+        pip install -r docs/requirements.txt
         python setup.py install
 
 
@@ -108,11 +111,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, ]  # latest release minus two
+        python-version: [ '3.7', '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
           django-3.1.txt,
+          django-3.2.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -125,12 +128,14 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install -r docs/requirements.txt
         python setup.py install
 
     - name: Test with django test runner

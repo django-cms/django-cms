@@ -1,9 +1,9 @@
-from django.test.simple import DjangoTestSuiteRunner
-from django.utils.encoding import force_str
 import operator
 import time
-from django.utils.unittest import TestSuite
 
+from django.test.simple import DjangoTestSuiteRunner
+from django.utils.encoding import force_str
+from django.utils.unittest import TestSuite
 
 TIMINGS = {}
 
@@ -34,6 +34,6 @@ class TimedTestRunner(DjangoTestSuiteRunner):
                 TIMINGS.items(),
                 key=operator.itemgetter(1),
                 reverse=True)[:10]
-        print(u"Ten slowest tests:")
+        print("Ten slowest tests:")
         for func_name, timing in by_time:
-            print(u"{t:.2f}s {f}".format(f=func_name, t=timing))
+            print("{t:.2f}s {f}".format(f=func_name, t=timing))

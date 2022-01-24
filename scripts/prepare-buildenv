@@ -1,0 +1,40 @@
+#!/bin/bash
+
+set -e
+
+SCRIPTS=$(dirname "$(realpath "$0")")
+#shellcheck disable=SC1090
+source "${SCRIPTS}/functions"
+
+check_command_exists python git awk sed pip npm xargs grep
+
+check_virtual_env
+
+status "- Installing needed python modules"
+grep -v django-cms docs/requirements.txt | grep -v '#' | xargs pip install --quiet django-admin transifex-client
+
+check_command_exists django-admin
+
+if [ ! -d cms ] ; then
+    error "Please only run this command within the django CMS root folder"
+    exit 1
+fi
+
+cd cms
+
+load_nvm
+
+if ! nvm current | grep -q "^v6" ; then
+    status "installing Node 6 (as required)"
+    nvm install 6
+    nvm use 6
+fi
+
+status "- Installing required node packages"
+npm install --loglevel warn
+
+if ! command -v gulp; then
+    npm install gulp --loglevel warn
+    check_command_exists gulp
+fi
+

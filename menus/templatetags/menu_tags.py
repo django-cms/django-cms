@@ -157,16 +157,14 @@ class ShowMenu(InclusionTag):
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
             children = menu_renderer.apply_modifiers(children, namespace, root_id, post_cut=True)
 
-        try:
-            context['children'] = children
-            context['template'] = template
-            context['from_level'] = from_level
-            context['to_level'] = to_level
-            context['extra_inactive'] = extra_inactive
-            context['extra_active'] = extra_active
-            context['namespace'] = namespace
-        except:
-            context = {"template": template}
+        context['children'] = children
+        context['template'] = template
+        context['from_level'] = from_level
+        context['to_level'] = to_level
+        context['extra_inactive'] = extra_inactive
+        context['extra_active'] = extra_active
+        context['namespace'] = namespace
+
         return context
 
 
@@ -293,8 +291,9 @@ class ShowBreadcrumb(InclusionTag):
             start_level = 0
         try:
             only_visible = bool(int(only_visible))
-        except:
+        except TypeError:
             only_visible = bool(only_visible)
+
         ancestors = []
 
         menu_renderer = context.get('cms_menu_renderer')
@@ -305,12 +304,10 @@ class ShowBreadcrumb(InclusionTag):
         nodes = menu_renderer.get_nodes(breadcrumb=True)
 
         # Find home
-        home = None
         root_url = unquote(reverse("pages-root"))
         home = next((node for node in nodes if node.get_absolute_url() == root_url), None)
 
         # Find selected
-        selected = None
         selected = next((node for node in nodes if node.selected), None)
 
         if selected and selected != home:

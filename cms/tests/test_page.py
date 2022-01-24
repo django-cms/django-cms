@@ -1,6 +1,6 @@
 import datetime
-import os.path
 import functools
+import os.path
 from unittest import skipIf
 
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.api import create_page, add_plugin, create_title, publish_page
+from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, Title
@@ -24,9 +24,7 @@ from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import (
-    get_available_slug,
-    get_current_site,
-    get_page_from_request,
+    get_available_slug, get_current_site, get_page_from_request,
 )
 
 
@@ -208,6 +206,14 @@ class PagesTestCase(TransactionCMSTestCase):
             create_page('test copy', 'nav_playground.html', 'en', published=True)
         new_slug = get_available_slug(site, 'test-copy', 'en')
         self.assertTrue(new_slug, 'test-copy-11')
+
+    def test_get_available_slug_recursion_exclude_current(self):
+        """ Checks cms.utils.page.get_available_slug for excluding the current page
+        """
+        site = get_current_site()
+        base = create_page('test', 'nav_playground.html', 'en', published=True)
+        new_slug = get_available_slug(site, 'test', 'en', current=base)
+        self.assertTrue(new_slug, 'test')
 
     def test_path_collisions_api_1(self):
         """ Checks for slug collisions on sibling pages - uses API to create pages
@@ -781,6 +787,16 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'test-page-4/test-page-3/')
 
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            copied = self.copy_page(page2, page2)
+            self.assertEqual(copied.get_absolute_url(),
+                             self.get_pages_root() + 'test-page-2/test-page-2/')
+            copied = self.move_page(copied, page2, position='left')
+            copied.reload()
+            self.assertEqual(copied.get_absolute_url(),
+                             self.get_pages_root() + 'test-page-2-copy-2/')
+
     def test_page_and_title_repr(self):
         non_saved_page = Page()
         self.assertIsNone(non_saved_page.pk)
@@ -1168,11 +1184,14 @@ class PagesTestCase(TransactionCMSTestCase):
         This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
         where the slug was not regenerated.
         """
-        parent = create_page('en-parent', "nav_playground.html", 'en',
-                             slug = 'en-parent', published=True)
-        child = create_page('en-child', "nav_playground.html", 'en',
-                            slug = 'en-child', parent=parent, published=True)
-        
+        parent = create_page(
+            'en-parent', "nav_playground.html", 'en',
+            slug='en-parent', published=True
+        )
+        child = create_page(
+            'en-child', "nav_playground.html", 'en',
+            slug='en-child', parent=parent, published=True
+        )
         create_title('de', 'de-child', child, slug='de-child')
 
         # Parent 'de' title created after child translation
@@ -1186,11 +1205,11 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get('/de/de-parent/de-child/')
         self.assertEqual(response.status_code, 200)
 
-    def  test_subpage_title_path_regeneration_after_parent_slug_change(self):    
+    def test_subpage_title_path_regeneration_after_parent_slug_change(self):
         """
         When a parent page slug changes,
         the child title path should be regenerated.
-        
+
         This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
         where the slug was not regenerated.
         """

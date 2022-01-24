@@ -1,11 +1,11 @@
 from classytags.utils import flatten_context
-
-from cms import constants
-from cms.test_utils.testcases import CMSTestCase
-from cms.utils.conf import get_cms_setting
 from django.core.exceptions import ImproperlyConfigured
 from django.template.loader import render_to_string
 from django.test.utils import override_settings
+
+from cms import constants
+from cms.test_utils.testcases import CMSTestCase
+from cms.utils.conf import get_cms_setting, get_languages
 
 
 class SettingsTests(CMSTestCase):
@@ -51,3 +51,17 @@ class SettingsTests(CMSTestCase):
                     ImproperlyConfigured,
                     get_cms_setting, 'TEMPLATES'
                 )
+
+    def test_use_empty_fallbacks_as_default(self):
+        cms_languages = {
+            1: [
+                {"code": "en", "name": "English",},
+                {"code": "de", "name": "German",},
+                {"code": "nl", "name": "Dutch",},
+            ],
+            "default": {"fallbacks": []},
+        }
+
+        with self.settings(CMS_LANGUAGES=cms_languages):
+            languages = get_languages()
+            self.assertListEqual(languages[1][0]["fallbacks"], [])

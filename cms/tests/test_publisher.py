@@ -1,16 +1,20 @@
-from djangocms_text_ckeditor.models import Text
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.core.management.base import CommandError
 from django.core.management import call_command
+from django.core.management.base import CommandError
 from django.urls import reverse
 from django.utils.translation import override as force_language
+from djangocms_text_ckeditor.models import Text
 
-from cms.api import create_page, add_plugin, create_title
-from cms.constants import PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
-from cms.management.commands.subcommands.publisher_publish import PublishCommand
-from cms.models import CMSPlugin, Page, TreeNode, Title
+from cms.api import add_plugin, create_page, create_title
+from cms.constants import (
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING,
+)
+from cms.management.commands.subcommands.publisher_publish import (
+    PublishCommand,
+)
+from cms.models import CMSPlugin, Page, Title, TreeNode
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import CMSTestCase as TestCase
 from cms.test_utils.util.context_managers import StdoutOverride
@@ -177,11 +181,15 @@ class PublisherCommandTests(TestCase):
         draft = Page.objects.drafts()[0]
         draft.reverse_id = 'a_test' # we have to change *something*
         draft.save()
-        add_plugin(draft.placeholders.get(slot=u"body"),
-                   u"TextPlugin", u"en", body="Test content")
+        add_plugin(
+            draft.placeholders.get(slot="body"),
+            "TextPlugin", "en", body="Test content"
+        )
         draft.publish('en')
-        add_plugin(draft.placeholders.get(slot=u"body"),
-                   u"TextPlugin", u"en", body="Test content")
+        add_plugin(
+            draft.placeholders.get(slot="body"),
+            "TextPlugin", "en", body="Test content"
+        )
 
         # Manually undoing table name patching
         Text._meta.db_table = 'djangocms_text_ckeditor_text'
@@ -245,7 +253,7 @@ class PublisherCommandTests(TestCase):
         get_user_model().objects.create_superuser('djangocms', 'cms@example.com', '123456')
 
         # Create a draft page with two published titles
-        page = create_page(u"The page!", "nav_playground.html", "en", published=False)
+        page = create_page("The page!", "nav_playground.html", "en", published=False)
         title = create_title('de', 'ja', page)
         title.published = True
         title.save()
@@ -268,12 +276,12 @@ class PublisherCommandTests(TestCase):
         siteB = Site.objects.create(domain='b.example.com', name='b.example.com')
 
         #example.com
-        create_page(u"example.com homepage", "nav_playground.html", "en", published=True)
+        create_page("example.com homepage", "nav_playground.html", "en", published=True)
         #a.example.com
-        create_page(u"a.example.com homepage", "nav_playground.html", "de", site=siteA, published=True)
+        create_page("a.example.com homepage", "nav_playground.html", "de", site=siteA, published=True)
         #b.example.com
-        create_page(u"b.example.com homepage", "nav_playground.html", "de", site=siteB, published=True)
-        create_page(u"b.example.com about", "nav_playground.html", "nl", site=siteB, published=True)
+        create_page("b.example.com homepage", "nav_playground.html", "de", site=siteB, published=True)
+        create_page("b.example.com about", "nav_playground.html", "nl", site=siteB, published=True)
 
         with StdoutOverride() as buffer:
             # Now we don't expect it to raise, but we need to redirect IO
@@ -778,9 +786,9 @@ class PublishingTests(TestCase):
         user = self.get_superuser()
         page = create_page("Page", "nav_playground.html", "en", published=True,
                            created_by=user)
-        placeholder = page.placeholders.get(slot=u"body")
-        deleted_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Deleted content")
-        text_plugin = add_plugin(placeholder, u"TextPlugin", u"en", body="Public content")
+        placeholder = page.placeholders.get(slot="body")
+        deleted_plugin = add_plugin(placeholder, "TextPlugin", "en", body="Deleted content")
+        text_plugin = add_plugin(placeholder, "TextPlugin", "en", body="Public content")
         page.publish('en')
 
         # Modify and delete plugins
@@ -804,13 +812,17 @@ class PublishingTests(TestCase):
     def test_revert_move(self):
         parent = create_page("Parent", "nav_playground.html", "en", published=True)
         parent_url = parent.get_absolute_url()
-        page = create_page("Page", "nav_playground.html", "en", published=True,
-                           parent=parent)
+        page = create_page(
+            "Page", "nav_playground.html", "en",
+            published=True, parent=parent
+        )
         other = create_page("Other", "nav_playground.html", "en", published=True)
         other_url = other.get_absolute_url()
 
-        child = create_page("Child", "nav_playground.html", "en", published=True,
-                            parent=page)
+        child = create_page(
+            "Child", "nav_playground.html", "en",
+            published=True, parent=page
+        )
         parent = parent.reload()
         page = page.reload()
         self.assertEqual(page.get_absolute_url(), parent_url + "page/")
@@ -838,18 +850,28 @@ class PublishingTests(TestCase):
                               /     \
                          subitem1 subitem2
         """
-        home_page = create_page("home", "nav_playground.html", "en",
-                                published=True, in_navigation=False)
+        home_page = create_page(
+            "home", "nav_playground.html", "en",
+            published=True, in_navigation=False
+        )
 
-        create_page("item1", "nav_playground.html", "en", parent=home_page,
-                    published=True)
-        item2 = create_page("item2", "nav_playground.html", "en", parent=home_page,
-                            published=True)
+        create_page(
+            "item1", "nav_playground.html", "en",
+            parent=home_page, published=True
+        )
+        item2 = create_page(
+            "item2", "nav_playground.html", "en",
+            parent=home_page, published=True
+        )
 
-        create_page("subitem1", "nav_playground.html", "en", parent=item2,
-                    published=True)
-        create_page("subitem2", "nav_playground.html", "en", parent=item2,
-                    published=True)
+        create_page(
+            "subitem1", "nav_playground.html", "en",
+            parent=item2, published=True
+        )
+        create_page(
+            "subitem2", "nav_playground.html", "en",
+            parent=item2, published=True
+        )
         item2 = item2.reload()
 
         self.assertEqual(Page.objects.filter(publisher_is_draft=False).count(), 5)

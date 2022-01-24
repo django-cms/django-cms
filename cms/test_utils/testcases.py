@@ -1,7 +1,6 @@
 import json
 import sys
 import warnings
-
 from urllib.parse import unquote, urljoin
 
 from django.conf import settings
@@ -19,26 +18,21 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
 from django.utils.translation import activate
-from menus.menu_pool import menu_pool
 
 from cms.api import create_page
 from cms.constants import (
-    PUBLISHER_STATE_DEFAULT,
-    PUBLISHER_STATE_DIRTY,
-    PUBLISHER_STATE_PENDING,
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING,
 )
-from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page
 from cms.models.permissionmodels import (
-    GlobalPagePermission,
-    PagePermission,
-    PageUser,
+    GlobalPagePermission, PagePermission, PageUser,
 )
+from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
-
+from menus.menu_pool import menu_pool
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
@@ -87,7 +81,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
         if v is not None:
             try:
                 v.__warningregistry__ = None
-            except:
+            except:  # noqa: E722
                 # Don't specify a particular exception type to handle in case
                 # some wacky object raises some wacky exception in response to
                 # the setattr attempt.
@@ -304,7 +298,7 @@ class BaseCMSTestCase:
         """
         for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
+            print("%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
             page.pk, page.path, page.depth, page.numchild))
 
     def print_node_structure(self, nodes, *extra):
@@ -313,7 +307,7 @@ class BaseCMSTestCase:
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print(u"%s%s: %s" % (ident, node.title, attrs))
+                print("%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
 
         _rec(nodes)
@@ -448,15 +442,24 @@ class BaseCMSTestCase:
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
+        cleanwarningsShown = []
         result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
 
         if not warningsShown:
             self.fail("No warnings emitted")
-        first = warningsShown[0]
-        for other in warningsShown[1:]:
-            if ((other.message, other.category)
-                != (first.message, first.category)):
+
+        for warning in warningsShown:
+            # this specific warning is present due to the way Django
+            # handle asyncio
+            # https://stackoverflow.com/questions/70303895/python-3-10-asyncio-gather-shows-deprecationwarning-there-is-no-current-event
+            if (warning.category != DeprecationWarning and warning.message != 'There is no current event loop'):
+                cleanwarningsShown.append(warning)
+
+        first = cleanwarningsShown[0]
+        for other in cleanwarningsShown[1:]:
+            if ((other.message, other.category) != (first.message, first.category)):
                 self.fail("Can't handle different warnings")
+
         self.assertEqual(first.message, message)
         self.assertTrue(first.category is category)
 

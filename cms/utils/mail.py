@@ -1,9 +1,9 @@
+from django.contrib.sites.models import Site
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.translation import gettext_lazy as _
-from django.contrib.sites.models import Site
 
-from cms.utils.urlutils import urljoin, admin_reverse
+from cms.utils.urlutils import admin_reverse, urljoin
 
 
 def send_mail(subject, txt_template, to, context=None, html_template=None, fail_silently=True):

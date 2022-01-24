@@ -6,13 +6,14 @@ from django.utils.encoding import force_str
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 
-from cms.utils.urlutils import admin_reverse, static_with_version
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.utils import get_page_choices, get_site_choices
 from cms.models import Page, PageUser
+from cms.utils.urlutils import admin_reverse, static_with_version
 
 
 class PageSelectWidget(MultiWidget):
-    """A widget that allows selecting a page by first selecting a site and then
+    """
+    A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
     """
     template_name = 'cms/widgets/pageselectwidget.html'
@@ -82,9 +83,7 @@ class PageSelectWidget(MultiWidget):
                 CMS.Widgets._pageSelectWidgets.push({
                     name: '%(name)s'
                 });
-            </script>""" % {
-                'name': name
-            }
+            </script>""" % {'name': name}
 
     def get_context(self, name, value, attrs):
         self._build_widgets()

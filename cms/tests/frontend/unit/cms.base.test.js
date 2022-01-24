@@ -769,45 +769,45 @@ describe('cms.base.js', function() {
                 var url;
 
                 url = CMS.API.Helpers.makeURL('test', [['param', '1'], ['another', '2']]);
-                expect(url).toEqual('test?param=1&amp;another=2');
+                expect(url).toEqual('test?param=1&another=2');
 
                 url = CMS.API.Helpers.makeURL('test?param=1', [['another', '2']]);
-                expect(url).toEqual('test?param=1&amp;another=2');
+                expect(url).toEqual('test?param=1&another=2');
 
                 url = CMS.API.Helpers.makeURL('test?param=1&another=2', [['different', '3']]);
-                expect(url).toEqual('test?param=1&amp;another=2&amp;different=3');
+                expect(url).toEqual('test?param=1&another=2&different=3');
 
                 url = CMS.API.Helpers.makeURL('test?param=1&amp;another=2', [['different', '3']]);
-                expect(url).toEqual('test?param=1&amp;another=2&amp;different=3');
+                expect(url).toEqual('test?param=1&another=2&different=3');
 
                 url = CMS.API.Helpers.makeURL('test?param=1&another=2&amp;again=3', [['different', '3']]);
-                expect(url).toEqual('test?param=1&amp;another=2&amp;again=3&amp;different=3');
+                expect(url).toEqual('test?param=1&another=2&again=3&different=3');
             });
 
             it('replaces param values with new ones if they match', function() {
                 var url;
 
                 url = CMS.API.Helpers.makeURL('test?param=1&amp;another=2', [['another', '3']]);
-                expect(url).toEqual('test?param=1&amp;another=3');
+                expect(url).toEqual('test?param=1&another=3');
 
                 url = CMS.API.Helpers.makeURL('test?param=1&amp;another=2', [['another', '3'], ['param', '4']]);
-                expect(url).toEqual('test?another=3&amp;param=4');
+                expect(url).toEqual('test?another=3&param=4');
             });
 
             it('understands hashes in the url', function() {
                 var url;
 
                 url = CMS.API.Helpers.makeURL('test#hash', [['param', '1'], ['another', '2']]);
-                expect(url).toEqual('test?param=1&amp;another=2#hash');
+                expect(url).toEqual('test?param=1&another=2#hash');
 
                 url = CMS.API.Helpers.makeURL('test#hash#with#hash', [['param', '1'], ['another', '2']]);
-                expect(url).toEqual('test?param=1&amp;another=2#hash#with#hash');
+                expect(url).toEqual('test?param=1&another=2#hash#with#hash');
 
                 url = CMS.API.Helpers.makeURL('test#', [['param', '1'], ['another', '2']]);
-                expect(url).toEqual('test?param=1&amp;another=2');
+                expect(url).toEqual('test?param=1&another=2');
 
                 url = CMS.API.Helpers.makeURL('test#hash&stuff', [['param', '1'], ['another', '2']]);
-                expect(url).toEqual('test?param=1&amp;another=2#hash&stuff');
+                expect(url).toEqual('test?param=1&another=2#hash&stuff');
 
                 url = CMS.API.Helpers.makeURL('test#hash&stuff', []);
                 expect(url).toEqual('test#hash&stuff');

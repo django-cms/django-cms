@@ -1,7 +1,7 @@
 import copy
 
 from cms.api import create_page, create_title
-from cms.models import Title, Page
+from cms.models import Page, Title
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.conf import get_cms_setting

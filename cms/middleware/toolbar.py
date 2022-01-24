@@ -2,16 +2,15 @@
 Edit Toolbar middleware
 """
 from django import forms
-from django.contrib.admin.models import LogEntry, ADDITION, CHANGE
+from django.contrib.admin.models import ADDITION, CHANGE, LogEntry
 from django.core.exceptions import ValidationError
-from django.urls import resolve
+from django.urls import Resolver404, resolve
 from django.utils.deprecation import MiddlewareMixin
 
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.request_ip_resolvers import get_request_ip_resolver
-
 
 get_request_ip = get_request_ip_resolver()
 
@@ -40,7 +39,7 @@ class ToolbarMiddleware(MiddlewareMixin):
 
         try:
             match = resolve(request.path_info)
-        except:
+        except Resolver404:
             return False
 
         return match.url_name in ('pages-root', 'pages-details-by-slug', 'cms_page_edit_plugin')

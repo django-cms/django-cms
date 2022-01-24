@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e 
+
+SCRIPTS=$(dirname "$(realpath "$0")")
+ROOT=$(git rev-parse --show-toplevel)
+
+cd "${ROOT}/cms"
+
+tx pull -f 
+django-admin compilemessages
+
+"${SCRIPTS}/filter-locale-changes"

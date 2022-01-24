@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
-from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
+from cms.constants import LEFT, REFRESH_PAGE, RIGHT, URL_CHANGE
 
 
 class ItemSearchResult:

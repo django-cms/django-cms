@@ -14,22 +14,26 @@ from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
-from cms.page_rendering import _handle_no_page, render_page, render_object_structure, _render_welcome_page
+from cms.page_rendering import (
+    _handle_no_page, _render_welcome_page, render_object_structure,
+    render_page,
+)
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
+from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import (get_fallback_languages, get_public_languages,
-                            get_redirect_on_fallback, get_language_list,
-                            get_default_language_for_site,
-                            is_language_prefix_patterns_used)
+from cms.utils.i18n import (
+    get_default_language_for_site, get_fallback_languages, get_language_list,
+    get_public_languages, get_redirect_on_fallback,
+    is_language_prefix_patterns_used,
+)
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_change_page
-from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 
 
 def _clean_redirect_url(redirect_url, language):
-    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/"
-            and not redirect_url.startswith('/%s/' % language)):
+    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
+            '/%s/' % language)):
         # add language prefix to url
         redirect_url = "/%s/%s" % (language, redirect_url.lstrip("/"))
     return redirect_url
@@ -43,9 +47,9 @@ def details(request, slug):
     response_timestamp = now()
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
-            not request.toolbar.edit_mode_active and
-            not request.toolbar.show_toolbar and
-            not request.user.is_authenticated
+            not request.toolbar.edit_mode_active
+            and not request.toolbar.show_toolbar  # noqa: W503
+            and not request.user.is_authenticated  # noqa: W503
         )
     ):
         cache_content = get_page_cache(request)
@@ -86,7 +90,10 @@ def details(request, slug):
     else:
         user_languages = get_public_languages(site_id=site.pk)
 
-    request_language = get_language_from_request(request, check_path=True)
+    if is_language_prefix_patterns_used():
+        request_language = get_language_from_request(request, check_path=True)
+    else:
+        request_language = get_default_language_for_site(site.pk)
 
     if not page.is_home and request_language not in user_languages:
         # The homepage is treated differently because
