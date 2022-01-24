@@ -1,6 +1,9 @@
-import cms
 import os
+
 from django.test import testcases
+
+import cms
+
 
 class AssetTestCase(testcases.TestCase):
 

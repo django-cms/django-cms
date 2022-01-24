@@ -1,9 +1,9 @@
-from django.test.simple import DjangoTestSuiteRunner
-from django.utils.encoding import force_str
 import operator
 import time
-from django.utils.unittest import TestSuite
 
+from django.test.simple import DjangoTestSuiteRunner
+from django.utils.encoding import force_str
+from django.utils.unittest import TestSuite
 
 TIMINGS = {}
 

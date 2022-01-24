@@ -1,10 +1,10 @@
 from django import forms
 from django.apps import apps
-from django.contrib.auth import get_user_model, get_permission_codename
+from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
@@ -14,24 +14,27 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import api
 from cms.apphook_pool import apphook_pool
 from cms.cache.permissions import clear_permission_cache
+from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
-from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
-from cms.forms.validators import (validate_relative_url, validate_url_uniqueness,
-                                  validate_overwrite_url)
-from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
-from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, Title,
-                        Placeholder, GlobalPagePermission, TreeNode)
+from cms.forms.validators import (
+    validate_overwrite_url, validate_relative_url, validate_url_uniqueness,
+)
+from cms.forms.widgets import (
+    AppHookSelect, ApplicationConfigSelect, UserSelectAdminWidget,
+)
+from cms.models import (
+    CMSPlugin, GlobalPagePermission, Page, PagePermission, PageType, PageUser,
+    PageUserGroup, Placeholder, Title, TreeNode,
+)
 from cms.models.permissionmodels import User
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
-from cms.utils.conf import get_cms_setting
 from cms.utils.compat.forms import UserChangeForm
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_language_object
 from cms.utils.permissions import (
-    get_current_user,
-    get_subordinate_users,
-    get_subordinate_groups,
+    get_current_user, get_subordinate_groups, get_subordinate_users,
     get_user_permission_level,
 )
 from menus.menu_pool import menu_pool
@@ -1016,6 +1019,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
         # raw id field for the user
         if use_raw_id:
             from django.contrib.admin.widgets import ForeignKeyRawIdWidget
+
             # This check will be False if the number of users in the system
             # is less than the threshold set by the RAW_ID_USERS setting.
             if isinstance(self.fields['user'].widget, ForeignKeyRawIdWidget):

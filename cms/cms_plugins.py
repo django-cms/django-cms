@@ -1,13 +1,16 @@
+from django.http import (
+    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+)
+from django.middleware.csrf import get_token
+from django.urls import re_path
+from django.utils.translation import get_language, gettext, gettext_lazy as _
+
 from cms.models import CMSPlugin, Placeholder
 from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
 from cms.utils.urlutils import admin_reverse
-from django.urls import re_path
-from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
-from django.middleware.csrf import get_token
-from django.utils.translation import gettext, gettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):

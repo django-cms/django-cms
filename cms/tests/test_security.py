@@ -2,10 +2,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import QueryDict
 
-from cms.api import create_page, add_plugin
+from cms.api import add_plugin, create_page
 from cms.models.pluginmodel import CMSPlugin
-from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.project.placeholderapp.models import Example1
+from cms.test_utils.testcases import CMSTestCase
 
 
 class SecurityTests(CMSTestCase):

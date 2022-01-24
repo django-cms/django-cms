@@ -6,8 +6,9 @@ from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils import i18n, get_language_from_request
+from cms.utils import get_language_from_request, i18n
 from cms.utils.compat import DJANGO_3_0, DJANGO_3_1, DJANGO_3_2
+
 
 @override_settings(
     LANGUAGE_CODE='en',
