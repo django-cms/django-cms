@@ -898,7 +898,6 @@ class PluginsTestCase(PluginsTestBaseCase):
             "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
             get_page, a
         )
-
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter('always')
             a.page
