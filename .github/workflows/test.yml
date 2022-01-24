@@ -11,7 +11,6 @@ jobs:
         python-version: [ '3.7', '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
           django-3.1.txt,
           django-3.2.txt,
         ]
@@ -38,6 +37,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
@@ -63,7 +63,6 @@ jobs:
         python-version: [ '3.7', '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
           django-3.1.txt,
           django-3.2.txt,
         ]
@@ -89,6 +88,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
@@ -114,7 +114,6 @@ jobs:
         python-version: [ '3.7', '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
           django-3.1.txt,
           django-3.2.txt,
         ]
@@ -129,6 +128,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
