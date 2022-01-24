@@ -7,7 +7,6 @@ from django.urls import clear_url_caches
 
 from cms.utils.apphook_reload import mark_urlconf_as_changed
 
-
 logger = logging.getLogger(__name__)
 
 DISPATCH_UID = 'cms-restart'

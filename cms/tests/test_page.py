@@ -1,6 +1,6 @@
 import datetime
-import os.path
 import functools
+import os.path
 from unittest import skipIf
 
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.api import create_page, add_plugin, create_title, publish_page
+from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, Title
@@ -24,9 +24,7 @@ from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import (
-    get_available_slug,
-    get_current_site,
-    get_page_from_request,
+    get_available_slug, get_current_site, get_page_from_request,
 )
 
 

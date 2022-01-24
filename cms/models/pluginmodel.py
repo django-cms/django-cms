@@ -1,7 +1,7 @@
-from datetime import date
 import json
 import os
 import warnings
+from datetime import date
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -13,13 +13,12 @@ from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from treebeard.mp_tree import MP_Node
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
-
-from treebeard.mp_tree import MP_Node
 
 
 class BoundRenderMeta:

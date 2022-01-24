@@ -4,8 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-
-from django.utils.translation import override as force_language, gettext as _
+from django.utils.translation import gettext as _, override as force_language
 
 from cms.utils.conf import get_cms_setting
 

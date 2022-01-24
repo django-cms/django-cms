@@ -6,18 +6,19 @@ from django.core.cache import cache
 from django.utils.translation import override as force_language
 
 from cms.admin import forms
-from cms.admin.forms import (PagePermissionInlineAdminForm,
-                             ViewRestrictionInlineAdminForm, GlobalPagePermissionAdminForm,
-                             PageUserGroupForm)
-from cms.api import create_page, create_title, assign_user_to_page
+from cms.admin.forms import (
+    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm,
+    PageUserGroupForm, ViewRestrictionInlineAdminForm,
+)
+from cms.api import assign_user_to_page, create_page, create_title
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
-
-from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
-
-from cms.forms.utils import update_site_and_page_choices, get_site_choices, get_page_choices
+from cms.forms.utils import (
+    get_page_choices, get_site_choices, update_site_and_page_choices,
+)
 from cms.forms.widgets import ApplicationConfigSelect
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
+    URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS, CMSTestCase,
 )
 from cms.utils import get_current_site
 

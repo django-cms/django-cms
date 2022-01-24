@@ -1,6 +1,6 @@
-from django.db.models import Model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Model
 
 
 class ObjectPermissionBackend:
@@ -23,7 +23,9 @@ class ObjectPermissionBackend:
         """
         Returns list of ``codename``'s of all permissions for given ``obj``.
         """
-        from cms.test_utils.project.objectpermissionsapp.models import UserObjectPermission
+        from cms.test_utils.project.objectpermissionsapp.models import (
+            UserObjectPermission,
+        )
         ctype = ContentType.objects.get_for_model(obj)
         related_name = UserObjectPermission.permission.field.related_query_name()
         user_filters = {
