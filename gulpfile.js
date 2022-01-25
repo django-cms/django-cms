@@ -41,7 +41,6 @@ const PROJECT_PATTERNS = {
         PROJECT_PATH.js + '/modules/*.js',
         PROJECT_PATH.js + '/widgets/*.js',
         PROJECT_PATH.js + '/*.js',
-        PROJECT_PATH.js + '/gulpfile.js',
         PROJECT_PATH.tests + '/**/*.js',
         '!' + PROJECT_PATH.tests + '/unit/helpers/**/*.js',
         '!' + PROJECT_PATH.tests + '/coverage/**/*.js',
@@ -110,9 +109,6 @@ const INTEGRATION_TESTS = [
 
 const CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' }).match(/__version__ = '(.*?)'/)[1];
 
-// #####################################################################################################################
-// #TASKS#
-
 const css = () => {
     return (
         gulp
@@ -138,8 +134,6 @@ const css = () => {
         .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'))
     );
 };
-
-gulp.task("sass", css);
 
 const icons = () => {
   return (
@@ -167,8 +161,6 @@ const icons = () => {
   );
 };
 
-gulp.task("icons", icons);
-
 const lint = () => {
   return (
     gulp
@@ -181,10 +173,6 @@ const lint = () => {
   );
 };
 
-gulp.task("lint", lint);
-
-
-// gulp.task('tests', ['tests:unit', 'tests:integration']);
 const unitTest = (done) => {
     return (
         new KarmaServer({
@@ -206,7 +194,6 @@ const testsIntegration = (done) => {
     });
     done();  
 }
-
 
 const webpackBundle = function(opts) {
     const webpackOptions = opts || {};
@@ -230,16 +217,17 @@ const webpackBundle = function(opts) {
     };
 };
 
-// gulp.task('bundle:watch', webpackBundle({ watch: true }));
-gulp.task('bundle', webpackBundle());
-
 const watchFiles = () => {
     browserSync.init();
     gulp.watch(PROJECT_PATTERNS.sass, css);
     gulp.watch(PROJECT_PATTERNS.js, lint);
 };
 
+gulp.task("sass", css);
+gulp.task("icons", icons);
+gulp.task("lint", lint);
 gulp.task('watch', gulp.parallel(watchFiles));
+gulp.task('bundle', webpackBundle());
 gulp.task('unitTest', unitTest);
 gulp.task('testsIntegration',testsIntegration);
-gulp.task('tests', gulp.series(unitTest, testsIntegration));s
+gulp.task('tests', gulp.series(unitTest, testsIntegration));
