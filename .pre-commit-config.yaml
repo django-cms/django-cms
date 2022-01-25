@@ -25,7 +25,9 @@ repos:
     rev: v4.1.0
     hooks:
       - id: check-merge-conflict
+      - id: debug-statements
       - id: mixed-line-ending
+      - id: trailing-whitespace
 
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
