@@ -137,53 +137,35 @@ const css = () => {
     );
 };
 
-// gulp.task('sass', function() {
-//     gulp
-//         .src(PROJECT_PATTERNS.sass)
-//         .pipe(gulpif(options.debug, sourcemaps.init()))
-//         .pipe(sass())
-//         .on('error', function(error) {
-//             gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));
-//         })
-//         .pipe(
-//             postcss([
-//                 autoprefixer({
-//                     cascade: false
-//                 })
-//             ])
-//         )
-//         .pipe(
-//             minifyCss({
-//                 rebase: false
-//             })
-//         )
-//         .pipe(gulpif(options.debug, sourcemaps.write()))
-//         .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'));
-// });
+gulp.task("sass", css);
 
-// gulp.task('icons', function() {
-//     gulp
-//         .src(PROJECT_PATTERNS.icons)
-//         .pipe(
-//             iconfontCss({
-//                 fontName: 'django-cms-iconfont',
-//                 path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
-//                 targetPath: '../../sass/components/_iconography.scss',
-//                 fontPath: '../../fonts/' + CMS_VERSION + '/'
-//             })
-//         )
-//         .pipe(
-//             iconfont({
-//                 fontName: 'django-cms-iconfont',
-//                 normalize: true,
-//                 formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
-//             })
-//         )
-//         .on('glyphs', function(glyphs, opts) {
-//             gutil.log.bind(glyphs, opts);
-//         })
-//         .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
-// });
+const icons = () => {
+  return (
+    gulp
+        .src(PROJECT_PATTERNS.icons)
+        .pipe(
+            iconfontCss({
+                fontName: 'django-cms-iconfont',
+                path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
+                targetPath: '../../sass/components/_iconography.scss',
+                fontPath: '../../fonts/' + CMS_VERSION + '/'
+            })
+        )
+        .pipe(
+            iconfont({
+                fontName: 'django-cms-iconfont',
+                normalize: true,
+                formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
+            })
+        )
+        .on('glyphs', function(glyphs, opts) {
+            gutil.log.bind(glyphs, opts);
+        })
+        .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'))
+  );
+};
+
+gulp.task("icons", icons);
 
 // gulp.task('lint', ['lint:javascript']);
 // gulp.task('lint:javascript', function() {
@@ -268,4 +250,3 @@ const css = () => {
 // gulp.task('default', ['sass', 'lint', 'watch']);
 
 
-gulp.task("sass", css);
