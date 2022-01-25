@@ -184,6 +184,15 @@ gulp.task("lint", lint);
 
 
 // gulp.task('tests', ['tests:unit', 'tests:integration']);
+const unitTest = (done) => {
+    return (
+        new KarmaServer({
+            configFile: PROJECT_PATH.tests + '/karma.conf.js',
+            singleRun: true
+        }, done).start()
+    );
+};
+
 
 // const unitTest = () => {
 //   return (
@@ -221,18 +230,20 @@ gulp.task("lint", lint);
 // });
 
 // // gulp tests:integration [--clean] [--screenshots] [--tests=loginAdmin,toolbar]
-// gulp.task(
-//     'tests:integration',
-//     integrationTests({
-//         tests: INTEGRATION_TESTS,
-//         pathToTests: PROJECT_PATH.tests,
-//         argv: argv,
-//         dbPath: 'testdb.sqlite',
-//         serverCommand: 'testserver.py',
-//         logger: gutil.log.bind(gutil),
-//         waitForMigrations: 5 // seconds
-//     })
-// );
+const testsIntegration = (done) => {
+    return (
+        integrationTests({
+            tests: INTEGRATION_TESTS,
+            pathToTests: PROJECT_PATH.tests,
+            argv: argv,
+            dbPath: 'testdb.sqlite',
+            serverCommand: 'testserver.py',
+            logger: gutil.log.bind(gutil),
+            waitForMigrations: 5 // seconds
+        }, done)
+    );
+}
+
 
 // const webpackBundle = function(opts) {
 //     const webpackOptions = opts || {};
@@ -266,3 +277,4 @@ const watchFiles = () => {
 };
 
 gulp.task('watch', gulp.parallel(watchFiles));
+gulp.task('unitTest', unitTest);
