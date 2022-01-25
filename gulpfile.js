@@ -18,6 +18,7 @@ const eslint = require('gulp-eslint');
 const webpack = require('webpack');
 const KarmaServer = require('karma').Server;
 const integrationTests = require('djangocms-casper-helpers/gulp');
+const GulpPostCss = require('gulp-postcss');
 
 const argv = require('minimist')(process.argv.slice(2)); // eslint-disable-line
 
@@ -193,55 +194,17 @@ const unitTest = (done) => {
     );
 };
 
-
-// const unitTest = () => {
-//   return (
-//     server = new KarmaServer(
-//         {
-//             configFile: PROJECT_PATH.tests + '/karma.conf.js',
-//             singleRun: true
-//         },
-//     );
-//     server.start();
-//   );
-// };
-
-// gulp.task("unitTest", unitTest);
-
-// // gulp tests:unit --tests=cms.base,cms.modal
-// gulp.task('tests:unit', function(done) {
-    // const server = new KarmaServer(
-    //     {
-    //         configFile: PROJECT_PATH.tests + '/karma.conf.js',
-    //         singleRun: true
-    //     },
-    //     done
-    // );
-
-    // server.start();
-// });
-
-// gulp.task('tests:unit:watch', function() {
-//     const server = new KarmaServer({
-//         configFile: PROJECT_PATH.tests + '/karma.conf.js'
-//     });
-
-//     server.start();
-// });
-
-// // gulp tests:integration [--clean] [--screenshots] [--tests=loginAdmin,toolbar]
 const testsIntegration = (done) => {
-    return (
-        integrationTests({
-            tests: INTEGRATION_TESTS,
-            pathToTests: PROJECT_PATH.tests,
-            argv: argv,
-            dbPath: 'testdb.sqlite',
-            serverCommand: 'testserver.py',
-            logger: gutil.log.bind(gutil),
-            waitForMigrations: 5 // seconds
-        }, done)
-    );
+    integrationTests({
+        tests: INTEGRATION_TESTS,
+        pathToTests: PROJECT_PATH.tests,
+        argv: argv,
+        dbPath: 'testdb.sqlite',
+        serverCommand: 'testserver.py',
+        logger: gutil.log.bind(gutil),
+        waitForMigrations: 5 // seconds
+    });
+    done();  
 }
 
 
@@ -278,3 +241,5 @@ const watchFiles = () => {
 
 gulp.task('watch', gulp.parallel(watchFiles));
 gulp.task('unitTest', unitTest);
+gulp.task('testsIntegration',testsIntegration);
+gulp.task('tests', gulp.series(unitTest, testsIntegration));s
