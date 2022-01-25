@@ -22,7 +22,8 @@
     "gulp-if": "1.2.5",
     "gulp-plumber": "^1.1.0",
     "gulp-postcss": "^6.4.0",
-    "gulp-sass": "3.1.0",
+    "gulp-sass": "^5.0.0",
+    "sass": "^1.27.0",
     "gulp-sourcemaps": "2.4.1",
     "gulp-util": "3.0.5",
     "imports-loader": "^0.7.1",
@@ -55,5 +56,8 @@
     "prevent-parent-scroll": "0.0.6",
     "urijs": "^1.18.10",
     "webpack2-polyfill-plugin": "0.0.2"
+  },
+  "scripts": {
+    "upgrade-interactive": "npm-check --update"
   }
 }
