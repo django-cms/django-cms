@@ -10,9 +10,12 @@
     "babel-plugin-rewire": "^1.1.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.4.0",
+    "browser-sync": "^2.26.12",
     "browserslist-saucelabs": "^0.2.3",
     "djangocms-casper-helpers": "^3.0.0",
     "eslint-plugin-compat": "^1.0.2",
+    "exports-loader": "^0.7.0",
+    "graceful-fs": "4.2.2",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^3.0.4",
     "gulp-eslint": "^3.0.1",
@@ -25,6 +28,7 @@
     "gulp-sourcemaps": "2.4.1",
     "gulp-util": "3.0.5",
     "imports-loader": "^0.7.1",
+    "istanbul-instrumenter-loader": "latest",
     "jasmine-core": "^2.3.4",
     "karma": "^0.13.15",
     "karma-coverage": "^0.5.3",
@@ -40,10 +44,8 @@
     "minimist": "1.2.0",
     "phantomjs-prebuilt": "^2.1.7",
     "raw-loader": "^0.5.1",
-    "graceful-fs": "4.2.2",
     "sass": "^1.27.0",
-    "webpack": "^3.0.0",
-    "browser-sync": "^2.26.12"
+    "webpack": "^3.0.0"
   },
   "dependencies": {
     "babel-runtime": "^6.23.0",
@@ -60,7 +62,7 @@
   "scripts": {
     "upgrade-interactive": "npm-check --update"
   },
- " overrides": {
+  " overrides": {
     "graceful-fs": "^4.2.9"
   }
 }
