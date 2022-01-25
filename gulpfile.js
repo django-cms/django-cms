@@ -245,30 +245,30 @@ const testsIntegration = (done) => {
 }
 
 
-// const webpackBundle = function(opts) {
-//     const webpackOptions = opts || {};
+const webpackBundle = function(opts) {
+    const webpackOptions = opts || {};
 
-//     webpackOptions.PROJECT_PATH = PROJECT_PATH;
-//     webpackOptions.debug = options.debug;
-//     webpackOptions.CMS_VERSION = CMS_VERSION;
+    webpackOptions.PROJECT_PATH = PROJECT_PATH;
+    webpackOptions.debug = options.debug;
+    webpackOptions.CMS_VERSION = CMS_VERSION;
 
-//     return function(done) {
-//         const config = require('./webpack.config')(webpackOptions);
+    return function(done) {
+        const config = require('./webpack.config')(webpackOptions);
 
-//         webpack(config, function(err, stats) {
-//             if (err) {
-//                 throw new gutil.PluginError('webpack', err);
-//             }
-//             gutil.log('[webpack]', stats.toString({ maxModules: Infinity, colors: true, optimizationBailout: true }));
-//             if (typeof done !== 'undefined' && (!opts || !opts.watch)) {
-//                 done();
-//             }
-//         });
-//     };
-// };
+        webpack(config, function(err, stats) {
+            if (err) {
+                throw new gutil.PluginError('webpack', err);
+            }
+            gutil.log('[webpack]', stats.toString({ maxModules: Infinity, colors: true, optimizationBailout: true }));
+            if (typeof done !== 'undefined' && (!opts || !opts.watch)) {
+                done();
+            }
+        });
+    };
+};
 
 // gulp.task('bundle:watch', webpackBundle({ watch: true }));
-// gulp.task('bundle', webpackBundle());
+gulp.task('bundle', webpackBundle());
 
 const watchFiles = () => {
     browserSync.init();
