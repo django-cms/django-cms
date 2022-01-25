@@ -6,6 +6,7 @@ const plumber = require('gulp-plumber');
 const fs = require('fs');
 const autoprefixer = require('autoprefixer');
 const postcss = require('gulp-postcss');
+const browserSync = require('browser-sync').create();
 const gulpif = require('gulp-if');
 const iconfont = require('gulp-iconfont');
 const iconfontCss = require('gulp-iconfont-css');
@@ -167,31 +168,48 @@ const icons = () => {
 
 gulp.task("icons", icons);
 
-// gulp.task('lint', ['lint:javascript']);
-// gulp.task('lint:javascript', function() {
-//     // DOCS: http://eslint.org
-//     return gulp
-//         .src(PROJECT_PATTERNS.js)
-//         .pipe(gulpif(!process.env.CI, plumber()))
-//         .pipe(eslint())
-//         .pipe(eslint.format())
-//         .pipe(eslint.failAfterError())
-//         .pipe(gulpif(!process.env.CI, plumber.stop()));
-// });
+const lint = () => {
+  return (
+    gulp
+        .src(PROJECT_PATTERNS.js)
+        .pipe(gulpif(!process.env.CI, plumber()))
+        .pipe(eslint())
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError())
+        .pipe(gulpif(!process.env.CI, plumber.stop()))
+  );
+};
+
+gulp.task("lint", lint);
+
 
 // gulp.task('tests', ['tests:unit', 'tests:integration']);
 
-// // gulp tests:unit --tests=cms.base,cms.modal
-// gulp.task('tests:unit', function(done) {
-//     const server = new KarmaServer(
+// const unitTest = () => {
+//   return (
+//     server = new KarmaServer(
 //         {
 //             configFile: PROJECT_PATH.tests + '/karma.conf.js',
 //             singleRun: true
 //         },
-//         done
 //     );
-
 //     server.start();
+//   );
+// };
+
+// gulp.task("unitTest", unitTest);
+
+// // gulp tests:unit --tests=cms.base,cms.modal
+// gulp.task('tests:unit', function(done) {
+    // const server = new KarmaServer(
+    //     {
+    //         configFile: PROJECT_PATH.tests + '/karma.conf.js',
+    //         singleRun: true
+    //     },
+    //     done
+    // );
+
+    // server.start();
 // });
 
 // gulp.task('tests:unit:watch', function() {
@@ -241,12 +259,10 @@ gulp.task("icons", icons);
 // gulp.task('bundle:watch', webpackBundle({ watch: true }));
 // gulp.task('bundle', webpackBundle());
 
-// gulp.task('watch', function() {
-//     gulp.start('bundle:watch');
-//     gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
-//     gulp.watch(PROJECT_PATTERNS.js, ['lint']);
-// });
+const watchFiles = () => {
+    browserSync.init();
+    gulp.watch(PROJECT_PATTERNS.sass, css);
+    gulp.watch(PROJECT_PATTERNS.js, lint);
+};
 
-// gulp.task('default', ['sass', 'lint', 'watch']);
-
-
+gulp.task('watch', gulp.parallel(watchFiles));

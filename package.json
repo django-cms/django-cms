@@ -42,7 +42,8 @@
     "raw-loader": "^0.5.1",
     "graceful-fs": "4.2.2",
     "sass": "^1.27.0",
-    "webpack": "^3.0.0"
+    "webpack": "^3.0.0",
+    "browser-sync": "^2.26.12"
   },
   "dependencies": {
     "babel-runtime": "^6.23.0",
