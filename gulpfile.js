@@ -1,31 +1,32 @@
 // #####################################################################################################################
 // #IMPORTS#
-var gulp = require('gulp');
-var gutil = require('gulp-util');
-var plumber = require('gulp-plumber');
-var fs = require('fs');
-var autoprefixer = require('autoprefixer');
-var postcss = require('gulp-postcss');
-var gulpif = require('gulp-if');
-var iconfont = require('gulp-iconfont');
-var iconfontCss = require('gulp-iconfont-css');
-var sass = require('gulp-sass');
-var sourcemaps = require('gulp-sourcemaps');
-var minifyCss = require('gulp-clean-css');
-var eslint = require('gulp-eslint');
-var webpack = require('webpack');
-var KarmaServer = require('karma').Server;
-var integrationTests = require('djangocms-casper-helpers/gulp');
+const gulp = require('gulp');
+const gutil = require('gulp-util');
+const plumber = require('gulp-plumber');
+const fs = require('fs');
+const autoprefixer = require('autoprefixer');
+const postcss = require('gulp-postcss');
+const gulpif = require('gulp-if');
+const iconfont = require('gulp-iconfont');
+const iconfontCss = require('gulp-iconfont-css');
+// const sass = require('gulp-sass');
+const sass = require('gulp-sass')(require('sass'));
+const sourcemaps = require('gulp-sourcemaps');
+const minifyCss = require('gulp-clean-css');
+const eslint = require('gulp-eslint');
+const webpack = require('webpack');
+const KarmaServer = require('karma').Server;
+const integrationTests = require('djangocms-casper-helpers/gulp');
 
-var argv = require('minimist')(process.argv.slice(2)); // eslint-disable-line
+const argv = require('minimist')(process.argv.slice(2)); // eslint-disable-line
 
 // #####################################################################################################################
 // #SETTINGS#
-var options = {
+const options = {
     debug: argv.debug
 };
-var PROJECT_ROOT = __dirname + '/cms/static/cms';
-var PROJECT_PATH = {
+const PROJECT_ROOT = __dirname + '/cms/static/cms';
+const PROJECT_PATH = {
     js: PROJECT_ROOT + '/js',
     sass: PROJECT_ROOT + '/sass',
     css: PROJECT_ROOT + '/css',
@@ -33,7 +34,7 @@ var PROJECT_PATH = {
     tests: __dirname + '/cms/tests/frontend'
 };
 
-var PROJECT_PATTERNS = {
+const PROJECT_PATTERNS = {
     js: [
         PROJECT_PATH.js + '/modules/*.js',
         PROJECT_PATH.js + '/widgets/*.js',
@@ -49,7 +50,7 @@ var PROJECT_PATTERNS = {
     icons: [PROJECT_PATH.icons + '/src/*.svg']
 };
 
-var INTEGRATION_TESTS = [
+const INTEGRATION_TESTS = [
     [
         'loginAdmin',
         'toolbar',
@@ -105,12 +106,14 @@ var INTEGRATION_TESTS = [
     ]
 ];
 
-var CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' }).match(/__version__ = '(.*?)'/)[1];
+const CMS_VERSION = fs.readFileSync('cms/__init__.py', { encoding: 'utf-8' }).match(/__version__ = '(.*?)'/)[1];
 
 // #####################################################################################################################
 // #TASKS#
-gulp.task('sass', function() {
-    gulp
+
+const css = () => {
+    return (
+        gulp
         .src(PROJECT_PATTERNS.sass)
         .pipe(gulpif(options.debug, sourcemaps.init()))
         .pipe(sass())
@@ -130,111 +133,139 @@ gulp.task('sass', function() {
             })
         )
         .pipe(gulpif(options.debug, sourcemaps.write()))
-        .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'));
-});
-
-gulp.task('icons', function() {
-    gulp
-        .src(PROJECT_PATTERNS.icons)
-        .pipe(
-            iconfontCss({
-                fontName: 'django-cms-iconfont',
-                path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
-                targetPath: '../../sass/components/_iconography.scss',
-                fontPath: '../../fonts/' + CMS_VERSION + '/'
-            })
-        )
-        .pipe(
-            iconfont({
-                fontName: 'django-cms-iconfont',
-                normalize: true,
-                formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
-            })
-        )
-        .on('glyphs', function(glyphs, opts) {
-            gutil.log.bind(glyphs, opts);
-        })
-        .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
-});
-
-gulp.task('lint', ['lint:javascript']);
-gulp.task('lint:javascript', function() {
-    // DOCS: http://eslint.org
-    return gulp
-        .src(PROJECT_PATTERNS.js)
-        .pipe(gulpif(!process.env.CI, plumber()))
-        .pipe(eslint())
-        .pipe(eslint.format())
-        .pipe(eslint.failAfterError())
-        .pipe(gulpif(!process.env.CI, plumber.stop()));
-});
-
-gulp.task('tests', ['tests:unit', 'tests:integration']);
-
-// gulp tests:unit --tests=cms.base,cms.modal
-gulp.task('tests:unit', function(done) {
-    var server = new KarmaServer(
-        {
-            configFile: PROJECT_PATH.tests + '/karma.conf.js',
-            singleRun: true
-        },
-        done
+        .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'))
     );
-
-    server.start();
-});
-
-gulp.task('tests:unit:watch', function() {
-    var server = new KarmaServer({
-        configFile: PROJECT_PATH.tests + '/karma.conf.js'
-    });
-
-    server.start();
-});
-
-// gulp tests:integration [--clean] [--screenshots] [--tests=loginAdmin,toolbar]
-gulp.task(
-    'tests:integration',
-    integrationTests({
-        tests: INTEGRATION_TESTS,
-        pathToTests: PROJECT_PATH.tests,
-        argv: argv,
-        dbPath: 'testdb.sqlite',
-        serverCommand: 'testserver.py',
-        logger: gutil.log.bind(gutil),
-        waitForMigrations: 5 // seconds
-    })
-);
-
-var webpackBundle = function(opts) {
-    var webpackOptions = opts || {};
-
-    webpackOptions.PROJECT_PATH = PROJECT_PATH;
-    webpackOptions.debug = options.debug;
-    webpackOptions.CMS_VERSION = CMS_VERSION;
-
-    return function(done) {
-        var config = require('./webpack.config')(webpackOptions);
-
-        webpack(config, function(err, stats) {
-            if (err) {
-                throw new gutil.PluginError('webpack', err);
-            }
-            gutil.log('[webpack]', stats.toString({ maxModules: Infinity, colors: true, optimizationBailout: true }));
-            if (typeof done !== 'undefined' && (!opts || !opts.watch)) {
-                done();
-            }
-        });
-    };
 };
 
-gulp.task('bundle:watch', webpackBundle({ watch: true }));
-gulp.task('bundle', webpackBundle());
+// gulp.task('sass', function() {
+//     gulp
+//         .src(PROJECT_PATTERNS.sass)
+//         .pipe(gulpif(options.debug, sourcemaps.init()))
+//         .pipe(sass())
+//         .on('error', function(error) {
+//             gutil.log(gutil.colors.red('Error (' + error.plugin + '): ' + error.messageFormatted));
+//         })
+//         .pipe(
+//             postcss([
+//                 autoprefixer({
+//                     cascade: false
+//                 })
+//             ])
+//         )
+//         .pipe(
+//             minifyCss({
+//                 rebase: false
+//             })
+//         )
+//         .pipe(gulpif(options.debug, sourcemaps.write()))
+//         .pipe(gulp.dest(PROJECT_PATH.css + '/' + CMS_VERSION + '/'));
+// });
 
-gulp.task('watch', function() {
-    gulp.start('bundle:watch');
-    gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
-    gulp.watch(PROJECT_PATTERNS.js, ['lint']);
-});
+// gulp.task('icons', function() {
+//     gulp
+//         .src(PROJECT_PATTERNS.icons)
+//         .pipe(
+//             iconfontCss({
+//                 fontName: 'django-cms-iconfont',
+//                 path: PROJECT_PATH.sass + '/libs/_iconfont.scss',
+//                 targetPath: '../../sass/components/_iconography.scss',
+//                 fontPath: '../../fonts/' + CMS_VERSION + '/'
+//             })
+//         )
+//         .pipe(
+//             iconfont({
+//                 fontName: 'django-cms-iconfont',
+//                 normalize: true,
+//                 formats: ['svg', 'ttf', 'eot', 'woff', 'woff2']
+//             })
+//         )
+//         .on('glyphs', function(glyphs, opts) {
+//             gutil.log.bind(glyphs, opts);
+//         })
+//         .pipe(gulp.dest(PROJECT_PATH.icons + '/' + CMS_VERSION + '/'));
+// });
 
-gulp.task('default', ['sass', 'lint', 'watch']);
+// gulp.task('lint', ['lint:javascript']);
+// gulp.task('lint:javascript', function() {
+//     // DOCS: http://eslint.org
+//     return gulp
+//         .src(PROJECT_PATTERNS.js)
+//         .pipe(gulpif(!process.env.CI, plumber()))
+//         .pipe(eslint())
+//         .pipe(eslint.format())
+//         .pipe(eslint.failAfterError())
+//         .pipe(gulpif(!process.env.CI, plumber.stop()));
+// });
+
+// gulp.task('tests', ['tests:unit', 'tests:integration']);
+
+// // gulp tests:unit --tests=cms.base,cms.modal
+// gulp.task('tests:unit', function(done) {
+//     const server = new KarmaServer(
+//         {
+//             configFile: PROJECT_PATH.tests + '/karma.conf.js',
+//             singleRun: true
+//         },
+//         done
+//     );
+
+//     server.start();
+// });
+
+// gulp.task('tests:unit:watch', function() {
+//     const server = new KarmaServer({
+//         configFile: PROJECT_PATH.tests + '/karma.conf.js'
+//     });
+
+//     server.start();
+// });
+
+// // gulp tests:integration [--clean] [--screenshots] [--tests=loginAdmin,toolbar]
+// gulp.task(
+//     'tests:integration',
+//     integrationTests({
+//         tests: INTEGRATION_TESTS,
+//         pathToTests: PROJECT_PATH.tests,
+//         argv: argv,
+//         dbPath: 'testdb.sqlite',
+//         serverCommand: 'testserver.py',
+//         logger: gutil.log.bind(gutil),
+//         waitForMigrations: 5 // seconds
+//     })
+// );
+
+// const webpackBundle = function(opts) {
+//     const webpackOptions = opts || {};
+
+//     webpackOptions.PROJECT_PATH = PROJECT_PATH;
+//     webpackOptions.debug = options.debug;
+//     webpackOptions.CMS_VERSION = CMS_VERSION;
+
+//     return function(done) {
+//         const config = require('./webpack.config')(webpackOptions);
+
+//         webpack(config, function(err, stats) {
+//             if (err) {
+//                 throw new gutil.PluginError('webpack', err);
+//             }
+//             gutil.log('[webpack]', stats.toString({ maxModules: Infinity, colors: true, optimizationBailout: true }));
+//             if (typeof done !== 'undefined' && (!opts || !opts.watch)) {
+//                 done();
+//             }
+//         });
+//     };
+// };
+
+// gulp.task('bundle:watch', webpackBundle({ watch: true }));
+// gulp.task('bundle', webpackBundle());
+
+// gulp.task('watch', function() {
+//     gulp.start('bundle:watch');
+//     gulp.watch(PROJECT_PATTERNS.sass, ['sass']);
+//     gulp.watch(PROJECT_PATTERNS.js, ['lint']);
+// });
+
+// gulp.task('default', ['sass', 'lint', 'watch']);
+
+
+gulp.task("sass", css);
