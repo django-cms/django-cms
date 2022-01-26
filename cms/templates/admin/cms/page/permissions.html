@@ -12,6 +12,7 @@
             <th>{% trans "Can change permissions" %}</th>
             <th>{% trans "Can move" %}</th>
             <th>{% trans "Can view" %}</th>
+            <th>{% trans "Can set as home" %}</th>
             <th>{% trans "Grant on" %}</th>
         </tr></thead>
         <tbody>
@@ -33,8 +34,8 @@
                             {% endif %}
                         {% endif %}
                     </td>
-                    <td class="user">{{ permission.user|default_if_none:"-" }}</td>
-                    <td class="group">{{ permission.group|default_if_none:"-" }}</td>
+                    <td class="user">{{ permission.user|default_if_none:"–" }}</td>
+                    <td class="group">{{ permission.group|default_if_none:"–" }}</td>
                     <td class="can_change">{{ permission.can_change|boolean_icon }}</td>
                     <td class="can_add">{{ permission.can_add|boolean_icon }}</td>
                     <td class="can_delete">{{ permission.can_delete|boolean_icon }}</td>
@@ -42,6 +43,7 @@
                     <td class="can_change_permissions">{{ permission.can_change_permissions|boolean_icon }}</td>
                     <td class="can_move_page">{{ permission.can_move_page|boolean_icon }}</td>
                     <td class="can_view">{{ permission.can_view|boolean_icon }}</td>
+                    <td class="can_set_as_home">{% if permission.can_set_as_home is not None %}{{ permission.can_set_as_home|boolean_icon }}{% else %}–{% endif %}</td>
                     <td class="grant_on">{% if row.is_global %}{% trans "All" %}
                         {% else %}{{ permission.get_grant_on_display }}
                     {% endif%}</td>
