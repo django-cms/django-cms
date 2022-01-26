@@ -333,7 +333,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
 def create_page_user(created_by, user,
                      can_add_page=True, can_view_page=True,
                      can_change_page=True, can_delete_page=True,
-                     can_recover_page=True, can_add_pageuser=True,
+                     can_recover_page=True, can_set_as_home=False, can_add_pageuser=True,
                      can_change_pageuser=True, can_delete_pageuser=True,
                      can_add_pagepermission=True,
                      can_change_pagepermission=True,
@@ -346,8 +346,14 @@ def create_page_user(created_by, user,
     from cms.admin.forms import save_permissions
     if grant_all:
         # just be lazy
-        return create_page_user(created_by, user, True, True, True, True,
-                                True, True, True, True, True, True, True)
+        return create_page_user(created_by, user,
+            can_add_page=True, can_view_page=True,
+            can_change_page=True, can_delete_page=True,
+            can_recover_page=True, can_set_as_home=True, can_add_pageuser=True,
+            can_change_pageuser=True, can_delete_pageuser=True,
+            can_add_pagepermission=True,
+            can_change_pagepermission=True,
+            can_delete_pagepermission=True)
 
     # validate created_by
     assert isinstance(created_by, get_user_model())
@@ -358,6 +364,7 @@ def create_page_user(created_by, user,
         'can_change_page': can_change_page,
         'can_delete_page': can_delete_page,
         'can_recover_page': can_recover_page,
+        'can_set_as_home': can_set_as_home,
         'can_add_pageuser': can_add_pageuser,
         'can_change_pageuser': can_change_pageuser,
         'can_delete_pageuser': can_delete_pageuser,
@@ -380,7 +387,7 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
                         can_add=False, can_change=False, can_delete=False,
                         can_change_advanced_settings=False, can_publish=False,
                         can_change_permissions=False, can_move_page=False,
-                        can_recover_page=True, can_view=False,
+                        can_recover_page=True, can_set_as_home=False, can_view=False,
                         grant_all=False, global_permission=False):
     """
     Assigns given user to page, and gives him requested permissions.
@@ -404,7 +411,8 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     page_permission.save()
     if global_permission:
         page_permission = GlobalPagePermission(
-            user=user, can_recover_page=can_recover_page, **data)
+            user=user, can_recover_page=can_recover_page, can_set_as_home=can_set_as_home,
+            **data)
         page_permission.save()
         page_permission.sites.add(get_current_site())
     return page_permission

@@ -325,6 +325,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             'has_change_permissions_permission': self.has_change_permissions_permission(request, obj=page),
             'has_move_page_permission':  self.has_move_page_permission(request, obj=page),
             'has_delete_permission':  self.has_delete_permission(request, obj=page),
+            'can_set_as_home': self.can_set_as_home(request),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
         }
 
@@ -683,6 +684,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             return False
         site = self.get_site(request)
         return page_permissions.user_can_delete_page(request.user, page=obj, site=site)
+
+    def can_set_as_home(self, request):
+        #if request.user.is_superuser:
+        #    return True
+        site = self.get_site(request)
+        perms = permissions.get_global_actions_for_user(request.user, site)
+        return 'can_set_as_home' in perms
 
     def has_delete_translation_permission(self, request, language, obj=None):
         if not obj:
@@ -1692,7 +1700,7 @@ class PageAdmin(BasePageAdmin):
     def set_home(self, request, object_id):
         page = self.get_object(request, object_id=object_id)
 
-        if not self.has_change_permission(request, page):
+        if not (self.can_set_as_home(request) and self.has_change_permission(request, page)):
             raise PermissionDenied("You do not have permission to set 'home'.")
 
         if page is None:

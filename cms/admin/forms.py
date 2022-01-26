@@ -1,3 +1,5 @@
+import warnings
+
 from django import forms
 from django.apps import apps
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -963,8 +965,9 @@ class ChangeListForm(forms.Form):
 
 
 class BasePermissionAdminForm(forms.ModelForm):
-
     def __init__(self, *args, **kwargs):
+        warnings.warn("{} is deprected and will be removed".format(self.__class__),
+                      category=DeprecationWarning, stacklevel=2)
         super().__init__(*args, **kwargs)
         permission_fields = self._meta.model.get_all_permissions()
 

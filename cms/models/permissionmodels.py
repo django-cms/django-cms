@@ -49,10 +49,9 @@ ACCESS_CHOICES = (
 
 
 class AbstractPagePermission(models.Model):
-    """Abstract page permissions
     """
-
-    # who:
+    Abstract page permissions
+    """
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -60,6 +59,7 @@ class AbstractPagePermission(models.Model):
         blank=True,
         null=True,
     )
+
     group = models.ForeignKey(
         Group,
         on_delete=models.CASCADE,
@@ -69,14 +69,47 @@ class AbstractPagePermission(models.Model):
     )
 
     # what:
-    can_change = models.BooleanField(_("can edit"), default=True)
-    can_add = models.BooleanField(_("can add"), default=True)
-    can_delete = models.BooleanField(_("can delete"), default=True)
-    can_change_advanced_settings = models.BooleanField(_("can change advanced settings"), default=False)
-    can_publish = models.BooleanField(_("can publish"), default=True)
-    can_change_permissions = models.BooleanField(_("can change permissions"), default=False, help_text=_("on page level"))
-    can_move_page = models.BooleanField(_("can move"), default=True)
-    can_view = models.BooleanField(_("view restricted"), default=False, help_text=_("frontend view restriction"))
+    can_change = models.BooleanField(
+        _("can edit"),
+        default=True,
+    )
+
+    can_add = models.BooleanField(
+        _("can add"),
+        default=True,
+    )
+
+    can_delete = models.BooleanField(
+        _("can delete"),
+        default=True,
+    )
+
+    can_change_advanced_settings = models.BooleanField(
+        _("can change advanced settings"),
+        default=False,
+    )
+
+    can_publish = models.BooleanField(
+        _("can publish"),
+        default=True,
+    )
+
+    can_change_permissions = models.BooleanField(
+        _("can change permissions"),
+        default=False,
+        help_text=_("on page level"),
+    )
+
+    can_move_page = models.BooleanField(
+        _("can move"),
+        default=True,
+    )
+
+    can_view = models.BooleanField(
+        _("view restricted"),
+        default=False,
+        help_text=_("frontend view restriction"),
+    )
 
     class Meta:
         abstract = True
@@ -183,6 +216,13 @@ class GlobalPagePermission(AbstractPagePermission):
         default=True,
         help_text=_("can recover any deleted page"),
     )
+
+    can_set_as_home = models.BooleanField(
+        verbose_name=_("Can set as home"),
+        default=False,
+        help_text=_("Can set first tier pages as home page"),
+    )
+
     sites = models.ManyToManyField(
         to=Site,
         blank=True,
@@ -200,12 +240,29 @@ class GlobalPagePermission(AbstractPagePermission):
     def __str__(self):
         return "%s :: GLOBAL" % self.audience
 
+    @classmethod
+    def get_permissions_by_action(cls):
+        permissions_by_action = super().get_permissions_by_action()
+        permissions_by_action['can_set_as_home'] = ['can_change', 'can_set_as_home']
+        return permissions_by_action
+
 
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
     """
-    grant_on = models.IntegerField(_("Grant on"), choices=ACCESS_CHOICES, default=ACCESS_PAGE_AND_DESCENDANTS)
-    page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("page"))
+    grant_on = models.IntegerField(
+        _("Grant on"),
+        choices=ACCESS_CHOICES,
+        default=ACCESS_PAGE_AND_DESCENDANTS,
+    )
+
+    page = models.ForeignKey(
+        Page,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name=_("page"),
+    )
 
     objects = PagePermissionManager()
 

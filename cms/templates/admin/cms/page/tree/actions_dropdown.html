@@ -47,7 +47,7 @@
                     <span>{% filter escapejs %}{% trans "Delete" %}...{% endfilter %}</span>
                 </a>
         </li>
-        {% if has_change_permission and page.is_potential_home %}
+        {% if can_set_as_home and page.is_potential_home %}
             <li class="js-cms-tree-item-set-home">
                 <a href="{% url opts|admin_urlname:'set_home' page.id %}" title="{% filter escapejs %}{% trans "Set as home" %}{% endfilter %}">
                     <span class="cms-icon cms-icon-home"></span>
