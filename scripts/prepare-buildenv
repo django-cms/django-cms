@@ -34,7 +34,7 @@ status "- Installing required node packages"
 npm install --loglevel warn
 
 if ! command -v gulp; then
-    npm install gulp --loglevel warn
+    npm install gulp@4.0.2 --loglevel warn
     check_command_exists gulp
 fi
 
