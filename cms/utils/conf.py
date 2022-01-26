@@ -46,8 +46,10 @@ DEFAULTS = {
     'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
-    # Whether to use raw ID lookups for users when PERMISSION is True
+    # DEPRECATED: Whether to use raw ID lookups for users when PERMISSION is True
     'RAW_ID_USERS': False,
+    # if number of users/groups exceeds this, use autocomplete_fields and remove filters in PermissionAdmin
+    'USERS_GROUPS_THRESHOLD': 25,
     'PUBLIC_FOR': 'all',
     'APPHOOKS': [],
     'TOOLBARS': [],

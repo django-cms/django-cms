@@ -22,6 +22,12 @@ for model, admin_instance in site._registry.items():
 
 
 class PagePermissionMixin:
+    def get_autocomplete_fields(self, request, obj=None):
+        users_groups_threshold = get_cms_setting('USERS_GROUPS_THRESHOLD')
+        if user_model.objects.count() > users_groups_threshold or Group.objects.count() > users_groups_threshold:
+            return ['user', 'group']
+        return []
+
     def has_change_permission(self, request, obj=None):
         if not obj:
             return False
@@ -68,38 +74,26 @@ class PagePermissionInlineAdmin(PagePermissionMixin, admin.TabularInline):
               'can_change_permissions', 'can_move_page', 'grant_on',
     ]
     extra = 0  # edit page load time boost
-    autocomplete_fields = ['user', 'group']
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(can_view=False)
 
-    def get_formset(self, request, obj=None, **kwargs):
-        """
-        Some fields may be excluded here. User can change only
-        permissions which are available for him. E.g. if user does not haves
-        can_publish flag, he can't change assign can_publish permissions.
-        """
-        exclude = self.exclude or []
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        fieldsets[0][1]['fields'] = fields = list(fieldsets[0][1]['fields'])
         if obj:
             user = request.user
             if not obj.has_add_permission(user):
-                exclude.append('can_add')
+                fields.remove('can_add')
             if not obj.has_delete_permission(user):
-                exclude.append('can_delete')
+                fields.remove('can_delete')
             if not obj.has_publish_permission(user):
-                exclude.append('can_publish')
+                fields.remove('can_publish')
             if not obj.has_advanced_settings_permission(user):
-                exclude.append('can_change_advanced_settings')
+                fields.remove('can_change_advanced_settings')
             if not obj.has_move_page_permission(user):
-                exclude.append('can_move_page')
-
-        kwargs['exclude'] = exclude
-        formset_cls = super().get_formset(request, obj=obj, **kwargs)
-        queryset = self.get_queryset(request)
-        if obj:
-            queryset = queryset.filter(page=obj)
-        formset_cls._queryset = queryset
-        return formset_cls
+                fields.remove('can_move_page')
+        return fieldsets
 
 
 class ViewRestrictionInlineAdmin(PagePermissionMixin, admin.TabularInline):
@@ -108,7 +102,6 @@ class ViewRestrictionInlineAdmin(PagePermissionMixin, admin.TabularInline):
     verbose_name = _("View restriction")
     verbose_name_plural = _("View restrictions")
     fields = ['user', 'group', 'grant_on', 'can_view']
-    autocomplete_fields = ['user', 'group']
 
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
@@ -129,15 +122,14 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_publish', 'can_change_advanced_settings',
               'can_change_permissions', 'can_move_page', 'can_view', 'can_set_as_home', 'sites']
     search_fields = ['user__{}'.format(field) for field in admin_class.search_fields] + ['group__name']
-    autocomplete_fields = ['user', 'group']
     filter_horizontal = ['sites']
-    list_filter_threshold = 100  # if the number of users and/or groups exceeds this threshold, don't add a filter
 
     def get_list_filter(self, request):
         list_filter = list(super().get_list_filter(request))
-        if Group.objects.count() < self.list_filter_threshold:
+        users_groups_threshold = get_cms_setting('USERS_GROUPS_THRESHOLD')
+        if Group.objects.count() <= users_groups_threshold:
             list_filter.insert(0, 'group')
-        if get_user_model().objects.count() < self.list_filter_threshold:
+        if get_user_model().objects.count() <= users_groups_threshold:
             list_filter.insert(0, 'user')
         return list_filter
 
