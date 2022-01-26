@@ -138,6 +138,7 @@ class BaseCMSTestCase:
             'can_change_permissions': False,
             'can_move_page': False,
             'can_recover_page': False,
+            'can_set_as_home': False,
             'user': user,
         }
         options.update(**kwargs)
