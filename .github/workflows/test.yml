@@ -2,9 +2,9 @@ name: django CMS test.yml
 
 on: [push, pull_request]
 
-#concurrency:
-#  group: ${{ github.head_ref || github.run_id }}
-#  cancel-in-progress: true
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   database-postgres:
