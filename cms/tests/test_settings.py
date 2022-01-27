@@ -1,11 +1,11 @@
 from classytags.utils import flatten_context
+from django.core.exceptions import ImproperlyConfigured
+from django.template.loader import render_to_string
+from django.test.utils import override_settings
 
 from cms import constants
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.conf import get_cms_setting, get_languages
-from django.core.exceptions import ImproperlyConfigured
-from django.template.loader import render_to_string
-from django.test.utils import override_settings
 
 
 class SettingsTests(CMSTestCase):

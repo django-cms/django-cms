@@ -6,7 +6,7 @@ from setuptools import find_packages, setup
 
 
 REQUIREMENTS = [
-    'Django>=2.2',
+    'Django>=2.2,<4.0',
     'django-classy-tags>=0.7.2',
     'django-formtools>=2.1',
     'django-treebeard>=4.3',
@@ -23,13 +23,12 @@ CLASSIFIERS = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.6',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
     'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
     'Framework :: Django',
     'Framework :: Django :: 2.2',
-    'Framework :: Django :: 3.0',
     'Framework :: Django :: 3.1',
     'Framework :: Django :: 3.2',
     'Topic :: Internet :: WWW/HTTP',
@@ -49,7 +48,9 @@ setup(
     license='BSD-3-Clause',
     description='Lean enterprise content management powered by Django.',
     long_description=open(os.path.join(os.path.dirname(__file__), 'README.rst')).read(),
+    long_description_content_type='text/x-rst',
     packages=find_packages(exclude=['project', 'project.*']),
+    python_requires='>=3.7',
     include_package_data=True,
     zip_safe=False,
     install_requires=REQUIREMENTS,

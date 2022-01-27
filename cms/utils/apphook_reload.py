@@ -1,13 +1,11 @@
 import logging
 import sys
 import uuid
-
+from importlib import reload
 from threading import local
 
 from django.conf import settings
 from django.urls import clear_url_caches
-
-from importlib import reload
 
 logger = logging.getLogger("cms")
 

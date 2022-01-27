@@ -1,4 +1,0 @@
--r requirements_base.txt
-Django>=3.0,<3.1
-django-formtools==2.2
-pyenchant==3.0.1

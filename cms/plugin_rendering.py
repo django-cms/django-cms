@@ -1,9 +1,7 @@
 from collections import OrderedDict
-
 from functools import partial
 
 from classytags.utils import flatten_context
-
 from django.contrib.sites.models import Site
 from django.template import Context
 from django.utils.functional import cached_property
@@ -12,14 +10,15 @@ from django.utils.safestring import mark_safe
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.toolbar.utils import (
-    get_placeholder_toolbar_js,
-    get_plugin_toolbar_js,
+    get_placeholder_toolbar_js, get_plugin_toolbar_js,
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
-from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
+from cms.utils.placeholder import (
+    get_toolbar_plugin_struct, restore_sekizai_context,
+)
 from cms.utils.plugins import get_plugin_restrictions
 
 

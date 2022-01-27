@@ -7,19 +7,14 @@ from django.core.files.storage import FileSystemStorage
 from django.forms import Form
 from django.template.response import SimpleTemplateResponse
 from django.urls import NoReverseMatch
-
 from formtools.wizard.views import SessionWizardView
 
 from cms.models import Page
 from cms.utils import get_current_site
 from cms.utils.i18n import get_site_language_from_request
 
+from .forms import WizardStep1Form, WizardStep2BaseForm, step2_form_factory
 from .wizard_pool import wizard_pool
-from .forms import (
-    WizardStep1Form,
-    WizardStep2BaseForm,
-    step2_form_factory,
-)
 
 
 class WizardCreateView(SessionWizardView):

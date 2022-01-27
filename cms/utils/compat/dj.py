@@ -2,7 +2,6 @@ from functools import WRAPPER_ASSIGNMENTS
 
 from django.apps import apps
 
-
 __all__ = ['is_installed', 'installed_apps']
 
 def is_installed(app_name):

@@ -3,9 +3,7 @@ from django.test.utils import override_settings
 from cms.api import add_plugin, create_page
 from cms.models import CMSPlugin
 from cms.plugin_rendering import (
-    ContentRenderer,
-    LegacyRenderer,
-    StructureRenderer,
+    ContentRenderer, LegacyRenderer, StructureRenderer,
 )
 from cms.test_utils.testcases import CMSTestCase
 

@@ -1,8 +1,8 @@
-from copy import deepcopy
 from collections import defaultdict
+from copy import deepcopy
+from functools import lru_cache
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
-from functools import lru_cache
 
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _

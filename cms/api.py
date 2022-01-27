@@ -9,9 +9,9 @@ import datetime
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.core.exceptions import FieldError
-from django.core.exceptions import PermissionDenied
-from django.core.exceptions import ValidationError
+from django.core.exceptions import (
+    FieldError, PermissionDenied, ValidationError,
+)
 from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
@@ -23,7 +23,8 @@ from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import (
-    PageUser, PagePermission, GlobalPagePermission, ACCESS_PAGE_AND_DESCENDANTS
+    ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
+    PageUser,
 )
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -36,7 +37,6 @@ from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug
 from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
-
 
 # ===============================================================================
 # Helpers/Internals

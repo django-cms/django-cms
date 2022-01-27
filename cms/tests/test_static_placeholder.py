@@ -4,7 +4,7 @@ from django.template import Context
 from django.template.base import Template
 
 from cms.api import add_plugin
-from cms.models import StaticPlaceholder, Placeholder, UserSettings
+from cms.models import Placeholder, StaticPlaceholder, UserSettings
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.urlutils import admin_reverse
 

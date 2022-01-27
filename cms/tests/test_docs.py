@@ -1,10 +1,9 @@
-from contextlib import contextmanager
-from unittest import skipIf, skipUnless
-
-import os
 import io
+import os
 import socket
 import sys
+from contextlib import contextmanager
+from unittest import skipIf, skipUnless
 
 from sphinx.application import Sphinx
 from sphinx.errors import SphinxWarning
@@ -17,7 +16,6 @@ except ImportError:
 import cms
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
-
 
 ROOT_DIR = os.path.dirname(cms.__file__)
 DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, u'..', u'docs'))

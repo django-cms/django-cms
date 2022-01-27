@@ -1,26 +1,22 @@
 import uuid
 import warnings
-
 from urllib.parse import parse_qsl, urlparse
 
-from django.urls import re_path
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import router, transaction
 from django.http import (
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
-    HttpResponseNotFound,
-    HttpResponseRedirect,
+    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+    HttpResponseNotFound, HttpResponseRedirect,
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
+from django.urls import re_path
+from django.utils import translation
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
-from django.utils import translation
 from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
@@ -33,7 +29,7 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.signals import pre_placeholder_operation, post_placeholder_operation
+from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
 from cms.utils import copy_plugins, get_current_site
 from cms.utils.conf import get_cms_setting

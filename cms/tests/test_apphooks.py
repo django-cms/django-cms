@@ -1,6 +1,6 @@
 import sys
-import mock
 
+import mock
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -18,10 +18,12 @@ from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
+from cms.appresolver import (
+    applications_page_check, clear_app_resolvers, get_app_patterns,
+)
 from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.models import Title, Page
 from cms.middleware.page import get_page
+from cms.models import Page, Title
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
@@ -30,7 +32,6 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
-
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'

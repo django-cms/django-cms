@@ -1,7 +1,7 @@
 MarkupSafe
 Pygments
 furo
-Sphinx>4
+Sphinx>=4.2.0
 sphinx-copybutton
 sphinxext-opengraph
 sphinxcontrib-spelling

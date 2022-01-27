@@ -36,6 +36,7 @@ class ToolbarPool:
         if not self.force_register and get_cms_setting('TOOLBARS'):
             return toolbar
         from cms.toolbar_base import CMSToolbar
+
         # validate the app
         if not issubclass(toolbar, CMSToolbar):
             raise ImproperlyConfigured('CMS Toolbar must inherit '
