@@ -6,7 +6,7 @@ from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.urlutils import admin_reverse
 
-from .models import Example1, CharPksExample
+from .models import CharPksExample, Example1
 
 SAMPLEAPP_BREAK = 'Example1 App Break'
 

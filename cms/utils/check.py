@@ -1,5 +1,5 @@
-from contextlib import contextmanager
 import inspect
+from contextlib import contextmanager
 from itertools import chain
 
 from django.conf import settings
@@ -9,9 +9,8 @@ from sekizai.helpers import validate_template
 
 from cms import constants
 from cms.models import AliasPluginModel
-from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import is_installed
-
+from cms.utils.conf import get_cms_setting
 
 SUCCESS = 1
 WARNING = 2
@@ -281,10 +280,10 @@ def check_plugin_instances(output):
 
 @define_check
 def check_copy_relations(output):
-    from cms.plugin_pool import plugin_pool
     from cms.extensions import extension_pool
     from cms.extensions.models import BaseExtension
     from cms.models.pluginmodel import CMSPlugin
+    from cms.plugin_pool import plugin_pool
 
     def c_to_s(klass):
         return '%s.%s' % (klass.__module__, klass.__name__)
@@ -349,8 +348,9 @@ def check_placeholder_fields(output):
     should be also a subclass of PlaceholderAdminMixin
     """
     from django.contrib.admin import site
-    from cms.models.fields import PlaceholderField
+
     from cms.admin.placeholderadmin import PlaceholderAdminMixin
+    from cms.models.fields import PlaceholderField
 
     with output.section("PlaceholderField") as section:
         for model, model_admin in site._registry.items():

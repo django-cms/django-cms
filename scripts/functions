@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# This script gather common fonctions for all scripts
+# This script gather common functions for all scripts
 
 
 RED="\033[31;1m"
@@ -13,9 +13,9 @@ if [ -z "${EDITOR}" ]; then
         EDITOR=vim
 fi
 
-###############################################################################
-#                   Status reportinng (echo with colors)                      #
-###############################################################################
+##############################################################################
+#                   Status reporting (echo with colors)                      #
+##############################################################################
 
 #
 # show a progress status
@@ -89,7 +89,7 @@ load_nvm() {
             exit 1
         fi
 
-        if [ ! -s "$NVM_DIR/nvm.sh" ]; then 
+        if [ ! -s "$NVM_DIR/nvm.sh" ]; then
             error "Can not find nvm script, please install NVM first"
             echo "to install nvm:"
             echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash"
@@ -154,5 +154,5 @@ check_virtual_env() {
         exit 1
     fi
 
-   
+
 }

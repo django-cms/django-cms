@@ -1,7 +1,8 @@
+from django.urls import NoReverseMatch, reverse
+from django.utils.translation import gettext_lazy as _
+
 from cms.menu_bases import CMSAttachMenu
 from cms.test_utils.project.sampleapp.models import Category
-from django.urls import reverse, NoReverseMatch
-from django.utils.translation import gettext_lazy as _
 from menus.base import Menu, NavigationNode
 from menus.menu_pool import menu_pool
 

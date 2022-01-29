@@ -1,6 +1,7 @@
-from cms.models import StaticPlaceholder
 from django.contrib import admin
+
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
+from cms.models import StaticPlaceholder
 
 
 class StaticPlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):

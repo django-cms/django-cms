@@ -4,12 +4,12 @@ import cms
 
 from .subcommands.base import SubcommandsCommand
 from .subcommands.check import CheckInstallation
+from .subcommands.copy import CopyCommand
+from .subcommands.delete_orphaned_plugins import DeleteOrphanedPluginsCommand
 from .subcommands.list import ListCommand
 from .subcommands.publisher_publish import PublishCommand
 from .subcommands.tree import FixTreeCommand
 from .subcommands.uninstall import UninstallCommand
-from .subcommands.copy import CopyCommand
-from .subcommands.delete_orphaned_plugins import DeleteOrphanedPluginsCommand
 
 
 class Command(SubcommandsCommand):

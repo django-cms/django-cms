@@ -1,17 +1,21 @@
 
 from django.conf import settings
-from django.contrib import admin
 from django.conf.urls.i18n import i18n_patterns
+from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, re_path
-from django.views.static import serve
 from django.views.i18n import JavaScriptCatalog
+from django.views.static import serve
 
-from cms.utils.conf import get_cms_setting
-from cms.test_utils.project.sampleapp.forms import LoginForm, LoginForm2, LoginForm3
-from cms.test_utils.project.placeholderapp.views import example_view, latest_view
+from cms.test_utils.project.placeholderapp.views import (
+    example_view, latest_view,
+)
+from cms.test_utils.project.sampleapp.forms import (
+    LoginForm, LoginForm2, LoginForm3,
+)
 from cms.test_utils.project.sampleapp.views import plain_view
+from cms.utils.conf import get_cms_setting
 
 admin.autodiscover()
 

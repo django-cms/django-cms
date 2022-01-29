@@ -23,7 +23,7 @@ install django CMS for free.
 
 2. As another option, you can set up the project `using docker <https://www.django-cms.org/en/blog/2021/01/19/how-you-spin-up-a-django-cms-project-in-less-than-5-minutes/>`_. It is a good way for a developer locally without an external vendor and we use this option in this django CMS demo.
 
-3. The last option is to install `django CMS manually by using virtualenv <https://docs.django-cms.org/en/latest/how_to/install.html>`_. This option is a good way for developers that want to install everything by hand to understand better and have full control.
+3. The last option is to install :ref:`django CMS manually by using virtualenv <installation>`. This option is a good way for developers that want to install everything by hand to understand better and have full control.
 
 For the sake of this demonstration we will use Option 2, please read on.
 
@@ -53,9 +53,9 @@ Open the terminal application on your computer and go to a safe folder (i.e. cd 
       docker compose run web python manage.py createsuperuser
       docker compose up -d
 
+During the installation process, you will be prompted to enter your email address and set a username and password.
 Open your browser and insert http://localhost:8000/; there you should be invited to login
 and continue with Step 4: create your first page
-
 
 ********************************
 Create your first page (Step 3)

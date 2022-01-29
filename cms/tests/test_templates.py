@@ -1,8 +1,8 @@
-from imp import load_module, PY_SOURCE
 import os.path
+from imp import PY_SOURCE, load_module
 
 from django.conf import settings
-from django.template import loader, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, loader
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _

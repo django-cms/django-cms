@@ -1,5 +1,7 @@
 import os
+
 from django.test import testcases
+
 
 class Compatibility4xTestCase(testcases.TestCase):
 

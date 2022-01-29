@@ -1,14 +1,12 @@
 import json
 
-from classytags.core import Tag, Options
-from cms.utils.encoder import SafeJSONEncoder
+from classytags.core import Options, Tag
 from django import template
 from django.utils.safestring import mark_safe
-
 from sekizai.helpers import get_varname
 
 from cms.models import StaticPlaceholder
-
+from cms.utils.encoder import SafeJSONEncoder
 
 register = template.Library()
 

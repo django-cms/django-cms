@@ -1,7 +1,7 @@
 coverage>=4
 python-coveralls>2.5.0
 unittest-xml-reporting==1.11.0
-Pillow==5.2.0
+Pillow==8.3.2
 django-treebeard>=4.3
 argparse
 dj-database-url

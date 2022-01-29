@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.template import TemplateSyntaxError, Template
+from django.template import Template, TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -17,24 +17,21 @@ from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
 from cms.test_utils.project.placeholderapp.models import (
-    DynamicPlaceholderSlotExample,
-    Example1,
-    TwoPlaceholderExample,
+    DynamicPlaceholderSlotExample, Example1, TwoPlaceholderExample,
 )
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
+from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (
-    PlaceholderNoAction, MLNGPlaceholderActions,
-    get_placeholder_conf, get_placeholders,
-    _get_nodelist, _scan_placeholders
+    MLNGPlaceholderActions, PlaceholderNoAction, _get_nodelist,
+    _scan_placeholders, get_placeholder_conf, get_placeholders,
 )
 from cms.utils.plugins import assign_plugins, has_reached_plugin_limit
 from cms.utils.urlutils import admin_reverse

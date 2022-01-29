@@ -1,6 +1,6 @@
 from django.db import models
-from cms.models import CMSPlugin
 
+from cms.models import CMSPlugin
 
 # sorry for the cryptic names. But we were hitting max lengths on Django 1.6
 # and 1.7 with the too long names otherwise.

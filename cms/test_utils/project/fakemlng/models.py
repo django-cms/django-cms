@@ -1,5 +1,6 @@
-from cms.models.fields import PlaceholderField
 from django.db import models
+
+from cms.models.fields import PlaceholderField
 
 
 class MainModel(models.Model):
