@@ -10,6 +10,7 @@ from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils.timezone import now
+from django.http import HttpResponse
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from mock import patch
 from sekizai.context import SekizaiContext
@@ -142,7 +143,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         user = self._create_user("admin", True, True)
         request.current_page = control
         request.user = user
-        middleware = ToolbarMiddleware()
+        middleware = ToolbarMiddleware(lambda req: HttpResponse())
         middleware.process_request(request)
         page = _get_page_by_untyped_arg(control.pk, request, 1)
         self.assertEqual(page, control.publisher_draft)

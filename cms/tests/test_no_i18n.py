@@ -4,6 +4,7 @@ from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
 from django.utils.translation import trans_null
+from django.http import HttpResponse
 from mock import patch
 
 from cms.api import create_page
@@ -51,6 +52,7 @@ overrides = dict(
 class TestNoI18N(CMSTestCase):
 
     def setUp(self):
+        self.request = HttpResponse()
         clear_url_caches()
         super().setUp()
 
@@ -76,7 +78,7 @@ class TestNoI18N(CMSTestCase):
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
-        mid = ToolbarMiddleware()
+        mid = ToolbarMiddleware(lambda req: HttpResponse)
         mid.process_request(request)
         if hasattr(request, 'toolbar'):
             request.toolbar.populate()

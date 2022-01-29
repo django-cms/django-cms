@@ -17,6 +17,7 @@ from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
+from django.http import HttpResponse
 
 from cms.admin.forms import RequestToolbarForm
 from cms.api import add_plugin, create_page, create_title
@@ -82,7 +83,7 @@ class ToolbarTestBase(CMSTestCase):
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
-        mid = ToolbarMiddleware()
+        mid = ToolbarMiddleware(lambda req: HttpResponse())
         mid.process_request(request)
         if hasattr(request,'toolbar'):
             request.toolbar.populate()
