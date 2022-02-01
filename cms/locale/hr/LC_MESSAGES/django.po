@@ -11,8 +11,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"POT-Creation-Date: 2022-02-01 23:19+0800\n"
+"PO-Revision-Date: 2021-10-18 15:36+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Croatian (http://www.transifex.com/divio/django-cms/language/hr/)\n"
 "MIME-Version: 1.0\n"
@@ -99,6 +99,9 @@ msgstr "Postavke aplikacije"
 
 msgid "Language independent options"
 msgstr "Postavke neovisne o izabranom jeziku"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -385,6 +388,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Ovo je alias referenca, sadržaj se može uređivati samo na stranici <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "Dokumentacija"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "Stvori"
 
@@ -424,6 +445,9 @@ msgstr "Odjavi se"
 
 msgid "Language"
 msgstr "Jezik"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "Struktura"
@@ -1343,9 +1367,6 @@ msgstr "Zabilješke za instalaciju"
 msgid "Support"
 msgstr "Podrška"
 
-msgid "Documentation"
-msgstr "Dokumentacija"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1548,6 +1569,15 @@ msgstr "Dodaj plugin u placeholder \"%(placeholder_label)s\""
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Dodaj plugin u %(plugin_name)s"
+
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
+msgstr ""
 
 msgid "CMS - your user account was created."
 msgstr "CMS - Vaš korisnički račun je kreiran."

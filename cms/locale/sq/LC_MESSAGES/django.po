@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-21 16:40+0800\n"
-"PO-Revision-Date: 2021-05-19 18:01+0000\n"
+"POT-Creation-Date: 2022-02-01 23:19+0800\n"
+"PO-Revision-Date: 2021-10-19 10:27+0000\n"
 "Last-Translator: Besnik Bleta <besnik@programeshqip.org>\n"
 "Language-Team: Albanian (http://www.transifex.com/divio/django-cms/language/sq/)\n"
 "MIME-Version: 1.0\n"
@@ -96,6 +96,9 @@ msgstr "Formësime aplikacioni"
 
 msgid "Language independent options"
 msgstr "Mundësi të pavarura nga gjuhët"
+
+msgid "You entered an invalid URL."
+msgstr "Dhatë një URL të pavlefshme."
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -382,6 +385,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Kjo është një referencë aliasi, lëndën mund ta përpunoni vetëm te faqja <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
+msgid "Getting started developer guide"
+msgstr "Udhërrëfyes si t’ia fillohet për zhvillues"
+
+msgid "Documentation"
+msgstr "Dokumentim"
+
+msgid "User guide"
+msgstr "Udhërrëfyes përdoruesish"
+
+msgid "Support Forum"
+msgstr "Forum Asistence"
+
+msgid "Support Slack"
+msgstr "Kanal Slack Asistence"
+
+msgid "What's new"
+msgstr "Ç’ka të re"
+
 msgid "Create"
 msgstr "Krijoje"
 
@@ -421,6 +442,9 @@ msgstr "Dalje"
 
 msgid "Language"
 msgstr "Gjuhë"
+
+msgid "Help"
+msgstr "Ndihmë"
 
 msgid "Structure"
 msgstr "Strukturë"
@@ -1339,9 +1363,6 @@ msgstr "Shënime Instalimi"
 msgid "Support"
 msgstr "Asistencë"
 
-msgid "Documentation"
-msgstr "Dokumentim"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1544,6 +1565,15 @@ msgstr "Shtoje shtojcën te vendmbajtësja \"%(placeholder_label)s\""
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Shtoje shtojcën te %(plugin_name)s"
+
+msgid "Community forum"
+msgstr "Forum bashkësie"
+
+msgid "Getting started"
+msgstr "Si t’ia fillohet"
+
+msgid "Talk to us"
+msgstr "Flisni me ne"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - llogaria juaj e përdoruesit u krijua."

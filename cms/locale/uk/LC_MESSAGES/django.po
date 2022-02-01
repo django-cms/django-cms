@@ -5,6 +5,7 @@
 # Translators:
 # d89e266cdb3589c6cb4ff79f3d6c5a21_99f0368 <7b4e3d2be999b12dc043e4885915d37c_97387>, 2013
 # d89e266cdb3589c6cb4ff79f3d6c5a21_99f0368 <7b4e3d2be999b12dc043e4885915d37c_97387>, 2013
+# Andrii Vozniuk, 2021
 # Anton Linevich <linevich@swebion.com>, 2016
 # Nick Nck <asteryx82@gmail.com>, 2015
 # Nick Nck <asteryx82@gmail.com>, 2015
@@ -25,8 +26,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-30 00:09+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"POT-Creation-Date: 2022-02-01 23:19+0800\n"
+"PO-Revision-Date: 2021-10-18 15:36+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"
 "MIME-Version: 1.0\n"
@@ -113,6 +114,9 @@ msgstr "Конфігурації програми"
 
 msgid "Language independent options"
 msgstr "Незалежні від мови налаштування"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -399,6 +403,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Це альтернативне посилання, Ви можете редагувати лише на <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> сторінці."
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "Документація"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "Створити"
 
@@ -438,6 +460,9 @@ msgstr "Вийти"
 
 msgid "Language"
 msgstr "Мова"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "Структура"
@@ -989,7 +1014,7 @@ msgid "last change by"
 msgstr "в останнє змінено"
 
 msgid "last change on"
-msgstr ""
+msgstr "в останнє змінено"
 
 msgid "meta"
 msgstr "meta"
@@ -1358,9 +1383,6 @@ msgstr "Нотатки з інсталяції"
 msgid "Support"
 msgstr "Підтримка"
 
-msgid "Documentation"
-msgstr "Документація"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1564,6 +1586,15 @@ msgstr "Додати плагін до заповнювача \"%(placeholder_la
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Додати плагін до %(plugin_name)s"
 
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
+msgstr ""
+
 msgid "CMS - your user account was created."
 msgstr "CMS - створено обліковий запис користувача."
 
@@ -1582,7 +1613,7 @@ msgstr "Це місце заповнення вже має максимальн�
 
 #, python-format
 msgid "This placeholder already has the maximum number of child plugins (%s)."
-msgstr ""
+msgstr "Заповнювач вже містить максимальну кількість розширень (%s)."
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."

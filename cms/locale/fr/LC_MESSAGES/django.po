@@ -4,7 +4,7 @@
 # 
 # Translators:
 # adrien.delhorme, 2014
-# Adrien Delhorme, 2017,2019
+# Adrien Delhorme, 2017,2019,2021
 # Adrien Delhorme, 2014
 # Alban Tiberghien <alban.tiberghien@gmail.com>, 2017
 # Alexandre Cloquet <Alexandre.cloquet@gmail.com>, 2014-2015
@@ -32,6 +32,7 @@
 # mbi0 <marco@cruncher.ch>, 2013
 # Nicolas PASCAL <np.pascal@gmail.com>, 2018-2019
 # Patrick Lauber <patrick.lauber@divio.ch>, 2014
+# Robin Durner, 2022
 # Samuel Sorin, 2016
 # kalvn <screamflydream@gmail.com>, 2014
 # Sébastien Fievet <_@sebastien-fievet.fr>, 2013
@@ -41,9 +42,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-20 22:17+0800\n"
-"PO-Revision-Date: 2021-06-02 16:35+0000\n"
-"Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
+"POT-Creation-Date: 2022-02-01 23:19+0800\n"
+"PO-Revision-Date: 2022-01-29 17:58+0000\n"
+"Last-Translator: Robin Durner\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -129,6 +130,9 @@ msgstr "Configurations de l'application"
 
 msgid "Language independent options"
 msgstr "Options indépendantes de la langue"
+
+msgid "You entered an invalid URL."
+msgstr "Vous avez saisi une URL non valide."
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -322,10 +326,10 @@ msgid "The page is not eligible to be home."
 msgstr "La page ne peut pas être la page d'accueil."
 
 msgid "View restriction"
-msgstr "Voir la restriction"
+msgstr "Restriction d'affichage"
 
 msgid "View restrictions"
-msgstr "Voir les restrictions"
+msgstr "Restrictions d'affichage"
 
 #, python-format
 msgid "Field %s not found"
@@ -415,6 +419,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Ceci est une référence liée ; le contenu ne peut être modifié que sur la page <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
+msgid "Getting started developer guide"
+msgstr "Guide de démarrage pour développeurs"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid "User guide"
+msgstr "Manuel d'utilisation"
+
+msgid "Support Forum"
+msgstr "Forum d'assistance"
+
+msgid "Support Slack"
+msgstr "Assistance sur Slack"
+
+msgid "What's new"
+msgstr "Quoi de neuf"
+
 msgid "Create"
 msgstr "Créer"
 
@@ -454,6 +476,9 @@ msgstr "Se déconnecter"
 
 msgid "Language"
 msgstr "Langue"
+
+msgid "Help"
+msgstr "Aide"
 
 msgid "Structure"
 msgstr "Structure"
@@ -655,7 +680,7 @@ msgid "login required"
 msgstr "identification requise"
 
 msgid "menu visibility"
-msgstr "visibilité du menu"
+msgstr "visibilité dans le menu"
 
 msgid "application"
 msgstr "application"
@@ -740,7 +765,7 @@ msgid "on page level"
 msgstr "au niveau de la page"
 
 msgid "frontend view restriction"
-msgstr "restriction de vue client"
+msgstr "restriction d'affichage client"
 
 msgid "Please select user or group."
 msgstr "Veuillez sélectionner un utilisateur ou un groupe."
@@ -1372,9 +1397,6 @@ msgstr "Notes d’installation"
 msgid "Support"
 msgstr "Assistance"
 
-msgid "Documentation"
-msgstr "Documentation"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1577,6 +1599,15 @@ msgstr "Ajouter le bloc au placeholder « %(placeholder_label)s »"
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Ajouter le bloc à %(plugin_name)s"
+
+msgid "Community forum"
+msgstr "Forum de la communauté"
+
+msgid "Getting started"
+msgstr "Guide de démarrage"
+
+msgid "Talk to us"
+msgstr "Communiquez avec nous"
 
 msgid "CMS - your user account was created."
 msgstr "CMS — votre compte utilisateur a été créé."

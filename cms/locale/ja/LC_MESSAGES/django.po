@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Daigo Sakamoto <superdaigo@gmail.com>, 2011
+# Daigo Sakamoto <daigo@soregashi.me>, 2011
 # Jonas Obrist <me@ojii.ch>, 2011
 # Jonas Obrist <ojiidotch@gmail.com>, 2012,2015
 # Paulo Alvarado <paulo.alvarado@divio.ch>, 2017
@@ -14,8 +14,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"POT-Creation-Date: 2022-02-01 23:19+0800\n"
+"PO-Revision-Date: 2021-10-18 15:36+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Japanese (http://www.transifex.com/divio/django-cms/language/ja/)\n"
 "MIME-Version: 1.0\n"
@@ -102,6 +102,9 @@ msgstr "アプリケーション設定"
 
 msgid "Language independent options"
 msgstr "言語に依存しないオプション"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -388,6 +391,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "これはエイリアス参照です。内容の編集ができるページは <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> だけです。"
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "ドキュメント"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "作成"
 
@@ -427,6 +448,9 @@ msgstr "ログアウト"
 
 msgid "Language"
 msgstr "言語"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "ストラクチャ"
@@ -1344,9 +1368,6 @@ msgstr "インストールのメモ"
 msgid "Support"
 msgstr "サポート"
 
-msgid "Documentation"
-msgstr "ドキュメント"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1548,6 +1569,15 @@ msgstr "プースホルダ #%(placeholder_label)s\" にプラグインを追加"
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
+msgstr ""
+
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

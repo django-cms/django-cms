@@ -23,8 +23,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"POT-Creation-Date: 2022-02-01 23:19+0800\n"
+"PO-Revision-Date: 2021-10-18 15:36+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Turkish (http://www.transifex.com/divio/django-cms/language/tr/)\n"
 "MIME-Version: 1.0\n"
@@ -111,6 +111,9 @@ msgstr "Uygulama ayarları"
 
 msgid "Language independent options"
 msgstr "Dilden bağımsız seçenekler"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -397,6 +400,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "Dokümantasyon"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "Oluştur"
 
@@ -436,6 +457,9 @@ msgstr "Çıkış"
 
 msgid "Language"
 msgstr "Dil"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "Yapı"
@@ -1354,9 +1378,6 @@ msgstr "Kurulum Notları"
 msgid "Support"
 msgstr "Destek"
 
-msgid "Documentation"
-msgstr "Dokümantasyon"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1558,6 +1579,15 @@ msgstr ""
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
+msgstr ""
+
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."
