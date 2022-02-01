@@ -51,9 +51,9 @@ Bug Fixes:
 * Fixed an issue when running migrations on a multi database project
 
 
-***********************
+************************
 How to upgrade to 3.10.0
-***********************
+************************
 
 We assume you are upgrading from django CMS 3.9.0.
 
