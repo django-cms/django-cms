@@ -5,10 +5,10 @@
 # Translators:
 # paitsi, 2013
 # Juha-Matti Tapio <jmtapio@verkkotelakka.net>, 2013
-# Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
-# Klaus Dahlén <klaus.dahlen@gmail.com>, 2011,2013-2014
+# Klaus Dahlén, 2011
+# Klaus Dahlén, 2011,2013-2014
 # Kusti Hämäläinen <kusti.hamalainen@aalto.fi>, 2020
-# Klaus Dahlén <klaus.dahlen@gmail.com>, 2011
+# Klaus Dahlén, 2011
 # Niklas Jerva <niklas.jerva@gmail.com>, 2016
 # paitsi, 2013
 # Timo Riski <timo.h.riski@outlook.com>, 2019
@@ -17,8 +17,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"POT-Creation-Date: 2022-02-01 23:19+0800\n"
+"PO-Revision-Date: 2021-10-18 15:36+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Finnish (http://www.transifex.com/divio/django-cms/language/fi/)\n"
 "MIME-Version: 1.0\n"
@@ -105,6 +105,9 @@ msgstr "Ohjelman asetukset"
 
 msgid "Language independent options"
 msgstr "Kielestä riippumattomat asetukset"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -391,6 +394,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "Dokumentaatio"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "Luo"
 
@@ -430,6 +451,9 @@ msgstr "Kirjaudu ulos"
 
 msgid "Language"
 msgstr "Kieli"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "Rakenne"
@@ -1348,9 +1372,6 @@ msgstr ""
 msgid "Support"
 msgstr "Tuki"
 
-msgid "Documentation"
-msgstr "Dokumentaatio"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1552,6 +1573,15 @@ msgstr "Lisää liitännäinen sisältöpaikkaan \"%(placeholder_label)s\""
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
+msgstr ""
+
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

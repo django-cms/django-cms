@@ -38,8 +38,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
+"POT-Creation-Date: 2022-02-01 23:19+0800\n"
+"PO-Revision-Date: 2021-10-18 15:36+0000\n"
 "Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
 "Language-Team: Russian (http://www.transifex.com/divio/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
@@ -126,6 +126,9 @@ msgstr "Конфигурации приложения"
 
 msgid "Language independent options"
 msgstr "Опции, независимые от языка"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -412,6 +415,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Это ссылка-синоним, вы можете отредактировать содержимое только на родительской странице  <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "Документация"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "Создать"
 
@@ -451,6 +472,9 @@ msgstr "Выход"
 
 msgid "Language"
 msgstr "Язык"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "Структура"
@@ -1371,9 +1395,6 @@ msgstr "Рекомендации по установке"
 msgid "Support"
 msgstr "Поддержка"
 
-msgid "Documentation"
-msgstr "Документация"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1576,6 +1597,15 @@ msgstr "Добавить плагин в плейсхолдер \"%(placeholder_
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Добавить плагин в %(plugin_name)s"
+
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
+msgstr ""
 
 msgid "CMS - your user account was created."
 msgstr "CMS - ваш аккаунт создан."
