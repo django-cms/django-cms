@@ -205,7 +205,7 @@ class CMSToolbar(BaseToolbar):
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
-        self.show_toolbar = self.is_staff or (anonymous_on and request.user.is_anonymous())
+        self.show_toolbar = self.is_staff or (anonymous_on and request.user.is_anonymous)
 
         if self.show_toolbar:
             edit_mode = (
