@@ -2,6 +2,10 @@ name: django CMS linters.yml
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   flake8:
     name: flake8
@@ -21,7 +25,6 @@ jobs:
           linters: flake8
           run: flake8
 
-
   isort:
     runs-on: ubuntu-latest
     steps:
@@ -38,4 +41,3 @@ jobs:
         with:
           linters: isort
           run: isort --check --diff cms
-

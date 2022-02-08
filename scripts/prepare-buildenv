@@ -25,16 +25,16 @@ cd cms
 load_nvm
 
 if ! nvm current | grep -q "^v6" ; then
-    status "installing Node 6 (as required)"
-    nvm install 6
-    nvm use 6
+    status "installing Node 16 (as required)"
+    nvm install 16
+    nvm use 16
 fi
 
 status "- Installing required node packages"
 npm install --loglevel warn
 
 if ! command -v gulp; then
-    npm install gulp --loglevel warn
+    npm install gulp@4.0.2 --loglevel warn
     check_command_exists gulp
 fi
 

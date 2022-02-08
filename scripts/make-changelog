@@ -146,7 +146,7 @@ r${content}
    rm "${content}"
 done
 
-# generating statistics 
+# generating statistics
 
 PR_NUMBER=$(git log --pretty=oneline "${OLD_FULL_VERSION}.." | wc -l)
 

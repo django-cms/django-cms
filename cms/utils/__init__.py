@@ -1,4 +1,4 @@
-# TODO: this is just stuff from utils.py - should be splitted / moved
+# TODO: this is just stuff from utils.py - should be split / moved
 from django.conf import settings
 from django.core.files.storage import get_storage_class
 from django.utils.functional import LazyObject
