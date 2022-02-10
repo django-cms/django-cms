@@ -24,7 +24,7 @@ coverage==5.5
     # via -r requirements.in
 datetime==4.3
     # via -r requirements.in
-django==3.2.5
+django==3.2.12
     # via
     #   django-classy-tags
     #   django-cms
@@ -128,7 +128,7 @@ urllib3==1.26.6
     # via requests
 wheel==0.36.2
     # via pip-tools
-zope.interface==5.4.0
+zope-interface==5.4.0
     # via datetime
 
 # The following packages are considered to be unsafe in a requirements file:
