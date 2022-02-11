@@ -135,7 +135,8 @@
                 color: $btn-default-color !important;
                 font-size: $font-size-small !important;
                 &:hover {
-                    color: darken($btn-default-color, 10%) !important;
+                    color: $btn-default-color !important;
+                    filter: brightness(0.9);
                 }
             }
         }
@@ -315,7 +316,7 @@
             background-image: none !important;
             &:before {
                 display: none;
-                color: white;
+                color: $white;
             }
             .cms-draggables {
                 display: none;

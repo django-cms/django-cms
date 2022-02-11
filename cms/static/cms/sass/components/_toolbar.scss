@@ -414,6 +414,7 @@
     a {
         @extend .cms-icon;
         @extend .cms-icon-logo;
+        color: $black;
         font-size: $toolbar-logo-height;
         line-height: $toolbar-height;
         height: $toolbar-height;

@@ -21,29 +21,33 @@
     &:focus,
     &.focus {
         color: $color important($important);
-        background-color: darken($background, 5%) important($important);
-        border-color: darken($border, 5%) important($important);
+        background-color: $background important($important);
+        border-color: $border important($important);
+        filter: brightness(var(--focus-brightness))  important($important);
         text-decoration: none important($important);
     }
     &:hover {
         color: $color important($important);
-        background-color: darken($background, 5%) important($important);
-        border-color: darken($border, 5%) important($important);
+        background-color: $background important($important);
+        border-color: $border important($important);
+        filter: brightness(var(--focus-brightness))  important($important);
         text-decoration: none important($important);
     }
     &:active,
     &.cms-btn-active {
         color: $color important($important);
-        background-color: darken($background, 10%) important($important);
-        border-color: darken($border, 10%) important($important);
+        background-color: $background important($important);
+        border-color: $border important($important);
+        filter: brightness(var(--active-brightness))  important($important);
         box-shadow: $btn-active-shadow important($important);
 
         &:hover,
         &:focus,
         &.focus {
             color: $color important($important);
-            background-color: darken($background, 17%) important($important);
-            border-color: darken($border, 25%) important($important);
+            background-color: $background important($important);
+            border-color: $border important($important);
+            filter: brightness(calc(var(--focus-brightness) * var(--active-brightness)))  important($important);
         }
     }
     &:active,
@@ -60,7 +64,7 @@
         &.cms-btn-active {
             background-color: rgba($background, 0.4) important($important);
             border-color: rgba($border, 0.4) important($important);
-            color: lighten($color, 50%) important(1);
+            color: rgba($color, 0.8) important(1);
             cursor: not-allowed;
             box-shadow: none important($important);
             &:before {

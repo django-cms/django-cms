@@ -69,7 +69,7 @@
         color: $dropdown-link-color;
         &.cms-btn-action,
         &.cms-btn-caution {
-            color: white;
+            color: $white;
         }
         white-space: nowrap; // prevent links from randomly breaking onto new lines
     }
@@ -197,7 +197,7 @@
             text-align: left !important;
             &.cms-btn-action,
             &.cms-btn-caution {
-                color: white;
+                color: $white;
             }
             &:first-child {
                 border-right: none !important;
