@@ -192,7 +192,7 @@ const testsIntegration = (done) => {
         logger: gutil.log.bind(gutil),
         waitForMigrations: 5 // seconds
     });
-    done();  
+    done();
 }
 
 const webpackBundle = function(opts) {
@@ -231,3 +231,4 @@ gulp.task('bundle', webpackBundle());
 gulp.task('unitTest', unitTest);
 gulp.task('testsIntegration',testsIntegration);
 gulp.task('tests', gulp.series(unitTest, testsIntegration));
+gulp.task("watchFiles", watchFiles);
