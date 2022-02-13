@@ -49,6 +49,7 @@ to make sure ``pip`` is up-to-date, as earlier versions can be less reliable.
 
 Then::
 
+    pip install django==3.2
     pip install django-cms
 
 to install the latest stable version of django CMS.
