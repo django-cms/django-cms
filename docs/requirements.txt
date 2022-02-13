@@ -128,7 +128,7 @@ urllib3==1.26.6
     # via requests
 wheel==0.36.2
     # via pip-tools
-zope.interface==5.4.0
+zope-interface==5.4.0
     # via datetime
 
 # The following packages are considered to be unsafe in a requirements file:
