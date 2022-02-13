@@ -64,14 +64,22 @@
         &.cms-btn-active { // TODO: FABR
             background-color: $background important($important);
             border-color: $border important($important);
-            color: $color important(1);
-            filter: brightness(0.6);
+            @if $color == $gray {
+                color: $gray-lighter important(1);
+            } @else {
+                color: $color important(1);
+                filter: brightness(0.6);
+            }
             cursor: not-allowed;
             box-shadow: none important($important);
             &:before {
-                color: $color important(1);
-                filter: brightness(0.6);
-           }
+                @if $color == $gray {
+                    color: $gray-lighter important(1);
+                } @else {
+                    color: $color important(1);
+                    filter: brightness(0.6);
+                }
+            }
         }
     }
 }
