@@ -25,26 +25,12 @@ $black: var(--dca-black);
     --dca-gray-super-lightest: #f7f7f7;
 }
 
-/*
-@media (prefers-color-scheme: dark) {
-   :root {
-       --dca-white: #2A2C2E;
-       --dca-black: #FFF;
-       --dca-gray: #666; //$gray-light;
-       --dca-gray-lightest: #333; //$gray-darkest;
-       --dca-gray-lighter: #454545; //$gray-darker;
-       --dca-gray-light: #777777; // $gray-light;
-       --dca-gray-darker: #999; //$gray;
-       --dca-gray-darkest: #ddd; // $gray-lighter;
-       --dca-gray-super-lightest: #070707;
-    }
-}
-*/
 
 @media (prefers-color-scheme: dark) {
    :root {
        --dca-white: #2A2C2E;
        --dca-black: #FFF;
+       --dca-primary: #58D1FC;
        --dca-gray: #999; //$gray-light;
        --dca-gray-lightest: #444; //$gray-darkest;
        --dca-gray-lighter: #777; //$gray-darker;
@@ -55,7 +41,8 @@ $black: var(--dca-black);
     }
 }
 
-$color-primary: #00bbff;
+$color-primary: var(--dca-primary);
+$color-primary-fallback: #00bbff;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
@@ -364,7 +351,7 @@ $sideframe-dimmer: rgba(var(--dca-shadow), 0.6);
 // Tooltip
 $hover-tooltip-width: 160px;
 $hover-tooltip-arrow-height: 6px;
-$hover-tooltip-bgcolor: rgba($black, 0.8);
+$hover-tooltip-bgcolor: $black;
 $hover-tooltip-padding: 6px 8px;
 
 

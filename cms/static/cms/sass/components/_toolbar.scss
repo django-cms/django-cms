@@ -373,7 +373,8 @@
         text-decoration: underline;
     }
     strong {
-        color: lighten($color-primary, 10%);
+        color: $color-primary;
+        filter: brightness(1.1);
         font-weight: $messages-font-weight;
     }
     ul {

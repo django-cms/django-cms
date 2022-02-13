@@ -207,12 +207,12 @@
         border-radius: $border-radius-base;
 
         &:hover {
-            background: darken($color-primary, 5%) !important;
+            background: darken($color-primary-fallback, 5%) !important;
         }
         &:active,
         &:focus {
             color: $white !important;
-            background: darken($color-primary, 15%) !important;
+            background: darken($color-primary-fallback, 15%) !important;
         }
     }
     .cms-pagetree-header-filter {
