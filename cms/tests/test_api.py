@@ -199,7 +199,7 @@ class PythonAPITests(CMSTestCase):
     def test_create_reverse_id_collision(self):
         create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
-        self.assertTrue(Page.objects.count(), 2)
+        self.assertEqual(Page.objects.count(), 2)
 
     def test_publish_page(self):
         page_attrs = self._get_default_create_page_arguments()

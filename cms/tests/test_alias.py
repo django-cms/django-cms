@@ -401,4 +401,4 @@ class AliasTestCase(TransactionCMSTestCase):
         context['placeholder'] = ph_en
         template = Template('{% load cms_tags %}{% render_extra_menu_items placeholder %}')
         output = template.render(context)
-        self.assertTrue(len(output), 200)
+        self.assertEqual(len(output), 200)
