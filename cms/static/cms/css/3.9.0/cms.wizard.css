@@ -1,0 +1,17 @@
+/* Error: $color: var(--dca-primary) is not a color.
+ *    ,
+ * 74 |             background: lighten($btn-action-bgcolor, 45%);
+ *    |                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *    '
+ *   cms.wizard.scss 74:25  root stylesheet */
+
+body::before {
+  font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
+      "Droid Sans Mono", monospace, monospace;
+  white-space: pre;
+  display: block;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-bottom: 2px solid black;
+  content: "Error: $color: var(--dca-primary) is not a color.\a    \2577 \a 74 \2502              background: lighten($btn-action-bgcolor, 45%);\a    \2502                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\a    \2575 \a   cms.wizard.scss 74:25  root stylesheet";
+}
