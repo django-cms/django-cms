@@ -207,12 +207,12 @@
         border-radius: $border-radius-base;
 
         &:hover {
-            background: darken($color-primary, 5%) !important;
+            background: darken($color-primary-fallback, 5%) !important;
         }
         &:active,
         &:focus {
             color: $white !important;
-            background: darken($color-primary, 15%) !important;
+            background: darken($color-primary-fallback, 15%) !important;
         }
     }
     .cms-pagetree-header-filter {
@@ -872,7 +872,7 @@
     // hover states
     .jstree-hovered,
     .jstree-clicked {
-        background-color: lighten($gray-lightest, 3%) !important;
+        background-color: $gray-lightest !important;
     }
 
     // special case for paste header
@@ -957,12 +957,12 @@
         > .jstree-anchor {
             border-style: solid;
             border-right: none;
-            background-color: white !important;
+            background-color: $white !important;
             border-bottom: $pagetree-border;
 
             &.jstree-hovered,
             &.jstree-clicked {
-                background-color: lighten($gray-lightest, 3%) !important;
+                background-color: $gray-lightest !important;
             }
         }
 
@@ -1000,11 +1000,12 @@
     }
 
     .cms-page-tree-cell-shared--false {
-        background-color: white;
+        background-color: $white;
 
         &.jstree-hovered,
         &.jstree-clicked {
-            background-color: lighten($gray-lightest, 3%) !important;
+                 background-color: $gray-lightest !important;
+                filter: brightness(1.1);
         }
     }
 

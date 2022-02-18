@@ -91,5 +91,5 @@
     padding-left: 20px;
     border: 2px solid $color-primary;
     border-radius: $border-radius-base;
-    background-color: mix(white, $color-primary, 90%);
+    background-color: rgba($color-primary-fallback, 20%);
 }
