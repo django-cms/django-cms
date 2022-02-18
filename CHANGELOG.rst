@@ -6,6 +6,8 @@ Changelog
 unreleased
 ==========
 
+* Added dark mode support to css
+
 3.9.0 (2021-06-30)
 ==================
 

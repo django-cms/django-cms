@@ -223,7 +223,7 @@
     a {
         color: $color-primary;
         &:hover {
-            color: darken($color-primary, 20%);
+            filter: brightness(0.8);
         }
         &:after {
             content: "/";
