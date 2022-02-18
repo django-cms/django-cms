@@ -737,7 +737,7 @@ var Toolbar = new Class({
         const switcher = this.ui.toolbarSwitcher.detach();
 
         $(this.ui.toolbar).html(newToolbar.children());
-        
+
         $('.cms-toolbar-item-cms-mode-switcher').replaceWith(switcher);
 
         this._setupUI();
