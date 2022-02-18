@@ -28,8 +28,6 @@ In your middleware settings be sure to add ``django.middleware.cache.UpdateCache
 Plugins
 =======
 
-.. versionadded:: 3.0
-
 Normally all plugins will be cached. If you have a plugin that is dynamic based on the current user or other
 dynamic properties of the request set the ``cache=False`` attribute on the plugin class::
 
