@@ -41,13 +41,13 @@ django CMS also has other requirements, which it lists as dependencies in its ``
         python3 -m venv venv # create a virtualenv
         source venv/bin/activate  # activate it
 
-     For the cms to work correctly, you will need django version 3.2.
-        Work with other versions can be unstable.
-        You can install recommended version of django with following command:
+    For the cms to work correctly, you will need django version 3.2.
+    Work with newer versions can be unstable.
+    You can install recommended version of django with following command:
 
-        .. code-block:: bash
+    .. code-block:: bash
 
-            pip install django==3.2
+        pip install django==3.2
 
 In an activated virtualenv, run::
 
