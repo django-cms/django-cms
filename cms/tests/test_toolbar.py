@@ -561,7 +561,6 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response, 'cms-toolbar')
 
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=False)
-    # Test toolbar on
     def test_hide_toolbar_login_anonymous_setting(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
         response = self.client.get(page.get_absolute_url())
