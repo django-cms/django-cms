@@ -1,6 +1,9 @@
 
 === 4.0.0 (unreleased) ===
-
+* feat: Re-enable showing the toolbar to anonymous users
+* Backport django 3.2 support
+* Backport django 3.1 support
+* Backport django 3.0 support
 * Allow Pagecontent.limit_visibility_in_menu to be reset once it has been set
 * Backported from develop: Added support for Github Actions based CI.
 * Backported from develop: Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
