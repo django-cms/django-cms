@@ -15,6 +15,7 @@ from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
@@ -48,7 +49,7 @@ URL_CMS_TRANSLATION_DELETE = urljoin('/en/admin/cms/pagecontent/', "delete-trans
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
-class _Warning():
+class _Warning:
     def __init__(self, message, category, filename, lineno):
         self.message = message
         self.category = category
@@ -87,7 +88,8 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-class BaseCMSTestCase():
+@override_settings(CONFIRM_VERSION4=True)
+class BaseCMSTestCase:
     counter = 1
 
     def _fixture_setup(self):
