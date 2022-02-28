@@ -15,7 +15,6 @@ from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
@@ -88,7 +87,6 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-@override_settings(CONFIRM_VERSION4=True)
 class BaseCMSTestCase:
     counter = 1
 
