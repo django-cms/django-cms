@@ -29,6 +29,7 @@ from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_object_structure_url
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
 from cms.views import details
@@ -551,13 +552,20 @@ class ToolbarTests(ToolbarTestBase):
         response = self.client.post(endpoint, {'username': username, 'password': username})
         self.assertRedirects(response, page.get_absolute_url(), fetch_redirect_response=False)
 
+    @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=True)
+    def test_show_toolbar_login_anonymous(self):
+        page = create_page("toolbar-page", "nav_playground.html", "en")
+        page_url = "%s?%s" % (page.get_absolute_url(), get_cms_setting('TOOLBAR_URL__ENABLE'))
+        response = self.client.get(page_url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'cms-toolbar')
+
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=False)
-    # Test toolbar on
     def test_hide_toolbar_login_anonymous_setting(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
         response = self.client.get(page.get_absolute_url())
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, 'cms-form-login')
+        self.assertNotContains(response, 'cms-toolbar')
 
     def test_admin_logout_staff(self):
         with override_settings(CMS_PERMISSION=True):
