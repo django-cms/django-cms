@@ -7,16 +7,16 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node-version: [6.x]
+        node-version: ['16']
 
     steps:
     - uses: actions/checkout@v2
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install
-    - run: npm install -g gulp@3.9.1
+    - run: npm install -g gulp@4.0.2
     - run: |
-          gulp tests:unit
+          gulp unitTest
           gulp lint
