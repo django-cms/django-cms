@@ -1,5 +1,6 @@
 
 === 4.0.0 (unreleased) ===
+* Backported from develop: Upgrade Gulp and NodeJs
 * feat: Re-enable showing the toolbar to anonymous users
 * Backport django 3.2 support
 * Backport django 3.1 support
