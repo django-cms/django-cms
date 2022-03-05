@@ -3,7 +3,7 @@ Changelog
 =========
 
 
-3.10.0rc1 (unpublished)
+3.10.0rc2 (unpublished)
 =======================
 
 Highlights:
@@ -18,6 +18,8 @@ Features:
 
 Bug Fixes:
 ----------
+* using .nvmrc to target the right nvm version (3e5227def) -- Florian Delizy
+* Add toolbar fix for broken CMS in the release 3.10.x -- Vinit Kumar
 * fixing release script to use 'unreleased' (low caps) instead of mixed caps (#7202) (b7a793c88) -- Florian Delizy
 * Cap django requirement at <4 (#7182) (c6c278497) -- Mark Walker
 * Set the default_auto_field on the AppConfigs (#7181) (272d62ced) -- Jeffrey de Lange
@@ -31,7 +33,7 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 54 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 56 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Anatoliy (3 pull requests)
 * Angelo Dini (1 pull request)
@@ -44,20 +46,23 @@ This release includes 54 pull requests, and was created with the help of the fol
 * Jens-Erik Weber (1 pull request)
 * Kaushal Dhungel (1 pull request)
 * Marco Bonetti (2 pull requests)
-* Mark Walker (9 pull requests)
+* Mark Walker (10 pull requests)
 * Nebojsa Knezevic (2 pull requests)
 * nichoski (2 pull requests)
 * Nicolai (11 pull requests)
 * Ryo Shimada (1 pull request)
 * Simon Krull (4 pull requests)
 * Stefan van den Eertwegh (1 pull request)
-* Vinit Kumar (4 pull requests)
+* Vinit Kumar (5 pull requests)
 
 With the review help of the following contributors:
 
+* fsbraun
 * Gabriel Andrade
 * Marco Bonetti
+* Mark Walker
 * Nicolai
+* Simon Krull
 * TiredFingers
 * victor-yunenko
 * Vinit Kumar
