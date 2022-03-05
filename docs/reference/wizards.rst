@@ -1,5 +1,3 @@
-.. versionadded:: 3.2
-
 .. _wizard_reference:
 
 ########################
