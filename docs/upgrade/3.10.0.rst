@@ -26,7 +26,9 @@ Features:
 Bug Fixes:
 ==========
 
+* using .nvmrc to target the right nvm version (3e5227def) -- Florian Delizy
 * Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
+* Add toolbar fix for broken CMS in the release 3.10.x -- Vinit Kumar
 * Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
 * Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
 * Fixed issue where default fallbacks is not used when it's an empty list (#6795) (5d21fa5eb) -- Arjan de Pooter
