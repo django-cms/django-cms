@@ -162,17 +162,17 @@ render only the English (``en``) plugins:
 
     {% render_placeholder mymodel_instance.my_placeholder language 'en' %}
 
-.. versionadded:: 3.0.2
-    This template tag supports the ``as`` argument. With this you can assign the result
-    of the template tag to a new variable that you can use elsewhere in the template.
 
-    Example::
+This template tag supports the ``as`` argument. With this you can assign the result
+of the template tag to a new variable that you can use elsewhere in the template.
 
-        {% render_placeholder mymodel_instance.my_placeholder as placeholder_content %}
-        <p>{{ placeholder_content }}</p>
+Example::
 
-    When used in this manner, the placeholder will not be displayed for
-    editing when the CMS is in edit mode.
+    {% render_placeholder mymodel_instance.my_placeholder as placeholder_content %}
+    <p>{{ placeholder_content }}</p>
+
+When used in this manner, the placeholder will not be displayed for
+editing when the CMS is in edit mode.
 
 ..  templatetag:: render_uncached_placeholder
 
@@ -294,8 +294,7 @@ Arguments:
 - ``page_lookup`` (see `page_lookup`_ for more information)
 - ``language`` (optional)
 - ``site`` (optional)
-- ``as var_name`` (version 3.0 or later, optional; page_url can now be used to assign the resulting
-  URL to a context variable ``var_name``)
+- ``as var_name`` (optional)
 
 
 Example::
@@ -307,15 +306,14 @@ If a matching page isn't found and :setting:`django:DEBUG` is ``True``, an
 exception will be raised. However, if :setting:`django:DEBUG` is ``False``, an
 exception will not be raised.
 
-.. versionadded:: 3.0
 
-    page_url now supports the ``as`` argument. When used this way, the tag
-    emits nothing, but sets a variable in the context with the specified name
-    to the resulting value.
+``page_url`` now supports the ``as`` argument. When used this way, the tag
+emits nothing, but sets a variable in the context with the specified name
+to the resulting value.
 
-    When using the ``as`` argument PageNotFound exceptions are always
-    suppressed, regardless of the setting of :setting:`django:DEBUG` and the
-    tag will simply emit an empty string in these cases.
+When using the ``as`` argument PageNotFound exceptions are always
+suppressed, regardless of the setting of :setting:`django:DEBUG` and the
+tag will simply emit an empty string in these cases.
 
 Example::
 
@@ -355,24 +353,22 @@ Example::
     {% page_attribute "page_title" request.current_page.parent_id %}
     {% page_attribute "slug" request.current_page.get_root %}
 
-.. versionadded:: 2.3.2
-    This template tag supports the ``as`` argument. With this you can assign the result
-    of the template tag to a new variable that you can use elsewhere in the template.
+This template tag supports the ``as`` argument. With this you can assign the result
+of the template tag to a new variable that you can use elsewhere in the template.
 
-    Example::
+Example::
 
-        {% page_attribute "page_title" as title %}
-        <title>{{ title }}</title>
+    {% page_attribute "page_title" as title %}
+    <title>{{ title }}</title>
 
-    It even can be used in combination with the ``page_lookup`` argument.
+It even can be used in combination with the ``page_lookup`` argument.
 
-    Example::
+Example::
 
-        {% page_attribute "page_title" "my_page_reverse_id" as title %}
-        <a href="/mypage/">{{ title }}</a>
+    {% page_attribute "page_title" "my_page_reverse_id" as title %}
+    <a href="/mypage/">{{ title }}</a>
 
 ..  templatetag:: render_plugin
-.. versionadded:: 2.4
 
 render_plugin
 =============
@@ -399,7 +395,6 @@ Example::
 Normally the children of plugins can be accessed via the ``child_plugins`` attribute of plugins.
 Plugins need the ``allow_children`` attribute to set to `True` for this to be enabled.
 
-.. versionadded:: 3.0
 ..  templatetag:: render_plugin_block
 
 render_plugin_block
@@ -455,7 +450,6 @@ Example::
     {% endblock %}
 
 ..  templatetag:: render_model
-.. versionadded:: 3.0
 
 render_model
 ============
@@ -535,7 +529,6 @@ This will render to:
 
 
 ..  templatetag:: render_model_block
-.. versionadded:: 3.0
 
 render_model_block
 ==================
@@ -609,8 +602,6 @@ method is available; also template tags and filters are available in the block.
 
 
 ..  templatetag:: render_model_icon
-.. versionadded:: 3.0
-
 
 render_model_icon
 =================
@@ -676,8 +667,6 @@ It will render to something like:
 
 
 ..  templatetag:: render_model_add
-.. versionadded:: 3.0
-
 
 render_model_add
 ================
@@ -748,7 +737,6 @@ It will render to something like:
 .. _django-hvad: https://github.com/kristianoellegaard/django-hvad
 
 ..  templatetag:: render_model_add_block
-.. versionadded:: 3.1
 
 render_model_add_block
 ======================

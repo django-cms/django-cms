@@ -4,8 +4,6 @@
 How to enable frontend editing for Page and Django models
 #########################################################
 
-.. versionadded:: 3.0
-
 As well as ``PlaceholderFields``, 'ordinary' Django model fields (both on CMS Pages and your own
 Django models) can also be edited through django CMS's frontend editing interface. This is very
 convenient for the user because it saves having to switch between frontend and admin views.

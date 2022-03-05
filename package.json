@@ -56,7 +56,7 @@
     "lodash": "4.17.21",
     "nprogress": "^0.2.0",
     "prevent-parent-scroll": "0.0.6",
-    "urijs": "^1.19.7",
+    "urijs": "^1.19.9",
     "webpack2-polyfill-plugin": "0.0.2"
  },
   "scripts": {
