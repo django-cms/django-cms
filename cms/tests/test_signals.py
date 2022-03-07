@@ -2,11 +2,12 @@ from django.conf import settings
 from django.test.utils import override_settings
 
 from cms.api import create_page
-from cms.models import Page, UrlconfRevision
+from cms.models import Page, PageUser, UrlconfRevision
 from cms.signals import urls_need_reloading
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import apphooks, signal_tester
+from cms.utils.permissions import set_current_user
 
 
 class SignalTests(CMSTestCase):
@@ -89,6 +90,18 @@ class SignalTests(CMSTestCase):
                     endpoint = self.get_admin_url(Page, 'publish_page', page.pk, 'en')
                     self.client.post(endpoint)
                     self.assertEqual(env.call_count, 1)
+
+
+class SignalReceiverTests(CMSTestCase):
+    def test_pageuser_creation(self):
+        """
+        Tests that a PageUser is created after a django.contrib.auth.User (or
+        a custom user model) is saved (via post_save signal)
+        """
+        superuser = self.get_superuser()
+        set_current_user(superuser)
+        self._create_user("testuser", is_staff=True)
+        self.assertEqual(PageUser.objects.count(), 1)
 
 
 @override_settings(**{
