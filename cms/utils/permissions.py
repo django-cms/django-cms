@@ -266,9 +266,9 @@ def get_subordinate_users(user, site):
         # return only staff users created by user
         # whose page permission record has no page attached.
         qs = get_user_model().objects.distinct().filter(
-                Q(is_staff=True) &
-                Q(pageuser__created_by=user) &
-                Q(pagepermission__page=None)
+            Q(is_staff=True)
+            & Q(pageuser__created_by=user)
+            & Q(pagepermission__page=None)
         )
         qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
         return qs
@@ -280,8 +280,8 @@ def get_subordinate_users(user, site):
 
     # normal query
     qs = get_user_model().objects.distinct().filter(
-        Q(is_staff=True) &
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
+        Q(is_staff=True)
+        & (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
         | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
@@ -305,8 +305,8 @@ def get_subordinate_groups(user, site):
             Group
             .objects
             .filter(
-                Q(pageusergroup__created_by=user) &
-                Q(pagepermission__page__isnull=True)
+                Q(pageusergroup__created_by=user)
+                & Q(pagepermission__page__isnull=True)
             )
             .distinct()
         )

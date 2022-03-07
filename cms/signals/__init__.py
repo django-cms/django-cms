@@ -10,7 +10,7 @@ from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserG
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 
-#################### Our own signals ###################
+# ################### Our own signals ###################
 
 # fired after page location is changed - is moved from one node to other
 page_moved = Signal(providing_args=["instance"])
@@ -61,7 +61,7 @@ post_placeholder_operation = Signal(
 )
 
 
-################### apphook reloading ###################
+# ################## apphook reloading ###################
 
 if settings.DEBUG:
     urls_need_reloading.connect(debug_server_restart)
@@ -73,13 +73,12 @@ urls_need_reloading.connect(
 )
 
 
-###################### log entries #######################
-
+# ##################### log entries #######################
 
 post_obj_operation.connect(log_page_operations)
 post_placeholder_operation.connect(log_placeholder_operations)
 
-###################### permissions #######################
+# ##################### permissions #######################
 
 if get_cms_setting('PERMISSION'):
     # only if permissions are in use

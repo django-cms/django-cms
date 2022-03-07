@@ -88,4 +88,3 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
 
 class WizardStep2BaseForm(BaseFormMixin):
     pass
-

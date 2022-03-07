@@ -213,8 +213,8 @@ class CMSToolbar(BaseToolbar):
 
         if self.show_toolbar:
             edit_mode = (
-                self._resolver_match and
-                self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+                self._resolver_match
+                and self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
             )
             if enable_toolbar in self.request.GET or edit_mode:
                 self.show_toolbar = True
