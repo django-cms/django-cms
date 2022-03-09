@@ -408,8 +408,8 @@ A list of plugin processors. Plugin processors are callables that modify all
 plugins' output *after* rendering. See :doc:`/how_to/custom_plugins`
 for more information.
 
-..  setting:: CMS_APPHOOKS
 
+..  setting:: CMS_APPHOOKS
 
 CMS_APPHOOKS
 ============
@@ -431,6 +431,22 @@ Example::
         'otherapp.cms_app.MyFancyApp',
         'sampleapp.cms_app.SampleApp',
     )
+
+
+..  setting:: CMS_ADMIN_NAMESPACE
+
+CMS_ADMIN_NAMESPACE
+=====================
+
+default
+    ``admin``
+
+Used to configure the namespace of the admin interface.
+
+When using a custom instance of Django's
+:class:`~django.contrib.admin.AdminSite`, provide the unique instance name as
+``CMS_ADMIN_NAMESPACE``. This instance name is used when :ref:`reversing admin
+URLs <django:admin-reverse-urls>`.
 
 
 .. _i18n_l10n_reference:
