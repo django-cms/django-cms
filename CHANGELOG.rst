@@ -6,6 +6,7 @@ Changelog
 unreleased
 ==========
 
+* Added dark mode support to css
 * Fix publishing of static placeholders outside of CMS pages
 
 3.9.0 (2021-06-30)
