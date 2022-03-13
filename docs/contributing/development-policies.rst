@@ -147,8 +147,6 @@ supported any longer.
 Commits
 *******
 
-.. versionadded:: 3.3
-
 Commit messages
 ===============
 
@@ -216,8 +214,6 @@ Ask for help if you run into trouble!
 *********
 Changelog
 *********
-
-.. versionadded:: 3.3
 
 **Every new feature, bugfix or other change of substance** must be represented in the `CHANGELOG
 <https://github.com/django-cms/django-cms/blob/develop/CHANGELOG.rst>`_. This includes documentation, but **doesn't** extend

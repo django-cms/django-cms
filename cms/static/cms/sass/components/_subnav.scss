@@ -34,7 +34,8 @@
     background-color: transparent;
     &:active,
     &.cms-btn-active {
-        background-color: darken($btn-default-bgcolor, 10%);
+        color: $btn-default-color !important;
+        filter: brightness(0.9);
     }
 }
 .cms-submenu-settings {
@@ -202,7 +203,7 @@
 
     .cms-dropdown-inner {
         z-index: 1;
-        background-color: white;
+        background-color: $white;
         border-radius: $border-radius-normal;
     }
 

@@ -9,5 +9,6 @@ pyenchant>3
 sphinx-autobuild
 datetime
 coverage
+django~=3.2
 django-cms
 pip-tools

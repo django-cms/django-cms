@@ -314,18 +314,19 @@ class PageToolbar(CMSToolbar):
             return None
 
     def has_publish_permission(self):
-        if self.page:
-            publish_permission = page_permissions.user_can_publish_page(
+        if self.page is not None:
+            has_publish_permission = page_permissions.user_can_publish_page(
                 self.request.user,
                 page=self.page,
-                site=self.current_site
+                site=self.current_site,
             )
         else:
-            publish_permission = False
+            has_publish_permission = False
 
-        if publish_permission and self.statics:
-            publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
-        return publish_permission
+        if (has_publish_permission or self.page is None) and self.statics:
+            has_publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
+
+        return has_publish_permission
 
     def has_unpublish_permission(self):
         return self.has_publish_permission()

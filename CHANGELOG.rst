@@ -6,6 +6,9 @@ Changelog
 unreleased
 ==========
 
+* Added dark mode support to css
+* Fix publishing of static placeholders outside of CMS pages
+
 3.9.0 (2021-06-30)
 ==================
 
@@ -52,7 +55,7 @@ Bug Fixes:
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
-* Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
+* Fixed a bug where the fallback page title whould be returned instead of the one from the current language
 * Fixed an issue when running migrations on a multi database project
 * Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
 
