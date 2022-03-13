@@ -170,7 +170,7 @@ def details(request, slug):
 
     # permission checks
     if page.login_required and not request.user.is_authenticated:
-        return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
+        return redirect_to_login(quote(request.get_full_path()), settings.LOGIN_URL)
 
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(page)
