@@ -84,8 +84,7 @@ class ToolbarTestBase(CMSTestCase):
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
-        mid = ToolbarMiddleware(lambda req: HttpResponse())
-        mid.process_request(request)
+        ToolbarMiddleware(lambda req: HttpResponse()).__call__(request)
         if hasattr(request,'toolbar'):
             request.toolbar.populate()
         return request

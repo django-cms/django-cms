@@ -22,10 +22,4 @@ class CurrentUserMiddleware(MiddlewareMixin):
 
         # Code to be executed for each request/response after
         # the view is called.
-
         return response
-
-    def process_request(self, request):
-        from cms.utils.permissions import set_current_user
-
-        set_current_user(getattr(request, 'user', None))
