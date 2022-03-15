@@ -20,13 +20,6 @@ class ToolbarMiddleware(MiddlewareMixin):
     Middleware to set up CMS Toolbar.
     """
 
-    def __init__(self, get_response):
-        self.get_response = get_response
-
-
-    def __call__(self, request):
-        return self.get_response(request)
-
     def is_cms_request(self, request):
         toolbar_hide = get_cms_setting('TOOLBAR_HIDE')
         internal_ips = get_cms_setting('INTERNAL_IPS')
