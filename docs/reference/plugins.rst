@@ -70,7 +70,7 @@ CMSPluginBase Attributes and Methods Reference
 
     ..  attribute:: change_form_template
 
-        Default: ``admin/cms/page/plugin_change_form.html``
+        Default: ``admin/cms/page/plugin/change_form.html``
 
         The template used to render the form when you edit the plugin.
 
@@ -80,7 +80,7 @@ CMSPluginBase Attributes and Methods Reference
                 model = MyModel
                 name = _("My Plugin")
                 render_template = "cms/plugins/my_plugin.html"
-                change_form_template = "admin/cms/page/plugin_change_form.html"
+                change_form_template = "admin/cms/page/plugin/change_form.html"
 
         See also: :attr:`frontend_edit_template`.
 
@@ -352,7 +352,7 @@ CMSPluginBase Attributes and Methods Reference
         The default implementation is as follows::
 
             def icon_alt(self, instance):
-                return "%s - %s" % (force_text(self.name), force_text(instance))
+                return "%s - %s" % (force_str(self.name), force_str(instance))
 
         See also: :attr:`text_enabled`, :meth:`icon_src`.
 

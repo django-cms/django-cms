@@ -1,0 +1,158 @@
+#!/bin/bash
+
+# This script gather common functions for all scripts
+
+
+RED="\033[31;1m"
+GREEN="\033[32;1m"
+YELLOW="\033[33;1m"
+BLUE="\033[34;1m"
+NORMAL="\033[0m"
+
+if [ -z "${EDITOR}" ]; then
+        EDITOR=vim
+fi
+
+##############################################################################
+#                   Status reporting (echo with colors)                      #
+##############################################################################
+
+#
+# show a progress status
+# usage:
+# status "message"
+#
+status() {
+    echo -e "${YELLOW}$1${NORMAL}"
+}
+
+#
+# show an error message:
+# usage:
+# error "message"
+#
+error() {
+    echo -e "${RED}$*${NORMAL}"
+}
+
+#
+# show a success message:
+# usage:
+# success "message"
+#
+success() {
+    echo -e "${GREEN}$*${NORMAL}"
+}
+
+#
+# open the editor to review a file
+#
+review() {
+    echo -e "** Please ${BLUE}review ${YELLOW}$1${NORMAL}"
+    echo -e "${BLUE}Press enter${NORMAL} to continue in ${EDITOR}"
+    read -r
+    ${EDITOR} "$1"
+}
+
+
+###############################################################################
+#                     sanity checks related functions                         #
+###############################################################################
+
+#
+# check if a command exists in the path and exit if not
+# Usage:
+# check_command_exists cmd1 cmd2 cmd3 ...
+#
+check_command_exists() {
+    for cmd in "$@"; do
+        if ! command -v "${cmd}" &> /dev/null; then
+            error "Can not find command ${cmd}, please install the tool before starting this script"
+            exit 1
+        fi
+    done
+}
+
+#
+# Check nvm exists and load it (exit if can't find nvm)
+# usage:
+# load_nvm
+#
+
+load_nvm() {
+    # Check for NVM:
+    if ! declare -f nvm &> /dev/null; then
+        if [ -z "${NVM_DIR}" ]; then
+            error "Can not find nvm directory variable.... please install nvm and/or set NVM_DIR"
+            echo "to install nvm:"
+            echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash"
+            exit 1
+        fi
+
+        if [ ! -s "$NVM_DIR/nvm.sh" ]; then
+            error "Can not find nvm script, please install NVM first"
+            echo "to install nvm:"
+            echo "curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash"
+            exit 1
+        fi
+        # shellcheck disable=SC1090
+        source "$NVM_DIR/nvm.sh"  # This loads nvm
+    fi
+
+    if ! declare -f nvm &> /dev/null; then
+        error "Failed to load nvm??"
+        exit 1
+    fi
+
+}
+
+#
+# Check the argument is a valid version format
+#
+# usage:
+# check_version_string "version"
+#
+check_version_string() {
+    # extracting version from the FULL_VERSION, and sanity checks
+    if ! echo "$1" | grep -q "^\([0-9]\+\.\)\{2\}[0-9]\+"; then
+        error "Incorrect version format '$1', must be X.Y.Z[suffix]"
+        exit 1
+    fi
+}
+
+#
+# get version from the full version ex: 3.9.0rc1 -> 3.9.0
+# usage:
+# get_main_version "full_version"
+#
+get_main_version() {
+    #shellcheck disable=SC2001
+    echo "$1" | sed -e "s/$(get_version_suffix "$1")\$//"
+}
+
+#
+# get the suffix version from full version
+# usage:
+# get_version_suffix "full_version"
+#
+get_version_suffix() {
+    #shellcheck disable=SC2001
+    echo "$1" | sed -e "s/^\(\([0-9]\+\.\)\{2\}[0-9]\+\)//"
+}
+
+#
+# check we are running in a virtual env
+#
+# usage:
+# check_virtual_env
+
+check_virtual_env() {
+    if [ -z "${VIRTUAL_ENV}" ]; then
+        error "Please run this script within a virtualenv!"
+        echo "you can create an environment with the following command: "
+        echo "virtualenv -p python3 --prompt "django-cms-release " env"
+        exit 1
+    fi
+
+
+}

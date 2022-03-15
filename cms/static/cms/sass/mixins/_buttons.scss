@@ -19,32 +19,37 @@
     background-clip: padding-box;
     -webkit-appearance: none;
     &:focus,
-    &.focus {
-        color: $color important($important);
-        background-color: darken($background, 5%) important($important);
-        border-color: darken($border, 5%) important($important);
-        text-decoration: none important($important);
-    }
+    &.focus,
     &:hover {
         color: $color important($important);
-        background-color: darken($background, 5%) important($important);
-        border-color: darken($border, 5%) important($important);
+        @if $background == $white {
+            background-color: $gray-lightest important($important);
+            border-color: $border important($important);
+        } @else {
+            background-color: $background important($important);
+            border-color: $border important($important);
+            filter: brightness(var(--focus-brightness)) opacity(1) important($important);
+            // Strange: removing opacity(1.) or correcting it makes item transparent
+        }
         text-decoration: none important($important);
     }
     &:active,
     &.cms-btn-active {
         color: $color important($important);
-        background-color: darken($background, 10%) important($important);
-        border-color: darken($border, 10%) important($important);
+        background-color: $background important($important);
+        border-color: $border important($important);
+        filter: brightness(var(--active-brightness)) opacity(1) important($important);
+        // Strange: removing opacity(1.) or correcting it makes item transparent
         box-shadow: $btn-active-shadow important($important);
 
         &:hover,
         &:focus,
         &.focus {
             color: $color important($important);
-            background-color: darken($background, 17%) important($important);
-            border-color: darken($border, 25%) important($important);
-        }
+            background-color: $background important($important);
+            border-color: $border important($important);
+            filter: brightness(calc(var(--focus-brightness) * var(--active-brightness))) opacity(1) important($important);
+        }  // Strange: removing opacity(1.) or correcting it makes item transparent
     }
     &:active,
     &.cms-btn-active {
@@ -57,14 +62,24 @@
         &:focus,
         &.focus,
         &:active,
-        &.cms-btn-active {
-            background-color: rgba($background, 0.4) important($important);
-            border-color: rgba($border, 0.4) important($important);
-            color: lighten($color, 50%) important(1);
+        &.cms-btn-active { // TODO: FABR
+            background-color: $background important($important);
+            border-color: $border important($important);
+            @if $color == $gray {
+                color: $gray-lighter important(1);
+            } @else {
+                color: $color important(1);
+                filter: brightness(0.6) opacity(1);  // Strange: removing opacity(1.) or correcting it makes item transparent
+            }
             cursor: not-allowed;
             box-shadow: none important($important);
             &:before {
-                color: rgba($color, 0.4) important(1);
+                @if $color == $gray {
+                    color: $gray-lighter important(1);
+                } @else {
+                    color: $color important(1);
+                    filter: brightness(0.6) opacity(1); // Strange: removing opacity(1.) or correcting it makes item transparent
+                }
             }
         }
     }

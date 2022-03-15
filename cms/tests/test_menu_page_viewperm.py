@@ -5,15 +5,14 @@ from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page
-from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
-from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import (
+    ACCESS_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN,
+    ACCESS_PAGE_AND_DESCENDANTS, Page,
+)
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import user_can_view_page
-
 from menus.menu_pool import menu_pool
-
 
 __all__ = [
     'ViewPermissionTreeBugTests',
@@ -226,9 +225,10 @@ class ViewPermissionTests(CMSTestCase):
                 in_restricted = True
             if page_id in public_page_ids:
                 in_public = True
-            self.assertTrue((in_public and not in_restricted) or
-                            (not in_public and in_restricted),
-                            msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted))
+            self.assertTrue(
+                (in_public and not in_restricted) or (not in_public and in_restricted),
+                msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted)
+            )
 
     def assertGrantedVisibility(self, all_pages, expected_granted_pages, username=None):
         """

@@ -36,9 +36,7 @@ def default_request_ip_resolver(request):
     'X_FORWARDED_FOR' header which supersedes a 'REMOTE_ADDR' header.
     """
     return (
-        real_ip(request) or
-        x_forwarded_ip(request) or
-        remote_addr_ip(request)
+        real_ip(request) or x_forwarded_ip(request) or remote_addr_ip(request)
     )
 
 

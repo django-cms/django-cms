@@ -1,23 +1,22 @@
-import json
 import datetime
+import json
 
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.models import LogEntry
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
+from django.http import Http404, HttpResponseBadRequest, HttpResponseNotFound
 from django.urls import reverse
-from django.http import (Http404, HttpResponseBadRequest,
-                         HttpResponseNotFound)
-from django.utils.encoding import force_text, smart_str
 from django.utils import timezone
+from django.utils.encoding import force_str, smart_str
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
 
 from cms import api
-from cms.api import create_page, create_title, add_plugin, publish_page
 from cms.admin.pageadmin import PageAdmin
+from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
 from cms.models.pagemodel import Page, PageType
@@ -27,9 +26,9 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_DELETE, URL_CMS_PAGE,URL_CMS_TRANSLATION_DELETE,
-    URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_CHANGE,
-    URL_CMS_PAGE_PUBLISHED,
+    URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_CHANGE_LANGUAGE,
+    URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED, URL_CMS_TRANSLATION_DELETE,
+    CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -317,19 +316,25 @@ class AdminTestCase(AdminTestsBase):
 
     def test_changelist_get_results(self):
         admin_user = self.get_superuser()
-        first_level_page = create_page('level1', 'nav_playground.html', 'en', published=True)
-        second_level_page_top = create_page('level21', "nav_playground.html", "en",
-                                            created_by=admin_user, published=True,
-                                            parent=first_level_page)
-        second_level_page_bottom = create_page('level22', "nav_playground.html", "en", # nopyflakes
-                                               created_by=admin_user, published=True,
-                                               parent=self.reload(first_level_page))
-        third_level_page = create_page('level3', "nav_playground.html", "en", # nopyflakes
-                                       created_by=admin_user, published=True,
-                                       parent=second_level_page_top)
-        fourth_level_page = create_page('level23', "nav_playground.html", "en", # nopyflakes
-                                        created_by=admin_user,
-                                        parent=self.reload(first_level_page))
+        first_level_page = create_page(
+            'level1', 'nav_playground.html', 'en', published=True
+        )
+        second_level_page_top = create_page(
+            'level21', "nav_playground.html", "en",
+            created_by=admin_user, published=True, parent=first_level_page
+        )
+        second_level_page_bottom = create_page(  # noqa
+            'level22', "nav_playground.html", "en",
+            created_by=admin_user, published=True, parent=self.reload(first_level_page)
+        )
+        third_level_page = create_page(  # noqa
+            'level3', "nav_playground.html", "en",
+            created_by=admin_user, published=True, parent=second_level_page_top
+        )
+        fourth_level_page = create_page(  # noqa
+            'level23', "nav_playground.html", "en",
+            created_by=admin_user, parent=self.reload(first_level_page)
+        )
         self.assertEqual(Page.objects.all().count(), 9)
         endpoint = self.get_admin_url(Page, 'changelist')
 
@@ -644,6 +649,40 @@ class AdminTests(AdminTestsBase):
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
+    def test_too_many_plugins_global_children(self):
+        from urllib.parse import urlencode
+        conf = {
+            'body': {
+                'limits': {
+                    'global_children': 1,
+                },
+            },
+        }
+        admin_user = self.get_admin()
+        url = admin_reverse('cms_page_add_plugin')
+        with self.settings(CMS_PERMISSION=False, CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('somepage', 'nav_playground.html', 'en')
+            body = page.placeholders.get(slot='body')
+            link = add_plugin(body, 'LinkPlugin', 'en', name='text', external_link='http://test.test/')
+            with self.login_user_context(admin_user):
+                data = {
+                    'plugin_type': 'TextPlugin',
+                    'placeholder_id': body.pk,
+                    'plugin_language': 'en',
+                }
+                url = admin_reverse('cms_page_add_plugin')
+                response = self.client.post('{}?{}'.format(url,urlencode(data)))
+                self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+            with self.login_user_context(admin_user):
+                data = {
+                    'plugin_type': 'TextPlugin',
+                    'placeholder_id': body.pk,
+                    'plugin_parent': link.pk,
+                    'plugin_language': 'en',
+                }
+                response = self.client.post('{}?{}'.format(url,urlencode(data)))
+                self.assertEqual(response.status_code, 302)
+
     def test_edit_title_dirty_bit(self):
         language = "en"
         admin_user = self.get_admin()
@@ -769,7 +808,7 @@ class PluginPermissionTests(AdminTestsBase):
         url = '%s/edit-plugin/%s/' % (admin_reverse('cms_page_edit_plugin', args=[plugin.id]), plugin.id)
         response = self.client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
-        self.assertTrue("Plugin not found" in force_text(response.content))
+        self.assertTrue("Plugin not found" in force_str(response.content))
 
 
 class AdminFormsTests(AdminTestsBase):
@@ -895,7 +934,7 @@ class AdminFormsTests(AdminTestsBase):
         path = admin_reverse('cms_page_advanced', args=(page.pk,))
 
         with self.login_user_context(admin_user):
-            en_path = path + u"?language=en"
+            en_path = path + "?language=en"
             redirect_path = admin_reverse('cms_page_changelist') + '?language=en'
             response = self.client.post(en_path, page_data)
             self.assertRedirects(response, redirect_path)
@@ -907,7 +946,7 @@ class AdminFormsTests(AdminTestsBase):
         page_data['template'] = 'nav_playground.html'
 
         with self.login_user_context(admin_user):
-            de_path = path + u"?language=de"
+            de_path = path + "?language=de"
             redirect_path = admin_reverse('cms_page_change', args=(page.pk,)) + '?language=de'
             response = self.client.post(de_path, page_data)
             # Assert user is redirected to basic settings.
@@ -924,7 +963,7 @@ class AdminFormsTests(AdminTestsBase):
         page_data['template'] = 'nav_playground.html'
 
         with self.login_user_context(admin_user):
-            de_path = path + u"?language=de"
+            de_path = path + "?language=de"
             response = self.client.post(de_path, page_data)
             # Assert user is not redirected because there was a form error
             self.assertEqual(response.status_code, 200)
@@ -939,7 +978,7 @@ class AdminFormsTests(AdminTestsBase):
         page_data['template'] = 'nav_playground.html'
 
         with self.login_user_context(admin_user):
-            en_path = path + u"?language=de"
+            en_path = path + "?language=de"
             redirect_path = admin_reverse('cms_page_changelist') + '?language=de'
             response = self.client.post(en_path, page_data)
             self.assertRedirects(response, redirect_path)
@@ -1021,7 +1060,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         self.assertEqual(Placeholder.objects.all().count(), 4)
         with self.login_user_context(user):
-            output = force_text(
+            output = force_str(
                 self.client.get(
                     '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
                 ).content
@@ -1031,7 +1070,7 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(StaticPlaceholder.objects.count(), 2)
             for placeholder in Placeholder.objects.all():
                 add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
-            output = force_text(
+            output = force_str(
                 self.client.get(
                     '/en/?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
                 ).content
@@ -1050,7 +1089,7 @@ class AdminFormsTests(AdminTestsBase):
         user = self.get_superuser()
         with self.login_user_context(user):
             with self.assertNumQueries(9):
-                force_text(self.client.get(self.get_admin_url(Page, 'changelist')))
+                force_str(self.client.get(self.get_admin_url(Page, 'changelist')))
 
     def test_smart_link_published_pages(self):
         admin, staff_guy = self._get_guys()

@@ -5,11 +5,12 @@ from collections import OrderedDict
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
-from django.template import TemplateSyntaxError, NodeList, Variable, Context, Template, engines
+from django.template import (
+    Context, NodeList, Template, TemplateSyntaxError, Variable, engines,
+)
 from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
-
 from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
@@ -23,10 +24,10 @@ def _get_nodelist(tpl):
         return tpl.nodelist
 
 
-def get_context():
+def get_context(extend_node):
     if engines is not None:
         context = Context()
-        context.template = Template('')
+        context.template = Template('', origin=extend_node.origin)
         return context
     else:
         return {}
@@ -277,7 +278,7 @@ def get_static_placeholders(template, context):
 
 
 def _get_block_nodes(extend_node):
-    parent = extend_node.get_parent(get_context())
+    parent = extend_node.get_parent(get_context(extend_node))
     parent_nodelist = _get_nodelist(parent)
     parent_nodes = parent_nodelist.get_nodes_by_type(BlockNode)
     parent_extend_nodes = parent_nodelist.get_nodes_by_type(ExtendsNode)
@@ -326,9 +327,9 @@ def _get_placeholder_nodes_from_extend(extend_node, node_class):
 
 
 def _find_topmost_template(extend_node):
-    parent_template = extend_node.get_parent(get_context())
+    parent_template = extend_node.get_parent(get_context(extend_node))
     for node in _get_nodelist(parent_template).get_nodes_by_type(ExtendsNode):
         # Their can only be one extend block in a template, otherwise django raises an exception
         return _find_topmost_template(node)
         # No ExtendsNode
-    return extend_node.get_parent(get_context())
+    return extend_node.get_parent(get_context(extend_node))

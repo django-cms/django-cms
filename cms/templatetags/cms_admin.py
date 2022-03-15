@@ -1,15 +1,15 @@
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
-from cms.constants import PUBLISHER_STATE_PENDING
-
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
-from django.utils.encoding import force_text
+from django.urls import NoReverseMatch
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from cms.constants import PUBLISHER_STATE_PENDING
 
 register = template.Library()
 
@@ -68,7 +68,8 @@ class TreePublishRow(Tag):
                 text = _("no content")
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
-            'data-cms-tooltip="%s"></span>' % (cls, force_text(text)))
+            'data-cms-tooltip="%s"></span>' % (cls, force_str(text))
+        )
 
 
 register.tag(TreePublishRow)
@@ -128,8 +129,10 @@ def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
     EXTENSION = 'svg'
     return mark_safe(
-        '<img src="%sicon-%s.%s" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), EXTENSION,
-                                                 value))
+        '<img src="%sicon-%s.%s" alt="%s" />' % (
+            CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), EXTENSION, value
+        )
+    )
 
 
 @register.filter
@@ -141,7 +144,7 @@ def preview_link(page, language):
         try:
             # attempt to retrieve the localized path/slug and return
             return page.get_absolute_url(language, fallback=False)
-        except:
+        except NoReverseMatch:
             # no localized path/slug. therefore nothing to preview. stay on the same page.
             # perhaps the user should be somehow notified for this.
             return ''
@@ -170,8 +173,7 @@ class PageSubmitRow(InclusionTag):
 
         context = {
             # TODO check this (old code: opts.get_ordered_objects() )
-            'onclick_attrib': (opts and change
-                               and 'onclick="submitOrderForm();"' or ''),
+            'onclick_attrib': (opts and change and 'onclick="submitOrderForm();"' or ''),
             'show_delete_link': False,
             'show_save_as_new': not is_popup and change and save_as,
             'show_save_and_add_another': False,
@@ -202,7 +204,8 @@ in_filtered = register.filter('in_filtered', in_filtered)
 @register.simple_tag
 def admin_static_url():
     """
-    If set, returns the string contained in the setting ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
+    If set, returns the string contained in the setting
+    ADMIN_MEDIA_PREFIX, otherwise returns STATIC_URL + 'admin/'.
     """
     return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
 

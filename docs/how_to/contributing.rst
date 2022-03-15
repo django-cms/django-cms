@@ -46,6 +46,10 @@ The basic workflow for a code contribution will typically run as follows:
 
    Replace ``X.Y`` with whichever version of Django you want to work with.
 
+#. Install pre-commit hooks::
+
+    pre-commit install
+
 #. Create a new branch for your work::
 
     git checkout -b my_fix

@@ -3,16 +3,15 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Pylyp Dukhlii <pylyp@pylyp.com.ua>, 2014
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
 # Roman Kozlovskyi <krzroman@gmail.com>, 2012
-# Volodymyr Vakulenko <wowkalucky@gmail.com>, 2017
+# Volodymyr Bergman <wowkalucky@gmail.com>, 2017
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 10:46+0100\n"
+"POT-Creation-Date: 2021-06-20 22:17+0800\n"
 "PO-Revision-Date: 2018-01-11 16:38+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"

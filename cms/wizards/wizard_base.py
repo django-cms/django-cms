@@ -2,10 +2,9 @@ import hashlib
 
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-
-from django.utils.translation import override as force_language, gettext as _
+from django.utils.translation import gettext as _, override as force_language
 
 from cms.utils.conf import get_cms_setting
 
@@ -52,9 +51,9 @@ class Wizard(WizardBase):
         in the form's markup, and we'd rather not expose code paths there.
         """
         if not self._hash_cache:
-            full_path = force_text(
-                    ".".join([self.__module__, self.__class__.__name__])
-                ).encode('utf-8')
+            full_path = force_str(
+                ".".join([self.__module__, self.__class__.__name__])
+            ).encode('utf-8')
             hash = hashlib.sha1()
             hash.update(full_path)
             self._hash_cache = hash.hexdigest()
@@ -87,7 +86,7 @@ class Wizard(WizardBase):
         return ""
 
     def __str__(self):
-        return force_text(self.title)
+        return force_str(self.title)
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} object at {location}>'.format(

@@ -1,7 +1,7 @@
-from datetime import date
 import json
 import os
 import warnings
+from datetime import date
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
@@ -10,16 +10,15 @@ from django.db.models import ManyToManyField, Model
 from django.db.models.base import ModelBase
 from django.urls import NoReverseMatch
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from treebeard.mp_tree import MP_Node
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
-
-from treebeard.mp_tree import MP_Node
 
 
 class BoundRenderMeta:
@@ -119,7 +118,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         text_enabled = False
 
     def __str__(self):
-        return force_text(self.pk)
+        return force_str(self.pk)
 
     def __repr__(self):
         display = "<{module}.{class_name} id={id} plugin_type='{plugin_type}' object at {location}>".format(
@@ -139,7 +138,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
     def get_short_description(self):
         instance = self.get_plugin_instance()[0]
         if instance is not None:
-            return force_text(instance)
+            return force_str(instance)
         return _("<Empty>")
 
     def get_plugin_class(self):
@@ -193,7 +192,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         data = {
             'type': 'plugin',
             'placeholder_id': str(self.placeholder_id),
-            'plugin_name': force_text(plugin_name) or '',
+            'plugin_name': force_str(plugin_name) or '',
             'plugin_type': self.plugin_type,
             'plugin_id': str(self.pk),
             'plugin_language': self.language or '',
@@ -245,7 +244,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         Get alt text for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return force_text(plugin.icon_alt(instance)) if instance else u''
+        return force_str(plugin.icon_alt(instance)) if instance else u''
 
     def update(self, refresh=False, **fields):
         CMSPlugin.objects.filter(pk=self.pk).update(**fields)
@@ -361,17 +360,27 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         for placeholder in Placeholder.objects.all():
             for language, __ in settings.LANGUAGES:
                 order = CMSPlugin.objects.filter(
-                        placeholder_id=placeholder.pk, language=language,
-                        parent_id__isnull=True
-                    ).order_by('position', 'path').values_list('pk', flat=True)
+                    placeholder_id=placeholder.pk,
+                    language=language,
+                    parent_id__isnull=True
+                ).order_by(
+                    'position', 'path'
+                ).values_list(
+                    'pk', flat=True
+                )
                 reorder_plugins(placeholder, None, language, order)
 
                 for plugin in CMSPlugin.objects.filter(
-                        placeholder_id=placeholder.pk,
-                        language=language).order_by('depth', 'path'):
+                    placeholder_id=placeholder.pk, language=language
+                ).order_by('depth', 'path'):
+
                     order = CMSPlugin.objects.filter(
-                            parent_id=plugin.pk
-                        ).order_by('position', 'path').values_list('pk', flat=True)
+                        parent_id=plugin.pk
+                    ).order_by(
+                        'position', 'path'
+                    ).values_list(
+                        'pk', flat=True
+                    )
                     reorder_plugins(placeholder, plugin.pk, language, order)
 
     def post_copy(self, old_instance, new_old_ziplist):
@@ -410,23 +419,35 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         breadcrumb = []
         for parent in self.get_ancestors():
             try:
-                url = force_text(
-                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
-                                  args=[parent.pk]))
+                url = force_str(
+                    admin_reverse(
+                        "%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                        args=[parent.pk]
+                    )
+                )
             except NoReverseMatch:
-                url = force_text(
-                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
-                                  args=[parent.pk]))
-            breadcrumb.append({'title': force_text(parent.get_plugin_name()), 'url': url})
+                url = force_str(
+                    admin_reverse(
+                        "%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                        args=[parent.pk]
+                    )
+                )
+            breadcrumb.append({'title': force_str(parent.get_plugin_name()), 'url': url})
         try:
-            url = force_text(
-                admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
-                              args=[self.pk]))
+            url = force_str(
+                admin_reverse(
+                    "%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                    args=[self.pk]
+                )
+            )
         except NoReverseMatch:
-            url = force_text(
-                admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
-                              args=[self.pk]))
-        breadcrumb.append({'title': force_text(self.get_plugin_name()), 'url': url})
+            url = force_str(
+                admin_reverse(
+                    "%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                    args=[self.pk]
+                )
+            )
+        breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
         return breadcrumb
 
     def get_breadcrumb_json(self):

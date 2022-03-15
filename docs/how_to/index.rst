@@ -27,6 +27,7 @@ Using core functionality
 
     Use placeholders outside the CMS <placeholders>
     Serve multiple languages <languages>
+    Create a multi-site set-up <multi-site>
     Work with templates <templates>
     Manage caching <caching>
     Enable frontend editing for Page and Django models <frontend_models>

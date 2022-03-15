@@ -1,5 +1,5 @@
-from django.test.utils import override_settings
 from django.contrib.auth import get_user_model
+from django.test.utils import override_settings
 
 from cms.tests.test_menu_page_viewperm import ViewPermissionTests
 

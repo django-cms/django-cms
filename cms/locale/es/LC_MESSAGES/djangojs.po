@@ -3,14 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Edwin Caldon <edycop@gmail.com>, 2011
-# Ernesto Avilés, 2015
+# e4db27214f7e7544f2022c647b585925_bb0e321, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-10-28 10:46+0100\n"
+"POT-Creation-Date: 2021-05-19 21:14+0800\n"
 "PO-Revision-Date: 2018-01-11 16:38+0000\n"
 "Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
 "Language-Team: Spanish (http://www.transifex.com/divio/django-cms/language/es/)\n"

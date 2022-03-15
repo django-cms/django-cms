@@ -10,13 +10,13 @@ from django.http import HttpRequest
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.admin.pageadmin import PageAdmin
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
@@ -25,14 +25,16 @@ from cms.models.pagemodel import Page, PageType
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
-from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_MOVE,
-    URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD
-)
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
-from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
-from cms.utils.conf import get_cms_setting
+from cms.test_utils.testcases import (
+    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_ADVANCED_CHANGE,
+    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_MOVE, CMSTestCase,
+)
+from cms.test_utils.util.context_managers import (
+    LanguageOverride, UserLoginContext,
+)
 from cms.utils.compat.dj import installed_apps
+from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -192,8 +194,8 @@ class PageTest(PageTestBase):
         with the request language pointing to a language
         not configured for the current site
         """
-        from django.test import Client
         from django.contrib.auth import get_user_model
+        from django.test import Client
 
         client = Client()
         superuser = self.get_superuser()
@@ -550,7 +552,7 @@ class PageTest(PageTestBase):
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute changed_by %} changed "
                 "on {% page_attribute changed_date as page_change %}"
-                "{{ page_change|date:'Y-m-d\TH:i:s' }}"
+                "{{ page_change|date:'Y-m-d\TH:i:s' }}"  # noqa: W605
             )
             req = HttpRequest()
             page.save()
@@ -1053,15 +1055,15 @@ class PageTest(PageTestBase):
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
                 page.title_cache = {'en': Title(slug='test', page_title="test2", title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', page_title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', menu_title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2')}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()
@@ -1339,6 +1341,25 @@ class PageTest(PageTestBase):
         request._current_page_cache = mock_page
         page = get_page_from_request(request)
         self.assertEqual(page, mock_page)
+
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_set_overwrite_url_with_invalid_value(self):
+        # User cannot add reserved characters in the "overwrite_url" input.
+        superuser = self.get_superuser()
+        cms_page = create_page('page', 'nav_playground.html', 'en', published=True)
+        expected_error_message = "You entered an invalid URL"
+
+        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+
+        with self.login_user_context(superuser):
+            page_data = {
+                'overwrite_url': 'https://django-cms.org',
+                'template': cms_page.template,
+            }
+            response = self.client.post(endpoint, page_data)
+            self.assertContains(response, expected_error_message)
+
 
     @override_settings(CMS_PERMISSION=False)
     def test_set_overwrite_url(self):
@@ -1707,7 +1728,7 @@ class PageTest(PageTestBase):
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
                 parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
-                content = force_text(parsed)
+                content = force_str(parsed)
                 self.assertIn(u'(Shift-Klick für erweiterte Einstellungen)', content)
 
     def test_page_get_tree_endpoint_flat(self):
@@ -1729,7 +1750,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn(tree, content)
             self.assertNotIn('<li>\nBeta\n</li>', content)
 
@@ -1761,7 +1782,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn(tree, content)
 
     def test_page_changelist_search(self):
@@ -1777,7 +1798,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint, data={'q': 'alpha'})
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn('<li>\nAlpha\n</li>', content)
             self.assertNotIn('<li>\nHome\n</li>', content)
             self.assertNotIn('<li>\nBeta\n</li>', content)

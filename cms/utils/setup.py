@@ -9,7 +9,9 @@ def validate_dependencies():
     Check for installed apps, their versions and configuration options
     """
     if not app_is_installed('treebeard'):
-        raise ImproperlyConfigured('django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.')
+        raise ImproperlyConfigured(
+            'django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.'
+        )
 
 
 def validate_settings():
@@ -20,11 +22,13 @@ def validate_settings():
         django_backend = [x for x in settings.TEMPLATES
                           if x['BACKEND'] == 'django.template.backends.django.DjangoTemplates'][0]
     except IndexError:
-        raise ImproperlyConfigured("django CMS requires django.template.context_processors.request in "
-                                   "'django.template.backends.django.DjangoTemplates' context processors.")
+        raise ImproperlyConfigured(
+            "django CMS requires django.template.context_processors.request in "
+            "'django.template.backends.django.DjangoTemplates' context processors."
+        )
 
     context_processors = django_backend.get('OPTIONS', {}).get('context_processors', [])
-    if ('django.core.context_processors.request' not in context_processors and
+    if ('django.core.context_processors.request' not in context_processors and  # noqa: W504
             'django.template.context_processors.request' not in context_processors):
         raise ImproperlyConfigured("django CMS requires django.template.context_processors.request in "
                                    "'django.template.backends.django.DjangoTemplates' context processors.")

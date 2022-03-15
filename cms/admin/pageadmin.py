@@ -1,78 +1,66 @@
-from collections import namedtuple
 import copy
 import json
 import sys
 import uuid
-
+from collections import namedtuple
 
 import django
-from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
-from django.urls import re_path
 from django.contrib import admin, messages
-from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.admin.helpers import AdminForm
+from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import (ObjectDoesNotExist,
-                                    PermissionDenied, ValidationError)
-from django.db import router, transaction
-from django.db.models import Q, Prefetch
-from django.http import (
-    HttpResponseRedirect,
-    HttpResponse,
-    Http404,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
+from django.core.exceptions import (
+    ObjectDoesNotExist, PermissionDenied, ValidationError,
 )
-from django.shortcuts import render, get_object_or_404
+from django.db import router, transaction
+from django.db.models import Prefetch, Q
+from django.http import (
+    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+    HttpResponseRedirect, QueryDict,
+)
+from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.utils.encoding import force_text
-from django.utils.translation import gettext, gettext_lazy as _, get_language
+from django.urls import NoReverseMatch, re_path
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_str
+from django.utils.translation import get_language, gettext, gettext_lazy as _
 from django.views.decorators.http import require_POST
-from django.http import QueryDict
 
 from cms import operations
 from cms.admin.forms import (
-    AddPageForm,
-    AddPageTypeForm,
-    AdvancedSettingsForm,
-    ChangePageForm,
-    ChangeListForm,
-    CopyPageForm,
-    CopyPermissionForm,
-    DuplicatePageForm,
-    MovePageForm,
-    PagePermissionForm,
-    PublicationDatesForm,
+    AddPageForm, AddPageTypeForm, AdvancedSettingsForm, ChangeListForm,
+    ChangePageForm, CopyPageForm, CopyPermissionForm, DuplicatePageForm,
+    MovePageForm, PagePermissionForm, PublicationDatesForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
-    EmptyTitle, Page, PageType,
-    Title, CMSPlugin, PagePermission,
-    GlobalPagePermission, StaticPlaceholder,
+    CMSPlugin, EmptyTitle, GlobalPagePermission, Page, PagePermission,
+    PageType, StaticPlaceholder, Title,
 )
 from cms.plugin_pool import plugin_pool
-from cms.signals import pre_obj_operation, post_obj_operation
+from cms.signals import post_obj_operation, pre_obj_operation
 from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
-from cms.utils import permissions, get_current_site, get_language_from_request, copy_plugins
-from cms.utils import page_permissions
-from cms.utils.i18n import (
-    get_language_list,
-    get_language_tuple,
-    get_language_object,
-    get_site_language_from_request,
+from cms.utils import (
+    copy_plugins, get_current_site, get_language_from_request,
+    page_permissions, permissions,
 )
 from cms.utils.admin import jsonify_request
+from cms.utils.compat.response import get_response_headers
 from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import (
+    get_language_list, get_language_object, get_language_tuple,
+    get_site_language_from_request,
+)
 from cms.utils.urlutils import admin_reverse
 
 require_POST = method_decorator(require_POST)
@@ -173,7 +161,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
@@ -416,10 +406,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         response = super().change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)
-        if tab_language and response.status_code == 302 and response._headers['location'][1] == request.path_info:
-            location = response._headers['location']
-            response._headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+        response_headers = get_response_headers(response)
+        if tab_language and response.status_code == 302 and response_headers['location'][1] == request.path_info:
+            location = response_headers['location']
+            response_headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+
         return response
+
 
     @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
@@ -451,13 +444,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
                 raise PermissionDenied
-            obj_display = force_text(obj)
+            obj_display = force_str(obj)
             obj_id = obj.serializable_value(opts.pk.attname)
             self.log_deletion(request, obj, obj_display)
             self.delete_model(request, obj)
             return self.response_delete(request, obj_display, obj_id)
 
-        object_name = force_text(opts.verbose_name)
+        object_name = force_str(opts.verbose_name)
 
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": object_name}
@@ -476,8 +469,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             opts=opts,
             app_label=app_label,
             preserved_filters=self.get_preserved_filters(request),
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
+            is_popup=(
+                IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET
+            ),
             to_field=None,
         )
         context.update(extra_context or {})
@@ -617,7 +611,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
     def _get_404_exception(self, object_id):
         exception = Http404(_('%(name)s object with primary key %(key)r does not exist.') % {
-            'name': force_text(self.opts.verbose_name),
+            'name': force_str(self.opts.verbose_name),
             'key': escape(object_id),
         })
         return exception
@@ -811,7 +805,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             'changelist_form': changelist_form,
             'cms_current_site': site,
             'has_add_permission': self.has_add_permission(request),
-            'module_name': force_text(self.model._meta.verbose_name_plural),
+            'module_name': force_str(self.model._meta.verbose_name_plural),
             'admin': self,
             'tree': {
                 'site': site,
@@ -842,11 +836,11 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         to_template = request.POST.get("template", None)
 
         if to_template not in dict(get_cms_setting('TEMPLATES')):
-            return HttpResponseBadRequest(force_text(_("Template not valid")))
+            return HttpResponseBadRequest(force_str(_("Template not valid")))
 
         page.template = to_template
         page.save()
-        return HttpResponse(force_text(_("The template was successfully changed")))
+        return HttpResponse(force_str(_("The template was successfully changed")))
 
     @require_POST
     @transaction.atomic
@@ -888,7 +882,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         # Does the user have permissions to do this...?
         if not can_move_page or (target and not target.has_add_permission(user)):
-            message = force_text(_("Error! You don't have permissions "
+            message = force_str(_("Error! You don't have permissions "
                                    "to move this page. Please reload the page"))
             return jsonify_request(HttpResponseForbidden(message))
 
@@ -974,13 +968,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             raise self._get_404_exception(page_id)
 
         if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
-            return HttpResponseBadRequest(force_text(_("Language must be set to a supported language!")))
+            return HttpResponseBadRequest(force_str(_("Language must be set to a supported language!")))
 
         for placeholder in page.get_placeholders():
             plugins = list(
                 placeholder.get_plugins(language=source_language).order_by('path'))
             if not placeholder.has_add_plugins_permission(request.user, plugins):
-                return HttpResponseForbidden(force_text(_('You do not have permission to copy these plugins.')))
+                return HttpResponseForbidden(force_str(_('You do not have permission to copy these plugins.')))
             copy_plugins.copy_plugins_to(plugins, placeholder, target_language)
         return HttpResponse("ok")
 
@@ -1018,14 +1012,14 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             can_copy_page = page_permissions.user_can_add_page(user, site)
 
         if not can_copy_page:
-            message = force_text(_("Error! You don't have permissions to copy this page."))
+            message = force_str(_("Error! You don't have permissions to copy this page."))
             return jsonify_request(HttpResponseForbidden(message))
 
         page_languages = page.get_languages()
         site_languages = get_language_list(site_id=site.pk)
 
         if not any(lang in  page_languages for lang in site_languages):
-            message = force_text(_("Error! The page you're pasting is not "
+            message = force_str(_("Error! The page you're pasting is not "
                                    "translated in any of the languages configured by the target site."))
             return jsonify_request(HttpResponseBadRequest(message))
 
@@ -1041,7 +1035,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         page = self.get_object(request, object_id=page_id)
 
         if not self.has_revert_to_live_permission(request, language, obj=page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to revert this page.")))
+            return HttpResponseForbidden(force_str(_("You do not have permission to revert this page.")))
 
         if page is None:
             raise self._get_404_exception(page_id)
@@ -1084,7 +1078,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         page = self.get_object(request, object_id=page_id)
 
         if page and not self.has_publish_permission(request, obj=page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to publish this page")))
+            return HttpResponseForbidden(force_str(_("You do not have permission to publish this page")))
 
         if page:
             translation = page.get_title_obj(language, fallback=False)
@@ -1208,13 +1202,13 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         page = self.get_object(request, object_id=page_id)
 
         if not self.has_publish_permission(request, obj=page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to unpublish this page")))
+            return HttpResponseForbidden(force_str(_("You do not have permission to unpublish this page")))
 
         if page is None:
             raise self._get_404_exception(page_id)
 
         if not page.publisher_public_id:
-            return HttpResponseBadRequest(force_text(_("This page was never published")))
+            return HttpResponseBadRequest(force_str(_("This page was never published")))
 
         has_translation = page.publisher_public.title_set.filter(language=language).exists()
 
@@ -1260,7 +1254,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         )
 
         if not self.has_delete_translation_permission(request, language, page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to delete this page")))
+            return HttpResponseForbidden(force_str(_("You do not have permission to delete this page")))
 
         if page is None:
             raise self._get_404_exception(object_id)
@@ -1306,7 +1300,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             )
 
             message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': force_text(get_language_object(language)['name'])
+                'language': force_str(get_language_object(language)['name'])
             }
             self.log_change(request, translation, message)
             messages.success(request, message)
@@ -1334,7 +1328,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         context = {
             "title": _("Are you sure?"),
-            "object_name": force_text(titleopts.verbose_name),
+            "object_name": force_str(titleopts.verbose_name),
             "object": translation,
             "deleted_objects": deleted_objects,
             "perms_lacking": perms_needed,
@@ -1375,7 +1369,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         if not can_see_page:
             message = gettext('You don\'t have permissions to see page "%(title)s"')
-            message = message % {'title': force_text(page)}
+            message = message % {'title': force_str(page)}
             self.message_user(request, message, level=messages.ERROR)
             return HttpResponseRedirect(self.get_admin_url('changelist'))
 
@@ -1400,7 +1394,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         if not self.has_change_permission(request, obj=page):
             message = _("You do not have permission to change this page's in_navigation status")
-            return HttpResponseForbidden(force_text(message))
+            return HttpResponseForbidden(force_str(message))
 
         if page is None:
             raise self._get_404_exception(page_id)
@@ -1430,9 +1424,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 # get all root nodes
                 Q(node__depth=1)
                 # or children which were previously open
-                | Q(node__depth=2, node__in=open_nodes)
+                | Q(node__depth=2, node__in=open_nodes)  # noqa: W503
                 # or children of the open descendants
-                | Q(node__parent__in=open_nodes)
+                | Q(node__parent__in=open_nodes)  # noqa: W503
             )
         pages = pages.prefetch_related(
             Prefetch(
@@ -1541,8 +1535,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 # This is a test if the object url can be retrieved
                 # In case it can't, object it's not taken into account
                 try:
-                    force_text(obj.get_absolute_url())
-                except:
+                    force_str(obj.get_absolute_url())
+                except [AttributeError, NoReverseMatch, TypeError]:
                     obj = None
             else:
                 obj = None
@@ -1558,8 +1552,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                     except ctype.model_class().DoesNotExist:
                         obj = None
                     try:
-                        force_text(obj.get_absolute_url())
-                    except:
+                        force_str(obj.get_absolute_url())
+                    except:  # noqa: E722
                         obj = None
         if obj:
             if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode_active', False):
@@ -1576,7 +1570,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             else:
                 url = obj.get_absolute_url()
         if url:
-            return HttpResponse(force_text(url), content_type='text/plain')
+            return HttpResponse(force_str(url), content_type='text/plain')
         return HttpResponse('', content_type='text/plain')
 
     def edit_title_fields(self, request, page_id, language):
@@ -1587,7 +1581,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         )
 
         if not self.has_change_permission(request, obj=page):
-            return HttpResponseForbidden(force_text(_("You do not have permission to edit this page")))
+            return HttpResponseForbidden(force_str(_("You do not have permission to edit this page")))
 
         if page is None:
             raise self._get_404_exception(page_id)
@@ -1675,10 +1669,13 @@ class PageAdmin(BasePageAdmin):
         return queryset.exclude(is_page_type=True)
 
     def get_urls(self):
-        """Get the admin urls
+        """
+        Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^([0-9]+)/set-home/$', self.set_home),
@@ -1702,7 +1699,7 @@ class PageAdmin(BasePageAdmin):
             raise self._get_404_exception(object_id)
 
         if not page.is_potential_home():
-            return HttpResponseBadRequest(force_text(_("The page is not eligible to be home.")))
+            return HttpResponseBadRequest(force_str(_("The page is not eligible to be home.")))
 
         new_home_tree, old_home_tree = page.set_as_homepage(request.user)
 
@@ -1733,10 +1730,15 @@ class PageAdmin(BasePageAdmin):
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
             matching_published_pages = self.model.objects.published().public().filter(
-                Q(title_set__title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__path__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
+                Q(
+                    title_set__title__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__path__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__menu_title__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__page_title__icontains=query_term, title_set__language=language_code
+                )
             ).distinct()
 
             results = []
