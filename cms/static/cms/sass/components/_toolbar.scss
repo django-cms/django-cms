@@ -373,7 +373,8 @@
         text-decoration: underline;
     }
     strong {
-        color: lighten($color-primary, 10%);
+        color: $color-primary;
+        filter: brightness(1.1);
         font-weight: $messages-font-weight;
     }
     ul {
@@ -414,6 +415,7 @@
     a {
         @extend .cms-icon;
         @extend .cms-icon-logo;
+        color: $black;
         font-size: $toolbar-logo-height;
         line-height: $toolbar-height;
         height: $toolbar-height;
