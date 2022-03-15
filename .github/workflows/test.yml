@@ -17,7 +17,7 @@ jobs:
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
-          django-4.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -70,7 +70,7 @@ jobs:
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
-          django-4.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -122,7 +122,7 @@ jobs:
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
-          django-4.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
