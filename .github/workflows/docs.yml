@@ -3,7 +3,7 @@ name: Docs
 on: [push, pull_request]
 
 concurrency:
-  group: ${{ github.head_ref || github.run_id }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
