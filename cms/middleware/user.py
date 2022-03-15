@@ -7,6 +7,24 @@ from django.utils.deprecation import MiddlewareMixin
 
 
 class CurrentUserMiddleware(MiddlewareMixin):
+    def __init__(self, get_response=None):
+        self.get_response = get_response
+        # One-time configuration and initialization.
+
+    def __call__(self, request):
+        # Code to be executed for each request before
+        # the view (and later middleware) are called.
+        from cms.utils.permissions import set_current_user
+
+        set_current_user(getattr(request, 'user', None))
+
+        response = self.get_response(request)
+
+        # Code to be executed for each request/response after
+        # the view is called.
+
+        return response
+
     def process_request(self, request):
         from cms.utils.permissions import set_current_user
 
