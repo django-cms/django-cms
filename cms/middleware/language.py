@@ -4,7 +4,12 @@ from django.utils.translation import get_language
 
 
 class LanguageCookieMiddleware(MiddlewareMixin):
-    def process_response(self, request, response):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+
+    def __call__(self, request):
+        response = self.get_response(request)
         language = get_language()
         if settings.LANGUAGE_COOKIE_NAME in request.COOKIES and \
                         request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == language:
