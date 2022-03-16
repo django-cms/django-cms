@@ -1,5 +1,6 @@
 
 from urllib.parse import quote
+
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login

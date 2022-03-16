@@ -1,8 +1,8 @@
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import lru_cache, wraps
-from asgiref.local import Local
 
+from asgiref.local import Local
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q

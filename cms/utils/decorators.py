@@ -1,6 +1,7 @@
+from urllib.parse import quote
+
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
-from urllib.parse import quote
 
 from cms.page_rendering import _handle_no_page
 from cms.utils import get_current_site

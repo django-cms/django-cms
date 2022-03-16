@@ -6,11 +6,11 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils.timezone import now
-from django.http import HttpResponse
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from mock import patch
 from sekizai.context import SekizaiContext

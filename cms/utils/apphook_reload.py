@@ -2,8 +2,8 @@ import logging
 import sys
 import uuid
 from importlib import reload
-from asgiref.local import Local
 
+from asgiref.local import Local
 from django.conf import settings
 from django.urls import clear_url_caches
 

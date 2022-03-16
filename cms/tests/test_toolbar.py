@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
 from django.template import RequestContext
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
@@ -18,7 +19,6 @@ from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
-from django.http import HttpResponse
 
 from cms.admin.forms import RequestToolbarForm
 from cms.api import add_plugin, create_page, create_title
