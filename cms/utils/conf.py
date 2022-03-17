@@ -57,6 +57,7 @@ DEFAULTS = {
     'PAGE_MEDIA_PATH': 'cms_page_media/',
     'TITLE_CHARACTER': '+',
     'PAGE_CACHE': True,
+    'INVALIDATE_PAGE_CACHE_ON_STARTUP': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
     'CACHE_PREFIX': 'cms_{}_'.format(__version__),
