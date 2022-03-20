@@ -8,6 +8,7 @@ from django.contrib import admin
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
 from django.template import RequestContext
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
@@ -83,8 +84,7 @@ class ToolbarTestBase(CMSTestCase):
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
-        mid = ToolbarMiddleware()
-        mid.process_request(request)
+        ToolbarMiddleware(lambda req: HttpResponse()).__call__(request)
         if hasattr(request,'toolbar'):
             request.toolbar.populate()
         return request

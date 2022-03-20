@@ -47,7 +47,7 @@ def real_ip(request):
 
     Should handle Nginx and some other WSGI servers.
     """
-    return request.META.get('HTTP_X_REAL_IP')
+    return request.headers.get('X-Real-Ip')
 
 
 def remote_addr_ip(request):
@@ -67,7 +67,7 @@ def x_forwarded_ip(request):
 
     Should handle properly configured proxy servers.
     """
-    ip_address_list = request.META.get('HTTP_X_FORWARDED_FOR')
+    ip_address_list = request.headers.get('X-Forwarded-For')
     if ip_address_list:
         ip_address_list = ip_address_list.split(',')
         return ip_address_list[0]
