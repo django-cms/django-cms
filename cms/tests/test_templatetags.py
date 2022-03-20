@@ -6,6 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.html import escape
@@ -142,8 +143,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         user = self._create_user("admin", True, True)
         request.current_page = control
         request.user = user
-        middleware = ToolbarMiddleware()
-        middleware.process_request(request)
+        ToolbarMiddleware(lambda req: HttpResponse()).__call__(request)
         page = _get_page_by_untyped_arg(control.pk, request, 1)
         self.assertEqual(page, control.publisher_draft)
 
