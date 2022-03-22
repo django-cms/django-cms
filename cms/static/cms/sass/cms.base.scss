@@ -33,6 +33,8 @@ div.cms {
     @import "components/pluginpicker";
     @import "components/shortcuts";
 
+    color-scheme: light dark;
+
     *:not(.cms-modal):focus {
         outline: 2px dotted $gray-darker;
         outline-offset: -3px;

@@ -69,7 +69,7 @@
         color: $dropdown-link-color;
         &.cms-btn-action,
         &.cms-btn-caution {
-            color: white;
+            color: $white;
         }
         white-space: nowrap; // prevent links from randomly breaking onto new lines
     }
@@ -197,7 +197,7 @@
             text-align: left !important;
             &.cms-btn-action,
             &.cms-btn-caution {
-                color: white;
+                color: $white;
             }
             &:first-child {
                 border-right: none !important;
@@ -217,8 +217,7 @@
 .cms-btn-group {
     > .cms-btn {
         &.cms-btn-action:last-child {
-            border-left: 1px solid darken($color-primary, 10%);
-
+            border-left: 1px solid darken($color-primary-fallback, 10%);
         }
         &.cms-btn-caution:last-child {
             border-left: 1px solid darken($color-danger, 10%);

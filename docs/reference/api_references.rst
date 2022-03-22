@@ -301,42 +301,39 @@ cms.app_base
 
     .. method:: get_menus(page, language, **kwargs)
 
-        .. versionadded:: 3.3
-            ``CMSApp.get_menus`` accepts page, language and generic keyword arguments:
-            you can customize this function to return different list of menu classes
-            according to the given arguments.
+        ``CMSApp.get_menus`` accepts page, language and generic keyword arguments:
+        you can customize this function to return different list of menu classes
+        according to the given arguments.
 
-            Returns the menus for the apphook instance, selected according
-            to the given arguments.
+        Returns the menus for the apphook instance, selected according
+        to the given arguments.
 
-            By default it returns the menus assigned to :attr:`_menus`
+        By default it returns the menus assigned to :attr:`_menus`
 
-            If no page and language are provided, this method **must** return all the
-            menus used by this apphook. Example::
+        If no page and language are provided, this method **must** return all the
+        menus used by this apphook. Example::
 
-                if page and page.reverse_id == 'page1':
-                    return [Menu1]
-                elif page and page.reverse_id == 'page2':
-                    return [Menu2]
-                else:
-                    return [Menu1, Menu2]
+            if page and page.reverse_id == 'page1':
+                return [Menu1]
+            elif page and page.reverse_id == 'page2':
+                return [Menu2]
+            else:
+                return [Menu1, Menu2]
 
-            :param page: page the apphook is attached to
-            :param language: current site language
-            :return: list of menu classes
+        :param page: page the apphook is attached to
+        :param language: current site language
+        :return: list of menu classes
 
     .. method:: get_urls(page, language, **kwargs)
 
-            .. versionadded:: 3.3
+        Returns the URL configurations for the apphook instance, selected
+        according to the given arguments.
 
-            Returns the URL configurations for the apphook instance, selected
-            according to the given arguments.
+        By default it returns the urls assigned to :attr:`_urls`
 
-            By default it returns the urls assigned to :attr:`_urls`
+        This method **must** return a non empty list of URL configurations,
+        even if no arguments are passed.
 
-            This method **must** return a non empty list of URL configurations,
-            even if no arguments are passed.
-
-            :param page: page the apphook is attached to
-            :param language: current site language
-            :return: list of strings representing URL configurations
+        :param page: page the apphook is attached to
+        :param language: current site language
+        :return: list of strings representing URL configurations

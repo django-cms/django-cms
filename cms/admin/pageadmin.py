@@ -1173,7 +1173,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         if 'redirect' in request.GET:
             return HttpResponseRedirect(request.GET['redirect'])
-        referrer = request.META.get('HTTP_REFERER', '')
+        referrer = request.headers.get('Referer', '')
 
         path = admin_reverse("cms_page_changelist")
         if request.GET.get('redirect_language'):
