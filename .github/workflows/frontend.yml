@@ -20,11 +20,3 @@ jobs:
     - run: |
           gulp unitTest
           gulp lint
-          gulp bundle
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v3
-      with:
-        name: CSS and JS
-        path: |
-          cms/static/cms/js/dist
-          cms/static/cms/css
