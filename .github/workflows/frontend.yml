@@ -21,4 +21,4 @@ jobs:
           gulp tests:unit
           gulp lint
           gulp bundle
-        
+

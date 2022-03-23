@@ -725,7 +725,7 @@ var Toolbar = new Class({
         const diff = dd.diff(this.ui.toolbar[0], newToolbar[0]);
 
         dd.apply(this.ui.toolbar[0], diff);
-
+        console.log('XXX', $('.cms-toolbar-item-cms-mode-switcher'), switcher);
         $('.cms-toolbar-item-cms-mode-switcher').replaceWith(switcher);
 
         this._setupUI();
