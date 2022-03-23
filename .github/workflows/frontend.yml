@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        node-version: [6.x]
+        node-version: [6.x 10.x]
 
     steps:
     - uses: actions/checkout@v2
@@ -21,4 +21,10 @@ jobs:
           gulp tests:unit
           gulp lint
           gulp bundle
-
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: CSS and JS
+        path: |
+          cms/static/cms/js/dist
+          cms/static/cms/css
