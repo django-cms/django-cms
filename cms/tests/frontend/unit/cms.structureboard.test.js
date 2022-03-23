@@ -2125,7 +2125,9 @@ describe('CMS.StructureBoard', function() {
 
             expect($.ajax).toHaveBeenCalledWith({
                 url: jasmine.stringMatching(
-                    /TOOLBAR_URL\?obj_id=100&amp;obj_type=cms.page&amp;cms_path=%2Fstructure*/
+                    /TOOLBAR_URL\?&obj_id=100&obj_type=cms.page&cms_path=%2Fstructure*/
+                    /* the first & qualifies that in the test there are no placeholder parameters
+                    * which would appear before the obj_id */
                 )
             });
         });
