@@ -1070,12 +1070,13 @@ class StructureBoard {
         const placeholderIds = getPlaceholderIds(CMS._plugins).map(id => `placeholders[]=${id}`).join('&');
 
         return $.ajax({
-            url: Helpers.updateUrlWithPath(
+            url: (
                 `${CMS.config.request.toolbar}?` +
                     placeholderIds +
                     '&' +
-                    `obj_id=${CMS.config.request.pk}&` +
-                    `obj_type=${encodeURIComponent(CMS.config.request.model)}`
+                    $.param(
+                        {obj_id: CMS.config.request.pk, obj_type: CMS.config.request.model}
+                    )
             )
         });
     }
