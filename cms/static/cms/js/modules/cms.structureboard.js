@@ -1004,13 +1004,11 @@ class StructureBoard {
                 this.updateContent();
                 return;  // Toolbar loaded
             }
-        } else {
-            // invalidate the content mode
-            if (action !== 'COPY') {
-                this._requestcontent = null;
-                this.updateContent();
-                return;  // Toolbar loaded
-            }
+        } else if (action !== 'COPY') {
+            this._requestcontent = null;
+            this.updateContent();
+            return;  // Toolbar loaded
+
         }
         this._loadToolbar()
             .done(newToolbar => {
