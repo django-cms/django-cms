@@ -1075,8 +1075,11 @@ class StructureBoard {
                     placeholderIds +
                     '&' +
                     $.param(
-                        {obj_id: CMS.config.request.pk, obj_type: CMS.config.request.model,
-                        cms_path: window.location.pathname + window.location.search}
+                        {
+                            obj_id: CMS.config.request.pk,
+                            obj_type: CMS.config.request.model,
+                            cms_path: window.location.pathname + window.location.search
+                        }
                     )
             )
         });
