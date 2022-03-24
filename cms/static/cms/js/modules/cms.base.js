@@ -299,12 +299,7 @@ export const Helpers = {
         });
 
         return newUrl
-            .toString()
-            .split('#')
-            .map((part, i) => {
-                return i === 0 ? part.replace(/&/g, '&amp;') : part;
-            })
-            .join('#');
+            .toString();
     },
 
     /**
