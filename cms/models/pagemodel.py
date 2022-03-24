@@ -122,9 +122,10 @@ class TreeNode(MP_Node):
 
     def _set_hierarchy(self, nodes, ancestors=None):
         if self.is_branch:
-            self._descendants = [node for node in nodes
-                           if node.path.startswith(self.path)
-                           and node.depth > self.depth]
+            self._descendants = [
+                node for node in nodes
+                if node.path.startswith(self.path) and node.depth > self.depth
+            ]
         else:
             self._descendants = []
 

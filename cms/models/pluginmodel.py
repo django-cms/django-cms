@@ -69,8 +69,7 @@ def plugin_supports_cte():
     connection = _get_database_connection('write')
     db_vendor = _get_database_vendor('write')
     sqlite_no_cte = (
-        db_vendor == 'sqlite'
-        and connection.Database.sqlite_version_info < (3, 8, 3)
+        db_vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 8, 3)
     )
 
     if sqlite_no_cte:

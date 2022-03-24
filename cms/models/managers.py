@@ -56,8 +56,7 @@ class PageManager(models.Manager):
         for plugin in plugins:
             cmsplugin = plugin.model
             if not (
-                hasattr(cmsplugin, 'search_fields') and
-                hasattr(cmsplugin, 'cmsplugin_ptr')
+                hasattr(cmsplugin, 'search_fields') and hasattr(cmsplugin, 'cmsplugin_ptr')
             ):
                 continue
             field = cmsplugin.cmsplugin_ptr.field
@@ -216,7 +215,8 @@ class PagePermissionManager(BasicPagePermissionManager):
         return queryset.filter(functools.reduce(operator.or_, queries)).exists()
 
     def subordinate_to_user(self, user, site):
-        """Get all page permission objects on which user/group is lover in
+        """
+        Get all page permission objects on which user/group is lover in
         hierarchy then given user and given user can change permissions on them.
 
         !IMPORTANT, but exclude objects with given user, or any group containing
@@ -308,16 +308,15 @@ class PagePermissionManager(BasicPagePermissionManager):
 
         # Ancestors
         query = (
-            Q(page__node__path__in=paths)
-            & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
+            Q(page__node__path__in=paths) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
         )
 
         if page.parent_page:
             # Direct parent
             query |= (
-                Q(page=page.parent_page)
-                & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
+                Q(page=page.parent_page) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
             )
-        query |= Q(page=page) & (Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) |
-                                  Q(grant_on=ACCESS_PAGE))
+        query |= Q(page=page) & (
+            Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) | Q(grant_on=ACCESS_PAGE)
+        )
         return self.filter(query).order_by('page__node__depth')
