@@ -98,7 +98,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     module = _("Generic")  # To be overridden in child classes
 
     form = None
-    change_form_template = "admin/cms/page/plugin/change_form.html"
+    change_form_template = 'admin/cms/page/plugin/change_form.html'
+    plugin_confirm_template = 'admin/cms/page/plugin/confirm_form.html'
     # Should the plugin be rendered in the admin?
     admin_preview = False
 
@@ -295,7 +296,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         if extra_context:
             context.update(extra_context)
         return render_to_response(
-            request, 'admin/cms/page/plugin/confirm_form.html', context
+            request, self.plugin_confirm_template, context
         )
 
     def save_model(self, request, obj, form, change):

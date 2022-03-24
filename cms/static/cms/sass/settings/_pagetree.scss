@@ -2,7 +2,7 @@
 // SETTINGS
 
 $pagetree-mobile: $screen-mobile + 200px;
-$pagetree-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+$pagetree-box-shadow: 0 0 5px 0 rgba(var(--dca-shadow), 0.2);
 $pagetree-border: 1px solid $gray-lighter;
 
 // top header area

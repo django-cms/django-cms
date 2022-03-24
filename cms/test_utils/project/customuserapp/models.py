@@ -1,4 +1,5 @@
 import re
+from urllib.parse import quote
 
 from django.contrib.auth.models import (
     AbstractBaseUser, PermissionsMixin, UserManager,
@@ -7,7 +8,6 @@ from django.core import validators
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
-from django.utils.http import urlquote
 from django.utils.translation import gettext_lazy as _
 
 
@@ -70,7 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('users')
 
     def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.username)
+        return "/users/%s/" % quote(self.username)
 
     def get_full_name(self):
         """
