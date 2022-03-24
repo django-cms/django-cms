@@ -200,6 +200,18 @@ class ToolbarTests(ToolbarTestBase):
                 },
             )
             self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, "Edit")
+
+            response = self.client.get(
+                endpoint,
+                data={
+                    'obj_id': page_content.pk,
+                    'obj_type': 'cms.pagecontent',
+                    'cms_path': get_object_edit_url(page_content)+"q"  # Invalid
+                },
+            )
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(response, "Edit")
 
             # Invalid app / model
             response = self.client.get(
