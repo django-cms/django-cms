@@ -1,8 +1,8 @@
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import lru_cache, wraps
-from threading import local
 
+from asgiref.local import Local
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Group
 from django.db.models import Q
@@ -15,7 +15,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
 
 # thread local support
-_thread_locals = local()
+_thread_locals = Local()
 
 
 def set_current_user(user):
