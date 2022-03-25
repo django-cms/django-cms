@@ -950,7 +950,7 @@ If the toolbar is visible the page is not cached as well.
 ..  setting:: CMS_PLACEHOLDER_CACHE
 
 CMS_INVALIDATE_PAGE_CACHE_ON_STARTUP
-==============
+====================================
 
 default
     ``True``
