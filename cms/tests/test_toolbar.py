@@ -200,7 +200,7 @@ class ToolbarTests(ToolbarTestBase):
                 },
             )
             self.assertEqual(response.status_code, 200)
-            self.assertNotContains(response, "Edit")
+            self.assertContains(response, "Clipboard")
 
             response = self.client.get(
                 endpoint,
@@ -211,7 +211,7 @@ class ToolbarTests(ToolbarTestBase):
                 },
             )
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, "Edit")
+            self.assertNotContains(response, "Clipboard")  # No clipboard exposed to invalid cms_path
 
             # Invalid app / model
             response = self.client.get(
