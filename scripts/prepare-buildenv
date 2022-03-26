@@ -20,15 +20,14 @@ if [ ! -d cms ] ; then
     exit 1
 fi
 
+nvm_ver="$(cat .nvmrc)"
+
 cd cms
 
 load_nvm
 
-if ! nvm current | grep -q "^v6" ; then
-    status "installing Node 16 (as required)"
-    nvm install 16
-    nvm use 16
-fi
+nvm install "${nvm_ver}"
+nvm use "${nvm_ver}"
 
 status "- Installing required node packages"
 npm install --loglevel warn
