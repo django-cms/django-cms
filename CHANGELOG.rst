@@ -3,8 +3,8 @@ Changelog
 =========
 
 
-3.10.0rc2 (unpublished)
-=======================
+3.10.0 (2022-03-26)
+===================
 
 Highlights:
 -----------
@@ -33,12 +33,12 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 56 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 59 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Anatoliy (3 pull requests)
 * Angelo Dini (1 pull request)
 * Dmytro Litvinov (1 pull request)
-* Florian Delizy (7 pull requests)
+* Florian Delizy (10 pull requests)
 * Gabriel Andrade (1 pull request)
 * Halit Çelik (1 pull request)
 * Jean-Baptiste PENRATH (1 pull request)
