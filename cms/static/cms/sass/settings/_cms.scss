@@ -4,26 +4,64 @@
 $speed-base: 200ms;
 
 // COLORS
-$white: #fff;
-$black: #000;
+$white: var(--dca-white);
+$black: var(--dca-black);
+:root {
+    --active-brightness: 0.9;
+    --focus-brightness: 0.95;
+}
 
-$color-primary: #00bbff;
+:root {
+    --dca-white: #FFFFFF;
+    --dca-black: #000000;
+    --dca-shadow: 0, 0, 0;
+    --dca-primary: #00bbff;
+    --dca-gray: #666;
+    --dca-gray-lightest: #f2f2f2;
+    --dca-gray-lighter: #ddd;
+    --dca-gray-light: #999;
+    --dca-gray-darker: #454545;
+    --dca-gray-darkest: #333;
+    --dca-gray-super-lightest: #f7f7f7;
+}
+
+
+@media (prefers-color-scheme: dark) {
+   :root {
+       --dca-white: #2A2C2E;
+       --dca-black: #FFF;
+       --dca-primary: #58D1FC;
+       --dca-gray: #999; //$gray-light;
+       --dca-gray-lightest: #444; //$gray-darkest;
+       --dca-gray-lighter: #666; //$gray-darker;
+       --dca-gray-light: #888; // $gray-light;
+       --dca-gray-darker: #aaa; //$gray;
+       --dca-gray-darkest: #eee; // $gray-lighter;
+       --dca-gray-super-lightest: #333;
+    }
+}
+
+$color-primary: var(--dca-primary);
+$color-primary-fallback: #00bbff;
 $color-success: #693;
 $color-danger: #f00;
 $color-warning: #c93;
 
 // COLORS gray
-$gray:            lighten($black, 40%); // #666;
-$gray-lightest:   lighten($gray, 55%); // #f2f2f2
-$gray-lighter:    lighten($gray, 46.5%); // #ddd
-$gray-light:      lighten($gray, 20%); // #999
-$gray-darker:     darken($gray, 13%); // #454545
-$gray-darkest:    darken($gray, 20%); // #333
+$gray:            var(--dca-gray); // lighten(#000, 40%); // #666;
+$gray-lightest:   var(--dca-gray-lightest); //lighten($gray, 55%); // #f2f2f2
+$gray-lighter:    var(--dca-gray-lighter); //lighten($gray, 46.5%); // #ddd
+$gray-light:      var(--dca-gray-light); // // #999
+$gray-darker:     var(--dca-gray-darker); // // #454545
+$gray-darkest:    var(--dca-gray-darkest); // // #333
 
 // used in pagetree / filer headers
-$gray-super-lightest: #f7f7f7;
+$gray-super-lightest: var(--dca-gray-super-lightest); //;
 
-$gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba(lighten($gray-lightest, 1%), 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
+
+
+
+$gradient-toolbar: to bottom, rgba($gray-lightest, 0.97) 0%, rgba($gray-lightest, 0.97) 50%, rgba($gray-lightest, 0.95) 100%;
 $gradient-striped-light: 135deg, rgba($white, .1) 25%, transparent 25%, transparent 50%, rgba($white, .1) 50%, rgba($white, .1) 75%, transparent 75%, transparent;
 $gradient-striped-dark: 135deg, rgba($white, .8) 25%, transparent 25%, transparent 50%, rgba($white, .8) 50%, rgba($white, .8) 75%, transparent 75%, transparent;
 
@@ -125,9 +163,9 @@ $z-layers: (
 //##############################################################################
 // BUTTONS
 $btn-border-radius-base: $border-radius-base;
-$btn-active-shadow: inset 0 3px 5px rgba($black, 0.125);
+$btn-active-shadow: inset 0 3px 5px rgba(var(--dca-shadow), 0.125);
 
-$btn-default-color: #555;
+$btn-default-color: $gray;
 $btn-default-bgcolor: $white;
 $btn-default-border: $gray-lighter;
 
@@ -147,7 +185,7 @@ $btn-active-border: $gray-darkest;
 //##############################################################################
 // Structureboard
 $structure-max-width: 980px;
-$structure-bgcolor: #f0f0f0;
+$structure-bgcolor: $gray-super-lightest;
 
 $structure-dragbar-height: 44px;
 $structure-dragbar-color: $black;
@@ -176,13 +214,13 @@ $structure-dragitem-fullheight: $structure-dragitem-height + 2 * $structure-drag
 // Structureboard
 $submenu-icon-area-size: 36px;
 $submenu-icon-size: 16px;
-$submenu-icon-color: #555;
+$submenu-icon-color: $gray;
 $submenu-right: ($structure-dragarea-padding * 2 + $structure-dragitem-height - $submenu-icon-area-size) / 2;
 
 $submenu-item-font-size: $font-size-normal;
 $submenu-item-height: $line-height-normal + 6px;
 $submenu-item-padding-horizontal: $padding-large;
-$submenu-item-color: #555;
+$submenu-item-color: $gray;
 $submenu-item-hover-color: $white;
 
 $submenu-dropdown-bgcolor: $white;
@@ -207,7 +245,7 @@ $tooltip-second-line-color: $white;
 //##############################################################################
 // Toolbar
 $toolbar-height: 46px; // has to be even number
-$toolbar-shadow: 0 0 5px rgba($black, 0.2);
+$toolbar-shadow: 0 0 5px rgba(var(--dca-shadow), 0.2);
 $toolbar-left-space: 15px;
 $toolbar-border: $gray-lighter;
 
@@ -224,7 +262,7 @@ $toolbar-menu-item-hover-color: $white;
 $toolbar-menu-item-hover-bgcolor: $color-primary;
 
 $toolbar-dropdown-padding: 4px 0 3px;
-$toolbar-dropdown-shadow: 0 1px 1px rgba($black, 0.4);
+$toolbar-dropdown-shadow: 0 1px 1px rgba(var(--dca-shadow), 0.4);
 $toolbar-dropdown-bgcolor: $white;
 $toolbar-dropdown-border-radius: $border-radius-base + 1px;
 
@@ -242,7 +280,7 @@ $toolbar-button-border-radius: $border-radius-base;
 //##############################################################################
 // Modal
 $modal-header-title-font-size: $font-size-large;
-$modal-shadow: 0 0 20px rgba($black, .5);
+$modal-shadow: 0 0 20px rgba(var(--dca-shadow), .5);
 $modal-bgcolor: $white;
 $modal-border-radius: $border-radius-normal;
 
@@ -289,7 +327,7 @@ $login-form-input-color: $gray;
 $login-form-input-width: 100px;
 $login-form-input-height: 28px;
 $login-form-input-padding-horizontal: 5px;
-$login-form-input-border: lighten($gray, 45%);
+$login-form-input-border: $gray-lighter;
 $login-form-input-border-radius: $border-radius-base;
 
 $login-form-submit-color: $white;
@@ -305,22 +343,22 @@ $sideframe-button-area-size: 32px;
 $sideframe-button-icon-size: 12px;
 $sideframe-button-space: 2px;
 $sideframe-resize-width: 15px;
-$sideframe-box-shadow: 10px 0 5px -5px rgba(0, 0, 0, 0.2);
-$sideframe-dimmer: rgba(0, 0, 0, 0.6);
+$sideframe-box-shadow: 10px 0 5px -5px rgba(var(--dca-shadow), 0.2);
+$sideframe-dimmer: rgba(var(--dca-shadow), 0.6);
 
 
 //##############################################################################
 // Tooltip
 $hover-tooltip-width: 160px;
 $hover-tooltip-arrow-height: 6px;
-$hover-tooltip-bgcolor: rgba($black, 0.8);
+$hover-tooltip-bgcolor: $black;
 $hover-tooltip-padding: 6px 8px;
 
 
 //##############################################################################
 // Dropdown
 $dropdown-width: 180px;
-$dropdown-shadow: 0 0 10px rgba($black, 0.25);
+$dropdown-shadow: 0 0 10px rgba(var(--dca-shadow), 0.25);
 $dropdown-item-height: 46px;
 $dropdown-item-icon-space: 40px;
 $dropdown-item-icon-position: 14px;
