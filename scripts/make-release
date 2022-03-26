@@ -198,7 +198,7 @@ read -r
 
 status "- Bumping version to ${FULL_VERSION}"
 # bump the version
-sed -i __init__.py -e "s/__version__ = '.*'/__version__ = '$FULL_VERSION'/"
+sed -i -e "s/__version__ = '.*'/__version__ = 'test'/" __init__.py
 git commit __init__.py -m "${COMMIT_PREFIX}Bumped version to ${FULL_VERSION}"
 
 status "- Fetching strings from transifex"
@@ -267,8 +267,8 @@ fi
 if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
     status "Adding ${VERSION} to doc index"
     # note: the new line in the following command is not a mistake, it is needed for sed to process the command
-    sed -i docs/upgrade/index.rst -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
-}"
+    sed -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
+}" docs/upgrade/index.rst
 fi
 
 review CHANGELOG.rst
