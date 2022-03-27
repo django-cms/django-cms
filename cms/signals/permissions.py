@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.conf import settings
+
 from cms.cache.permissions import clear_user_permission_cache
 from cms.models import PageUser, PageUserGroup
 from menus.menu_pool import menu_pool
