@@ -465,6 +465,8 @@ class CMSToolbar(BaseToolbar):
 
         with force_language(self.toolbar_language):
             # needed to populate the context with sekizai content
+            if 'debug' not in context:
+                context['debug'] = settings.DEBUG
             render_to_string('cms/toolbar/toolbar_javascript.html', flatten_context(context))
 
         # render everything below the tag

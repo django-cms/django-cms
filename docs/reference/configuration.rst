@@ -949,6 +949,22 @@ If the toolbar is visible the page is not cached as well.
 
 ..  setting:: CMS_PLACEHOLDER_CACHE
 
+CMS_INVALIDATE_PAGE_CACHE_ON_STARTUP
+====================================
+
+default
+    ``True``
+
+Should the cache version be invalidated on startup?
+In a instance where you cannot access the cache in the init phase (for example,
+Google App Engine) or where you don't want to invalidate the page cache on the
+startup of a new instance (for example, with many instances scaling up and down
+rapidly), you may want to keep the page cache version in the cache rather than
+reset it on the start of every new instance.
+
+
+..  setting:: INVALIDATE_PAGE_CACHE_ON_STARTUP
+
 CMS_PLACEHOLDER_CACHE
 =====================
 
