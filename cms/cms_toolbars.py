@@ -50,12 +50,12 @@ TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 SHORTCUTS_BREAK = 'Shortcuts Break'
 
 DEFAULT_HELP_MENU_ITEMS = (
-    (gettext("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
-    (gettext("Documentation"), 'https://docs.django-cms.org/en/latest/'),
-    (gettext("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/'),
-    (gettext("Support Forum"), 'https://discourse.django-cms.org/'),
-    (gettext("Support Slack"), 'https://www.django-cms.org/slack'),
-    (gettext("What's new"), 'https://www.django-cms.org/en/blog/'),
+    (gettext("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html', True),
+    (gettext("Documentation"), 'https://docs.django-cms.org/en/latest/', True),
+    (gettext("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/', True),
+    (gettext("Support Forum"), 'https://discourse.django-cms.org/', True),
+    (gettext("Support Slack"), 'https://www.django-cms.org/slack', True),
+    (gettext("What's new"), 'https://www.django-cms.org/en/blog/', True),
 )
 
 
@@ -231,8 +231,8 @@ class BasicToolbar(CMSToolbar):
         if get_cms_setting('ENABLE_HELP'):
             self._help_menu = self.toolbar.get_or_create_menu(HELP_MENU_IDENTIFIER, _('Help'), position=-1)
             self._help_menu.items = []  # reset the items so we don't duplicate
-            for label, url in DEFAULT_HELP_MENU_ITEMS:
-                self._help_menu.add_link_item(label, url=url)
+            for label, url, external in DEFAULT_HELP_MENU_ITEMS:
+                self._help_menu.add_link_item(label, url=url, extra_classes=['js-external-link',])
 
             extra_menu_items = get_cms_setting('EXTRA_HELP_MENU_ITEMS')
             if extra_menu_items:

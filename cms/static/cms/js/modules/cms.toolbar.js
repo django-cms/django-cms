@@ -759,4 +759,13 @@ var Toolbar = new Class({
     }
 });
 
+    $(function(){
+    $(document).on("click",".js-external-link",function(e){
+        e.preventDefault();
+        var el = $(this);
+        var url = el.attr("href");
+        window.open(url);
+    });
+});
+
 export default Toolbar;
