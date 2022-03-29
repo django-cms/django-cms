@@ -11,7 +11,7 @@ from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
 )
 from django.http.request import QueryDict
-from django.urls import re_path, resolve, Resolver404
+from django.urls import Resolver404, re_path, resolve
 from django.utils.translation import override
 
 from cms.admin.forms import RequestToolbarForm
