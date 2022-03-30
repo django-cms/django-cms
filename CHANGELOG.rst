@@ -223,7 +223,7 @@ Thanks to all contributors for their efforts!
 * Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 * Improved documentation building
 * Updated the content for django CMS’s development community
-* Replaced all occurences of ``force_text`` and ``smart_text`` against
+* Replaced all occurrences of ``force_text`` and ``smart_text`` against
   ``force_str``and ``smart_str``.
 
 
@@ -761,7 +761,7 @@ Thanks to all contributors for their efforts!
 - Substantial improvements to the page tree and significant reduction of reloads
 - Update jsTree version to 3.2.1 with slight adaptions to the Pagetree
 - Documentation improvements
-- Improve the display and useability of the language menu, especially in cases
+- Improve the display and usability of the language menu, especially in cases
   where there are many languages.
 - Fix an issue relating to search fields in plugins
 - Fix an issue where the app-resolver would trigger locales into migrations
@@ -1075,7 +1075,7 @@ Thanks to all contributors for their efforts!
 - Improves redirection as a result of changes to page slugs, etc.
 - Improves performance of "watched models"
 - Improves frontend performance relating to resizing the sideframe
-- Corrects an issue where items might not be visible in structue mode menus
+- Corrects an issue where items might not be visible in structure mode menus
 - Limits version of django-mptt used in CMS for 3.0.x
 - Prevent accidental upgrades to Django 1.8, which is not yet supported
 
@@ -1132,7 +1132,7 @@ Thanks to all contributors for their efforts!
 ==================
 
 - Add require_parent option to CMS_PLACEHOLDER_CONF
-- Fix django-mptt version depenency to be PEP440 compatible
+- Fix django-mptt version dependency to be PEP440 compatible
 - Fix some Django 1.4 compatibility issues
 - Add toolbar sanity check
 - Fix behavior with CMSPluginBase.get_render_template()
@@ -1160,7 +1160,7 @@ Thanks to all contributors for their efforts!
 - Fixes PageField to work in Django 1.7 environments
 - Updates to community and project governance documentation
 - Added list of retired core developers
-- Added branch policy documentaion
+- Added branch policy documentation
 
 
 3.0.6 (2014-10-07)
@@ -1370,7 +1370,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - CMS_FRONTEND_LANGUAGES limits django languages as well during language selection
 - Wymeditor updated to 1.0.4a
 - icon_url escape fixed
-- Ukranian translation added
+- Ukrainian translation added
 - Fixed wrong language prefix handling for form actions and admin preview
 - Admin icons in django 1.4 fixed
 - Added requirements.txt for pip and testing in test_requirements
