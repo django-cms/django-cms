@@ -41,3 +41,7 @@ jobs:
         with:
           linters: isort
           run: isort --check --diff cms
+  codespell:
+    uses: codespell-project/actions-codespell@master
+    with:
+      check_filenames: true
