@@ -329,7 +329,7 @@ class CMSToolbar(BaseToolbar):
                 except (NoReverseMatch, AttributeError):
                     try:
                         return self.obj.get_absolute_url()
-                    except NoReverseMatch:
+                    except (NoReverseMatch, AttributeError):
                         pass
         return ''
 
