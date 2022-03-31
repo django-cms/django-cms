@@ -54,6 +54,3 @@ jobs:
       - run: python -m pip install codespell
       - name: codespell
         uses: codespell-project/actions-codespell@master
-        with:
-          linters: codespell
-          run: codespell docs
