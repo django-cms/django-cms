@@ -492,7 +492,7 @@ class CMSEditableObject(InclusionTag):
     def _get_editable_context(self, context, instance, language, edit_fields,
                               view_method, view_url, querystring, editmode=True):
         """
-        Populate the contex with the requested attributes to trigger the changeform
+        Populate the context with the requested attributes to trigger the changeform
         """
         request = context['request']
         if hasattr(request, 'toolbar'):
@@ -508,16 +508,16 @@ class CMSEditableObject(InclusionTag):
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = "%s %s list" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {} list".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = "%s %s" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {}".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(edit_fields) \
                                                         if not isinstance('edit_fields', str) else edit_fields
             else:
-                instance.get_plugin_name = "%s %s" % (smart_str(_('Add')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {}".format(smart_str(_('Add')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
             extra_context['generic'] = opts
@@ -535,12 +535,12 @@ class CMSEditableObject(InclusionTag):
                 # The default view_url is the default admin changeform for the
                 # current instance
                 if not editmode:
-                    view_url = 'admin:%s_%s_add' % (
+                    view_url = 'admin:{}_{}_add'.format(
                         opts.app_label, opts.model_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
                     if not view_url:
-                        view_url = 'admin:%s_%s_change' % (
+                        view_url = 'admin:{}_{}_change'.format(
                             opts.app_label, opts.model_name)
                     if isinstance(instance, Page):
                         url_base = reverse(view_url, args=(instance.pk, language))
@@ -548,7 +548,7 @@ class CMSEditableObject(InclusionTag):
                         url_base = reverse(view_url, args=(instance.pk,))
                 else:
                     if not view_url:
-                        view_url = 'admin:%s_%s_edit_field' % (
+                        view_url = 'admin:{}_{}_edit_field'.format(
                             opts.app_label, opts.model_name)
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
@@ -556,7 +556,7 @@ class CMSEditableObject(InclusionTag):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             if editmode:
-                extra_context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+                extra_context['edit_url'] = f"{url_base}?{urlencode(querystring)}"
             else:
                 extra_context['edit_url'] = "%s" % url_base
             extra_context['refresh_page'] = True
@@ -654,13 +654,13 @@ class CMSEditableObject(InclusionTag):
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
         if edit_fields == 'changelist':
-            view_url = 'admin:%s_%s_changelist' % (
+            view_url = 'admin:{}_{}_changelist'.format(
                 instance._meta.app_label, instance._meta.model_name)
         querystring = OrderedDict((('language', language),))
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")
         # If the toolbar is not enabled the following part is just skipped: it
-        # would cause a perfomance hit for no reason
+        # would cause a performance hit for no reason
         if self._is_editable(context.get('request', None)):
             extra_context.update(self._get_editable_context(
                 extra_context, instance, language, edit_fields, view_method,

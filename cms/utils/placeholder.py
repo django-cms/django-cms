@@ -51,7 +51,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
         # 1st level
         if template:
-            keys.append(u'%s %s' % (template, placeholder))
+            keys.append(f'{template} {placeholder}')
         # 2nd level
         keys.append(placeholder)
         # 3rd level
@@ -177,7 +177,7 @@ def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blo
 
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.
-        # This is important to avoid processing overriden block nodes.
+        # This is important to avoid processing overridden block nodes.
         ignore_blocks = []
 
     for node in nodelist:

@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -12,7 +13,6 @@ from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from mock import patch
 from sekizai.context import SekizaiContext
 
 import cms
@@ -262,7 +262,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
 
     def test_create_placeholder_if_not_exist_in_template(self):
         """
-        Tests that adding a new placeholder to a an exising page's template
+        Tests that adding a new placeholder to an existing page's template
         creates the placeholder.
         """
         page = create_page('Test', 'col_two.html', 'en')
