@@ -14,4 +14,4 @@ jobs:
       - run: pip install pre-commit
       - run: pre-commit --version
       - run: pre-commit install
-      - run: pre-commit run --all-files || true  # TODO: Remove `|| true` the codebase is ready
+      - run: pre-commit run --all-files || true  # TODO: Remove `|| true` when the codebase is ready
