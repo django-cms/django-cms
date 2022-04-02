@@ -54,7 +54,7 @@ The django CMS Core Addons are:
 * `django CMS Video <https://github.com/django-cms/djangocms-video>`_ - embed videos from YouTube, Vimeo
   and other services, or use uploaded videos (Filer-compatible)
 * `django CMS GoogleMap <http://github.com/django-cms/djangocms-googlemap>`_ - displays a map of an
-  address on your page. Supports addresses and co-ordinates. Zoom level and route planner options
+  address on your page. Supports addresses and coordinates. Zoom level and route planner options
   can also be set.
 
 We welcome feedback, documentation, patches and any other help to maintain and improve these
