@@ -1,7 +1,8 @@
-from cms.utils.compat import DJANGO_3_0
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
+
+from cms.utils.compat import DJANGO_3_0
 
 
 class LanguageCookieMiddleware(MiddlewareMixin):
