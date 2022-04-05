@@ -69,7 +69,7 @@ class PageManager(PublisherManager):
             if related_query_name and not related_query_name.startswith('+'):
                 for field in cmsplugin.search_fields:
                     qp |= Q(**{
-                        'placeholders__cmsplugin__{0}__{1}__icontains'.format(
+                        'placeholders__cmsplugin__{}__{}__icontains'.format(
                             related_query_name,
                             field,
                         ): q})

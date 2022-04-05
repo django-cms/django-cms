@@ -1,4 +1,3 @@
-
 import time
 
 from django.conf import settings
@@ -325,7 +324,7 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(FuzzyInt(14, 26)):
                 response = self.client.get(page1_url)
                 resp1 = response.content.decode('utf8').split("$$$")[1]
-            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])  # noqa
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
             cache_control1 = response['Cache-Control']
             expires1 = response['Expires']
 
@@ -507,7 +506,7 @@ class CacheTestCase(CMSTestCase):
 
             # Assert no cached content was used
             with self.assertNumQueries(FuzzyInt(1, 24)):
-                response = self.client.get('{}?edit'.format(page1_url))
+                response = self.client.get(f'{page1_url}?edit')
             self.assertEqual(response.status_code, 200)
 
     def test_invalidate_restart(self):
@@ -755,7 +754,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
     def test_get_placeholder_cache_key(self):
         version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en', 1)
-        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',
@@ -775,7 +774,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
         en_us_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_us_request)
         self.assertNotEqual(en_key, en_us_key)
 
-        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',

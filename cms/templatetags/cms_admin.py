@@ -129,7 +129,7 @@ def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
     EXTENSION = 'svg'
     return mark_safe(
-        '<img src="%sicon-%s.%s" alt="%s" />' % (
+        '<img src="{}icon-{}.{}" alt="{}" />'.format(
             CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), EXTENSION, value
         )
     )

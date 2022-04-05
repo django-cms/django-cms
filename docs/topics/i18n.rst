@@ -3,7 +3,7 @@ Internationalisation
 ####################
 
 django CMS excels in its multilingual support, and can be configured to handle a vast range of different requirements. Its
-behaviour is flexible and can be controlled at a granular level in :setting:`CMS_LANGUAGES`. Other :ref:`i18n_l10n_reference` settings offer further control.  
+behaviour is flexible and can be controlled at a granular level in :setting:`CMS_LANGUAGES`. Other :ref:`i18n_l10n_reference` settings offer further control.
 
 See :ref:`multilingual_support_how_to` on how to set up a multilingual django CMS project.
 

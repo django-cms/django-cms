@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # André Hendriks <andre.hendriks@deltares.nl>, 2011
 # Bert de Mranda <h.miranda@chello.nl>, 2014-2015

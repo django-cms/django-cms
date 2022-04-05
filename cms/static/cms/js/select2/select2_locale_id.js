@@ -1,6 +1,6 @@
 /**
  * Select2 Indonesian translation.
- * 
+ *
  * Author: Ibrahim Yusuf <ibrahim7usuf@gmail.com>
  */
 (function ($) {

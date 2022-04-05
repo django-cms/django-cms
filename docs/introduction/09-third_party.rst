@@ -60,7 +60,7 @@ sophisticated image cropping.
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     )
-    
+
     META_SITE_PROTOCOL = 'https'  # set 'http' for non ssl enabled websites
     META_USE_SITES = True
 

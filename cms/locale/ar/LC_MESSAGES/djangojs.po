@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Abdelkader Maarouf <dep2g2@gmail.com>, 2015
 # Ahmed H <info@draco-003.com>, 2013

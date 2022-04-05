@@ -1,6 +1,6 @@
 /**
  * Select2 Turkish translation.
- * 
+ *
  * Author: Salim KAYABAŞI <salim.kayabasi@gmail.com>
  */
 (function ($) {

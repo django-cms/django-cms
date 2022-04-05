@@ -650,11 +650,11 @@ class PatricksMoveTest(CMSTestCase):
         # check if urls are correct after move
         self.assertEqual(
             self.pg.publisher_public.get_absolute_url(),
-            u'%smaster/slave-home/pc/pg/' % self.get_pages_root()
+            '%smaster/slave-home/pc/pg/' % self.get_pages_root()
         )
         self.assertEqual(
             self.ph.publisher_public.get_absolute_url(),
-            u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root()
+            '%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root()
         )
 
 

@@ -1,4 +1,3 @@
-
 from django.conf import settings
 from django.contrib.auth.models import Group
 from django.db.models import signals

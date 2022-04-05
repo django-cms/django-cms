@@ -36,4 +36,4 @@ class TimedTestRunner(DjangoTestSuiteRunner):
                 reverse=True)[:10]
         print("Ten slowest tests:")
         for func_name, timing in by_time:
-            print("{t:.2f}s {f}".format(f=func_name, t=timing))
+            print(f"{timing:.2f}s {func_name}")

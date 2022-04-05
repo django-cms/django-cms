@@ -5,7 +5,7 @@ from cms.publisher.manager import PublisherManager
 
 class PageMetaClass(ModelBase):
     def __new__(cls, name, bases, attrs):
-        super_new = super(PageMetaClass, cls).__new__
+        super_new = super().__new__
 
         if 'objects' in attrs:
             if not isinstance(attrs['objects'], PublisherManager):

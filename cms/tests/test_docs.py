@@ -18,7 +18,7 @@ from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
 
 ROOT_DIR = os.path.dirname(cms.__file__)
-DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, u'..', u'docs'))
+DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, '..', 'docs'))
 
 
 def has_no_internet():
@@ -27,7 +27,7 @@ def has_no_internet():
         s.settimeout(5)
         s.connect(('4.4.4.2', 80))
         s.send(b"hello")
-    except socket.error:  # no internet
+    except OSError:  # no internet
         return True
     return False
 

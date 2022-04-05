@@ -1,6 +1,6 @@
 /**
  * Select2 Greek translation.
- * 
+ *
  * @author  Uriy Efremochkin <efremochkin@uriy.me>
  */
 (function ($) {

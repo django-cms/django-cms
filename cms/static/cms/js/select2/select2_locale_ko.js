@@ -1,6 +1,6 @@
 /**
  * Select2 Korean translation.
- * 
+ *
  * @author  Swen Mun <longfinfunnel@gmail.com>
  */
 (function ($) {

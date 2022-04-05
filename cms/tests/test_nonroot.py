@@ -80,5 +80,5 @@ class NonRootCase(CMSTestCase):
         with force_language("en"):
             pages_root = self.get_pages_root()
             link = preview_link(self.page2,language=language)
-        self.assertEqual(link,'%s%s/' % (pages_root,self.page2.get_slug()))
+        self.assertEqual(link,f'{pages_root}{self.page2.get_slug()}/')
         self.assertEqual(link,'/en/content/page2/')

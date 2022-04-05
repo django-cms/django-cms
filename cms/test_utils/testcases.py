@@ -298,7 +298,7 @@ class BaseCMSTestCase:
         """
         for page in qs.order_by('path'):
             ident = "  " * page.level
-            print("%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
+            print("{}{} ({}), path: {}, depth: {}, numchild: {}".format(ident, page,
             page.pk, page.path, page.depth, page.numchild))
 
     def print_node_structure(self, nodes, *extra):
@@ -307,7 +307,7 @@ class BaseCMSTestCase:
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print("%s%s: %s" % (ident, node.title, attrs))
+                print(f"{ident}{node.title}: {attrs}")
                 _rec(node.children, level + 1)
 
         _rec(nodes)
@@ -486,7 +486,7 @@ class BaseCMSTestCase:
 
     def get_admin_url(self, model, action, *args):
         opts = model._meta
-        url_name = "{}_{}_{}".format(opts.app_label, opts.model_name, action)
+        url_name = f"{opts.app_label}_{opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_permissions_test_page(self):
@@ -517,7 +517,7 @@ class BaseCMSTestCase:
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = placeholder.get_add_url()
         data = {
@@ -538,7 +538,7 @@ class BaseCMSTestCase:
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'edit_plugin', plugin.pk)
         endpoint += '?' + urlencode({'cms_path': path})
@@ -551,7 +551,7 @@ class BaseCMSTestCase:
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'move_plugin')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -564,7 +564,7 @@ class BaseCMSTestCase:
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -577,7 +577,7 @@ class BaseCMSTestCase:
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -590,7 +590,7 @@ class BaseCMSTestCase:
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'delete_plugin', plugin.pk)
         endpoint += '?' + urlencode({'cms_path': path})
@@ -603,7 +603,7 @@ class BaseCMSTestCase:
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(
             container,

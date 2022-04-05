@@ -22,7 +22,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
     they're not given.
     """
     def __new__(cls, name, bases, attrs):
-        super_new = super(CMSPluginBaseMetaclass, cls).__new__
+        super_new = super().__new__
         parents = [base for base in bases if isinstance(base, CMSPluginBaseMetaclass)]
         if not parents:
             # If this is CMSPluginBase itself, and not a subclass, don't do anything
@@ -378,7 +378,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (force_str(self.name), force_str(instance))
+        return f"{force_str(self.name)} - {force_str(instance)}"
 
     def get_fieldsets(self, request, obj=None):
         """

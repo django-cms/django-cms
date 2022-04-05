@@ -14,7 +14,7 @@ if [ ! -d cms ] || [ ! -d .git ] || [ ! -f setup.py ] ; then
 fi
 
 if ! command -v twine >/dev/null ; then
-    grep -v django-cms docs/requirements.txt | xargs pip install --quiet twine 
+    grep -v django-cms docs/requirements.txt | xargs pip install --quiet twine
     check_command_exists twine
 fi
 

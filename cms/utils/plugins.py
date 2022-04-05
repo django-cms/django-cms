@@ -72,7 +72,7 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     plugins = downcast_plugins(plugins, non_fallback_phs, request=request)
     # split the plugins up by placeholder
     # Plugins should still be sorted by placeholder
-    plugin_groups = dict((key, list(plugins)) for key, plugins in groupby(plugins, attrgetter('placeholder_id')))
+    plugin_groups = {key: list(plugins) for key, plugins in groupby(plugins, attrgetter('placeholder_id'))}
     all_plugins_groups = plugin_groups.copy()
     for group in plugin_groups:
         plugin_groups[group] = build_plugin_tree(plugin_groups[group])

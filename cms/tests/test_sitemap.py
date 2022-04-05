@@ -93,9 +93,9 @@ class SitemapTestCase(CMSTestCase):
         urlset = sitemap.get_urls()
         for item in urlset:
             if item['item'].path:
-                url = 'http://example.com/%s/%s/' % (item['item'].language, item['item'].path)
+                url = 'http://example.com/{}/{}/'.format(item['item'].language, item['item'].path)
             else:
-                url = 'http://example.com/%s/%s' % (item['item'].language, item['item'].path)
+                url = 'http://example.com/{}/{}'.format(item['item'].language, item['item'].path)
             self.assertEqual(item['location'], url)
 
     def test_sitemap_published_titles(self):
@@ -110,9 +110,9 @@ class SitemapTestCase(CMSTestCase):
         for title in Title.objects.public():
             page = title.page.get_public_object()
             if title.path:
-                url = 'http://example.com/%s/%s/' % (title.language, title.path)
+                url = f'http://example.com/{title.language}/{title.path}/'
             else:
-                url = 'http://example.com/%s/%s' % (title.language, title.path)
+                url = f'http://example.com/{title.language}/{title.path}'
             if page.is_published('en') and not page.publisher_is_draft:
                 self.assertTrue(url in locations)
             else:
@@ -142,9 +142,9 @@ class SitemapTestCase(CMSTestCase):
         for path in unpublished_titles:
             title = Title.objects.get(path=path)
             if title.path:
-                url = 'http://example.com/%s/%s/' % (title.language, title.path)
+                url = f'http://example.com/{title.language}/{title.path}/'
             else:
-                url = 'http://example.com/%s/%s' % (title.language, title.path)
+                url = f'http://example.com/{title.language}/{title.path}'
             self.assertFalse(url in locations)
 
     def test_sitemap_uses_public_languages_only(self):

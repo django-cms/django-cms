@@ -1,4 +1,3 @@
-
 from django.contrib.sitemaps import Sitemap
 from django.db.models import Q
 from django.utils import translation
@@ -13,8 +12,7 @@ def from_iterable(iterables):
     Backport of itertools.chain.from_iterable
     """
     for it in iterables:
-        for element in it:
-            yield element
+        yield from it
 
 
 class CMSSitemap(Sitemap):

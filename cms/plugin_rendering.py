@@ -341,7 +341,7 @@ class ContentRenderer(BaseRenderer):
             )
         parent_page = current_page.parent_page
         should_inherit = (
-            inherit and not content and parent_page  # noqa: W503
+            inherit and not content and parent_page
             # The placeholder cache is primed when the first placeholder
             # is loaded. If the current page's parent is not in there,
             # it means its cache was never primed as it wasn't necessary.

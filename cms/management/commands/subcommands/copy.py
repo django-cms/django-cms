@@ -55,7 +55,7 @@ class CopyLangCommand(SubcommandsCommand):
                 if isinstance(title, EmptyTitle):
                     title = page.get_title_obj(from_lang)
                     if verbose:
-                        self.stdout.write('copying title %s from language %s\n' % (title.title, from_lang))
+                        self.stdout.write(f'copying title {title.title} from language {from_lang}\n')
                     title.id = None
                     title.publisher_public_id = None
                     title.publisher_state = 0
@@ -67,11 +67,11 @@ class CopyLangCommand(SubcommandsCommand):
                 if copy_content:
                     # copy plugins using API
                     if verbose:
-                        self.stdout.write('copying plugins for %s from %s\n' % (page.get_page_title(from_lang), from_lang))
+                        self.stdout.write(f'copying plugins for {page.get_page_title(from_lang)} from {from_lang}\n')
                     copy_plugins_to_language(page, from_lang, to_lang, only_empty)
             else:
                 if verbose:
-                    self.stdout.write('Skipping page %s, language %s not defined\n' % (page.get_page_title(page.get_languages()[0]), from_lang))
+                    self.stdout.write(f'Skipping page {page.get_page_title(page.get_languages()[0])}, language {from_lang} not defined\n')
 
         if copy_content:
             for static_placeholder in StaticPlaceholder.objects.all():
@@ -83,7 +83,7 @@ class CopyLangCommand(SubcommandsCommand):
                 if plugin_list:
                     if verbose:
                         self.stdout.write(
-                            'copying plugins from static_placeholder "%s" in "%s" to "%s"\n' % (
+                            'copying plugins from static_placeholder "{}" in "{}" to "{}"\n'.format(
                                 static_placeholder.name, from_lang, to_lang)
                         )
                     copy_plugins_to(plugin_list, static_placeholder.draft, to_lang)
@@ -137,7 +137,7 @@ class CopySiteCommand(SubcommandsCommand):
 
                 if page.is_home:
                     new_page.set_as_homepage()
-        self.stdout.write('Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n'.format(from_site.pk, to_site.pk))
+        self.stdout.write(f'Copied CMS Tree from SITE_ID {from_site.pk} successfully to SITE_ID {to_site.pk}.\n')
 
     def get_site(self, site_id):
         if site_id:

@@ -63,7 +63,7 @@ class ViewTests(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
         apphooks = (
-            '%s.%s' % (APP_MODULE, APP_NAME),
+            f'{APP_MODULE}.{APP_NAME}',
         )
         page = create_page("page2", "nav_playground.html", "en", published=True)
         with self.settings(CMS_APPHOOKS=apphooks):
@@ -213,7 +213,7 @@ class ViewTests(CMSTestCase):
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
 
         with self.login_user_context(user):
-            response = self.client.get("/fr/?{}".format(edit_on))
+            response = self.client.get(f"/fr/?{edit_on}")
             expected = """
                 <a href="?structure" class="cms-btn cms-btn-disabled" title="Toggle structure"
                 data-cms-structure-btn='{ "url": "/fr/?structure", "name": "Structure" }'
@@ -233,7 +233,7 @@ class ViewTests(CMSTestCase):
                 count=1,
                 html=True,
             )
-            response = self.client.get("/fr/?preview&{}".format(edit_off))
+            response = self.client.get(f"/fr/?preview&{edit_off}")
             self.assertContains(
                 response,
                 expected,
@@ -242,7 +242,7 @@ class ViewTests(CMSTestCase):
             )
             self.assertContains(
                 response,
-                '<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="/fr/?{}">Edit</a>'.format(edit_on),
+                f'<a class="cms-btn cms-btn-action cms-btn-switch-edit" href="/fr/?{edit_on}">Edit</a>',
                 count=1,
                 html=True,
             )

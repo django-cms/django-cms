@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import itertools
 
 from cms.plugin_base import CMSPluginBase
@@ -45,7 +44,7 @@ class DynamicJsLoadingPlugin(CMSPluginBase):
             *case_list[instance.testcase - 1]
         )
 
-        return super(DynamicJsLoadingPlugin, self).render(
+        return super().render(
             context, instance, placeholder
         )
 

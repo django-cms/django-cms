@@ -160,10 +160,10 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     def get_urls(self):
         """Get the admin urls
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
 
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
         url_patterns = [
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
@@ -300,7 +300,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             message = message % {'language': language_obj['name']}
             self.message_user(request, message, level=messages.ERROR)
             path = self.get_admin_url('change', object_id)
-            return HttpResponseRedirect("%s?language=%s" % (path, language))
+            return HttpResponseRedirect(f"{path}?language={language}")
         return self.change_view(request, object_id, extra_context={'advanced_settings': True, 'title': _("Advanced Settings")})
 
     def actions_menu(self, request, object_id, extra_context=None):
@@ -354,8 +354,8 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         uhd_version = get_cms_setting('UNIHANDECODE_VERSION')
         if uhd_lang and uhd_host and uhd_version:
             uhd_urls = [
-                '%sunihandecode-%s.core.min.js' % (uhd_host, uhd_version),
-                '%sunihandecode-%s.%s.min.js' % (uhd_host, uhd_version, uhd_lang),
+                f'{uhd_host}unihandecode-{uhd_version}.core.min.js',
+                f'{uhd_host}unihandecode-{uhd_version}.{uhd_lang}.min.js',
             ]
         else:
             uhd_urls = []
@@ -409,7 +409,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         response_headers = get_response_headers(response)
         if tab_language and response.status_code == 302 and response_headers['location'][1] == request.path_info:
             location = response_headers['location']
-            response_headers['location'] = (location[0], "%s?language=%s" % (location[1], tab_language))
+            response_headers['location'] = (location[0], f"{location[1]}?language={tab_language}")
 
         return response
 
@@ -1069,7 +1069,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         messages.info(request, _('"%s" was reverted to the live version.') % page)
 
         path = page.get_absolute_url(language=language)
-        path = '%s?%s' % (path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+        path = '{}?{}'.format(path, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
         return HttpResponseRedirect(path)
 
     @require_POST
@@ -1177,7 +1177,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         path = admin_reverse("cms_page_changelist")
         if request.GET.get('redirect_language'):
-            path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
+            path = "{}?language={}&page_id={}".format(path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
         if admin_reverse('index') not in referrer:
             if all_published:
                 if page:
@@ -1185,9 +1185,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                         path = page.get_absolute_url(language, fallback=True)
                     else:
                         public_page = Page.objects.get(publisher_public=page.pk)
-                        path = '%s?preview&%s' % (public_page.get_absolute_url(language, fallback=True), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+                        path = '{}?preview&{}'.format(public_page.get_absolute_url(language, fallback=True), get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
                 else:
-                    path = '%s?preview&%s' % (referrer, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
+                    path = '{}?preview&{}'.format(referrer, get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF'))
             else:
                 path = '/?preview&%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
 
@@ -1238,7 +1238,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             messages.error(request, exc.message)
         path = admin_reverse("cms_page_changelist")
         if request.GET.get('redirect_language'):
-            path = "%s?language=%s&page_id=%s" % (path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
+            path = "{}?language={}&page_id={}".format(path, request.GET.get('redirect_language'), request.GET.get('redirect_page_id'))
         return HttpResponseRedirect(path)
 
     def delete_translation(self, request, object_id, extra_context=None):
@@ -1339,7 +1339,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         context.update(extra_context or {})
         request.current_app = self.admin_site.name
         return render(request, self.delete_confirmation_template or [
-            "admin/%s/%s/delete_confirmation.html" % (app_label, titleopts.object_name.lower()),
+            f"admin/{app_label}/{titleopts.object_name.lower()}/delete_confirmation.html",
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context)
@@ -1382,7 +1382,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             # and the page is not available on the current site's tree.
             # Redirect to the page url in the selected site
             proto = 'https' if request.is_secure() else 'http'
-            url = "{}://{}{}".format(proto, active_site.domain, url)
+            url = f"{proto}://{active_site.domain}{url}"
         return HttpResponseRedirect(url)
 
     @require_POST
@@ -1442,7 +1442,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             depth=(page.node.depth + 1 if page else 1),
             follow_descendants=True,
         )
-        return HttpResponse(u''.join(rows))
+        return HttpResponse(''.join(rows))
 
     def get_tree_rows(self, request, pages, language, depth=1,
                       follow_descendants=True):
@@ -1561,7 +1561,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                     if obj.get_public_object():
                         url = obj.get_public_object().get_absolute_url()
                     else:
-                        url = '%s?%s' % (
+                        url = '{}?{}'.format(
                             obj.get_draft_object().get_absolute_url(),
                             get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
                         )
@@ -1672,10 +1672,10 @@ class PageAdmin(BasePageAdmin):
         """
         Get the admin urls
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
 
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
         url_patterns = [
             pat(r'^([0-9]+)/set-home/$', self.set_home),
