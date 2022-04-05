@@ -32,6 +32,7 @@ from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
+from cms.exceptions import DuplicatePlaceholderWarning
 from menus.menu_pool import menu_pool
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -440,23 +441,41 @@ class BaseCMSTestCase:
         request._messages = MockStorage()
         return request
 
+    # TODO: Renable this.
+    # def failUnlessWarns(self, category, message, f, *args, **kwargs):
+    #     warningsShown = []
+    #     cleanwarningsShown = []
+    #     result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
+    #
+    #     if not warningsShown:
+    #         self.fail("No warnings emitted")
+    #
+    #     for warning in warningsShown:
+    #         # this specific warning is present due to the way Django
+    #         # handle asyncio
+    #         # https://stackoverflow.com/questions/70303895/python-3-10-asyncio-gather-shows-deprecationwarning-there-is-no-current-event
+    #         duplicateplaceholderwarning = 'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.'
+    #         if warning.category not in (DeprecationWarning, DuplicatePlaceholderWarning) and warning.message not in ('There is no current event loop', duplicateplaceholderwarning):
+    #             cleanwarningsShown.append(warning)
+    #
+    #     first = cleanwarningsShown[0]
+    #     for other in cleanwarningsShown[1:]:
+    #         if ((other.message, other.category) != (first.message, first.category)):
+    #             self.fail("Can't handle different warnings")
+    #
+    #     self.assertEqual(first.message, message)
+    #     self.assertTrue(first.category is category)
+    #
+    #     return result
+
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
-        cleanwarningsShown = []
         result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
 
         if not warningsShown:
             self.fail("No warnings emitted")
-
-        for warning in warningsShown:
-            # this specific warning is present due to the way Django
-            # handle asyncio
-            # https://stackoverflow.com/questions/70303895/python-3-10-asyncio-gather-shows-deprecationwarning-there-is-no-current-event
-            if (warning.category != DeprecationWarning and warning.message != 'There is no current event loop'):
-                cleanwarningsShown.append(warning)
-
-        first = cleanwarningsShown[0]
-        for other in cleanwarningsShown[1:]:
+        first = warningsShown[0]
+        for other in warningsShown[1:]:
             if ((other.message, other.category) != (first.message, first.category)):
                 self.fail("Can't handle different warnings")
 
@@ -464,6 +483,7 @@ class BaseCMSTestCase:
         self.assertTrue(first.category is category)
 
         return result
+
 
     assertWarns = failUnlessWarns
 
