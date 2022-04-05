@@ -1006,6 +1006,18 @@ Default value of the ``cache`` attribute of plugins. Should plugins be cached by
     If you disable the plugin cache be sure to restart the server and clear the cache afterwards.
 
 
+..  setting:: CMS_LIMIT_TTL_CACHE_FUNCTION
+
+CMS_LIMIT_TTL_CACHE_FUNCTION
+============================
+
+default
+    ``None``
+
+If defined, specifies the function to be called that allows to limit the page cache ttl value 
+using a business logic. The function receives one argument, the `response`, and returns an `int`
+the max business value of the page cache ttl.
+
 ..  setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 
 
