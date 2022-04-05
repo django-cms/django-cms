@@ -18,6 +18,7 @@ charset-normalizer==2.0.12
     # via requests
 click==8.0.4
     # via pip-tools
+codespell==2.1.0
 colorama==0.4.4
     # via sphinx-autobuild
 coverage==6.3.2
