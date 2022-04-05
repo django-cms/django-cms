@@ -1,6 +1,6 @@
 /**
  * Select2 Persian translation.
- * 
+ *
  * Author: Ali Choopan <choopan@arsh.co>
  * Author: Ebrahim Byagowi <ebrahim@gnu.org>
  */

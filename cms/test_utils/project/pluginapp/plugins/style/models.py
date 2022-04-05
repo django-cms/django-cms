@@ -53,12 +53,12 @@ class Style(CMSPlugin):
         if self.label:
             display.append(self.label)
         if self.tag_type:
-            display.append('<{0}>'.format(self.tag_type))
+            display.append(f'<{self.tag_type}>')
         if self.class_name:
             classes.append(self.class_name)
         if self.additional_classes:
             classes.extend(item.strip() for item in self.additional_classes.split(',') if item.strip())
-        display.append('.{0}'.format('.'.join(classes)))
+        display.append('.{}'.format('.'.join(classes)))
         return ' '.join(display)
 
     def get_additional_classes(self):

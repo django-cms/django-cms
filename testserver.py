@@ -38,13 +38,13 @@ class DisableMigrations:
 
 
 HELPER_SETTINGS = dict(
-    ALLOWED_HOSTS=[u'0.0.0.0', u'localhost'],
+    ALLOWED_HOSTS=['0.0.0.0', 'localhost'],
     CMS_PERMISSION=permission,
     LANGUAGES=(
-        ('en', u'English'),
-        ('de', u'Deutsch'),
-        ('it', u'Italiano'),
-        ('zh-cn', u'Chinese (Simplified)'),
+        ('en', 'English'),
+        ('de', 'Deutsch'),
+        ('it', 'Italiano'),
+        ('zh-cn', 'Chinese (Simplified)'),
     ),
     LANGUAGE_CODE='en',
     PARLER_LANGUAGES={
@@ -156,8 +156,8 @@ HELPER_SETTINGS = dict(
 
 
 def _helper_patch(*args, **kwargs):
-    from django.core.management import call_command
     from app_helper import utils
+    from django.core.management import call_command
 
     call_command('migrate', run_syncdb=True)
     utils.create_user('normal', 'normal@normal.normal', 'normal', is_staff=True, base_cms_permissions=True,
@@ -165,8 +165,7 @@ def _helper_patch(*args, **kwargs):
 
 
 def run():
-    from app_helper import runner
-    from app_helper import utils
+    from app_helper import runner, utils
 
     os.environ.setdefault('DATABASE_URL', 'sqlite://localhost/testdb.sqlite')
 

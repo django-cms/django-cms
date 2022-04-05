@@ -1,6 +1,6 @@
 /**
  * Select2 Ukrainian translation.
- * 
+ *
  * @author  bigmihail <bigmihail@bigmir.net>
  * @author  Uriy Efremochkin <efremochkin@uriy.me>
  */

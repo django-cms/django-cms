@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
 from django.template import Template
@@ -5,7 +7,6 @@ from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
 from django.utils.translation import trans_null
-from mock import patch
 
 from cms.api import create_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC

@@ -1,9 +1,9 @@
 {% load menu_tags cache %}
 {% for child in children %}
-				
+
 <li>
 	<a href="{{ child.get_absolute_url }}" class="menu {% if child.selected %} selected{% endif %}{% if child.ancestor %} ancestor{% endif %}">{% if not child.is_leaf_node %}+{% endif %}{{ child.get_menu_title }}
-	<span>	
+	<span>
 	{% if child.selected %}selected{% endif %}
 	{% if child.ancestor %}ancestor{% endif %}
 	{% if child.sibling %}sibling{% endif %}
@@ -18,5 +18,5 @@
     </ul>
     {% endif %}
 </li>
-				
+
 {% endfor %}

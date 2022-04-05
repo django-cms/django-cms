@@ -27,11 +27,11 @@ class ListApphooksCommand(SubcommandsCommand):
         for apphook, attributes in apphooks.items():
             attributes[0].sort()
             if attributes[1]:
-                self.stdout.write('{0}[instance: {1}] ({2})\n'.format(
+                self.stdout.write('{}[instance: {}] ({})\n'.format(
                     apphook, attributes[1], '/'.join(attributes[0])
                 ))
             else:
-                self.stdout.write('{0} ({1})\n'.format(
+                self.stdout.write('{} ({})\n'.format(
                     apphook, '/'.join(attributes[0])
                 ))
 

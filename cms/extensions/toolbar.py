@@ -53,11 +53,11 @@ class ExtensionToolbar(CMSToolbar):
             model_name = self.model.__name__.lower()
             if page_extension:
                 admin_url = admin_reverse(
-                    '%s_%s_change' % (self.model._meta.app_label, model_name),
+                    f'{self.model._meta.app_label}_{model_name}_change',
                     args=(page_extension.pk,))
             else:
-                admin_url = "%s?extended_object=%s" % (
-                    admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
+                admin_url = "{}?extended_object={}".format(
+                    admin_reverse(f'{self.model._meta.app_label}_{model_name}_add'),
                     self.page.pk)
         except NoReverseMatch:  # pragma: no cover
             admin_url = None
@@ -88,11 +88,11 @@ class ExtensionToolbar(CMSToolbar):
                 model_name = self.model.__name__.lower()
                 if title_extension:
                     admin_url = admin_reverse(
-                        '%s_%s_change' % (self.model._meta.app_label, model_name),
+                        f'{self.model._meta.app_label}_{model_name}_change',
                         args=(title_extension.pk,))
                 else:
-                    admin_url = "%s?extended_object=%s" % (
-                        admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
+                    admin_url = "{}?extended_object={}".format(
+                        admin_reverse(f'{self.model._meta.app_label}_{model_name}_add'),
                         title.pk)
             except NoReverseMatch:  # pragma: no cover
                 admin_url = None

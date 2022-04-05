@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import os
 
-from cms import __version__
 from setuptools import find_packages, setup
 
+from cms import __version__
 
 REQUIREMENTS = [
     'Django>=2.2,<5.0',

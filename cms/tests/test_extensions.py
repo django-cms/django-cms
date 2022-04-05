@@ -587,7 +587,7 @@ class ExtensionAdminTestCase(CMSTestCase):
                         )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
-            response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
+            response = self.client.get(f'{self.page.get_absolute_url()}?edit')
             self.assertIn("TestItem", response.rendered_content)
 
         toolbar_pool.toolbars = old_toolbars
@@ -612,7 +612,7 @@ class ExtensionAdminTestCase(CMSTestCase):
                         )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
-            response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
+            response = self.client.get(f'{self.page.get_absolute_url()}?edit')
             self.assertIn("TestItem", response.rendered_content)
 
         toolbar_pool.toolbars = old_toolbars

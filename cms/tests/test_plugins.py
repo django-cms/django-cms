@@ -834,8 +834,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertIn("plugin_type=''", repr(non_saved_plugin))
 
         saved_plugin = CMSPlugin.objects.create(plugin_type='TextPlugin')
-        self.assertIn('id={}'.format(saved_plugin.pk), repr(saved_plugin))
-        self.assertIn("plugin_type='{}'".format(saved_plugin.plugin_type), repr(saved_plugin))
+        self.assertIn(f'id={saved_plugin.pk}', repr(saved_plugin))
+        self.assertIn(f"plugin_type='{saved_plugin.plugin_type}'", repr(saved_plugin))
 
 
     def test_pickle(self):
@@ -980,14 +980,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         from cms.utils.placeholder import get_toolbar_plugin_struct
 
         expected_struct_en = {
-            'module': u'Generic',
-            'name': u'Style',
+            'module': 'Generic',
+            'name': 'Style',
             'value': 'StylePlugin',
         }
 
         expected_struct_de = {
-            'module': u'Generisch',
-            'name': u'Style',
+            'module': 'Generisch',
+            'name': 'Style',
             'value': 'StylePlugin',
         }
 
@@ -1225,7 +1225,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(1, CMSPlugin.objects.all().count())
         self.assertEqual(1, ArticlePluginModel.objects.count())
         articles_plugin = ArticlePluginModel.objects.all()[0]
-        self.assertEqual(u'Articles Plugin 1', articles_plugin.title)
+        self.assertEqual('Articles Plugin 1', articles_plugin.title)
         self.assertEqual(self.section_count, articles_plugin.sections.count())
 
         # check publish box
@@ -1252,7 +1252,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         plugin.add_root(instance=plugin)
 
         endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
-        endpoint += '?cms_path=/{}/'.format(self.FIRST_LANG)
+        endpoint += f'?cms_path=/{self.FIRST_LANG}/'
 
         data = {
             'title': "Articles Plugin 1",
@@ -1269,7 +1269,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         #create 2nd language page
         page_data.update({
             'language': self.SECOND_LANG,
-            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
+            'title': f"{page.get_title()} {self.SECOND_LANG}",
         })
 
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
@@ -1288,7 +1288,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         }
 
         endpoint = self.get_admin_url(Page, 'copy_plugins')
-        endpoint += '?cms_path=/{}/'.format(self.FIRST_LANG)
+        endpoint += f'?cms_path=/{self.FIRST_LANG}/'
 
         response = self.client.post(endpoint, copy_data)
         self.assertEqual(response.status_code, 200)

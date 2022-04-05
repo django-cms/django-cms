@@ -51,7 +51,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
         # 1st level
         if template:
-            keys.append(u'%s %s' % (template, placeholder))
+            keys.append(f'{template} {placeholder}')
         # 2nd level
         keys.append(placeholder)
         # 3rd level

@@ -55,11 +55,11 @@ class PageSelectWidget(MultiWidget):
         # the same as an empty string, if the data or inital value we get
         # is None, replace it w/ u''.
         if data is None or (len(data)>=2 and data[1] in [None,'']):
-            data_value = u''
+            data_value = ''
         else:
             data_value = data
         if initial is None:
-            initial_value = u''
+            initial_value = ''
         else:
             initial_value = initial
         if force_str(initial_value) != force_str(data_value):
@@ -78,14 +78,14 @@ class PageSelectWidget(MultiWidget):
 
     def _build_script(self, name, value, attrs={}):
         return r"""<script type="text/javascript">
-                var CMS = window.CMS || {};
+                var CMS = window.CMS || {{}};
 
-                CMS.Widgets = CMS.Widgets || {};
+                CMS.Widgets = CMS.Widgets || {{}};
                 CMS.Widgets._pageSelectWidgets = CMS.Widgets._pageSelectWidgets || [];
-                CMS.Widgets._pageSelectWidgets.push({
-                    name: '%(name)s'
-                });
-            </script>""" % {'name': name}
+                CMS.Widgets._pageSelectWidgets.push({{
+                    name: '{name}'
+                }});
+            </script>""".format(name=name)
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
@@ -94,7 +94,7 @@ class PageSelectWidget(MultiWidget):
         return context
 
     def format_output(self, rendered_widgets):
-        return u' '.join(rendered_widgets)
+        return ' '.join(rendered_widgets)
 
 
 class PageSmartLinkWidget(TextInput):
@@ -125,22 +125,22 @@ class PageSmartLinkWidget(TextInput):
 
     def _build_script(self, name, value, attrs={}):
         return r"""<script type="text/javascript">
-            var CMS = window.CMS || {};
+            var CMS = window.CMS || {{}};
 
-            CMS.Widgets = CMS.Widgets || {};
+            CMS.Widgets = CMS.Widgets || {{}};
             CMS.Widgets._pageSmartLinkWidgets = CMS.Widgets._pageSmartLinkWidgets || [];
-            CMS.Widgets._pageSmartLinkWidgets.push({
-                id: '%(element_id)s',
-                text: '%(placeholder_text)s',
-                lang: '%(language_code)s',
-                url: '%(ajax_url)s'
-            });
-        </script>""" % {
-            'element_id': attrs.get('id', ''),
-            'placeholder_text': attrs.get('placeholder_text', ''),
-            'language_code': self.language,
-            'ajax_url': force_str(self.ajax_url)
-        }
+            CMS.Widgets._pageSmartLinkWidgets.push({{
+                id: '{element_id}',
+                text: '{placeholder_text}',
+                lang: '{language_code}',
+                url: '{ajax_url}'
+            }});
+        </script>""".format(
+            element_id=attrs.get('id', ''),
+            placeholder_text=attrs.get('placeholder_text', ''),
+            language_code=self.language,
+            ajax_url=force_str(self.ajax_url)
+        )
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -166,9 +166,9 @@ class UserSelectAdminWidget(Select):
                 add_url = admin_reverse(f"{auth_model._meta.app_label}_{auth_model._meta.model_name}_add")
             else:
                 add_url = admin_reverse('cms_pageuser_add')
-            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
+            output.append('<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
-        return mark_safe(u''.join(output))
+        return mark_safe(''.join(output))
 
 class AppHookSelect(Select):
 
@@ -241,23 +241,23 @@ class ApplicationConfigSelect(Select):
         configs = []
         urls = []
         for application, cms_app in self.app_configs.items():
-            configs.append("'%s': [%s]" % (application, ",".join(
-                ["['%s', '%s']" % (config.pk, escapejs(escape(config))) for config in cms_app.get_configs()])))  # noqa
+            configs.append("'{}': [{}]".format(application, ",".join(
+                [f"['{config.pk}', '{escapejs(escape(config))}']" for config in cms_app.get_configs()])))
         for application, cms_app in self.app_configs.items():
-            urls.append("'%s': '%s'" % (application, cms_app.get_config_add_url()))
+            urls.append(f"'{application}': '{cms_app.get_config_add_url()}'")
         return r"""<script type="text/javascript">
-            var apphooks_configuration = {
-                %(apphooks_configurations)s
-            };
-            var apphooks_configuration_url = {
-                %(apphooks_url)s
-            };
-            var apphooks_configuration_value = '%(apphooks_value)s';
-        </script>""" % {
-            'apphooks_configurations': ','.join(configs),
-            'apphooks_url': ','.join(urls),
-            'apphooks_value': value,
-        }
+            var apphooks_configuration = {{
+                {apphooks_configurations}
+            }};
+            var apphooks_configuration_url = {{
+                {apphooks_url}
+            }};
+            var apphooks_configuration_value = '{apphooks_value}';
+        </script>""".format(
+            apphooks_configurations=','.join(configs),
+            apphooks_url=','.join(urls),
+            apphooks_value=value,
+        )
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)

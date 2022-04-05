@@ -1,5 +1,3 @@
-
-
 class CMSApp:
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
     _urls = []
@@ -30,7 +28,7 @@ class CMSApp:
                     )
                 )
             cls.app_config.cmsapp = cls
-        return super(CMSApp, cls).__new__(cls)
+        return super().__new__(cls)
 
     def get_configs(self):
         """

@@ -1,6 +1,6 @@
 /**
  * Select2 Georgian (Kartuli) translation.
- * 
+ *
  * Author: Dimitri Kurashvili dimakura@gmail.com
  */
 (function ($) {

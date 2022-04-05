@@ -69,7 +69,7 @@ class Migration(IrreversibleMigration):
 
             if 'migration_0018_control' in column_names:
                 # The new 0018 migration has been applied
-                return super(Migration, self).apply(project_state, schema_editor, collect_sql)
+                return super().apply(project_state, schema_editor, collect_sql)
 
             # The old 0018 migration was applied
             # Move the project state forward without actually running

@@ -46,7 +46,7 @@ class TestStructureRenderer(CMSTestCase):
             '"MultiColumnPlugin"',
             '"addPluginHelpTitle": "Add plugin to placeholder \\"Body\\""',
             '"name": "Body"',
-            '"placeholder_id": "{}"'.format(placeholder.pk),
+            f'"placeholder_id": "{placeholder.pk}"',
         ]
 
         for bit in expected_bits:
@@ -66,7 +66,7 @@ class TestStructureRenderer(CMSTestCase):
             '"MultiColumnPlugin"',
             '"addPluginHelpTitle": "Add plugin to placeholder \\"Content-with-dash\\""',
             '"name": "Content-with-dash"',
-            '"placeholder_id": "{}"'.format(placeholder.pk),
+            f'"placeholder_id": "{placeholder.pk}"',
         ]
 
         for bit in expected_bits:

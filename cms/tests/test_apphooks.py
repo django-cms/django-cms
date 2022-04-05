@@ -1,6 +1,6 @@
 import sys
+from unittest import mock
 
-import mock
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -139,7 +139,7 @@ class ApphooksTestCase(CMSTestCase):
         result = check_url_config(None)
         self.assertEqual(len(result), 0)
 
-    @override_settings(CMS_APPHOOKS=['%s.%s' % (APP_MODULE, APP_NAME)])
+    @override_settings(CMS_APPHOOKS=[f'{APP_MODULE}.{APP_NAME}'])
     def test_explicit_apphooks(self):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.

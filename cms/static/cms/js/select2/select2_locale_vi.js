@@ -1,6 +1,6 @@
 /**
  * Select2 Vietnamese translation.
- * 
+ *
  * Author: Long Nguyen <olragon@gmail.com>
  */
 (function ($) {

@@ -1,13 +1,10 @@
 from django.conf import settings
-from django.urls import NoReverseMatch, reverse, resolve, Resolver404
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import (
-    force_language,
-    get_default_language_for_site,
-    get_fallback_languages,
-    hide_untranslated,
-    is_valid_site_language,
+    force_language, get_default_language_for_site, get_fallback_languages,
+    hide_untranslated, is_valid_site_language,
 )
 
 
@@ -149,7 +146,7 @@ class DefaultLanguageChanger:
         elif view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
-                view_name = "%s:%s" % (view.namespace, view_name)
+                view_name = f"{view.namespace}:{view_name}"
             url = None
             with force_language(lang):
                 try:
@@ -158,4 +155,4 @@ class DefaultLanguageChanger:
                     pass
             if url:
                 return url
-        return '%s%s' % (self.get_page_path(lang), self.app_path)
+        return f'{self.get_page_path(lang)}{self.app_path}'

@@ -304,7 +304,7 @@ class CMSToolbar(BaseToolbar):
 
     def get_object_model(self):
         if self.obj:
-            return "{0}.{1}".format(self.obj._meta.app_label, self.obj._meta.object_name).lower()
+            return f"{self.obj._meta.app_label}.{self.obj._meta.object_name}".lower()
         return ''
 
     def get_object_pk(self):
@@ -482,7 +482,7 @@ class CMSToolbar(BaseToolbar):
             # render the toolbar content
             toolbar = render_to_string('cms/toolbar/toolbar_with_structure.html', flatten_context(context))
         # return the toolbar content and the content below
-        return '%s\n%s' % (toolbar, rendered_contents)
+        return f'{toolbar}\n{rendered_contents}'
 
 
 class EmptyToolbar(BaseToolbar):

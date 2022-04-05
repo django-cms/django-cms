@@ -100,13 +100,13 @@ class CreateCMSPageForm(AddPageForm):
 
         if parent_node:
             base = parent_node.item.get_path(self._language)
-            path = u'%s/%s' % (base, slug) if base else slug
+            path = f'{base}/{slug}' if base else slug
         else:
             base = ''
             path = slug
 
         data['slug'] = get_available_slug(self._site, path, self._language, suffix=None)
-        data['path'] = '%s/%s' % (base, data['slug']) if base else data['slug']
+        data['path'] = '{}/{}'.format(base, data['slug']) if base else data['slug']
 
         if not data['slug']:
             raise forms.ValidationError("Please provide a valid slug.")

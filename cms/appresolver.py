@@ -120,7 +120,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
         # make sure we don't get patterns that start with more than one '^'!
         app_pat = app_pat.lstrip('^')
         path = path.lstrip('^')
-        regex = r'^%s%s' % (path, app_pat) if not nested else r'^%s' % (app_pat)
+        regex = fr'^{path}{app_pat}' if not nested else r'^%s' % (app_pat)
         if isinstance(pattern, URLResolver):
             # include default_args
             args = pattern.default_kwargs
@@ -234,7 +234,7 @@ def _get_app_patterns(site):
     # TODO: Need to be fixed for django-treebeard when forward ported to 3.1
     for title in titles:
         path = title.path
-        mix_id = "%s:%s:%s" % (
+        mix_id = "{}:{}:{}".format(
             path + "/", title.page.application_urls, title.language)
         if mix_id in included:
             # don't add the same thing twice

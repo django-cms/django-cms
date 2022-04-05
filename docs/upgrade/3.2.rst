@@ -93,7 +93,7 @@ Content wizards
 :doc:`/reference/wizards` can help simplify production of content, and can be created to handle
 non-CMS content too.
 
-For a quick introduction to using a wizard as a content editor, see the user tutorial. 
+For a quick introduction to using a wizard as a content editor, see the user tutorial.
 
 
 

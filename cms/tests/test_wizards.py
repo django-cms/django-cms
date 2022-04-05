@@ -1,4 +1,3 @@
-
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
@@ -58,11 +57,11 @@ class WizardTestMixin:
             self.fail("Sequence lengths are not the same.")
         for idx, (a, b) in enumerate(zipped):
             if a != b:
-                self.fail("Sequences differ at index {0}".format(idx))
+                self.fail(f"Sequences differ at index {idx}")
 
     @classmethod
     def setUpClass(cls):
-        super(WizardTestMixin, cls).setUpClass()
+        super().setUpClass()
         # This prevents auto-discovery, which would otherwise occur as soon as
         # tests start, creating unexpected starting conditions.
         wizard_pool._discovered = True
@@ -72,7 +71,7 @@ class WizardTestMixin:
 
         # This is a basic Wizard
         cls.page_wizard = PageWizard(
-            title=_(u"Page"),
+            title=_("Page"),
             weight=100,
             form=WizardForm,
             model=Page,
@@ -84,7 +83,7 @@ class WizardTestMixin:
 
         # This is a Wizard that uses a ModelForm to define the model
         cls.user_settings_wizard = SettingsWizard(
-            title=_(u"UserSettings"),
+            title=_("UserSettings"),
             weight=200,
             form=ModelWizardForm,
         )
@@ -95,7 +94,7 @@ class WizardTestMixin:
         # This is a bad wizard definition as it neither defines a model, nor
         # uses a ModelForm that has model defined in Meta
         cls.title_wizard = TitleWizard(
-            title=_(u"Page"),
+            title=_("Page"),
             weight=100,
             form=BadModelForm,
             template_name='my_template.html',  # This doesn't exist anywhere
@@ -124,12 +123,12 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             in_navigation=True,
             published=False
         )
-        url = "{0}?edit".format(page.get_absolute_url(language="en"))
+        url = "{}?edit".format(page.get_absolute_url(language="en"))
         self.assertEqual(self.page_wizard.get_success_url(
             page, language="en"), url)
 
         # Now again without a language code
-        url = "{0}?edit".format(page.get_absolute_url())
+        url = f"{page.get_absolute_url()}?edit"
         self.assertEqual(self.page_wizard.get_success_url(page), url)
 
     def test_get_model(self):
@@ -218,7 +217,7 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
             if isinstance(entry, CMSPageWizard)
         ][0]
         self.assertIn("cms.cms_wizards.CMSPageWizard", repr(page_wizard))
-        self.assertIn("id={}".format(page_wizard.id), repr(page_wizard))
+        self.assertIn(f"id={page_wizard.id}", repr(page_wizard))
         self.assertIn(hex(id(page_wizard)), repr(page_wizard))
 
     def test_wizard_first_page_published(self):
@@ -382,8 +381,8 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
             with self.login_user_context(superuser):
                 url = page.get_absolute_url('en')
-                expected = '<div class="sub-content">{0}</div>'.format(content)
-                unexpected = '<div class="content">{0}</div>'.format(content)
+                expected = f'<div class="sub-content">{content}</div>'
+                unexpected = f'<div class="content">{content}</div>'
                 response = self.client.get(url)
                 self.assertContains(response, expected, status_code=200)
                 self.assertNotContains(response, unexpected, status_code=200)

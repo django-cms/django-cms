@@ -22,7 +22,7 @@ def _load_from_file(module_path):
 
     imported = None
     if module_path:
-        with open(module_path, 'r') as openfile:
+        with open(module_path) as openfile:
             imported = load_module("mod", openfile, module_path, ('imported', 'r', PY_SOURCE))
     return imported
 
@@ -60,7 +60,7 @@ DEFAULTS = {
     'INVALIDATE_PAGE_CACHE_ON_STARTUP': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
-    'CACHE_PREFIX': 'cms_{}_'.format(__version__),
+    'CACHE_PREFIX': f'cms_{__version__}_',
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
     'UNIHANDECODE_VERSION': None,
@@ -212,7 +212,7 @@ def _ensure_languages_settings(languages):
             for key in language_object:
                 if key not in valid_language_keys:
                     raise ImproperlyConfigured(
-                        "CMS_LANGUAGES has invalid key %r in language %r in site %r" % (key, language_code, site)
+                        f"CMS_LANGUAGES has invalid key {key!r} in language {language_code!r} in site {site!r}"
                     )
 
             if 'fallbacks' not in language_object:
