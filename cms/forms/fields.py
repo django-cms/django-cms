@@ -28,8 +28,8 @@ class LazyChoiceField(forms.ChoiceField):
 class PageSelectFormField(forms.MultiValueField):
     widget = PageSelectWidget
     default_error_messages = {
-        'invalid_site': _(u'Select a valid site'),
-        'invalid_page': _(u'Select a valid page'),
+        'invalid_site': _('Select a valid site'),
+        'invalid_page': _('Select a valid page'),
     }
 
     def __init__(self, queryset=None, empty_label="---------", cache_choices=False,

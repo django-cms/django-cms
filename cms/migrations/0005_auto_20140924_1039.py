@@ -42,7 +42,7 @@ def _get_path(path, depth, newstep):
     """
     parentpath = _get_basepath(path, depth - 1)
     key = _int2str(newstep)
-    return '{0}{1}{2}'.format(
+    return '{}{}{}'.format(
         parentpath,
         ALPHABET[0] * (STEPLEN - len(key)),
         key
@@ -54,8 +54,8 @@ def _inc_path(obj):
     newpos = _str2int(obj.path[-STEPLEN:]) + 1
     key = _int2str(newpos)
     if len(key) > STEPLEN:
-        raise Exception("Path Overflow from: '%s'" % (obj.path, ))
-    return '{0}{1}{2}'.format(
+        raise Exception(f"Path Overflow from: '{obj.path}'")
+    return '{}{}{}'.format(
         obj.path[:-STEPLEN],
         ALPHABET[0] * (STEPLEN - len(key)),
         key

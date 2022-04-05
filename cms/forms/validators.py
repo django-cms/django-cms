@@ -64,10 +64,10 @@ def validate_url_uniqueness(site, path, language, exclude_page=None):
     else:
         change_url = admin_reverse('cms_page_change', args=[page_id])
 
-    conflict_url = '<a href="%(change_url)s" target="_blank">%(page_title)s</a>' % {
-        'change_url': change_url,
-        'page_title': force_str(conflict_page),
-    }
+    conflict_url = '<a href="{change_url}" target="_blank">{page_title}</a>'.format(
+        change_url=change_url,
+        page_title=force_str(conflict_page),
+    )
 
     if exclude_page:
         message = gettext('Page %(conflict_page)s has the same url \'%(url)s\' as current page "%(instance)s".')

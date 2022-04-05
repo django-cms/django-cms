@@ -46,7 +46,7 @@ class CheckAssertMixin:
         check(output)
         self.assertEqual(output.successful, successful)
         for key, value in assertions.items():
-            self.assertEqual(getattr(output, key), value, "%s %s expected, got %s" % (value, key, getattr(output, key)))
+            self.assertEqual(getattr(output, key), value, f"{value} {key} expected, got {getattr(output, key)}")
 
 
 class CheckTests(CheckAssertMixin, TestCase):

@@ -1,4 +1,3 @@
-
 import warnings
 from datetime import datetime, timedelta
 
@@ -111,7 +110,7 @@ class Placeholder(models.Model):
         else:
             app_label = model._meta.app_label
             model_name = model.__name__.lower()
-            return admin_reverse('%s_%s_%s' % (app_label, model_name, key), args=args)
+            return admin_reverse(f'{app_label}_{model_name}_{key}', args=args)
 
     def has_change_permission(self, user):
         """

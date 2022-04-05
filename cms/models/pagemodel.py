@@ -261,7 +261,7 @@ class Page(models.Model):
             except IndexError:
                 title = None
         if title is None:
-            title = u""
+            title = ""
         return force_str(title)
 
     def __repr__(self):
@@ -343,7 +343,7 @@ class Page(models.Model):
         title_obj = self.get_title_obj(language, fallback=False)
         title_obj.slug = get_available_slug(title_obj.page.node.site, title_obj.slug, title_obj.language, current=title_obj.page)
         if not title_obj.page.is_home:
-            title_obj.path = '%s/%s' % (base, title_obj.slug) if base else title_obj.slug
+            title_obj.path = f'{base}/{title_obj.slug}' if base else title_obj.slug
         title_obj.save()
 
     def _update_title_path_recursive(self, language, slug=None):
@@ -703,13 +703,13 @@ class Page(models.Model):
 
             if parent_page:
                 base = parent_page.get_path(title.language)
-                path = '%s/%s' % (base, title.slug) if base else title.slug
+                path = f'{base}/{title.slug}' if base else title.slug
             else:
                 base = ''
                 path = title.slug
 
             title.slug = get_available_slug(site, path, title.language)
-            title.path = '%s/%s' % (base, title.slug) if base else title.slug
+            title.path = f'{base}/{title.slug}' if base else title.slug
             title.save()
 
             new_page.title_cache[title.language] = title
@@ -1273,7 +1273,7 @@ class Page(models.Model):
     def get_published_languages(self):
         if self.publisher_is_draft:
             return self.get_languages()
-        return sorted([language for language in self.get_languages() if self.is_published(language)])
+        return sorted(language for language in self.get_languages() if self.is_published(language))
 
     def set_translations_cache(self):
         for translation in self.title_set.all():
@@ -1286,7 +1286,7 @@ class Page(models.Model):
         if self.parent_page:
             base = self.parent_page.get_path(language, fallback=True)
             # base can be empty when the parent is a home-page
-            path = u'%s/%s' % (base, slug) if base else slug
+            path = f'{base}/{slug}' if base else slug
         else:
             path = slug
         return path

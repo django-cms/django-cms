@@ -73,10 +73,10 @@ class FrontendEditableAdminMixin:
         """
         Register the url for the single field edit view
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
 
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
@@ -104,7 +104,7 @@ class FrontendEditableAdminMixin:
                 'message': force_str(_("Field %s not found")) % raw_fields
             }
             return render(request, 'admin/cms/page/plugin/error_form.html', context)
-        if not request.user.has_perm("{0}.change_{1}".format(self.model._meta.app_label,
+        if not request.user.has_perm("{}.change_{}".format(self.model._meta.app_label,
                                                              self.model._meta.model_name)):
             context = {
                 'opts': opts,
@@ -222,10 +222,10 @@ class PlaceholderAdminMixin:
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
 
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
         url_patterns = [
             pat(r'copy-plugins/$', self.copy_plugins),

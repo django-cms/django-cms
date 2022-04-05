@@ -1,6 +1,6 @@
 /**
  * Select2 Polish translation.
- * 
+ *
  * @author  Jan Kondratowicz <jan@kondratowicz.pl>
  * @author  Uriy Efremochkin <efremochkin@uriy.me>
  * @author  Michał Połtyn <mike@poltyn.com>

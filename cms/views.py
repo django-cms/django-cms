@@ -1,4 +1,3 @@
-
 from urllib.parse import quote
 
 from django.conf import settings
@@ -37,7 +36,7 @@ def _clean_redirect_url(redirect_url, language):
     if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
             '/%s/' % language)):
         # add language prefix to url
-        redirect_url = "/%s/%s" % (language, redirect_url.lstrip("/"))
+        redirect_url = "/{}/{}".format(language, redirect_url.lstrip("/"))
     return redirect_url
 
 
@@ -198,5 +197,5 @@ def login(request):
     if form.is_valid():
         auth_login(request, form.user_cache)
     else:
-        redirect_to += u'?cms_toolbar_login_error=1'
+        redirect_to += '?cms_toolbar_login_error=1'
     return HttpResponseRedirect(redirect_to)

@@ -11,10 +11,11 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
-import cms
 import datetime
 import os
 import sys
+
+import cms
 
 # If extensions (or modules to document with autodoc) are in another
 # directory, add these directories to sys.path here. If the directory is
@@ -64,7 +65,7 @@ master_doc = 'index'
 current_year = datetime.datetime.now().year
 # General information about the project.
 project = 'django cms'
-copyright = '2009-{}, django CMS Association and contributors'.format(current_year)
+copyright = f'2009-{current_year}, django CMS Association and contributors'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

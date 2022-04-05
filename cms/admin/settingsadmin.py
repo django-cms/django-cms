@@ -123,7 +123,7 @@ class SettingsAdmin(ModelAdmin):
                 args=[obj.id, ],
                 current_app=self.admin_site.name
             )
-        return HttpResponseRedirect("{0}?reload_window".format(post_url))
+        return HttpResponseRedirect(f"{post_url}?reload_window")
 
     def has_change_permission(self, request, obj=None):
         if obj and obj.user == request.user:

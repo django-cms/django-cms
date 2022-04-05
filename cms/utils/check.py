@@ -58,32 +58,32 @@ class FileOutputWrapper:
         return colorize(msg, opts=opts, **kwargs)
 
     def write_line(self, message=''):
-        self.write(u'%s\n' % message)
+        self.write('%s\n' % message)
 
     def write(self, message):
         self.stdout.write(message)
 
     def write_stderr_line(self, message=''):
-        self.write_stderr(u'%s\n' % message)
+        self.write_stderr('%s\n' % message)
 
     def write_stderr(self, message):
         self.stderr.write(message)
 
     def success(self, message):
         self.successes += 1
-        self.write_line(u'%s %s' % (message, self.colorize('[OK]', fg='green', opts=['bold'])))
+        self.write_line('{} {}'.format(message, self.colorize('[OK]', fg='green', opts=['bold'])))
 
     def error(self, message):
         self.errors += 1
-        self.write_stderr_line(u'%s %s' % (message, self.colorize('[ERROR]', fg='red', opts=['bold'])))
+        self.write_stderr_line('{} {}'.format(message, self.colorize('[ERROR]', fg='red', opts=['bold'])))
 
     def warn(self, message):
         self.warnings += 1
-        self.write_stderr_line(u'%s %s' % (message, self.colorize('[WARNING]', fg='yellow', opts=['bold'])))
+        self.write_stderr_line('{} {}'.format(message, self.colorize('[WARNING]', fg='yellow', opts=['bold'])))
 
     def skip(self, message):
         self.skips += 1
-        self.write_line(u'%s %s' % (message, self.colorize('[SKIP]', fg='blue', opts=['bold'])))
+        self.write_line('{} {}'.format(message, self.colorize('[SKIP]', fg='blue', opts=['bold'])))
 
     @method_decorator(contextmanager)
     def section(self, title):
@@ -126,10 +126,10 @@ class FileSectionWrapper(FileOutputWrapper):
         self.wrapper = wrapper
 
     def write_line(self, message=''):
-        self.write(u'  - %s\n' % message)
+        self.write('  - %s\n' % message)
 
     def write_stderr_line(self, message=''):
-        self.write_stderr(u'  - %s\n' % message)
+        self.write_stderr('  - %s\n' % message)
 
     def finish_success(self, message):
         self.wrapper.write_line()
@@ -265,7 +265,7 @@ def check_plugin_instances(output):
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
                 section.error(
-                    "%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
+                    "{} has {} unsaved instances".format(plugin_type["type"], len(plugin_type["unsaved_instances"])))
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
@@ -286,7 +286,7 @@ def check_copy_relations(output):
     from cms.plugin_pool import plugin_pool
 
     def c_to_s(klass):
-        return '%s.%s' % (klass.__module__, klass.__name__)
+        return f'{klass.__module__}.{klass.__name__}'
 
     def get_class(method_name, model):
         for cls in inspect.getmro(model):
@@ -303,13 +303,13 @@ def check_copy_relations(output):
                 # to do
                 continue
             for rel in plugin_class._meta.many_to_many:
-                section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
+                section.warn('{} has a many-to-many relation to {},\n    but no "copy_relations" method defined.'.format(
                     c_to_s(plugin_class),
                     c_to_s(rel.model),
                 ))
             for rel in plugin_class._get_related_objects():
                 if rel.model != CMSPlugin and not issubclass(rel.model, plugin.model) and rel.model != AliasPluginModel:
-                    section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
+                    section.warn('{} has a foreign key from {},\n    but no "copy_relations" method defined.'.format(
                         c_to_s(plugin_class),
                         c_to_s(rel.model),
                     ))
@@ -327,7 +327,7 @@ def check_copy_relations(output):
                 ))
             for rel in extension._get_related_objects():
                 if rel.model != extension:
-                    section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
+                    section.warn('{} has a foreign key from {},\n    but no "copy_relations" method defined.'.format(
                         c_to_s(extension),
                         c_to_s(rel.model),
                     ))
@@ -337,8 +337,8 @@ def check_copy_relations(output):
         else:
             section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\n'
                                    'This might lead to data loss when publishing or copying plugins/extensions.\n'
-                                   'See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
-                                   'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
+                                   'See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or '
+                                   'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')
 
 
 @define_check

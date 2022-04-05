@@ -1,4 +1,3 @@
-
 """
 This module manages placeholder caching. We use a cache-versioning strategy
 in which each (placeholder x lang x site_id) manages its own version. The

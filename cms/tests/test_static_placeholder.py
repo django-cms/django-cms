@@ -1,4 +1,3 @@
-
 from django.contrib.admin.sites import site
 from django.template import Context
 from django.template.base import Template
@@ -96,7 +95,7 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         self.assertEqual(static_placeholder.draft.cmsplugin_set.all().count(), 2)
         self.assertEqual(static_placeholder.public.cmsplugin_set.all().count(), 0)
         with self.login_user_context(self.get_superuser()):
-            response = self.client.post('%s?statics=%s' % (admin_reverse("cms_page_publish_page", args=[1, 'en']), static_placeholder.pk))
+            response = self.client.post('{}?statics={}'.format(admin_reverse("cms_page_publish_page", args=[1, 'en']), static_placeholder.pk))
             self.assertEqual(response.status_code, 302)
 
     def test_permissions(self):

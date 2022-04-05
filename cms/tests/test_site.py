@@ -36,7 +36,7 @@ class SiteTestCase(CMSTestCase):
         with self.settings(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "de", site=self.site2)
 
-            response = self.client.get("%s?site__exact=%s" % (URL_CMS_PAGE, self.site3.pk))
+            response = self.client.get(f"{URL_CMS_PAGE}?site__exact={self.site3.pk}")
             self.assertEqual(response.status_code, 200)
             create_page("page_3b", "nav_playground.html", "de", site=self.site3)
 
@@ -65,10 +65,10 @@ class SiteTestCase(CMSTestCase):
             response = self.client.get(admin_reverse('cms_page_preview_page', args=[page.pk, 'de']))
             self.assertEqual(response.status_code, 302)
             if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
-                self.assertEqual(response._headers['location'][1], 'http://sample2.com{}&language=de'.format(page_edit_url_on))
+                self.assertEqual(response._headers['location'][1], f'http://sample2.com{page_edit_url_on}&language=de')
             else:
                 #  for django3.2 and above. response.headers replace response._headers in earlier versions of django
-                self.assertEqual(response.headers['Location'], 'http://sample2.com{}&language=de'.format(page_edit_url_on))
+                self.assertEqual(response.headers['Location'], f'http://sample2.com{page_edit_url_on}&language=de')
 
 
     def test_site_publish(self):

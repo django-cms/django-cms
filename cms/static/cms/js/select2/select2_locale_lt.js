@@ -1,6 +1,6 @@
 /**
  * Select2 Lithuanian translation.
- * 
+ *
  * @author  CRONUS Karmalakas <cronus dot karmalakas at gmail dot com>
  * @author  Uriy Efremochkin <efremochkin@uriy.me>
  */

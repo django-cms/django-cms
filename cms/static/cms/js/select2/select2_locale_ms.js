@@ -1,6 +1,6 @@
 /**
  * Select2 Malay translation.
- * 
+ *
  * Author: Kepoweran <kepoweran@gmail.com>
  */
 (function ($) {

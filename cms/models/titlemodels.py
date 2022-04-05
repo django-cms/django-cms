@@ -55,7 +55,7 @@ class Title(models.Model):
         app_label = 'cms'
 
     def __str__(self):
-        return "%s (%s, %s)" % (self.title, self.slug, self.language)
+        return f"{self.title} ({self.slug}, {self.language})"
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
@@ -69,7 +69,7 @@ class Title(models.Model):
 
     def get_path_for_base(self, base_path=''):
         old_base, sep, slug = self.path.rpartition('/')
-        return '%s/%s' % (base_path, slug) if base_path else slug
+        return f'{base_path}/{slug}' if base_path else slug
 
     @property
     def has_path_override(self):

@@ -20,7 +20,7 @@ def compile_messages():
     try:
         pipe = subprocess.Popen(['msgfmt', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except OSError as e:
-        raise CommandError('Unable to run msgfmt (gettext) command. You probably don\'t have gettext installed. {}'.format(e))
+        raise CommandError(f'Unable to run msgfmt (gettext) command. You probably don\'t have gettext installed. {e}')
 
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):

@@ -192,7 +192,7 @@ const testsIntegration = (done) => {
         logger: gutil.log.bind(gutil),
         waitForMigrations: 5 // seconds
     });
-    done();  
+    done();
 }
 
 const webpackBundle = function(opts) {

@@ -1,5 +1,3 @@
-
-
 def use_draft(request):
     is_staff = (request.user.is_authenticated and request.user.is_staff)
     return is_staff and not request.session.get('cms_preview')

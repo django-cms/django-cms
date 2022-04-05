@@ -81,7 +81,7 @@ class Wizard(WizardBase):
         model = self.get_model()
         if model:
             model_name = model._meta.verbose_name
-            return _(u"Create a new %s instance.") % model_name
+            return _("Create a new %s instance.") % model_name
 
         return ""
 
@@ -109,7 +109,7 @@ class Wizard(WizardBase):
         model = self.get_model()
         app_label = model._meta.app_label
         model_name = model.__name__.lower()
-        return user.has_perm("%s.%s_%s" % (app_label, "add", model_name))
+        return user.has_perm("{}.{}_{}".format(app_label, "add", model_name))
 
     def get_success_url(self, obj, **kwargs):
         """
@@ -124,7 +124,7 @@ class Wizard(WizardBase):
         # Add 'edit' to GET params of URL
         if self.edit_mode_on_success:
             sep = "&" if "?" in url else "?"
-            url = '{0}{1}{2}'.format(
+            url = '{}{}{}'.format(
                 url, sep, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON'))
         return url
 
@@ -135,8 +135,8 @@ class Wizard(WizardBase):
             model = self.form._meta.model
             if model:
                 return model
-        raise ImproperlyConfigured(u"Please set entry 'model' attribute or use "
-                                   u"ModelForm subclass as a form")
+        raise ImproperlyConfigured("Please set entry 'model' attribute or use "
+                                   "ModelForm subclass as a form")
 
     @cached_property
     def widget_attributes(self):

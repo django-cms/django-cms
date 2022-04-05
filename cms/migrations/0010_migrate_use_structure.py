@@ -25,9 +25,9 @@ def forwards(apps, schema_editor):
         ph_ctype = get_manager(ContentType).get_for_model(ph_model)
         page_ctype = get_manager(ContentType).get_for_model(page_model)
         permission, __ = get_manager(Permission).get_or_create(
-            codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
+            codename='use_structure', content_type=ph_ctype, name="Can use Structure mode")
         page_permission, __ = get_manager(Permission).get_or_create(
-            codename='change_page', content_type=page_ctype, name=u'Can change page'
+            codename='change_page', content_type=page_ctype, name='Can change page'
         )
         for user in get_manager(user_model).filter(is_superuser=False, is_staff=True):
             if user.user_permissions.filter(codename='change_page', content_type_id=page_ctype.pk).exists():
@@ -36,7 +36,7 @@ def forwards(apps, schema_editor):
             if page_permission in group.permissions.all():
                 group.permissions.add(permission.pk)
     except Exception:
-        warnings.warn(u'Users not migrated to use_structure permission, please add the permission manually')
+        warnings.warn('Users not migrated to use_structure permission, please add the permission manually')
 
 
 def backwards(apps, schema_editor):
@@ -56,14 +56,14 @@ def backwards(apps, schema_editor):
 
     try:
         permission, __ = get_manager(Permission).get_or_create(
-            codename='use_structure', content_type=ph_ctype, name=u"Can use Structure mode")
+            codename='use_structure', content_type=ph_ctype, name="Can use Structure mode")
         for user in get_manager(user_model).filter(is_superuser=False, is_staff=True):
             user.user_permissions.remove(permission.pk)
         for group in get_manager(Group).all():
             if permission in group.permissions.all():
                 group.permissions.remove(permission.pk)
     except Exception:
-        warnings.warn(u'use_structure not removed from all the users, please check the permission manually')
+        warnings.warn('use_structure not removed from all the users, please check the permission manually')
 
 
 class Migration(migrations.Migration):

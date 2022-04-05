@@ -1,4 +1,3 @@
-
 import importlib
 
 from django.core.exceptions import ImproperlyConfigured

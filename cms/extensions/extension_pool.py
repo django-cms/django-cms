@@ -34,7 +34,7 @@ class ExtensionPool:
             self.title_extensions.add(extension)
         else:
             raise SubClassNeededError(
-                'Extension has to subclass either %r or %r. %r does not!' % (PageExtension, TitleExtension, extension)
+                f'Extension has to subclass either {PageExtension!r} or {TitleExtension!r}. {extension!r} does not!'
             )
         self._activate_signaling()
         return extension

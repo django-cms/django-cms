@@ -94,7 +94,7 @@ class Migration(IrreversibleMigration):
         ),
         migrations.AlterUniqueTogether(
             name='page',
-            unique_together=set([('node', 'publisher_is_draft')]),
+            unique_together={('node', 'publisher_is_draft')},
         ),
         migrations.AlterModelManagers(
             name='pageusergroup',

@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # Andre Manzano <andremanzano@gmail.com>, 2014
 # Cleber de Souza Corrêa <cscorrea@gmail.com>, 2014

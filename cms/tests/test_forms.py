@@ -170,7 +170,7 @@ class FormsTestCase(CMSTestCase):
                             'nav_playground.html', 'en',
                             site=site, parent=page1)
         # enforce the choices to be casted to a list
-        site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
+        site_choices, page_choices = (list(bit) for bit in update_site_and_page_choices('en'))
         self.assertEqual(page_choices, [
             ('', '----'),
             (site.name, [

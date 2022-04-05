@@ -17,8 +17,7 @@ def get_descendants(root):
     for child in children.iterator():
         yield child
 
-        for descendant in get_descendants(child):
-            yield descendant
+        yield from get_descendants(child)
 
 
 class FixTreeCommand(SubcommandsCommand):

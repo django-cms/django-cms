@@ -128,4 +128,4 @@ class ApphooksReloadTests(CMSTestCase):
 
         # And, this should result in a the updating of the UrlconfRevision
         new_revision, _ = UrlconfRevision.get_or_create_revision()
-        self.assertNotEquals(current_revision, new_revision)
+        self.assertNotEqual(current_revision, new_revision)

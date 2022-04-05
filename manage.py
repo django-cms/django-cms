@@ -7,6 +7,7 @@ import app_manage
 
 from cms.exceptions import DontUsePageAttributeWarning
 
+
 def gettext(s):
     return s
 
@@ -194,7 +195,7 @@ if __name__ == '__main__':
             ('de', gettext('German')),
             ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
-            ('es-mx', u'Español'),
+            ('es-mx', 'Español'),
         ),
         CMS_LANGUAGES={
             1: [
@@ -222,7 +223,7 @@ if __name__ == '__main__':
                 },
                 {
                     'code': 'es-mx',
-                    'name': u'Español',
+                    'name': 'Español',
                     'public': True,
                 },
             ],
