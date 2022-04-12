@@ -52,7 +52,7 @@ class PageSelectWidget(MultiWidget):
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or inital value we get
+        # the same as an empty string, if the data or initial value we get
         # is None, replace it w/ u''.
         if data is None or (len(data)>=2 and data[1] in [None,'']):
             data_value = u''
