@@ -757,11 +757,12 @@ class Page(models.Model):
 
     # ## PageContent object access
 
-    def get_title_obj(self, language=None, fallback=True, force_reload=False):
-        """Helper function for accessing wanted / current title.
-        If wanted title doesn't exists, EmptyPageContent instance will be returned.
+    def get_content_obj(self, language=None, fallback=True, force_reload=False):
         """
-        language = self._get_title_cache(language, fallback, force_reload)
+        Helper function for accessing wanted / current page content.
+        If wanted page content doesn't exist, EmptyPageContent instance will be returned.
+        """
+        language = self._get_page_content_cache(language, fallback, force_reload)
         if language in self.title_cache:
             return self.title_cache[language]
         from cms.models import EmptyPageContent
@@ -769,18 +770,15 @@ class Page(models.Model):
         return EmptyPageContent(language)
 
     def get_page_content_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
-        """Helper function for getting attribute or None from wanted/current title.
-        """
+        """Helper function for getting attribute or None from wanted/current page content."""
         try:
-            attribute = getattr(self.get_title_obj(language, fallback, force_reload), attrname)
+            attribute = getattr(self.get_content_obj(language, fallback, force_reload), attrname)
             return attribute
         except AttributeError:
             return None
 
     def get_path(self, language, fallback=True):
-        """
-        get the path of the page depending on the given language
-        """
+        """Get the path of the page depending on the given language"""
         languages = [language]
 
         if fallback:
@@ -832,7 +830,7 @@ class Page(models.Model):
         except (AttributeError, KeyError):
             return None
 
-    def get_title(self, language=None, fallback=True, force_reload=False):
+    def get_page_content(self, language=None, fallback=True, force_reload=False):
         """
         get the title of the page depending on the given language
         """
@@ -844,7 +842,7 @@ class Page(models.Model):
         """
         menu_title = self.get_page_content_obj_attribute("menu_title", language, fallback, force_reload)
         if not menu_title:
-            return self.get_title(language, True, force_reload)
+            return self.get_page_content(language, True, force_reload)
         return menu_title
 
     def get_placeholders(self, language):
@@ -872,7 +870,7 @@ class Page(models.Model):
         page_title = self.get_page_content_obj_attribute("page_title", language, fallback, force_reload)
 
         if not page_title:
-            return self.get_title(language, True, force_reload)
+            return self.get_page_content(language, True, force_reload)
         return page_title
 
     def get_meta_description(self, language=None, fallback=True, force_reload=False):
@@ -893,30 +891,29 @@ class Page(models.Model):
         """
         return self.get_page_content_obj_attribute("redirect", language, fallback, force_reload)
 
-    def _get_title_cache(self, language, fallback, force_reload):
+    def _get_page_content_cache(self, language, fallback, force_reload):
         def get_fallback_language(page, language):
             fallback_langs = i18n.get_fallback_languages(language)
             for lang in fallback_langs:
-                if page.title_cache.get(lang):
+                if page.page_content_cache.get(lang):
                     return lang
 
         if not language:
             language = get_language()
 
-        force_reload = (force_reload or language not in self.title_cache)
+        force_reload = (force_reload or language not in self.page_content_cache)
         if force_reload:
             from cms.models import PageContent
-            titles = PageContent.objects.filter(page=self)
-            for title in titles:
-                self.title_cache[title.language] = title
+            page_contents = PageContent.objects.filter(page=self)
+            for page_content in page_contents:
+                self.title_cache[page_content.language] = page_content
 
-        if self.title_cache.get(language):
+        if self.page_content_cache.get(language):
             return language
-
 
         use_fallback = all([
             fallback,
-            not self.title_cache.get(language),
+            not self.page_content_cache.get(language),
             get_fallback_language(self, language)
         ])
         if use_fallback:
