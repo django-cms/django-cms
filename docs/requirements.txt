@@ -19,13 +19,14 @@ charset-normalizer==2.0.12
 click==8.0.4
     # via pip-tools
 codespell==2.1.0
+    # via -r requirements.in
 colorama==0.4.4
     # via sphinx-autobuild
 coverage==6.3.2
     # via -r requirements.in
 datetime==4.4
     # via -r requirements.in
-django==3.2.12
+django==3.2.13
     # via
     #   -r requirements.in
     #   django-classy-tags
