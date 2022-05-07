@@ -16,3 +16,5 @@ iptools
 django-app-helper
 mock>=2.0.0
 flake8
+isort
+pre-commit

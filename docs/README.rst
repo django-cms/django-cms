@@ -5,7 +5,7 @@ django CMS Documentation
 Run the documentation locally
 -----------------------------
 
-Install the Enchant libary
+Install the Enchant library
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 You will need to install the

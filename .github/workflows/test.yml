@@ -12,11 +12,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.7', '3.8', '3.9', '3.10']
+        python-version: [ '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -35,10 +36,10 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -64,11 +65,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.7', '3.8', '3.9', '3.10']
+        python-version: [ '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -86,10 +88,10 @@ jobs:
 
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -115,21 +117,22 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.7', '3.8', '3.9', '3.10']
+        python-version: [ '3.8', '3.9', '3.10']
         requirements-file: [
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
+          django-4.0.txt,
         ]
         os: [
           ubuntu-20.04,
         ]
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v3
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'

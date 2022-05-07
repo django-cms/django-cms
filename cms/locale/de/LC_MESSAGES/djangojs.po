@@ -5,14 +5,15 @@
 # Translators:
 # Jonas Obrist <me@ojii.ch>, 2011
 # Michael P. Jung <michael.jung@terreon.de>, 2013
+# Peter Wischer <peter.wischer@lwl.org>, 2022
 # Stefan T. Oertel <me@schneck.cc>, 2015
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2022-03-26 17:28+0800\n"
+"PO-Revision-Date: 2010-11-30 06:49+0000\n"
+"Last-Translator: Peter Wischer <peter.wischer@lwl.org>, 2022\n"
 "Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -20,5 +21,14 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "pathname"
+msgstr "Pfadname"
+
+msgid "urnpath"
+msgstr "URN-Pfad"
+
+msgid "reserved"
+msgstr "reserviert"
+
 msgid "Are you sure you want to change tabs without saving the page first?"
-msgstr "Sind Sie sicher Sie wollen die Sprache ändern ohne vorher zu speichern?"
+msgstr "Sind Sie sicher Sie wollen den Reiter wechseln ohne vorher zu speichern?"

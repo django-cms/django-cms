@@ -24,7 +24,7 @@ CMS.config = {
         'toolbar': '{% language cms_toolbar.request_language %}{% cms_admin_url "cms_usersettings_get_toolbar" %}{% endlanguage %}'
     },
     'lang': {
-        {% if user.is_authenticated %}
+        {% if debug and user.is_authenticated %}
         'debug': '{% filter escapejs %}{% blocktrans %}Development version using django CMS {{ cms_version }}, Django {{ django_version }}, Python {{ python_version }}{% endblocktrans %}{% endfilter %}',
         {% endif %}
         'cancel': '{% filter escapejs %}{% trans "Cancel" %}{% endfilter %}',

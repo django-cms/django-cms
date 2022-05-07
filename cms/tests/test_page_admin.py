@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
+from django.http.response import HttpResponse
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
@@ -1679,9 +1680,8 @@ class PageTest(PageTestBase):
             page = self.get_page()
             form_url = admin_reverse("cms_page_change", args=(page.pk,))
             # Middleware is needed to correctly setup the environment for the admin
-            middleware = CurrentUserMiddleware()
             request = self.get_request()
-            middleware.process_request(request)
+            CurrentUserMiddleware(lambda req: HttpResponse).__call__(request)
             response = pageadmin.change_view(
                 request, str(page.pk),
                 form_url=form_url)

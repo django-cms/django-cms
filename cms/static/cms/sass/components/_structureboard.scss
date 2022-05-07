@@ -135,7 +135,8 @@
                 color: $btn-default-color !important;
                 font-size: $font-size-small !important;
                 &:hover {
-                    color: darken($btn-default-color, 10%) !important;
+                    color: $btn-default-color !important;
+                    filter: brightness(0.9);
                 }
             }
         }
@@ -265,7 +266,7 @@
             margin: 0;
             border: 2px solid $color-primary;
             border-radius: $border-radius-base;
-            background-color: mix(white, $color-primary, 90%);
+            background-color: rgba($color-primary-fallback, 20%);
             box-shadow: none;
             transform: translateY(0) !important;
             &:before {
@@ -315,7 +316,7 @@
             background-image: none !important;
             &:before {
                 display: none;
-                color: white;
+                color: $white;
             }
             .cms-draggables {
                 display: none;
@@ -381,7 +382,7 @@
 
     .cms-draggable-selected .cms-dragitem,
     .cms-draggable-selected .cms-dragitem strong {
-        color: adjust-hue($color-primary, 15deg);
+        color: adjust-hue($color-primary-fallback, 15deg);
     }
     .cms-draggable-selected .cms-draggable .cms-dragitem,
     .cms-draggable-selected .cms-draggable .cms-dragitem strong {
@@ -391,8 +392,8 @@
     .cms-draggable-allowed,
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
-        color: lighten($color-primary, 40%);
-        border-color: lighten($color-primary, 40%);
+        color: lighten($color-primary-fallback, 40%);
+        border-color: lighten($color-primary-fallback, 40%);
     }
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
@@ -543,7 +544,7 @@
     left: -2px;
     z-index: z(structure, content, droppable);
     border: 1px solid $color-primary !important;
-    background: mix(white, $color-primary, 80%) !important;
+    background: rgba($color-primary-fallback, 20%) !important;
     border-radius: $border-radius-base;
     opacity: 0.6;
 
