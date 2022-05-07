@@ -1,6 +1,7 @@
+from urllib.parse import quote
+
 from django.conf import settings
 from django.contrib.auth.views import redirect_to_login
-from django.utils.http import urlquote
 
 from cms.page_rendering import _handle_no_page
 from cms.utils import get_current_site
@@ -12,7 +13,7 @@ def cms_perms(func):
         page = request.current_page
         if page:
             if page.login_required and not request.user.is_authenticated:
-                return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
+                return redirect_to_login(quote(request.get_full_path()), settings.LOGIN_URL)
             site = get_current_site()
             if not user_can_view_page(request.user, page, site):
                 return _handle_no_page(request)

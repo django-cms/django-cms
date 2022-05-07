@@ -41,7 +41,7 @@
     "karma-sauce-launcher": "^0.3.0",
     "karma-sourcemap-loader": "^0.3.7",
     "karma-webpack": "^2.0.4",
-    "minimist": "1.2.0",
+    "minimist": "1.2.6",
     "phantomjs-prebuilt": "^2.1.7",
     "raw-loader": "^0.5.1",
     "sass": "^1.27.0",
@@ -56,7 +56,7 @@
     "lodash": "4.17.21",
     "nprogress": "^0.2.0",
     "prevent-parent-scroll": "0.0.6",
-    "urijs": "^1.19.10",
+    "urijs": "^1.19.11",
     "webpack2-polyfill-plugin": "0.0.2"
  },
   "scripts": {

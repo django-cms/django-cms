@@ -101,7 +101,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 middle = BrokenLinkEmailsMiddleware()
                 domain = request.get_host()
                 path = request.get_full_path()
-                referer = force_str(request.META.get('HTTP_REFERER', ''), errors='replace')
+                referer = force_str(request.headers.get('Referer', ''), errors='replace')
                 if not middle.is_ignorable_request(request, path, domain, referer):
                     mail_managers(subject, body, fail_silently=True)
             return None
