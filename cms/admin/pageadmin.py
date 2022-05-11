@@ -714,7 +714,7 @@ class PageAdmin(admin.ModelAdmin):
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
 
     def edit_title_fields(self, request, page_id, language):
-        page = self.get_object(request, page_id)
+        page = self.get_object(request, object_id=page_id)
         translation = page.get_title_obj(language, fallback=False)
 
         if not self.has_change_permission(request, obj=page):
