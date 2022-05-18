@@ -705,16 +705,16 @@ class PageAdmin(admin.ModelAdmin):
         page_languages = page.get_languages()
         site_languages = get_language_list(site_id=site.pk)
 
-        if not any(lang in  page_languages for lang in site_languages):
+        if not any(lang in page_languages for lang in site_languages):
             message = force_str(_("Error! The page you're pasting is not "
-                                   "translated in any of the languages configured by the target site."))
+                                  "translated in any of the languages configured by the target site."))
             return jsonify_request(HttpResponseBadRequest(message))
 
         new_page = form.copy_page()
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
 
     def edit_title_fields(self, request, page_id, language):
-        page = self.get_object(page_id)
+        page = self.get_object(request, object_id=page_id)
         translation = page.get_title_obj(language, fallback=False)
 
         if not self.has_change_permission(request, obj=page):
