@@ -211,7 +211,8 @@ class ToolbarTests(ToolbarTestBase):
                 },
             )
             self.assertEqual(response.status_code, 200)
-            self.assertNotContains(response, "Clipboard")  # No clipboard exposed to invalid cms_path
+            # No clipboard exposed to invalid cms_path
+            self.assertNotContains(response, "Clipboard")
 
             # Invalid app / model
             response = self.client.get(
