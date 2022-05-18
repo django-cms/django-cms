@@ -280,7 +280,7 @@ export const Helpers = {
     },
 
     /**
-     * Modifies the url with new params and sanitises the url 
+     * Modifies the url with new params and sanitises the url
      * reversing any &amp; to ampersand (introduced with #3404)
      *
      * @method makeURL
