@@ -1072,7 +1072,7 @@ class StructureBoard {
                 `${CMS.config.request.toolbar}?` +
                     placeholderIds +
                     '&' +
-                     `obj_id=${CMS.config.request.pk}&` +
+                    `obj_id=${CMS.config.request.pk}&` +
                     `obj_type=${encodeURIComponent(CMS.config.request.model)}`
             )
         });
