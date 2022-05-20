@@ -1,5 +1,5 @@
-from contextlib import contextmanager
 import inspect
+from contextlib import contextmanager
 from itertools import chain
 
 from django.conf import settings
@@ -9,9 +9,8 @@ from sekizai.helpers import validate_template
 
 from cms import constants
 from cms.models import AliasPluginModel
-from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import is_installed
-
+from cms.utils.conf import get_cms_setting
 
 SUCCESS = 1
 WARNING = 2
@@ -94,7 +93,7 @@ class FileOutputWrapper:
         wrapper = self.section_wrapper(self)
         try:
             yield wrapper
-        except:
+        except:  # noqa: E722
             self.error('Checker failed, see traceback')
             raise
         self.errors += wrapper.errors
@@ -271,20 +270,23 @@ def check_plugin_instances(output):
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
         else:
-            section.finish_error("There are potentially serious problems with the plugins in your database. \nEven if "
-                                 "your site works, you should run the 'manage.py cms list plugins' \ncommand and then "
-                                 "the 'manage.py cms delete-orphaned-plugins' command. \nThis will alter your "
-                                 "database; read the documentation before using it.")
+            section.finish_error(
+                "There are potentially serious problems with the plugins in your database. \nEven if "
+                "your site works, you should run the 'manage.py cms list plugins' \ncommand and then "
+                "the 'manage.py cms delete-orphaned-plugins' command. \nThis will alter your "
+                "database; read the documentation before using it."
+            )
 
 
 @define_check
 def check_copy_relations(output):
-    from cms.plugin_pool import plugin_pool
     from cms.extensions import extension_pool
     from cms.extensions.models import BaseExtension
     from cms.models.pluginmodel import CMSPlugin
+    from cms.plugin_pool import plugin_pool
 
-    def c_to_s(klass): return '%s.%s' % (klass.__module__, klass.__name__)
+    def c_to_s(klass):
+        return '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):
         for cls in inspect.getmro(model):
@@ -346,8 +348,9 @@ def check_placeholder_fields(output):
     should be also a subclass of PlaceholderAdminMixin
     """
     from django.contrib.admin import site
-    from cms.models.fields import PlaceholderField
+
     from cms.admin.placeholderadmin import PlaceholderAdminMixin
+    from cms.models.fields import PlaceholderField
 
     with output.section("PlaceholderField") as section:
         for model, model_admin in site._registry.items():

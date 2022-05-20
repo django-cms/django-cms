@@ -163,7 +163,7 @@ django CMS   Python                    Django
 \            3.9 3.8 3.7 3.6 3.5 3.4   3.2 3.1 3.0 2.2 2.1 2.0 1.11
 ===========  === === === === === ===   === === === === === === ====
 4.0.x        ✓   ✓   ✓   ✓   ×   ×     ✓   ✓   ✓   ✓   ×   ×   ×
-3.9.x        ✓   ✓   ✓   ×   ×   ×     ✓   ✓   ✓   ✓   ×   ×   ×
+3.9.x        ✓   ✓   ✓   ✓   ×   ×     ✓   ✓   ✓   ✓   ×   ×   ×
 3.8.x        ×   ✓   ✓   ✓   ✓   ×     x   ✓   ✓   LTS ×   ×   ×
 3.7.x        ×   ✓   ✓   ✓   ✓   ✓     x   x   ✓   LTS ✓   ✓   LTS
 3.6.x        ×   ×   ✓   ✓   ✓   ✓     x   x   x   ✓   ✓   ✓   ✓
@@ -194,4 +194,4 @@ project.
     topics/index
     contributing/index
     upgrade/index
-    user/index
+    whoisbehind/index

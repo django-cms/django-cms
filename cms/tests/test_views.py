@@ -10,14 +10,13 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches
 
 from cms.api import create_page, create_title, publish_page
-from cms.models import PagePermission, UserSettings, Placeholder
+from cms.models import PagePermission, Placeholder, UserSettings
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.conf import get_cms_setting
 from cms.views import details
 from menus.menu_pool import menu_pool
-
 
 APP_NAME = 'SampleApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
@@ -156,13 +155,14 @@ class ViewTests(CMSTestCase):
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", published=True, login_required=True)
         plain_url = '/accounts/'
-        login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
+        login_rx = re.compile(r"%s\?(signin=|next=/en/)&" % plain_url)
         with self.settings(LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/en/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
             self.assertTrue(login_rx.search(response['Location']))
-        login_rx = re.compile("%s\?(signin=|next=/)&" % plain_url)
+
+        login_rx = re.compile(r"%s\?(signin=|next=/)&" % plain_url)
         with self.settings(USE_I18N=False, LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/')
             response = details(request, '')

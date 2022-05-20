@@ -1,8 +1,8 @@
-from copy import deepcopy
 from collections import defaultdict
+from copy import deepcopy
+from functools import lru_cache
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
-from functools import lru_cache
 
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
@@ -51,10 +51,11 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     fallbacks = defaultdict(list)
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (not is_fallback and
-        not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active)):
-        disjoint_placeholders = (ph for ph in placeholders
-                                 if all(ph.pk != p.placeholder_id for p in plugins))
+    if not is_fallback and not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active):
+        disjoint_placeholders = (
+            ph for ph in placeholders
+            if all(ph.pk != p.placeholder_id for p in plugins)
+        )
         for placeholder in disjoint_placeholders:
             if get_placeholder_conf("language_fallback", placeholder.slot, template, True):
                 for fallback_language in get_fallback_languages(lang):
@@ -281,7 +282,7 @@ def downcast_plugins(plugins,
 
         # put them in a map so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_qs.iterator():
+        for instance in plugin_qs.all():
             placeholder = placeholders_by_id.get(instance.placeholder_id)
 
             if placeholder:

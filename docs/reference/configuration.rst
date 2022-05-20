@@ -408,8 +408,8 @@ A list of plugin processors. Plugin processors are callables that modify all
 plugins' output *after* rendering. See :doc:`/how_to/custom_plugins`
 for more information.
 
-..  setting:: CMS_APPHOOKS
 
+..  setting:: CMS_APPHOOKS
 
 CMS_APPHOOKS
 ============
@@ -431,6 +431,22 @@ Example::
         'otherapp.cms_app.MyFancyApp',
         'sampleapp.cms_app.SampleApp',
     )
+
+
+..  setting:: CMS_ADMIN_NAMESPACE
+
+CMS_ADMIN_NAMESPACE
+=====================
+
+default
+    ``admin``
+
+Used to configure the namespace of the admin interface.
+
+When using a custom instance of Django's
+:class:`~django.contrib.admin.AdminSite`, provide the unique instance name as
+``CMS_ADMIN_NAMESPACE``. This instance name is used when :ref:`reversing admin
+URLs <django:admin-reverse-urls>`.
 
 
 .. _i18n_l10n_reference:
@@ -949,6 +965,22 @@ If the toolbar is visible the page is not cached as well.
 
 ..  setting:: CMS_PLACEHOLDER_CACHE
 
+CMS_INVALIDATE_PAGE_CACHE_ON_STARTUP
+====================================
+
+default
+    ``True``
+
+Should the cache version be invalidated on startup?
+In a instance where you cannot access the cache in the init phase (for example,
+Google App Engine) or where you don't want to invalidate the page cache on the
+startup of a new instance (for example, with many instances scaling up and down
+rapidly), you may want to keep the page cache version in the cache rather than
+reset it on the start of every new instance.
+
+
+..  setting:: INVALIDATE_PAGE_CACHE_ON_STARTUP
+
 CMS_PLACEHOLDER_CACHE
 =====================
 
@@ -1002,6 +1034,30 @@ Example::
     ]
 
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
+
+
+CMS_ENABLE_HELP
+===============
+
+default
+    ``True``
+
+This setting controls if the help menu appears in the toolbar.
+
+
+CMS_EXTRA_HELP_MENU_ITEMS
+=========================
+
+Example::
+
+    CMS_EXTRA_HELP_MENU_ITEMS = (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    )
+
+This setting adds to the default links of the support menu allowing project or company support links.
 
 
 CMS_TOOLBAR_ANONYMOUS_ON

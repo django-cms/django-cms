@@ -1,16 +1,10 @@
 import json
 import re
 
-from django.shortcuts import render as render_to_response
-
 from django import forms
-from django.contrib import admin
-from django.contrib import messages
-from django.core.exceptions import (
-    ImproperlyConfigured,
-    ObjectDoesNotExist,
-    ValidationError,
-)
+from django.contrib import admin, messages
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.shortcuts import render as render_to_response
 from django.utils.encoding import force_str
 from django.utils.html import escapejs
 from django.utils.translation import gettext, gettext_lazy as _
@@ -18,7 +12,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
-from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
+from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree_as_json
 from cms.utils.conf import get_cms_setting
 
 
@@ -42,8 +36,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 % (new_plugin.model, new_plugin)
             )
         # validate the template:
-        if (not hasattr(new_plugin, 'render_template') and
-                not hasattr(new_plugin, 'get_render_template')):
+        if (not hasattr(new_plugin, 'render_template') and not hasattr(new_plugin, 'get_render_template')):
             raise ImproperlyConfigured(
                 "CMSPluginBase subclasses must have a render_template attribute"
                 " or get_render_template method"
@@ -86,7 +79,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 ]
         # Set default name
         if not new_plugin.name:
-            new_plugin.name = re.sub("([a-z])([A-Z])", "\g<1> \g<2>", name)
+            new_plugin.name = re.sub("([a-z])([A-Z])", r"\g<1> \g<2>", name)
 
         # By flagging the plugin class, we avoid having to call these class
         # methods for every plugin all the time.
@@ -105,7 +98,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     module = _("Generic")  # To be overridden in child classes
 
     form = None
-    change_form_template = "admin/cms/page/plugin/change_form.html"
+    change_form_template = 'admin/cms/page/plugin/change_form.html'
+    plugin_confirm_template = 'admin/cms/page/plugin/confirm_form.html'
     # Should the plugin be rendered in the admin?
     admin_preview = False
 
@@ -163,7 +157,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             template = None
 
         if not template:
-            raise ValidationError("plugin has no render_template: %s" % self.__class__)
+            raise ImproperlyConfigured("plugin has no render_template: %s" % self.__class__)
         return template
 
     @classmethod
@@ -302,7 +296,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         if extra_context:
             context.update(extra_context)
         return render_to_response(
-            request, 'admin/cms/page/plugin/confirm_form.html', context
+            request, self.plugin_confirm_template, context
         )
 
     def save_model(self, request, obj, form, change):

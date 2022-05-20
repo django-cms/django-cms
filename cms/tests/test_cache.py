@@ -3,31 +3,22 @@ import time
 
 from django.conf import settings
 from django.template import Context
-
 from sekizai.context import SekizaiContext
 
 from cms.api import add_plugin, create_page, create_title
 from cms.cache import _get_cache_version, invalidate_cms_page_cache
 from cms.cache.placeholder import (
-    _get_placeholder_cache_version_key,
-    _get_placeholder_cache_version,
-    _set_placeholder_cache_version,
-    _get_placeholder_cache_key,
-    set_placeholder_cache,
-    get_placeholder_cache,
-    clear_placeholder_cache,
+    _get_placeholder_cache_key, _get_placeholder_cache_version,
+    _get_placeholder_cache_version_key, _set_placeholder_cache_version,
+    clear_placeholder_cache, get_placeholder_cache, set_placeholder_cache,
 )
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
-    DateTimeCacheExpirationPlugin,
-    LegacyCachePlugin,
-    NoCachePlugin,
-    SekizaiPlugin,
-    TimeDeltaCacheExpirationPlugin,
-    TTLCacheExpirationPlugin,
+    DateTimeCacheExpirationPlugin, LegacyCachePlugin, NoCachePlugin,
+    SekizaiPlugin, TimeDeltaCacheExpirationPlugin, TTLCacheExpirationPlugin,
     VaryCacheOnPlugin,
 )
 from cms.test_utils.testcases import CMSTestCase
@@ -633,7 +624,7 @@ class CacheTestCase(CMSTestCase):
         ###
         # add the test plugin
         ##
-        test_plugin = add_plugin(ph1, u"TextPlugin", u"en", body="Some text")
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some text")
         test_plugin.save()
 
         request = self.get_request()
@@ -705,7 +696,7 @@ class CacheTestCase(CMSTestCase):
 
         text = content_renderer.render_placeholder(ph1, context, use_cache=True)
         self.assertEqual(text, "Some textSome other text")
-        
+
 
 class PlaceholderCacheTestCase(CMSTestCase):
     def setUp(self):

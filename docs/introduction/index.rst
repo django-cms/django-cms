@@ -1,8 +1,8 @@
 .. _tutorials:
 
-#########
-Tutorials
-#########
+###############
+Getting Started
+###############
 
 The pages in this section of the documentation are aimed at the newcomer to
 django CMS. They're designed to help you get started quickly, and show how

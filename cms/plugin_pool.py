@@ -1,13 +1,13 @@
 from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.urls import re_path, include
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import slugify
+from django.urls import include, re_path
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language, deactivate_all, activate
-from django.template import TemplateDoesNotExist, TemplateSyntaxError
+from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
@@ -36,7 +36,7 @@ class PluginPool:
             return
         from cms.cache import invalidate_cms_page_cache
 
-        if get_cms_setting("PAGE_CACHE"):
+        if get_cms_setting("PAGE_CACHE") and get_cms_setting("INVALIDATE_PAGE_CACHE_ON_STARTUP"):
             invalidate_cms_page_cache()
 
         autodiscover_modules('cms_plugins')
@@ -50,18 +50,17 @@ class PluginPool:
     def validate_templates(self, plugin=None):
         """
         Plugins templates are validated at this stage
-
         """
         if plugin:
             plugins = [plugin]
         else:
             plugins = self.plugins.values()
         for plugin in plugins:
-            if (plugin.render_plugin and not type(plugin.render_plugin) == property
-                    or hasattr(plugin.model, 'render_template')
-                    or hasattr(plugin, 'get_render_template')):
-                if (plugin.render_template is None and
-                        not hasattr(plugin, 'get_render_template')):
+            if (plugin.render_plugin and not type(
+                    plugin.render_plugin) == property or hasattr(
+                    plugin.model, 'render_template') or hasattr(plugin, 'get_render_template')):
+
+                if (plugin.render_template is None and not hasattr(plugin, 'get_render_template')):
                     raise ImproperlyConfigured(
                         "CMS Plugins must define a render template, "
                         "a get_render_template method or "

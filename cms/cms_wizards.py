@@ -3,10 +3,9 @@ from django.utils.translation import gettext_lazy as _
 from cms.models import Page
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 
-from .wizards.wizard_pool import wizard_pool
-from .wizards.wizard_base import Wizard
-
 from .forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
+from .wizards.wizard_base import Wizard
+from .wizards.wizard_pool import wizard_pool
 
 
 class CMSPageWizard(Wizard):
@@ -37,19 +36,19 @@ class CMSSubPageWizard(Wizard):
 
 
 cms_page_wizard = CMSPageWizard(
-    title=_(u"New page"),
+    title=_("New page"),
     weight=100,
     form=CreateCMSPageForm,
     model=Page,
-    description=_(u"Create a new page next to the current page.")
+    description=_("Create a new page next to the current page.")
 )
 
 cms_subpage_wizard = CMSSubPageWizard(
-    title=_(u"New sub page"),
+    title=_("New sub page"),
     weight=110,
     form=CreateCMSSubPageForm,
     model=Page,
-    description=_(u"Create a page below the current page.")
+    description=_("Create a page below the current page.")
 )
 
 wizard_pool.register(cms_page_wizard)

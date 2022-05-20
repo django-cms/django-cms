@@ -1,3 +1,5 @@
+from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.forms.widgets import MultiWidget, Select, TextInput
@@ -6,13 +8,14 @@ from django.utils.encoding import force_str
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 
-from cms.utils.urlutils import admin_reverse, static_with_version
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.utils import get_page_choices, get_site_choices
 from cms.models import Page, PageUser
+from cms.utils.urlutils import admin_reverse, static_with_version
 
 
 class PageSelectWidget(MultiWidget):
-    """A widget that allows selecting a page by first selecting a site and then
+    """
+    A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
     """
     template_name = 'cms/widgets/pageselectwidget.html'
@@ -49,7 +52,7 @@ class PageSelectWidget(MultiWidget):
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or inital value we get
+        # the same as an empty string, if the data or initial value we get
         # is None, replace it w/ u''.
         if data is None or (len(data)>=2 and data[1] in [None,'']):
             data_value = u''
@@ -82,9 +85,7 @@ class PageSelectWidget(MultiWidget):
                 CMS.Widgets._pageSelectWidgets.push({
                     name: '%(name)s'
                 });
-            </script>""" % {
-                'name': name
-            }
+            </script>""" % {'name': name}
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
@@ -160,11 +161,14 @@ class UserSelectAdminWidget(Select):
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
-            add_url = admin_reverse('cms_pageuser_add')
+            if settings.AUTH_USER_MODEL:
+                auth_model = apps.get_model(settings.AUTH_USER_MODEL)
+                add_url = admin_reverse(f"{auth_model._meta.app_label}_{auth_model._meta.model_name}_add")
+            else:
+                add_url = admin_reverse('cms_pageuser_add')
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
         return mark_safe(u''.join(output))
-
 
 class AppHookSelect(Select):
 

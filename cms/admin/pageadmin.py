@@ -1,80 +1,67 @@
-from collections import namedtuple
 import copy
 import json
 import sys
 import uuid
-
+from collections import namedtuple
 
 import django
-from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
-from django.urls import re_path
 from django.contrib import admin, messages
-from django.contrib.admin.models import LogEntry, CHANGE
+from django.contrib.admin.helpers import AdminForm
+from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import (ObjectDoesNotExist,
-                                    PermissionDenied, ValidationError)
-from django.db import router, transaction
-from django.db.models import Q, Prefetch
-from django.http import (
-    HttpResponseRedirect,
-    HttpResponse,
-    Http404,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
+from django.core.exceptions import (
+    ObjectDoesNotExist, PermissionDenied, ValidationError,
 )
-from django.shortcuts import render, get_object_or_404
+from django.db import router, transaction
+from django.db.models import Prefetch, Q
+from django.http import (
+    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+    HttpResponseRedirect, QueryDict,
+)
+from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.utils.encoding import force_str
-from django.utils.translation import gettext, gettext_lazy as _, get_language
+from django.urls import NoReverseMatch, re_path
 from django.utils.decorators import method_decorator
+from django.utils.encoding import force_str
+from django.utils.translation import get_language, gettext, gettext_lazy as _
 from django.views.decorators.http import require_POST
-from django.http import QueryDict
 
 from cms import operations
 from cms.admin.forms import (
-    AddPageForm,
-    AddPageTypeForm,
-    AdvancedSettingsForm,
-    ChangePageForm,
-    ChangeListForm,
-    CopyPageForm,
-    CopyPermissionForm,
-    DuplicatePageForm,
-    MovePageForm,
-    PagePermissionForm,
-    PublicationDatesForm,
+    AddPageForm, AddPageTypeForm, AdvancedSettingsForm, ChangeListForm,
+    ChangePageForm, CopyPageForm, CopyPermissionForm, DuplicatePageForm,
+    MovePageForm, PagePermissionForm, PublicationDatesForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
-    EmptyTitle, Page, PageType,
-    Title, CMSPlugin, PagePermission,
-    GlobalPagePermission, StaticPlaceholder,
+    CMSPlugin, EmptyTitle, GlobalPagePermission, Page, PagePermission,
+    PageType, StaticPlaceholder, Title,
 )
 from cms.plugin_pool import plugin_pool
-from cms.signals import pre_obj_operation, post_obj_operation
+from cms.signals import post_obj_operation, pre_obj_operation
 from cms.signals.apphook import set_restart_trigger
 from cms.toolbar_pool import toolbar_pool
-from cms.utils import permissions, get_current_site, get_language_from_request, copy_plugins
-from cms.utils import page_permissions
-from cms.utils.i18n import (
-    get_language_list,
-    get_language_tuple,
-    get_language_object,
-    get_site_language_from_request,
+from cms.utils import (
+    copy_plugins, get_current_site, get_language_from_request,
+    page_permissions, permissions,
 )
 from cms.utils.admin import jsonify_request
-from cms.utils.conf import get_cms_setting
-from cms.utils.urlutils import admin_reverse
 from cms.utils.compat.response import get_response_headers
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import (
+    get_language_list, get_language_object, get_language_tuple,
+    get_site_language_from_request,
+)
+from cms.utils.urlutils import admin_reverse
 
 require_POST = method_decorator(require_POST)
 
@@ -174,7 +161,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^([0-9]+)/advanced-settings/$', self.advanced),
@@ -480,8 +469,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             opts=opts,
             app_label=app_label,
             preserved_filters=self.get_preserved_filters(request),
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
+            is_popup=(
+                IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET
+            ),
             to_field=None,
         )
         context.update(extra_context or {})
@@ -1183,7 +1173,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         if 'redirect' in request.GET:
             return HttpResponseRedirect(request.GET['redirect'])
-        referrer = request.META.get('HTTP_REFERER', '')
+        referrer = request.headers.get('Referer', '')
 
         path = admin_reverse("cms_page_changelist")
         if request.GET.get('redirect_language'):
@@ -1434,9 +1424,9 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 # get all root nodes
                 Q(node__depth=1)
                 # or children which were previously open
-                | Q(node__depth=2, node__in=open_nodes)
+                | Q(node__depth=2, node__in=open_nodes)  # noqa: W503
                 # or children of the open descendants
-                | Q(node__parent__in=open_nodes)
+                | Q(node__parent__in=open_nodes)  # noqa: W503
             )
         pages = pages.prefetch_related(
             Prefetch(
@@ -1546,7 +1536,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                 # In case it can't, object it's not taken into account
                 try:
                     force_str(obj.get_absolute_url())
-                except:
+                except [AttributeError, NoReverseMatch, TypeError]:
                     obj = None
             else:
                 obj = None
@@ -1563,7 +1553,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
                         obj = None
                     try:
                         force_str(obj.get_absolute_url())
-                    except:
+                    except:  # noqa: E722
                         obj = None
         if obj:
             if not getattr(request, 'toolbar', False) or not getattr(request.toolbar, 'edit_mode_active', False):
@@ -1679,10 +1669,13 @@ class PageAdmin(BasePageAdmin):
         return queryset.exclude(is_page_type=True)
 
     def get_urls(self):
-        """Get the admin urls
+        """
+        Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        def pat(regex, fn): return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^([0-9]+)/set-home/$', self.set_home),
@@ -1737,10 +1730,15 @@ class PageAdmin(BasePageAdmin):
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
             matching_published_pages = self.model.objects.published().public().filter(
-                Q(title_set__title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__path__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__menu_title__icontains=query_term, title_set__language=language_code)
-                | Q(title_set__page_title__icontains=query_term, title_set__language=language_code)
+                Q(
+                    title_set__title__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__path__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__menu_title__icontains=query_term, title_set__language=language_code
+                ) | Q(
+                    title_set__page_title__icontains=query_term, title_set__language=language_code
+                )
             ).distinct()
 
             results = []

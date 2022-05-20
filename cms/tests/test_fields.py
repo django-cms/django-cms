@@ -1,9 +1,9 @@
 from cms.api import create_page
-from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.project.sampleapp.models import (
-    PageOnDeleteCascade, PageOnDeleteSetNull,
-    PlaceholderOnDeleteCascade, PlaceholderOnDeleteSetNull,
+    PageOnDeleteCascade, PageOnDeleteSetNull, PlaceholderOnDeleteCascade,
+    PlaceholderOnDeleteSetNull,
 )
+from cms.test_utils.testcases import CMSTestCase
 
 
 class PageFieldOnDeleteTestCase(CMSTestCase):

@@ -7,6 +7,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
+from django.http.response import HttpResponse
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
@@ -16,7 +17,7 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.admin.pageadmin import PageAdmin
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
@@ -25,14 +26,16 @@ from cms.models.pagemodel import Page, PageType
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
-from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_MOVE,
-    URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD
-)
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
-from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
-from cms.utils.conf import get_cms_setting
+from cms.test_utils.testcases import (
+    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_ADVANCED_CHANGE,
+    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_MOVE, CMSTestCase,
+)
+from cms.test_utils.util.context_managers import (
+    LanguageOverride, UserLoginContext,
+)
 from cms.utils.compat.dj import installed_apps
+from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -192,8 +195,8 @@ class PageTest(PageTestBase):
         with the request language pointing to a language
         not configured for the current site
         """
-        from django.test import Client
         from django.contrib.auth import get_user_model
+        from django.test import Client
 
         client = Client()
         superuser = self.get_superuser()
@@ -550,7 +553,7 @@ class PageTest(PageTestBase):
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute changed_by %} changed "
                 "on {% page_attribute changed_date as page_change %}"
-                "{{ page_change|date:'Y-m-d\TH:i:s' }}"
+                "{{ page_change|date:'Y-m-d\TH:i:s' }}"  # noqa: W605
             )
             req = HttpRequest()
             page.save()
@@ -1677,9 +1680,8 @@ class PageTest(PageTestBase):
             page = self.get_page()
             form_url = admin_reverse("cms_page_change", args=(page.pk,))
             # Middleware is needed to correctly setup the environment for the admin
-            middleware = CurrentUserMiddleware()
             request = self.get_request()
-            middleware.process_request(request)
+            CurrentUserMiddleware(lambda req: HttpResponse).__call__(request)
             response = pageadmin.change_view(
                 request, str(page.pk),
                 form_url=form_url)

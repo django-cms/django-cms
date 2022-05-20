@@ -1,10 +1,10 @@
-from cms.utils.urlutils import admin_reverse
+from django.urls import NoReverseMatch
+
 from cms.api import get_page_draft
 from cms.toolbar_base import CMSToolbar
 from cms.utils import get_language_list
 from cms.utils.page_permissions import user_can_change_page
-
-from django.urls import NoReverseMatch
+from cms.utils.urlutils import admin_reverse
 
 
 class ExtensionToolbar(CMSToolbar):

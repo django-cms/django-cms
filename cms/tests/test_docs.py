@@ -1,10 +1,9 @@
-from contextlib import contextmanager
-from unittest import skipIf, skipUnless
-
-import os
 import io
+import os
 import socket
 import sys
+from contextlib import contextmanager
+from unittest import skipIf, skipUnless
 
 from sphinx.application import Sphinx
 from sphinx.errors import SphinxWarning
@@ -17,7 +16,6 @@ except ImportError:
 import cms
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
-
 
 ROOT_DIR = os.path.dirname(cms.__file__)
 DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, u'..', u'docs'))
@@ -35,13 +33,13 @@ def has_no_internet():
 
 
 @contextmanager
-def tmp_list_append(l, x):
-    l.append(x)
+def tmp_list_append(lst, x):
+    lst.append(x)
     try:
         yield
     finally:
-        if x in l:
-            l.remove(x)
+        if x in lst:
+            lst.remove(x)
 
 
 class DocsTestCase(CMSTestCase):
@@ -63,7 +61,7 @@ class DocsTestCase(CMSTestCase):
             )
             try:
                 app.build()
-            except:
+            except:  # noqa: E722
                 print(status.getvalue())
                 raise
 
@@ -96,6 +94,6 @@ class DocsTestCase(CMSTestCase):
                 except SphinxWarning:
                     # while normally harmless, causes a test failure
                     pass
-                except:
+                except:  # noqa: E722
                     print(status.getvalue())
                     raise

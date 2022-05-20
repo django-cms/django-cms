@@ -1,6 +1,6 @@
 import datetime
-import os.path
 import functools
+import os.path
 from unittest import skipIf
 
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.api import create_page, add_plugin, create_title, publish_page
+from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, Title
@@ -24,9 +24,7 @@ from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import (
-    get_available_slug,
-    get_current_site,
-    get_page_from_request,
+    get_available_slug, get_current_site, get_page_from_request,
 )
 
 
@@ -1170,11 +1168,14 @@ class PagesTestCase(TransactionCMSTestCase):
         This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
         where the slug was not regenerated.
         """
-        parent = create_page('en-parent', "nav_playground.html", 'en',
-                             slug = 'en-parent', published=True)
-        child = create_page('en-child', "nav_playground.html", 'en',
-                            slug = 'en-child', parent=parent, published=True)
-        
+        parent = create_page(
+            'en-parent', "nav_playground.html", 'en',
+            slug='en-parent', published=True
+        )
+        child = create_page(
+            'en-child', "nav_playground.html", 'en',
+            slug='en-child', parent=parent, published=True
+        )
         create_title('de', 'de-child', child, slug='de-child')
 
         # Parent 'de' title created after child translation
@@ -1188,11 +1189,11 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get('/de/de-parent/de-child/')
         self.assertEqual(response.status_code, 200)
 
-    def  test_subpage_title_path_regeneration_after_parent_slug_change(self):    
+    def test_subpage_title_path_regeneration_after_parent_slug_change(self):
         """
         When a parent page slug changes,
         the child title path should be regenerated.
-        
+
         This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
         where the slug was not regenerated.
         """

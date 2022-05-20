@@ -81,4 +81,3 @@ class DynamicJsLoadingPlugin(CMSPluginBase):
             if include_bool:
                 class_list.append(class_string)
         return " ".join(class_list)
-

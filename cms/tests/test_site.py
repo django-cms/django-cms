@@ -4,10 +4,10 @@ from django.contrib.sites.models import Site
 
 from cms.api import create_page
 from cms.models import Page
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE
+from cms.test_utils.testcases import URL_CMS_PAGE, CMSTestCase
+from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
-from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
 
 
 class SiteTestCase(CMSTestCase):

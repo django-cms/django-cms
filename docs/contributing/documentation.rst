@@ -220,8 +220,8 @@ Our documentation is divided into the following main sections:
   and so on
 * :doc:`/contributing/index` (``contributing``)
 * :doc:`/upgrade/index` (``upgrade``)
-* :doc:`/user/index` (``user``): guides for *using* rather than setting up or developing for the
-  CMS
+* :doc:`/whoisbehind/index` (``who``): who is behind the django CMS project
+
 
 
 ********************
