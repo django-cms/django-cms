@@ -4,7 +4,7 @@
 3.11.0 release notes
 ####################
 
-This release focuses on Python 3.10, node 16 (for build system), and bug fixes.
+This release focuses on support for django 4 and dark mode.
 
 ********************
 What's new in 3.11.0
