@@ -12,45 +12,21 @@ What's new in 3.11.0
 
 Features:
 =========
-* Add support for Django 3.2 LTS version
-* Page changed_date added to the Page tree admin actions dropdown template #6701 (#7046) (73cbbdb00) -- Vladimir Kuvandjiev
-* Allow recursive template extending in placeholders (#6564) (fed6fe54d) -- Stefan Wehrmeyer
-* Added ability to set placeholder global limit on children only (#6847) (18e146495) -- G3RB3N
-* Replaced Travis.CI with Github Actions (#7000) (0f33b5839) -- Vinit Kumar
-* Added support for Github Actions based CI.
-* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
-* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
-* Improved performance of ``cms list plugins`` command
-* Page changed date added to the Page tree admin actions dropdown
+* Add pre commit functionality (#7204) (d1ecb6359) -- Mark Walker
+* Run workflows in concurrency groups (#7211) (04e843337) -- Mark Walker
+* Added concurrency option to github workflows (#7205) (546b36827) -- Mark Walker
+* Add support for django 4 (#7268) (9e8eb17) -- Vinit Kumar
+* Make Plugin Confirm Template configurable (#7267) (bab1e6e) -- Jacob Rief
+* Add support for dark mode for toolbar, page tree, structure tree, modals (#7245) (b2d9a08) -- Fabian Braun
 
 Bug Fixes:
 ==========
 
-* using .nvmrc to target the right nvm version (3e5227def) -- Florian Delizy
-* Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
-* Add toolbar fix for broken CMS in the release 3.10.x -- Vinit Kumar
-* Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
-* Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
-* Fixed issue where default fallbacks is not used when it's an empty list (#6795) (5d21fa5eb) -- Arjan de Pooter
-* Fixed prefix_default_language = False redirect behavior (#6851) (34a26bd1b) -- Radek Stępień
-* Fix not checking slug uniqueness on page move (#6958) (5976d393a) -- Iacopo Spalletti
-* Fixed DontUsePageAttributeWarning message (#6734) (45383888e) -- carmenkow
-* Fixed Cache not invalidated when using a PlaceholderField outside the CMS #6912 (#6956) (3ce63d7d3) -- Benjamin PIERRE
-* Fixed unexpected behavior get_page_from_request (#6974) (#6073) (52f926e0d) -- Yuriy Mamaev
-* Fixed django treebeard 4.5.1 compatibility (#6988) (eeb86fd70) -- Aiky30
-* Fixed Bad Title.path in Multilanguage sites if parent slug is created or modified (#6968) (6e7b0ae48) -- fp4code
-* Fixed redirect issues when i18n_patterns had prefix_default_language = False
-* Fixed not checking slug uniqueness when moving a page
-* Fixed builds on RTD
-* Fixed the cache not being invalidated when updating a PlaceholderField in a custom model
-* Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
-* Fixed 6973 bag with unexpected behavior ``get_page_from_request``
-* Fixed migrations with multiple databases
-* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
-* Fixed missing builtin arguments on main ``cms`` management command causing it to crash
-* Fixed template label nested translation
-* Fixed a bug where the fallback page title would be returned instead of the one from the current language 
-* Fixed an issue when running migrations on a multi database project
+* release script version number (#7322) (8ffc6488d) -- Mark Walker
+* add support for custom user model in cms permission signals (#7281) (c10b8ffc3) -- Vinit Kumar
+* publishing static placeholders outside of CMS (#7253) (bdb50b650) -- Adrien Delhorme
+* Toolbar bug in 3.10 (#7232) (b12d07989) -- Mark Walker
+* Disable workflow concurrency to bring stability back to the CI (#7209) (fdad05756) -- Mark Walker
 
 
 ************************
