@@ -12,6 +12,7 @@
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
+# Dmitrii Kurskov, 2022
 # eXtractor <evg.kirov@gmail.com>, 2019
 # Gleb Chipiga <gleb.chipiga@gmail.com>, 2011
 # ha7y <maxvyaznikov@gmail.com>, 2014
@@ -38,9 +39,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-26 17:28+0800\n"
+"POT-Creation-Date: 2022-05-23 23:22+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Kirill Artemenko <4322221@gmail.com>, 2021\n"
+"Last-Translator: Dmitrii Kurskov, 2022\n"
 "Language-Team: Russian (http://www.transifex.com/divio/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -128,7 +129,7 @@ msgid "Language independent options"
 msgstr "Опции, независимые от языка"
 
 msgid "You entered an invalid URL."
-msgstr ""
+msgstr "Вы ввели неверный URL."
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -416,22 +417,22 @@ msgid ""
 msgstr "Это ссылка-синоним, вы можете отредактировать содержимое только на родительской странице  <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
 msgid "Getting started developer guide"
-msgstr ""
+msgstr "Руководство по началу работы для разработчиков"
 
 msgid "Documentation"
 msgstr "Документация"
 
 msgid "User guide"
-msgstr ""
+msgstr "Руководство пользователя"
 
 msgid "Support Forum"
-msgstr ""
+msgstr "Форум поддержки пользователей"
 
 msgid "Support Slack"
 msgstr ""
 
 msgid "What's new"
-msgstr ""
+msgstr "Что нового"
 
 msgid "Create"
 msgstr "Создать"
@@ -474,7 +475,7 @@ msgid "Language"
 msgstr "Язык"
 
 msgid "Help"
-msgstr ""
+msgstr "Помощь"
 
 msgid "Structure"
 msgstr "Структура"
@@ -551,7 +552,7 @@ msgid "Unpublish page"
 msgstr "Отменить публикацию"
 
 msgid "Publish page"
-msgstr ""
+msgstr "Опубликовать страницу"
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Вы точно хотите вернуться к опубликованной версии?"
@@ -1026,7 +1027,7 @@ msgid "last change by"
 msgstr "последнее изменение сделано"
 
 msgid "last change on"
-msgstr ""
+msgstr "последнее изменение"
 
 msgid "meta"
 msgstr "Мета"
@@ -1599,10 +1600,10 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr "Добавить плагин в %(plugin_name)s"
 
 msgid "Community forum"
-msgstr ""
+msgstr "Форум сообщества"
 
 msgid "Getting started"
-msgstr ""
+msgstr "Начало работы"
 
 msgid "Talk to us"
 msgstr ""
