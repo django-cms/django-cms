@@ -5,6 +5,9 @@ Changelog
 unreleased
 ==========
 
+* Added dark mode support to css
+* Fix publishing of static placeholders outside of CMS pages
+* Allow to override the template rendered after a plugin has been saved.
 
 3.10.0 (2022-03-26)
 ===================
@@ -71,10 +74,6 @@ With the review help of the following contributors:
 * Vinit Kumar
 
 Thanks to all contributors for their efforts!
-
-* Added dark mode support to css
-* Fix publishing of static placeholders outside of CMS pages
-* Allow to override the template rendered after a plugin has been saved.
 
 3.9.0 (2021-06-30)
 ==================
