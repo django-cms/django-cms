@@ -280,8 +280,8 @@ export const Helpers = {
     },
 
     /**
-     * Modifies the url with new params and sanitises
-     * the ampersand within the url for #3404.
+     * Modifies the url with new params and sanitises the url
+     * reversing any &amp; to ampersand (introduced with #3404)
      *
      * @method makeURL
      * @param {String} url original url
@@ -299,12 +299,7 @@ export const Helpers = {
         });
 
         return newUrl
-            .toString()
-            .split('#')
-            .map((part, i) => {
-                return i === 0 ? part.replace(/&/g, '&amp;') : part;
-            })
-            .join('#');
+            .toString();
     },
 
     /**
