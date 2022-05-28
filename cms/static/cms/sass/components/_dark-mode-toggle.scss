@@ -1,0 +1,29 @@
+@use "sass:math";
+
+div.cms .cms-toolbar-item-dark-mode-toggle {
+    $margin: math.div($toolbar-height - $toolbar-button-height, 2);
+    margin: calc(1.35 * $margin) 0 $margin;
+    span.cms-icon.cms-toggle {
+        font-size: 170%;
+        color: var(--dca-gray-darkest);
+        cursor: pointer;
+    }
+}
+
+html[data-color-scheme="light"] .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+    @extend .cms-icon-moon;
+}
+
+html[data-color-scheme="dark"] .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+    @extend .cms-icon-sun;
+}
+
+html:not([data-color-scheme]) .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+    @extend .cms-icon-moon;
+}
+
+@media (prefers-color-scheme: dark) {
+   html:not([data-color-scheme]) .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+       // @extend .cms-icon-sun;
+    }
+}

@@ -421,6 +421,12 @@ var Toolbar = new Class({
             this._debug();
         }
 
+        if (CMS.settings.color_scheme) {
+            this._set_color_scheme (CMS.settings.color_scheme);
+        } else if (CMS.config.color_scheme) {
+            this._set_color_scheme (CMS.config.color_scheme);
+        }
+
         // check if there are messages and display them
         if (CMS.config.messages) {
             CMS.API.Messages.open({
@@ -756,6 +762,19 @@ var Toolbar = new Class({
         CMS.API.Clipboard.ui.triggers = $('.cms-clipboard-trigger a');
         CMS.API.Clipboard.ui.triggerRemove = $('.cms-clipboard-empty a');
         CMS.API.Clipboard._toolbarEvents();
+    },
+
+    _set_color_scheme: function (scheme) {
+        switch (scheme) {
+            case 'light':
+            case 'dark':
+                this.ui.body.attr('data-color-scheme', scheme);
+                break;
+            case 'auto':
+                break;
+            default:
+                console.error("Illegal color scheme", scheme);
+        }
     }
 });
 

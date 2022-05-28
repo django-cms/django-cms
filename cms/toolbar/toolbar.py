@@ -32,6 +32,7 @@ class BaseToolbar(ToolbarAPIMixin):
     edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
     structure_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+    color_scheme = get_cms_setting('COLOR_SCHEME')
 
     @cached_property
     def site_language(self):
@@ -446,6 +447,7 @@ class CMSToolbar(BaseToolbar):
             'django_version': DJANGO_VERSION,
             'login_form': CMSToolbarLoginForm(),
             'python_version': PYTHON_VERSION,
+            'cms_color_scheme': self.color_scheme,
         }
         return context
 

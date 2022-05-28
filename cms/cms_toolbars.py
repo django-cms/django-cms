@@ -1,9 +1,12 @@
+from urllib.parse import urlparse, urlunparse
+
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.db.models import Q
+from django.http import QueryDict
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.translation import (
     gettext, gettext_lazy as _, override as force_language,
@@ -93,6 +96,23 @@ class PlaceholderToolbar(CMSToolbar):
                                       side=self.toolbar.RIGHT,
                                       disabled=disabled,
                                       on_close=REFRESH_PAGE)
+
+@toolbar_pool.register
+class AppearanceToolbar(CMSToolbar):
+    """
+    Adds appearance switches, esp. for dark and light mode
+    """
+    class Media:
+        js=("cms/js/toolbar.colortoggle.js",)
+
+    def populate(self):
+        if True:
+            dark_mode_toggle = TemplateItem(
+                template="cms/toolbar/items/dark_mode_toggle.html",
+                side=self.toolbar.RIGHT,
+            )
+            self.toolbar.add_item(dark_mode_toggle)
+
 
 
 @toolbar_pool.register

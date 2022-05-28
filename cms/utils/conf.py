@@ -87,7 +87,8 @@ DEFAULTS = {
         (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
         (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
         (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
-    )
+    ),
+    'COLOR_SCHEME': 'light',
 }
 
 
