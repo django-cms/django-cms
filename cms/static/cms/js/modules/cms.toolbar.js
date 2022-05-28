@@ -422,9 +422,9 @@ var Toolbar = new Class({
         }
 
         if (CMS.settings.color_scheme) {
-            this._set_color_scheme (CMS.settings.color_scheme);
+            this.set_color_scheme (CMS.settings.color_scheme);
         } else if (CMS.config.color_scheme) {
-            this._set_color_scheme (CMS.config.color_scheme);
+            this.set_color_scheme (CMS.config.color_scheme);
         }
 
         // check if there are messages and display them
@@ -622,7 +622,18 @@ var Toolbar = new Class({
                     onSuccess: el.data('on-success')
                 });
                 break;
-            default:
+            case 'color-toggle':
+                console.log("Color-toggle");
+                switch(this.get_color_scheme()) {
+                    case 'light':
+                        this.set_color_scheme('dark');
+                        break;
+                    case 'dark':
+                        this.set_color_scheme('light');
+                        break;
+                }
+                break;
+             default:
                 Helpers._getWindow().location.href = el.attr('href');
         }
     },
@@ -764,16 +775,46 @@ var Toolbar = new Class({
         CMS.API.Clipboard._toolbarEvents();
     },
 
-    _set_color_scheme: function (scheme) {
-        switch (scheme) {
-            case 'light':
-            case 'dark':
-                this.ui.body.attr('data-color-scheme', scheme);
-                break;
-            case 'auto':
-                break;
-            default:
-                console.error("Illegal color scheme", scheme);
+    /**
+     * Get color scheme either from :root[data-color-scheme] or user system setting
+     *
+     * @method get_color_scheme
+     * @public
+     * @returns {String}
+     */
+    get_color_scheme: function () {
+        let state = this.ui.body.attr('data-color-scheme');
+        if (!state && window.matchMedia) {
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                state = 'dark'; // dark mode
+            } else {
+                state = 'light';
+            }
+        }
+        return state;
+    },
+
+    /**
+     * Sets the color scheme for the current document and all iframes contained.
+     *
+     * @method set_color_scheme
+     * @public
+     * @param scheme {String}
+     * @retiurns {void}
+     */
+
+    set_color_scheme: function (scheme) {
+        CMS.API.Helpers.setSettings({color_scheme: scheme});
+        if (scheme === 'auto') {
+            this.ui.body.removeAttr('data-color-scheme');
+            this.ui.body.find('iframe').each(function(i, e) {
+                delete e.contentDocument.documentElement.dataset.colorScheme;
+            });
+        } else {
+            this.ui.body.attr('data-color-scheme', scheme);
+            this.ui.body.find('iframe').each(function(i, e) {
+                e.contentDocument.documentElement.dataset.colorScheme = scheme;
+            });
         }
     }
 });

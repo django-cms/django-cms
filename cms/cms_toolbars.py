@@ -102,9 +102,6 @@ class AppearanceToolbar(CMSToolbar):
     """
     Adds appearance switches, esp. for dark and light mode
     """
-    class Media:
-        js=("cms/js/toolbar.colortoggle.js",)
-
     def populate(self):
         if True:
             dark_mode_toggle = TemplateItem(
