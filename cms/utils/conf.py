@@ -89,6 +89,7 @@ DEFAULTS = {
         (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
     ),
     'COLOR_SCHEME': 'light',
+    'COLOR_SCHEME_TOGGLE': False,
 }
 
 

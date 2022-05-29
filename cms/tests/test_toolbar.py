@@ -667,6 +667,20 @@ class ToolbarTests(ToolbarTestBase):
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 8)
 
+    @override_settings(CMS_COLOR_SCHEME_TOGGLE=True)
+    def test_color_scheme_toggle(self):
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        # Needed because publish button only shows if the page is dirty
+        page.set_publisher_state('en', state=PUBLISHER_STATE_DIRTY)
+
+        request = self.get_page_request(page, self.get_superuser(), edit=True)
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
+        self.assertTrue(toolbar.edit_mode_active)
+        items = toolbar.get_left_items() + toolbar.get_right_items()
+        self.assertEqual(len(items), 9)
+
     def test_publish_button_no_page(self):
         static_placeholder = StaticPlaceholder.objects.create(name="foo", code='bar', site_id=1)
         request = self.get_page_request(None, self.get_superuser(), '/', edit=True)
