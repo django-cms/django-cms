@@ -22,7 +22,7 @@ and as one of the founding members of the dCA, next to `What <https://what.digit
 `Eliga Services <https://eliga.services/>`_.
 
 The dCA’s role in steering the project’s development is formalised in the
-`django CMS technical comittee <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_,
+`django CMS technical committee <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_,
 whose members are drawn from the django CMS community and the dCA.
 
 The dCA maintains overall control of the `django CMS repository <https://github.com/django-cms/django-cms>`_.
