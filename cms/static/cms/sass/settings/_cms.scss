@@ -31,12 +31,14 @@ $black: var(--dca-black);
 
 :root[data-color-scheme="light"] {
     color-scheme: light;
-    --dca-light-mode: " ";
+    --dca-light-mode: 1;
+    --dca-dark-mode: 0;
 }
 
 :root[data-color-scheme="dark"] {
     color-scheme: dark;
-    --dca-dark-mode: " ";
+    --dca-light-mode: 0;
+    --dca-dark-mode: 1;
     --dca-white: #2A2C2E;
     --dca-black: #FFF;
     --dca-primary: #58D1FC;
@@ -53,7 +55,8 @@ $black: var(--dca-black);
 }
 @media (prefers-color-scheme: dark) {
     :root:not([data-color-scheme]) {
-        --dca-dark-mode: " ";
+        --dca-light-mode: 0;
+        --dca-dark-mode: 1;
         --dca-white: #2A2C2E;
         --dca-black: #FFF;
         --dca-primary: #58D1FC;
