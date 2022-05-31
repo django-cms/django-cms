@@ -3,6 +3,21 @@ Changelog
 =========
 
 
+Statistics:
+-----------
+
+This release includes 8 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Conrad (3 pull requests)
+* Florian Delizy (1 pull request)
+* Marco Bonetti (1 pull request)
+* Mark Walker (3 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 3.10.0 (2022-03-26)
 ===================
 
