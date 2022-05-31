@@ -814,9 +814,12 @@ var Toolbar = new Class({
             });
         } else {
             this.ui.body.attr('data-color-scheme', scheme);
-            this.ui.body.find('div.cms iframe').each(function(i, e) {
+            this.ui.body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
                 if (e.contentDocument) {
                     e.contentDocument.documentElement.dataset.colorScheme = scheme;
+                    // ckeditor (and potentially other apps) have iframes inside their admin forms
+                    // also set color scheme there
+                    $(e.contentDocument).find('iframe').each(setFrameColorScheme);
                 }
             });
         }
