@@ -8,7 +8,8 @@ $speed-base: 200ms;
 $white: var(--dca-white);
 $black: var(--dca-black);
 :root, :root.cms-light-mode {
-    --dca-light-mode: " ";
+    --dca-light-mode: 1;
+    --dca-dark-mode: 0;
     --dca-white: #FFFFFF;
     --dca-black: #000000;
     --dca-shadow: 0, 0, 0;

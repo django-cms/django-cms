@@ -253,6 +253,9 @@
         padding-top: 8px;
         border-top: 1px solid $gray-lighter;
     }
+    .cms-toolbar-item-dark-mode-toggle {
+        display: none;
+    }
 }
 .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
     position: fixed;
