@@ -129,7 +129,7 @@ class BasicToolbar(CMSToolbar):
                 sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
                 sites_menu.add_break(ADMIN_SITES_BREAK)
                 for site in sites_queryset:
-                    sites_menu.add_link_item(site.name, url='https://%s' % site.domain,
+                    sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                              active=site.pk == self.current_site.pk)
 
             # admin
