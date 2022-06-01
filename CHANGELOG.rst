@@ -8,6 +8,7 @@ unreleased
 * Added dark mode support to css
 * Fix publishing of static placeholders outside of CMS pages
 * Allow to override the template rendered after a plugin has been saved.
+* Revert change to the toolbar sites menu to use ``http`` protocol.
 
 3.10.0 (2022-03-26)
 ===================
