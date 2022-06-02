@@ -45,7 +45,7 @@ Open the terminal application on your computer and go to a safe folder (i.e. cd 
 
 ::
 
-      git clone git@github.com:django-cms/django-cms-quickstart.git
+      git clone https://github.com/django-cms/django-cms-quickstart.git
       cd django-cms-quickstart
       docker compose build web
       docker compose up -d database_default
