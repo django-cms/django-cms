@@ -94,6 +94,22 @@ class PlaceholderToolbar(CMSToolbar):
                                       disabled=disabled,
                                       on_close=REFRESH_PAGE)
 
+@toolbar_pool.register
+class AppearanceToolbar(CMSToolbar):
+    """
+    Adds appearance switches, esp. for dark and light mode
+    """
+    color_scheme_toggle = get_cms_setting('COLOR_SCHEME_TOGGLE')
+
+    def populate(self):
+        if self.color_scheme_toggle:
+            dark_mode_toggle = TemplateItem(
+                template="cms/toolbar/items/dark_mode_toggle.html",
+                side=self.toolbar.RIGHT,
+            )
+            self.toolbar.add_item(dark_mode_toggle)
+
+
 
 @toolbar_pool.register
 class BasicToolbar(CMSToolbar):

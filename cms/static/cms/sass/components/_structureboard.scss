@@ -1,5 +1,6 @@
 //##############################################################################
 // STRUCTURE
+@use "sass:math";
 
 .cms-droppable {
     position: relative;
@@ -366,7 +367,7 @@
             left: $structure-dragitem-icon-space - $structure-dragarea-padding-horizontal - 10px;
             color: $submenu-icon-color;
             font-size: $structure-dragitem-icon-size;
-            margin-top: -$structure-dragitem-icon-size/2;
+            margin-top: math.div(-$structure-dragitem-icon-size, 2);
             margin-left: $structure-dragarea-padding-horizontal - 10px;
             cursor: pointer;
             transform: rotate(180deg);
@@ -446,7 +447,7 @@
         right: $submenu-right;
         width: $submenu-icon-area-size;
         height: $submenu-icon-area-size;
-        margin-top: -($submenu-icon-area-size / 2);
+        margin-top: -(math.div($submenu-icon-area-size, 2));
         .cms-icon {
             $submenu-icon-size: 20px;
             position: absolute;
@@ -454,8 +455,8 @@
             left: 50%;
             color: $submenu-icon-color;
             font-size: $submenu-icon-size;
-            margin-top: -($submenu-icon-size / 2);
-            margin-left: -($submenu-icon-size / 2);
+            margin-top: -(math.div($submenu-icon-size, 2));
+            margin-left: -(math.div($submenu-icon-size, 2));
         }
     }
 

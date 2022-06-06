@@ -4,6 +4,8 @@
 // INFO: please note that all related styles to the pagetree itself are
 // handled through theming after the "PAGETREE THEME" section in this file.
 
+@use "sass:math";
+
 .cms-admin-sideframe:not(.djangocms-admin-style) {
     margin-top: $toolbar-height;
 }
@@ -335,7 +337,7 @@
 
     .cms-pagetree-dropdown-menu {
         right: 50%;
-        margin-right: -$pagetree-header-height / 2 - 1px !important;
+        margin-right:  math.div(-$pagetree-header-height, 2) - 1px !important;
     }
 }
 
@@ -391,7 +393,7 @@
     position: absolute;
     right: 4px;
     top: 50%;
-    margin-top: -($pagetree-cell-inner-height + 6px) / 2;
+    margin-top: math.div(-($pagetree-cell-inner-height + 6px), 2);
 
     .cms-pagetree-dropdown-menu {
         right: 40px;
@@ -482,7 +484,7 @@
 .cms-tree-item-button .cms-hover-tooltip {
     &:before,
     &:after {
-        bottom: $pagetree-cell-inner-height / 2 + 7px;
+        bottom: math.div($pagetree-cell-inner-height, 2) + 7px;
     }
 }
 .cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil:not(.cms-btn-disabled)[data-url] {
