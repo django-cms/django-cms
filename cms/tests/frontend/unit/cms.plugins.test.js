@@ -661,7 +661,7 @@ describe('CMS.Plugin', function() {
             expect(FakeModal.prototype.open).toHaveBeenCalledWith({
                 url: '/edit-url',
                 title: 'Test Plugin',
-                breadcrumbs: 'breadcrumb',
+                breadcrumbs: 'breadcrumb'
             });
         });
 
@@ -670,7 +670,7 @@ describe('CMS.Plugin', function() {
             expect(FakeModal.prototype.open).toHaveBeenCalledWith({
                 url: '/edit-plugin-url',
                 title: 'Random Plugin',
-                breadcrumbs: ['breadcrumb'],
+                breadcrumbs: ['breadcrumb']
             });
         });
         it('adds events to remove the "add plugin" placeholder', function() {
