@@ -662,7 +662,6 @@ describe('CMS.Plugin', function() {
                 url: '/edit-url',
                 title: 'Test Plugin',
                 breadcrumbs: 'breadcrumb',
-                width: 850
             });
         });
 
@@ -672,7 +671,6 @@ describe('CMS.Plugin', function() {
                 url: '/edit-plugin-url',
                 title: 'Random Plugin',
                 breadcrumbs: ['breadcrumb'],
-                width: 850
             });
         });
         it('adds events to remove the "add plugin" placeholder', function() {

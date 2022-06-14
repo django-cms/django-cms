@@ -573,7 +573,6 @@ var Plugin = new Class({
             url: url,
             title: name,
             breadcrumbs: breadcrumb,
-            width: 850
         });
     },
 
