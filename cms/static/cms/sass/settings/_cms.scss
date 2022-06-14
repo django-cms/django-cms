@@ -7,7 +7,7 @@ $speed-base: 200ms;
 // COLORS
 $white: var(--dca-white);
 $black: var(--dca-black);
-:root, :root.cms-light-mode {
+:root, :root[data-color-scheme="light"] {
     --dca-light-mode: 1;
     --dca-dark-mode: 0;
     --dca-white: #FFFFFF;
@@ -30,10 +30,8 @@ $black: var(--dca-black);
     color-scheme: dark light;
 }
 
-:root[data-color-scheme="light"] {
+root[data-color-scheme="light"] {
     color-scheme: light;
-    --dca-light-mode: 1;
-    --dca-dark-mode: 0;
 }
 
 :root[data-color-scheme="dark"] {
@@ -54,6 +52,7 @@ $black: var(--dca-black);
     --active-brightness: 2;
     --focus-brightness: 1.5;
 }
+
 @media (prefers-color-scheme: dark) {
     :root:not([data-color-scheme]) {
         --dca-light-mode: 0;

@@ -698,7 +698,8 @@ class ToolbarTests(ToolbarTestBase):
 
         toolbar = CMSToolbar(request)
         renderer = toolbar.get_content_renderer()
-        renderer.render_static_placeholder(static_placeholder, RequestContext(request))
+        # TextPlugin needs request in context
+        renderer.render_static_placeholder(static_placeholder, RequestContext(request, dict(request=request)))
         toolbar.populate()
         toolbar.post_template_populate()
 
