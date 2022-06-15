@@ -1,17 +1,15 @@
 // #############################################################################
 // SETTINGS
+@use "sass:math";
 
 $speed-base: 200ms;
 
 // COLORS
 $white: var(--dca-white);
 $black: var(--dca-black);
-:root {
-    --active-brightness: 0.9;
-    --focus-brightness: 0.95;
-}
-
-:root {
+:root, :root[data-color-scheme="light"] {
+    --dca-light-mode: 1;
+    --dca-dark-mode: 0;
     --dca-white: #FFFFFF;
     --dca-black: #000000;
     --dca-shadow: 0, 0, 0;
@@ -23,23 +21,58 @@ $black: var(--dca-black);
     --dca-gray-darker: #454545;
     --dca-gray-darkest: #333;
     --dca-gray-super-lightest: #f7f7f7;
+
+    --active-brightness: 0.9;
+    --focus-brightness: 0.95;
 }
 
+:root {
+    color-scheme: dark light;
+}
+
+root[data-color-scheme="light"] {
+    color-scheme: light;
+}
+
+:root[data-color-scheme="dark"] {
+    color-scheme: dark;
+    --dca-light-mode: 0;
+    --dca-dark-mode: 1;
+    --dca-white: #2A2C2E;
+    --dca-black: #FFF;
+    --dca-primary: #58D1FC;
+    --dca-gray: #999; // $gray-light;
+    --dca-gray-lightest: #444; //$gray-darkest;
+    --dca-gray-lighter: #666; //$gray-darker;
+    --dca-gray-light: #888; // $gray-light;
+    --dca-gray-darker: #aaa; //$gray;
+    --dca-gray-darkest: #eee; // $gray-lighter;
+    --dca-gray-super-lightest: #333;
+
+    --active-brightness: 2;
+    --focus-brightness: 1.5;
+}
 
 @media (prefers-color-scheme: dark) {
-   :root {
-       --dca-white: #2A2C2E;
-       --dca-black: #FFF;
-       --dca-primary: #58D1FC;
-       --dca-gray: #999; //$gray-light;
-       --dca-gray-lightest: #444; //$gray-darkest;
-       --dca-gray-lighter: #666; //$gray-darker;
-       --dca-gray-light: #888; // $gray-light;
-       --dca-gray-darker: #aaa; //$gray;
-       --dca-gray-darkest: #eee; // $gray-lighter;
-       --dca-gray-super-lightest: #333;
+    :root:not([data-color-scheme]) {
+        --dca-light-mode: 0;
+        --dca-dark-mode: 1;
+        --dca-white: #2A2C2E;
+        --dca-black: #FFF;
+        --dca-primary: #58D1FC;
+        --dca-gray: #999; // $gray-light;
+        --dca-gray-lightest: #444; //$gray-darkest;
+        --dca-gray-lighter: #666; //$gray-darker;
+        --dca-gray-light: #888; // $gray-light;
+        --dca-gray-darker: #aaa; //$gray;
+        --dca-gray-darkest: #eee; // $gray-lighter;
+        --dca-gray-super-lightest: #333;
+
+        --active-brightness: 2;
+        --focus-brightness: 1.5;
     }
 }
+
 
 $color-primary: var(--dca-primary);
 $color-primary-fallback: #00bbff;
@@ -215,7 +248,7 @@ $structure-dragitem-fullheight: $structure-dragitem-height + 2 * $structure-drag
 $submenu-icon-area-size: 36px;
 $submenu-icon-size: 16px;
 $submenu-icon-color: $gray;
-$submenu-right: ($structure-dragarea-padding * 2 + $structure-dragitem-height - $submenu-icon-area-size) / 2;
+$submenu-right:  math.div($structure-dragarea-padding * 2 + $structure-dragitem-height - $submenu-icon-area-size, 2);
 
 $submenu-item-font-size: $font-size-normal;
 $submenu-item-height: $line-height-normal + 6px;
@@ -256,13 +289,13 @@ $toolbar-logo-height: 21px;
 
 $toolbar-right-space: 15px;
 
-$toolbar-menu-item-padding: 0 ($line-height-normal / 2); // has to be 0 $value;;
+$toolbar-menu-item-padding: 0 math.div($line-height-normal, 2); // has to be 0 $value;;
 $toolbar-menu-item-color: $black;
 $toolbar-menu-item-hover-color: $white;
 $toolbar-menu-item-hover-bgcolor: $color-primary;
 
 $toolbar-dropdown-padding: 4px 0 3px;
-$toolbar-dropdown-shadow: 0 1px 1px rgba(var(--dca-shadow), 0.4);
+$toolbar-dropdown-shadow: 0 1.5px 1.5px rgba(var(--dca-shadow), 0.4);
 $toolbar-dropdown-bgcolor: $white;
 $toolbar-dropdown-border-radius: $border-radius-base + 1px;
 
@@ -363,7 +396,7 @@ $dropdown-item-height: 46px;
 $dropdown-item-icon-space: 40px;
 $dropdown-item-icon-position: 14px;
 $dropdown-arrow-side: 10px;
-$dropdown-arrow-position: $submenu-right + $submenu-icon-area-size/2 - $dropdown-arrow-side/2;
+$dropdown-arrow-position: $submenu-right + math.div($submenu-icon-area-size, 2) - math.div($dropdown-arrow-side, 2);
 
 $dropdown-bg:                  $submenu-dropdown-bgcolor;
 $dropdown-border:              transparent;

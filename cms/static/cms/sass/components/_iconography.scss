@@ -101,41 +101,47 @@
     @if $filename == minus {
         $char: "E019";
     }
-    @if $filename == paste {
+    @if $filename == moon {
         $char: "E01A";
     }
-    @if $filename == pencil {
+    @if $filename == paste {
         $char: "E01B";
     }
-    @if $filename == pin {
+    @if $filename == pencil {
         $char: "E01C";
     }
-    @if $filename == plugins {
+    @if $filename == pin {
         $char: "E01D";
     }
-    @if $filename == plus-square-o {
+    @if $filename == plugins {
         $char: "E01E";
     }
-    @if $filename == plus {
+    @if $filename == plus-square-o {
         $char: "E01F";
     }
-    @if $filename == puzzle {
+    @if $filename == plus {
         $char: "E020";
     }
-    @if $filename == scissors {
+    @if $filename == puzzle {
         $char: "E021";
     }
-    @if $filename == search {
+    @if $filename == scissors {
         $char: "E022";
     }
-    @if $filename == sitemap {
+    @if $filename == search {
         $char: "E023";
     }
-    @if $filename == squares {
+    @if $filename == sitemap {
         $char: "E024";
     }
-    @if $filename == window {
+    @if $filename == squares {
         $char: "E025";
+    }
+    @if $filename == sun {
+        $char: "E026";
+    }
+    @if $filename == window {
+        $char: "E027";
     }
 
     @return $char;
@@ -257,6 +263,10 @@
     @include icon(minus);
 }
 
+.cms-icon-moon {
+    @include icon(moon);
+}
+
 .cms-icon-paste {
     @include icon(paste);
 }
@@ -299,6 +309,10 @@
 
 .cms-icon-squares {
     @include icon(squares);
+}
+
+.cms-icon-sun {
+    @include icon(sun);
 }
 
 .cms-icon-window {

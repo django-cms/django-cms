@@ -5,10 +5,11 @@ Changelog
 unreleased
 ==========
 
-* Added dark mode support to css
+* Added dark mode support to css, dark mode settings and toggle button
 * Fix publishing of static placeholders outside of CMS pages
 * Allow to override the template rendered after a plugin has been saved.
 * Revert change to the toolbar sites menu to use ``http`` protocol.
+* Fix edit plugin popup width (remove 850px width contraint).
 
 3.10.0 (2022-03-26)
 ===================

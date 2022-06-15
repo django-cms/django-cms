@@ -1,6 +1,8 @@
 //##############################################################################
 // MODAL
 
+@use "sass:math";
+
 // Editing plugins in frontend
 .cms-modal {
     display: none;
@@ -151,7 +153,7 @@
     display: block;
     position: absolute;
     top: 50%;
-    margin-top: -$modal-header-button-area-size / 2;
+    margin-top:  math.div(-$modal-header-button-area-size, 2);
     right: $padding-normal;
     color: $gray-light;
     text-align: center;
@@ -160,7 +162,7 @@
     cursor: pointer;
     &:before {
         position: relative;
-        top: ($modal-header-button-area-size - $icon-size) / 2;
+        top:  math.div($modal-header-button-area-size - $icon-size, 2);
     }
     &:hover {
         color: $color-primary;
@@ -250,7 +252,7 @@
     padding: 0 $modal-resize-size 0 $padding-normal;
 }
 .cms-modal-item-buttons {
-    $margin: ($toolbar-height - $toolbar-button-height) / 2;
+    $margin:  math.div($toolbar-height - $toolbar-button-height, 2);
     @extend .cms-toolbar-item-buttons;
     float: right;
     margin-left: $margin;
@@ -262,10 +264,10 @@
 // alter footer when html markup is loaded
 .cms-modal-markup {
     .cms-modal-foot {
-        height: $modal-footer-height / 2;
+        height:  math.div($modal-footer-height, 2);
     }
     .cms-modal-body {
-        bottom: $modal-footer-height / 2;
+        bottom:  math.div($modal-footer-height, 2);
     }
 }
 

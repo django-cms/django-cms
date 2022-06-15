@@ -1,3 +1,5 @@
+@use "sass:math";
+
 .cms-pagetree-dropdown {
     position: relative;
 }
@@ -111,7 +113,7 @@
         z-index: z(below);
         width: $dropdown-arrow-side;
         height: $dropdown-arrow-side;
-        margin-left: -($dropdown-arrow-side / 2);
+        margin-left: math.div(-$dropdown-arrow-side, 2);
         background-color: $submenu-dropdown-bgcolor;
         box-shadow: $dropdown-shadow;
         transform: rotate(45deg) translateZ(0);

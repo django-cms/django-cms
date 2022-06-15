@@ -1060,6 +1060,25 @@ Example::
 This setting adds to the default links of the support menu allowing project or company support links.
 
 
+CMS_COLOR_SCHEME
+================
+
+default
+    ``"light"``
+
+Sets the color scheme for django CMS' editing system. Valid values are ``"light"``,
+``"dark"``, and ``"auto"``. ``"auto"`` will take the user's preference from
+the browser or operating system setting (or light if no preference is available).
+
+CMS_COLOR_SCHEME_TOGGLE
+=======================
+
+default
+    ``False``
+
+If set to ``True`` the toolbar will show a moon or sun icon allowing the user
+to change the current color scheme from light to dark and vice versa.
+
 CMS_TOOLBAR_ANONYMOUS_ON
 ========================
 
@@ -1100,24 +1119,6 @@ This should be an integer preferably taken from the ``cms.constants`` e.g.
 - X_FRAME_OPTIONS_ALLOW
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
-
-
-.. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
-
-CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE
-=================================
-
-default:
-    ``True``
-
-The new structure board operates by default in "simple" mode. The older mode used absolute
-positioning. Setting this attribute to ``False`` will allow the absolute positioning used in
-versions prior to 3.2. This setting will be removed in 3.3.
-
-
-Example::
-
-    CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
 
 ..  setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
