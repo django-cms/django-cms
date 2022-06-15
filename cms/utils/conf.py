@@ -96,11 +96,13 @@ def get_cache_durations():
     """
     Returns the setting: CMS_CACHE_DURATIONS or the defaults.
     """
-    return getattr(settings, 'CMS_CACHE_DURATIONS', {
+    cache_durations = {
         'menus': 60 * 60,
         'content': 60,
         'permissions': 60 * 60,
-    })
+    }
+    cache_durations.update(getattr(settings, 'CMS_CACHE_DURATIONS', {}))
+    return cache_durations
 
 
 @default('CMS_MEDIA_ROOT')
