@@ -9,7 +9,8 @@ unreleased
 * Fix publishing of static placeholders outside of CMS pages
 * Allow to override the template rendered after a plugin has been saved.
 * Revert change to the toolbar sites menu to use ``http`` protocol.
-* Fix edit plugin popup width (remove 850px width contraint).
+* Fix edit plugin popup width (remove 850px width constraint).
+* Fix except block using list instead of tuple. (#7334)
 
 3.10.0 (2022-03-26)
 ===================
