@@ -2,8 +2,11 @@
 Changelog
 =========
 
-unreleased
-==========
+0.10.1 (2022-06-22)
+===================
+
+Highlights:
+-----------
 
 * Added dark mode support to css, dark mode settings and toggle button
 * Fix publishing of static placeholders outside of CMS pages
@@ -11,6 +14,65 @@ unreleased
 * Revert change to the toolbar sites menu to use ``http`` protocol.
 * Fix edit plugin popup width (remove 850px width constraint).
 * Fix except block using list instead of tuple. (#7334)
+
+Features:
+---------
+* Configurable dark mode (#7329) (05b6d8344) -- Fabian Braun
+* Add pre commit functionality (#7204) (d1ecb6359) -- Mark Walker
+* Run workflows in concurrency groups (#7211) (04e843337) -- Mark Walker
+* Added concurrency option to github workflows (#7205) (546b36827) -- Mark Walker
+
+Bug Fixes:
+----------
+* Except block using list instead of tuple (#7342) (7941d339f) -- Mark Walker
+* remove fixed width for edit plugin popup (=> autowidth) (#7337) (fcec4c8b8) -- Fabien MICHEL
+* dark mode tweaks and test fixes (requests in context) (#7338) (e7c1f3f63) -- Fabian Braun
+* Use http rather than https in toolbar sites menu (#7331) (174e8d02e) -- Mark Walker
+* release script version number (#7322) (8ffc6488d) -- Mark Walker
+* add support for custom user model in cms permission signals (#7281) (c10b8ffc3) -- Vinit Kumar
+* publishing static placeholders outside of CMS (#7253) (bdb50b650) -- Adrien Delhorme
+* Toolbar bug in 3.10 (#7232) (b12d07989) -- Mark Walker
+* Disable workflow concurrency to bring stability back to the CI (#7209) (fdad05756) -- Mark Walker
+
+Statistics:
+-----------
+
+This release includes 45 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Adrien Delhorme (1 pull request)
+* Anatoliy (1 pull request)
+* Cam Cecil (1 pull request)
+* Christian Clauss (4 pull requests)
+* Conrad (3 pull requests)
+* crydotsnake (1 pull request)
+* dependabot[bot] (0 pull request)
+* Devyn Keeney (1 pull request)
+* Dmytro Litvinov (1 pull request)
+* Fabian Braun (2 pull requests)
+* Fabien MICHEL (1 pull request)
+* Florian Delizy (1 pull request)
+* fsbraun (1 pull request)
+* Jacob Rief (1 pull request)
+* jillalberts (1 pull request)
+* Mark Walker (16 pull requests)
+* Vinit Kumar (3 pull requests)
+
+With the review help of the following contributors:
+
+* Adrien Delhorme
+* Anatoliy
+* crydotsnake
+* dependabot[bot]
+* Florian Delizy
+* fsbraun
+* Jacob Rief
+* Marco Bonetti
+* Mark Walker
+* Simon Krull
+* Vinit Kumar
+* Youri Roggeveen
+
+Thanks to all contributors for their efforts!
 
 3.10.0 (2022-03-26)
 ===================
