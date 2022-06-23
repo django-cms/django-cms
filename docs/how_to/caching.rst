@@ -54,6 +54,7 @@ Have a look at the following settings to enable/disable various caching behaviou
 - :setting:`CMS_PAGE_CACHE`
 - :setting:`CMS_PLACEHOLDER_CACHE`
 - :setting:`CMS_PLUGIN_CACHE`
+- :setting:`CMS_LIMIT_TTL_CACHE_FUNCTION`
 
 
 
