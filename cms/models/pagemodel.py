@@ -830,7 +830,7 @@ class Page(models.Model):
         except (AttributeError, KeyError):
             return None
 
-    def get_page_content(self, language=None, fallback=True, force_reload=False):
+    def get_title(self, language=None, fallback=True, force_reload=False):
         """
         get the title of the page depending on the given language
         """
@@ -842,7 +842,7 @@ class Page(models.Model):
         """
         menu_title = self.get_page_content_obj_attribute("menu_title", language, fallback, force_reload)
         if not menu_title:
-            return self.get_page_content(language, True, force_reload)
+            return self.get_title(language, True, force_reload)
         return menu_title
 
     def get_placeholders(self, language):
@@ -870,7 +870,7 @@ class Page(models.Model):
         page_title = self.get_page_content_obj_attribute("page_title", language, fallback, force_reload)
 
         if not page_title:
-            return self.get_page_content(language, True, force_reload)
+            return self.get_title(language, True, force_reload)
         return page_title
 
     def get_meta_description(self, language=None, fallback=True, force_reload=False):

@@ -62,7 +62,7 @@ class MultilingualTestCase(CMSTestCase):
         self.assertTrue(bool(content))
 
         # Has correct title and slug after calling save()?
-        self.assertEqual(page.get_page_content(), page_data['title'])
+        self.assertEqual(page.get_title(), page_data['title'])
         self.assertEqual(page.get_slug(TESTLANG), page_data['slug'])
         self.assertEqual(page.get_placeholders(TESTLANG).count(), 2)
 
@@ -94,18 +94,18 @@ class MultilingualTestCase(CMSTestCase):
 
             # Test the new language version
             page._clear_internal_cache()
-            self.assertEqual(page.get_page_content(language=TESTLANG2), page_data2['title'])
+            self.assertEqual(page.get_title(language=TESTLANG2), page_data2['title'])
             self.assertEqual(page.get_slug(language=TESTLANG2), page_data2['slug'])
 
             # Test the default language version (TESTLANG)
             self.assertEqual(page.get_slug(TESTLANG), page_data['slug'])
-            self.assertEqual(page.get_page_content(language=TESTLANG, fallback=False), page_data['title'])
+            self.assertEqual(page.get_title(language=TESTLANG, fallback=False), page_data['title'])
 
     def test_multilingual_page(self):
         TESTLANG = get_primary_language()
         TESTLANG2 = get_secondary_language()
         page = create_page("mlpage", "nav_playground.html", TESTLANG)
-        create_title(TESTLANG2, page.get_page_content(), page, slug=page.get_slug(TESTLANG))
+        create_title(TESTLANG2, page.get_title(), page, slug=page.get_slug(TESTLANG))
         page.rescan_placeholders(TESTLANG)
         page = self.reload(page)
         page_placeholder_lang_1 = page.get_placeholders(TESTLANG)[0]
@@ -155,11 +155,11 @@ class MultilingualTestCase(CMSTestCase):
         lang_settings[1][0]['public'] = False
         with self.settings(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="en"):
             page = create_page("page1", "nav_playground.html", "en")
-            create_title("de", page.get_page_content(), page, slug=page.get_slug('en'))
+            create_title("de", page.get_title(), page, slug=page.get_slug('en'))
             page2 = create_page("page2", "nav_playground.html", "en")
-            create_title("de", page2.get_page_content(), page2, slug=page2.get_slug('en'))
+            create_title("de", page2.get_title(), page2, slug=page2.get_slug('en'))
             page3 = create_page("page2", "nav_playground.html", "en")
-            create_title("de", page3.get_page_content(), page3, slug=page3.get_slug('en'))
+            create_title("de", page3.get_title(), page3, slug=page3.get_slug('en'))
             create_page("page4", "nav_playground.html", "de")
 
             page.set_as_homepage()
