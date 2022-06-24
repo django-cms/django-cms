@@ -720,7 +720,7 @@ class PagesTestCase(TransactionCMSTestCase):
                 CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), ),
         ):
             page = create_page('home', 'placeholder_tests/base.html', 'en', slug='home')
-            page.title_cache['en'] = page.pagecontent_set.get(language='en')
+            page.page_content_cache['en'] = page.pagecontent_set.get(language='en')
             placeholders = list(page.get_placeholders('en'))
             for i, placeholder in enumerate(placeholders):
                 for j in range(5):
@@ -934,6 +934,6 @@ class PageContentTests(CMSTestCase):
         """
         Cache partially populated, if no hit it should try to populate it
         """
-        del self.page.title_cache['de']
-        german_content = self.page.get_title_obj('de')
+        del self.page.page_content_cache['de']
+        german_content = self.page.get_content_obj('de')
         self.assertEqual(german_content.pk, self.german_content.pk)
