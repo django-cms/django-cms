@@ -321,7 +321,7 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
         self.assertEqual(child_page.node.depth, 2)
         self.assertEqual(child_page.parent_page, parent_page)
-        self.assertEqual(child_page.get_title('en'), 'Child')
+        self.assertEqual(child_page.get_page_content('en'), 'Child')
         self.assertEqual(child_page.get_path('en'), 'parent/child')
 
     def test_wizard_create_atomic(self):

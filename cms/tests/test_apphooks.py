@@ -81,7 +81,7 @@ class ApphooksTestCase(CMSTestCase):
         self.superuser = superuser
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser)
-        create_title('de', page.get_title(), page)
+        create_title('de', page.get_page_content(), page)
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
         create_title('de', child_page.get_page_content(), child_page)

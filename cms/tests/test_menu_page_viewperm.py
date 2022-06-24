@@ -602,10 +602,10 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         for page in all_pages:
             perm = PagePermission.objects.for_page(page=page)
             # only page_6 has a permission assigned
-            if page.get_title() == 'page_6':
+            if page.get_page_content() == 'page_6':
                 self.assertEqual(len(perm), 2)
             else:
-                msg = "Permission wrong at page %s" % (page.get_title())
+                msg = "Permission wrong at page %s" % (page.get_page_content())
                 self.assertEqual(len(perm), 0, msg)
         granted = ['page_1',
             'page_2',
