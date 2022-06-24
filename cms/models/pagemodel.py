@@ -194,7 +194,7 @@ class Page(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.urls_cache = {}
-        self.title_cache = {}
+        self.page_content_cache = {}
 
     def __str__(self):
         try:
@@ -223,7 +223,7 @@ class Page(models.Model):
 
     def _clear_internal_cache(self):
         self.urls_cache = {}
-        self.title_cache = {}
+        self.page_content_cache = {}
         self._clear_node_cache()
 
         if hasattr(self, '_prefetched_objects_cache'):
@@ -512,7 +512,7 @@ class Page(models.Model):
                     default_width=placeholder.default_width,
                 )
                 placeholder.copy_plugins(new_placeholder, language=new_title.language)
-            new_page.title_cache[new_title.language] = new_title
+            new_page.page_content_cache[new_title.language] = new_title
         new_page.update_languages([trans.language for trans in translations])
 
         if extensions:
@@ -725,7 +725,7 @@ class Page(models.Model):
 
     def set_translations_cache(self):
         for translation in self.pagecontent_set.all():
-            self.title_cache.setdefault(translation.language, translation)
+            self.page_content_cache.setdefault(translation.language, translation)
 
     def get_path_for_slug(self, slug, language):
         if self.is_home:
@@ -763,8 +763,8 @@ class Page(models.Model):
         If wanted page content doesn't exist, EmptyPageContent instance will be returned.
         """
         language = self._get_page_content_cache(language, fallback, force_reload)
-        if language in self.title_cache:
-            return self.title_cache[language]
+        if language in self.page_content_cache:
+            return self.page_content_cache[language]
         from cms.models import EmptyPageContent
 
         return EmptyPageContent(language)
@@ -906,7 +906,7 @@ class Page(models.Model):
             from cms.models import PageContent
             page_contents = PageContent.objects.filter(page=self)
             for page_content in page_contents:
-                self.title_cache[page_content.language] = page_content
+                self.page_content_cache[page_content.language] = page_content
 
         if self.page_content_cache.get(language):
             return language
