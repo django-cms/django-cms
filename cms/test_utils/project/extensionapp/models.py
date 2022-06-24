@@ -22,7 +22,7 @@ extension_pool.register(MyPageExtension)
 # extension_pool.register can be used also as a decorator
 @extension_pool.register
 class MyPageContentExtension(PageContentExtension):
-    extra_content = models.CharField(blank=True, default='', max_length=255)
+    extra_title = models.CharField(blank=True, default='', max_length=255)
 
 
 class MultiTablePageExtensionParent(models.Model):
