@@ -318,7 +318,7 @@ class AdminTestCase(AdminTestsBase):
         add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
 
         # creating a de title of the page and adding plugins to it
-        create_title("de", page_en.get_title(), page_en, slug=page_en.get_slug('en'))
+        create_title("de", page_en.get_page_content(), page_en, slug=page_en.get_slug('en'))
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE")
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE 2")
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE 3")

@@ -1859,7 +1859,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_title-{0} cms-render-model"></template>'
             '{1}'
             '<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_title-{0} cms-render-model"></template>'.format(
-                page.pk, page.get_title(language)))
+                page.pk, page.get_page_content(language)))
         self.assertContains(
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-%s cms-render-model cms-render-model-block"></template>\n        <h3>Menu</h3>' % page.pk)

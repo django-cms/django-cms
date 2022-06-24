@@ -58,7 +58,7 @@ class FormsTestCase(CMSTestCase):
         expected = [
             ('', '----'),
             (site.name, [
-                (page.pk, page.get_title('en', fallback=False))
+                (page.pk, page.get_page_content('en', fallback=False))
                 for page in pages
             ])
         ]
@@ -76,14 +76,14 @@ class FormsTestCase(CMSTestCase):
 
         for page in pages:
             for language in languages:
-                title = page.get_title('en')
+                title = page.get_page_content('en')
                 create_title(language, title, page=page)
 
         for language in ['en'] + languages:
             expected = [
                 ('', '----'),
                 (site.name, [
-                    (page.pk, page.get_title(language, fallback=False))
+                    (page.pk, page.get_page_content(language, fallback=False))
                     for page in pages
                 ])
             ]

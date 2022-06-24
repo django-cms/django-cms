@@ -175,7 +175,7 @@ class PageTest(PageTestBase):
             self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
             page_url = PageUrl.objects.get(slug=page_data['slug'])
-            self.assertEqual(page_url.page.get_title(), page_data['title'])
+            self.assertEqual(page_url.page.get_page_content(), page_data['title'])
             self.assertEqual(page_url.page.get_slug('en'), page_data['slug'])
             self.assertEqual(page_url.page.get_placeholders('en').count(), 2)
 
@@ -347,7 +347,7 @@ class PageTest(PageTestBase):
             response = self.client.post(self.get_page_change_uri('en', page), page_data)
             page._clear_internal_cache()
             self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
-            self.assertEqual(page.get_title(), 'changed title')
+            self.assertEqual(page.get_page_content(), 'changed title')
 
     def test_page_redirect_field_validation(self):
         superuser = self.get_superuser()
@@ -1036,7 +1036,7 @@ class PageTest(PageTestBase):
             self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
             page = Page.objects.get(urls__slug=page_data['slug'])
             with LanguageOverride(TESTLANG):
-                self.assertEqual(page.get_title(), 'changed title')
+                self.assertEqual(page.get_page_content(), 'changed title')
 
     def test_get_page_from_request_cached(self):
         mock_page = 'hello world'

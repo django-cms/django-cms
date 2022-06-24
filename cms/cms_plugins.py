@@ -98,12 +98,12 @@ class AliasPlugin(CMSPluginBase):
         # I have a feeling this could fail with a NoReverseMatch error
         # if this is the case, then it's likely a corruption.
         page_url = origin_page.get_absolute_url(language=obj.language)
-        page_title = origin_page.get_title(language=obj.language)
+        page_content = origin_page.get_page_content(language=obj.language)
 
         message = gettext('This is an alias reference, '
                            'you can edit the content only on the '
-                           '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.')
-        return message % {'page_url': page_url, 'page_title': page_title}
+                           '<a href="%(page_url)s?edit" target="_parent">%(page_content)s</a> page.')
+        return message % {'page_url': page_url, 'page_content': page_content}
 
     def create_alias(self, request):
         warnings.warn(

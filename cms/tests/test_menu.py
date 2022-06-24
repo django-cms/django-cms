@@ -320,7 +320,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         for page in Page.objects.all():
             create_title(
                 language='de',
-                title=page.get_title('en'),
+                title=page.get_page_content('en'),
                 page=page,
                 slug='{}-de'.format(page.get_slug('en'))
             )

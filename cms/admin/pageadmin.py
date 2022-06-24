@@ -317,7 +317,7 @@ class PageAdmin(admin.ModelAdmin):
                 results.append(
                     {
                         'path': page.get_path(language=language_code),
-                        'title': page.get_title(language=language_code),
+                        'title': page.get_page_content(language=language_code),
                         'redirect_url': page.get_absolute_url(language=language_code)
                     }
                 )

@@ -41,7 +41,7 @@ class Wizard(WizardBase):
     @property
     def id(self):
         """
-        To construct an unique ID for each wizard, we start with the module and
+        To construct a unique ID for each wizard, we start with the module and
         class name for uniqueness, we hash it because a wizard's ID is displayed
         in the form's markup, and we'd rather not expose code paths there.
         """
@@ -76,7 +76,7 @@ class Wizard(WizardBase):
         model = self.get_model()
         if model:
             model_name = model._meta.verbose_name
-            return _(u"Create a new %s instance.") % model_name
+            return _("Create a new %s instance.") % model_name
 
         return ""
 
