@@ -37,8 +37,8 @@ class ExtensionsTestCase(CMSTestCase):
         extension_pool.register(page_extension)
         self.assertEqual(len(extension_pool.page_extensions), initial_extension_count+1)
 
-        # --- Title registering --------------------------------------
-        page_content_extension = self.get_title_extension_class()
+        # --- Page Content registering -------------------------------
+        page_content_extension = self.get_page_content_extension_class()
 
         # register first time
         extension_pool.register(page_content_extension)
