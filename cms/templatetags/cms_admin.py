@@ -53,24 +53,24 @@ def get_page_display_name(cms_page):
     from cms.models import EmptyPageContent
     language = get_language()
 
-    if not cms_page.title_cache:
+    if not cms_page.page_content_cache:
         cms_page.set_translations_cache()
 
-    if not cms_page.title_cache.get(language):
+    if not cms_page.page_content_cache.get(language):
         fallback_langs = i18n.get_fallback_languages(language)
         found = False
         for lang in fallback_langs:
-            if cms_page.title_cache.get(lang):
+            if cms_page.page_content_cache.get(lang):
                 found = True
                 language = lang
         if not found:
             language = None
-            for lang, item in cms_page.title_cache.items():
+            for lang, item in cms_page.page_content_cache.items():
                 if not isinstance(item, EmptyPageContent):
                     language = lang
     if not language:
         return _("Empty")
-    title = cms_page.title_cache[language]
+    title = cms_page.page_content_cache[language]
     if title.title:
         return title.title
     if title.page_title:
@@ -85,7 +85,7 @@ def tree_publish_row(context, page, language):
     cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
     text = _("no content")
 
-    if page.title_cache.get(language):
+    if page.page_content_cache.get(language):
         cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
         text = _("has contents")
 

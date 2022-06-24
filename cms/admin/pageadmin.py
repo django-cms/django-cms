@@ -817,7 +817,7 @@ class PageContentAdmin(admin.ModelAdmin):
         obj = super().get_object(request, object_id, from_field)
 
         if obj:
-            obj.page.title_cache[obj.language] = obj
+            obj.page.page_content_cache[obj.language] = obj
         return obj
 
     def get_admin_url(self, action, *args):
@@ -1414,12 +1414,12 @@ class PageContentAdmin(admin.ModelAdmin):
         page_content_type = ContentType.objects.get_for_model(PageContent)
 
         def render_page_row(page):
-            page.title_cache = {trans.language: trans for trans in page.filtered_translations}
+            page.page_content_cache = {trans.language: trans for trans in page.filtered_translations}
 
             for _language in languages:
                 # EmptyPageContent is used to prevent the cms from trying
                 # to find a translation in the database
-                page.title_cache.setdefault(_language, EmptyPageContent(language=_language))
+                page.page_content_cache.setdefault(_language, EmptyPageContent(language=_language))
 
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
