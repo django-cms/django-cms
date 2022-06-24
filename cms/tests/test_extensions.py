@@ -24,7 +24,7 @@ class ExtensionsTestCase(CMSTestCase):
         none_extension = self.get_none_extension_class()
         self.assertRaises(SubClassNeededError, extension_pool.register, none_extension)
         self.assertEqual(len(extension_pool.page_extensions), initial_extension_count)
-        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count)
+        self.assertEqual(len(extension_pool.page_content_extensions), initial_extension_count)
 
         # --- Page registering ---------------------------------------
         page_extension = self.get_page_extension_class()
@@ -38,26 +38,26 @@ class ExtensionsTestCase(CMSTestCase):
         self.assertEqual(len(extension_pool.page_extensions), initial_extension_count+1)
 
         # --- Title registering --------------------------------------
-        title_extension = self.get_title_extension_class()
+        page_content_extension = self.get_title_extension_class()
 
         # register first time
-        extension_pool.register(title_extension)
-        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count+1)
+        extension_pool.register(page_content_extension)
+        self.assertEqual(len(extension_pool.page_content_extensions), initial_extension_count+1)
 
         # register second time
-        extension_pool.register(title_extension)
-        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count+1)
+        extension_pool.register(page_content_extension)
+        self.assertEqual(len(extension_pool.page_content_extensions), initial_extension_count+1)
 
         # --- Unregister ---------------------------------------------
         extension_pool.unregister(page_extension)
         self.assertEqual(len(extension_pool.page_extensions), initial_extension_count)
 
-        extension_pool.unregister(title_extension)
-        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count)
+        extension_pool.unregister(page_content_extension)
+        self.assertEqual(len(extension_pool.page_content_extensions), initial_extension_count)
 
         # Unregister an object that is not registered yet
         extension_pool.unregister(page_extension)
-        extension_pool.unregister(title_extension)
+        extension_pool.unregister(page_content_extension)
 
     def get_page_extension_class(self):
         from django.db import models
@@ -70,7 +70,7 @@ class ExtensionsTestCase(CMSTestCase):
 
         return TestPageExtension
 
-    def get_title_extension_class(self):
+    def get_page_content_extension_class(self):
         from django.db import models
 
         class TestPageContentExtension(PageContentExtension):
@@ -95,38 +95,38 @@ class ExtensionsTestCase(CMSTestCase):
         page_extension = MyPageExtension(extended_object=page, extra='page extension 1')
         page_extension.save()
         page.mypageextension = page_extension
-        title = page.get_content_obj()
-        title_extension = MyPageContentExtension(extended_object=title, extra_title='title extension 1')
-        title_extension.save()
-        page.myPageContentExtension = title_extension
+        page_content = page.get_content_obj()
+        page_content_extension = MyPageContentExtension(extended_object=page_content, extra_title='title extension 1')
+        page_content_extension.save()
+        page.myPageContentExtension = page_content_extension
 
         subpage_extension = MyPageExtension(extended_object=subpage, extra='page extension 2')
         subpage_extension.save()
         subpage.mypageextension = subpage_extension
-        subtitle = subpage.get_content_obj()
-        subtitle_extension = MyPageContentExtension(extended_object=subtitle, extra_title='title extension 2')
-        subtitle_extension.save()
-        subpage.myPageContentExtension = subtitle_extension
+        subpage_content = subpage.get_content_obj()
+        subpage_content_extension = MyPageContentExtension(extended_object=subpage_content, extra_title='title extension 2')
+        subpage_content_extension.save()
+        subpage.myPageContentExtension = subpage_content_extension
 
         # asserting original extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
-        self.assertEqual(len(extension_pool.get_title_extensions()), 2)
+        self.assertEqual(len(extension_pool.get_page_content_extensions()), 2)
         copied_page = page.copy_with_descendants(target_node=None, position='last-child')
 
         # asserting original + copied extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 4)
-        self.assertEqual(len(extension_pool.get_title_extensions()), 4)
+        self.assertEqual(len(extension_pool.get_page_content_extensions()), 4)
 
         # testing extension content
         old_page_extensions = [page_extension, subpage_extension]
-        old_title_extension = [title_extension, subtitle_extension]
+        old_title_extension = [page_content_extension, subpage_content_extension]
         for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             self.assertEqual(
                 extension_pool.get_page_extensions(new_page)[0].extra,
                 old_page_extensions[index].extra
             )
             self.assertEqual(
-                extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].extra_title,
+                extension_pool.get_page_content_extensions(new_page.pagecontent_set.get(language='en'))[0].extra_title,
                 old_title_extension[index].extra_title
             )
             # check that objects are actually different
@@ -135,7 +135,7 @@ class ExtensionsTestCase(CMSTestCase):
                 old_page_extensions[index].pk
             )
             self.assertNotEqual(
-                extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
+                extension_pool.get_page_content_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
                 old_title_extension[index].pk
             )
 
@@ -143,7 +143,7 @@ class ExtensionsTestCase(CMSTestCase):
         page.delete()
         # asserting original extensions are gone, but copied ones should still exist
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
-        self.assertEqual(len(extension_pool.get_title_extensions()), 2)
+        self.assertEqual(len(extension_pool.get_page_content_extensions()), 2)
 
     def test_copy_multitable_extensions(self):
         root = create_page('Root', "nav_playground.html", "en")
@@ -172,47 +172,49 @@ class ExtensionsTestCase(CMSTestCase):
         subpage_extension.save()
         subpage.multitablepageextension = subpage_extension
         subtitle = subpage.get_content_obj()
-        subtitle_extension = MultiTablePageContentExtension(extended_object=subtitle,
-                                                      extension_title_parent_field='title extension 2',
-                                                      multitable_extra_title='multi-table title extension 2')
+        subtitle_extension = MultiTablePageContentExtension(
+            extended_object=subtitle,
+            extension_content_parent_field='title extension 2',
+            multitable_extra_content='multi-table title extension 2'
+        )
         subtitle_extension.save()
         subpage.multitablePageContentExtension = subtitle_extension
 
         # asserting original extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
-        self.assertEqual(len(extension_pool.get_title_extensions()), 2)
+        self.assertEqual(len(extension_pool.get_page_content_extensions()), 2)
 
         copied_page = page.copy_with_descendants(target_node=None, position='last-child')
 
         # asserting original + copied extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 4)
-        self.assertEqual(len(extension_pool.get_title_extensions()), 4)
+        self.assertEqual(len(extension_pool.get_page_content_extensions()), 4)
 
         # testing extension content
         old_page_extensions = [page_extension, subpage_extension]
         old_title_extension = [title_extension, subtitle_extension]
         for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             copied_page_extension = extension_pool.get_page_extensions(new_page)[0]
-            copied_title_extension = extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0]
+            copied_title_extension = extension_pool.get_page_content_extensions(new_page.pagecontent_set.get(language='en'))[0]
             self.assertEqual(copied_page_extension.extension_parent_field,
                              old_page_extensions[index].extension_parent_field)
             self.assertEqual(copied_page_extension.multitable_extra,
                              old_page_extensions[index].multitable_extra)
             self.assertEqual(copied_title_extension.extension_title_parent_field,
-                             old_title_extension[index].extension_title_parent_field)  # TODO
+                             old_title_extension[index].extension_content_parent_field)
             self.assertEqual(copied_title_extension.multitable_extra_title,
-                             old_title_extension[index].multitable_extra_title)  # TODO
+                             old_title_extension[index].multitable_extra_content)
             # check that objects are actually different
             self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
                                 old_page_extensions[index].pk)
-            self.assertNotEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
+            self.assertNotEqual(extension_pool.get_page_content_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
                                 old_title_extension[index].pk)
 
         # Test deleting original page for #3987
         page.delete()
         # asserting original extensions are gone, but copied ones should still exist
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
-        self.assertEqual(len(extension_pool.get_title_extensions()), 2)
+        self.assertEqual(len(extension_pool.get_page_content_extensions()), 2)
 
 
 class ExtensionAdminTestCase(CMSTestCase):
