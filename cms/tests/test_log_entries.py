@@ -184,7 +184,7 @@ class LogPageOperationsTests(CMSTestCase):
         """
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en")
-            title = create_title(language='de', title="other title %s" % page.get_page_content('en'), page=page)
+            title = create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
             endpoint = self.get_page_change_uri('en', page)
             data = model_to_dict(title, fields=['title', 'template'])
             data['title'] = 'my_new_title_field'
@@ -214,7 +214,7 @@ class LogPageOperationsTests(CMSTestCase):
         """
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en")
-            create_title(language='de', title="other title %s" % page.get_page_content('en'), page=page)
+            create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
             endpoint = self.get_page_delete_translation_uri('en', page)
             post_data = {'post': 'yes', 'language': 'en'}
 
