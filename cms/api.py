@@ -204,7 +204,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
                  created_by='python-api', soft_root=False, in_navigation=False,
                  template=TEMPLATE_INHERITANCE_MAGIC,
                  limit_visibility_in_menu=constants.VISIBILITY_ALL,
-                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
+                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):  # TODO: Deprecate this
     """
     Create a title.
 

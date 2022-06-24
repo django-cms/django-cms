@@ -930,9 +930,9 @@ class Page(models.Model):
         return self.get_page_content_obj_attribute("soft_root")
 
     def get_template(self, language=None, fallback=True, force_reload=False):
-        title = self.get_title_obj(language, fallback, force_reload)
-        if title:
-            return title.get_template()
+        content = self.get_content_obj(language, fallback, force_reload)
+        if content:
+            return content.get_template()
         return get_cms_setting('TEMPLATES')[0][0]
 
     def get_template_name(self):
@@ -1027,7 +1027,7 @@ class Page(models.Model):
         return self.__class__.objects.get(pk=self.pk)
 
     def rescan_placeholders(self, language):
-        return self.get_title_obj(language=language).rescan_placeholders()
+        return self.get_content_obj(language=language).rescan_placeholders()
 
     def get_declared_placeholders(self):
         # inline import to prevent circular imports
@@ -1036,7 +1036,7 @@ class Page(models.Model):
         return get_placeholders(self.get_template())
 
     def get_xframe_options(self, language=None, fallback=True, force_reload=False):
-        title = self.get_title_obj(language, fallback, force_reload)
+        title = self.get_content_obj(language, fallback, force_reload)
         if title:
             return title.get_xframe_options()
 

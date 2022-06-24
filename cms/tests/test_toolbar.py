@@ -486,7 +486,7 @@ class ToolbarTests(ToolbarTestBase):
 
         page = create_page("english-page", "nav_playground.html", "en")
         german_content = create_title("de", "german content", page)
-        english_content = page.get_title_obj('en')
+        english_content = page.get_content_obj('en')
         edit_url = get_object_edit_url(english_content)
         staff = self.get_staff()
         self.client.force_login(staff)
@@ -1832,13 +1832,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         language = "en"
         user = self.get_superuser()
         page = create_page('Test', 'col_two.html', language)
-        title = page.get_title_obj(language)
-        title.menu_title = 'Menu Test'
-        title.page_title = 'Page Test'
-        title.title = 'Main Test'
-        title.save()
+        content = page.get_content_obj(language)
+        content.menu_title = 'Menu Test'
+        content.page_title = 'Page Test'
+        content.title = 'Main Test'
+        content.save()
         page.reload()
-        edit_url = get_object_edit_url(title)
+        edit_url = get_object_edit_url(content)
         request = self.get_page_request(page, user, edit_url)
         response = details(request, page.get_path(language))
         response.render()

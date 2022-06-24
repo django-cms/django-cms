@@ -1210,10 +1210,10 @@ class PageContentAdmin(admin.ModelAdmin):
 
         page = source_page_content.page
 
-        if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
+        if not target_language or not target_language in get_language_list(site_id=page.node.site_id):  # TODO: not in
             return HttpResponseBadRequest(force_str(_("Language must be set to a supported language!")))
 
-        target_page_content = page.get_title_obj(target_language, fallback=False)
+        target_page_content = page.get_content_obj(target_language, fallback=False)
 
         for placeholder in source_page_content.get_placeholders():
             # TODO: Handle missing placeholder
@@ -1434,7 +1434,7 @@ class PageContentAdmin(admin.ModelAdmin):
                 'opts': self.opts,
                 'site': site,
                 'page': page,
-                'page_content': page.get_title_obj(language, fallback=True),
+                'page_content': page.get_content_obj(language, fallback=True),
                 'page_content_type': page_content_type,
                 'node': page.node,
                 'ancestors': [node.item for node in page.node.get_cached_ancestors()],

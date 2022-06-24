@@ -750,7 +750,7 @@ class AdminFormsTests(AdminTestsBase):
                                            overwrite_url='overwritten_url',
                                            menu_title='menu_title')
 
-            title = multi_title_page.get_title_obj()
+            title = multi_title_page.get_content_obj()
             title.page_title = 'page_title'
             title.save()
 
@@ -760,8 +760,7 @@ class AdminFormsTests(AdminTestsBase):
             self.assertEqual(403, self.client.get(page_url).status_code)
 
             self.assertEqual(200,
-                             self.client.get(page_url, HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code
-            )
+                             self.client.get(page_url, HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code)
 
             # Test that the query param is working as expected.
             self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'main_title'},

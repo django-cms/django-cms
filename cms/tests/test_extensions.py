@@ -95,7 +95,7 @@ class ExtensionsTestCase(CMSTestCase):
         page_extension = MyPageExtension(extended_object=page, extra='page extension 1')
         page_extension.save()
         page.mypageextension = page_extension
-        title = page.get_title_obj()
+        title = page.get_content_obj()
         title_extension = MyPageContentExtension(extended_object=title, extra_title='title extension 1')
         title_extension.save()
         page.myPageContentExtension = title_extension
@@ -103,7 +103,7 @@ class ExtensionsTestCase(CMSTestCase):
         subpage_extension = MyPageExtension(extended_object=subpage, extra='page extension 2')
         subpage_extension.save()
         subpage.mypageextension = subpage_extension
-        subtitle = subpage.get_title_obj()
+        subtitle = subpage.get_content_obj()
         subtitle_extension = MyPageContentExtension(extended_object=subtitle, extra_title='title extension 2')
         subtitle_extension.save()
         subpage.myPageContentExtension = subtitle_extension
@@ -157,7 +157,7 @@ class ExtensionsTestCase(CMSTestCase):
                                                  multitable_extra='multi-table page extension 1')
         page_extension.save()
         page.multitablepageextension = page_extension
-        title = page.get_title_obj()
+        title = page.get_content_obj()
         title_extension = MultiTablePageContentExtension(
             extended_object=title,
             extension_content_parent_field='content extension 1',
@@ -171,7 +171,7 @@ class ExtensionsTestCase(CMSTestCase):
                                                     multitable_extra='multi-table page extension 2')
         subpage_extension.save()
         subpage.multitablepageextension = subpage_extension
-        subtitle = subpage.get_title_obj()
+        subtitle = subpage.get_content_obj()
         subtitle_extension = MultiTablePageContentExtension(extended_object=subtitle,
                                                       extension_title_parent_field='title extension 2',
                                                       multitable_extra_title='multi-table title extension 2')
@@ -199,9 +199,9 @@ class ExtensionsTestCase(CMSTestCase):
             self.assertEqual(copied_page_extension.multitable_extra,
                              old_page_extensions[index].multitable_extra)
             self.assertEqual(copied_title_extension.extension_title_parent_field,
-                             old_title_extension[index].extension_title_parent_field)
+                             old_title_extension[index].extension_title_parent_field)  # TODO
             self.assertEqual(copied_title_extension.multitable_extra_title,
-                             old_title_extension[index].multitable_extra_title)
+                             old_title_extension[index].multitable_extra_title)  # TODO
             # check that objects are actually different
             self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
                                 old_page_extensions[index].pk)
@@ -242,19 +242,19 @@ class ExtensionAdminTestCase(CMSTestCase):
         self.page = create_page(
             'My Extension Page', 'nav_playground.html', 'en',
             site=self.site, created_by=self.admin)
-        self.page_title = self.page.get_title_obj('en')
+        self.page_title = self.page.get_content_obj('en')
         create_title('de', 'de title', self.page)
         self.page_extension = MyPageExtension.objects.create(
             extended_object=self.page,
             extra="page extension text")
         self.title_extension = MyPageContentExtension.objects.create(
-            extended_object=self.page.get_title_obj(),
+            extended_object=self.page.get_content_obj(),
             extra_title="title extension text")
 
         self.page_without_extension = create_page(
             'A Page', 'nav_playground.html', 'en',
             site=self.site, created_by=self.admin)
-        self.page_title_without_extension = self.page_without_extension.get_title_obj()
+        self.page_title_without_extension = self.page_without_extension.get_content_obj()
 
     def test_duplicate_extensions(self):
         with self.login_user_context(self.admin):
