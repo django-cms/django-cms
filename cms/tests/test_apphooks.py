@@ -622,7 +622,7 @@ class ApphooksTestCase(CMSTestCase):
         request = self.get_request(path)
         toolbar = CMSToolbar(request)
         self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
+        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'].is_current_app)
 
         # Testing a decorated view
         with force_language("en"):
@@ -632,9 +632,9 @@ class ApphooksTestCase(CMSTestCase):
         self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].app_path,
                          'cms.test_utils.project.sampleapp')
         self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'].app_path,
                          'cms.test_utils.project.sampleapp')
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
+        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'].is_current_app)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_toolbar_current_app_apphook_with_implicit_current_app(self):
@@ -646,9 +646,9 @@ class ApphooksTestCase(CMSTestCase):
         self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].app_path,
                          'cms.test_utils.project.sampleapp')
         self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'].app_path,
                          'cms.test_utils.project.sampleapp')
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
+        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'].is_current_app)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
     def test_toolbar_no_namespace(self):
@@ -658,7 +658,7 @@ class ApphooksTestCase(CMSTestCase):
         request = self.get_request(path)
         toolbar = CMSToolbar(request)
         self.assertFalse(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
+        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'].is_current_app)
         self.assertTrue(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].is_current_app)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
@@ -671,9 +671,9 @@ class ApphooksTestCase(CMSTestCase):
         self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].app_path,
                          'cms.test_utils.project.placeholderapp')
         self.assertFalse(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'].app_path,
                          'cms.test_utils.project.placeholderapp')
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
+        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'].is_current_app)
         self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageExtensionToolbar'].app_path,
                          'cms.test_utils.project.placeholderapp')
         self.assertTrue(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageExtensionToolbar'].is_current_app)

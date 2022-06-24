@@ -82,7 +82,7 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin_user):
             request = self.get_request(self.get_pages_admin_list_uri('en'))
             response = site.index(request)
-            self.assertNotContains(response, '/mytitleextension/')
+            self.assertNotContains(response, '/mypagecontentextension/')
             self.assertNotContains(response, '/mypageextension/')
 
     @override_settings(CMS_PERMISSION=False)
