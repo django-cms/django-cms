@@ -208,10 +208,10 @@ class PageContent(models.Model):
         return self.page.get_absolute_url(language=language)
 
 
-class EmptyPageContent():
+class EmptyPageContent:
     """
-    Empty title object, can be returned from Page.get_title_obj() if required
-    title object doesn't exists.
+    Empty title object, can be returned from Page.get_content_obj() if required
+    title object doesn't exist.
     """
     title = ""
     meta_description = ""
