@@ -860,3 +860,44 @@ class PlaceholderCacheTestCase(CMSTestCase):
             # Prove it still works as expected
             cached_en_crazy_content = get_placeholder_cache(self.placeholder, 'en', 1, en_crazy_request)
             self.assertEqual(en_crazy_content, cached_en_crazy_content)
+
+    def test_cache_limit_ttl(self):
+        """"
+        Test the `CMS_LIMIT_TTL_CACHE_FUNCTION` setting that allows to change the default 40 seconds
+        default ttl cache value with a business logic function.
+        """
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+        page1_url = page1.get_absolute_url()
+
+        limit_page_cache_ttl_function = ".".join([PlaceholderCacheTestCase.__module__, limit_page_cache_ttl_test_5.__name__])
+        with self.settings(CMS_LIMIT_TTL_CACHE_FUNCTION=limit_page_cache_ttl_function):
+            page1.publish('en')
+            request = self.get_request(page1_url)
+            request.current_page = Page.objects.get(pk=page1.pk)
+            response = self.client.get(page1_url)
+            self.assertTrue('max-age=5' in response['Cache-Control'], response['Cache-Control'])  # noqa
+
+    def test_cache_limit_ttl_greater_than_default_cache_ttl(self):
+        """
+        Test the `CMS_LIMIT_TTL_CACHE_FUNCTION` setting with a class that returns a value much
+        greater thant the default value of 40 seconds.
+        """
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+        page1_url = page1.get_absolute_url()
+
+        limit_page_cache_ttl_function = ".".join([PlaceholderCacheTestCase.__module__, limit_page_cache_ttl_test_500.__name__])
+        with self.settings(CMS_LIMIT_TTL_CACHE_FUNCTION=limit_page_cache_ttl_function):
+            page1.publish('en')
+            request = self.get_request(page1_url)
+            request.current_page = Page.objects.get(pk=page1.pk)
+            response = self.client.get(page1_url)
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])  # noqa
+
+
+def limit_page_cache_ttl_test_5(response):
+    return 5
+
+def limit_page_cache_ttl_test_500(response):
+    return 40
