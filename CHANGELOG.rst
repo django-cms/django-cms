@@ -27,9 +27,6 @@ This release includes 12 pull requests, and was created with the help of the fol
 * Marco Bonetti (1 pull request)
 * Mark Walker (7 pull requests)
 
-With the review help of the following contributors:
-
-
 Thanks to all contributors for their efforts!
 
 3.10.0 (2022-03-26)
