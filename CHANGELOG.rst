@@ -2,8 +2,8 @@
 Changelog
 =========
 
-3.10.1 (2022-06-02)
-===================
+3.10.1rc1 (2022-06-02)
+======================
 
 Bug Fixes:
 ----------
@@ -25,8 +25,8 @@ This release includes 8 pull requests, and was created with the help of the foll
 
 Thanks to all contributors for their efforts!
 
-3.10.0rc1 (2022-03-26)
-======================
+3.10.0 (2022-03-26)
+===================
 
 Highlights:
 -----------
