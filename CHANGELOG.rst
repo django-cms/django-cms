@@ -2,11 +2,15 @@
 Changelog
 =========
 
-3.10.1rc1 (2022-06-02)
+3.10.1 (2022-06-02)
 ======================
 
 Bug Fixes:
 ----------
+* Changelog titles for 3.10.x (#7347) (31f399535) -- Mark Walker
+* Request missing from test rendering (#7346) (eff54b0fd) -- Mark Walker
+* Changelog title for 3.10.1rc1 (#7345) (966a90fd2) -- Mark Walker
+* Revert change to the toolbar sites menu to use ``http`` protocol (#7332) (caddfe7f4) -- Mark Walker
 * Fixed ``AttributeError`` (#7288) when the current toolbar object doesn't define ``get_draft_url()`` (#7289) -- Marco Bonetti
 * Fix for django 2.2 in middleware [#7290] (#7293) -- Mark Walker
 * Update release script to start bringing support for macOS (#7294) -- Mark Walker
@@ -16,12 +20,15 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 8 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 12 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Conrad (3 pull requests)
 * Florian Delizy (1 pull request)
 * Marco Bonetti (1 pull request)
-* Mark Walker (4 pull requests)
+* Mark Walker (7 pull requests)
+
+With the review help of the following contributors:
+
 
 Thanks to all contributors for their efforts!
 
