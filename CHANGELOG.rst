@@ -1190,7 +1190,7 @@ Thanks to all contributors for their efforts!
 - Fixes PageField to work in Django 1.7 environments
 - Updates to community and project governance documentation
 - Added list of retired core developers
-- Added branch policy documentaion
+- Added branch policy documentation
 
 
 3.0.6 (2014-10-07)
