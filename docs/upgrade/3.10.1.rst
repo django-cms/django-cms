@@ -38,7 +38,7 @@ Bug Fixes:
 * Fixed Cache not invalidated when using a PlaceholderField outside the CMS #6912 (#6956) (3ce63d7d3) -- Benjamin PIERRE
 * Fixed unexpected behavior get_page_from_request (#6974) (#6073) (52f926e0d) -- Yuriy Mamaev
 * Fixed django treebeard 4.5.1 compatibility (#6988) (eeb86fd70) -- Aiky30
-* Fixed Bad Title.path in Multilanguage sites if parent slug is created or modified (#6968) (6e7b0ae48) -- fp4code
+* Fixed bad Title.path in Multilanguage sites if parent slug is created or modified (#6968) (6e7b0ae48) -- fp4code
 * Fixed redirect issues when i18n_patterns had prefix_default_language = False
 * Fixed not checking slug uniqueness when moving a page
 * Fixed builds on RTD
