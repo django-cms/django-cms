@@ -1105,7 +1105,7 @@ Thanks to all contributors for their efforts!
 - Improves redirection as a result of changes to page slugs, etc.
 - Improves performance of "watched models"
 - Improves frontend performance relating to resizing the sideframe
-- Corrects an issue where items might not be visible in structue mode menus
+- Corrects an issue where items might not be visible in structure mode menus
 - Limits version of django-mptt used in CMS for 3.0.x
 - Prevent accidental upgrades to Django 1.8, which is not yet supported
 
