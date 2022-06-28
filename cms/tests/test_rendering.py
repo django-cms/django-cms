@@ -197,8 +197,8 @@ class RenderingTestCase(CMSTestCase):
                          slug=self.test_data9['slug'],
                          reverse_id=self.test_data9['reverse_id'], published=True)
         p10 = create_page(self.test_data10['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
-                         slug=self.test_data10['slug'], parent=p9,
-                         reverse_id=self.test_data10['reverse_id'], published=True)
+                          slug=self.test_data10['slug'], parent=p9,
+                          reverse_id=self.test_data10['reverse_id'], published=True)
 
         # Reload test pages
         self.test_page = self.reload(p.publisher_public)
@@ -281,6 +281,8 @@ class RenderingTestCase(CMSTestCase):
         plugin_rendering._standard_processors = {}
 
         content_renderer = self.get_content_renderer()
+
+        context.update({'request': self.get_request()})
         r = content_renderer.render_plugin(instance, context, self.test_placeholders['main'])
         expected = (
             self.test_data['text_main'] +  # noqa: W504
