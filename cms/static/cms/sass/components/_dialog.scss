@@ -1,5 +1,6 @@
 //##############################################################################
 // DIALOG
+@use "sass:math";
 
 // used in: /cms/admin/page/tree/copy_premissions
 .cms-dialog {
@@ -9,7 +10,7 @@
     z-index: z(dialog);
     box-sizing: border-box;
     width: $dialog-width;
-    margin: -100px 0 0 (-$dialog-width/2);
+    margin: -100px 0 0  math.div(-$dialog-width, 2);
     padding: $padding-large;
     border: 1px solid $gray-lighter;
     border-radius: $dialog-border-radius;

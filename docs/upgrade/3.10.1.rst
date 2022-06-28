@@ -1,13 +1,13 @@
-.. _upgrade-to-3.10.0:
+.. _upgrade-to-3.10.1:
 
 ####################
-3.10.0 release notes
+3.10.1 release notes
 ####################
 
 This release focuses on Python 3.10, node 16 (for build system), and bug fixes.
 
 ********************
-What's new in 3.10.0
+What's new in 3.10.1
 ********************
 
 Features:
@@ -49,15 +49,15 @@ Bug Fixes:
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
-* Fixed a bug where the fallback page title would be returned instead of the one from the current language
+* Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
 * Fixed an issue when running migrations on a multi database project
 
 
 ************************
-How to upgrade to 3.10.0
+How to upgrade to 3.10.1
 ************************
 
-We assume you are upgrading from django CMS 3.9.0.
+We assume you are upgrading from django CMS 3.10.0.
 
 Please make sure that your current database is consistent and in a healthy
 state, and **make a copy of the database before proceeding further.**
