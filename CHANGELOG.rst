@@ -1400,7 +1400,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - CMS_FRONTEND_LANGUAGES limits django languages as well during language selection
 - Wymeditor updated to 1.0.4a
 - icon_url escape fixed
-- Ukranian translation added
+- Ukrainian translation added
 - Fixed wrong language prefix handling for form actions and admin preview
 - Admin icons in django 1.4 fixed
 - Added requirements.txt for pip and testing in test_requirements
