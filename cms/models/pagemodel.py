@@ -461,7 +461,7 @@ class Page(models.Model):
         """
         try:
             return self.get_draft_object().get_absolute_url(language, fallback)
-        except [AttributeError, NoReverseMatch, TypeError]:
+        except (AttributeError, NoReverseMatch, TypeError):
             return ''
 
     def set_tree_node(self, site, target=None, position='first-child'):

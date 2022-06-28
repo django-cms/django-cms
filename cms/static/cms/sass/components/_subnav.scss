@@ -1,6 +1,8 @@
 //##############################################################################
 // SUBNAV
 
+@use "sass:math";
+
 .cms-submenu-btn {
     @include icon(menu);
     display: block;
@@ -10,14 +12,14 @@
     height: $submenu-icon-area-size;
     cursor: pointer;
     top: 50%;
-    margin-top: -($submenu-icon-area-size / 2);
+    margin-top: -( math.div($submenu-icon-area-size, 2));
     &:before {
         @extend %icon;
         position: absolute;
         left: 50%;
         top: 50%;
-        margin-left: -($icon-size / 2);
-        margin-top: -($icon-size / 2);
+        margin-left: -( math.div($icon-size, 2));
+        margin-top: -( math.div($icon-size, 2));
         color: $submenu-icon-color;
     }
 
@@ -53,8 +55,8 @@
 .cms-submenu-edit,
 .cms-submenu-add {
     &:before {
-        margin-left: -($icon-size / 2);
-        margin-top: -($icon-size / 2);
+        margin-left: -(math.div($icon-size, 2));
+        margin-top: -(math.div($icon-size, 2));
         font-size: $icon-size;
     }
 }
@@ -63,7 +65,7 @@
     position: absolute;
     top: 50%;
     height: $line-height-normal;
-    margin-top: -($line-height-normal / 2);
+    margin-top: -(math.div($line-height-normal, 2));
     line-height: $line-height-normal - 2px;
     right: 10px;
     padding: 0 5px;
@@ -180,7 +182,7 @@
         left: 100%;
         width: $dropdown-arrow-side;
         height: $dropdown-arrow-side;
-        margin-left: -($dropdown-arrow-side / 2);
+        margin-left: -(math.div($dropdown-arrow-side, 2));
         transform: rotate(45deg);
         background-color: $submenu-dropdown-bgcolor;
         box-shadow: $dropdown-shadow;
