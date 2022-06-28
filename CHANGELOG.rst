@@ -1162,7 +1162,7 @@ Thanks to all contributors for their efforts!
 ==================
 
 - Add require_parent option to CMS_PLACEHOLDER_CONF
-- Fix django-mptt version depenency to be PEP440 compatible
+- Fix django-mptt version dependency to be PEP440 compatible
 - Fix some Django 1.4 compatibility issues
 - Add toolbar sanity check
 - Fix behavior with CMSPluginBase.get_render_template()
