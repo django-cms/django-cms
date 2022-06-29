@@ -43,7 +43,6 @@ def default(name):
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
     'DEFAULT_X_FRAME_OPTIONS': constants.X_FRAME_OPTIONS_INHERIT,
-    'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
     # Whether to use raw ID lookups for users when PERMISSION is True
@@ -87,7 +86,9 @@ DEFAULTS = {
         (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
         (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
         (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
-    )
+    ),
+    'COLOR_SCHEME': 'light',
+    'COLOR_SCHEME_TOGGLE': False,
 }
 
 

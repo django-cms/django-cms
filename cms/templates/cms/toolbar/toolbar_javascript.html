@@ -120,6 +120,7 @@ CMS.config = {
         'structure': '{{ cms_structure_on }}',
         'legacy_mode': {{ cms_toolbar.uses_legacy_structure_mode|yesno:'true,false' }}
     },
+    'color_scheme' : '{{ cms_color_scheme }}',
     'clipboard': {
         'id': '{{ cms_toolbar.clipboard.pk|unlocalize }}',
         'url': '{% if cms_toolbar.clipboard.pk %}{% cms_admin_url "cms_page_clear_placeholder" cms_toolbar.clipboard.pk %}{% endif %}'

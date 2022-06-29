@@ -11,7 +11,7 @@ from django.http import (
     HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
 )
 from django.http.request import QueryDict
-from django.urls import re_path
+from django.urls import Resolver404, re_path, resolve
 from django.utils.translation import override
 
 from cms.admin.forms import RequestToolbarForm
@@ -97,6 +97,10 @@ class SettingsAdmin(ModelAdmin):
         request = copy.copy(request)
         request.GET = data
         request.current_page = current_page
+        try:
+            request.resolver_match = resolve(origin_url.path)
+        except Resolver404:
+            pass
         request.toolbar = CMSToolbar(request, request_path=origin_url.path, _async=True)
         request.toolbar.set_object(attached_obj or current_page)
         return HttpResponse(request.toolbar.render())
