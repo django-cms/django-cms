@@ -12,6 +12,7 @@ unreleased
 * Fix edit plugin popup width (remove 850px width constraint).
 * Fix except block using list instead of tuple. (#7334)
 * Added cache ttl extension point.
+* Fix isort line length to by in sync with flake8
 
 3.10.1 (2022-06-28)
 ===================
