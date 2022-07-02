@@ -50,9 +50,7 @@ def get_plugin_toolbar_js(plugin, children=None, parents=None):
 
 
 def get_plugin_tree_as_json(request, plugins):
-    from cms.utils.plugins import (
-        build_plugin_tree, downcast_plugins, get_plugin_restrictions,
-    )
+    from cms.utils.plugins import build_plugin_tree, downcast_plugins, get_plugin_restrictions
 
     tree_data = []
     tree_structure = []

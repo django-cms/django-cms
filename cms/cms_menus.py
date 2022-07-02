@@ -8,10 +8,7 @@ from cms.api import get_page_draft
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyTitle
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import (
-    get_fallback_languages, get_public_languages, hide_untranslated,
-    is_valid_site_language,
-)
+from cms.utils.i18n import get_fallback_languages, get_public_languages, hide_untranslated, is_valid_site_language
 from cms.utils.page import get_page_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
 from cms.utils.permissions import get_view_restrictions
@@ -103,8 +100,8 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     if page.navigation_extenders:
         if page.navigation_extenders in renderer.menus:
             extenders.append(page.navigation_extenders)
-        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in renderer.menus:
-            extenders.append("{0}:{1}".format(page.navigation_extenders, page.pk))
+        elif f"{page.navigation_extenders}:{page.pk}" in renderer.menus:
+            extenders.append(f"{page.navigation_extenders}:{page.pk}")
     # Is this page an apphook? If so, we need to handle the apphooks's nodes
     # Only run this if we have a translation in the requested language for this
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
@@ -120,7 +117,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
         if hasattr(ext, "get_instances"):
             # CMSAttachMenus are treated a bit differently to allow them to be
             # able to be attached to multiple points in the navigation.
-            exts.append("{0}:{1}".format(ext.__name__, page.pk))
+            exts.append(f"{ext.__name__}:{page.pk}")
         elif hasattr(ext, '__name__'):
             exts.append(ext.__name__)
         else:

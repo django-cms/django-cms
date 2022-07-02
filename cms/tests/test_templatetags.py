@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -12,7 +13,6 @@ from django.test.utils import override_settings
 from django.utils.html import escape
 from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from mock import patch
 from sekizai.context import SekizaiContext
 
 import cms
@@ -20,9 +20,7 @@ from cms.api import add_plugin, create_page, create_title
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, Placeholder
 from cms.templatetags.cms_js_tags import json_filter
-from cms.templatetags.cms_tags import (
-    _get_page_by_untyped_arg, _show_placeholder_by_id, render_plugin,
-)
+from cms.templatetags.cms_tags import _get_page_by_untyped_arg, _show_placeholder_by_id, render_plugin
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar

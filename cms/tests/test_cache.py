@@ -1,4 +1,3 @@
-
 import time
 
 from django.conf import settings
@@ -8,18 +7,16 @@ from sekizai.context import SekizaiContext
 from cms.api import add_plugin, create_page, create_title
 from cms.cache import _get_cache_version, invalidate_cms_page_cache
 from cms.cache.placeholder import (
-    _get_placeholder_cache_key, _get_placeholder_cache_version,
-    _get_placeholder_cache_version_key, _set_placeholder_cache_version,
-    clear_placeholder_cache, get_placeholder_cache, set_placeholder_cache,
+    _get_placeholder_cache_key, _get_placeholder_cache_version, _get_placeholder_cache_version_key,
+    _set_placeholder_cache_version, clear_placeholder_cache, get_placeholder_cache, set_placeholder_cache,
 )
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
-    DateTimeCacheExpirationPlugin, LegacyCachePlugin, NoCachePlugin,
-    SekizaiPlugin, TimeDeltaCacheExpirationPlugin, TTLCacheExpirationPlugin,
-    VaryCacheOnPlugin,
+    DateTimeCacheExpirationPlugin, LegacyCachePlugin, NoCachePlugin, SekizaiPlugin, TimeDeltaCacheExpirationPlugin,
+    TTLCacheExpirationPlugin, VaryCacheOnPlugin,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -325,7 +322,7 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(FuzzyInt(14, 26)):
                 response = self.client.get(page1_url)
                 resp1 = response.content.decode('utf8').split("$$$")[1]
-            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])  # noqa
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
             cache_control1 = response['Cache-Control']
             expires1 = response['Expires']
 
@@ -507,7 +504,7 @@ class CacheTestCase(CMSTestCase):
 
             # Assert no cached content was used
             with self.assertNumQueries(FuzzyInt(1, 24)):
-                response = self.client.get('{}?edit'.format(page1_url))
+                response = self.client.get(f'{page1_url}?edit')
             self.assertEqual(response.status_code, 200)
 
     def test_invalidate_restart(self):
@@ -755,7 +752,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
     def test_get_placeholder_cache_key(self):
         version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en', 1)
-        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',
@@ -775,7 +772,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
         en_us_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_us_request)
         self.assertNotEqual(en_key, en_us_key)
 
-        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',
@@ -876,7 +873,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             response = self.client.get(page1_url)
-            self.assertTrue('max-age=5' in response['Cache-Control'], response['Cache-Control'])  # noqa
+            self.assertTrue('max-age=5' in response['Cache-Control'], response['Cache-Control'])
 
     def test_cache_limit_ttl_greater_than_default_cache_ttl(self):
         """
@@ -893,7 +890,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             response = self.client.get(page1_url)
-            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])  # noqa
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
 
 
 def limit_page_cache_ttl_test_5(response):

@@ -7,22 +7,16 @@ from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
 from cms.admin.forms import save_permissions
-from cms.api import (
-    add_plugin, assign_user_to_page, create_page, create_page_user,
-    publish_page,
-)
+from cms.api import add_plugin, assign_user_to_page, create_page, create_page_user, publish_page
 from cms.cms_menus import get_visible_nodes
 from cms.models import ACCESS_PAGE, CMSPlugin, Page, Title
 from cms.models.permissionmodels import (
-    ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission,
-    PagePermission,
+    ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
 )
 from cms.test_utils.testcases import URL_CMS_PAGE_ADD, CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_current_site
-from cms.utils.page_permissions import (
-    user_can_publish_page, user_can_view_page,
-)
+from cms.utils.page_permissions import user_can_publish_page, user_can_view_page
 
 
 def fake_tree_attrs(page):
@@ -650,11 +644,11 @@ class PatricksMoveTest(CMSTestCase):
         # check if urls are correct after move
         self.assertEqual(
             self.pg.publisher_public.get_absolute_url(),
-            u'%smaster/slave-home/pc/pg/' % self.get_pages_root()
+            '%smaster/slave-home/pc/pg/' % self.get_pages_root()
         )
         self.assertEqual(
             self.ph.publisher_public.get_absolute_url(),
-            u'%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root()
+            '%smaster/slave-home/pc/pg/pe/ph/' % self.get_pages_root()
         )
 
 
