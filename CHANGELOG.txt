@@ -9,6 +9,7 @@
 * Backported from develop: Added support for Github Actions based CI.
 * Backported from develop: Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
 * Backported from develop: Remove travis integration from the project as the project has moved to Github Actions.
+* Fixed usage of ``get_object`` in ``edit_title_fields`` of the page admin.
 
 
 === 3.6.0 (unreleased) ===

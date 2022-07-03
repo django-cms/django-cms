@@ -163,11 +163,7 @@ class CMSToolbar(BaseToolbar):
                 try:
                     # If the original view is decorated we try to extract the real function
                     # module instead of the decorator's one
-                    if decorator and getattr(decorator, 'func_closure', False):
-                        # python 2
-                        self.app_name = decorator.func_closure[0].cell_contents.__module__
-                    elif decorator and getattr(decorator, '__closure__', False):
-                        # python 3
+                    if decorator and getattr(decorator, '__closure__', False):
                         self.app_name = decorator.__closure__[0].cell_contents.__module__
                     else:
                         raise AttributeError()
