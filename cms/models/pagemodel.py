@@ -4,33 +4,33 @@ from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
-from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
-from django.utils.encoding import force_text
+from django.urls import NoReverseMatch, reverse
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
-    get_language,
-    override as force_language,
-    gettext_lazy as _,
+    get_language, gettext_lazy as _, override as force_language,
 )
+from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.cache.permissions import clear_permission_cache
-from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
-from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
+from cms.constants import (
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING,
+    TEMPLATE_INHERITANCE_MAGIC,
+)
+from cms.exceptions import (
+    LanguageError, PublicIsUnmodifiable, PublicVersionNeeded,
+)
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
-
+from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
-
-from treebeard.mp_tree import MP_Node
-
 
 logger = getLogger(__name__)
 
@@ -125,9 +125,10 @@ class TreeNode(MP_Node):
 
     def _set_hierarchy(self, nodes, ancestors=None):
         if self.is_branch:
-            self._descendants = [node for node in nodes
-                           if node.path.startswith(self.path)
-                           and node.depth > self.depth]
+            self._descendants = [
+                node for node in nodes
+                if node.path.startswith(self.path) and node.depth > self.depth
+            ]
         else:
             self._descendants = []
 
@@ -261,7 +262,7 @@ class Page(models.Model):
                 title = None
         if title is None:
             title = u""
-        return force_text(title)
+        return force_str(title)
 
     def __repr__(self):
         display = '<{module}.{class_name} id={id} is_draft={is_draft} object at {location}>'.format(
@@ -330,6 +331,8 @@ class Page(models.Model):
         return (new_home_tree, old_home_tree)
 
     def _update_title_path(self, language):
+        from cms.utils.page import get_available_slug
+
         parent_page = self.get_parent_page()
 
         if parent_page:
@@ -338,7 +341,9 @@ class Page(models.Model):
             base = ''
 
         title_obj = self.get_title_obj(language, fallback=False)
-        title_obj.path = title_obj.get_path_for_base(base)
+        title_obj.slug = get_available_slug(title_obj.page.node.site, title_obj.slug, title_obj.language, current=title_obj.page)
+        if not title_obj.page.is_home:
+            title_obj.path = '%s/%s' % (base, title_obj.slug) if base else title_obj.slug
         title_obj.save()
 
     def _update_title_path_recursive(self, language, slug=None):
@@ -446,7 +451,7 @@ class Page(models.Model):
         """
         try:
             return self.get_public_object().get_absolute_url(language, fallback)
-        except:
+        except:  # noqa: E722
             return ''
 
     def get_draft_url(self, language=None, fallback=True):
@@ -456,7 +461,7 @@ class Page(models.Model):
         """
         try:
             return self.get_draft_object().get_absolute_url(language, fallback)
-        except:
+        except (AttributeError, NoReverseMatch, TypeError):
             return ''
 
     def set_tree_node(self, site, target=None, position='first-child'):
@@ -561,6 +566,8 @@ class Page(models.Model):
                 self.mark_as_published(language)
                 self.mark_descendants_as_published(language)
         self.clear_cache(menu=True)
+        if get_cms_setting('PERMISSION'):
+            clear_permission_cache()
         return self
 
     def _copy_titles(self, target, language, published):
@@ -825,6 +832,8 @@ class Page(models.Model):
             clear_permission_cache()
             self.created_by = self.changed_by
         super().save(**kwargs)
+        if created and get_cms_setting('PERMISSION'):
+            clear_permission_cache()
 
     def save_base(self, *args, **kwargs):
         """Overridden save_base. If an instance is draft, and was changed, mark
@@ -1421,27 +1430,16 @@ class Page(models.Model):
 
         force_reload = (force_reload or language not in self.title_cache)
 
+        if force_reload:
+            for title in self.title_set.all():
+                self.title_cache[title.language] = title
+
         if fallback and not self.title_cache.get(language):
-            # language can be in the cache but might be an EmptyTitle instance
             fallback_langs = i18n.get_fallback_languages(language)
             for lang in fallback_langs:
                 if self.title_cache.get(lang):
                     return lang
 
-        if force_reload:
-            from cms.models.titlemodels import Title
-
-            titles = Title.objects.filter(page=self)
-            for title in titles:
-                self.title_cache[title.language] = title
-            if self.title_cache.get(language):
-                return language
-            else:
-                if fallback:
-                    fallback_langs = i18n.get_fallback_languages(language)
-                    for lang in fallback_langs:
-                        if self.title_cache.get(lang):
-                            return lang
         return language
 
     def get_template(self):
@@ -1524,7 +1522,9 @@ class Page(models.Model):
         return user_can_publish_page(user, page=self)
 
     def has_advanced_settings_permission(self, user):
-        from cms.utils.page_permissions import user_can_change_page_advanced_settings
+        from cms.utils.page_permissions import (
+            user_can_change_page_advanced_settings,
+        )
         return user_can_change_page_advanced_settings(user, page=self)
 
     def has_change_permissions_permission(self, user):

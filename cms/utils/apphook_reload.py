@@ -1,18 +1,16 @@
 import logging
 import sys
 import uuid
+from importlib import reload
 
-from threading import local
-
+from asgiref.local import Local
 from django.conf import settings
 from django.urls import clear_url_caches
-
-from importlib import reload
 
 logger = logging.getLogger("cms")
 
 _urlconf_revision = {}
-_urlconf_revision_threadlocal = local()
+_urlconf_revision_threadlocal = Local()
 
 use_threadlocal = False
 

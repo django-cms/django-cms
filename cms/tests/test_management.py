@@ -1,25 +1,23 @@
 import io
 import uuid
 
-from cms.test_utils.project.sampleapp.cms_apps import SampleApp
-from cms.test_utils.util.context_managers import apphooks
-
+import mock
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
 from django.test.utils import override_settings
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models import Page, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
+from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
-
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-
+from cms.test_utils.util.context_managers import apphooks
 
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"
@@ -149,7 +147,10 @@ class ManagementTestCase(CMSTestCase):
         bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
         bogus_plugin.save()
 
-        management.call_command('cms', 'list', 'plugins', interactive=False, stdout=out)
+        with mock.patch('cms.management.commands.subcommands.list.plugin_report') as report_fn:
+            management.call_command('cms', 'list', 'plugins', interactive=False, stdout=out)
+            report_fn.assert_called_once()
+
         report = plugin_report()
 
         # there should be reports for three plugin types

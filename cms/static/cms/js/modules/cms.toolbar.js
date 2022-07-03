@@ -8,14 +8,12 @@ import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import Plugin from './cms.plugins';
-import DiffDOM from 'diff-dom';
 import { filter, throttle, uniq } from 'lodash';
 import { showLoader, hideLoader } from './loader';
 import { Helpers, KEYS } from './cms.base';
 
 var SECOND = 1000;
 var TOOLBAR_OFFSCREEN_OFFSET = 10; // required to hide box-shadow
-var dd;
 
 export const getPlaceholderIds = pluginRegistry =>
     uniq(filter(pluginRegistry, ([, opts]) => opts.type === 'placeholder').map(([, opts]) => opts.placeholder_id));
@@ -99,18 +97,6 @@ var Toolbar = new Class({
 
         // set a state to determine if we need to reinitialize this._events();
         this.ui.toolbar.data('ready', true);
-
-        dd = new DiffDOM({
-            preDiffApply(info) {
-                if (
-                    (info.diff.action === 'removeAttribute' || info.diff.action === 'modifyAttribute') &&
-                    info.diff.name === 'style' &&
-                    $('.cms-toolbar').is(info.node)
-                ) {
-                    return true;
-                }
-            }
-        });
     },
 
     /**
@@ -435,6 +421,12 @@ var Toolbar = new Class({
             this._debug();
         }
 
+        if (CMS.settings.color_scheme) {
+            this.set_color_scheme (CMS.settings.color_scheme);
+        } else if (CMS.config.color_scheme) {
+            this.set_color_scheme (CMS.config.color_scheme);
+        }
+
         // check if there are messages and display them
         if (CMS.config.messages) {
             CMS.API.Messages.open({
@@ -630,6 +622,18 @@ var Toolbar = new Class({
                     onSuccess: el.data('on-success')
                 });
                 break;
+            case 'color-toggle':
+                switch (this.get_color_scheme()) {
+                    case 'light':
+                        this.set_color_scheme('dark');
+                        break;
+                    case 'dark':
+                        this.set_color_scheme('light');
+                        break;
+                    default:
+                        break;
+                }
+                break;
             default:
                 Helpers._getWindow().location.href = el.attr('href');
         }
@@ -749,9 +753,8 @@ var Toolbar = new Class({
 
     _refreshMarkup: function(newToolbar) {
         const switcher = this.ui.toolbarSwitcher.detach();
-        const diff = dd.diff(this.ui.toolbar[0], newToolbar[0]);
 
-        dd.apply(this.ui.toolbar[0], diff);
+        $(this.ui.toolbar).html(newToolbar.children());
 
         $('.cms-toolbar-item-cms-mode-switcher').replaceWith(switcher);
 
@@ -771,6 +774,55 @@ var Toolbar = new Class({
         CMS.API.Clipboard.ui.triggers = $('.cms-clipboard-trigger a');
         CMS.API.Clipboard.ui.triggerRemove = $('.cms-clipboard-empty a');
         CMS.API.Clipboard._toolbarEvents();
+    },
+
+    /**
+     * Get color scheme either from :root[data-color-scheme] or user system setting
+     *
+     * @method get_color_scheme
+     * @public
+     * @returns {String}
+     */
+    get_color_scheme: function () {
+        let state = this.ui.body.attr('data-color-scheme');
+
+        if (!state && window.matchMedia) {
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                state = 'dark'; // dark mode
+            } else {
+                state = 'light';
+            }
+        }
+        return state;
+    },
+
+    /**
+     * Sets the color scheme for the current document and all iframes contained.
+     *
+     * @method set_color_scheme
+     * @public
+     * @param scheme {String}
+     * @retiurns {void}
+     */
+
+    set_color_scheme: function (scheme) {
+        CMS.API.Helpers.setSettings({ color_scheme: scheme });
+        if (scheme === 'auto') {
+            this.ui.body.removeAttr('data-color-scheme');
+            this.ui.body.find('div.cms iframe').each(function(i, e) {
+                delete e.contentDocument.documentElement.dataset.colorScheme;
+            });
+        } else {
+            this.ui.body.attr('data-color-scheme', scheme);
+            this.ui.body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
+                if (e.contentDocument) {
+                    e.contentDocument.documentElement.dataset.colorScheme = scheme;
+                    // ckeditor (and potentially other apps) have iframes inside their admin forms
+                    // also set color scheme there
+                    $(e.contentDocument).find('iframe').each(setFrameColorScheme);
+                }
+            });
+        }
     }
 });
 

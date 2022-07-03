@@ -36,9 +36,7 @@ def default_request_ip_resolver(request):
     'X_FORWARDED_FOR' header which supersedes a 'REMOTE_ADDR' header.
     """
     return (
-        real_ip(request) or
-        x_forwarded_ip(request) or
-        remote_addr_ip(request)
+        real_ip(request) or x_forwarded_ip(request) or remote_addr_ip(request)
     )
 
 
@@ -49,7 +47,7 @@ def real_ip(request):
 
     Should handle Nginx and some other WSGI servers.
     """
-    return request.META.get('HTTP_X_REAL_IP')
+    return request.headers.get('X-Real-Ip')
 
 
 def remote_addr_ip(request):
@@ -69,7 +67,7 @@ def x_forwarded_ip(request):
 
     Should handle properly configured proxy servers.
     """
-    ip_address_list = request.META.get('HTTP_X_FORWARDED_FOR')
+    ip_address_list = request.headers.get('X-Forwarded-For')
     if ip_address_list:
         ip_address_list = ip_address_list.split(',')
         return ip_address_list[0]

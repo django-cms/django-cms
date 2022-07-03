@@ -1,11 +1,13 @@
 
+from urllib.parse import quote
+
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
-from django.utils.http import is_safe_url, urlquote
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
 from django.utils.translation import get_language_from_request
 from django.views.decorators.http import require_POST
@@ -14,21 +16,26 @@ from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
-from cms.page_rendering import _handle_no_page, render_page, render_object_structure, _render_welcome_page
+from cms.page_rendering import (
+    _handle_no_page, _render_welcome_page, render_object_structure,
+    render_page,
+)
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
+from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import (get_fallback_languages, get_public_languages,
-                            get_redirect_on_fallback, get_language_list,
-                            get_default_language_for_site,
-                            is_language_prefix_patterns_used)
+from cms.utils.i18n import (
+    get_default_language_for_site, get_fallback_languages, get_language_list,
+    get_public_languages, get_redirect_on_fallback,
+    is_language_prefix_patterns_used,
+)
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_change_page
 
 
 def _clean_redirect_url(redirect_url, language):
-    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/"
-            and not redirect_url.startswith('/%s/' % language)):
+    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
+            '/%s/' % language)):
         # add language prefix to url
         redirect_url = "/%s/%s" % (language, redirect_url.lstrip("/"))
     return redirect_url
@@ -42,9 +49,9 @@ def details(request, slug):
     response_timestamp = now()
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
-            not request.toolbar.edit_mode_active and
-            not request.toolbar.show_toolbar and
-            not request.user.is_authenticated
+            not request.toolbar.edit_mode_active
+            and not request.toolbar.show_toolbar  # noqa: W503
+            and not request.user.is_authenticated  # noqa: W503
         )
     ):
         cache_content = get_page_cache(request)
@@ -52,7 +59,11 @@ def details(request, slug):
             content, headers, expires_datetime = cache_content
             response = HttpResponse(content)
             response.xframe_options_exempt = True
-            response._headers = headers
+            if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
+                response._headers = headers
+            else:
+                #  for django3.2 and above. response.headers replace response._headers in earlier versions of django
+                response.headers = headers
             # Recalculate the max-age header for this cached response
             max_age = int(
                 (expires_datetime - response_timestamp).total_seconds() + 0.5)
@@ -81,7 +92,10 @@ def details(request, slug):
     else:
         user_languages = get_public_languages(site_id=site.pk)
 
-    request_language = get_language_from_request(request, check_path=True)
+    if is_language_prefix_patterns_used():
+        request_language = get_language_from_request(request, check_path=True)
+    else:
+        request_language = get_default_language_for_site(site.pk)
 
     if not page.is_home and request_language not in user_languages:
         # The homepage is treated differently because
@@ -157,7 +171,7 @@ def details(request, slug):
 
     # permission checks
     if page.login_required and not request.user.is_authenticated:
-        return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
+        return redirect_to_login(quote(request.get_full_path()), settings.LOGIN_URL)
 
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(page)
@@ -173,7 +187,7 @@ def details(request, slug):
 def login(request):
     redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
 
-    if not is_safe_url(url=redirect_to, allowed_hosts=request.get_host()):
+    if not url_has_allowed_host_and_scheme(url=redirect_to, allowed_hosts=request.get_host()):
         redirect_to = reverse("pages-root")
 
     if request.user.is_authenticated:

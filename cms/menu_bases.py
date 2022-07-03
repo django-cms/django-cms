@@ -1,9 +1,8 @@
-from django.db.models import Q
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from cms.apphook_pool import apphook_pool
 from cms.models import Page
-
 from menus.base import Menu
 
 
@@ -46,6 +45,5 @@ class CMSAttachMenu(Menu):
         for app in cls.get_apphooks():
             parent_apps.append(app.__class__.__name__)
         return Page.objects.filter(
-            Q(application_urls__in=parent_apps)
-            | Q(navigation_extenders=cls.__name__)
+            Q(application_urls__in=parent_apps) | Q(navigation_extenders=cls.__name__)
         )

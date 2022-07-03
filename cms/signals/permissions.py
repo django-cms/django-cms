@@ -1,3 +1,5 @@
+from django.apps import apps
+from django.conf import settings
 
 from cms.cache.permissions import clear_user_permission_cache
 from cms.models import PageUser, PageUserGroup
@@ -12,12 +14,22 @@ def post_save_user(instance, raw, created, **kwargs):
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user
+
     # read current user from thread locals
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous:
         return
-
-    page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
+    if settings.AUTH_USER_MODEL:
+        # looks for a custom user profile
+        auth_model = apps.get_model(settings.AUTH_USER_MODEL)
+        # creates a dynamic kwargs dict with a pointer to the right user model
+        kwargs = {
+            f"{auth_model._meta.model_name}_ptr_id": instance.pk,
+            "created_by": creator
+        }
+        page_user = PageUser(**kwargs)
+    else:
+        page_user = PageUser(user_ptr_id=instance.pk, created_by=creator)
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
@@ -31,6 +43,7 @@ def post_save_user_group(instance, raw, created, **kwargs):
     requires: CurrentUserMiddleware
     """
     from cms.utils.permissions import get_current_user
+
     # read current user from thread locals
     creator = get_current_user()
     if not creator or not created or creator.is_anonymous:
@@ -50,13 +63,13 @@ def pre_delete_user(instance, **kwargs):
 
 def pre_save_group(instance, raw, **kwargs):
     if instance.pk:
-        user_set = getattr(instance, 'user_set')
+        user_set = getattr(instance, "user_set")
         for user in user_set.all():
             clear_user_permission_cache(user)
 
 
 def pre_delete_group(instance, **kwargs):
-    user_set = getattr(instance, 'user_set')
+    user_set = getattr(instance, "user_set")
     for user in user_set.all():
         clear_user_permission_cache(user)
 
@@ -65,7 +78,7 @@ def _clear_users_permissions(instance):
     if instance.user:
         clear_user_permission_cache(instance.user)
     if instance.group:
-        user_set = getattr(instance.group, 'user_set')
+        user_set = getattr(instance.group, "user_set")
         for user in user_set.all():
             clear_user_permission_cache(user)
 

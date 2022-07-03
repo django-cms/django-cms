@@ -1,10 +1,10 @@
-from copy import deepcopy
 from collections import defaultdict
+from copy import deepcopy
+from functools import lru_cache
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
-from functools import lru_cache
 
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
@@ -51,10 +51,11 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     fallbacks = defaultdict(list)
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (not is_fallback and
-        not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active)):
-        disjoint_placeholders = (ph for ph in placeholders
-                                 if all(ph.pk != p.placeholder_id for p in plugins))
+    if not is_fallback and not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active):
+        disjoint_placeholders = (
+            ph for ph in placeholders
+            if all(ph.pk != p.placeholder_id for p in plugins)
+        )
         for placeholder in disjoint_placeholders:
             if get_placeholder_conf("language_fallback", placeholder.slot, template, True):
                 for fallback_language in get_fallback_languages(lang):
@@ -281,7 +282,7 @@ def downcast_plugins(plugins,
 
         # put them in a map so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_qs.iterator():
+        for instance in plugin_qs.all():
             placeholder = placeholders_by_id.get(instance.placeholder_id)
 
             if placeholder:
@@ -330,7 +331,7 @@ def reorder_plugins(placeholder, parent_id, language, order=None):
     return plugins
 
 
-def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
+def has_reached_plugin_limit(placeholder, plugin_type, language, template=None, parent_plugin=None):
     """
     Checks if placeholder has reached it's global plugin limit,
     if not then it checks if it has reached it's plugin_type limit.
@@ -352,8 +353,12 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
                 .count()
             )
             if type_count >= type_limit:
-                plugin_name = force_text(plugin_pool.get_plugin(plugin_type).name)
+                plugin_name = force_str(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(
                     "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
                                          % {'limit': type_limit, 'plugin_name': plugin_name})
+        global_children_limit = limits.get("global_children")
+        children_count = placeholder.get_child_plugins(language=language).count()
+        if not parent_plugin and global_children_limit and children_count >= global_children_limit:
+            raise PluginLimitReached(_("This placeholder already has the maximum number of child plugins (%s)." % children_count))
     return False

@@ -5,30 +5,30 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
-from django.utils.translation import override as force_language, gettext_lazy as _
+from django.utils.translation import (
+    gettext, gettext_lazy as _, override as force_language,
+)
 
-from cms.api import get_page_draft, can_change_page
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
-from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
-from cms.toolbar.items import ButtonList, TemplateItem, REFRESH_PAGE
+from cms.api import can_change_page, get_page_draft
+from cms.constants import PUBLISHER_STATE_PENDING, TEMPLATE_INHERITANCE_MAGIC
+from cms.models import Page, PageType, Placeholder, StaticPlaceholder, Title
+from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple, get_language_dict
+from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
-    user_can_change_page,
-    user_can_delete_page,
-    user_can_publish_page,
+    user_can_change_page, user_can_delete_page, user_can_publish_page,
 )
 from cms.utils.urlutils import add_url_parameters, admin_reverse
-
 from menus.utils import DefaultLanguageChanger
-
 
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
 LANGUAGE_MENU_IDENTIFIER = 'language-menu'
+HELP_MENU_IDENTIFIER = 'help-menu'
+HELP_MENU_BREAK = 'Help Menu Break'
 TEMPLATE_MENU_BREAK = 'Template Menu Break'
 PAGE_MENU_IDENTIFIER = 'page'
 PAGE_MENU_ADD_IDENTIFIER = 'add_page'
@@ -48,6 +48,15 @@ REMOVE_PAGE_LANGUAGE_BREAK = "Remove page language Break"
 COPY_PAGE_LANGUAGE_BREAK = "Copy page language Break"
 TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 SHORTCUTS_BREAK = 'Shortcuts Break'
+
+DEFAULT_HELP_MENU_ITEMS = (
+    (gettext("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
+    (gettext("Documentation"), 'https://docs.django-cms.org/en/latest/'),
+    (gettext("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/'),
+    (gettext("Support Forum"), 'https://discourse.django-cms.org/'),
+    (gettext("Support Slack"), 'https://www.django-cms.org/slack'),
+    (gettext("What's new"), 'https://www.django-cms.org/en/blog/'),
+)
 
 
 @toolbar_pool.register
@@ -69,7 +78,7 @@ class PlaceholderToolbar(CMSToolbar):
 
         if self.page:
             user = self.request.user
-            page_pk  = self.page.pk
+            page_pk = self.page.pk
             disabled = len(list(entry_choices(user, self.page))) == 0
         else:
             page_pk = ''
@@ -84,6 +93,22 @@ class PlaceholderToolbar(CMSToolbar):
                                       side=self.toolbar.RIGHT,
                                       disabled=disabled,
                                       on_close=REFRESH_PAGE)
+
+@toolbar_pool.register
+class AppearanceToolbar(CMSToolbar):
+    """
+    Adds appearance switches, esp. for dark and light mode
+    """
+    color_scheme_toggle = get_cms_setting('COLOR_SCHEME_TOGGLE')
+
+    def populate(self):
+        if self.color_scheme_toggle:
+            dark_mode_toggle = TemplateItem(
+                template="cms/toolbar/items/dark_mode_toggle.html",
+                side=self.toolbar.RIGHT,
+            )
+            self.toolbar.add_item(dark_mode_toggle)
+
 
 
 @toolbar_pool.register
@@ -104,6 +129,7 @@ class BasicToolbar(CMSToolbar):
             self.clipboard = self.request.toolbar.user_settings.clipboard
             self.add_admin_menu()
             self.add_language_menu()
+            self.add_help_menu()
 
     def add_admin_menu(self):
         if not self._admin_menu:
@@ -135,19 +161,28 @@ class BasicToolbar(CMSToolbar):
                 # True if the clipboard exists and there's plugins in it.
                 clipboard_is_bound = self.toolbar.clipboard_plugin
 
-                self._admin_menu.add_link_item(_('Clipboard...'), url='#',
-                        extra_classes=['cms-clipboard-trigger'],
-                        disabled=not clipboard_is_bound)
-                self._admin_menu.add_link_item(_('Clear clipboard'), url='#',
-                        extra_classes=['cms-clipboard-empty'],
-                        disabled=not clipboard_is_bound)
+                self._admin_menu.add_link_item(
+                    _('Clipboard...'), url='#',
+                    extra_classes=['cms-clipboard-trigger'],
+                    disabled=not clipboard_is_bound
+                )
+                self._admin_menu.add_link_item(
+                    _('Clear clipboard'), url='#',
+                    extra_classes=['cms-clipboard-empty'],
+                    disabled=not clipboard_is_bound
+                )
                 self._admin_menu.add_break(CLIPBOARD_BREAK)
 
             # Disable toolbar
-            self._admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
+            self._admin_menu.add_link_item(
+                _('Disable toolbar'),
+                url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+            )
             self._admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
-            self._admin_menu.add_link_item(_('Shortcuts...'), url='#',
-                    extra_classes=('cms-show-shortcuts',))
+            self._admin_menu.add_link_item(
+                _('Shortcuts...'), url='#',
+                extra_classes=('cms-show-shortcuts',)
+            )
             self._admin_menu.add_break(SHORTCUTS_BREAK)
 
             # logout
@@ -206,6 +241,20 @@ class BasicToolbar(CMSToolbar):
                 except NoReverseMatch:
                     url = DefaultLanguageChanger(self.request)(code)
                 self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+
+    def add_help_menu(self):
+        """ Adds the help menu if it's enabled in settings """
+        if get_cms_setting('ENABLE_HELP'):
+            self._help_menu = self.toolbar.get_or_create_menu(HELP_MENU_IDENTIFIER, _('Help'), position=-1)
+            self._help_menu.items = []  # reset the items so we don't duplicate
+            for label, url in DEFAULT_HELP_MENU_ITEMS:
+                self._help_menu.add_link_item(label, url=url)
+
+            extra_menu_items = get_cms_setting('EXTRA_HELP_MENU_ITEMS')
+            if extra_menu_items:
+                self._help_menu.add_break(HELP_MENU_BREAK)
+                for label, url in extra_menu_items:
+                    self._help_menu.add_link_item(label, url=url)
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user
@@ -281,18 +330,19 @@ class PageToolbar(CMSToolbar):
             return None
 
     def has_publish_permission(self):
-        if self.page:
-            publish_permission = page_permissions.user_can_publish_page(
+        if self.page is not None:
+            has_publish_permission = page_permissions.user_can_publish_page(
                 self.request.user,
                 page=self.page,
-                site=self.current_site
+                site=self.current_site,
             )
         else:
-            publish_permission = False
+            has_publish_permission = False
 
-        if publish_permission and self.statics:
-            publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
-        return publish_permission
+        if (has_publish_permission or self.page is None) and self.statics:
+            has_publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
+
+        return has_publish_permission
 
     def has_unpublish_permission(self):
         return self.has_publish_permission()
@@ -303,8 +353,9 @@ class PageToolbar(CMSToolbar):
         return self.page_change_permission
 
     def page_is_pending(self, page, language):
-        return (page.publisher_public_id and
-                page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING)
+        return (
+            page.publisher_public_id and page.publisher_public.get_publisher_state(language) == PUBLISHER_STATE_PENDING
+        )
 
     def in_apphook(self):
         with force_language(self.toolbar.request_language):
@@ -468,14 +519,19 @@ class PageToolbar(CMSToolbar):
             languages = get_language_dict(self.current_site.pk)
 
             remove = [(code, languages.get(code, code)) for code in self.page.get_languages() if code in languages]
-            add = [l for l in languages.items() if l not in remove]
-            copy = [(code, name) for code, name in languages.items() if code != self.current_lang and (code, name) in remove]
+            add = [lang for lang in languages.items() if lang not in remove]
+            copy = [
+                (code, name) for code, name in languages.items()
+                if code != self.current_lang and (code, name) in remove
+            ]
 
             if add or remove or copy:
                 language_menu.add_break(ADD_PAGE_LANGUAGE_BREAK)
 
             if add:
-                add_plugins_menu = language_menu.get_or_create_menu('{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation'))
+                add_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation')
+                )
 
                 if self.page.is_page_type:
                     page_change_url = admin_reverse('cms_pagetype_change', args=(self.page.pk,))
@@ -492,14 +548,18 @@ class PageToolbar(CMSToolbar):
                 else:
                     translation_delete_url = admin_reverse('cms_page_delete_translation', args=(self.page.pk,))
 
-                remove_plugins_menu = language_menu.get_or_create_menu('{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation'))
+                remove_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation')
+                )
                 disabled = len(remove) == 1
                 for code, name in remove:
                     url = add_url_parameters(translation_delete_url, language=code)
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
-                copy_plugins_menu = language_menu.get_or_create_menu('{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins'))
+                copy_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins')
+                )
                 title = _('from %s')
                 question = _('Are you sure you want to copy all plugins from %s?')
 
@@ -552,7 +612,9 @@ class PageToolbar(CMSToolbar):
             # when the Content Manager is at the root of the app-hook,
             # some of the page options still make sense.
             current_page_menu = self.toolbar.get_or_create_menu(
-                PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
+                PAGE_MENU_IDENTIFIER, _('Page'),
+                position=1, disabled=self.in_apphook() and not self.in_apphook_root()
+            )
 
             new_page_params = {'edit': 1}
             new_sub_page_params = {'edit': 1, 'parent_node': self.page.node_id}
@@ -649,13 +711,16 @@ class PageToolbar(CMSToolbar):
                         active = self.page.template == path
                         if path == TEMPLATE_INHERITANCE_MAGIC:
                             templates_menu.add_break(TEMPLATE_MENU_BREAK)
-                        templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
-                                                     on_success=refresh)
+                        templates_menu.add_ajax_item(
+                            name, action=action, data={'template': path}, active=active, on_success=refresh
+                        )
 
             # page type
             if not self.page.is_page_type:
                 page_type_url = admin_reverse('cms_pagetype_add')
-                page_type_url = add_url_parameters(page_type_url, source=self.page.pk, language=self.toolbar.request_language)
+                page_type_url = add_url_parameters(
+                    page_type_url, source=self.page.pk, language=self.toolbar.request_language
+                )
                 page_type_disabled = not edit_mode or not can_add_root_page
                 current_page_menu.add_modal_item(_('Save as Page Type'), page_type_url, disabled=page_type_disabled)
 
@@ -720,10 +785,7 @@ class PageToolbar(CMSToolbar):
                 revert_question = _('Are you sure you want to revert to live?')
                 # Only show this action if the page has pending changes and a public version
                 is_enabled = (
-                    edit_mode
-                    and can_change
-                    and self.page.is_dirty(self.current_lang)
-                    and self.page.publisher_public
+                    edit_mode and can_change and self.page.is_dirty(self.current_lang) and self.page.publisher_public
                 )
                 current_page_menu.add_ajax_item(
                     _('Revert to live'),
@@ -744,5 +806,6 @@ class PageToolbar(CMSToolbar):
                 delete_url = admin_reverse('cms_page_delete', args=(self.page.pk,))
             delete_disabled = not edit_mode or not user_can_delete_page(self.request.user, page=self.page)
             on_delete_redirect_url = self.get_on_delete_redirect_url()
-            current_page_menu.add_modal_item(_('Delete page'), url=delete_url, on_close=on_delete_redirect_url,
-                                             disabled=delete_disabled)
+            current_page_menu.add_modal_item(
+                _('Delete page'), url=delete_url, on_close=on_delete_redirect_url, disabled=delete_disabled
+            )

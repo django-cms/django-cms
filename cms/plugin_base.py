@@ -1,24 +1,18 @@
 import json
 import re
 
-from django.shortcuts import render as render_to_response
-
 from django import forms
-from django.contrib import admin
-from django.contrib import messages
-from django.core.exceptions import (
-    ImproperlyConfigured,
-    ObjectDoesNotExist,
-    ValidationError,
-)
-from django.utils.encoding import force_text, smart_str
+from django.contrib import admin, messages
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
+from django.shortcuts import render as render_to_response
+from django.utils.encoding import force_str
 from django.utils.html import escapejs
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
-from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
+from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree_as_json
 from cms.utils.conf import get_cms_setting
 
 
@@ -42,8 +36,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 % (new_plugin.model, new_plugin)
             )
         # validate the template:
-        if (not hasattr(new_plugin, 'render_template') and
-                not hasattr(new_plugin, 'get_render_template')):
+        if (not hasattr(new_plugin, 'render_template') and not hasattr(new_plugin, 'get_render_template')):
             raise ImproperlyConfigured(
                 "CMSPluginBase subclasses must have a render_template attribute"
                 " or get_render_template method"
@@ -86,7 +79,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 ]
         # Set default name
         if not new_plugin.name:
-            new_plugin.name = re.sub("([a-z])([A-Z])", "\g<1> \g<2>", name)
+            new_plugin.name = re.sub("([a-z])([A-Z])", r"\g<1> \g<2>", name)
 
         # By flagging the plugin class, we avoid having to call these class
         # methods for every plugin all the time.
@@ -105,7 +98,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     module = _("Generic")  # To be overridden in child classes
 
     form = None
-    change_form_template = "admin/cms/page/plugin/change_form.html"
+    change_form_template = 'admin/cms/page/plugin/change_form.html'
+    plugin_confirm_template = 'admin/cms/page/plugin/confirm_form.html'
     # Should the plugin be rendered in the admin?
     admin_preview = False
 
@@ -163,7 +157,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             template = None
 
         if not template:
-            raise ValidationError("plugin has no render_template: %s" % self.__class__)
+            raise ImproperlyConfigured("plugin has no render_template: %s" % self.__class__)
         return template
 
     @classmethod
@@ -270,16 +264,18 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             root = obj
 
         plugins = [root] + list(root.get_descendants().order_by('path'))
+        # simulate the call to the unauthorized CMSPlugin.page property
+        cms_page = obj.placeholder.page if obj.placeholder_id else None
 
         child_classes = self.get_child_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
         parent_classes = self.get_parent_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
@@ -288,7 +284,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             children=child_classes,
             parents=parent_classes,
         )
-        data['plugin_desc'] = escapejs(force_text(obj.get_short_description()))
+        data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
 
         context = {
             'plugin': obj,
@@ -300,7 +296,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         if extra_context:
             context.update(extra_context)
         return render_to_response(
-            request, 'admin/cms/page/plugin/confirm_form.html', context
+            request, self.plugin_confirm_template, context
         )
 
     def save_model(self, request, obj, form, change):
@@ -353,7 +349,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def response_change(self, request, obj):
         self.object_successfully_changed = True
         opts = self.model._meta
-        msg_dict = {'name': force_text(opts.verbose_name), 'obj': force_text(obj)}
+        msg_dict = {'name': force_str(opts.verbose_name), 'obj': force_str(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
         return self.render_close_frame(request, obj)
@@ -382,7 +378,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
         """
-        return "%s - %s" % (force_text(self.name), force_text(instance))
+        return "%s - %s" % (force_str(self.name), force_str(instance))
 
     def get_fieldsets(self, request, obj=None):
         """
@@ -505,11 +501,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def get_extra_plugin_menu_items(cls, request, plugin):
         pass
 
-    def __repr__(self):
-        return smart_str(self.name)
-
     def __str__(self):
-        return self.name
+        return force_str(self.name)
 
 
 class PluginMenuItem:

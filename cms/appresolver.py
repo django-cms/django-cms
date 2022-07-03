@@ -4,16 +4,15 @@ from importlib import import_module
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
-from django.utils.translation import get_language, override
-from django.urls import Resolver404, reverse, URLResolver
+from django.urls import Resolver404, URLResolver, reverse
 from django.urls.resolvers import RegexPattern, URLPattern
+from django.utils.translation import get_language, override
 
 from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
 from cms.utils.i18n import get_language_list
 from cms.utils.moderator import use_draft
-
 
 APP_RESOLVERS = []
 
@@ -23,12 +22,10 @@ def clear_app_resolvers():
     APP_RESOLVERS = []
 
 
-def applications_page_check(request, current_page=None, path=None):
+def applications_page_check(request, path=None):
     """Tries to find if given path was resolved over application.
     Applications have higher priority than other cms pages.
     """
-    if current_page:
-        return current_page
     if path is None:
         # We should get in this branch only if an apphook is active on /
         # This removes the non-CMS part of the URL.

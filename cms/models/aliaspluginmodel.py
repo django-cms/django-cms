@@ -1,6 +1,6 @@
 from django.db import models
 from django.db.models import Q
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cms.models import CMSPlugin, Placeholder
 
@@ -32,9 +32,9 @@ class AliasPluginModel(CMSPlugin):
 
     def __str__(self):
         if self.plugin_id:
-            return "(%s) %s" % (force_text(self.plugin.get_plugin_name()), self.plugin.get_plugin_instance()[0])
+            return "(%s) %s" % (force_str(self.plugin.get_plugin_name()), self.plugin.get_plugin_instance()[0])
         else:
-            return force_text(self.alias_placeholder.get_label())
+            return force_str(self.alias_placeholder.get_label())
 
     def get_aliased_placeholder_id(self):
         if self.plugin_id:
@@ -54,8 +54,6 @@ class AliasPluginModel(CMSPlugin):
             placeholder_id=placeholder_id,
         )
         plugins = plugins.filter(
-            Q(plugin=self) |
-            Q(plugin__placeholder=self.placeholder_id) |
-            Q(alias_placeholder=self.placeholder_id)
+            Q(plugin=self) | Q(plugin__placeholder=self.placeholder_id) | Q(alias_placeholder=self.placeholder_id)
         )
         return plugins.exists()

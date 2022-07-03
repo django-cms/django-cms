@@ -3,7 +3,7 @@ TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
 REFRESH_PAGE = 'REFRESH_PAGE'
 FOLLOW_REDIRECT = 'FOLLOW_REDIRECT'
 URL_CHANGE = 'URL_CHANGE'
-RIGHT = object() # this is a trick so "foo is RIGHT" will only ever work for this, same goes for LEFT.
+RIGHT = object()  # this is a trick so "foo is RIGHT" will only ever work for this, same goes for LEFT.
 LEFT = object()
 
 PUBLISHER_STATE_DEFAULT = 0
@@ -26,6 +26,7 @@ X_FRAME_OPTIONS_ALLOW = 3
 PAGE_USERNAME_MAX_LENGTH = 255
 
 SLUG_REGEXP = '[0-9A-Za-z-_.//]+'
+NEGATE_SLUG_REGEXP = '[^0-9A-Za-z-_.//]+'
 
 EXPIRE_NOW = 0
 # HTTP Specification says max caching should only be up to one year.

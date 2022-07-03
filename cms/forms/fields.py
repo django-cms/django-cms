@@ -3,7 +3,7 @@ from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.core.validators import EMPTY_VALUES
 from django.utils.translation import gettext_lazy as _
 
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.utils import get_page_choices, get_site_choices
 from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
@@ -32,7 +32,7 @@ class PageSelectFormField(forms.MultiValueField):
         'invalid_page': _(u'Select a valid page'),
     }
 
-    def __init__(self, queryset=None, empty_label=u"---------", cache_choices=False,
+    def __init__(self, queryset=None, empty_label="---------", cache_choices=False,
                  required=True, widget=None, to_field_name=None, limit_choices_to=None,
                   *args, **kwargs):
         errors = self.default_error_messages.copy()

@@ -1,0 +1,189 @@
+#!/bin/bash
+
+# This script will take the last CHANGELOG.rst, pull information from the commit logs since last tagged version
+# and update the content to create dedicated sections
+
+SCRIPTS=$(dirname "$(realpath "$0")")
+
+#shellcheck disable=SC1090
+source "${SCRIPTS}/functions"
+
+# Scope used in this script
+declare -A SCOPES_HEADINGS
+declare -a SCOPES
+
+SCOPES=("feat" "security" "fix" "style" "refactor" "tools")
+SCOPES_HEADINGS["feat"]="Features:"
+SCOPES_HEADINGS["fix"]="Bug Fixes:"
+SCOPES_HEADINGS["security"]="Security Updates:"
+SCOPES_HEADINGS["style"]="Styles:"
+SCOPES_HEADINGS["refactor"]="Refactoring and Cleanups:"
+SCOPES_HEADINGS["tools"]="Internal Tools:"
+
+
+# argument checks
+
+if [ -z "$1" ] ; then
+    echo "Usage $0 <version> [base_version]"
+    echo
+    echo "Update the CHANGELOG.rst to create <version>"
+    echo "Version can be X.Y.Zsuffix"
+    echo "suffix can be rc, or anything, X,Y,Z are numbers"
+    exit 1
+fi
+
+FULL_VERSION="$1"
+
+# extracting version from the FULL_VERSION, and sanity checks
+check_version_string "${FULL_VERSION}"
+
+VERSION=$(get_main_version "${FULL_VERSION}")
+VERSUFFIX=$(get_version_suffix "${FULL_VERSION}")
+
+
+# extracting the base version from changelog
+OLD_FULL_VERSION="$2"
+if [ -z "${OLD_FULL_VERSION}" ]; then
+    OLD_FULL_VERSION=$(grep -vi "unreleased\|unpublished" CHANGELOG.rst | awk '/^[0-9]+\.[0-9]+\.[0-9] \(.+\)$/ { print $1; nextfile }')
+else
+    check_version_string "${OLD_FULL_VERSION}"
+fi
+
+# shellcheck disable=SC2001
+OLD_VERSION=$(get_main_version "${OLD_FULL_VERSION}")
+
+# shellcheck disable=SC2001
+
+
+# Sanity checks
+if [ -z "$(git tag -l "${OLD_FULL_VERSION}")" ]; then
+    error "Can not find tag for version ${OLD_FULL_VERSION} aborting ..."
+    exit 1
+fi
+
+if [ "${FULL_VERSION}" = "${OLD_VERSION}" ]; then
+    error "New version must be different than old version!"
+    exit 1
+fi
+
+# Computing dates
+
+if echo "${VERSUFFIX}" | grep -qi '^rc'; then
+    DATE="unpublished"
+else
+    DATE=$(date +"%Y-%m-%d")
+fi
+title="${FULL_VERSION} (${DATE})"
+#shellcheck disable=SC2001
+line=$(echo "${title}" | sed 's/./=/g')
+
+
+# Cutting the Changelog into OLD and CURRENT
+legacy="$(mktemp)"
+current="$(mktemp)"
+
+awk -e "BEGIN {show=0} /^${OLD_FULL_VERSION} \([0-9]{4}-[0-9]{2}-[0-9]{2}\)\$/ {show=1} {if (show==1) print; }" < CHANGELOG.rst > "${legacy}"
+awk -e "/^${OLD_FULL_VERSION} \([0-9]{4}-[0-9]{2}-[0-9]{2}\)\$/ {nextfile} {print; }" < CHANGELOG.rst | awk -e '/^Statistics:$/ {nextfile} {print}' > "${current}"
+
+LAST_FULL_VERSION=$(awk -e '/^[0-9]+\.[0-9]+\.[0-9].* \(.+\)$/ { print $1; nextfile }' < CHANGELOG.rst )
+LAST_VERSION=$(get_main_version "${LAST_FULL_VERSION}")
+
+# Sanity checks
+if [ -z "$(git tag -l "${LAST_FULL_VERSION}")" ]; then
+    error "Can not find tag for version ${LAST_FULL_VERSION} aborting ..."
+    exit 1
+fi
+
+# making sure the headings are right:
+
+if [ "${VERSION}" = "${LAST_VERSION}" ]; then
+    # releasing a golden release from RC, so we just change the version RC to the new one
+    sed -i "${current}" \
+        -e "/^${LAST_FULL_VERSION} (unpublished)$/a${title}" \
+        -e "/^${LAST_FULL_VERSION} (unpublished)$/a${line}" \
+        -e "/^${LAST_FULL_VERSION} (unpublished)$/,+1d" \
+        -e "s/(unpublished)/(${DATE})/"
+else
+
+    # This is a first release (RC or equivalent),
+    # let's add some headings to be sure we got all of them right for next steps
+    sed -i "${current}" \
+        -e "/^unreleased$/a${title}" \
+        -e "/^unreleased$/a${line}" \
+        -e "/^unreleased$/a
+" \
+        -e "/^unreleased$/aHighlights:" \
+        -e "/^unreleased$/a-----------" \
+        -e "/^unreleased$/,+1d" \
+        -e "s/(unpublished)/(${DATE})/"
+fi
+
+# computing / updating each section
+
+for scope in "${SCOPES[@]}"; do
+    content=$(mktemp)
+    heading="${SCOPES_HEADINGS[$scope]}"
+
+    # only checking on the last version *in the changelog" (ex:rc1 to rc2, the changelog already includes old to rc1)
+    git log "${LAST_FULL_VERSION}.." --pretty="format:%s (%h) -- %aN" | grep -i "^${scope}:" | sed -e "s/^${scope}:/*/i" > "${content}"
+    if [ -z "$(cat "${content}")" ]; then
+        continue
+    fi
+
+    # making sure the heading is there:
+    if ! grep -q "^${heading}\$" "${current}"; then
+        # shellcheck disable=SC2129
+        echo "${heading}" >> "${current}"
+        # shellcheck disable=SC2001
+        echo "${heading}" | sed -e 's/./-/g' >> "${current}"
+        echo "" >> "${current}"
+    fi
+
+    sed -i "${current}" -e "/^${heading}\$/{N
+r${content}
+}"
+
+   rm "${content}"
+done
+
+# generating statistics
+
+PR_NUMBER=$(git log --pretty=oneline "${OLD_FULL_VERSION}.." | wc -l)
+
+cat >> "${current}" << EOF
+Statistics:
+-----------
+
+This release includes ${PR_NUMBER} pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+EOF
+
+while read -r name; do
+    count=$( git log "${OLD_FULL_VERSION}.." --pretty=format:"%aN" | grep -c "${name}" )
+    if [ "${count}" -gt 1 ]; then
+        pl="s"
+     else
+         pl=""
+    fi
+    echo "* ${name} (${count} pull request${pl})" >> "${current}"
+done < <( git log "${OLD_FULL_VERSION}.." --pretty=format:"%aN" | sort -u)
+
+# shellcheck disable=SC2129
+cat >> "${current}" << EOF
+
+With the review help of the following contributors:
+
+EOF
+
+git log "${OLD_FULL_VERSION}.." | grep Co-authored-by | sed -e 's/^ *Co-authored-by: /* /;s/ <.*//' | sort -u >> "${current}"
+
+cat >> "${current}" << EOF
+
+Thanks to all contributors for their efforts!
+
+EOF
+
+cat "${current}" "${legacy}" > CHANGELOG.rst
+rm "${current}" "${legacy}"
+
+# now computing sections

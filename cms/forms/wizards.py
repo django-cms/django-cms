@@ -2,20 +2,14 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.text import slugify
-from django.utils.translation import (
-    gettext,
-    gettext_lazy as _,
-)
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms.admin.forms import AddPageForm
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site, permissions
-from cms.utils.page import get_available_slug
-from cms.utils.page_permissions import (
-    user_can_add_page,
-    user_can_add_subpage,
-)
 from cms.utils.conf import get_cms_setting
+from cms.utils.page import get_available_slug
+from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 from cms.utils.urlutils import static_with_version
 
 try:
@@ -48,9 +42,11 @@ class CreateCMSPageForm(AddPageForm):
     meta_description = None
 
     content = forms.CharField(
-        label=_(u'Content'), widget=text_widget, required=False,
-        help_text=_(u"Optional. If supplied, will be automatically added "
-                    u"within a new text plugin.")
+        label=_('Content'), widget=text_widget, required=False,
+        help_text=_(
+            "Optional. If supplied, will be automatically added "
+            "within a new text plugin."
+        )
     )
 
     class Media:
@@ -65,10 +61,10 @@ class CreateCMSPageForm(AddPageForm):
         self._user = self.user
         self._language = self.language_code
         super().__init__(*args, **kwargs)
-        self.fields['title'].help_text = _(u"Provide a title for the new page.")
+        self.fields['title'].help_text = _("Provide a title for the new page.")
         self.fields['slug'].required = False
         self.fields['slug'].widget = SlugWidget()
-        self.fields['slug'].help_text = _(u"Leave empty for automatic slug, or override as required.")
+        self.fields['slug'].help_text = _("Leave empty for automatic slug, or override as required.")
 
     @staticmethod
     def get_placeholder(page, slot=None):

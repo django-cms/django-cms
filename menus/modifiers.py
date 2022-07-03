@@ -1,6 +1,7 @@
 from menus.base import Modifier
 from menus.menu_pool import menu_pool
 
+
 class Marker(Modifier):
     """
     searches the current selected node and marks them.
@@ -51,7 +52,6 @@ class Marker(Modifier):
             self.mark_descendants(node.children)
 
 
-
 class Level(Modifier):
     """
     marks all node levels
@@ -72,7 +72,6 @@ class Level(Modifier):
 
         return nodes
 
-
     def mark_levels(self, node, post_cut):
         for child in node.children:
             if post_cut:
@@ -80,7 +79,6 @@ class Level(Modifier):
             else:
                 child.level = node.level + 1
             self.mark_levels(child, post_cut)
-
 
 
 class AuthVisibility(Modifier):
@@ -92,10 +90,8 @@ class AuthVisibility(Modifier):
             return nodes
         final = []
         for node in nodes:
-            if (node.attr.get('visible_for_authenticated', True) and \
-                 request.user.is_authenticated) or \
-                (node.attr.get('visible_for_anonymous', True) and \
-                 not request.user.is_authenticated):
+            if (node.attr.get('visible_for_authenticated', True) and request.user.is_authenticated) or \
+                    (node.attr.get('visible_for_anonymous', True) and not request.user.is_authenticated):
                 final.append(node)
             else:
                 if node.parent and node in node.parent.children:

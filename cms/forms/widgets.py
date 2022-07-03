@@ -1,18 +1,21 @@
+from django.apps import apps
+from django.conf import settings
 from django.contrib.auth import get_permission_codename
 from django.contrib.sites.models import Site
 from django.forms.widgets import MultiWidget, Select, TextInput
 from django.urls import NoReverseMatch, reverse_lazy
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 
-from cms.utils.urlutils import admin_reverse, static_with_version
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.utils import get_page_choices, get_site_choices
 from cms.models import Page, PageUser
+from cms.utils.urlutils import admin_reverse, static_with_version
 
 
 class PageSelectWidget(MultiWidget):
-    """A widget that allows selecting a page by first selecting a site and then
+    """
+    A widget that allows selecting a page by first selecting a site and then
     a page on that site in a two step process.
     """
     template_name = 'cms/widgets/pageselectwidget.html'
@@ -49,7 +52,7 @@ class PageSelectWidget(MultiWidget):
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or inital value we get
+        # the same as an empty string, if the data or initial value we get
         # is None, replace it w/ u''.
         if data is None or (len(data)>=2 and data[1] in [None,'']):
             data_value = u''
@@ -59,7 +62,7 @@ class PageSelectWidget(MultiWidget):
             initial_value = u''
         else:
             initial_value = initial
-        if force_text(initial_value) != force_text(data_value):
+        if force_str(initial_value) != force_str(data_value):
             return True
         return False
 
@@ -82,9 +85,7 @@ class PageSelectWidget(MultiWidget):
                 CMS.Widgets._pageSelectWidgets.push({
                     name: '%(name)s'
                 });
-            </script>""" % {
-                'name': name
-            }
+            </script>""" % {'name': name}
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
@@ -138,7 +139,7 @@ class PageSmartLinkWidget(TextInput):
             'element_id': attrs.get('id', ''),
             'placeholder_text': attrs.get('placeholder_text', ''),
             'language_code': self.language,
-            'ajax_url': force_text(self.ajax_url)
+            'ajax_url': force_str(self.ajax_url)
         }
 
     def get_context(self, name, value, attrs):
@@ -160,11 +161,14 @@ class UserSelectAdminWidget(Select):
         if hasattr(self, 'user') and (self.user.is_superuser or \
             self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
             # append + icon
-            add_url = admin_reverse('cms_pageuser_add')
+            if settings.AUTH_USER_MODEL:
+                auth_model = apps.get_model(settings.AUTH_USER_MODEL)
+                add_url = admin_reverse(f"{auth_model._meta.app_label}_{auth_model._meta.model_name}_add")
+            else:
+                add_url = admin_reverse('cms_pageuser_add')
             output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
         return mark_safe(u''.join(output))
-
 
 class AppHookSelect(Select):
 
@@ -191,7 +195,7 @@ class AppHookSelect(Select):
     def _build_option(self, selected_choices, option_value, option_label):
         if option_value is None:
             option_value = ''
-        option_value = force_text(option_value)
+        option_value = force_str(option_value)
         if option_value in selected_choices:
             selected_html = mark_safe(' selected="selected"')
             if not self.allow_multiple_selected:
@@ -204,7 +208,7 @@ class AppHookSelect(Select):
             data_html = mark_safe(' data-namespace="%s"' % escape(self.app_namespaces[option_value]))
         else:
             data_html = ''
-        return option_value, selected_html, data_html, force_text(option_label)
+        return option_value, selected_html, data_html, force_str(option_label)
 
     def render_option(self, selected_choices, option_value, option_label):
         option_data = self._build_option(selected_choices, option_value, option_label)

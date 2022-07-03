@@ -1,16 +1,19 @@
 
 import hashlib
-
 from datetime import timedelta
+from importlib import import_module
 
 from django.conf import settings
-from django.utils.cache import add_never_cache_headers, patch_response_headers, patch_vary_headers
+from django.utils.cache import (
+    add_never_cache_headers, patch_response_headers, patch_vary_headers,
+)
 from django.utils.encoding import iri_to_uri
 from django.utils.timezone import now
 
-from cms.cache import _get_cache_version, _set_cache_version, _get_cache_key
+from cms.cache import _get_cache_key, _get_cache_version, _set_cache_version
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.toolbar.utils import get_toolbar_from_request
+from cms.utils.compat.response import get_response_headers
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
 
@@ -43,7 +46,7 @@ def set_page_cache(response):
 
     placeholders = toolbar.content_renderer.get_rendered_placeholders()
     # Checks if there's a plugin using the legacy "cache = False"
-    placeholder_ttl_list = []
+    ttl_list = []
     vary_cache_on_set = set()
     for ph in placeholders:
         # get_cache_expiration() always returns:
@@ -51,22 +54,29 @@ def set_page_cache(response):
         ttl = ph.get_cache_expiration(request, timestamp)
         vary_cache_on = ph.get_vary_cache_on(request)
 
-        placeholder_ttl_list.append(ttl)
+        ttl_list.append(ttl)
         if ttl and vary_cache_on:
             # We're only interested in vary headers if they come from
             # a cache-able placeholder.
             vary_cache_on_set |= set(vary_cache_on)
 
-    if EXPIRE_NOW not in placeholder_ttl_list:
-        if placeholder_ttl_list:
-            min_placeholder_ttl = min(x for x in placeholder_ttl_list)
-        else:
-            # Should only happen when there are no placeholders at all
-            min_placeholder_ttl = MAX_EXPIRATION_TTL
-        ttl = min(
-            get_cms_setting('CACHE_DURATIONS')['content'],
-            min_placeholder_ttl
-        )
+    if EXPIRE_NOW not in ttl_list:
+        ttl_list.append(get_cms_setting('CACHE_DURATIONS')['content'])
+        ttl_list.append(MAX_EXPIRATION_TTL)
+
+        if hasattr(settings, 'CMS_LIMIT_TTL_CACHE_FUNCTION'):
+            extension_point = settings.CMS_LIMIT_TTL_CACHE_FUNCTION
+
+            module, func_name = extension_point.rsplit('.', 1)
+            module = import_module(module)
+            limit_ttl_cache_function = getattr(module, func_name)
+            limit_ttl = limit_ttl_cache_function(response)
+
+            # if the extension point returns an integer as ttl
+            if isinstance(limit_ttl, int):
+                ttl_list.append(limit_ttl)
+
+        ttl = min(ttl_list)
 
         if ttl > 0:
             # Adds expiration, etc. to headers
@@ -77,11 +87,12 @@ def set_page_cache(response):
             # We also store the absolute expiration timestamp to avoid
             # recomputing it on cache-reads.
             expires_datetime = timestamp + timedelta(seconds=ttl)
+            response_headers = get_response_headers(response)
             cache.set(
                 _page_cache_key(request),
                 (
                     response.content,
-                    response._headers,
+                    response_headers,
                     expires_datetime,
                 ),
                 ttl,

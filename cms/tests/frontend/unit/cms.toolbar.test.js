@@ -817,8 +817,6 @@ describe('CMS.Toolbar', function () {
             expect(toolbar._setupUI).toHaveBeenCalledTimes(1);
             expect(toolbar._events).toHaveBeenCalledTimes(1);
             expect(toolbar.navigation instanceof FakeNavigation).toEqual(true);
-            expect(DiffDOM.prototype.diff).toHaveBeenCalledTimes(1);
-            expect(DiffDOM.prototype.apply).toHaveBeenCalledTimes(1);
             expect(trigger).toHaveBeenCalledWith('resize');
             expect(CMS.API.Clipboard._toolbarEvents).toHaveBeenCalledTimes(1);
         });

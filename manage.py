@@ -7,7 +7,8 @@ import app_manage
 
 from cms.exceptions import DontUsePageAttributeWarning
 
-def gettext(s): return s
+def gettext(s):
+    return s
 
 
 warnings.filterwarnings('ignore', category=DontUsePageAttributeWarning)
@@ -169,6 +170,7 @@ if __name__ == '__main__':
         TIME_ZONE='UTC',
         SITE_ID=1,
         USE_I18N=True,
+        DEFAULT_AUTO_FIELD = 'django.db.models.AutoField',
         MEDIA_ROOT=app_manage.TempDir(),
         STATIC_ROOT=app_manage.TempDir(),
         CMS_MEDIA_ROOT=app_manage.TempDir(),

@@ -1,5 +1,4 @@
 import os
-
 from functools import update_wrapper
 from urllib.parse import urljoin
 
@@ -7,9 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
-from cms import constants
-from cms import __version__
-
+from cms import __version__, constants
 
 __all__ = ['get_cms_setting']
 
@@ -21,7 +18,7 @@ def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
     """
-    from imp import load_module, PY_SOURCE
+    from imp import PY_SOURCE, load_module
 
     imported = None
     if module_path:
@@ -46,7 +43,6 @@ def default(name):
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
     'DEFAULT_X_FRAME_OPTIONS': constants.X_FRAME_OPTIONS_INHERIT,
-    'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
     # Whether to use raw ID lookups for users when PERMISSION is True
@@ -60,6 +56,7 @@ DEFAULTS = {
     'PAGE_MEDIA_PATH': 'cms_page_media/',
     'TITLE_CHARACTER': '+',
     'PAGE_CACHE': True,
+    'INVALIDATE_PAGE_CACHE_ON_STARTUP': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
     'CACHE_PREFIX': 'cms_{}_'.format(__version__),
@@ -82,6 +79,16 @@ DEFAULTS = {
     'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
     'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
     'PAGE_WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
+    'ENABLE_HELP': True,  # Adds help menu toolbar
+    'EXTRA_HELP_MENU_ITEMS': (),
+    'HELP_MENU_ITEMS': (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    ),
+    'COLOR_SCHEME': 'light',
+    'COLOR_SCHEME_TOGGLE': False,
 }
 
 
@@ -210,7 +217,7 @@ def _ensure_languages_settings(languages):
                     )
 
             if 'fallbacks' not in language_object:
-                if default_fallbacks:
+                if isinstance(default_fallbacks, list):
                     language_object['fallbacks'] = default_fallbacks
                 else:
                     needs_fallbacks.append((site, language_object))

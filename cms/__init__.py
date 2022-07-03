@@ -1,4 +1,6 @@
+import django
 
-__version__ = '3.8.0'
+__version__ = '3.10.1'
 
-default_app_config = 'cms.apps.CMSConfig'
+if django.VERSION < (3, 2):
+    default_app_config = 'cms.apps.CMSConfig'

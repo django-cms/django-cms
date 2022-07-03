@@ -6,7 +6,7 @@ import tmpl from '../tmpl';
 var template = require('./help.html');
 
 /**
- * Binds [?] to open modal with shorcuts listing.
+ * Binds [?] to open modal with shortcuts listing.
  *
  * @function initHelpShortcut
  * @public

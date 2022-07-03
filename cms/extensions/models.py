@@ -1,8 +1,7 @@
+from django.db import models
 from django.db.models import ManyToManyField
 
 from cms.constants import PUBLISHER_STATE_DIRTY
-from django.db import models
-
 from cms.models import Page, Title
 
 
