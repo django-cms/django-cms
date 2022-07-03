@@ -47,7 +47,7 @@ class SampleAppWithConfig(CMSApp):
             return None
 
     def get_config_add_url(self):
-        return reverse('admin:%s_%s_add' % (self.app_config._meta.app_label, self.app_config._meta.model_name))
+        return reverse(f'admin:{self.app_config._meta.app_label}_{self.app_config._meta.model_name}_add')
 
 
 class SampleAppWithExcludedPermissions(CMSApp):
@@ -70,7 +70,7 @@ class SampleApp2(CMSApp):
 
 
 class SampleApp3(CMSApp):
-    # CMSApp which returns the url directly rather than trough another Python module
+    # CMSApp which returns the url directly rather than through another Python module
     name = _("Sample App 3")
 
     def get_urls(self, page=None, language=None, **kwargs):
