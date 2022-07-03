@@ -878,7 +878,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
     def test_cache_limit_ttl_greater_than_default_cache_ttl(self):
         """
         Test the `CMS_LIMIT_TTL_CACHE_FUNCTION` setting with a class that returns a value much
-        greater thant the default value of 40 seconds.
+        greater than the default value of 40 seconds.
         """
         page1 = create_page('test page 1', 'nav_playground.html', 'en',
                             published=True)
@@ -895,6 +895,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
 def limit_page_cache_ttl_test_5(response):
     return 5
+
 
 def limit_page_cache_ttl_test_500(response):
     return 40

@@ -79,7 +79,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     if fallbacks is None:
         fallbacks = []
 
-    # Theses are simple to port over, since they are not calculated.
+    # These are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
     attr = {
         'is_page': True,

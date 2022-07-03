@@ -161,7 +161,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             self.assertEqual(Title.objects.all().count(), 0)
             self.assertEqual(Page.objects.all().count(), 0)
-            # crate home and auto publish
+            # create home and auto publish
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             page_data = self.get_new_page_data()

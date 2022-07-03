@@ -175,7 +175,7 @@ def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blo
 
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.
-        # This is important to avoid processing overriden block nodes.
+        # This is important to avoid processing overridden block nodes.
         ignore_blocks = []
 
     for node in nodelist:

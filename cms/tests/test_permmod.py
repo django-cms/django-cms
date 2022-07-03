@@ -479,7 +479,7 @@ class PatricksMoveTest(CMSTestCase):
 
         2. `master`:
             - published page
-            - crated by super
+            - created by super
             - `master` can do anything on it and its descendants
             - subpages:
 
