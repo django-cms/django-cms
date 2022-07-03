@@ -2,9 +2,109 @@
 Changelog
 =========
 
-
 unreleased
 ==========
+
+* Added dark mode support to css, dark mode settings and toggle button
+* Fix publishing of static placeholders outside of CMS pages
+* Allow to override the template rendered after a plugin has been saved.
+* Revert change to the toolbar sites menu to use ``http`` protocol.
+* Fix edit plugin popup width (remove 850px width constraint).
+* Fix except block using list instead of tuple. (#7334)
+* Added cache ttl extension point.
+
+3.10.1 (2022-06-28)
+===================
+
+Bug Fixes:
+----------
+* Changelog titles for 3.10.x (#7347) (31f399535) -- Mark Walker
+* Request missing from test rendering (#7346) (eff54b0fd) -- Mark Walker
+* Changelog title for 3.10.1rc1 (#7345) (966a90fd2) -- Mark Walker
+* Revert change to the toolbar sites menu to use ``http`` protocol (#7332) (caddfe7f4) -- Mark Walker
+* Fixed ``AttributeError`` (#7288) when the current toolbar object doesn't define ``get_draft_url()`` (#7289) -- Marco Bonetti
+* Fix for django 2.2 in middleware [#7290] (#7293) -- Mark Walker
+* Update release script to start bringing support for macOS (#7294) -- Mark Walker
+* Fix release script version commit. (#7295) -- Mark Walker
+* Revert change to the toolbar sites menu to use ``http`` protocol. (#7331) -- Mark Walker
+
+Statistics:
+-----------
+
+This release includes 12 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Conrad (3 pull requests)
+* Florian Delizy (1 pull request)
+* Marco Bonetti (1 pull request)
+* Mark Walker (7 pull requests)
+
+Thanks to all contributors for their efforts!
+
+3.10.0 (2022-03-26)
+===================
+
+Highlights:
+-----------
+
+This feature focuses on bringing python 3.10 support, bringing build system to latest nodejs, and bugfixes
+
+Features:
+---------
+* python3.10 support (#7126) (324f08594) -- Vinit Kumar
+* improve build performance (#7192) (bdb04bc31) -- Vinit Kumar
+
+Bug Fixes:
+----------
+* using .nvmrc to target the right nvm version (3e5227def) -- Florian Delizy
+* Add toolbar fix for broken CMS in the release 3.10.x -- Vinit Kumar
+* fixing release script to use 'unreleased' (low caps) instead of mixed caps (#7202) (b7a793c88) -- Florian Delizy
+* Cap django requirement at <4 (#7182) (c6c278497) -- Mark Walker
+* Set the default_auto_field on the AppConfigs (#7181) (272d62ced) -- Jeffrey de Lange
+* do not convert & URL query separator to &amp; (#7114) (c0c10e051) -- nichoski
+* discrepancy around python 3.6 compatibility between `setup.py`, docs and tests (#7095) (70970061f) -- Mark Walker
+* update permission cache when moving pages and adding pages. (#7090) (53dddb106) -- Ryo Shimada
+* https://github.com/django-cms/django-cms/projects/6#card-63761457 (#7085) (a5159d3a6) -- Gabriel Andrade
+* missing tests of django3.2 for mysql and sqlite (#7082) (c7fd7c0c5) -- Vinit Kumar
+* Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (#7062) (f4043cd75) -- Vinit Kumar
+
+Statistics:
+-----------
+
+This release includes 59 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Anatoliy (3 pull requests)
+* Angelo Dini (1 pull request)
+* Dmytro Litvinov (1 pull request)
+* Florian Delizy (10 pull requests)
+* Gabriel Andrade (1 pull request)
+* Halit Çelik (1 pull request)
+* Jean-Baptiste PENRATH (1 pull request)
+* Jeffrey de Lange (1 pull request)
+* Jens-Erik Weber (1 pull request)
+* Kaushal Dhungel (1 pull request)
+* Marco Bonetti (2 pull requests)
+* Mark Walker (10 pull requests)
+* Nebojsa Knezevic (2 pull requests)
+* nichoski (2 pull requests)
+* Nicolai (11 pull requests)
+* Ryo Shimada (1 pull request)
+* Simon Krull (4 pull requests)
+* Stefan van den Eertwegh (1 pull request)
+* Vinit Kumar (5 pull requests)
+
+With the review help of the following contributors:
+
+* fsbraun
+* Gabriel Andrade
+* Marco Bonetti
+* Mark Walker
+* Nicolai
+* Simon Krull
+* TiredFingers
+* victor-yunenko
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
 
 3.9.0 (2021-06-30)
 ==================
@@ -52,7 +152,7 @@ Bug Fixes:
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
-* Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
+* Fixed a bug where the fallback page title whould be returned instead of the one from the current language
 * Fixed an issue when running migrations on a multi database project
 * Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
 
@@ -1005,7 +1105,7 @@ Thanks to all contributors for their efforts!
 - Improves redirection as a result of changes to page slugs, etc.
 - Improves performance of "watched models"
 - Improves frontend performance relating to resizing the sideframe
-- Corrects an issue where items might not be visible in structue mode menus
+- Corrects an issue where items might not be visible in structure mode menus
 - Limits version of django-mptt used in CMS for 3.0.x
 - Prevent accidental upgrades to Django 1.8, which is not yet supported
 
@@ -1062,7 +1162,7 @@ Thanks to all contributors for their efforts!
 ==================
 
 - Add require_parent option to CMS_PLACEHOLDER_CONF
-- Fix django-mptt version depenency to be PEP440 compatible
+- Fix django-mptt version dependency to be PEP440 compatible
 - Fix some Django 1.4 compatibility issues
 - Add toolbar sanity check
 - Fix behavior with CMSPluginBase.get_render_template()
@@ -1090,7 +1190,7 @@ Thanks to all contributors for their efforts!
 - Fixes PageField to work in Django 1.7 environments
 - Updates to community and project governance documentation
 - Added list of retired core developers
-- Added branch policy documentaion
+- Added branch policy documentation
 
 
 3.0.6 (2014-10-07)
@@ -1300,7 +1400,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 - CMS_FRONTEND_LANGUAGES limits django languages as well during language selection
 - Wymeditor updated to 1.0.4a
 - icon_url escape fixed
-- Ukranian translation added
+- Ukrainian translation added
 - Fixed wrong language prefix handling for form actions and admin preview
 - Admin icons in django 1.4 fixed
 - Added requirements.txt for pip and testing in test_requirements

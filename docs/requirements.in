@@ -8,6 +8,8 @@ sphinxcontrib-spelling
 pyenchant>3
 sphinx-autobuild
 datetime
+codespell
 coverage
+django~=3.2
 django-cms
 pip-tools

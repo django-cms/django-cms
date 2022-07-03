@@ -12,6 +12,7 @@
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Denis Darii <denis.darii@gmail.com>, 2011
 # Dimmus <dmitri.chudinov@gmail.com>, 2011
+# Dmitrii Kurskov, 2022
 # eXtractor <evg.kirov@gmail.com>, 2019
 # Gleb Chipiga <gleb.chipiga@gmail.com>, 2011
 # ha7y <maxvyaznikov@gmail.com>, 2014
@@ -38,9 +39,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
-"Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
+"POT-Creation-Date: 2022-05-31 20:29+0200\n"
+"PO-Revision-Date: 2010-11-30 06:47+0000\n"
+"Last-Translator: Dmitrii Kurskov, 2022\n"
 "Language-Team: Russian (http://www.transifex.com/divio/django-cms/language/ru/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -126,6 +127,9 @@ msgstr "Конфигурации приложения"
 
 msgid "Language independent options"
 msgstr "Опции, независимые от языка"
+
+msgid "You entered an invalid URL."
+msgstr "Вы ввели неверный URL."
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -412,6 +416,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Это ссылка-синоним, вы можете отредактировать содержимое только на родительской странице  <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
+msgid "Getting started developer guide"
+msgstr "Руководство по началу работы для разработчиков"
+
+msgid "Documentation"
+msgstr "Документация"
+
+msgid "User guide"
+msgstr "Руководство пользователя"
+
+msgid "Support Forum"
+msgstr "Форум поддержки пользователей"
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr "Что нового"
+
 msgid "Create"
 msgstr "Создать"
 
@@ -451,6 +473,9 @@ msgstr "Выход"
 
 msgid "Language"
 msgstr "Язык"
+
+msgid "Help"
+msgstr "Помощь"
 
 msgid "Structure"
 msgstr "Структура"
@@ -527,7 +552,7 @@ msgid "Unpublish page"
 msgstr "Отменить публикацию"
 
 msgid "Publish page"
-msgstr ""
+msgstr "Опубликовать страницу"
 
 msgid "Are you sure you want to revert to live?"
 msgstr "Вы точно хотите вернуться к опубликованной версии?"
@@ -1002,7 +1027,7 @@ msgid "last change by"
 msgstr "последнее изменение сделано"
 
 msgid "last change on"
-msgstr ""
+msgstr "последнее изменение"
 
 msgid "meta"
 msgstr "Мета"
@@ -1371,9 +1396,6 @@ msgstr "Рекомендации по установке"
 msgid "Support"
 msgstr "Поддержка"
 
-msgid "Documentation"
-msgstr "Документация"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1576,6 +1598,15 @@ msgstr "Добавить плагин в плейсхолдер \"%(placeholder_
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Добавить плагин в %(plugin_name)s"
+
+msgid "Community forum"
+msgstr "Форум сообщества"
+
+msgid "Getting started"
+msgstr "Начало работы"
+
+msgid "Talk to us"
+msgstr ""
 
 msgid "CMS - your user account was created."
 msgstr "CMS - ваш аккаунт создан."

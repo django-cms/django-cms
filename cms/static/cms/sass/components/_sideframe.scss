@@ -1,6 +1,9 @@
 //##############################################################################
 // SIDEFRAME
 
+@use "sass:math";
+
+
 // "Pages" frame on the left
 .cms-sideframe {
     display: none;
@@ -84,8 +87,8 @@
         position: absolute;
         top: 50%;
         left: 50%;
-        margin-left: -($sideframe-button-area-size / 4);
-        margin-top: -($sideframe-button-area-size / 4);
+        margin-left: -(math.div($sideframe-button-area-size, 4));
+        margin-top: -(math.div($sideframe-button-area-size, 4));
 
         &:hover {
             color: $gray-darkest;

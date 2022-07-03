@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 from django.template import Template
 from django.test import RequestFactory
 from django.test.utils import override_settings
@@ -51,6 +52,7 @@ overrides = dict(
 class TestNoI18N(CMSTestCase):
 
     def setUp(self):
+        self.request = HttpResponse()
         clear_url_caches()
         super().setUp()
 
@@ -76,8 +78,7 @@ class TestNoI18N(CMSTestCase):
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
-        mid = ToolbarMiddleware()
-        mid.process_request(request)
+        ToolbarMiddleware(lambda req: HttpResponse()).__call__(request)
         if hasattr(request, 'toolbar'):
             request.toolbar.populate()
         return request

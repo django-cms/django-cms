@@ -50,7 +50,7 @@ Bug Fixes:
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
-* Fixed a bug where the fallback page title whould be returned instead of the one from the current language 
+* Fixed a bug where the fallback page title would be returned instead of the one from the current language 
 * Fixed an issue when running migrations on a multi database project
 
 

@@ -32,6 +32,7 @@ class BaseToolbar(ToolbarAPIMixin):
     edit_mode_url_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
     structure_mode_url_on = get_cms_setting('CMS_TOOLBAR_URL__BUILD')
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+    color_scheme = get_cms_setting('COLOR_SCHEME')
 
     @cached_property
     def site_language(self):
@@ -138,11 +139,7 @@ class CMSToolbar(BaseToolbar):
                 try:
                     # If the original view is decorated we try to extract the real function
                     # module instead of the decorator's one
-                    if decorator and getattr(decorator, 'func_closure', False):
-                        # python 2
-                        self.app_name = decorator.func_closure[0].cell_contents.__module__
-                    elif decorator and getattr(decorator, '__closure__', False):
-                        # python 3
+                    if decorator and getattr(decorator, '__closure__', False):
                         self.app_name = decorator.__closure__[0].cell_contents.__module__
                     else:
                         raise AttributeError()
@@ -326,10 +323,10 @@ class CMSToolbar(BaseToolbar):
             with force_language(self.request_language):
                 try:
                     return self.obj.get_draft_url()
-                except NoReverseMatch:
+                except (NoReverseMatch, AttributeError):
                     try:
                         return self.obj.get_absolute_url()
-                    except NoReverseMatch:
+                    except (NoReverseMatch, AttributeError):
                         pass
         return ''
 
@@ -450,6 +447,7 @@ class CMSToolbar(BaseToolbar):
             'django_version': DJANGO_VERSION,
             'login_form': CMSToolbarLoginForm(),
             'python_version': PYTHON_VERSION,
+            'cms_color_scheme': self.color_scheme,
         }
         return context
 
@@ -469,6 +467,8 @@ class CMSToolbar(BaseToolbar):
 
         with force_language(self.toolbar_language):
             # needed to populate the context with sekizai content
+            if 'debug' not in context:
+                context['debug'] = settings.DEBUG
             render_to_string('cms/toolbar/toolbar_javascript.html', flatten_context(context))
 
         # render everything below the tag
