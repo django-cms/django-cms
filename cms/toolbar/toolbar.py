@@ -163,11 +163,7 @@ class CMSToolbar(BaseToolbar):
                 try:
                     # If the original view is decorated we try to extract the real function
                     # module instead of the decorator's one
-                    if decorator and getattr(decorator, 'func_closure', False):
-                        # python 2
-                        self.app_name = decorator.func_closure[0].cell_contents.__module__
-                    elif decorator and getattr(decorator, '__closure__', False):
-                        # python 3
+                    if decorator and getattr(decorator, '__closure__', False):
                         self.app_name = decorator.__closure__[0].cell_contents.__module__
                     else:
                         raise AttributeError()
@@ -202,8 +198,14 @@ class CMSToolbar(BaseToolbar):
         self.is_staff = self.request.user.is_staff
         self.show_toolbar = self.is_staff
 
+        anonymous_on = get_cms_setting('TOOLBAR_ANONYMOUS_ON')
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+
+        # Handle showing the toolbar for anonymouse users when they supply
+        # the enable toolbar parameter
+        if (anonymous_on and request.user.is_anonymous) and enable_toolbar in self.request.GET:
+            self.show_toolbar = True
 
         if self.show_toolbar:
             edit_mode = (

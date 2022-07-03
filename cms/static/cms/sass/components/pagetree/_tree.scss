@@ -40,6 +40,12 @@
     touch-action: none;
 }
 
+#changelist {
+    display: block;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+
 //###########################################################
 // CONTAINER
 // general container around the jstree or elements
@@ -94,7 +100,6 @@
 // handles top header area styles
 .cms-pagetree-header {
     position: relative;
-    display: table;
     display: flex;
     width: 100%;
     box-sizing: border-box;
