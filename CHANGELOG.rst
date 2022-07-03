@@ -13,6 +13,7 @@ unreleased
 * Fix except block using list instead of tuple. (#7334)
 * Added cache ttl extension point.
 * Added spell checking to pre-commit and github workflows
+* Added current language to the page cache key (#6607)
 
 3.10.1 (2022-06-28)
 ===================
