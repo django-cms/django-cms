@@ -12,6 +12,7 @@ unreleased
 * Fix edit plugin popup width (remove 850px width constraint).
 * Fix except block using list instead of tuple. (#7334)
 * Added cache ttl extension point.
+* Fixed permission denied error after page create (#6866)
 
 3.10.1 (2022-06-28)
 ===================
@@ -267,7 +268,6 @@ Thanks to all contributors for their efforts!
 3.7.3 (2020-05-27)
 ==================
 
-* Fixed permission denied error after page create
 * Fixed apphooks config select in Firefox
 * Fixed compatibility errors on python 2
 * Fixed long page titles in Page tree/list view to prevent horizontal scrolling
