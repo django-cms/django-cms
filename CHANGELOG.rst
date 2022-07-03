@@ -17,6 +17,7 @@ Highlights:
 * Fix edit plugin popup width (remove 850px width constraint).
 * Fix except block using list instead of tuple. (#7334)
 * Added cache ttl extension point.
+* Added current language to the page cache key (#6607)
 
 3.10.1 (2022-06-28)
 ===================
@@ -42,58 +43,6 @@ This release includes 12 pull requests, and was created with the help of the fol
 * Florian Delizy (1 pull request)
 * Marco Bonetti (1 pull request)
 * Mark Walker (7 pull requests)
-
-Thanks to all contributors for their efforts!
-
-Features:
----------
-* Add pre commit functionality (#7204) (d1ecb6359) -- Mark Walker
-* Run workflows in concurrency groups (#7211) (04e843337) -- Mark Walker
-* Added concurrency option to github workflows (#7205) (546b36827) -- Mark Walker
-* Add support for django 4 (#7268) (9e8eb17) -- Vinit Kumar
-* Make Plugin Confirm Template configurable (#7267) (bab1e6e) -- Jacob Rief
-* Add support for dark mode for toolbar, page tree, structure tree, modals (#7245) (b2d9a08) -- Fabian Braun
-
-Bug Fixes:
-----------
-* release script version number (#7322) (8ffc6488d) -- Mark Walker
-* add support for custom user model in cms permission signals (#7281) (c10b8ffc3) -- Vinit Kumar
-* publishing static placeholders outside of CMS (#7253) (bdb50b650) -- Adrien Delhorme
-* Toolbar bug in 3.10 (#7232) (b12d07989) -- Mark Walker
-* Disable workflow concurrency to bring stability back to the CI (#7209) (fdad05756) -- Mark Walker
-
-Statistics:
------------
-
-This release includes 38 pull requests, and was created with the help of the following contributors (in alphabetical order):
-
-* Adrien Delhorme (1 pull request)
-* Anatoliy (1 pull request)
-* Cam Cecil (1 pull request)
-* Christian Clauss (4 pull requests)
-* Conrad (3 pull requests)
-* crydotsnake (1 pull request)
-* dependabot[bot] (0 pull request)
-* Devyn Keeney (1 pull request)
-* Dmytro Litvinov (1 pull request)
-* Florian Delizy (1 pull request)
-* fsbraun (1 pull request)
-* Jacob Rief (1 pull request)
-* Mark Walker (13 pull requests)
-* Vinit Kumar (3 pull requests)
-
-With the review help of the following contributors:
-
-* Adrien Delhorme
-* Anatoliy
-* crydotsnake
-* dependabot[bot]
-* fsbraun
-* Jacob Rief
-* Mark Walker
-* Simon Krull
-* Vinit Kumar
-* Youri Roggeveen
 
 Thanks to all contributors for their efforts!
 
@@ -209,7 +158,7 @@ Bug Fixes:
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
-* Fixed a bug where the fallback page title whould be returned instead of the one from the current language
+* Fixed a bug where the fallback page title would be returned instead of the one from the current language
 * Fixed an issue when running migrations on a multi database project
 * Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
 
@@ -310,7 +259,7 @@ Thanks to all contributors for their efforts!
 * Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 * Improved documentation building
 * Updated the content for django CMS’s development community
-* Replaced all occurences of ``force_text`` and ``smart_text`` against
+* Replaced all occurrences of ``force_text`` and ``smart_text`` against
   ``force_str``and ``smart_str``.
 
 
@@ -848,7 +797,7 @@ Thanks to all contributors for their efforts!
 - Substantial improvements to the page tree and significant reduction of reloads
 - Update jsTree version to 3.2.1 with slight adaptions to the Pagetree
 - Documentation improvements
-- Improve the display and useability of the language menu, especially in cases
+- Improve the display and usability of the language menu, especially in cases
   where there are many languages.
 - Fix an issue relating to search fields in plugins
 - Fix an issue where the app-resolver would trigger locales into migrations
