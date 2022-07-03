@@ -12,6 +12,5 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - run: python -m pip install codespell
       - name: codespell
         uses: codespell-project/actions-codespell@master
