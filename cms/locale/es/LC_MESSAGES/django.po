@@ -37,15 +37,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
-"Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
+"POT-Creation-Date: 2022-05-31 20:29+0200\n"
+"PO-Revision-Date: 2010-11-30 06:47+0000\n"
+"Last-Translator: Pier Jose Gotta Perez <piegope@protonmail.com>, 2020\n"
 "Language-Team: Spanish (http://www.transifex.com/divio/django-cms/language/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: es\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 msgid "All"
 msgstr "Todo"
@@ -125,6 +125,9 @@ msgstr "Configuraciones de aplicación"
 
 msgid "Language independent options"
 msgstr "Opciones independientes del idioma"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -411,6 +414,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Esta es una referencia de alias, puede editar el contenido solo en <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> página."
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "Documentación"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "Crear"
 
@@ -450,6 +471,9 @@ msgstr "Salir"
 
 msgid "Language"
 msgstr "Idioma"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "Estructura"
@@ -922,6 +946,7 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Por favor, corrija el error de abajo."
 msgstr[1] "Por favor, corrija los errores de abajo."
+msgstr[2] "Por favor, corrija los errores de abajo."
 
 msgid "All permissions"
 msgstr "Todos los permisos"
@@ -1368,9 +1393,6 @@ msgstr "Notas de instalación"
 msgid "Support"
 msgstr "Soporte"
 
-msgid "Documentation"
-msgstr "Documentación"
-
 msgid ""
 "\n"
 "                <p class=\"cms-welcome-notes\">If you don't see the django CMS logo at the top, make sure\n"
@@ -1573,6 +1595,15 @@ msgstr "Agregar extensión al marcador de posición \"%(placeholder_label)s\""
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Agregar extensión a %(plugin_name)s"
+
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
+msgstr ""
 
 msgid "CMS - your user account was created."
 msgstr "CMS - su cuenta de usuario ha sido creada."

@@ -1,19 +1,17 @@
 from django.core.cache import cache
 from django.test.utils import override_settings
-
 from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
-from cms.api import create_page, add_plugin
+from cms.api import add_plugin, create_page
 from cms.cache.placeholder import get_placeholder_cache
-from cms.models import Page, Placeholder, CMSPlugin
+from cms.models import CMSPlugin, Page, Placeholder
 from cms.plugin_rendering import PluginContext
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.views import details
-
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 INHERIT_TEMPLATE_NAME = 'tests/rendering/inherit.html'
@@ -199,8 +197,8 @@ class RenderingTestCase(CMSTestCase):
                          slug=self.test_data9['slug'],
                          reverse_id=self.test_data9['reverse_id'], published=True)
         p10 = create_page(self.test_data10['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
-                         slug=self.test_data10['slug'], parent=p9,
-                         reverse_id=self.test_data10['reverse_id'], published=True)
+                          slug=self.test_data10['slug'], parent=p9,
+                          reverse_id=self.test_data10['reverse_id'], published=True)
 
         # Reload test pages
         self.test_page = self.reload(p.publisher_public)
@@ -255,6 +253,7 @@ class RenderingTestCase(CMSTestCase):
         passed to PluginContext.
         """
         from djangocms_text_ckeditor.cms_plugins import TextPlugin
+
         from cms.plugin_pool import plugin_pool
 
         instance = CMSPlugin.objects.all()[0].get_plugin_instance()[0]
@@ -277,11 +276,13 @@ class RenderingTestCase(CMSTestCase):
         instance.plugin_type = 'ProcessorTestPlugin'
         instance._inst = instance
 
-        context = PluginContext({'original_context_var': 'original_context_var_ok'}, instance,
+        context = PluginContext({'original_context_var': 'original_context_var_ok', 'request': None}, instance,
                                 self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,))
         plugin_rendering._standard_processors = {}
 
         content_renderer = self.get_content_renderer()
+
+        context.update({'request': self.get_request()})
         r = content_renderer.render_plugin(instance, context, self.test_placeholders['main'])
         expected = (
             self.test_data['text_main'] +  # noqa: W504

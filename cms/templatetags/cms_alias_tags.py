@@ -2,8 +2,7 @@ from django import template
 from django.utils.safestring import mark_safe
 
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.plugins import downcast_plugins, build_plugin_tree
-
+from cms.utils.plugins import build_plugin_tree, downcast_plugins
 
 register = template.Library()
 

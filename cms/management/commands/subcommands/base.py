@@ -1,9 +1,8 @@
 import os
-
 from collections import OrderedDict
 
 from django.core.management.base import BaseCommand, CommandParser
-from django.core.management.color import no_style, color_style
+from django.core.management.color import color_style, no_style
 
 from cms.utils.compat import DJANGO_3_0, DJANGO_3_1, DJANGO_3_2
 

@@ -4,35 +4,33 @@ from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
-from django.urls import reverse, NoReverseMatch
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
+from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
-    get_language,
-    override as force_language,
-    gettext_lazy as _,
+    get_language, gettext_lazy as _, override as force_language,
 )
+from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import (
-    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_PENDING, PUBLISHER_STATE_DIRTY, TEMPLATE_INHERITANCE_MAGIC
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING,
+    TEMPLATE_INHERITANCE_MAGIC,
 )
-from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded, LanguageError
+from cms.exceptions import (
+    LanguageError, PublicIsUnmodifiable, PublicVersionNeeded,
+)
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
-
+from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
-
-from treebeard.mp_tree import MP_Node
-
 
 logger = getLogger(__name__)
 
@@ -463,7 +461,7 @@ class Page(models.Model):
         """
         try:
             return self.get_draft_object().get_absolute_url(language, fallback)
-        except [AttributeError, NoReverseMatch, TypeError]:
+        except (AttributeError, NoReverseMatch, TypeError):
             return ''
 
     def set_tree_node(self, site, target=None, position='first-child'):
@@ -1523,7 +1521,9 @@ class Page(models.Model):
         return user_can_publish_page(user, page=self)
 
     def has_advanced_settings_permission(self, user):
-        from cms.utils.page_permissions import user_can_change_page_advanced_settings
+        from cms.utils.page_permissions import (
+            user_can_change_page_advanced_settings,
+        )
         return user_can_change_page_advanced_settings(user, page=self)
 
     def has_change_permissions_permission(self, user):

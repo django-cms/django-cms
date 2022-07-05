@@ -1,26 +1,23 @@
 import io
 import uuid
-import mock
-
-from cms.test_utils.project.sampleapp.cms_apps import SampleApp
-from cms.test_utils.util.context_managers import apphooks
+from unittest import mock
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
 from django.test.utils import override_settings
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models import Page, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
+from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
-
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-
+from cms.test_utils.util.context_managers import apphooks
 
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"
@@ -169,7 +166,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             bogus_plugins_report["type"],
-            u'BogusPlugin')
+            'BogusPlugin')
 
         self.assertEqual(
             bogus_plugins_report["instances"][0],
@@ -183,7 +180,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             link_plugins_report["type"],
-            u'LinkPlugin')
+            'LinkPlugin')
 
         self.assertEqual(
             link_plugins_report["instances"][0].get_plugin_instance()[0],
@@ -197,7 +194,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             text_plugins_report["type"],
-            u'TextPlugin')
+            'TextPlugin')
 
         self.assertEqual(
             len(text_plugins_report["instances"]),
@@ -375,7 +372,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site).drafts()
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins*2)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -420,7 +417,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site).drafts()
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -508,7 +505,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
     def test_copy_existing_title(self):
         """
-        Even if a title already exists the copy is successfull, the original
+        Even if a title already exists the copy is successful, the original
         title remains untouched
         """
         site = 1
@@ -524,7 +521,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site).drafts()
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
 
         # Original Title untouched
         self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))
@@ -638,7 +635,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             self.assertEqual(origina_site1_langs[page.pk], set(page.get_languages()))
 
         for page in Page.objects.on_site(site_active).drafts():
-            self.assertEqual(set(('de', 'fr')), set(page.get_languages()))
+            self.assertEqual({'de', 'fr'}, set(page.get_languages()))
 
         # plugins for site 1
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)

@@ -5,11 +5,12 @@ from collections import OrderedDict
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
-from django.template import TemplateSyntaxError, NodeList, Variable, Context, Template, engines
+from django.template import (
+    Context, NodeList, Template, TemplateSyntaxError, Variable, engines,
+)
 from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
-
 from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
@@ -50,7 +51,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
         # 1st level
         if template:
-            keys.append(u'%s %s' % (template, placeholder))
+            keys.append(f'{template} {placeholder}')
         # 2nd level
         keys.append(placeholder)
         # 3rd level
@@ -176,7 +177,7 @@ def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blo
 
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.
-        # This is important to avoid processing overriden block nodes.
+        # This is important to avoid processing overridden block nodes.
         ignore_blocks = []
 
     for node in nodelist:

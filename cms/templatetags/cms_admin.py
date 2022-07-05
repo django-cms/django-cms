@@ -1,17 +1,15 @@
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import InclusionTag
-from django.urls import NoReverseMatch
-
-from cms.constants import PUBLISHER_STATE_PENDING
-
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
+from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
+from cms.constants import PUBLISHER_STATE_PENDING
 
 register = template.Library()
 

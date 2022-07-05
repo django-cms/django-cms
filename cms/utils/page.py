@@ -11,7 +11,6 @@ from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
 
-
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
 

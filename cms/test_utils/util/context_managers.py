@@ -1,12 +1,13 @@
-import sys
 import io
+import sys
 from contextlib import contextmanager
 from shutil import rmtree as _rmtree
-from tempfile import template, mkdtemp, _exists
-from cms.apphook_pool import apphook_pool
+from tempfile import _exists, mkdtemp, template
 
 from django.contrib.auth import get_user_model
-from django.utils.translation import get_language, activate
+from django.utils.translation import activate, get_language
+
+from cms.apphook_pool import apphook_pool
 
 
 class NULL:
@@ -61,7 +62,7 @@ class TemporaryDirectory:
         with TemporaryDirectory() as tmpdir:
             ...
 
-    Upon exiting the context, the directory and everthing contained
+    Upon exiting the context, the directory and everything contained
     in it are removed.
     """
 

@@ -1,20 +1,21 @@
 from copy import deepcopy
-from cms.extensions.toolbar import ExtensionToolbar
-from cms.toolbar_pool import toolbar_pool
-from cms.utils.urlutils import admin_reverse
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
 from cms.api import create_page, create_title
 from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.extensions import extension_pool
-from cms.extensions import TitleExtension
-from cms.extensions import PageExtension
+from cms.extensions import PageExtension, TitleExtension, extension_pool
+from cms.extensions.toolbar import ExtensionToolbar
 from cms.models import Page, PageType
-from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
-from cms.test_utils.project.extensionapp.models import MultiTablePageExtension, MultiTableTitleExtension
+from cms.test_utils.project.extensionapp.models import (
+    MultiTablePageExtension, MultiTableTitleExtension, MyPageExtension,
+    MyTitleExtension,
+)
 from cms.test_utils.testcases import CMSTestCase
+from cms.toolbar_pool import toolbar_pool
+from cms.utils.urlutils import admin_reverse
 
 
 class ExtensionsTestCase(CMSTestCase):

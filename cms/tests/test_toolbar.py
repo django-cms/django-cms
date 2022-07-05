@@ -1,13 +1,15 @@
 
 import datetime
-import iptools
 import re
 
+import iptools
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
+from django.template import RequestContext
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -18,29 +20,35 @@ from django.utils.functional import lazy
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
 
-from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
-from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
-                              DEFAULT_HELP_MENU_ITEMS, HELP_MENU_IDENTIFIER, LANGUAGE_MENU_IDENTIFIER)
-from cms.middleware.toolbar import ToolbarMiddleware
+from cms.api import add_plugin, create_page, create_title
+from cms.cms_toolbars import (
+    ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, DEFAULT_HELP_MENU_ITEMS,
+    HELP_MENU_IDENTIFIER, LANGUAGE_MENU_IDENTIFIER, AppearanceToolbar,
+    get_user_model,
+)
 from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.models import Page, UserSettings, PagePermission
-from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
-from cms.test_utils.project.placeholderapp.views import detail_view, detail_view_char, ClassDetail
+from cms.middleware.toolbar import ToolbarMiddleware
+from cms.models import Page, PagePermission, StaticPlaceholder, UserSettings
+from cms.test_utils.project.placeholderapp.models import (
+    CharPksExample, Example1,
+)
+from cms.test_utils.project.placeholderapp.views import (
+    ClassDetail, detail_view, detail_view_char,
+)
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE, URL_CMS_USERSETTINGS
+    URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE, URL_CMS_USERSETTINGS, CMSTestCase,
 )
 from cms.test_utils.util.context_managers import UserLoginContext
-from cms.toolbar_pool import toolbar_pool
 from cms.toolbar.items import (
-    AjaxItem, Break, ItemSearchResult, LinkItem, SubMenu, ToolbarAPIMixin
+    AjaxItem, Break, ItemSearchResult, LinkItem, SubMenu, ToolbarAPIMixin,
 )
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar_pool import toolbar_pool
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
 from cms.views import details
-
 
 FOUR_CHARS = {
     'char_1': "char_1",
@@ -77,8 +85,7 @@ class ToolbarTestBase(CMSTestCase):
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
-        mid = ToolbarMiddleware()
-        mid.process_request(request)
+        ToolbarMiddleware(lambda req: HttpResponse()).__call__(request)
         if hasattr(request,'toolbar'):
             request.toolbar.populate()
         return request
@@ -660,6 +667,45 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(toolbar.edit_mode_active)
         items = toolbar.get_left_items() + toolbar.get_right_items()
         self.assertEqual(len(items), 8)
+
+    def test_color_scheme_toggle(self):
+        page = create_page('test', 'nav_playground.html', 'en', published=True)
+        # Needed because publish button only shows if the page is dirty
+        page.set_publisher_state('en', state=PUBLISHER_STATE_DIRTY)
+
+        request = self.get_page_request(page, self.get_superuser(), edit=True)
+        AppearanceToolbar.color_scheme_toggle = True  # Simulate corresponding settings
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        toolbar.post_template_populate()
+        self.assertTrue(toolbar.edit_mode_active)
+        items = toolbar.get_left_items() + toolbar.get_right_items()
+        self.assertEqual(len(items), 9)
+        AppearanceToolbar.color_scheme_toggle = False  # Undo settings patch
+
+    def test_publish_button_no_page(self):
+        static_placeholder = StaticPlaceholder.objects.create(name="foo", code='bar', site_id=1)
+        request = self.get_page_request(None, self.get_superuser(), '/', edit=True)
+
+        # Add content to static placeholder, and mark as dirty
+        plugin = add_plugin(
+            static_placeholder.draft, "TextPlugin", "en",
+            body="01",
+        )
+        plugin.save()
+        static_placeholder.dirty = True
+        static_placeholder.save()
+
+        toolbar = CMSToolbar(request)
+        renderer = toolbar.get_content_renderer()
+        # TextPlugin needs request in context
+        renderer.render_static_placeholder(static_placeholder, RequestContext(request, dict(request=request)))
+        toolbar.populate()
+        toolbar.post_template_populate()
+
+        items = toolbar.get_left_items() + toolbar.get_right_items()
+        self.assertTrue(toolbar.edit_mode_active)
+        self.assertEqual(len(items), 7)
 
     def test_no_publish_button(self):
         page = create_page('test', 'nav_playground.html', 'en', published=True)

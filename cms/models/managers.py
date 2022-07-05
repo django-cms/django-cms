@@ -4,12 +4,11 @@ import operator
 from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Q
-
 from treebeard.mp_tree import MP_NodeManager
 
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
-from cms.models.query import PageQuerySet, PageNodeQuerySet
+from cms.models.query import PageNodeQuerySet, PageQuerySet
 from cms.publisher import PublisherManager
 from cms.utils.i18n import get_fallback_languages
 
@@ -311,8 +310,8 @@ class PagePermissionManager(BasicPagePermissionManager):
         Result of this is used in admin for page permissions inline.
         """
         # get user level
-        from cms.utils.permissions import get_user_permission_level
         from cms.utils.page_permissions import get_change_permissions_id_list
+        from cms.utils.permissions import get_user_permission_level
 
         try:
             user_level = get_user_permission_level(user, site)
@@ -345,8 +344,8 @@ class PagePermissionManager(BasicPagePermissionManager):
         # permissions should be managed on the draft page only
 
         from cms.models import (
-            ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE_AND_CHILDREN,
-            ACCESS_PAGE_AND_DESCENDANTS, ACCESS_PAGE
+            ACCESS_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE,
+            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS,
         )
 
         page = page.get_draft_object()

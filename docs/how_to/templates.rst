@@ -16,7 +16,6 @@ use :ttag:`static_placeholder` instead.
 
 CMS_TEMPLATE
 ------------
-.. versionadded:: 3.0
 
 ``CMS_TEMPLATE`` is a context variable available in the context; it contains
 the template path for CMS pages and application using apphooks, and the default
@@ -60,7 +59,6 @@ template can dynamically import it.
 
 render_model
 ------------
-.. versionadded:: 3.0
 
 :ttag:`render_model` allows to edit the django models from the frontend by
 reusing the django CMS frontend editor.

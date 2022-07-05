@@ -3,18 +3,13 @@ import sys
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import FieldError
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import FieldError, PermissionDenied
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
-from menus.menu_pool import menu_pool
 
 from cms.api import (
-    create_page,
-    _verify_plugin_type,
-    assign_user_to_page,
-    publish_page,
+    _verify_plugin_type, assign_user_to_page, create_page, publish_page,
 )
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
@@ -24,6 +19,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME
+from menus.menu_pool import menu_pool
 
 
 def _grant_page_permission(user, codename):

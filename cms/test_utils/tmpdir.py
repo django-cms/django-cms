@@ -1,9 +1,9 @@
-from contextlib import contextmanager
-from tempfile import mkdtemp
 import os
 import random
 import shutil
 import stat
+from contextlib import contextmanager
+from tempfile import mkdtemp
 
 
 @contextmanager

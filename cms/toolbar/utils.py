@@ -1,7 +1,7 @@
 import json
 
 from django.utils.encoding import force_str
-from django.utils.translation import override as force_language, gettext
+from django.utils.translation import gettext, override as force_language
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 
@@ -51,9 +51,7 @@ def get_plugin_toolbar_js(plugin, children=None, parents=None):
 
 def get_plugin_tree_as_json(request, plugins):
     from cms.utils.plugins import (
-        build_plugin_tree,
-        downcast_plugins,
-        get_plugin_restrictions,
+        build_plugin_tree, downcast_plugins, get_plugin_restrictions,
     )
 
     tree_data = []

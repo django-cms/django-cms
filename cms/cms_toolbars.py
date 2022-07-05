@@ -5,26 +5,24 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
-from django.utils.translation import override as force_language, gettext, gettext_lazy as _
+from django.utils.translation import (
+    gettext, gettext_lazy as _, override as force_language,
+)
 
-from cms.api import get_page_draft, can_change_page
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC, PUBLISHER_STATE_PENDING
-from cms.models import Placeholder, Title, Page, PageType, StaticPlaceholder
-from cms.toolbar.items import ButtonList, TemplateItem, REFRESH_PAGE
+from cms.api import can_change_page, get_page_draft
+from cms.constants import PUBLISHER_STATE_PENDING, TEMPLATE_INHERITANCE_MAGIC
+from cms.models import Page, PageType, Placeholder, StaticPlaceholder, Title
+from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple, get_language_dict
+from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
-    user_can_change_page,
-    user_can_delete_page,
-    user_can_publish_page,
+    user_can_change_page, user_can_delete_page, user_can_publish_page,
 )
 from cms.utils.urlutils import add_url_parameters, admin_reverse
-
 from menus.utils import DefaultLanguageChanger
-
 
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
@@ -96,6 +94,22 @@ class PlaceholderToolbar(CMSToolbar):
                                       disabled=disabled,
                                       on_close=REFRESH_PAGE)
 
+@toolbar_pool.register
+class AppearanceToolbar(CMSToolbar):
+    """
+    Adds appearance switches, esp. for dark and light mode
+    """
+    color_scheme_toggle = get_cms_setting('COLOR_SCHEME_TOGGLE')
+
+    def populate(self):
+        if self.color_scheme_toggle:
+            dark_mode_toggle = TemplateItem(
+                template="cms/toolbar/items/dark_mode_toggle.html",
+                side=self.toolbar.RIGHT,
+            )
+            self.toolbar.add_item(dark_mode_toggle)
+
+
 
 @toolbar_pool.register
 class BasicToolbar(CMSToolbar):
@@ -131,7 +145,7 @@ class BasicToolbar(CMSToolbar):
                 sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
                 sites_menu.add_break(ADMIN_SITES_BREAK)
                 for site in sites_queryset:
-                    sites_menu.add_link_item(site.name, url='https://%s' % site.domain,
+                    sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                              active=site.pk == self.current_site.pk)
 
             # admin
@@ -316,18 +330,19 @@ class PageToolbar(CMSToolbar):
             return None
 
     def has_publish_permission(self):
-        if self.page:
-            publish_permission = page_permissions.user_can_publish_page(
+        if self.page is not None:
+            has_publish_permission = page_permissions.user_can_publish_page(
                 self.request.user,
                 page=self.page,
-                site=self.current_site
+                site=self.current_site,
             )
         else:
-            publish_permission = False
+            has_publish_permission = False
 
-        if publish_permission and self.statics:
-            publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
-        return publish_permission
+        if (has_publish_permission or self.page is None) and self.statics:
+            has_publish_permission = all(sp.has_publish_permission(self.request) for sp in self.dirty_statics)
+
+        return has_publish_permission
 
     def has_unpublish_permission(self):
         return self.has_publish_permission()
