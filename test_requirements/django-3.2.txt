@@ -1,5 +1,5 @@
 -r requirements_base.txt
-Django==3.2
+Django==3.2.14
 djangocms-admin-style>=3.0
 django-classy-tags>=3.0
 django-formtools==2.2
