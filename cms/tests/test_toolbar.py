@@ -1,10 +1,14 @@
 import datetime
 import iptools
 import re
+from unittest.mock import Mock, patch
 
+from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.core.validators import URLValidator
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -28,7 +32,10 @@ from cms.toolbar_pool import toolbar_pool
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_object_structure_url
+from cms.toolbar.utils import (
+    add_endpoint_querystring_params, get_object_edit_url,
+    get_object_preview_url, get_object_structure_url
+)
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
@@ -1863,6 +1870,57 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-%s cms-render-model cms-render-model-block"></template>\n        <h3>Menu</h3>' % page.pk)
+
+
+class ToolbarUtilsTestCase(ToolbarTestBase):
+    @override_settings(CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED=True)
+    def test_add_endpoint_querystring_params(self):
+        def add_querystring_param(obj, language):
+            return "example_querystring_param", "example_querystring_content"
+
+        querystring_param = add_endpoint_querystring_params(self._get_example_obj(), add_querystring_param)
+
+        self.assertEqual(("example_querystring_param", "example_querystring_content"), querystring_param)
+
+    @override_settings(CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED=True)
+    @patch("cms.toolbar.utils._get_cms_extension")
+    def test_get_querystring_modifier_base_url_no_querystring(self, _get_cms_extension):
+        '''object, content_type, url'''
+
+        def add_querystring_param(obj, language):
+            return "example_querystring_param", "example_querystring_content"
+
+        test_obj = self._get_example_obj()
+        content_type = ContentType.objects.get(app_label=test_obj._meta.app_label, model=test_obj._meta.model_name)
+        cms_app_extension = apps.get_app_config("cms").cms_extension
+        cms_app_extension.cms_endpoint_modifiers = {content_type: add_querystring_param}
+        _get_cms_extension.return_value = cms_app_extension
+
+        url = get_object_edit_url(test_obj)
+
+        self.assertIn("?example_querystring_param=example_querystring_content", url)
+        self.assertEqual(url.count("?"), 1)
+
+    @override_settings(CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED=True)
+    @patch("cms.toolbar.utils._get_cms_extension")
+    @patch("cms.utils.urlutils.admin_reverse")
+    def test_get_querystring_modifier_base_url_no_querystring(self, patched_admin_reverse, _get_cms_extension):
+        '''object, content_type, url'''
+        def add_querystring_param(obj, language):
+            return "example_querystring_param", "example_querystring_content"
+
+        test_obj = self._get_example_obj()
+        content_type = ContentType.objects.get(app_label=test_obj._meta.app_label, model=test_obj._meta.model_name)
+        cms_app_extension = apps.get_app_config("cms").cms_extension
+        cms_app_extension.cms_endpoint_modifiers = {content_type: add_querystring_param}
+        _get_cms_extension.return_value = cms_app_extension
+        base_url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, test_obj.pk])
+        patched_admin_reverse.return_value = f"{base_url}?base_qsp=base_value"
+
+        url = get_object_edit_url(test_obj)
+
+        self.assertIn("?base_qsp=base_value&example_querystring_param=example_querystring_content", url)
+        self.assertEqual(url.count("?"), 1)
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):

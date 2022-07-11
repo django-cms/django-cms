@@ -128,8 +128,7 @@ def add_endpoint_querystring_params(obj, modifier, language=None):
     Used to inject querystring parameters into endpoint URLs using a cms_config,
     when the setting CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED = True.
     """
-    querystring_param_name, querystring_param_content = modifier(obj, language)
-    return f"?{querystring_param_name}={querystring_param_content}"
+    return modifier(obj, language)
 
 
 def get_querystring_modifier(obj, content_type, url, language=None):
@@ -137,8 +136,12 @@ def get_querystring_modifier(obj, content_type, url, language=None):
 
     method = extension.cms_endpoint_modifiers.get(content_type, None)
     if method:
-        # TODO: Add validation to the url, to ensure we don't already have querystring params
-        url += add_endpoint_querystring_params(obj, method, language)
+        param, content = add_endpoint_querystring_params(obj, method, language)
+        urls = url.split("?")
+        if len(urls) > 1:
+            url += f"&{param}={content}"
+        else:
+            url += f"?{param}={content}"
     return url
 
 
