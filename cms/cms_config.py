@@ -61,8 +61,7 @@ class CMSCoreExtensions(CMSAppExtension):
     def configure_cms_endpoint_modifiers(self, cms_config):
         if not isinstance(cms_config.cms_endpoint_modifiers, dict):
             raise ImproperlyConfigured("cms_endpoint_modifiers must be a dict")
-        for content_type in cms_config.cms_endpoint_modifiers:
-            self.cms_endpoint_modifiers[content_type] = cms_config.cms_endpoint_modifiers[content_type]
+        self.cms_endpoint_modifiers.update(cms_config.cms_endpoint_modifiers)
 
     def configure_app(self, cms_config):
         # The cms_wizards settings is optional. If it's not here
