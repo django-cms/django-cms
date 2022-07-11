@@ -1,14 +1,13 @@
 import datetime
 import iptools
 import re
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.validators import URLValidator
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -29,6 +28,7 @@ from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_USERSETTINGS)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar_pool import toolbar_pool
+from cms.toolbar import utils
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
@@ -1930,8 +1930,8 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         # Get the original endpoint url, and patch it with additional querystring parameter
         base_url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, test_obj.pk])
         patched_admin_reverse.return_value = f"{base_url}?base_qsp=base_value"
-
-        edit_url = get_object_edit_url(test_obj)
+        with patch.object(utils, "admin_reverse", return_value=f"{base_url}?base_qsp=base_value"):
+            edit_url = get_object_edit_url(test_obj)
 
         self.assertIn("?base_qsp=base_value&example_querystring_param=example_querystring_content", edit_url)
         self.assertEqual(edit_url.count("?"), 1)
