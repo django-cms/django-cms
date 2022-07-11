@@ -120,6 +120,9 @@ def get_toolbar_from_request(request):
 
 
 def _get_cms_extension():
+    """
+    Return the cms cms_extension
+    """
     return apps.get_app_config('cms').cms_extension
 
 
@@ -132,6 +135,9 @@ def add_endpoint_querystring_params(obj, modifier, language=None):
 
 
 def get_querystring_modifier(obj, content_type, url, language=None):
+    """
+    Get the querystring modifier if one exists for the content type, and add it to the endpoint url
+    """
     extension = _get_cms_extension()
 
     method = extension.cms_endpoint_modifiers.get(content_type, None)

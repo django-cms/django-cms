@@ -1,5 +1,6 @@
 
 === 4.0.0 (unreleased) ===
+* feat: Enable the configuration of endpoint querystring parameters via cms_config
 * Backported from develop: Upgrade Gulp and NodeJs
 * feat: Re-enable showing the toolbar to anonymous users
 * Backport django 3.2 support
