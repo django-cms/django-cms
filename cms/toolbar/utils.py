@@ -1,6 +1,8 @@
 from collections import defaultdict, deque
 import json
 
+from django.apps import apps
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_str
 from django.utils.translation import get_language, override as force_language, gettext
@@ -117,6 +119,29 @@ def get_toolbar_from_request(request):
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
+def _get_cms_extension():
+    return apps.get_app_config('cms').cms_extension
+
+
+def add_endpoint_querystring_params(obj, modifier, language=None):
+    """
+    Used to inject querystring parameters into endpoint URLs using a cms_config,
+    when the setting CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED = True.
+    """
+    querystring_param_name, querystring_param_content = modifier(obj, language)
+    return f"?{querystring_param_name}={querystring_param_content}"
+
+
+def get_querystring_modifier(obj, content_type, url, language=None):
+    extension = _get_cms_extension()
+
+    method = extension.cms_endpoint_modifiers.get(content_type, None)
+    if method:
+        # TODO: Add validation to the url, to ensure we don't already have querystring params
+        url += add_endpoint_querystring_params(obj, method, language)
+    return url
+
+
 def get_object_edit_url(obj, language=None):
     content_type = ContentType.objects.get_for_model(obj)
 
@@ -124,7 +149,10 @@ def get_object_edit_url(obj, language=None):
         language = get_language()
 
     with force_language(language):
-        return admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
+        url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
+    if getattr(settings, "CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED", False):
+        url = get_querystring_modifier(obj, content_type, url, language)
+    return url
 
 
 def get_object_preview_url(obj, language=None):
@@ -134,7 +162,10 @@ def get_object_preview_url(obj, language=None):
         language = get_language()
 
     with force_language(language):
-        return admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
+        url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
+    if getattr(settings, "CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED", False):
+        url = get_querystring_modifier(obj, content_type, url, language)
+    return url
 
 
 def get_object_structure_url(obj, language=None):
@@ -144,4 +175,7 @@ def get_object_structure_url(obj, language=None):
         language = get_language()
 
     with force_language(language):
-        return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+        url = admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+    if getattr(settings, "CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED", False):
+        url = get_querystring_modifier(obj, content_type, url, language)
+    return url
