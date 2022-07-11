@@ -1,9 +1,9 @@
 from collections import defaultdict, deque
 import json
 
-from django.apps import apps
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import force_str
 from django.utils.translation import get_language, override as force_language, gettext
 
@@ -119,11 +119,19 @@ def get_toolbar_from_request(request):
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
-def _get_cms_extension():
+def _get_cms_endpoint_settings():
     """
     Return the cms cms_extension
     """
-    return apps.get_app_config('cms').cms_extension
+    qsp_config = getattr(settings, 'CMS_ENDPOINT_QUERYSTRING_CONFIGURATION', None)
+    if not qsp_config:
+        raise ImproperlyConfigured(
+            """
+            With 'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED' set to True,
+            CMS_ENDPOINT_QUERYSTRING_CONFIGURATION must be provided
+            """
+        )
+    return qsp_config
 
 
 def add_endpoint_querystring_params(obj, modifier, language=None):
@@ -138,9 +146,9 @@ def get_querystring_modifier(obj, content_type, url, language=None):
     """
     Get the querystring modifier if one exists for the content type, and add it to the endpoint url
     """
-    extension = _get_cms_extension()
+    qsp_config = _get_cms_endpoint_settings()
+    method = qsp_config.get(content_type, None)
 
-    method = extension.cms_endpoint_modifiers.get(content_type, None)
     if method:
         param, content = add_endpoint_querystring_params(obj, method, language)
         urls = url.split("?")

@@ -3,7 +3,6 @@ import iptools
 import re
 from unittest.mock import patch
 
-from django.apps import apps
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -1883,8 +1882,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(("example_querystring_param", "example_querystring_content"), querystring_param)
 
     @override_settings(CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED=True)
-    @patch("cms.toolbar.utils._get_cms_extension")
-    def test_get_querystring_modifier_base_url_no_querystring(self, _get_cms_extension):
+    def test_get_querystring_modifier_base_url_no_querystring(self):
         """
         When the endpoint returns a value without a querystring param, one should be added to the
         url returned
@@ -1894,13 +1892,11 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
 
         test_obj = self._get_example_obj()
         content_type = ContentType.objects.get(app_label=test_obj._meta.app_label, model=test_obj._meta.model_name)
-        cms_app_extension = apps.get_app_config("cms").cms_extension
-        cms_app_extension.cms_endpoint_modifiers = {content_type: add_querystring_param}
-        _get_cms_extension.return_value = cms_app_extension
 
-        edit_url = get_object_edit_url(test_obj)
-        preview_url = get_object_preview_url(test_obj)
-        structure_url = get_object_structure_url(test_obj)
+        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={content_type: add_querystring_param}):
+            edit_url = get_object_edit_url(test_obj)
+            preview_url = get_object_preview_url(test_obj)
+            structure_url = get_object_structure_url(test_obj)
 
         self.assertIn("?example_querystring_param=example_querystring_content", edit_url)
         self.assertIn("?example_querystring_param=example_querystring_content", preview_url)
@@ -1911,34 +1907,28 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(edit_url.count("&"), 0)
 
     @override_settings(CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED=True)
-    @patch("cms.toolbar.utils._get_cms_extension")
     @patch("cms.utils.urlutils.admin_reverse")
-    def test_get_querystring_modifier_base_url_with_querystring(self, patched_admin_reverse, _get_cms_extension):
+    def test_get_querystring_modifier_base_url_with_querystring(self, patched_admin_reverse):
         """
         With the endpoint returning an existing querystring param, the additional params should be appended
         to the existing with &.
         """
         def add_querystring_param(obj, language):
             return "example_querystring_param", "example_querystring_content"
-
         test_obj = self._get_example_obj()
         content_type = ContentType.objects.get(app_label=test_obj._meta.app_label, model=test_obj._meta.model_name)
-        # Create a new app extension with the desired config, and patch it to the existing one
-        cms_app_extension = apps.get_app_config("cms").cms_extension
-        cms_app_extension.cms_endpoint_modifiers = {content_type: add_querystring_param}
-        _get_cms_extension.return_value = cms_app_extension
         # Get the original endpoint url, and patch it with additional querystring parameter
         base_url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, test_obj.pk])
         patched_admin_reverse.return_value = f"{base_url}?base_qsp=base_value"
-        with patch.object(utils, "admin_reverse", return_value=f"{base_url}?base_qsp=base_value"):
-            edit_url = get_object_edit_url(test_obj)
+        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={content_type: add_querystring_param}):
+            with patch.object(utils, "admin_reverse", return_value=f"{base_url}?base_qsp=base_value"):
+                edit_url = get_object_edit_url(test_obj)
 
         self.assertIn("?base_qsp=base_value&example_querystring_param=example_querystring_content", edit_url)
         self.assertEqual(edit_url.count("?"), 1)
         self.assertEqual(edit_url.count("&"), 1)
 
-    @patch("cms.toolbar.utils._get_cms_extension")
-    def test_get_querystring_modifier_base_url_no_querystring_setting_disabled(self, _get_cms_extension):
+    def test_get_querystring_modifier_base_url_no_querystring_setting_disabled(self):
         """
         When the endpoint returns a value without a querystring param, one should be added to the
         url returned
@@ -1948,13 +1938,11 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
 
         test_obj = self._get_example_obj()
         content_type = ContentType.objects.get(app_label=test_obj._meta.app_label, model=test_obj._meta.model_name)
-        cms_app_extension = apps.get_app_config("cms").cms_extension
-        cms_app_extension.cms_endpoint_modifiers = {content_type: add_querystring_param}
-        _get_cms_extension.return_value = cms_app_extension
 
-        edit_url = get_object_edit_url(test_obj)
-        preview_url = get_object_preview_url(test_obj)
-        structure_url = get_object_structure_url(test_obj)
+        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={content_type: add_querystring_param}):
+            edit_url = get_object_edit_url(test_obj)
+            preview_url = get_object_preview_url(test_obj)
+            structure_url = get_object_structure_url(test_obj)
 
         self.assertNotIn("?example_querystring_param=example_querystring_content", edit_url)
         self.assertNotIn("?example_querystring_param=example_querystring_content", preview_url)

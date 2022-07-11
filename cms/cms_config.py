@@ -24,7 +24,6 @@ class CMSCoreExtensions(CMSAppExtension):
     def __init__(self):
         self.wizards = {}
         self.toolbar_enabled_models = {}
-        self.cms_endpoint_modifiers = {}
 
     def configure_wizards(self, cms_config):
         """
@@ -58,11 +57,6 @@ class CMSCoreExtensions(CMSAppExtension):
             else:
                 self.toolbar_enabled_models[model] = render_func
 
-    def configure_cms_endpoint_modifiers(self, cms_config):
-        if not isinstance(cms_config.cms_endpoint_modifiers, dict):
-            raise ImproperlyConfigured("cms_endpoint_modifiers must be a dict")
-        self.cms_endpoint_modifiers.update(cms_config.cms_endpoint_modifiers)
-
     def configure_app(self, cms_config):
         # The cms_wizards settings is optional. If it's not here
         # just move on.
@@ -70,5 +64,3 @@ class CMSCoreExtensions(CMSAppExtension):
             self.configure_wizards(cms_config)
         if hasattr(cms_config, 'cms_toolbar_enabled_models'):
             self.configure_toolbar_enabled_models(cms_config)
-        if hasattr(cms_config, 'cms_endpoint_modifiers'):
-            self.configure_cms_endpoint_modifiers(cms_config)
