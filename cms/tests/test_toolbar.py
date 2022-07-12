@@ -32,8 +32,9 @@ from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
-    add_endpoint_querystring_params, get_object_edit_url,
-    get_object_preview_url, get_object_structure_url
+    get_object_edit_url,
+    get_object_preview_url,
+    get_object_structure_url
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
@@ -1873,15 +1874,6 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
 class ToolbarUtilsTestCase(ToolbarTestBase):
     @override_settings(CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED=True)
-    def test_add_endpoint_querystring_params(self):
-        def add_querystring_param(obj, language):
-            return "example_querystring_param", "example_querystring_content"
-
-        querystring_param = add_endpoint_querystring_params(self._get_example_obj(), add_querystring_param)
-
-        self.assertEqual(("example_querystring_param", "example_querystring_content"), querystring_param)
-
-    @override_settings(CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED=True)
     def test_get_querystring_modifier_base_url_no_querystring(self):
         """
         When the endpoint returns a value without a querystring param, one should be added to the
@@ -1891,9 +1883,10 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
             return "example_querystring_param", "example_querystring_content"
 
         test_obj = self._get_example_obj()
-        content_type = ContentType.objects.get(app_label=test_obj._meta.app_label, model=test_obj._meta.model_name)
+        app_label = test_obj._meta.app_label
+        model_name = test_obj._meta.model_name
 
-        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={content_type: add_querystring_param}):
+        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={f"{app_label}.{model_name}": add_querystring_param}):
             edit_url = get_object_edit_url(test_obj)
             preview_url = get_object_preview_url(test_obj)
             structure_url = get_object_structure_url(test_obj)
@@ -1915,12 +1908,15 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         """
         def add_querystring_param(obj, language):
             return "example_querystring_param", "example_querystring_content"
+
         test_obj = self._get_example_obj()
-        content_type = ContentType.objects.get(app_label=test_obj._meta.app_label, model=test_obj._meta.model_name)
+        app_label = test_obj._meta.app_label
+        model_name = test_obj._meta.model_name
+        content_type = ContentType.objects.get(app_label=app_label, model=model_name)
         # Get the original endpoint url, and patch it with additional querystring parameter
         base_url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, test_obj.pk])
         patched_admin_reverse.return_value = f"{base_url}?base_qsp=base_value"
-        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={content_type: add_querystring_param}):
+        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={f"{app_label}.{model_name}": add_querystring_param}):
             with patch.object(utils, "admin_reverse", return_value=f"{base_url}?base_qsp=base_value"):
                 edit_url = get_object_edit_url(test_obj)
 
@@ -1937,9 +1933,10 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
             return "example_querystring_param", "example_querystring_content"
 
         test_obj = self._get_example_obj()
-        content_type = ContentType.objects.get(app_label=test_obj._meta.app_label, model=test_obj._meta.model_name)
+        app_label = test_obj._meta.app_label
+        model_name = test_obj._meta.model_name
 
-        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={content_type: add_querystring_param}):
+        with self.settings(CMS_ENDPOINT_QUERYSTRING_CONFIGURATION={f"{app_label}.{model_name}": add_querystring_param}):
             edit_url = get_object_edit_url(test_obj)
             preview_url = get_object_preview_url(test_obj)
             structure_url = get_object_structure_url(test_obj)
