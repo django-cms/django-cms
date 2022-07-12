@@ -1979,7 +1979,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(edit_url, expected_edit_url)
         self.assertEqual(preview_url, expected_preview_url)
         self.assertEqual(edit_url.count("?"), 0)
-        self.assertEqual(expected_preview_url.count("?"), 0)
+        self.assertEqual(preview_url.count("?"), 0)
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
