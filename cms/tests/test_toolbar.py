@@ -32,10 +32,8 @@ from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
-    add_live_url_querystring_param,
-    get_object_edit_url,
-    get_object_preview_url,
-    get_object_structure_url,
+    add_live_url_querystring_param, get_object_edit_url,
+    get_object_preview_url, get_object_structure_url
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple

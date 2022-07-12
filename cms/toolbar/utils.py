@@ -1,7 +1,6 @@
 from collections import defaultdict, deque
 import json
 
-from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_str
 from django.utils.translation import get_language, override as force_language, gettext
