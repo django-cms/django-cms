@@ -17,11 +17,6 @@ __all__ = ['get_cms_setting']
 class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
 
 
-def get_page_live_url(obj, language):
-    # Return a tuple of querystring param name, and content
-    return "live-url", obj.get_absolute_url(language)
-
-
 def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
