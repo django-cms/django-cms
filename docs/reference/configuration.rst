@@ -1127,9 +1127,9 @@ default
 Setting to enable the appending of a PageContents live url to its preview and
 edit endpoints as a querystring parameter. This is disabled by default.
 
-.. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED
+.. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
 
-CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED
+CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
 ===============================================
 
 default
