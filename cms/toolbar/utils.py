@@ -120,7 +120,7 @@ def get_toolbar_from_request(request):
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
-def get_querystring_modifier(obj, url, language=None):
+def add_live_url_querystring_param(obj, url, language=None):
     """
     Get CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM as the parameter, and the live url, if the object is
     PageContent
@@ -153,7 +153,7 @@ def get_object_edit_url(obj, language=None):
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
     if getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED', False):
-        url = get_querystring_modifier(obj, url, language)
+        url = add_live_url_querystring_param(obj, url, language)
     return url
 
 
@@ -166,7 +166,7 @@ def get_object_preview_url(obj, language=None):
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
     if getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED', False):
-        url = get_querystring_modifier(obj, url, language)
+        url = add_live_url_querystring_param(obj, url, language)
     return url
 
 

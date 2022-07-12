@@ -33,10 +33,10 @@ from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
+    add_live_url_querystring_param,
     get_object_edit_url,
     get_object_preview_url,
     get_object_structure_url,
-    get_querystring_modifier
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
@@ -1964,7 +1964,27 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
             )
 
         with self.assertRaises(ImproperlyConfigured):
-            get_querystring_modifier(page_content, expected_edit_url)
+            add_live_url_querystring_param(page_content, expected_edit_url)
+
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
+    def test_get_querystring_modifier_handles_wrong_content_type(self):
+        """
+        With CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED set True, and
+        CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM provided, but a content type that isn't PageContent provided,
+        don't add the querystring params
+        """
+        test_obj = self._get_example_obj()
+        content_type = ContentType.objects.get_for_model(test_obj)
+        language = get_language()
+        with override(language):
+            expected_edit_url = admin_reverse(
+                'cms_placeholder_render_object_edit', args=[content_type.pk, test_obj.pk]
+            )
+        url = add_live_url_querystring_param(test_obj, expected_edit_url)
+
+        self.assertEqual(url, expected_edit_url)
+        self.assertEqual(url.count("?"), 0)
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
