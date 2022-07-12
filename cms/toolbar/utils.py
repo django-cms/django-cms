@@ -8,6 +8,7 @@ from django.utils.encoding import force_str
 from django.utils.translation import get_language, override as force_language, gettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
+from cms.models import PageContent
 from cms.utils.urlutils import admin_reverse
 
 
@@ -121,26 +122,25 @@ def get_toolbar_from_request(request):
 
 def get_querystring_modifier(obj, url, language=None):
     """
-    Get the querystring modifier if one exists for the content type, and add it to the endpoint url
+    Get CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM as the parameter, and the live url, if the object is
+    PageContent
     """
-    qsp_config = getattr(settings, 'CMS_ENDPOINT_QUERYSTRING_CONFIGURATION', None)
-    search_field = f"{obj._meta.app_label}.{obj._meta.model_name}"
-    if not qsp_config:
+    url_param = getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM', None)
+    if not url_param:
         raise ImproperlyConfigured(
             """
-            With 'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED' set to True,
-            CMS_ENDPOINT_QUERYSTRING_CONFIGURATION must be provided
+            With 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED' set to True,
+            CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM must be provided
             """
         )
-    method = qsp_config.get(search_field, None)
-
-    if method:
-        param, content = method(obj, language)
-        urls = url.split('?')
-        if len(urls) > 1:
-            url += f'&{param}={content}'
-        else:
-            url += f'?{param}={content}'
+    if not isinstance(obj, PageContent):
+        return url
+    live_url = obj.page.get_absolute_url(language=language)
+    url_fragments = url.split('?')
+    if len(url_fragments) > 1:
+        url += f'&{url_param}={live_url}'
+    else:
+        url += f'?{url_param}={live_url}'
     return url
 
 
@@ -152,7 +152,7 @@ def get_object_edit_url(obj, language=None):
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
-    if getattr(settings, 'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED', False):
+    if getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED', False):
         url = get_querystring_modifier(obj, url, language)
     return url
 
@@ -165,7 +165,7 @@ def get_object_preview_url(obj, language=None):
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
-    if getattr(settings, 'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED', False):
+    if getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED', False):
         url = get_querystring_modifier(obj, url, language)
     return url
 
@@ -177,7 +177,4 @@ def get_object_structure_url(obj, language=None):
         language = get_language()
 
     with force_language(language):
-        url = admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
-    if getattr(settings, 'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED', False):
-        url = get_querystring_modifier(obj, url, language)
-    return url
+        return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])

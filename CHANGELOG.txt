@@ -1,7 +1,6 @@
 
 === 4.0.0 (unreleased) ===
-* feat: Enable the configuration of endpoint querystring parameters via CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED
-  and CMS_ENDPOINT_QUERYSTRING_CONFIGURATION settings
+* feat: Added live-url querystring parameter option for PageContent edit and preview endpoints
 * Backported from develop: Upgrade Gulp and NodeJs
 * feat: Re-enable showing the toolbar to anonymous users
 * Backport django 3.2 support
