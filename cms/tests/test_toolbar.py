@@ -1948,24 +1948,6 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(edit_url.count("&"), 0)
         self.assertEqual(preview_url.count("&"), 0)
 
-    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
-    def test_add_live_url_querystring_param_handles_missing_enabled_setting(self):
-        """
-        With CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED set True, without
-        CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM provided, raise ImproperlyConfigured
-        """
-        page = create_page("home", 'nav_playground.html', "en")
-        page_content = page.get_title_obj()
-        content_type = ContentType.objects.get_for_model(page_content)
-        language = get_language()
-        with override(language):
-            expected_edit_url = admin_reverse(
-                'cms_placeholder_render_object_edit', args=[content_type.pk, page_content.pk]
-            )
-
-        with self.assertRaises(ImproperlyConfigured):
-            add_live_url_querystring_param(page_content, expected_edit_url)
-
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
     def test_add_live_url_querystring_param_handles_wrong_content_type(self):

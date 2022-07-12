@@ -126,13 +126,6 @@ def add_live_url_querystring_param(obj, url, language=None):
     PageContent
     """
     url_param = getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM', None)
-    if not url_param:
-        raise ImproperlyConfigured(
-            """
-            With 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED' set to True,
-            CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM must be provided
-            """
-        )
     if not isinstance(obj, PageContent):
         return url
     live_url = obj.page.get_absolute_url(language=language)
