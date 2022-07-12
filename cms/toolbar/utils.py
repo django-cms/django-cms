@@ -3,12 +3,12 @@ import json
 
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import force_str
 from django.utils.translation import get_language, override as force_language, gettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.models import PageContent
+from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
@@ -125,7 +125,7 @@ def add_live_url_querystring_param(obj, url, language=None):
     Get CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM as the parameter, and the live url, if the object is
     PageContent
     """
-    url_param = getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM', None)
+    url_param = get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM')
     if not isinstance(obj, PageContent):
         return url
     live_url = obj.page.get_absolute_url(language=language)
@@ -145,7 +145,7 @@ def get_object_edit_url(obj, language=None):
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
-    if getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED', False):
+    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
         url = add_live_url_querystring_param(obj, url, language)
     return url
 
@@ -158,7 +158,7 @@ def get_object_preview_url(obj, language=None):
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
-    if getattr(settings, 'CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED', False):
+    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
         url = add_live_url_querystring_param(obj, url, language)
     return url
 
