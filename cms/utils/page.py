@@ -12,7 +12,8 @@ SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
 
 def get_page_live_url(obj, language):
-    return obj.get_absolute_url(language)
+    # Return a tuple of querystring param name, and content
+    return "live-url", obj.get_absolute_url(language)
 
 
 def get_page_template_from_request(request):
