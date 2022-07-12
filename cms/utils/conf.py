@@ -9,6 +9,8 @@ from django.utils.translation import gettext_lazy as _
 
 from cms import constants
 from cms import __version__
+from cms.models import Page
+from cms.utils.page import get_page_live_url
 
 
 __all__ = ['get_cms_setting']
@@ -82,6 +84,8 @@ DEFAULTS = {
     'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
     'PAGE_WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
     'SIDEFRAME_ENABLED': True,
+    'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED': True,
+    'CMS_ENDPOINT_QUERYSTRING_CONFIGURATION': {Page: get_page_live_url},
 }
 
 

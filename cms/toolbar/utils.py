@@ -151,11 +151,11 @@ def get_querystring_modifier(obj, content_type, url, language=None):
 
     if method:
         param, content = add_endpoint_querystring_params(obj, method, language)
-        urls = url.split("?")
+        urls = url.split('?')
         if len(urls) > 1:
-            url += f"&{param}={content}"
+            url += f'&{param}={content}'
         else:
-            url += f"?{param}={content}"
+            url += f'?{param}={content}'
     return url
 
 
@@ -167,7 +167,7 @@ def get_object_edit_url(obj, language=None):
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
-    if getattr(settings, "CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED", False):
+    if getattr(settings, 'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED', False):
         url = get_querystring_modifier(obj, content_type, url, language)
     return url
 
@@ -180,7 +180,7 @@ def get_object_preview_url(obj, language=None):
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
-    if getattr(settings, "CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED", False):
+    if getattr(settings, 'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED', False):
         url = get_querystring_modifier(obj, content_type, url, language)
     return url
 
@@ -193,6 +193,6 @@ def get_object_structure_url(obj, language=None):
 
     with force_language(language):
         url = admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
-    if getattr(settings, "CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED", False):
+    if getattr(settings, 'CMS_ENDPOINT_QUERYSTRING_PARAM_ENABLED', False):
         url = get_querystring_modifier(obj, content_type, url, language)
     return url

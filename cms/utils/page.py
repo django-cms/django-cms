@@ -11,6 +11,10 @@ from cms.utils.conf import get_cms_setting
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
 
+def get_page_live_url(obj, language):
+    return obj.get_absolute_url(language)
+
+
 def get_page_template_from_request(request):
     """
     Gets a valid template from different sources or falls back to the default
