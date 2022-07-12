@@ -1877,7 +1877,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 class ToolbarUtilsTestCase(ToolbarTestBase):
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
-    def test_get_querystring_modifier_base_url_no_querystring(self):
+    def test_add_live_url_querystring_param_no_querystring(self):
         """
         When the endpoint returns a value without a querystring param, one should be added to the
         url returned
@@ -1898,7 +1898,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
     @patch("cms.utils.urlutils.admin_reverse")
-    def test_get_querystring_modifier_base_url_with_querystring(self, patched_admin_reverse):
+    def test_add_live_url_querystring_param_with_querystring(self, patched_admin_reverse):
         """
         With the endpoint returning an existing querystring param, the additional param should be appended
         to the existing with &.
@@ -1921,7 +1921,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(edit_url.count("&"), 1)
 
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
-    def test_get_querystring_modifier_base_url_no_querystring_setting_disabled(self):
+    def test_add_live_url_querystring_param_no_querystring_setting_disabled(self):
         """
         With the querystring param configured, but CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED not set True,
         don't add the querystring params
@@ -1949,7 +1949,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(preview_url.count("&"), 0)
 
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
-    def test_get_querystring_modifier_handles_missing_enabled_setting(self):
+    def test_add_live_url_querystring_param_handles_missing_enabled_setting(self):
         """
         With CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED set True, without
         CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM provided, raise ImproperlyConfigured
@@ -1968,7 +1968,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
 
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
-    def test_get_querystring_modifier_handles_wrong_content_type(self):
+    def test_add_live_url_querystring_param_handles_wrong_content_type(self):
         """
         With CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED set True, and
         CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM provided, but a content type that isn't PageContent provided,
