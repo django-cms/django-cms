@@ -121,8 +121,13 @@ def get_toolbar_from_request(request):
 
 def add_live_url_querystring_param(obj, url, language=None):
     """
-    Get CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM as the parameter, and the live url, if the object is
-    PageContent
+    Append a live url to a given Page url using a supplied url parameter configured
+    by the setting: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
+
+    :param obj: Placeholder source object
+    :param url: Url string
+    :param language: The current language code or None
+    :returns: A url string
     """
     url_param = get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM')
     if not isinstance(obj, PageContent):

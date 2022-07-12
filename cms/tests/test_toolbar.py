@@ -1893,6 +1893,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(edit_url.count("?"), 1)
         self.assertEqual(preview_url.count("?"), 1)
         self.assertEqual(edit_url.count("&"), 0)
+        self.assertEqual(preview_url.count("&"), 0)
 
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
     @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
@@ -1908,16 +1909,24 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         model_name = page_content._meta.model_name
         live_url = page.get_absolute_url()
         content_type = ContentType.objects.get(app_label=app_label, model=model_name)
-        # Get the original endpoint url, and patch it with additional querystring parameter
-        base_url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, page_content.pk])
-        patched_admin_reverse.return_value = f"{base_url}?base_qsp=base_value"
+        # Get the original edit endpoint url, and patch it with additional querystring parameter
+        base_edit_url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, page_content.pk])
 
-        with patch.object(utils, "admin_reverse", return_value=f"{base_url}?base_qsp=base_value"):
+        with patch.object(utils, "admin_reverse", return_value=f"{base_edit_url}?base_qsp=base_value"):
             edit_url = get_object_edit_url(page_content)
 
+        # Get the original edit endpoint url, and patch it with additional querystring parameter
+        base_preview_url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, page_content.pk])
+
+        with patch.object(utils, "admin_reverse", return_value=f"{base_preview_url}?base_qsp=base_value"):
+            preview_url = get_object_edit_url(page_content)
+
         self.assertIn(f"?base_qsp=base_value&test-live-link={live_url}", edit_url)
+        self.assertIn(f"?base_qsp=base_value&test-live-link={live_url}", preview_url)
         self.assertEqual(edit_url.count("?"), 1)
+        self.assertEqual(preview_url.count("?"), 1)
         self.assertEqual(edit_url.count("&"), 1)
+        self.assertEqual(preview_url.count("&"), 1)
 
     def test_add_live_url_querystring_param_no_querystring_setting_disabled(self):
         """
@@ -1961,10 +1970,16 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
             expected_edit_url = admin_reverse(
                 'cms_placeholder_render_object_edit', args=[content_type.pk, test_obj.pk]
             )
-        url = add_live_url_querystring_param(test_obj, expected_edit_url)
+            expected_preview_url = admin_reverse(
+                'cms_placeholder_render_object_preview', args=[content_type.pk, test_obj.pk]
+            )
+        edit_url = add_live_url_querystring_param(test_obj, expected_edit_url)
+        preview_url = add_live_url_querystring_param(test_obj, expected_preview_url)
 
-        self.assertEqual(url, expected_edit_url)
-        self.assertEqual(url.count("?"), 0)
+        self.assertEqual(edit_url, expected_edit_url)
+        self.assertEqual(preview_url, expected_preview_url)
+        self.assertEqual(edit_url.count("?"), 0)
+        self.assertEqual(expected_preview_url.count("?"), 0)
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
