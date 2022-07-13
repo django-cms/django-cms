@@ -1115,3 +1115,25 @@ when the "Content" field is filled in. There should be no need to change it,
 unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
 your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
 body field **different** than ``body``.
+
+.. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED
+
+CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED
+===============================================
+
+default
+    ``False``
+
+Setting to enable the appending of a PageContents live url to its preview and
+edit endpoints as a querystring parameter. This is disabled by default.
+
+.. setting:: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
+
+CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
+===============================================
+
+default
+    ``live-url``
+
+Setting to configure the query string parameter name used for the live-url of a
+PageContent edit/preview endpoint.
