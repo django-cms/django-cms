@@ -8,6 +8,8 @@ from django.utils.six import text_type
 from django.utils.translation import get_language, override as force_language, ugettext
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
+from cms.models import PageContent
+from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
@@ -119,6 +121,28 @@ def get_toolbar_from_request(request):
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
+def add_live_url_querystring_param(obj, url, language=None):
+    """
+    Append a live url to a given Page url using a supplied url parameter configured
+    by the setting: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
+
+    :param obj: Placeholder source object
+    :param url: Url string
+    :param language: The current language code or None
+    :returns: A url string
+    """
+    url_param = get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM')
+    if not isinstance(obj, PageContent):
+        return url
+    live_url = obj.page.get_absolute_url(language=language)
+    url_fragments = url.split('?')
+    if len(url_fragments) > 1:
+        url += f'&{url_param}={live_url}'
+    else:
+        url += f'?{url_param}={live_url}'
+    return url
+
+
 def get_object_edit_url(obj, language=None):
     content_type = ContentType.objects.get_for_model(obj)
 
@@ -126,7 +150,10 @@ def get_object_edit_url(obj, language=None):
         language = get_language()
 
     with force_language(language):
-        return admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
+        url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, obj.pk])
+    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
+        url = add_live_url_querystring_param(obj, url, language)
+    return url
 
 
 def get_object_preview_url(obj, language=None):
@@ -136,7 +163,10 @@ def get_object_preview_url(obj, language=None):
         language = get_language()
 
     with force_language(language):
-        return admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
+        url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, obj.pk])
+    if get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED'):
+        url = add_live_url_querystring_param(obj, url, language)
+    return url
 
 
 def get_object_structure_url(obj, language=None):

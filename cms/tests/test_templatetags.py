@@ -49,7 +49,6 @@ class TemplatetagTests(CMSTestCase):
                     'name': 'English',
                     'fallbacks': ['fr', 'de'],
                     'public': True,
-                    'fallbacks': ['fr']
                 },
                 {
                     'code': 'fr',
