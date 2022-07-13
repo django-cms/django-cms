@@ -13,7 +13,6 @@
 * Backported from develop-4: Fixed usage of ``get_object`` in ``edit_title_fields`` of the page admin.
 
 
-
 === 3.6.0 (unreleased) ===
 
 * Introduced Django 2.2 support.
