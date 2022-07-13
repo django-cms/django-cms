@@ -1,5 +1,6 @@
 
 === 4.0.0 (unreleased) ===
+* feat: Added live-url querystring parameter option for PageContent edit and preview endpoints
 * Backported from develop: Upgrade Gulp and NodeJs
 * feat: Re-enable showing the toolbar to anonymous users
 * Backport django 3.2 support
