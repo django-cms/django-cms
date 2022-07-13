@@ -1,6 +1,5 @@
 
 === 4.0.0 (unreleased) ===
-<<<<<<< HEAD
 * Backported from develop-4: Upgrade Gulp and NodeJs
 * Backported from develop-4: feat: Re-enable showing the toolbar to anonymous users
 * Backported from develop-4: feat: Added live-url querystring parameter option for PageContent edit and
