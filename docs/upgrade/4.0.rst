@@ -6,8 +6,8 @@
 
 This release of django CMS is a complete rewrite of the core, hugely simplyfying what django-cms does
 out of the box. The main reasons for the changes:
-    - Limitations with Publishing where only 2 versions can ever exist
-    - Too many "opinions" of how parts of the CMS should work
+    - Limitations with publishing, where only 2 versions can ever exist
+    - Too many "opinions" of how parts of the CMS should work baked in
 
 .. warning:: Upgrading from previous versions
 
@@ -23,7 +23,7 @@ What's new in 4.0.0
 Improvements and new features
 =============================
 
-Do we comment on chnages that have already happened in previous v3 versions, such as Github actions etc??
+Do we comment on changes that have already happened in previous v3 versions, such as Github actions etc??
 
 
 * Added Prevent JS injection in the admin add plugin url (https://github.com/django-cms/django-cms/commit/72025947d8d3757977f0efab75bda70504a3b6c4)
