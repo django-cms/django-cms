@@ -1,9 +1,9 @@
-
 import hashlib
 from datetime import timedelta
 from importlib import import_module
 
 from django.conf import settings
+from django.utils import translation
 from django.utils.cache import (
     add_never_cache_headers, patch_response_headers, patch_vary_headers,
 )
@@ -19,11 +19,12 @@ from cms.utils.helpers import get_timezone_name
 
 
 def _page_cache_key(request):
-    #sha1 key of current path
-    cache_key = "%s:%d:%s" % (
+    # sha1 key of current path
+    cache_key = "%s:%d:%s:%s" % (
         get_cms_setting("CACHE_PREFIX"),
         settings.SITE_ID,
-        hashlib.sha1(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
+        hashlib.sha1(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest(),
+        translation.get_language()
     )
     if settings.USE_TZ:
         cache_key += '.%s' % get_timezone_name()

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import itertools
 
 from cms.plugin_base import CMSPluginBase
@@ -16,7 +15,7 @@ class DynamicJsLoadingPlugin(CMSPluginBase):
     def render(self, context, instance, placeholder):
         """
         This generates a list of all 16 class usage permutations.
-        originaly from https://stackoverflow.com/a/54059999
+        originally from https://stackoverflow.com/a/54059999
         >>> import itertools
         >>> l=[False,True]
         >>> list(itertools.product(l,repeat=4))
@@ -45,7 +44,7 @@ class DynamicJsLoadingPlugin(CMSPluginBase):
             *case_list[instance.testcase - 1]
         )
 
-        return super(DynamicJsLoadingPlugin, self).render(
+        return super().render(
             context, instance, placeholder
         )
 

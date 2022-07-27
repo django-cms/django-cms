@@ -35,7 +35,7 @@ class PluginModelBase(ModelBase):
     """
 
     def __new__(cls, name, bases, attrs):
-        super_new = super(PluginModelBase, cls).__new__
+        super_new = super().__new__
         # remove RenderMeta from the plugin class
         attr_meta = attrs.pop('RenderMeta', None)
 
@@ -237,14 +237,14 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         Get src URL for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return plugin.icon_src(instance) if instance else u''
+        return plugin.icon_src(instance) if instance else ''
 
     def get_instance_icon_alt(self):
         """
         Get alt text for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return force_str(plugin.icon_alt(instance)) if instance else u''
+        return force_str(plugin.icon_alt(instance)) if instance else ''
 
     def update(self, refresh=False, **fields):
         CMSPlugin.objects.filter(pk=self.pk).update(**fields)
@@ -356,7 +356,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         """
         from cms.utils.plugins import reorder_plugins
 
-        super(CMSPlugin, cls).fix_tree(destructive)
+        super().fix_tree(destructive)
         for placeholder in Placeholder.objects.all():
             for language, __ in settings.LANGUAGES:
                 order = CMSPlugin.objects.filter(
@@ -421,14 +421,14 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
             try:
                 url = force_str(
                     admin_reverse(
-                        "%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                        f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
                         args=[parent.pk]
                     )
                 )
             except NoReverseMatch:
                 url = force_str(
                     admin_reverse(
-                        "%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                        f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
                         args=[parent.pk]
                     )
                 )
@@ -436,14 +436,14 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         try:
             url = force_str(
                 admin_reverse(
-                    "%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                    f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
                     args=[self.pk]
                 )
             )
         except NoReverseMatch:
             url = force_str(
                 admin_reverse(
-                    "%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                    f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
                     args=[self.pk]
                 )
             )
@@ -526,7 +526,7 @@ def get_plugin_media_path(instance, filename):
     Django requires that unbound function used in fields' definitions to be
     defined outside the parent class.
      (see https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values)
-    This function is used withing field definition:
+    This function is used within field definition:
 
         file = models.FileField(_("file"), upload_to=get_plugin_media_path)
 

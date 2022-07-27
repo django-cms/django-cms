@@ -834,8 +834,8 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertIn("plugin_type=''", repr(non_saved_plugin))
 
         saved_plugin = CMSPlugin.objects.create(plugin_type='TextPlugin')
-        self.assertIn('id={}'.format(saved_plugin.pk), repr(saved_plugin))
-        self.assertIn("plugin_type='{}'".format(saved_plugin.plugin_type), repr(saved_plugin))
+        self.assertIn(f'id={saved_plugin.pk}', repr(saved_plugin))
+        self.assertIn(f"plugin_type='{saved_plugin.plugin_type}'", repr(saved_plugin))
 
 
     def test_pickle(self):
@@ -980,14 +980,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         from cms.utils.placeholder import get_toolbar_plugin_struct
 
         expected_struct_en = {
-            'module': u'Generic',
-            'name': u'Style',
+            'module': 'Generic',
+            'name': 'Style',
             'value': 'StylePlugin',
         }
 
         expected_struct_de = {
-            'module': u'Generisch',
-            'name': u'Style',
+            'module': 'Generisch',
+            'name': 'Style',
             'value': 'StylePlugin',
         }
 
@@ -1225,7 +1225,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(1, CMSPlugin.objects.all().count())
         self.assertEqual(1, ArticlePluginModel.objects.count())
         articles_plugin = ArticlePluginModel.objects.all()[0]
-        self.assertEqual(u'Articles Plugin 1', articles_plugin.title)
+        self.assertEqual('Articles Plugin 1', articles_plugin.title)
         self.assertEqual(self.section_count, articles_plugin.sections.count())
 
         # check publish box
@@ -1252,7 +1252,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         plugin.add_root(instance=plugin)
 
         endpoint = self.get_admin_url(Page, 'edit_plugin', plugin.pk)
-        endpoint += '?cms_path=/{}/'.format(self.FIRST_LANG)
+        endpoint += f'?cms_path=/{self.FIRST_LANG}/'
 
         data = {
             'title': "Articles Plugin 1",
@@ -1269,7 +1269,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         #create 2nd language page
         page_data.update({
             'language': self.SECOND_LANG,
-            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
+            'title': f"{page.get_title()} {self.SECOND_LANG}",
         })
 
         response = self.client.post(URL_CMS_PAGE_CHANGE % page.pk + "?language=%s" % self.SECOND_LANG, page_data)
@@ -1288,7 +1288,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         }
 
         endpoint = self.get_admin_url(Page, 'copy_plugins')
-        endpoint += '?cms_path=/{}/'.format(self.FIRST_LANG)
+        endpoint += f'?cms_path=/{self.FIRST_LANG}/'
 
         response = self.client.post(endpoint, copy_data)
         self.assertEqual(response.status_code, 200)
@@ -1368,15 +1368,15 @@ class PluginCopyRelationsTestCase(PluginsTestBaseCase):
 
 
 class PluginsMetaOptionsTests(TestCase):
-    ''' TestCase set for ensuring that bugs like #992 are caught '''
+    """ TestCase set for ensuring that bugs like #992 are caught """
 
     # these plugins are inlined because, due to the nature of the #992
     # ticket, we cannot actually import a single file with all the
     # plugin variants in, because that calls __new__, at which point the
-    # error with splitted occurs.
+    # error with split occurs.
 
     def test_meta_options_as_defaults(self):
-        ''' handling when a CMSPlugin meta options are computed defaults '''
+        """ handling when a CMSPlugin meta options are computed defaults """
         # this plugin relies on the base CMSPlugin and Model classes to
         # decide what the app_label and db_table should be
 
@@ -1385,7 +1385,7 @@ class PluginsMetaOptionsTests(TestCase):
         self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_as_declared_defaults(self):
-        ''' handling when a CMSPlugin meta options are declared as per defaults '''
+        """ handling when a CMSPlugin meta options are declared as per defaults """
         # here, we declare the db_table and app_label explicitly, but to the same
         # values as would be computed, thus making sure it's not a problem to
         # supply options.
@@ -1395,21 +1395,21 @@ class PluginsMetaOptionsTests(TestCase):
         self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_custom_app_label(self):
-        ''' make sure customised meta options on CMSPlugins don't break things '''
+        """ make sure customised meta options on CMSPlugins don't break things """
 
         plugin = TestPlugin3.model
         self.assertEqual(plugin._meta.db_table, 'one_thing_testpluginmodel3')
         self.assertEqual(plugin._meta.app_label, 'one_thing')
 
     def test_meta_options_custom_db_table(self):
-        ''' make sure custom database table names are OK. '''
+        """ make sure custom database table names are OK. """
 
         plugin = TestPlugin4.model
         self.assertEqual(plugin._meta.db_table, 'or_another_4')
         self.assertEqual(plugin._meta.app_label, 'meta')
 
     def test_meta_options_custom_both(self):
-        ''' We should be able to customise app_label and db_table together '''
+        """ We should be able to customise app_label and db_table together """
 
         plugin = TestPlugin5.model
         self.assertEqual(plugin._meta.db_table, 'or_another_5')
