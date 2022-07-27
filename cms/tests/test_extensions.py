@@ -202,7 +202,7 @@ class ExtensionsTestCase(CMSTestCase):
                              old_page_extensions[index].multitable_extra)
             self.assertEqual(copied_title_extension.extension_content_parent_field,
                              old_title_extension[index].extension_content_parent_field)
-            self.assertEqual(copied_title_extension.multitable_extra_title,
+            self.assertEqual(copied_title_extension.multitable_extra_content,
                              old_title_extension[index].multitable_extra_content)
             # check that objects are actually different
             self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
