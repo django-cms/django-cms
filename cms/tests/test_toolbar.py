@@ -1882,7 +1882,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         url returned
         """
         page = create_page("home", 'nav_playground.html', "en")
-        page_content = page.get_title_obj()
+        page_content = page.get_content_obj()
         live_url = page.get_absolute_url()
 
         edit_url = get_object_edit_url(page_content)
@@ -1904,7 +1904,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         to the existing with &.
         """
         page = create_page("home", 'nav_playground.html', "en")
-        page_content = page.get_title_obj()
+        page_content = page.get_content_obj()
         app_label = page_content._meta.app_label
         model_name = page_content._meta.model_name
         live_url = page.get_absolute_url()
@@ -1934,7 +1934,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         don't add the querystring params
         """
         page = create_page("home", 'nav_playground.html', "en")
-        page_content = page.get_title_obj()
+        page_content = page.get_content_obj()
         content_type = ContentType.objects.get_for_model(page_content)
         language = get_language()
         with override(language):
