@@ -200,7 +200,7 @@ class ExtensionsTestCase(CMSTestCase):
                              old_page_extensions[index].extension_parent_field)
             self.assertEqual(copied_page_extension.multitable_extra,
                              old_page_extensions[index].multitable_extra)
-            self.assertEqual(copied_title_extension.extension_title_parent_field,
+            self.assertEqual(copied_title_extension.extension_content_parent_field,
                              old_title_extension[index].extension_content_parent_field)
             self.assertEqual(copied_title_extension.multitable_extra_title,
                              old_title_extension[index].multitable_extra_content)
@@ -380,12 +380,11 @@ class ExtensionAdminTestCase(CMSTestCase):
             self.assertIn("TestItem", response.rendered_content)
         toolbar_pool.toolbars = old_toolbars
 
-
     def test_admin_title_extension(self):
         with self.login_user_context(self.admin):
             # add a new extension
             response = self.client.get(
-                admin_reverse('extensionapp_myPageContentExtension_add') + '?extended_object=%s' % self.page_title_without_extension.pk
+                admin_reverse('extensionapp_mypagecontentextension_add') + '?extended_object=%s' % self.page_title_without_extension.pk
             )
             self.assertEqual(response.status_code, 200)
             # make sure there is no extension yet
@@ -394,30 +393,30 @@ class ExtensionAdminTestCase(CMSTestCase):
                 'extra_title': 'my extra title'
             }
             self.client.post(
-                admin_reverse('extensionapp_myPageContentExtension_add') + '?extended_object=%s' % self.page_title_without_extension.pk,
+                admin_reverse('extensionapp_mypagecontentextension_add') + '?extended_object=%s' % self.page_title_without_extension.pk,
                 post_data, follow=True
             )
             created_title_extension = MyPageContentExtension.objects.get(extended_object=self.page_title_without_extension)
 
             # can delete extension
             self.client.post(
-                admin_reverse('extensionapp_myPageContentExtension_delete', args=(created_title_extension.pk,)),
+                admin_reverse('extensionapp_mypagecontentextension_delete', args=(created_title_extension.pk,)),
                 {'post': 'yes'}, follow=True
             )
             self.assertFalse(MyPageContentExtension.objects.filter(extended_object=self.page_title_without_extension).exists())
 
             # accessing the add view on a page that already has an extension should redirect
             response = self.client.get(
-                admin_reverse('extensionapp_myPageContentExtension_add') + '?extended_object=%s' % self.page_title.pk
+                admin_reverse('extensionapp_mypagecontentextension_add') + '?extended_object=%s' % self.page_title.pk
             )
-            self.assertRedirects(response, admin_reverse('extensionapp_myPageContentExtension_change', args=(self.title_extension.pk,)))
+            self.assertRedirects(response, admin_reverse('extensionapp_mypagecontentextension_change', args=(self.title_extension.pk,)))
 
             # saving an extension should work without the GET parameter
             post_data = {
                 'extra_title': 'my extra text'
             }
             self.client.post(
-                admin_reverse('extensionapp_myPageContentExtension_change', args=(self.title_extension.pk,)),
+                admin_reverse('extensionapp_mypagecontentextension_change', args=(self.title_extension.pk,)),
                 post_data, follow=True
             )
             self.assertTrue(MyPageContentExtension.objects.filter(extra_title='my extra text', pk=self.title_extension.pk).exists())
@@ -428,14 +427,14 @@ class ExtensionAdminTestCase(CMSTestCase):
                 'extra_title': 'try to change extra text'
             }
             response = self.client.post(
-                admin_reverse('extensionapp_myPageContentExtension_change', args=(self.title_extension.pk,)),
+                admin_reverse('extensionapp_mypagecontentextension_change', args=(self.title_extension.pk,)),
                 post_data, follow=True
             )
             self.assertEqual(response.status_code, 403)
 
             # can't delete without page permission
             response = self.client.post(
-                admin_reverse('extensionapp_myPageContentExtension_delete', args=(self.title_extension.pk,)),
+                admin_reverse('extensionapp_mypagecontentextension_delete', args=(self.title_extension.pk,)),
                 {'post': 'yes'}, follow=True
             )
             self.assertEqual(response.status_code, 403)
