@@ -14,6 +14,7 @@ unreleased
 * Added cache ttl extension point.
 * Added spell checking to pre-commit and github workflows
 * Added current language to the page cache key (#6607)
+* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
 
 3.10.1 (2022-06-28)
 ===================
