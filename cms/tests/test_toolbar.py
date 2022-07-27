@@ -1,10 +1,12 @@
 import datetime
 import iptools
 import re
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
+from django.contrib.contenttypes.models import ContentType
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -13,7 +15,7 @@ from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, override, gettext_lazy as _
 
 from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
@@ -25,10 +27,16 @@ from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
 from cms.test_utils.testcases import (CMSTestCase, URL_CMS_USERSETTINGS)
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar_pool import toolbar_pool
+from cms.toolbar import utils
 from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
                                Break, SubMenu, AjaxItem)
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_object_structure_url
+from cms.toolbar.utils import (
+    add_live_url_querystring_param,
+    get_object_edit_url,
+    get_object_preview_url,
+    get_object_structure_url
+)
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
@@ -1863,6 +1871,115 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-%s cms-render-model cms-render-model-block"></template>\n        <h3>Menu</h3>' % page.pk)
+
+
+class ToolbarUtilsTestCase(ToolbarTestBase):
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
+    def test_add_live_url_querystring_param_no_querystring(self):
+        """
+        When the endpoint returns a value without a querystring param, one should be added to the
+        url returned
+        """
+        page = create_page("home", 'nav_playground.html', "en")
+        page_content = page.get_title_obj()
+        live_url = page.get_absolute_url()
+
+        edit_url = get_object_edit_url(page_content)
+        preview_url = get_object_preview_url(page_content)
+
+        self.assertIn(f"?test-live-link={live_url}", edit_url)
+        self.assertIn(f"?test-live-link={live_url}", preview_url)
+        self.assertEqual(edit_url.count("?"), 1)
+        self.assertEqual(preview_url.count("?"), 1)
+        self.assertEqual(edit_url.count("&"), 0)
+        self.assertEqual(preview_url.count("&"), 0)
+
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
+    @patch("cms.utils.urlutils.admin_reverse")
+    def test_add_live_url_querystring_param_with_querystring(self, patched_admin_reverse):
+        """
+        With the endpoint returning an existing querystring param, the additional param should be appended
+        to the existing with &.
+        """
+        page = create_page("home", 'nav_playground.html', "en")
+        page_content = page.get_title_obj()
+        app_label = page_content._meta.app_label
+        model_name = page_content._meta.model_name
+        live_url = page.get_absolute_url()
+        content_type = ContentType.objects.get(app_label=app_label, model=model_name)
+        # Get the original edit endpoint url, and patch it with additional querystring parameter
+        base_edit_url = admin_reverse('cms_placeholder_render_object_edit', args=[content_type.pk, page_content.pk])
+
+        with patch.object(utils, "admin_reverse", return_value=f"{base_edit_url}?base_qsp=base_value"):
+            edit_url = get_object_edit_url(page_content)
+
+        # Get the original edit endpoint url, and patch it with additional querystring parameter
+        base_preview_url = admin_reverse('cms_placeholder_render_object_preview', args=[content_type.pk, page_content.pk])
+
+        with patch.object(utils, "admin_reverse", return_value=f"{base_preview_url}?base_qsp=base_value"):
+            preview_url = get_object_edit_url(page_content)
+
+        self.assertIn(f"?base_qsp=base_value&test-live-link={live_url}", edit_url)
+        self.assertIn(f"?base_qsp=base_value&test-live-link={live_url}", preview_url)
+        self.assertEqual(edit_url.count("?"), 1)
+        self.assertEqual(preview_url.count("?"), 1)
+        self.assertEqual(edit_url.count("&"), 1)
+        self.assertEqual(preview_url.count("&"), 1)
+
+    def test_add_live_url_querystring_param_no_querystring_setting_disabled(self):
+        """
+        With the querystring param configured, but CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED not set True,
+        don't add the querystring params
+        """
+        page = create_page("home", 'nav_playground.html', "en")
+        page_content = page.get_title_obj()
+        content_type = ContentType.objects.get_for_model(page_content)
+        language = get_language()
+        with override(language):
+            expected_edit_url = admin_reverse(
+                'cms_placeholder_render_object_edit', args=[content_type.pk, page_content.pk]
+            )
+            expected_preview_url = admin_reverse(
+                'cms_placeholder_render_object_preview', args=[content_type.pk, page_content.pk]
+            )
+
+        edit_url = get_object_edit_url(page_content)
+        preview_url = get_object_preview_url(page_content)
+
+        self.assertEqual(edit_url, expected_edit_url)
+        self.assertEqual(preview_url, expected_preview_url)
+        self.assertEqual(edit_url.count("?"), 0)
+        self.assertEqual(preview_url.count("?"), 0)
+        self.assertEqual(edit_url.count("&"), 0)
+        self.assertEqual(preview_url.count("&"), 0)
+
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM="test-live-link")
+    @override_settings(CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED=True)
+    def test_add_live_url_querystring_param_handles_wrong_content_type(self):
+        """
+        With CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM_ENABLED set True, and
+        CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM provided, but a content type that isn't PageContent provided,
+        don't add the querystring params
+        """
+        test_obj = self._get_example_obj()
+        content_type = ContentType.objects.get_for_model(test_obj)
+        language = get_language()
+        with override(language):
+            expected_edit_url = admin_reverse(
+                'cms_placeholder_render_object_edit', args=[content_type.pk, test_obj.pk]
+            )
+            expected_preview_url = admin_reverse(
+                'cms_placeholder_render_object_preview', args=[content_type.pk, test_obj.pk]
+            )
+        edit_url = add_live_url_querystring_param(test_obj, expected_edit_url)
+        preview_url = add_live_url_querystring_param(test_obj, expected_preview_url)
+
+        self.assertEqual(edit_url, expected_edit_url)
+        self.assertEqual(preview_url, expected_preview_url)
+        self.assertEqual(edit_url.count("?"), 0)
+        self.assertEqual(preview_url.count("?"), 0)
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):
