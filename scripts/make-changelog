@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/opt/homebrew/bin/bash
 
 # This script will take the last CHANGELOG.rst, pull information from the commit logs since last tagged version
 # and update the content to create dedicated sections
