@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/opt/homebrew/bin/bash
 
 GREEN="\033[32;1m"
 NORMAL="\033[0m"
