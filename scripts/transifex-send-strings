@@ -1,4 +1,4 @@
-#!/opt/homebrew/bin/bash
+#!/bin/bash
 SCRIPTS=$(dirname "$(realpath "$0")")
 ROOT=$(git rev-parse --show-toplevel)
 
