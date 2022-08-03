@@ -80,6 +80,11 @@ def get_page_from_path(site, path, preview=False, draft=False, language_code=Non
     """
     Resolves a url path to a single page object.
     Returns None if page does not exist
+
+    Preferres page results based on language code in this order:
+    - Matches sublanguage (e.g. de-at)
+    - Matches language (e.g. de)
+    - All other pages matching the path
     """
     from cms.models import Title
 
@@ -93,8 +98,13 @@ def get_page_from_path(site, path, preview=False, draft=False, language_code=Non
     else:
         titles = titles.filter(published=True, publisher_is_draft=False)
     if language_code is not None:
+        # since a language code is provided, prefer pages that match that language
         sublanguage = language_code
         language = sublanguage.split("-", maxsplit=1)[0]
+        # use `annotate()` to add two new fields to our queryset in order to prefer the request language code
+        # `matches_sublanguage` will be true when the full code (both language and sublanguage) match
+        # `matches_language` will be true for all pages matching the top-level language code
+        # https://docs.djangoproject.com/en/stable/ref/models/querysets/#django.db.models.query.QuerySet.annotate
         titles = titles.annotate(
             matches_sublanguage=ExpressionWrapper(
                 Q(language=sublanguage), output_field=BooleanField()
