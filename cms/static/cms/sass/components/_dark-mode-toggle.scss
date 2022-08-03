@@ -1,0 +1,25 @@
+@use "sass:math";
+
+div.cms .cms-toolbar-item-dark-mode-toggle span.cms-icon.cms-toggle {
+    font-size: 170%;
+    line-height: 150%;
+    color: var(--dca-gray-darkest);
+}
+
+html[data-color-scheme="light"] .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+    @extend .cms-icon-moon;
+}
+
+html[data-color-scheme="dark"] .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+    @extend .cms-icon-sun;
+}
+
+html:not([data-color-scheme]) .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+    @extend .cms-icon-moon;
+}
+
+@media (prefers-color-scheme: dark) {
+   html:not([data-color-scheme]) .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+       // @extend .cms-icon-sun;
+    }
+}

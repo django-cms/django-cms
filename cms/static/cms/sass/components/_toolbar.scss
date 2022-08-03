@@ -1,6 +1,8 @@
 //##############################################################################
 // TOOLBAR
 
+@use "sass:math";
+
 .cms-toolbar {
     position: fixed;
     top: 0;
@@ -122,7 +124,7 @@
         position: absolute;
         top: 50%;
         right: 7px;
-        margin-top: -($toolbar-dropdown-item-icon-size / 2);
+        margin-top: -(math.div($toolbar-dropdown-item-icon-size, 2));
         font-size: $toolbar-dropdown-item-icon-size;
         transform: rotate(180deg);
     }
@@ -251,6 +253,9 @@
         padding-top: 8px;
         border-top: 1px solid $gray-lighter;
     }
+    .cms-toolbar-item-dark-mode-toggle {
+        display: none;
+    }
 }
 .cms-toolbar-item-navigation .cms-toolbar-item-navigation-hover .cms-more-dropdown-full {
     position: fixed;
@@ -323,8 +328,8 @@
         clip: rect(0, $toolbar-height, $toolbar-height, 0px);
         .cms-icon {
             position: absolute;
-            left: $toolbar-height / 2;
-            top: $toolbar-height / 2;
+            left:  math.div($toolbar-height, 2);
+            top:  math.div($toolbar-height, 2);
             margin-left: -10px;
             margin-top: -9px;
             font-size: 20px !important;
@@ -531,14 +536,14 @@
         }
         input[type="submit"] {
             border-radius: 0 $border-radius-base $border-radius-base 0;
-            padding: 0 $login-form-submit-padding-horizontal / 2;
+            padding: 0  math.div($login-form-submit-padding-horizontal, 2);
         }
     }
 }
 
 // #TOOLBAR/elements/buttongroups#
 .cms-toolbar-item-buttons {
-    $margin: ($toolbar-height - $toolbar-button-height) / 2;
+    $margin: math.div($toolbar-height - $toolbar-button-height, 2);
     margin: $margin 0 $margin;
 
     a {
