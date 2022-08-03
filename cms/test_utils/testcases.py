@@ -14,11 +14,10 @@ from django.template import engines
 from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
-from django.utils import translation
 from django.urls import reverse
+from django.utils import translation
 from django.utils.http import urlencode
 from django.utils.timezone import now
-from django.utils.translation import activate
 
 from cms.api import create_page
 from cms.constants import (
@@ -106,7 +105,7 @@ class BaseCMSTestCase:
     def _fixture_setup(self):
         super()._fixture_setup()
         self.create_fixtures()
-        activate("en")
+        translation.activate("en")
 
     def create_fixtures(self):
         pass
