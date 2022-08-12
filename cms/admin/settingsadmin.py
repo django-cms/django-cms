@@ -10,7 +10,7 @@ from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
-from django.urls import re_path
+from django.urls import re_path, resolve, Resolver404
 from django.utils.html import conditional_escape
 from django.utils.translation import override
 
@@ -97,6 +97,10 @@ class SettingsAdmin(ModelAdmin):
         request = copy.copy(request)
         request.GET = data
         request.current_page = current_page
+        try:
+            request.resolver_match = resolve(origin_url.path)
+        except Resolver404:
+            pass
         request.toolbar = CMSToolbar(request, request_path=origin_url.path, _async=True)
         request.toolbar.set_object(attached_obj or current_page)
         return HttpResponse(request.toolbar.render())
