@@ -1,3 +1,5 @@
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
 version: 2
 
 sphinx:
@@ -11,5 +13,7 @@ formats:
 python:
   version: 3.8
   install:
+    - method: setuptools
+      path: .
     - requirements: docs/requirements.txt
   system_packages: false
