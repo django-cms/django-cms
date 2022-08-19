@@ -5,14 +5,22 @@ Changelog
 unreleased
 ==========
 
+3.11.0 (2022-08-02)
+===================
+
+Highlights:
+-----------
+* Support for django 4
+* Dark mode support
+
 * Added dark mode support to css, dark mode settings and toggle button
 * Fix publishing of static placeholders outside of CMS pages
 * Allow to override the template rendered after a plugin has been saved.
 * Revert change to the toolbar sites menu to use ``http`` protocol.
 * Fix edit plugin popup width (remove 850px width constraint).
 * Fix except block using list instead of tuple. (#7334)
-* Added cache ttl extension point.
 * Added spell checking to pre-commit and github workflows
+* Added cache ttl extension point.
 * Added current language to the page cache key (#6607)
 
 3.10.1 (2022-06-28)
