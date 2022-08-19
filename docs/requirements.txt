@@ -33,27 +33,7 @@ coverage==6.4.4
 datetime==4.5
     # via -r requirements.in
 django==3.2.15
-    # via
-    #   -r requirements.in
-    #   django-classy-tags
-    #   django-cms
-    #   django-formtools
-    #   django-sekizai
-    #   django-treebeard
-django-classy-tags==3.0.1
-    # via
-    #   django-cms
-    #   django-sekizai
-django-cms==3.11.0
     # via -r requirements.in
-django-formtools==2.3
-    # via django-cms
-django-sekizai==4.0.0
-    # via django-cms
-django-treebeard==4.5.1
-    # via django-cms
-djangocms-admin-style==3.2.0
-    # via django-cms
 docutils==0.19
     # via sphinx
 furo==2022.6.21
