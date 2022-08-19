@@ -1157,7 +1157,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 self.assertEqual(response.status_code, 200)
                 old_response_size = len(response.content)
                 old_user_count = get_user_model().objects.count()
-                # create additionals user and reload the page
+                # create additional user and reload the page
                 get_user_model().objects.create_user(username=USER_NAME, email=USER_NAME + '@django-cms.org',
                                                      password=USER_NAME)
                 user_count = get_user_model().objects.count()

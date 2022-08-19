@@ -136,7 +136,7 @@ def get_toolbar_url__disable():
 def get_templates():
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
-        # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory
+        # CMS_TEMPLATES_DIR can either be a string pointing to the templates directory
         # or a dictionary holding 'site: template dir' entries
         if isinstance(tpldir, dict):
             tpldir = tpldir[settings.SITE_ID]
