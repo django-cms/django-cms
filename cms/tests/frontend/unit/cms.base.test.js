@@ -1044,5 +1044,20 @@ describe('cms.base.js', function() {
                 expect(CMS.API.Helpers.updateUrlWithPath('/')).toEqual('/?cms_path=%2Fde%2F%3Flanguage%3Den');
             });
         });
+
+        describe('.setColorScheme() and .getColorScheme()', function() {
+            it('allows setting of dark color scheme', function() {
+                CMS.API.Helpers.setColorScheme('dark');
+                expect(CMS.API.Helpers.getColorScheme()).toEqual('dark');
+            });
+            it('allows setting of light color scheme', function() {
+                CMS.API.Helpers.setColorScheme('light');
+                expect(CMS.API.Helpers.getColorScheme()).toEqual('light');
+            });
+            it('allows setting of system color scheme', function() {
+                CMS.API.Helpers.setColorScheme('auto');
+                expect(CMS.API.Helpers.getColorScheme()).toEqual('auto');
+            });
+        });
     });
 });
