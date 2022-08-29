@@ -94,7 +94,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 # This first one is a sanity test, just to prove that we aren't
                 # simply comparing *exactly the same items* in all these tests.
                 # It could happen...
-                self.assertNotEquals(original.id, copy.id)
+                self.assertNotEqual(original.id, copy.id)
                 self.assertEqual(
                     original_text_plugin.body,
                     copied_text_plugin.body
@@ -649,7 +649,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # add the link plugin to the body
             # emulate the editor in admin that adds some txt for the nested plugin
             in_txt = """<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
-            nesting_body = "%s<p>%s</p>" % (text_plugin.body, (in_txt % (link_plugin.id)))
+            nesting_body = f"{text_plugin.body}<p>{(in_txt % (link_plugin.id))}</p>"
             text_plugin.body = nesting_body
             text_plugin.save()
 
@@ -702,7 +702,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             link_plugin = self.reload(link_plugin)
             text_plugin_two = self.reload(text_plugin_two)
             in_txt = """<cms-plugin id="%s" title="Link" alt="Link"></cms-plugin>"""
-            nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
+            nesting_body = f"{text_plugin_two.body}<p>{(in_txt % (link_plugin.id))}</p>"
             # emulate the editor in admin that adds some txt for the nested plugin
             text_plugin_two.body = nesting_body
             text_plugin_two.save()
@@ -785,18 +785,18 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             found_page = page_two_ph_three.page if page_two_ph_three else None
             self.assertEqual(found_page, page_two)
             # check the stored placeholders org vs copy
-            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            msg = 'placehoder ids copy:{} org:{} copied page {} are identical - tree broken'.format(
                 page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk
             )
-            self.assertNotEquals(page_two_ph_one.pk, page_one_ph_one.pk, msg)
-            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            self.assertNotEqual(page_two_ph_one.pk, page_one_ph_one.pk, msg)
+            msg = 'placehoder ids copy:{} org:{} copied page {} are identical - tree broken'.format(
                 page_two_ph_two.pk, page_one_ph_two.pk, page_two.pk
             )
-            self.assertNotEquals(page_two_ph_two.pk, page_one_ph_two.pk, msg)
-            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            self.assertNotEqual(page_two_ph_two.pk, page_one_ph_two.pk, msg)
+            msg = 'placehoder ids copy:{} org:{} copied page {} are identical - tree broken'.format(
                 page_two_ph_three.pk, page_one_ph_three.pk, page_two.pk
             )
-            self.assertNotEquals(page_two_ph_three.pk, page_one_ph_three.pk, msg)
+            self.assertNotEqual(page_two_ph_three.pk, page_one_ph_three.pk, msg)
             # get the plugins from the original page
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
             self.assertEqual(len(org_placeholder_one_plugins), 1)
@@ -815,17 +815,17 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # placeholder 1
             count_plugins_copied = len(copied_placeholder_one_plugins)
             count_plugins_org = len(org_placeholder_one_plugins)
-            msg = "plugin count %s %s for placeholder one not equal" % (count_plugins_copied, count_plugins_org)
+            msg = f"plugin count {count_plugins_copied} {count_plugins_org} for placeholder one not equal"
             self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # placeholder 2
             count_plugins_copied = len(copied_placeholder_two_plugins)
             count_plugins_org = len(org_placeholder_two_plugins)
-            msg = "plugin count %s %s for placeholder two not equal" % (count_plugins_copied, count_plugins_org)
+            msg = f"plugin count {count_plugins_copied} {count_plugins_org} for placeholder two not equal"
             self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # placeholder 3
             count_plugins_copied = len(copied_placeholder_three_plugins)
             count_plugins_org = len(org_placeholder_three_plugins)
-            msg = "plugin count %s %s for placeholder three not equal" % (count_plugins_copied, count_plugins_org)
+            msg = f"plugin count {count_plugins_copied} {count_plugins_org} for placeholder three not equal"
             self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # verify the body of text plugin with nested link plugin
             # org to copied
@@ -846,12 +846,12 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                     if instance.body.startswith(pre_nesting_body):
                         copied_nested_text_plugin = instance
                         break
-            msg = "orginal nested text plugin not found"
-            self.assertNotEquals(org_nested_text_plugin, None, msg=msg)
+            msg = "original nested text plugin not found"
+            self.assertNotEqual(org_nested_text_plugin, None, msg=msg)
             msg = "copied nested text plugin not found"
-            self.assertNotEquals(copied_nested_text_plugin, None, msg=msg)
+            self.assertNotEqual(copied_nested_text_plugin, None, msg=msg)
             # get the children ids of the texplugin with a nested link
-            # to check if the body of the text is genrated correctly
+            # to check if the body of the text is generated correctly
             org_link_child_plugin = org_nested_text_plugin.get_children()[0]
             copied_link_child_plugin = copied_nested_text_plugin.get_children()[0]
             # validate the textplugin body texts
@@ -871,8 +871,8 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # now reverse lookup the placeholders from the plugins
             org_placeholder = org_link_child_plugin.placeholder
             copied_placeholder = copied_link_child_plugin.placeholder
-            msg = "placeholder of the orginal plugin and copied plugin are the same"
-            ok = ((org_placeholder.id != copied_placeholder.id))
+            msg = "placeholder of the original plugin and copied plugin are the same"
+            ok = (org_placeholder.id != copied_placeholder.id)
             self.assertTrue(ok, msg)
 
     def test_copy_page_nested_plugin_moved_parent_plugin(self):
@@ -917,7 +917,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                 body=pre_nesting_body
             )
             text_plugin_two = self.reload(text_plugin_two)
-            # prepare nestin plugin
+            # prepare nesting plugin
             page_one_ph_two = self.reload(page_one_ph_two)
             text_plugin_two = self.reload(text_plugin_two)
             link_plugin = add_plugin(
@@ -932,7 +932,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             link_plugin = self.reload(link_plugin)
             text_plugin_two = self.reload(text_plugin_two)
             in_txt = """<cms-plugin id="%s" title="Link" alt="Link"></cms-plugin>"""
-            nesting_body = "%s<p>%s</p>" % (text_plugin_two.body, (in_txt % (link_plugin.id)))
+            nesting_body = f"{text_plugin_two.body}<p>{(in_txt % (link_plugin.id))}</p>"
             # emulate the editor in admin that adds some txt for the nested plugin
             text_plugin_two.body = nesting_body
             text_plugin_two.save()
@@ -1011,7 +1011,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             )
             self.assertEqual(after_copy_page_count, 3, "no new page after copy")
             # validate the structure
-            # orginal placeholder
+            # original placeholder
             page_one = self.reload(page_one)
             page_one_ph_one = page_one.placeholders.get(slot="col_sidebar")
             page_one_ph_two = page_one.placeholders.get(slot="col_left")
@@ -1035,18 +1035,18 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             found_page = page_two_ph_three.page if page_two_ph_three else None
             self.assertEqual(found_page, page_two)
             # check the stored placeholders org vs copy
-            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            msg = 'placehoder ids copy:{} org:{} copied page {} are identical - tree broken'.format(
                 page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk
             )
-            self.assertNotEquals(page_two_ph_one.pk, page_one_ph_one.pk, msg)
-            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            self.assertNotEqual(page_two_ph_one.pk, page_one_ph_one.pk, msg)
+            msg = 'placehoder ids copy:{} org:{} copied page {} are identical - tree broken'.format(
                 page_two_ph_two.pk, page_one_ph_two.pk, page_two.pk
             )
-            self.assertNotEquals(page_two_ph_two.pk, page_one_ph_two.pk, msg)
-            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            self.assertNotEqual(page_two_ph_two.pk, page_one_ph_two.pk, msg)
+            msg = 'placehoder ids copy:{} org:{} copied page {} are identical - tree broken'.format(
                 page_two_ph_three.pk, page_one_ph_three.pk, page_two.pk
             )
-            self.assertNotEquals(page_two_ph_three.pk, page_one_ph_three.pk, msg)
+            self.assertNotEqual(page_two_ph_three.pk, page_one_ph_three.pk, msg)
             # get the plugins from the original page
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
             self.assertEqual(len(org_placeholder_one_plugins), 1)
@@ -1065,17 +1065,17 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # placeholder 1
             count_plugins_copied = len(copied_placeholder_one_plugins)
             count_plugins_org = len(org_placeholder_one_plugins)
-            msg = "plugin count %s %s for placeholder one not equal" % (count_plugins_copied, count_plugins_org)
+            msg = f"plugin count {count_plugins_copied} {count_plugins_org} for placeholder one not equal"
             self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # placeholder 2
             count_plugins_copied = len(copied_placeholder_two_plugins)
             count_plugins_org = len(org_placeholder_two_plugins)
-            msg = "plugin count %s %s for placeholder two not equal" % (count_plugins_copied, count_plugins_org)
+            msg = f"plugin count {count_plugins_copied} {count_plugins_org} for placeholder two not equal"
             self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # placeholder 3
             count_plugins_copied = len(copied_placeholder_three_plugins)
             count_plugins_org = len(org_placeholder_three_plugins)
-            msg = "plugin count %s %s for placeholder three not equal" % (count_plugins_copied, count_plugins_org)
+            msg = f"plugin count {count_plugins_copied} {count_plugins_org} for placeholder three not equal"
             self.assertEqual(count_plugins_copied, count_plugins_org, msg)
             # verify the body of text plugin with nested link plugin
             # org to copied
@@ -1096,10 +1096,10 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                     if instance.body.startswith(pre_nesting_body):
                         copied_nested_text_plugin = instance
                         break
-            msg = "orginal nested text plugin not found"
-            self.assertNotEquals(org_nested_text_plugin, None, msg=msg)
+            msg = "original nested text plugin not found"
+            self.assertNotEqual(org_nested_text_plugin, None, msg=msg)
             msg = "copied nested text plugin not found"
-            self.assertNotEquals(copied_nested_text_plugin, None, msg=msg)
+            self.assertNotEqual(copied_nested_text_plugin, None, msg=msg)
             # get the children ids of the texplugin with a nested link
             # to check if the body of the text is generated correctly
             org_link_child_plugin = org_nested_text_plugin.get_children()[0]
@@ -1121,7 +1121,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # now reverse lookup the placeholders from the plugins
             org_placeholder = org_link_child_plugin.placeholder
             copied_placeholder = copied_link_child_plugin.placeholder
-            msg = "placeholder of the orginal plugin and copied plugin are the same"
+            msg = "placeholder of the original plugin and copied plugin are the same"
             self.assertNotEqual(org_placeholder.id, copied_placeholder.id, msg)
 
     def test_add_child_plugin(self):

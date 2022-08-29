@@ -505,7 +505,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # configure non fallback
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             # Deutsch page should have no text
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             content_de = _render_placeholder(placeholder_de, context_de)
             # Deutsch page should inherit english content
@@ -516,12 +516,12 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             request.user = self.get_superuser()
             request.toolbar = CMSToolbar(request)
             context_de2['request'] = request
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             content_de2 = _render_placeholder(placeholder_de, context_de2)
             self.assertFalse("en body" in content_de2)
             # remove the cached plugins instances
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_de, 'TextPlugin', 'de', body='de body')
@@ -557,12 +557,12 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             request.user = self.get_superuser()
             request.toolbar = CMSToolbar(request)
             context_de2['request'] = request
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             content_de2 = _render_placeholder(placeholder_de, context_de2)
             self.assertFalse("en body" in content_de2)
             # remove the cached plugins instances
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             # Then we add a plugin to check for proper rendering
             link_de = add_plugin(
@@ -594,13 +594,13 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # Deutsch page should have the text plugin
         content_de = _render_placeholder(placeholder_en, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
-        del(placeholder_en._plugins_cache)
+        del placeholder_en._plugins_cache
         cache.clear()
         # English page should have no text
         content_en = _render_placeholder(placeholder_en, context_en)
         self.assertRegexpMatches(content_en, "^de body$")
         self.assertEqual(len(content_en), 7)
-        del(placeholder_en._plugins_cache)
+        del placeholder_en._plugins_cache
         cache.clear()
         conf = {
             'col_left': {
@@ -614,7 +614,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             self.assertNotRegex(content_en, "^de body$")
 
             # remove the cached plugins instances
-            del(placeholder_en._plugins_cache)
+            del placeholder_en._plugins_cache
             cache.clear()
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_en, 'TextPlugin', 'en', body='en body')
@@ -650,7 +650,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             self.assertRegexpMatches(content_en, "^en body$")
 
             # remove the cached plugins instances
-            del(placeholder_sidebar_en._plugins_cache)
+            del placeholder_sidebar_en._plugins_cache
             cache.clear()
 
     def test_plugins_prepopulate(self):
