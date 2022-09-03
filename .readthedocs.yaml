@@ -14,9 +14,5 @@ python:
   version: 3.8
 
   install:
-    - method: pip
-      path: .
-    - method: setuptools
-      path: .
     - requirements: docs/requirements.txt
   system_packages: false
