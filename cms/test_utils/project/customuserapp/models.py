@@ -28,6 +28,7 @@ class CustomUserManager(UserManager):
         user.save(using=self._db)
         return user
 
+
 class User(AbstractBaseUser, PermissionsMixin):
     """
     An abstract base class implementing a fully featured User model with
@@ -39,7 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_('Required. 300 characters or fewer. Letters, numbers and '
                     '@/./+/-/_ characters'),
         validators=[
-            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
+            validators.RegexValidator(re.compile('^[.@+-]+$'), _('Enter a valid username.'), 'invalid')
         ])
     email = models.EmailField(_('email address'), blank=True)
     is_staff = models.BooleanField(_('staff status'), default=False,

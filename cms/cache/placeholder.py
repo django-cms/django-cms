@@ -16,7 +16,6 @@ the current HTTPRequest object.
 The vary-on header-names are also stored with the version. This enables us to
 check for cache hits without re-computing placeholder.get_vary_cache_on().
 """
-
 import hashlib
 import time
 

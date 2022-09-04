@@ -51,7 +51,7 @@ class PageSelectFormField(forms.MultiValueField):
         # causes an error where the MultiValueField doesn't expect it
         # https://github.com/django/django/commit/da79ee472d803963dc3ea81ee67767dc06068aac
         if 'blank' in kwargs:
-            del(kwargs['blank'])
+            del kwargs['blank']
 
         super().__init__(fields, *args, **kwargs)
 

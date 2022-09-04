@@ -18,4 +18,5 @@ class TestMenu(CMSAttachMenu):
         nodes.append(n4)
         return nodes
 
+
 menu_pool.register_menu(TestMenu)

@@ -21,7 +21,7 @@ SKIPPED = 4
 CHECKERS = []
 
 
-class FileOutputWrapper():
+class FileOutputWrapper:
     """
     Wraps two file-like objects (that support at the very least the 'write'
     method) into an API to be used by the check function further down in
@@ -94,7 +94,7 @@ class FileOutputWrapper():
         wrapper = self.section_wrapper(self)
         try:
             yield wrapper
-        except:
+        except:  # NOQA
             self.error('Checker failed, see traceback')
             raise
         self.errors += wrapper.errors

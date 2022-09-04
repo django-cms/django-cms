@@ -82,9 +82,7 @@ class PageSelectWidget(MultiWidget):
                 CMS.Widgets._pageSelectWidgets.push({
                     name: '%(name)s'
                 });
-            </script>""" % {
-                'name': name
-            }
+            </script>""" % {'name': name}
 
     def get_context(self, name, value, attrs):
         self._build_widgets()

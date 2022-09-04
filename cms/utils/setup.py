@@ -31,8 +31,9 @@ def validate_settings():
                                    "'django.template.backends.django.DjangoTemplates' context processors.")
 
     context_processors = django_backend.get('OPTIONS', {}).get('context_processors', [])
-    if ('django.core.context_processors.request' not in context_processors and
-            'django.template.context_processors.request' not in context_processors):
+    core_request = 'django.core.context_processors.request'
+    template_request = 'django.template.context_processors.request'
+    if core_request not in context_processors and template_request not in context_processors:
         raise ImproperlyConfigured("django CMS requires django.template.context_processors.request in "
                                    "'django.template.backends.django.DjangoTemplates' context processors.")
 
