@@ -15,7 +15,7 @@
 # ksiedlarek <katarzyna@siedlarek.pl>, 2014
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
 # Maciej Kostuch <kostuchmaciek@gmail.com>, 2017-2018,2020
-# m_aciek <maciej.olko@gmail.com>, 2016-2018
+# Maciej Olko <maciej.olko@gmail.com>, 2016-2018
 # Piotr Jakimiak <legolass71@gmail.com>, 2015
 # Piotr Kilczuk <p.kilczuk@neumea.pl>, 2013
 # Piotr Wojcik <pwwpww@gmail.com>, 2016
@@ -31,7 +31,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-26 17:28+0800\n"
+"POT-Creation-Date: 2022-08-02 11:21+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
 "Last-Translator: Maciej Kostuch <kostuchmaciek@gmail.com>, 2017-2018,2020\n"
 "Language-Team: Polish (http://www.transifex.com/divio/django-cms/language/pl/)\n"

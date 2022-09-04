@@ -814,7 +814,8 @@ class PageTreeForm(forms.Form):
     def get_root_nodes(self):
         # TODO: this needs to avoid using the pages accessor directly
         nodes = TreeNode.get_root_nodes()
-        return nodes.exclude(cms_pages__is_page_type=not(self.page.is_page_type))
+        is_page_type = self.page.is_page_type
+        return nodes.exclude(cms_pages__is_page_type=not is_page_type)
 
     def get_tree_options(self):
         position = self.cleaned_data['position']
@@ -1092,7 +1093,7 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
 
 
 class GenericCmsPermissionForm(forms.ModelForm):
-    """Generic form for User & Grup permissions in cms
+    """Generic form for User & Group permissions in cms
     """
     _current_user = None
 
