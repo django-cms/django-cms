@@ -1,9 +1,9 @@
 from django.template import Template
+from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
-from django.test.utils import override_settings
 from menus.base import NavigationNode
 
 

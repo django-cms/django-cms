@@ -1,6 +1,6 @@
 from djangocms_text_ckeditor.models import Text
 
-from cms.api import create_page, add_plugin
+from cms.api import add_plugin, create_page
 from cms.models import Page
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin

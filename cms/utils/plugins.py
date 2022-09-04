@@ -1,5 +1,6 @@
+from collections import OrderedDict, defaultdict, deque
 from copy import deepcopy
-from collections import defaultdict, deque, OrderedDict
+from functools import lru_cache
 
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
@@ -9,8 +10,6 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_placeholder_conf
-
-from functools import lru_cache
 
 
 @lru_cache(maxsize=None)

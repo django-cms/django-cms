@@ -1,16 +1,16 @@
 from django.apps import apps
-from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.db import models
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
-from cms.models.managers import (PagePermissionManager,
-                                 GlobalPagePermissionManager)
-
+from cms.models.managers import (
+    GlobalPagePermissionManager, PagePermissionManager,
+)
 
 # Cannot use contrib.auth.get_user_model() at compile time.
 user_app_name, user_model_name = settings.AUTH_USER_MODEL.rsplit('.', 1)

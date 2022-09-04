@@ -1,11 +1,10 @@
 from django.core.cache import cache
 from django.http.response import Http404
 from django.test.utils import override_settings
-
 from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
-from cms.api import create_page, add_plugin
+from cms.api import add_plugin, create_page
 from cms.cache.placeholder import get_placeholder_cache
 from cms.models import EmptyPageContent, Page, Placeholder
 from cms.plugin_rendering import PluginContext
@@ -15,7 +14,6 @@ from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
 from cms.views import details
-
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 INHERIT_TEMPLATE_NAME = 'tests/rendering/inherit.html'
@@ -289,6 +287,7 @@ class RenderingTestCase(CMSTestCase):
         passed to PluginContext.
         """
         from djangocms_text_ckeditor.cms_plugins import TextPlugin
+
         from cms.plugin_pool import plugin_pool
 
         instance = self.test_placeholders['main'].get_plugins('en').first().get_bound_plugin()

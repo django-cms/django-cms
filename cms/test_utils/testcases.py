@@ -1,7 +1,6 @@
 import json
 import sys
 import warnings
-
 from urllib.parse import unquote, urljoin
 
 from django.conf import settings
@@ -19,22 +18,19 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
 from django.utils.translation import activate, get_language
-from menus.menu_pool import menu_pool
 
-from cms.api import create_page, add_plugin
+from cms.api import add_plugin, create_page
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page, PageContent
 from cms.models.permissionmodels import (
-    GlobalPagePermission,
-    PagePermission,
-    PageUser,
+    GlobalPagePermission, PagePermission, PageUser,
 )
+from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
-
+from menus.menu_pool import menu_pool
 
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"

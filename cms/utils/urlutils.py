@@ -1,5 +1,4 @@
 import re
-
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -8,9 +7,7 @@ from django.utils.encoding import force_str
 from django.utils.http import urlencode
 
 import cms
-
 from cms.utils.conf import get_cms_setting
-
 
 # checks validity of absolute / relative url
 any_path_re = re.compile('^/?[a-zA-Z0-9_.-]+(/[a-zA-Z0-9_.-]+)*/?$')

@@ -1,5 +1,5 @@
-from django.db.models import ManyToManyField
 from django.db import models
+from django.db.models import ManyToManyField
 
 from cms.models import Page, PageContent
 

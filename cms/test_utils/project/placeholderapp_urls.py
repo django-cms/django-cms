@@ -8,7 +8,6 @@ from django.views.static import serve
 from cms.test_utils.project.placeholderapp.views import detail_view
 from cms.utils.conf import get_cms_setting
 
-
 admin.autodiscover()
 
 urlpatterns = [

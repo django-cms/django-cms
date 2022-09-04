@@ -1,14 +1,13 @@
-from logging import getLogger
 from collections import Iterable
+from logging import getLogger
 
 from django.core.exceptions import ImproperlyConfigured
 
-from cms.app_base import CMSAppExtension, CMSAppConfig
+from cms.app_base import CMSAppConfig, CMSAppExtension
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.models import PageContent
 from cms.page_rendering import render_pagecontent
 from cms.wizards.wizard_base import Wizard
-
 
 logger = getLogger(__name__)
 

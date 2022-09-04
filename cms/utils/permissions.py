@@ -1,6 +1,6 @@
 from collections import defaultdict
 from contextlib import contextmanager
-from functools import wraps
+from functools import lru_cache, wraps
 from threading import local
 
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -10,13 +10,9 @@ from django.db.models import Q
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, Page, PagePermission
+from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
-
-from cms.utils.compat.dj import available_attrs
-
-from functools import lru_cache
-
 
 # thread local support
 _thread_locals = local()

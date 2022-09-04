@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from cms.extensions import PageExtension, TitleExtension
-from cms.extensions.extension_pool import  extension_pool
+from cms.extensions.extension_pool import extension_pool
 
 
 class MyPageExtension(PageExtension):

@@ -1,16 +1,17 @@
-from functools import update_wrapper
 import copy
 import json
-
+from functools import update_wrapper
 from urllib.parse import urlparse
 
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
+from django.http import (
+    HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
+)
 from django.http.request import QueryDict
-from django.urls import re_path, resolve, Resolver404
+from django.urls import Resolver404, re_path, resolve
 from django.utils.html import conditional_escape
 from django.utils.translation import override
 

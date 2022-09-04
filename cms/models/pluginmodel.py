@@ -1,7 +1,8 @@
-from datetime import date
 import json
 import os
 import warnings
+from datetime import date
+from functools import lru_cache
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
@@ -16,8 +17,6 @@ from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
-
-from functools import lru_cache
 
 
 @lru_cache(maxsize=None)

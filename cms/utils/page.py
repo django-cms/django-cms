@@ -7,7 +7,6 @@ from cms.constants import PAGE_USERNAME_MAX_LENGTH
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 
-
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
 

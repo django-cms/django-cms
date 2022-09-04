@@ -16,7 +16,7 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.admin.pageadmin import PageContentAdmin
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.middleware.user import CurrentUserMiddleware
@@ -24,13 +24,13 @@ from cms.models import PageContent
 from cms.models.pagemodel import Page, PageUrl
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
-from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_MOVE,
-)
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
-from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
-from cms.utils.conf import get_cms_setting
+from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
+from cms.test_utils.util.context_managers import (
+    LanguageOverride, UserLoginContext,
+)
 from cms.utils.compat.dj import installed_apps
+from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -185,8 +185,8 @@ class PageTest(PageTestBase):
         with the request language pointing to a language
         not configured for the current site
         """
-        from django.test import Client
         from django.contrib.auth import get_user_model
+        from django.test import Client
 
         client = Client()
         superuser = self.get_superuser()

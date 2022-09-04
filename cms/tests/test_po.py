@@ -1,16 +1,15 @@
 import os
-from pathlib import Path
 import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 from django.core.management.base import CommandError
 from django.core.management.commands.compilemessages import has_bom
 from django.test.testcases import TestCase
 
 from cms.test_utils.util.context_managers import TemporaryDirectory
-from cms.utils.compat import DJANGO_3_1, DJANGO_2_2, DJANGO_3_0
-
+from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 
 THIS_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'locale'))

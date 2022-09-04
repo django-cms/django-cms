@@ -1,75 +1,60 @@
-from collections import namedtuple
 import copy
 import json
+from collections import namedtuple
 
 import django
-from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
 from django.contrib import admin, messages
+from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import (ObjectDoesNotExist,
-                                    PermissionDenied, ValidationError)
+from django.core.exceptions import (
+    ObjectDoesNotExist, PermissionDenied, ValidationError,
+)
 from django.db import transaction
-from django.db.models import Q, Prefetch
+from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
 from django.forms.fields import IntegerField
 from django.http import (
-    QueryDict,
-    HttpResponseRedirect,
-    HttpResponse,
-    Http404,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
+    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+    HttpResponseRedirect, QueryDict,
 )
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 
 from cms import operations
 from cms.admin.forms import (
-    AddPageForm,
-    AdvancedSettingsForm,
-    ChangePageForm,
-    ChangeListForm,
-    CopyPageForm,
-    CopyPermissionForm,
-    DuplicatePageForm,
-    MovePageForm,
+    AddPageForm, AdvancedSettingsForm, ChangeListForm, ChangePageForm,
+    CopyPageForm, CopyPermissionForm, DuplicatePageForm, MovePageForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
 from cms.models import (
-    EmptyPageContent,
-    CMSPlugin,
-    Page,
-    PageContent,
-    PagePermission,
-    Placeholder,
-    GlobalPagePermission,
+    CMSPlugin, EmptyPageContent, GlobalPagePermission, Page, PageContent,
+    PagePermission, Placeholder,
 )
-from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
+from cms.operations.helpers import (
+    send_post_page_operation, send_pre_page_operation,
+)
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
-from cms.utils import permissions, get_current_site
-from cms.utils import page_permissions
+from cms.utils import get_current_site, page_permissions, permissions
+from cms.utils.admin import jsonify_request
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_language_list,
-    get_language_tuple,
-    get_language_object,
+    get_language_list, get_language_object, get_language_tuple,
     get_site_language_from_request,
 )
 from cms.utils.plugins import copy_plugins_to_placeholder
-from cms.utils.admin import jsonify_request
-from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 require_POST = method_decorator(require_POST)

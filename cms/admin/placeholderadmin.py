@@ -1,5 +1,6 @@
 import uuid
 import warnings
+from urllib.parse import parse_qsl, urlparse
 
 from django import forms
 from django.contrib import admin
@@ -8,11 +9,8 @@ from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import (
-    HttpResponse,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
-    HttpResponseNotFound,
-    HttpResponseRedirect,
+    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+    HttpResponseNotFound, HttpResponseRedirect,
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
@@ -21,7 +19,6 @@ from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
 from django.utils.translation import get_language_from_path, gettext as _
-
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
@@ -33,20 +30,18 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.signals import pre_placeholder_operation, post_placeholder_operation
+from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_list, get_language_code
+from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import (
-    copy_plugins_to_placeholder,
-    has_reached_plugin_limit,
+    copy_plugins_to_placeholder, has_reached_plugin_limit,
 )
 from cms.utils.urlutils import admin_reverse
-from cms.views import render_object_edit, render_object_structure, render_object_preview
-
-from urllib.parse import parse_qsl, urlparse
-
+from cms.views import (
+    render_object_edit, render_object_preview, render_object_structure,
+)
 
 _no_default = object()
 

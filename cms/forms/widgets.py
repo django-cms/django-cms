@@ -6,9 +6,9 @@ from django.utils.encoding import force_str
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 
-from cms.utils.urlutils import admin_reverse, static_with_version
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.utils import get_page_choices, get_site_choices
 from cms.models import Page, PageUser
+from cms.utils.urlutils import admin_reverse, static_with_version
 
 
 class PageSelectWidget(MultiWidget):

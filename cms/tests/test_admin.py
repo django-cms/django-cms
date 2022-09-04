@@ -1,19 +1,18 @@
 import json
 
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
-from django.http import (Http404, HttpResponseBadRequest,
-                         HttpResponseNotFound)
-from django.utils.encoding import force_str, smart_str
+from django.http import Http404, HttpResponseBadRequest, HttpResponseNotFound
 from django.test.utils import override_settings
+from django.utils.encoding import force_str, smart_str
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
 
 from cms import api
-from cms.api import create_page, create_title, add_plugin
+from cms.api import add_plugin, create_page, create_title
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import PageContent, StaticPlaceholder, UserSettings
 from cms.models.pagemodel import Page
@@ -21,8 +20,7 @@ from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_DELETE,
-    URL_CMS_PAGE_PUBLISHED,
+    URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED, CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse

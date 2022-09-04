@@ -1,6 +1,7 @@
+from django.db import models
+
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
-from django.db import models
 
 
 class PlaceholderReference(CMSPlugin):

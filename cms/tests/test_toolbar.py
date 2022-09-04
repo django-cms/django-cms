@@ -1,8 +1,8 @@
 import datetime
-import iptools
 import re
 from unittest.mock import patch
 
+import iptools
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
@@ -15,28 +15,33 @@ from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
-from django.utils.translation import get_language, override, gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _, override
 
-from cms.api import create_page, create_title, add_plugin
 from cms.admin.forms import RequestToolbarForm
-from cms.cms_toolbars import (ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, get_user_model,
-                              LANGUAGE_MENU_IDENTIFIER)
-from cms.models import UserSettings, PagePermission
-from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
-from cms.test_utils.project.placeholderapp.views import detail_view, ClassDetail
-from cms.test_utils.testcases import (CMSTestCase, URL_CMS_USERSETTINGS)
+from cms.api import add_plugin, create_page, create_title
+from cms.cms_toolbars import (
+    ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, LANGUAGE_MENU_IDENTIFIER,
+    get_user_model,
+)
+from cms.models import PagePermission, UserSettings
+from cms.test_utils.project.placeholderapp.models import (
+    CharPksExample, Example1,
+)
+from cms.test_utils.project.placeholderapp.views import (
+    ClassDetail, detail_view,
+)
+from cms.test_utils.testcases import URL_CMS_USERSETTINGS, CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext
-from cms.toolbar_pool import toolbar_pool
 from cms.toolbar import utils
-from cms.toolbar.items import (ToolbarAPIMixin, LinkItem, ItemSearchResult,
-                               Break, SubMenu, AjaxItem)
+from cms.toolbar.items import (
+    AjaxItem, Break, ItemSearchResult, LinkItem, SubMenu, ToolbarAPIMixin,
+)
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
-    add_live_url_querystring_param,
-    get_object_edit_url,
-    get_object_preview_url,
-    get_object_structure_url
+    add_live_url_querystring_param, get_object_edit_url,
+    get_object_preview_url, get_object_structure_url,
 )
+from cms.toolbar_pool import toolbar_pool
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse

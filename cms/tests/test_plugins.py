@@ -1,14 +1,14 @@
-from contextlib import contextmanager
 import datetime
 import pickle
 import warnings
-
-from cms.api import create_page
+from contextlib import contextmanager
 
 from django import http
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
+from django.contrib.admin.widgets import (
+    FilteredSelectMultiple, RelatedFieldWidgetWrapper,
+)
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
@@ -16,28 +16,31 @@ from django.urls import re_path, reverse
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.translation import override as force_language
+from djangocms_text_ckeditor.models import Text
 
 from cms import api
-from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered, DontUsePageAttributeWarning
+from cms.api import create_page
+from cms.exceptions import (
+    DontUsePageAttributeWarning, PluginAlreadyRegistered, PluginNotRegistered,
+)
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
-    Article, Section, ArticlePluginModel,
+    Article, ArticlePluginModel, Section,
 )
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
-    TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5)
+    TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5,
+)
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
-    NonExisitngRenderTemplate, NoRender, NoRenderButChildren, DynTemplate)
+    DynTemplate, NonExisitngRenderTemplate, NoRender, NoRenderButChildren,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_toolbar_from_request, get_object_edit_url
-from cms.utils.plugins import copy_plugins_to_placeholder
-from cms.utils.plugins import get_plugins
-
-from djangocms_text_ckeditor.models import Text
+from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
 
 
 @contextmanager
@@ -1150,7 +1153,9 @@ class BrokenPluginTests(TestCase):
 
 class MTIPluginsTestCase(PluginsTestBaseCase):
     def test_add_edit_plugin(self):
-        from cms.test_utils.project.mti_pluginapp.models import TestPluginBetaModel
+        from cms.test_utils.project.mti_pluginapp.models import (
+            TestPluginBetaModel,
+        )
 
         """
         Test that we can instantiate and use a MTI plugin
@@ -1180,10 +1185,11 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
 
     def test_related_name(self):
         from cms.test_utils.project.mti_pluginapp.models import (
-            TestPluginAlphaModel, TestPluginBetaModel, ProxiedAlphaPluginModel,
-            ProxiedBetaPluginModel, AbstractPluginParent, TestPluginGammaModel, MixedPlugin,
-            LessMixedPlugin, NonPluginModel
+            AbstractPluginParent, LessMixedPlugin, MixedPlugin, NonPluginModel,
+            ProxiedAlphaPluginModel, ProxiedBetaPluginModel,
+            TestPluginAlphaModel, TestPluginBetaModel, TestPluginGammaModel,
         )
+
         # the first concrete class of the following four plugins is TestPluginAlphaModel
         self.assertEqual(TestPluginAlphaModel.cmsplugin_ptr.field.remote_field.related_name,
                          'mti_pluginapp_testpluginalphamodel')

@@ -1,16 +1,22 @@
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group, User
 from django.db.models import signals
 from django.db.models.signals import pre_migrate
-from django.dispatch import receiver, Signal
+from django.dispatch import Signal, receiver
 
 from cms.exceptions import ConfirmationOfVersion4Required
-from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserGroup
+from cms.models import (
+    GlobalPagePermission, PagePermission, PageUser, PageUserGroup,
+)
 from cms.signals.apphook import debug_server_restart, trigger_server_restart
-from cms.signals.log_entries import log_page_operations, log_placeholder_operations
+from cms.signals.log_entries import (
+    log_page_operations, log_placeholder_operations,
+)
 from cms.signals.permissions import (
-    post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group,
-    pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
+    post_save_user, post_save_user_group, pre_delete_globalpagepermission,
+    pre_delete_group, pre_delete_pagepermission, pre_delete_user,
+    pre_save_globalpagepermission, pre_save_group, pre_save_pagepermission,
+    pre_save_user,
 )
 from cms.utils.conf import get_cms_setting
 

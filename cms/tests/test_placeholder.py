@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
-from django.template import TemplateSyntaxError, Template
+from django.template import Template, TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -17,26 +17,25 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.settingmodels import UserSettings
 from cms.plugin_pool import plugin_pool
-from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.placeholder_relation_field_app.models import FancyPoll
+from cms.test_utils.project.placeholder_relation_field_app.models import (
+    FancyPoll,
+)
 from cms.test_utils.project.placeholderapp.models import (
-    DynamicPlaceholderSlotExample,
-    Example1,
-    TwoPlaceholderExample,
+    DynamicPlaceholderSlotExample, Example1, TwoPlaceholderExample,
 )
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
+from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_structure_url,
-    get_toolbar_from_request,
+    get_object_edit_url, get_object_structure_url, get_toolbar_from_request,
 )
-from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
-                                   get_placeholder_conf, get_placeholders, _get_nodelist,
-                                   _scan_placeholders)
+from cms.utils.placeholder import (
+    MLNGPlaceholderActions, PlaceholderNoAction, _get_nodelist,
+    _scan_placeholders, get_placeholder_conf, get_placeholders,
+)
 from cms.utils.urlutils import admin_reverse
 
 

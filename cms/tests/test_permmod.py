@@ -6,13 +6,13 @@ from django.db.models import Q
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from cms.api import assign_user_to_page, create_page, create_page_user
 from cms.admin.forms import save_permissions
+from cms.api import assign_user_to_page, create_page, create_page_user
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, PageContent, ACCESS_PAGE
-from cms.models.permissionmodels import (ACCESS_PAGE_AND_DESCENDANTS,
-                                         PagePermission,
-                                         GlobalPagePermission)
+from cms.models import ACCESS_PAGE, Page, PageContent
+from cms.models.permissionmodels import (
+    ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_current_site

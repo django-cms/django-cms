@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as OriginalUserAdmin
 
-from .models import EmailUser
 from .forms import UserChangeForm, UserCreationForm
+from .models import EmailUser
 
 
 class UserAdmin(OriginalUserAdmin):

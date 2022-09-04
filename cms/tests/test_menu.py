@@ -1,31 +1,36 @@
 import copy
-from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, Permission, Group
+from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
 from django.test.utils import override_settings
 from django.utils.translation import activate, override as force_language
-from cms.apphook_pool import apphook_pool
-from menus.base import NavigationNode
-from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.models import CacheKey
-from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page, create_title
+from cms.apphook_pool import apphook_pool
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
-from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
-                                           SoftrootFixture, ExtendedMenusFixture)
+from cms.test_utils.fixtures.menus import (
+    ExtendedMenusFixture, MenusFixture, SoftrootFixture, SubMenusFixture,
+)
+from cms.test_utils.project.sampleapp.cms_apps import (
+    NamespacedApp, SampleApp, SampleApp2,
+)
+from cms.test_utils.project.sampleapp.cms_menus import (
+    SampleAppMenu, StaticMenu, StaticMenu2,
+)
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import apphooks, LanguageOverride
+from cms.test_utils.util.context_managers import LanguageOverride, apphooks
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from menus.base import NavigationNode
+from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
+from menus.models import CacheKey
+from menus.utils import cut_levels, find_selected, mark_descendants
 
 
 class BaseMenuTest(CMSTestCase):

@@ -1,6 +1,5 @@
 from classytags.core import Tag
 from classytags.helpers import InclusionTag
-
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
@@ -10,7 +9,6 @@ from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse
-
 
 register = template.Library()
 

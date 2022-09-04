@@ -4,30 +4,27 @@ from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
-from django.utils.translation import override as force_language, gettext_lazy as _
+from django.utils.translation import (
+    gettext_lazy as _, override as force_language,
+)
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import Placeholder, Page, PageType
-from cms.toolbar.items import ButtonList, REFRESH_PAGE
+from cms.models import Page, PageType, Placeholder
+from cms.toolbar.items import REFRESH_PAGE, ButtonList
+from cms.toolbar.utils import (
+    get_object_edit_url, get_object_preview_url, get_object_structure_url,
+)
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_preview_url,
-    get_object_structure_url,
-)
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_language_tuple, get_language_dict
+from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
-    user_can_change_page,
-    user_can_delete_page,
+    user_can_change_page, user_can_delete_page,
 )
 from cms.utils.urlutils import add_url_parameters, admin_reverse
-
 from menus.utils import DefaultLanguageChanger
-
 
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'

@@ -3,7 +3,7 @@ from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.core.validators import EMPTY_VALUES
 from django.utils.translation import gettext_lazy as _
 
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.utils import get_page_choices, get_site_choices
 from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page

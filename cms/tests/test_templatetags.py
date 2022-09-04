@@ -1,5 +1,5 @@
-from copy import deepcopy
 import os
+from copy import deepcopy
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -13,20 +13,20 @@ from django.utils.html import escape
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-
 from mock import patch
+from sekizai.context import SekizaiContext
 
 import cms
-from cms.api import create_page, create_title, add_plugin
+from cms.api import add_plugin, create_page, create_title
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.models import EmptyPageContent, Page, PageContent, Placeholder, PageUrl
-from cms.templatetags.cms_tags import (
-    _get_page_by_untyped_arg,
-    _show_placeholder_by_id,
-    render_plugin,
+from cms.models import (
+    EmptyPageContent, Page, PageContent, PageUrl, Placeholder,
 )
-from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_admin import get_page_display_name
+from cms.templatetags.cms_js_tags import json_filter
+from cms.templatetags.cms_tags import (
+    _get_page_by_untyped_arg, _show_placeholder_by_id, render_plugin,
+)
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
@@ -34,7 +34,6 @@ from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_site_id
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import get_placeholders
-from sekizai.context import SekizaiContext
 
 
 class TemplatetagTests(CMSTestCase):
@@ -524,6 +523,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_model_with_deferred_fields(self):
         from django.core.cache import cache
+
         from cms.test_utils.project.sampleapp.models import Category
 
         Category.objects.create(name='foo', depth=1)
@@ -556,6 +556,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_model_add(self):
         from django.core.cache import cache
+
         from cms.test_utils.project.sampleapp.models import Category
 
         cache.clear()
@@ -589,6 +590,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_model_add_block(self):
         from django.core.cache import cache
+
         from cms.test_utils.project.sampleapp.models import Category
 
         cache.clear()

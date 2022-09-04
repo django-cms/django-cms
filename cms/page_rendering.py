@@ -3,8 +3,7 @@ from django.http import Http404
 from django.template.response import TemplateResponse
 from django.urls import Resolver404, resolve, reverse
 
-from cms import __version__
-from cms import constants
+from cms import __version__, constants
 from cms.cache.page import set_page_cache
 from cms.models import EmptyPageContent
 from cms.utils.page import get_page_template_from_request

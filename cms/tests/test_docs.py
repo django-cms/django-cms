@@ -1,14 +1,12 @@
-from contextlib import contextmanager
-from unittest import skipIf, skipUnless
-
 import os
 import socket
 import sys
-
+from contextlib import contextmanager
 from io import StringIO
+from unittest import skipIf, skipUnless
 
-from sphinx.errors import SphinxWarning
 from sphinx.application import Sphinx
+from sphinx.errors import SphinxWarning
 
 try:
     import enchant
@@ -18,7 +16,6 @@ except ImportError:
 import cms
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import TemporaryDirectory
-
 
 ROOT_DIR = os.path.dirname(cms.__file__)
 DOCS_DIR = os.path.abspath(os.path.join(ROOT_DIR, u'..', u'docs'))
