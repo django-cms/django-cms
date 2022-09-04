@@ -16,6 +16,15 @@ out of the box. The main reasons for the changes:
     process of upgrading from 3.5+ to 4.0.0
 
 
+TODO:
+- Architecture of 3.x vs 4.x, justifying why the code was changed the way that it was
+- Advised core packages and link to relevant documentation
+- Add migration documentation
+- Add App registration documentation to the docs
+- Rework reference documentation
+- Rework topics documentation
+
+
 *******************
 What's new in 4.0.0
 *******************
