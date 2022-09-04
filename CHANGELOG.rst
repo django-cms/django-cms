@@ -1494,7 +1494,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 - language namespaces for apphooks (reverse("de:myview"), reverse("en:myview"))
 - video plugin switch to https://github.com/FlashJunior/OSFlashVideoPlayer
-- frontediting added (cms.middlware.toolbar.ToolbarMiddleware)
+- frontediting added (cms.middleware.toolbar.ToolbarMiddleware)
 - testsuite works now under sqlite and postgres
 - orphaned text embed plugins get now deleted if not referenced in the text anymore
 - placeholder templatetag: "theme" attribute removed in favor of "width" (backward incompatible change if theme was used)

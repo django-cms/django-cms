@@ -358,7 +358,7 @@ class PermissionModeratorTests(CMSTestCase):
     def test_staff_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
         all_view_perms = PagePermission.objects.filter(can_view=True)
-        # verifiy that the user_staff has access to this page
+        # verify that the user_staff has access to this page
         has_perm = False
         for perm in all_view_perms:
             if perm.page == self.page_b:
@@ -380,7 +380,7 @@ class PermissionModeratorTests(CMSTestCase):
     def test_user_normal_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
         all_view_perms = PagePermission.objects.filter(can_view=True)
-        # verifiy that the normal_user has access to this page
+        # verify that the normal_user has access to this page
         normal_has_perm = False
         for perm in all_view_perms:
             if perm.page == self.page_b:
@@ -391,7 +391,7 @@ class PermissionModeratorTests(CMSTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
-        # verifiy that the user_non_global has not access to this page
+        # verify that the user_non_global has not access to this page
         non_global_has_perm = False
         for perm in all_view_perms:
             if perm.page == self.page_b:
