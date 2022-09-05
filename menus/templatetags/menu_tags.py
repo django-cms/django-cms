@@ -165,7 +165,7 @@ class ShowMenu(InclusionTag):
             context['extra_inactive'] = extra_inactive
             context['extra_active'] = extra_active
             context['namespace'] = namespace
-        except:
+        except:  # NOQA
             context = {"template": template}
         return context
 
@@ -293,7 +293,7 @@ class ShowBreadcrumb(InclusionTag):
             start_level = 0
         try:
             only_visible = bool(int(only_visible))
-        except:
+        except:  # NOQA
             only_visible = bool(only_visible)
         ancestors = []
 

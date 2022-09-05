@@ -11,7 +11,8 @@ from menus.utils import (
 
 
 class DumbPageLanguageUrl(PageLanguageUrl):
-    def __init__(self): pass
+    def __init__(self):
+        pass
 
 
 class MenuUtilsTests(CMSTestCase):

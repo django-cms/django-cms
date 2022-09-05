@@ -113,8 +113,8 @@ if __name__ == '__main__':
                     'django.template.loaders.app_directories.Loader',
                 )
             }
-        }
-    ]}
+        }]
+    }
 
     if 'test' in sys.argv:
         SESSION_ENGINE = "django.contrib.sessions.backends.cache"

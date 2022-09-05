@@ -332,6 +332,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
     def test_toolbar_page_extension(self):
         old_toolbars = deepcopy(toolbar_pool.toolbars)
+
         class SampleExtension(ExtensionToolbar):
             model = MyPageExtension  # The PageExtension / TitleExtension you are working with
 

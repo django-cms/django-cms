@@ -123,35 +123,38 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
 
     def add_sideframe_item(self, name, url, active=False, disabled=False,
                            extra_classes=None, on_close=None, side=LEFT, position=None):
-        item = SideframeItem(name, url,
-                             active=active,
-                             disabled=disabled,
-                             extra_classes=extra_classes,
-                             on_close=on_close,
-                             side=side,
+        item = SideframeItem(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            on_close=on_close,
+            side=side,
         )
         self.add_item(item, position=position)
         return item
 
     def add_modal_item(self, name, url, active=False, disabled=False,
                        extra_classes=None, on_close=REFRESH_PAGE, side=LEFT, position=None):
-        item = ModalItem(name, url,
-                         active=active,
-                         disabled=disabled,
-                         extra_classes=extra_classes,
-                         on_close=on_close,
-                         side=side,
+        item = ModalItem(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            on_close=on_close,
+            side=side,
         )
         self.add_item(item, position=position)
         return item
 
     def add_link_item(self, name, url, active=False, disabled=False,
                       extra_classes=None, side=LEFT, position=None):
-        item = LinkItem(name, url,
-                        active=active,
-                        disabled=disabled,
-                        extra_classes=extra_classes,
-                        side=side
+        item = LinkItem(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            side=side
         )
         self.add_item(item, position=position)
         return item
@@ -159,15 +162,17 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
     def add_ajax_item(self, name, action, active=False, disabled=False,
                       extra_classes=None, data=None, question=None,
                       side=LEFT, position=None, on_success=None, method='POST'):
-        item = AjaxItem(name, action, self.csrf_token,
-                        active=active,
-                        disabled=disabled,
-                        extra_classes=extra_classes,
-                        data=data,
-                        question=question,
-                        side=side,
-                        on_success=on_success,
-                        method=method,
+
+        item = AjaxItem(
+            name, action, self.csrf_token,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            data=data,
+            question=question,
+            side=side,
+            on_success=on_success,
+            method=method,
         )
         self.add_item(item, position=position)
         return item
@@ -461,30 +466,33 @@ class ButtonList(BaseItem):
 
     def add_button(self, name, url, active=False, disabled=False,
                    extra_classes=None):
-        item = Button(name, url,
-                      active=active,
-                      disabled=disabled,
-                      extra_classes=extra_classes
+        item = Button(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes
         )
         self.buttons.append(item)
         return item
 
     def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE):
-        item = ModalButton(name, url,
-                      active=active,
-                      disabled=disabled,
-                      extra_classes=extra_classes,
-                      on_close=on_close,
+        item = ModalButton(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            on_close=on_close,
         )
         self.buttons.append(item)
         return item
 
     def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
-        item = SideframeButton(name, url,
-                      active=active,
-                      disabled=disabled,
-                      extra_classes=extra_classes,
-                      on_close=on_close,
+        item = SideframeButton(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            on_close=on_close,
         )
         self.buttons.append(item)
         return item

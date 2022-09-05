@@ -74,8 +74,7 @@ def _verify_plugin_type(plugin_type):
     Verifies the given plugin_type is valid and returns a tuple of
     (plugin_model, plugin_type)
     """
-    if (hasattr(plugin_type, '__module__') and
-            issubclass(plugin_type, CMSPluginBase)):
+    if hasattr(plugin_type, '__module__') and issubclass(plugin_type, CMSPluginBase):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
@@ -110,7 +109,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     See docs/extending_cms/api_reference.rst for more info
     """
-    if published != None:
+    if published is not None:
         warnings.warn('This API function no longer accepts a published argument', UserWarning)
 
     # validate template

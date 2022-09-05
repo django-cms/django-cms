@@ -6,6 +6,7 @@ import sys
 def noop_gettext(s):
     return s
 
+
 permission = True
 cms_toolbar_edit_on = 'edit'
 

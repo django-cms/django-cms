@@ -291,10 +291,15 @@ class PageAdmin(admin.ModelAdmin):
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
             matching_published_pages = self.model.objects.filter(
-                Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
+                Q(
+                    pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code
+                ) | Q(
+                    urls__path__icontains=query_term, pagecontent_set__language=language_code
+                ) | Q(
+                    pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code
+                ) | Q(
+                    pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code
+                )
             ).distinct()
 
             results = []
@@ -411,8 +416,7 @@ class PageAdmin(admin.ModelAdmin):
             protected=protected,
             opts=opts,
             app_label=app_label,
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
+            is_popup=(IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET),
             to_field=None,
         )
         context.update(extra_context or {})
@@ -1252,9 +1256,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         to_delete_objects = [to_delete_urls, to_delete_plugins, to_delete_translations]
         perms_needed = set(
-            list(perms_needed_url) +
-            list(perms_needed_translation) +
-            list(perms_needed_plugins)
+            list(perms_needed_url) + list(perms_needed_translation) + list(perms_needed_plugins)
         )
 
         # This is bad and I should feel bad.
@@ -1354,16 +1356,14 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if node_id:
             page = get_object_or_404(pages, node_id=int(node_id))
-            pages = page.get_descendant_pages().filter(Q(node__in=open_nodes)|Q(node__parent__in=open_nodes))
+            pages = page.get_descendant_pages().filter(Q(node__in=open_nodes) | Q(node__parent__in=open_nodes))
         else:
             page = None
             pages = pages.filter(
                 # get all root nodes
-                Q(node__depth=1)
                 # or children which were previously open
-                | Q(node__depth=2, node__in=open_nodes)
                 # or children of the open descendants
-                | Q(node__parent__in=open_nodes)
+                Q(node__depth=1) | Q(node__depth=2, node__in=open_nodes) | Q(node__parent__in=open_nodes)
             )
         pages = pages.prefetch_related(
             Prefetch(

@@ -85,4 +85,3 @@ class PermissionCacheTests(CMSTestCase):
             Site.objects.get_current(),
         )
         self.assertTrue(can_publish)
-

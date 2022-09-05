@@ -68,9 +68,10 @@ class PageSelectWidget(MultiWidget):
         page_choices = get_page_choices()
         self.site_choices = site_choices
         self.choices = page_choices
-        self.widgets = (Select(choices=site_choices ),
-                   Select(choices=[('', '----')]),
-                   Select(choices=self.choices, attrs={'style': "display:none;"} ),
+        self.widgets = (
+            Select(choices=site_choices),
+            Select(choices=[('', '----')]),
+            Select(choices=self.choices, attrs={'style': "display:none;"}),
         )
 
     def _build_script(self, name, value, attrs={}):
@@ -155,13 +156,17 @@ class UserSelectAdminWidget(Select):
     """
     def render(self, name, value, attrs=None, choices=(), renderer=None):
         output = [super().render(name, value, attrs, renderer=renderer)]
-        if hasattr(self, 'user') and (self.user.is_superuser or \
-            self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
+        if hasattr(self, 'user') and (
+            self.user.is_superuser or self.user.has_perm(
+                PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))
+        ):
             # append + icon
             add_url = admin_reverse('cms_pageuser_add')
-            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
-                    (add_url, name))
-        return mark_safe(u''.join(output))
+            output.append(
+                '<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' %
+                (add_url, name)
+            )
+        return mark_safe(''.join(output))
 
 
 class AppHookSelect(Select):

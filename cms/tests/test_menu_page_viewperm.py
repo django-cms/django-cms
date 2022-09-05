@@ -303,7 +303,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_c',
             'page_c_a',
             'page_c_b',
@@ -337,7 +338,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_c',
             'page_c_a',
             'page_c_b',
@@ -420,7 +422,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_b',
             'page_b_a',
             'page_b_b',
@@ -462,7 +465,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_b_b_a',
             'page_b_b_a_a',
             'page_b_b_b',
@@ -497,7 +501,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_c',
             'page_c_a',
             'page_c_b',
@@ -570,7 +575,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         page_4 = create_page("page_4", parent=page_3, **stdkwargs)
         page_5 = create_page("page_5", parent=homepage, **stdkwargs)
         page_6 = create_page("page_6", parent=page_5, **stdkwargs)
-        return [homepage,
+        return [
+            homepage,
             page_2,
             page_3,
             page_4,
@@ -606,7 +612,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
             else:
                 msg = "Permission wrong at page %s" % (page.get_title())
                 self.assertEqual(len(perm), 0, msg)
-        granted = ['page_1',
+        granted = [
+            'page_1',
             'page_2',
             'page_3',
             'page_4',
@@ -620,7 +627,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         self.assertViewAllowed(urls["/en/page_5/"], user)
         self.assertViewNotAllowed(urls["/en/page_5/page_6/"], user)
         # group member
-        granted = ['page_1',
+        granted = [
+            'page_1',
             'page_2',
             'page_3',
             'page_4',

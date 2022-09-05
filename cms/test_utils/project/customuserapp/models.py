@@ -38,19 +38,25 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     Username, password and email are required. Other fields are optional.
     """
-    username = models.CharField(_('username'), max_length=300, unique=True,
+    username = models.CharField(
+        _('username'), max_length=300, unique=True,
         help_text=_('Required. 300 characters or fewer. Letters, numbers and '
                     '@/./+/-/_ characters'),
         validators=[
             validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
-        ])
+        ]
+    )
     email = models.EmailField(_('email address'), blank=True)
-    is_staff = models.BooleanField(_('staff status'), default=False,
+    is_staff = models.BooleanField(
+        _('staff status'), default=False,
         help_text=_('Designates whether the user can log into this admin '
-                    'site.'))
-    is_active = models.BooleanField(_('active'), default=True,
+                    'site.')
+    )
+    is_active = models.BooleanField(
+        _('active'), default=True,
         help_text=_('Designates whether this user should be treated as '
-                    'active. Unselect this instead of deleting accounts.'))
+                    'active. Unselect this instead of deleting accounts.')
+    )
     my_new_field = models.IntegerField(null=True, blank=True, default=42)
 
     objects = CustomUserManager()

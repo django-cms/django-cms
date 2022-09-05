@@ -252,15 +252,15 @@ class AdminTestCase(AdminTestsBase):
         second_level_page_top = create_page('level21', "nav_playground.html", "en",
                                             created_by=admin_user,
                                             parent=first_level_page)
-        second_level_page_bottom = create_page('level22', "nav_playground.html", "en", # nopyflakes
-                                               created_by=admin_user,
-                                               parent=self.reload(first_level_page))
-        third_level_page = create_page('level3', "nav_playground.html", "en", # nopyflakes
-                                       created_by=admin_user,
-                                       parent=second_level_page_top)
-        fourth_level_page = create_page('level23', "nav_playground.html", "en", # nopyflakes
-                                        created_by=admin_user,
-                                        parent=self.reload(first_level_page))
+        create_page('level22', "nav_playground.html", "en",  # nopyflakes
+                    created_by=admin_user,
+                    parent=self.reload(first_level_page))
+        create_page('level3', "nav_playground.html", "en",  # nopyflakes
+                    created_by=admin_user,
+                    parent=second_level_page_top)
+        create_page('level23', "nav_playground.html", "en",  # nopyflakes
+                    created_by=admin_user,
+                    parent=self.reload(first_level_page))
         self.assertEqual(Page.objects.all().count(), 5)
         endpoint = self.get_pages_admin_list_uri()
 
@@ -757,22 +757,46 @@ class AdminFormsTests(AdminTestsBase):
             # Non ajax call should return a 403 as this page shouldn't be accessed by anything else but ajax queries
             self.assertEqual(403, self.client.get(page_url).status_code)
 
-            self.assertEqual(200,
-                             self.client.get(page_url, HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code
+            self.assertEqual(
+                200, self.client.get(page_url, HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code
             )
 
             # Test that the query param is working as expected.
-            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'main_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
+            self.assertEqual(
+                1, len(json.loads(
+                    self.client.get(
+                        page_url, {'q': 'main_title'},
+                        HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+                    ).content.decode("utf-8")
+                ))
+            )
 
-            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'menu_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
+            self.assertEqual(
+                1, len(json.loads(
+                    self.client.get(
+                        page_url, {'q': 'menu_title'},
+                        HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+                    ).content.decode("utf-8")
+                ))
+            )
 
-            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'overwritten_url'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
+            self.assertEqual(
+                1, len(json.loads(
+                    self.client.get(
+                        page_url, {'q': 'overwritten_url'},
+                        HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+                    ).content.decode("utf-8")
+                ))
+            )
 
-            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'page_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
+            self.assertEqual(
+                1, len(json.loads(
+                    self.client.get(
+                        page_url, {'q': 'page_title'},
+                        HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+                    ).content.decode("utf-8")
+                ))
+            )
 
 
 class AdminPageEditContentSizeTests(AdminTestsBase):

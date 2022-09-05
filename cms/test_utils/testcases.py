@@ -164,8 +164,9 @@ class BaseCMSTestCase:
         """
         User = get_user_model()
 
-        fields = dict(email=username + '@django-cms.org', last_login=now(),
-                      is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
+        fields = dict(
+            email=username + '@django-cms.org', last_login=now(),
+            is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
         )
 
         # Check for special case where email is used as username

@@ -217,7 +217,7 @@ class Placeholder(models.Model):
                 try:
                     if field.exists():
                         self._attached_fields_cache.append(rel.field)
-                except:
+                except:  # NOQA
                     pass
         return self._attached_fields_cache
 

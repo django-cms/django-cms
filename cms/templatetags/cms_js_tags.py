@@ -69,4 +69,6 @@ class JavascriptString(Tag):
             from django.utils.text import javascript_quote as escapejs
         rendered = self.nodelist.render(context)
         return "'%s'" % escapejs(rendered.strip())
+
+
 register.tag(JavascriptString)

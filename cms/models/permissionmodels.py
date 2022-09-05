@@ -277,4 +277,3 @@ class PageUserGroup(Group):
         verbose_name = _('User group (page)')
         verbose_name_plural = _('User groups (page)')
         app_label = 'cms'
-

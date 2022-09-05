@@ -252,19 +252,27 @@ class BasicToolbar(CMSToolbar):
                 # True if the clipboard exists and there's plugins in it.
                 clipboard_is_bound = self.toolbar.clipboard_plugin
 
-                self._admin_menu.add_link_item(_('Clipboard...'), url='#',
-                        extra_classes=['cms-clipboard-trigger'],
-                        disabled=not clipboard_is_bound)
-                self._admin_menu.add_link_item(_('Clear clipboard'), url='#',
-                        extra_classes=['cms-clipboard-empty'],
-                        disabled=not clipboard_is_bound)
+                self._admin_menu.add_link_item(
+                    _('Clipboard...'), url='#',
+                    extra_classes=['cms-clipboard-trigger'],
+                    disabled=not clipboard_is_bound
+                )
+                self._admin_menu.add_link_item(
+                    _('Clear clipboard'), url='#',
+                    extra_classes=['cms-clipboard-empty'],
+                    disabled=not clipboard_is_bound
+                )
                 self._admin_menu.add_break(CLIPBOARD_BREAK)
 
             # Disable toolbar
-            self._admin_menu.add_link_item(_('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE'))
+            self._admin_menu.add_link_item(
+                _('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
+            )
             self._admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
-            self._admin_menu.add_link_item(_('Shortcuts...'), url='#',
-                    extra_classes=('cms-show-shortcuts',))
+            self._admin_menu.add_link_item(
+                _('Shortcuts...'), url='#',
+                extra_classes=('cms-show-shortcuts',)
+            )
             self._admin_menu.add_break(SHORTCUTS_BREAK)
 
             # logout
@@ -410,7 +418,7 @@ class PageToolbar(CMSToolbar):
             languages = get_language_dict(self.current_site.pk)
 
             remove = [(code, languages.get(code, code)) for code in self.page.get_languages() if code in languages]
-            add = [l for l in languages.items() if l not in remove]
+            add = [lang for lang in languages.items() if lang not in remove]
             copy = [(code, name) for code, name in languages.items() if code != self.current_lang and (code, name) in remove]
 
             if add or remove or copy:

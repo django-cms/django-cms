@@ -87,6 +87,8 @@ class DumbFixturePluginWithUrls(DumbFixturePlugin):
         return [
             re_path(r'^testview/$', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
         ]
+
+
 plugin_pool.register_plugin(DumbFixturePluginWithUrls)
 
 
@@ -261,7 +263,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(db_plugin_1.position, 1)
             self.assertEqual(text_plugin_2.position, 2)
             self.assertEqual(db_plugin_2.position, 2)
-            ## Finally we render the placeholder to test the actual content
+            # Finally we render the placeholder to test the actual content
             context = self.get_context(page_en.get_absolute_url(), page=page_en)
             rendered_placeholder = _render_placeholder(ph_en, context)
             self.assertEqual(rendered_placeholder, "I'm the firstI'm the second")
@@ -270,8 +272,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         Test that plugin position is saved after creation
         """
-        cms_page = api.create_page("PluginOrderPage", "col_two.html", "en",
-                                     slug="page1", in_navigation=True)
+        cms_page = api.create_page("PluginOrderPage", "col_two.html", "en", slug="page1", in_navigation=True)
         placeholder = cms_page.get_placeholders("en").get(slot="col_left")
 
         # We check created objects and objects from the DB to be sure the position value
@@ -301,7 +302,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_2.pk).position, 2)
             self.assertEqual(CMSPlugin.objects.get(pk=text_plugin_3.pk).position, 3)
 
-            ## Finally we render the placeholder to test the actual content
+            # Finally we render the placeholder to test the actual content
             draft_page_context = self.get_context(cms_page.get_absolute_url(), page=cms_page)
             rendered_placeholder = _render_placeholder(placeholder, draft_page_context)
             self.assertEqual(rendered_placeholder, "I'm the firstI'm the secondI'm the third")
@@ -504,7 +505,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         """
         # add a page
         page = api.create_page(
-             title='test page',
+            title='test page',
             language=settings.LANGUAGES[0][0],
             template='nav_playground.html'
         )
@@ -612,7 +613,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         saved_plugin = CMSPlugin.objects.create(plugin_type='TextPlugin')
         self.assertIn('id={}'.format(saved_plugin.pk), repr(saved_plugin))
         self.assertIn("plugin_type='{}'".format(saved_plugin.plugin_type), repr(saved_plugin))
-
 
     def test_pickle(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -805,12 +805,12 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
         ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
-                                    dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
+                                  dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
 
         with register_plugins(ChildClassesPlugin):
             plugin = api.add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
-            ## assert baseline
+            # assert baseline
             self.assertEqual(['TextPlugin'], plugin.get_child_classes(placeholder.slot, page))
 
             CMS_PLACEHOLDER_CONF = {
@@ -833,7 +833,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with register_plugins(ParentClassesPlugin):
             plugin = api.add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
-            ## assert baseline
+            # assert baseline
             self.assertEqual(['TextPlugin'], plugin.get_parent_classes(placeholder.slot, page))
 
             CMS_PLACEHOLDER_CONF = {
@@ -850,15 +850,13 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_plugin_parent_classes_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
-        ParentPlugin = type('ParentPlugin', (CMSPluginBase,),
-                                    dict(render_plugin=False))
-        ChildPlugin = type('ChildPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['ParentPlugin'], render_plugin=False))
+        ParentPlugin = type('ParentPlugin', (CMSPluginBase,), dict(render_plugin=False))
+        ChildPlugin = type('ChildPlugin', (CMSPluginBase,), dict(parent_classes=['ParentPlugin'], render_plugin=False))
 
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
-            ## assert baseline
+            # assert baseline
             child_classes = plugin.get_child_classes(placeholder.slot, page)
             self.assertIn('ChildPlugin', child_classes)
             self.assertIn('ParentPlugin', child_classes)
@@ -866,15 +864,13 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_plugin_require_parent_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
-        ParentPlugin = type('ParentPlugin', (CMSPluginBase,),
-                                    dict(render_plugin=False))
-        ChildPlugin = type('ChildPlugin', (CMSPluginBase,),
-                                    dict(require_parent=True, render_plugin=False))
+        ParentPlugin = type('ParentPlugin', (CMSPluginBase,), dict(render_plugin=False))
+        ChildPlugin = type('ChildPlugin', (CMSPluginBase,), dict(require_parent=True, render_plugin=False))
 
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
-            ## assert baseline
+            # assert baseline
             child_classes = plugin.get_child_classes(placeholder.slot, page)
             self.assertIn('ChildPlugin', child_classes)
             self.assertIn('ParentPlugin', child_classes)
@@ -979,7 +975,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         self.assertEqual(ArticlePluginModel.objects.all()[0].sections.count(), self.section_count)
 
         page_data = self.get_new_page_data()
-        #create 2nd language page
+        # create 2nd language page
         page_data.update({
             'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
             'cms_page': page.pk,

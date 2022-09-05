@@ -90,13 +90,13 @@ class ApphooksTestCase(CMSTestCase):
                                        "en", created_by=superuser, parent=child_page, apphook=apphook,
                                        apphook_namespace=namespace)
         create_title("de", child_child_page.get_title(), child_child_page)
-        # publisher_public is set to draft on publish, issue with onetoone reverse
+        # publisher_public is set to draft on publish, issue with one-to-one reverse
         child_child_page = self.reload(child_child_page)
 
         if isinstance(title_langs, str):
             titles = child_child_page.get_title_obj(title_langs)
         else:
-            titles = [child_child_page.get_title_obj(l) for l in title_langs]
+            titles = [child_child_page.get_title_obj(lang) for lang in title_langs]
 
         self.reload_urls()
 

@@ -56,7 +56,8 @@ class RenderingEmptyTestCase(CMSTestCase):
 
         self.user = self.get_superuser()
         self.client.force_login(self.user)
-        self.page = create_page(self.test_data['title'], TEMPLATE_NAME, 'en',
+        self.page = create_page(
+            self.test_data['title'], TEMPLATE_NAME, 'en',
             slug=self.test_data['slug'], created_by=self.user,
             reverse_id=self.test_data['reverse_id']
         )

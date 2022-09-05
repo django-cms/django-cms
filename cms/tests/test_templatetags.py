@@ -55,7 +55,8 @@ class TemplatetagTests(CMSTestCase):
                     'public': True,
                     'fallbacks': ['en']
                 },
-        ]}
+            ]
+        }
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
                 page.title_cache = {'en': PageContent(page_title="test2", title="test2")}
@@ -206,8 +207,9 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
     def test_get_page_by_untyped_arg_dict_fail_debug(self):
         with self.settings(DEBUG=True):
             request = self.get_request('/')
-            self.assertRaises(Page.DoesNotExist,
-                              _get_page_by_untyped_arg, {'pk': 1003}, request, 1
+            self.assertRaises(
+                Page.DoesNotExist,
+                _get_page_by_untyped_arg, {'pk': 1003}, request, 1
             )
             self.assertEqual(len(mail.outbox), 0)
 

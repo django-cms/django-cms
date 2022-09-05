@@ -1396,4 +1396,3 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected)
-

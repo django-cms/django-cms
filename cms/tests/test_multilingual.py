@@ -278,12 +278,13 @@ class MultilingualTestCase(CMSTestCase):
             self.assertRedirects(response, '/en/')
 
     def test_no_english_defined(self):
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],
+        with self.settings(
+            TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
-                1:[
+                1: [
                     {'code': 'de', 'name': 'German', 'public':True, 'fallbacks': []},
                 ]},
-            ):
+        ):
             try:
                 update_site_and_page_choices(language='en-us')
             except LanguageError:

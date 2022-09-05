@@ -17,6 +17,7 @@ class CategoryAdmin(admin.ModelAdmin):
 class SomeEditableAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
     pass
 
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(SampleAppConfig)
 admin.site.register(SomeEditableModel, SomeEditableAdmin)

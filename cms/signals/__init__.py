@@ -35,6 +35,7 @@ def check_v4_confirmation(**kwargs):
 
 # ################### Our own signals ###################
 
+
 # fired after page location is changed - is moved from one node to other
 page_moved = Signal(providing_args=["instance"])
 
