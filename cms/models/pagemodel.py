@@ -909,7 +909,6 @@ class Page(models.Model):
         if self.title_cache.get(language):
             return language
 
-
         use_fallback = all([
             fallback,
             not self.title_cache.get(language),

@@ -38,7 +38,6 @@ def sample_plugin_context_processor(instance, placeholder, original_context):
     }
 
 
-
 @override_settings(
     CMS_TEMPLATES=[
         (TEMPLATE_NAME, TEMPLATE_NAME),

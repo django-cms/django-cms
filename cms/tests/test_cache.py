@@ -466,7 +466,6 @@ class CacheTestCase(CMSTestCase):
                 response = self.client.get(page_url)
             self.assertEqual(response.status_code, 200)
 
-
     def test_invalidate_restart(self):
 
         # Ensure that we're testing in an environment WITHOUT the MW cache...

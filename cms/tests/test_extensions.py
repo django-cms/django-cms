@@ -372,7 +372,6 @@ class ExtensionAdminTestCase(CMSTestCase):
             self.assertIn("TestItem", response.rendered_content)
         toolbar_pool.toolbars = old_toolbars
 
-
     def test_admin_title_extension(self):
         with self.login_user_context(self.admin):
             # add a new extension

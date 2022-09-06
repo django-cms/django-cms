@@ -991,7 +991,6 @@ class CMSAdminURL(AsTag):
         return admin_reverse(viewname, args=args, kwargs=kwargs)
 
 
-
 register.tag('page_attribute', PageAttribute)
 register.tag('render_plugin_block', RenderPluginBlock)
 register.tag('placeholder', Placeholder)

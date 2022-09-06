@@ -332,7 +332,6 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self.assertViewNotAllowed(urls["/en/page_d/"], user)
         self.assertNotInMenu(urls["/en/page_d/"], user)
 
-
     def test_menu_access_page_and_children_group_1(self):
         """
         simulate behaviour of group b member

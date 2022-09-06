@@ -267,7 +267,6 @@ class ViewTests(CMSTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/de/jobs/')
 
-
     def test_page_sanitisation_xss_attack(self):
         """
             When sending a request the CMS uses get_page_from_request to return the appropriate page.

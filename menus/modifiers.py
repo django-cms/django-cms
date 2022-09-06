@@ -52,7 +52,6 @@ class Marker(Modifier):
             self.mark_descendants(node.children)
 
 
-
 class Level(Modifier):
     """
     marks all node levels
@@ -73,7 +72,6 @@ class Level(Modifier):
 
         return nodes
 
-
     def mark_levels(self, node, post_cut):
         for child in node.children:
             if post_cut:
@@ -81,7 +79,6 @@ class Level(Modifier):
             else:
                 child.level = node.level + 1
             self.mark_levels(child, post_cut)
-
 
 
 class AuthVisibility(Modifier):

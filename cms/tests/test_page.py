@@ -487,7 +487,6 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
 
-
     def test_delete_with_plugins(self):
         """
         Check that plugins and placeholders get correctly deleted when we delete

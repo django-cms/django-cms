@@ -79,7 +79,6 @@ class TemplatesConfig(CMSTestCase):
                 if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
                     self.assertTrue(template[0].find('%s/' % SITE_PATH[2]) >= -1)
 
-
     @override_settings(CMS_TEMPLATES_DIR=BAD_PATH)
     def test_custom_templates_bad_dir(self):
         """
