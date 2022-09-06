@@ -3,7 +3,7 @@ import importlib
 from django.apps import apps
 from django.conf import settings
 
-# overide with custom classes if they exist
+# override with custom classes if they exist
 if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
     # UserAdmin class
     user_app_name = settings.AUTH_USER_MODEL.split('.')[0]
@@ -17,7 +17,7 @@ if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
         else:
             from django.contrib.auth.admin import UserAdmin
     except ImportError:
-        from django.contrib.auth.admin import UserAdmin  # nopyflakes
+        from django.contrib.auth.admin import UserAdmin  # noqa
 
     # user form classes
     try:
@@ -33,9 +33,9 @@ if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
         else:
             from django.contrib.auth.forms import UserChangeForm
     except ImportError:
-        from django.contrib.auth.forms import UserChangeForm  # nopyflakes
-        from django.contrib.auth.forms import UserCreationForm  # nopyflakes
+        from django.contrib.auth.forms import UserChangeForm  # noqa
+        from django.contrib.auth.forms import UserCreationForm  # noqa
 else:
-    from django.contrib.auth.admin import UserAdmin  # nopyflakes
-    from django.contrib.auth.forms import UserChangeForm  # nopyflakes
-    from django.contrib.auth.forms import UserCreationForm  # nopyflakes
+    from django.contrib.auth.admin import UserAdmin  # noqa
+    from django.contrib.auth.forms import UserChangeForm  # noqa
+    from django.contrib.auth.forms import UserCreationForm  # noqa
