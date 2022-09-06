@@ -47,7 +47,7 @@ def urljoin(*segments):
     >>> urljoin('/a', '')
     u'/a/'
     """
-    url  = '/' if segments[0].startswith('/') else ''
+    url = '/' if segments[0].startswith('/') else ''
     url += '/'.join(filter(None, (force_str(s).strip('/') for s in segments)))
     return url + '/' if settings.APPEND_SLASH else url
 

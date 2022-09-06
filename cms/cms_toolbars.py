@@ -70,7 +70,7 @@ class PlaceholderToolbar(CMSToolbar):
 
         if self.page:
             user = self.request.user
-            page_pk  = self.page.pk
+            page_pk = self.page.pk
             disabled = len(list(entry_choices(user, self.page))) == 0
         else:
             page_pk = ''
