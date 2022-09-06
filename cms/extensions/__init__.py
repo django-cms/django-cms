@@ -1,5 +1,13 @@
-from .admin import PageExtensionAdmin  # noqa
-from .admin import TitleExtensionAdmin  # noqa
-from .extension_pool import extension_pool  # noqa
-from .models import PageExtension  # noqa
-from .models import TitleExtension  # noqa
+from .admin import PageExtensionAdmin
+from .admin import TitleExtensionAdmin
+from .extension_pool import extension_pool
+from .models import PageExtension
+from .models import TitleExtension
+
+__all__ = [
+    'extension_pool',
+    'PageExtension',
+    'PageExtensionAdmin',
+    'TitleExtension',
+    'TitleExtensionAdmin'
+]
