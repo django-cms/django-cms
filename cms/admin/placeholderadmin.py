@@ -629,8 +629,9 @@ class PlaceholderAdmin(admin.ModelAdmin):
         parent_id = get_int(request.POST.get('plugin_parent', ""), None)
         target_language = request.POST['target_language']
         move_a_copy = request.POST.get('move_a_copy')
-        move_a_copy = (move_a_copy and move_a_copy != "0" and
-                       move_a_copy.lower() != "false")
+        move_a_copy = (
+            move_a_copy and move_a_copy != "0" and move_a_copy.lower() != "false"
+        )
         move_to_clipboard = placeholder == request.toolbar.clipboard
         source_placeholder = plugin.placeholder
 

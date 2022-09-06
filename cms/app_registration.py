@@ -20,10 +20,8 @@ def _find_subclasses(module, klass):
     # Find all classes that inherit from klass
     for name, obj in inspect.getmembers(module):
         is_subclass = (
-            inspect.isclass(obj) and
-            issubclass(obj, klass) and
             # Ignore the import of klass itself
-            obj != klass
+            inspect.isclass(obj) and issubclass(obj, klass) and obj != klass
         )
         if is_subclass:
             classes.append(obj)

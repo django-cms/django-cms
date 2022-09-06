@@ -145,10 +145,7 @@ class PlaceholderToolbar(CMSToolbar):
         if not self.request.user.has_perm('cms.use_structure'):
             return False
 
-        if (
-            self.page and not self.page.application_urls and
-            self._has_page_change_perm()
-        ):
+        if self.page and not self.page.application_urls and self._has_page_change_perm():
             return True
         elif self._has_placeholder_change_perm():
             return True

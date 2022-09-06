@@ -225,9 +225,10 @@ class ViewPermissionTests(CMSTestCase):
                 in_restricted = True
             if page_id in public_page_ids:
                 in_public = True
-            self.assertTrue((in_public and not in_restricted) or
-                            (not in_public and in_restricted),
-                            msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted))
+            self.assertTrue(
+                (in_public and not in_restricted) or (not in_public and in_restricted),
+                msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted)
+            )
 
     def assertGrantedVisibility(self, all_pages, expected_granted_pages, username=None):
         """
