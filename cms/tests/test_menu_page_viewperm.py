@@ -150,7 +150,7 @@ class ViewPermissionTests(CMSTestCase):
                 user_set.add(user)
                 group.save()
 
-        self.assertEqual(11, get_user_model().objects.all().count()-default_users_count)
+        self.assertEqual(11, get_user_model().objects.all().count() - default_users_count)
 
     def _setup_view_restrictions(self):
         """
@@ -242,7 +242,7 @@ class ViewPermissionTests(CMSTestCase):
                 username = username + '@django-cms.org'
 
             query = dict()
-            query[get_user_model().USERNAME_FIELD+'__iexact'] = username
+            query[get_user_model().USERNAME_FIELD + '__iexact'] = username
             user = get_user_model().objects.get(**query)
         request = self.get_request(user)
         visible_page_ids = [page.pk for page in get_visible_nodes(request, all_pages, self.site)]

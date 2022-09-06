@@ -447,7 +447,7 @@ class PageTest(PageTestBase):
             change_user = str(superuser)
             # some databases don't store microseconds, so move the start flag
             # back by 1 second
-            before_change = tz_now()+datetime.timedelta(seconds=-1)
+            before_change = tz_now() + datetime.timedelta(seconds=-1)
             self.client.post(self.get_page_add_uri('en'), page_data)
             page = Page.objects.get(urls__slug=page_data['slug'])
             self.client.post(self.get_page_change_uri('en', page), page_data)

@@ -338,9 +338,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
         # These asserts that no orphaned plugin exists
-        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins*2)
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins * 2)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins)
 
@@ -489,7 +489,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))
 
         # Plugins still copied
-        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins*2)
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins * 2)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins)
 
@@ -514,7 +514,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         # one placeholder (with 7 plugins) is skipped, so the difference must be 6
-        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins-6)
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins - 6)
 
     def test_copy_filled_placeholder_force_copy(self):
         """
@@ -544,7 +544,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         # we have an existing plugin in one placeholder, so we have one more
-        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins+1)
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins + 1)
 
     def test_copy_from_non_existing_lang(self):
         """
@@ -606,7 +606,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         # plugins for site 2 fr
         self.assertEqual(CMSPlugin.objects.filter(language='fr').count(), number_site2_plugins)
         # global number of plugins
-        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins + number_site2_plugins*2)
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins + number_site2_plugins * 2)
 
     def test_copy_bad_languages(self):
         out = StringIO()
@@ -616,4 +616,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
                 stdout=out
             )
 
-        self.assertEqual(str(command_error.exception), 'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES')
+        self.assertEqual(
+            str(command_error.exception),
+            'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES'
+        )

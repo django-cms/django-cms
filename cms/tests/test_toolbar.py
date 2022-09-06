@@ -220,7 +220,7 @@ class ToolbarTests(ToolbarTestBase):
                 data={
                     'obj_id': page_content.pk,
                     'obj_type': 'cms.pagecontent',
-                    'cms_path': get_object_edit_url(page_content)+"q"  # Invalid
+                    'cms_path': get_object_edit_url(page_content) + "q"  # Invalid
                 },
             )
             self.assertEqual(response.status_code, 200)

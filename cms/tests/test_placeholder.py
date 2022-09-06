@@ -1353,15 +1353,13 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
         for i in range(1, 12, 3):
             parent = self._create_plugin(placeholder, position=i)
             parent_2 = self._create_plugin(placeholder, parent=parent, position=i + 1)
-            self._create_plugin(placeholder, parent=parent_2, position=i+2)
+            self._create_plugin(placeholder, parent=parent_2, position=i + 2)
 
     def test_move_to_placeholder_under_parent(self):
         plugin = self.get_plugins().filter(parent__isnull=True).first()
         source_tree_by_root = self.get_plugin_tree()
         source_plugin_tree_all = list(
-            self
-            .get_plugins()
-            .values_list('pk', flat=True)
+            self .get_plugins() .values_list('pk', flat=True)
         )
         target = self._create_placeholder('target')
         self.create_plugins(target)

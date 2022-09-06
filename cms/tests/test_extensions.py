@@ -32,22 +32,22 @@ class ExtensionsTestCase(CMSTestCase):
 
         # register first time
         extension_pool.register(page_extension)
-        self.assertEqual(len(extension_pool.page_extensions), initial_extension_count+1)
+        self.assertEqual(len(extension_pool.page_extensions), initial_extension_count + 1)
 
         # register second time
         extension_pool.register(page_extension)
-        self.assertEqual(len(extension_pool.page_extensions), initial_extension_count+1)
+        self.assertEqual(len(extension_pool.page_extensions), initial_extension_count + 1)
 
         # --- Title registering --------------------------------------
         title_extension = self.get_title_extension_class()
 
         # register first time
         extension_pool.register(title_extension)
-        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count+1)
+        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count + 1)
 
         # register second time
         extension_pool.register(title_extension)
-        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count+1)
+        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count + 1)
 
         # --- Unregister ---------------------------------------------
         extension_pool.unregister(page_extension)
