@@ -1,1 +1,1 @@
-from .cms_sitemap import CMSSitemap  # noqa
+from .cms_sitemap import CMSSitemap  # nopyflakes
