@@ -11,7 +11,7 @@ else:
 
 urlpatterns = [
     # Public pages
-    re_path(r'^$', details, {'slug':''}, name='pages-root'),
+    re_path(r'^$', details, {'slug': ''}, name='pages-root'),
     reg,
 ]
 

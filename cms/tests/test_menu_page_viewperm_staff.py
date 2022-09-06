@@ -419,7 +419,7 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_d',]
+        granted = ['page_d', ]
         self.assertGrantedVisibility(all_pages, granted, username='user_5_nostaff')
 
         if get_user_model().USERNAME_FIELD == 'email':

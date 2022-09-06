@@ -282,7 +282,7 @@ class MultilingualTestCase(CMSTestCase):
             TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
                 1: [
-                    {'code': 'de', 'name': 'German', 'public':True, 'fallbacks': []},
+                    {'code': 'de', 'name': 'German', 'public': True, 'fallbacks': []},
                 ]},
         ):
             try:

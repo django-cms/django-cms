@@ -39,7 +39,7 @@ class PageSelectWidget(MultiWidget):
             page = Page.objects.select_related('node').get(pk=value)
             return [page.node.site_id, page.pk, page.pk]
         site = Site.objects.get_current()
-        return [site.pk,None,None]
+        return [site.pk, None, None]
 
     def _has_changed(self, initial, data):
         # THIS IS A COPY OF django.forms.widgets.Widget._has_changed()
@@ -92,7 +92,7 @@ class PageSelectWidget(MultiWidget):
         return context
 
     def format_output(self, rendered_widgets):
-        return u' '.join(rendered_widgets)
+        return ' '.join(rendered_widgets)
 
 
 class PageSmartLinkWidget(TextInput):
