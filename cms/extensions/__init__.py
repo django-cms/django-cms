@@ -1,8 +1,7 @@
-from .admin import PageExtensionAdmin
-from .admin import TitleExtensionAdmin
+from .admin import PageExtensionAdmin, TitleExtensionAdmin
 from .extension_pool import extension_pool
-from .models import PageExtension
-from .models import TitleExtension
+from .models import PageExtension, TitleExtension
+
 
 __all__ = [
     'extension_pool',
