@@ -382,7 +382,7 @@ class LanguageChooser(InclusionTag):
             i18n_mode = _tmp
         if template is NOT_PROVIDED:
             template = "menu/language_chooser.html"
-        if not i18n_mode in MARKERS:
+        if i18n_mode not in MARKERS:
             i18n_mode = 'raw'
         if 'request' not in context:
             # If there's an exception (500), default context_processors may not be called.

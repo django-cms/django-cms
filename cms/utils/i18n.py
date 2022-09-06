@@ -149,7 +149,7 @@ def get_default_language(language_code=None, site_id=None):
     # otherwise split the language code if possible, so iso3
     language_code = language_code.split("-")[0]
 
-    if not language_code in languages:
+    if language_code not in languages:
         return settings.LANGUAGE_CODE
 
     return language_code
