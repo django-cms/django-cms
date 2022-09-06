@@ -13,6 +13,7 @@ class PlaceholderReference(CMSPlugin):
     )
     name = models.CharField(max_length=255)
     placeholder_ref = PlaceholderField(slotname='clipboard')
+
     class Meta:
         app_label = 'cms'
 

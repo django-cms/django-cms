@@ -148,7 +148,7 @@ class ViewPermissionComplexMenuStaffNodeTests(ViewPermissionTests):
         self.assertViewNotAllowed(urls['/en/page_b/page_b_b/page_b_b_a/page_b_b_a_a/'], user)
         self.assertViewNotAllowed(urls['/en/page_d/'], user)
         self.assertViewAllowed(urls['/en/page_d/page_d_a/'], user)
-#
+
     def test_node_staff_access_children_group_2_nostaff(self):
         """
         simulate behaviour of group 2 member
