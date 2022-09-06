@@ -49,14 +49,14 @@ class PageSelectWidget(MultiWidget):
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or inital value we get
-        # is None, replace it w/ u''.
-        if data is None or (len(data)>=2 and data[1] in [None,'']):
-            data_value = u''
+        # the same as an empty string, if the data or initial value we get
+        # is None, replace it w/ ''.
+        if data is None or (len(data) >= 2 and data[1] in [None, '']):
+            data_value = ''
         else:
             data_value = data
         if initial is None:
-            initial_value = u''
+            initial_value = ''
         else:
             initial_value = initial
         if force_str(initial_value) != force_str(data_value):
