@@ -1,6 +1,7 @@
 from menus.base import Modifier
 from menus.menu_pool import menu_pool
 
+
 class Marker(Modifier):
     """
     searches the current selected node and marks them.

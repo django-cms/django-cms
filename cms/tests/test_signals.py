@@ -12,6 +12,8 @@ overrides = {
     'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + settings.MIDDLEWARE,
     'CMS_PERMISSION': False,
 }
+
+
 @override_settings(**overrides)
 class SignalTests(CMSTestCase):
     def test_urls_need_reloading_signal_set_apphook(self):

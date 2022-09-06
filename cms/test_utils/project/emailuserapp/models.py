@@ -38,6 +38,7 @@ class EmailUserManager(BaseUserManager):
         return self._create_user(email, password, True, True,
                                  **extra_fields)
 
+
 class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
     """
     An abstract user model that is an alternative to the standard AbstractUser.  The

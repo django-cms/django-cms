@@ -51,6 +51,7 @@ def render_page(request, page, current_language, slug):
         response['X-Frame-Options'] = 'DENY'
     return response
 
+
 def _handle_no_page(request):
     try:
         # add a $ to the end of the url (does not match on the cms anymore)

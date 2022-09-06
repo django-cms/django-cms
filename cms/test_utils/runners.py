@@ -7,6 +7,7 @@ from django.utils.unittest import TestSuite
 
 TIMINGS = {}
 
+
 def time_it(func):
     def _inner(*args, **kwargs):
         start = time.time()

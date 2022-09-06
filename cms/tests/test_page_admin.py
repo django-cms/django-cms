@@ -2972,6 +2972,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             self.assertEqual(response.status_code, 403)
             self.assertEqual(placeholder.get_plugins('en').count(), 2)
 
+
 @override_settings(CMS_PERMISSION=True)
 class PermissionsOnPageTest(PermissionsTestCase):
     """

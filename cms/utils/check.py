@@ -240,6 +240,7 @@ def check_middlewares(output):
             if middleware not in middlewares:
                 section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
 
+
 @define_check
 def check_context_processors(output):
     with output.section("Context processors") as section:
