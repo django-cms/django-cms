@@ -74,7 +74,9 @@ class AbstractPagePermission(models.Model):
     can_delete = models.BooleanField(_("can delete"), default=True)
     can_change_advanced_settings = models.BooleanField(_("can change advanced settings"), default=False)
     can_publish = models.BooleanField(_("can publish"), default=True)
-    can_change_permissions = models.BooleanField(_("can change permissions"), default=False, help_text=_("on page level"))
+    can_change_permissions = models.BooleanField(
+        _("can change permissions"), default=False, help_text=_("on page level")
+    )
     can_move_page = models.BooleanField(_("can move"), default=True)
     can_view = models.BooleanField(_("view restricted"), default=False, help_text=_("frontend view restriction"))
 
@@ -271,7 +273,11 @@ class PageUser(User):
 class PageUserGroup(Group):
     """Cms specific group data, required for permission system
     """
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="created_usergroups")
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="created_usergroups"
+    )
 
     class Meta:
         verbose_name = _('User group (page)')

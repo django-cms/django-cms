@@ -74,7 +74,9 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
         elif isinstance(position, BaseItem):
             position = self._item_position(position)
         elif not (position is None or isinstance(position, (int,))):
-            raise ValueError("Position must be None, an integer, an item or an ItemSearchResult, got %r instead" % position)
+            raise ValueError(
+                "Position must be None, an integer, an item or an ItemSearchResult, got %r instead" % position
+            )
         self._add_item(item, position)
         self._memoize(item)
         return item

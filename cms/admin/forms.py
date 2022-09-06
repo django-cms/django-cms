@@ -125,19 +125,39 @@ class BasePageContentForm(forms.ModelForm):
     _site = None
     _request = None
 
-    title = forms.CharField(label=_("Title"), max_length=255, widget=forms.TextInput(),
-                            help_text=_('The default title'))
-    slug = forms.CharField(label=_("Slug"), max_length=255, widget=forms.TextInput(),
-                           help_text=_('The part of the title that is used in the URL'))
-    menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
-                                 help_text=_('Overwrite what is displayed in the menu'), required=False)
-    page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
-                                 help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'),
-                                 required=False)
-    meta_description = forms.CharField(label=_('Description meta tag'), required=False,
-                                       widget=forms.Textarea(attrs={'maxlength': '320', 'rows': '4'}),
-                                       help_text=_('A description of the page used by search engines.'),
-                                       max_length=320)
+    title = forms.CharField(
+        label=_("Title"),
+        max_length=255,
+        widget=forms.TextInput(),
+        help_text=_('The default title')
+    )
+    slug = forms.CharField(
+        label=_("Slug"),
+        max_length=255,
+        widget=forms.TextInput(),
+        help_text=_('The part of the title that is used in the URL')
+    )
+    menu_title = forms.CharField(
+        label=_("Menu Title"),
+        widget=forms.TextInput(),
+        help_text=_('Overwrite what is displayed in the menu'),
+        required=False
+    )
+    page_title = forms.CharField(
+        label=_("Page Title"),
+        widget=forms.TextInput(),
+        required=False,
+        help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'),
+    )
+    meta_description = forms.CharField(
+        label=_('Description meta tag'),
+        max_length=320,
+        required=False,
+        widget=forms.Textarea(
+            attrs={'maxlength': '320', 'rows': '4'}
+        ),
+        help_text=_('A description of the page used by search engines.'),
+    )
 
     class Meta:
         model = PageContent
@@ -651,7 +671,9 @@ class AdvancedSettingsForm(forms.ModelForm):
 
                 if page_data.get('application_urls', False) and page_data['application_urls'] in app_configs:
                     configs = app_configs[page_data['application_urls']].get_configs()
-                    self.fields['application_configs'].widget.choices = [(config.pk, force_str(config)) for config in configs]
+                    self.fields['application_configs'].widget.choices = [
+                        (config.pk, force_str(config)) for config in configs
+                    ]
 
                     try:
                         config = configs.get(namespace=self.initial['application_namespace'])

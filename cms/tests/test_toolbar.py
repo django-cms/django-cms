@@ -343,8 +343,10 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, staff_user, edit_url)
         toolbar = CMSToolbar(request)
         page_item = self.get_page_item(toolbar)
-        template_item = [item for item in page_item.items
-                         if force_str(getattr(item, 'name', '')) == 'Templates']
+        template_item = [
+            item for item in page_item.items
+            if force_str(getattr(item, 'name', '')) == 'Templates'
+        ]
         self.assertEqual(len(template_item), 0)
 
         # Give the user change advanced settings permission
@@ -359,8 +361,10 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, staff_user, edit_url)
         toolbar = CMSToolbar(request)
         page_item = self.get_page_item(toolbar)
-        template_item = [item for item in page_item.items
-                         if force_str(getattr(item, 'name', '')) == 'Templates']
+        template_item = [
+            item for item in page_item.items
+            if force_str(getattr(item, 'name', '')) == 'Templates'
+        ]
         self.assertEqual(len(template_item), 1)
 
     def test_markup(self):
@@ -439,8 +443,10 @@ class ToolbarTests(ToolbarTestBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'href="LinkPlugin">')
-        self.assertContains(response,
-                            '<div class="cms-submenu-item cms-submenu-item-title"><span>Different Grouper</span>')
+        self.assertContains(
+            response,
+            '<div class="cms-submenu-item cms-submenu-item-title"><span>Different Grouper</span>'
+        )
 
     def test_extra_placeholder_menu_items(self):
         superuser = self.get_superuser()
@@ -469,16 +475,22 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page("toolbar-page-1", "col_two.html", "en")
         page_content = self.get_page_title_obj(page)
         page_edit_url = get_object_edit_url(page_content)
-        plugin_1 = add_plugin(page.get_placeholders("en").get(slot='col_left'), language='en',
-                              plugin_type='TestPluginAlpha', alpha='alpha')
+        plugin_1 = add_plugin(
+            page.get_placeholders("en").get(slot='col_left'), language='en',
+            plugin_type='TestPluginAlpha', alpha='alpha'
+        )
         superuser = self.get_superuser()
         with self.login_user_context(superuser):
             response = self.client.get(page_edit_url)
         self.assertEqual(response.status_code, 200)
         response_text = response.render().rendered_content
-        self.assertTrue(re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text))
+        self.assertTrue(
+            re.search('edit_plugin.+/en/admin/cms/placeholder/edit-plugin/%s' % plugin_1.pk, response_text)
+        )
         self.assertTrue(re.search('move_plugin.+/en/admin/cms/placeholder/move-plugin/', response_text))
-        self.assertTrue(re.search('delete_plugin.+/en/admin/cms/placeholder/delete-plugin/%s/' % plugin_1.pk, response_text))
+        self.assertTrue(
+            re.search('delete_plugin.+/en/admin/cms/placeholder/delete-plugin/%s/' % plugin_1.pk, response_text)
+        )
         self.assertTrue(re.search('add_plugin.+/en/admin/cms/placeholder/add-plugin/', response_text))
         self.assertTrue(re.search('copy_plugin.+/en/admin/cms/placeholder/copy-plugins/', response_text))
 
@@ -1023,8 +1035,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<h1><template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
             'one'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template></h1>'.format(
-                'placeholderapp', 'example1', 'char_1', ex1.pk))
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model">'
+            '</template></h1>'.format(
+                'placeholderapp', 'example1', 'char_1', ex1.pk
+            )
+        )
 
     def test_invalid_item(self):
         user = self.get_staff()
@@ -1326,8 +1341,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2} cms-render-model-icon"></template>'
             '<img src="/static/cms/img/toolbar/render_model_placeholder.png">'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2} cms-render-model-icon"></template>'.format(
-                'placeholderapp', 'example1', ex1.pk))
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2} cms-render-model-icon">'
+            '</template>'.format(
+                'placeholderapp', 'example1', ex1.pk
+            )
+        )
         self.assertContains(response, "onClose: 'REFRESH_PAGE',")
 
     def test_icon_tag(self):
@@ -1349,8 +1367,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2} cms-render-model-icon"></template>'
             '<img src="/static/cms/img/toolbar/render_model_placeholder.png">'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2} cms-render-model-icon"></template>'.format(
-                'placeholderapp', 'example1', ex1.pk))
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2} cms-render-model-icon">'
+            '</template>'.format(
+                'placeholderapp', 'example1', ex1.pk
+            )
+        )
 
     def test_icon_followed_by_render_model_block_tag(self):
         user = self.get_staff()

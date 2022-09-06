@@ -580,7 +580,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         p1 = create_page('page1', in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
         create_page('page4', in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
-        create_page('page2', in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj)
+        create_page(
+            'page2', in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj
+        )
 
         for page in Page.objects.on_site(site_active):
             self._fill_page_body(page, 'de')

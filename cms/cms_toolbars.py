@@ -316,7 +316,9 @@ class BasicToolbar(CMSToolbar):
 
     def add_language_menu(self):
         if settings.USE_I18N and not self._language_menu:
-            self._language_menu = self.toolbar.get_or_create_menu(LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1)
+            self._language_menu = self.toolbar.get_or_create_menu(
+                LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1
+            )
             language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
             for code, name in get_language_tuple(self.current_site.pk):
                 try:
@@ -419,13 +421,18 @@ class PageToolbar(CMSToolbar):
 
             remove = [(code, languages.get(code, code)) for code in self.page.get_languages() if code in languages]
             add = [lang for lang in languages.items() if lang not in remove]
-            copy = [(code, name) for code, name in languages.items() if code != self.current_lang and (code, name) in remove]
+            copy = [
+                (code, name) for code, name in languages.items() if
+                code != self.current_lang and (code, name) in remove
+            ]
 
             if add or remove or copy:
                 language_menu.add_break(ADD_PAGE_LANGUAGE_BREAK)
 
             if add:
-                add_plugins_menu = language_menu.get_or_create_menu('{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation'))
+                add_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation')
+                )
 
                 page_add_url = admin_reverse('cms_pagecontent_add')
 
@@ -434,7 +441,9 @@ class PageToolbar(CMSToolbar):
                     add_plugins_menu.add_modal_item(name, url=url)
 
             if remove:
-                remove_plugins_menu = language_menu.get_or_create_menu('{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation'))
+                remove_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation')
+                )
                 disabled = len(remove) == 1
                 for code, name in remove:
                     pagecontent = self.page.get_title_obj(code)
@@ -443,7 +452,9 @@ class PageToolbar(CMSToolbar):
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
-                copy_plugins_menu = language_menu.get_or_create_menu('{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins'))
+                copy_plugins_menu = language_menu.get_or_create_menu(
+                    '{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins')
+                )
                 title = _('from %s')
                 question = _('Are you sure you want to copy all plugins from %s?')
 

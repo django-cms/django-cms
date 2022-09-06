@@ -246,9 +246,13 @@ class AdminTestCase(AdminTestsBase):
         second_level_page_top = create_page(
             'level21', "nav_playground.html", "en", created_by=admin_user, parent=first_level_page
         )
-        create_page('level22', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page))
+        create_page(
+            'level22', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page)
+        )
         create_page('level3', "nav_playground.html", "en", created_by=admin_user, parent=second_level_page_top)
-        create_page('level23', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page))
+        create_page(
+            'level23', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page)
+        )
         self.assertEqual(Page.objects.all().count(), 5)
         endpoint = self.get_pages_admin_list_uri()
 

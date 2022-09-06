@@ -867,14 +867,19 @@ class PageTest(PageTestBase):
             # check page2 path and url
             page2 = Page.objects.get(pk=page2.pk)
             self.assertEqual(page2.get_path('en'), page_data1['slug'] + "/" + page_data2['slug'])
-            self.assertEqual(page2.get_absolute_url(),
-                             self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/")
+            self.assertEqual(
+                page2.get_absolute_url(),
+                self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/"
+            )
             # check page3 path and url
             page3 = Page.objects.get(pk=page3.pk)
-            self.assertEqual(page3.get_path('en'), page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3['slug'])
-            self.assertEqual(page3.get_absolute_url(),
-                             self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3[
-                                 'slug'] + "/")
+            self.assertEqual(
+                page3.get_path('en'), page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3['slug']
+            )
+            self.assertEqual(
+                page3.get_absolute_url(),
+                self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3['slug'] + "/"
+            )
 
             # Remove home page
             home.delete()

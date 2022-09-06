@@ -74,7 +74,8 @@ def get_current_language():
     """
     Returns the currently active language
 
-    It's a replacement for Django's translation.get_language() to make sure the LANGUAGE_CODE will be found in LANGUAGES.
+    It's a replacement for Django's translation.get_language() to make sure the
+    LANGUAGE_CODE will be found in LANGUAGES.
     Overcomes this issue: https://code.djangoproject.com/ticket/9340
     """
     language_code = translation.get_language()

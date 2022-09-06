@@ -20,7 +20,9 @@ def compile_messages():
     try:
         pipe = subprocess.Popen(['msgfmt', '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     except OSError as e:
-        raise CommandError('Unable to run msgfmt (gettext) command. You probably don\'t have gettext installed. {}'.format(e))
+        raise CommandError(
+            f'Unable to run msgfmt (gettext) command. You probably don\'t have gettext installed. {e}'
+        )
 
     basedirs = [os.path.join('conf', 'locale'), 'locale']
     if os.environ.get('DJANGO_SETTINGS_MODULE'):
@@ -31,7 +33,10 @@ def compile_messages():
     basedirs = set(map(os.path.abspath, filter(os.path.isdir, basedirs)))
 
     if not basedirs:
-        raise CommandError("This script should be run from the Django SVN tree or your project or app tree, or with the settings module specified.")
+        raise CommandError(
+            "This script should be run from the Django SVN tree or your project or app tree, "
+            "or with the settings module specified."
+        )
 
     for basedir in basedirs:
         for dirpath, dirnames, filenames in os.walk(basedir):
@@ -43,7 +48,10 @@ def compile_messages():
                         # for django3.2 and above. The change happened in djang3.2 to pathlib.
                         pfn = Path(dirpath) / f
                     if has_bom(pfn):
-                        raise CommandError("The %s file has a BOM (Byte Order Mark). Django only supports .po files encoded in UTF-8 and without any BOM." % pfn)
+                        raise CommandError(
+                            "The %s file has a BOM (Byte Order Mark). "
+                            "Django only supports .po files encoded in UTF-8 and without any BOM." % pfn
+                        )
                     pf = os.path.splitext(pfn)[0]
                     # Store the names of the .mo and .po files in an environment
                     # variable, rather than doing a string replacement into the

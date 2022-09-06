@@ -488,9 +488,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         output = render_plugin(context, plugin)
         self.assertEqual(
             output,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>Test<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'.format(
-                plugin.pk
-            )
+            f'<template class="cms-plugin cms-plugin-start cms-plugin-{plugin.pk}"></template>'
+            f'Test<template class="cms-plugin cms-plugin-end cms-plugin-{plugin.pk}"></template>'
         )
 
     def test_render_placeholder_with_no_page(self):
@@ -574,8 +573,12 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar.is_staff = True
         with self.assertNumQueries(1):
             output = self.render_template_obj(template, {'category': Category()}, request)
-        expected_start = '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
-        expected_end = '<template class="cms-plugin cms-plugin-end cms-plugin-sampleapp-category-add-0 cms-render-model-add"></template>'
+        expected_start = \
+            '<template class="cms-plugin cms-plugin-start cms-plugin-sampleapp-category-add-0 cms-render-model-add">' \
+            '</template>'
+        expected_end = \
+            '<template class="cms-plugin cms-plugin-end cms-plugin-sampleapp-category-add-0 cms-render-model-add">' \
+            '</template>'
         self.assertIn(expected_start, output)
         self.assertIn(expected_end, output)
 

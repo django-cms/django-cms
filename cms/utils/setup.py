@@ -13,7 +13,9 @@ def validate_dependencies():
     Check for installed apps, their versions and configuration options
     """
     if not app_is_installed('treebeard'):
-        raise ImproperlyConfigured('django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.')
+        raise ImproperlyConfigured(
+            'django CMS requires django-treebeard. Please install it and add "treebeard" to INSTALLED_APPS.'
+        )
 
 
 def validate_settings():

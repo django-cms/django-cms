@@ -154,7 +154,9 @@ def get_templates():
         # If module file is not present skip configuration and just dump the filenames as templates
         if os.path.isfile(config_path):
             template_module = _load_from_file(config_path)
-            templates = [(os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()]
+            templates = [
+                (os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()
+            ]
         else:
             templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
     else:

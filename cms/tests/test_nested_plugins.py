@@ -479,7 +479,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
 
             # add the link plugin to the body
             # emulate the editor in admin that adds some txt for the nested plugin
-            in_txt = """<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">"""
+            in_txt = '<img id="plugin_obj_%s" title="Link" alt="Link" src="/static/cms/img/icons/plugins/link.png">'
             nesting_body = "%s<p>%s</p>" % (text_plugin.body, (in_txt % (link_plugin.id)))
             text_plugin.body = nesting_body
             text_plugin.save()

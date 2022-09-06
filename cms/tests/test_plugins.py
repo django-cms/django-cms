@@ -928,11 +928,15 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         for plugin in plugins:
             if plugin.title == 'custom template':
                 content = content_renderer.render_plugin(plugin, context, ph_en)
-                self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles_custom.html')
+                self.assertEqual(
+                    plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles_custom.html'
+                )
                 self.assertTrue('Articles Custom template' in content)
             else:
                 content = content_renderer.render_plugin(plugin, context, ph_en)
-                self.assertEqual(plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles.html')
+                self.assertEqual(
+                    plugin.get_plugin_class_instance().get_render_template({}, plugin, ph_en), 'articles.html'
+                )
                 self.assertFalse('Articles Custom template' in content)
 
     def test_add_plugin_with_m2m(self):
@@ -1235,4 +1239,7 @@ class UserInputValidationPluginTest(PluginsTestBaseCase):
             response = self.client.get(add_url)
 
         self.assertEqual(response.status_code, 400)
-        self.assertIn('TextPlugin&quot;&gt;&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;', response.content.decode("utf-8"))
+        self.assertIn(
+            'TextPlugin&quot;&gt;&lt;script&gt;alert(&quot;hello world&quot;)&lt;/script&gt;',
+            response.content.decode("utf-8")
+        )
