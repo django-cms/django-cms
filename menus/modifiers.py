@@ -92,10 +92,8 @@ class AuthVisibility(Modifier):
             return nodes
         final = []
         for node in nodes:
-            if (node.attr.get('visible_for_authenticated', True) and \
-                 request.user.is_authenticated) or \
-                (node.attr.get('visible_for_anonymous', True) and \
-                 not request.user.is_authenticated):
+            if (node.attr.get('visible_for_authenticated', True) and request.user.is_authenticated) or \
+                    (node.attr.get('visible_for_anonymous', True) and not request.user.is_authenticated):
                 final.append(node)
             else:
                 if node.parent and node in node.parent.children:

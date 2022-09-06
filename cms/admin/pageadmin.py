@@ -580,8 +580,9 @@ class PageAdmin(admin.ModelAdmin):
 
         # Does the user have permissions to do this...?
         if not can_move_page or (target and not target.has_add_permission(user)):
-            message = force_str(_("Error! You don't have permissions "
-                                   "to move this page. Please reload the page"))
+            message = force_str(
+                _("Error! You don't have permissions to move this page. Please reload the page")
+            )
             return jsonify_request(HttpResponseForbidden(message))
 
         operation_token = send_pre_page_operation(

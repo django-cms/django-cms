@@ -47,10 +47,11 @@ class PageExtensionAdmin(ExtensionAdmin):
                 page = Page.objects.get(pk=extended_object_id)
                 extension = self.model.objects.get(extended_object=page)
                 opts = self.model._meta
-                change_url = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.model_name),
-                                            args=(extension.pk,),
-                                            current_app=self.admin_site.name)
+                change_url = reverse(
+                    'admin:%s_%s_change' % (opts.app_label, opts.model_name),
+                    args=(extension.pk,),
+                    current_app=self.admin_site.name
+                )
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass
@@ -93,10 +94,11 @@ class TitleExtensionAdmin(ExtensionAdmin):
                 title = PageContent.objects.get(pk=extended_object_id)
                 extension = self.model.objects.get(extended_object=title)
                 opts = self.model._meta
-                change_url = reverse('admin:%s_%s_change' %
-                                            (opts.app_label, opts.model_name),
-                                            args=(extension.pk,),
-                                            current_app=self.admin_site.name)
+                change_url = reverse(
+                    'admin:%s_%s_change' % (opts.app_label, opts.model_name),
+                    args=(extension.pk,),
+                    current_app=self.admin_site.name
+                )
                 return HttpResponseRedirect(change_url)
             except self.model.DoesNotExist:
                 pass

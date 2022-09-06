@@ -126,12 +126,9 @@ class AdminTestCase(AdminTestsBase):
 
     def test_delete(self):
         admin_user = self.get_superuser()
-        create_page("home", "nav_playground.html", "en",
-                           created_by=admin_user)
-        page = create_page("delete-page", "nav_playground.html", "en",
-                           created_by=admin_user)
-        create_page('child-page', "nav_playground.html", "en",
-                    created_by=admin_user, parent=page)
+        create_page("home", "nav_playground.html", "en", created_by=admin_user)
+        page = create_page("delete-page", "nav_playground.html", "en", created_by=admin_user)
+        create_page('child-page', "nav_playground.html", "en", created_by=admin_user, parent=page)
         body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         with self.login_user_context(admin_user):
@@ -141,12 +138,9 @@ class AdminTestCase(AdminTestsBase):
 
     def test_delete_diff_language(self):
         admin_user = self.get_superuser()
-        create_page("home", "nav_playground.html", "en",
-                           created_by=admin_user)
-        page = create_page("delete-page", "nav_playground.html", "en",
-                           created_by=admin_user)
-        create_page('child-page', "nav_playground.html", "de",
-                    created_by=admin_user, parent=page)
+        create_page("home", "nav_playground.html", "en", created_by=admin_user)
+        page = create_page("delete-page", "nav_playground.html", "en", created_by=admin_user)
+        create_page('child-page', "nav_playground.html", "de", created_by=admin_user, parent=page)
         body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         with self.login_user_context(admin_user):
@@ -171,8 +165,7 @@ class AdminTestCase(AdminTestsBase):
 
     def test_pagetree_filtered(self):
         superuser = self.get_superuser()
-        create_page("root-page", "nav_playground.html", "en",
-                    created_by=superuser)
+        create_page("root-page", "nav_playground.html", "en", created_by=superuser)
         with self.login_user_context(superuser):
             url = admin_reverse('cms_pagecontent_changelist')
             response = self.client.get('%s?template__exact=nav_playground.html' % url)
@@ -181,8 +174,7 @@ class AdminTestCase(AdminTestsBase):
 
     def test_delete_translation(self):
         admin_user = self.get_superuser()
-        page = create_page("delete-page-translation", "nav_playground.html", "en",
-                           created_by=admin_user)
+        page = create_page("delete-page-translation", "nav_playground.html", "en", created_by=admin_user)
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
         create_title("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
         with self.login_user_context(admin_user):
@@ -229,13 +221,15 @@ class AdminTestCase(AdminTestsBase):
     def test_changelist_items(self):
         admin_user = self.get_superuser()
         first_level_page = create_page('level1', 'nav_playground.html', 'en')
-        second_level_page_top = create_page('level21', "nav_playground.html", "en",
-                                            created_by=admin_user, parent=first_level_page)
-        second_level_page_bottom = create_page('level22', "nav_playground.html", "en",
-                                               created_by=admin_user,
-                                               parent=self.reload(first_level_page))
-        third_level_page = create_page('level3', "nav_playground.html", "en",
-                                       created_by=admin_user, parent=second_level_page_top)
+        second_level_page_top = create_page(
+            'level21', "nav_playground.html", "en", created_by=admin_user, parent=first_level_page
+        )
+        second_level_page_bottom = create_page(
+            'level22', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page)
+        )
+        third_level_page = create_page(
+            'level3', "nav_playground.html", "en", created_by=admin_user, parent=second_level_page_top
+        )
         self.assertEqual(Page.objects.all().count(), 4)
 
         with self.login_user_context(admin_user):
@@ -249,18 +243,12 @@ class AdminTestCase(AdminTestsBase):
     def test_changelist_get_results(self):
         admin_user = self.get_superuser()
         first_level_page = create_page('level1', 'nav_playground.html', 'en')
-        second_level_page_top = create_page('level21', "nav_playground.html", "en",
-                                            created_by=admin_user,
-                                            parent=first_level_page)
-        create_page('level22', "nav_playground.html", "en",  # nopyflakes
-                    created_by=admin_user,
-                    parent=self.reload(first_level_page))
-        create_page('level3', "nav_playground.html", "en",  # nopyflakes
-                    created_by=admin_user,
-                    parent=second_level_page_top)
-        create_page('level23', "nav_playground.html", "en",  # nopyflakes
-                    created_by=admin_user,
-                    parent=self.reload(first_level_page))
+        second_level_page_top = create_page(
+            'level21', "nav_playground.html", "en", created_by=admin_user, parent=first_level_page
+        )
+        create_page('level22', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page))
+        create_page('level3', "nav_playground.html", "en", created_by=admin_user, parent=second_level_page_top)
+        create_page('level23', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page))
         self.assertEqual(Page.objects.all().count(), 5)
         endpoint = self.get_pages_admin_list_uri()
 

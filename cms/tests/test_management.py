@@ -311,8 +311,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         col4 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         # add a *nested* link plugin
-        add_plugin(ph_en, "LinkPlugin", lang, target=col4,
-                                    name="A Link", external_link="https://www.django-cms.org")
+        add_plugin(ph_en, "LinkPlugin", lang, target=col4, name="A Link", external_link="https://www.django-cms.org")
         static_placeholder = StaticPlaceholder(code=str(uuid.uuid4()), site_id=1)
         static_placeholder.save()
         add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")

@@ -103,9 +103,10 @@ class AliasPlugin(CMSPluginBase):
         page_url = origin_page.get_absolute_url(language=obj.language)
         page_title = origin_page.get_title(language=obj.language)
 
-        message = gettext('This is an alias reference, '
-                           'you can edit the content only on the '
-                           '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.')
+        message = gettext(
+            'This is an alias reference, you can edit the content only on the '
+            '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.'
+        )
         return message % {'page_url': page_url, 'page_title': page_title}
 
     def create_alias(self, request):

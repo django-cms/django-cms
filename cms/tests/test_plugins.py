@@ -668,7 +668,8 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertWarns(
             DontUsePageAttributeWarning,
-            "Don't use the page attribute on CMSPlugins! CMSPlugins are not guaranteed to have a page associated with them!",
+            "Don't use the page attribute on CMSPlugins! "
+            "CMSPlugins are not guaranteed to have a page associated with them!",
             get_page, a
         )
 
@@ -734,8 +735,9 @@ class PluginsTestCase(PluginsTestBaseCase):
         Assert that a plugin marked as 'require_parent' is not listed
         in the plugin pool when a placeholder is specified
         """
-        ParentRequiredPlugin = type('ParentRequiredPlugin', (CMSPluginBase,),
-                                    dict(require_parent=True, render_plugin=False))
+        ParentRequiredPlugin = type(
+            'ParentRequiredPlugin', (CMSPluginBase,), dict(require_parent=True, render_plugin=False)
+        )
 
         with register_plugins(ParentRequiredPlugin):
             page = api.create_page("page", "nav_playground.html", "en")
@@ -752,14 +754,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         from cms.utils.placeholder import get_toolbar_plugin_struct
 
         expected_struct_en = {
-            'module': u'Generic',
-            'name': u'Style',
+            'module': 'Generic',
+            'name': 'Style',
             'value': 'StylePlugin',
         }
 
         expected_struct_de = {
-            'module': u'Generisch',
-            'name': u'Style',
+            'module': 'Generisch',
+            'name': 'Style',
             'value': 'StylePlugin',
         }
 
@@ -804,8 +806,10 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
-        ChildClassesPlugin = type('ChildClassesPlugin', (CMSPluginBase,),
-                                  dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html'))
+        ChildClassesPlugin = type(
+            'ChildClassesPlugin', (CMSPluginBase,),
+            dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html')
+        )
 
         with register_plugins(ChildClassesPlugin):
             plugin = api.add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
@@ -821,14 +825,17 @@ class PluginsTestCase(PluginsTestBaseCase):
                 }
             }
             with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
-                self.assertEqual(['LinkPlugin', 'PicturePlugin'],
-                                    plugin.get_child_classes(placeholder.slot, page))
+                self.assertEqual(
+                    ['LinkPlugin', 'PicturePlugin'],
+                    plugin.get_child_classes(placeholder.slot, page)
+                )
 
     def test_plugin_parent_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot='body')
-        ParentClassesPlugin = type('ParentClassesPlugin', (CMSPluginBase,),
-                                    dict(parent_classes=['TextPlugin'], render_plugin=False))
+        ParentClassesPlugin = type(
+            'ParentClassesPlugin', (CMSPluginBase,), dict(parent_classes=['TextPlugin'], render_plugin=False)
+        )
 
         with register_plugins(ParentClassesPlugin):
             plugin = api.add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
@@ -844,8 +851,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                 }
             }
             with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
-                self.assertEqual(['TestPlugin'],
-                                    plugin.get_parent_classes(placeholder.slot, page))
+                self.assertEqual(['TestPlugin'], plugin.get_parent_classes(placeholder.slot, page))
 
     def test_plugin_parent_classes_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")

@@ -77,9 +77,10 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
             return pages.select_related('node').get(**page_lookup)
     except Page.DoesNotExist:
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
-        body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
-                 "The URL of the request was: http://%(host)s%(path)s") \
-               % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path_info}
+        body = _(
+            "A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
+            "The URL of the request was: http://%(host)s%(path)s"
+        ) % {'page_lookup': repr(page_lookup), 'host': site.domain, 'path': request.path_info}
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
