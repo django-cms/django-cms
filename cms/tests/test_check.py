@@ -122,7 +122,7 @@ class CheckTests(CheckAssertMixin, TestCase):
 class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
 
     def test_check_plugin_instances(self):
-        self.assertCheck(True, warnings=0, errors=0 )
+        self.assertCheck(True, warnings=0, errors=0)
 
         placeholder = Placeholder.objects.create(slot="test")
         add_plugin(placeholder, TextPlugin, "en", body="en body")

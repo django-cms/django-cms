@@ -264,7 +264,7 @@ def check_plugin_instances(output):
         for plugin_type in report:
             # warn about those that are not installed
             if not plugin_type["model"]:
-                section.error("%s has instances but is no longer installed" % plugin_type["type"] )
+                section.error("%s has instances but is no longer installed" % plugin_type["type"])
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
                 section.error(
