@@ -642,7 +642,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             add_plugin(ex.placeholder, u"EmptyPlugin", lang)
         # reload instance from database
         ex = Example1.objects.get(pk=ex.pk)
-        #get languages
+        # get languages
         langs = [lang['code'] for lang in ex.placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
 

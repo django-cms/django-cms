@@ -18,7 +18,7 @@ from cms.utils.urlutils import admin_reverse
 class PlaceholderPlugin(CMSPluginBase):
     name = _("Placeholder")
     parent_classes = ['0']  # so you will not be able to add it something
-    #require_parent = True
+    # require_parent = True
     render_plugin = False
     admin_preview = False
     system = True

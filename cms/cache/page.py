@@ -17,7 +17,7 @@ from cms.utils.helpers import get_timezone_name
 
 
 def _page_cache_key(request):
-    #sha1 key of current path
+    # sha1 key of current path
     cache_key = "%s:%d:%s" % (
         get_cms_setting("CACHE_PREFIX"),
         settings.SITE_ID,

@@ -51,8 +51,8 @@ class PermissionModeratorTests(CMSTestCase):
             - created by super
             - master can add/change/delete on it and descendants
     """
-    #TODO: Split this test case into one that tests publish functionality, and
-    #TODO: one that tests permission inheritance. This is too complex.
+    # TODO: Split this test case into one that tests publish functionality, and
+    # TODO: one that tests permission inheritance. This is too complex.
 
     def setUp(self):
         # create super user

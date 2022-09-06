@@ -53,7 +53,7 @@ def render_page(request, page, current_language, slug):
 
 def _handle_no_page(request):
     try:
-        #add a $ to the end of the url (does not match on the cms anymore)
+        # add a $ to the end of the url (does not match on the cms anymore)
         resolve('%s$' % request.path)
     except Resolver404 as e:
         # raise a django http 404 page

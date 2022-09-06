@@ -16,7 +16,7 @@ class ToolbarPool():
     def discover_toolbars(self):
         if self._discovered:
             return
-            #import all the modules
+            # import all the modules
         toolbars = get_cms_setting('TOOLBARS')
         if toolbars:
             for path in toolbars:
