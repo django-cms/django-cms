@@ -118,7 +118,7 @@ class FormsTestCase(CMSTestCase):
         raised = False
         try:
             fake_field = Mock_PageSelectFormField(required=True)
-            data_list = (0, None)  #(site_id, page_id) dsite-id is not used
+            data_list = (0, None)  # (site_id, page_id) dsite-id is not used
             fake_field.compress(data_list)
             self.fail('compress function didn\'t raise!')
         except forms.ValidationError:
@@ -127,7 +127,7 @@ class FormsTestCase(CMSTestCase):
 
     def test_compress_function_returns_none_when_not_required(self):
         fake_field = Mock_PageSelectFormField(required=False)
-        data_list = (0, None)  #(site_id, page_id) dsite-id is not used
+        data_list = (0, None)  # (site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
         self.assertEqual(result, None)
 
@@ -154,7 +154,7 @@ class FormsTestCase(CMSTestCase):
             home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The actual test
             fake_field = Mock_PageSelectFormField()
-            data_list = (0, home_page.pk)  #(site_id, page_id) dsite-id is not used
+            data_list = (0, home_page.pk)  # (site_id, page_id) dsite-id is not used
             result = fake_field.compress(data_list)
             self.assertEqual(home_page, result)
 
