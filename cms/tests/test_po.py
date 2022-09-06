@@ -50,10 +50,10 @@ def compile_messages():
                     # command, so that we can take advantage of shell quoting, to
                     # quote any malicious characters/escaping.
                     # See http://cyberelk.net/tim/articles/cmdline/ar01s02.html
-                    if sys.platform == 'win32': # Different shell-variable syntax
-                        bits = ['msgfmt', '--check-format',  '-o',  pf + '.mo', pf + '.po']
+                    if sys.platform == 'win32':  # Different shell-variable syntax
+                        bits = ['msgfmt', '--check-format', '-o', pf + '.mo', pf + '.po']
                     else:
-                        bits = ['msgfmt', '--check-format',  '-o',  pf + '.mo', pf + '.po']
+                        bits = ['msgfmt', '--check-format', '-o', pf + '.mo', pf + '.po']
                     pipe = subprocess.Popen(bits, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
                     stderr = pipe.communicate()[-1]
                     if pipe.returncode != 0:

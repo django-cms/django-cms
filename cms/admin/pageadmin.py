@@ -205,8 +205,8 @@ class PageAdmin(admin.ModelAdmin):
             'has_change_permission': self.has_change_permission(request, obj=page),
             'has_change_advanced_settings_permission': self.has_change_advanced_settings_permission(request, obj=page),
             'has_change_permissions_permission': self.has_change_permissions_permission(request, obj=page),
-            'has_move_page_permission':  self.has_move_page_permission(request, obj=page),
-            'has_delete_permission':  self.has_delete_permission(request, obj=page),
+            'has_move_page_permission': self.has_move_page_permission(request, obj=page),
+            'has_delete_permission': self.has_delete_permission(request, obj=page),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
         }
 
@@ -930,15 +930,15 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if 'duplicate' in request.path_info:
             extra_context.update({
-                'title':  _("Add Page Copy"),
+                'title': _("Add Page Copy"),
             })
         elif 'parent_node' in request.GET:
             extra_context.update({
-                'title':  _("New sub page"),
+                'title': _("New sub page"),
             })
         else:
             extra_context.update({
-                'title':  _("New page"),
+                'title': _("New page"),
             })
 
         try:

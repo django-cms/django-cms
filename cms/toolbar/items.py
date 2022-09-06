@@ -418,7 +418,7 @@ class Button(BaseButton):
 class ModalButton(Button):
     template = "cms/toolbar/items/button_modal.html"
 
-    def __init__(self, name, url, active=False, disabled=False,  extra_classes=None, on_close=None):
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
         self.name = name
         self.url = url
         self.active = active
