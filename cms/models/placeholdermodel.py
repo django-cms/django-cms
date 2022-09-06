@@ -13,8 +13,8 @@ from cms.cache.placeholder import clear_placeholder_cache
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.exceptions import LanguageError
 from cms.models.managers import PlaceholderManager
-from cms.utils import get_language_from_request, get_site_id, permissions
-from cms.utils.conf import get_cms_setting
+from cms.utils import get_language_from_request, permissions
+from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_language_object
 
 

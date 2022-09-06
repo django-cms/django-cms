@@ -33,7 +33,8 @@ from cms.models import (
 )
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils import get_current_site, get_language_from_request, get_site_id
+from cms.utils import get_current_site, get_language_from_request
+from cms.utils.conf import get_site_id
 from cms.utils.page import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse

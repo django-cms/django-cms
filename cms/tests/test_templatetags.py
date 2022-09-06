@@ -31,8 +31,7 @@ from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_object_edit_url
-from cms.utils import get_site_id
-from cms.utils.conf import get_cms_setting
+from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.placeholder import get_placeholders
 
 

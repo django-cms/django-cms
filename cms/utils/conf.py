@@ -8,7 +8,10 @@ from django.utils.translation import gettext_lazy as _
 
 from cms import __version__, constants
 
-__all__ = ['get_cms_setting']
+__all__ = [
+    'get_cms_setting',
+    'get_site_id'
+]
 
 
 class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
