@@ -51,8 +51,8 @@ class MenuUtilsTests(CMSTestCase):
             '/en/en-page/',
             '/de/de-page/',
             '/fr/fr-page/',
-            '/en/en-page/', # the pt-br url is en because that's a fallback
-            '/en/en-page/', # the es-mx url is en because that's a fallback
+            '/en/en-page/',  # the pt-br url is en because that's a fallback
+            '/en/en-page/',  # the es-mx url is en because that's a fallback
         ]
         urls_found = [DefaultLanguageChanger(request)(code)
                       for code in get_language_list(site_id=1)]

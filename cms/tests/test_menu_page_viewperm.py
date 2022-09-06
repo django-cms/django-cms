@@ -346,10 +346,10 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
             'page_c',
             'page_c_a',
             'page_c_b',
-            #group_1
-            'page_b', #page_id b has page_id and children restricted - group 1
+            # group_1
+            'page_b',  # page_id b has page_id and children restricted - group 1
             'page_b_a',
-            'page_b_b', #page_id b_b children restricted - group 2
+            'page_b_b',  # page_id b_b children restricted - group 2
             'page_b_c',
             'page_b_d',
             # not restricted

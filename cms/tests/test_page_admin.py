@@ -1337,7 +1337,7 @@ class PageTest(PageTestBase):
                 self.assertEqual(response.status_code, 200)
                 parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
                 content = force_str(parsed)
-                self.assertIn(u'(Shift-Klick für erweiterte Einstellungen)', content)
+                self.assertIn('(Shift-Klick für erweiterte Einstellungen)', content)
 
     def test_page_get_tree_endpoint_flat(self):
         superuser = self.get_superuser()
@@ -1429,15 +1429,15 @@ class PageTest(PageTestBase):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
-                response = self.client.post(endpoint, data) # first
+                response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_2, position=2, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_2)
-                response = self.client.post(endpoint, data) # second
+                response = self.client.post(endpoint, data)  # second
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_3, position=3, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_3)
-                response = self.client.post(endpoint, data) # third
+                response = self.client.post(endpoint, data)  # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
@@ -1457,11 +1457,11 @@ class PageTest(PageTestBase):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
-                response = self.client.post(endpoint, data) # first
+                response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_2, position=2, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
-                response = self.client.post(endpoint, data) # second
+                response = self.client.post(endpoint, data)  # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")

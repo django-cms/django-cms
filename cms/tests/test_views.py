@@ -177,7 +177,7 @@ class ViewTests(CMSTestCase):
         with self.login_user_context(user):
             response = self.client.get(page_preview_url)
         toolbar = response.wsgi_request.toolbar
-        self.assertEqual(len(toolbar.get_right_items()), 1) # Only has Create button
+        self.assertEqual(len(toolbar.get_right_items()), 1)  # Only has Create button
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):

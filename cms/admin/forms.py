@@ -968,7 +968,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        user = get_current_user() # current user from threadlocals
+        user = get_current_user()  # current user from threadlocals
         site = Site.objects.get_current()
         sub_users = get_subordinate_users(user, site)
 
@@ -1011,7 +1011,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
         else:
             self.fields['user'].widget = UserSelectAdminWidget()
             self.fields['user'].queryset = sub_users
-            self.fields['user'].widget.user = user # assign current user
+            self.fields['user'].widget.user = user  # assign current user
 
         self.fields['group'].queryset = get_subordinate_groups(user, site)
 

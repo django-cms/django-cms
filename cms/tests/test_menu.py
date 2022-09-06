@@ -1638,7 +1638,7 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         c2 = create_page('c2', template, 'en', parent=b1, **kw)
         c3 = create_page('c3', template, 'en', parent=b2, **kw)
         c4 = create_page('c4', template, 'en', parent=b2, **kw)
-        self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
+        self.pages = [a, b1, c1, c2, b2, c3, c4]  # tree order
         self.site = get_current_site()
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
