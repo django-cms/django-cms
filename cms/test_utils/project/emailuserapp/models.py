@@ -52,7 +52,7 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
         max_length=300,
         blank=True,
         unique=True,
-        help_text = "Required.  Standard format email address."
+        help_text="Required.  Standard format email address."
     )
 
     first_name = models.CharField(

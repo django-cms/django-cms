@@ -180,7 +180,7 @@ if __name__ == '__main__':
         EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend',
         PLUGIN_APPS=PLUGIN_APPS,
         INSTALLED_APPS=INSTALLED_APPS,
-        DEBUG_TOOLBAR_PATCH_SETTINGS = False,
+        DEBUG_TOOLBAR_PATCH_SETTINGS=False,
         INTERNAL_IPS=['127.0.0.1'],
         AUTHENTICATION_BACKENDS=(
             'django.contrib.auth.backends.ModelBackend',
@@ -193,7 +193,7 @@ if __name__ == '__main__':
             ('de', gettext('German')),
             ('pt-br', gettext('Brazilian Portuguese')),
             ('nl', gettext("Dutch")),
-            ('es-mx', u'Español'),
+            ('es-mx', 'Español'),
         ),
         CMS_LANGUAGES={
             1: [
