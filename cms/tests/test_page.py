@@ -874,12 +874,15 @@ class PageTreeTests(CMSTestCase):
         create_page('grandpa', 'nav_playground.html', 'en', slug='home')
         parent = create_page('parent', 'nav_playground.html', 'en', slug='parent')
         child = create_page('child', 'nav_playground.html', 'en', slug='child', parent=parent)
-        grandchild_1 = create_page('grandchild-1', 'nav_playground.html', 'en', slug='grandchild-1',
-                                 parent=child)
-        grandchild_2 = create_page('grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2',
-                                 parent=child.reload())
-        grandchild_3 = create_page('grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3',
-                                 parent=child.reload())
+        grandchild_1 = create_page(
+            'grandchild-1', 'nav_playground.html', 'en', slug='grandchild-1', parent=child
+        )
+        grandchild_2 = create_page(
+            'grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2', parent=child.reload()
+        )
+        grandchild_3 = create_page(
+            'grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3', parent=child.reload()
+        )
         endpoint = self.get_page_change_uri('en', parent)
 
         with self.login_user_context(superuser):

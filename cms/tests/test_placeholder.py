@@ -651,11 +651,11 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set([u'en', u'de', u'fr'])
+        avail_langs = set(['en', 'de', 'fr'])
         # Setup instances
-        page = create_page('test page', 'col_two.html', u'en')
+        page = create_page('test page', 'col_two.html', 'en')
         for lang in avail_langs:
-            if lang != u'en':
+            if lang != 'en':
                 create_title(lang, 'test page %s' % lang, page)
         placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         ###
@@ -683,18 +683,22 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         """
 
         nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
-        self.assertNotIn('one',
+        self.assertNotIn(
+            'one',
             nodelist[0].blocks.keys(),
             "test_super_extends_1.html contains a block called 'one', "
-            "but _2.html does not.")
+            "but _2.html does not."
+        )
 
         _get_placeholder_slots("placeholder_tests/test_super_extends_2.html")
 
         nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
-        self.assertNotIn('one',
+        self.assertNotIn(
+            'one',
             nodelist[0].blocks.keys(),
             "test_super_extends_1.html still should not contain a block "
-            "called 'one' after rescanning placeholders.")
+            "called 'one' after rescanning placeholders."
+        )
 
     @override_settings(TEMPLATE_LOADERS=(
         ('django.template.loaders.cached.Loader', (
@@ -710,15 +714,13 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         """
         template = get_template("placeholder_tests/test_super_extends_2.html")
         output = template.render({})
-        self.assertEqual(['Whee'], [o for o in output.split('\n')
-            if 'Whee' in o])
+        self.assertEqual(['Whee'], [o for o in output.split('\n') if 'Whee' in o])
 
         _get_placeholder_slots("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
         output = template.render({})
-        self.assertEqual(['Whee'], [o for o in output.split('\n')
-            if 'Whee' in o])
+        self.assertEqual(['Whee'], [o for o in output.split('\n') if 'Whee' in o])
 
     def test_sets_source_when_title_is_created(self):
         """

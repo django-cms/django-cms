@@ -217,8 +217,9 @@ def _ensure_languages_settings(languages):
     for site, language_object in needs_fallbacks:
         if site not in site_fallbacks:
             site_fallbacks[site] = [lang['code'] for lang in languages[site] if lang['public']]
-        language_object['fallbacks'] = [lang_code for lang_code in site_fallbacks[site] if
-            lang_code != language_object['code']]
+        language_object['fallbacks'] = [
+            lang_code for lang_code in site_fallbacks[site] if lang_code != language_object['code']
+        ]
 
     languages['default'] = defaults
     languages[VERIFIED] = True  # this will be busted by @override_settings and cause a re-check

@@ -22,10 +22,8 @@ from cms.utils.conf import get_cms_setting
 admin.autodiscover()
 
 urlpatterns = [
-    re_path(r'^media/(?P<path>.*)$', serve,
-        {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    re_path(r'^media/cms/(?P<path>.*)$', serve,
-        {'document_root': get_cms_setting('MEDIA_ROOT'), 'show_indexes': True}),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    re_path(r'^media/cms/(?P<path>.*)$', serve, {'document_root': get_cms_setting('MEDIA_ROOT'), 'show_indexes': True}),
     re_path(r'^jsi18n/(?P<packages>\S+?)/$', JavaScriptCatalog.as_view()),
 ]
 
@@ -33,17 +31,13 @@ urlpatterns += staticfiles_urlpatterns()
 
 
 urlpatterns += i18n_patterns(
-    re_path(r'^sample/login_other/$', LoginView.as_view(),
-        kwargs={'authentication_form': LoginForm2}),
-    re_path(r'^sample/login/$', LoginView.as_view(),
-        kwargs={'authentication_form': LoginForm}),
-    re_path(r'^sample/login3/$', LoginView.as_view(),
-        kwargs={'authentication_form': LoginForm3}),
+    re_path(r'^sample/login_other/$', LoginView.as_view(), kwargs={'authentication_form': LoginForm2}),
+    re_path(r'^sample/login/$', LoginView.as_view(), kwargs={'authentication_form': LoginForm}),
+    re_path(r'^sample/login3/$', LoginView.as_view(), kwargs={'authentication_form': LoginForm3}),
     re_path(r'^admin/', admin.site.urls),
     re_path(r'^example/$', example_view),
     re_path(r'^example/latest/$', latest_view),
     re_path(r'^plain_view/$', plain_view),
-    re_path(r'^fancypolls/detail/([0-9]+)/$', fancy_poll_detail_view,
-        name='fancy_poll_detail_view'),
+    re_path(r'^fancypolls/detail/([0-9]+)/$', fancy_poll_detail_view, name='fancy_poll_detail_view'),
     re_path(r'^', include('cms.urls')),
 )

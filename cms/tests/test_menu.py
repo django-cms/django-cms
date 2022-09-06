@@ -758,8 +758,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_show_breadcrumb_invisible(self):
         parent = Page.objects.get(pagecontent_set__title='P3')
-        invisible_page = create_page("invisible", "nav_playground.html", "en",
-            parent=parent, in_navigation=False)
+        invisible_page = create_page("invisible", "nav_playground.html", "en", parent=parent, in_navigation=False)
         context = self.get_context(
             path=invisible_page.get_absolute_url(),
             page=invisible_page,
@@ -1282,14 +1281,10 @@ class ShowMenuBelowIdTests(BaseMenuTest):
           \-D (not in nav)
     """
     def test_not_in_navigation(self):
-        a = create_page('A', 'nav_playground.html', 'en',
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', parent=b,
-                        in_navigation=True)
-        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
-                    in_navigation=False)
+        a = create_page('A', 'nav_playground.html', 'en', in_navigation=True, reverse_id='a')
+        b = create_page('B', 'nav_playground.html', 'en', parent=a, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', parent=b, in_navigation=True)
+        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b), in_navigation=False)
         context = self.get_context(a.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
         tpl.render(context)
@@ -1456,12 +1451,9 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             |-B
             C (soft_root)
         """
-        a = create_page('A', 'nav_playground.html', 'en',
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en',
-                        in_navigation=True, soft_root=True)
+        a = create_page('A', 'nav_playground.html', 'en', in_navigation=True, reverse_id='a')
+        b = create_page('B', 'nav_playground.html', 'en', parent=a, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', in_navigation=True, soft_root=True)
         context = self.get_context(a.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' %}")
         tpl.render(context)

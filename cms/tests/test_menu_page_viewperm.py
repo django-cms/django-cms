@@ -156,7 +156,8 @@ class ViewPermissionTests(CMSTestCase):
         """
         Setup a view restriction with every type of the grant_on ACCESS_*
         """
-        data = [("page_b", self.GROUPNAME_1, ACCESS_PAGE_AND_CHILDREN),
+        data = [
+            ("page_b", self.GROUPNAME_1, ACCESS_PAGE_AND_CHILDREN),
             ("page_b_b", self.GROUPNAME_2, ACCESS_CHILDREN),
             ("page_b", self.GROUPNAME_3, ACCESS_PAGE_AND_DESCENDANTS),
             ("page_b_b", self.GROUPNAME_4, ACCESS_DESCENDANTS),

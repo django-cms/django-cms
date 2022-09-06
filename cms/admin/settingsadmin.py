@@ -34,18 +34,10 @@ class SettingsAdmin(ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
 
         return [
-            re_path(r'^session_store/$',
-                self.session_store,
-                name='%s_%s_session_store' % info),
-            re_path(r'^cms-toolbar/$',
-                wrap(self.get_toolbar),
-                name='%s_%s_get_toolbar' % info),
-            re_path(r'^$',
-                wrap(self.change_view),
-                name='%s_%s_change' % info),
-            re_path(r'^(.+)/$',
-                wrap(self.change_view),
-                name='%s_%s_change' % info),
+            re_path(r'^session_store/$', self.session_store, name='%s_%s_session_store' % info),
+            re_path(r'^cms-toolbar/$', wrap(self.get_toolbar), name='%s_%s_get_toolbar' % info),
+            re_path(r'^$', wrap(self.change_view), name='%s_%s_change' % info),
+            re_path(r'^(.+)/$', wrap(self.change_view), name='%s_%s_change' % info),
         ]
 
     @csrf_protect_m

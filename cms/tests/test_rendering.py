@@ -184,8 +184,7 @@ class RenderingTestCase(CMSTestCase):
         for placeholder in p3.get_placeholders('en'):
             self.test_placeholders3[placeholder.slot] = placeholder
             # # Insert some test Text plugins
-        add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en',
-                   body=self.test_data3['text_sub'])
+        add_plugin(self.test_placeholders3['sub'], 'TextPlugin', 'en', body=self.test_data3['text_sub'])
 
         # Insert another page that is not the home
         p4 = create_page(self.test_data4['title'], 'extra_context.html', 'en', parent=p)
@@ -197,43 +196,50 @@ class RenderingTestCase(CMSTestCase):
         add_plugin(self.test_placeholders4['extra_context'], 'ExtraContextPlugin', 'en')
 
         # Insert another page that is not the home page
-        p5 = create_page(self.test_data5['title'], INHERIT_TEMPLATE_NAME, 'en',
-                         parent=p, slug=self.test_data5['slug'],
-                         reverse_id=self.test_data5['reverse_id'])
+        p5 = create_page(
+            self.test_data5['title'], INHERIT_TEMPLATE_NAME, 'en',
+            parent=p, slug=self.test_data5['slug'],
+            reverse_id=self.test_data5['reverse_id']
+        )
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders5 = {}
         for placeholder in p5.get_placeholders('en'):
             self.test_placeholders5[placeholder.slot] = placeholder
             # # Insert some test Text plugins
-        add_plugin(self.test_placeholders5['sub'], 'TextPlugin', 'en',
-                   body=self.test_data5['text_sub'])
-        add_plugin(self.test_placeholders5['main'], 'TextPlugin', 'en',
-                   body=self.test_data5['text_main'])
+        add_plugin(self.test_placeholders5['sub'], 'TextPlugin', 'en', body=self.test_data5['text_sub'])
+        add_plugin(self.test_placeholders5['main'], 'TextPlugin', 'en', body=self.test_data5['text_main'])
 
         # Insert another page that is not the home page
-        p6 = create_page(self.test_data6['title'], INHERIT_TEMPLATE_NAME, 'en',
-                         slug=self.test_data6['slug'], parent=p5,
-                         reverse_id=self.test_data6['reverse_id'])
+        p6 = create_page(
+            self.test_data6['title'], INHERIT_TEMPLATE_NAME, 'en',
+            slug=self.test_data6['slug'], parent=p5,
+            reverse_id=self.test_data6['reverse_id']
+        )
         # Placeholders have been inserted on post_save signal:
         self.test_placeholders6 = {}
         for placeholder in p6.get_placeholders('en'):
             self.test_placeholders6[placeholder.slot] = placeholder
             # # Insert some test Text plugins
-        add_plugin(self.test_placeholders6['sub'], 'TextPlugin', 'en',
-                   body=self.test_data6['text_sub'])
-        p7 = create_page(self.test_data7['title'], INHERIT_TEMPLATE_NAME, 'en',
-                         slug=self.test_data7['slug'], parent=p6,
-                         reverse_id=self.test_data7['reverse_id'])
-        p8 = create_page(self.test_data8['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
-                         slug=self.test_data8['slug'], parent=p7,
-                         reverse_id=self.test_data8['reverse_id'])
-
-        p9 = create_page(self.test_data9['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
-                         slug=self.test_data9['slug'],
-                         reverse_id=self.test_data9['reverse_id'])
-        p10 = create_page(self.test_data10['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
-                         slug=self.test_data10['slug'], parent=p9,
-                         reverse_id=self.test_data10['reverse_id'])
+        add_plugin(self.test_placeholders6['sub'], 'TextPlugin', 'en', body=self.test_data6['text_sub'])
+        p7 = create_page(
+            self.test_data7['title'], INHERIT_TEMPLATE_NAME, 'en',
+            slug=self.test_data7['slug'], parent=p6,
+            reverse_id=self.test_data7['reverse_id']
+        )
+        p8 = create_page(
+            self.test_data8['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
+            slug=self.test_data8['slug'], parent=p7,
+            reverse_id=self.test_data8['reverse_id']
+        )
+        p9 = create_page(
+            self.test_data9['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
+            slug=self.test_data9['slug'],
+            reverse_id=self.test_data9['reverse_id']
+        )
+        p10 = create_page(
+            self.test_data10['title'], INHERIT_WITH_OR_TEMPLATE_NAME, 'en',
+            slug=self.test_data10['slug'], parent=p9,
+            reverse_id=self.test_data10['reverse_id'])
 
         # Reload test pages
         self.test_page = self.reload(p)

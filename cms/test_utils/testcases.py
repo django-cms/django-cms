@@ -293,8 +293,11 @@ class BaseCMSTestCase:
         """
         for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
-            page.pk, page.path, page.depth, page.numchild))
+            print(
+                "%s%s (%s), path: %s, depth: %s, numchild: %s" % (
+                    ident, page, page.pk, page.path, page.depth, page.numchild
+                )
+            )
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -302,7 +305,7 @@ class BaseCMSTestCase:
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print(u"%s%s: %s" % (ident, node.title, attrs))
+                print("%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
 
         _rec(nodes)
