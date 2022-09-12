@@ -22,6 +22,7 @@ Highlights:
 * Added spell checking to pre-commit and github workflows
 * Added cache ttl extension point.
 * Added current language to the page cache key (#6607)
+* Fix isort line length to by in sync with flake8
 
 3.10.1 (2022-06-28)
 ===================

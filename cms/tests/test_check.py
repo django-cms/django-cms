@@ -10,9 +10,7 @@ from cms.api import add_plugin
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.extensionapp.models import MyPageExtension
-from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
-    ArticlePluginModel,
-)
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
 from cms.utils.check import FileOutputWrapper, FileSectionWrapper, check
 
 
@@ -46,7 +44,7 @@ class CheckAssertMixin:
         check(output)
         self.assertEqual(output.successful, successful)
         for key, value in assertions.items():
-            self.assertEqual(getattr(output, key), value, "%s %s expected, got %s" % (value, key, getattr(output, key)))
+            self.assertEqual(getattr(output, key), value, f"{value} {key} expected, got {getattr(output, key)}")
 
 
 class CheckTests(CheckAssertMixin, TestCase):

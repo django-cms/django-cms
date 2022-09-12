@@ -20,9 +20,7 @@ from cms.api import add_plugin, create_page, create_title
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, Placeholder
 from cms.templatetags.cms_js_tags import json_filter
-from cms.templatetags.cms_tags import (
-    _get_page_by_untyped_arg, _show_placeholder_by_id, render_plugin,
-)
+from cms.templatetags.cms_tags import _get_page_by_untyped_arg, _show_placeholder_by_id, render_plugin
 from cms.test_utils.fixtures.templatetags import TwoPagesFixture
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
