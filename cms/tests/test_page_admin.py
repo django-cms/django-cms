@@ -3,6 +3,7 @@ import json
 import sys
 from unittest import skipUnless
 
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -15,7 +16,6 @@ from django.urls import clear_url_caches
 from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
-from django.conf import settings
 
 from cms import constants
 from cms.admin.pageadmin import PageAdmin
