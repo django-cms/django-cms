@@ -1,6 +1,7 @@
 import datetime
 import json
 import sys
+from unittest import skipUnless
 
 from django.contrib import admin
 from django.contrib.sites.models import Site
@@ -14,6 +15,7 @@ from django.urls import clear_url_caches
 from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
+from django.conf import settings
 
 from cms import constants
 from cms.admin.pageadmin import PageAdmin
@@ -1912,31 +1914,55 @@ class PageTest(PageTestBase):
             self.assertEqual(page.reload().get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
 
+    @skipUnless(
+        'sqlite' in settings.DATABASES.get('default').get('ENGINE').lower(),
+        'This test only works in SQLITE',
+    )
     @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
     def test_page_tree_render_localized_page_ids(self):
+        from django.db import connection
+
+        # Artificially increment the sequence number on cms_page and cms_treenode (below)
+        # to be > 1000, to trigger a THOUSAND_SEPARATOR localization in the
+        # rendered template
+
         admin_user = self.get_superuser()
-        root = create_page("home", "nav_playground.html", "fr",
-                           created_by=admin_user, published=True)
+        root = create_page(
+            "home", "nav_playground.html", "fr", created_by=admin_user, published=True
+        )
+        with connection.cursor() as c:
+            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_page"')
+            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_treenode"')
 
-        for i in range(1, 1001):
-            page = create_page("child-page-{}".format(i), "nav_playground.html", "fr",
-                               created_by=admin_user, published=True, parent=root,
-                               slug="child-page-{}".format(i),)
+        page = create_page(
+            "child-page",
+            "nav_playground.html",
+            "fr",
+            created_by=admin_user,
+            published=True,
+            parent=root,
+            slug="child-page",
+        )
 
-        create_page("grand-child-page-{}".format(page.pk),
-                    "nav_playground.html", "fr",
-                    created_by=admin_user, published=True, parent=page,
-                    slug="grand-child-page-{}".format(page.pk),)
+        sub_page = create_page(
+            "grand-child-page",
+            "nav_playground.html",
+            "fr",
+            created_by=admin_user,
+            published=True,
+            parent=page,
+            slug="grand-child-page",
+        )
+        self.assertTrue(page.id > 1000)
+        self.assertTrue(sub_page.id > 1000)
 
-        self.assertTrue(page.pk > 1000)
+        self.assertTrue(page.node.id > 1000)
+        self.assertTrue(sub_page.node.id > 1000)
 
         # make sure the rendered page tree doesn't
         # localize page or node ids
         with self.login_user_context(admin_user):
-            data = {
-                'openNodes[]': [root.node.pk, page.node.pk],
-                'language': 'fr'
-            }
+            data = {'openNodes[]': [root.node.pk, page.node.pk], 'language': 'fr'}
 
             endpoint = self.get_admin_url(Page, 'get_tree')
             response = self.client.get(endpoint, data=data)
@@ -1950,10 +1976,7 @@ class PageTest(PageTestBase):
         # make sure DjangoCMS doesn't choke on them when they are passed
         # into the view
         with self.login_user_context(admin_user):
-            data = {
-                'openNodes[]': [root.node.pk, f'{page.node.pk:,}'],
-                'language': 'fr'
-            }
+            data = {'openNodes[]': [root.node.pk, f'{page.node.pk:,}'], 'language': 'fr'}
             endpoint = self.get_admin_url(Page, 'get_tree')
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
