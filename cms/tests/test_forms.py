@@ -7,19 +7,14 @@ from django.utils.translation import override as force_language
 
 from cms.admin import forms
 from cms.admin.forms import (
-    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm,
-    PageUserGroupForm, ViewRestrictionInlineAdminForm,
+    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, PageUserGroupForm, ViewRestrictionInlineAdminForm,
 )
 from cms.api import assign_user_to_page, create_page, create_title
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
-from cms.forms.utils import (
-    get_page_choices, get_site_choices, update_site_and_page_choices,
-)
+from cms.forms.utils import get_page_choices, get_site_choices, update_site_and_page_choices
 from cms.forms.widgets import ApplicationConfigSelect
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
-from cms.test_utils.testcases import (
-    URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS, CMSTestCase,
-)
+from cms.test_utils.testcases import URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS, CMSTestCase
 from cms.utils import get_current_site
 
 
@@ -170,7 +165,7 @@ class FormsTestCase(CMSTestCase):
                             'nav_playground.html', 'en',
                             site=site, parent=page1)
         # enforce the choices to be casted to a list
-        site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
+        site_choices, page_choices = (list(bit) for bit in update_site_and_page_choices('en'))
         self.assertEqual(page_choices, [
             ('', '----'),
             (site.name, [

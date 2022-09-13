@@ -6,9 +6,7 @@ from contextlib import contextmanager
 from django import http
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.widgets import (
-    FilteredSelectMultiple, RelatedFieldWidgetWrapper,
-)
+from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
@@ -22,9 +20,7 @@ from djangocms_text_ckeditor.utils import plugin_to_tag
 
 from cms import api
 from cms.api import create_page
-from cms.exceptions import (
-    DontUsePageAttributeWarning, PluginAlreadyRegistered, PluginNotRegistered,
-)
+from cms.exceptions import DontUsePageAttributeWarning, PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
@@ -40,8 +36,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
     DynTemplate, NonExisitngRenderTemplate, NoRender, NoRenderButChildren,
 )
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PUBLISH,
-    URL_CMS_PLUGIN_ADD, CMSTestCase,
+    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PUBLISH, URL_CMS_PLUGIN_ADD, CMSTestCase,
 )
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
@@ -1488,9 +1483,7 @@ class BrokenPluginTests(TestCase):
 
 class MTIPluginsTestCase(PluginsTestBaseCase):
     def test_add_edit_plugin(self):
-        from cms.test_utils.project.mti_pluginapp.models import (
-            TestPluginBetaModel,
-        )
+        from cms.test_utils.project.mti_pluginapp.models import TestPluginBetaModel
 
         """
         Test that we can instantiate and use a MTI plugin
@@ -1520,9 +1513,8 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
 
     def test_related_name(self):
         from cms.test_utils.project.mti_pluginapp.models import (
-            AbstractPluginParent, LessMixedPlugin, MixedPlugin, NonPluginModel,
-            ProxiedAlphaPluginModel, ProxiedBetaPluginModel,
-            TestPluginAlphaModel, TestPluginBetaModel, TestPluginGammaModel,
+            AbstractPluginParent, LessMixedPlugin, MixedPlugin, NonPluginModel, ProxiedAlphaPluginModel,
+            ProxiedBetaPluginModel, TestPluginAlphaModel, TestPluginBetaModel, TestPluginGammaModel,
         )
 
         # the first concrete class of the following four plugins is TestPluginAlphaModel

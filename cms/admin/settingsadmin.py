@@ -7,9 +7,7 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
-from django.http import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
-)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.http.request import QueryDict
 from django.urls import Resolver404, re_path, resolve
 from django.utils.translation import override
@@ -127,7 +125,7 @@ class SettingsAdmin(ModelAdmin):
                 args=[obj.id, ],
                 current_app=self.admin_site.name
             )
-        return HttpResponseRedirect("{0}?reload_window".format(post_url))
+        return HttpResponseRedirect(f"{post_url}?reload_window")
 
     def has_change_permission(self, request, obj=None):
         if obj and obj.user == request.user:
