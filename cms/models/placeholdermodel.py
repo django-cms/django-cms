@@ -572,29 +572,24 @@ class Placeholder(models.Model):
         target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
 
         if target_last_plugin:
-            source_offset = source_last_plugin.position
-            target_offset = target_last_plugin.position
-            source_plugin_desc_count = plugin._get_descendants_count()
-            # Projected position of the plugin being moved
-            # If the plugin has descendants then this is the projected position
-            # of the last descendant for the plugin being moved.
-            source_projected_last_position = plugin.position + source_plugin_desc_count + source_offset
-            # Projected position of the first plugin to the right
-            # of the plugin being moved, in the target placeholder.
-            target_projected_first_position = target_position + target_offset
-            # Real position of the last plugin in the target placeholder,
-            # after the move takes place.
-            target_last_position = target_last_plugin.position + 1 + source_plugin_desc_count
+            source_length = source_last_plugin.position
+            target_length = target_last_plugin.position
+            plugins_to_move_count = 1 + plugin._get_descendants_count()  # parent plus descendants
 
-            if source_projected_last_position <= target_last_position:
-                source_diff = (target_last_position - source_projected_last_position)
-                source_offset += source_diff + 1
-                source_projected_last_position += source_diff + 1
+            source_offset = max(
+                # far enough to shift behind current last source position
+                source_length,
+                # far enough to be shifted behind last target position plus no. of moved plugins
+                target_length + plugins_to_move_count
+            ) - plugin.position + 1
 
-            if source_projected_last_position >= target_projected_first_position:
-                target_diff = source_projected_last_position - target_projected_first_position
-                target_offset += target_diff + 1
-
+            # move target position counter to at least behind
+            target_offset = max(
+                # far enough to shift behind current last target position
+                target_length - target_position + 1,
+                # far enough to leave enough space to move back
+                plugin.position + source_offset - target_position + plugins_to_move_count
+            )
             target_placeholder._shift_plugin_positions(
                 plugin.language,
                 start=target_position,
@@ -602,12 +597,9 @@ class Placeholder(models.Model):
             )
         else:
             # moving to empty placeholder
+            # Mover out behind  last source position
             source_offset = source_last_plugin.position
 
-        # Shift all plugins whose position is greater than or equal to
-        # the plugin being moved. This includes the plugin itself.
-        # This is to create enough space in-between for the squashing
-        # to work without conflicts.
         self._shift_plugin_positions(
             plugin.language,
             start=plugin.position,
