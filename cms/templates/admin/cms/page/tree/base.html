@@ -107,7 +107,7 @@
                                     <span class="label">{% trans "Sites" %}</span>
                                 </li>
                                 {% for site in tree.sites %}
-                                    <li{% if site.pk|unlocalize == tree.site.pk|unlocalize %} class="active"{% endif %}>
+                                    <li{% if site.pk == tree.site.pk %} class="active"{% endif %}>
                                         <a href="#{{ site.pk|unlocalize }}" class="js-cms-pagetree-site-trigger" data-id="{{ site.pk|unlocalize }}">{{ site.name }}</a>
                                     </li>
                                 {% endfor %}

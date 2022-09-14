@@ -76,7 +76,7 @@
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-preview
                 {# INFO: highlight active icon when in sidebar mode #}
-                {% if page.id|unlocalize|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
+                {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
                     <a class="js-cms-pagetree-page-view" href="{% url opts|admin_urlname:'preview_page' page.id lang %}"{% if lang in page_languages %} target="_top"{% endif %}">
                         <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
