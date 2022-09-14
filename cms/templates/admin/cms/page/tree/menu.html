@@ -16,7 +16,7 @@
         {% endif %}
     {% endblock %}
     "
-    {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
+    {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id|unlocalize }}); return false;"{% endif %}
     data-id="{{ page.pk|unlocalize }}"
     data-node-id="{{ node.pk|unlocalize }}"
     data-slug="{{ page.get_slug }}"
@@ -76,7 +76,7 @@
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-preview
                 {# INFO: highlight active icon when in sidebar mode #}
-                {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
+                {% if page.id|unlocalize|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
                     <a class="js-cms-pagetree-page-view" href="{% url opts|admin_urlname:'preview_page' page.id lang %}"{% if lang in page_languages %} target="_top"{% endif %}">
                         <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
@@ -152,7 +152,7 @@
             <div class="cms-tree-item cms-tree-item-menu{% if not has_change_permission %} cms-tree-item-disabled{% endif %} js-cms-tree-item-menu">
                 <div class="cms-tree-item-inner">
                     {% if has_change_permission %}
-                        <a href="{% url opts|admin_urlname:'change_innavigation' page.id %}?language={{ preview_language }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
+                        <a href="{% url opts|admin_urlname:'change_innavigation' page.id %}?language={{ preview_language }}&amp;{{ page.id|unlocalize }}={{ page.in_navigation|yesno:"1,0" }}">
                     {% endif %}
                         {% if page.in_navigation %}
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
