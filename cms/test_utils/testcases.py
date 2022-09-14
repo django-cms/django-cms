@@ -48,7 +48,7 @@ URL_CMS_TRANSLATION_DELETE = urljoin('/en/admin/cms/pagecontent/', "delete-trans
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
-class _Warning():
+class _Warning:
     def __init__(self, message, category, filename, lineno):
         self.message = message
         self.category = category
@@ -87,7 +87,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-class BaseCMSTestCase():
+class BaseCMSTestCase:
     counter = 1
 
     def _fixture_setup(self):
