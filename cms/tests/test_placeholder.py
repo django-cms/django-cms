@@ -193,6 +193,40 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2], list(ph2.cmsplugin_set.order_by('position')))
 
+    def test_inter_placeholder_nested_plugin_move(self):
+        # symmetric and asymmetric plugin numbers
+        for n1, n2 in ((1, 2), (2, 0), (1, 1)):
+            ex = TwoPlaceholderExample(
+                char_1='one',
+                char_2='two',
+                char_3='tree',
+                char_4='four'
+            )
+            ex.save()
+            ph1 = ex.placeholder_1
+            ph2 = ex.placeholder_2
+
+            ph1parent = add_plugin(ph1, 'TextPlugin', 'en', body='ph1 parent').cmsplugin_ptr
+            ph1children = []
+            for i in range(n1):
+                ph1children.append(
+                    add_plugin(ph1, 'TextPlugin', 'en', target=ph1parent, body=f'ph1 child{i}').cmsplugin_ptr
+                )
+            ph2parent = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 parent').cmsplugin_ptr
+            ph2children = []
+            for i in range(n2):
+                ph2children.append(
+                    add_plugin(ph2, 'TextPlugin', 'en', target=ph2parent, body=f'ph2 child{i}').cmsplugin_ptr
+                )
+
+            ph2.move_plugin(ph2parent, target_plugin=ph1parent, target_position=2, target_placeholder=ph1)
+            left = [ph1parent, ph2parent] + ph2children + ph1children
+            right = list(ph1.cmsplugin_set.order_by('position'))
+            self.assertEqual(left, right)
+
+            ph1.delete()
+            ph2.delete()
+
     def test_copy_plugin(self):
         superuser = self.get_superuser()
         page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
