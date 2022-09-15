@@ -267,6 +267,25 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             # the last plugin does not have a child hence position should be none
             self.assertEqual(ph.get_last_plugin_position('en', parent=parent), n if parent != plugins[-1] else None)
 
+    def test_get_last_plugin_position_order(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph = ex.placeholder
+
+        parent = None
+        n = 15  # This will be the position of the last plugin
+
+        for i in range(n):
+            add_plugin(ph, 'TextPlugin', 'en', position='first-child').cmsplugin_ptr
+
+        self.assertEqual(ph.get_last_plugin_position('en'), n)  # should be n
+
+
     def test_copy_plugin(self):
         superuser = self.get_superuser()
         page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
