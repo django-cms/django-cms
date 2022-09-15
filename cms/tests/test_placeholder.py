@@ -277,7 +277,6 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         ex.save()
         ph = ex.placeholder
 
-        parent = None
         n = 15  # This will be the position of the last plugin
 
         for i in range(n):

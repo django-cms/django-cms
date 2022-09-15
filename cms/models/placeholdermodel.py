@@ -498,7 +498,7 @@ class Placeholder(models.Model):
             self._shift_plugin_positions(
                 instance.language,
                 start=instance.position,
-                offset=last_position-instance.position + 2, # behind last_position plus one for the new 
+                offset=last_position-instance.position + 2, # behind last_position plus one for the new
             )
 
         instance.save()
@@ -653,7 +653,7 @@ class Placeholder(models.Model):
             tree = parent.get_descendants()
         else:
             tree = self.get_plugins(language)
-        return tree.values_list('position', flat=True).order_by('position').last()
+        return tree.values_list('position', flat=True).last()
 
     def _shift_plugin_positions(self, language, start, offset=None):
         if offset is None:
