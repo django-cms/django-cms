@@ -646,14 +646,14 @@ class Placeholder(models.Model):
 
         if parent:
             tree = tree.filter(parent=parent)
-        return tree.values_list('position', flat=True).first()
+        return tree.values_list('position', flat=True).order_by('position').first()
 
     def get_last_plugin_position(self, language, parent=None):
-        tree = self.get_plugins(language)
-
         if parent:
-            tree = tree.filter(parent=parent)
-        return tree.values_list('position', flat=True).last()
+            tree = parent.get_descendants()
+        else:
+            tree = self.get_plugins(language)
+        return tree.values_list('position', flat=True).order_by('position').last()
 
     def _shift_plugin_positions(self, language, start, offset=None):
         if offset is None:

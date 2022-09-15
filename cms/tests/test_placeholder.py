@@ -195,7 +195,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
     def test_inter_placeholder_nested_plugin_move(self):
         # symmetric and asymmetric plugin numbers
-        for n1, n2 in ((1, 2), (2, 0), (1, 1)):
+        for n1, n2 in ((1, 10), (10, 0), (5, 5)):
             ex = TwoPlaceholderExample(
                 char_1='one',
                 char_2='two',
@@ -226,6 +226,46 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
             ph1.delete()
             ph2.delete()
+
+    def test_get_last_plugin_position(self):
+        ex = Example1(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph = ex.placeholder
+
+        parent = None
+        n = 4  # This will be the position of the last plugin
+
+        plugins = []
+        for i in range(n):
+            parent=add_plugin(ph, 'TextPlugin', 'en', target=parent).cmsplugin_ptr
+            plugins.append(parent)
+
+        self.assertEqual(ph.get_last_plugin_position('en'), n)  # should be n
+        for parent in plugins:
+            # needs to be n also if we look at the parents
+            # the last plugin does not have a child hence position should be none
+            self.assertEqual(ph.get_last_plugin_position('en', parent=parent), n if parent != plugins[-1] else None)
+
+        # Tree
+
+        # Plugin 1
+        #   Plugin 2
+        #     Plugin 3
+        #       Plugin 4
+        # Final Plugin
+
+        add_plugin(ph, 'TextPlugin', 'en', target=None)  # Add a top level final plugin
+
+        self.assertEqual(ph.get_last_plugin_position('en'), n + 1)  # plus the last plugin
+        for parent in plugins:
+            # still needs to be n also if we look at the parents
+            # the last plugin does not have a child hence position should be none
+            self.assertEqual(ph.get_last_plugin_position('en', parent=parent), n if parent != plugins[-1] else None)
 
     def test_copy_plugin(self):
         superuser = self.get_superuser()
