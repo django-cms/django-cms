@@ -768,7 +768,7 @@ class Placeholder(models.Model):
                     if min(children_positions) <= parent_position.position:
                         messages.append(f"{language}: Children with positions lower than their parent's (id={parent}) position")
 
-        # Check 3: Children AFTER parents
+        # Check 3: parents belonging to other placeholders
         for plugin in self.cmsplugin_set.all():
             if plugin.parent and plugin.parent.placeholder != self:
                 messages.append(f"{language}: Plugins claim to be children of parents in a different placeholder")
