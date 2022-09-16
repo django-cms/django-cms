@@ -279,8 +279,9 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         n = 15  # This will be the position of the last plugin
 
+        positions = ('first-child', ) # 'last-child', )
         for i in range(n):
-            add_plugin(ph, 'TextPlugin', 'en', position='first-child').cmsplugin_ptr
+            add_plugin(ph, 'TextPlugin', 'en', position=positions[i % len(positions)]).cmsplugin_ptr
 
         self.assertEqual(ph.get_last_plugin_position('en'), n)  # should be n
 

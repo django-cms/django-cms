@@ -292,7 +292,7 @@ class Placeholder(models.Model):
         Returns language objects for every language for which the placeholder
         has plugins.
 
-        This is not cached as it's meant to eb used in the frontend editor.
+        This is not cached as it's meant to be used in the frontend editor.
         """
 
         languages = []
@@ -498,7 +498,7 @@ class Placeholder(models.Model):
             self._shift_plugin_positions(
                 instance.language,
                 start=instance.position,
-                offset=last_position-instance.position + 2, # behind last_position plus one for the new
+                offset=last_position - instance.position + 2, # behind last_position plus one for the new
             )
 
         instance.save()
@@ -646,13 +646,15 @@ class Placeholder(models.Model):
 
         if parent:
             tree = tree.filter(parent=parent)
-        return tree.values_list('position', flat=True).order_by('position').first()
+        return tree.values_list('position', flat=True).first()
 
     def get_last_plugin_position(self, language, parent=None):
-        if parent:
-            tree = parent.get_descendants()
-        else:
+        if parent is None:
             tree = self.get_plugins(language)
+        elif parent.placeholder == self:
+            tree = parent.get_descendants()
+        else:  # No last plugin if parent is not in this placeholder's plugin tree
+            return None
         return tree.values_list('position', flat=True).last()
 
     def _shift_plugin_positions(self, language, start, offset=None):
@@ -731,3 +733,53 @@ class Placeholder(models.Model):
             raise RuntimeError(
                 '{} is not supported by django-cms'.format(connection.vendor)
             )
+
+    def check_tree(self, language=None):
+        messages = []
+
+        if language is None:
+            languages = self.cmsplugin_set.values_list('language', flat=True)
+            for language in languages:
+                message = self.check_tree(language)
+                if message is not None:
+                    messages += message
+            return messages
+
+        # Check 1: Positions are consecutive starting at 1
+        position_list = list(self.cmsplugin_set.values_list('position', flat=True))
+        if position_list != list(range(1, self.get_last_plugin_position(language)+1)):
+            messages.append(f"{language}: Non consecutive position entries: {position_list}")
+
+        # Check 2: Children AFTER parents
+        parent_list = list(self.cmsplugin_set.values_list('parent', flat=True))
+        for parent in parent_list:
+            if parent is not None:
+                parent_position = self.cmsplugin_set.filter(pk=parent).first().position
+                children_positions = self.cmsplugin_set.filter(parent=parent).values_list('position', flat=True)
+                if min(children_positions) <= parent_position:
+                    messages.append(f"{language}: Children with positions lower than their parent's (id={parent}) position\n"
+                                    f"{parent_position=} {children_positions=}")
+
+        return messages
+
+    def fix_tree(self, language=None):
+        if language is None:
+            languages = self.cmsplugin_set.values_list('language', flat=True)
+            for language in languages:
+                self.fix_tree(language)
+            return
+
+        def build_tree(self, parent):
+            nonlocal position
+
+            for plugin in self.cmsplugin_set.filter(parent=parent).order_by("position"):
+                plugin.position = position
+                plugin.save()
+                position += 1
+                build_tree(self, plugin)
+
+        position = self.get_last_plugin_position(language) + 1
+
+        build_tree(self, None)
+
+        self._recalculate_plugin_positions(language)
