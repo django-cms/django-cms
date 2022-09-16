@@ -795,8 +795,7 @@ class Placeholder(models.Model):
         # First cut links to other placeholders
         for plugin in self.cmsplugin_set.filter(language=language):
             if plugin.parent and plugin.parent.placeholder != self:
-                plugin.parent = None  # At this point the tree is seriously broken: Cut the link
-                plugin.save()
+                plugin.update(parent=None)  # At this point the tree is seriously broken: Cut the link
 
         # Then rebuild tree
         def build_tree(self, parent):
@@ -804,8 +803,7 @@ class Placeholder(models.Model):
 
             for plugin in self.cmsplugin_set.filter(parent=parent, language=language).order_by("position"):
                 position += 1
-                plugin.position = position
-                plugin.save()
+                plugin.update(position=position)
                 build_tree(self, plugin)
 
         position = self.get_last_plugin_position(language)
