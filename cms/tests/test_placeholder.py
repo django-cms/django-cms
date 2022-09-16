@@ -1537,8 +1537,8 @@ class CheckAndFixTreeTests(TransactionCMSTestCase):
         messages = ph1.check_tree()
         expected_message_parts = [
             "Non consecutive position entries",
-            "Children with positions lower than their parent's (id=1)",
-            "Children with positions lower than their parent's (id=3)",
+            f"Children with positions lower than their parent's (id={tree[0].id})",
+            f"Children with positions lower than their parent's (id={tree[2].id})",
             "Plugins claim to be children of parents in a different placeholder",
         ]
         for part in expected_message_parts:
