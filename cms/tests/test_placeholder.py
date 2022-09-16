@@ -1507,6 +1507,8 @@ class CheckAndFixTreeTests(TransactionCMSTestCase):
             tree.append(add_plugin(ph1, 'TextPlugin', 'en').cmsplugin_ptr)
         ph2_plugin = add_plugin(ph2, 'TextPlugin', 'en').cmsplugin_ptr
 
+        delta = tree[0].id - 1
+
         # Garble plugin tree in ph 1
         tree[-1].position += 1 # Create gap
         tree[-1].parent = ph2_plugin  # Parent across placeholders
@@ -1552,5 +1554,5 @@ class CheckAndFixTreeTests(TransactionCMSTestCase):
         self.assertFalse(ph1.check_tree())  # Messages gone away
 
         # After fixing the tree positions and id correspond just as the tree was created
-        for plugin in ph1.cmsplugin_set.all():
-            self.assertEqual(plugin.id, plugin.position)
+        positions = list(ph1.cmsplugin_set.order_by('id').values_list('position', flat=True))
+        self.assertEqual(list(range(1, len(positions)+1)), positions)
