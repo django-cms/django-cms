@@ -521,6 +521,7 @@ class Placeholder(models.Model):
         target_tree = self.get_plugins(plugin.language)
         last_plugin = self.get_last_plugin(plugin.language)
         source_plugin_desc_count = plugin._get_descendants_count()
+        # Attn: The following line assumes that all children and grand-children have consecutive positions!
         source_plugin_range = (plugin.position, plugin.position + source_plugin_desc_count)
 
         if target_position < plugin.position:
@@ -600,6 +601,11 @@ class Placeholder(models.Model):
             # Move out (remaining) plugins right behind last source position to be able to recalculate
             source_offset = source_last_plugin.position
 
+        # Shift all plugins whose position is greater than or equal to
+        # the plugin being moved. This includes the plugin itself.
+        # This is to create enough s
+        # pace in-between for the squashing
+        # to work without conflicts.
         self._shift_plugin_positions(
             plugin.language,
             start=plugin.position,
