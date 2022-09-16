@@ -1507,8 +1507,6 @@ class CheckAndFixTreeTests(TransactionCMSTestCase):
             tree.append(add_plugin(ph1, 'TextPlugin', 'en').cmsplugin_ptr)
         ph2_plugin = add_plugin(ph2, 'TextPlugin', 'en').cmsplugin_ptr
 
-        delta = tree[0].id - 1
-
         # Garble plugin tree in ph 1
         tree[-1].position += 1 # Create gap
         tree[-1].parent = ph2_plugin  # Parent across placeholders
