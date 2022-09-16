@@ -72,7 +72,7 @@ work well, and about known issues affecting touch-screen device support.
 Feedback required
 -----------------
 
-We've tested the CMS interface extensively, but will be very keen to have feedback from other users
+We have tested the CMS interface extensively, but will be very keen to have feedback from other users
 - device reports, bug reports and general suggestions and opinions are very welcome.
 
 
@@ -93,7 +93,7 @@ Content wizards
 :doc:`/reference/wizards` can help simplify production of content, and can be created to handle
 non-CMS content too.
 
-For a quick introduction to using a wizard as a content editor, see the user tutorial. 
+For a quick introduction to using a wizard as a content editor, see the user tutorial.
 
 
 
@@ -134,13 +134,13 @@ include:
 * We no longer use ``develop.py``; we now use ``manage.py`` for all development tasks. See
   :ref:`contributing_patch` for examples.
 
-* We've moved our ``widgets.py`` JavaScript to ``static/cms/js/widgets``.
+* We have moved our ``widgets.py`` JavaScript to ``static/cms/js/widgets``.
 
 
 Code formatting
 ---------------
 
-We've switched from tabs (in some places) to four spaces *everywhere*. See :ref:`contributing-code`
+We have switched from tabs (in some places) to four spaces *everywhere*. See :ref:`contributing-code`
 for more on formatting.
 
 
@@ -155,13 +155,13 @@ Sass-related changes
 
 We now use `LibSass <https://github.com/sass/libsass>`_ rather than Compass for building static
 files (this only affects frontend developers *of* django CMS - contributors to it, not other users
-or developers). We've also adopted `CSSComb <http://csscomb.com>`_.
+or developers). We have also adopted `CSSComb <http://csscomb.com>`_.
 
 
 ``.editorconfig`` file
 ----------------------
 
-We've added a ``.editorconfig`` (at the root of the project) to provide cues to text editors.
+We have added a ``.editorconfig`` (at the root of the project) to provide cues to text editors.
 
 
 Automated spelling checks for documentation

@@ -71,12 +71,12 @@ template             rendering                         --
 The plugin **model**, the sub-class of :class:`cms.models.pluginmodel.CMSPlugin`,
 is optional.
 
-You could have a plugin that doesn't need to be configured, because it only
+You could have a plugin that does not need to be configured, because it only
 ever does one thing.
 
 For example, you could have a plugin that only publishes information
-about the top-selling record of the past seven days. Obviously, this wouldn't
-be very flexible - you wouldn't be able to use the same plugin for the
+about the top-selling record of the past seven days. Obviously, this would not
+be very flexible - you would not be able to use the same plugin for the
 best-selling release of the last *month* instead.
 
 Usually, you find that it is useful to be able to configure your plugin, and this
@@ -128,4 +128,3 @@ that are ignored by the CMS are:
 * ``search_fields``
 * ``show_full_result_count``
 * ``view_on_site``
-

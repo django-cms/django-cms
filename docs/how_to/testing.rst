@@ -9,7 +9,7 @@ Testing Apps
 Resolving View Names
 ====================
 
-Your apps need testing, but in your live site they aren't in ``urls.py`` as
+Your apps need testing, but in your live site they are not in ``urls.py`` as
 they are attached to a CMS page.  So if you want to be able to use
 :func:`~django.urls.reverse()` in your tests, or test templates that
 use the :ttag:`url` template tag, you need to hook up your app to a special
@@ -101,4 +101,3 @@ it or the context provided to its template::
             renderer = ContentRenderer(request=RequestFactory())
             html = renderer.render_plugin(model_instance, {})
             self.assertEqual(html, '<strong>Test</strong>')
-

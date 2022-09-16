@@ -1,7 +1,7 @@
 .. _colorscheme:
 
 ##########################################
-Color schemes (light/dark) with django CMS
+Colour schemes (light/dark) with django CMS
 ##########################################
 
 .. important::
@@ -10,7 +10,7 @@ Color schemes (light/dark) with django CMS
     interfaces**. The visitor-facing published site is **wholly independent** of this, and the
     responsibility of the site developer.
 
-    The admin interfaces will only reflect the described behavior if the package
+    The admin interfaces will only reflect the described behaviour if the package
     ``djangocms-admin-style`` is installed (version XXX or later). If it is not installed the admin
     interface is managed by your underlying Django installation which usually
     uses the browser's color scheme.
@@ -59,5 +59,3 @@ Toggle button for the color scheme
 Adding the setting ``CMS_COLOR_SCHEME_TOGGLE = True`` to the project's ``settings.py``
 will add a toggle icon (sun/moon) to the toolbar allowing a user to switch their
 color scheme for their session.
-
-

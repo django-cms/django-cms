@@ -40,4 +40,4 @@ What django CMS shows in your menus
 ===================================
 
 If :setting:`hide_untranslated` is ``True`` (the default) then pages that
-aren't translated into the desired language will not appear in the menu.
+are not translated into the desired language will not appear in the menu.

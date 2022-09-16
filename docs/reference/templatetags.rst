@@ -302,7 +302,7 @@ Example::
     <a href="{% page_url "help" %}">Help page</a>
     <a href="{% page_url request.current_page.parent %}">Parent page</a>
 
-If a matching page isn't found and :setting:`django:DEBUG` is ``True``, an
+If a matching page is not found and :setting:`django:DEBUG` is ``True``, an
 exception will be raised. However, if :setting:`django:DEBUG` is ``False``, an
 exception will not be raised.
 

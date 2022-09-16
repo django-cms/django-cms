@@ -70,7 +70,7 @@ Release schedule
 ****************
 
 The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website. The release schedule is
-managed by the release management workgroup. The plan is to release quarterly and according to a retrospectice approach.
+managed by the release management workgroup. The plan is to release quarterly and according to a retrospective approach.
 
 Example of retrospective approach.
 

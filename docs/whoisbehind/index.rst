@@ -31,14 +31,14 @@ long-term approach to the project, the dCA reserves the right of final say in
 any decisions concerning its development.
 
 As a non-profit organization the django CMS Association is dependent on
-donations to fulfill its mission, which is based on the following three statements:
+donations to fulfil its mission, which is based on the following three statements:
 
 * Innovate and lead
 * Foster contribution
 * Drive adoption
 
 The best way to donate is to become a member of the association and pay
-membership fees. The funding is funneled back into core development and
+membership fees. The funding is funnelled back into core development and
 community projects.
 
 * `Sign up for more information about becoming a member of the dCA <https://www.django-cms.org/en/sign-up/>`_

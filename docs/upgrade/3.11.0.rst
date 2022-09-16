@@ -12,21 +12,21 @@ What's new in 3.11.0
 
 Features:
 =========
-* Add pre commit functionality (#7204) (d1ecb6359) -- Mark Walker
-* Run workflows in concurrency groups (#7211) (04e843337) -- Mark Walker
-* Added concurrency option to github workflows (#7205) (546b36827) -- Mark Walker
-* Add support for django 4 (#7268) (9e8eb17) -- Vinit Kumar
-* Make Plugin Confirm Template configurable (#7267) (bab1e6e) -- Jacob Rief
-* Add support for dark mode for toolbar, page tree, structure tree, modals (#7245) (b2d9a08) -- Fabian Braun
+* Add pre commit functionality ``(#7204) (d1ecb6359)`` -- Mark Walker
+* Run workflows in concurrency groups ``(#7211) (04e843337)`` -- Mark Walker
+* Added concurrency option to github workflows ``(#7205) (546b36827)`` -- Mark Walker
+* Add support for django 4 ``(#7268) (9e8eb17)`` -- Vinit Kumar
+* Make Plugin Confirm Template configurable ``(#7267) (bab1e6e)`` -- Jacob Rief
+* Add support for dark mode for toolbar, page tree, structure tree, modals ``(#7245) (b2d9a08)`` -- Fabian Braun
 
 Bug Fixes:
 ==========
 
-* release script version number (#7322) (8ffc6488d) -- Mark Walker
-* add support for custom user model in cms permission signals (#7281) (c10b8ffc3) -- Vinit Kumar
-* publishing static placeholders outside of CMS (#7253) (bdb50b650) -- Adrien Delhorme
-* Toolbar bug in 3.10 (#7232) (b12d07989) -- Mark Walker
-* Disable workflow concurrency to bring stability back to the CI (#7209) (fdad05756) -- Mark Walker
+* release script version number ``(#7322) (8ffc6488d)`` -- Mark Walker
+* add support for custom user model in cms permission signals ``(#7281) (c10b8ffc3)`` -- Vinit Kumar
+* publishing static placeholders outside of CMS ``(#7253) (bdb50b650)`` -- Adrien Delhorme
+* Toolbar bug in 3.10 ``(#7232) (b12d07989)`` -- Mark Walker
+* Disable workflow concurrency to bring stability back to the CI ``(#7209) (fdad05756)`` -- Mark Walker
 
 
 ************************

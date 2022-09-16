@@ -52,7 +52,7 @@ Getting your issue accepted
 Other django CMS developers will see your issue, and will be able to comment. A core developer may
 add further comments, or a :ref:`label <label-reference>`.
 
-The important thing at this stage is to have your issue *accepted*. This means that we've agreed
+The important thing at this stage is to have your issue *accepted*. This means that we have agreed
 it's a genuine issue, and represents something we can or are willing to do in the CMS.
 
 You may be asked for more information before it's accepted, and there may be some discussion before
@@ -84,7 +84,7 @@ A ticket's *status* and *needs* are the most important of these. They tell us tw
 Needless to say, these labels need to be applied carefully, according to the rules of this system.
 
 GitHub's interface means that we have no alternative but to use colours to help identify our
-tickets. We're sorry about this. We've tried to use colours that will cause the fewest issues for
+tickets. We're sorry about this. We have tried to use colours that will cause the fewest issues for
 colour-blind people, so we don't use green (since we use red) or yellow (since we use blue) labels,
 but we are aware it's not ideal.
 
@@ -191,7 +191,7 @@ only for one or the other:
 
     accepted
         (issues only) The issue has been accepted as a genuine issue that needs to be addressed.
-        Note that it doesn't necessarily mean we will do what the issue suggests, if it makes a
+        Note that it does not necessarily mean we will do what the issue suggests, if it makes a
         suggestion - simply that we agree that there is an issue to be resolved.
 
     non-issue
@@ -207,7 +207,7 @@ only for one or the other:
         When this label is applied, an explanation must be provided in a comment.
 
     marked for rejection
-        We've been unable to reproduce the issue, and it has lain dormant for a long time. Or, it's
+        We have been unable to reproduce the issue, and it has lain dormant for a long time. Or, it's
         a pull request of low significance that requires more work, and looks like it might have
         been abandoned. These tickets will be closed when we make the next release.
 
@@ -290,7 +290,7 @@ Other
 .. glossary::
 
     has patch
-        (issues only) A patch intended to address the issue exists. This doesn't imply that the
+        (issues only) A patch intended to address the issue exists. This does not imply that the
         patch will be accepted, or even that it contains a viable solution.
 
         When this label is applied, a comment should cross-reference the pull request(s) containing

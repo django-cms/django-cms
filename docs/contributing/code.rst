@@ -17,7 +17,7 @@ Here's what the contribution process looks like in brief:
 #. Fork our `GitHub`_ repository, https://github.com/django-cms/django-cms
 #. Work locally and push your changes to your repository.
 #. When you feel your code is good enough for inclusion, send us a pull request.
-#. After that, please join the `Slack Channel`_ of our Pull Request Review work group (#workgroup-pr-review). This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
+#. After that, please join the `Slack Channel`_ of our Pull Request Review work group ``#workgroup-pr-review``. This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “PR review buddy” who is going to review your pull request.
 #. Get acknowledged by the django CMS community for your contribution
 
 See the :ref:`contributing_patch` how-to document for a walk-through of this process.
@@ -175,7 +175,7 @@ into the web font. All classes will be automatically added to
 
 Additionally we created an SVG template within
 ``cms/static/cms/font/src/_template.svgz`` that you should use when converting
-or creating additional icons. It is named *svgz* so it doesn't get compiled
+or creating additional icons. It is named *svgz* so it does not get compiled
 into the font. When using *Adobe Illustrator* please mind the
 `following settings <images/svg_settings.png>`_.
 

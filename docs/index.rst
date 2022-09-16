@@ -134,7 +134,7 @@ There are other capable Django-based CMS platforms but here's why you should
 consider django CMS:
 
 * thorough documentation
-* easy and comprehensive integration into existing projects - django CMS isn't a monolithic application
+* easy and comprehensive integration into existing projects - django CMS is not a monolithic application
 * a healthy, active and supportive developer community
 * a strong culture of good code, including an emphasis on automated testing
 

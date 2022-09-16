@@ -80,5 +80,5 @@ You can force the menu to be added automatically to the page by the apphook if y
 
     * If you're going to use sub-pages, you'll need to improve the menu styling to make it work a
       bit better.
-    * Since the Polls page lists all the Polls in it anyway, this isn't really the most practical
+    * Since the Polls page lists all the Polls in it anyway, this is not really the most practical
       addition to the menu.

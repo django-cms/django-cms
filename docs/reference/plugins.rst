@@ -195,7 +195,7 @@ CMSPluginBase Attributes and Methods Reference
 
         This attribute controls whether your plugin will be usable (and rendered)
         in a text plugin. When you edit a text plugin on a page, the plugin will show up in
-        the *CMS Plugins* dropdown and can be configured and inserted. The output will even
+        the *CMS Plugins* drop-down and can be configured and inserted. The output will even
         be previewed in the text editor.
 
         Of course, not all plugins are usable in text plugins. Therefore the default of this
@@ -368,7 +368,7 @@ CMSPluginBase Attributes and Methods Reference
         plugin.
 
         Since djangocms-text-ckeditor introduced inline previews of plugins, the icon
-        will not be rendered anymore.
+        will not be rendered any more.
 
         icon_src takes 1 argument:
 

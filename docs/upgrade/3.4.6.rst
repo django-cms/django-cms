@@ -23,5 +23,5 @@ Bug Fixes
 * Fixed a bug where the sitemap would ignore the ``public`` setting of the site languages
   and thus display hidden languages.
 * Fixed an ``AttributeError`` raised when adding or removing apphooks in Django 1.11.
-* Fixed an ``InconsistentMigrationHistory`` error raised when the contenttypes app
+* Fixed an ``InconsistentMigrationHistory`` error raised when the ``contenttypes app``
   has a pending migration after the user has applied the ``0010_migrate_use_structure`` migration.

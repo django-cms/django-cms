@@ -6,7 +6,7 @@
 Integrating a third-party application
 #####################################
 
-We've already written our own django CMS plugins and apps, but now we want to
+We have already written our own django CMS plugins and apps, but now we want to
 extend our CMS with a third-party application,
 `Djangocms-Blog <https://github.com/nephila/djangocms-blog>`_.
 
@@ -60,7 +60,7 @@ sophisticated image cropping.
         'filer.thumbnail_processors.scale_and_crop_with_subject_location',
         'easy_thumbnails.processors.filters',
     )
-    
+
     META_SITE_PROTOCOL = 'https'  # set 'http' for non ssl enabled websites
     META_USE_SITES = True
 
@@ -68,7 +68,7 @@ sophisticated image cropping.
 ``URL Patterns``
 =======================
 
-Add the following url pattern to the main urls.py:
+Add the following url pattern to the main ``urls.py``:
 
 .. code-block:: python
 
@@ -81,7 +81,7 @@ Add the following url pattern to the main urls.py:
 Migrate the database
 ********************
 
-We've added a new application so we need to update our database::
+We have added a new application so we need to update our database::
 
     python manage.py migrate
 
@@ -116,4 +116,3 @@ Add new News & Blog articles
 ****************************
 
 You can add new articles using the admin or the new *Blog* menu that now appears in the toolbar when you are on a page belonging to Blog.
-

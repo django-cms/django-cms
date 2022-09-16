@@ -10,11 +10,11 @@ All the following sections of this tutorial are concerned with different ways of
 applications into django CMS. The ease with which other applications can be built into django CMS
 sites is an important feature of the system.
 
-Integrating applications doesn't merely mean installing them alongside django CMS, so that they peacefully co-exist. It
+Integrating applications does not merely mean installing them alongside django CMS, so that they peacefully co-exist. It
 means using django CMS's features to build them into a single coherent web project that speeds up the work of managing
 the site, and makes possible richer and more automated publishing.
 
-It's key to the way that django CMS integration works that **it doesn't require you to modify your other applications**
+It's key to the way that django CMS integration works that **it does not require you to modify your other applications**
 unless you want to. This is particularly important when you're using third-party applications and don't want to have to
 maintain your own forked versions of them. (The only exception to this is if you decide to build django CMS features
 directly into the applications themselves, for example when using :ref:`placeholders in other applications
@@ -57,7 +57,7 @@ Add the ``poll`` URL configuration to ``urlpatterns`` in the project's ``urls.py
     )
 
 Note that it must be included **before** the line for the django CMS URLs. django CMS's URL pattern
-needs to be last, because it "swallows up" anything that hasn't already been matched by a previous
+needs to be last, because it "swallows up" anything that has not already been matched by a previous
 pattern.
 
 Now run the application's migrations:

@@ -38,24 +38,24 @@ Run the demo project in docker (Step 2)
 ****************************************
 
 Info: The `demo project <https://github.com/django-cms/django-cms-quickstart>`_ is a minimal
-django project with some additional requirements in the requirements.txt.
+django project with some additional requirements in the ``requirements.txt``.
 
-Open the terminal application on your computer and go to a safe folder (i.e. cd ~/Projects), then:
+Open the terminal application on your computer and go to a safe folder (i.e. ``cd ~/Projects``), then:
 
 
 ::
 
       git clone https://github.com/django-cms/django-cms-quickstart.git
       cd django-cms-quickstart
-      docker compose build web
-      docker compose up -d database_default
-      docker compose run web python manage.py migrate
-      docker compose run web python manage.py createsuperuser
-      docker compose up -d
+      docker-compose build web
+      docker-compose up -d database_default
+      docker-compose run web python manage.py migrate
+      docker-compose run web python manage.py createsuperuser
+      docker-compose up -d
 
 During the installation process, you will be prompted to enter your email address and set a username and password.
 Open your browser and insert ``http://localhost:8000/admin`` there you should be invited to login
-and continue with Step 4: create your first page
+and continue with Step 3: create your first page
 
 ********************************
 Create your first page (Step 3)

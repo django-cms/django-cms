@@ -58,7 +58,7 @@ Are you new to django CMS?
 
 If you are new to django CMS, then we recommend you to first familiarize yourself with the CMS
 and start with the `install <https://docs.django-cms.org/en/latest/introduction/01-install.html>`_ section.
-After that, you can have a go at issues on Github that are marked `Good first issue <https://github.com/django-cms/django-cms/labels/good%20first%20issues>`_.
+After that, you can have a go at issues on GitHub that are marked `Good first issue <https://github.com/django-cms/django-cms/labels/good%20first%20issues>`_.
 These issues are especially good if you're just starting out but still want to contribute.
 Beginners can also contribute to the project, for example by helping to improve the documentation,
 or other tasks, such as writing a blog article series about your journey of learning django CMS
@@ -108,5 +108,5 @@ By the way, you can also create your own work group. Find out more `here <https:
 
 Are you interested in knowledge sharing and improving your skills? Then a workgroup might be
 the right choice for you. Would you rather decide for yourself when and what you work on? Then you
-can choose a task from our community tasks list or contribute directly on Github
+can choose a task from our community tasks list or contribute directly on GitHub
 by answering issues or create Pull Requests.

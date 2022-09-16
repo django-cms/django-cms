@@ -4,14 +4,14 @@
 Guidelines for django CMS projects
 #####################################
 
-.. note:: These guidelines are based on the best practice established by the Jazzband project, a community of contributors that shares the responsibility of maintaining Python-based projects.
+.. note:: These guidelines are based on the best practice established by the ``Jazzband project``, a community of contributors that shares the responsibility of maintaining Python-based projects.
 
 The django CMS ecosystem consists of many custom projects. Often these projects are maintained by the author themselves.
 However, sometimes it can make sense to put a project in the care of the django CMS project.
 Either because it is of interest to the entire community, or because the author can no longer devote time to maintain the project themselves.
 
-Whether an existing project is transferred to the django CMS Github organization,
-or a new project is set up within the django CMS Github organization, it is important that certain standards are followed.
+Whether an existing project is transferred to the django CMS GitHub organization,
+or a new project is set up within the django CMS GitHub organization, it is important that certain standards are followed.
 
 **********************************************************
 Acceptance criteria for new projects or existing ones
@@ -73,7 +73,7 @@ This is a `django CMS <https://www.django-cms.org>`_ project.
 By contributing you agree to abide by the `Contributor Code of Conduct <https://docs.django-cms.org/en/latest/contributing/code_of_conduct.html>`_ and follow the `guidelines <https://docs.django-cms.org/en/latest/contributing/index.html>`_. Of course extending the contributing document with your project’s contributing guide is highly encouraged, too. See GitHub’s documentation on contributing guidelines for more information.
 
 *****************************************************************
-Move an existing project to the django CMS Github organization
+Move an existing project to the django CMS GitHub organization
 *****************************************************************
 
-To initiate the transfer to django CMS, you should use Github’s `Transfer Feature <https://docs.github.com/en/repositories/creating-and-managing-repositories/transferring-a-repository>`_ to transfer the repository to the django CMS organization.
+To initiate the transfer to django CMS, you should use GitHub’s `Transfer Feature <https://docs.github.com/en/repositories/creating-and-managing-repositories/transferring-a-repository>`_ to transfer the repository to the django CMS organization.

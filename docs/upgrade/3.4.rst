@@ -70,7 +70,7 @@ Backward incompatible changes
 Apphooks & Toolbars
 ===================
 
-As per our deprecation policy we've now removed the backwards compatible shim
+As per our deprecation policy we have now removed the backwards compatible shim
 for ``cms_app.py`` and ``cms_toolbar.py``.
 If you have not done so already, please rename these to ``cms_apps.py`` and ``cms_toolbars.py``.
 
@@ -111,7 +111,7 @@ The following methods were changed to require a user parameter instead of a requ
 These are also deprecated in favour of their counterparts in ``cms.utils.page_permissions``.
 
 To keep consistency with both django CMS permissions and Django permissions,
-we've modified the vanilla permissions system (``CMS_PERMISSIONS = False``)
+we have modified the vanilla permissions system (``CMS_PERMISSIONS = False``)
 to require users to have certain Django permissions to perform an action.
 
 Here's an overview:
@@ -138,7 +138,7 @@ This change will only affect non-superuser staff members.
 Manual plugin rendering
 =======================
 
-We've rewritten the way plugins and placeholders are rendered.
+We have rewritten the way plugins and placeholders are rendered.
 As a result, if you're manually rendering plugins and placeholders
 you'll have to adapt your code to match the new rendering mechanism.
 
