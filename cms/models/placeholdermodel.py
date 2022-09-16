@@ -596,8 +596,8 @@ class Placeholder(models.Model):
                 offset=target_offset,
             )
         else:
-            # moving to empty placeholder
-            # Mover out behind  last source position
+            # moving to empty placeholder:
+            # Move out (remaining) plugins right behind last source position to be able to recalculate
             source_offset = source_last_plugin.position
 
         self._shift_plugin_positions(
