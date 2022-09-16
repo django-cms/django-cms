@@ -1491,3 +1491,66 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected)
 
+class CheckAndFixTreeTests(TransactionCMSTestCase):
+    def test_check_tree_and_fix_tree(self):
+        ex = TwoPlaceholderExample(
+            char_1='one',
+            char_2='two',
+            char_3='tree',
+            char_4='four'
+        )
+        ex.save()
+        ph1 = ex.placeholder_1
+        ph2 = ex.placeholder_2
+        tree = []
+        for i in range(8):
+            tree.append(add_plugin(ph1, 'TextPlugin', 'en').cmsplugin_ptr)
+        ph2_plugin = add_plugin(ph2, 'TextPlugin', 'en').cmsplugin_ptr
+
+        # Garble plugin tree in ph 1
+        tree[-1].position += 1 # Create gap
+        tree[-1].parent = ph2_plugin  # Parent accross plugins
+
+        tree[1].parent = tree[0]  # Build parent relationships
+        tree[2].parent = tree[0]
+        tree[3].parent = tree[2]
+        tree[4].parent = tree[0]
+
+        # Garble positons
+        tree[2].position, tree[3].position = tree[3].position, tree[2].position
+        tree[0].position, tree[3].position = tree[3].position, tree[0].position
+
+        # Parent 1, position 1
+        #     Child 1, position 2
+        #     Parent 2, position 3
+        #         Child 2, position 4
+        #     Child 3, position 5
+        # Parent 3, position 6
+        #     Child 4 position 7
+        # Child 5, position 8   # (Parent link to parent plugin in other placeholder removed)
+
+        # Save tree
+        for plugin in tree:
+            plugin.position += len(tree)+2  # Avoid unique constraints to fail.
+            plugin.save()
+
+        messages = ph1.check_tree()
+        expected_message_parts = [
+            "Non consecutive position entries",
+            "Children with positions lower than their parent's (id=1)",
+            "Children with positions lower than their parent's (id=3)",
+            "Plugins claim to be children of parents in a different placeholder",
+        ]
+        for part in expected_message_parts:
+            for message in messages:
+                if part in message:
+                    break
+            else:
+                self.fail(f"'{part}' not detected by check_tree ")
+
+        ph1.fix_tree()  # Fix it
+        self.assertFalse(ph1.check_tree())  # Messages gone away
+
+        # After fixign the tree positions and id correspond just as the tree was created
+        for plugin in ph1.cmsplugin_set.all():
+            self.assertEqual(plugin.id, plugin.position)
