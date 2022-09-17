@@ -1,4 +1,4 @@
-drop-down.. _upgrade-to-3.9.0:
+.. _upgrade-to-3.9.0:
 
 ###################
 3.9.0 release notes

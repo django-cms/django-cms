@@ -55,7 +55,7 @@ select a page type and all plugins and contents will be pre-filled.
 Experimental Python 3.3 support
 ===============================
 
-we have added experimental support for Python 3.3. Support for Python 2.5 has
+We have added experimental support for Python 3.3. Support for Python 2.5 has
 been dropped.
 
 Better multilingual editing

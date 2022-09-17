@@ -1,4 +1,4 @@
-we have.. _upgrade-to-3.4.4:
+.. _upgrade-to-3.4.4:
 
 ###################
 3.4.4 release notes

@@ -406,13 +406,13 @@ A **bad** example:
         the EventListener for the event ``'load'`` and/or ``'DOMContentLoaded'``,
         the following classes can be added to the script tag:
 
-        ===========================================     ========================================================
-        Classname                                       Corresponding Javascript code
-        ===========================================     ========================================================
-        ``cms-trigger-event-document-DOMContentLoaded`` ``document.dispatchEvent(new Event('DOMContentLoaded')``
-        ``cms-trigger-event-window-DOMContentLoaded``   ``window.dispatchEvent(new Event('DOMContentLoaded')``
-        ``cms-trigger-event-window-load``               ``window.dispatchEvent(new Event('load')``
-        ===========================================     ========================================================
+        ===============================================    ========================================================
+        Classname                                          Corresponding JavaScript code
+        ===============================================    ========================================================
+        ``cms-trigger-event-document-DOMContentLoaded``    ``document.dispatchEvent(new Event('DOMContentLoaded')``
+        ``cms-trigger-event-window-DOMContentLoaded``      ``window.dispatchEvent(new Event('DOMContentLoaded')``
+        ``cms-trigger-event-window-load``                  ``window.dispatchEvent(new Event('load')``
+        ===============================================    ========================================================
 
 
         The events will be triggered once after all scripts are successfully injected into the DOM.
