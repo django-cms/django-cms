@@ -194,6 +194,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2], list(ph2.cmsplugin_set.order_by('position')))
 
     def test_inter_placeholder_nested_plugin_move(self):
+        # languages!
+        language_fun = ('en', 'de', 'it', 'de-formal')
         # symmetric and asymmetric plugin numbers
         for n1, n2 in ((1, 10), (10, 0), (5, 5)):
             ex = TwoPlaceholderExample(
@@ -205,29 +207,40 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             ex.save()
             ph1 = ex.placeholder_1
             ph2 = ex.placeholder_2
-
-            ph1parent = add_plugin(ph1, 'TextPlugin', 'en', body='ph1 parent').cmsplugin_ptr
-            ph1children = []
-            for i in range(n1):
-                ph1children.append(
-                    add_plugin(ph1, 'TextPlugin', 'en', target=ph1parent, body=f'ph1 child{i}').cmsplugin_ptr
-                )
-            ph2parent = add_plugin(ph2, 'TextPlugin', 'en', body='ph2 parent').cmsplugin_ptr
-            ph2children = []
-            for i in range(n2):
-                ph2children.append(
-                    add_plugin(ph2, 'TextPlugin', 'en', target=ph2parent, body=f'ph2 child{i}').cmsplugin_ptr
-                )
-
-            ph2.move_plugin(ph2parent, target_plugin=ph1parent, target_position=2, target_placeholder=ph1)
-            left = [ph1parent, ph2parent] + ph2children + ph1children
-            right = list(ph1.cmsplugin_set.order_by('position'))
+            ph1parent = {}
+            ph2parent = {}
+            ph1children = {}
+            ph2children = {}
+            for lang in language_fun:
+                ph1parent[lang] = add_plugin(ph1, 'TextPlugin', lang, body='ph1 parent').cmsplugin_ptr
+                ph1children[lang] = []
+                for i in range(n1):
+                    ph1children[lang].append(
+                        add_plugin(ph1, 'TextPlugin', lang, target=ph1parent[lang], body=f'ph1 child{i}').cmsplugin_ptr
+                    )
+                ph2parent[lang] = add_plugin(ph2, 'TextPlugin', lang, body='ph2 parent').cmsplugin_ptr
+                ph2children[lang] = []
+                for i in range(n2):
+                    ph2children[lang].append(
+                        add_plugin(ph2, 'TextPlugin', lang, target=ph2parent[lang], body=f'ph2 child{i}').cmsplugin_ptr
+                    )
+            ph2.move_plugin(
+                ph2parent[language_fun[0]],
+                target_plugin=ph1parent[language_fun[0]],
+                target_position=2,
+                target_placeholder=ph1,
+            )
+            left = [ph1parent[language_fun[0]], ph2parent[language_fun[0]]] + ph2children[language_fun[0]] + ph1children[language_fun[0]]
+            right = list(ph1.cmsplugin_set.filter(language=language_fun[0]).order_by('position'))
             self.assertEqual(left, right)
 
             ph1.delete()
             ph2.delete()
 
     def test_get_last_plugin_position(self):
+        # languages!
+        language_fun = ('en', 'de', 'it', 'de-formal')
+
         ex = Example1(
             char_1='one',
             char_2='two',
@@ -240,34 +253,45 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         parent = None
         n = 4  # This will be the position of the last plugin
 
-        plugins = []
+        plugins = {lang: [] for lang in language_fun}
+        parent = {lang: None for lang in language_fun}
         for i in range(n):
-            parent=add_plugin(ph, 'TextPlugin', 'en', target=parent).cmsplugin_ptr
-            plugins.append(parent)
+            for lang in language_fun:
+                parent[lang]=add_plugin(ph, 'TextPlugin', lang, target=parent[lang]).cmsplugin_ptr
+                plugins[lang].append(parent[lang])
 
-        self.assertEqual(ph.get_last_plugin_position('en'), n)  # should be n
-        for parent in plugins:
-            # needs to be n also if we look at the parents
-            # the last plugin does not have a child hence position should be none
-            self.assertEqual(ph.get_last_plugin_position('en', parent=parent), n if parent != plugins[-1] else None)
+        for lang in language_fun:
+            self.assertEqual(ph.get_last_plugin_position(lang), n)  # should be n
 
-        # Tree
+            for parent in plugins[lang]:
+                # needs to be n also if we look at the parents
+                # the last plugin does not have a child hence position should be none
+                self.assertEqual(
+                    ph.get_last_plugin_position(lang, parent=parent),
+                    n if parent != plugins[lang][-1] else None,
+                )
 
-        # Plugin 1
-        #   Plugin 2
-        #     Plugin 3
-        #       Plugin 4
-        # Final Plugin
+            # Tree
 
-        add_plugin(ph, 'TextPlugin', 'en', target=None)  # Add a top level final plugin
+            # Plugin 1
+            #   Plugin 2
+            #     Plugin 3
+            #       Plugin 4
+            # Final Plugin
 
-        self.assertEqual(ph.get_last_plugin_position('en'), n + 1)  # plus the last plugin
-        for parent in plugins:
-            # still needs to be n also if we look at the parents
-            # the last plugin does not have a child hence position should be none
-            self.assertEqual(ph.get_last_plugin_position('en', parent=parent), n if parent != plugins[-1] else None)
+            add_plugin(ph, 'TextPlugin', lang, target=None)  # Add a top level final plugin
+
+            self.assertEqual(ph.get_last_plugin_position(lang), n + 1)  # plus the last plugin
+            for parent in plugins[lang]:
+                # still needs to be n also if we look at the parents
+                # the last plugin does not have a child hence position should be none
+                self.assertEqual(
+                    ph.get_last_plugin_position(lang, parent=parent),
+                    n if parent != plugins[lang][-1] else None,
+                )
 
     def test_get_last_plugin_position_order(self):
+        language_fun = ('en', 'de', 'it', 'en-US')
         ex = Example1(
             char_1='one',
             char_2='two',
@@ -279,9 +303,10 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         n = 15  # This will be the position of the last plugin
 
-        positions = ('first-child', ) # 'last-child', )
         for i in range(n):
-            add_plugin(ph, 'TextPlugin', 'en', position=positions[i % len(positions)]).cmsplugin_ptr
+            # Use 'first-child' order causes pk and position run inversely
+            for language in language_fun:
+                add_plugin(ph, 'TextPlugin', language, 'first-child').cmsplugin_ptr
 
         self.assertEqual(ph.get_last_plugin_position('en'), n)  # should be n
 
@@ -1490,67 +1515,3 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected)
-
-class CheckAndFixTreeTests(TransactionCMSTestCase):
-    def test_check_tree_and_fix_tree(self):
-        ex = TwoPlaceholderExample(
-            char_1='one',
-            char_2='two',
-            char_3='tree',
-            char_4='four'
-        )
-        ex.save()
-        ph1 = ex.placeholder_1
-        ph2 = ex.placeholder_2
-        tree = []
-        for i in range(8):
-            tree.append(add_plugin(ph1, 'TextPlugin', 'en').cmsplugin_ptr)
-        ph2_plugin = add_plugin(ph2, 'TextPlugin', 'en').cmsplugin_ptr
-
-        # Garble plugin tree in ph 1
-        tree[-1].position += 1 # Create gap
-        tree[-1].parent = ph2_plugin  # Parent across placeholders
-
-        tree[1].parent = tree[0]  # Build parent relationships
-        tree[2].parent = tree[0]
-        tree[3].parent = tree[2]
-        tree[4].parent = tree[0]
-
-        # Garble positons
-        tree[2].position, tree[3].position = tree[3].position, tree[2].position
-        tree[0].position, tree[3].position = tree[3].position, tree[0].position
-
-        # Parent 1, position 1
-        #     Child 1, position 2
-        #     Parent 2, position 3
-        #         Child 2, position 4
-        #     Child 3, position 5
-        # Parent 3, position 6
-        #     Child 4 position 7
-        # Child 5, position 8   # (Parent link to parent plugin in other placeholder removed)
-
-        # Save tree
-        for plugin in tree:
-            plugin.position += len(tree)+2  # Avoid unique constraints to fail.
-            plugin.save()
-
-        messages = ph1.check_tree()
-        expected_message_parts = [
-            "Non consecutive position entries",
-            f"Children with positions lower than their parent's (id={tree[0].id})",
-            f"Children with positions lower than their parent's (id={tree[2].id})",
-            "Plugins claim to be children of parents in a different placeholder",
-        ]
-        for part in expected_message_parts:
-            for message in messages:
-                if part in message:
-                    break
-            else:
-                self.fail(f"'{part}' not detected by check_tree ")
-
-        ph1.fix_tree()  # Fix it
-        self.assertFalse(ph1.check_tree())  # Messages gone away
-
-        # After fixing the tree positions and id correspond just as the tree was created
-        positions = list(ph1.cmsplugin_set.order_by('id').values_list('position', flat=True))
-        self.assertEqual(list(range(1, len(positions)+1)), positions)
