@@ -572,10 +572,11 @@ class Placeholder(models.Model):
         source_last_plugin = self.get_last_plugin(plugin.language)
         target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
 
+        plugin_descendants = plugin.get_descendants()
         if target_last_plugin:
             source_length = source_last_plugin.position
             target_length = target_last_plugin.position
-            plugins_to_move_count = 1 + plugin._get_descendants_count()  # parent plus descendants
+            plugins_to_move_count = 1 + len(plugin_descendants)  # parent plus descendants
 
             source_offset = max(
                 # far enough to shift behind current last source position
@@ -613,7 +614,7 @@ class Placeholder(models.Model):
 
         plugin.update(parent=target_plugin, placeholder=target_placeholder)
         # TODO: More efficient is to do raw sql update
-        plugin.get_descendants().update(placeholder=target_placeholder)
+        plugin_descendants.update(placeholder=target_placeholder)
         self._recalculate_plugin_positions(plugin.language)
         target_placeholder._recalculate_plugin_positions(plugin.language)
 
