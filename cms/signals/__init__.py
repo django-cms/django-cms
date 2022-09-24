@@ -1,14 +1,31 @@
-from cms.signals.apphook import debug_server_restart, trigger_server_restart
-from cms.signals.log_entries import log_page_operations, log_placeholder_operations
-from cms.signals.permissions import post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group, pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
-from cms.utils.conf import get_cms_setting
-
-from django.db.models import signals
-from django.dispatch import Signal
-
-from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserGroup
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from django.db.models import signals
+from django.db.models.signals import pre_migrate
+from django.dispatch import receiver, Signal
+
+from cms.exceptions import ConfirmationOfVersion4Required
+from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserGroup
+from cms.signals.apphook import debug_server_restart, trigger_server_restart
+from cms.signals.log_entries import log_page_operations, log_placeholder_operations
+from cms.signals.permissions import (
+    post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group,
+    pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
+)
+from cms.utils.conf import get_cms_setting
+
+
+@receiver(pre_migrate)
+def check_v4_confirmation(**kwargs):
+    """
+    Signal handler to get the confirmation that using version 4 is intentional.
+
+    This is a temporary step to ensure people only migrate their databases intentionally.
+    """
+    if not get_cms_setting('CONFIRM_VERSION4'):
+        raise ConfirmationOfVersion4Required(
+            "You must confirm your intention to use django-cms version 4 with the setting CMS_CONFIRM_VERSION4"
+        )
 
 #################### Our own signals ###################
 

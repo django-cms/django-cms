@@ -318,6 +318,6 @@ if __name__ == '__main__':
         MIGRATION_MODULES=MIGRATION_MODULES,
         # django 3.0
         X_FRAME_OPTIONS='SAMEORIGIN',
-
+        CMS_CONFIRM_VERSION4=True,
         **dynamic_configs
     )
