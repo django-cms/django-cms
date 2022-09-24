@@ -154,26 +154,25 @@ The model structure was changed to allow the core of the cms to be flexible and 
 
 To handle the fact that the Title model is renamed in the CMS you will need to import the PageContent model.
 
-For a djangocms 4.0 only project
-```
+For a djangocms 4.0 only project::
+
     from cms.models import PageContent
-```
 
-For a djangocms 3.x and 4.0 compatible project
-```
-# To handle the fact that the Title model is renamed in the CMS you will need to import the PageContent model.
-try:
+
+For a djangocms 3.x and 4.0 compatible project::
+
+    # To handle the fact that the Title model is renamed in the CMS you will need to import the PageContent model.
+    try:
+        from cms.models import PageContent
+    # django CMS 3.x
+    except ImportError:
+        from cms.models import Title as PageContent
+
+
+For a djangocms 4.x+ only project::
+
     from cms.models import PageContent
-# django CMS 3.x
-except ImportError:
-    from cms.models import Title as PageContent
-```
 
-For a djangocms 4.x+ only project
-
-```
-from cms.models import PageContent
-```
 
 
 Settings
@@ -220,28 +219,27 @@ https://github.com/django-cms/django-cms/pull/6421 app registration docs in the 
 - CMSAPPConfig is a class, which defines the configuration for a specific add-on, this is then passed to CMSAppExtension. It provides a way of telling the core that an app wants to access something from another app config (the centralized way of handling app config). For example: Alias wants to tell versioning to version it. This requires two components, versioning must define CMSAppExtension, all it needs to do is implement one method, called `configure_app`, which takes an instance of the CMSAppConfig. In order for an alias app to be linked to it set `app_name_enabled=True`. When the extension is configured like this the cms will take all the config settings and pass them to the relevant extension, specify models that need to be versioned and which apps need to access this config. CMSAppExtension is the way to register the add-ons and in the future plugins (or plugin_pools) with have their configs defined in CMSAPPConfig.
 
 ### App configuration example
-An application that defines an app extension can be used by other apps by registering as "enabled" in the CMSAppConfig by adding: "package_with_extension_enabled"
+An application that defines an app extension can be used by other apps by registering as "enabled" in the CMSAppConfig by adding: "package_with_extension_enabled"::
 
-```
-# A package that defines an app extension for other apps to register with
-# myapp/cms_config.py
-class MyappCMSExtension(CMSAppExtension):
-    def __init__(self):
-        self.mylist = []
+    # A package that defines an app extension for other apps to register with
+    # myapp/cms_config.py
+    class MyappCMSExtension(CMSAppExtension):
+        def __init__(self):
+            self.mylist = []
 
-    def configure_app(self, cms_config):
-        if hasattr(cms_config, "myapp_attribute"):
-            self.mylist.append(cms_config.myapp_attribute)
+        def configure_app(self, cms_config):
+            if hasattr(cms_config, "myapp_attribute"):
+                self.mylist.append(cms_config.myapp_attribute)
 
 
-# A package that defines a value to add to the extension
-# someotherapp/cms_config.py
-class SomeotherappCMSConfig(CMSAppConfig):
-    # By enabling the someotherapp with myapp, the extension will be used for the someotherapp
-    myapp_enabled = True
-    # Supply a value to `myapp_attribute` to be added to the myapp cms_config.mylist attribute.
-    myapp_attribute = "A string value"
-```
+    # A package that defines a value to add to the extension
+    # someotherapp/cms_config.py
+    class SomeotherappCMSConfig(CMSAppConfig):
+        # By enabling the someotherapp with myapp, the extension will be used for the someotherapp
+        myapp_enabled = True
+        # Supply a value to `myapp_attribute` to be added to the myapp cms_config.mylist attribute.
+        myapp_attribute = "A string value"
+
 
 App configuration usage examples in djangocms-url-manager and djangocms-alias
 -----------------------------------------------------------------------------
@@ -268,18 +266,18 @@ djangocms-versioning overrides queries from PageContent
 -------------------------------------------------------
 
 - django CMS Versioning overrides the standard query manager for PageContent by adding the query manager: PublishedContentManagerMixin. https://github.com/django-cms/djangocms-versioning/blob/429e50d4de6d14f1088cbdba2be63b20c2885be9/djangocms_versioning/managers.py#L4
-- By default only published versions are returned from `PageContents.objects.all()`. To get all versions regardless of versioning state you can use the "\_base_manager": `PageContent._base_manager.all()`
+- By default only published versions are returned from `PageContents.objects.all()`.
 
-```
-# Get only published PageContents
-PageContent.objects.all()
+To get all versions regardless of versioning state you can use the "\_base_manager": `PageContent._base_manager.all()`::
+    # Get only published PageContents
+    PageContent.objects.all()
 
-# Get all PageContents regardless of the versioning status, be careful with this as it can return archived, draft and published versions!
-PageContent._base_manager.all()
+    # Get all PageContents regardless of the versioning status, be careful with this as it can return archived, draft and published versions!
+    PageContent._base_manager.all()
 
-# Get only draft PageContents
-from djangcms-versioning.constants import DRAFT PageContent._base_manager.filter(versions__state=DRAFT)
-```
+    # Get only draft PageContents
+    from djangcms-versioning.constants import DRAFT PageContent._base_manager.filter(versions__state=DRAFT)
+
 
 Disabling the admin sideframe
 =============================
@@ -326,39 +324,38 @@ Placeholder relations
 
 The `PlaceholderField` has been replaced by the `PlaceholderRelationField`, the built-in migrations will automatically take care of the replacement, but it can't however replace the code.
 
-You need to replace your fields such as:
-```
-class Post(models.Model):
-    ...
-    media = PlaceholderField("media", related_name="media")
-```
+You need to replace your fields such as::
 
-with:
-```
-class Post(models.Model):
-    ...
-    placeholders = PlaceholderRelationField()
-```
+    class Post(models.Model):
+        ...
+        media = PlaceholderField("media", related_name="media")
+
+
+with::
+
+    class Post(models.Model):
+        ...
+        placeholders = PlaceholderRelationField()
+
 
 The above you may think is very strange, and you are completely correct. This is because the placeholder relationship is now a GenericForeignKey relationship, so it can handle many different placeholders at once.
 
-To be able to use `media` again, we can create a property like the below example:
+To be able to use `media` again, we can create a property like the below example::
 
-```
-class Post(models.Model):
-    ...
-    def _get_placeholder_from_slotname(self, slotname):
-        try:
-            return self.placeholders.get(slot=slotname)
-        except Placeholder.DoesNotExist:
-            from cms.utils.placeholder import rescan_placeholders_for_obj
-            rescan_placeholders_for_obj(self)
-            return self.placeholders.get(slot=slotname)
+    class Post(models.Model):
+        ...
+        def _get_placeholder_from_slotname(self, slotname):
+            try:
+                return self.placeholders.get(slot=slotname)
+            except Placeholder.DoesNotExist:
+                from cms.utils.placeholder import rescan_placeholders_for_obj
+                rescan_placeholders_for_obj(self)
+                return self.placeholders.get(slot=slotname)
 
-    @cached_property
-    def media(self):
-        return self._get_placeholder_from_slotname("media")
-```
+        @cached_property
+        def media(self):
+            return self._get_placeholder_from_slotname("media")
+
 
 
 Placeholder endpoints
@@ -387,26 +384,24 @@ We can use djangocms-alias as an example here because this is a very good exampl
 
 Your app should have a placeholder field, djangocms-alias adds this manually. The core CMS has a more advanced technique of adding placeholders by the templates, for django-cms alias we only need one placeholder. Please refer to how the core django-cms package implements this for PageContent if you need more advanced control of Placeholder creation.
 
-It is important that your app uses the concept for djangocms-versioning of a grouper and content model.
+It is important that your app uses the concept for djangocms-versioning of a grouper and content model::
 
-```
-# models.py
+    # models.py
 
-class AliasContent(models.Model):
-    ...
-    placeholders = PlaceholderRelationField()
-    placeholder_slotname = 'content'
-```
+    class AliasContent(models.Model):
+        ...
+        placeholders = PlaceholderRelationField()
+        placeholder_slotname = 'content'
 
-Within your packages cms_config add the following entry
 
-```
-# cms_config.py
+Within your packages cms_config add the following entry::
 
-class AliasCMSConfig(CMSAppConfig):
-    cms_enabled = True
-    cms_toolbar_enabled_models = [(AliasContent, render_alias_content)]
-```
+    # cms_config.py
+
+    class AliasCMSConfig(CMSAppConfig):
+        cms_enabled = True
+        cms_toolbar_enabled_models = [(AliasContent, render_alias_content)]
+
 
 
 Static Placeholders
