@@ -22,18 +22,28 @@ The core principles of django-cms 4.0+
 - Allow third parties to define how publishing should work, if anyone needs the feature to work differently they can. This is why publishing was moved to djangocms-versioning.
 
 
-TODO:
-- Architecture of 3.x vs 4.x, justifying why the code was changed the way that it was
-- Advised core packages and link to relevant documentation
-- Add migration documentation
-- Add App registration documentation to the docs
-- Rework reference documentation
-- Rework topics documentation
+***********************
+How to upgrade to 4.0.0
+***********************
+
+It is currently recommended to start new projects on django-cms 4.0.0. The changes from
+django-cms 3.x to 4.x are so different that only 3rd party utilities can assist with the
+migration such as `djangocms-4-migration` https://pypi.org/project/djangocms-4-migration/.
+
+Please refer to the guidance within the aforementioned package to perform a migration between projects.
 
 
 *******************
 What's new in 4.0.0
 *******************
+New features at a glance
+
+* A revised model structure, delivering huge performance improvements
+* Powerful versioning functionality
+* A new app configuration facility that allows other apps to customise / control other apps by enhancing features.
+* Dedicated Edit, Preview and Structure endpoints.  Allows the editing interface to be used by custom models and not just pages.
+* New and improved plugin architecture
+* New Alias Placeholders that are versioned and provide more control  (replaces Static placeholders)
 
 Improvements and new features
 =============================
@@ -93,28 +103,6 @@ Removal of deprecated functionality
 * Removed `Page.get_published()`
 * Removed `StaticPlaceholders`
 
-***********************
-How to upgrade to 4.0.0
-***********************
-
-It is currently recommended to start new projects on django-cms 4.0.0. The changes from
-django-cms 3.x to 4.x are so different that only 3rd party utilities can assist with the
-migration such as `djangocms-4-migration` https://pypi.org/project/djangocms-4-migration/.
-
-Please refer to the guidance within the aforementioned package to perform a migration between projects.
-
-
-******************************
-What's new in django-cms 4.0.0
-******************************
-
-New features at a glance
-* A revised model structure, delivering huge performance improvements
-* Powerful versioning functionality
-* A new app configuration facility that allows other apps to customise / control other apps by enhancing features.
-* Dedicated Edit, Preview and Structure endpoints.  Allows the editing interface to be used by custom models and not just pages.
-* New and improved plugin architecture
-* New Alias Placeholders that are versioned and provide more control  (replaces Static placeholders)
 
 Main differences to django CMS 3.x
 ==================================
@@ -126,21 +114,6 @@ The main differences to note in the core CMS which is now extremely simplified a
 - Dedicated Edit, Preview and Structure endpoints, this allows any applications using Placeholders inside or outside of the CMS (djangocms_alias) to use the same editing experience.
 - New plugin architecture, simplified and no reliance on treebeard which was problematic in the past.
 - Static placeholders are being replaced by djangocms_alias because static placeholders cannot be versioned or allow moderation.
-
-
-| Topic | Description |
-| - |- |
-| New Plugin Architecture (Backend) | Treebeard was previously used. Treebeard only used for pagetree. Migration possible, simple |
-| Placeholder field relations| Affected for programmed placeholder fields. Now better to know what plugin is stored where. Should still work on a migration, source is backwards compatible |
-| Pages and titles | Placeholders are now separated into languagesBefore you had one placeholder per page for all languages now it is 3placeholders for 3 languages |
-| Title is now “page contents” | Basic settings were stored in the title object and advanced settings in the page object. Title is now PageContentSome settings have been moved to PageContent. For example templates can now be set as PageContent meaning if you have different languages each language can have a different template. Should be fine but might eventually require  work|
-| Changes in how we store the URL information                               | Slug and path is now stored outside of PageContentIs now stored in PageUrlShould be migrated to new system |
-| Publishing of django CMS has been removed                                 | Draft and live pages don’t exist anymore. Migration is possible and has been achieved.  |
-| ?edit has been removed | There are 3 new endpoints to change contentLive version of the page. Edit button that goes to versioning. Preview view of a websiteKeep ?edit would the same as ?toolbar_on. Should be migrated to new system |
-| New system to interact between addons via CMSAppConfig andCMSAppExtension | Is a new systemBackwards compatibility is available |
-| Disabled Features – Backwards Incompatible | Page types have been disabled. Why has it been removed, alternative? GOOD Default plugins per placeholder on render (if the placeholder isempty check if it has configured default plugins > create these on rendertime). Handover 3Kryz working on an add-on to do it on addon level. Temporary removal, Ask Andrew Aikman about registering the PageType model with the Placeholder endpoints: https://github.com/django-cms/django-cms/pull/6503 |
-| Need to continue conversation | A few things have been removed from the core. Removing / deprecating the alias addon. Upgrade path can be added. Default plugins. Feature from placeholder configurations. Plugin inheritance has been removed. If placeholder is empty take the plugins from the parentKeep or remove? Static placeholders will be gone? As plugins cannot be stored the traditional way. Add warning for deprecations that changes will be removed in 4.2 |
-
 
 Model changes
 =============
@@ -188,24 +161,24 @@ For a djangocms 4.0 only project
 
 For a djangocms 3.x and 4.0 compatible project
 ```
-    # To handle the fact that the Title model is renamed in the CMS you will need to import the PageContent model.
-    try:
-        from cms.models import PageContent
-    # django CMS 3.x
-    except ImportError:
-        from cms.models import Title as PageContent
-
-```
-
-For a djangocms 4.0 only project
-
-```
+# To handle the fact that the Title model is renamed in the CMS you will need to import the PageContent model.
+try:
     from cms.models import PageContent
+# django CMS 3.x
+except ImportError:
+    from cms.models import Title as PageContent
+```
+
+For a djangocms 4.x+ only project
+
+```
+from cms.models import PageContent
 ```
 
 
 Settings
 ========
+New or changed settings added.
 
 CMS_TOOLBAR_ANONYMOUS_ON
 ------------------------
@@ -217,6 +190,7 @@ This setting controls if anonymous users can see the CMS toolbar with
 a login button when ``?toolbat_on`` is appended to a URL. The default behaviour
 is to not show the toolbar to anonymous users.
 
+
 CMS_TOOLBAR_URL__ENABLE
 -----------------------
 
@@ -224,6 +198,7 @@ default
     ``toolbar_on``
 
 This setting is used to force the toolbar to show on a page.
+
 
 CMS_TOOLBAR_URL__DISABLE
 ------------------------
@@ -248,25 +223,24 @@ https://github.com/django-cms/django-cms/pull/6421 app registration docs in the 
 An application that defines an app extension can be used by other apps by registering as "enabled" in the CMSAppConfig by adding: "package_with_extension_enabled"
 
 ```
+# A package that defines an app extension for other apps to register with
+# myapp/cms_config.py
+class MyappCMSExtension(CMSAppExtension):
+    def __init__(self):
+        self.mylist = []
 
-    # A package that defines an app extension for other apps to register with
-    # myapp/cms_config.py
-    class MyappCMSExtension(CMSAppExtension):
-        def __init__(self):
-            self.mylist = []
-
-        def configure_app(self, cms_config):
-            if hasattr(cms_config, "myapp_attribute"):
-                self.mylist.append(cms_config.myapp_attribute)
+    def configure_app(self, cms_config):
+        if hasattr(cms_config, "myapp_attribute"):
+            self.mylist.append(cms_config.myapp_attribute)
 
 
-    # A package that defines a value to add to the extension
-    # someotherapp/cms_config.py
-    class SomeotherappCMSConfig(CMSAppConfig):
-        # By enabling the someotherapp with myapp, the extension will be used for the someotherapp
-        myapp_enabled = True
-        # Supply a value to `myapp_attribute` to be added to the myapp cms_config.mylist attribute.
-        myapp_attribute = "A string value"
+# A package that defines a value to add to the extension
+# someotherapp/cms_config.py
+class SomeotherappCMSConfig(CMSAppConfig):
+    # By enabling the someotherapp with myapp, the extension will be used for the someotherapp
+    myapp_enabled = True
+    # Supply a value to `myapp_attribute` to be added to the myapp cms_config.mylist attribute.
+    myapp_attribute = "A string value"
 ```
 
 App configuration usage examples in djangocms-url-manager and djangocms-alias
@@ -276,6 +250,7 @@ It is configurable in v4 so you can have another Content Type that you want to w
 If you had a new Content Type and a new application , you can add the config entry in your third party application and url manager would start to use your model.
 
 Here is an example of djangocms-alias configuring itself for versioning: https://github.com/django-cms/djangocms-alias/blob/7d90b7763278ff74ebe49f70420ecb9f0e2dc4c6/djangocms_alias/cms_config.py#L26 versioning knows nothing about Alias, Alias tells versioning how to use it. No more other apps embedding logic. Obviously Page is configured in url manager by default because it depends on django-cms.
+
 
 Publishing has been moved to djangocms-versioning
 =================================================
@@ -288,6 +263,7 @@ Publishing has been moved to djangocms-versioning
 
 djangocms-versioning documentation: https://divio-djangocms-versioning.readthedocs-hosted.com/en/latest/
 
+
 djangocms-versioning overrides queries from PageContent
 -------------------------------------------------------
 
@@ -295,20 +271,21 @@ djangocms-versioning overrides queries from PageContent
 - By default only published versions are returned from `PageContents.objects.all()`. To get all versions regardless of versioning state you can use the "\_base_manager": `PageContent._base_manager.all()`
 
 ```
-    # Get only published PageContents
-    PageContent.objects.all()
+# Get only published PageContents
+PageContent.objects.all()
 
-    # Get all PageContents regardless of the versioning status, be careful with this as it can return archived, draft and published versions!
-    PageContent._base_manager.all()
+# Get all PageContents regardless of the versioning status, be careful with this as it can return archived, draft and published versions!
+PageContent._base_manager.all()
 
-    # Get only draft PageContents
-    from djangcms-versioning.constants import DRAFT PageContent._base_manager.filter(versions__state=DRAFT)
+# Get only draft PageContents
+from djangcms-versioning.constants import DRAFT PageContent._base_manager.filter(versions__state=DRAFT)
 ```
 
 Disabling the admin sideframe
 =============================
 
 - The CMS sideframe in the Django admin caused many issues when navigating through different plugins admin views, the experience it offered left the user confused at the page they were currently on after making various changes, it was also buggy at times. Disable the sideframe by adding the following setting in the settings.py file, it is enabled by default. CMS_SIDEFRAME_ENABLED = False
+
 
 Plugin refactor
 ===============
@@ -321,15 +298,18 @@ Page, Title (now PageContent) and Placeholder refactor
 
 There are various changes to the model structure for the Page and PageContents (formerly Title). The most notable is the fact that plugins from different Title instances were all saved in the same Placeholder instance. This has now changed in DjangoCMS 4, a PageContent (formerly Title) instance now contains a dedicated set of Placeholder instances. Please see the illustration below:
 
+
 Signals
 =======
 
 Page signals have been merged into pre_obj and post_obj signals for operations on Page. Publishing signals have been removed as of DjangoCMS 4.0 but are available in djangocms-versioning: https://github.com/django-cms/django-cms/commit/03941533670ee9f8c5c078bda8e5cfdd9a639f53
 
+
 Log Operations
 ==============
 
-- Previously the logs created were inconsistent and were not created for all page and placeholder operations. Now all page and placeholder operations are logged in the Django Admin model LogEntry. The logs can also be triggered by external apps via using the signals provided in the CMS. https://github.com/django-cms/django-cms/commit/03941533670ee9f8c5c078bda8e5cfdd9a639f53
+Previously the logs created were inconsistent and were not created for all page and placeholder operations. Now all page and placeholder operations are logged in the Django Admin model LogEntry. The logs can also be triggered by external apps via using the signals provided in the CMS. https://github.com/django-cms/django-cms/commit/03941533670ee9f8c5c078bda8e5cfdd9a639f53
+
 
 Placeholder Admin
 =================
@@ -340,32 +320,68 @@ The placeholder is now responsible for the edit, structure and preview endpoints
 - render function - a function that takes django.http.HttpRequest object and an object of the model specified above, and returns a django.http.HttpResponse (or any subclass, like TemplateResponse) object based on provided data. Please note that the preview/edit endpoint has changed. Appending ?edit no longer works. There's a separate endpoint for editing (that the toolbar is aware of and links to when clicking Edit button). One also needs to include `cms_enabled = True` in the cms config, otherwise that cms_toolbar_enabled_models config won’t be passed to the cms.
 - PlaceholderAdminMixin is deprecated and has a deprecation notice that it will be removed in the next major release: CMS 5.0. https://github.com/django-cms/django-cms/blob/release/4.0.x/cms/admin/placeholderadmin.py#L178
 
-Configuring you application to use Placeholder endpoint
--------------------------------------------------------
-
 
 Placeholder relations
 ---------------------
 
-TODO: Describe the process of migrating from PlaceholderRelationField
+The `PlaceholderField` has been replaced by the `PlaceholderRelationField`, the built-in migrations will automatically take care of the replacement, but it can't however replace the code.
+
+You need to replace your fields such as:
+```
+class Post(models.Model):
+    ...
+    media = PlaceholderField("media", related_name="media")
+```
+
+with:
+```
+class Post(models.Model):
+    ...
+    placeholders = PlaceholderRelationField()
+```
+
+The above you may think is very strange, and you are completely correct. This is because the placeholder relationship is now a GenericForeignKey relationship, so it can handle many different placeholders at once.
+
+To be able to use `media` again, we can create a property like the below example:
+
+```
+class Post(models.Model):
+    ...
+    def _get_placeholder_from_slotname(self, slotname):
+        try:
+            return self.placeholders.get(slot=slotname)
+        except Placeholder.DoesNotExist:
+            from cms.utils.placeholder import rescan_placeholders_for_obj
+            rescan_placeholders_for_obj(self)
+            return self.placeholders.get(slot=slotname)
+
+    @cached_property
+    def media(self):
+        return self._get_placeholder_from_slotname("media")
+```
+
 
 Placeholder endpoints
 =====================
+
 
 Preview end-point
 -----------------
 The preview endpoint replaces what was the `?preview` feature in django-cms 3.x
 
+
 Edit end-point
 --------------
 The edit endpoint replaces what was the `?edit` feature in django-cms 3.x
+
 
 Structure end-point
 -------------------
 The structure endpoint is a endpoint used by the plugin sidebar used when viewing the edit endpoint. It's where the plugins are rendered and can be dragged & dropped, added and removed.
 
-Configure your app to use the placeholder endpoints
----------------------------------------------------
+
+Configuring you application to use Placeholder endpoint
+-------------------------------------------------------
 
 We can use djangocms-alias as an example here because this is a very good example of a package that "reuses" the django-cms placeholder endpoints.
 
@@ -374,23 +390,24 @@ Your app should have a placeholder field, djangocms-alias adds this manually. Th
 It is important that your app uses the concept for djangocms-versioning of a grouper and content model.
 
 ```
-    # models.py
+# models.py
 
-    class AliasContent(models.Model):
-        ...
-        placeholders = PlaceholderRelationField()
-        placeholder_slotname = 'content'
+class AliasContent(models.Model):
+    ...
+    placeholders = PlaceholderRelationField()
+    placeholder_slotname = 'content'
 ```
 
 Within your packages cms_config add the following entry
 
 ```
-    # cms_config.py
+# cms_config.py
 
-    class AliasCMSConfig(CMSAppConfig):
-        cms_enabled = True
-        cms_toolbar_enabled_models = [(AliasContent, render_alias_content)]
+class AliasCMSConfig(CMSAppConfig):
+    cms_enabled = True
+    cms_toolbar_enabled_models = [(AliasContent, render_alias_content)]
 ```
+
 
 Static Placeholders
 -------------------
