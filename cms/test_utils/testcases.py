@@ -460,15 +460,17 @@ class BaseCMSTestCase:
         warningsShown = []
         result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
 
+        warningsShown = set(warningsShown)
         if not warningsShown:
             self.fail("No warnings emitted")
-        first = warningsShown[0]
-        for other in warningsShown[1:]:
-            if ((other.message, other.category)
-                != (first.message, first.category)):
-                self.fail("Can't handle different warnings")
-        self.assertEqual(first.message, message)
-        self.assertTrue(first.category is category)
+        for warning in warningsShown:
+            if warning.message == message and warning.category is category:
+                break
+            else:
+                if warning.category not in (DeprecationWarning, ):
+                    self.fail(f"Unexpected warning {warning.message} ({warning.category})" )
+        else:
+            self.fail(f"Warning {message} not given.")
 
         return result
 
