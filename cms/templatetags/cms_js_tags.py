@@ -55,6 +55,7 @@ def render_plugin_init_js(context, plugin):
     context[get_varname()]['js'].append('<script data-cms>{}</script>'.format(plugin_js))
 
 
+@register.tag(name="javascript_string")
 class JavascriptString(Tag):
     name = 'javascript_string'
     options = Options(
@@ -70,4 +71,3 @@ class JavascriptString(Tag):
             from django.utils.text import javascript_quote as escapejs
         rendered = self.nodelist.render(context)
         return "'%s'" % escapejs(rendered.strip())
-register.tag(JavascriptString)

@@ -11,6 +11,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
+from django.http import HttpResponse
 from django.template import engines
 from django.template.context import Context
 from django.test import testcases
@@ -450,8 +451,8 @@ class BaseCMSTestCase:
         if persist is not None:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__PERSIST')] = persist
         request.current_page = page
-        mid = ToolbarMiddleware()
-        mid.process_request(request)
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
         if hasattr(request, 'toolbar'):
             request.toolbar.populate()
         return request
