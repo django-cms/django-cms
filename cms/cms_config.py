@@ -1,5 +1,5 @@
 from logging import getLogger
-from collections import Iterable
+from collections.abc import Iterable
 
 from django.core.exceptions import ImproperlyConfigured
 
