@@ -11,4 +11,5 @@ DJANGO_2_2 = Version(DJANGO_VERSION) < Version('3.0')
 DJANGO_3_0 = Version(DJANGO_VERSION) < Version('3.1')
 DJANGO_3_1 = Version(DJANGO_VERSION) < Version('3.2')
 DJANGO_3_2 = Version(DJANGO_VERSION) < Version('4.0')
+DJANGO_3 = DJANGO_3_2
 DJANGO_4_1 = Version(DJANGO_VERSION) < Version('4.2')
