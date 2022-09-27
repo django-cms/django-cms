@@ -468,65 +468,6 @@ export const Helpers = {
         var path = win.location.pathname + win.location.search;
 
         return this.makeURL(url, [['cms_path', path]]);
-    },
-
-    /**
-     * Get color scheme either from :root[data-color-scheme] or user system setting
-     *
-     * @method get_color_scheme
-     * @public
-     * @returns {String}
-     */
-    getColorScheme: function () {
-        let state = $('html').attr('data-color-scheme');
-
-        if (!state) {
-            if (!CMS.settings) {
-                // Settings loaded? If not, pls. load.
-                this.getSettings();
-            }
-            state = CMS.settings.color_scheme;
-            if (!state && window.matchMedia) {
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    state = 'dark'; // dark mode
-                } else {
-                    state = 'light';
-                }
-            }
-        }
-
-        return state;
-    },
-
-    /**
-     * Sets the color scheme for the current document and all iframes contained.
-     *
-     * @method setColorScheme
-     * @public
-     * @param scheme {String}
-     * @retiurns {void}
-     */
-
-    setColorScheme: function (scheme) {
-        let body = $('html');
-
-        this.setSettings({ color_scheme: scheme });
-        if (scheme === 'auto') {
-            body.removeAttr('data-color-scheme');
-            body.find('div.cms iframe').each(function(i, e) {
-                delete e.contentDocument.documentElement.dataset.colorScheme;
-            });
-        } else {
-            body.attr('data-color-scheme', scheme);
-            body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
-                if (e.contentDocument) {
-                    e.contentDocument.documentElement.dataset.colorScheme = scheme;
-                    // ckeditor (and potentially other apps) have iframes inside their admin forms
-                    // also set color scheme there
-                    $(e.contentDocument).find('iframe').each(setFrameColorScheme);
-                }
-            });
-        }
     }
 };
 

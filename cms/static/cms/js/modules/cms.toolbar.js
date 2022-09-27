@@ -422,9 +422,9 @@ var Toolbar = new Class({
         }
 
         if (CMS.settings.color_scheme) {
-            Helpers.setColorScheme (CMS.settings.color_scheme);
+            this.set_color_scheme (CMS.settings.color_scheme);
         } else if (CMS.config.color_scheme) {
-            Helpers.setColorScheme (CMS.config.color_scheme);
+            this.set_color_scheme (CMS.config.color_scheme);
         }
 
         // check if there are messages and display them
