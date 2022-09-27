@@ -5,7 +5,10 @@ Changelog
 unreleased
 ==========
 
+
 * Support for django 4.1
+* Make javascript dark mode functions available to popups as CMS.API.getColorScheme
+  and CMS.API.setColorScheme
 
 3.11.0 (2022-08-02)
 ===================
