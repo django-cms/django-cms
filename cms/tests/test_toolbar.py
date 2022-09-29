@@ -437,28 +437,36 @@ class ToolbarTests(ToolbarTestBase):
         self.assertContains(response,
                             '<div class="cms-submenu-item cms-submenu-item-title"><span>Different Grouper</span>')
 
-    def test_extra_placeholder_menu_items(self):
+    def test_placeholder_menu_items(self):
         superuser = self.get_superuser()
         page = create_page("toolbar-page", "col_two.html", "en")
         page_content = self.get_page_title_obj(page)
         page_structure_url = get_object_structure_url(page_content)
+        placeholders = page_content.get_placeholders()
+        self.assertEqual(len(placeholders), 2)  # we get two placeholders
 
         with self.login_user_context(superuser):
             response = self.client.get(page_structure_url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(
-            response,
-            '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"'
+        expected_bits = (
+            # Copy all in placeholder menu
+            '<div class="cms-submenu-item"><a data-cms-icon="copy" data-rel="copy" href="#">Copy all</a></div>',
+            # Past in placeholder menu
+            '<div class="cms-submenu-item"><a data-cms-icon="paste" data-rel="paste" href="#">Paste</a></div>',
+            # Empty all placeholder menu (for both placeholders)
+            '<div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="' +
+            reverse("admin:cms_placeholder_clear_placeholder", args=(placeholders[0].id, )),
+            '<div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="' +
+            reverse("admin:cms_placeholder_clear_placeholder", args=(placeholders[1].id, )),
+            'data-name="sidebar column">Empty all</a></div>',
+            # Extra items in placeholder menu
+            '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"',
+            'data-on-success="REFRESH_PAGE" data-cms-icon="whatever" >Data item - not usable</a></div>',
+            '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"',
         )
-        self.assertContains(
-            response,
-            'data-on-success="REFRESH_PAGE" data-cms-icon="whatever" >Data item - not usable</a></div>'
-        )
-        self.assertContains(
-            response,
-            '<div class="cms-submenu-item"><a href="/some/other/url/" data-rel="ajax_add"'
-        )
+        for bit in expected_bits:
+            self.assertContains(response, bit)
 
     def test_markup_plugin_template(self):
         page = create_page("toolbar-page-1", "col_two.html", "en")
