@@ -1,5 +1,6 @@
 import json
 
+from cms.utils.i18n import get_language_list
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
@@ -1038,6 +1039,24 @@ class AdminPageTreeTests(AdminTestsBase):
         #       ⊢ Beta
         #   ⊢ Delta
         #       ⊢ Gamma
+
+    def test_create_page_language(self):
+        admin_user, staff = self._get_guys()
+        pagecontent_admin = self.pagecontent_admin_class
+        languages = get_language_list()
+        url = admin_reverse("cms_pagecontent_changelist")
+        add_url = admin_reverse("cms_pagecontent_add")
+        self.assertIn("/en/", add_url + "?language=en")  # English admin
+        with self.login_user_context(admin_user):
+            request = self.get_request(url)
+            response = pagecontent_admin.changelist_view(request)
+            self.assertContains(response, f"{add_url}?language=en")
+
+            for language in languages:
+                request = self.get_request(path=f"{url}?language={language}")
+                response = pagecontent_admin.changelist_view(request)
+                self.assertContains(response, f'href="{add_url}?language={language}"')
+
 
 
 class AdminInputSanitationTests(AdminTestsBase):
