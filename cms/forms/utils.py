@@ -4,10 +4,7 @@ from django.db.models.signals import post_delete, post_save
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
-from cms.cache.choices import (
-    _page_cache_key, _site_cache_key, clean_page_choices_cache,
-    clean_site_choices_cache,
-)
+from cms.cache.choices import _page_cache_key, _site_cache_key, clean_page_choices_cache, clean_site_choices_cache
 from cms.models import Page, Title
 from cms.utils import i18n
 
@@ -52,7 +49,7 @@ def get_page_choices_for_site(site, language):
             if language in titles_by_language:
                 title = titles_by_language[language]
                 indent = "&nbsp;&nbsp;" * (page.node.depth - 1)
-                label = mark_safe("%s%s" % (indent, escape(title)))
+                label = mark_safe(f"{indent}{escape(title)}")
                 yield (page.pk, label)
                 break
 

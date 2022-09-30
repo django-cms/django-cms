@@ -3,7 +3,7 @@ import importlib
 from django.apps import apps
 from django.conf import settings
 
-# overide with custom classes if they exist
+# override with custom classes if they exist
 if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
     # UserAdmin class
     user_app_name = settings.AUTH_USER_MODEL.split('.')[0]

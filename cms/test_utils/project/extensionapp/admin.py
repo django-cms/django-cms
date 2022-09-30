@@ -1,9 +1,7 @@
 from django.contrib import admin
 
 from cms.extensions import PageExtensionAdmin, TitleExtensionAdmin
-from cms.test_utils.project.extensionapp.models import (
-    MyPageExtension, MyTitleExtension,
-)
+from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
 
 
 class MyPageExtensionAdmin(PageExtensionAdmin):

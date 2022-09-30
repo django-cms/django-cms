@@ -9,8 +9,7 @@ from django.db import OperationalError
 from django.utils.translation import gettext_lazy as _
 
 from cms.admin.forms import (
-    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm,
-    ViewRestrictionInlineAdminForm,
+    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm,
 )
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission

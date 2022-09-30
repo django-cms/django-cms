@@ -1,6 +1,6 @@
 import sys
+from unittest import mock
 
-import mock
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -18,9 +18,7 @@ from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import (
-    applications_page_check, clear_app_resolvers, get_app_patterns,
-)
+from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.middleware.page import get_page
 from cms.models import Page, Title
@@ -139,7 +137,7 @@ class ApphooksTestCase(CMSTestCase):
         result = check_url_config(None)
         self.assertEqual(len(result), 0)
 
-    @override_settings(CMS_APPHOOKS=['%s.%s' % (APP_MODULE, APP_NAME)])
+    @override_settings(CMS_APPHOOKS=[f'{APP_MODULE}.{APP_NAME}'])
     def test_explicit_apphooks(self):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.
