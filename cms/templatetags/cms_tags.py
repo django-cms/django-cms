@@ -2,9 +2,7 @@ from collections import OrderedDict, namedtuple
 from copy import copy
 from datetime import datetime
 
-from classytags.arguments import (
-    Argument, MultiKeywordArgument, MultiValueArgument,
-)
+from classytags.arguments import Argument, MultiKeywordArgument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import AsTag, InclusionTag
 from classytags.parser import Parser
@@ -21,16 +19,12 @@ from django.urls import reverse
 from django.utils.encoding import force_str, smart_str
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.translation import (
-    get_language, gettext_lazy as _, override as force_language,
-)
+from django.utils.translation import get_language, gettext_lazy as _, override as force_language
 from sekizai.templatetags.sekizai_tags import RenderBlock, SekizaiParser
 
 from cms.cache.page import get_page_url_cache, set_page_url_cache
 from cms.exceptions import PlaceholderNotFound
-from cms.models import (
-    CMSPlugin, Page, Placeholder as PlaceholderModel, StaticPlaceholder,
-)
+from cms.models import CMSPlugin, Page, Placeholder as PlaceholderModel, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request, get_site_id

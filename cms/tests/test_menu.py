@@ -13,18 +13,10 @@ from cms.apphook_pool import apphook_pool
 from cms.cms_menus import get_visible_nodes
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.fixtures.menus import (
-    ExtendedMenusFixture, MenusFixture, SoftrootFixture, SubMenusFixture,
-)
-from cms.test_utils.project.sampleapp.cms_apps import (
-    NamespacedApp, SampleApp, SampleApp2,
-)
-from cms.test_utils.project.sampleapp.cms_menus import (
-    SampleAppMenu, StaticMenu, StaticMenu2,
-)
-from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_ADD, CMSTestCase,
-)
+from cms.test_utils.fixtures.menus import ExtendedMenusFixture, MenusFixture, SoftrootFixture, SubMenusFixture
+from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
+from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
+from cms.test_utils.testcases import URL_CMS_PAGE, URL_CMS_PAGE_ADD, CMSTestCase
 from cms.test_utils.util.context_managers import LanguageOverride, apphooks
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
