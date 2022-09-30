@@ -514,7 +514,7 @@ to ``INSTALLED_APPS``.
 
 Then run migrations::
 
-    python manage.py migrate.
+    python manage.py migrate
 
 These and other plugins are described in more detail in :ref:`commonly-used-plugins`. More are listed
 plugins available on the `django CMS Marketplace <https://marketplace.django-cms.org/en/addons/>`_.

@@ -69,7 +69,7 @@ class PageManager(PublisherManager):
             if related_query_name and not related_query_name.startswith('+'):
                 for field in cmsplugin.search_fields:
                     qp |= Q(**{
-                        'placeholders__cmsplugin__{0}__{1}__icontains'.format(
+                        'placeholders__cmsplugin__{}__{}__icontains'.format(
                             related_query_name,
                             field,
                         ): q})
@@ -344,8 +344,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         # permissions should be managed on the draft page only
 
         from cms.models import (
-            ACCESS_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE,
-            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS,
+            ACCESS_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS,
         )
 
         page = page.get_draft_object()
