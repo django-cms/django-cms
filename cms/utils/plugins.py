@@ -266,7 +266,11 @@ def downcast_plugins(plugins,
     placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
 
     for plugin_type, pks in plugin_types_map.items():
-        cls = plugin_pool.get_plugin(plugin_type)
+        try:
+            cls = plugin_pool.get_plugin(plugin_type)
+        except KeyError:
+            # Plugin not available
+            continue
         # get all the plugins of type cls.model
         plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
 

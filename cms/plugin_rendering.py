@@ -1,3 +1,4 @@
+import sys
 from collections import OrderedDict
 
 from functools import partial
@@ -458,13 +459,21 @@ class ContentRenderer(BaseRenderer):
         # which is guaranteed by get_cached_template if the template returned by
         # plugin._get_render_template is either a string or an engine-specific template object
         context = PluginContext(context, instance, placeholder)
-        context = plugin.render(context, instance, placeholder.slot)
-        context = flatten_context(context)
+        try:
+            context = plugin.render(context, instance, placeholder.slot)
+            context = flatten_context(context)
+        except Exception:  # catch errors when executing a plugin's render method
+            context['exc_info'] = sys.exc_info()
+            content = self.render_exception('executing plugin.render', instance, context, placeholder, editable)
+        else:
+            template = plugin._get_render_template(context, instance, placeholder)
+            template = self.templates.get_cached_template(template)
 
-        template = plugin._get_render_template(context, instance, placeholder)
-        template = self.templates.get_cached_template(template)
-
-        content = template.render(context)
+            try:
+                content = template.render(context)
+            except Exception:  # catch errors when rendering a plugin's template
+                context['exc_info'] = sys.exc_info()
+                content = self.render_exception('rendering template', instance, context, placeholder, editable)
 
         for path in get_cms_setting('PLUGIN_PROCESSORS'):
             processor = import_string(path)
@@ -475,6 +484,12 @@ class ContentRenderer(BaseRenderer):
             placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
             placeholder_cache.setdefault('plugins', []).append(instance)
         return mark_safe(content)
+
+    def render_exception(self, action, instance, context, placeholder, editable):
+        if editable:
+            exc, value, traceback = context['exc_info']
+            return f"Exception when {action} in {instance.plugin_type} (id={instance.id}) - {exc.__name__}: {value}"
+        return ''
 
     def render_plugins(self, placeholder, language, context, editable=False, template=None):
         plugins = self.get_plugins_to_render(
