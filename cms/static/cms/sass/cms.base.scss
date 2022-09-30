@@ -18,6 +18,7 @@
 @import "components/dialog";
 @import "components/content";
 @import "components/loader";
+@import "components/dark-mode-toggle";
 
 // div.cms needs to beat .cms-reset a selectors
 div.cms {
@@ -32,8 +33,6 @@ div.cms {
     @import "components/clipboard";
     @import "components/pluginpicker";
     @import "components/shortcuts";
-
-    color-scheme: light dark;
 
     *:not(.cms-modal):focus {
         outline: 2px dotted $gray-darker;

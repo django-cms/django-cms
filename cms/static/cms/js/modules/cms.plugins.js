@@ -572,8 +572,7 @@ var Plugin = new Class({
         modal.open({
             url: url,
             title: name,
-            breadcrumbs: breadcrumb,
-            width: 850
+            breadcrumbs: breadcrumb
         });
     },
 

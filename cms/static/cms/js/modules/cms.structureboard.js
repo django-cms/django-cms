@@ -1022,26 +1022,24 @@ class StructureBoard {
         // refresh toolbar
         var currentMode = CMS.settings.mode;
 
-        this._loadToolbar()
-            .done(newToolbar => {
-                CMS.API.Toolbar._refreshMarkup($(newToolbar).find('.cms-toolbar'));
-            })
-            .fail(() => Helpers.reloadBrowser());
-
         if (currentMode === 'structure') {
             this._requestcontent = null;
 
             if (this._loadedContent && action !== 'COPY') {
                 this.updateContent();
+                return;  // Toolbar loaded
             }
-            return;
-        }
-
-        // invalidate the content mode
-        if (action !== 'COPY') {
+        } else if (action !== 'COPY') {
             this._requestcontent = null;
             this.updateContent();
+            return;  // Toolbar loaded
+
         }
+        this._loadToolbar()
+            .done(newToolbar => {
+                CMS.API.Toolbar._refreshMarkup($(newToolbar).find('.cms-toolbar'));
+            })
+            .fail(() => Helpers.reloadBrowser());
     }
 
     _propagateInvalidatedState(action, data) {

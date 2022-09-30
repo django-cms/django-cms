@@ -8,9 +8,7 @@ from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 
-from cms.api import (
-    _verify_plugin_type, assign_user_to_page, create_page, publish_page,
-)
+from cms.api import _verify_plugin_type, assign_user_to_page, create_page, publish_page
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
@@ -53,7 +51,7 @@ class PythonAPITests(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
         apphooks = (
-            '%s.%s' % (APP_MODULE, APP_NAME),
+            f'{APP_MODULE}.{APP_NAME}',
         )
 
         with self.settings(CMS_APPHOOKS=apphooks):

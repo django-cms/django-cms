@@ -28,12 +28,9 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_ADVANCED_CHANGE,
-    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_MOVE, CMSTestCase,
+    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_MOVE, CMSTestCase,
 )
-from cms.test_utils.util.context_managers import (
-    LanguageOverride, UserLoginContext,
-)
+from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
@@ -164,7 +161,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             self.assertEqual(Title.objects.all().count(), 0)
             self.assertEqual(Page.objects.all().count(), 0)
-            # crate home and auto publish
+            # create home and auto publish
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             page_data = self.get_new_page_data()
@@ -553,7 +550,7 @@ class PageTest(PageTestBase):
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute changed_by %} changed "
                 "on {% page_attribute changed_date as page_change %}"
-                "{{ page_change|date:'Y-m-d\TH:i:s' }}"  # noqa: W605
+                r"{{ page_change|date:'Y-m-d\TH:i:s' }}"
             )
             req = HttpRequest()
             page.save()
@@ -563,7 +560,7 @@ class PageTest(PageTestBase):
             req.GET = {}
 
             actual_result = t.render(template.Context({"request": req}))
-            desired_result = "{0} changed on {1}".format(
+            desired_result = "{} changed on {}".format(
                 change_user,
                 actual_result[-19:]
             )
@@ -679,7 +676,7 @@ class PageTest(PageTestBase):
                 placeholder,
                 plugin_type='LinkPlugin',
                 language=language,
-                name='Link {}'.format(language),
+                name=f'Link {language}',
                 external_link='https://www.django-cms.org',
             )
 
@@ -690,7 +687,7 @@ class PageTest(PageTestBase):
         for language in languages:
             self.assertTrue(new_placeholder.get_plugins(language).exists())
             plugin = new_placeholder.get_plugins(language)[0].get_bound_plugin()
-            self.assertEqual(plugin.name, 'Link {}'.format(language))
+            self.assertEqual(plugin.name, f'Link {language}')
 
     def test_copy_page_to_root(self):
         """
@@ -1707,7 +1704,7 @@ class PageTest(PageTestBase):
         try:
             dom = _parse_html(content)
         except HTMLParseError as e:
-            standardMsg = '%s\n%s' % ("Response's content is not valid HTML", e.msg)
+            standardMsg = '{}\n{}'.format("Response's content is not valid HTML", e.msg)
             self.fail(self._formatMessage(None, standardMsg))
         return dom
 
@@ -1729,7 +1726,7 @@ class PageTest(PageTestBase):
                 self.assertEqual(response.status_code, 200)
                 parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
                 content = force_str(parsed)
-                self.assertIn(u'(Shift-Klick für erweiterte Einstellungen)', content)
+                self.assertIn('(Shift-Klick für erweiterte Einstellungen)', content)
 
     def test_page_get_tree_endpoint_flat(self):
         superuser = self.get_superuser()
@@ -1963,7 +1960,7 @@ class PermissionsTestCase(PageTestBase):
 
         for attr, value in kwargs.items():
             if attr not in non_inline:
-                attr = 'pagepermission_set-2-0-{}'.format(attr)
+                attr = f'pagepermission_set-2-0-{attr}'
             data[attr] = value
         return data
 
@@ -1996,7 +1993,7 @@ class PermissionsTestCase(PageTestBase):
 
         for attr, value in kwargs.items():
             if attr not in non_inline:
-                attr = 'pagepermission_set-0-{}'.format(attr)
+                attr = f'pagepermission_set-0-{attr}'
             data[attr] = value
         return data
 

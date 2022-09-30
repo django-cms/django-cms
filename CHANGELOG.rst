@@ -5,6 +5,54 @@ Changelog
 unreleased
 ==========
 
+* Make javascript dark mode functions available to popups as CMS.API.getColorScheme
+  and CMS.API.setColorScheme
+
+3.11.0 (2022-08-02)
+===================
+
+Highlights:
+-----------
+* Support for django 4
+* Dark mode support
+
+* Added dark mode support to css, dark mode settings and toggle button
+* Fix publishing of static placeholders outside of CMS pages
+* Allow to override the template rendered after a plugin has been saved.
+* Revert change to the toolbar sites menu to use ``http`` protocol.
+* Fix edit plugin popup width (remove 850px width constraint).
+* Fix except block using list instead of tuple. (#7334)
+* Added spell checking to pre-commit and github workflows
+* Added cache ttl extension point.
+* Added current language to the page cache key (#6607)
+* Fix isort line length to by in sync with flake8
+
+3.10.1 (2022-06-28)
+===================
+
+Bug Fixes:
+----------
+* Changelog titles for 3.10.x (#7347) (31f399535) -- Mark Walker
+* Request missing from test rendering (#7346) (eff54b0fd) -- Mark Walker
+* Changelog title for 3.10.1rc1 (#7345) (966a90fd2) -- Mark Walker
+* Revert change to the toolbar sites menu to use ``http`` protocol (#7332) (caddfe7f4) -- Mark Walker
+* Fixed ``AttributeError`` (#7288) when the current toolbar object doesn't define ``get_draft_url()`` (#7289) -- Marco Bonetti
+* Fix for django 2.2 in middleware [#7290] (#7293) -- Mark Walker
+* Update release script to start bringing support for macOS (#7294) -- Mark Walker
+* Fix release script version commit. (#7295) -- Mark Walker
+* Revert change to the toolbar sites menu to use ``http`` protocol. (#7331) -- Mark Walker
+
+Statistics:
+-----------
+
+This release includes 12 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Conrad (3 pull requests)
+* Florian Delizy (1 pull request)
+* Marco Bonetti (1 pull request)
+* Mark Walker (7 pull requests)
+
+Thanks to all contributors for their efforts!
 
 3.10.0 (2022-03-26)
 ===================
@@ -71,10 +119,6 @@ With the review help of the following contributors:
 * Vinit Kumar
 
 Thanks to all contributors for their efforts!
-
-* Added dark mode support to css
-* Fix publishing of static placeholders outside of CMS pages
-* Allow to override the template rendered after a plugin has been saved.
 
 3.9.0 (2021-06-30)
 ==================
@@ -1454,7 +1498,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 - language namespaces for apphooks (reverse("de:myview"), reverse("en:myview"))
 - video plugin switch to https://github.com/FlashJunior/OSFlashVideoPlayer
-- frontediting added (cms.middlware.toolbar.ToolbarMiddleware)
+- frontediting added (cms.middleware.toolbar.ToolbarMiddleware)
 - testsuite works now under sqlite and postgres
 - orphaned text embed plugins get now deleted if not referenced in the text anymore
 - placeholder templatetag: "theme" attribute removed in favor of "width" (backward incompatible change if theme was used)

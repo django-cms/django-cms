@@ -421,6 +421,12 @@ var Toolbar = new Class({
             this._debug();
         }
 
+        if (CMS.settings.color_scheme) {
+            Helpers.setColorScheme (CMS.settings.color_scheme);
+        } else if (CMS.config.color_scheme) {
+            Helpers.setColorScheme (CMS.config.color_scheme);
+        }
+
         // check if there are messages and display them
         if (CMS.config.messages) {
             CMS.API.Messages.open({
@@ -616,6 +622,18 @@ var Toolbar = new Class({
                     onSuccess: el.data('on-success')
                 });
                 break;
+            case 'color-toggle':
+                switch (Helpers.getColorScheme()) {
+                    case 'light':
+                        Helpers.setColorScheme('dark');
+                        break;
+                    case 'dark':
+                        Helpers.setColorScheme('light');
+                        break;
+                    default:
+                        break;
+                }
+                break;
             default:
                 Helpers._getWindow().location.href = el.attr('href');
         }
@@ -756,7 +774,14 @@ var Toolbar = new Class({
         CMS.API.Clipboard.ui.triggers = $('.cms-clipboard-trigger a');
         CMS.API.Clipboard.ui.triggerRemove = $('.cms-clipboard-empty a');
         CMS.API.Clipboard._toolbarEvents();
-    }
+    },
+
+    /**
+     * Compatibility shims to be removed CMS 4.0+
+     *
+     */
+    get_color_scheme: Helpers.getColorScheme,
+    set_color_scheme: Helpers.setColorScheme
 });
 
 export default Toolbar;

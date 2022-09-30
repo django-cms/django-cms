@@ -3,17 +3,12 @@ from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
 from cms.api import assign_user_to_page, create_page
-from cms.cache.permissions import (
-    clear_user_permission_cache, get_permission_cache, set_permission_cache,
-)
+from cms.cache.permissions import clear_user_permission_cache, get_permission_cache, set_permission_cache
 from cms.models import Page
-from cms.models.permissionmodels import (
-    ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission,
-)
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
 from cms.test_utils.testcases import URL_CMS_PAGE_ADD, CMSTestCase
 from cms.utils.page_permissions import (
-    get_change_id_list, user_can_add_subpage, user_can_publish_page,
-    user_can_view_page,
+    get_change_id_list, user_can_add_subpage, user_can_publish_page, user_can_view_page,
 )
 
 

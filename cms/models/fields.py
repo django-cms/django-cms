@@ -7,9 +7,7 @@ from cms.models.placeholdermodel import Placeholder
 class PlaceholderField(models.ForeignKey):
 
     def __init__(self, slotname, default_width=None, actions=None, **kwargs):
-        from cms.utils.placeholder import (
-            PlaceholderNoAction, validate_placeholder_name,
-        )
+        from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
 
         if not actions:
             actions = PlaceholderNoAction
