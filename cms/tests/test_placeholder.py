@@ -1537,8 +1537,8 @@ class CheckAndFixTreeTests(TransactionCMSTestCase):
         messages = ph1.check_tree()
         expected_message_parts = [
             "Non consecutive position entries",
-            f"Children with positions lower than their parent's (id={tree[0].id})",
-            f"Children with positions lower than their parent's (id={tree[2].id})",
+            "Children with positions lower than their parent's (id=1)",
+            "Children with positions lower than their parent's (id=3)",
             "Plugins claim to be children of parents in a different placeholder",
         ]
         for part in expected_message_parts:
@@ -1552,5 +1552,5 @@ class CheckAndFixTreeTests(TransactionCMSTestCase):
         self.assertFalse(ph1.check_tree())  # Messages gone away
 
         # After fixing the tree positions and id correspond just as the tree was created
-        positions = list(ph1.cmsplugin_set.order_by('id').values_list('position', flat=True))
-        self.assertEqual(list(range(1, len(positions)+1)), positions)
+        for plugin in ph1.cmsplugin_set.all():
+            self.assertEqual(plugin.id, plugin.position)

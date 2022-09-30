@@ -498,7 +498,7 @@ class Placeholder(models.Model):
             self._shift_plugin_positions(
                 instance.language,
                 start=instance.position,
-                offset=last_position - instance.position + 2, # behind last_position plus one for the new
+                offset=last_position,
             )
 
         instance.save()
@@ -521,7 +521,6 @@ class Placeholder(models.Model):
         target_tree = self.get_plugins(plugin.language)
         last_plugin = self.get_last_plugin(plugin.language)
         source_plugin_desc_count = plugin._get_descendants_count()
-        # Attn: The following line assumes that all children and grand-children have consecutive positions!
         source_plugin_range = (plugin.position, plugin.position + source_plugin_desc_count)
 
         if target_position < plugin.position:
@@ -573,39 +572,39 @@ class Placeholder(models.Model):
         target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
 
         if target_last_plugin:
-            source_length = source_last_plugin.position
-            target_length = target_last_plugin.position
-            plugins_to_move_count = 1 + plugin._get_descendants_count()  # parent plus descendants
+            source_offset = source_last_plugin.position
+            target_offset = target_last_plugin.position
+            source_plugin_desc_count = plugin._get_descendants_count()
+            # Projected position of the plugin being moved
+            # If the plugin has descendants then this is the projected position
+            # of the last descendant for the plugin being moved.
+            source_projected_last_position = plugin.position + source_plugin_desc_count + source_offset
+            # Projected position of the first plugin to the right
+            # of the plugin being moved, in the target placeholder.
+            target_projected_first_position = target_position + target_offset
+            # Real position of the last plugin in the target placeholder,
+            # after the move takes place.
+            target_last_position = target_last_plugin.position + 1 + source_plugin_desc_count
 
-            source_offset = max(
-                # far enough to shift behind current last source position
-                source_length,
-                # far enough to be shifted behind last target position plus no. of moved plugins
-                target_length + plugins_to_move_count
-            ) - plugin.position + 1
+            if source_projected_last_position <= target_last_position:
+                source_diff = (target_last_position - source_projected_last_position)
+                source_offset += source_diff + 1
+                source_projected_last_position += source_diff + 1
 
-            # move target position counter to at least behind
-            target_offset = max(
-                # far enough to shift behind current last target position
-                target_length - target_position + 1,
-                # far enough to leave enough space to move back
-                plugin.position + source_offset - target_position + plugins_to_move_count
-            )
+            if source_projected_last_position >= target_projected_first_position:
+                target_diff = source_projected_last_position - target_projected_first_position
+                target_offset += target_diff + 1
+
             target_placeholder._shift_plugin_positions(
                 plugin.language,
                 start=target_position,
                 offset=target_offset,
             )
         else:
-            # moving to empty placeholder:
-            # Move out (remaining) plugins right behind last source position to be able to recalculate
+            # moving to empty placeholder
+            # Mover out behind  last source position
             source_offset = source_last_plugin.position
 
-        # Shift all plugins whose position is greater than or equal to
-        # the plugin being moved. This includes the plugin itself.
-        # This is to create enough s
-        # pace in-between for the squashing
-        # to work without conflicts.
         self._shift_plugin_positions(
             plugin.language,
             start=plugin.position,
@@ -655,12 +654,10 @@ class Placeholder(models.Model):
         return tree.values_list('position', flat=True).first()
 
     def get_last_plugin_position(self, language, parent=None):
-        if parent is None:
-            tree = self.get_plugins(language)
-        elif parent.placeholder == self:
-            tree = parent.get_descendants()
-        else:  # No last plugin if parent is not in this placeholder's plugin tree
-            return None
+        tree = self.get_plugins(language)
+
+        if parent:
+            tree = tree.filter(parent=parent)
         return tree.values_list('position', flat=True).last()
 
     def _shift_plugin_positions(self, language, start, offset=None):
@@ -739,76 +736,3 @@ class Placeholder(models.Model):
             raise RuntimeError(
                 '{} is not supported by django-cms'.format(connection.vendor)
             )
-
-    def check_tree(self, language=None):
-        """checks the plugin tree if the placeholder for common inconsistencies and returns a list
-        of messages describing the inconsistency. Returns list of messages."""
-        messages = []
-
-        if language is None:
-            languages = self.cmsplugin_set.order_by('language').values_list('language', flat=True).distinct()
-            for language in languages:
-                message = self.check_tree(language)
-                if message is not None:
-                    messages += message
-            return messages
-
-        # Check 1: Positions are consecutive starting at 1
-        position_list = list(self.cmsplugin_set.values_list('position', flat=True))
-        if position_list != list(range(1, self.get_last_plugin_position(language)+1)):
-            messages.append(f"{language}: Non consecutive position entries: {position_list}")
-
-        # Check 2: Children AFTER parents
-        parent_list = list(self.cmsplugin_set.values_list('parent', flat=True))
-        for parent in parent_list:
-            if parent is not None:
-                parent_position = self.cmsplugin_set.filter(pk=parent).first()
-                if parent_position is not None:
-                    children_positions = self.cmsplugin_set.filter(parent=parent).values_list('position', flat=True)
-                    if min(children_positions) <= parent_position.position:
-                        messages.append(f"{language}: Children with positions lower than their parent's (id={parent}) position")
-
-        # Check 3: parents belonging to other placeholders
-        for plugin in self.cmsplugin_set.all():
-            if plugin.parent and plugin.parent.placeholder != self:
-                messages.append(f"{language}: Plugins claim to be children of parents in a different placeholder")
-
-        return messages
-
-    def fix_tree(self, language=None):
-        """rebuilds the plugin tree for the placeholder. The resulting tree will look like this:
-        Parent 1, position 1
-            Child 1, position 2
-            Parent 2, position 3
-                Child 2, position 4
-            Child 3, position 5
-        Parent 3, position 6
-            Child 4 position 7
-        Child 5, position 8   # (Parent link to parent plugin in other placeholder removed)
-        """
-        if language is None:
-            languages = self.cmsplugin_set.order_by('language').values_list('language', flat=True).distinct()
-            for language in languages:
-                self.fix_tree(language)
-            return
-
-        # First cut links to other placeholders
-        for plugin in self.cmsplugin_set.filter(language=language):
-            if plugin.parent and plugin.parent.placeholder != self:
-                plugin.update(parent=None)  # At this point the tree is seriously broken: Cut the link
-
-        # Then rebuild tree
-        def build_tree(self, parent):
-            nonlocal position
-
-            for plugin in self.cmsplugin_set.filter(parent=parent, language=language).order_by("position"):
-                position += 1
-                plugin.update(position=position)
-                build_tree(self, plugin)
-
-        position = self.get_last_plugin_position(language)
-        build_tree(self, None)
-
-        self._recalculate_plugin_positions(language)
-
-
