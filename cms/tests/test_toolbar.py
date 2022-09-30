@@ -466,10 +466,10 @@ class ToolbarTests(ToolbarTestBase):
             # Past in placeholder menu
             '<div class="cms-submenu-item"><a data-cms-icon="paste" data-rel="paste" href="#">Paste</a></div>',
             # Empty all placeholder menu (for both placeholders)
-            '<div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="' +
-            reverse("admin:cms_placeholder_clear_placeholder", args=(placeholders[0].id, )),
-            '<div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="' +
-            reverse("admin:cms_placeholder_clear_placeholder", args=(placeholders[1].id, )),
+            '<div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="'
+            + reverse("admin:cms_placeholder_clear_placeholder", args=(placeholders[0].id, )),
+            '<div class="cms-submenu-item"><a data-cms-icon="bin" data-rel="modal" href="'
+            + reverse("admin:cms_placeholder_clear_placeholder", args=(placeholders[1].id, )),
             'data-name="sidebar column">Empty all</a></div>',
             # Extra items in placeholder menu
             '<div class="cms-submenu-item"><a href="/some/url/" data-rel="ajax"',
