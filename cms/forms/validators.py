@@ -41,6 +41,10 @@ def validate_url_uniqueness(site, path, language, user_language=None, exclude_pa
 
     conflict_translation = conflict_page.get_title_obj(language, fallback=False)
 
+    if conflict_translation:
+        # No conflict with a non-existing page content
+        return True
+
     change_url = admin_reverse('cms_pagecontent_change', args=[conflict_translation.pk])
 
     if user_language:
