@@ -44,7 +44,7 @@ class NavigationNode(object):
         self.parent_id = parent_id
         self.parent_namespace = parent_namespace
         self.visible = visible
-        self.attr = attr or {} # To avoid declaring a dict in defaults...
+        self.attr = attr or {}  # To avoid declaring a dict in defaults...
 
     def __repr__(self):
         return "<Navigation Node: %s>" % smart_str(self.title)

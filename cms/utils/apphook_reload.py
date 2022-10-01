@@ -1,13 +1,11 @@
 import sys
 import uuid
-
+# Py2 and Py3 compatible reload
+from imp import reload
 from threading import local
 
 from django.conf import settings
-from django.urls import reverse, clear_url_caches
-
-# Py2 and Py3 compatible reload
-from imp import reload
+from django.urls import clear_url_caches, reverse
 
 _urlconf_revision = {}
 _urlconf_revision_threadlocal = local()

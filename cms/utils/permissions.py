@@ -1,6 +1,6 @@
 from collections import defaultdict
 from contextlib import contextmanager
-from functools import wraps
+from functools import lru_cache, wraps
 from threading import local
 
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -10,13 +10,9 @@ from django.db.models import Q
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, Page, PagePermission
+from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
-
-from cms.utils.compat.dj import available_attrs
-
-from functools import lru_cache
-
 
 # thread local support
 _thread_locals = local()
@@ -266,9 +262,7 @@ def get_subordinate_users(user, site):
         # return only staff users created by user
         # whose page permission record has no page attached.
         qs = get_user_model().objects.distinct().filter(
-                Q(is_staff=True) &
-                Q(pageuser__created_by=user) &
-                Q(pagepermission__page=None)
+            Q(is_staff=True) & Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
         qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
         return qs
@@ -280,9 +274,11 @@ def get_subordinate_users(user, site):
 
     # normal query
     qs = get_user_model().objects.distinct().filter(
-        Q(is_staff=True) &
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
-        | (Q(pageuser__created_by=user) & Q(pagepermission__page=None))
+        Q(is_staff=True) & (
+            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+        ) | (
+            Q(pageuser__created_by=user) & Q(pagepermission__page=None)
+        )
     )
     qs = qs.exclude(pk=user.pk).exclude(groups__user__pk=user.pk)
     return qs
@@ -305,8 +301,7 @@ def get_subordinate_groups(user, site):
             Group
             .objects
             .filter(
-                Q(pageusergroup__created_by=user) &
-                Q(pagepermission__page__isnull=True)
+                Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
             )
             .distinct()
         )
@@ -320,8 +315,11 @@ def get_subordinate_groups(user, site):
     page_id_allow_list = get_change_permissions_id_list(user, site, check_global=False)
 
     return Group.objects.distinct().filter(
-        (Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level))
-        | (Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True))
+        (
+            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+        ) | (
+            Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
+        )
     )
 
 
