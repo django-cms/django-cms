@@ -65,11 +65,17 @@ class CopyLangCommand(SubcommandsCommand):
                 if copy_content:
                     # copy plugins using API
                     if verbose:
-                        self.stdout.write('copying plugins for %s from %s\n' % (page.get_page_title(from_lang), from_lang))
+                        self.stdout.write(
+                            'copying plugins for %s from %s\n' % (page.get_page_title(from_lang), from_lang)
+                        )
                     copy_plugins_to_language(page, from_lang, to_lang, only_empty)
             else:
                 if verbose:
-                    self.stdout.write('Skipping page %s, language %s not defined\n' % (page.get_page_title(page.get_languages()[0]), from_lang))
+                    self.stdout.write(
+                        'Skipping page %s, language %s not defined\n' % (
+                            page.get_page_title(page.get_languages()[0]), from_lang
+                        )
+                    )
 
         if copy_content:
             for static_placeholder in StaticPlaceholder.objects.all():
@@ -138,7 +144,9 @@ class CopySiteCommand(SubcommandsCommand):
 
                 if page.is_home:
                     new_page.set_as_homepage()
-        self.stdout.write('Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n'.format(from_site.pk, to_site.pk))
+        self.stdout.write(
+            'Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n'.format(from_site.pk, to_site.pk)
+        )
 
     def get_site(self, site_id):
         if site_id:

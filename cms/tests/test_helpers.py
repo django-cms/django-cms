@@ -1,5 +1,7 @@
 from cms.models import Page, PageContent
-from cms.test_utils.project.sampleapp.models import Category, Picture, SomeEditableModel
+from cms.test_utils.project.sampleapp.models import (
+    Category, Picture, SomeEditableModel,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.helpers import is_editable_model
 
