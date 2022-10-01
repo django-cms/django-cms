@@ -7,6 +7,7 @@ unreleased
 
 * Make javascript dark mode functions available to popups as CMS.API.getColorScheme
   and CMS.API.setColorScheme
+* Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 
 3.11.0 (2022-08-02)
 ===================
