@@ -1,6 +1,5 @@
 import json
 
-from cms.utils.i18n import get_language_list
 from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
@@ -24,6 +23,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED, CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
 
 
@@ -1091,6 +1091,7 @@ class AdminPageTreeTests(AdminTestsBase):
                     response,
                     f'href="{add_url}?parent_node={page[language].node_id}&language={language}"'
                 )
+
 
 class AdminInputSanitationTests(AdminTestsBase):
 
