@@ -15,16 +15,17 @@ from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_title
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
-from cms.models import PageContent
+from cms.appresolver import (
+    applications_page_check, clear_app_resolvers, get_app_patterns,
+)
 from cms.middleware.page import get_page
+from cms.models import PageContent
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
-
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
@@ -89,13 +90,13 @@ class ApphooksTestCase(CMSTestCase):
                                        "en", created_by=superuser, parent=child_page, apphook=apphook,
                                        apphook_namespace=namespace)
         create_title("de", child_child_page.get_title(), child_child_page)
-        # publisher_public is set to draft on publish, issue with onetoone reverse
+        # publisher_public is set to draft on publish, issue with one-to-one reverse
         child_child_page = self.reload(child_child_page)
 
         if isinstance(title_langs, str):
             titles = child_child_page.get_title_obj(title_langs)
         else:
-            titles = [child_child_page.get_title_obj(l) for l in title_langs]
+            titles = [child_child_page.get_title_obj(lang) for lang in title_langs]
 
         self.reload_urls()
 
@@ -621,20 +622,32 @@ class ApphooksTestCase(CMSTestCase):
             path = reverse('namespaced_app_ns:sample-settings')
         request = self.get_request(path)
         toolbar = CMSToolbar(request)
-        self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
+        self.assertTrue(
+            toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
+        )
+        self.assertFalse(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+        )
 
         # Testing a decorated view
         with force_language("en"):
             path = reverse('namespaced_app_ns:sample-exempt')
         request = self.get_request(path)
         toolbar = CMSToolbar(request)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].app_path,
-                         'cms.test_utils.project.sampleapp')
-        self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
-                         'cms.test_utils.project.sampleapp')
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
+        self.assertEqual(
+            toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].app_path,
+            'cms.test_utils.project.sampleapp'
+        )
+        self.assertTrue(
+            toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
+        )
+        self.assertEqual(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            'cms.test_utils.project.sampleapp'
+        )
+        self.assertFalse(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+        )
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
     def test_toolbar_current_app_apphook_with_implicit_current_app(self):
@@ -643,12 +656,20 @@ class ApphooksTestCase(CMSTestCase):
             path = reverse('namespaced_app_ns:current-app')
         request = self.get_request(path)
         toolbar = CMSToolbar(request)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].app_path,
-                         'cms.test_utils.project.sampleapp')
-        self.assertTrue(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
-                         'cms.test_utils.project.sampleapp')
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
+        self.assertEqual(
+            toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].app_path,
+            'cms.test_utils.project.sampleapp'
+        )
+        self.assertTrue(
+            toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
+        )
+        self.assertEqual(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            'cms.test_utils.project.sampleapp'
+        )
+        self.assertFalse(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+        )
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
     def test_toolbar_no_namespace(self):
@@ -657,9 +678,15 @@ class ApphooksTestCase(CMSTestCase):
         path = reverse('detail', kwargs={'id': 20})
         request = self.get_request(path)
         toolbar = CMSToolbar(request)
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
-        self.assertTrue(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].is_current_app)
+        self.assertFalse(
+            toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
+        )
+        self.assertFalse(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+        )
+        self.assertTrue(
+            toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].is_current_app
+        )
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
     def test_toolbar_multiple_supported_apps(self):
@@ -670,16 +697,30 @@ class ApphooksTestCase(CMSTestCase):
         toolbar = CMSToolbar(request)
         self.assertEqual(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].app_path,
                          'cms.test_utils.project.placeholderapp')
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
-                         'cms.test_utils.project.placeholderapp')
-        self.assertFalse(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageExtensionToolbar'].app_path,
-                         'cms.test_utils.project.placeholderapp')
-        self.assertTrue(toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageExtensionToolbar'].is_current_app)
-        self.assertEqual(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].app_path,
-                         'cms.test_utils.project.placeholderapp')
-        self.assertTrue(toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].is_current_app)
+        self.assertFalse(
+            toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
+        )
+        self.assertEqual(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            'cms.test_utils.project.placeholderapp'
+        )
+        self.assertFalse(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+        )
+        self.assertEqual(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageExtensionToolbar'].app_path,
+            'cms.test_utils.project.placeholderapp'
+        )
+        self.assertTrue(
+            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageExtensionToolbar'].is_current_app
+        )
+        self.assertEqual(
+            toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].app_path,
+            'cms.test_utils.project.placeholderapp'
+        )
+        self.assertTrue(
+            toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].is_current_app
+        )
 
     @override_settings(
         CMS_APPHOOKS=['cms.test_utils.project.placeholderapp.cms_apps.Example1App'],
@@ -700,7 +741,7 @@ class ApphooksTestCase(CMSTestCase):
 
             self.user = self._create_user('admin_staff', True, True)
             with self.login_user_context(self.user):
-                response = self.client.get(path+"?edit")
+                response = self.client.get(path + "?edit")
 
             request = response.context['request']
             toolbar = request.toolbar
@@ -711,7 +752,7 @@ class ApphooksTestCase(CMSTestCase):
 
             self.user = self._create_user('staff', True, False)
             with self.login_user_context(self.user):
-                response = self.client.get(path+"?edit")
+                response = self.client.get(path + "?edit")
 
             request = response.context['request']
             request.user = get_user_model().objects.get(pk=self.user.pk)
@@ -723,7 +764,7 @@ class ApphooksTestCase(CMSTestCase):
 
             self.user.user_permissions.add(Permission.objects.get(codename='change_example1'))
             with self.login_user_context(self.user):
-                response = self.client.get(path+"?edit")
+                response = self.client.get(path + "?edit")
 
             request = response.context['request']
             request.user = get_user_model().objects.get(pk=self.user.pk)

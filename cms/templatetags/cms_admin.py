@@ -1,6 +1,5 @@
 from classytags.core import Tag
 from classytags.helpers import InclusionTag
-
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
@@ -10,7 +9,6 @@ from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse
-
 
 register = template.Library()
 
@@ -189,9 +187,11 @@ def submit_row_plugin(context):
     save_as = context['save_as']
     ctx = {
         'opts': opts,
-        'show_delete_link': context.get('has_delete_permission', False) and change and context.get('show_delete', True),
+        'show_delete_link': context.get(
+            'has_delete_permission', False) and change and context.get('show_delete', True),
         'show_save_as_new': not is_popup and change and save_as,
-        'show_save_and_add_another': context['has_add_permission'] and not is_popup and (not save_as or context['add']),
+        'show_save_and_add_another': context['has_add_permission'] and not is_popup and (
+            not save_as or context['add']),
         'show_save_and_continue': not is_popup and context['has_change_permission'],
         'is_popup': is_popup,
         'show_save': True,

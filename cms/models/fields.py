@@ -10,7 +10,9 @@ from cms.models.placeholdermodel import Placeholder
 class PlaceholderField(models.ForeignKey):
 
     def __init__(self, slotname, default_width=None, actions=None, **kwargs):
-        from cms.utils.placeholder import PlaceholderNoAction, validate_placeholder_name
+        from cms.utils.placeholder import (
+            PlaceholderNoAction, validate_placeholder_name,
+        )
 
         if not actions:
             actions = PlaceholderNoAction
@@ -23,7 +25,7 @@ class PlaceholderField(models.ForeignKey):
         self.default_width = default_width
         self.actions = actions()
         kwargs.update({'null': True})  # always allow Null
-        kwargs.update({'editable': False}) # never allow edits in admin
+        kwargs.update({'editable': False})  # never allow edits in admin
         # We hard-code the `to` argument for ForeignKey.__init__
         # since a PlaceholderField can only be a ForeignKey to a Placeholder
         kwargs['to'] = 'cms.Placeholder'

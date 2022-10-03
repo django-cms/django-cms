@@ -1,12 +1,11 @@
-from mock import Mock, patch
-
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
+from mock import Mock, patch
 
 from cms.api import create_page
-from cms.app_registration import get_cms_extension_apps, get_cms_config_apps
+from cms.app_registration import get_cms_config_apps, get_cms_extension_apps
 from cms.cms_config import CMSCoreExtensions
 from cms.models import Page, PageContent
 from cms.page_rendering import render_pagecontent

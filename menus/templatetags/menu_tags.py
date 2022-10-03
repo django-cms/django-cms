@@ -165,7 +165,7 @@ class ShowMenu(InclusionTag):
             context['extra_inactive'] = extra_inactive
             context['extra_active'] = extra_active
             context['namespace'] = namespace
-        except:
+        except:  # NOQA
             context = {"template": template}
         return context
 
@@ -293,7 +293,7 @@ class ShowBreadcrumb(InclusionTag):
             start_level = 0
         try:
             only_visible = bool(int(only_visible))
-        except:
+        except:  # NOQA
             only_visible = bool(only_visible)
         ancestors = []
 
@@ -382,7 +382,7 @@ class LanguageChooser(InclusionTag):
             i18n_mode = _tmp
         if template is NOT_PROVIDED:
             template = "menu/language_chooser.html"
-        if not i18n_mode in MARKERS:
+        if i18n_mode not in MARKERS:
             i18n_mode = 'raw'
         if 'request' not in context:
             # If there's an exception (500), default context_processors may not be called.

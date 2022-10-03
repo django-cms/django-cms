@@ -27,7 +27,7 @@ class SiteTestCase(CMSTestCase):
         self._login_context.__exit__(None, None, None)
 
     def test_site_framework(self):
-        #Test the site framework, and test if it's possible to disable it
+        # Test the site framework, and test if it's possible to disable it
         with self.settings(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "de", site=self.site2)
             page_list = self.get_pages_admin_list_uri('en')

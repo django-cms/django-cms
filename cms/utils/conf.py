@@ -1,17 +1,17 @@
-from functools import update_wrapper
 import os
-
+from functools import update_wrapper
 from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.translation import gettext_lazy as _
 
-from cms import constants
-from cms import __version__
+from cms import __version__, constants
 
-
-__all__ = ['get_cms_setting']
+__all__ = [
+    'get_cms_setting',
+    'get_site_id'
+]
 
 
 class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
@@ -21,7 +21,7 @@ def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
     """
-    from imp import load_module, PY_SOURCE
+    from imp import PY_SOURCE, load_module
 
     imported = None
     if module_path:
@@ -157,7 +157,9 @@ def get_templates():
         # If module file is not present skip configuration and just dump the filenames as templates
         if os.path.isfile(config_path):
             template_module = _load_from_file(config_path)
-            templates = [(os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()]
+            templates = [
+                (os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()
+            ]
         else:
             templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
     else:
@@ -220,8 +222,9 @@ def _ensure_languages_settings(languages):
     for site, language_object in needs_fallbacks:
         if site not in site_fallbacks:
             site_fallbacks[site] = [lang['code'] for lang in languages[site] if lang['public']]
-        language_object['fallbacks'] = [lang_code for lang_code in site_fallbacks[site] if
-            lang_code != language_object['code']]
+        language_object['fallbacks'] = [
+            lang_code for lang_code in site_fallbacks[site] if lang_code != language_object['code']
+        ]
 
     languages['default'] = defaults
     languages[VERIFIED] = True  # this will be busted by @override_settings and cause a re-check

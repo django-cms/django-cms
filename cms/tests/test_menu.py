@@ -1,31 +1,36 @@
 import copy
-from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, Permission, Group
+from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
 from django.test.utils import override_settings
 from django.utils.translation import activate, override as force_language
-from cms.apphook_pool import apphook_pool
-from menus.base import NavigationNode
-from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.models import CacheKey
-from menus.utils import mark_descendants, find_selected, cut_levels
 
 from cms.api import create_page, create_title
+from cms.apphook_pool import apphook_pool
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
-from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
-from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
-                                           SoftrootFixture, ExtendedMenusFixture)
+from cms.test_utils.fixtures.menus import (
+    ExtendedMenusFixture, MenusFixture, SoftrootFixture, SubMenusFixture,
+)
+from cms.test_utils.project.sampleapp.cms_apps import (
+    NamespacedApp, SampleApp, SampleApp2,
+)
+from cms.test_utils.project.sampleapp.cms_menus import (
+    SampleAppMenu, StaticMenu, StaticMenu2,
+)
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.util.context_managers import apphooks, LanguageOverride
+from cms.test_utils.util.context_managers import LanguageOverride, apphooks
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from menus.base import NavigationNode
+from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
+from menus.models import CacheKey
+from menus.utils import cut_levels, find_selected, mark_descendants
 
 
 class BaseMenuTest(CMSTestCase):
@@ -753,8 +758,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 
     def test_show_breadcrumb_invisible(self):
         parent = Page.objects.get(pagecontent_set__title='P3')
-        invisible_page = create_page("invisible", "nav_playground.html", "en",
-            parent=parent, in_navigation=False)
+        invisible_page = create_page("invisible", "nav_playground.html", "en", parent=parent, in_navigation=False)
         context = self.get_context(
             path=invisible_page.get_absolute_url(),
             page=invisible_page,
@@ -1277,14 +1281,10 @@ class ShowMenuBelowIdTests(BaseMenuTest):
           \-D (not in nav)
     """
     def test_not_in_navigation(self):
-        a = create_page('A', 'nav_playground.html', 'en',
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', parent=b,
-                        in_navigation=True)
-        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
-                    in_navigation=False)
+        a = create_page('A', 'nav_playground.html', 'en', in_navigation=True, reverse_id='a')
+        b = create_page('B', 'nav_playground.html', 'en', parent=a, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', parent=b, in_navigation=True)
+        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b), in_navigation=False)
         context = self.get_context(a.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
         tpl.render(context)
@@ -1451,12 +1451,9 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             |-B
             C (soft_root)
         """
-        a = create_page('A', 'nav_playground.html', 'en',
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en',
-                        in_navigation=True, soft_root=True)
+        a = create_page('A', 'nav_playground.html', 'en', in_navigation=True, reverse_id='a')
+        b = create_page('B', 'nav_playground.html', 'en', parent=a, in_navigation=True)
+        c = create_page('C', 'nav_playground.html', 'en', in_navigation=True, soft_root=True)
         context = self.get_context(a.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' %}")
         tpl.render(context)
@@ -1632,16 +1629,16 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         B1     B2
         C1 C2  C3 C4
         """
-        l = 'nav_playground.html'
+        template = 'nav_playground.html'
         kw = dict(in_navigation=True)
-        a = create_page('a', l, 'en', **kw)
-        b1 = create_page('b1', l, 'en', parent=a, **kw)
-        b2 = create_page('b2', l, 'en', parent=a, **kw)
-        c1 = create_page('c1', l, 'en', parent=b1, **kw)
-        c2 = create_page('c2', l, 'en', parent=b1, **kw)
-        c3 = create_page('c3', l, 'en', parent=b2, **kw)
-        c4 = create_page('c4', l, 'en', parent=b2, **kw)
-        self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
+        a = create_page('a', template, 'en', **kw)
+        b1 = create_page('b1', template, 'en', parent=a, **kw)
+        b2 = create_page('b2', template, 'en', parent=a, **kw)
+        c1 = create_page('c1', template, 'en', parent=b1, **kw)
+        c2 = create_page('c2', template, 'en', parent=b1, **kw)
+        c3 = create_page('c3', template, 'en', parent=b2, **kw)
+        c4 = create_page('c4', template, 'en', parent=b2, **kw)
+        self.pages = [a, b1, c1, c2, b2, c3, c4]  # tree order
         self.site = get_current_site()
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
