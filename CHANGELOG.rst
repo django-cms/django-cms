@@ -7,6 +7,7 @@ unreleased
 
 * Make javascript dark mode functions available to popups as CMS.API.getColorScheme
   and CMS.API.setColorScheme
+* Fix bug where switching color scheme affects other settings
 
 3.11.0 (2022-08-02)
 ===================
