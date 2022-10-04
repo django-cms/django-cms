@@ -510,7 +510,8 @@ export const Helpers = {
     setColorScheme: function (scheme) {
         let body = $('html');
 
-        this.setSettings({ color_scheme: scheme });
+        CMS.settings.color_scheme = scheme;
+        this.setSettings(CMS.settings.color_scheme);
         if (scheme === 'auto') {
             body.removeAttr('data-color-scheme');
             body.find('div.cms iframe').each(function(i, e) {
