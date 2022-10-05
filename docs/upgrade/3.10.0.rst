@@ -67,8 +67,8 @@ For more information, please see: https://github.com/django-cms/django-cms/pull/
 
 Then run::
 
-    ``python manage.py migrate``  # to ensure that your database is up-to-date with migrations
-    ``python manage.py cms fix-tree``
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
 
 Check custom code and third-party applications for use of deprecated or removed functionality or
 APIs (see above). Some third-party components may need to be updated.
