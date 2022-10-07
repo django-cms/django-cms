@@ -1,14 +1,13 @@
 import logging
 
-from cms import api
-from cms.models import PagePermission
-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 
+from cms import api
+from cms.models import PagePermission
 from cms.test_utils.testcases import CMSTestCase
 
 logger = logging.getLogger(__name__)
