@@ -7,6 +7,7 @@ unreleased
 
 * Make javascript dark mode functions available to popups as CMS.API.getColorScheme
   and CMS.API.setColorScheme
+* Allow to partially override ``CMS_CACHE_DURATIONS``
 
 3.11.0 (2022-08-02)
 ===================
