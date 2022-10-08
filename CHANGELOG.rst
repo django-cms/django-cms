@@ -7,6 +7,7 @@ unreleased
 
 * Make javascript dark mode functions available to popups as CMS.API.getColorScheme
   and CMS.API.setColorScheme
+* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
 * Allow to partially override ``CMS_CACHE_DURATIONS``
 
 3.11.0 (2022-08-02)
