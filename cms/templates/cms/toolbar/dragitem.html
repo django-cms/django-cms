@@ -47,7 +47,7 @@
             </div>
         {% endif %}
 
-        <span class="cms-dragitem-text" title="{{ plugin.plugin_type }} ID: {{ plugin.pk }}"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
+        <span class="cms-dragitem-text" title="{{ plugin.plugin_type }} ID: {{ plugin.pk|unlocalize }}"><strong>{{ plugin.get_plugin_name }}</strong> {{ plugin.get_short_description }}</span>
     </div>
 
     <div class="cms-collapsable-container cms-hidden

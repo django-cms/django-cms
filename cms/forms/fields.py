@@ -4,7 +4,7 @@ from django.core.validators import EMPTY_VALUES
 from django.utils.translation import gettext_lazy as _
 
 from cms.forms.utils import get_page_choices, get_site_choices
-from cms.forms.validators import validate_url
+from cms.forms.validators import validate_url_extra
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
 
@@ -28,8 +28,8 @@ class LazyChoiceField(forms.ChoiceField):
 class PageSelectFormField(forms.MultiValueField):
     widget = PageSelectWidget
     default_error_messages = {
-        'invalid_site': _(u'Select a valid site'),
-        'invalid_page': _(u'Select a valid page'),
+        'invalid_site': _('Select a valid site'),
+        'invalid_page': _('Select a valid page'),
     }
 
     def __init__(self, queryset=None, empty_label="---------", cache_choices=False,
@@ -79,7 +79,7 @@ class PageSelectFormField(forms.MultiValueField):
 
 class PageSmartLinkField(forms.CharField):
     widget = PageSmartLinkWidget
-    default_validators = [validate_url]
+    default_validators = [validate_url_extra]
 
     def __init__(self, max_length=None, min_length=None, placeholder_text=None,
                  ajax_view=None, *args, **kwargs):
