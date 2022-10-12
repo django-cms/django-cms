@@ -6,7 +6,7 @@
 Integrating a third-party application
 #####################################
 
-We have already written our own django CMS plugins and apps, but now we want to
+We've already written our own django CMS plugins and apps, but now we want to
 extend our CMS with a third-party application,
 `Djangocms-Blog <https://github.com/nephila/djangocms-blog>`_.
 
@@ -81,7 +81,7 @@ Add the following url pattern to the main ``urls.py``:
 Migrate the database
 ********************
 
-We have added a new application so we need to update our database::
+We've added a new application so we need to update our database::
 
     python manage.py migrate
 

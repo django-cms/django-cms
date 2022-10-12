@@ -293,7 +293,7 @@ items. For example, to find (using ``get_menu()``) and rename the *Site* menu:
 
 * it can update the item's attributes itself
   (``self.toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Site')``)
-* if the item does not exist, it will create it rather than raising an error.
+* if the item doesn't exist, it will create it rather than raising an error.
 
 
 ``find_items()`` and ``find_first()``
@@ -308,7 +308,7 @@ Search for items by their type:
         self.toolbar.find_items(item_type=LinkItem)
 
 will find all ``LinkItem``\s in the toolbar (but not for example in the menus in the toolbar - it
-does not search *other* items in the toolbar for items of their own).
+doesn't search *other* items in the toolbar for items of their own).
 
 :meth:`~cms.toolbar.items.ToolbarAPIMixin.find_items` returns a list of
 :class:`~cms.toolbar.items.ItemSearchResult` objects;

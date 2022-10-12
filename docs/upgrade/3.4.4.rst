@@ -42,7 +42,7 @@ Placeholder utilities
 =====================
 
 Because of a performance issue with placeholder inheritance,
-we have altered the return value for the following internal placeholder utility functions:
+we've altered the return value for the following internal placeholder utility functions:
 
 * ``cms.utils.placeholder._scan_placeholders``
   This will now return a list of ``Placeholder`` tag instances instead of a list of placeholder slot names.

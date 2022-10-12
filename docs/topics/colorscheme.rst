@@ -1,7 +1,7 @@
 .. _colorscheme:
 
 ###########################################
-Colour schemes (light/dark) with django CMS
+Color schemes (light/dark) with django CMS
 ###########################################
 
 .. important::

@@ -13,7 +13,7 @@ Bug Fixes
 
 * Fix cache settings
 * Fix user lookup for view restrictions/page permissions when using raw id field
-* Fixed regression when page could not be copied if CMS_PERMISSION was False
+* Fixed regression when page couldn't be copied if CMS_PERMISSION was False
 * Fixes an issue relating to uninstalling a namespaced application
 * Adds "Can change page" permission
 * Fixes a number of page-tree issues the could lead data corruption under

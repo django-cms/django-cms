@@ -48,7 +48,7 @@ First, open your system's terminal and go to the folder where you want to instal
 Confirm you can access the login page
 ****************************************
 
-Once the installation process has finished, open your browser and type `http://localhost:8000/admin <http://localhost:8000/admin>`_. You have successfully installed django CMS, If you can see the login page.
+Once the installation process has finished, open your browser and type `http://localhost:8000/admin <http://localhost:8000/admin>`_. If you can see the login page, you have successfully installed django CMS.
 
 Log in using the username and password you set during the installation process.
 

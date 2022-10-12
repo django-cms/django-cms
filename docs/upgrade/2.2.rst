@@ -81,7 +81,7 @@ the ``cms_tags`` template tag library in your templates. The template tag
 should be placed somewhere within the body of the HTML (within ``<body>...</body>``).
 
 This solves issues people were having with the toolbar showing up in places it
-should not have.
+shouldn't have.
 
 
 Static files moved to /static/

@@ -83,7 +83,7 @@ Troubleshooting
 
 Since plugin modules are found and loaded by django's importlib, you might
 experience errors because the path environment is different at runtime. If
-your `cms_plugins` is not loaded or accessible, try the following::
+your `cms_plugins` isn't loaded or accessible, try the following::
 
     $ python manage.py shell
     >>> from importlib import import_module
@@ -118,7 +118,7 @@ In our ``models.py`` we add the following::
         guest_name = models.CharField(max_length=50, default='Guest')
 
 
-If you followed the Django tutorial, this should not look too new to you. The
+If you followed the Django tutorial, this shouldn't look too new to you. The
 only difference to normal models is that you sub-class
 :class:`cms.models.pluginmodel.CMSPlugin` rather than
 :class:`django.db.models.Model`.
@@ -201,7 +201,7 @@ Typically, you will want it to copy related objects. To do this you should
 create a method called ``copy_relations`` on your plugin model, that receives
 the **old** instance of the plugin as an argument.
 
-You may however decide that the related objects should not be copied - you may
+You may however decide that the related objects shouldn't be copied - you may
 want to leave them alone, for example. Or, you might even want to choose some
 altogether different relations for it, or to create new ones when it's
 copied... it depends on your plugin and the way you want it to work.
@@ -400,7 +400,7 @@ A **bad** example:
 .. note::
         If the Plugin requires javascript code to be rendered properly,
         the class ``'cms-execute-js-to-render'`` can be added to the script tag.
-        This will download and execute all scripts with this class, which were not present before,
+        This will download and execute all scripts with this class, which weren't present before,
         when the plugin is first added to the page.
         If the javascript code is protected from prematurely executing by
         the EventListener for the event ``'load'`` and/or ``'DOMContentLoaded'``,

@@ -75,7 +75,7 @@ menu becomes much more manageable::
 Registration
 ============
 
-The menu system is not monolithic. Rather, it is composed of numerous active parts, many of which can operate independently of each other.
+The menu system isn't monolithic. Rather, it is composed of numerous active parts, many of which can operate independently of each other.
 
 What they operate on is a list of menu nodes, that gets passed around the menu system, until it emerges at the other end.
 

@@ -4,7 +4,7 @@
 Frontend integration
 ####################
 
-Generally speaking, django CMS is wholly frontend-agnostic. It does not care what your site's
+Generally speaking, django CMS is wholly frontend-agnostic. It doesn't care what your site's
 frontend is built on or uses.
 
 The exception to this is when editing your site, as the django CMS toolbar and editing controls

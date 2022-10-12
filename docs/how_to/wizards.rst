@@ -60,7 +60,7 @@ do this for ``MyApp``, it might look like this::
 
 .. note::
 
-    If your model does not define a ``get_absolute_url`` function then your wizard
+    If your model doesn't define a ``get_absolute_url`` function then your wizard
     will require a :ref:`get_success_url` method.
 
     ..  code-block:: python

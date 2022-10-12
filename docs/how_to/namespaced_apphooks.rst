@@ -41,7 +41,7 @@ throw up a ``NoReverseMatch`` error.
 
 You can set the namespace for the instance of the apphook in the *Application instance name* field. However, you'll
 need to set that to something *different* if an instance with that value already exists. In this case, as long as
-``app_name = "myapp"`` it does not matter; even if the system does not find a match with the name of the instance it will
+``app_name = "myapp"`` it doesn't matter; even if the system does not find a match with the name of the instance it will
 fall back to the one hard-wired into the class.
 
 In other words setting ``app_name`` correctly guarantees that URL-reversing will work, because it sets the fallback

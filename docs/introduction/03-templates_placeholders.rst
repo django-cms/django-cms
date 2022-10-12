@@ -76,7 +76,7 @@ If you switch to *Structure* mode (*button in the upper-right corner of the page
 Static Placeholders
 *******************
 
-The content of the placeholders we have encountered so far is different for
+The content of the placeholders we've encountered so far is different for
 every page. Sometimes though you'll want to have a section on your website
 which should be the same on every single page, such as a footer block.
 

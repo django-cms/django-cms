@@ -235,3 +235,8 @@ spelling_lang = 'en_GB'
 spelling_word_list_filename = 'spelling_wordlist'
 
 spelling_ignore_pypi_package_names = True
+
+#Split common contractions from words so they are not flagged as errors by the spellchecker.
+#https://github.com/sphinx-contrib/spelling/blob/master/sphinxcontrib/spelling/filters.py
+#See https://sphinxcontrib-spelling.readthedocs.io/en/latest/customize.html#word-filters
+spelling_filters=["sphinxcontrib.spelling.filters.ContractionFilter"]

@@ -202,7 +202,7 @@ Properties of Navigation Nodes in templates
 
     {{ node.is_leaf_node }}
 
-Is it the last in the tree? If true it does not have any children.
+Is it the last in the tree? If true it doesn't have any children.
 
 ::
 

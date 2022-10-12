@@ -65,7 +65,7 @@ Apphooks for non-namespaced applications
 
 If you are writing apphooks for third-party applications, you may find one that in fact does
 not have an application namespace for its URLs. Such an application is liable to tun into namespace
-conflicts, and does not represent good practice.
+conflicts, and doesn't represent good practice.
 
 However if you *do* encounter such an application, your own apphook for it will need in turn to forgo the
 ``app_name`` attribute.

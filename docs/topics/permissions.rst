@@ -92,7 +92,7 @@ They include:
 
 .. _important:
 
-    Even though a user may have *Can edit* permissions on a page, that does not give them
+    Even though a user may have *Can edit* permissions on a page, that doesn't give them
     permissions to add or change plugins *within* that page. In order to be able to
     add/change/delete plugins on any page, you will need to go through :ref:`the standard Django
     permissions <key-user-permissions>` to provide users with the actions they can perform, for
@@ -118,7 +118,7 @@ only.
 .. _view-restrictions:
 
 *View restrictions* determine which groups and users will be able to see the page when it is
-published. Adding a view restriction will allow you to set this. Note that this does not apply any
+published. Adding a view restriction will allow you to set this. Note that this doesn't apply any
 restrictions to users who are also editors with appropriate permissions.
 
 *Page permissions* determine what editors can do to a page (or hierarchy of pages). They are

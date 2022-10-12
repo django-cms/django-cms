@@ -7,7 +7,7 @@ Running and writing tests
 Good code needs tests.
 
 A project like django CMS simply can't afford to incorporate new code that
-does not come with its own tests.
+doesn't come with its own tests.
 
 Tests provide some necessary minimum confidence: they can show the code will
 behave as it expected, and help identify what's going wrong if something breaks
@@ -219,7 +219,7 @@ can also rewind.
 It might sometimes be useful not to restart the server when creating the tests,
 for that you can run ``python testserver.py`` with necessary arguments in one
 shell and ``gulp tests:integration --no-server`` in another. However you would
-need to clean the state yourself if the test you have been writing fails.
+need to clean the state yourself if the test you've been writing fails.
 
 *************
 Writing tests
@@ -246,5 +246,5 @@ Generally tests should be:
 * Short running. No hard numbers here, but if your one test doubles the time it
   takes for everybody to run them, it's probably an indication that you're doing
   it wrong.
-* Easy to understand. If your test code is not obvious, please add comments on
+* Easy to understand. If your test code isn't obvious, please add comments on
   what it's doing.

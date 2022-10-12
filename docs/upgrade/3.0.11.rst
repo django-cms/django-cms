@@ -19,7 +19,7 @@ Bug Fixes
 * Fixes a missing migration issue
 * Fixes an issue when using the PageField widget
 * Fixes an issue where duplicate page slugs is not prevented in some cases
-* Fixes an issue where copying a page did not copy its extensions
+* Fixes an issue where copying a page didn't copy its extensions
 * Fixes an issue where translations where broken when operating on a page
 * Fixes an edge-case SQLite issue under Django 1.7
 * Fixes an issue where a confirmation dialog shows only some of the plugins to

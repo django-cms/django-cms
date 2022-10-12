@@ -16,7 +16,7 @@ If you prefer to do things manually, this how-to guide will take you through the
     assumes that you are starting with a blank project, so you will need to adapt the steps below appropriately as
     required.
 
-This document assumes you have some basic familiarity with Python and Django. After you have integrated django CMS into
+This document assumes you have some basic familiarity with Python and Django. After you've integrated django CMS into
 your project, you should be able to follow the :doc:`/introduction/index` for an introduction to developing with django
 CMS.
 
@@ -141,7 +141,7 @@ Database
 
 django CMS requires a relational database backend. Each django CMS installation should have its own database.
 
-You can use SQLite, which is included in Python and does not need to be installed separately or configured further. You
+You can use SQLite, which is included in Python and doesn't need to be installed separately or configured further. You
 are unlikely to be using that for a project in production, but it's ideal for development and exploration, especially
 as it is configured by default in a new Django project's :setting:`django:DATABASES`::
 
@@ -414,7 +414,7 @@ so far has no plugins installed, which means it has no way of handling content i
 CMS is managed via plugins. So, we now need to install some additional addon applications to provide plugins and other
 functionality.
 
-You don't actually **need** to install any of these. django CMS does not commit you to any particular applications for
+You don't actually **need** to install any of these. django CMS doesn't commit you to any particular applications for
 content handling. The ones listed here however provide key functionality and are strongly recommended.
 
 Django Filer

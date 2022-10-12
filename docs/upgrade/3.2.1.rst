@@ -29,8 +29,8 @@ Bug Fixes
 - Fix messages not being positioned correctly in debug mode.
 - Fix an issue where plugin parent restrictions where not respected when pasting a plugin.
 - Fix an issue where "Copy all" menu item could have been clicked on empty placeholder.
-- Fix a bug where page tree styles did not load from STATIC_URL that pointed to a different host.
-- Fix an issue where the side-frame would not refresh under some circumstances.
+- Fix a bug where page tree styles didn't load from STATIC_URL that pointed to a different host.
+- Fix an issue where the side-frame wouldn't refresh under some circumstances.
 - Honour CMS_RAW_ID_USERS in GlobalPagePermissionAdmin.
 
 

@@ -175,7 +175,7 @@ into the web font. All classes will be automatically added to
 
 Additionally we created an SVG template within
 ``cms/static/cms/font/src/_template.svgz`` that you should use when converting
-or creating additional icons. It is named *svgz* so it does not get compiled
+or creating additional icons. It is named *svgz* so it doesn't get compiled
 into the font. When using *Adobe Illustrator* please mind the
 `following settings <images/svg_settings.png>`_.
 

@@ -55,7 +55,7 @@ select a page type and all plugins and contents will be pre-filled.
 Experimental Python 3.3 support
 ===============================
 
-We have added experimental support for Python 3.3. Support for Python 2.5 has
+We've added experimental support for Python 3.3. Support for Python 2.5 has
 been dropped.
 
 Better multilingual editing
@@ -221,7 +221,7 @@ to keep your existing files from the old ``cms.plugins.snippet``!)
 Twitter Plugin
 --------------
 
-Twitter disabled V1 of their API, thus we have removed the twitter plugin
+Twitter disabled V1 of their API, thus we've removed the twitter plugin
 (``cms.plugins.twitter``) completely.
 
 For alternatives have a look at these plugins:
@@ -277,7 +277,7 @@ when defining a model admin class containing a placeholder, now add
 ``PlaceholderAdminMixin`` to the list of parent classes, together with
 ``admin.ModelAdmin``.
 
-``PlaceholderAdmin`` does not have language tabs any more and the plugin editor
+``PlaceholderAdmin`` doesn't have language tabs any more and the plugin editor
 is gone. The plugin API has changed and is now more consistent. ``PageAdmin``
 uses the same API as ``PlaceholderAdminMixin`` now. If your app talked with
 the Plugin API directly be sure to read the code and the changed parameters.
