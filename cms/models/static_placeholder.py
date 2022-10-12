@@ -25,12 +25,12 @@ class StaticPlaceholder(models.Model):
         (CREATION_BY_CODE, _('by code')),
     )
     name = models.CharField(
-        verbose_name=_(u'static placeholder name'), max_length=255, blank=True, default='',
-        help_text=_(u'Descriptive name to identify this static placeholder. Not displayed to users.'))
+        verbose_name=_('static placeholder name'), max_length=255, blank=True, default='',
+        help_text=_('Descriptive name to identify this static placeholder. Not displayed to users.'))
     code = models.CharField(
-        verbose_name=_(u'placeholder code'), max_length=255, blank=True,
-        help_text=_(u'To render the static placeholder in templates.'))
-    draft = PlaceholderField(static_slotname, verbose_name=_(u'placeholder content'), related_name='static_draft')
+        verbose_name=_('placeholder code'), max_length=255, blank=True,
+        help_text=_('To render the static placeholder in templates.'))
+    draft = PlaceholderField(static_slotname, verbose_name=_('placeholder content'), related_name='static_draft')
     public = PlaceholderField(static_slotname, editable=False, related_name='static_public')
     dirty = models.BooleanField(default=False, editable=False)
     creation_method = models.CharField(
@@ -40,8 +40,8 @@ class StaticPlaceholder(models.Model):
     site = models.ForeignKey(Site, on_delete=models.CASCADE, null=True, blank=True)
 
     class Meta:
-        verbose_name = _(u'static placeholder')
-        verbose_name_plural = _(u'static placeholders')
+        verbose_name = _('static placeholder')
+        verbose_name_plural = _('static placeholders')
         app_label = 'cms'
         unique_together = (('code', 'site'),)
 
@@ -50,12 +50,12 @@ class StaticPlaceholder(models.Model):
 
     def get_name(self):
         return self.name or self.code or str(self.pk)
-    get_name.short_description = _(u'static placeholder name')
+    get_name.short_description = _('static placeholder name')
 
     def clean(self):
         # TODO: check for clashes if the random code is already taken
         if not self.code:
-            self.code = u'static-%s' % uuid.uuid4()
+            self.code = 'static-%s' % uuid.uuid4()
         if not self.site:
             placeholders = StaticPlaceholder.objects.filter(code=self.code, site__isnull=True)
             if self.pk:
@@ -74,4 +74,4 @@ class StaticPlaceholder(models.Model):
             return True
         opts = self._meta
         return request.user.has_perm(opts.app_label + '.' + get_permission_codename('change', opts)) and \
-               request.user.has_perm(opts.app_label + '.' + 'publish_page')
+            request.user.has_perm(opts.app_label + '.' + 'publish_page')

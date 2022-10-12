@@ -1,75 +1,60 @@
-from collections import namedtuple
 import copy
 import json
+from collections import namedtuple
 
 import django
-from django.contrib.admin.helpers import AdminForm
 from django.conf import settings
 from django.contrib import admin, messages
+from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.options import IS_POPUP_VAR
 from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import (ObjectDoesNotExist,
-                                    PermissionDenied, ValidationError)
+from django.core.exceptions import (
+    ObjectDoesNotExist, PermissionDenied, ValidationError,
+)
 from django.db import transaction
-from django.db.models import Q, Prefetch
+from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
 from django.forms.fields import IntegerField
 from django.http import (
-    QueryDict,
-    HttpResponseRedirect,
-    HttpResponse,
-    Http404,
-    HttpResponseBadRequest,
-    HttpResponseForbidden,
+    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+    HttpResponseRedirect, QueryDict,
 )
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
-from django.utils.decorators import method_decorator
 from django.views.decorators.http import require_POST
 
 from cms import operations
 from cms.admin.forms import (
-    AddPageForm,
-    AdvancedSettingsForm,
-    ChangePageForm,
-    ChangeListForm,
-    CopyPageForm,
-    CopyPermissionForm,
-    DuplicatePageForm,
-    MovePageForm,
+    AddPageForm, AdvancedSettingsForm, ChangeListForm, ChangePageForm,
+    CopyPageForm, CopyPermissionForm, DuplicatePageForm, MovePageForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
 from cms.models import (
-    EmptyPageContent,
-    CMSPlugin,
-    Page,
-    PageContent,
-    PagePermission,
-    Placeholder,
-    GlobalPagePermission,
+    CMSPlugin, EmptyPageContent, GlobalPagePermission, Page, PageContent,
+    PagePermission, Placeholder,
 )
-from cms.operations.helpers import send_post_page_operation, send_pre_page_operation
+from cms.operations.helpers import (
+    send_post_page_operation, send_pre_page_operation,
+)
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
-from cms.utils import permissions, get_current_site
-from cms.utils import page_permissions
+from cms.utils import get_current_site, page_permissions, permissions
+from cms.utils.admin import jsonify_request
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_language_list,
-    get_language_tuple,
-    get_language_object,
+    get_language_list, get_language_object, get_language_tuple,
     get_site_language_from_request,
 )
 from cms.utils.plugins import copy_plugins_to_placeholder
-from cms.utils.admin import jsonify_request
-from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 require_POST = method_decorator(require_POST)
@@ -220,8 +205,8 @@ class PageAdmin(admin.ModelAdmin):
             'has_change_permission': self.has_change_permission(request, obj=page),
             'has_change_advanced_settings_permission': self.has_change_advanced_settings_permission(request, obj=page),
             'has_change_permissions_permission': self.has_change_permissions_permission(request, obj=page),
-            'has_move_page_permission':  self.has_move_page_permission(request, obj=page),
-            'has_delete_permission':  self.has_delete_permission(request, obj=page),
+            'has_move_page_permission': self.has_move_page_permission(request, obj=page),
+            'has_delete_permission': self.has_delete_permission(request, obj=page),
             'CMS_PERMISSION': get_cms_setting('PERMISSION'),
         }
 
@@ -306,10 +291,15 @@ class PageAdmin(admin.ModelAdmin):
 
             language_code = request.GET.get('language_code', settings.LANGUAGE_CODE)
             matching_published_pages = self.model.objects.filter(
-                Q(pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(urls__path__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code)
-                | Q(pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code)
+                Q(
+                    pagecontent_set__title__icontains=query_term, pagecontent_set__language=language_code
+                ) | Q(
+                    urls__path__icontains=query_term, pagecontent_set__language=language_code
+                ) | Q(
+                    pagecontent_set__menu_title__icontains=query_term, pagecontent_set__language=language_code
+                ) | Q(
+                    pagecontent_set__page_title__icontains=query_term, pagecontent_set__language=language_code
+                )
             ).distinct()
 
             results = []
@@ -426,8 +416,7 @@ class PageAdmin(admin.ModelAdmin):
             protected=protected,
             opts=opts,
             app_label=app_label,
-            is_popup=(IS_POPUP_VAR in request.POST or
-                      IS_POPUP_VAR in request.GET),
+            is_popup=(IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET),
             to_field=None,
         )
         context.update(extra_context or {})
@@ -591,8 +580,9 @@ class PageAdmin(admin.ModelAdmin):
 
         # Does the user have permissions to do this...?
         if not can_move_page or (target and not target.has_add_permission(user)):
-            message = force_str(_("Error! You don't have permissions "
-                                   "to move this page. Please reload the page"))
+            message = force_str(
+                _("Error! You don't have permissions to move this page. Please reload the page")
+            )
             return jsonify_request(HttpResponseForbidden(message))
 
         operation_token = send_pre_page_operation(
@@ -940,15 +930,15 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if 'duplicate' in request.path_info:
             extra_context.update({
-                'title':  _("Add Page Copy"),
+                'title': _("Add Page Copy"),
             })
         elif 'parent_node' in request.GET:
             extra_context.update({
-                'title':  _("New sub page"),
+                'title': _("New sub page"),
             })
         else:
             extra_context.update({
-                'title':  _("New page"),
+                'title': _("New page"),
             })
 
         try:
@@ -1210,7 +1200,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         page = source_page_content.page
 
-        if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
+        if not target_language or target_language not in get_language_list(site_id=page.node.site_id):
             return HttpResponseBadRequest(force_str(_("Language must be set to a supported language!")))
 
         target_page_content = page.get_title_obj(target_language, fallback=False)
@@ -1267,9 +1257,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         to_delete_objects = [to_delete_urls, to_delete_plugins, to_delete_translations]
         perms_needed = set(
-            list(perms_needed_url) +
-            list(perms_needed_translation) +
-            list(perms_needed_plugins)
+            list(perms_needed_url) + list(perms_needed_translation) + list(perms_needed_plugins)
         )
 
         # This is bad and I should feel bad.
@@ -1369,16 +1357,14 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if node_id:
             page = get_object_or_404(pages, node_id=int(node_id))
-            pages = page.get_descendant_pages().filter(Q(node__in=open_nodes)|Q(node__parent__in=open_nodes))
+            pages = page.get_descendant_pages().filter(Q(node__in=open_nodes) | Q(node__parent__in=open_nodes))
         else:
             page = None
             pages = pages.filter(
                 # get all root nodes
-                Q(node__depth=1)
                 # or children which were previously open
-                | Q(node__depth=2, node__in=open_nodes)
                 # or children of the open descendants
-                | Q(node__parent__in=open_nodes)
+                Q(node__depth=1) | Q(node__depth=2, node__in=open_nodes) | Q(node__parent__in=open_nodes)
             )
         pages = pages.prefetch_related(
             Prefetch(

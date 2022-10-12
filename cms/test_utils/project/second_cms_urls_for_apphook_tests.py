@@ -4,7 +4,6 @@ from django.urls import include, re_path
 from cms.apphook_pool import apphook_pool
 from cms.views import details
 
-
 if settings.APPEND_SLASH:
     reg = re_path(r'^(?P<slug>[0-9A-Za-z-_.//]+)/$', details, name='pages-details-by-slug')
 else:
@@ -12,10 +11,8 @@ else:
 
 urlpatterns = [
     # Public pages
-    re_path(r'^example/',
-        include('cms.test_utils.project.sampleapp.urls_example', namespace="example1")),
-    re_path(r'^example2/',
-        include('cms.test_utils.project.sampleapp.urls_example', namespace="example2")),
+    re_path(r'^example/', include('cms.test_utils.project.sampleapp.urls_example', namespace="example1")),
+    re_path(r'^example2/', include('cms.test_utils.project.sampleapp.urls_example', namespace="example2")),
     re_path(r'^$', details, {'slug': ''}, name='pages-root'),
     reg,
 ]

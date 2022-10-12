@@ -99,4 +99,5 @@ class ExtensionPool():
                 extensions.extend(list(extension.objects.all()))
         return extensions
 
+
 extension_pool = ExtensionPool()
