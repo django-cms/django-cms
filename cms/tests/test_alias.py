@@ -401,4 +401,5 @@ class AliasTestCase(TransactionCMSTestCase):
         context['placeholder'] = ph_en
         template = Template('{% load cms_tags %}{% render_extra_menu_items placeholder %}')
         output = template.render(context)
-        self.assertEqual(len(output), 200)
+        self.assertIn('href="/en/admin/cms/page/plugin/alias_plugin/create_alias/"', output)
+        self.assertIn("Create Alias", output)
