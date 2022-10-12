@@ -1,5 +1,6 @@
 import copy
 import json
+import re
 import sys
 import uuid
 from collections import namedtuple
@@ -1401,8 +1402,12 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         """
         site = self.get_site(request)
         pages = self.get_queryset(request)
-        node_id = request.GET.get('nodeId')
-        open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
+        node_id = re.sub(r'[^\d]', '', request.GET.get('nodeId', '')) or None
+        open_nodes = list(map(
+            int,
+            [re.sub(r'[^\d]', '', node) for node in
+                request.GET.getlist('openNodes[]')]
+            ))
 
         if node_id:
             page = get_object_or_404(pages, node_id=int(node_id))
