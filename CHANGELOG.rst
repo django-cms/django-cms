@@ -12,6 +12,7 @@ unreleased
 * Fix bug where switching color scheme affects other settings
 * Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 * Fixed permission denied error after page create (#6866)
+* Add deprecation warning to ``cms.utils.i18n.get_current_language()`` (#6720)
 
 3.11.0 (2022-08-02)
 ===================

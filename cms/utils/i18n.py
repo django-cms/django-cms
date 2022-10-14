@@ -1,3 +1,4 @@
+import warnings
 from contextlib import contextmanager
 
 from django.conf import settings
@@ -59,13 +60,13 @@ def get_language_code(language_code, site_id=None):
 
     languages = get_language_list(site_id)
 
-    if language_code in languages: # direct hit
+    if language_code in languages:  # direct hit
         return language_code
 
     for lang in languages:
-        if language_code.split('-')[0] == lang: # base language hit
+        if language_code.split('-')[0] == lang:  # base language hit
             return lang
-        if lang.split('-')[0] == language_code: # base language hit
+        if lang.split('-')[0] == language_code:  # base language hit
             return lang
     return language_code
 
@@ -77,6 +78,10 @@ def get_current_language():
     It's a replacement for Django's translation.get_language() to make sure the LANGUAGE_CODE will be found in LANGUAGES.
     Overcomes this issue: https://code.djangoproject.com/ticket/9340
     """
+    warnings.warn(
+        "get_current_language() is deprecated; use django.utils.translation.get_language().",
+        warnings.DeprecationWarning
+    )
     language_code = translation.get_language()
     return get_language_code(language_code)
 
