@@ -377,7 +377,7 @@ Edit end-point
 --------------
 The edit endpoint replaces what was the `?edit` feature in django-cms 3.x
 
-To generate an edit url you can create reuse the following snippet, replacing my_page_content_instance with an instance of PageContent::
+To generate an edit url you can reuse the following snippet, replacing my_page_content_instance with an instance of PageContent::
 
     from cms.toolbar.utils import get_object_edit_url
 
