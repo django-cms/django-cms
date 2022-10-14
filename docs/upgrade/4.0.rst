@@ -6,8 +6,8 @@
 
 This release of django CMS is a complete rewrite of the core, hugely simplyfying what django-cms does
 out of the box. The main reasons for the changes:
-    - Limitations with publishing, where only 2 versions can ever exist
-    - Too many "opinions" of how parts of the CMS should work baked in
+- Limitations with publishing, where only 2 versions can ever exist
+- Too many "opinions" of how parts of the CMS should work baked in
 
 .. warning:: Upgrading from previous versions
 
