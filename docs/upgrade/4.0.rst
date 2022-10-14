@@ -12,7 +12,7 @@ out of the box. The main reasons for the changes:
 .. warning:: Upgrading from previous versions
 
     4.0.0 introduces some changes that **require** action if you are upgrading
-    from a previous version. Please read :ref:`upgrade-guide-4.0.0` for a step-by-step guide to the
+    from a previous version. Please read below for a step-by-step guide to the
     process of upgrading from 3.5+ to 4.0.0
 
 The core principles of django-cms 4.0+
@@ -127,24 +127,24 @@ The model structure was changed to allow flexibility in the core of the cms, thi
 Data model of CMS < 4
 ^^^^^^^^^^^^^^^^^^^^^
 - Page (x1 for Draft and x1 for Live)
-  - Title Language: "EN"
-  - Title Language: "DE"
-  - Placeholder Slot: "header"
-  - Placeholder Slot: "contents"
-    - Plugin 1 Language "EN"
-    - Plugin 2 Language "DE"
+    - Title Language: "EN"
+    - Title Language: "DE"
+    - Placeholder Slot: "header"
+    - Placeholder Slot: "contents"
+        - Plugin 1 Language "EN"
+        - Plugin 2 Language "DE"
 
 Data model of CMS >= 4
 ^^^^^^^^^^^^^^^^^^^^^^
 - Page
-  - PageContents Language: "EN"
-    - Placeholder Slot: "header"
-    - Placeholder Slot: "contents"
-      - Plugin 1 Language "EN"
-  - PageContents Language: "DE"
-    - Placeholder Slot: "header"
-    - Placeholder Slot: "contents"
-      - Plugin 2 Language "DE"
+    - PageContents Language: "EN"
+        - Placeholder Slot: "header"
+        - Placeholder Slot: "contents"
+            - Plugin 1 Language "EN"
+    - PageContents Language: "DE"
+        - Placeholder Slot: "header"
+        - Placeholder Slot: "contents"
+            - Plugin 2 Language "DE"
 
 Page, PageContents (Title) and Placeholder relation refactor: https://github.com/django-cms/django-cms/commit /37082d074a4e37a9d2114c4236d526529daa1219
 
