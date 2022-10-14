@@ -1,6 +1,4 @@
-from django.http import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.middleware.csrf import get_token
 from django.urls import re_path
 from django.utils.translation import get_language, gettext, gettext_lazy as _
@@ -36,7 +34,7 @@ class AliasPlugin(CMSPluginBase):
 
     @classmethod
     def get_render_queryset(cls):
-        queryset = super(AliasPlugin, cls).get_render_queryset()
+        queryset = super().get_render_queryset()
         return queryset.select_related('plugin', 'alias_placeholder')
 
     @classmethod
@@ -66,7 +64,7 @@ class AliasPlugin(CMSPluginBase):
 
     @classmethod
     def get_empty_change_form_text(cls, obj=None):
-        original = super(AliasPlugin, cls).get_empty_change_form_text(obj=obj)
+        original = super().get_empty_change_form_text(obj=obj)
 
         if not obj:
             return original

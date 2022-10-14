@@ -1,7 +1,9 @@
 import datetime
 import json
 import sys
+from unittest import skipUnless
 
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -28,12 +30,9 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_ADVANCED_CHANGE,
-    URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_MOVE, CMSTestCase,
+    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_MOVE, CMSTestCase,
 )
-from cms.test_utils.util.context_managers import (
-    LanguageOverride, UserLoginContext,
-)
+from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
@@ -1913,6 +1912,75 @@ class PageTest(PageTestBase):
             self.assertEqual(response.status_code, 302)
             self.assertEqual(placeholder.get_plugins('en').count(), 0)
             self.assertEqual(page.reload().get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
+
+
+    @skipUnless(
+        'sqlite' in settings.DATABASES.get('default').get('ENGINE').lower(),
+        'This test only works in SQLITE',
+    )
+    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+    def test_page_tree_render_localized_page_ids(self):
+        from django.db import connection
+
+        # Artificially increment the sequence number on cms_page and cms_treenode (below)
+        # to be > 1000, to trigger a THOUSAND_SEPARATOR localization in the
+        # rendered template
+
+        admin_user = self.get_superuser()
+        root = create_page(
+            "home", "nav_playground.html", "fr", created_by=admin_user, published=True
+        )
+        with connection.cursor() as c:
+            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_page"')
+            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_treenode"')
+
+        page = create_page(
+            "child-page",
+            "nav_playground.html",
+            "fr",
+            created_by=admin_user,
+            published=True,
+            parent=root,
+            slug="child-page",
+        )
+
+        sub_page = create_page(
+            "grand-child-page",
+            "nav_playground.html",
+            "fr",
+            created_by=admin_user,
+            published=True,
+            parent=page,
+            slug="grand-child-page",
+        )
+        self.assertTrue(page.id > 1000)
+        self.assertTrue(sub_page.id > 1000)
+
+        self.assertTrue(page.node.id > 1000)
+        self.assertTrue(sub_page.node.id > 1000)
+
+        # make sure the rendered page tree doesn't
+        # localize page or node ids
+        with self.login_user_context(admin_user):
+            data = {'openNodes[]': [root.node.pk, page.node.pk], 'language': 'fr'}
+
+            endpoint = self.get_admin_url(Page, 'get_tree')
+            response = self.client.get(endpoint, data=data)
+
+            self.assertEqual(response.status_code, 200)
+            content = force_str(response.content)
+            self.assertFalse(f'parent_node={page.node.pk:,}"' in content)
+            self.assertTrue(f'parent_node={page.node.pk}"' in content)
+
+        # if per chance we have localized node ids in our localstorage,
+        # make sure DjangoCMS doesn't choke on them when they are passed
+        # into the view
+        with self.login_user_context(admin_user):
+            data = {'openNodes[]': [root.node.pk, f'{page.node.pk:,}'], 'language': 'fr'}
+            endpoint = self.get_admin_url(Page, 'get_tree')
+            response = self.client.get(endpoint, data=data)
+            self.assertEqual(response.status_code, 200)
+
 
 
 class PermissionsTestCase(PageTestBase):
