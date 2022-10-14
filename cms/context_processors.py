@@ -1,9 +1,9 @@
+from functools import lru_cache
+
 from django.utils.functional import lazy
 
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_template_from_request
-
-from functools import lru_cache
 
 
 def cms_settings(request):

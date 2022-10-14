@@ -3,7 +3,6 @@ import json
 from django.http import HttpResponse
 from django.utils.encoding import smart_str
 
-
 NOT_FOUND_RESPONSE = "NotFound"
 
 

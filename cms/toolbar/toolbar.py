@@ -1,33 +1,30 @@
-from collections import OrderedDict
 import functools
 import operator
-
-from cms import __version__
-from cms.constants import LEFT, REFRESH_PAGE
-from cms.forms.login import CMSToolbarLoginForm
-from cms.models import UserSettings, Placeholder
-from cms.templates import TemplatesCache
-from cms.toolbar.items import Menu, ToolbarAPIMixin, ButtonList
-from cms.toolbar_pool import toolbar_pool
-from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_structure_url,
-    get_object_preview_url,
-)
-from cms.utils import get_language_from_request
-from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
-from cms.utils.compat.dj import installed_apps
-from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_site_language_from_request
+from collections import OrderedDict
 
 from classytags.utils import flatten_context
-
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
 from django.urls import Resolver404, resolve
 from django.utils.functional import cached_property
 from django.utils.translation import override as force_language
+
+from cms import __version__
+from cms.constants import LEFT, REFRESH_PAGE
+from cms.forms.login import CMSToolbarLoginForm
+from cms.models import Placeholder, UserSettings
+from cms.templates import TemplatesCache
+from cms.toolbar.items import ButtonList, Menu, ToolbarAPIMixin
+from cms.toolbar.utils import (
+    get_object_edit_url, get_object_preview_url, get_object_structure_url,
+)
+from cms.toolbar_pool import toolbar_pool
+from cms.utils import get_language_from_request
+from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
+from cms.utils.compat.dj import installed_apps
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_site_language_from_request
 
 
 class BaseToolbar(ToolbarAPIMixin):
@@ -209,8 +206,8 @@ class CMSToolbar(BaseToolbar):
 
         if self.show_toolbar:
             edit_mode = (
-                self._resolver_match and
-                self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+                self._resolver_match
+                and self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
             )
             if enable_toolbar in self.request.GET or edit_mode:
                 self.show_toolbar = True
@@ -316,18 +313,22 @@ class CMSToolbar(BaseToolbar):
         return item
 
     def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
-                   side=LEFT, position=None, on_close=REFRESH_PAGE):
+                         side=LEFT, position=None, on_close=REFRESH_PAGE):
         self.populate()
         item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
-        item.add_modal_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes, on_close=on_close)
+        item.add_modal_button(
+            name, url, active=active, disabled=disabled, extra_classes=extra_classes, on_close=on_close
+        )
         self.add_item(item, position=position)
         return item
 
-    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
-                   side=LEFT, position=None, on_close=None):
+    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None,
+                             extra_wrapper_classes=None, side=LEFT, position=None, on_close=None):
         self.populate()
         item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
-        item.add_sideframe_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes, on_close=on_close)
+        item.add_sideframe_button(
+            name, url, active=active, disabled=disabled, extra_classes=extra_classes, on_close=on_close
+        )
         self.add_item(item, position=position)
         return item
 

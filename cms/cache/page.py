@@ -1,13 +1,14 @@
 import hashlib
-
 from datetime import timedelta
 
 from django.conf import settings
-from django.utils.cache import add_never_cache_headers, patch_response_headers, patch_vary_headers
+from django.utils.cache import (
+    add_never_cache_headers, patch_response_headers, patch_vary_headers,
+)
 from django.utils.encoding import iri_to_uri
 from django.utils.timezone import now
 
-from cms.cache import _get_cache_version, _set_cache_version, _get_cache_key
+from cms.cache import _get_cache_key, _get_cache_version, _set_cache_version
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.compat.response import get_response_headers
@@ -16,7 +17,7 @@ from cms.utils.helpers import get_timezone_name
 
 
 def _page_cache_key(request):
-    #sha1 key of current path
+    # sha1 key of current path
     cache_key = "%s:%d:%s" % (
         get_cms_setting("CACHE_PREFIX"),
         settings.SITE_ID,

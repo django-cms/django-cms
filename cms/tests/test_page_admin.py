@@ -16,7 +16,7 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.admin.pageadmin import PageContentAdmin
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.middleware.user import CurrentUserMiddleware
@@ -24,13 +24,13 @@ from cms.models import PageContent
 from cms.models.pagemodel import Page, PageUrl
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
-from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_MOVE,
-)
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
-from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
-from cms.utils.conf import get_cms_setting
+from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
+from cms.test_utils.util.context_managers import (
+    LanguageOverride, UserLoginContext,
+)
 from cms.utils.compat.dj import installed_apps
+from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -185,8 +185,8 @@ class PageTest(PageTestBase):
         with the request language pointing to a language
         not configured for the current site
         """
-        from django.test import Client
         from django.contrib.auth import get_user_model
+        from django.test import Client
 
         client = Client()
         superuser = self.get_superuser()
@@ -447,7 +447,7 @@ class PageTest(PageTestBase):
             change_user = str(superuser)
             # some databases don't store microseconds, so move the start flag
             # back by 1 second
-            before_change = tz_now()+datetime.timedelta(seconds=-1)
+            before_change = tz_now() + datetime.timedelta(seconds=-1)
             self.client.post(self.get_page_add_uri('en'), page_data)
             page = Page.objects.get(urls__slug=page_data['slug'])
             self.client.post(self.get_page_change_uri('en', page), page_data)
@@ -867,14 +867,19 @@ class PageTest(PageTestBase):
             # check page2 path and url
             page2 = Page.objects.get(pk=page2.pk)
             self.assertEqual(page2.get_path('en'), page_data1['slug'] + "/" + page_data2['slug'])
-            self.assertEqual(page2.get_absolute_url(),
-                             self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/")
+            self.assertEqual(
+                page2.get_absolute_url(),
+                self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/"
+            )
             # check page3 path and url
             page3 = Page.objects.get(pk=page3.pk)
-            self.assertEqual(page3.get_path('en'), page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3['slug'])
-            self.assertEqual(page3.get_absolute_url(),
-                             self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3[
-                                 'slug'] + "/")
+            self.assertEqual(
+                page3.get_path('en'), page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3['slug']
+            )
+            self.assertEqual(
+                page3.get_absolute_url(),
+                self.get_pages_root() + page_data1['slug'] + "/" + page_data2['slug'] + "/" + page_data3['slug'] + "/"
+            )
 
             # Remove home page
             home.delete()
@@ -1337,7 +1342,7 @@ class PageTest(PageTestBase):
                 self.assertEqual(response.status_code, 200)
                 parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
                 content = force_str(parsed)
-                self.assertIn(u'(Shift-Klick für erweiterte Einstellungen)', content)
+                self.assertIn('(Shift-Klick für erweiterte Einstellungen)', content)
 
     def test_page_get_tree_endpoint_flat(self):
         superuser = self.get_superuser()
@@ -1429,15 +1434,15 @@ class PageTest(PageTestBase):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
-                response = self.client.post(endpoint, data) # first
+                response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_2, position=2, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_2)
-                response = self.client.post(endpoint, data) # second
+                response = self.client.post(endpoint, data)  # second
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_3, position=3, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_3)
-                response = self.client.post(endpoint, data) # third
+                response = self.client.post(endpoint, data)  # third
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content, b"This placeholder already has the maximum number of plugins (2).")
 
@@ -1457,11 +1462,11 @@ class PageTest(PageTestBase):
             with self.settings(CMS_PLACEHOLDER_CONF=self.placeholderconf):
                 data = self._get_move_data(plugin_1, position=1, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
-                response = self.client.post(endpoint, data) # first
+                response = self.client.post(endpoint, data)  # first
                 self.assertEqual(response.status_code, 200)
                 data = self._get_move_data(plugin_2, position=2, placeholder=target_placeholder)
                 endpoint = self.get_move_plugin_uri(plugin_1)
-                response = self.client.post(endpoint, data) # second
+                response = self.client.post(endpoint, data)  # second
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
@@ -2971,6 +2976,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             response = self.client.post(endpoint, {'test': 0})
             self.assertEqual(response.status_code, 403)
             self.assertEqual(placeholder.get_plugins('en').count(), 2)
+
 
 @override_settings(CMS_PERMISSION=True)
 class PermissionsOnPageTest(PermissionsTestCase):
