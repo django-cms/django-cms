@@ -4,6 +4,7 @@ from classytags.helpers import InclusionTag
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
+from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
@@ -82,17 +83,44 @@ def get_page_display_name(cms_page):
 
 @register.simple_tag(takes_context=True)
 def tree_publish_row(context, page, language):
-    cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
-    text = _("no content")
+    def get_dirtyness_indicator(context, page, language):
+        """Inner function allowing for djangocms-versioning monkey patching"""
+        cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
+        text = _("no content")  # "Empty"?
+        if page.title_cache.get(language):
+            cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
+            text = _("has contents")  # "Public content"?
+        return cls, text
 
-    if page.title_cache.get(language):
-        cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
-        text = _("has contents")
+    def get_dirtyness_legend(context, page, language):
+        """Inner function allowing for djangocms-versioning monkey patching"""
+        return (
+            ("cms-pagetree-node-state cms-pagetree-node-state-published", _("has contents")),
+            ("cms-pagetree-node-state cms-pagetree-node-state-empty", _("no content")),
+        )
+    if page is None:  # Retrieve all for legend
+        context["dirty_legend_items"] = get_dirtyness_legend(context, page, language)
+        return render_to_string("admin/cms/page/tree/dirty_legend.html", context.flatten())
 
+    cls, text = get_dirtyness_indicator(context, page, language)
     return mark_safe(
         '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
         'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
 
+@register.simple_tag(takes_context=True)
+def tree_publish_row_menu(context, page, language):
+    """New template tag that renders a pontential menu to be offered with the
+    dirty indicators. The core will not display a menu."""
+    def get_publish_menu(context, page, language):
+        """Inner function allowing for djangocms-versioning monkey patching.
+        Core does not have a publishing menu."""
+        return "", []
+
+    template, publish_menu_items = get_publish_menu(context, page, language)
+    if template:
+        context["publish_menu_items"] = publish_menu_items
+        return render_to_string(template, context.flatten())
+    return ''
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')
 def render_filter_field(request, field):
