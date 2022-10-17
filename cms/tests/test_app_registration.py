@@ -1,14 +1,14 @@
 from importlib import import_module
-from mock import patch, Mock
 
-from django.test import override_settings
-from django.apps import apps, AppConfig
+from django.apps import AppConfig, apps
 from django.core.exceptions import ImproperlyConfigured
+from django.test import override_settings
+from mock import Mock, patch
 
 from cms import app_registration
 from cms.apps import CMSConfig
-from cms.utils import setup
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils import setup
 
 
 class AutodiscoverTestCase(CMSTestCase):

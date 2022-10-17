@@ -1,4 +1,4 @@
-from cms.app_base import CMSAppExtension, CMSAppConfig
+from cms.app_base import CMSAppConfig, CMSAppExtension
 
 
 class CMSFeatureConfig(CMSAppExtension):

@@ -81,19 +81,22 @@ class UserChangeForm(forms.ModelForm):
     """
     email = forms.EmailField(
         label='Email',
-        help_text = "Required.  Standard format email address.",
+        help_text="Required.  Standard format email address.",
     )
 
-    password = ReadOnlyPasswordHashField(label="Password",
-        help_text="Raw passwords are not stored, so there is no way to see "
-                    "this user's password, but you can change the password "
-                    "using <a href=\"password/\">this form</a>.")
+    password = ReadOnlyPasswordHashField(
+        label="Password",
+        help_text="Raw passwords are not stored, so there is no way to see this user's password, "
+                  "but you can change the password using <a href=\"password/\">this form</a>."
+    )
 
     class Meta:
         model = EmailUser
-        fields = ('email', 'password', 'first_name', 'last_name', 'is_active',
+        fields = (
+            'email', 'password', 'first_name', 'last_name', 'is_active',
             'is_staff', 'is_superuser', 'groups', 'user_permissions', 'last_login',
-            'date_joined')
+            'date_joined'
+        )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

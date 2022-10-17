@@ -1,6 +1,6 @@
 import datetime
-import os.path
 import functools
+import os.path
 from unittest import skipIf
 
 from django.conf import settings
@@ -14,7 +14,7 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, PageContent
 from cms.models.placeholdermodel import Placeholder
@@ -23,9 +23,7 @@ from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import (
-    get_available_slug,
-    get_current_site,
-    get_page_from_request,
+    get_available_slug, get_current_site, get_page_from_request,
 )
 
 
@@ -489,7 +487,6 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
 
-
     def test_delete_with_plugins(self):
         """
         Check that plugins and placeholders get correctly deleted when we delete
@@ -543,25 +540,18 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_get_page_without_final_slash(self):
         root = create_page("root", "nav_playground.html", "en", slug="root")
-        create_page("page", "nav_playground.html", "en", slug="page",
-                           parent=root)
+        create_page("page", "nav_playground.html", "en", slug="page", parent=root)
         request = self.get_request('/en/root/page')
         found_page = get_page_from_request(request)
         self.assertIsNotNone(found_page)
 
     def test_page_urls(self):
         page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en')
-
-        page2 = create_page('test page 2', 'nav_playground.html', 'en',
-                            parent=page1)
-
-        page3 = create_page('test page 3', 'nav_playground.html', 'en',
-                            parent=page2)
-
+        page2 = create_page('test page 2', 'nav_playground.html', 'en', parent=page1)
+        page3 = create_page('test page 3', 'nav_playground.html', 'en', parent=page2)
         page4 = create_page('test page 4', 'nav_playground.html', 'en')
+        page5 = create_page('test page 5', 'nav_playground.html', 'en', parent=page4)
 
-        page5 = create_page('test page 5', 'nav_playground.html', 'en',
-                            parent=page4)
         page1 = page1.reload()
         page2 = page2.reload()
         page3 = page3.reload()
@@ -571,31 +561,22 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(page2.node.parent_id, page1.node.pk)
         self.assertEqual(page5.node.parent_id, page4.node.pk)
 
-
-        self.assertEqual(page1.get_absolute_url(),
-                         self.get_pages_root() + '')
-        self.assertEqual(page2.get_absolute_url(),
-                         self.get_pages_root() + 'test-page-2/')
-        self.assertEqual(page3.get_absolute_url(),
-                         self.get_pages_root() + 'test-page-2/test-page-3/')
-        self.assertEqual(page4.get_absolute_url(),
-                         self.get_pages_root() + 'test-page-4/')
-        self.assertEqual(page5.get_absolute_url(),
-                         self.get_pages_root() + 'test-page-4/test-page-5/')
+        self.assertEqual(page1.get_absolute_url(), self.get_pages_root() + '')
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + 'test-page-2/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'test-page-2/test-page-3/')
+        self.assertEqual(page4.get_absolute_url(), self.get_pages_root() + 'test-page-4/')
+        self.assertEqual(page5.get_absolute_url(), self.get_pages_root() + 'test-page-4/test-page-5/')
         page3 = self.move_page(page3, page1)
-        self.assertEqual(page3.get_absolute_url(),
-                         self.get_pages_root() + 'test-page-3/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'test-page-3/')
         page3 = page3.reload()
         page2 = page2.reload()
         page5 = page5.reload()
         page5 = self.move_page(page5, page2)
-        self.assertEqual(page5.get_absolute_url(),
-                         self.get_pages_root() + 'test-page-2/test-page-5/')
+        self.assertEqual(page5.get_absolute_url(), self.get_pages_root() + 'test-page-2/test-page-5/')
         page3 = page3.reload()
         page4 = page4.reload()
         page3 = self.move_page(page3, page4)
-        self.assertEqual(page3.get_absolute_url(),
-                         self.get_pages_root() + 'test-page-4/test-page-3/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'test-page-4/test-page-3/')
 
     def test_page_and_title_repr(self):
         non_saved_page = Page()
@@ -618,17 +599,15 @@ class PagesTestCase(TransactionCMSTestCase):
 
         page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en')
 
-        page2 = create_page('test page 2', 'nav_playground.html', 'en',
-                            parent=page1)
+        page2 = create_page('test page 2', 'nav_playground.html', 'en', parent=page1)
 
-        page3 = create_page('test page 3', 'nav_playground.html', 'en',
-                            parent=page2, overwrite_url='i-want-another-url')
+        page3 = create_page(
+            'test page 3', 'nav_playground.html', 'en', parent=page2, overwrite_url='i-want-another-url'
+        )
         superuser = self.get_superuser()
 
-        self.assertEqual(page2.get_absolute_url(),
-                         self.get_pages_root() + 'test-page-2/')
-        self.assertEqual(page3.get_absolute_url(),
-                         self.get_pages_root() + 'i-want-another-url/')
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + 'test-page-2/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'i-want-another-url/')
 
         endpoint = self.get_page_change_uri('en', page2)
 
@@ -640,16 +619,13 @@ class PagesTestCase(TransactionCMSTestCase):
         page2 = Page.objects.get(pk=page2.pk)
         page3 = Page.objects.get(pk=page3.pk)
 
-        self.assertEqual(page2.get_absolute_url(),
-                         self.get_pages_root() + 'page-test-2/')
-        self.assertEqual(page3.get_absolute_url(),
-                         self.get_pages_root() + 'i-want-another-url/')
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + 'page-test-2/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'i-want-another-url/')
 
         # tests a bug found in 2.2 where saving an ancestor page
         # wiped out the overwrite_url for child pages
         page2.save()
-        self.assertEqual(page3.get_absolute_url(),
-                         self.get_pages_root() + 'i-want-another-url/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'i-want-another-url/')
 
     def test_slug_url_overwrite_clash(self):
         """ Tests if a URL-Override clashes with a normal page url
@@ -897,12 +873,15 @@ class PageTreeTests(CMSTestCase):
         create_page('grandpa', 'nav_playground.html', 'en', slug='home')
         parent = create_page('parent', 'nav_playground.html', 'en', slug='parent')
         child = create_page('child', 'nav_playground.html', 'en', slug='child', parent=parent)
-        grandchild_1 = create_page('grandchild-1', 'nav_playground.html', 'en', slug='grandchild-1',
-                                 parent=child)
-        grandchild_2 = create_page('grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2',
-                                 parent=child.reload())
-        grandchild_3 = create_page('grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3',
-                                 parent=child.reload())
+        grandchild_1 = create_page(
+            'grandchild-1', 'nav_playground.html', 'en', slug='grandchild-1', parent=child
+        )
+        grandchild_2 = create_page(
+            'grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2', parent=child.reload()
+        )
+        grandchild_3 = create_page(
+            'grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3', parent=child.reload()
+        )
         endpoint = self.get_page_change_uri('en', parent)
 
         with self.login_user_context(superuser):

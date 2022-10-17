@@ -99,8 +99,7 @@ class ListPluginsCommand(SubcommandsCommand):
                 self.stdout.write('    unsaved instance(s) : %s  \n' % unsaved_instances)
 
             else:
-                self.stdout.write('  model      : %s.%s  \n' %
-                    (plugin_model.__module__, plugin_model.__name__))
+                self.stdout.write('  model      : %s.%s  \n' % (plugin_model.__module__, plugin_model.__name__))
                 if unsaved_instances:
                     self.stdout.write(self.style.ERROR('  ERROR      : %s unsaved instance(s) \n' % unsaved_instances))
 

@@ -1,5 +1,4 @@
 import warnings
-
 from datetime import datetime, timedelta
 
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -11,17 +10,12 @@ from django.utils.translation import gettext_lazy as _
 
 from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import clear_placeholder_cache
+from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.exceptions import LanguageError
 from cms.models.managers import PlaceholderManager
-from cms.utils import get_site_id
+from cms.utils import get_language_from_request, permissions
+from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_language_object
-from cms.constants import (
-    EXPIRE_NOW,
-    MAX_EXPIRATION_TTL,
-)
-from cms.utils import get_language_from_request
-from cms.utils import permissions
-from cms.utils.conf import get_cms_setting
 
 
 class Placeholder(models.Model):
@@ -223,7 +217,7 @@ class Placeholder(models.Model):
                 try:
                     if field.exists():
                         self._attached_fields_cache.append(rel.field)
-                except:
+                except:  # NOQA
                     pass
         return self._attached_fields_cache
 
@@ -672,7 +666,9 @@ class Placeholder(models.Model):
         ).update(position=models.F('position') + offset)
 
     def _recalculate_plugin_positions(self, language):
-        from cms.models.pluginmodel import CMSPlugin, _get_database_cursor, _get_database_vendor
+        from cms.models.pluginmodel import (
+            CMSPlugin, _get_database_cursor, _get_database_vendor,
+        )
 
         cursor = _get_database_cursor('write')
         db_vendor = _get_database_vendor('write')

@@ -3,7 +3,6 @@ from django.templatetags.static import StaticNode
 
 from cms.utils.urlutils import static_with_version
 
-
 register = template.Library()
 
 

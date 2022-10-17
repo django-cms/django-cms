@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.http import QueryDict
 
-from cms.api import create_page, add_plugin
+from cms.api import add_plugin, create_page
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.testcases import CMSTestCase
 
@@ -63,7 +63,7 @@ class SecurityTests(CMSTestCase):
             'plugin_id': plugin.pk,
             'body': 'newbody',
         }
-        self.assertEqual(plugin.body, 'body') # check the body is as expected.
+        self.assertEqual(plugin.body, 'body')  # check the body is as expected.
         # log the user out, try to edit the plugin
         self.client.logout()
         endpoint = self.get_change_plugin_uri(plugin)
