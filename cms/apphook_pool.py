@@ -32,17 +32,19 @@ class ApphookPool():
 
         if app.__name__ in self.apps:
             raise AppAlreadyRegistered(
-                'A CMS application %r is already registered' % app.__name__)
+                'A CMS application %r is already registered' % app.__name__
+            )
 
         if not issubclass(app, CMSApp):
             raise ImproperlyConfigured(
-                'CMS application must inherit from cms.app_base.CMSApp, '
-                'but %r does not' % app.__name__)
+                'CMS application must inherit from cms.app_base.CMSApp, but %r does not' % app.__name__
+            )
 
         if not hasattr(app, 'menus') and hasattr(app, 'menu'):
-            warnings.warn("You define a 'menu' attribute on CMS application "
-                "%r, but the 'menus' attribute is empty, "
-                "did you make a typo?" % app.__name__)
+            warnings.warn(
+                "You define a 'menu' attribute on CMS application %r, but the 'menus' attribute is empty, "
+                "did you make a typo?" % app.__name__
+            )
 
         self.apps[app.__name__] = app()
         return app

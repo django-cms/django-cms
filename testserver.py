@@ -6,6 +6,7 @@ import sys
 def noop_gettext(s):
     return s
 
+
 permission = True
 cms_toolbar_edit_on = 'edit'
 
@@ -34,21 +35,21 @@ class DisableMigrations(object):
 
 
 HELPER_SETTINGS = dict(
-    ALLOWED_HOSTS=[u'0.0.0.0', u'localhost'],
+    ALLOWED_HOSTS=['0.0.0.0', 'localhost'],
     CMS_PERMISSION=permission,
     LANGUAGES=(
-        ('en', u'English'),
-        ('de', u'Deutsch'),
-        ('it', u'Italiano'),
-        ('zh-cn', u'Chinese (Simplified)'),
+        ('en', 'English'),
+        ('de', 'Deutsch'),
+        ('it', 'Italiano'),
+        ('zh-cn', 'Chinese (Simplified)'),
     ),
     LANGUAGE_CODE='en',
     PARLER_LANGUAGES={
         1: (
-            {'code': 'en', 'fallbacks': ['de',]},
-            {'code': 'de', 'fallbacks': ['en',]},
-            {'code': 'it', 'fallbacks': ['en',]},
-            {'code': 'zh-cn', 'fallbacks': ['en',]},
+            {'code': 'en', 'fallbacks': ['de', ]},
+            {'code': 'de', 'fallbacks': ['en', ]},
+            {'code': 'it', 'fallbacks': ['en', ]},
+            {'code': 'zh-cn', 'fallbacks': ['en', ]},
         ),
         'default': {
             'fallback': 'en',
@@ -69,26 +70,26 @@ HELPER_SETTINGS = dict(
             {
                 'code': 'en',
                 'name': gettext('English'),
-                'fallbacks': ['de',],
+                'fallbacks': ['de', ],
             },
             {
                 'code': 'de',
                 'name': gettext('German'),
-                'fallbacks': ['en',],
+                'fallbacks': ['en', ],
             },
             {
                 'code': 'it',
                 'name': gettext('Italian'),
-                'fallbacks': ['en',],
+                'fallbacks': ['en', ],
             },
             {
                 'code': 'zh-cn',
                 'name': gettext('Chinese Simplified'),
-                'fallbacks': ['en',]
+                'fallbacks': ['en', ]
             },
         ],
         'default': {
-            'fallbacks': ['en', 'de',],
+            'fallbacks': ['en', 'de', ],
             'redirect_on_fallback': False,
             'public': True,
             'hide_untranslated': False,
@@ -155,8 +156,10 @@ def _helper_patch(*args, **kwargs):
     from app_helper import utils
 
     call_command('migrate', run_syncdb=True)
-    utils.create_user('normal', 'normal@normal.normal', 'normal', is_staff=True, base_cms_permissions=True,
-            permissions=['view_page'])
+    utils.create_user(
+        'normal', 'normal@normal.normal', 'normal', is_staff=True, base_cms_permissions=True,
+        permissions=['view_page']
+    )
 
 
 def run():

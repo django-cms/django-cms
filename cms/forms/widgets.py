@@ -6,9 +6,9 @@ from django.utils.encoding import force_str
 from django.utils.html import escape, escapejs
 from django.utils.safestring import mark_safe
 
-from cms.utils.urlutils import admin_reverse, static_with_version
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.utils import get_page_choices, get_site_choices
 from cms.models import Page, PageUser
+from cms.utils.urlutils import admin_reverse, static_with_version
 
 
 class PageSelectWidget(MultiWidget):
@@ -39,7 +39,7 @@ class PageSelectWidget(MultiWidget):
             page = Page.objects.select_related('node').get(pk=value)
             return [page.node.site_id, page.pk, page.pk]
         site = Site.objects.get_current()
-        return [site.pk,None,None]
+        return [site.pk, None, None]
 
     def _has_changed(self, initial, data):
         # THIS IS A COPY OF django.forms.widgets.Widget._has_changed()
@@ -49,14 +49,14 @@ class PageSelectWidget(MultiWidget):
         Return True if data differs from initial.
         """
         # For purposes of seeing whether something has changed, None is
-        # the same as an empty string, if the data or inital value we get
-        # is None, replace it w/ u''.
-        if data is None or (len(data)>=2 and data[1] in [None,'']):
-            data_value = u''
+        # the same as an empty string, if the data or initial value we get
+        # is None, replace it w/ ''.
+        if data is None or (len(data) >= 2 and data[1] in [None, '']):
+            data_value = ''
         else:
             data_value = data
         if initial is None:
-            initial_value = u''
+            initial_value = ''
         else:
             initial_value = initial
         if force_str(initial_value) != force_str(data_value):
@@ -68,9 +68,10 @@ class PageSelectWidget(MultiWidget):
         page_choices = get_page_choices()
         self.site_choices = site_choices
         self.choices = page_choices
-        self.widgets = (Select(choices=site_choices ),
-                   Select(choices=[('', '----')]),
-                   Select(choices=self.choices, attrs={'style': "display:none;"} ),
+        self.widgets = (
+            Select(choices=site_choices),
+            Select(choices=[('', '----')]),
+            Select(choices=self.choices, attrs={'style': "display:none;"}),
         )
 
     def _build_script(self, name, value, attrs={}):
@@ -82,9 +83,7 @@ class PageSelectWidget(MultiWidget):
                 CMS.Widgets._pageSelectWidgets.push({
                     name: '%(name)s'
                 });
-            </script>""" % {
-                'name': name
-            }
+            </script>""" % {'name': name}
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
@@ -93,7 +92,7 @@ class PageSelectWidget(MultiWidget):
         return context
 
     def format_output(self, rendered_widgets):
-        return u' '.join(rendered_widgets)
+        return ' '.join(rendered_widgets)
 
 
 class PageSmartLinkWidget(TextInput):
@@ -157,13 +156,17 @@ class UserSelectAdminWidget(Select):
     """
     def render(self, name, value, attrs=None, choices=(), renderer=None):
         output = [super().render(name, value, attrs, renderer=renderer)]
-        if hasattr(self, 'user') and (self.user.is_superuser or \
-            self.user.has_perm(PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))):
+        if hasattr(self, 'user') and (
+            self.user.is_superuser or self.user.has_perm(
+                PageUser._meta.app_label + '.' + get_permission_codename('add', PageUser._meta))
+        ):
             # append + icon
             add_url = admin_reverse('cms_pageuser_add')
-            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
-                    (add_url, name))
-        return mark_safe(u''.join(output))
+            output.append(
+                '<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' %
+                (add_url, name)
+            )
+        return mark_safe(''.join(output))
 
 
 class AppHookSelect(Select):

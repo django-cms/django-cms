@@ -1,5 +1,3 @@
-from mock import patch, Mock
-
 from django import forms
 from django.apps import apps
 from django.apps.registry import Apps
@@ -10,6 +8,7 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
+from mock import Mock, patch
 
 from cms import app_registration
 from cms.api import create_page
@@ -23,15 +22,12 @@ from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.setup import setup_cms_apps
-from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
+from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
 from cms.wizards.helpers import get_entries, get_entry
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.wizard_pool import (
-    AlreadyRegisteredException,
-    entry_choices,
-    wizard_pool,
+    AlreadyRegisteredException, entry_choices, wizard_pool,
 )
-
 
 CreateCMSPageForm = step2_form_factory(
     mixin_cls=WizardStep2BaseForm,

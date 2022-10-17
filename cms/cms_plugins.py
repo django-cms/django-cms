@@ -1,21 +1,24 @@
 import warnings
 
+from django.http import (
+    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
+)
+from django.middleware.csrf import get_token
+from django.urls import re_path
+from django.utils.translation import get_language, gettext, gettext_lazy as _
+
 from cms.models import CMSPlugin, Placeholder
 from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
 from cms.utils.urlutils import admin_reverse
-from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
-from django.middleware.csrf import get_token
-from django.urls import re_path
-from django.utils.translation import gettext, gettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):
     name = _("Placeholder")
     parent_classes = ['0']  # so you will not be able to add it something
-    #require_parent = True
+    # require_parent = True
     render_plugin = False
     admin_preview = False
     system = True
@@ -100,9 +103,10 @@ class AliasPlugin(CMSPluginBase):
         page_url = origin_page.get_absolute_url(language=obj.language)
         page_title = origin_page.get_title(language=obj.language)
 
-        message = gettext('This is an alias reference, '
-                           'you can edit the content only on the '
-                           '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.')
+        message = gettext(
+            'This is an alias reference, you can edit the content only on the '
+            '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.'
+        )
         return message % {'page_url': page_url, 'page_title': page_title}
 
     def create_alias(self, request):
@@ -114,7 +118,7 @@ class AliasPlugin(CMSPluginBase):
         )
         if not request.user.is_staff:
             return HttpResponseForbidden("not enough privileges")
-        if not 'plugin_id' in request.POST and not 'placeholder_id' in request.POST:
+        if 'plugin_id' not in request.POST and 'placeholder_id' not in request.POST:
             return HttpResponseBadRequest("plugin_id or placeholder_id POST parameter missing.")
         plugin = None
         placeholder = None
