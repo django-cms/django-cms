@@ -248,7 +248,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             #     Children Source Placeholder     <-- Moved plugin children
             #   Children Target Placeholder
             left = (
-                [ph1parent[language_fun[0]], ph2parent[language_fun[0]]] 
+                [ph1parent[language_fun[0]], ph2parent[language_fun[0]]]
                 + ph2children[language_fun[0]] + ph1children[language_fun[0]]
             )
             # The result in practice
