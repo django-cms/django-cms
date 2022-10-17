@@ -1,4 +1,4 @@
-.. _upgrade-tp-enter-version-here:
+.. _upgrade-to-enter-version-here-template:
 
 *******************
 4.X.X release notes
