@@ -239,7 +239,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             ph2.move_plugin(
                 ph2parent[language_fun[0]],  # Move parent (first language only) **and** its children
                 target_plugin=ph1parent[language_fun[0]],  # as child of parent in target placeholder
-                target_position=2, #  First child, that is
+                target_position=2,  # First child, that is
                 target_placeholder=ph1,
             )
             # The result in theory:
@@ -247,7 +247,10 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             #   Parent Source Palceholder         <-- Moved plugin parent
             #     Children Source Placeholder     <-- Moved plugin children
             #   Children Target Placeholder
-            left = [ph1parent[language_fun[0]], ph2parent[language_fun[0]]] + ph2children[language_fun[0]] + ph1children[language_fun[0]]
+            left = (
+                [ph1parent[language_fun[0]], ph2parent[language_fun[0]]] 
+                + ph2children[language_fun[0]] + ph1children[language_fun[0]]
+            )
             # The result in practice
             right = list(ph1.cmsplugin_set.filter(language=language_fun[0]).order_by('position'))
             self.assertEqual(left, right)
@@ -279,7 +282,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         parent = {lang: None for lang in language_fun}
         for i in range(n):
             for lang in language_fun:
-                parent[lang]=add_plugin(ph, 'TextPlugin', lang, target=parent[lang]).cmsplugin_ptr
+                parent[lang] = add_plugin(ph, 'TextPlugin', lang, target=parent[lang]).cmsplugin_ptr
                 plugins[lang].append(parent[lang])
 
         for lang in language_fun:
@@ -329,7 +332,6 @@ class PlaceholderTestCase(TransactionCMSTestCase):
                 add_plugin(ph, 'TextPlugin', language, 'first-child').cmsplugin_ptr
 
         self.assertEqual(ph.get_last_plugin_position('en'), n)  # should be n
-
 
     def test_copy_plugin(self):
         superuser = self.get_superuser()
