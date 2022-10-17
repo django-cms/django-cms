@@ -492,7 +492,7 @@ class Placeholder(models.Model):
             self._shift_plugin_positions(
                 instance.language,
                 start=instance.position,
-                offset=last_position - instance.position + 2, # behind last_position plus one to shift back
+                offset=last_position - instance.position + 2,  # behind last_position plus one to shift back
             )
 
         instance.save()
