@@ -13,7 +13,7 @@ incompatible changes you’ll want to be aware of when upgrading from
 django CMS 4.0 or earlier. We’ve begun the deprecation process for some
 features.
 
-See the `How to upgrade to 4.X.X`_ to a newer version guide if you’re
+See the How to upgrade to 4.X.X to a newer version guide if you’re
 updating an existing project.
 
 Django and Python compatibility
