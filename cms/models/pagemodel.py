@@ -824,6 +824,7 @@ class Page(models.Model):
         self.changed_by = get_current_user_name()
 
         if created:
+            clear_permission_cache()
             self.created_by = self.changed_by
         super().save(**kwargs)
         if created and get_cms_setting('PERMISSION'):

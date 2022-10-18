@@ -889,6 +889,7 @@ CMS_CACHE_DURATIONS
 ===================
 
 This dictionary carries the various cache duration settings.
+You can override it partially, e.g. ``{'content': 3600}``.
 
 
 ``'content'``
