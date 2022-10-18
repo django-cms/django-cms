@@ -807,7 +807,7 @@ class PageContentAdmin(admin.ModelAdmin):
         obj = super().get_object(request, object_id, from_field)
 
         if obj:
-            obj.page.title_cache[obj.language] = obj
+            obj.page.page_content_cache[obj.language] = obj
         return obj
 
     def get_admin_url(self, action, *args):
