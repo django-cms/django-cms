@@ -6,7 +6,6 @@ from django.utils.safestring import mark_safe
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.plugins import downcast_plugins, get_plugins_as_layered_tree
 
-
 register = template.Library()
 
 

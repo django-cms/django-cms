@@ -6,13 +6,13 @@ from django.db.models import Q
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 
-from cms.api import assign_user_to_page, create_page, create_page_user
 from cms.admin.forms import save_permissions
+from cms.api import assign_user_to_page, create_page, create_page_user
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, PageContent, ACCESS_PAGE
-from cms.models.permissionmodels import (ACCESS_PAGE_AND_DESCENDANTS,
-                                         PagePermission,
-                                         GlobalPagePermission)
+from cms.models import ACCESS_PAGE, Page, PageContent
+from cms.models.permissionmodels import (
+    ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils import get_current_site
@@ -51,8 +51,8 @@ class PermissionModeratorTests(CMSTestCase):
             - created by super
             - master can add/change/delete on it and descendants
     """
-    #TODO: Split this test case into one that tests publish functionality, and
-    #TODO: one that tests permission inheritance. This is too complex.
+    # TODO: Split this test case into one that tests publish functionality, and
+    # TODO: one that tests permission inheritance. This is too complex.
 
     def setUp(self):
         # create super user
@@ -159,7 +159,7 @@ class PermissionModeratorTests(CMSTestCase):
     def test_staff_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
         all_view_perms = PagePermission.objects.filter(can_view=True)
-        # verifiy that the user_staff has access to this page
+        # verify that the user_staff has access to this page
         has_perm = False
         for perm in all_view_perms:
             if perm.page == self.page_b:
@@ -181,7 +181,7 @@ class PermissionModeratorTests(CMSTestCase):
     def test_user_normal_can_view(self):
         url = self.page_b.get_absolute_url(language='en')
         all_view_perms = PagePermission.objects.filter(can_view=True)
-        # verifiy that the normal_user has access to this page
+        # verify that the normal_user has access to this page
         normal_has_perm = False
         for perm in all_view_perms:
             if perm.page == self.page_b:
@@ -192,7 +192,7 @@ class PermissionModeratorTests(CMSTestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
 
-        # verifiy that the user_non_global has not access to this page
+        # verify that the user_non_global has not access to this page
         non_global_has_perm = False
         for perm in all_view_perms:
             if perm.page == self.page_b:
@@ -214,13 +214,12 @@ class PermissionModeratorTests(CMSTestCase):
         with self.login_user_context(self.user_super):
             user_global = create_page_user(user_global, user_global)
             user_global.is_staff = False
-            user_global.save() # Prevent is_staff permission
+            user_global.save()  # Prevent is_staff permission
             global_page = create_page("global", "nav_playground.html", "en")
             # Removed call since global page user doesn't have publish permission
-            #global_page = publish_page(global_page, user_global)
+            # global_page = publish_page(global_page, user_global)
             # it's allowed for the normal user to view the page
-            assign_user_to_page(global_page, user_global,
-                                global_permission=True, can_view=True)
+            assign_user_to_page(global_page, user_global, global_permission=True, can_view=True)
 
         url = global_page.get_absolute_url('en')
         all_view_perms = PagePermission.objects.filter(can_view=True)

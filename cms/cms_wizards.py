@@ -3,9 +3,8 @@ from django.utils.translation import gettext_lazy as _
 from cms.models import Page
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 
-from .wizards.wizard_base import Wizard
-
 from .forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
+from .wizards.wizard_base import Wizard
 
 
 class CMSPageWizard(Wizard):

@@ -1,5 +1,11 @@
-from .models import PageExtension  # nopyflakes
-from .models import PageContentExtension  # nopyflakes
-from .extension_pool import extension_pool  # nopyflakes
-from .admin import PageExtensionAdmin  # nopyflakes
-from .admin import PageContentExtensionAdmin  # nopyflakes
+from .admin import PageContentExtensionAdmin, PageExtensionAdmin
+from .extension_pool import extension_pool
+from .models import PageExtension, PageContentExtension
+
+__all__ = [
+    'extension_pool',
+    'PageContentExtension',
+    'PageContentExtensionAdmin',
+    'PageExtension',
+    'PageExtensionAdmin'
+]

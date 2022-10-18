@@ -4,13 +4,15 @@ from cms.api import create_page, create_title
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.i18n import get_language_list
-
 from menus.templatetags.menu_tags import PageLanguageUrl
-from menus.utils import find_selected, language_changer_decorator, DefaultLanguageChanger
+from menus.utils import (
+    DefaultLanguageChanger, find_selected, language_changer_decorator,
+)
 
 
 class DumbPageLanguageUrl(PageLanguageUrl):
-    def __init__(self): pass
+    def __init__(self):
+        pass
 
 
 class MenuUtilsTests(CMSTestCase):
@@ -49,8 +51,8 @@ class MenuUtilsTests(CMSTestCase):
             '/en/en-page/',
             '/de/de-page/',
             '/fr/fr-page/',
-            '/en/en-page/', # the pt-br url is en because that's a fallback
-            '/en/en-page/', # the es-mx url is en because that's a fallback
+            '/en/en-page/',  # the pt-br url is en because that's a fallback
+            '/en/en-page/',  # the es-mx url is en because that's a fallback
         ]
         urls_found = [DefaultLanguageChanger(request)(code)
                       for code in get_language_list(site_id=1)]

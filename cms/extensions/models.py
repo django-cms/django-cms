@@ -1,5 +1,5 @@
-from django.db.models import ManyToManyField
 from django.db import models
+from django.db.models import ManyToManyField
 
 from cms.models import Page, PageContent
 
@@ -70,8 +70,10 @@ class BaseExtension(models.Model):
         this.extended_object = public_object  # set the new public object
 
         if public_extension:
-            this.pk = public_extension.pk  # overwrite current public extension
-            this.public_extension = None  # remove public extension or it will point to itself and raise duplicate entry
+            # overwrite current public extension
+            this.pk = public_extension.pk
+            # remove public extension, or it will point to itself and raise duplicate entry
+            this.public_extension = None
 
             # Set public_extension concrete parents PKs. See issue #5494
             for parent, field in this._meta.parents.items():

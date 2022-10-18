@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.translation import override as force_language, gettext as _
+from django.utils.translation import gettext as _, override as force_language
 
 
 class WizardBase():
@@ -47,8 +47,8 @@ class Wizard(WizardBase):
         """
         if not self._hash_cache:
             full_path = force_str(
-                    ".".join([self.__module__, self.__class__.__name__])
-                ).encode('utf-8')
+                ".".join([self.__module__, self.__class__.__name__])
+            ).encode('utf-8')
             hash = hashlib.sha1()
             hash.update(full_path)
             self._hash_cache = hash.hexdigest()

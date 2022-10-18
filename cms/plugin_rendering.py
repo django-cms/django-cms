@@ -1,9 +1,7 @@
 from collections import OrderedDict
-
 from functools import partial
 
 from classytags.utils import flatten_context
-
 from django.contrib.sites.models import Site
 from django.template import Context
 from django.utils.functional import cached_property
@@ -13,16 +11,14 @@ from django.utils.safestring import mark_safe
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models import PageContent
 from cms.toolbar.utils import (
-    get_placeholder_toolbar_js,
-    get_plugin_toolbar_js,
+    get_placeholder_toolbar_js, get_plugin_toolbar_js,
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (
-    get_toolbar_plugin_struct,
-    rescan_placeholders_for_obj,
+    get_toolbar_plugin_struct, rescan_placeholders_for_obj,
     restore_sekizai_context,
 )
 from cms.utils.plugins import get_plugin_restrictions
@@ -121,7 +117,7 @@ class BaseRenderer():
         return plugin_menu_template.render({'plugin_menu': plugin_menu})
 
     def get_placeholder_toolbar_js(self, placeholder, page=None):
-        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page) # original
+        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page)  # original
 
         plugin_types = [cls.__name__ for cls in plugins]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
@@ -148,7 +144,7 @@ class BaseRenderer():
     def get_plugin_class(self, plugin):
         plugin_type = plugin.plugin_type
 
-        if not plugin_type in self._cached_plugin_classes:
+        if plugin_type not in self._cached_plugin_classes:
             self._cached_plugin_classes[plugin_type] = self.plugin_pool.get_plugin(plugin_type)
         return self._cached_plugin_classes[plugin_type]
 
@@ -508,7 +504,7 @@ class ContentRenderer(BaseRenderer):
                 request=self.request,
             )
 
-            if cached_value != None:
+            if cached_value is not None:
                 # None means nothing in the cache
                 # Anything else is a valid value
                 language_cache[placeholder.pk] = cached_value
@@ -549,7 +545,7 @@ class ContentRenderer(BaseRenderer):
             # has not been cached.
             placeholders_to_fetch = [
                 placeholder for placeholder in placeholders
-                if _cached_content(placeholder, self.request_language) == None]
+                if _cached_content(placeholder, self.request_language) is None]
         else:
             # cache is disabled, prefetch plugins for all
             # placeholders in the page.

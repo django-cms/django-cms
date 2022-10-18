@@ -59,8 +59,6 @@ class AliasPluginModel(CMSPlugin):
             placeholder_id=placeholder_id,
         )
         plugins = plugins.filter(
-            Q(plugin=self) |
-            Q(plugin__placeholder=self.placeholder_id) |
-            Q(alias_placeholder=self.placeholder_id)
+            Q(plugin=self) | Q(plugin__placeholder=self.placeholder_id) | Q(alias_placeholder=self.placeholder_id)
         )
         return plugins.exists()

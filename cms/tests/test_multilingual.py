@@ -3,16 +3,13 @@ import copy
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
-from cms.api import create_page, create_title, add_plugin
-from cms.forms.utils import update_site_and_page_choices
+from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import LanguageError
+from cms.forms.utils import update_site_and_page_choices
 from cms.models import EmptyPageContent, PageContent
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.conf import get_cms_setting
-from cms.utils.conf import get_languages
-
+from cms.utils.conf import get_cms_setting, get_languages
 from menus.menu_pool import menu_pool
-
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -281,12 +278,13 @@ class MultilingualTestCase(CMSTestCase):
             self.assertRedirects(response, '/en/')
 
     def test_no_english_defined(self):
-        with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],
+        with self.settings(
+            TEMPLATE_CONTEXT_PROCESSORS=[],
             CMS_LANGUAGES={
-                1:[
-                    {'code': 'de', 'name': 'German', 'public':True, 'fallbacks': []},
+                1: [
+                    {'code': 'de', 'name': 'German', 'public': True, 'fallbacks': []},
                 ]},
-            ):
+        ):
             try:
                 update_site_and_page_choices(language='en-us')
             except LanguageError:

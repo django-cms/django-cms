@@ -1,10 +1,12 @@
 from django.apps import apps
-from django.core.exceptions import ObjectDoesNotExist
 from django.conf import settings
 from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
-from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import (
+    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
+)
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
@@ -17,22 +19,26 @@ from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
 from cms.models.pagemodel import TreeNode
-from cms.page_rendering import _handle_no_page, _render_welcome_page, render_pagecontent
+from cms.page_rendering import (
+    _handle_no_page, _render_welcome_page, render_pagecontent,
+)
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import is_editable_model
-from cms.utils.i18n import (get_fallback_languages, get_public_languages,
-                            get_redirect_on_fallback, get_language_list,
-                            get_default_language_for_site,
-                            is_language_prefix_patterns_used)
+from cms.utils.i18n import (
+    get_default_language_for_site, get_fallback_languages, get_language_list,
+    get_public_languages, get_redirect_on_fallback,
+    is_language_prefix_patterns_used,
+)
 from cms.utils.page import get_page_from_request
 
 
 def _clean_redirect_url(redirect_url, language):
-    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/"
-            and not redirect_url.startswith('/%s/' % language)):
+    if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
+            '/%s/' % language
+    )):
         # add language prefix to url
         redirect_url = "/%s/%s" % (language, redirect_url.lstrip("/"))
     return redirect_url
@@ -43,12 +49,11 @@ def details(request, slug):
     The main view of the Django-CMS! Takes a request and a slug, renders the
     page.
     """
+    is_authenticated = request.user.is_authenticated
     response_timestamp = now()
     if get_cms_setting("PAGE_CACHE") and (
         not hasattr(request, 'toolbar') or (
-            not request.toolbar.edit_mode_active and
-            not request.toolbar.show_toolbar and
-            not request.user.is_authenticated
+            not request.toolbar.edit_mode_active and not request.toolbar.show_toolbar and not is_authenticated
         )
     ):
         cache_content = get_page_cache(request)

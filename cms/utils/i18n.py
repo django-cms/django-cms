@@ -1,9 +1,9 @@
 from contextlib import contextmanager
 
 from django.conf import settings
+from django.urls import LocalePrefixPattern, get_resolver
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
-from django.urls import get_resolver, LocalePrefixPattern
 
 from cms.exceptions import LanguageError
 from cms.utils.conf import get_cms_setting, get_site_id
@@ -59,13 +59,13 @@ def get_language_code(language_code, site_id=None):
 
     languages = get_language_list(site_id)
 
-    if language_code in languages: # direct hit
+    if language_code in languages:  # direct hit
         return language_code
 
     for lang in languages:
-        if language_code.split('-')[0] == lang: # base language hit
+        if language_code.split('-')[0] == lang:  # base language hit
             return lang
-        if lang.split('-')[0] == language_code: # base language hit
+        if lang.split('-')[0] == language_code:  # base language hit
             return lang
     return language_code
 
@@ -74,7 +74,8 @@ def get_current_language():
     """
     Returns the currently active language
 
-    It's a replacement for Django's translation.get_language() to make sure the LANGUAGE_CODE will be found in LANGUAGES.
+    It's a replacement for Django's translation.get_language() to make sure the
+    LANGUAGE_CODE will be found in LANGUAGES.
     Overcomes this issue: https://code.djangoproject.com/ticket/9340
     """
     language_code = translation.get_language()
@@ -148,7 +149,7 @@ def get_default_language(language_code=None, site_id=None):
     # otherwise split the language code if possible, so iso3
     language_code = language_code.split("-")[0]
 
-    if not language_code in languages:
+    if language_code not in languages:
         return settings.LANGUAGE_CODE
 
     return language_code

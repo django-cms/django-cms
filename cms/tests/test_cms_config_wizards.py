@@ -1,9 +1,8 @@
-from mock import Mock, patch
-
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
+from mock import Mock, patch
 
-from cms.app_registration import get_cms_extension_apps, get_cms_config_apps
+from cms.app_registration import get_cms_config_apps, get_cms_extension_apps
 from cms.cms_config import CMSCoreExtensions
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard

@@ -3,8 +3,7 @@ from django.http import Http404
 from django.template.response import TemplateResponse
 from django.urls import Resolver404, resolve, reverse
 
-from cms import __version__
-from cms import constants
+from cms import __version__, constants
 from cms.cache.page import set_page_cache
 from cms.models import EmptyPageContent
 from cms.utils.page import get_page_template_from_request
@@ -52,9 +51,10 @@ def render_page(request, page, current_language, slug):
         response['X-Frame-Options'] = 'DENY'
     return response
 
+
 def _handle_no_page(request):
     try:
-        #add a $ to the end of the url (does not match on the cms anymore)
+        # add a $ to the end of the url (does not match on the cms anymore)
         resolve('%s$' % request.path)
     except Resolver404 as e:
         # raise a django http 404 page

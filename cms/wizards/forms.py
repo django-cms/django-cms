@@ -83,9 +83,8 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     def get_wizard_entries(self):
         for entry in self['entry']:
             wizard = wizard_pool.get_entry(entry.choice_value)
-            yield(entry, wizard)
+            yield entry, wizard
 
 
 class WizardStep2BaseForm(BaseFormMixin):
     pass
-

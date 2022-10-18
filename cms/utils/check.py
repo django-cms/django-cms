@@ -1,5 +1,5 @@
-from contextlib import contextmanager
 import inspect
+from contextlib import contextmanager
 from itertools import chain
 
 from django.conf import settings
@@ -9,9 +9,8 @@ from sekizai.helpers import validate_template
 
 from cms import constants
 from cms.models import AliasPluginModel
-from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import is_installed
-
+from cms.utils.conf import get_cms_setting
 
 SUCCESS = 1
 WARNING = 2
@@ -21,7 +20,7 @@ SKIPPED = 4
 CHECKERS = []
 
 
-class FileOutputWrapper():
+class FileOutputWrapper:
     """
     Wraps two file-like objects (that support at the very least the 'write'
     method) into an API to be used by the check function further down in
@@ -94,7 +93,7 @@ class FileOutputWrapper():
         wrapper = self.section_wrapper(self)
         try:
             yield wrapper
-        except:
+        except:  # NOQA
             self.error('Checker failed, see traceback')
             raise
         self.errors += wrapper.errors
@@ -241,6 +240,7 @@ def check_middlewares(output):
             if middleware not in middlewares:
                 section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
 
+
 @define_check
 def check_context_processors(output):
     with output.section("Context processors") as section:
@@ -265,7 +265,7 @@ def check_plugin_instances(output):
         for plugin_type in report:
             # warn about those that are not installed
             if not plugin_type["model"]:
-                section.error("%s has instances but is no longer installed" % plugin_type["type"] )
+                section.error("%s has instances but is no longer installed" % plugin_type["type"])
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
                 section.error(
@@ -282,10 +282,10 @@ def check_plugin_instances(output):
 
 @define_check
 def check_copy_relations(output):
-    from cms.plugin_pool import plugin_pool
     from cms.extensions import extension_pool
     from cms.extensions.models import BaseExtension
     from cms.models.pluginmodel import CMSPlugin
+    from cms.plugin_pool import plugin_pool
 
     c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
 
@@ -309,7 +309,8 @@ def check_copy_relations(output):
                     c_to_s(rel.model),
                 ))
             for rel in plugin_class._get_related_objects():
-                if rel.model != CMSPlugin and not issubclass(rel.model, plugin.model) and rel.model != AliasPluginModel:
+                if rel.model != CMSPlugin and not issubclass(
+                        rel.model, plugin.model) and rel.model != AliasPluginModel:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
                         c_to_s(plugin_class),
                         c_to_s(rel.model),
@@ -321,11 +322,13 @@ def check_copy_relations(output):
                 # extension... move along...
                 continue
             for rel in extension._meta.many_to_many:
-                section.warn('%s has a many-to-many relation to %s,\n    '
-                             'but no "copy_relations" method defined.' % (
-                    c_to_s(extension),
-                    c_to_s(rel.remote_field.model),
-                ))
+                section.warn(
+                    '%s has a many-to-many relation to %s,\n    '
+                    'but no "copy_relations" method defined.' % (
+                        c_to_s(extension),
+                        c_to_s(rel.remote_field.model),
+                    )
+                )
             for rel in extension._get_related_objects():
                 if rel.model != extension:
                     section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (

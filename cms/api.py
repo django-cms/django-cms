@@ -9,8 +9,7 @@ import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.core.exceptions import FieldError
-from django.core.exceptions import ValidationError
+from django.core.exceptions import FieldError, ValidationError
 from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
@@ -21,8 +20,10 @@ from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import PageContent
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import (PageUser, PagePermission, GlobalPagePermission,
-                                         ACCESS_PAGE_AND_DESCENDANTS)
+from cms.models.permissionmodels import (
+    ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
+    PageUser,
+)
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
@@ -35,10 +36,9 @@ from cms.utils.permissions import _thread_locals
 from cms.utils.plugins import copy_plugins_to_placeholder
 from menus.menu_pool import menu_pool
 
-
-#===============================================================================
+# ===============================================================================
 # Helpers/Internals
-#===============================================================================
+# ===============================================================================
 
 
 def _verify_apphook(apphook, namespace):
@@ -74,8 +74,7 @@ def _verify_plugin_type(plugin_type):
     Verifies the given plugin_type is valid and returns a tuple of
     (plugin_model, plugin_type)
     """
-    if (hasattr(plugin_type, '__module__') and
-            issubclass(plugin_type, CMSPluginBase)):
+    if hasattr(plugin_type, '__module__') and issubclass(plugin_type, CMSPluginBase):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
@@ -91,9 +90,9 @@ def _verify_plugin_type(plugin_type):
     return plugin_model, plugin_type
 
 
-#===============================================================================
+# ===============================================================================
 # Public API
-#===============================================================================
+# ===============================================================================
 
 @transaction.atomic
 def create_page(title, template, language, menu_title=None, slug=None,
@@ -110,7 +109,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     See docs/extending_cms/api_reference.rst for more info
     """
-    if published != None:
+    if published is not None:
         warnings.warn('This API function no longer accepts a published argument', UserWarning)
 
     # validate template
