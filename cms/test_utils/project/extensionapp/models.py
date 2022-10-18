@@ -45,4 +45,3 @@ class MultiTablePageContentExtension(MultiTableContentExtensionParent, PageConte
 
 
 extension_pool.register(MultiTablePageContentExtension)
-

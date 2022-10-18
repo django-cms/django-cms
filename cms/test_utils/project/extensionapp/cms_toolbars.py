@@ -27,9 +27,13 @@ class MyPageContentExtensionToolbar(CMSToolbar):
                 mypagecontentextension = None
             try:
                 if mypagecontentextension:
-                    url = admin_reverse('extensionapp_mypagecontentextension_change', args=(mypagecontentextension.pk,))
+                    url = admin_reverse(
+                        'extensionapp_mypagecontentextension_change', args=(mypagecontentextension.pk,)
+                    )
                 else:
-                    url = admin_reverse('extensionapp_mypagecontentextension_add') + '?extended_object=%s' % self.page.pk
+                    url = admin_reverse(
+                        'extensionapp_mypagecontentextension_add'
+                    ) + '?extended_object=%s' % self.page.pk
             except NoReverseMatch:
                 # not in urls
                 pass

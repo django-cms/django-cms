@@ -105,7 +105,10 @@ class ExtensionsTestCase(CMSTestCase):
         subpage_extension.save()
         subpage.mypageextension = subpage_extension
         subpage_content = subpage.get_content_obj()
-        subpage_content_extension = MyPageContentExtension(extended_object=subpage_content, extra_title='title extension 2')
+        subpage_content_extension = MyPageContentExtension(
+            extended_object=subpage_content,
+            extra_title='title extension 2'
+        )
         subpage_content_extension.save()
         subpage.myPageContentExtension = subpage_content_extension
 
@@ -127,7 +130,9 @@ class ExtensionsTestCase(CMSTestCase):
                 old_page_extensions[index].extra
             )
             self.assertEqual(
-                extension_pool.get_page_content_extensions(new_page.pagecontent_set.get(language='en'))[0].extra_title,
+                extension_pool.get_page_content_extensions(
+                    new_page.pagecontent_set.get(language='en')
+                )[0].extra_title,
                 old_title_extension[index].extra_title
             )
             # check that objects are actually different
@@ -436,7 +441,9 @@ class ExtensionAdminTestCase(CMSTestCase):
                 ) + '?extended_object=%s' % self.page_title_without_extension.pk,
                 post_data, follow=True
             )
-            created_title_extension = MyPageContentExtension.objects.get(extended_object=self.page_title_without_extension)
+            created_title_extension = MyPageContentExtension.objects.get(
+                extended_object=self.page_title_without_extension
+            )
 
             # can delete extension
             self.client.post(
