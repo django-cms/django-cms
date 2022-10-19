@@ -32,15 +32,15 @@ class TabularInline(admin.TabularInline):
 
 def users_exceed_threshold():
     """
-    Check if the number of users exceed the configured threshold. Only bother
+    Check if the number of users exceeds the configured threshold. Only bother
     counting the users when using an integer threshold, otherwise return the
-    value of the setting to avoid a potentially expensive DB query.
+    truthy value of the setting to avoid a potentially expensive DB query.
     """
     threshold = get_cms_setting('RAW_ID_USERS')
 
     # Don't bother counting the users when not using an integer threshold
-    if threshold is True or threshold is False:
-        return threshold
+    if not isinstance(threshold, int):
+        return bool(threshold)
 
     # Given a fresh django-cms install and a django settings with the
     # CMS_RAW_ID_USERS = CMS_PERMISSION = True
@@ -97,8 +97,8 @@ class PagePermissionInlineAdmin(TabularInline):
     def get_formset(self, request, obj=None, **kwargs):
         """
         Some fields may be excluded here. User can change only
-        permissions which are available for him. E.g. if user does not haves
-        can_publish flag, he can't change assign can_publish permissions.
+        permissions which are available for them. E.g. if user does not have
+        can_publish flag, they can't change assign can_publish permissions.
         """
         exclude = self.exclude or []
         if obj:
