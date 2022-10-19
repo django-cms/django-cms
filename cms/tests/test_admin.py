@@ -16,9 +16,7 @@ from djangocms_text_ckeditor.models import Text
 
 from cms import api
 from cms.admin.pageadmin import PageAdmin
-from cms.admin.permissionadmin import (
-    GlobalPagePermissionAdmin, PagePermissionInlineAdmin,
-)
+from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
 from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
