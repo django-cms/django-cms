@@ -39,8 +39,8 @@ def users_exceed_threshold():
     threshold = get_cms_setting('RAW_ID_USERS')
 
     # Don't bother counting the users when not using an integer threshold
-    if not isinstance(threshold, int):
-        return bool(threshold)
+    if threshold is True or threshold is False or not isinstance(threshold, int):
+        return (threshold)
 
     # Given a fresh django-cms install and a django settings with the
     # CMS_RAW_ID_USERS = CMS_PERMISSION = True
