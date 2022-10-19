@@ -363,6 +363,10 @@ def check_placeholder_fields(output):
                     section.error(
                         "%s does not subclass of PlaceholderAdminMixin" % model_admin
                     )
+            else:
+                section.warn(
+                    "%s wasn't checked if it has placeholders; model has no \"get_fields\" method" % model_admin
+                )
 
         if section.successful:
             section.finish_success("PlaceholderField configuration okay")
