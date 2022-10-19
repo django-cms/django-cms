@@ -705,7 +705,7 @@ class PageAdmin(admin.ModelAdmin):
 
     def edit_title_fields(self, request, page_id, language):
         page = self.get_object(request, object_id=page_id)
-        translation = page.get_title_obj(language, fallback=False)
+        translation = page.get_content_obj(language, fallback=False)
 
         if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(force_str(_("You do not have permission to edit this page")))
