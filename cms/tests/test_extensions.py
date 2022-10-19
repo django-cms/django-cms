@@ -5,12 +5,12 @@ from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
 from cms.api import create_page, create_title
-from cms.extensions import PageExtension, PageContentExtension, extension_pool
+from cms.extensions import PageContentExtension, PageExtension, extension_pool
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.models import Page, PageContent
 from cms.test_utils.project.extensionapp.models import (
-    MultiTablePageExtension, MultiTablePageContentExtension, MyPageExtension,
-    MyPageContentExtension,
+    MultiTablePageContentExtension, MultiTablePageExtension,
+    MyPageContentExtension, MyPageExtension,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_pool import toolbar_pool
