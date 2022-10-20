@@ -12,6 +12,7 @@ unreleased
 * Fix bug where switching color scheme affects other settings
 * Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 * Fixed permission denied error after page create (#6866)
+* Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
 
 3.11.0 (2022-08-02)
 ===================
