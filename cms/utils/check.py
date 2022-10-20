@@ -354,13 +354,18 @@ def check_placeholder_fields(output):
 
     with output.section("PlaceholderField") as section:
         for model, model_admin in site._registry.items():
-            ph_fields = [field for field in model._meta.get_fields() if isinstance(field, PlaceholderField)]
-            if len(ph_fields) == 0:
-                continue
+            if getattr(model._meta, 'get_fields', None):
+                ph_fields = [field for field in model._meta.get_fields() if isinstance(field, PlaceholderField)]
+                if len(ph_fields) == 0:
+                    continue
 
-            if not isinstance(model_admin, PlaceholderAdminMixin):
-                section.error(
-                    "%s does not subclass of PlaceholderAdminMixin" % model_admin
+                if not isinstance(model_admin, PlaceholderAdminMixin):
+                    section.error(
+                        "%s does not subclass of PlaceholderAdminMixin" % model_admin
+                    )
+            else:
+                section.warn(
+                    "%s wasn't checked if it has placeholders; model has no \"get_fields\" method" % model_admin
                 )
 
         if section.successful:
