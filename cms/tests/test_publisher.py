@@ -724,7 +724,7 @@ class PublishingTests(TestCase):
         other = self.create_page("Another Page", published=True)
         child = self.create_page("Child", published=True, parent=home)
         child2 = self.create_page("Child", published=True, parent=other)
-        self.assertTrue(Page.objects.filter(is_home=True).count(), 2)
+        self.assertEqual(Page.objects.filter(is_home=True).count(), 2)
         self.assertTrue(home.is_home)
 
         home = home.reload()
