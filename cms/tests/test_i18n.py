@@ -11,7 +11,7 @@ from cms.utils.compat import DJANGO_2_2
 
 if DJANGO_2_2:
     from django.utils.translation import LANGUAGE_SESSION_KEY
-    
+
 
 @override_settings(
     LANGUAGE_CODE='en',
