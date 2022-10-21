@@ -10,7 +10,7 @@ if DJANGO_2_2:
 
 class LanguageCookieMiddleware(MiddlewareMixin):
     def __init__(self, get_response):
-        self.get_response = get_response
+        super().__init__(get_response)
 
     if DJANGO_2_2:
 
