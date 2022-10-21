@@ -40,8 +40,10 @@ class LanguageCookieMiddleware(MiddlewareMixin):
         def __call__(self, request):
             response = self.get_response(request)
             language = get_language()
-            if settings.LANGUAGE_COOKIE_NAME in request.COOKIES and \
-                            request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == language:
+            if (
+                settings.LANGUAGE_COOKIE_NAME in request.COOKIES  # noqa: W503
+                and request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == language
+            ):
                 return response
 
             # To ensure support of very old browsers, Django processed automatically "expires" according
