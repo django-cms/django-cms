@@ -18,33 +18,33 @@ How to upgrade django CMS to a newer version
 While it can be a complex process at times, upgrading to the latest django CMS
 version has several benefits:
 
-* New features and improvements are added.
-* Bugs are fixed.
-* Older version of django CMS will eventually no longer receive security updates.
-* Upgrading as each new django CMS release is available makes future upgrades less
+- New features and improvements are added.
+- Bugs are fixed.
+- Older version of django CMS will eventually no longer receive security updates.
+- Upgrading as each new django CMS release is available makes future upgrades less
   painful by keeping your code base up to date.
 
 Here are some things to consider to help make your upgrade process as smooth as
 possible:
 
-* Read the release notes for each major release from the one after your current
+- Read the release notes for each major release from the one after your current
   django CMS version, up to and including the version to which you plan to
   upgrade.
-* Check the versions of the django CMS packages such as djangocms-versioning
+- Check the versions of the django CMS packages such as djangocms-versioning
   that you are using in your project. Read their release notes.
-* Pay particular attention to backwards incompatible changes to get a clear
+- Pay particular attention to backwards incompatible changes to get a clear
   idea of what will be needed for a successful upgrade.
-* Consider upgrading through more than one major version (e.g., 3.0 to 3.2),
+- Consider upgrading through more than one major version (e.g., 3.0 to 3.2),
   it is usually easier to upgrade through each major release incrementally, i.e.,
   3.0 to 3.1 to 3.2. For each major release use the latest patch release.
-* Before upgrading `resolve any deprecation
+- Before upgrading `resolve any deprecation
   warnings <https://docs.djangoproject.com/en/dev/howto/upgrade-version/>`_ raised
   by your project while using your current version of django CMS
 
 
 .. toctree::
     :maxdepth: 1
-    
+
     4.0
     3.8
     3.7.4
