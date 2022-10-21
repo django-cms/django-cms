@@ -1,6 +1,6 @@
 from platform import python_version
-from django import get_version
 
+from django import get_version
 from packaging.version import Version
 
 DJANGO_VERSION = get_version()
