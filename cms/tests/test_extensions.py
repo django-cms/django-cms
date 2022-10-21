@@ -1,19 +1,20 @@
 from copy import deepcopy
-from cms.extensions.toolbar import ExtensionToolbar
-from cms.toolbar_pool import toolbar_pool
-from cms.utils.urlutils import admin_reverse
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
 from cms.api import create_page, create_title
-from cms.extensions import extension_pool
-from cms.extensions import TitleExtension
-from cms.extensions import PageExtension
+from cms.extensions import PageExtension, TitleExtension, extension_pool
+from cms.extensions.toolbar import ExtensionToolbar
 from cms.models import Page, PageContent
-from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
-from cms.test_utils.project.extensionapp.models import MultiTablePageExtension, MultiTableTitleExtension
+from cms.test_utils.project.extensionapp.models import (
+    MultiTablePageExtension, MultiTableTitleExtension, MyPageExtension,
+    MyTitleExtension,
+)
 from cms.test_utils.testcases import CMSTestCase
+from cms.toolbar_pool import toolbar_pool
+from cms.utils.urlutils import admin_reverse
 
 
 class ExtensionsTestCase(CMSTestCase):
@@ -31,22 +32,22 @@ class ExtensionsTestCase(CMSTestCase):
 
         # register first time
         extension_pool.register(page_extension)
-        self.assertEqual(len(extension_pool.page_extensions), initial_extension_count+1)
+        self.assertEqual(len(extension_pool.page_extensions), initial_extension_count + 1)
 
         # register second time
         extension_pool.register(page_extension)
-        self.assertEqual(len(extension_pool.page_extensions), initial_extension_count+1)
+        self.assertEqual(len(extension_pool.page_extensions), initial_extension_count + 1)
 
         # --- Title registering --------------------------------------
         title_extension = self.get_title_extension_class()
 
         # register first time
         extension_pool.register(title_extension)
-        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count+1)
+        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count + 1)
 
         # register second time
         extension_pool.register(title_extension)
-        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count+1)
+        self.assertEqual(len(extension_pool.title_extensions), initial_extension_count + 1)
 
         # --- Unregister ---------------------------------------------
         extension_pool.unregister(page_extension)
@@ -123,15 +124,21 @@ class ExtensionsTestCase(CMSTestCase):
         old_page_extensions = [page_extension, subpage_extension]
         old_title_extension = [title_extension, subtitle_extension]
         for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
-            self.assertEqual(extension_pool.get_page_extensions(new_page)[0].extra,
-                             old_page_extensions[index].extra)
-            self.assertEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].extra_title,
-                             old_title_extension[index].extra_title)
+            self.assertEqual(
+                extension_pool.get_page_extensions(new_page)[0].extra,
+                old_page_extensions[index].extra
+            )
+            self.assertEqual(
+                extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].extra_title,
+                old_title_extension[index].extra_title
+            )
             # check that objects are actually different
             self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
                                 old_page_extensions[index].pk)
-            self.assertNotEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
-                                old_title_extension[index].pk)
+            self.assertNotEqual(
+                extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
+                old_title_extension[index].pk
+            )
 
         # Test deleting original page for #3987
         page.delete()
@@ -141,32 +148,38 @@ class ExtensionsTestCase(CMSTestCase):
 
     def test_copy_multitable_extensions(self):
         root = create_page('Root', "nav_playground.html", "en")
-        page = create_page('Test Multi-Table Page Extension', "nav_playground.html", "en",
-                           parent=root)
-        subpage = create_page('Test Multi-Table subpage Extension', "nav_playground.html", "en",
-                              parent=page)
+        page = create_page('Test Multi-Table Page Extension', "nav_playground.html", "en", parent=root)
+        subpage = create_page('Test Multi-Table subpage Extension', "nav_playground.html", "en", parent=page)
         page = Page.objects.get(pk=page.pk)
-        page_extension = MultiTablePageExtension(extended_object=page,
-                                                 extension_parent_field='page extension 1',
-                                                 multitable_extra='multi-table page extension 1')
+        page_extension = MultiTablePageExtension(
+            extended_object=page,
+            extension_parent_field='page extension 1',
+            multitable_extra='multi-table page extension 1'
+        )
         page_extension.save()
         page.multitablepageextension = page_extension
         title = page.get_title_obj()
-        title_extension = MultiTableTitleExtension(extended_object=title,
-                                                   extension_title_parent_field='title extension 1',
-                                                   multitable_extra_title='multi-table title extension 1')
+        title_extension = MultiTableTitleExtension(
+            extended_object=title,
+            extension_title_parent_field='title extension 1',
+            multitable_extra_title='multi-table title extension 1'
+        )
         title_extension.save()
         page.multitabletitleextension = title_extension
 
-        subpage_extension = MultiTablePageExtension(extended_object=subpage,
-                                                    extension_parent_field='page extension 2',
-                                                    multitable_extra='multi-table page extension 2')
+        subpage_extension = MultiTablePageExtension(
+            extended_object=subpage,
+            extension_parent_field='page extension 2',
+            multitable_extra='multi-table page extension 2'
+        )
         subpage_extension.save()
         subpage.multitablepageextension = subpage_extension
         subtitle = subpage.get_title_obj()
-        subtitle_extension = MultiTableTitleExtension(extended_object=subtitle,
-                                                      extension_title_parent_field='title extension 2',
-                                                      multitable_extra_title='multi-table title extension 2')
+        subtitle_extension = MultiTableTitleExtension(
+            extended_object=subtitle,
+            extension_title_parent_field='title extension 2',
+            multitable_extra_title='multi-table title extension 2'
+        )
         subtitle_extension.save()
         subpage.multitabletitleextension = subtitle_extension
 
@@ -185,20 +198,34 @@ class ExtensionsTestCase(CMSTestCase):
         old_title_extension = [title_extension, subtitle_extension]
         for index, new_page in enumerate([copied_page] + list(copied_page.get_descendant_pages())):
             copied_page_extension = extension_pool.get_page_extensions(new_page)[0]
-            copied_title_extension = extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0]
-            self.assertEqual(copied_page_extension.extension_parent_field,
-                             old_page_extensions[index].extension_parent_field)
-            self.assertEqual(copied_page_extension.multitable_extra,
-                             old_page_extensions[index].multitable_extra)
-            self.assertEqual(copied_title_extension.extension_title_parent_field,
-                             old_title_extension[index].extension_title_parent_field)
-            self.assertEqual(copied_title_extension.multitable_extra_title,
-                             old_title_extension[index].multitable_extra_title)
+            copied_title_extension = extension_pool.get_title_extensions(
+                new_page.pagecontent_set.get(language='en')
+            )[0]
+            self.assertEqual(
+                copied_page_extension.extension_parent_field,
+                old_page_extensions[index].extension_parent_field
+            )
+            self.assertEqual(
+                copied_page_extension.multitable_extra,
+                old_page_extensions[index].multitable_extra
+            )
+            self.assertEqual(
+                copied_title_extension.extension_title_parent_field,
+                old_title_extension[index].extension_title_parent_field
+            )
+            self.assertEqual(
+                copied_title_extension.multitable_extra_title,
+                old_title_extension[index].multitable_extra_title
+            )
             # check that objects are actually different
-            self.assertNotEqual(extension_pool.get_page_extensions(new_page)[0].pk,
-                                old_page_extensions[index].pk)
-            self.assertNotEqual(extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
-                                old_title_extension[index].pk)
+            self.assertNotEqual(
+                extension_pool.get_page_extensions(new_page)[0].pk,
+                old_page_extensions[index].pk
+            )
+            self.assertNotEqual(
+                extension_pool.get_title_extensions(new_page.pagecontent_set.get(language='en'))[0].pk,
+                old_title_extension[index].pk
+            )
 
         # Test deleting original page for #3987
         page.delete()
@@ -216,9 +243,13 @@ class ExtensionAdminTestCase(CMSTestCase):
         self.normal_guy = self.get_staff_user_with_std_permissions()
 
         if get_user_model().USERNAME_FIELD == 'email':
-            self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'test2@test.com')
+            self.no_page_permission_user = User.objects.create_user(
+                'no_page_permission', 'test2@test.com', 'test2@test.com'
+            )
         else:
-            self.no_page_permission_user = User.objects.create_user('no_page_permission', 'test2@test.com', 'no_page_permission')
+            self.no_page_permission_user = User.objects.create_user(
+                'no_page_permission', 'test2@test.com', 'no_page_permission'
+            )
 
         self.no_page_permission_user.is_staff = True
         self.no_page_permission_user.is_active = True
@@ -273,7 +304,9 @@ class ExtensionAdminTestCase(CMSTestCase):
         with self.login_user_context(self.admin):
             # add a new extension
             response = self.client.get(
-                admin_reverse('extensionapp_mypageextension_add') + '?extended_object=%s' % self.page_without_extension.pk
+                admin_reverse(
+                    'extensionapp_mypageextension_add'
+                ) + '?extended_object=%s' % self.page_without_extension.pk
             )
             self.assertEqual(response.status_code, 200)
             # make sure there is no extension yet
@@ -282,7 +315,9 @@ class ExtensionAdminTestCase(CMSTestCase):
                 'extra': 'my extra'
             }
             response = self.client.post(
-                admin_reverse('extensionapp_mypageextension_add') + '?extended_object=%s' % self.page_without_extension.pk,
+                admin_reverse(
+                    'extensionapp_mypageextension_add'
+                ) + '?extended_object=%s' % self.page_without_extension.pk,
                 post_data, follow=True
             )
             created_page_extension = MyPageExtension.objects.get(extended_object=self.page_without_extension)
@@ -298,7 +333,9 @@ class ExtensionAdminTestCase(CMSTestCase):
             response = self.client.get(
                 admin_reverse('extensionapp_mypageextension_add') + '?extended_object=%s' % self.page.pk
             )
-            self.assertRedirects(response, admin_reverse('extensionapp_mypageextension_change', args=(self.page_extension.pk,)))
+            self.assertRedirects(
+                response, admin_reverse('extensionapp_mypageextension_change', args=(self.page_extension.pk,))
+            )
 
             # saving an extension should work without the GET parameter
             post_data = {
@@ -331,6 +368,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
     def test_toolbar_page_extension(self):
         old_toolbars = deepcopy(toolbar_pool.toolbars)
+
         class SampleExtension(ExtensionToolbar):
             model = MyPageExtension  # The PageExtension / TitleExtension you are working with
 
@@ -340,9 +378,12 @@ class ExtensionAdminTestCase(CMSTestCase):
                     position = 0
                     page_extension, url = self.get_page_extension_admin()
                     if url:
-                        current_page_menu.add_modal_item('TestItem', url=url,
-                                                         disabled=not self.toolbar.edit_mode_active,
-                                                         position=position)
+                        current_page_menu.add_modal_item(
+                            'TestItem',
+                            url=url,
+                            disabled=not self.toolbar.edit_mode_active,
+                            position=position
+                        )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
             response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
@@ -361,30 +402,38 @@ class ExtensionAdminTestCase(CMSTestCase):
                     position = 0
                     urls = self.get_title_extension_admin()
                     for title_extension, url in urls:
-                        current_page_menu.add_modal_item('TestItem', url=url,
-                                                         disabled=not self.toolbar.edit_mode_active,
-                                                         position=position)
+                        current_page_menu.add_modal_item(
+                            'TestItem',
+                            url=url,
+                            disabled=not self.toolbar.edit_mode_active,
+                            position=position
+                        )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
             response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
             self.assertIn("TestItem", response.rendered_content)
         toolbar_pool.toolbars = old_toolbars
 
-
     def test_admin_title_extension(self):
         with self.login_user_context(self.admin):
             # add a new extension
             response = self.client.get(
-                admin_reverse('extensionapp_mytitleextension_add') + '?extended_object=%s' % self.page_title_without_extension.pk
+                admin_reverse(
+                    'extensionapp_mytitleextension_add'
+                ) + '?extended_object=%s' % self.page_title_without_extension.pk
             )
             self.assertEqual(response.status_code, 200)
             # make sure there is no extension yet
-            self.assertFalse(MyTitleExtension.objects.filter(extended_object=self.page_title_without_extension).exists())
+            self.assertFalse(
+                MyTitleExtension.objects.filter(extended_object=self.page_title_without_extension).exists()
+            )
             post_data = {
                 'extra_title': 'my extra title'
             }
             self.client.post(
-                admin_reverse('extensionapp_mytitleextension_add') + '?extended_object=%s' % self.page_title_without_extension.pk,
+                admin_reverse(
+                    'extensionapp_mytitleextension_add'
+                ) + '?extended_object=%s' % self.page_title_without_extension.pk,
                 post_data, follow=True
             )
             created_title_extension = MyTitleExtension.objects.get(extended_object=self.page_title_without_extension)
@@ -394,13 +443,17 @@ class ExtensionAdminTestCase(CMSTestCase):
                 admin_reverse('extensionapp_mytitleextension_delete', args=(created_title_extension.pk,)),
                 {'post': 'yes'}, follow=True
             )
-            self.assertFalse(MyTitleExtension.objects.filter(extended_object=self.page_title_without_extension).exists())
+            self.assertFalse(
+                MyTitleExtension.objects.filter(extended_object=self.page_title_without_extension).exists()
+            )
 
             # accessing the add view on a page that already has an extension should redirect
             response = self.client.get(
                 admin_reverse('extensionapp_mytitleextension_add') + '?extended_object=%s' % self.page_title.pk
             )
-            self.assertRedirects(response, admin_reverse('extensionapp_mytitleextension_change', args=(self.title_extension.pk,)))
+            self.assertRedirects(
+                response, admin_reverse('extensionapp_mytitleextension_change', args=(self.title_extension.pk,))
+            )
 
             # saving an extension should work without the GET parameter
             post_data = {
@@ -410,7 +463,9 @@ class ExtensionAdminTestCase(CMSTestCase):
                 admin_reverse('extensionapp_mytitleextension_change', args=(self.title_extension.pk,)),
                 post_data, follow=True
             )
-            self.assertTrue(MyTitleExtension.objects.filter(extra_title='my extra text', pk=self.title_extension.pk).exists())
+            self.assertTrue(
+                MyTitleExtension.objects.filter(extra_title='my extra text', pk=self.title_extension.pk).exists()
+            )
 
         with self.login_user_context(self.no_page_permission_user):
             # can't save if user does not have permissions to change the page

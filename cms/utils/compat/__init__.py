@@ -3,6 +3,7 @@ from django import get_version
 
 from packaging.version import Version
 
+from django import get_version
 
 DJANGO_VERSION = get_version()
 PYTHON_VERSION = python_version()

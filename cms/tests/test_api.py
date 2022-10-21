@@ -7,13 +7,9 @@ from django.core.exceptions import FieldError
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
-from menus.menu_pool import menu_pool
 
 from cms.api import (
-    add_plugin,
-    create_page,
-    _verify_plugin_type,
-    assign_user_to_page,
+    _verify_plugin_type, add_plugin, assign_user_to_page, create_page,
 )
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
@@ -22,6 +18,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME
+from menus.menu_pool import menu_pool
 
 
 def _grant_page_permission(user, codename):
@@ -223,7 +220,9 @@ class PythonAPIPluginTests(CMSTestCase):
         root_plugin_4 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
         root_plugin_6 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
         root_plugin_3 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='left', target=root_plugin_4)
-        root_plugin_5 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='right', target=root_plugin_4.reload())
+        root_plugin_5 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='right', target=root_plugin_4.reload()
+        )
         new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
         expected = [
             (root_plugin_1.pk, 1),
@@ -248,9 +247,15 @@ class PythonAPIPluginTests(CMSTestCase):
         User can add a new plugin to be in the first position
         """
         root_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
-        child_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
-        child_plugin_3 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
-        child_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='first-child', target=root_plugin_1)
+        child_plugin_2 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1
+        )
+        child_plugin_3 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1
+        )
+        child_plugin_1 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='first-child', target=root_plugin_1
+        )
         root_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
         new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
         expected = [
@@ -264,12 +269,24 @@ class PythonAPIPluginTests(CMSTestCase):
 
     def test_add_child_plugin_middle(self):
         root_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en')
-        child_plugin_1 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
-        child_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
-        child_plugin_4 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
-        child_plugin_6 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1)
-        child_plugin_3 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='left', target=child_plugin_4)
-        child_plugin_5 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='right', target=child_plugin_4.reload())
+        child_plugin_1 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1
+        )
+        child_plugin_2 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1
+        )
+        child_plugin_4 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1
+        )
+        child_plugin_6 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='last-child', target=root_plugin_1
+        )
+        child_plugin_3 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='left', target=child_plugin_4
+        )
+        child_plugin_5 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='right', target=child_plugin_4.reload()
+        )
         root_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
         new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
         expected = [

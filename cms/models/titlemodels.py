@@ -15,7 +15,8 @@ class PageContent(models.Model):
         (constants.VISIBILITY_USERS, _('for logged in users only')),
         (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
     )
-    TEMPLATE_DEFAULT = constants.TEMPLATE_INHERITANCE_MAGIC if get_cms_setting('TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
+    TEMPLATE_DEFAULT = constants.TEMPLATE_INHERITANCE_MAGIC if get_cms_setting(
+        'TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
 
     X_FRAME_OPTIONS_CHOICES = (
         (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
@@ -38,15 +39,43 @@ class PageContent(models.Model):
 
     language = models.CharField(_("language"), max_length=15, db_index=True)
     title = models.CharField(_("title"), max_length=255)
-    page_title = models.CharField(_("title"), max_length=255, blank=True, null=True,
-                                  help_text=_("overwrite the title (html title tag)"))
-    menu_title = models.CharField(_("title"), max_length=255, blank=True, null=True,
-                                  help_text=_("overwrite the title in the menu"))
-    meta_description = models.TextField(_("description"), blank=True, null=True,
-                                        help_text=_("The text displayed in search engines."))
-    redirect = models.CharField(_("redirect"), max_length=2048, blank=True, null=True)
-    page = models.ForeignKey(Page, on_delete=models.CASCADE, verbose_name=_("page"), related_name="pagecontent_set")
-    creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
+    page_title = models.CharField(
+        _("title"),
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_("overwrite the title (html title tag)")
+    )
+    menu_title = models.CharField(
+        _("title"),
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text=_("overwrite the title in the menu")
+    )
+    meta_description = models.TextField(
+        _("description"),
+        blank=True,
+        null=True,
+        help_text=_("The text displayed in search engines.")
+    )
+    redirect = models.CharField(
+        _("redirect"),
+        max_length=2048,
+        blank=True,
+        null=True
+    )
+    page = models.ForeignKey(
+        Page,
+        on_delete=models.CASCADE,
+        verbose_name=_("page"),
+        related_name="pagecontent_set"
+    )
+    creation_date = models.DateTimeField(
+        _("creation date"),
+        editable=False,
+        default=timezone.now
+    )
     # Placeholders (plugins)
     placeholders = PlaceholderRelationField()
 
@@ -59,14 +88,28 @@ class PageContent(models.Model):
     changed_date = models.DateTimeField(auto_now=True)
 
     in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
-    soft_root = models.BooleanField(_("soft root"), db_index=True, default=False,
-                                    help_text=_("All ancestors will not be displayed in the navigation"))
-    template = models.CharField(_("template"), max_length=100, choices=template_choices,
-                                help_text=_('The template used to render the content.'),
-                                default=TEMPLATE_DEFAULT)
-    limit_visibility_in_menu = models.SmallIntegerField(_("menu visibility"), default=constants.VISIBILITY_ALL,
-                                                        null=True, blank=True, choices=LIMIT_VISIBILITY_IN_MENU_CHOICES,
-                                                        db_index=True, help_text=_("limit when this page is visible in the menu"))
+    soft_root = models.BooleanField(
+        _("soft root"),
+        db_index=True,
+        default=False,
+        help_text=_("All ancestors will not be displayed in the navigation")
+    )
+    template = models.CharField(
+        _("template"),
+        max_length=100,
+        choices=template_choices,
+        help_text=_('The template used to render the content.'),
+        default=TEMPLATE_DEFAULT
+    )
+    limit_visibility_in_menu = models.SmallIntegerField(
+        _("menu visibility"),
+        default=constants.VISIBILITY_ALL,
+        choices=LIMIT_VISIBILITY_IN_MENU_CHOICES,
+        db_index=True,
+        blank=True,
+        null=True,
+        help_text=_("limit when this page is visible in the menu")
+    )
 
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(

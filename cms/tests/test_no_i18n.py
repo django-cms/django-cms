@@ -4,9 +4,8 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches
 
 from cms.api import create_page
-from cms.models import Page, CMSPlugin
+from cms.models import CMSPlugin, Page
 from cms.test_utils.testcases import CMSTestCase
-
 
 overrides = dict(
     LANGUAGE_CODE='en-us',

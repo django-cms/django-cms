@@ -2,13 +2,11 @@ from django.db import models
 
 from cms.models import CMSPlugin
 
-
 CLASS_CHOICES = ['container', 'content', 'teaser']
 CLASS_CHOICES = tuple((entry, entry) for entry in CLASS_CHOICES)
 
 TAG_CHOICES = [
-    'div', 'article', 'section', 'header', 'footer', 'aside',
-     'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
+    'div', 'article', 'section', 'header', 'footer', 'aside', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'
 ]
 TAG_CHOICES = tuple((entry, entry) for entry in TAG_CHOICES)
 

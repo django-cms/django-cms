@@ -6,18 +6,19 @@ from django.core.cache import cache
 from django.utils.translation import override as force_language
 
 from cms.admin import forms
-from cms.admin.forms import (PagePermissionInlineAdminForm,
-                             ViewRestrictionInlineAdminForm, GlobalPagePermissionAdminForm,
-                             PageUserGroupForm)
-from cms.api import create_page, create_title, assign_user_to_page
+from cms.admin.forms import (
+    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm,
+    PageUserGroupForm, ViewRestrictionInlineAdminForm,
+)
+from cms.api import assign_user_to_page, create_page, create_title
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
-
-from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
-
-from cms.forms.utils import update_site_and_page_choices, get_site_choices, get_page_choices
+from cms.forms.utils import (
+    get_page_choices, get_site_choices, update_site_and_page_choices,
+)
 from cms.forms.widgets import ApplicationConfigSelect
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_PERMISSIONS
+    URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_PERMISSIONS, CMSTestCase,
 )
 from cms.utils import get_current_site
 
@@ -117,7 +118,7 @@ class FormsTestCase(CMSTestCase):
         raised = False
         try:
             fake_field = Mock_PageSelectFormField(required=True)
-            data_list = (0, None)  #(site_id, page_id) dsite-id is not used
+            data_list = (0, None)  # (site_id, page_id) dsite-id is not used
             fake_field.compress(data_list)
             self.fail('compress function didn\'t raise!')
         except forms.ValidationError:
@@ -126,7 +127,7 @@ class FormsTestCase(CMSTestCase):
 
     def test_compress_function_returns_none_when_not_required(self):
         fake_field = Mock_PageSelectFormField(required=False)
-        data_list = (0, None)  #(site_id, page_id) dsite-id is not used
+        data_list = (0, None)  # (site_id, page_id) dsite-id is not used
         result = fake_field.compress(data_list)
         self.assertEqual(result, None)
 
@@ -153,7 +154,7 @@ class FormsTestCase(CMSTestCase):
             home_page = create_page("home", "nav_playground.html", "en", created_by=user_super)
             # The actual test
             fake_field = Mock_PageSelectFormField()
-            data_list = (0, home_page.pk)  #(site_id, page_id) dsite-id is not used
+            data_list = (0, home_page.pk)  # (site_id, page_id) dsite-id is not used
             result = fake_field.compress(data_list)
             self.assertEqual(home_page, result)
 

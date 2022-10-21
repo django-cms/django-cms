@@ -3,31 +3,26 @@ from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
-from django.urls import reverse
 from django.db import models
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
+from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
-    get_language,
-    override as force_language,
-    gettext_lazy as _,
+    get_language, gettext_lazy as _, override as force_language,
 )
+from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.exceptions import LanguageError
 from cms.models.managers import PageManager, PageNodeManager, PageUrlManager
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import get_clean_username
 from cms.utils.i18n import get_current_language
-
+from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
-
-from treebeard.mp_tree import MP_Node
-
 
 logger = getLogger(__name__)
 
@@ -122,9 +117,10 @@ class TreeNode(MP_Node):
 
     def _set_hierarchy(self, nodes, ancestors=None):
         if self.is_branch:
-            self._descendants = [node for node in nodes
-                           if node.path.startswith(self.path)
-                           and node.depth > self.depth]
+            self._descendants = [
+                node for node in nodes
+                if node.path.startswith(self.path) and node.depth > self.depth
+            ]
         else:
             self._descendants = []
 
@@ -913,7 +909,6 @@ class Page(models.Model):
         if self.title_cache.get(language):
             return language
 
-
         use_fallback = all([
             fallback,
             not self.title_cache.get(language),
@@ -991,7 +986,9 @@ class Page(models.Model):
         return user_can_publish_page(user, page=self)
 
     def has_advanced_settings_permission(self, user):
-        from cms.utils.page_permissions import user_can_change_page_advanced_settings
+        from cms.utils.page_permissions import (
+            user_can_change_page_advanced_settings,
+        )
         return user_can_change_page_advanced_settings(user, page=self)
 
     def has_change_permissions_permission(self, user):
