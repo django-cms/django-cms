@@ -12,7 +12,6 @@ class LanguageCookieMiddleware(MiddlewareMixin):
     def __init__(self, get_response):
         self.get_response = get_response
 
-
     if DJANGO_2_2:
 
         def __call__(self, request):
@@ -23,8 +22,10 @@ class LanguageCookieMiddleware(MiddlewareMixin):
                 if session_language and not session_language == language:
                     request.session[LANGUAGE_SESSION_KEY] = language
                     request.session.save()
-            if settings.LANGUAGE_COOKIE_NAME in request.COOKIES and \
-                request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == language:
+            if (
+                settings.LANGUAGE_COOKIE_NAME in request.COOKIES
+                and request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == language  # noqa: W503
+            ):
                 return response
             response.set_cookie(
                 settings.LANGUAGE_COOKIE_NAME,
