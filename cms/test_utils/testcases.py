@@ -469,7 +469,7 @@ class BaseCMSTestCase:
                 break
             else:
                 if warning.category not in (DeprecationWarning, ):
-                    self.fail(f"Unexpected warning {warning.message} ({warning.category})" )
+                    self.fail(f"Unexpected warning {warning.message} ({warning.category})")
         else:
             self.fail(f"Warning {message} not given.")
         return result
