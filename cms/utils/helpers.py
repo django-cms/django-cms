@@ -61,8 +61,7 @@ def get_header_name(name):
     CONTENT_LENGTH.
     """
     uc_name = re.sub(r'\W+', '_', force_str(name)).upper()
-    if (uc_name in ['CONTENT_LENGTH', 'CONTENT_TYPE'] or
-            uc_name.startswith('HTTP_')):
+    if uc_name in ['CONTENT_LENGTH', 'CONTENT_TYPE'] or uc_name.startswith('HTTP_'):
         return uc_name
     return 'HTTP_{0}'.format(uc_name)
 

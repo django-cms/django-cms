@@ -1,7 +1,8 @@
 from urllib.parse import quote
 
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+from django.contrib.auth.models import (
+    AbstractBaseUser, BaseUserManager, PermissionsMixin,
+)
 from django.core.mail import send_mail
 from django.db import models
 from django.utils import timezone
@@ -38,6 +39,7 @@ class EmailUserManager(BaseUserManager):
         return self._create_user(email, password, True, True,
                                  **extra_fields)
 
+
 class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
     """
     An abstract user model that is an alternative to the standard AbstractUser.  The
@@ -52,7 +54,7 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
         max_length=300,
         blank=True,
         unique=True,
-        help_text = "Required.  Standard format email address."
+        help_text="Required.  Standard format email address."
     )
 
     first_name = models.CharField(
@@ -76,7 +78,8 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(
         'active',
         default=True,
-        help_text='Designates whether this user should be treated as active. Unselect this instead of deleting accounts.'
+        help_text='Designates whether this user should be treated as active. '
+                  'Unselect this instead of deleting accounts.'
     )
 
     date_joined = models.DateTimeField('date joined', default=timezone.now)

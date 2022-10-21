@@ -12,22 +12,17 @@ from django.urls import clear_url_caches
 from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_title
-from cms.models import PagePermission, UserSettings, Placeholder
+from cms.models import PagePermission, Placeholder, UserSettings
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_preview_url,
-    get_object_structure_url,
+    get_object_edit_url, get_object_preview_url, get_object_structure_url,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
-
 from cms.views import details, login
-
 from menus.menu_pool import menu_pool
-
 
 APP_NAME = 'SampleApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
@@ -182,7 +177,7 @@ class ViewTests(CMSTestCase):
         with self.login_user_context(user):
             response = self.client.get(page_preview_url)
         toolbar = response.wsgi_request.toolbar
-        self.assertEqual(len(toolbar.get_right_items()), 1) # Only has Create button
+        self.assertEqual(len(toolbar.get_right_items()), 1)  # Only has Create button
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
@@ -271,7 +266,6 @@ class ViewTests(CMSTestCase):
         response = self.client.get('/de/stevejobs/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/de/jobs/')
-
 
     def test_page_sanitisation_xss_attack(self):
         """

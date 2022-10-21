@@ -169,12 +169,12 @@ class MenuRenderer(object):
                 # exist, skip them instead of crashing
                 nodes = []
                 if toolbar and toolbar.is_staff:
-                    messages.error(self.request,
-                        _('Menu %s cannot be loaded. Please, make sure all '
-                          'its urls exist and can be resolved.') %
-                        menu_class_name)
-                logger.error("Menu %s could not be loaded." %
-                    menu_class_name, exc_info=True)
+                    messages.error(
+                        self.request,
+                        _('Menu %s cannot be loaded. Please, make sure all its urls exist and can be resolved.') %
+                        menu_class_name
+                    )
+                logger.error("Menu %s could not be loaded." % menu_class_name, exc_info=True)
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
 
@@ -197,8 +197,7 @@ class MenuRenderer(object):
             node.selected = node.is_selected(self.request)
         return nodes
 
-    def apply_modifiers(self, nodes, namespace=None, root_id=None,
-            post_cut=False, breadcrumb=False):
+    def apply_modifiers(self, nodes, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
         if not post_cut:
             nodes = self._mark_selected(nodes)
 
