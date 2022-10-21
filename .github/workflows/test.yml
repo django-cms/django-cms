@@ -136,7 +136,7 @@ jobs:
         ]
         exclude:
           - python-version: 3.7
-          requirements-file: [django-4.0.txt, django-4.1.txt]
+            requirements-file: [django-4.0.txt, django-4.1.txt]
         os: [
           ubuntu-20.04,
         ]
