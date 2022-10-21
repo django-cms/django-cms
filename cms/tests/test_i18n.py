@@ -5,7 +5,7 @@ from django.test.utils import override_settings
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils import i18n, get_language_from_request
+from cms.utils import get_language_from_request, i18n
 from cms.utils.compat import DJANGO_2_2
 
 if DJANGO_2_2:
