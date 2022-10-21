@@ -5,6 +5,7 @@ Changelog
 unreleased
 ==========
 
+* Support for django 4.1
 * Allow to partially override ``CMS_CACHE_DURATIONS``
 * Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
 * Make javascript dark mode functions available to popups as CMS.API.getColorScheme
