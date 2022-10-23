@@ -47,7 +47,8 @@ In this ``PollsApphook`` class, we have done several key things:
 * ``app_name`` attribute gives the system a unique way to refer to the apphook. You can see from
   `Django Polls <https://github.com/divio/django-polls/blob/master/polls/urls.py#L6>`_ that the
   application namespace ``polls`` is hard-coded into the application, so this attribute **must**
-  also be ``polls``.
+  also be ``polls``. ``app_name = "polls"`` in its ``urls.py`` file will ensure that we can reverse 
+  also the apphook urls by using the ``polls`` namespace.
 * ``name`` is a human-readable name, and will be displayed to the admin user.
 * ``get_urls()`` method is what actually hooks the application in, returning a
   list of URL configurations that will be made active wherever the apphook is used - in this case,
