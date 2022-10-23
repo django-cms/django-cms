@@ -225,7 +225,8 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_no_email(self):
         with self.settings(
-            MIDDLEWARE=[mw for mw in settings.MIDDLEWARE if mw != "django.middleware.common.BrokenLinkEmailsMiddleware"],
+            MIDDLEWARE=[mw for mw in settings.MIDDLEWARE
+                        if mw != "django.middleware.common.BrokenLinkEmailsMiddleware"],
             DEBUG=False,
             MANAGERS=[("Jenkins", "tests@django-cms.org")]
         ):
