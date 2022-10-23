@@ -232,4 +232,3 @@ New lines should be added to the top of the list.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
-.. _freenode: http://freenode.net/
