@@ -1,9 +1,9 @@
+from django.contrib import admin
+
 from cms.admin.placeholderadmin import FrontendEditableAdminMixin
 from cms.test_utils.project.placeholderapp.models import (
-    Example1, TwoPlaceholderExample, CharPksExample
+    CharPksExample, Example1, TwoPlaceholderExample,
 )
-
-from django.contrib import admin
 
 
 class ExampleAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):

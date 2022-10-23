@@ -5,9 +5,7 @@ from django.test.utils import override_settings
 from cms.api import add_plugin, create_page
 from cms.models import CMSPlugin
 from cms.plugin_rendering import (
-    ContentRenderer,
-    LegacyRenderer,
-    StructureRenderer,
+    ContentRenderer, LegacyRenderer, StructureRenderer,
 )
 from cms.test_utils.testcases import CMSTestCase
 
@@ -134,7 +132,9 @@ class TestContentRenderer(TestStructureRenderer):
         cache = renderer._placeholders_by_page_cache[cms_page.pk]
 
         self.assertEqual(cache[placeholder_1.slot], placeholder_1)
-        self.assertEqual(cache[placeholder_1.slot]._plugins_cache, deque([placeholder_1_plugin_1, placeholder_1_plugin_2]))
+        self.assertEqual(
+            cache[placeholder_1.slot]._plugins_cache, deque([placeholder_1_plugin_1, placeholder_1_plugin_2])
+        )
         self.assertEqual(cache[placeholder_2.slot], placeholder_2)
         self.assertEqual(cache[placeholder_2.slot]._plugins_cache, deque([placeholder_2_plugin_1]))
 

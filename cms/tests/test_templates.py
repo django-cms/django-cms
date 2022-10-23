@@ -1,8 +1,8 @@
-from imp import load_module, PY_SOURCE
 import os.path
+from imp import PY_SOURCE, load_module
 
 from django.conf import settings
-from django.template import loader, TemplateDoesNotExist
+from django.template import TemplateDoesNotExist, loader
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
@@ -78,7 +78,6 @@ class TemplatesConfig(CMSTestCase):
             for template in templates:
                 if template[0] != constants.TEMPLATE_INHERITANCE_MAGIC:
                     self.assertTrue(template[0].find('%s/' % SITE_PATH[2]) >= -1)
-
 
     @override_settings(CMS_TEMPLATES_DIR=BAD_PATH)
     def test_custom_templates_bad_dir(self):

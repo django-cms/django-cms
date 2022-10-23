@@ -1,6 +1,5 @@
-from cms.wizards.wizard_base import Wizard
-
 from cms.test_utils.project.sampleapp.forms import SampleWizardForm
+from cms.wizards.wizard_base import Wizard
 
 
 class SampleWizard(Wizard):

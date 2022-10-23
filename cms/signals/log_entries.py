@@ -1,10 +1,9 @@
-from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
+from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
 
 from cms import operations
 from cms.models import Page, PageType
-
 
 _page_operations_map = {
     operations.MOVE_PAGE: {
