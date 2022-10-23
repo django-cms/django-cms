@@ -7,10 +7,9 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.db.models import Model
-from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.encoding import force_str, smart_str
+from django.utils.encoding import smart_str
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.translation import (
