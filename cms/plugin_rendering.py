@@ -496,7 +496,12 @@ class ContentRenderer(BaseRenderer):
     def render_exception(self, action, instance, context, placeholder, editable):
         if editable:
             exc, value, traceback = context['exc_info']
-            return f"Exception when {action} in {instance.plugin_type} (id={instance.id}) - {exc.__name__}: {value}"
+            return f'<div style="display: inline-block; border: none; background: rgba(0, 0, 0, 0.5); padding: 0.6em 0.3em;' \
+                   f'cursor: not-allowed; min-height: 2em; width:100%; vertical-align:middle; text-align:center;">' \
+                   f'  <span style="font-weight: bold; color: darkred;"> ' \
+                   f'   Exception when {action} in {instance.plugin_type} (id={instance.id}) <br> {exc.__name__}: {value}' \
+                   f'  </span>' \
+                   f'</div>'
         return ''
 
     def render_plugins(self, placeholder, language, context, editable=False, template=None):
