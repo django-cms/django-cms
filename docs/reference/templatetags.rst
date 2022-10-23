@@ -304,8 +304,12 @@ Example::
 
 If a matching page isn't found and :setting:`django:DEBUG` is ``True``, an
 exception will be raised. However, if :setting:`django:DEBUG` is ``False``, an
-exception will not be raised.
-
+exception will not be raised. To be notified of broken links install Django's `broken
+link middleware 
+<https://docs.djangoproject.com/en/dev/ref/middleware/#django.middleware.common.BrokenLinkEmailsMiddleware>`_. 
+If installed ``page_url`` will send an email to the `manager group
+<https://docs.djangoproject.com/en/dev/ref/settings/#std-setting-MANAGERS>`_ of the project.
+No broken link url will be reandered into the temlate. 
 
 ``page_url`` now supports the ``as`` argument. When used this way, the tag
 emits nothing, but sets a variable in the context with the specified name
