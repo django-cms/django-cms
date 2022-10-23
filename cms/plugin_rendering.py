@@ -470,9 +470,9 @@ class ContentRenderer(BaseRenderer):
             )
         else:
             template_name = plugin._get_render_template(context, instance, placeholder)
-            template = self.templates.get_cached_template(template_name)
 
             try:
+                template = self.templates.get_cached_template(template_name)
                 content = template.render(context)
             except Exception:  # catch errors when rendering a plugin's template
                 context['exc_info'] = sys.exc_info()
