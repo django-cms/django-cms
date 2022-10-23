@@ -1,5 +1,5 @@
-import tempfile
 import codecs
+import tempfile
 
 try:
     from cStringIO import StringIO

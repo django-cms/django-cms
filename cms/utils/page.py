@@ -7,7 +7,6 @@ from cms.constants import PAGE_USERNAME_MAX_LENGTH
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 
-
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
 
@@ -43,7 +42,7 @@ def get_clean_username(user):
     else:
         # limit changed_by and created_by to avoid problems with Custom User Model
         if len(username) > PAGE_USERNAME_MAX_LENGTH:
-            username = u'{0}... (id={1})'.format(
+            username = '{0}... (id={1})'.format(
                 username[:PAGE_USERNAME_MAX_LENGTH - 15],
                 user.pk,
             )

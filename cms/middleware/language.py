@@ -1,8 +1,8 @@
 import datetime
 
-from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
 from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.translation import LANGUAGE_SESSION_KEY, get_language
 
 
 class LanguageCookieMiddleware(MiddlewareMixin):
@@ -14,7 +14,7 @@ class LanguageCookieMiddleware(MiddlewareMixin):
                 request.session[LANGUAGE_SESSION_KEY] = language
                 request.session.save()
         if settings.LANGUAGE_COOKIE_NAME in request.COOKIES and \
-                        request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == language:
+                request.COOKIES[settings.LANGUAGE_COOKIE_NAME] == language:
             return response
         max_age = 365 * 24 * 60 * 60  # 10 years
         expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=max_age)

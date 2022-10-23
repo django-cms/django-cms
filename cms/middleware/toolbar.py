@@ -5,14 +5,12 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.urls import resolve
 from django.utils.deprecation import MiddlewareMixin
-
 from django.utils.functional import SimpleLazyObject
 
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.request_ip_resolvers import get_request_ip_resolver
-
 
 get_request_ip = get_request_ip_resolver()
 

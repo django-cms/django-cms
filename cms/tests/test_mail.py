@@ -8,7 +8,7 @@ from cms.utils.mail import mail_page_user_change
 
 class MailTestCase(CMSTestCase):
     def setUp(self):
-        mail.outbox = [] # reset outbox
+        mail.outbox = []  # reset outbox
 
     def test_mail_page_user_change(self):
         user = get_user_model().objects.create_superuser("username", "username@django-cms.org", "username")

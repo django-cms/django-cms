@@ -1,6 +1,7 @@
+from django.db import models
+
 from cms.models import CMSPlugin
 from cms.models.fields import PlaceholderField
-from django.db import models
 
 
 class PlaceholderReference(CMSPlugin):
@@ -12,6 +13,7 @@ class PlaceholderReference(CMSPlugin):
     )
     name = models.CharField(max_length=255)
     placeholder_ref = PlaceholderField(slotname='clipboard')
+
     class Meta:
         app_label = 'cms'
 

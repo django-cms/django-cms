@@ -16,7 +16,7 @@ class ToolbarPool():
     def discover_toolbars(self):
         if self._discovered:
             return
-            #import all the modules
+            # import all the modules
         toolbars = get_cms_setting('TOOLBARS')
         if toolbars:
             for path in toolbars:
@@ -36,6 +36,7 @@ class ToolbarPool():
         if not self.force_register and get_cms_setting('TOOLBARS'):
             return toolbar
         from cms.toolbar_base import CMSToolbar
+
         # validate the app
         if not issubclass(toolbar, CMSToolbar):
             raise ImproperlyConfigured('CMS Toolbar must inherit '

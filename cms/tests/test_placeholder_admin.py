@@ -2,7 +2,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.forms.models import model_to_dict
 
 from cms.api import create_page
-from cms.models import Placeholder, UserSettings, CMSPlugin
+from cms.models import CMSPlugin, Placeholder, UserSettings
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.urlutils import admin_reverse
 
