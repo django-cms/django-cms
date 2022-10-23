@@ -200,7 +200,6 @@ the source modules.
 .. _django-cms-developers: https://groups.google.com/group/django-cms-developers
 .. _GitHub: http://www.github.com
 .. _GitHub help: http://help.github.com
-.. _freenode: http://freenode.net/
 .. _pull request: http://help.github.com/send-pull-requests/
 .. _git: http://git-scm.com/
 .. _Slack Channel: https://django-cmsworkspace.slack.com/
