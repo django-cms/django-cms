@@ -1,10 +1,9 @@
+import logging
 import sys
 from collections import OrderedDict
-
 from functools import partial
 
 from classytags.utils import flatten_context
-
 from django.contrib.sites.models import Site
 from django.template import Context
 from django.utils.functional import cached_property
@@ -14,19 +13,19 @@ from django.utils.safestring import mark_safe
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models import PageContent
 from cms.toolbar.utils import (
-    get_placeholder_toolbar_js,
-    get_plugin_toolbar_js,
+    get_placeholder_toolbar_js, get_plugin_toolbar_js,
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (
-    get_toolbar_plugin_struct,
-    rescan_placeholders_for_obj,
+    get_toolbar_plugin_struct, rescan_placeholders_for_obj,
     restore_sekizai_context,
 )
 from cms.utils.plugins import get_plugin_restrictions
+
+logger = logging.getLogger(__name__)
 
 
 def _unpack_plugins(parent_plugin):
@@ -465,15 +464,24 @@ class ContentRenderer(BaseRenderer):
         except Exception:  # catch errors when executing a plugin's render method
             context['exc_info'] = sys.exc_info()
             content = self.render_exception('executing plugin.render', instance, context, placeholder, editable)
+            logger.error(
+                f"{instance.__class__.__name__}.render for plugin pk={instance.id} raised an exception",
+                exc_info=context['exc_info']
+            )
         else:
-            template = plugin._get_render_template(context, instance, placeholder)
-            template = self.templates.get_cached_template(template)
+            template_name = plugin._get_render_template(context, instance, placeholder)
+            template = self.templates.get_cached_template(template_name)
 
             try:
                 content = template.render(context)
             except Exception:  # catch errors when rendering a plugin's template
                 context['exc_info'] = sys.exc_info()
                 content = self.render_exception('rendering template', instance, context, placeholder, editable)
+                logger.error(
+                    f'Rendering "{template_name}" for plugin {instance.__class__.__name__} '
+                    f'(pk={instance.id}) raised an exception',
+                    exc_info=context['exc_info']
+                )
 
         for path in get_cms_setting('PLUGIN_PROCESSORS'):
             processor = import_string(path)
