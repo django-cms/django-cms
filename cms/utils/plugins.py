@@ -1,5 +1,8 @@
+import logging
+import sys
+from collections import OrderedDict, defaultdict, deque
 from copy import deepcopy
-from collections import defaultdict, deque, OrderedDict
+from functools import lru_cache
 
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
@@ -10,7 +13,7 @@ from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_placeholder_conf
 
-from functools import lru_cache
+logger = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=None)
@@ -270,6 +273,9 @@ def downcast_plugins(plugins,
             cls = plugin_pool.get_plugin(plugin_type)
         except KeyError:
             # Plugin not available
+            logger.error(
+                f"Plugin not installed: {plugin_type} (pk={', '.joing(pks)})", exc_info=sys.exc_info()
+            )
             continue
         # get all the plugins of type cls.model
         plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
