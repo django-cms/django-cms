@@ -8,5 +8,6 @@ divio-docs-theme
 datetime
 coverage
 django~=3.2
+django-sekizai<4  # for python 3.7
 django-cms
 pip-tools
