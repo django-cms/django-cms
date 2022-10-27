@@ -1,3 +1,5 @@
+=== (unreleased) ===
+* Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
 
 === 4.0.0 (unreleased) ===
 * feat: Added live-url querystring parameter option for PageContent edit and preview endpoints
