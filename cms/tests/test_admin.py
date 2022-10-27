@@ -16,6 +16,7 @@ from djangocms_text_ckeditor.models import Text
 
 from cms import api
 from cms.admin.pageadmin import PageAdmin
+from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
 from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
@@ -1389,3 +1390,54 @@ class AdminPageTreeTests(AdminTestsBase):
         #       ⊢ Beta
         #   ⊢ Delta
         #       ⊢ Gamma
+
+
+class AdminPerformanceTests(AdminTestsBase):
+
+    def test_raw_id_threshold_page_permission_inline_admin(self):
+        """
+        Only count users when using an integer value as threshold for
+        CMS_RAW_ID_USERS.
+        """
+        with self.settings(CMS_RAW_ID_USERS=1):
+            with self.assertNumQueries(1):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, [])
+
+        # Create users to check if threshold is honored
+        self._get_guys()
+
+        with self.settings(CMS_RAW_ID_USERS=False):
+            with self.assertNumQueries(0):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, [])
+
+        with self.settings(CMS_RAW_ID_USERS=True):
+            with self.assertNumQueries(0):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, ['user'])
+
+        with self.settings(CMS_RAW_ID_USERS=1):
+            with self.assertNumQueries(1):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, ['user'])
+
+    def test_raw_id_threshold_global_page_permission_admin(self):
+        """
+        Only count users when using an integer value as threshold for
+        CMS_RAW_ID_USERS.
+        """
+        with self.settings(CMS_RAW_ID_USERS=1):
+            with self.assertNumQueries(1):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, [])
+
+        # Create users to check if threshold is honored
+        self._get_guys()
+
+        with self.settings(CMS_RAW_ID_USERS=False):
+            with self.assertNumQueries(0):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, [])
+
+        with self.settings(CMS_RAW_ID_USERS=True):
+            with self.assertNumQueries(0):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, ['user'])
+
+        with self.settings(CMS_RAW_ID_USERS=1):
+            with self.assertNumQueries(1):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, ['user'])

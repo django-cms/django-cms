@@ -1002,7 +1002,7 @@ msgid "Copy"
 msgstr "Copiar"
 
 msgid "Cut"
-msgstr "Colar"
+msgstr "Recortar"
 
 msgid "Paste"
 msgstr "Colar"

@@ -1,4 +1,4 @@
-{% load i18n cms_admin admin_urls %}
+{% load i18n cms_admin admin_urls l10n %}
 
 {# INFO: columns are defined in base.html options #}
 {% spaceless %}
@@ -16,9 +16,9 @@
         {% endif %}
     {% endblock %}
     "
-    {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id }}); return false;"{% endif %}
-    data-id="{{ page.pk }}"
-    data-node-id="{{ node.pk }}"
+    {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.id|unlocalize }}); return false;"{% endif %}
+    data-id="{{ page.pk|unlocalize }}"
+    data-node-id="{{ node.pk|unlocalize }}"
     data-slug="{{ page.get_slug }}"
     data-is-home="{{ page.is_home|yesno:"true,false" }}"
     data-move-permission="{{ has_move_page_permission|yesno:"true,false" }}"
@@ -152,7 +152,7 @@
             <div class="cms-tree-item cms-tree-item-menu{% if not has_change_permission %} cms-tree-item-disabled{% endif %} js-cms-tree-item-menu">
                 <div class="cms-tree-item-inner">
                     {% if has_change_permission %}
-                        <a href="{% url opts|admin_urlname:'change_innavigation' page.id %}?language={{ preview_language }}&amp;{{ page.id }}={{ page.in_navigation|yesno:"1,0" }}">
+                        <a href="{% url opts|admin_urlname:'change_innavigation' page.id %}?language={{ preview_language }}&amp;{{ page.id|unlocalize }}={{ page.in_navigation|yesno:"1,0" }}">
                     {% endif %}
                         {% if page.in_navigation %}
                             <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
@@ -198,7 +198,7 @@
                     <div{% if has_add_page_permission %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                         data-cms-tooltip="{% autoescape on %}{% trans 'New sub page' %}{% endautoescape %}"{% endif %}>
                         {% if has_add_page_permission %}
-                            <a href="{% url opts|admin_urlname:'add' %}?parent_node={{ node.pk }}"
+                            <a href="{% url opts|admin_urlname:'add' %}?parent_node={{ node.pk|unlocalize }}"
                                 class="js-cms-pagetree-add-page cms-btn cms-btn-default cms-icon cms-icon-plus">
                         {% else %}
                             <span class="cms-btn cms-btn-default cms-btn-disabled cms-icon cms-icon-plus">
@@ -212,7 +212,7 @@
                     </div>
                 </div>
                 <div class="js-cms-pagetree-actions-dropdown cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown" data-lazy-url="{% url opts|admin_urlname:'actions_menu' page.id %}">
-                    <a data-node-id="{{ node.pk }}" data-id="{{ page.pk }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                    <a data-node-id="{{ node.pk|unlocalize }}" data-id="{{ page.pk|unlocalize }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
                         <span class="sr-only">{% autoescape on %}{% trans "Options" %}{% endautoescape %}</span>
                     </a>
 
@@ -234,7 +234,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#" data-node-id="{{ node.pk }}" data-id="{{ page.pk }}" class="cms-pagetree-dropdown-item-disabled">
+                                <a href="#" data-node-id="{{ node.pk|unlocalize }}" data-id="{{ page.pk|unlocalize }}" class="cms-pagetree-dropdown-item-disabled">
                                     <span class="cms-icon cms-icon-alias"></span>
                                     <span>{% autoescape on %}{% trans "Paste" %}{% endautoescape %}</span>
                                 </a>
