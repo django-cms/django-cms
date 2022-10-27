@@ -7,6 +7,8 @@ unreleased
 
 * Make javascript dark mode functions available to popups as CMS.API.getColorScheme
   and CMS.API.setColorScheme
+* Deprecate usage of legacy SEND_BROKEN_LINK_EMAILS setting (removed since Django 1.8)
+
 
 3.11.0 (2022-08-02)
 ===================

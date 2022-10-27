@@ -1,3 +1,5 @@
+import warnings
+
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
@@ -32,6 +34,14 @@ def validate_settings():
             'django.template.context_processors.request' not in context_processors):
         raise ImproperlyConfigured("django CMS requires django.template.context_processors.request in "
                                    "'django.template.backends.django.DjangoTemplates' context processors.")
+
+    if (
+        hasattr(settings, "SEND_BROKEN_LINK_EMAILS") and
+        "django.middleware.common.BrokenLinkEmailsMiddleware" not in getattr(settings, "MIDDLEWARE", [])
+    ):
+        warnings.warn('The setting "SEND_BROKEN_LINK_EMAILS" will not be honored by django CMS as of version 4.1. '
+                      'Add "django.middleware.common.BrokenLinkEmailsMiddleware" to your MIDDLEWARE settings '
+                      'instead.', DeprecationWarning)
 
 
 def setup():
