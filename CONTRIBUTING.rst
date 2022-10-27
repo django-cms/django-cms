@@ -34,7 +34,7 @@ Here’s what the pull request process looks like in brief:
 
 To learn more about basic requirements and standards of code contribution, please familiarize yourself with our comprehensive `documentation <https://docs.django-cms.org/en/latest/contributing/code.html#>`_.
 
-django CMS commits follow the `Conventionnal Commits Guideline <http://conventionnalcommits.org/>`_ , please try to follow the Guidelines in your commit messages to ease our review&merge process.
+django CMS commits follow the `Conventional Commits Guideline <https://conventionalcommits.org/>`_, please try to follow the Guidelines in your commit messages to ease our review & merge process.
 
 
 Proposing large feature additions

@@ -5,15 +5,34 @@ Changelog
 unreleased
 ==========
 
+* Support for django 4.1
+* Allow to partially override ``CMS_CACHE_DURATIONS``
+* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
+* Make javascript dark mode functions available to popups as CMS.API.getColorScheme
+  and CMS.API.setColorScheme
+* Fix bug where switching color scheme affects other settings
+* Unlocalize page and node ids when rendering the page tree in the admin (#7175)
+* Fixed permission denied error after page create (#6866)
+* Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
+
+3.11.0 (2022-08-02)
+===================
+
+Highlights:
+-----------
+* Support for django 4
+* Dark mode support
+
 * Added dark mode support to css, dark mode settings and toggle button
 * Fix publishing of static placeholders outside of CMS pages
 * Allow to override the template rendered after a plugin has been saved.
 * Revert change to the toolbar sites menu to use ``http`` protocol.
 * Fix edit plugin popup width (remove 850px width constraint).
 * Fix except block using list instead of tuple. (#7334)
-* Added cache ttl extension point.
 * Added spell checking to pre-commit and github workflows
+* Added cache ttl extension point.
 * Added current language to the page cache key (#6607)
+* Fix isort line length to by in sync with flake8
 
 3.10.1 (2022-06-28)
 ===================
@@ -1486,7 +1505,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 - language namespaces for apphooks (reverse("de:myview"), reverse("en:myview"))
 - video plugin switch to https://github.com/FlashJunior/OSFlashVideoPlayer
-- frontediting added (cms.middlware.toolbar.ToolbarMiddleware)
+- frontediting added (cms.middleware.toolbar.ToolbarMiddleware)
 - testsuite works now under sqlite and postgres
 - orphaned text embed plugins get now deleted if not referenced in the text anymore
 - placeholder templatetag: "theme" attribute removed in favor of "width" (backward incompatible change if theme was used)

@@ -24,9 +24,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import (
-    get_available_slug, get_current_site, get_page_from_request,
-)
+from cms.utils.page import get_available_slug, get_current_site, get_page_from_request
 
 
 class PageMigrationTestCase(CMSTestCase):
@@ -158,8 +156,8 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertTrue(page.is_home)
         self.assertTrue(page.publisher_public.is_home)
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
-        self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [u''])
+        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [''])
+        self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [''])
 
     @skipIf(has_no_custom_user(), 'No custom user')
     def test_create_page_api_with_long_username(self):
@@ -178,12 +176,12 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(Page.objects.count(), 1)
 
         self.assertLessEqual(len(page.created_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegexpMatches(page.created_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.created_by, r'V+\.{3} \(id=\d+\)')
 
         self.assertLessEqual(len(page.changed_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegexpMatches(page.changed_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.changed_by, r'V+\.{3} \(id=\d+\)')
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u'root'])
+        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), ['root'])
 
     def test_delete_page_no_template(self):
         page_data = {
@@ -527,7 +525,7 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
-        with open(path, 'r') as fobj:
+        with open(path) as fobj:
             old = fobj.read()
         try:
             new = old.replace(
@@ -818,8 +816,8 @@ class PagesTestCase(TransactionCMSTestCase):
 
         saved_page = create_page('test saved page', 'nav_playground.html', 'en')
         self.assertIsNotNone(saved_page.pk)
-        self.assertIn('id={}'.format(saved_page.pk), repr(saved_page))
-        self.assertIn('is_draft={}'.format(saved_page.publisher_is_draft), repr(saved_page))
+        self.assertIn(f'id={saved_page.pk}', repr(saved_page))
+        self.assertIn(f'is_draft={saved_page.publisher_is_draft}', repr(saved_page))
 
         non_saved_title = Title()
         self.assertIsNone(non_saved_title.pk)
@@ -827,8 +825,8 @@ class PagesTestCase(TransactionCMSTestCase):
 
         saved_title = saved_page.get_title_obj()
         self.assertIsNotNone(saved_title.pk)
-        self.assertIn('id={}'.format(saved_title.pk), repr(saved_title))
-        self.assertIn('is_draft={}'.format(saved_title.publisher_is_draft), repr(saved_title))
+        self.assertIn(f'id={saved_title.pk}', repr(saved_title))
+        self.assertIn(f'is_draft={saved_title.publisher_is_draft}', repr(saved_title))
 
     def test_page_overwrite_urls(self):
 

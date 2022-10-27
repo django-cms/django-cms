@@ -96,11 +96,13 @@ def get_cache_durations():
     """
     Returns the setting: CMS_CACHE_DURATIONS or the defaults.
     """
-    return getattr(settings, 'CMS_CACHE_DURATIONS', {
+    cache_durations = {
         'menus': 60 * 60,
         'content': 60,
         'permissions': 60 * 60,
-    })
+    }
+    cache_durations.update(getattr(settings, 'CMS_CACHE_DURATIONS', {}))
+    return cache_durations
 
 
 @default('CMS_MEDIA_ROOT')
@@ -136,7 +138,7 @@ def get_toolbar_url__disable():
 def get_templates():
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
-        # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory
+        # CMS_TEMPLATES_DIR can either be a string pointing to the templates directory
         # or a dictionary holding 'site: template dir' entries
         if isinstance(tpldir, dict):
             tpldir = tpldir[settings.SITE_ID]

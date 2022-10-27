@@ -17,7 +17,9 @@ class MigrationTestCase(TestCase):
         }
 
         try:
-            call_command('makemigrations', **options)
+            # Django 4.1 introduces a new migration to djangocms_text_ckeditor
+            # therefore only check for own migrations
+            call_command('makemigrations', 'cms', **options)
         except SystemExit as e:
             status_code = str(e)
         else:
