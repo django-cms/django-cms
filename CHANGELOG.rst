@@ -14,6 +14,7 @@ unreleased
 * Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 * Fixed permission denied error after page create (#6866)
 * Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
+* Fix #3548 by reflecting the request language when resolving identical page slugs 
 
 3.11.0 (2022-08-02)
 ===================
