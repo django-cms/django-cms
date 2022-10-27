@@ -80,7 +80,8 @@ def get_current_language():
     """
     warnings.warn(
         "get_current_language() is deprecated; use django.utils.translation.get_language().",
-        DeprecationWarning
+        DeprecationWarning,
+        stacklevel=2
     )
     language_code = translation.get_language()
     return get_language_code(language_code)
