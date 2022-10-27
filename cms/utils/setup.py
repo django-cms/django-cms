@@ -36,7 +36,7 @@ def validate_settings():
                                    "'django.template.backends.django.DjangoTemplates' context processors.")
 
     if (
-        hasattr(settings, "SEND_BROKEN_LINK_EMAILS") and
+        hasattr(settings, "SEND_BROKEN_LINK_EMAILS") and  # noqa: W504
         "django.middleware.common.BrokenLinkEmailsMiddleware" not in getattr(settings, "MIDDLEWARE", [])
     ):
         warnings.warn('The setting "SEND_BROKEN_LINK_EMAILS" will not be honored by django CMS as of version 4.1. '
