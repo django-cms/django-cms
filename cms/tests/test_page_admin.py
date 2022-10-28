@@ -6,7 +6,7 @@ from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.forms.models import model_to_dict
-from django.http import HttpRequest
+from django.http import HttpRequest, HttpResponse
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
@@ -1291,9 +1291,9 @@ class PageTest(PageTestBase):
             content = self.get_page_title_obj(page, 'en')
             form_url = self.get_page_change_uri('en', page)
             # Middleware is needed to correctly setup the environment for the admin
-            middleware = CurrentUserMiddleware()
             request = self.get_request()
-            middleware.process_request(request)
+            middleware = CurrentUserMiddleware(lambda req: HttpResponse(""))
+            middleware(request)
             response = content_admin.change_view(
                 request, str(content.pk),
                 form_url=form_url,

@@ -10,7 +10,7 @@ djangocms-admin-style>=1.5
 docutils<0.18  # Fix for: https://github.yuuza.net/sphinx-doc/sphinx/issues/9727
 iptools
 mock>=2.0.0
-Pillow==5.2.0
+Pillow
 pyenchant==3.0.1
 pyflakes>=2.1
 python-coveralls>2.5.0

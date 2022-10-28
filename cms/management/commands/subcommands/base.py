@@ -4,7 +4,7 @@ from collections import OrderedDict
 from django.core.management.base import BaseCommand, CommandParser
 from django.core.management.color import color_style, no_style
 
-from cms.utils.compat import DJANGO_3_0, DJANGO_3_1, DJANGO_3_2
+from cms.utils.compat import DJANGO_2_2
 
 
 def add_builtin_arguments(parser):
@@ -43,7 +43,7 @@ def add_builtin_arguments(parser):
     parser.add_argument(
         '--force-color', action='store_true', dest='force_color', default=False, help="Colorize the command output."
     )
-    if DJANGO_3_0 or DJANGO_3_1 or DJANGO_3_2:
+    if not DJANGO_2_2:
         parser.add_argument(
             '--skip-checks', action='store_true', dest='skip_checks', default=False, help="Skip the checks."
         )

@@ -122,6 +122,7 @@ def boolean_icon(value):
         '<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
 
 
+@register.tag(name="page_submit_row")
 class PageSubmitRow(InclusionTag):
     name = 'page_submit_row'
     template = 'admin/cms/page/submit_row.html'
@@ -148,9 +149,6 @@ class PageSubmitRow(InclusionTag):
         return context
 
 
-register.tag(PageSubmitRow)
-
-
 def in_filtered(seq1, seq2):
     return [x for x in seq1 if x in seq2]
 
@@ -166,14 +164,12 @@ def admin_static_url():
     return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
 
 
+@register.tag(name="cms_admin_icon_base")
 class CMSAdminIconBase(Tag):
     name = 'cms_admin_icon_base'
 
     def render_tag(self, context):
         return CMS_ADMIN_ICON_BASE
-
-
-register.tag(CMSAdminIconBase)
 
 
 @register.inclusion_tag('admin/cms/page/plugin/submit_line.html', takes_context=True)
