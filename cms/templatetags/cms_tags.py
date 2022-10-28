@@ -15,10 +15,9 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.db.models import Model
-from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.encoding import force_str, smart_str
+from django.utils.encoding import smart_str
 from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.translation import (
@@ -85,16 +84,8 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         if settings.DEBUG:
             raise Page.DoesNotExist(body)
         else:
-            mw = settings.MIDDLEWARE
-            if getattr(settings, 'SEND_BROKEN_LINK_EMAILS', False):
+            if 'django.middleware.common.BrokenLinkEmailsMiddleware' in settings.MIDDLEWARE:
                 mail_managers(subject, body, fail_silently=True)
-            elif 'django.middleware.common.BrokenLinkEmailsMiddleware' in mw:
-                middle = BrokenLinkEmailsMiddleware()
-                domain = request.get_host()
-                path = request.get_full_path()
-                referer = force_str(request.META.get('HTTP_REFERER', ''), errors='replace')
-                if not middle.is_ignorable_request(request, path, domain, referer):
-                    mail_managers(subject, body, fail_silently=True)
             return None
 
 
