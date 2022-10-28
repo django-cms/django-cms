@@ -9,8 +9,7 @@ from django.db import OperationalError
 from django.utils.translation import gettext_lazy as _
 
 from cms.admin.forms import (
-    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm,
-    ViewRestrictionInlineAdminForm,
+    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm,
 )
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
@@ -29,6 +28,29 @@ for model, admin_instance in site._registry.items():
 
 class TabularInline(admin.TabularInline):
     pass
+
+
+def users_exceed_threshold():
+    """
+    Check if the number of users exceeds the configured threshold. Only bother
+    counting the users when using an integer threshold, otherwise return the
+    truthy value of the setting to avoid a potentially expensive DB query.
+    """
+    threshold = get_cms_setting('RAW_ID_USERS')
+
+    # Don't bother counting the users when not using an integer threshold
+    if threshold is True or threshold is False or not isinstance(threshold, int):
+        return (threshold)
+
+    # Given a fresh django-cms install and a django settings with the
+    # CMS_RAW_ID_USERS = CMS_PERMISSION = True
+    # django throws an OperationalError when running
+    # ./manage migrate
+    # because auth_user doesn't exists yet
+    try:
+        return get_user_model().objects.count() > threshold
+    except OperationalError:
+        return False
 
 
 class PagePermissionInlineAdmin(TabularInline):
@@ -54,19 +76,7 @@ class PagePermissionInlineAdmin(TabularInline):
     @classproperty
     def raw_id_fields(cls):
         # Dynamically set raw_id_fields based on settings
-        threshold = get_cms_setting('RAW_ID_USERS')
-
-        # Given a fresh django-cms install and a django settings with the
-        # CMS_RAW_ID_USERS = CMS_PERMISSION = True
-        # django throws an OperationalError when running
-        # ./manage migrate
-        # because auth_user doesn't exists yet
-        try:
-            threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
-            threshold = False
-
-        return ['user'] if threshold else []
+        return ['user'] if users_exceed_threshold() else []
 
     def get_queryset(self, request):
         """
@@ -87,8 +97,8 @@ class PagePermissionInlineAdmin(TabularInline):
     def get_formset(self, request, obj=None, **kwargs):
         """
         Some fields may be excluded here. User can change only
-        permissions which are available for him. E.g. if user does not haves
-        can_publish flag, he can't change assign can_publish permissions.
+        permissions which are available for them. E.g. if user does not have
+        can_publish flag, they can't change assign can_publish permissions.
         """
         exclude = self.exclude or []
         if obj:
@@ -135,13 +145,8 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     list_filter.append('can_change_advanced_settings')
 
     def get_list_filter(self, request):
-        threshold = get_cms_setting('RAW_ID_USERS')
-        try:
-            threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
-            threshold = False
         filter_copy = deepcopy(self.list_filter)
-        if threshold:
+        if users_exceed_threshold():
             filter_copy.remove('user')
         return filter_copy
 
@@ -160,19 +165,7 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     @classproperty
     def raw_id_fields(cls):
         # Dynamically set raw_id_fields based on settings
-        threshold = get_cms_setting('RAW_ID_USERS')
-
-        # Given a fresh django-cms install and a django settings with the
-        # CMS_RAW_ID_USERS = CMS_PERMISSION = True
-        # django throws an OperationalError when running
-        # ./manage migrate
-        # because auth_user doesn't exists yet
-        try:
-            threshold = threshold and get_user_model().objects.count() > threshold
-        except OperationalError:
-            threshold = False
-
-        return ['user'] if threshold else []
+        return ['user'] if users_exceed_threshold() else []
 
 
 if get_cms_setting('PERMISSION'):

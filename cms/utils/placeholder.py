@@ -5,9 +5,7 @@ from collections import OrderedDict
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
-from django.template import (
-    Context, NodeList, Template, TemplateSyntaxError, Variable, engines,
-)
+from django.template import Context, NodeList, Template, TemplateSyntaxError, Variable, engines
 from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode

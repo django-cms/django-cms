@@ -17,15 +17,11 @@ from cms.cache.permissions import clear_permission_cache
 from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
-from cms.forms.validators import (
-    validate_overwrite_url, validate_relative_url, validate_url_uniqueness,
-)
-from cms.forms.widgets import (
-    AppHookSelect, ApplicationConfigSelect, UserSelectAdminWidget,
-)
+from cms.forms.validators import validate_overwrite_url, validate_relative_url, validate_url_uniqueness
+from cms.forms.widgets import AppHookSelect, ApplicationConfigSelect, UserSelectAdminWidget
 from cms.models import (
-    CMSPlugin, GlobalPagePermission, Page, PagePermission, PageType, PageUser,
-    PageUserGroup, Placeholder, Title, TreeNode,
+    CMSPlugin, GlobalPagePermission, Page, PagePermission, PageType, PageUser, PageUserGroup, Placeholder, Title,
+    TreeNode,
 )
 from cms.models.permissionmodels import User
 from cms.plugin_pool import plugin_pool
@@ -34,8 +30,7 @@ from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_language_object
 from cms.utils.permissions import (
-    get_current_user, get_subordinate_groups, get_subordinate_users,
-    get_user_permission_level,
+    get_current_user, get_subordinate_groups, get_subordinate_users, get_user_permission_level,
 )
 from menus.menu_pool import menu_pool
 
@@ -72,8 +67,7 @@ def get_page_changed_by_filter_choices():
 def get_page_template_filter_choices():
     yield ('', _('All'))
 
-    for value, name in get_cms_setting('TEMPLATES'):
-        yield (value, name)
+    yield from get_cms_setting('TEMPLATES')
 
 
 def save_permissions(data, obj):
@@ -96,7 +90,7 @@ def save_permissions(data, obj):
             # add permission `key` for model `model`
             codename = get_permission_codename(key, model._meta)
             permission = Permission.objects.get(content_type=content_type, codename=codename)
-            field = 'can_%s_%s' % (key, name)
+            field = f'can_{key}_{name}'
 
             if data.get(field):
                 permission_accessor.add(permission)
@@ -148,7 +142,7 @@ class BasePageForm(forms.ModelForm):
 
 class AddPageForm(BasePageForm):
     source = forms.ModelChoiceField(
-        label=_(u'Page type'),
+        label=_('Page type'),
         queryset=Page.objects.filter(
             is_page_type=True,
             publisher_is_draft=True,
@@ -201,7 +195,7 @@ class AddPageForm(BasePageForm):
         if parent_node:
             slug = data['slug']
             parent_path = parent_node.item.get_path(self._language)
-            path = u'%s/%s' % (parent_path, slug) if parent_path else slug
+            path = f'{parent_path}/{slug}' if parent_path else slug
         else:
             path = data['slug']
 
@@ -433,7 +427,7 @@ class ChangePageForm(BasePageForm):
         if page.parent_page:
             slug = data['slug']
             parent_path = page.parent_page.get_path(self._language)
-            path = u'%s/%s' % (parent_path, slug) if parent_path else slug
+            path = f'{parent_path}/{slug}' if parent_path else slug
         else:
             path = data['slug']
 
@@ -958,7 +952,7 @@ class ChangeListForm(forms.Form):
 
     def run_filters(self, queryset):
         for field, value in self.get_filter_items():
-            query = {'{}__exact'.format(field): value}
+            query = {f'{field}__exact': value}
             queryset = queryset.filter(**query)
         return queryset
 
@@ -1099,7 +1093,7 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
 
 
 class GenericCmsPermissionForm(forms.ModelForm):
-    """Generic form for User & Grup permissions in cms
+    """Generic form for User & Group permissions in cms
     """
     _current_user = None
 
@@ -1176,7 +1170,7 @@ class GenericCmsPermissionForm(forms.ModelForm):
             permissions = permission_accessor.filter(content_type=content_type).values_list('codename', flat=True)
             for key in ('add', 'change', 'delete'):
                 codename = get_permission_codename(key, model._meta)
-                initials['can_%s_%s' % (key, name)] = codename in permissions
+                initials[f'can_{key}_{name}'] = codename in permissions
         return initials
 
     def save(self, commit=True):

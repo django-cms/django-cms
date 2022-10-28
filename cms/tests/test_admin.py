@@ -16,6 +16,7 @@ from djangocms_text_ckeditor.models import Text
 
 from cms import api
 from cms.admin.pageadmin import PageAdmin
+from cms.admin.permissionadmin import GlobalPagePermissionAdmin, PagePermissionInlineAdmin
 from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import StaticPlaceholder
@@ -26,9 +27,8 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_CHANGE_LANGUAGE,
-    URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED, URL_CMS_TRANSLATION_DELETE,
-    CMSTestCase,
+    URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED,
+    URL_CMS_TRANSLATION_DELETE, CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -587,11 +587,11 @@ class AdminTests(AdminTestsBase):
             request = self.get_request('/?public=true')
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?%s&language=en' % (base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+            self.assertEqual(response['Location'], '{}?{}&language=en'.format(base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
             request = self.get_request()
             response = self.admin_class.preview_page(request, page.pk, 'en')
             self.assertEqual(response.status_code, 302)
-            self.assertEqual(response['Location'], '%s?%s&language=en' % (base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
+            self.assertEqual(response['Location'], '{}?{}&language=en'.format(base_url, get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')))
 
             # Switch active site
             request.session['cms_admin_site'] = new_site.pk
@@ -671,7 +671,7 @@ class AdminTests(AdminTestsBase):
                     'plugin_language': 'en',
                 }
                 url = admin_reverse('cms_page_add_plugin')
-                response = self.client.post('{}?{}'.format(url,urlencode(data)))
+                response = self.client.post(f'{url}?{urlencode(data)}')
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
             with self.login_user_context(admin_user):
                 data = {
@@ -680,7 +680,7 @@ class AdminTests(AdminTestsBase):
                     'plugin_parent': link.pk,
                     'plugin_language': 'en',
                 }
-                response = self.client.post('{}?{}'.format(url,urlencode(data)))
+                response = self.client.post(f'{url}?{urlencode(data)}')
                 self.assertEqual(response.status_code, 302)
 
     def test_edit_title_dirty_bit(self):
@@ -759,7 +759,7 @@ class PluginPermissionTests(AdminTestsBase):
         return admin.site._registry[Page]
 
     def _give_permission(self, user, model, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        codename = f'{permission_type}_{model._meta.object_name.lower()}'
         user.user_permissions.add(Permission.objects.get(codename=codename))
 
     def _give_page_permission_rights(self, user):
@@ -805,7 +805,7 @@ class PluginPermissionTests(AdminTestsBase):
             self.client.login(username='test', password='test')
 
         self._give_permission(normal_guy, Text, 'change')
-        url = '%s/edit-plugin/%s/' % (admin_reverse('cms_page_edit_plugin', args=[plugin.id]), plugin.id)
+        url = '{}/edit-plugin/{}/'.format(admin_reverse('cms_page_edit_plugin', args=[plugin.id]), plugin.id)
         response = self.client.post(url, dict())
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTrue("Plugin not found" in force_str(response.content))
@@ -1157,7 +1157,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 self.assertEqual(response.status_code, 200)
                 old_response_size = len(response.content)
                 old_user_count = get_user_model().objects.count()
-                # create additionals user and reload the page
+                # create additional user and reload the page
                 get_user_model().objects.create_user(username=USER_NAME, email=USER_NAME + '@django-cms.org',
                                                      password=USER_NAME)
                 user_count = get_user_model().objects.count()
@@ -1174,7 +1174,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 foundcount = text.count(USER_NAME)
                 # 2 forms contain usernames as options
                 self.assertEqual(foundcount, 2,
-                                 "Username %s appeared %s times in response.content, expected 2 times" % (
+                                 "Username {} appeared {} times in response.content, expected 2 times".format(
                                      USER_NAME, foundcount))
 
 
@@ -1390,3 +1390,54 @@ class AdminPageTreeTests(AdminTestsBase):
         #       ⊢ Beta
         #   ⊢ Delta
         #       ⊢ Gamma
+
+
+class AdminPerformanceTests(AdminTestsBase):
+
+    def test_raw_id_threshold_page_permission_inline_admin(self):
+        """
+        Only count users when using an integer value as threshold for
+        CMS_RAW_ID_USERS.
+        """
+        with self.settings(CMS_RAW_ID_USERS=1):
+            with self.assertNumQueries(1):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, [])
+
+        # Create users to check if threshold is honored
+        self._get_guys()
+
+        with self.settings(CMS_RAW_ID_USERS=False):
+            with self.assertNumQueries(0):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, [])
+
+        with self.settings(CMS_RAW_ID_USERS=True):
+            with self.assertNumQueries(0):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, ['user'])
+
+        with self.settings(CMS_RAW_ID_USERS=1):
+            with self.assertNumQueries(1):
+                self.assertEqual(PagePermissionInlineAdmin.raw_id_fields, ['user'])
+
+    def test_raw_id_threshold_global_page_permission_admin(self):
+        """
+        Only count users when using an integer value as threshold for
+        CMS_RAW_ID_USERS.
+        """
+        with self.settings(CMS_RAW_ID_USERS=1):
+            with self.assertNumQueries(1):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, [])
+
+        # Create users to check if threshold is honored
+        self._get_guys()
+
+        with self.settings(CMS_RAW_ID_USERS=False):
+            with self.assertNumQueries(0):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, [])
+
+        with self.settings(CMS_RAW_ID_USERS=True):
+            with self.assertNumQueries(0):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, ['user'])
+
+        with self.settings(CMS_RAW_ID_USERS=1):
+            with self.assertNumQueries(1):
+                self.assertEqual(GlobalPagePermissionAdmin.raw_id_fields, ['user'])

@@ -11,20 +11,15 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import (
-    get_language, gettext_lazy as _, override as force_language,
-)
+from django.utils.translation import get_language, gettext_lazy as _, override as force_language
 from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import (
-    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING,
-    TEMPLATE_INHERITANCE_MAGIC,
+    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING, TEMPLATE_INHERITANCE_MAGIC,
 )
-from cms.exceptions import (
-    LanguageError, PublicIsUnmodifiable, PublicVersionNeeded,
-)
+from cms.exceptions import LanguageError, PublicIsUnmodifiable, PublicVersionNeeded
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
@@ -261,7 +256,7 @@ class Page(models.Model):
             except IndexError:
                 title = None
         if title is None:
-            title = u""
+            title = ""
         return force_str(title)
 
     def __repr__(self):
@@ -343,7 +338,7 @@ class Page(models.Model):
         title_obj = self.get_title_obj(language, fallback=False)
         title_obj.slug = get_available_slug(title_obj.page.node.site, title_obj.slug, title_obj.language, current=title_obj.page)
         if not title_obj.page.is_home:
-            title_obj.path = '%s/%s' % (base, title_obj.slug) if base else title_obj.slug
+            title_obj.path = f'{base}/{title_obj.slug}' if base else title_obj.slug
         title_obj.save()
 
     def _update_title_path_recursive(self, language, slug=None):
@@ -703,13 +698,13 @@ class Page(models.Model):
 
             if parent_page:
                 base = parent_page.get_path(title.language)
-                path = '%s/%s' % (base, title.slug) if base else title.slug
+                path = f'{base}/{title.slug}' if base else title.slug
             else:
                 base = ''
                 path = title.slug
 
             title.slug = get_available_slug(site, path, title.language)
-            title.path = '%s/%s' % (base, title.slug) if base else title.slug
+            title.path = f'{base}/{title.slug}' if base else title.slug
             title.save()
 
             new_page.title_cache[title.language] = title
@@ -829,6 +824,7 @@ class Page(models.Model):
         self.changed_by = get_current_user_name()
 
         if created:
+            clear_permission_cache()
             self.created_by = self.changed_by
         super().save(**kwargs)
         if created and get_cms_setting('PERMISSION'):
@@ -843,11 +839,14 @@ class Page(models.Model):
         PUBLISHER_STATE_DEFAULT (in publish method).
         """
         keep_state = getattr(self, '_publisher_keep_state', None)
-        if self.publisher_is_draft and not keep_state and self.is_new_dirty():
-            self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
+        is_new_dirty = self.is_new_dirty()
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        return super().save_base(*args, **kwargs)
+        result = super().save_base(*args, **kwargs)
+        if self.publisher_is_draft and not keep_state and is_new_dirty:
+            # As of Django 4.1 only possible after self has been saved.
+            self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
+        return result
 
     def update(self, refresh=False, draft_only=True, **data):
         assert self.publisher_is_draft
@@ -1273,7 +1272,7 @@ class Page(models.Model):
     def get_published_languages(self):
         if self.publisher_is_draft:
             return self.get_languages()
-        return sorted([language for language in self.get_languages() if self.is_published(language)])
+        return sorted(language for language in self.get_languages() if self.is_published(language))
 
     def set_translations_cache(self):
         for translation in self.title_set.all():
@@ -1286,7 +1285,7 @@ class Page(models.Model):
         if self.parent_page:
             base = self.parent_page.get_path(language, fallback=True)
             # base can be empty when the parent is a home-page
-            path = u'%s/%s' % (base, slug) if base else slug
+            path = f'{base}/{slug}' if base else slug
         else:
             path = slug
         return path
@@ -1521,9 +1520,7 @@ class Page(models.Model):
         return user_can_publish_page(user, page=self)
 
     def has_advanced_settings_permission(self, user):
-        from cms.utils.page_permissions import (
-            user_can_change_page_advanced_settings,
-        )
+        from cms.utils.page_permissions import user_can_change_page_advanced_settings
         return user_can_change_page_advanced_settings(user, page=self)
 
     def has_change_permissions_permission(self, user):

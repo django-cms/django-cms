@@ -422,9 +422,9 @@ var Toolbar = new Class({
         }
 
         if (CMS.settings.color_scheme) {
-            this.set_color_scheme (CMS.settings.color_scheme);
+            Helpers.setColorScheme (CMS.settings.color_scheme);
         } else if (CMS.config.color_scheme) {
-            this.set_color_scheme (CMS.config.color_scheme);
+            Helpers.setColorScheme (CMS.config.color_scheme);
         }
 
         // check if there are messages and display them
@@ -623,12 +623,12 @@ var Toolbar = new Class({
                 });
                 break;
             case 'color-toggle':
-                switch (this.get_color_scheme()) {
+                switch (Helpers.getColorScheme()) {
                     case 'light':
-                        this.set_color_scheme('dark');
+                        Helpers.setColorScheme('dark');
                         break;
                     case 'dark':
-                        this.set_color_scheme('light');
+                        Helpers.setColorScheme('light');
                         break;
                     default:
                         break;
@@ -777,53 +777,11 @@ var Toolbar = new Class({
     },
 
     /**
-     * Get color scheme either from :root[data-color-scheme] or user system setting
+     * Compatibility shims to be removed CMS 4.0+
      *
-     * @method get_color_scheme
-     * @public
-     * @returns {String}
      */
-    get_color_scheme: function () {
-        let state = this.ui.body.attr('data-color-scheme');
-
-        if (!state && window.matchMedia) {
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                state = 'dark'; // dark mode
-            } else {
-                state = 'light';
-            }
-        }
-        return state;
-    },
-
-    /**
-     * Sets the color scheme for the current document and all iframes contained.
-     *
-     * @method set_color_scheme
-     * @public
-     * @param scheme {String}
-     * @retiurns {void}
-     */
-
-    set_color_scheme: function (scheme) {
-        CMS.API.Helpers.setSettings({ color_scheme: scheme });
-        if (scheme === 'auto') {
-            this.ui.body.removeAttr('data-color-scheme');
-            this.ui.body.find('div.cms iframe').each(function(i, e) {
-                delete e.contentDocument.documentElement.dataset.colorScheme;
-            });
-        } else {
-            this.ui.body.attr('data-color-scheme', scheme);
-            this.ui.body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
-                if (e.contentDocument) {
-                    e.contentDocument.documentElement.dataset.colorScheme = scheme;
-                    // ckeditor (and potentially other apps) have iframes inside their admin forms
-                    // also set color scheme there
-                    $(e.contentDocument).find('iframe').each(setFrameColorScheme);
-                }
-            });
-        }
-    }
+    get_color_scheme: Helpers.getColorScheme,
+    set_color_scheme: Helpers.setColorScheme
 });
 
 export default Toolbar;

@@ -10,8 +10,7 @@ from cms.extensions import PageExtension, TitleExtension, extension_pool
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.models import Page, PageType
 from cms.test_utils.project.extensionapp.models import (
-    MultiTablePageExtension, MultiTableTitleExtension, MyPageExtension,
-    MyTitleExtension,
+    MultiTablePageExtension, MultiTableTitleExtension, MyPageExtension, MyTitleExtension,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_pool import toolbar_pool
@@ -587,7 +586,7 @@ class ExtensionAdminTestCase(CMSTestCase):
                         )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
-            response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
+            response = self.client.get(f'{self.page.get_absolute_url()}?edit')
             self.assertIn("TestItem", response.rendered_content)
 
         toolbar_pool.toolbars = old_toolbars
@@ -612,7 +611,7 @@ class ExtensionAdminTestCase(CMSTestCase):
                         )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
-            response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
+            response = self.client.get(f'{self.page.get_absolute_url()}?edit')
             self.assertIn("TestItem", response.rendered_content)
 
         toolbar_pool.toolbars = old_toolbars

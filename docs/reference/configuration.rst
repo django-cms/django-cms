@@ -851,11 +851,16 @@ This setting only applies if :setting:`CMS_PERMISSION` is ``True``
 
 The ``view restrictions`` and ``page permissions`` inlines on the
 :class:`cms.models.Page` admin change forms can cause performance problems
-where there are many thousands of users being put into simple select boxes. If
-set to a positive integer, this setting forces the inlines on that page to use
+where there are many thousands of users being put into simple select boxes.
+
+If set to a positive integer, this setting forces the inlines on that page to use
 standard Django admin raw ID widgets rather than select boxes if the number of
 users in the system is greater than that number, dramatically improving
 performance.
+
+If set to ``True`` it forces the inlines on Page admin to use raw ID widgets
+without even counting the number of users, giving an additional performance
+improvement.
 
 .. note:: Using raw ID fields in combination with ``limit_choices_to`` causes
           errors due to excessively long URLs if you have many thousands of
@@ -889,6 +894,7 @@ CMS_CACHE_DURATIONS
 ===================
 
 This dictionary carries the various cache duration settings.
+You can override it partially, e.g. ``{'content': 3600}``.
 
 
 ``'content'``
@@ -1014,7 +1020,7 @@ CMS_LIMIT_TTL_CACHE_FUNCTION
 default
     ``None``
 
-If defined, specifies the function to be called that allows to limit the page cache ttl value 
+If defined, specifies the function to be called that allows to limit the page cache ttl value
 using a business logic. The function receives one argument, the `response`, and returns an `int`
 the max business value of the page cache ttl.
 

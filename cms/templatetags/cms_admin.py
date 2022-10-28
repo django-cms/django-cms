@@ -72,7 +72,7 @@ class TreePublishRow(Tag):
         )
 
 
-register.tag(TreePublishRow)
+register.tag("tree_publish_row", TreePublishRow)
 
 
 @register.filter
@@ -191,7 +191,7 @@ class PageSubmitRow(InclusionTag):
         return context
 
 
-register.tag(PageSubmitRow)
+register.tag("page_submit_row", PageSubmitRow)
 
 
 def in_filtered(seq1, seq2):
@@ -217,7 +217,7 @@ class CMSAdminIconBase(Tag):
         return CMS_ADMIN_ICON_BASE
 
 
-register.tag(CMSAdminIconBase)
+register.tag("cms_admin_icon_base", CMSAdminIconBase)
 
 
 @register.inclusion_tag('admin/cms/page/plugin/submit_line.html', takes_context=True)
