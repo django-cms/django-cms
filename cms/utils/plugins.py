@@ -274,7 +274,7 @@ def downcast_plugins(plugins,
         except KeyError:
             # Plugin not available
             logger.error(
-                f"Plugin not installed: {plugin_type} (pk={', '.joing(pks)})", exc_info=sys.exc_info()
+                f"Plugin not installed: {plugin_type} (pk={', '.join(str(pk) for pk in pks)})", exc_info=sys.exc_info()
             )
             continue
         # get all the plugins of type cls.model
