@@ -1,19 +1,18 @@
 import json
 
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
-from django.http import (Http404, HttpResponseBadRequest,
-                         HttpResponseNotFound)
-from django.utils.encoding import force_str, smart_str
+from django.http import Http404, HttpResponseBadRequest, HttpResponseNotFound
 from django.test.utils import override_settings
+from django.utils.encoding import force_str, smart_str
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
 
 from cms import api
-from cms.api import create_page, create_title, add_plugin
+from cms.api import add_plugin, create_page, create_title
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import PageContent, StaticPlaceholder, UserSettings
 from cms.models.pagemodel import Page
@@ -21,8 +20,7 @@ from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_DELETE,
-    URL_CMS_PAGE_PUBLISHED,
+    URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED, CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -128,12 +126,9 @@ class AdminTestCase(AdminTestsBase):
 
     def test_delete(self):
         admin_user = self.get_superuser()
-        create_page("home", "nav_playground.html", "en",
-                           created_by=admin_user)
-        page = create_page("delete-page", "nav_playground.html", "en",
-                           created_by=admin_user)
-        create_page('child-page', "nav_playground.html", "en",
-                    created_by=admin_user, parent=page)
+        create_page("home", "nav_playground.html", "en", created_by=admin_user)
+        page = create_page("delete-page", "nav_playground.html", "en", created_by=admin_user)
+        create_page('child-page', "nav_playground.html", "en", created_by=admin_user, parent=page)
         body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         with self.login_user_context(admin_user):
@@ -143,12 +138,9 @@ class AdminTestCase(AdminTestsBase):
 
     def test_delete_diff_language(self):
         admin_user = self.get_superuser()
-        create_page("home", "nav_playground.html", "en",
-                           created_by=admin_user)
-        page = create_page("delete-page", "nav_playground.html", "en",
-                           created_by=admin_user)
-        create_page('child-page', "nav_playground.html", "de",
-                    created_by=admin_user, parent=page)
+        create_page("home", "nav_playground.html", "en", created_by=admin_user)
+        page = create_page("delete-page", "nav_playground.html", "en", created_by=admin_user)
+        create_page('child-page', "nav_playground.html", "de", created_by=admin_user, parent=page)
         body = page.get_placeholders("en").get(slot='body')
         add_plugin(body, 'TextPlugin', 'en', body='text')
         with self.login_user_context(admin_user):
@@ -173,8 +165,7 @@ class AdminTestCase(AdminTestsBase):
 
     def test_pagetree_filtered(self):
         superuser = self.get_superuser()
-        create_page("root-page", "nav_playground.html", "en",
-                    created_by=superuser)
+        create_page("root-page", "nav_playground.html", "en", created_by=superuser)
         with self.login_user_context(superuser):
             url = admin_reverse('cms_pagecontent_changelist')
             response = self.client.get('%s?template__exact=nav_playground.html' % url)
@@ -183,8 +174,7 @@ class AdminTestCase(AdminTestsBase):
 
     def test_delete_translation(self):
         admin_user = self.get_superuser()
-        page = create_page("delete-page-translation", "nav_playground.html", "en",
-                           created_by=admin_user)
+        page = create_page("delete-page-translation", "nav_playground.html", "en", created_by=admin_user)
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
         create_title("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
         with self.login_user_context(admin_user):
@@ -231,13 +221,15 @@ class AdminTestCase(AdminTestsBase):
     def test_changelist_items(self):
         admin_user = self.get_superuser()
         first_level_page = create_page('level1', 'nav_playground.html', 'en')
-        second_level_page_top = create_page('level21', "nav_playground.html", "en",
-                                            created_by=admin_user, parent=first_level_page)
-        second_level_page_bottom = create_page('level22', "nav_playground.html", "en",
-                                               created_by=admin_user,
-                                               parent=self.reload(first_level_page))
-        third_level_page = create_page('level3', "nav_playground.html", "en",
-                                       created_by=admin_user, parent=second_level_page_top)
+        second_level_page_top = create_page(
+            'level21', "nav_playground.html", "en", created_by=admin_user, parent=first_level_page
+        )
+        second_level_page_bottom = create_page(
+            'level22', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page)
+        )
+        third_level_page = create_page(
+            'level3', "nav_playground.html", "en", created_by=admin_user, parent=second_level_page_top
+        )
         self.assertEqual(Page.objects.all().count(), 4)
 
         with self.login_user_context(admin_user):
@@ -251,18 +243,16 @@ class AdminTestCase(AdminTestsBase):
     def test_changelist_get_results(self):
         admin_user = self.get_superuser()
         first_level_page = create_page('level1', 'nav_playground.html', 'en')
-        second_level_page_top = create_page('level21', "nav_playground.html", "en",
-                                            created_by=admin_user,
-                                            parent=first_level_page)
-        second_level_page_bottom = create_page('level22', "nav_playground.html", "en", # nopyflakes
-                                               created_by=admin_user,
-                                               parent=self.reload(first_level_page))
-        third_level_page = create_page('level3', "nav_playground.html", "en", # nopyflakes
-                                       created_by=admin_user,
-                                       parent=second_level_page_top)
-        fourth_level_page = create_page('level23', "nav_playground.html", "en", # nopyflakes
-                                        created_by=admin_user,
-                                        parent=self.reload(first_level_page))
+        second_level_page_top = create_page(
+            'level21', "nav_playground.html", "en", created_by=admin_user, parent=first_level_page
+        )
+        create_page(
+            'level22', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page)
+        )
+        create_page('level3', "nav_playground.html", "en", created_by=admin_user, parent=second_level_page_top)
+        create_page(
+            'level23', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page)
+        )
         self.assertEqual(Page.objects.all().count(), 5)
         endpoint = self.get_pages_admin_list_uri()
 
@@ -759,22 +749,46 @@ class AdminFormsTests(AdminTestsBase):
             # Non ajax call should return a 403 as this page shouldn't be accessed by anything else but ajax queries
             self.assertEqual(403, self.client.get(page_url).status_code)
 
-            self.assertEqual(200,
-                             self.client.get(page_url, HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code
+            self.assertEqual(
+                200, self.client.get(page_url, HTTP_X_REQUESTED_WITH='XMLHttpRequest').status_code
             )
 
             # Test that the query param is working as expected.
-            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'main_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
+            self.assertEqual(
+                1, len(json.loads(
+                    self.client.get(
+                        page_url, {'q': 'main_title'},
+                        HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+                    ).content.decode("utf-8")
+                ))
+            )
 
-            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'menu_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
+            self.assertEqual(
+                1, len(json.loads(
+                    self.client.get(
+                        page_url, {'q': 'menu_title'},
+                        HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+                    ).content.decode("utf-8")
+                ))
+            )
 
-            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'overwritten_url'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
+            self.assertEqual(
+                1, len(json.loads(
+                    self.client.get(
+                        page_url, {'q': 'overwritten_url'},
+                        HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+                    ).content.decode("utf-8")
+                ))
+            )
 
-            self.assertEqual(1, len(json.loads(self.client.get(page_url, {'q':'page_title'},
-                                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest').content.decode("utf-8"))))
+            self.assertEqual(
+                1, len(json.loads(
+                    self.client.get(
+                        page_url, {'q': 'page_title'},
+                        HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+                    ).content.decode("utf-8")
+                ))
+            )
 
 
 class AdminPageEditContentSizeTests(AdminTestsBase):

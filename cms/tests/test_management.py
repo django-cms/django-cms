@@ -1,26 +1,22 @@
 import uuid
-
 from io import StringIO
-
-from cms.test_utils.project.sampleapp.cms_apps import SampleApp
-from cms.test_utils.util.context_managers import apphooks
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
 from django.test.utils import override_settings
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models import Page, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.fixtures.navextenders import NavextendersFixture
+from cms.test_utils.project.sampleapp.cms_apps import SampleApp
 from cms.test_utils.testcases import CMSTestCase
-
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
-
+from cms.test_utils.util.context_managers import apphooks
 
 APPHOOK = "SampleApp"
 PLUGIN = "TextPlugin"
@@ -315,8 +311,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         col4 = add_plugin(ph_en, "ColumnPlugin", lang, position="first-child", target=mcol2)
         # add a *nested* link plugin
-        add_plugin(ph_en, "LinkPlugin", lang, target=col4,
-                                    name="A Link", external_link="https://www.django-cms.org")
+        add_plugin(ph_en, "LinkPlugin", lang, target=col4, name="A Link", external_link="https://www.django-cms.org")
         static_placeholder = StaticPlaceholder(code=str(uuid.uuid4()), site_id=1)
         static_placeholder.save()
         add_plugin(static_placeholder.draft, "TextPlugin", lang, body="example content")
@@ -343,9 +338,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
         # These asserts that no orphaned plugin exists
-        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins*2)
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins * 2)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins)
 
@@ -494,7 +489,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))
 
         # Plugins still copied
-        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins*2)
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins * 2)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins)
 
@@ -519,7 +514,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         # one placeholder (with 7 plugins) is skipped, so the difference must be 6
-        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins-6)
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins - 6)
 
     def test_copy_filled_placeholder_force_copy(self):
         """
@@ -549,7 +544,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
         # we have an existing plugin in one placeholder, so we have one more
-        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins+1)
+        self.assertEqual(CMSPlugin.objects.filter(language='de').count(), number_start_plugins + 1)
 
     def test_copy_from_non_existing_lang(self):
         """
@@ -585,7 +580,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         p1 = create_page('page1', in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
         create_page('page4', in_navigation=True, language='de', template='nav_playground.html', site=site_obj)
-        create_page('page2', in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj)
+        create_page(
+            'page2', in_navigation=True, parent=p1, language='de', template='nav_playground.html', site=site_obj
+        )
 
         for page in Page.objects.on_site(site_active):
             self._fill_page_body(page, 'de')
@@ -611,7 +608,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         # plugins for site 2 fr
         self.assertEqual(CMSPlugin.objects.filter(language='fr').count(), number_site2_plugins)
         # global number of plugins
-        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins + number_site2_plugins*2)
+        self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins + number_site2_plugins * 2)
 
     def test_copy_bad_languages(self):
         out = StringIO()
@@ -621,4 +618,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
                 stdout=out
             )
 
-        self.assertEqual(str(command_error.exception), 'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES')
+        self.assertEqual(
+            str(command_error.exception),
+            'Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES'
+        )

@@ -1,15 +1,13 @@
-from django.contrib.admin.models import LogEntry, ADDITION, CHANGE, DELETION
+from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
 
 from cms.api import add_plugin, create_page, create_title
 from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, Placeholder, UserSettings
-from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_MOVE,
-)
+from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
 from cms.utils import get_current_site
-from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
+from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
 
 # Snippet to create wizard page taken from: test_wizards.py
 CreateCMSPageForm = step2_form_factory(

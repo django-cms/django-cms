@@ -1,9 +1,9 @@
 from django.template import Template
+from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.models import Page
 from cms.test_utils.testcases import CMSTestCase
-from django.test.utils import override_settings
 from menus.base import NavigationNode
 
 
@@ -31,12 +31,9 @@ class NonRootCase(CMSTestCase):
             language="en",
             in_navigation=True,
         )
-        self.page2 = create_page("page2", "nav_playground.html", "en",
-                          parent=self.page1, in_navigation=True)
-        self.page3 = create_page("page3", "nav_playground.html", "en",
-                          parent=self.page2, in_navigation=True)
-        self.page4 = create_page("page4", "nav_playground.html", "en",
-                                      in_navigation=True)
+        self.page2 = create_page("page2", "nav_playground.html", "en", parent=self.page1, in_navigation=True)
+        self.page3 = create_page("page3", "nav_playground.html", "en", parent=self.page2, in_navigation=True)
+        self.page4 = create_page("page4", "nav_playground.html", "en", in_navigation=True)
         self.all_pages = [self.page1, self.page2, self.page3, self.page4]
         self.top_level_pages = [self.page1, self.page4]
         self.level1_pages = [self.page2]

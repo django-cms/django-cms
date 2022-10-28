@@ -1,7 +1,7 @@
 import uuid
 
 from cms.models import Page
-from cms.signals import pre_obj_operation, post_obj_operation
+from cms.signals import post_obj_operation, pre_obj_operation
 
 
 def send_pre_page_operation(request, operation, sender=Page, **kwargs):

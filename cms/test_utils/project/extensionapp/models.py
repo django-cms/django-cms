@@ -2,7 +2,7 @@ from django.conf import settings
 from django.db import models
 
 from cms.extensions import PageExtension, TitleExtension
-from cms.extensions.extension_pool import  extension_pool
+from cms.extensions.extension_pool import extension_pool
 
 
 class MyPageExtension(PageExtension):
@@ -14,6 +14,7 @@ class MyPageExtension(PageExtension):
             favorite_user.pk = None
             favorite_user.mypageextension = self
             favorite_user.save()
+
 
 extension_pool.register(MyPageExtension)
 
@@ -31,6 +32,7 @@ class MultiTablePageExtensionParent(models.Model):
 class MultiTablePageExtension(MultiTablePageExtensionParent, PageExtension):
     multitable_extra = models.CharField(blank=True, default='', max_length=255)
 
+
 extension_pool.register(MultiTablePageExtension)
 
 
@@ -41,5 +43,5 @@ class MultiTableTitleExtensionParent(models.Model):
 class MultiTableTitleExtension(MultiTableTitleExtensionParent, TitleExtension):
     multitable_extra_title = models.CharField(blank=True, default='', max_length=255)
 
-extension_pool.register(MultiTableTitleExtension)
 
+extension_pool.register(MultiTableTitleExtension)
