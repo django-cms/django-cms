@@ -65,7 +65,7 @@ template             rendering                         --
 ===================  ================================  ========================================================
 
 
-:class:`CMSPluginBase <cms.plugin_base.CMSPluginBase>`
+:class:`CMSPlugin <cms.models.pluginmodel.CMSPlugin>`
 ======================================================
 
 The plugin **model**, the sub-class of :class:`cms.models.pluginmodel.CMSPlugin`,
@@ -83,7 +83,7 @@ Usually, you find that it is useful to be able to configure your plugin, and thi
 will require a model.
 
 
-:class:`CMSPlugin <cms.models.pluginmodel.CMSPlugin>`
+:class:`CMSPluginBase <cms.plugin_base.CMSPluginBase>`
 ==================================================================
 
 :class:`cms.plugin_base.CMSPluginBase` is actually a sub-class of

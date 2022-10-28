@@ -1,12 +1,12 @@
-{% load i18n admin_urls %}
+{% load i18n l10n admin_urls %}
 {% spaceless %}
 <ul class="cms-pagetree-dropdown-menu-inner">
     {% block actions %}
         <li
             {% if has_copy_page_permission %}
                 class="js-cms-tree-item-copy"
-                data-id="{{ page.pk }}"
-                data-node-id="{{ node.pk }}"
+                data-id="{{ page.pk|unlocalize }}"
+                data-node-id="{{ node.pk|unlocalize }}"
                 data-apphook="{{ page.application_urls|default_if_none:"" }}"
             {% endif %}
         >
@@ -18,8 +18,8 @@
         <li
             {% if has_move_page_permission %}
                 class="js-cms-tree-item-cut"
-                data-id="{{ page.pk }}"
-                data-node-id="{{ node.pk }}"
+                data-id="{{ page.pk|unlocalize }}"
+                data-node-id="{{ node.pk|unlocalize }}"
             {% endif %}
         >
             <a{% if not has_move_page_permission %} class="cms-pagetree-dropdown-item-disabled"{% endif %}
@@ -29,8 +29,8 @@
             </a>
         </li>
         <li>
-            <a href="#" data-id="{{ page.pk }}"
-                data-node-id="{{ node.pk }}"
+            <a href="#" data-id="{{ page.pk|unlocalize }}"
+                data-node-id="{{ node.pk|unlocalize }}"
                 class="{% if has_add_permission %}js-cms-tree-item-paste{% endif %}
                 {% if not has_add_permission or not paste_enabled %} cms-pagetree-dropdown-item-disabled{% endif %}">
                 <span class="cms-icon cms-icon-alias"></span>

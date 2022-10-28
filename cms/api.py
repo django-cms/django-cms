@@ -9,9 +9,7 @@ import datetime
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.core.exceptions import (
-    FieldError, PermissionDenied, ValidationError,
-)
+from django.core.exceptions import FieldError, PermissionDenied, ValidationError
 from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
@@ -22,10 +20,7 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import (
-    ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
-    PageUser,
-)
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission, PageUser
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title

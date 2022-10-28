@@ -5,13 +5,34 @@ Changelog
 unreleased
 ==========
 
+* Support for django 4.1
+* Allow to partially override ``CMS_CACHE_DURATIONS``
+* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
+* Make javascript dark mode functions available to popups as CMS.API.getColorScheme
+  and CMS.API.setColorScheme
+* Fix bug where switching color scheme affects other settings
+* Unlocalize page and node ids when rendering the page tree in the admin (#7175)
+* Fixed permission denied error after page create (#6866)
+* Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
+
+3.11.0 (2022-08-02)
+===================
+
+Highlights:
+-----------
+* Support for django 4
+* Dark mode support
+
 * Added dark mode support to css, dark mode settings and toggle button
 * Fix publishing of static placeholders outside of CMS pages
 * Allow to override the template rendered after a plugin has been saved.
 * Revert change to the toolbar sites menu to use ``http`` protocol.
 * Fix edit plugin popup width (remove 850px width constraint).
 * Fix except block using list instead of tuple. (#7334)
+* Added spell checking to pre-commit and github workflows
 * Added cache ttl extension point.
+* Added current language to the page cache key (#6607)
+* Fix isort line length to by in sync with flake8
 
 3.10.1 (2022-06-28)
 ===================
@@ -152,7 +173,7 @@ Bug Fixes:
 * Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
 * Fixed missing builtin arguments on main ``cms`` management command causing it to crash
 * Fixed template label nested translation
-* Fixed a bug where the fallback page title whould be returned instead of the one from the current language
+* Fixed a bug where the fallback page title would be returned instead of the one from the current language
 * Fixed an issue when running migrations on a multi database project
 * Fixes #7033: also check for Django 3.2, now that 3.9 supports it. (#7054) (02083f2dc) -- Marco Bonetti
 
@@ -253,7 +274,7 @@ Thanks to all contributors for their efforts!
 * Fixed an issue in ``wizards/create.html`` where the error message did not use the plural form
 * Improved documentation building
 * Updated the content for django CMS’s development community
-* Replaced all occurences of ``force_text`` and ``smart_text`` against
+* Replaced all occurrences of ``force_text`` and ``smart_text`` against
   ``force_str``and ``smart_str``.
 
 
@@ -791,7 +812,7 @@ Thanks to all contributors for their efforts!
 - Substantial improvements to the page tree and significant reduction of reloads
 - Update jsTree version to 3.2.1 with slight adaptions to the Pagetree
 - Documentation improvements
-- Improve the display and useability of the language menu, especially in cases
+- Improve the display and usability of the language menu, especially in cases
   where there are many languages.
 - Fix an issue relating to search fields in plugins
 - Fix an issue where the app-resolver would trigger locales into migrations
@@ -1484,7 +1505,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 - language namespaces for apphooks (reverse("de:myview"), reverse("en:myview"))
 - video plugin switch to https://github.com/FlashJunior/OSFlashVideoPlayer
-- frontediting added (cms.middlware.toolbar.ToolbarMiddleware)
+- frontediting added (cms.middleware.toolbar.ToolbarMiddleware)
 - testsuite works now under sqlite and postgres
 - orphaned text embed plugins get now deleted if not referenced in the text anymore
 - placeholder templatetag: "theme" attribute removed in favor of "width" (backward incompatible change if theme was used)

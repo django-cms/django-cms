@@ -168,7 +168,7 @@ class ShowMenu(InclusionTag):
         return context
 
 
-register.tag(ShowMenu)
+register.tag("show_menu", ShowMenu)
 
 
 class ShowMenuBelowId(ShowMenu):
@@ -185,7 +185,7 @@ class ShowMenuBelowId(ShowMenu):
     )
 
 
-register.tag(ShowMenuBelowId)
+register.tag("show_menu_below_id", ShowMenuBelowId)
 
 
 class ShowSubMenu(InclusionTag):
@@ -260,7 +260,7 @@ class ShowSubMenu(InclusionTag):
         return context
 
 
-register.tag(ShowSubMenu)
+register.tag("show_sub_menu", ShowSubMenu)
 
 
 class ShowBreadcrumb(InclusionTag):
@@ -328,7 +328,7 @@ class ShowBreadcrumb(InclusionTag):
         return context
 
 
-register.tag(ShowBreadcrumb)
+register.tag("show_breadcrumb", ShowBreadcrumb)
 
 
 def _raw_language_marker(language, lang_code):
@@ -406,7 +406,7 @@ class LanguageChooser(InclusionTag):
         return context
 
 
-register.tag(LanguageChooser)
+register.tag("language_chooser", LanguageChooser)
 
 
 class PageLanguageUrl(InclusionTag):
@@ -439,4 +439,4 @@ class PageLanguageUrl(InclusionTag):
         return {'content': url}
 
 
-register.tag(PageLanguageUrl)
+register.tag("page_language_url", PageLanguageUrl)
