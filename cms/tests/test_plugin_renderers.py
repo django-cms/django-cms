@@ -179,7 +179,9 @@ class TestContentRenderer(TestStructureRenderer):
         # Test if exception in template rendering creates error log and does not fail (plugin 1)
         # Test if exception in plugin.render creates error log and does not fail (plugin 2)
         # patch link plugin
-        from cms.test_utils.project.pluginapp.plugins.link.cms_plugins import LinkPlugin
+        from cms.test_utils.project.pluginapp.plugins.link.cms_plugins import (
+            LinkPlugin,
+        )
         link_template = LinkPlugin.render_template
         LinkPlugin.render_template = "pluginapp/link/bugs.html"
         with self.assertLogs("cms.plugin_rendering", level="ERROR") as logs:
