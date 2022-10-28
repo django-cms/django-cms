@@ -1,5 +1,7 @@
 
 === 4.0.0 (unreleased) ===
+
+* feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * feat: Added live-url querystring parameter option for PageContent edit and preview endpoints
 * Backported from develop: Upgrade Gulp and NodeJs
 * feat: Re-enable showing the toolbar to anonymous users
