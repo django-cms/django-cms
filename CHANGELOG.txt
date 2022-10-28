@@ -1,4 +1,6 @@
 === (unreleased) ===
+* Django 4.1 and 4.0 support
+* Python 3.10 support
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
 
 === 4.0.0 (unreleased) ===
