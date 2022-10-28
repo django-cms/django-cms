@@ -85,4 +85,4 @@ class JavascriptString(Tag):
         return "'%s'" % escapejs(rendered.strip())
 
 
-register.tag(JavascriptString)
+register.tag("javascript_string", JavascriptString)

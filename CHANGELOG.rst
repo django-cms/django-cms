@@ -5,6 +5,7 @@ Changelog
 unreleased
 ==========
 
+* Support for django 4.1
 * Allow to partially override ``CMS_CACHE_DURATIONS``
 * Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
 * Make javascript dark mode functions available to popups as CMS.API.getColorScheme
@@ -12,6 +13,7 @@ unreleased
 * Fix bug where switching color scheme affects other settings
 * Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 * Fixed permission denied error after page create (#6866)
+* Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
 * Add deprecation warning to ``cms.utils.i18n.get_current_language()`` (#6720)
 
 3.11.0 (2022-08-02)

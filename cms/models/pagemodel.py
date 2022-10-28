@@ -839,11 +839,14 @@ class Page(models.Model):
         PUBLISHER_STATE_DEFAULT (in publish method).
         """
         keep_state = getattr(self, '_publisher_keep_state', None)
-        if self.publisher_is_draft and not keep_state and self.is_new_dirty():
-            self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
+        is_new_dirty = self.is_new_dirty()
         if keep_state:
             delattr(self, '_publisher_keep_state')
-        return super().save_base(*args, **kwargs)
+        result = super().save_base(*args, **kwargs)
+        if self.publisher_is_draft and not keep_state and is_new_dirty:
+            # As of Django 4.1 only possible after self has been saved.
+            self.title_set.all().update(publisher_state=PUBLISHER_STATE_DIRTY)
+        return result
 
     def update(self, refresh=False, draft_only=True, **data):
         assert self.publisher_is_draft
