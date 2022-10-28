@@ -1,8 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as OriginalUserAdmin
 
-from .models import EmailUser
 from .forms import UserChangeForm, UserCreationForm
+from .models import EmailUser
 
 
 class UserAdmin(OriginalUserAdmin):
@@ -17,23 +17,26 @@ class UserAdmin(OriginalUserAdmin):
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
         ('Personal Info', {'fields': ('first_name', 'last_name')}),
-        ('Permissions', {'fields': ('is_active', 'is_staff', 'is_superuser',
-                                       'groups', 'user_permissions')}),
+        ('Permissions', {'fields': (
+            'is_active', 'is_staff', 'is_superuser',
+            'groups', 'user_permissions')}),
         ('Important dates', {'fields': ('last_login', 'date_joined')}),
     )
 
     # UserAdmin overrides get_fieldsets to use this attribute
     # so it must be populated
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2')}
+        (
+            None, {
+                'classes': ('wide',),
+                'fields': ('email', 'password1', 'password2')
+            }
         ),
     )
 
     search_fields = ('email', 'first_name', 'last_name',)
     ordering = ('last_name', 'first_name', 'email')
 
-# Now register the emailuser admin
 
+# Now register the emailuser admin
 admin.site.register(EmailUser, UserAdmin)

@@ -1,14 +1,13 @@
 import inspect
+from functools import lru_cache
 from importlib import import_module
 
 from django.apps import apps
-from django.utils.module_loading import module_has_submodule
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.module_loading import module_has_submodule
 
 from cms.app_base import CMSAppConfig, CMSAppExtension
 from cms.constants import CMS_CONFIG_NAME
-
-from functools import lru_cache
 
 
 def _find_subclasses(module, klass):
@@ -21,10 +20,8 @@ def _find_subclasses(module, klass):
     # Find all classes that inherit from klass
     for name, obj in inspect.getmembers(module):
         is_subclass = (
-            inspect.isclass(obj) and
-            issubclass(obj, klass) and
             # Ignore the import of klass itself
-            obj != klass
+            inspect.isclass(obj) and issubclass(obj, klass) and obj != klass
         )
         if is_subclass:
             classes.append(obj)
@@ -76,7 +73,7 @@ def autodiscover_cms_configs():
         try:
             cms_module = import_module(
                 '%s.%s' % (app_config.name, CMS_CONFIG_NAME))
-        except:
+        except:  # NOQA
             # If something in cms_config.py raises an exception let that
             # exception bubble up. Only catch the exception if
             # cms_config.py doesn't exist
@@ -170,7 +167,7 @@ def backwards_compatibility_config():
         for app_config in apps.get_app_configs():
             try:
                 import_module('%s.%s' % (app_config.name, module))
-            except Exception:
+            except Exception:  # NOQA
                 # Decide whether to bubble up this error. If the app just
                 # doesn't have the module in question, we can ignore the error
                 # attempting to import it, otherwise we want it to bubble up.

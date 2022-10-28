@@ -5,19 +5,16 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.apphook_pool import apphook_pool
-from cms.models import EmptyPageContent, PageUrl, PageContent
+from cms.models import EmptyPageContent, PageContent, PageUrl
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_fallback_languages,
-    get_public_languages,
-    hide_untranslated,
+    get_fallback_languages, get_public_languages, hide_untranslated,
     is_valid_site_language,
 )
-from cms.utils.permissions import get_view_restrictions
 from cms.utils.page import get_page_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
-
-from menus.base import Menu, NavigationNode, Modifier
+from cms.utils.permissions import get_view_restrictions
+from menus.base import Menu, Modifier, NavigationNode
 from menus.menu_pool import menu_pool
 
 
@@ -255,7 +252,7 @@ class CMSMenu(Menu):
             for trans in page.filtered_translations:
                 page.title_cache[trans.language] = trans
 
-            menu_node =  get_menu_node_for_page(
+            menu_node = get_menu_node_for_page(
                 self.renderer,
                 page,
                 language=lang,
@@ -341,6 +338,7 @@ class NavExtender(Modifier):
         for node in removed:
             nodes.remove(node)
         return nodes
+
 
 menu_pool.register_modifier(NavExtender)
 

@@ -1,7 +1,6 @@
 import json
 import sys
 import warnings
-
 from urllib.parse import unquote, urljoin
 
 from django.conf import settings
@@ -19,22 +18,19 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.timezone import now
 from django.utils.translation import activate, get_language
-from menus.menu_pool import menu_pool
 
-from cms.api import create_page, add_plugin
+from cms.api import add_plugin, create_page
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page, PageContent
 from cms.models.permissionmodels import (
-    GlobalPagePermission,
-    PagePermission,
-    PageUser,
+    GlobalPagePermission, PagePermission, PageUser,
 )
+from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
-
+from menus.menu_pool import menu_pool
 
 # Page urls
 URL_CMS_PAGE = "/en/admin/cms/page/"
@@ -168,8 +164,9 @@ class BaseCMSTestCase:
         """
         User = get_user_model()
 
-        fields = dict(email=username + '@django-cms.org', last_login=now(),
-                      is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
+        fields = dict(
+            email=username + '@django-cms.org', last_login=now(),
+            is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
         )
 
         # Check for special case where email is used as username
@@ -296,8 +293,11 @@ class BaseCMSTestCase:
         """
         for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
-            page.pk, page.path, page.depth, page.numchild))
+            print(
+                "%s%s (%s), path: %s, depth: %s, numchild: %s" % (
+                    ident, page, page.pk, page.path, page.depth, page.numchild
+                )
+            )
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
@@ -305,7 +305,7 @@ class BaseCMSTestCase:
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print(u"%s%s: %s" % (ident, node.title, attrs))
+                print("%s%s: %s" % (ident, node.title, attrs))
                 _rec(node.children, level + 1)
 
         _rec(nodes)
@@ -464,8 +464,7 @@ class BaseCMSTestCase:
             self.fail("No warnings emitted")
         first = warningsShown[0]
         for other in warningsShown[1:]:
-            if ((other.message, other.category)
-                != (first.message, first.category)):
+            if (other.message, other.category) != (first.message, first.category):
                 self.fail("Can't handle different warnings")
         self.assertEqual(first.message, message)
         self.assertTrue(first.category is category)

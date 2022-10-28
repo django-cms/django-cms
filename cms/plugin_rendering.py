@@ -121,7 +121,7 @@ class BaseRenderer():
         return plugin_menu_template.render({'plugin_menu': plugin_menu})
 
     def get_placeholder_toolbar_js(self, placeholder, page=None):
-        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page) # original
+        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page)  # original
 
         plugin_types = [cls.__name__ for cls in plugins]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
@@ -148,7 +148,7 @@ class BaseRenderer():
     def get_plugin_class(self, plugin):
         plugin_type = plugin.plugin_type
 
-        if not plugin_type in self._cached_plugin_classes:
+        if plugin_type not in self._cached_plugin_classes:
             self._cached_plugin_classes[plugin_type] = self.plugin_pool.get_plugin(plugin_type)
         return self._cached_plugin_classes[plugin_type]
 
@@ -538,7 +538,7 @@ class ContentRenderer(BaseRenderer):
                 request=self.request,
             )
 
-            if cached_value != None:
+            if cached_value is not None:
                 # None means nothing in the cache
                 # Anything else is a valid value
                 language_cache[placeholder.pk] = cached_value
@@ -579,7 +579,7 @@ class ContentRenderer(BaseRenderer):
             # has not been cached.
             placeholders_to_fetch = [
                 placeholder for placeholder in placeholders
-                if _cached_content(placeholder, self.request_language) == None]
+                if _cached_content(placeholder, self.request_language) is None]
         else:
             # cache is disabled, prefetch plugins for all
             # placeholders in the page.

@@ -6,7 +6,6 @@ from cms.apphook_pool import apphook_pool
 from cms.appresolver import get_app_patterns
 from cms.constants import SLUG_REGEXP
 
-
 if settings.APPEND_SLASH:
     regexp = r'^(?P<slug>%s)/$' % SLUG_REGEXP
 else:
