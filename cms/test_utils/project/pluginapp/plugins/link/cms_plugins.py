@@ -22,8 +22,9 @@ class BuggyPlugin(CMSPluginBase):
     render_template = 'pluginapp/link/bugs.html'
 
     def render(self, context, instance, placeholder):
-        context["result"] = 1/0  # Finally we'd find out, won't we?
+        context["result"] = 1 / 0  # Finally we'd find out, won't we?
         return super().render(context, instance, placeholder)
+
 
 plugin_pool.register_plugin(LinkPlugin)
 plugin_pool.register_plugin(BuggyPlugin)
