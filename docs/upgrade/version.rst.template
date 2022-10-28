@@ -1,0 +1,71 @@
+.. _upgrade-to-enter-version-here-template:
+
+*******************
+4.X.X release notes
+*******************
+
+*October 31, 2022*
+
+Welcome to django CMS 4.X.X!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you’ll want to be aware of when upgrading from
+django CMS 4.0 or earlier. We’ve begun the deprecation process for some
+features.
+
+See the How to upgrade to 4.X.X to a newer version guide if you’re
+updating an existing project.
+
+Django and Python compatibility
+===============================
+
+django CMS supports **Django 3.2, 4.0, and 4.1**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.7, 3.8, 3.9, and 3.10**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 4.X.X
+***********************
+
+*******************
+What's new in 4.0.0
+*******************
+
+Feature 1
+=========
+
+Feature 2
+=========
+
+Feature 3
+=========
+
+Minor features
+==============
+
+Bug Fixes
+=========
+
+**************************************
+Backward incompatible changes in 4.X.X
+**************************************
+
+TitleExtension
+==============
+
+
+Miscellaneous
+=============
+
+Features deprecated in 4.X.X
+============================
+
+Empty sections are to be removed before release.
+
+Removal of deprecated functionality
+===================================
+
+Empty sections are to be removed before release.
+
