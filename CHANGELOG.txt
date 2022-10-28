@@ -1,9 +1,13 @@
 === (unreleased) ===
+
 * Django 4.1 and 4.0 support
 * Python 3.10 support
+* Fix bug that broke page tree if it contained empty page content
+* Fix bug that created new page content not in the displayed language but the browser language
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
 
 === 4.0.0 (unreleased) ===
+
 * feat: Added live-url querystring parameter option for PageContent edit and preview endpoints
 * Backported from develop: Upgrade Gulp and NodeJs
 * feat: Re-enable showing the toolbar to anonymous users

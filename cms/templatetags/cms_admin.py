@@ -67,7 +67,7 @@ def get_page_display_name(cms_page):
                 if not isinstance(item, EmptyPageContent):
                     language = lang
     if not language:
-        return _("Empty")
+        return _("Empty content. Create content using the pencil tool.")
     title = cms_page.title_cache[language]
     if title.title:
         return title.title
