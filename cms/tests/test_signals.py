@@ -5,14 +5,15 @@ from cms.api import create_page
 from cms.models import Page, UrlconfRevision
 from cms.signals import urls_need_reloading
 from cms.test_utils.project.sampleapp.cms_apps import SampleApp
-from cms.test_utils.util.context_managers import apphooks, signal_tester
 from cms.test_utils.testcases import CMSTestCase
-
+from cms.test_utils.util.context_managers import apphooks, signal_tester
 
 overrides = {
     'MIDDLEWARE': ['cms.middleware.utils.ApphookReloadMiddleware'] + settings.MIDDLEWARE,
     'CMS_PERMISSION': False,
 }
+
+
 @override_settings(**overrides)
 class SignalTests(CMSTestCase):
     def test_urls_need_reloading_signal_set_apphook(self):

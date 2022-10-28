@@ -73,4 +73,5 @@ class WizardPool():
         # TODO: Deprecated warning
         return get_entry(entry)
 
+
 wizard_pool = WizardPool()

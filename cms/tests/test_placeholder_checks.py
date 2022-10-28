@@ -1,10 +1,8 @@
-from mock import call, Mock, patch
-
 from django.forms.models import model_to_dict
+from mock import Mock, call, patch
 
 from cms.api import create_page
-from cms.models import Placeholder, UserSettings
-from cms.models import fields
+from cms.models import Placeholder, UserSettings, fields
 from cms.models.fields import PlaceholderRelationField
 from cms.test_utils.testcases import CMSTestCase
 

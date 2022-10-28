@@ -5,15 +5,14 @@ from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page
-from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
-from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import (
+    ACCESS_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN,
+    ACCESS_PAGE_AND_DESCENDANTS, Page,
+)
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import user_can_view_page
-
 from menus.menu_pool import menu_pool
-
 
 __all__ = [
     'ViewPermissionTreeBugTests',
@@ -151,13 +150,14 @@ class ViewPermissionTests(CMSTestCase):
                 user_set.add(user)
                 group.save()
 
-        self.assertEqual(11, get_user_model().objects.all().count()-default_users_count)
+        self.assertEqual(11, get_user_model().objects.all().count() - default_users_count)
 
     def _setup_view_restrictions(self):
         """
         Setup a view restriction with every type of the grant_on ACCESS_*
         """
-        data = [("page_b", self.GROUPNAME_1, ACCESS_PAGE_AND_CHILDREN),
+        data = [
+            ("page_b", self.GROUPNAME_1, ACCESS_PAGE_AND_CHILDREN),
             ("page_b_b", self.GROUPNAME_2, ACCESS_CHILDREN),
             ("page_b", self.GROUPNAME_3, ACCESS_PAGE_AND_DESCENDANTS),
             ("page_b_b", self.GROUPNAME_4, ACCESS_DESCENDANTS),
@@ -225,9 +225,10 @@ class ViewPermissionTests(CMSTestCase):
                 in_restricted = True
             if page_id in public_page_ids:
                 in_public = True
-            self.assertTrue((in_public and not in_restricted) or
-                            (not in_public and in_restricted),
-                            msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted))
+            self.assertTrue(
+                (in_public and not in_restricted) or (not in_public and in_restricted),
+                msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted)
+            )
 
     def assertGrantedVisibility(self, all_pages, expected_granted_pages, username=None):
         """
@@ -242,15 +243,17 @@ class ViewPermissionTests(CMSTestCase):
                 username = username + '@django-cms.org'
 
             query = dict()
-            query[get_user_model().USERNAME_FIELD+'__iexact'] = username
+            query[get_user_model().USERNAME_FIELD + '__iexact'] = username
             user = get_user_model().objects.get(**query)
         request = self.get_request(user)
         visible_page_ids = [page.pk for page in get_visible_nodes(request, all_pages, self.site)]
-        public_page_ids = Page.objects.filter(pagecontent_set__title__in=expected_granted_pages).values_list('id',
-                                                                                                                flat=True)
+        public_page_ids = Page.objects.filter(pagecontent_set__title__in=expected_granted_pages).values_list(
+            'id', flat=True
+        )
         self.assertEqual(len(visible_page_ids), len(expected_granted_pages))
-        restricted_pages = Page.objects.exclude(pagecontent_set__title__in=expected_granted_pages).values_list('id',
-                                                                                                                  flat=True)
+        restricted_pages = Page.objects.exclude(pagecontent_set__title__in=expected_granted_pages).values_list(
+            'id', flat=True
+        )
         self.assertNodeMemberships(visible_page_ids, restricted_pages, public_page_ids)
 
     def get_request(self, user=None, page=None):
@@ -304,7 +307,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_c',
             'page_c_a',
             'page_c_b',
@@ -329,7 +333,6 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self.assertViewNotAllowed(urls["/en/page_d/"], user)
         self.assertNotInMenu(urls["/en/page_d/"], user)
 
-
     def test_menu_access_page_and_children_group_1(self):
         """
         simulate behaviour of group b member
@@ -338,14 +341,15 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_c',
             'page_c_a',
             'page_c_b',
-            #group_1
-            'page_b', #page_id b has page_id and children restricted - group 1
+            # group_1
+            'page_b',  # page_id b has page_id and children restricted - group 1
             'page_b_a',
-            'page_b_b', #page_id b_b children restricted - group 2
+            'page_b_b',  # page_id b_b children restricted - group 2
             'page_b_c',
             'page_b_d',
             # not restricted
@@ -421,7 +425,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_b',
             'page_b_a',
             'page_b_b',
@@ -463,7 +468,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_b_b_a',
             'page_b_b_a_a',
             'page_b_b_b',
@@ -498,7 +504,8 @@ class ViewPermissionComplexMenuAllNodesTests(ViewPermissionTests):
         self._setup_user_groups()
         all_pages = self._setup_tree_pages()
         self._setup_view_restrictions()
-        granted = ['page_a',
+        granted = [
+            'page_a',
             'page_c',
             'page_c_a',
             'page_c_b',
@@ -571,7 +578,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         page_4 = create_page("page_4", parent=page_3, **stdkwargs)
         page_5 = create_page("page_5", parent=homepage, **stdkwargs)
         page_6 = create_page("page_6", parent=page_5, **stdkwargs)
-        return [homepage,
+        return [
+            homepage,
             page_2,
             page_3,
             page_4,
@@ -607,7 +615,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
             else:
                 msg = "Permission wrong at page %s" % (page.get_title())
                 self.assertEqual(len(perm), 0, msg)
-        granted = ['page_1',
+        granted = [
+            'page_1',
             'page_2',
             'page_3',
             'page_4',
@@ -621,7 +630,8 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
         self.assertViewAllowed(urls["/en/page_5/"], user)
         self.assertViewNotAllowed(urls["/en/page_5/page_6/"], user)
         # group member
-        granted = ['page_1',
+        granted = [
+            'page_1',
             'page_2',
             'page_3',
             'page_4',

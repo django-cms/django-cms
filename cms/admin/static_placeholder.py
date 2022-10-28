@@ -1,5 +1,6 @@
-from cms.models import StaticPlaceholder
 from django.contrib import admin
+
+from cms.models import StaticPlaceholder
 
 
 class StaticPlaceholderAdmin(admin.ModelAdmin):
@@ -7,5 +8,6 @@ class StaticPlaceholderAdmin(admin.ModelAdmin):
     search_fields = ('name', 'code',)
     exclude = ('creation_method',)
     list_filter = ('creation_method', 'site')
+
 
 admin.site.register(StaticPlaceholder, StaticPlaceholderAdmin)

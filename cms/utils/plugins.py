@@ -1,5 +1,6 @@
 import logging
 import sys
+
 from collections import OrderedDict, defaultdict, deque
 from copy import deepcopy
 from functools import lru_cache
@@ -329,6 +330,6 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
             if type_count >= type_limit:
                 plugin_name = force_str(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(
-                    "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
-                                         % {'limit': type_limit, 'plugin_name': plugin_name})
+                    "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins."
+                ) % {'limit': type_limit, 'plugin_name': plugin_name})
     return False
