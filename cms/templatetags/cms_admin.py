@@ -89,7 +89,7 @@ class TreePublishRow(Tag):
         Argument('language')
     )
 
-    def get_dirtyness_indicator(self, context, page, language):
+    def get_indicator(self, context, page, language):
         """Method allowing for djangocms-versioning monkey patching"""
         cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
         text = _("Empty")
@@ -98,7 +98,7 @@ class TreePublishRow(Tag):
             text = _("Public content")
         return cls, text
 
-    def get_dirtyness_legend(self, context, page, language):
+    def get_indicator_legend(self, context, page, language):
         """Method allowing for djangocms-versioning monkey patching"""
         return (
             ("cms-pagetree-node-state cms-pagetree-node-state-published", _("Public content")),
@@ -107,10 +107,10 @@ class TreePublishRow(Tag):
 
     def render_tag(self, context, page, language):
         if page is None:  # Retrieve all for legend
-            context["indicator_legend_items"] = self.get_dirtyness_legend(context, page, language)
+            context["indicator_legend_items"] = self.get_indicator_legend(context, page, language)
             return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
 
-        cls, text = self.get_dirtyness_indicator(context, page, language)
+        cls, text = self.get_indicator(context, page, language)
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
             'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
@@ -131,21 +131,24 @@ class TreePublishRowMenu(AsTag):
         Argument('varname', required=False, resolve=False)
     )
 
-    def get_publish_menu(self, context, page, language):
+    menu_template = "admin/cms/page/tree/indicator_menu.html"
+
+    def get_indicator_menu(self, context, page, language):
         """Method allowing for djangocms-versioning monkey patching.
         Core does not have a publishing menu."""
-        if page.title_cache.get(language):
-            return "", []
-        return "admin/cms/page/tree/indicator_menu.html", [
-            (
-                _("Configure"),
-                "cms-icon-cogs",
-                admin_reverse('cms_pagecontent_add') + f'?cms_page={page.pk}&language={language}',
-            ),
-        ]
+        if context.get("has_change_permission", False) and not page.title_cache.get(language):
+            return self.menu_template, [
+                (
+                    _("Configure"),  # Entry
+                    "cms-icon-cogs",  # Optional icon
+                    admin_reverse('cms_pagecontent_add') + f'?cms_page={page.pk}&language={language}',  # url
+                    None,  # Optional add classes for <a>
+                ),
+            ]
+        return "", []
 
     def get_value(self, context, page, language):
-        template, publish_menu_items = self.get_publish_menu(context, page, language)
+        template, publish_menu_items = self.get_indicator_menu(context, page, language)
         if template:
             context["indicator_menu_items"] = publish_menu_items
             return render_to_string(template, context.flatten())
