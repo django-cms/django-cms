@@ -1,5 +1,6 @@
-from classytags.core import Tag
-from classytags.helpers import InclusionTag
+from classytags.arguments import Argument
+from classytags.core import Tag, Options
+from classytags.helpers import InclusionTag, AsTag
 
 from django import template
 from django.conf import settings
@@ -81,46 +82,75 @@ def get_page_display_name(cms_page):
     return cms_page.get_slug(language)
 
 
-@register.simple_tag(takes_context=True)
-def tree_publish_row(context, page, language):
-    def get_dirtyness_indicator(context, page, language):
-        """Inner function allowing for djangocms-versioning monkey patching"""
-        cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
-        text = _("no content")  # "Empty"?
-        if page.title_cache.get(language):
-            cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
-            text = _("has contents")  # "Public content"?
-        return cls, text
-
-    def get_dirtyness_legend(context, page, language):
-        """Inner function allowing for djangocms-versioning monkey patching"""
-        return (
-            ("cms-pagetree-node-state cms-pagetree-node-state-published", _("has contents")),
-            ("cms-pagetree-node-state cms-pagetree-node-state-empty", _("no content")),
-        )
-    if page is None:  # Retrieve all for legend
-        context["dirty_legend_items"] = get_dirtyness_legend(context, page, language)
-        return render_to_string("admin/cms/page/tree/dirty_legend.html", context.flatten())
-
-    cls, text = get_dirtyness_indicator(context, page, language)
-    return mark_safe(
-        '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
-        'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
-
-@register.simple_tag(takes_context=True)
-def tree_publish_row_menu(context, page, language):
+@register.tag
+class TreePublishRow(Tag):
     """New template tag that renders a pontential menu to be offered with the
     dirty indicators. The core will not display a menu."""
-    def get_publish_menu(context, page, language):
-        """Inner function allowing for djangocms-versioning monkey patching.
-        Core does not have a publishing menu."""
-        return "", []
+    name = "tree_publish_row"
+    options = Options(
+        Argument('page'),
+        Argument('language')
+    )
 
-    template, publish_menu_items = get_publish_menu(context, page, language)
-    if template:
-        context["publish_menu_items"] = publish_menu_items
-        return render_to_string(template, context.flatten())
-    return ''
+    def get_dirtyness_indicator(self, context, page, language):
+        """Method allowing for djangocms-versioning monkey patching"""
+        cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
+        text = _("Empty")
+        if page.title_cache.get(language):
+            cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
+            text = _("Public content")
+        return cls, text
+
+    def get_dirtyness_legend(self, context, page, language):
+        """Method allowing for djangocms-versioning monkey patching"""
+        return (
+            ("cms-pagetree-node-state cms-pagetree-node-state-published", _("Public content")),
+            ("cms-pagetree-node-state cms-pagetree-node-state-empty", _("Empty")),
+        )
+
+    def render_tag(self, context, page, language):
+        if page is None:  # Retrieve all for legend
+            context["indicator_legend_items"] = self.get_dirtyness_legend(context, page, language)
+            return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
+
+        cls, text = self.get_dirtyness_indicator(context, page, language)
+        return mark_safe(
+            '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
+            'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
+
+
+@register.tag
+class TreePublishRowMenu(AsTag):
+    """New template tag that renders a pontential menu to be offered with the
+    dirty indicators. The core will not display a menu."""
+    name = "tree_publish_row_menu"
+    options = Options(
+        Argument('page'),
+        Argument('language'),
+        'as',
+        Argument('varname', required=False, resolve=False)
+    )
+
+    def get_publish_menu(self, context, page, language):
+        """Method allowing for djangocms-versioning monkey patching.
+        Core does not have a publishing menu."""
+        if page.title_cache.get(language):
+            return "", []
+        return "admin/cms/page/tree/indicator_menu.html", [
+            (
+                _("Create"),
+                "cms-icon-plus",
+                admin_reverse('cms_pagecontent_add') + f'?cms_page={page.pk}&language={language}',
+            ),
+        ]
+
+    def get_value(self, context, page, language):
+        template, publish_menu_items = self.get_publish_menu(context, page, language)
+        if template:
+            context["indicator_menu_items"] = publish_menu_items
+            return render_to_string(template, context.flatten())
+        return ''
+
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')
 def render_filter_field(request, field):

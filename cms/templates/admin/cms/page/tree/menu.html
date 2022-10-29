@@ -89,10 +89,17 @@
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-lang">
                 <div class="cms-tree-item-inner cms-pagetree-dropdown js-cms-pagetree-dropdown">
-                    <span class="cms-tree-lang-container">
-                        {% tree_publish_row page preview_language %}
-                    </span>
-                    {% tree_publish_row_menu page preview_language as test %}
+                    {% tree_publish_row_menu page preview_language as dropdown_menu %}
+                    {% if dropdown_menu %}
+                        <a href="#" class="cms-pagetree-dropdown-trigger js-cms-pagetree-dropdown-trigger">
+                    {% endif %}
+                        <span class="cms-tree-lang-container">
+                            {% tree_publish_row page preview_language %}
+                        </span>
+                    {% if dropdown_menu %}
+                        </a>
+                        {{ dropdown_menu }}
+                    {% endif %}
                 </div>
             </div>
         </div>
