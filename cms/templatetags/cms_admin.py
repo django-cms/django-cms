@@ -69,7 +69,7 @@ def get_page_display_name(cms_page):
                 if not isinstance(item, EmptyPageContent):
                     language = lang
     if not language:
-        return _("Empty content. Create content using the pencil tool.")
+        return _("Empty")
     title = cms_page.title_cache[language]
     if title.title:
         return title.title
@@ -80,7 +80,6 @@ def get_page_display_name(cms_page):
     return cms_page.get_slug(language)
 
 
-@register.tag
 class TreePublishRow(Tag):
     """New template tag that renders a pontential menu to be offered with the
     dirty indicators. The core will not display a menu."""
@@ -117,6 +116,9 @@ class TreePublishRow(Tag):
             'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
 
 
+register.tag(TreePublishRow, TreePublishRow.name)
+
+
 @register.tag
 class TreePublishRowMenu(AsTag):
     """New template tag that renders a pontential menu to be offered with the
@@ -148,6 +150,9 @@ class TreePublishRowMenu(AsTag):
             context["indicator_menu_items"] = publish_menu_items
             return render_to_string(template, context.flatten())
         return ''
+
+
+register.tag(TreePublishRowMenu, TreePublishRowMenu.name)
 
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')
