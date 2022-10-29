@@ -3,7 +3,7 @@ from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.core.validators import EMPTY_VALUES
 from django.utils.translation import gettext_lazy as _
 
-from cms.forms.utils import get_site_choices, get_page_choices
+from cms.forms.utils import get_page_choices, get_site_choices
 from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
@@ -28,13 +28,12 @@ class LazyChoiceField(forms.ChoiceField):
 class PageSelectFormField(forms.MultiValueField):
     widget = PageSelectWidget
     default_error_messages = {
-        'invalid_site': _(u'Select a valid site'),
-        'invalid_page': _(u'Select a valid page'),
+        'invalid_site': _('Select a valid site'),
+        'invalid_page': _('Select a valid page'),
     }
 
-    def __init__(self, queryset=None, empty_label=u"---------", cache_choices=False,
-                 required=True, widget=None, to_field_name=None, limit_choices_to=None,
-                  *args, **kwargs):
+    def __init__(self, queryset=None, empty_label="---------", cache_choices=False,
+                 required=True, widget=None, to_field_name=None, limit_choices_to=None, *args, **kwargs):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
@@ -51,7 +50,7 @@ class PageSelectFormField(forms.MultiValueField):
         # causes an error where the MultiValueField doesn't expect it
         # https://github.com/django/django/commit/da79ee472d803963dc3ea81ee67767dc06068aac
         if 'blank' in kwargs:
-            del(kwargs['blank'])
+            del kwargs['blank']
 
         super().__init__(fields, *args, **kwargs)
 
@@ -91,8 +90,9 @@ class PageSmartLinkField(forms.CharField):
                  ajax_view=None, *args, **kwargs):
         self.placeholder_text = placeholder_text
         widget = self.widget(ajax_view=ajax_view)
-        super().__init__(max_length=max_length, min_length=min_length,
-                                                 widget=widget, *args, **kwargs)
+        super().__init__(
+            max_length=max_length, min_length=min_length, widget=widget, *args, **kwargs
+        )
 
     def widget_attrs(self, widget):
         attrs = super().widget_attrs(widget)

@@ -1,15 +1,14 @@
 import json
 
+from classytags.core import Options, Tag
 from django import template
 from django.utils.safestring import mark_safe
-
-from cms.utils.encoder import SafeJSONEncoder
-from cms.utils.placeholder import get_declared_placeholders_for_obj, rescan_placeholders_for_obj
-
-from classytags.core import Tag, Options
-
 from sekizai.helpers import get_varname
 
+from cms.utils.encoder import SafeJSONEncoder
+from cms.utils.placeholder import (
+    get_declared_placeholders_for_obj, rescan_placeholders_for_obj,
+)
 
 register = template.Library()
 
@@ -55,6 +54,7 @@ def render_plugin_init_js(context, plugin):
     context[get_varname()]['js'].append('<script data-cms>{}</script>'.format(plugin_js))
 
 
+@register.tag(name="javascript_string")
 class JavascriptString(Tag):
     name = 'javascript_string'
     options = Options(
@@ -70,4 +70,3 @@ class JavascriptString(Tag):
             from django.utils.text import javascript_quote as escapejs
         rendered = self.nodelist.render(context)
         return "'%s'" % escapejs(rendered.strip())
-register.tag(JavascriptString)

@@ -1,16 +1,22 @@
 from django.conf import settings
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group, User
 from django.db.models import signals
 from django.db.models.signals import pre_migrate
-from django.dispatch import receiver, Signal
+from django.dispatch import Signal, receiver
 
 from cms.exceptions import ConfirmationOfVersion4Required
-from cms.models import PagePermission, GlobalPagePermission, PageUser, PageUserGroup
+from cms.models import (
+    GlobalPagePermission, PagePermission, PageUser, PageUserGroup,
+)
 from cms.signals.apphook import debug_server_restart, trigger_server_restart
-from cms.signals.log_entries import log_page_operations, log_placeholder_operations
+from cms.signals.log_entries import (
+    log_page_operations, log_placeholder_operations,
+)
 from cms.signals.permissions import (
-    post_save_user, post_save_user_group, pre_save_user, pre_delete_user, pre_save_group, pre_delete_group,
-    pre_save_pagepermission, pre_delete_pagepermission, pre_save_globalpagepermission, pre_delete_globalpagepermission
+    post_save_user, post_save_user_group, pre_delete_globalpagepermission,
+    pre_delete_group, pre_delete_pagepermission, pre_delete_user,
+    pre_save_globalpagepermission, pre_save_group, pre_save_pagepermission,
+    pre_save_user,
 )
 from cms.utils.conf import get_cms_setting
 
@@ -27,58 +33,29 @@ def check_v4_confirmation(**kwargs):
             "You must confirm your intention to use django-cms version 4 with the setting CMS_CONFIRM_VERSION4"
         )
 
-#################### Our own signals ###################
+# ################### Our own signals ###################
+
 
 # fired after page location is changed - is moved from one node to other
-page_moved = Signal(providing_args=["instance"])
+page_moved = Signal()
 
 # fired if a public page with an apphook is added or changed
-urls_need_reloading = Signal(providing_args=[])
+urls_need_reloading = Signal()
 
 # *disclaimer*
 # The generic object operation signals are very likely to change
 # as their usage evolves.
 # As a result, rely on these at your own risk
-pre_obj_operation = Signal(
-    providing_args=[
-        "operation",
-        "request",
-        "token",
-        "obj",
-    ]
-)
+pre_obj_operation = Signal()
 
-post_obj_operation = Signal(
-    providing_args=[
-        "operation",
-        "request",
-        "token",
-        "obj",
-    ]
-)
+post_obj_operation = Signal()
 
-pre_placeholder_operation = Signal(
-    providing_args=[
-        "operation",
-        "request",
-        "language",
-        "token",
-        "origin",
-    ]
-)
+pre_placeholder_operation = Signal()
 
-post_placeholder_operation = Signal(
-    providing_args=[
-        "operation",
-        "request",
-        "language",
-        "token",
-        "origin",
-    ]
-)
+post_placeholder_operation = Signal()
 
 
-################### apphook reloading ###################
+# ################## apphook reloading ###################
 
 if settings.DEBUG:
     urls_need_reloading.connect(debug_server_restart)
@@ -90,13 +67,12 @@ urls_need_reloading.connect(
 )
 
 
-###################### log entries #######################
-
+# ##################### log entries #######################
 
 post_obj_operation.connect(log_page_operations)
 post_placeholder_operation.connect(log_placeholder_operations)
 
-###################### permissions #######################
+# ##################### permissions #######################
 
 if get_cms_setting('PERMISSION'):
     # only if permissions are in use
@@ -114,11 +90,17 @@ if get_cms_setting('PERMISSION'):
     signals.pre_save.connect(pre_save_group, sender=PageUserGroup, dispatch_uid='cms_pre_save_pageusergroup')
     signals.pre_delete.connect(pre_delete_group, sender=PageUserGroup, dispatch_uid='cms_pre_delete_pageusergroup')
 
-    signals.pre_save.connect(pre_save_pagepermission, sender=PagePermission, dispatch_uid='cms_pre_save_pagepermission')
-    signals.pre_delete.connect(pre_delete_pagepermission, sender=PagePermission,
-                               dispatch_uid='cms_pre_delete_pagepermission')
+    signals.pre_save.connect(
+        pre_save_pagepermission, sender=PagePermission, dispatch_uid='cms_pre_save_pagepermission'
+    )
+    signals.pre_delete.connect(
+        pre_delete_pagepermission, sender=PagePermission, dispatch_uid='cms_pre_delete_pagepermission'
+    )
 
-    signals.pre_save.connect(pre_save_globalpagepermission, sender=GlobalPagePermission,
-                             dispatch_uid='cms_pre_save_globalpagepermission')
-    signals.pre_delete.connect(pre_delete_globalpagepermission, sender=GlobalPagePermission,
-                               dispatch_uid='cms_pre_delete_globalpagepermission')
+    signals.pre_save.connect(
+        pre_save_globalpagepermission, sender=GlobalPagePermission, dispatch_uid='cms_pre_save_globalpagepermission'
+    )
+    signals.pre_delete.connect(
+        pre_delete_globalpagepermission, sender=GlobalPagePermission,
+        dispatch_uid='cms_pre_delete_globalpagepermission'
+    )

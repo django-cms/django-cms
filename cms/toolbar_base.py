@@ -15,7 +15,9 @@ class CMSToolbar(metaclass=MediaDefiningClass):
         self.app_path = app_path
         self.current_site = get_current_site()
         try:
-            self.current_lang = get_language_object(get_language_from_request(self.request), self.current_site.pk)['code']
+            self.current_lang = get_language_object(
+                get_language_from_request(self.request), self.current_site.pk
+            )['code']
         except LanguageError:
             self.current_lang = None
 

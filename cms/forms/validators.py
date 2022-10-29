@@ -41,8 +41,10 @@ def validate_url_uniqueness(site, path, language, user_language=None, exclude_pa
 
     conflict_translation = conflict_page.get_title_obj(language, fallback=False)
 
-    change_url = admin_reverse('cms_pagecontent_change', args=[conflict_translation.pk])
-
+    if conflict_translation:  # No empty page content
+        change_url = admin_reverse('cms_pagecontent_change', args=[conflict_translation.pk])
+    else:
+        change_url = ""  # Empty page has no slug
     if user_language:
         change_url += '?language={}'.format(user_language)
 

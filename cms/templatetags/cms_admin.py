@@ -1,7 +1,6 @@
 from classytags.arguments import Argument
 from classytags.core import Tag, Options
 from classytags.helpers import InclusionTag, AsTag
-
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
@@ -12,7 +11,6 @@ from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse
-
 
 register = template.Library()
 
@@ -71,7 +69,7 @@ def get_page_display_name(cms_page):
                 if not isinstance(item, EmptyPageContent):
                     language = lang
     if not language:
-        return _("Empty")
+        return _("Empty content. Create content using the pencil tool.")
     title = cms_page.title_cache[language]
     if title.title:
         return title.title
@@ -182,6 +180,7 @@ def boolean_icon(value):
         '<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
 
 
+@register.tag(name="page_submit_row")
 class PageSubmitRow(InclusionTag):
     name = 'page_submit_row'
     template = 'admin/cms/page/submit_row.html'
@@ -208,9 +207,6 @@ class PageSubmitRow(InclusionTag):
         return context
 
 
-register.tag(PageSubmitRow)
-
-
 def in_filtered(seq1, seq2):
     return [x for x in seq1 if x in seq2]
 
@@ -226,14 +222,12 @@ def admin_static_url():
     return getattr(settings, 'ADMIN_MEDIA_PREFIX', None) or ''.join([settings.STATIC_URL, 'admin/'])
 
 
+@register.tag(name="cms_admin_icon_base")
 class CMSAdminIconBase(Tag):
     name = 'cms_admin_icon_base'
 
     def render_tag(self, context):
         return CMS_ADMIN_ICON_BASE
-
-
-register.tag(CMSAdminIconBase)
 
 
 @register.inclusion_tag('admin/cms/page/plugin/submit_line.html', takes_context=True)
@@ -247,9 +241,11 @@ def submit_row_plugin(context):
     save_as = context['save_as']
     ctx = {
         'opts': opts,
-        'show_delete_link': context.get('has_delete_permission', False) and change and context.get('show_delete', True),
+        'show_delete_link': context.get(
+            'has_delete_permission', False) and change and context.get('show_delete', True),
         'show_save_as_new': not is_popup and change and save_as,
-        'show_save_and_add_another': context['has_add_permission'] and not is_popup and (not save_as or context['add']),
+        'show_save_and_add_another': context['has_add_permission'] and not is_popup and (
+            not save_as or context['add']),
         'show_save_and_continue': not is_popup and context['has_change_permission'],
         'is_popup': is_popup,
         'show_save': True,
