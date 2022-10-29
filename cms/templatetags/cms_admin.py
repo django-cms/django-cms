@@ -116,7 +116,7 @@ class TreePublishRow(Tag):
             'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
 
 
-register.tag(TreePublishRow, TreePublishRow.name)
+register.tag(TreePublishRow.name, TreePublishRow)
 
 
 @register.tag
@@ -138,8 +138,8 @@ class TreePublishRowMenu(AsTag):
             return "", []
         return "admin/cms/page/tree/indicator_menu.html", [
             (
-                _("Create"),
-                "cms-icon-plus",
+                _("Configure"),
+                "cms-icon-cogs",
                 admin_reverse('cms_pagecontent_add') + f'?cms_page={page.pk}&language={language}',
             ),
         ]
@@ -152,7 +152,7 @@ class TreePublishRowMenu(AsTag):
         return ''
 
 
-register.tag(TreePublishRowMenu, TreePublishRowMenu.name)
+register.tag(TreePublishRowMenu.name, TreePublishRowMenu)
 
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')
