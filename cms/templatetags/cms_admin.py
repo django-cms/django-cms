@@ -1,6 +1,6 @@
 from classytags.arguments import Argument
-from classytags.core import Tag, Options
-from classytags.helpers import InclusionTag, AsTag
+from classytags.core import Options, Tag
+from classytags.helpers import AsTag, InclusionTag
 from django import template
 from django.conf import settings
 from django.contrib.admin.views.main import ERROR_FLAG
