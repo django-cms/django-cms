@@ -17,15 +17,38 @@ register = template.Library()
 CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 
-@register.simple_tag(takes_context=False)
-def get_admin_url_for_language(page, language):
-    if language not in page.get_languages():
-        admin_url = admin_reverse('cms_pagecontent_add')
-        admin_url += '?cms_page={}&language={}'.format(page.pk, language)
-        return admin_url
+class GetAdminUrlForLanguage(AsTag):
+    """Classy tag that returns the url for editing PageContent in the admin."""
+    name = "get_admin_url_for_language"
 
-    page_content = page.get_title_obj(language, fallback=False)
-    return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
+    options = Options(
+        Argument('page'),
+        Argument('language'),
+        'as',
+        Argument('varname', required=False, resolve=False)
+    )
+
+    def is_editable(self, context, page, language):
+        """Method allowing for djangocms-versioning monkey patching"""
+        return True
+
+    def get_admin_url_for_language(self, context, page, language):
+        if language not in page.get_languages():
+            admin_url = admin_reverse('cms_pagecontent_add')
+            admin_url += '?cms_page={}&language={}'.format(page.pk, language)
+            return admin_url
+
+        page_content = page.get_title_obj(language, fallback=False)
+        return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
+
+    def get_value(self, context, page, language):
+        if not self.is_editable(context, page, language):
+            # Convention: If this tag returns None the page content cannot be edited
+            return ""
+        return self.get_admin_url_for_language(context, page, language)
+
+
+register.tag(GetAdminUrlForLanguage.name, GetAdminUrlForLanguage)
 
 
 @register.simple_tag(takes_context=True)
@@ -121,8 +144,9 @@ register.tag(TreePublishRow.name, TreePublishRow)
 
 @register.tag
 class TreePublishRowMenu(AsTag):
-    """New template tag that renders a pontential menu to be offered with the
-    dirty indicators. The core will not display a menu."""
+    """New template tag that renders a potential menu to be offered with the
+    dirty indicators. The core will only display a menu for EmptyContent to allow
+    to create a new PageContent."""
     name = "tree_publish_row_menu"
     options = Options(
         Argument('page'),

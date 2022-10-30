@@ -135,10 +135,11 @@
         <div class="cms-tree-col cms-tree-col-padding-sm">
             <div class="cms-tree-item-wrapper">
                 <div class="cms-tree-item cms-tree-item-button">
-                    <div{% if has_change_permission and has_change_advanced_settings_permission %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                        data-cms-tooltip="{% autoescape on %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endautoescape %}"{% endif %}>
-                        {% if has_change_permission or has_change_advanced_settings_permission %}
-                        <a {% if has_change_permission %}href="{% get_admin_url_for_language page preview_language %}" {% endif %}
+                    {% get_admin_url_for_language page preview_language as content_admin_url %}
+                    <div{% if has_change_permission and has_change_advanced_settings_permission and content_admin_url %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                        data-cms-tooltip="{% trans "Page settings (SHIFT click for advanced settings)" %}"{% endif %}>
+                        {% if has_change_permission and content_admin_url  %}
+                        <a href="{{ content_admin_url }}"
                             class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-pencil"
                             {% if has_change_advanced_settings_permission %}
                             data-url="{% url 'admin:cms_page_advanced' page.id %}"
@@ -147,8 +148,8 @@
                         {% else %}
                             <span class="cms-btn cms-btn-default cms-btn-disabled js-cms-tree-advanced-settings cms-icon cms-icon-pencil">
                         {% endif %}
-                            <span class="sr-only">{% autoescape on %}{% trans "Page settings (SHIFT click for advanced settings)" %}{% endautoescape %}</span>
-                        {% if has_change_permission or has_change_advanced_settings_permission %}
+                            <span class="sr-only">{% trans "Page settings (SHIFT click for advanced settings)" %}</span>
+                        {% if has_change_permission and content_admin_url or has_change_advanced_settings_permission %}
                         </a>
                         {% endif %}
                     </div>

@@ -36,6 +36,10 @@
         border-color: $color-success;
         background-color: $color-success;
     }
+    &-draft {
+        border-color: $color-primary;
+        background-color: $white;
+    }
     &-dirty {
         animation: pulsate 2.5s ease-out infinite;
         border-color: $color-primary;
