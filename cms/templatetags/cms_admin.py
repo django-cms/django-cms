@@ -41,7 +41,7 @@ class GetAdminUrlForLanguage(AsTag):
         page_content = page.get_title_obj(language, fallback=False)
         return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
 
-    def get_value(self, context, page, language, **kwargs):
+    def get_value(self, context, page, language):
         if not self.is_editable(context, page, language):
             # Convention: If this tag returns None the page content cannot be edited
             return ""
@@ -128,7 +128,7 @@ class TreePublishRow(Tag):
             ("cms-pagetree-node-state cms-pagetree-node-state-empty", _("Empty")),
         )
 
-    def render_tag(self, context, page, language, **kwargs):
+    def render_tag(self, context, page, language):
         if page is None:  # Retrieve all for legend
             context["indicator_legend_items"] = self.get_indicator_legend(context, page, language)
             return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
@@ -171,7 +171,7 @@ class TreePublishRowMenu(AsTag):
             ]
         return "", []
 
-    def get_value(self, context, page, language, **kwargs):
+    def get_value(self, context, page, language):
         template, publish_menu_items = self.get_indicator_menu(context, page, language)
         if template:
             context["indicator_menu_items"] = publish_menu_items
@@ -258,7 +258,7 @@ def admin_static_url():
 class CMSAdminIconBase(Tag):
     name = 'cms_admin_icon_base'
 
-    def render_tag(self, context, **kwargs):
+    def render_tag(self, context):
         return CMS_ADMIN_ICON_BASE
 
 
