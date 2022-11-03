@@ -15,7 +15,9 @@ unreleased
 * Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 * Fixed permission denied error after page create (#6866)
 * Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
+* Deprecate usage of legacy SEND_BROKEN_LINK_EMAILS setting (removed since Django 1.8)
 * Add deprecation warning to ``cms.utils.i18n.get_current_language()`` (#6720)
+
 
 3.11.0 (2022-08-02)
 ===================
