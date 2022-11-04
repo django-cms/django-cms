@@ -357,7 +357,10 @@ class PageToolbar(CMSToolbar):
             except Resolver404:
                 return False
             else:
-                from cms.views import details, render_object_preview, render_object_structure, render_object_edit
+                from cms.views import (
+                    details, render_object_edit, render_object_preview,
+                    render_object_structure,
+                )
                 return resolver.func in (
                     details,  # live view
                     render_object_preview,  # preview endpoint
