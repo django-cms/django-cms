@@ -3,6 +3,7 @@ import functools
 import os.path
 from unittest import skipIf
 
+import mock
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -11,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.utils.timezone import now as tz_now
-from django.utils.translation import override as force_language
+from django.utils.translation import activate, override as force_language
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_title, publish_page
@@ -677,6 +678,35 @@ class PagesTestCase(TransactionCMSTestCase):
         found_page = get_page_from_request(request)
         self.assertIsNotNone(found_page)
         self.assertFalse(found_page.publisher_is_draft)
+
+    def test_language_homograph(self):
+        # a page about boots you can wear
+        wearable_boot = create_page("boot", "nav_playground.html", "en", slug="boot",
+                           published=True)
+        create_title('de', 'stiefel', wearable_boot, slug='stiefel')
+        wearable_boot.publish('de')
+        # a page about boats that float on water
+        floating_boat = create_page("boat", "nav_playground.html", "en", slug="boat",
+                           published=True)
+        create_title('de', 'boot', floating_boat, slug='boot')
+        floating_boat.publish('de')
+
+        activate('en')
+        request = self.get_request('/en/boot/')
+        page = get_page_from_request(request)
+        self.assertEqual(page.pk, wearable_boot.publisher_public_id)
+
+        activate('de')
+        request = self.get_request('/de/boot/', language='de')
+        page = get_page_from_request(request)
+        self.assertEqual(page.pk, floating_boat.publisher_public_id)
+
+    def test_no_request_language_code(self):
+        request = self.get_request('/any-page/')
+        del request.LANGUAGE_CODE
+        with mock.patch('cms.utils.page.get_page_from_path') as mock_page_from_path:
+            get_page_from_request(request)
+        self.assertIsNone(mock_page_from_path.call_args.kwargs['language_code'])
 
     def test_get_page_from_request_without_cache_when_has_use_path_argument(self):
         request = self.get_request('/test')

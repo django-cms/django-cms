@@ -15,9 +15,9 @@ from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils import translation
 from django.utils.http import urlencode
 from django.utils.timezone import now
-from django.utils.translation import activate
 
 from cms.api import create_page
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING
@@ -101,7 +101,7 @@ class BaseCMSTestCase:
     def _fixture_setup(self):
         super()._fixture_setup()
         self.create_fixtures()
-        activate("en")
+        translation.activate("en")
 
     def create_fixtures(self):
         pass
@@ -398,10 +398,7 @@ class BaseCMSTestCase:
             path = self.get_pages_root()
 
         if not language:
-            if settings.USE_I18N:
-                language = settings.LANGUAGES[0][0]
-            else:
-                language = settings.LANGUAGE_CODE
+            language = translation.get_language()
 
         if post_data:
             request = factory.post(path, post_data)
