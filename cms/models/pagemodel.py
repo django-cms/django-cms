@@ -1068,7 +1068,7 @@ class PageUrl(models.Model):
         default_permissions = []
 
     def __str__(self):
-        return u"%s (%s)" % (self.path or self.slug, self.language)
+        return "%s (%s)" % (self.path or self.slug, self.language)
 
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
