@@ -78,9 +78,11 @@
                 {# INFO: highlight active icon when in sidebar mode #}
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
-                    <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_placeholder_render_object_preview' page_content_type.pk page_content.pk %}"{% if lang in page_languages %} target="_top"{% endif %}">
-                        <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
-                    </a>
+                    {% if page_content %}
+                        <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_placeholder_render_object_preview' page_content_type.pk page_content.pk %}"{% if lang in page_languages %} target="_top"{% endif %}">
+                            <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         </div>
@@ -100,7 +102,7 @@
         <div class="cms-tree-col">
             <div class="cms-tree-item cms-tree-item-menu{% if not has_change_permission %} cms-tree-item-disabled{% endif %} js-cms-tree-item-menu">
                 <div class="cms-tree-item-inner">
-                    {% if is_concrete and has_change_permission %}
+                    {% if page_content and is_concrete and has_change_permission %}
                         <a href="{% url opts|admin_urlname:'change_innavigation' page_content.pk %}">
                     {% endif %}
                         {% if is_concrete and page_content.in_navigation %}
@@ -147,7 +149,7 @@
                     <div{% if has_add_page_permission %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                         data-cms-tooltip="{% autoescape on %}{% trans 'New sub page' %}{% endautoescape %}"{% endif %}>
                         {% if has_add_page_permission %}
-                            <a href="{% url opts|admin_urlname:'add' %}?parent_node={{ node.pk }}"
+                            <a href="{% url opts|admin_urlname:'add' %}?parent_node={{ node.pk }}&language={{ lang }}"
                                 class="js-cms-pagetree-add-page cms-btn cms-btn-default cms-icon cms-icon-plus">
                         {% else %}
                             <span class="cms-btn cms-btn-default cms-btn-disabled cms-icon cms-icon-plus">

@@ -29,8 +29,8 @@ support the latest release of each series.
 What's new in 4.X.X
 *******************
 
-Integration of djangocms-versioning into the pagetree
-=====================================================
+Feature 1
+=========
 
 Feature 2
 =========
@@ -68,6 +68,13 @@ their code base.
 
 Miscellaneous
 =============
+
+* The Django setting ``SEND_BROKEN_LINK_EMAILS`` (removed from Django since
+  version 1.8) was used as a signal to send an email to the site managers
+  if ``page_url`` could not reverse the url name. Since this version the
+  outdated setting is ignored. If managers want to receive mails add
+  ``django.middleware.common.BrokenLinkEmailsMiddleware`` to the project's
+  ``settings.MIDDLEWARE``. 
 
 Features deprecated in 4.X.X
 ============================
