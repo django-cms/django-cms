@@ -8,6 +8,13 @@ SCRIPTS=$(dirname "$(realpath "$0")")
 #shellcheck disable=SC1090
 source "${SCRIPTS}/functions"
 
+status "- Building changelog with bash ${BASH_VERSION}"
+
+SED=sed
+if [ `uname` == "Darwin" ]; then
+	SED=gsed
+fi
+
 # Scope used in this script
 declare -A SCOPES_HEADINGS
 declare -a SCOPES
@@ -75,7 +82,7 @@ else
 fi
 title="${FULL_VERSION} (${DATE})"
 #shellcheck disable=SC2001
-line=$(echo "${title}" | sed 's/./=/g')
+line=$(echo "${title}" | $SED 's/./=/g')
 
 
 # Cutting the Changelog into OLD and CURRENT
@@ -98,24 +105,24 @@ fi
 
 if [ "${VERSION}" = "${LAST_VERSION}" ]; then
     # releasing a golden release from RC, so we just change the version RC to the new one
-    sed -i "${current}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/a${title}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/a${line}" \
-        -e "/^${LAST_FULL_VERSION} (unpublished)$/,+1d" \
-        -e "s/(unpublished)/(${DATE})/"
+    $SED -i "${current}" \
+         -e "/^${LAST_FULL_VERSION} (unpublished)$/a${title}" \
+         -e "/^${LAST_FULL_VERSION} (unpublished)$/a${line}" \
+         -e "/^${LAST_FULL_VERSION} (unpublished)$/,+1d" \
+         -e "s/(unpublished)/(${DATE})/"
 else
 
     # This is a first release (RC or equivalent),
     # let's add some headings to be sure we got all of them right for next steps
-    sed -i "${current}" \
-        -e "/^unreleased$/a${title}" \
-        -e "/^unreleased$/a${line}" \
-        -e "/^unreleased$/a
+    $SED -i "${current}" \
+         -e "/^unreleased$/a${title}" \
+         -e "/^unreleased$/a${line}" \
+         -e "/^unreleased$/a
 " \
-        -e "/^unreleased$/aHighlights:" \
-        -e "/^unreleased$/a-----------" \
-        -e "/^unreleased$/,+1d" \
-        -e "s/(unpublished)/(${DATE})/"
+         -e "/^unreleased$/aHighlights:" \
+         -e "/^unreleased$/a-----------" \
+         -e "/^unreleased$/,+1d" \
+         -e "s/(unpublished)/(${DATE})/"
 fi
 
 # computing / updating each section
@@ -125,7 +132,7 @@ for scope in "${SCOPES[@]}"; do
     heading="${SCOPES_HEADINGS[$scope]}"
 
     # only checking on the last version *in the changelog" (ex:rc1 to rc2, the changelog already includes old to rc1)
-    git log "${LAST_FULL_VERSION}.." --pretty="format:%s (%h) -- %aN" | grep -i "^${scope}:" | sed -e "s/^${scope}:/*/i" > "${content}"
+    git log "${LAST_FULL_VERSION}.." --pretty="format:%s (%h) -- %aN" | grep -i "^${scope}:" | $SED -e "s/^${scope}:/*/i" > "${content}"
     if [ -z "$(cat "${content}")" ]; then
         continue
     fi
@@ -135,11 +142,11 @@ for scope in "${SCOPES[@]}"; do
         # shellcheck disable=SC2129
         echo "${heading}" >> "${current}"
         # shellcheck disable=SC2001
-        echo "${heading}" | sed -e 's/./-/g' >> "${current}"
+        echo "${heading}" | $SED -e 's/./-/g' >> "${current}"
         echo "" >> "${current}"
     fi
 
-    sed -i "${current}" -e "/^${heading}\$/{N
+    $SED -i "${current}" -e "/^${heading}\$/{N
 r${content}
 }"
 
@@ -154,7 +161,8 @@ cat >> "${current}" << EOF
 Statistics:
 -----------
 
-This release includes ${PR_NUMBER} pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes ${PR_NUMBER} pull requests, and was created with the help of the 
+following contributors (in alphabetical order):
 
 EOF
 
@@ -175,7 +183,7 @@ With the review help of the following contributors:
 
 EOF
 
-git log "${OLD_FULL_VERSION}.." | grep Co-authored-by | sed -e 's/^ *Co-authored-by: /* /;s/ <.*//' | sort -u >> "${current}"
+git log "${OLD_FULL_VERSION}.." | grep Co-authored-by | $SED -e 's/^ *Co-authored-by: /* /;s/ <.*//' | sort -u >> "${current}"
 
 cat >> "${current}" << EOF
 

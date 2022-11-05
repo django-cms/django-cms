@@ -20,9 +20,18 @@ SCRIPTS=$(dirname "$(realpath "$0")")
 source "${SCRIPTS}/functions"
 
 # Preparations:
+SED=sed
+if [ `uname` == "Darwin" ]; then
+	SED=gsed
+	if [[ `which awk` == "/usr/bin/awk" || `which bash` == "/bin/bash" ]]; then
+		error "Please install a current version of bash and gnu awk,"
+		error "e.g. \"brew install gawk bash\""
+		exit 1
+	fi
+fi
 
 # checking we have all necessary tools
-check_command_exists python git awk sed pip npm xargs grep "${EDITOR}"
+check_command_exists python git awk $SED pip npm xargs grep "${EDITOR}"
 load_nvm
 
 # -- argument checks
@@ -51,6 +60,8 @@ check_version_string "${FULL_VERSION}"
 
 VERSION=$(get_main_version "${FULL_VERSION}")
 VERSUFFIX=$(get_version_suffix "${FULL_VERSION}")
+
+error $VERSION
 
 BRANCH_SUFFIX=$(echo "${FULL_VERSION}" | awk -F '.' -e '{print $1 "." $2 ".x"}')
 BRANCH="release/${BRANCH_SUFFIX}"
@@ -164,7 +175,7 @@ if ! git branch -a | grep -q "remotes/upstream/${BRANCH}\$"; then
 else
     echo "You appear to already have a ${BRANCH} created, using it"
     git checkout "${BRANCH}"
-    git pull upstream "${BRANCH}"
+    git pull origin "${BRANCH}"
 fi
 
 # cleaning on the branch
@@ -198,12 +209,13 @@ read -r
 
 status "- Bumping version to ${FULL_VERSION}"
 # bump the version
-sed -i -e "s/__version__ = '.*'/__version__ = '$FULL_VERSION'/" __init__.py
-git commit __init__.py -m "${COMMIT_PREFIX}Bumped version to ${FULL_VERSION}"
+$SED -i -e "s/__version__ = '.*'/__version__ = '$FULL_VERSION'/" __init__.py
+git commit __init__.py ../package-lock.json -m "${COMMIT_PREFIX}Bumped version to ${FULL_VERSION}"
 
 status "- Fetching strings from transifex"
 "${SCRIPTS}/transifex-pull-strings"
 
+status "- Find changes to ignore"
 # Before compiling:
 # ignore changesets that only involves "^POT-Creation-Date:" "^PO-Revision-Date:"
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}compilemessages"
@@ -223,7 +235,7 @@ git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 
 
 status "- preparing documentation"
-"${SCRIPTS}/make-changelog" "${FULL_VERSION}"
+bash "${SCRIPTS}/make-changelog" "${FULL_VERSION}"
 
 upgrade_doc="docs/upgrade/${VERSION}.rst"
 
@@ -238,10 +250,10 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
         if [ "${last}" -gt 0 ]; then
             last=$(( last - 1 ))
             #shellcheck disable=SC2001
-            needle=$(echo "${needle}" | sed -e "s/\.[0-9]\+\$/.${last}/")
+            needle=$(echo "${needle}" | $SED -e "s/\.[0-9]\+\$/.${last}/")
         else
             #shellcheck disable=SC2001
-            needle=$(echo "${needle}" | sed -e 's/\.[0-9]\+$//')
+            needle=$(echo "${needle}" | $SED -e 's/\.[0-9]\+$//')
         fi
     done
 
@@ -256,18 +268,18 @@ if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
     cp "docs/upgrade/${needle}.rst" "${upgrade_doc}"
     git add "docs/upgrade/${VERSION}.rst"
 
-    sed -i "${upgrade_doc}" \
-        -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to-${VERSION}:/" \
-        -e "s/^${needle}.* release notes$/${VERSION} release notes/i" \
-        -e "s/^What's new in ${needle}.*$/What's new in ${VERSION}/i" \
-        -e "s/^How to upgrade to ${needle}.*$/How to upgrade to ${VERSION}/i" \
-        -e "s/^We assume you are upgrading from django CMS.*\.$/We assume you are upgrading from django CMS ${needle}./"
+    $SED -i "${upgrade_doc}" \
+         -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to-${VERSION}:/" \
+         -e "s/^${needle}.* release notes$/${VERSION} release notes/i" \
+         -e "s/^What's new in ${needle}.*$/What's new in ${VERSION}/i" \
+         -e "s/^How to upgrade to ${needle}.*$/How to upgrade to ${VERSION}/i" \
+         -e "s/^We assume you are upgrading from django CMS.*\.$/We assume you are upgrading from django CMS ${needle}./"
 fi
 
 if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
     status "Adding ${VERSION} to doc index"
     # note: the new line in the following command is not a mistake, it is needed for sed to process the command
-    sed -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
+    $SED -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
 }" docs/upgrade/index.rst
 fi
 
@@ -281,6 +293,7 @@ git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX
 
 # update the blog post using the What's new section
 status "Uploading to fork"
+git pull
 git push -u origin "${BRANCH}"
 
 success "Release process complete on the fork"

@@ -13,6 +13,14 @@ if [ -z "${EDITOR}" ]; then
         EDITOR=vim
 fi
 
+# If SED is not defined yet, do so
+if [ -z ${SED+x} ]; then
+	SED=sed
+	if [ `uname` == "Darwin" ]; then
+		SED=gsed
+	fi
+fi
+
 ##############################################################################
 #                   Status reporting (echo with colors)                      #
 ##############################################################################
@@ -127,7 +135,7 @@ check_version_string() {
 #
 get_main_version() {
     #shellcheck disable=SC2001
-    echo "$1" | sed -e "s/$(get_version_suffix "$1")\$//"
+    echo "$1" | $SED -e "s/$(get_version_suffix "$1")\$//"
 }
 
 #
@@ -137,7 +145,7 @@ get_main_version() {
 #
 get_version_suffix() {
     #shellcheck disable=SC2001
-    echo "$1" | sed -e "s/^\(\([0-9]\+\.\)\{2\}[0-9]\+\)//"
+    echo "$1" | $SED -e "s/^\(\([0-9]\+\.\)\{2\}[0-9]\+\)//"
 }
 
 #
