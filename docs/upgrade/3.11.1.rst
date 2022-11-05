@@ -1,4 +1,4 @@
-.. _upgrade-to-:
+.. _upgrade-to-3.11.1:
 
 ####################
  release notes 3.11.1
