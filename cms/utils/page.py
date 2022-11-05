@@ -1,6 +1,7 @@
 import re
 
-from django.db.models import Q
+from django.db.models import ExpressionWrapper, Q
+from django.db.models.fields import BooleanField
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_str
@@ -75,10 +76,15 @@ def get_page_queryset(site, draft=True, published=False):
     return Page.objects.public().on_site(site)
 
 
-def get_page_from_path(site, path, preview=False, draft=False):
+def get_page_from_path(site, path, preview=False, draft=False, language_code=None):
     """
     Resolves a url path to a single page object.
     Returns None if page does not exist
+
+    Preferres page results based on language code in this order:
+    - Matches sublanguage (e.g. de-at)
+    - Matches language (e.g. de)
+    - All other pages matching the path
     """
     from cms.models import Title
 
@@ -91,6 +97,22 @@ def get_page_from_path(site, path, preview=False, draft=False):
         titles = titles.filter(publisher_is_draft=False)
     else:
         titles = titles.filter(published=True, publisher_is_draft=False)
+    if language_code is not None:
+        # since a language code is provided, prefer pages that match that language
+        sublanguage = language_code
+        language = sublanguage.split("-", maxsplit=1)[0]
+        # use `annotate()` to add two new fields to our queryset in order to prefer the request language code
+        # `matches_sublanguage` will be true when the full code (both language and sublanguage) match
+        # `matches_language` will be true for all pages matching the top-level language code
+        # https://docs.djangoproject.com/en/stable/ref/models/querysets/#django.db.models.query.QuerySet.annotate
+        titles = titles.annotate(
+            matches_sublanguage=ExpressionWrapper(
+                Q(language=sublanguage), output_field=BooleanField()
+            ),
+            matches_language=ExpressionWrapper(
+                Q(language=language), output_field=BooleanField()
+            ),
+        ).order_by("-matches_sublanguage", "-matches_language")
     titles = titles.filter(path=(path or ''))
 
     for title in titles.iterator():
@@ -162,10 +184,15 @@ def get_page_from_request(request, use_path=None, clean_path=None):
             path = path[:-1]
 
     site = get_current_site()
-    page = get_page_from_path(site, path, preview, draft)
+    request_language_code = getattr(request, "LANGUAGE_CODE", None)
+    page = get_page_from_path(
+        site, path, preview, draft, language_code=request_language_code
+    )
 
     if draft and page and not user_can_view_page_draft(request.user, page):
-        page = get_page_from_path(site, path, preview, draft=False)
+        page = get_page_from_path(
+            site, path, preview, draft=False, language_code=request_language_code
+        )
 
     # For public pages, check if any parent is hidden due to published dates
     # In this case the selected page is not reachable

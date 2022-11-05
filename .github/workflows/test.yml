@@ -12,12 +12,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10']
+        python-version: [ '3.8', '3.9', '3.10', '3.11']
         requirements-file: [
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
+          django-4.1.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -65,12 +66,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10']
+        python-version: [ '3.8', '3.9', '3.10', '3.11']
         requirements-file: [
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
+          django-4.1.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -117,12 +119,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10']
+        python-version: [ '3.8', '3.9', '3.10', '3.11']
         requirements-file: [
           django-2.2.txt,
           django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
+          django-4.1.txt,
         ]
         os: [
           ubuntu-20.04,

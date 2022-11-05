@@ -22,7 +22,7 @@ def _load_from_file(module_path):
 
     imported = None
     if module_path:
-        with open(module_path, 'r') as openfile:
+        with open(module_path) as openfile:
             imported = load_module("mod", openfile, module_path, ('imported', 'r', PY_SOURCE))
     return imported
 
@@ -59,7 +59,7 @@ DEFAULTS = {
     'INVALIDATE_PAGE_CACHE_ON_STARTUP': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
-    'CACHE_PREFIX': 'cms_{}_'.format(__version__),
+    'CACHE_PREFIX': f'cms_{__version__}_',
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
     'UNIHANDECODE_VERSION': None,
@@ -96,11 +96,13 @@ def get_cache_durations():
     """
     Returns the setting: CMS_CACHE_DURATIONS or the defaults.
     """
-    return getattr(settings, 'CMS_CACHE_DURATIONS', {
+    cache_durations = {
         'menus': 60 * 60,
         'content': 60,
         'permissions': 60 * 60,
-    })
+    }
+    cache_durations.update(getattr(settings, 'CMS_CACHE_DURATIONS', {}))
+    return cache_durations
 
 
 @default('CMS_MEDIA_ROOT')
@@ -136,12 +138,12 @@ def get_toolbar_url__disable():
 def get_templates():
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
-        # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory
+        # CMS_TEMPLATES_DIR can either be a string pointing to the templates directory
         # or a dictionary holding 'site: template dir' entries
         if isinstance(tpldir, dict):
             tpldir = tpldir[settings.SITE_ID]
-        # We must extract the relative path of CMS_TEMPLATES_DIR to the neares
-        # valid templates directory. Here we mimick what the filesystem and
+        # We must extract the relative path of CMS_TEMPLATES_DIR to the nearest
+        # valid templates directory. Here we mimic what the filesystem and
         # app_directories template loaders do
         prefix = ''
         # Relative to TEMPLATE['DIRS'] for filesystem loader
@@ -213,7 +215,7 @@ def _ensure_languages_settings(languages):
             for key in language_object:
                 if key not in valid_language_keys:
                     raise ImproperlyConfigured(
-                        "CMS_LANGUAGES has invalid key %r in language %r in site %r" % (key, language_code, site)
+                        f"CMS_LANGUAGES has invalid key {key!r} in language {language_code!r} in site {site!r}"
                     )
 
             if 'fallbacks' not in language_object:
