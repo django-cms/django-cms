@@ -157,7 +157,7 @@ by a long-term support policy.
 *✓* indicates that the version has been tested and works. *×* indicates that it has not been tested, or
 is known to be incompatible.
 
-===========  ==== === === === === === ===   === === === === === === === === ====
+===========  ==== ==== === === === === === ===   === === === === === === === === ====
 django CMS   Python                              Django
 -----------  ---------------------------------   ------------------------------------
 \            3.11 3.10 3.9 3.8 3.7 3.6 3.5 3.4   4.1 4.0 3.2 3.1 3.0 2.2 2.1 2.0 1.11
