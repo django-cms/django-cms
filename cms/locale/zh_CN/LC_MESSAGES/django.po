@@ -9,6 +9,7 @@
 # aaffdd11 <chenyuan328@gmail.com>, 2011
 # aaron <aaronwwf@qq.com>, 2015
 # Aosp T, 2017
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # Felix Lu <lufelixgh@gmail.com>, 2013
 # Florian Delizy <florian.delizy@gmail.com>, 2021
 # ofive <glacier_05@yahoo.com.cn>, 2011
@@ -31,9 +32,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-26 17:28+0800\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Florian Delizy <florian.delizy@gmail.com>, 2021\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Chinese (China) (http://www.transifex.com/divio/django-cms/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1234,7 +1235,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "取消"
 
-msgid "The following error occured:"
+msgid "The following error occurred:"
 msgstr "发生了下述错误："
 
 msgid "Action successful."
