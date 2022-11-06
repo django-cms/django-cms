@@ -1,8 +1,8 @@
 .. _upgrade-to-3.11.1:
 
-####################
+######################
  release notes 3.11.1
-####################
+######################
 
 This release focuses on support for django 4 and dark mode.
 
