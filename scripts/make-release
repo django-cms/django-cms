@@ -25,7 +25,7 @@ if [ `uname` == "Darwin" ]; then
 	SED=gsed
 	if [[ `which awk` == "/usr/bin/awk" || `which bash` == "/bin/bash" ]]; then
 		error "Please install a current version of bash and gnu awk,"
-		error "e.g. \"brew install gawk bash\""
+		error "e.g. \"brew install gsed gawk bash\""
 		exit 1
 	fi
 fi
