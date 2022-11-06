@@ -8,6 +8,7 @@ Features:
 * add Python 3.11 support for Django CMS (#7422) (3fe1449e6) -- Vinit Kumar
 * Support for Django 4.1 (#7404) (777864af3) -- Fabian Braun
 * Add support for tel: and mailto: URIs in Advanced Page Settings redirect field (#7370) (0fd058ed3) -- Mark Walker
+* Improved dutch translations -- Stefan van den Eertwegh
 
 Bug Fixes:
 ----------
@@ -30,7 +31,7 @@ Refactoring and Cleanups:
 Statistics:
 -----------
 
-This release includes       40 pull requests, and was created with the help of the 
+This release includes       40 pull requests, and was created with the help of the
 following contributors (in alphabetical order):
 
 * Cage Johnson (1 pull request)
