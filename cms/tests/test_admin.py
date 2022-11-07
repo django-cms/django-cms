@@ -23,6 +23,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED, CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
 
 
@@ -1052,6 +1053,44 @@ class AdminPageTreeTests(AdminTestsBase):
         #       ⊢ Beta
         #   ⊢ Delta
         #       ⊢ Gamma
+
+    def test_create_page_language(self):
+        """tests if the New Page button creates a page content object in the language specified
+        by the language selectors. The creates pages in all languages and checks if the "+" button
+        creats a child in the same language"""
+
+        admin_user, staff = self._get_guys()
+        pagecontent_admin = self.pagecontent_admin_class
+
+        languages = get_language_list()  # Run trough all languages
+        url = admin_reverse("cms_pagecontent_changelist")
+        add_url = admin_reverse("cms_pagecontent_add")  # "Add page" button
+        self.assertIn("/en/", add_url + "?language=en")  # English admin (default in tests)
+        with self.login_user_context(admin_user):
+            request = self.get_request(url)
+            response = pagecontent_admin.changelist_view(request)
+            self.assertContains(response, f"{add_url}?language=en")
+
+            for language in languages:  # Now check all language with the languages selector defined
+                request = self.get_request(path=f"{url}?language={language}")  # Language of the page tree
+                response = pagecontent_admin.changelist_view(request)
+                self.assertContains(response, f'href="{add_url}?language={language}"')
+
+            # Create pages in all languages
+            page = {}
+            for language in languages:
+                page[language] = create_page('Alpha', 'nav_playground.html', language)
+
+            # Get the page tree and see if the href triggers an add page content for the
+            # selected language
+            url = admin_reverse("cms_pagecontent_get_tree")
+            for language in languages:
+                request = self.get_request(path=f"{url}?language={language}")
+                response = pagecontent_admin.get_tree(request)
+                self.assertContains(
+                    response,
+                    f'href="{add_url}?parent_node={page[language].node_id}&language={language}"'
+                )
 
 
 class AdminInputSanitationTests(AdminTestsBase):

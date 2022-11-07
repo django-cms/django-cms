@@ -175,9 +175,9 @@ class PagesTestCase(TransactionCMSTestCase):
         """
         site = get_current_site()
         for x in range(0, 12):
-            create_page('test copy', 'nav_playground.html', 'en')
-        new_slug = get_available_slug(site, 'test-copy', 'en')
-        self.assertTrue(new_slug, 'test-copy-11')
+            create_page('test-page', 'nav_playground.html', 'en')
+        new_slug = get_available_slug(site, 'test-page', 'en')
+        self.assertEqual(new_slug, 'test-page-copy-13')  # get_available_slug's suffix default is 'copy'
 
     def test_path_collisions_api_1(self):
         """ Checks for slug collisions on sibling pages - uses API to create pages
@@ -290,7 +290,7 @@ class PagesTestCase(TransactionCMSTestCase):
             page2 = create_page("test page 2", "nav_playground.html", "en",
                                 parent=page)
             homepage = Page.objects.get_home()
-            self.assertTrue(homepage.get_slug('en'), 'test-page-1')
+            self.assertEqual(homepage.get_slug('en'), 'test-page-1')
 
             self.assertEqual(page2.get_absolute_url(), '/en/test-page-2/')
             response = self.client.get(page2.get_absolute_url())

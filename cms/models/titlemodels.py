@@ -254,7 +254,7 @@ class PageContent(models.Model):
 class EmptyPageContent():
     """
     Empty title object, can be returned from Page.get_title_obj() if required
-    title object doesn't exists.
+    title object doesn't exist.
     """
     title = ""
     meta_description = ""

@@ -755,7 +755,7 @@ class Page(models.Model):
 
     def get_title_obj(self, language=None, fallback=True, force_reload=False):
         """Helper function for accessing wanted / current title.
-        If wanted title doesn't exists, EmptyPageContent instance will be returned.
+        If wanted title doesn't exist, EmptyPageContent instance will be returned.
         """
         language = self._get_title_cache(language, fallback, force_reload)
         if language in self.title_cache:

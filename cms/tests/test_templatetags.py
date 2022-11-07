@@ -6,6 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.core import mail
 from django.core.exceptions import ImproperlyConfigured
+from django.http import HttpResponse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
@@ -180,8 +181,8 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         user = self._create_user("admin", True, True)
         request.current_page = control
         request.user = user
-        middleware = ToolbarMiddleware()
-        middleware.process_request(request)
+        middleware = ToolbarMiddleware(lambda req: HttpResponse(""))
+        middleware(request)
         page = _get_page_by_untyped_arg(control.pk, request, 1)
         self.assertEqual(page, control)
 
@@ -213,16 +214,23 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
             self.assertEqual(len(mail.outbox), 0)
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_do_email(self):
-        with self.settings(SEND_BROKEN_LINK_EMAILS=True, DEBUG=False,
-                           MANAGERS=[("Jenkins", "tests@django-cms.org")]):
+        with self.settings(
+            MIDDLEWARE=settings.MIDDLEWARE + ["django.middleware.common.BrokenLinkEmailsMiddleware"],
+            DEBUG=False,
+            MANAGERS=[("Jenkins", "tests@django-cms.org")]
+        ):
             request = self.get_request('/')
             page = _get_page_by_untyped_arg({'pk': 1003}, request, 1)
             self.assertEqual(page, None)
             self.assertEqual(len(mail.outbox), 1)
 
     def test_get_page_by_untyped_arg_dict_fail_nodebug_no_email(self):
-        with self.settings(SEND_BROKEN_LINK_EMAILS=False, DEBUG=False,
-                           MANAGERS=[("Jenkins", "tests@django-cms.org")]):
+        with self.settings(
+            MIDDLEWARE=[mw for mw in settings.MIDDLEWARE
+                        if mw != "django.middleware.common.BrokenLinkEmailsMiddleware"],
+            DEBUG=False,
+            MANAGERS=[("Jenkins", "tests@django-cms.org")]
+        ):
             request = self.get_request('/')
             page = _get_page_by_untyped_arg({'pk': 1003}, request, 1)
             self.assertEqual(page, None)
