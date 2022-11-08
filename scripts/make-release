@@ -293,7 +293,6 @@ git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX
 
 # update the blog post using the What's new section
 status "Uploading to fork"
-git pull
 git push -u origin "${BRANCH}"
 
 success "Release process complete on the fork"
