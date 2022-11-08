@@ -2,6 +2,74 @@
 Changelog
 =========
 
+
+Features:
+---------
+* add Python 3.11 support for Django CMS (#7422) (3fe1449e6) -- Vinit Kumar
+* Support for Django 4.1 (#7404) (777864af3) -- Fabian Braun
+* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field (#7370) (0fd058ed3) -- Mark Walker
+* Improved dutch translations -- Stefan van den Eertwegh
+
+Bug Fixes:
+----------
+* Prefer titles matching request language (#7144) (06c9a85df) -- Micah Denbraver
+* Adds a deprecation warning for SEND_BROKEN_LINK_EMAILS (#7420) (d38f4a1cc) -- Fabian Braun
+* Added deprecation warning to `get_current_language()` (#7410) (2788f75e6) -- Mark Walker
+* CMS check management command fixed [#7412] (#7413) (dcf394bd5) -- ton77v
+* Changing color scheme resets session settings to defaults (#7407) (fcfe77f63) -- Fabian Braun
+* Clear page permission cache on page create (#6866) (e59c179dd) -- G3RB3N
+* Unlocalize page and node ids when rendering the page tree in the admin (#7188) (9e3c57946) -- Marco Bonetti
+* Allow partially overriding CMS_CACHE_DURATIONS (#7339) (162ff8dd8) -- Qijia Liu
+* CMS check management command fixed [#7386] (cdcf260aa) -- Marco Bonetti
+* default light mode (#7381) (abc6e6c5b) -- viliammihalik
+* Added language to page cache key (#7354) (d5a9f49e6) -- Mark Walker
+
+Refactoring and Cleanups:
+-------------------------
+* Move js API functions to CMS.Helpers to make them available also to the admin site (#7384) (a7f8cd44f) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes       40 pull requests, and was created with the help of the
+following contributors (in alphabetical order):
+
+* Cage Johnson (1 pull request)
+* Christian Clauss (1 pull request)
+* Dapo Adedire (1 pull request)
+* Fabian Braun (11 pull requests)
+* G3RB3N (1 pull request)
+* Hussein Srour (1 pull request)
+* Marco Bonetti (2 pull requests)
+* Mark Walker (10 pull requests)
+* Micah Denbraver (1 pull request)
+* Qijia Liu (1 pull request)
+* Shivan Sivakumaran (1 pull request)
+* Vinit Kumar (1 pull request)
+* code-review-doctor (1 pull request)
+* dependabot[bot] (0 pull request)
+* ton77v (1 pull request)
+* viliammihalik (1 pull request)
+* wesleysima (1 pull request)
+
+With the review help of the following contributors:
+
+* Christian Clauss
+* Conrad
+* Fabian Braun
+* Florian Delizy
+* Marco Bonetti
+* Mark Walker
+* Pankrat
+* Patrick Mazulo
+* Simon Krull
+* Vinit Kumar
+* dependabot[bot]
+* fsbraun
+* jefe
+
+Thanks to all contributors for their efforts!
+
 3.11.0 (2022-08-02)
 ===================
 
@@ -16,8 +84,10 @@ Highlights:
 * Revert change to the toolbar sites menu to use ``http`` protocol.
 * Fix edit plugin popup width (remove 850px width constraint).
 * Fix except block using list instead of tuple. (#7334)
+* Added spell checking to pre-commit and github workflows
 * Added cache ttl extension point.
 * Added current language to the page cache key (#6607)
+* Fix isort line length to by in sync with flake8
 
 3.10.1 (2022-06-28)
 ===================
@@ -1490,7 +1560,7 @@ Please see Install/2.4 release notes *before* attempting to upgrade to version 2
 
 - language namespaces for apphooks (reverse("de:myview"), reverse("en:myview"))
 - video plugin switch to https://github.com/FlashJunior/OSFlashVideoPlayer
-- frontediting added (cms.middlware.toolbar.ToolbarMiddleware)
+- frontediting added (cms.middleware.toolbar.ToolbarMiddleware)
 - testsuite works now under sqlite and postgres
 - orphaned text embed plugins get now deleted if not referenced in the text anymore
 - placeholder templatetag: "theme" attribute removed in favor of "width" (backward incompatible change if theme was used)

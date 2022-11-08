@@ -9,16 +9,11 @@ from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
-from cms.toolbar.utils import (
-    get_placeholder_toolbar_js, get_plugin_toolbar_js,
-    get_toolbar_from_request,
-)
+from cms.toolbar.utils import get_placeholder_toolbar_js, get_plugin_toolbar_js, get_toolbar_from_request
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
-from cms.utils.placeholder import (
-    get_toolbar_plugin_struct, restore_sekizai_context,
-)
+from cms.utils.placeholder import get_toolbar_plugin_struct, restore_sekizai_context
 from cms.utils.plugins import get_plugin_restrictions
 
 
@@ -341,7 +336,7 @@ class ContentRenderer(BaseRenderer):
             )
         parent_page = current_page.parent_page
         should_inherit = (
-            inherit and not content and parent_page  # noqa: W503
+            inherit and not content and parent_page
             # The placeholder cache is primed when the first placeholder
             # is loaded. If the current page's parent is not in there,
             # it means its cache was never primed as it wasn't necessary.

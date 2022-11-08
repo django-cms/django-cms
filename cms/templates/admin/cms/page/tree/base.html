@@ -1,5 +1,5 @@
 {% extends "admin/change_list.html" %}
-{% load i18n admin_list static admin_urls cms_admin cms_js_tags cms_static cms_tags %}
+{% load i18n l10n admin_list static admin_urls cms_admin cms_js_tags cms_static cms_tags %}
 
 {# TODO might not need that #}
 {% block title %}{% trans "List of pages" %}{% endblock %}
@@ -108,7 +108,7 @@
                                 </li>
                                 {% for site in tree.sites %}
                                     <li{% if site.pk == tree.site.pk %} class="active"{% endif %}>
-                                        <a href="#{{ site.pk }}" class="js-cms-pagetree-site-trigger" data-id="{{ site.pk }}">{{ site.name }}</a>
+                                        <a href="#{{ site.pk|unlocalize }}" class="js-cms-pagetree-site-trigger" data-id="{{ site.pk|unlocalize }}">{{ site.name }}</a>
                                     </li>
                                 {% endfor %}
                                 {% if has_recover_permission %}
@@ -127,7 +127,7 @@
                         <form method="post" class="js-cms-pagetree-site-form cms-hidden">
                             <select name="site">
                                 {% for site in tree.sites %}
-                                    <option value="{{ site.pk }}">{{ site.name }}</option>
+                                    <option value="{{ site.pk|unlocalize }}">{{ site.name }}</option>
                                 {% endfor %}
                             </select>
                             {% csrf_token %}
@@ -186,7 +186,7 @@
                             "permission": {{ CMS_PERMISSION|bool }},
                             "debug": {{ DEBUG|bool }},
                             "filtered": {% if tree.is_filtered %}true{% else %}false{% endif %},
-                            "site": {{ tree.site.pk }},
+                            "site": {{ tree.site.pk|unlocalize }},
                             "hasAddRootPermission": {{ has_add_permission|yesno:"true,false" }},
                             "lang": {
                                 "code": "{{ preview_language|lower }}",
@@ -250,7 +250,7 @@
                         "permission": {{ CMS_PERMISSION|bool }},
                         "debug": {{ DEBUG|bool }},
                         "filtered": {% if tree.is_filtered %}true{% else %}false{% endif %},
-                        "site": {{ tree.site.pk }},
+                        "site": {{ tree.site.pk|unlocalize }},
                         "hasAddRootPermission": {{ has_add_permission|yesno:"true,false" }},
                         "lang": {
                             "code": "{{ preview_language|lower }}",

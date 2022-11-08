@@ -30,7 +30,7 @@ $black: var(--dca-black);
     color-scheme: dark light;
 }
 
-root[data-color-scheme="light"] {
+:root[data-color-scheme="light"] {
     color-scheme: light;
 }
 
@@ -180,7 +180,7 @@ $z-layers: (
         "fixed-headers": 2,
         "container":    1,
     ),
-    // parent dependant, but should be higher than quicksearch, but
+    // parent dependent, but should be higher than quicksearch, but
     // lower than dropdown
     "hovertooltip":     1001,
     "screenblock":      100,

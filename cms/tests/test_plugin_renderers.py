@@ -2,9 +2,7 @@ from django.test.utils import override_settings
 
 from cms.api import add_plugin, create_page
 from cms.models import CMSPlugin
-from cms.plugin_rendering import (
-    ContentRenderer, LegacyRenderer, StructureRenderer,
-)
+from cms.plugin_rendering import ContentRenderer, LegacyRenderer, StructureRenderer
 from cms.test_utils.testcases import CMSTestCase
 
 
@@ -46,7 +44,7 @@ class TestStructureRenderer(CMSTestCase):
             '"MultiColumnPlugin"',
             '"addPluginHelpTitle": "Add plugin to placeholder \\"Body\\""',
             '"name": "Body"',
-            '"placeholder_id": "{}"'.format(placeholder.pk),
+            f'"placeholder_id": "{placeholder.pk}"',
         ]
 
         for bit in expected_bits:
@@ -66,7 +64,7 @@ class TestStructureRenderer(CMSTestCase):
             '"MultiColumnPlugin"',
             '"addPluginHelpTitle": "Add plugin to placeholder \\"Content-with-dash\\""',
             '"name": "Content-with-dash"',
-            '"placeholder_id": "{}"'.format(placeholder.pk),
+            f'"placeholder_id": "{placeholder.pk}"',
         ]
 
         for bit in expected_bits:

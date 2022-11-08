@@ -3,6 +3,7 @@ import functools
 import os.path
 from unittest import skipIf
 
+import mock
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -11,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.utils.timezone import now as tz_now
-from django.utils.translation import override as force_language
+from django.utils.translation import activate, override as force_language
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_title, publish_page
@@ -23,9 +24,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import (
-    get_available_slug, get_current_site, get_page_from_request,
-)
+from cms.utils.page import get_available_slug, get_current_site, get_page_from_request
 
 
 class PageMigrationTestCase(CMSTestCase):
@@ -157,8 +156,8 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertTrue(page.is_home)
         self.assertTrue(page.publisher_public.is_home)
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
-        self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [u''])
+        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [''])
+        self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [''])
 
     @skipIf(has_no_custom_user(), 'No custom user')
     def test_create_page_api_with_long_username(self):
@@ -177,12 +176,12 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(Page.objects.count(), 1)
 
         self.assertLessEqual(len(page.created_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegexpMatches(page.created_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.created_by, r'V+\.{3} \(id=\d+\)')
 
         self.assertLessEqual(len(page.changed_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegexpMatches(page.changed_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.changed_by, r'V+\.{3} \(id=\d+\)')
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u'root'])
+        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), ['root'])
 
     def test_delete_page_no_template(self):
         page_data = {
@@ -526,7 +525,7 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
-        with open(path, 'r') as fobj:
+        with open(path) as fobj:
             old = fobj.read()
         try:
             new = old.replace(
@@ -680,6 +679,35 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNotNone(found_page)
         self.assertFalse(found_page.publisher_is_draft)
 
+    def test_language_homograph(self):
+        # a page about boots you can wear
+        wearable_boot = create_page("boot", "nav_playground.html", "en", slug="boot",
+                           published=True)
+        create_title('de', 'stiefel', wearable_boot, slug='stiefel')
+        wearable_boot.publish('de')
+        # a page about boats that float on water
+        floating_boat = create_page("boat", "nav_playground.html", "en", slug="boat",
+                           published=True)
+        create_title('de', 'boot', floating_boat, slug='boot')
+        floating_boat.publish('de')
+
+        activate('en')
+        request = self.get_request('/en/boot/')
+        page = get_page_from_request(request)
+        self.assertEqual(page.pk, wearable_boot.publisher_public_id)
+
+        activate('de')
+        request = self.get_request('/de/boot/', language='de')
+        page = get_page_from_request(request)
+        self.assertEqual(page.pk, floating_boat.publisher_public_id)
+
+    def test_no_request_language_code(self):
+        request = self.get_request('/any-page/')
+        del request.LANGUAGE_CODE
+        with mock.patch('cms.utils.page.get_page_from_path') as mock_page_from_path:
+            get_page_from_request(request)
+        self.assertIsNone(mock_page_from_path.call_args.kwargs['language_code'])
+
     def test_get_page_from_request_without_cache_when_has_use_path_argument(self):
         request = self.get_request('/test')
         request._current_page_cache = True
@@ -788,8 +816,8 @@ class PagesTestCase(TransactionCMSTestCase):
 
         saved_page = create_page('test saved page', 'nav_playground.html', 'en')
         self.assertIsNotNone(saved_page.pk)
-        self.assertIn('id={}'.format(saved_page.pk), repr(saved_page))
-        self.assertIn('is_draft={}'.format(saved_page.publisher_is_draft), repr(saved_page))
+        self.assertIn(f'id={saved_page.pk}', repr(saved_page))
+        self.assertIn(f'is_draft={saved_page.publisher_is_draft}', repr(saved_page))
 
         non_saved_title = Title()
         self.assertIsNone(non_saved_title.pk)
@@ -797,8 +825,8 @@ class PagesTestCase(TransactionCMSTestCase):
 
         saved_title = saved_page.get_title_obj()
         self.assertIsNotNone(saved_title.pk)
-        self.assertIn('id={}'.format(saved_title.pk), repr(saved_title))
-        self.assertIn('is_draft={}'.format(saved_title.publisher_is_draft), repr(saved_title))
+        self.assertIn(f'id={saved_title.pk}', repr(saved_title))
+        self.assertIn(f'is_draft={saved_title.publisher_is_draft}', repr(saved_title))
 
     def test_page_overwrite_urls(self):
 
