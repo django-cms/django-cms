@@ -629,7 +629,7 @@ class ToolbarTests(ToolbarTestBase):
         cms_page = create_page('test-en', 'nav_playground.html', 'en')
         page_content_en = self.get_page_title_obj(cms_page)
         edit_url_en = get_object_edit_url(page_content_en)
-        page_content_de = create_title('de', 'test-de', cms_page)
+        page_content_de = create_page_content('de', 'test-de', cms_page)
         edit_url_de = get_object_edit_url(page_content_de)
 
         en_request = self.get_page_request(cms_page, user, edit_url_en)
