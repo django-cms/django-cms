@@ -384,7 +384,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
     :type plugin_type: str or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
     :param str language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
     :param str position: Position to add this plugin to the placeholder. Allowed positions are ``"last-child"``
-                       ` (default), ``"first-child"``, ``"left"``, ``"right"``.
+                         (default), ``"first-child"``, ``"left"``, ``"right"``.
     :param target: Parent plugin. Must be plugin instance
     :param data: Data for the plugin type instance
     """
