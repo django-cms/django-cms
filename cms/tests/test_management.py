@@ -11,7 +11,7 @@ from django.core import management
 from django.core.management import CommandError
 from django.test.utils import override_settings
 
-from cms.api import create_page, add_plugin, create_title
+from cms.api import create_page, add_plugin, create_page_content
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models import Page, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder
@@ -480,7 +480,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         # create an empty title language
         root_page = Page.objects.get_home(site)
-        create_title("de", "root page de", root_page)
+        create_page_content("de", "root page de", root_page)
 
         out = StringIO()
         management.call_command(
@@ -508,7 +508,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         # create an empty title language
         root_page = Page.objects.get_home(site)
-        create_title("de", "root page de", root_page)
+        create_page_content("de", "root page de", root_page)
         ph = root_page.get_placeholders('en').get(slot="body")
         add_plugin(ph, "TextPlugin", "de", body="Hello World")
 
@@ -532,7 +532,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         # create an empty title language
         root_page = Page.objects.get_home(site)
-        create_title("de", "root page de", root_page)
+        create_page_content("de", "root page de", root_page)
         ph = root_page.get_placeholders('en').get(slot="body")
         add_plugin(ph, "TextPlugin", "de", body="Hello World")
 

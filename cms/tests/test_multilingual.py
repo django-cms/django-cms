@@ -3,7 +3,7 @@ import copy
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
-from cms.api import create_page, create_title, add_plugin
+from cms.api import create_page, create_page_content, add_plugin
 from cms.forms.utils import update_site_and_page_choices
 from cms.exceptions import LanguageError
 from cms.models import EmptyPageContent, PageContent
@@ -105,7 +105,7 @@ class MultilingualTestCase(CMSTestCase):
         TESTLANG = get_primary_language()
         TESTLANG2 = get_secondary_language()
         page = create_page("mlpage", "nav_playground.html", TESTLANG)
-        create_title(TESTLANG2, page.get_title(), page, slug=page.get_slug(TESTLANG))
+        create_page_content(TESTLANG2, page.get_title(), page, slug=page.get_slug(TESTLANG))
         page.rescan_placeholders(TESTLANG)
         page = self.reload(page)
         page_placeholder_lang_1 = page.get_placeholders(TESTLANG)[0]
@@ -119,7 +119,7 @@ class MultilingualTestCase(CMSTestCase):
         TESTLANG = get_primary_language()
         TESTLANG2 = get_secondary_language()
         page = create_page("mlpage-%s" % TESTLANG, "nav_playground.html", TESTLANG)
-        create_title(TESTLANG2, "mlpage-%s" % TESTLANG2, page, slug=page.get_slug(TESTLANG))
+        create_page_content(TESTLANG2, "mlpage-%s" % TESTLANG2, page, slug=page.get_slug(TESTLANG))
         create_page("mlpage-2-%s" % TESTLANG, "nav_playground.html", TESTLANG, parent=page)
 
         lang_settings = copy.deepcopy(get_cms_setting('LANGUAGES'))
@@ -155,11 +155,11 @@ class MultilingualTestCase(CMSTestCase):
         lang_settings[1][0]['public'] = False
         with self.settings(CMS_LANGUAGES=lang_settings, LANGUAGE_CODE="en"):
             page = create_page("page1", "nav_playground.html", "en")
-            create_title("de", page.get_title(), page, slug=page.get_slug('en'))
+            create_page_content("de", page.get_title(), page, slug=page.get_slug('en'))
             page2 = create_page("page2", "nav_playground.html", "en")
-            create_title("de", page2.get_title(), page2, slug=page2.get_slug('en'))
+            create_page_content("de", page2.get_title(), page2, slug=page2.get_slug('en'))
             page3 = create_page("page2", "nav_playground.html", "en")
-            create_title("de", page3.get_title(), page3, slug=page3.get_slug('en'))
+            create_page_content("de", page3.get_title(), page3, slug=page3.get_slug('en'))
             create_page("page4", "nav_playground.html", "de")
 
             page.set_as_homepage()

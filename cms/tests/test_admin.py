@@ -13,7 +13,7 @@ from django.utils.encoding import force_str, smart_str
 from django.test.utils import override_settings
 
 from cms import api
-from cms.api import create_page, create_title, add_plugin
+from cms.api import create_page, create_page_content, add_plugin
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import PageContent, StaticPlaceholder, UserSettings
 from cms.models.pagemodel import Page
@@ -185,8 +185,8 @@ class AdminTestCase(AdminTestsBase):
         admin_user = self.get_superuser()
         page = create_page("delete-page-translation", "nav_playground.html", "en",
                            created_by=admin_user)
-        create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
-        create_title("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
+        create_page_content("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
+        create_page_content("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
         with self.login_user_context(admin_user):
             response = self.client.get(self.get_page_delete_translation_uri('de', page))
             self.assertEqual(response.status_code, 200)
@@ -318,7 +318,7 @@ class AdminTestCase(AdminTestsBase):
         add_plugin(ph, "TextPlugin", "en", body="Hello World EN 2")
 
         # creating a de title of the page and adding plugins to it
-        create_title("de", page_en.get_title(), page_en, slug=page_en.get_slug('en'))
+        create_page_content("de", page_en.get_title(), page_en, slug=page_en.get_slug('en'))
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE")
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE 2")
         add_plugin(ph, "TextPlugin", "de", body="Hello World DE 3")

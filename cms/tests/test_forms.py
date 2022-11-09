@@ -9,7 +9,7 @@ from cms.admin import forms
 from cms.admin.forms import (PagePermissionInlineAdminForm,
                              ViewRestrictionInlineAdminForm, GlobalPagePermissionAdminForm,
                              PageUserGroupForm)
-from cms.api import create_page, create_title, assign_user_to_page
+from cms.api import create_page, create_page_content, assign_user_to_page
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
 
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
@@ -77,7 +77,7 @@ class FormsTestCase(CMSTestCase):
         for page in pages:
             for language in languages:
                 title = page.get_title('en')
-                create_title(language, title, page=page)
+                create_page_content(language, title, page=page)
 
         for language in ['en'] + languages:
             expected = [

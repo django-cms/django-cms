@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
-from cms.api import create_page, create_title
+from cms.api import create_page, create_page_content
 from cms.extensions import extension_pool
 from cms.extensions import TitleExtension
 from cms.extensions import PageExtension
@@ -235,7 +235,7 @@ class ExtensionAdminTestCase(CMSTestCase):
             'My Extension Page', 'nav_playground.html', 'en',
             site=self.site, created_by=self.admin)
         self.page_title = self.page.get_title_obj('en')
-        create_title('de', 'de title', self.page)
+        create_page_content('de', 'de title', self.page)
         self.page_extension = MyPageExtension.objects.create(
             extended_object=self.page,
             extra="page extension text")

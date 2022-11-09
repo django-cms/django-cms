@@ -14,7 +14,7 @@ from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
 from menus.models import CacheKey
 from menus.utils import mark_descendants, find_selected, cut_levels
 
-from cms.api import create_page, create_title
+from cms.api import create_page, create_page_content
 from cms.cms_menus import get_visible_nodes
 from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
@@ -318,7 +318,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(len(nodes), 0)
 
         for page in Page.objects.all():
-            create_title(
+            create_page_content(
                 language='de',
                 title=page.get_title('en'),
                 page=page,
@@ -985,7 +985,7 @@ class MenuTests(BaseMenuTest):
             template='nav_playground.html',
             in_navigation=True,
         )
-        create_title('fr', 'FR-P2', nl_page_2, in_navigation=True)
+        create_page_content('fr', 'FR-P2', nl_page_2, in_navigation=True)
 
         with self.settings(SITE_ID=2):
             request = self.get_request('/en/')
