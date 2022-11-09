@@ -1,9 +1,39 @@
 """
-Public Python API to create CMS contents.
+Python APIs for creating CMS content. This is done in :mod:`cms.api` and not
+on the models and managers, because the direct API via models and managers is
+slightly counterintuitive for developers.
 
-WARNING: None of the functions defined in this module checks for permissions.
-You must implement the necessary permission checks in your own code before
-calling these methods!
+Teh api for both Pages and Plugins has changed significantly since django CMS
+Version 4.
+
+Also, the functions defined in this module do sanity checks on arguments.
+
+.. warning:: None of the functions in this module does any security or permission
+             checks. They verify their input values to be sane wherever
+             possible, however permission checks should be implemented manually
+             before calling any of these functions.
+
+.. warning:: Due to potential circular dependency issues, it's recommended
+             to import the api in the functions that uses its function.
+
+             e.g. use:
+
+             ::
+
+                 def my_function():
+                     from cms.api import api_function
+
+                     api_function(...)
+
+             instead of:
+
+             ::
+
+                 from cms.api import api_function
+
+                 def my_function():
+                     api_function(...)
+
 """
 import warnings
 
@@ -106,12 +136,41 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 position="last-child", overwrite_url=None,
                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
-    Create a CMS Page and it's title for the given language
+    Creates a :class:`cms.models.Page` instance and returns it. Also
+    creates a :class:`cms.models.Title` instance for the specified
+    language.
 
-    See docs/extending_cms/api_reference.rst for more info
+    :param str title: Title of the page
+    :param str template: Template to use for this page. Must be in :setting:`CMS_TEMPLATES`
+    :param str language: Language code for this page. Must be in :setting:`django:LANGUAGES`
+    :param str menu_title: Menu title for this page
+    :param str slug: Slug for the page, by default uses a slugified version of *title*
+    :param apphook: Application to hook on this page, must be a valid apphook
+    :type apphook: str or :class:`cms.app_base.CMSApp` sub-class
+    :param str apphook_namespace: Name of the apphook namespace
+    :param str redirect: URL redirect
+    :param str meta_description: Description of this page for SEO
+    :param created_by: User that is creating this page
+    :type created_by: str of :class:`django.contrib.auth.models.User` instance
+    :param parent: Parent page of this page
+    :type parent: :class:`cms.models.Page` instance
+    :param bool in_navigation: Whether this page should be in the navigation or not
+    :param bool soft_root: Whether this page is a soft root or not
+    :param str reverse_id: Reverse ID of this page (for template tags)
+    :param str navigation_extenders: Menu to attach to this page. Must be a valid menu
+    :param site: Site to put this page on
+    :type site: :class:`django.contrib.sites.models.Site` instance
+    :param bool login_required: Whether users must be logged in or not to view this page
+    :param limit_visibility_in_menu: Limits visibility of this page in the menu
+    :type limit_visibility_in_menu: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
+    :param str position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
+    :param str   overwrite_url: Overwritten path for this page
+    :param int xframe_options: X Frame Option value for Clickjacking protection
+    :param str page_title: Overridden page title for HTML title tag
     """
-    if published != None:
-        warnings.warn('This API function no longer accepts a published argument', UserWarning)
+    if published is not None or publication_date is not None or publication_end_date is not None:
+        warnings.warn('This API function no longer accepts a "published", "publication_date", or '
+                      '"publication_end_date" argument', UserWarning)
 
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
