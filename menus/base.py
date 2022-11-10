@@ -2,6 +2,7 @@ from django.utils.encoding import smart_str
 
 
 class Menu(object):
+    """The base class for all menu-generating classes."""
     namespace = None
 
     def __init__(self, renderer):
@@ -11,18 +12,18 @@ class Menu(object):
             self.namespace = self.__class__.__name__
 
     def get_nodes(self, request):
-        """
-        should return a list of NavigationNode instances
-        """
+        """Each subclass of Menu should return a list of :class:`menus.base.NavigationNode` instances."""
         raise NotImplementedError
 
 
 class Modifier(object):
-
+    """The base class for all menu-modifying classes. A modifier add, removes or changes
+    :class:`menus.base.NavigationNode` in the list."""
     def __init__(self, renderer):
         self.renderer = renderer
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+        """Each subclass of :class:`Modifier` should implement a :meth:`modify` method."""
         pass
 
 
