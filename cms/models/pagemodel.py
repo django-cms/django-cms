@@ -287,7 +287,7 @@ class Page(models.Model):
          .objects
          .filter(language=language, page=self)
          .exclude(managed=False)
-         .update(path=new_path))
+         .update(path=new_path))  # TODO: Update or create?
 
     def _update_url_path_recursive(self, language):
         if self.node.is_leaf() or language not in self.get_languages():
@@ -301,7 +301,7 @@ class Page(models.Model):
          .objects
          .filter(language=language, page__in=pages)
          .exclude(managed=False)
-         .update(path=new_path))
+         .update(path=new_path))  # TODO: Update or create?
 
         for child in pages.filter(urls__language=language).iterator():
             child._update_url_path_recursive(language)
@@ -356,7 +356,7 @@ class Page(models.Model):
         with force_language(language):
             if self.is_home:
                 return reverse('pages-root')
-            path = self.get_path(language, fallback) or self.get_slug(language, fallback)
+            path = self.get_path(language, fallback) or self.get_slug(language, fallback)  # TODO: Disallow get_slug
             return reverse('pages-details-by-slug', kwargs={"slug": path})
 
     def set_tree_node(self, site, target=None, position='first-child'):
@@ -791,7 +791,7 @@ class Page(models.Model):
 
         if language not in self.urls_cache:
             self.urls_cache.update({
-                url.language: url for url in self.urls.filter(language__in=languages)
+                url.language: url for url in self.urls.filter(language__in=languages)  # TODO: overwrites multiple urls
             })
 
             for _language in languages:
