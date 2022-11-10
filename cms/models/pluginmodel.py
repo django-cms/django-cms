@@ -380,9 +380,11 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         )
         from cms.utils.plugins import copy_plugins_to_placeholder
 
-        return copy_plugins_to_placeholder([self], target_placeholder, target_language,
-                                    root_plugin=None, start_positions=None)
-
+        return copy_plugins_to_placeholder(
+            [self] + self.get_descendants(),
+            target_placeholder,
+            target_language,
+        )
 
     def post_copy(self, old_instance, new_old_ziplist):
         """
