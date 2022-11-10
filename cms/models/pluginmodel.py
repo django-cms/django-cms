@@ -146,7 +146,7 @@ class PluginModelBase(ModelBase):
 
 
 class CMSPlugin(models.Model, metaclass=PluginModelBase):
-    '''
+    """
     The base class for a CMS plugin model. When defining a new custom plugin, you should
     store plugin-instance specific information on a subclass of this class. (An example for this
     would be to store the number of pictures to display in a gallery.)
@@ -155,14 +155,22 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
 
     1. Subclasses of CMSPlugin **cannot be further subclassed**
     2. Subclasses of CMSPlugin cannot define a "text" field.
+    """
 
-    '''
+    #: `django.models.ForeignKey`: Placeholder the plugin belongs to
     placeholder = models.ForeignKey(Placeholder, on_delete=models.CASCADE, editable=False, null=True)
+    #: `django.models.ForeignKey`: Parent plugin or ``None`` for plugins at root level in the placeholder
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+    #: `django.models.SmallIntegerField`: Position (unique for placeholder and language) starting with 1
+    #: for the first plugin in the placeholder
     position = models.SmallIntegerField(_("position"), default=1, editable=False)
+    #: `django.models.CharField`: Language of the plugin
     language = models.CharField(_("language"), max_length=15, blank=False, db_index=True, editable=False)
+    #: `django.models.CharField`: Plugin type (name of the class as string)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
+    #: `django.models.DateTimeField`: Datetime the plugin was created
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
+    #: `django.models.DateTimeField`: Datetime the plugin was last changed
     changed_date = models.DateTimeField(auto_now=True)
     child_plugin_instances = None
 

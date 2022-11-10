@@ -526,11 +526,18 @@ class Placeholder(models.Model):
         the last plugin (*n*, where *n* is the number of plugins in the placeholder).
 
         :param instance: Plugin to add. It's position parameter needs to be set.
-        :type instance: :class:`cms.models.pluginmodel.Plugin` instance
+        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
 
         .. note::
             As of version 4 of django CMS the position counter does not re-start at 1 for the first
             child plugin. The ``position`` field  and ``language`` field are unique for a placeholder.
+
+        Example::
+
+            new_child = MyCoolPlugin()
+            new_child.position = parent_plugin.position + 1
+            parent_plugin.placeholder.add(new_child)
+
         """
         last_position = self.get_last_plugin_position(instance.language) or 0
         # A shift is only needed if the distance between the new plugin
@@ -560,13 +567,13 @@ class Placeholder(models.Model):
         Moves a plugin within the placeholder (``target_placeholder=None``) or to another placeholder.
 
         :param plugin: Plugin to move
-        :type plugin: :class:`cms.models.pluginmodel.Plugin` instance
+        :type plugin: :class:`cms.models.pluginmodel.CMSPlugin` instance
         :param int target_position: The plugin's new position
         :param  target_placeholder: Placeholder to move plugin to (or ``None``)
         :type target_placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
         :param target_plugin: New parent plugin (or ``None``). The target plugin must be in the same placeholder
            or in the ``target_placeholder`` if one is given.
-        :type target_plugin: :class:`cms.models.pluginmodel.Plugin` instance
+        :type target_plugin: :class:`cms.models.pluginmodel.CMSPlugin` instance
 
         The ``target_position`` is enumerated from the start of the palceholder's plugin tree (1) to
         the last plugin (*n*, where *n* is the number of plugins in the placeholder).
@@ -689,7 +696,7 @@ class Placeholder(models.Model):
         Removes a plugin and its descendants from the placeholder and database.
 
         :param instance: Plugin to add. It's position parameter needs to be set.
-        :type instance: :class:`cms.models.pluginmodel.Plugin` instance
+        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
         """
         instance.get_descendants().delete()
         instance.delete()
@@ -714,7 +721,7 @@ class Placeholder(models.Model):
 
         :param str language: language for which the position is to be calculated
         :param parent: Parent plugin or ``None`` (if position is on top level)
-        :type parent: :class:`cms.models.pluginmodel.Plugin` instance
+        :type parent: :class:`cms.models.pluginmodel.CMSPlugin` instance
         :param str insert_order: Either ``"first"`` (default) or ``"last"``
         """
         if insert_order == 'first':
