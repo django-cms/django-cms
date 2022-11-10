@@ -7,6 +7,21 @@ Collection of important constants used throughout django CMS.
 TEMPLATE_INHERITANCE_MAGIC = 'INHERIT'
 
 REFRESH_PAGE = 'REFRESH_PAGE'
+"""
+Supplied to ``on_close`` arguments to refresh the current page when the frame is closed, for
+example:
+
+..  code-block:: python
+
+    from cms.constants import REFRESH_PAGE
+
+    self.toolbar.add_modal_item(
+        'Modal item',
+        url=modal_url,
+        on_close=REFRESH_PAGE
+        )
+"""
+
 FOLLOW_REDIRECT = 'FOLLOW_REDIRECT'
 URL_CHANGE = 'URL_CHANGE'
 

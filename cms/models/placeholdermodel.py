@@ -297,8 +297,8 @@ class Placeholder(models.Model):
     def page_setter(self, value):
         self._page = value
 
-    #: Gives the page object if the placeholder belongs to a ``PageContent`` object (and not to some other
-    #: model.) If the placeholder is not attached to a page it returns ``None```
+    #: Gives the page object if the placeholder belongs to a :class:`cms.models.titlemodels.PageContent` object
+    #: (and not to some other model.) If the placeholder is not attached to a page it returns ``None``
     page = property(page_getter, page_setter)
 
     def get_plugins_list(self, language=None):
@@ -535,7 +535,7 @@ class Placeholder(models.Model):
         Example::
 
             new_child = MyCoolPlugin()
-            new_child.position = parent_plugin.position + 1
+            new_child.position = parent_plugin.position + 1  # add as first child: directly after parent
             parent_plugin.placeholder.add(new_child)
 
         """
