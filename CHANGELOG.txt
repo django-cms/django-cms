@@ -4,6 +4,7 @@
 * Python 3.10 support
 * Fix bug that broke page tree if it contained empty page content
 * Fix bug that created new page content not in the displayed language but the browser language
+* feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
 
 === 4.0.0 (unreleased) ===
