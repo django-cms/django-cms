@@ -1,3 +1,5 @@
+import logging
+import sys
 from collections import OrderedDict, defaultdict, deque
 from copy import deepcopy
 from functools import lru_cache
@@ -10,6 +12,8 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_placeholder_conf
+
+logger = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=None)
@@ -265,7 +269,14 @@ def downcast_plugins(plugins,
     placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
 
     for plugin_type, pks in plugin_types_map.items():
-        cls = plugin_pool.get_plugin(plugin_type)
+        try:
+            cls = plugin_pool.get_plugin(plugin_type)
+        except KeyError:
+            # Plugin not available
+            logger.error(
+                f"Plugin not installed: {plugin_type} (pk={', '.join(str(pk) for pk in pks)})", exc_info=sys.exc_info()
+            )
+            continue
         # get all the plugins of type cls.model
         plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
 
