@@ -194,6 +194,145 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2], list(ph2.cmsplugin_set.order_by('position')))
 
+    def test_inter_placeholder_nested_plugin_move(self):
+        # Specific test to move a large number of plugins from one placeholder to a placeholder with a
+        # small number of plugins, between similarly size placeholders and a small number of plugins to
+        # a placeholder with a large number of plugins (For this test large is 10 times small.)
+        # These cases ensure the move operation is flexible with the relation of plugins, e.g. creates enough space
+        #
+        # To ensure the test works with different languages, plugins are created for a number of language with
+        # interlacing pk, the move operation only happens in the first language - others should stay unchanged.
+        #
+        language_fun = ('en', 'de', 'it', 'de-formal')
+        # symmetric and asymmetric plugin numbers in target placeholder, source placeholder
+        # (1, 10) One plugin in the target palceholder, 10 plugins to be moved
+        # (5, 5) Same size situation
+        # (10, 1) Ten plugins in the target placeholder, 1 plugin to be moved
+        for n1, n2 in ((1, 10), (10, 1), (5, 5)):
+            ex = TwoPlaceholderExample()
+            ex.save()
+            ph1 = ex.placeholder_1
+            ph2 = ex.placeholder_2
+            ph1parent = {}  # parents
+            ph2parent = {}
+            ph1children = {}  # Children
+            ph2children = {}
+            for lang in language_fun:
+                # first create parent in target placeholder
+                ph1parent[lang] = add_plugin(ph1, 'TextPlugin', lang, body='ph1 parent').cmsplugin_ptr
+                ph1children[lang] = []
+                for i in range(n1):
+                    # create children in target placeholder
+                    ph1children[lang].append(
+                        add_plugin(ph1, 'TextPlugin', lang, target=ph1parent[lang], body=f'ph1 child{i}').cmsplugin_ptr
+                    )
+                # now create parent in source placeholder
+                ph2parent[lang] = add_plugin(ph2, 'TextPlugin', lang, body='ph2 parent').cmsplugin_ptr
+                ph2children[lang] = []
+                for i in range(n2):
+                    # followed by children in source placeholder
+                    ph2children[lang].append(
+                        add_plugin(ph2, 'TextPlugin', lang, target=ph2parent[lang], body=f'ph2 child{i}').cmsplugin_ptr
+                    )
+            # Plugins have been created in all languages. Now move the first language plugins from the source
+            # placeholder to the target placeholder
+            ph2.move_plugin(
+                ph2parent[language_fun[0]],  # Move parent (first language only) **and** its children
+                target_plugin=ph1parent[language_fun[0]],  # as child of parent in target placeholder
+                target_position=2,  # First child, that is
+                target_placeholder=ph1,
+            )
+            # The result in theory:
+            # Parent Target Placeholder
+            #   Parent Source Palceholder         <-- Moved plugin parent
+            #     Children Source Placeholder     <-- Moved plugin children
+            #   Children Target Placeholder
+            left = (
+                [ph1parent[language_fun[0]], ph2parent[language_fun[0]]]
+                + ph2children[language_fun[0]] + ph1children[language_fun[0]]
+            )
+            # The result in practice
+            right = list(ph1.cmsplugin_set.filter(language=language_fun[0]).order_by('position'))
+            self.assertEqual(left, right)
+
+            ph1.delete()
+            ph2.delete()
+
+    def test_get_last_plugin_position(self):
+        # get_last_plugin_position is supposed to either get the position of the last plugin of the placeholder
+        # or the position of the last grand(!) child if a given plugin, independent of language!
+        # This test creates a tree of the form
+
+        # 1. Plugin 1
+        # 2.   Plugin 2
+        # 3.     Plugin 3
+        # 4.       Plugin 4
+        # 5. Final Plugin
+
+        language_fun = ('en', 'de', 'it', 'de-formal')
+
+        ex = Example1()
+        ex.save()
+        ph = ex.placeholder
+
+        parent = None
+        n = 4  # This will be the position of the last plugin
+
+        plugins = {lang: [] for lang in language_fun}
+        parent = {lang: None for lang in language_fun}
+        for i in range(n):
+            for lang in language_fun:
+                parent[lang] = add_plugin(ph, 'TextPlugin', lang, target=parent[lang]).cmsplugin_ptr
+                plugins[lang].append(parent[lang])
+
+        for lang in language_fun:
+            self.assertEqual(ph.get_last_plugin_position(lang), n)  # should be n
+
+            for parent in plugins[lang]:
+                # needs to be n also if we look at the parents
+                # the last plugin does not have a child hence position should be none
+                self.assertEqual(
+                    ph.get_last_plugin_position(lang, parent=parent),
+                    n if parent != plugins[lang][-1] else None,
+                )
+
+            add_plugin(ph, 'TextPlugin', lang, target=None)  # Add a top level final plugin
+
+            self.assertEqual(ph.get_last_plugin_position(lang), n + 1)  # plus the last plugin
+            for parent in plugins[lang]:
+                # still needs to be n also if we look at the parents
+                # the last plugin does not have a child hence position should be none
+                self.assertEqual(
+                    ph.get_last_plugin_position(lang, parent=parent),
+                    n if parent != plugins[lang][-1] else None,
+                )
+
+    def test_get_last_plugin_position_order(self):
+        # This test creates a tree like this
+        # 1. Plugin n
+        # 2. Plugin n-1
+        # 3. Plugin n-2
+        #    ...
+        # n. Plugin 1
+        # The children are created with the 'first-child' option, i.e. in reverse order: new children
+        # are prepended to the existing ones. Still get_last_plugin_position needs to return the position
+        # n if the last plugin (though it was created first).
+        # To make this more fun we interlace plugins with other languages to ensure they do not influence
+        # the result.
+        language_fun = ('en', 'de', 'it', 'en-US')
+        ex = Example1()
+        ex.save()
+        ph = ex.placeholder
+
+        n = 15  # This will be the position of the last plugin
+
+        for i in range(n):
+            # Use 'first-child' order causes pk and position run inversely
+            for language in language_fun:
+                add_plugin(ph, 'TextPlugin', language, 'first-child').cmsplugin_ptr
+
+        self.assertEqual(ph.get_last_plugin_position('en'), n)  # should be n
+
     def test_copy_plugin(self):
         superuser = self.get_superuser()
         page_en = create_page("CopyPluginTestPage (EN)", "nav_playground.html", "en")
@@ -1070,7 +1209,10 @@ class PlaceholderPluginTestsBase(CMSTestCase):
 
     def create_plugins(self, placeholder):
         for i in range(1, 9):
-            self._create_plugin(placeholder, position=i)
+            parent = add_plugin(placeholder or self.placeholder, 'StylePlugin', 'en')
+            # self._create_plugin(placeholder, position=i)
+            for j in range(3):
+                add_plugin(placeholder or self.placeholder, 'StylePlugin', 'en', 'last-child', parent)
 
     def get_first_root_plugin(self, placeholder=None):
         return self.get_plugins(placeholder).filter(parent__isnull=True).first()
@@ -1175,6 +1317,7 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
             self.placeholder.move_plugin(last_plugin, target_plugin.position)
             last_plugin.refresh_from_db()
 
+            # Assumes(!) that the children follow directly the parents!
             for edge, plugin_id in enumerate([last_plugin.pk] + tree[last_plugin.pk]):
                 target_index = plugin_tree_all.index(target_plugin.pk)
                 plugin_tree_all.remove(plugin_id)

@@ -297,7 +297,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
             new_pos = target.position
             parent_id = target.parent_id
         elif position == 'right':
-            new_pos = target.position + 1
+            new_pos = target.position + 1 + target._get_descendants_count()
             parent_id = target.parent_id
         else:
             raise Exception('position not supported: %s' % position)
