@@ -365,34 +365,6 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'pk', 'position']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):  # pragma: no cover
-        """
-        Copy this plugin and return the new plugin.
-
-        :param target_placeholder: Target placeholder the plugin is copied to
-        :type target_placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
-        :param str target_language: Which language the copied plugin will belong to
-        :param dict parent_cache: Cache for parent relationships - ignored
-        :param bool no_signals: Switch to avoid signals to be sent - ignored
-
-        .. warning::
-
-            This method has been replaced by :func:`cms.utils.plugins.copy_plugins_to_placeholder`
-
-        """
-        warnings.warn(
-            "plugin.copy_plugin is deprecated. Use cms.utils.plugins.copy_plugins_to_placeholder instead",
-            DeprecationWarning,
-            stacklevel=2
-        )
-        from cms.utils.plugins import copy_plugins_to_placeholder
-
-        return copy_plugins_to_placeholder(
-            [self] + self.get_descendants(),
-            target_placeholder,
-            target_language,
-        )
-
     def post_copy(self, old_instance, new_old_ziplist):
         """
         Can (should) be overridden to handle the copying of plugins which contain children plugins after the original
