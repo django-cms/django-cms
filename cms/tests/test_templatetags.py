@@ -18,7 +18,7 @@ from mock import patch
 from sekizai.context import SekizaiContext
 
 import cms
-from cms.api import create_page, create_page_content, add_plugin
+from cms.api import add_plugin, create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import (
     EmptyPageContent, Page, PageContent, PageUrl, Placeholder,

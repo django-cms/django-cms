@@ -3,7 +3,7 @@ import copy
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
-from cms.api import create_page, create_page_content, add_plugin
+from cms.api import add_plugin, create_page, create_page_content
 from cms.exceptions import LanguageError
 from cms.forms.utils import update_site_and_page_choices
 from cms.models import EmptyPageContent, PageContent

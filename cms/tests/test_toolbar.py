@@ -18,7 +18,7 @@ from django.utils.html import escape
 from django.utils.translation import get_language, gettext_lazy as _, override
 
 from cms.admin.forms import RequestToolbarForm
-from cms.api import create_page, create_page_content, add_plugin
+from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_toolbars import (
     ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, LANGUAGE_MENU_IDENTIFIER,
     get_user_model,

@@ -5,9 +5,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
 
 from cms.api import create_page, create_page_content
-from cms.extensions import extension_pool
-from cms.extensions import TitleExtension
-from cms.extensions import PageExtension
+from cms.extensions import PageExtension, TitleExtension, extension_pool
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.models import Page, PageContent
 from cms.test_utils.project.extensionapp.models import (

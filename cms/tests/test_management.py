@@ -8,7 +8,7 @@ from django.core.management import CommandError
 from django.test.utils import override_settings
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
-from cms.api import create_page, add_plugin, create_page_content
+from cms.api import add_plugin, create_page, create_page_content
 from cms.management.commands.subcommands.list import plugin_report
 from cms.models import Page, StaticPlaceholder
 from cms.models.placeholdermodel import Placeholder

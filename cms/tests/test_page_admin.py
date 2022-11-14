@@ -16,7 +16,7 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.admin.pageadmin import PageContentAdmin
-from cms.api import create_page, add_plugin, create_page_content
+from cms.api import add_plugin, create_page, create_page_content
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.middleware.user import CurrentUserMiddleware

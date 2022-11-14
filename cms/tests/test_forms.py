@@ -6,7 +6,6 @@ from django.core.cache import cache
 from django.utils.translation import override as force_language
 
 from cms.admin import forms
-
 from cms.admin.forms import (
     GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm,
     PageUserGroupForm, ViewRestrictionInlineAdminForm,

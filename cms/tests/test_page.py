@@ -14,7 +14,7 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.api import create_page, add_plugin, create_page_content
+from cms.api import add_plugin, create_page, create_page_content
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, PageContent
 from cms.models.placeholdermodel import Placeholder
