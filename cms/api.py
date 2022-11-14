@@ -32,6 +32,7 @@ from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
+from cms.utils.patching import patch_hook
 from cms.utils.permissions import _thread_locals
 from cms.utils.plugins import copy_plugins_to_placeholder
 from menus.menu_pool import menu_pool
@@ -196,6 +197,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     return page
 
 
+@patch_hook
 @transaction.atomic
 def create_title(language, title, page, menu_title=None, slug=None,
                  redirect=None, meta_description=None, parent=None,

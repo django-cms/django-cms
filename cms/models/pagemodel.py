@@ -22,6 +22,7 @@ from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
 from cms.utils.page import get_clean_username
+from cms.utils.patching import patch_hook
 from menus.menu_pool import menu_pool
 
 logger = getLogger(__name__)
@@ -843,6 +844,7 @@ class Page(models.Model):
             return self.get_title(language, True, force_reload)
         return menu_title
 
+    @patch_hook
     def get_placeholders(self, language):
         from cms.models import PageContent, Placeholder
 

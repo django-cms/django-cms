@@ -3,6 +3,8 @@ import re
 from django.utils.encoding import force_str
 from django.utils.timezone import get_current_timezone_name
 
+from cms.utils.patching import patch_hook
+
 
 def find_placeholder_relation(obj):
     return 'page'
@@ -111,6 +113,7 @@ def is_editable_model(model_class):
     return isinstance(admin_class, FrontendEditableAdminMixin)
 
 
+@patch_hook
 def get_admin_model_object_by_id(model_class, obj_id):
     """
     A method to fetch an object by object id.

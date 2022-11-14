@@ -25,6 +25,7 @@ from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_site_language_from_request
+from cms.utils.patching import patch_hook
 
 
 class BaseToolbar(ToolbarAPIMixin):
@@ -68,12 +69,14 @@ class BaseToolbar(ToolbarAPIMixin):
 
         return LegacyRenderer(request=self.request)
 
+    @patch_hook
     @cached_property
     def content_renderer(self):
         from cms.plugin_rendering import ContentRenderer
 
         return ContentRenderer(request=self.request)
 
+    @patch_hook
     @cached_property
     def structure_renderer(self):
         from cms.plugin_rendering import StructureRenderer

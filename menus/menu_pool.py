@@ -12,6 +12,7 @@ from django.utils.translation import get_language_from_request, gettext_lazy as 
 
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
+from cms.utils.patching import patch_hook
 
 from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
@@ -105,6 +106,7 @@ class MenuRenderer(object):
         self.site = Site.objects.get_current(request)
         self.draft_mode_active = use_draft(request)
 
+    @patch_hook
     @property
     def cache_key(self):
         prefix = get_cms_setting('CACHE_PREFIX')

@@ -6,6 +6,8 @@ from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _, override as force_language
 
+from cms.utils.patching import patch_hook
+
 
 class WizardBase():
     template_name = None
@@ -106,6 +108,7 @@ class Wizard(WizardBase):
         model_name = model.__name__.lower()
         return user.has_perm("%s.%s_%s" % (app_label, "add", model_name))
 
+    @patch_hook
     def get_success_url(self, obj, **kwargs):
         """
         This should return the URL of the created object, «obj».

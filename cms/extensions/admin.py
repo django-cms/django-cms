@@ -6,6 +6,7 @@ from django.urls import reverse
 
 from cms.models import Page, PageContent
 from cms.utils.page_permissions import user_can_change_page
+from cms.utils.patching import patch_hook
 
 
 class ExtensionAdmin(admin.ModelAdmin):
@@ -60,6 +61,7 @@ class PageExtensionAdmin(ExtensionAdmin):
 
 class TitleExtensionAdmin(ExtensionAdmin):
 
+    @patch_hook
     def save_model(self, request, obj, form, change):
         if not change and 'extended_object' in request.GET:
             obj.extended_object = PageContent.objects.get(pk=request.GET['extended_object'])
@@ -83,6 +85,7 @@ class TitleExtensionAdmin(ExtensionAdmin):
         """
         return {}
 
+    @patch_hook
     @csrf_protect_m
     def add_view(self, request, form_url='', extra_context=None):
         """

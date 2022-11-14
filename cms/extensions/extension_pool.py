@@ -1,6 +1,7 @@
 from cms.exceptions import SubClassNeededError
 
 from .models import PageExtension, TitleExtension
+from ..utils.patching import patch_hook
 
 
 class ExtensionPool():
@@ -59,6 +60,7 @@ class ExtensionPool():
                 else:
                     instance.copy_to_public(target_page, language)
 
+    @patch_hook
     def _copy_title_extensions(self, source_page, target_page, language, clone=False):
         source_title = source_page.pagecontent_set.get(language=language)
         if target_page:

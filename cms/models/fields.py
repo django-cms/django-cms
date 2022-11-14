@@ -100,6 +100,7 @@ class PageField(models.ForeignKey):
 
 
 class PlaceholderRelationField(GenericRelation):
+    # ATTN: default_checks is patched by djangocms_versioning
     default_checks = []
 
     def __init__(self, checks=None, **kwargs):

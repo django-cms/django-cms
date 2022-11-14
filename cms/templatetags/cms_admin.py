@@ -8,6 +8,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.utils import i18n
+from cms.utils.patching import patch_hook
 from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
@@ -15,6 +16,7 @@ register = template.Library()
 CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 
+@patch_hook
 @register.simple_tag(takes_context=False)
 def get_admin_url_for_language(page, language):
     if language not in page.get_languages():

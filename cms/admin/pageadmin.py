@@ -54,6 +54,7 @@ from cms.utils.i18n import (
     get_language_list, get_language_object, get_language_tuple,
     get_site_language_from_request,
 )
+from cms.utils.patching import patch_hook
 from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.urlutils import admin_reverse
 
@@ -832,6 +833,7 @@ class PageContentAdmin(admin.ModelAdmin):
             preserved_filters['language'] = lang
         return preserved_filters.urlencode()
 
+    @patch_hook
     def get_queryset(self, request):
         site = get_site(request)
         languages = get_language_list(site.pk)
@@ -1186,6 +1188,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         return HttpResponse(force_str(_("The template was successfully changed")))
 
+    @patch_hook
     @require_POST
     @transaction.atomic
     def copy_language(self, request, object_id):

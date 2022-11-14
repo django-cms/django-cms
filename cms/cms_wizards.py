@@ -4,6 +4,7 @@ from cms.models import Page
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 
 from .forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
+from .utils.patching import patch_hook
 from .wizards.wizard_base import Wizard
 
 
@@ -23,6 +24,10 @@ class CMSPageWizard(Wizard):
             has_perm = user_can_add_page(user)
         return has_perm
 
+    @patch_hook
+    def get_success_url(self, obj, **kwargs):
+        return super().get_success_url(obj, **kwargs)
+
 
 class CMSSubPageWizard(Wizard):
 
@@ -32,6 +37,10 @@ class CMSSubPageWizard(Wizard):
             # app-hooked page.
             return False
         return user_can_add_subpage(user, target=page)
+
+    @patch_hook
+    def get_success_url(self, obj, **kwargs):
+        return super().get_success_url(obj, **kwargs)
 
 
 cms_page_wizard = CMSPageWizard(
