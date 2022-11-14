@@ -61,8 +61,6 @@ check_version_string "${FULL_VERSION}"
 VERSION=$(get_main_version "${FULL_VERSION}")
 VERSUFFIX=$(get_version_suffix "${FULL_VERSION}")
 
-error $VERSION
-
 BRANCH_SUFFIX=$(echo "${FULL_VERSION}" | awk -F '.' -e '{print $1 "." $2 ".x"}')
 BRANCH="release/${BRANCH_SUFFIX}"
 TAG="${FULL_VERSION}"
@@ -175,7 +173,7 @@ if ! git branch -a | grep -q "remotes/upstream/${BRANCH}\$"; then
 else
     echo "You appear to already have a ${BRANCH} created, using it"
     git checkout "${BRANCH}"
-    git pull origin "${BRANCH}"
+    git pull upstream "${BRANCH}"
 fi
 
 # cleaning on the branch
