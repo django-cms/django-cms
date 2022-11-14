@@ -38,4 +38,3 @@ def patch_cms(obj, method, patch):
     module_name = f"({obj.__module__}) " if hasattr(obj, "__module__") else ""
     raise ImproperlyConfigured(f"File {filename} in line {line_number} tried to patch {method} of {obj.__name__} "
                                f"{module_name}but there is no method marked as @patch_hook.")
-
