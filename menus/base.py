@@ -58,7 +58,7 @@ class NavigationNode(object):
         self.parent_id = parent_id
         self.parent_namespace = parent_namespace
         self.visible = visible
-        self.attr = attr or {} # To avoid declaring a dict in defaults...
+        self.attr = attr or {}  # To avoid declaring a dict in defaults...
         """
         A dictionary, provided in order that arbitrary attributes may be added to the node -
         placing them directly on the node itself could cause a clash with an existing or future attribute.
