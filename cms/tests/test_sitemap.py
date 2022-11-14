@@ -61,7 +61,6 @@ class SitemapTestCase(CMSTestCase):
 
             create_page('P11', in_navigation=True, parent=p9, **defaults)
 
-
     def test_sitemap_count(self):
         """
         Has the sitemap the correct number of elements?

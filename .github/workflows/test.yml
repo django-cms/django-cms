@@ -2,19 +2,30 @@ name: django CMS test.yml
 
 on: [push, pull_request]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   database-postgres:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9 ]  # latest release minus two
+        python-version: [ 3.7, 3.8, 3.9, '3.10' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.0.txt,
           django-3.1.txt,
           django-3.2.txt,
+          django-4.0.txt,
+          django-4.1.txt,
         ]
+        exclude:
+          - python-version: 3.7
+            requirements-file: django-4.0.txt
+          - python-version: 3.7
+            requirements-file: django-4.1.txt
         os: [
           ubuntu-20.04,
         ]
@@ -38,6 +49,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
@@ -59,13 +71,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9 ]  # latest release minus two
+        python-version: [ 3.7, 3.8, 3.9, '3.10' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.0.txt,
           django-3.1.txt,
           django-3.2.txt,
+          django-4.0.txt,
+          django-4.1.txt,
         ]
+        exclude:
+          - python-version: 3.7
+            requirements-file: django-4.0.txt
+          - python-version: 3.7
+            requirements-file: django-4.1.txt
         os: [
           ubuntu-20.04,
         ]
@@ -88,6 +107,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
@@ -109,13 +129,20 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9 ]  # latest release minus two
+        python-version: [ 3.7, 3.8, 3.9, '3.10' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.0.txt,
           django-3.1.txt,
           django-3.2.txt,
+          django-4.0.txt,
+          django-4.1.txt,
         ]
+        exclude:
+          - python-version: 3.7
+            requirements-file: django-4.0.txt
+          - python-version: 3.7
+            requirements-file: django-4.1.txt
         os: [
           ubuntu-20.04,
         ]
@@ -127,6 +154,7 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y

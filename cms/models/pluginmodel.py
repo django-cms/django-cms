@@ -1,7 +1,8 @@
-from datetime import date
 import json
 import os
 import warnings
+from datetime import date
+from functools import lru_cache
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
@@ -17,8 +18,6 @@ from cms.models.placeholdermodel import Placeholder
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
-from functools import lru_cache
-
 
 @lru_cache(maxsize=None)
 def _get_descendants_cte():
@@ -26,21 +25,21 @@ def _get_descendants_cte():
     if db_vendor == 'oracle':
         sql = (
             "WITH descendants (id, cms_plugin_position, cms_plugin_parent_id) as ("
-                "SELECT {0}.id, {0}.position, {0}.parent_id  "
-                    "FROM {0} WHERE {0}.parent_id = %s "
-                "UNION ALL "
-                "SELECT {0}.id, {0}.position, {0}.parent_id "
-                    "FROM descendants, {0} WHERE {0}.parent_id = descendants.id"
+            "SELECT {0}.id, {0}.position, {0}.parent_id  "
+            "FROM {0} WHERE {0}.parent_id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.position, {0}.parent_id "
+            "FROM descendants, {0} WHERE {0}.parent_id = descendants.id"
             ")"
         )
     else:
         sql = (
             "WITH RECURSIVE descendants as ("
-                "SELECT {0}.id, {0}.position, {0}.parent_id  "
-                    "FROM {0} WHERE {0}.parent_id = %s "
-                "UNION ALL "
-                "SELECT {0}.id, {0}.position, {0}.parent_id "
-                    "FROM descendants, {0} WHERE {0}.parent_id = descendants.id"
+            "SELECT {0}.id, {0}.position, {0}.parent_id  "
+            "FROM {0} WHERE {0}.parent_id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.position, {0}.parent_id "
+            "FROM descendants, {0} WHERE {0}.parent_id = descendants.id"
             ")"
         )
     return sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
@@ -69,8 +68,7 @@ def plugin_supports_cte():
     connection = _get_database_connection('write')
     db_vendor = _get_database_vendor('write')
     sqlite_no_cte = (
-        db_vendor == 'sqlite'
-        and connection.Database.sqlite_version_info < (3, 8, 3)
+        db_vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 8, 3)
     )
 
     if sqlite_no_cte:

@@ -6,7 +6,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
-from cms.constants import RIGHT, LEFT, REFRESH_PAGE, URL_CHANGE
+from cms.constants import LEFT, REFRESH_PAGE, RIGHT, URL_CHANGE
 
 
 class ItemSearchResult():
@@ -99,7 +99,9 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
         elif isinstance(position, BaseItem):
             position = self._item_position(position)
         elif not (position is None or isinstance(position, (int,))):
-            raise ValueError("Position must be None, an integer, an item or an ItemSearchResult, got %r instead" % position)
+            raise ValueError(
+                "Position must be None, an integer, an item or an ItemSearchResult, got %r instead" % position
+            )
         self._add_item(item, position)
         self._memoize(item)
         return item
@@ -518,7 +520,7 @@ class ModalButton(Button):
     """
     template = "cms/toolbar/items/button_modal.html"
 
-    def __init__(self, name, url, active=False, disabled=False,  extra_classes=None, on_close=None):
+    def __init__(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
         self.name = name
         self.url = url
         self.active = active
@@ -578,6 +580,7 @@ class ButtonList(BaseItem):
     def add_button(self, name, url, active=False, disabled=False,
                    extra_classes=None):
         """Adds a :class:`Button` to the list of buttons and returns it."""
+        
         item = Button(name, url,
                       active=active,
                       disabled=disabled,
@@ -588,6 +591,7 @@ class ButtonList(BaseItem):
 
     def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE):
         """Adds a :class:`~cms.toolbar.items.ModalButton` to the button list and returns it."""
+
         item = ModalButton(name, url,
                       active=active,
                       disabled=disabled,
@@ -599,6 +603,7 @@ class ButtonList(BaseItem):
 
     def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
         """Adds a :class:`~cms.toolbar.items.SideFrameButton` to the button list and returns it."""
+
         item = SideframeButton(name, url,
                       active=active,
                       disabled=disabled,

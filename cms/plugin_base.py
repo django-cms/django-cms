@@ -1,16 +1,12 @@
 import json
 import re
 
-from django.shortcuts import render
-
 from django import forms
-from django.contrib import admin
-from django.contrib import messages
+from django.contrib import admin, messages
 from django.core.exceptions import (
-    ImproperlyConfigured,
-    ObjectDoesNotExist,
-    ValidationError,
+    ImproperlyConfigured, ObjectDoesNotExist, ValidationError,
 )
+from django.shortcuts import render
 from django.utils.encoding import force_str, smart_str
 from django.utils.html import escapejs
 from django.utils.translation import gettext, gettext_lazy as _
@@ -18,7 +14,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
-from cms.toolbar.utils import get_plugin_tree_as_json, get_plugin_toolbar_info
+from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree_as_json
 from cms.utils.conf import get_cms_setting
 
 
@@ -42,8 +38,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 % (new_plugin.model, new_plugin)
             )
         # validate the template:
-        if (not hasattr(new_plugin, 'render_template') and
-                not hasattr(new_plugin, 'get_render_template')):
+        if (not hasattr(new_plugin, 'render_template') and not hasattr(new_plugin, 'get_render_template')):
             raise ImproperlyConfigured(
                 "CMSPluginBase subclasses must have a render_template attribute"
                 " or get_render_template method"

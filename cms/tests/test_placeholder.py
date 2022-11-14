@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ImproperlyConfigured
-from django.template import TemplateSyntaxError, Template
+from django.template import Template, TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -17,26 +17,25 @@ from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.settingmodels import UserSettings
 from cms.plugin_pool import plugin_pool
-from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.placeholder_relation_field_app.models import FancyPoll
+from cms.test_utils.project.placeholder_relation_field_app.models import (
+    FancyPoll,
+)
 from cms.test_utils.project.placeholderapp.models import (
-    DynamicPlaceholderSlotExample,
-    Example1,
-    TwoPlaceholderExample,
+    DynamicPlaceholderSlotExample, Example1, TwoPlaceholderExample,
 )
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
+from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.utils import (
-    get_object_edit_url,
-    get_object_structure_url,
-    get_toolbar_from_request,
+    get_object_edit_url, get_object_structure_url, get_toolbar_from_request,
 )
-from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
-                                   get_placeholder_conf, get_placeholders, _get_nodelist,
-                                   _scan_placeholders)
+from cms.utils.placeholder import (
+    MLNGPlaceholderActions, PlaceholderNoAction, _get_nodelist,
+    _scan_placeholders, get_placeholder_conf, get_placeholders,
+)
 from cms.utils.urlutils import admin_reverse
 
 
@@ -63,74 +62,76 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
     def test_placeholder_scanning_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_one.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'three']))
 
     def test_placeholder_scanning_variable_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_variable_extends.html')
-        self.assertEqual(placeholders, [u'one', u'two', u'three', u'four'])
+        self.assertEqual(placeholders, ['one', 'two', 'three', 'four'])
 
     def test_placeholder_scanning_inherit_from_variable_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_inherit_from_variable_extends.html')
-        self.assertEqual(placeholders, [u'one', u'two', u'three', u'four'])
+        self.assertEqual(placeholders, ['one', 'two', 'three', 'four'])
 
     def test_placeholder_scanning_sekizai_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_one_sekizai.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'three']))
 
     def test_placeholder_scanning_include(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_two.html')
-        self.assertEqual(sorted(placeholders), sorted([u'child', u'three']))
+        self.assertEqual(sorted(placeholders), sorted(['child', 'three']))
 
     def test_placeholder_scanning_double_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_three.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'new_three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'new_three']))
 
     def test_placeholder_scanning_sekizai_double_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_three_sekizai.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'new_three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'new_three']))
 
     def test_placeholder_scanning_complex(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_four.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'child', u'four']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'child', 'four']))
 
     def test_placeholder_scanning_super(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_five.html')
-        self.assertEqual(sorted(placeholders), sorted([u'one', u'extra_one', u'two', u'three']))
+        self.assertEqual(sorted(placeholders), sorted(['one', 'extra_one', 'two', 'three']))
 
     def test_placeholder_scanning_nested(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_six.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'new_two', u'new_three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'new_two', 'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
-        placeholders = self.assertWarns(DuplicatePlaceholderWarning,
-                                        'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
-                                        _get_placeholder_slots, 'placeholder_tests/test_seven.html')
-        self.assertEqual(sorted(placeholders), sorted([u'one']))
+        placeholders = self.assertWarns(
+            DuplicatePlaceholderWarning,
+            'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
+            _get_placeholder_slots, 'placeholder_tests/test_seven.html'
+        )
+        self.assertEqual(sorted(placeholders), sorted(['one']))
 
     def test_placeholder_scanning_extend_outside_block(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'base_outside']))
 
     def test_placeholder_scanning_sekizai_extend_outside_block(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_sekizai.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'base_outside']))
 
     def test_placeholder_scanning_extend_outside_block_nested(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_nested.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'base_outside']))
 
     def test_placeholder_scanning_sekizai_extend_outside_block_nested(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_nested_sekizai.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'base_outside']))
 
     def test_placeholder_scanning_var(self):
         t = Template('{%load cms_tags %}{% include name %}{% placeholder "a_placeholder" %}')
         phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
-        self.assertListEqual(phs, sorted([u'a_placeholder']))
+        self.assertListEqual(phs, sorted(['a_placeholder']))
 
         t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
         phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
-        self.assertListEqual(phs, sorted([u'two', u'new_one', u'base_outside']))
+        self.assertListEqual(phs, sorted(['two', 'new_one', 'base_outside']))
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
@@ -192,6 +193,145 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual([ph1_pl1, ph1_pl3], list(ph1.cmsplugin_set.order_by('position')))
         self.assertEqual([ph2_pl3, ph2_pl1, ph2_pl2, ph1_pl2], list(ph2.cmsplugin_set.order_by('position')))
+
+    def test_inter_placeholder_nested_plugin_move(self):
+        # Specific test to move a large number of plugins from one placeholder to a placeholder with a
+        # small number of plugins, between similarly size placeholders and a small number of plugins to
+        # a placeholder with a large number of plugins (For this test large is 10 times small.)
+        # These cases ensure the move operation is flexible with the relation of plugins, e.g. creates enough space
+        #
+        # To ensure the test works with different languages, plugins are created for a number of language with
+        # interlacing pk, the move operation only happens in the first language - others should stay unchanged.
+        #
+        language_fun = ('en', 'de', 'it', 'de-formal')
+        # symmetric and asymmetric plugin numbers in target placeholder, source placeholder
+        # (1, 10) One plugin in the target palceholder, 10 plugins to be moved
+        # (5, 5) Same size situation
+        # (10, 1) Ten plugins in the target placeholder, 1 plugin to be moved
+        for n1, n2 in ((1, 10), (10, 1), (5, 5)):
+            ex = TwoPlaceholderExample()
+            ex.save()
+            ph1 = ex.placeholder_1
+            ph2 = ex.placeholder_2
+            ph1parent = {}  # parents
+            ph2parent = {}
+            ph1children = {}  # Children
+            ph2children = {}
+            for lang in language_fun:
+                # first create parent in target placeholder
+                ph1parent[lang] = add_plugin(ph1, 'TextPlugin', lang, body='ph1 parent').cmsplugin_ptr
+                ph1children[lang] = []
+                for i in range(n1):
+                    # create children in target placeholder
+                    ph1children[lang].append(
+                        add_plugin(ph1, 'TextPlugin', lang, target=ph1parent[lang], body=f'ph1 child{i}').cmsplugin_ptr
+                    )
+                # now create parent in source placeholder
+                ph2parent[lang] = add_plugin(ph2, 'TextPlugin', lang, body='ph2 parent').cmsplugin_ptr
+                ph2children[lang] = []
+                for i in range(n2):
+                    # followed by children in source placeholder
+                    ph2children[lang].append(
+                        add_plugin(ph2, 'TextPlugin', lang, target=ph2parent[lang], body=f'ph2 child{i}').cmsplugin_ptr
+                    )
+            # Plugins have been created in all languages. Now move the first language plugins from the source
+            # placeholder to the target placeholder
+            ph2.move_plugin(
+                ph2parent[language_fun[0]],  # Move parent (first language only) **and** its children
+                target_plugin=ph1parent[language_fun[0]],  # as child of parent in target placeholder
+                target_position=2,  # First child, that is
+                target_placeholder=ph1,
+            )
+            # The result in theory:
+            # Parent Target Placeholder
+            #   Parent Source Palceholder         <-- Moved plugin parent
+            #     Children Source Placeholder     <-- Moved plugin children
+            #   Children Target Placeholder
+            left = (
+                [ph1parent[language_fun[0]], ph2parent[language_fun[0]]]
+                + ph2children[language_fun[0]] + ph1children[language_fun[0]]
+            )
+            # The result in practice
+            right = list(ph1.cmsplugin_set.filter(language=language_fun[0]).order_by('position'))
+            self.assertEqual(left, right)
+
+            ph1.delete()
+            ph2.delete()
+
+    def test_get_last_plugin_position(self):
+        # get_last_plugin_position is supposed to either get the position of the last plugin of the placeholder
+        # or the position of the last grand(!) child if a given plugin, independent of language!
+        # This test creates a tree of the form
+
+        # 1. Plugin 1
+        # 2.   Plugin 2
+        # 3.     Plugin 3
+        # 4.       Plugin 4
+        # 5. Final Plugin
+
+        language_fun = ('en', 'de', 'it', 'de-formal')
+
+        ex = Example1()
+        ex.save()
+        ph = ex.placeholder
+
+        parent = None
+        n = 4  # This will be the position of the last plugin
+
+        plugins = {lang: [] for lang in language_fun}
+        parent = {lang: None for lang in language_fun}
+        for i in range(n):
+            for lang in language_fun:
+                parent[lang] = add_plugin(ph, 'TextPlugin', lang, target=parent[lang]).cmsplugin_ptr
+                plugins[lang].append(parent[lang])
+
+        for lang in language_fun:
+            self.assertEqual(ph.get_last_plugin_position(lang), n)  # should be n
+
+            for parent in plugins[lang]:
+                # needs to be n also if we look at the parents
+                # the last plugin does not have a child hence position should be none
+                self.assertEqual(
+                    ph.get_last_plugin_position(lang, parent=parent),
+                    n if parent != plugins[lang][-1] else None,
+                )
+
+            add_plugin(ph, 'TextPlugin', lang, target=None)  # Add a top level final plugin
+
+            self.assertEqual(ph.get_last_plugin_position(lang), n + 1)  # plus the last plugin
+            for parent in plugins[lang]:
+                # still needs to be n also if we look at the parents
+                # the last plugin does not have a child hence position should be none
+                self.assertEqual(
+                    ph.get_last_plugin_position(lang, parent=parent),
+                    n if parent != plugins[lang][-1] else None,
+                )
+
+    def test_get_last_plugin_position_order(self):
+        # This test creates a tree like this
+        # 1. Plugin n
+        # 2. Plugin n-1
+        # 3. Plugin n-2
+        #    ...
+        # n. Plugin 1
+        # The children are created with the 'first-child' option, i.e. in reverse order: new children
+        # are prepended to the existing ones. Still get_last_plugin_position needs to return the position
+        # n if the last plugin (though it was created first).
+        # To make this more fun we interlace plugins with other languages to ensure they do not influence
+        # the result.
+        language_fun = ('en', 'de', 'it', 'en-US')
+        ex = Example1()
+        ex.save()
+        ph = ex.placeholder
+
+        n = 15  # This will be the position of the last plugin
+
+        for i in range(n):
+            # Use 'first-child' order causes pk and position run inversely
+            for language in language_fun:
+                add_plugin(ph, 'TextPlugin', language, 'first-child').cmsplugin_ptr
+
+        self.assertEqual(ph.get_last_plugin_position('en'), n)  # should be n
 
     def test_copy_plugin(self):
         superuser = self.get_superuser()
@@ -462,19 +602,19 @@ class PlaceholderTestCase(TransactionCMSTestCase):
                 'require_parent': False,
             },
             'layout/home.html main': {
-                'name': u'main content with FilerImagePlugin and limit',
+                'name': 'main content with FilerImagePlugin and limit',
                 'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin'],
                 'inherit': 'main',
                 'limits': {'global': 1},
             },
             'layout/other.html main': {
-                'name': u'main content with FilerImagePlugin and no limit',
+                'name': 'main content with FilerImagePlugin and no limit',
                 'inherit': 'layout/home.html main',
                 'limits': {},
                 'excluded_plugins': ['LinkPlugin']
             },
             None: {
-                'name': u'All',
+                'name': 'All',
                 'plugins': ['FilerImagePlugin', 'LinkPlugin'],
                 'limits': {},
             },
@@ -536,7 +676,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
     def test_placeholder_scanning_nested_super(self):
         placeholders = _get_placeholder_slots('placeholder_tests/nested_super_level1.html')
-        self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
+        self.assertEqual(sorted(placeholders), sorted(['level1', 'level2', 'level3', 'level4']))
 
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
@@ -627,7 +767,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set([u'en', u'de', u'fr'])
+        avail_langs = set(['en', 'de', 'fr'])
         # Setup instance
         ex = Example1(
             char_1='one',
@@ -643,7 +783,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             add_plugin(ex.placeholder, u"EmptyPlugin", lang)
         # reload instance from database
         ex = Example1.objects.get(pk=ex.pk)
-        #get languages
+        # get languages
         langs = [lang['code'] for lang in ex.placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
 
@@ -652,11 +792,11 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set([u'en', u'de', u'fr'])
+        avail_langs = set(['en', 'de', 'fr'])
         # Setup instances
-        page = create_page('test page', 'col_two.html', u'en')
+        page = create_page('test page', 'col_two.html', 'en')
         for lang in avail_langs:
-            if lang != u'en':
+            if lang != 'en':
                 create_page_content(lang, 'test page %s' % lang, page)
         placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         ###
@@ -684,18 +824,22 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         """
 
         nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
-        self.assertNotIn('one',
+        self.assertNotIn(
+            'one',
             nodelist[0].blocks.keys(),
             "test_super_extends_1.html contains a block called 'one', "
-            "but _2.html does not.")
+            "but _2.html does not."
+        )
 
         _get_placeholder_slots("placeholder_tests/test_super_extends_2.html")
 
         nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
-        self.assertNotIn('one',
+        self.assertNotIn(
+            'one',
             nodelist[0].blocks.keys(),
             "test_super_extends_1.html still should not contain a block "
-            "called 'one' after rescanning placeholders.")
+            "called 'one' after rescanning placeholders."
+        )
 
     @override_settings(TEMPLATE_LOADERS=(
         ('django.template.loaders.cached.Loader', (
@@ -711,15 +855,13 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         """
         template = get_template("placeholder_tests/test_super_extends_2.html")
         output = template.render({})
-        self.assertEqual(['Whee'], [o for o in output.split('\n')
-            if 'Whee' in o])
+        self.assertEqual(['Whee'], [o for o in output.split('\n') if 'Whee' in o])
 
         _get_placeholder_slots("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
         output = template.render({})
-        self.assertEqual(['Whee'], [o for o in output.split('\n')
-            if 'Whee' in o])
+        self.assertEqual(['Whee'], [o for o in output.split('\n') if 'Whee' in o])
 
     def test_sets_source_when_title_is_created(self):
         """
@@ -947,16 +1089,16 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
         result = force_str(ph)
-        self.assertEqual(result, u'test')
+        self.assertEqual(result, 'test')
 
     def test_excercise_get_attached_model(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
         result = ph._get_attached_model()
-        self.assertEqual(result, None) # Simple PH - no model
+        self.assertEqual(result, None)  # Simple PH - no model
 
     def test_excercise_get_attached_field(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        self.assertEqual(ph._get_attached_field(), None) # Simple PH - no field name
+        self.assertEqual(ph._get_attached_field(), None)  # Simple PH - no field name
 
     def test_excercise_get_attached_models_notplugins(self):
         ex = Example1(
@@ -968,10 +1110,10 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         ex.save()
         ph = ex.placeholder
         result = list(ph._get_attached_models())
-        self.assertEqual(result, [Example1]) # Simple PH - Example1 model
+        self.assertEqual(result, [Example1])  # Simple PH - Example1 model
         add_plugin(ph, 'TextPlugin', 'en', body='en body')
         result = list(ph._get_attached_models())
-        self.assertEqual(result, [Example1]) # Simple PH still one Example1 model
+        self.assertEqual(result, [Example1])  # Simple PH still one Example1 model
 
     def test_excercise_get_attached_fields_notplugins(self):
         ex = Example1(
@@ -983,10 +1125,10 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         ex.save()
         ph = ex.placeholder
         result = [f.name for f in list(ph._get_attached_fields())]
-        self.assertEqual(result, ['placeholder']) # Simple PH - placeholder field name
+        self.assertEqual(result, ['placeholder'])  # Simple PH - placeholder field name
         add_plugin(ph, 'TextPlugin', 'en', body='en body')
         result = [f.name for f in list(ph._get_attached_fields())]
-        self.assertEqual(result, ['placeholder']) # Simple PH - still one placeholder field name
+        self.assertEqual(result, ['placeholder'])  # Simple PH - still one placeholder field name
 
     def test_repr(self):
         unsaved_ph = Placeholder()
@@ -1067,7 +1209,10 @@ class PlaceholderPluginTestsBase(CMSTestCase):
 
     def create_plugins(self, placeholder):
         for i in range(1, 9):
-            self._create_plugin(placeholder, position=i)
+            parent = add_plugin(placeholder or self.placeholder, 'StylePlugin', 'en')
+            # self._create_plugin(placeholder, position=i)
+            for j in range(3):
+                add_plugin(placeholder or self.placeholder, 'StylePlugin', 'en', 'last-child', parent)
 
     def get_first_root_plugin(self, placeholder=None):
         return self.get_plugins(placeholder).filter(parent__isnull=True).first()
@@ -1172,6 +1317,7 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
             self.placeholder.move_plugin(last_plugin, target_plugin.position)
             last_plugin.refresh_from_db()
 
+            # Assumes(!) that the children follow directly the parents!
             for edge, plugin_id in enumerate([last_plugin.pk] + tree[last_plugin.pk]):
                 target_index = plugin_tree_all.index(target_plugin.pk)
                 plugin_tree_all.remove(plugin_id)
@@ -1352,15 +1498,13 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
         for i in range(1, 12, 3):
             parent = self._create_plugin(placeholder, position=i)
             parent_2 = self._create_plugin(placeholder, parent=parent, position=i + 1)
-            self._create_plugin(placeholder, parent=parent_2, position=i+2)
+            self._create_plugin(placeholder, parent=parent_2, position=i + 2)
 
     def test_move_to_placeholder_under_parent(self):
         plugin = self.get_plugins().filter(parent__isnull=True).first()
         source_tree_by_root = self.get_plugin_tree()
         source_plugin_tree_all = list(
-            self
-            .get_plugins()
-            .values_list('pk', flat=True)
+            self .get_plugins() .values_list('pk', flat=True)
         )
         target = self._create_placeholder('target')
         self.create_plugins(target)
@@ -1397,4 +1541,3 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected)
-

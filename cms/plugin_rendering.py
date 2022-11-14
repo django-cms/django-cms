@@ -1,9 +1,9 @@
+import logging
+import sys
 from collections import OrderedDict
-
 from functools import partial
 
 from classytags.utils import flatten_context
-
 from django.contrib.sites.models import Site
 from django.template import Context
 from django.utils.functional import cached_property
@@ -13,19 +13,19 @@ from django.utils.safestring import mark_safe
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models import PageContent
 from cms.toolbar.utils import (
-    get_placeholder_toolbar_js,
-    get_plugin_toolbar_js,
+    get_placeholder_toolbar_js, get_plugin_toolbar_js,
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (
-    get_toolbar_plugin_struct,
-    rescan_placeholders_for_obj,
+    get_toolbar_plugin_struct, rescan_placeholders_for_obj,
     restore_sekizai_context,
 )
 from cms.utils.plugins import get_plugin_restrictions
+
+logger = logging.getLogger(__name__)
 
 
 def _unpack_plugins(parent_plugin):
@@ -121,7 +121,7 @@ class BaseRenderer():
         return plugin_menu_template.render({'plugin_menu': plugin_menu})
 
     def get_placeholder_toolbar_js(self, placeholder, page=None):
-        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page) # original
+        plugins = self.plugin_pool.get_all_plugins(placeholder.slot, page)  # original
 
         plugin_types = [cls.__name__ for cls in plugins]
         allowed_plugins = plugin_types + self.plugin_pool.get_system_plugins()
@@ -148,7 +148,7 @@ class BaseRenderer():
     def get_plugin_class(self, plugin):
         plugin_type = plugin.plugin_type
 
-        if not plugin_type in self._cached_plugin_classes:
+        if plugin_type not in self._cached_plugin_classes:
             self._cached_plugin_classes[plugin_type] = self.plugin_pool.get_plugin(plugin_type)
         return self._cached_plugin_classes[plugin_type]
 
@@ -458,13 +458,30 @@ class ContentRenderer(BaseRenderer):
         # which is guaranteed by get_cached_template if the template returned by
         # plugin._get_render_template is either a string or an engine-specific template object
         context = PluginContext(context, instance, placeholder)
-        context = plugin.render(context, instance, placeholder.slot)
-        context = flatten_context(context)
+        try:
+            context = plugin.render(context, instance, placeholder.slot)
+            context = flatten_context(context)
+        except Exception:  # catch errors when executing a plugin's render method
+            context['exc_info'] = sys.exc_info()
+            content = self.render_exception('executing plugin.render', instance, context, placeholder, editable)
+            logger.error(
+                f"{instance.__class__.__name__}.render for plugin pk={instance.id} raised an exception",
+                exc_info=context['exc_info']
+            )
+        else:
+            template_name = plugin._get_render_template(context, instance, placeholder)
 
-        template = plugin._get_render_template(context, instance, placeholder)
-        template = self.templates.get_cached_template(template)
-
-        content = template.render(context)
+            try:
+                template = self.templates.get_cached_template(template_name)
+                content = template.render(context)
+            except Exception:  # catch errors when rendering a plugin's template
+                context['exc_info'] = sys.exc_info()
+                content = self.render_exception('rendering template', instance, context, placeholder, editable)
+                logger.error(
+                    f'Rendering "{template_name}" for plugin {instance.__class__.__name__} '
+                    f'(pk={instance.id}) raised an exception',
+                    exc_info=context['exc_info']
+                )
 
         for path in get_cms_setting('PLUGIN_PROCESSORS'):
             processor = import_string(path)
@@ -475,6 +492,20 @@ class ContentRenderer(BaseRenderer):
             placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
             placeholder_cache.setdefault('plugins', []).append(instance)
         return mark_safe(content)
+
+    def render_exception(self, action, instance, context, placeholder, editable):
+        if editable:
+            exc, value, traceback = context['exc_info']
+            return f'''
+                <div style="display: inline-block; border: none; background: rgba(0, 0, 0, 0.5);
+                   padding: 0.6em 0.3em; cursor: not-allowed; min-height: 2em; width:100%; vertical-align:middle;
+                   text-align:center;">
+                    <span style="font-weight: bold; color: darkred;">
+                      Exception when {action} in {instance.plugin_type} (id={instance.id})<br />
+                      {exc.__name__}: {value}
+                    </span>
+                </div>'''
+        return ''
 
     def render_plugins(self, placeholder, language, context, editable=False, template=None):
         plugins = self.get_plugins_to_render(
@@ -508,7 +539,7 @@ class ContentRenderer(BaseRenderer):
                 request=self.request,
             )
 
-            if cached_value != None:
+            if cached_value is not None:
                 # None means nothing in the cache
                 # Anything else is a valid value
                 language_cache[placeholder.pk] = cached_value
@@ -549,7 +580,7 @@ class ContentRenderer(BaseRenderer):
             # has not been cached.
             placeholders_to_fetch = [
                 placeholder for placeholder in placeholders
-                if _cached_content(placeholder, self.request_language) == None]
+                if _cached_content(placeholder, self.request_language) is None]
         else:
             # cache is disabled, prefetch plugins for all
             # placeholders in the page.

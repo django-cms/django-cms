@@ -1,5 +1,4 @@
 import warnings
-
 from datetime import datetime, timedelta
 
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -11,17 +10,12 @@ from django.utils.translation import gettext_lazy as _
 
 from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import clear_placeholder_cache
+from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.exceptions import LanguageError
 from cms.models.managers import PlaceholderManager
-from cms.utils import get_site_id
+from cms.utils import get_language_from_request, permissions
+from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_language_object
-from cms.constants import (
-    EXPIRE_NOW,
-    MAX_EXPIRATION_TTL,
-)
-from cms.utils import get_language_from_request
-from cms.utils import permissions
-from cms.utils.conf import get_cms_setting
 
 
 class Placeholder(models.Model):
@@ -246,7 +240,7 @@ class Placeholder(models.Model):
                 try:
                     if field.exists():
                         self._attached_fields_cache.append(rel.field)
-                except:
+                except:  # NOQA
                     pass
         return self._attached_fields_cache
 
@@ -549,7 +543,7 @@ class Placeholder(models.Model):
             self._shift_plugin_positions(
                 instance.language,
                 start=instance.position,
-                offset=last_position,
+                offset=last_position - instance.position + 2,  # behind last_position plus one to shift back
             )
 
         instance.save()
@@ -590,6 +584,7 @@ class Placeholder(models.Model):
         target_tree = self.get_plugins(plugin.language)
         last_plugin = self.get_last_plugin(plugin.language)
         source_plugin_desc_count = plugin._get_descendants_count()
+        # Attn: The following line assumes that all children and grand-children have consecutive positions!
         source_plugin_range = (plugin.position, plugin.position + source_plugin_desc_count)
 
         if target_position < plugin.position:
@@ -640,37 +635,34 @@ class Placeholder(models.Model):
         source_last_plugin = self.get_last_plugin(plugin.language)
         target_last_plugin = target_placeholder.get_last_plugin(plugin.language)
 
+        plugin_descendants = plugin.get_descendants()
         if target_last_plugin:
-            source_offset = source_last_plugin.position
-            target_offset = target_last_plugin.position
-            source_plugin_desc_count = plugin._get_descendants_count()
-            # Projected position of the plugin being moved
-            # If the plugin has descendants then this is the projected position
-            # of the last descendant for the plugin being moved.
-            source_projected_last_position = plugin.position + source_plugin_desc_count + source_offset
-            # Projected position of the first plugin to the right
-            # of the plugin being moved, in the target placeholder.
-            target_projected_first_position = target_position + target_offset
-            # Real position of the last plugin in the target placeholder,
-            # after the move takes place.
-            target_last_position = target_last_plugin.position + 1 + source_plugin_desc_count
+            source_length = source_last_plugin.position
+            target_length = target_last_plugin.position
+            plugins_to_move_count = 1 + len(plugin_descendants)  # parent plus descendants
 
-            if source_projected_last_position <= target_last_position:
-                source_diff = (target_last_position - source_projected_last_position)
-                source_offset += source_diff + 1
-                source_projected_last_position += source_diff + 1
+            source_offset = max(
+                # far enough to shift behind current last source position
+                source_length,
+                # far enough to be shifted behind last target position plus no. of moved plugins
+                target_length + plugins_to_move_count
+            ) - plugin.position + 1
 
-            if source_projected_last_position >= target_projected_first_position:
-                target_diff = source_projected_last_position - target_projected_first_position
-                target_offset += target_diff + 1
-
+            # move target position counter to at least behind
+            target_offset = max(
+                # far enough to shift behind current last target position
+                target_length - target_position + 1,
+                # far enough to leave enough space to move back
+                plugin.position + source_offset - target_position + plugins_to_move_count
+            )
             target_placeholder._shift_plugin_positions(
                 plugin.language,
                 start=target_position,
                 offset=target_offset,
             )
         else:
-            # moving to empty placeholder
+            # moving to empty placeholder:
+            # Move out (remaining) plugins right behind last source position to be able to recalculate
             source_offset = source_last_plugin.position
 
         # Shift all plugins whose position is greater than or equal to
@@ -685,7 +677,7 @@ class Placeholder(models.Model):
 
         plugin.update(parent=target_plugin, placeholder=target_placeholder)
         # TODO: More efficient is to do raw sql update
-        plugin.get_descendants().update(placeholder=target_placeholder)
+        plugin_descendants.update(placeholder=target_placeholder)
         self._recalculate_plugin_positions(plugin.language)
         target_placeholder._recalculate_plugin_positions(plugin.language)
 
@@ -744,10 +736,12 @@ class Placeholder(models.Model):
         return tree.values_list('position', flat=True).first()
 
     def get_last_plugin_position(self, language, parent=None):
-        tree = self.get_plugins(language)
-
-        if parent:
-            tree = tree.filter(parent=parent)
+        if parent is None:
+            tree = self.get_plugins(language)
+        elif parent.placeholder == self:
+            tree = parent.get_descendants()
+        else:  # No last plugin if parent is not in this placeholder's plugin tree
+            return None
         return tree.values_list('position', flat=True).last()
 
     def _shift_plugin_positions(self, language, start, offset=None):
@@ -759,7 +753,9 @@ class Placeholder(models.Model):
         ).update(position=models.F('position') + offset)
 
     def _recalculate_plugin_positions(self, language):
-        from cms.models.pluginmodel import CMSPlugin, _get_database_cursor, _get_database_vendor
+        from cms.models.pluginmodel import (
+            CMSPlugin, _get_database_cursor, _get_database_vendor,
+        )
 
         cursor = _get_database_cursor('write')
         db_vendor = _get_database_vendor('write')

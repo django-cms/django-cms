@@ -2,13 +2,14 @@ from importlib import import_module
 
 from django.conf import settings
 from django.test.utils import override_settings
-from django.utils.translation import LANGUAGE_SESSION_KEY
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils import i18n, get_language_from_request
+from cms.utils import get_language_from_request, i18n
+from cms.utils.compat import DJANGO_2_2
 
-from cms.utils.compat import DJANGO_3_0, DJANGO_3_1, DJANGO_3_2
+if DJANGO_2_2:
+    from django.utils.translation import LANGUAGE_SESSION_KEY
 
 
 @override_settings(
@@ -18,7 +19,8 @@ from cms.utils.compat import DJANGO_3_0, DJANGO_3_1, DJANGO_3_2
                ('de', 'German'),
                ('es', 'Spanish')),
     CMS_LANGUAGES={
-        1: [{'code' : 'en',
+        1: [
+            {'code': 'en',
              'name': 'English',
              'public': True},
             {'code': 'fr',
@@ -85,7 +87,8 @@ class TestLanguages(CMSTestCase):
                ('de', 'German'),
                ('es', 'Spanish')),
     CMS_LANGUAGES={
-        1: [{'code' : 'en',
+        1: [
+            {'code': 'en',
              'name': 'English',
              'public': True},
             {'code': 'fr',
@@ -145,7 +148,8 @@ class TestLanguagesNoDefault(CMSTestCase):
                ('de', 'German'),
                ('es', 'Spanish')),
     CMS_LANGUAGES={
-        1: [{'code' : 'en-us',
+        1: [
+            {'code': 'en-us',
              'name': 'English (US)',
              'public': True},
             {'code': 'fr-ca',
@@ -215,7 +219,8 @@ class TestLanguageCodesEnUS(CMSTestCase):
                ('de', 'German'),
                ('es', 'Spanish')),
     CMS_LANGUAGES={
-        1: [{'code' : 'en-gb',
+        1: [
+            {'code': 'en-gb',
              'name': 'English (UK)',
              'public': True},
             {'code': 'fr-ca',
@@ -311,7 +316,8 @@ class TestLanguagesNotInCMSLanguages(CMSTestCase):
                ('de', 'German'),
                ('es', 'Spanish')),
     CMS_LANGUAGES={
-        1: [{'code' : 'en',
+        1: [
+            {'code': 'en',
              'name': 'English',
              'public': False},
             {'code': 'fr',
@@ -340,13 +346,14 @@ class TestLanguageFallbacks(CMSTestCase):
 
     @override_settings(
         CMS_LANGUAGES={
-            1: [{'code' : 'en',
+            1: [
+                {'code': 'en',
                  'name': 'English',
                  'public': True},
                 {'code': 'fr',
                  'name': 'French',
                  'public': True},
-             ]
+            ]
         },
     )
     def test_session_language(self):
@@ -362,7 +369,7 @@ class TestLanguageFallbacks(CMSTestCase):
 
         #   ugly and long set of session
         session = self.client.session
-        if DJANGO_3_0 or DJANGO_3_1 or DJANGO_3_2:
+        if not DJANGO_2_2:
             self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'fr'
         else:
             session[LANGUAGE_SESSION_KEY] = 'fr'
@@ -371,7 +378,7 @@ class TestLanguageFallbacks(CMSTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/fr/')
         self.client.get('/en/')
-        if DJANGO_3_0 or DJANGO_3_1 or DJANGO_3_2:
+        if not DJANGO_2_2:
             self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'en')
         else:
             self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'en')
@@ -387,7 +394,8 @@ class TestLanguageFallbacks(CMSTestCase):
                ('de', 'German'),
                ('es', 'Spanish')),
     CMS_LANGUAGES={
-        1: [{'code' : 'en',
+        1: [
+            {'code': 'en',
              'name': 'English',
              'public': False},
             {'code': 'fr',

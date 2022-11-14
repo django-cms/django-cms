@@ -8,14 +8,13 @@ from django.views.static import serve
 from cms.test_utils.project.placeholderapp.views import example_view
 from cms.utils.conf import get_cms_setting
 
-
 admin.autodiscover()
 
 urlpatterns = [
-    re_path(r'^media/(?P<path>.*)$', serve,
-        {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
-    re_path(r'^media/cms/(?P<path>.*)$', serve,
-        {'document_root': get_cms_setting('MEDIA_ROOT'), 'show_indexes': True}),
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT, 'show_indexes': True}),
+    re_path(
+        r'^media/cms/(?P<path>.*)$', serve, {'document_root': get_cms_setting('MEDIA_ROOT'), 'show_indexes': True}
+    ),
     re_path(r'^jsi18n/(?P<packages>\S+?)/$', JavaScriptCatalog.as_view()),
 ]
 

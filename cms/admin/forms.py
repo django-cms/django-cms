@@ -1,10 +1,10 @@
 from django import forms
 from django.apps import apps
-from django.contrib.auth import get_user_model, get_permission_codename
+from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
@@ -16,34 +16,32 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import api
 from cms.apphook_pool import apphook_pool
 from cms.cache.permissions import clear_permission_cache
+from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
-from cms.constants import PAGE_TYPES_ID, ROOT_USER_LEVEL
 from cms.forms.fields import PageSmartLinkField
 from cms.forms.validators import validate_relative_url, validate_url_uniqueness
-from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
-from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, PageContent,
-                        Placeholder, GlobalPagePermission, TreeNode)
+from cms.forms.widgets import (
+    AppHookSelect, ApplicationConfigSelect, UserSelectAdminWidget,
+)
+from cms.models import (
+    CMSPlugin, GlobalPagePermission, Page, PageContent, PagePermission,
+    PageType, PageUser, PageUserGroup, Placeholder, TreeNode,
+)
 from cms.models.permissionmodels import User
 from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION
 from cms.operations.helpers import (
-    send_pre_page_operation,
-    send_post_page_operation,
+    send_post_page_operation, send_pre_page_operation,
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
-from cms.utils.conf import get_cms_setting
-from cms.utils.compat.forms import UserChangeForm
 from cms.utils import helpers
-from cms.utils.i18n import (
-    get_language_list,
-    get_site_language_from_request,
-)
+from cms.utils.compat.forms import UserChangeForm
+from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
 from cms.utils.permissions import (
-    get_current_user,
-    get_subordinate_users,
-    get_subordinate_groups,
+    get_current_user, get_subordinate_groups, get_subordinate_users,
     get_user_permission_level,
 )
 from menus.menu_pool import menu_pool
@@ -127,19 +125,39 @@ class BasePageContentForm(forms.ModelForm):
     _site = None
     _request = None
 
-    title = forms.CharField(label=_("Title"), max_length=255, widget=forms.TextInput(),
-                            help_text=_('The default title'))
-    slug = forms.CharField(label=_("Slug"), max_length=255, widget=forms.TextInput(),
-                           help_text=_('The part of the title that is used in the URL'))
-    menu_title = forms.CharField(label=_("Menu Title"), widget=forms.TextInput(),
-                                 help_text=_('Overwrite what is displayed in the menu'), required=False)
-    page_title = forms.CharField(label=_("Page Title"), widget=forms.TextInput(),
-                                 help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'),
-                                 required=False)
-    meta_description = forms.CharField(label=_('Description meta tag'), required=False,
-                                       widget=forms.Textarea(attrs={'maxlength': '320', 'rows': '4'}),
-                                       help_text=_('A description of the page used by search engines.'),
-                                       max_length=320)
+    title = forms.CharField(
+        label=_("Title"),
+        max_length=255,
+        widget=forms.TextInput(),
+        help_text=_('The default title')
+    )
+    slug = forms.CharField(
+        label=_("Slug"),
+        max_length=255,
+        widget=forms.TextInput(),
+        help_text=_('The part of the title that is used in the URL')
+    )
+    menu_title = forms.CharField(
+        label=_("Menu Title"),
+        widget=forms.TextInput(),
+        help_text=_('Overwrite what is displayed in the menu'),
+        required=False
+    )
+    page_title = forms.CharField(
+        label=_("Page Title"),
+        widget=forms.TextInput(),
+        required=False,
+        help_text=_('Overwrites what is displayed at the top of your browser or in bookmarks'),
+    )
+    meta_description = forms.CharField(
+        label=_('Description meta tag'),
+        max_length=320,
+        required=False,
+        widget=forms.Textarea(
+            attrs={'maxlength': '320', 'rows': '4'}
+        ),
+        help_text=_('A description of the page used by search engines.'),
+    )
 
     class Meta:
         model = PageContent
@@ -653,7 +671,9 @@ class AdvancedSettingsForm(forms.ModelForm):
 
                 if page_data.get('application_urls', False) and page_data['application_urls'] in app_configs:
                     configs = app_configs[page_data['application_urls']].get_configs()
-                    self.fields['application_configs'].widget.choices = [(config.pk, force_str(config)) for config in configs]
+                    self.fields['application_configs'].widget.choices = [
+                        (config.pk, force_str(config)) for config in configs
+                    ]
 
                     try:
                         config = configs.get(namespace=self.initial['application_namespace'])
@@ -802,7 +822,7 @@ class PageTreeForm(forms.Form):
     def get_root_nodes(self):
         # TODO: this needs to avoid using the pages accessor directly
         nodes = TreeNode.get_root_nodes()
-        return nodes.exclude(cms_pages__is_page_type=not(self.page.is_page_type))
+        return nodes.exclude(cms_pages__is_page_type=not self.page.is_page_type)
 
     def get_tree_options(self):
         position = self.cleaned_data['position']
@@ -970,7 +990,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        user = get_current_user() # current user from threadlocals
+        user = get_current_user()  # current user from threadlocals
         site = Site.objects.get_current()
         sub_users = get_subordinate_users(user, site)
 
@@ -1000,6 +1020,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
         # raw id field for the user
         if use_raw_id:
             from django.contrib.admin.widgets import ForeignKeyRawIdWidget
+
             # This check will be False if the number of users in the system
             # is less than the threshold set by the RAW_ID_USERS setting.
             if isinstance(self.fields['user'].widget, ForeignKeyRawIdWidget):
@@ -1012,7 +1033,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
         else:
             self.fields['user'].widget = UserSelectAdminWidget()
             self.fields['user'].queryset = sub_users
-            self.fields['user'].widget.user = user # assign current user
+            self.fields['user'].widget.user = user  # assign current user
 
         self.fields['group'].queryset = get_subordinate_groups(user, site)
 

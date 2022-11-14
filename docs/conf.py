@@ -143,7 +143,7 @@ try:
             </div>
         """,
     }
-except:
+except:  # NOQA
     html_theme = 'default'
 
 
