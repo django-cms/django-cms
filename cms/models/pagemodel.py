@@ -142,8 +142,8 @@ class Page(models.Model):
     stands in relation to other pages as parent, child or sibling. This hierarchy is managed by the `django-treebeard
     <http://django-treebeard.readthedocs.io/en/latest/>`_ library.
 
-    A ``Page`` also has language-specific properties - for example, it will have a title and a slug for each language it
-    exists in. These properties are managed by the :class:`cms.models.titlemodel.PageContent model.
+    A ``Page`` also has language-specific properties - for example, it will have a title and a slug for each language
+    it exists in. These properties are managed by the :class:`cms.models.titlemodel.PageContent model.
     """
 
     created_by = models.CharField(

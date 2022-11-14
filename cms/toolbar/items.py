@@ -156,12 +156,14 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
     def add_sideframe_item(self, name, url, active=False, disabled=False,
                            extra_classes=None, on_close=None, side=LEFT, position=None):
         """Adds a :class:`SideframeItem` that opens ``url`` in the sideframe and returns it."""
-        item = SideframeItem(name, url,
-                             active=active,
-                             disabled=disabled,
-                             extra_classes=extra_classes,
-                             on_close=on_close,
-                             side=side,
+
+        item = SideframeItem(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            on_close=on_close,
+            side=side,
         )
         self.add_item(item, position=position)
         return item
@@ -170,12 +172,14 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
                        extra_classes=None, on_close=REFRESH_PAGE, side=LEFT, position=None):
         """Similar to :meth:`add_sideframe_item`, but adds a :class:`ModalItem` that opens the
         ``url`` in a modal dialog instead of the sideframe, and returns it."""
-        item = ModalItem(name, url,
-                         active=active,
-                         disabled=disabled,
-                         extra_classes=extra_classes,
-                         on_close=on_close,
-                         side=side,
+
+        item = ModalItem(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            on_close=on_close,
+            side=side,
         )
         self.add_item(item, position=position)
         return item
@@ -183,11 +187,13 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
     def add_link_item(self, name, url, active=False, disabled=False,
                       extra_classes=None, side=LEFT, position=None):
         """Adds a :class:`LinkItem` that opens ``url``, and returns it."""
-        item = LinkItem(name, url,
-                        active=active,
-                        disabled=disabled,
-                        extra_classes=extra_classes,
-                        side=side
+
+        item = LinkItem(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            side=side
         )
         self.add_item(item, position=position)
         return item
@@ -201,15 +207,17 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
 
         If a string is provided for ``question``, it will be presented to the user to allow
         confirmation before the request is sent."""
-        item = AjaxItem(name, action, self.csrf_token,
-                        active=active,
-                        disabled=disabled,
-                        extra_classes=extra_classes,
-                        data=data,
-                        question=question,
-                        side=side,
-                        on_success=on_success,
-                        method=method,
+
+        item = AjaxItem(
+            name, action, self.csrf_token,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            data=data,
+            question=question,
+            side=side,
+            on_success=on_success,
+            method=method,
         )
         self.add_item(item, position=position)
         return item
@@ -580,11 +588,12 @@ class ButtonList(BaseItem):
     def add_button(self, name, url, active=False, disabled=False,
                    extra_classes=None):
         """Adds a :class:`Button` to the list of buttons and returns it."""
-        
-        item = Button(name, url,
-                      active=active,
-                      disabled=disabled,
-                      extra_classes=extra_classes
+
+        item = Button(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes
         )
         self.buttons.append(item)
         return item
@@ -592,11 +601,12 @@ class ButtonList(BaseItem):
     def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=REFRESH_PAGE):
         """Adds a :class:`~cms.toolbar.items.ModalButton` to the button list and returns it."""
 
-        item = ModalButton(name, url,
-                      active=active,
-                      disabled=disabled,
-                      extra_classes=extra_classes,
-                      on_close=on_close,
+        item = ModalButton(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            on_close=on_close,
         )
         self.buttons.append(item)
         return item
@@ -604,11 +614,12 @@ class ButtonList(BaseItem):
     def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
         """Adds a :class:`~cms.toolbar.items.SideFrameButton` to the button list and returns it."""
 
-        item = SideframeButton(name, url,
-                      active=active,
-                      disabled=disabled,
-                      extra_classes=extra_classes,
-                      on_close=on_close,
+        item = SideframeButton(
+            name, url,
+            active=active,
+            disabled=disabled,
+            extra_classes=extra_classes,
+            on_close=on_close,
         )
         self.buttons.append(item)
         return item

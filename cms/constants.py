@@ -26,7 +26,7 @@ FOLLOW_REDIRECT = 'FOLLOW_REDIRECT'
 URL_CHANGE = 'URL_CHANGE'
 
 #: Used as a position indicator in the toolbar: On the right side.
-RIGHT = object() # this is a trick so "foo is RIGHT" will only ever work for this, same goes for LEFT.
+RIGHT = object()  # this is a trick so "foo is RIGHT" will only ever work for this, same goes for LEFT.
 
 #: Used as a position indicator in the toolbar: On the left side.
 LEFT = object()

@@ -497,7 +497,8 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     :param user: The user to assign to the page
     :type user: :class:`django.contrib.auth.models.User` instance
     :param grant_on: Controls which pages are affected
-    :type grant_on: :data:`cms.models.ACCESS_PAGE`, :data:`cms.models.ACCESS_CHILDREN`, :data:`cms.models.ACCESS_DESCENDANTS` or :data:`cms.models.ACCESS_PAGE_AND_DESCENDANTS`
+    :type grant_on: :data:`cms.models.ACCESS_PAGE`, :data:`cms.models.ACCESS_CHILDREN`,
+    :data:`cms.models.ACCESS_DESCENDANTS` or :data:`cms.models.ACCESS_PAGE_AND_DESCENDANTS`
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
     """

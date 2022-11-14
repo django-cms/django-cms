@@ -334,7 +334,7 @@ class CMSToolbar(BaseToolbar):
         return item
 
     def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
-                   side=LEFT, position=None, on_close=REFRESH_PAGE):
+                         side=LEFT, position=None, on_close=REFRESH_PAGE):
         """Adds a :class:`~cms.toolbar.items.ModalButton` to the toolbar."""
         self.populate()
         item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
@@ -344,8 +344,8 @@ class CMSToolbar(BaseToolbar):
         self.add_item(item, position=position)
         return item
 
-    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
-                   side=LEFT, position=None, on_close=None):
+    def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None,
+                             extra_wrapper_classes=None, side=LEFT, position=None, on_close=None):
         """Adds a :class:`~cms.toolbar.items.SideframeButton` to the toolbar."""
 
         self.populate()
