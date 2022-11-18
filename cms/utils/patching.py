@@ -2,12 +2,17 @@ from django.core.exceptions import ImproperlyConfigured
 
 
 def patch_hook(method):
-    """Decorator to mark methods or functions that might be patched by a supporting package like
+    """Decorator to mark functions, methods, or properties that might be patched by a supporting package like
     djangocms-versioning or djangocms-moderation.
 
     .. warning::
 
-        Do not rename or move this method since other packages depend on
+        Do not rename or move functions, methods, or properties marked with the ``@patch_hook`` decorator
+        since other packages depend on patching those functions, methods, or properties
+
+    .. info:::
+
+        It is discouraged to add patch hooks to the django cms core.
 
     """
     if isinstance(method, property):
@@ -19,7 +24,11 @@ def patch_hook(method):
 
 def patch_cms(obj, method, patch):
     """Patches a cms method which has been marked with the @patch_hook decorator. It's parameters are those
-    of setattr."""
+    of setattr.
+
+    Trying to patch a function, method, or property that does not have the ``@patch_hook`` decorator will raise
+    an ``ImproperlyConfigured`` exception.
+    """
     if hasattr(obj, method):
         if isinstance(getattr(obj, method), property):
             # For properties the getter is marked
