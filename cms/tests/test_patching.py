@@ -6,7 +6,6 @@ from cms.utils.patching import patch_cms, patch_hook
 
 class PatchingAPITests(CMSTestCase):
 
-
     def this_should_not_be_patchable(self):
         return "Never ever patch me"
 
