@@ -24,10 +24,12 @@ def patch_cms(obj, method, patch):
         if isinstance(getattr(obj, method), property):
             # For properties the getter is marked
             if getattr(getattr(obj, method).fget, "_is_cms_patch_hook", False):
+                patch.fget._is_cms_patch_hook = True
                 setattr(obj, method, patch)
                 return
 
         if getattr(getattr(obj, method), "_is_cms_patch_hook", False):
+            patch._is_cms_patch_hook = True  # The patch also can be patched
             setattr(obj, method, patch)
             return
 
