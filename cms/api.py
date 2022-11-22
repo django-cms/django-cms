@@ -110,7 +110,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     See docs/extending_cms/api_reference.rst for more info
     """
     if published is not None:
-        warnings.warn('This API function no longer accepts a published argument', UserWarning)
+        warnings.warn('This API function no longer accepts a published argument', UserWarning, stacklevel=2)
 
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
@@ -237,6 +237,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
         path = page.get_path_for_slug(slug, language)
 
     if created_by and isinstance(created_by, get_user_model()):
+        _thread_locals.user = created_by
         created_by = get_clean_username(created_by)
 
     page.urls.create(
@@ -247,7 +248,18 @@ def create_title(language, title, page, menu_title=None, slug=None,
         language=language,
     )
 
-    title = PageContent.objects.create(
+    page_content_manager = PageContent.objects
+    if hasattr(page_content_manager, "with_user"):
+        # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
+        user = getattr(_thread_locals, "user", None)
+        if user:
+            page_content_manager = page_content_manager.with_user(_thread_locals.user)
+        else:
+            raise ValueError(
+                f"With versioning enabled, create_title requires a {get_user_model().__name__} instance "
+                f"to be passed as created_by argument"
+            )
+    title = page_content_manager.create(
         language=language,
         title=title,
         menu_title=menu_title,
@@ -410,14 +422,16 @@ def publish_page(page, user, language):
 
     See docs/extending_cms/api_reference.rst for more info
     """
-    warnings.warn('This API function has been removed', UserWarning)
+    warnings.warn('This API function has been removed. For publishing functionality use djangocms-versioning.',
+                  UserWarning, stacklevel=2)
 
 
 def publish_pages(include_unpublished=False, language=None, site=None):
     """
     Create published public version of selected drafts.
     """
-    warnings.warn('This API function has been removed', UserWarning)
+    warnings.warn('This API function has been removed. For publishing functionality use djangocms-versioning.',
+                  UserWarning, stacklevel=2)
 
 
 def get_page_draft(page):
@@ -430,7 +444,8 @@ def get_page_draft(page):
     :return page: draft version of the page
     :type page: :class:`cms.models.pagemodel.Page` instance
     """
-    warnings.warn('This API function has been removed', UserWarning)
+    warnings.warn('This API function has been removed. For publishing functionality use djangocms-versioning.',
+                  UserWarning, stacklevel=2)
 
 
 def copy_plugins_to_language(page, source_language, target_language,

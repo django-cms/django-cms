@@ -17,13 +17,14 @@ CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 @register.simple_tag(takes_context=False)
 def get_admin_url_for_language(page, language):
-    if language not in page.get_languages():
-        admin_url = admin_reverse('cms_pagecontent_add')
-        admin_url += '?cms_page={}&language={}'.format(page.pk, language)
-        return admin_url
+    if language in page.get_languages():
+        page_content = page.get_title_obj(language, fallback=False)
+        if page_content:
+            return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
+    admin_url = admin_reverse('cms_pagecontent_add')
+    admin_url += '?cms_page={}&language={}'.format(page.pk, language)
+    return admin_url
 
-    page_content = page.get_title_obj(language, fallback=False)
-    return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
 
 
 @register.simple_tag(takes_context=True)

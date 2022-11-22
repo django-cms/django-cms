@@ -905,6 +905,11 @@ class Page(models.Model):
             titles = PageContent.objects.filter(page=self)
             for title in titles:
                 self.title_cache[title.language] = title
+        else:
+            prefetch_cache = getattr(self, "_prefetched_objects_cache", {})
+            cached_page_content = prefetch_cache.get("pagecontent_set", [])
+            for page_content in cached_page_content:
+                self.title_cache[page_content.language] = page_content
 
         if self.title_cache.get(language):
             return language

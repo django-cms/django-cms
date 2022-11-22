@@ -26,6 +26,11 @@ from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_site_language_from_request
 
+from django.apps import apps
+
+
+cms_toolbar_extensions = apps.get_app_config('cms').cms_extension.toolbar_mixins
+
 
 class BaseToolbar(ToolbarAPIMixin):
 
@@ -124,7 +129,7 @@ class BaseToolbar(ToolbarAPIMixin):
         return get_cms_setting('SIDEFRAME_ENABLED')
 
 
-class CMSToolbar(BaseToolbar):
+class CMSToolbarBase(BaseToolbar):
     """
     The default CMS Toolbar
     """
@@ -516,6 +521,9 @@ class CMSToolbar(BaseToolbar):
             toolbar = render_to_string('cms/toolbar/toolbar_with_structure.html', flatten_context(context))
         # return the toolbar content and the content below
         return '%s\n%s' % (toolbar, rendered_contents)
+
+# Add toolbar mixins from extensions to toolbar
+CMSToolbar = type("CMSToolbar", tuple(cms_toolbar_extensions + [CMSToolbarBase]), dict())
 
 
 class EmptyToolbar(BaseToolbar):

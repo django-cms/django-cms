@@ -35,7 +35,6 @@ from cms.operations.helpers import (
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
-from cms.utils import helpers
 from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
@@ -1361,7 +1360,13 @@ class RequestToolbarForm(forms.Form):
             raise forms.ValidationError(message)
 
         try:
-            generic_obj = helpers.get_admin_model_object_by_id(model_class, obj_id)
+            if hasattr(model_class, "get_admin_model_object_by_id"):
+                # Does the model class provide a way to get the object by id?
+                # TODO: Write test
+                generic_obj = model_class.get_admin_model_object_by_id(obj_id)
+            else:
+                # Use standard manager to get object
+                generic_obj = model_class.objects.get(pk=obj_id)
         except model_class.DoesNotExist:
             message = 'Invalid object lookup. Both obj_id and obj_type are required'
             raise forms.ValidationError(message)
