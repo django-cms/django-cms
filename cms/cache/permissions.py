@@ -1,3 +1,5 @@
+import hashlib
+
 from django.contrib.auth import get_user_model
 
 from cms.utils.conf import get_cms_setting
@@ -12,7 +14,7 @@ PERMISSION_KEYS = [
 def get_cache_key(user, key):
     username = getattr(user, get_user_model().USERNAME_FIELD)
     return "%s:permission:%s:%s" % (
-        get_cms_setting('CACHE_PREFIX'), username, key)
+        get_cms_setting('CACHE_PREFIX'), hashlib.md5(username.encode("utf-8")).hexdigest(), key)
 
 
 def get_cache_permission_version_key():

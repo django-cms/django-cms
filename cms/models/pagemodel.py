@@ -899,17 +899,18 @@ class Page(models.Model):
         if not language:
             language = get_language()
 
-        force_reload = (force_reload or language not in self.title_cache)
-        if force_reload:
+        # Update titlecache from _prefetched_objects_cache if available
+        prefetch_cache = getattr(self, "_prefetched_objects_cache", {})
+        cached_page_content = prefetch_cache.get("pagecontent_set", [])
+        for page_content in cached_page_content:
+            self.title_cache[page_content.language] = page_content
+
+        # Reload if explicitly needed or language not in title cache
+        if force_reload or language not in self.title_cache:
             from cms.models import PageContent
             titles = PageContent.objects.filter(page=self)
             for title in titles:
                 self.title_cache[title.language] = title
-        else:
-            prefetch_cache = getattr(self, "_prefetched_objects_cache", {})
-            cached_page_content = prefetch_cache.get("pagecontent_set", [])
-            for page_content in cached_page_content:
-                self.title_cache[page_content.language] = page_content
 
         if self.title_cache.get(language):
             return language
