@@ -351,17 +351,16 @@ class PageToolbar(CMSToolbar):
         return self.page_change_permission
 
     def in_apphook(self):
-        if self.toolbar.edit_mode_active:
-            return False
-
         with force_language(self.toolbar.request_language):
             try:
                 resolver = resolve(self.toolbar.request_path)
             except Resolver404:
                 return False
             else:
-                from cms.views import details
-                return resolver.func != details
+                cms_views = (
+                    "render_object_edit", "render_object_preview", "render_object_structure", "details"
+                )
+                return resolver.func.__name__ not in cms_views
 
     def in_apphook_root(self):
         """
@@ -557,11 +556,6 @@ class PageToolbar(CMSToolbar):
 
             # first break
             current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
-
-            # page edit
-            with force_language(self.current_lang):
-                page_edit_url = get_object_edit_url(self.title) if self.title else ''
-                current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
 
             # page settings
             page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.request_language)

@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 
-from cms.models import Page
+from cms.models import Page, PageContent
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 
 from .forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
@@ -23,6 +23,10 @@ class CMSPageWizard(Wizard):
             has_perm = user_can_add_page(user)
         return has_perm
 
+    def get_success_url(self, obj, **kwargs):
+        page_content = PageContent._base_manager.filter(page=obj).first()  # Don't let customer managers fool you
+        return super().get_success_url(page_content, **kwargs)
+
 
 class CMSSubPageWizard(Wizard):
 
@@ -32,6 +36,10 @@ class CMSSubPageWizard(Wizard):
             # app-hooked page.
             return False
         return user_can_add_subpage(user, target=page)
+
+    def get_success_url(self, obj, **kwargs):
+        page_content = PageContent._base_manager.filter(page=obj).first()  # Don't let custom managers fool you
+        return super().get_success_url(page_content, **kwargs)
 
 
 cms_page_wizard = CMSPageWizard(

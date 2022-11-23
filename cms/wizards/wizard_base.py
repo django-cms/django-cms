@@ -1,10 +1,13 @@
 import hashlib
 
+from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _, override as force_language
+
+from cms.toolbar.utils import get_object_preview_url
 
 
 class WizardBase():
@@ -110,13 +113,15 @@ class Wizard(WizardBase):
         """
         This should return the URL of the created object, «obj».
         """
-        if 'language' in kwargs:
-            with force_language(kwargs['language']):
-                url = obj.get_absolute_url()
-        else:
-            url = obj.get_absolute_url()
+        extension = apps.get_app_config('cms').cms_extension
 
-        return url
+        if obj.__class__ in extension.toolbar_enabled_models:
+            return get_object_preview_url(obj, language=kwargs.get("language", None))
+        else:
+            if "language" in kwargs:
+                with force_language(language=kwargs["language"]):
+                    return obj.get_absolute_url()
+            return obj.get_absolute_url()
 
     def get_model(self):
         if self.model:
