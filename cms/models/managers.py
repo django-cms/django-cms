@@ -41,7 +41,6 @@ class PageManager(models.Manager):
         from cms.plugin_pool import plugin_pool
 
         qs = self.get_queryset()
-        qs = qs.public()
 
         if current_site_only:
             site = Site.objects.get_current()
@@ -63,7 +62,7 @@ class PageManager(models.Manager):
             if related_query_name and not related_query_name.startswith('+'):
                 for field in cmsplugin.search_fields:
                     qp |= Q(**{
-                        'placeholders__cmsplugin__{0}__{1}__icontains'.format(
+                        'pagecontent_set__placeholders__cmsplugin__{0}__{1}__icontains'.format(
                             related_query_name,
                             field,
                         ): q})
