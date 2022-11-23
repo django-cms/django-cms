@@ -1360,13 +1360,8 @@ class RequestToolbarForm(forms.Form):
             raise forms.ValidationError(message)
 
         try:
-            if hasattr(model_class, "get_admin_model_object_by_id"):
-                # Does the model class provide a way to get the object by id?
-                # TODO: Write test
-                generic_obj = model_class.get_admin_model_object_by_id(obj_id)
-            else:
-                # Use standard manager to get object
-                generic_obj = model_class.objects.get(pk=obj_id)
+            # Use abse manager to also get objects that are hidden by custom managers
+            generic_obj = model_class._base_manager.get(pk=obj_id)
         except model_class.DoesNotExist:
             message = 'Invalid object lookup. Both obj_id and obj_type are required'
             raise forms.ValidationError(message)
