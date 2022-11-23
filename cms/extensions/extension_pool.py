@@ -1,6 +1,7 @@
 from cms.exceptions import SubClassNeededError
 
 from .models import PageExtension, TitleExtension
+from ..models import PageContent
 
 
 class ExtensionPool():
@@ -60,10 +61,15 @@ class ExtensionPool():
                     instance.copy_to_public(target_page, language)
 
     def _copy_title_extensions(self, source_page, target_page, language, clone=False):
-        source_title = source_page.pagecontent_set.get(language=language)
+        source_title = PageContent._base_manager.filter(
+            page=source_page, language=language
+        ).first()
         if target_page:
-            target_title = target_page.pagecontent_set.get(language=language)
+            target_title = PageContent._base_manager.filter(
+                page=target_page, language=language
+            ).first()
         else:
+            # TODO: This looks fishy
             target_title = source_title.publisher_public
         for extension in self.title_extensions:
             for instance in extension.objects.filter(extended_object=source_title):
