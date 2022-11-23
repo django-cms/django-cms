@@ -1,5 +1,6 @@
 from collections import deque
 
+from django.template import Context
 from django.test.utils import override_settings
 
 from cms.api import add_plugin, create_page
@@ -137,6 +138,59 @@ class TestContentRenderer(TestStructureRenderer):
         )
         self.assertEqual(cache[placeholder_2.slot], placeholder_2)
         self.assertEqual(cache[placeholder_2.slot]._plugins_cache, deque([placeholder_2_plugin_1]))
+
+    def test_plugin_exception_catchers(self):
+        """Tests if failing plugins do not break template rendering and report errors to the logger"""
+        cms_page = create_page("page", 'nav_playground.html', "en")
+        placeholder_1 = cms_page.get_placeholders("en").get(slot='body')
+        add_plugin(
+            placeholder_1,
+            plugin_type='LinkPlugin',
+            language='en',
+            name='Link #1',
+            external_link='https://www.django-cms.org',
+        )
+        add_plugin(
+            placeholder_1,
+            plugin_type='BuggyPlugin',
+            language='en',
+        )
+        placeholder_2 = cms_page.get_placeholders("en").get(slot='right-column')
+        placeholder_2_plugin_1 = add_plugin(
+            placeholder_2,
+            plugin_type='LinkPlugin',
+            language='en',
+            name='Link #3',
+            external_link='https://www.django-cms.org',
+        )
+        renderer = self.get_renderer(page=cms_page)
+
+        # Test if non-existent plugins creates error log and does not fail
+        placeholder_2_plugin_1.plugin_type = 'NonExistingPlugin'
+        placeholder_2_plugin_1.save()
+        with self.assertLogs("cms.utils.plugins", level="ERROR") as logs:
+            plugin_context = Context()
+            renderer.render_placeholder(placeholder_2, plugin_context, "en")
+            self.assertEqual(len(logs.output), 1)
+            self.assertIn("Plugin not installed: NonExistingPlugin", logs.output[0])
+        placeholder_2_plugin_1.plugin_type = 'LinkPlugin'
+        placeholder_2_plugin_1.save()
+
+        # Test if exception in template rendering creates error log and does not fail (plugin 1)
+        # Test if exception in plugin.render creates error log and does not fail (plugin 2)
+        # patch link plugin
+        from cms.test_utils.project.pluginapp.plugins.link.cms_plugins import (
+            LinkPlugin,
+        )
+        link_template = LinkPlugin.render_template
+        LinkPlugin.render_template = "pluginapp/link/bugs.html"
+        with self.assertLogs("cms.plugin_rendering", level="ERROR") as logs:
+            plugin_context = Context()
+            renderer.render_placeholder(placeholder_1, plugin_context, "en")
+            self.assertEqual(len(logs.output), 2)
+            self.assertIn("pluginapp/link/bugs.html", logs.output[0])
+            self.assertIn("ZeroDivisionError:", logs.output[1])
+        LinkPlugin.render_template = link_template
 
 
 class TestLegacyRenderer(TestContentRenderer):

@@ -287,7 +287,25 @@ class PythonAPIPluginTests(CMSTestCase):
         child_plugin_5 = add_plugin(
             self.placeholder, 'SolarSystemPlugin', 'en', position='right', target=child_plugin_4.reload()
         )
-        root_plugin_2 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
+        root_plugin_3 = add_plugin(self.placeholder, 'SolarSystemPlugin', 'en', position='last-child')
+        new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
+        expected = [
+            (root_plugin_1.pk, 1),
+            (child_plugin_1.pk, 2),
+            (child_plugin_2.pk, 3),
+            (child_plugin_3.pk, 4),
+            (child_plugin_4.pk, 5),
+            (child_plugin_5.pk, 6),
+            (child_plugin_6.pk, 7),
+            (root_plugin_3.pk, 8),
+        ]
+        self.assertSequenceEqual(new_tree, expected)
+
+        # Insert additional plugin right of first root plugin to see where it is positioned relative to the
+        # first root plugin's children
+        root_plugin_2 = add_plugin(
+            self.placeholder, 'SolarSystemPlugin', 'en', position='right', target=root_plugin_1
+        )
         new_tree = self.placeholder.get_plugins('en').values_list('pk', 'position')
         expected = [
             (root_plugin_1.pk, 1),
@@ -298,5 +316,6 @@ class PythonAPIPluginTests(CMSTestCase):
             (child_plugin_5.pk, 6),
             (child_plugin_6.pk, 7),
             (root_plugin_2.pk, 8),
+            (root_plugin_3.pk, 9),
         ]
         self.assertSequenceEqual(new_tree, expected)
