@@ -1478,12 +1478,12 @@ class PageContentAdmin(admin.ModelAdmin):
                 (
                     _("Create Content"),  # Entry
                     "cms-icon-cogs",  # Optional icon
-                    admin_reverse('cms_pagecontent_add') + f'?cms_page={page_content.page.pk}&language={page_content.language}',  # url
+                    admin_reverse('cms_pagecontent_add')
+                    + f'?cms_page={page_content.page.pk}&language={page_content.language}',  # url
                     None,  # Optional add classes for <a>
                 ),
             ]
         return "", []
-
 
 
 admin.site.register(Page, PageAdmin)
