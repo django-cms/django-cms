@@ -1405,7 +1405,7 @@ class PageContentAdmin(admin.ModelAdmin):
             for _language in languages:
                 # EmptyPageContent is used to prevent the cms from trying
                 # to find a translation in the database
-                page.title_cache.setdefault(_language, EmptyPageContent(language=_language))
+                page.title_cache.setdefault(_language, EmptyPageContent(language=_language, page=page))
 
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
@@ -1420,7 +1420,7 @@ class PageContentAdmin(admin.ModelAdmin):
                 'opts': self.opts,
                 'site': site,
                 'page': page,
-                'page_content': page.get_title_obj(language, fallback=True),
+                'page_content': page.get_title_obj(language, fallback=False),  # Show specific language
                 'page_content_type': page_content_type,
                 'node': page.node,
                 'ancestors': [node.item for node in page.node.get_cached_ancestors()],
@@ -1461,6 +1461,29 @@ class PageContentAdmin(admin.ModelAdmin):
             for page in root_pages:
                 page.node.__dict__['item'] = page
                 yield render_page_row(page)
+
+    # Indicators in the page tree
+    @property
+    def indicator_descriptions(self):
+        return {
+            "public": _("Public content"),
+            "empty": _("Empty"),
+        }
+
+    @classmethod
+    def get_indicator_menu(cls, request, page_content):
+        menu_template = "admin/cms/page/tree/indicator_menu.html"
+        if not page_content:
+            return menu_template, [
+                (
+                    _("Create Content"),  # Entry
+                    "cms-icon-cogs",  # Optional icon
+                    admin_reverse('cms_pagecontent_add') + f'?cms_page={page_content.page.pk}&language={page_content.language}',  # url
+                    None,  # Optional add classes for <a>
+                ),
+            ]
+        return "", []
+
 
 
 admin.site.register(Page, PageAdmin)

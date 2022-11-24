@@ -3,12 +3,14 @@ from classytags.core import Options, Tag
 from classytags.helpers import AsTag, InclusionTag
 from django import template
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
+from cms.models.titlemodels import PageContent, EmptyPageContent
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse
 
@@ -28,10 +30,6 @@ class GetAdminUrlForLanguage(AsTag):
         Argument('varname', required=False, resolve=False)
     )
 
-    def is_editable(self, context, page, language):
-        """Method allowing for djangocms-versioning monkey patching"""
-        return True
-
     def get_admin_url_for_language(self, context, page, language):
         if language not in page.get_languages():
             admin_url = admin_reverse('cms_pagecontent_add')
@@ -42,7 +40,7 @@ class GetAdminUrlForLanguage(AsTag):
         return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
 
     def get_value(self, context, page, language):
-        if not self.is_editable(context, page, language):
+        if not page.get_title_obj(language).is_editable(context["request"]):
             # Convention: If this tag returns None the page content cannot be edited
             return ""
         return self.get_admin_url_for_language(context, page, language)
@@ -112,28 +110,28 @@ class TreePublishRow(Tag):
         Argument('language')
     )
 
-    def get_indicator(self, context, page, language):
-        """Method allowing for djangocms-versioning monkey patching"""
-        cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
-        text = _("Empty")
-        if page.title_cache.get(language):
-            cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
-            text = _("Public content")
-        return cls, text
+    def get_indicator(self, page_content):
+        indicator = page_content.content_indicator()
+        page_content_admin_class = admin.site._registry[PageContent]
+        css_classes = f"cms-pagetree-node-state cms-pagetree-node-state-{indicator} {indicator}"
+        return css_classes, page_content_admin_class.indicator_descriptions.get(indicator, _("Unknown"))
 
-    def get_indicator_legend(self, context, page, language):
-        """Method allowing for djangocms-versioning monkey patching"""
+    def get_indicator_legend(self, descriptions):
         return (
-            ("cms-pagetree-node-state cms-pagetree-node-state-published", _("Public content")),
-            ("cms-pagetree-node-state cms-pagetree-node-state-empty", _("Empty")),
+            (f"cms-pagetree-node-state cms-pagetree-node-state-{state}", description)
+            for state, description in descriptions.items()
         )
 
     def render_tag(self, context, page, language):
         if page is None:  # Retrieve all for legend
-            context["indicator_legend_items"] = self.get_indicator_legend(context, page, language)
+            page_content_admin_class = admin.site._registry[PageContent]
+            context["indicator_legend_items"] = self.get_indicator_legend(
+                page_content_admin_class.indicator_descriptions
+            )
             return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
 
-        cls, text = self.get_indicator(context, page, language)
+        page_content = page.title_cache.get(language)
+        cls, text = self.get_indicator(page_content)
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
             'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
@@ -155,27 +153,16 @@ class TreePublishRowMenu(AsTag):
         Argument('varname', required=False, resolve=False)
     )
 
-    menu_template = "admin/cms/page/tree/indicator_menu.html"
-
-    def get_indicator_menu(self, context, page, language):
-        """Method allowing for djangocms-versioning monkey patching.
-        Core does not have a publishing menu."""
-        if context.get("has_change_permission", False) and not page.title_cache.get(language):
-            return self.menu_template, [
-                (
-                    _("Configure"),  # Entry
-                    "cms-icon-cogs",  # Optional icon
-                    admin_reverse('cms_pagecontent_add') + f'?cms_page={page.pk}&language={language}',  # url
-                    None,  # Optional add classes for <a>
-                ),
-            ]
-        return "", []
-
     def get_value(self, context, page, language):
-        template, publish_menu_items = self.get_indicator_menu(context, page, language)
-        if template:
-            context["indicator_menu_items"] = publish_menu_items
-            return render_to_string(template, context.flatten())
+        page_content = page.title_cache.get(language)
+        if context.get("has_change_permission", False):
+            page_content_admin_class = admin.site._registry[PageContent]
+            template, publish_menu_items = page_content_admin_class.get_indicator_menu(
+                context["request"], page_content
+            )
+            if template:
+                context["indicator_menu_items"] = publish_menu_items
+                return render_to_string(template, context.flatten())
         return ''
 
 

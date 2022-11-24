@@ -762,7 +762,7 @@ class Page(models.Model):
             return self.title_cache[language]
         from cms.models import EmptyPageContent
 
-        return EmptyPageContent(language)
+        return EmptyPageContent(language=language, page=self)
 
     def get_page_content_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
         """Helper function for getting attribute or None from wanted/current title.
