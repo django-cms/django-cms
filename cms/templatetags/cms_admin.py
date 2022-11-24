@@ -10,7 +10,7 @@ from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
-from cms.models.titlemodels import PageContent, EmptyPageContent
+from cms.models.titlemodels import PageContent
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse
 
