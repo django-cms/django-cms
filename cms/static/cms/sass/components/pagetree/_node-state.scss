@@ -32,7 +32,11 @@
         border-color: $gray-light;
         background-color: $gray-light;
     }
-    &-published {
+   &-archived {
+        border-color: $gray-light;
+        background-color: $gray-lighter;
+    }
+    &-published, &-public {
         border-color: $color-success;
         background-color: $color-success;
     }
