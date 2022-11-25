@@ -195,7 +195,7 @@ class Page(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.urls_cache = {}
-        self.title_cache = {}
+        self.page_content_cache = {}
 
     def __str__(self):
         try:
@@ -224,7 +224,7 @@ class Page(models.Model):
 
     def _clear_internal_cache(self):
         self.urls_cache = {}
-        self.title_cache = {}
+        self.page_content_cache = {}
         self._clear_node_cache()
 
         if hasattr(self, '_prefetched_objects_cache'):
@@ -726,7 +726,7 @@ class Page(models.Model):
 
     def set_translations_cache(self):
         for translation in self.pagecontent_set.all():
-            self.title_cache.setdefault(translation.language, translation)
+            self.page_content_cache.setdefault(translation.language, translation)
 
     def get_path_for_slug(self, slug, language):
         if self.is_home:
