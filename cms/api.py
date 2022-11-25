@@ -1,9 +1,38 @@
 """
-Public Python API to create CMS contents.
+Python APIs for creating CMS content. This is done in :mod:`cms.api` and not
+on the models and managers, because the direct API via models and managers is
+slightly counterintuitive for developers.
 
-WARNING: None of the functions defined in this module checks for permissions.
-You must implement the necessary permission checks in your own code before
-calling these methods!
+Teh api for both Pages and Plugins has changed significantly since django CMS
+Version 4.
+
+Also, the functions defined in this module do sanity checks on arguments.
+
+.. warning:: None of the functions in this module does any security or permission
+             checks. They verify their input values to be sane wherever
+             possible, however permission checks should be implemented manually
+             before calling any of these functions.
+
+.. info:: Due to potential circular dependency issues, it's recommended
+          to import the api in the functions that uses its function.
+
+          e.g. use:
+
+          ::
+
+              def my_function():
+                  from cms.api import api_function
+                  api_function(...)
+
+          instead of:
+
+          ::
+
+              from cms.api import api_function
+
+              def my_function():
+                  api_function(...)
+
 """
 import warnings
 
@@ -105,12 +134,45 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 position="last-child", overwrite_url=None,
                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
-    Create a CMS Page and it's title for the given language
+    Creates a :class:`cms.models.Page` instance and returns it. Also
+    creates a :class:`cms.models.Title` instance for the specified
+    language.
 
-    See docs/extending_cms/api_reference.rst for more info
+    .. warning::
+        Since version 4 the parameters published, publication_date, and publication_end_date
+        do not change the behaviour of this function. If they are supplied a warning is raised.
+
+    :param str title: Title of the page
+    :param str template: Template to use for this page. Must be in :setting:`CMS_TEMPLATES`
+    :param str language: Language code for this page. Must be in :setting:`django:LANGUAGES`
+    :param str menu_title: Menu title for this page
+    :param str slug: Slug for the page, by default uses a slugified version of *title*
+    :param apphook: Application to hook on this page, must be a valid apphook
+    :type apphook: str or :class:`cms.app_base.CMSApp` sub-class
+    :param str apphook_namespace: Name of the apphook namespace
+    :param str redirect: URL redirect
+    :param str meta_description: Description of this page for SEO
+    :param created_by: User that is creating this page
+    :type created_by: str of :class:`django.contrib.auth.models.User` instance
+    :param parent: Parent page of this page
+    :type parent: :class:`cms.models.Page` instance
+    :param bool in_navigation: Whether this page should be in the navigation or not
+    :param bool soft_root: Whether this page is a soft root or not
+    :param str reverse_id: Reverse ID of this page (for template tags)
+    :param str navigation_extenders: Menu to attach to this page. Must be a valid menu
+    :param site: Site to put this page on
+    :type site: :class:`django.contrib.sites.models.Site` instance
+    :param bool login_required: Whether users must be logged in or not to view this page
+    :param limit_visibility_in_menu: Limits visibility of this page in the menu
+    :type limit_visibility_in_menu: :data:`VISIBILITY_ALL` or :data:`VISIBILITY_USERS` or :data:`VISIBILITY_ANONYMOUS`
+    :param str position: Where to insert this node if *parent* is given, must be ``'first-child'`` or ``'last-child'``
+    :param str   overwrite_url: Overwritten path for this page
+    :param int xframe_options: X Frame Option value for Clickjacking protection
+    :param str page_title: Overridden page title for HTML title tag
     """
-    if published is not None:
-        warnings.warn('This API function no longer accepts a published argument', UserWarning)
+    if published is not None or publication_date is not None or publication_end_date is not None:
+        warnings.warn('This API function no longer accepts a "published", "publication_date", or '
+                      '"publication_end_date" argument', UserWarning)
 
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
@@ -172,7 +234,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     page.set_tree_node(site=site, target=target_node, position=position)
     page.save()
 
-    create_title(
+    create_page_content(
         language=language,
         title=title,
         menu_title=menu_title,
@@ -197,19 +259,31 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
 
 @transaction.atomic
-def create_title(language, title, page, menu_title=None, slug=None,
-                 redirect=None, meta_description=None, parent=None,
-                 overwrite_url=None, page_title=None, path=None,
-                 created_by='python-api', soft_root=False, in_navigation=False,
-                 template=TEMPLATE_INHERITANCE_MAGIC,
-                 limit_visibility_in_menu=constants.VISIBILITY_ALL,
-                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
+def create_page_content(language, title, page, menu_title=None, slug=None,
+                        redirect=None, meta_description=None, parent=None,
+                        overwrite_url=None, page_title=None, path=None,
+                        created_by='python-api', soft_root=False, in_navigation=False,
+                        template=TEMPLATE_INHERITANCE_MAGIC,
+                        limit_visibility_in_menu=constants.VISIBILITY_ALL,
+                        xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
-    Create a title.
+    Creates a :class:`cms.models.PageContent` instance and returns it.
 
-    Parent is only used if slug=None.
+    ``parent`` is only used if slug=None.
 
-    See docs/extending_cms/api_reference.rst for more info
+    :param str language: Language code for this page. Must be in :setting:`django:LANGUAGES`
+    :param str title: Title of the page
+    :param page: The page for which to create this title
+    :type page: :class:`cms.models.Page` instance
+    :param str menu_title: Menu title for this page
+    :param str slug: Slug for the page, by default uses a slugified version of *title*
+    :param str redirect: URL redirect
+    :param str meta_description: Description of this page for SEO
+    :param parent: Used for automated slug generation
+    :type parent: :class:`cms.models.Page` instance
+    :param str overwrite_url: Overwritten path for this page
+    :param str page_title: Overridden page title for HTML title tag
+
     """
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:
@@ -247,7 +321,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
         language=language,
     )
 
-    title = PageContent.objects.create(
+    page_content = PageContent.objects.create(
         language=language,
         title=title,
         menu_title=menu_title,
@@ -263,22 +337,55 @@ def create_title(language, title, page, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-    title.rescan_placeholders()
+    page_content.rescan_placeholders()
 
     page_languages = page.get_languages()
 
     if language not in page_languages:
         page.update_languages(page_languages + [language])
-    return title
+    return page_content
+
+
+def create_title(language, title, page, menu_title=None, slug=None,
+                 redirect=None, meta_description=None, parent=None,
+                 overwrite_url=None, page_title=None, path=None,
+                 created_by='python-api', soft_root=False, in_navigation=False,
+                 template=TEMPLATE_INHERITANCE_MAGIC,
+                 limit_visibility_in_menu=constants.VISIBILITY_ALL,
+                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
+    """
+    .. warning ::
+        ``create_title`` has been renamed to ``create_page_content`` as of django CMS version 4.
+    """
+    warnings.warn(
+        "cms.api.create_title has been renamed to cms.api.create_page_content().",
+        DeprecationWarning,
+        stacklevel=2
+    )
+    return create_page_content(
+        language, title, page,
+        menu_title=menu_title, slug=slug, redirect=redirect, meta_description=meta_description,
+        parent=parent, overwrite_url=overwrite_url, page_title=page_title, path=path,
+        created_by=created_by, soft_root=soft_root, in_navigation=in_navigation, template=template,
+        limit_visibility_in_menu=limit_visibility_in_menu, xframe_options=xframe_options
+    )
 
 
 @transaction.atomic
 def add_plugin(placeholder, plugin_type, language, position='last-child',
                target=None, **data):
     """
-    Add a plugin to a placeholder
+    Adds a plugin to a placeholder and returns it.
 
-    See docs/extending_cms/api_reference.rst for more info
+    :param placeholder: Placeholder to add the plugin to
+    :type placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
+    :param plugin_type: What type of plugin to add
+    :type plugin_type: str or :class:`cms.plugin_base.CMSPluginBase` sub-class, must be a valid plugin
+    :param str language: Language code for this plugin, must be in :setting:`django:LANGUAGES`
+    :param str position: Position to add this plugin to the placeholder. Allowed positions are ``"last-child"``
+                         (default), ``"first-child"``, ``"left"``, ``"right"``.
+    :param target: Parent plugin. Must be plugin instance
+    :param data: Data for the plugin type instance
     """
     # validate placeholder
     assert isinstance(placeholder, Placeholder)
@@ -332,9 +439,14 @@ def create_page_user(created_by, user,
                      can_change_pagepermission=True,
                      can_delete_pagepermission=True, grant_all=False):
     """
-    Creates a page user.
+    Creates a page user for the user provided and returns that page user.
 
-    See docs/extending_cms/api_reference.rst for more info
+    :param created_by: The user that creates the page user
+    :type created_by: :class:`django.contrib.auth.models.User` instance
+    :param user: The user to create the page user from
+    :type user: :class:`django.contrib.auth.models.User` instance
+    :param bool can_*: Permissions to give the user
+    :param bool grant_all: Grant all permissions to the user
     """
     from cms.admin.forms import save_permissions
     if grant_all:
@@ -376,9 +488,19 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
                         can_recover_page=True, can_view=False,
                         grant_all=False, global_permission=False):
     """
-    Assigns given user to page, and gives him requested permissions.
+    Assigns a user to a page and gives them some permissions. Returns the
+    :class:`cms.models.PagePermission` object that gets
+    created.
 
-    See docs/extending_cms/api_reference.rst for more info
+    :param page: The page to assign the user to
+    :type page: :class:`cms.models.Page` instance
+    :param user: The user to assign to the page
+    :type user: :class:`django.contrib.auth.models.User` instance
+    :param grant_on: Controls which pages are affected
+    :type grant_on: :data:`cms.models.ACCESS_PAGE`, :data:`cms.models.ACCESS_CHILDREN`,
+    :data:`cms.models.ACCESS_DESCENDANTS` or :data:`cms.models.ACCESS_PAGE_AND_DESCENDANTS`
+    :param can_*: Permissions to grant
+    :param bool grant_all: Grant all permissions to the user
     """
     grant_all = grant_all and not global_permission
     data = {
@@ -405,30 +527,33 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
 
 def publish_page(page, user, language):
     """
-    Publish a page. This sets `page.published` to `True` and calls publish()
-    which does the actual publishing.
+    .. warning::
 
-    See docs/extending_cms/api_reference.rst for more info
+        Publishing pages has been removed from django CMS core in version 4 onward.
+
+        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
     """
     warnings.warn('This API function has been removed', UserWarning)
 
 
 def publish_pages(include_unpublished=False, language=None, site=None):
     """
-    Create published public version of selected drafts.
+    .. warning::
+
+        Publishing pages has been removed from django CMS core in version 4 onward.
+
+        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
     """
     warnings.warn('This API function has been removed', UserWarning)
 
 
 def get_page_draft(page):
     """
-    Returns the draft version of a page, regardless if the passed in
-    page is a published version or a draft version.
+     .. warning::
 
-    :param page: The page to get the draft version
-    :type page: :class:`cms.models.pagemodel.Page` instance
-    :return page: draft version of the page
-    :type page: :class:`cms.models.pagemodel.Page` instance
+        The concept of draft pages has been removed from django CMS core in version 4 onward.
+
+        For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
     """
     warnings.warn('This API function has been removed', UserWarning)
 
@@ -439,7 +564,7 @@ def copy_plugins_to_language(page, source_language, target_language,
     Copy the plugins to another language in the same page for all the page
     placeholders.
 
-    By default plugins are copied only if placeholder has no plugin for the
+    By default, plugins are copied only if placeholder has no plugin for the
     target language; use ``only_empty=False`` to change this.
 
     .. warning: This function skips permissions checks
@@ -472,6 +597,10 @@ def can_change_page(request):
 
     This will work across all permission-related setting, with a unified interface
     to permission checking.
+
+    :param request: The request object from which the user will be taken.
+    :type request: :class:`HttpRequest` instance
+
     """
     from cms.utils import page_permissions
 

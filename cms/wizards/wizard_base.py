@@ -8,6 +8,9 @@ from django.utils.translation import gettext as _, override as force_language
 
 
 class WizardBase():
+    """
+
+    """
     template_name = None
 
     def __init__(self, title, weight, form, model=None, template_name=None,
@@ -35,6 +38,11 @@ class WizardBase():
 
 
 class Wizard(WizardBase):
+    """
+     All wizard classes should inherit from ``cms.wizards.wizard_base.Wizard``. This
+     class implements a number of methods that may be overridden as required.
+     """
+
     template_name = 'cms/wizards/create.html'
     _hash_cache = None
 
@@ -56,19 +64,23 @@ class Wizard(WizardBase):
 
     def get_title(self, **kwargs):
         """
-        Return the title for this wizard. May be overridden as required.
+        Simply returns the ``title`` property assigned during instantiation. Override
+        this method if this needs to be determined programmatically.
         """
         return self.title
 
     def get_weight(self, **kwargs):
         """
-        Return the weight for this wizard. May be overridden as required.
+        Simply returns the ``weight`` property assigned during instantiation. Override
+        this method if this needs to be determined programmatically.
         """
         return self.weight
 
     def get_description(self, **kwargs):
         """
-        Return the description for this wizard. May be overridden as required.
+        Simply returns the ``description`` property assigned during instantiation or one
+        derived from the model if description is not provided during instantiation.
+        Override this method if this needs to be determined programmatically.
         """
         if self.description:
             return self.description
@@ -94,9 +106,9 @@ class Wizard(WizardBase):
 
     def user_has_add_permission(self, user, **kwargs):
         """
-        Returns whether the given «user» has permission to add instances of this
-        wizard's associated model. Can be overridden as required for more
-        complex situations.
+        Returns boolean reflecting whether the given «user» has permission to
+        add instances of this wizard's associated model. Can be overridden as
+        required for more complex situations.
 
         :param user: The current user using the wizard.
         :return: True if the user should be able to use this wizard.
@@ -108,7 +120,19 @@ class Wizard(WizardBase):
 
     def get_success_url(self, obj, **kwargs):
         """
-        This should return the URL of the created object, «obj».
+        Once the wizard has completed, the user will be redirected to the URL of the new
+        object that was created. By default, this is done by return the result of
+        calling the ``get_absolute_url`` method on the object. This may then be modified
+        to force the user into edit mode if the wizard property ``edit_mode_on_success``
+        is True.
+
+        In some cases, the created content will not implement ``get_absolute_url`` or
+        that redirecting the user is undesirable. In these cases, simply override this
+        method. If ``get_success_url`` returns ``None``, the CMS will just redirect to
+        the current page after the object is created.
+
+        :param object obj: The created object
+        :param dict kwargs: Arbitrary keyword arguments
         """
         if 'language' in kwargs:
             with force_language(kwargs['language']):

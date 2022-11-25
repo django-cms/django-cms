@@ -95,30 +95,107 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 
 
 class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
+    """
+    Inherits :class:`django:django.contrib.admin.ModelAdmin` and in most respects behaves like a
+    normal subclass.
 
+    Note however that some attributes of ``ModelAdmin`` simply won't make sense in the
+    context of a Plugin.
+    """
+
+    #: Name of the plugin needs to be set in child classes
     name = ""
+
+    #: Modules collect plugins of similar type
     module = _("Generic")  # To be overridden in child classes
 
+    #: Custom form class to be used to edit this plugin.
     form = None
+
     change_form_template = "admin/cms/page/plugin/change_form.html"
-    # Should the plugin be rendered in the admin?
+    """
+    The template used to render the form when you edit the plugin.
+
+    Example::
+
+        class MyPlugin(CMSPluginBase):
+            model = MyModel
+            name = _("My Plugin")
+            render_template = "cms/plugins/my_plugin.html"
+            change_form_template = "admin/cms/page/plugin_change_form.html"
+
+    See also: :attr:`frontend_edit_template`.
+    """
+    #: If True, displays a preview in the admin.
     admin_preview = False
 
+    #:  The path to the template used to render the template. If ``render_plugin`` is ``True`` either this or
+    #: ``get_render_template`` **must** be defined. See also: :attr:`render_plugin` , :meth:`get_render_template`.
     render_template = None
 
-    # Should the plugin be rendered at all, or doesn't it have any output?
+    #: If set to ``False``, this plugin will not be rendered at all. If ``True``, :meth:`render_template` must also
+    #: be defined. See also: :attr:`render_template`, :meth:`get_render_template`.
     render_plugin = True
 
+    #: If the plugin requires per-instance settings, then this setting must be set to a model that inherits from
+    #: :class:`~cms.models.pluginmodel.CMSPlugin`. See also: :ref:`storing configuration`.
     model = CMSPlugin
+
     text_enabled = False
+    """This attribute controls whether your plugin will be usable (and rendered)
+    in a text plugin. When you edit a text plugin on a page, the plugin will show up in
+    the *CMS Plugins* dropdown and can be configured and inserted. The output will even
+    be previewed in the text editor.
+
+    Of course, not all plugins are usable in text plugins. Therefore the default of this
+    attribute is ``False``. If your plugin *is* usable in a text plugin:
+
+    #. set this to ``True``
+    #. make sure your plugin provides its own :meth:`icon_alt`, this will be used as a tooltip in
+      the text-editor and comes in handy when you use multiple plugins in your text.
+
+    See also: :meth:`icon_alt`, :meth:`icon_src`."""
+
+    #: Set to ``True`` if this plugin should only be used in a placeholder that is attached to a django CMS page,
+    #: and not other models with ``PlaceholderFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
+    #: :attr:`require_parent`.
     page_only = False
 
     allow_children = False
+    """Allows this plugin to have child plugins - other plugins placed inside it?
+
+    If ``True`` you need to ensure that your plugin can render its children in the plugin template. For example:
+
+    .. code-block:: html+django
+
+        {% load cms_tags %}
+        <div class="myplugin">
+            {{ instance.my_content }}
+            {% for plugin in instance.child_plugin_instances %}
+                {% render_plugin plugin %}
+            {% endfor %}
+        </div>
+
+    ``instance.child_plugin_instances`` provides access to all the plugin's children.
+    They are pre-filled and ready to use. The child plugins should be rendered using
+    the ``{% render_plugin %}`` template tag.
+
+    See also: :attr:`child_classes`, :attr:`parent_classes`, :attr:`require_parent`.
+    """
+
+    #: A list of Plugin Class Names. If this is set, only plugins listed here can be added to this plugin.
+    #: See also: :attr:`parent_classes`.
     child_classes = None
 
+    #: Is it required that this plugin is a child of another plugin? Or can it be added to any placeholder, even one
+    #: attached to a page. See also: :attr:`child_classes`, :attr:`parent_classes`.
     require_parent = False
+
+    #: A list of the names of permissible parent classes for this plugin. See also: :attr:`child_classes`,
+    #: :attr:`require_parent`.
     parent_classes = None
 
+    #: Disables *dragging* of child plugins in structure mode.
     disable_child_plugins = False
 
     # Warning: setting these to False, may have a serious performance impact,
@@ -131,6 +208,23 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     _has_extra_plugin_menu_items = False
 
     cache = get_cms_setting('PLUGIN_CACHE')
+    """Is this plugin cacheable? If your plugin displays content based on the user or
+    request or other dynamic properties set this to ``False``.
+
+    If present and set to ``False``, the plugin will prevent the caching of
+    the resulting page.
+
+    .. important:: Setting this to ``False`` will effectively disable the
+                   CMS page cache and all upstream caches for pages where
+                   the plugin appears. This may be useful in certain cases
+                   but for general cache management, consider using the much
+                   more capable :meth:`get_cache_expiration`.
+
+    .. warning::
+
+        If you disable a plugin cache be sure to restart the server and clear the cache afterwards.
+    """
+
     system = False
 
     opts = {}
@@ -145,7 +239,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         self.cms_plugin_instance = None
         # The _cms_initial_attributes acts as a hook to set
         # certain values when the form is saved.
-        # Currently this only happens on plugin creation.
+        # Currently, this only happens on plugin creation.
         self._cms_initial_attributes = {}
         self._operation_token = None
 
@@ -166,6 +260,32 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return cls.model._default_manager.all()
 
     def render(self, context, instance, placeholder):
+        """This method returns the context to be used to render the template
+        specified in :attr:`render_template`.
+
+        :param dict context: The context with which the page is rendered.
+        :param instance: The instance of your plugin that is rendered.
+        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
+        :param str placeholder: The name of the placeholder that is rendered.
+        :rtype: `dict` or :class:`django.template.Context`
+
+        This method must return a dictionary or an instance of
+        :class:`django.template.Context`, which will be used as context to render the
+        plugin template.
+
+        By default, this method will add ``instance`` and ``placeholder`` to the
+        context, which means for simple plugins, there is no need to overwrite this
+        method.
+
+        If you overwrite this method it's recommended to always populate the context
+        with default values by calling the render method of the super class::
+
+            def render(self, context, instance, placeholder):
+                context = super().render(context, instance, placeholder)
+                ...
+                return context
+
+        """
         context['instance'] = instance
         context['placeholder'] = placeholder
         return context
@@ -194,26 +314,38 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         determining the appropriate Cache-Control headers to add to the
         HTTPResponse object.
 
+        :param request: Relevant ``HTTPRequest`` instance.
+        :param instance: The ``CMSPlugin`` instance that is being rendered.
+        :rtype: ``None`` or ``datetime`` or ```time_delta`` or ``int``
+
         Must return one of:
-            - None: This means the placeholder and the page will not even
-              consider this plugin when calculating the page expiration;
 
-            - A TZ-aware `datetime` of a specific date and time in the future
-              when this plugin's content expires;
+        :``None``:
+            This means the placeholder and the page will not even
+            consider this plugin when calculating the page expiration;
 
-            - A `datetime.timedelta` instance indicating how long, relative to
-              the response timestamp that the content can be cached;
+        :``datetime``:
+            A specific date and time (timezone-aware) in the future
+            when this plugin's content expires;
 
-            - An integer number of seconds that this plugin's content can be
-              cached.
+            .. important:: The returned ``datetime`` must be timezone-aware
+                           or the plugin will be ignored (with a warning)
+                           during expiration calculations.
 
-        There are constants are defined in `cms.constants` that may be helpful:
-            - `EXPIRE_NOW`
-            - `MAX_EXPIRATION_TTL`
 
-        An integer value of 0 (zero) or `EXPIRE_NOW` effectively means "do not
-        cache". Negative values will be treated as `EXPIRE_NOW`. Values
-        exceeding the value `MAX_EXPIRATION_TTL` will be set to that value.
+        :``datetime.timedelta``:
+            A timedelta instance indicating how long, relative to
+            the response timestamp that the content can be cached;
+
+        :``int``:
+            An integer number of seconds that this plugin's content can be cached.
+
+        There are constants are defined in ``cms.constants`` that may be
+        useful: :const:`~cms.constants.EXPIRE_NOW` and :data:`~cms.constants.MAX_EXPIRATION_TTL`.
+
+        An integer value of 0 (zero) or :const:`~cms.constants.EXPIRE_NOW` effectively means "do not
+        cache". Negative values will be treated as `EXPIRE_NOW`. Values exceeding the value
+        `~cms.constants.MAX_EXPIRATION_TTL` will be set to that value.
 
         Negative `timedelta` values or those greater than `MAX_EXPIRATION_TTL`
         will also be ranged in the same manner.
@@ -226,17 +358,28 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     def get_vary_cache_on(self, request, instance, placeholder):
         """
-        Provides hints to the placeholder, and in turn to the page for
-        determining VARY headers for the response.
+        Returns an HTTP VARY header string or a list of them to be considered by the placeholder
+        and in turn by the page to caching behaviour.
+
+        Overriding this method is optional.
 
         Must return one of:
-            - None (default),
-            - String of a case-sensitive header name, or
-            - iterable of case-sensitive header names.
 
-        NOTE: This only makes sense to use with caching. If this plugin has
-        ``cache = False`` or plugin.get_cache_expiration(...) returns 0,
-        get_vary_cache_on() will have no effect.
+        :``None``:
+            This means that this plugin declares no headers for the cache
+            to be varied upon. (default)
+
+        :string:
+            The name of a header to vary caching upon.
+
+        :list of strings:
+            A list of strings, each corresponding to a header to vary the
+            cache upon.
+
+        .. note::
+            This only makes sense to use with caching. If this plugin has
+            ``cache = False`` or plugin.get_cache_expiration(...) returns 0,
+            get_vary_cache_on() will have no effect.
         """
         return None
 
@@ -363,19 +506,52 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         pass
 
     def icon_src(self, instance):
-        """
-        Overwrite this if text_enabled = True
+        """By default, this returns an empty string, which, if left un-overridden would result in no icon
+        rendered at all, which, in turn, would render the plugin un-editable by the operator inside a parent
+        text plugin.
 
-        Return the URL for an image to be used for an icon for this
-        plugin instance in a text editor.
+        Therefore, this should be overridden when the plugin has text_enabled set to True to return the path
+        to an icon to display in the text of the text plugin.
+
+        Since djangocms-text-ckeditor introduced inline previews of plugins, the icon will not be
+        rendered in TextPlugins anymore.
+
+        :param instance: The instance of the plugin model.
+        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
+
+        Example::
+
+            def icon_src(self, instance):
+                return settings.STATIC_URL + "cms/img/icons/plugins/link.png"
+
+        See also: :attr:`text_enabled`, :meth:`icon_alt`
         """
         return ""
 
     def icon_alt(self, instance):
         """
-        Overwrite this if necessary if text_enabled = True
+        Overwrite this if necessary if ``text_enabled = True``
         Return the 'alt' text to be used for an icon representing
         the plugin object in a text editor.
+
+        :param instance: The instance of the plugin model to provide specific information
+            for the 'alt' text.
+        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
+
+        By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
+        [instance]", but can be modified to return anything you like.
+
+        This function accepts the ``instance`` as a parameter and returns a string to be
+        used as the ``alt`` text for the plugin's preview or icon.
+
+        Authors of text-enabled plugins should consider overriding this function as
+        it will be rendered as a tooltip in most browser. This is useful, because if
+        the same plugin is used multiple times, this tooltip can provide information about
+        its configuration.
+
+        See also: :attr:`text_enabled`, :meth:`icon_src`.
+
+
         """
         return "%s - %s" % (force_str(self.name), force_str(instance))
 
@@ -483,8 +659,12 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     def get_plugin_urls(self):
         """
-        Return URL patterns for which the plugin wants to register
-        views for.
+        Returns the URL patterns the plugin wants to register views for.
+        They are included under django CMS's page admin URLS in the plugin path
+        (e.g.: ``/admin/cms/page/plugin/<plugin-name>/`` in the default case).
+
+
+        ``get_plugin_urls()`` is useful if your plugin needs to talk asynchronously to the admin.
         """
         return []
 
@@ -494,10 +674,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     def get_extra_placeholder_menu_items(self, request, placeholder):
+        """Extends the placeholder context menu for all placeholders.
+
+        To add one or more custom context menu items that are displayed in the context menu for all placeholders when
+        in structure mode, override this method in a related plugin to return a list of
+        :class:`cms.plugin_base.PluginMenuItem` instances.
+        """
         pass
 
     @classmethod
     def get_extra_plugin_menu_items(cls, request, plugin):
+        """Extends the plugin context menu for all plugins.
+
+        To add one or more custom context menu items that are displayed in the context menu for all plugins when in
+        structure mode, override this method in a related plugin to return a list of
+        :class:`cms.plugin_base.PluginMenuItem` instances.
+        """
         pass
 
     def __repr__(self):
@@ -508,18 +700,18 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
 
 class PluginMenuItem():
+    """
+    Creates an item in the plugin / placeholder menu
 
+    :param name: Item name (label)
+    :param url: URL the item points to. This URL will be called using POST
+    :param data: Data to be POSTed to the above URL
+    :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
+    :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
+    :param attributes: Dictionary whose content will be added as data-attributes to the menu item
+
+    """
     def __init__(self, name, url, data=None, question=None, action='ajax', attributes=None):
-        """
-        Creates an item in the plugin / placeholder menu
-
-        :param name: Item name (label)
-        :param url: URL the item points to. This URL will be called using POST
-        :param data: Data to be POSTed to the above URL
-        :param question: Confirmation text to be shown to the user prior to call the given URL (optional)
-        :param action: Custom action to be called on click; currently supported: 'ajax', 'ajax_add'
-        :param attributes: Dictionary whose content will be added as data-attributes to the menu item
-        """
         if not attributes:
             attributes = {}
 

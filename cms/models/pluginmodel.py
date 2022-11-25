@@ -144,23 +144,32 @@ class PluginModelBase(ModelBase):
 
 
 class CMSPlugin(models.Model, metaclass=PluginModelBase):
-    '''
+    """
     The base class for a CMS plugin model. When defining a new custom plugin, you should
-    store plugin-instance specific information on a subclass of this class.
-
-    An example for this would be to store the number of pictures to display in a galery.
+    store plugin-instance specific information on a subclass of this class. (An example for this
+    would be to store the number of pictures to display in a gallery.)
 
     Two restrictions apply when subclassing this to use in your own models:
-    1. Subclasses of CMSPlugin *cannot be further subclassed*
-    2. Subclasses of CMSPlugin cannot define a "text" field.
 
-    '''
+    1. Subclasses of CMSPlugin **cannot be further subclassed**
+    2. Subclasses of CMSPlugin cannot define a "text" field.
+    """
+
+    #: :class:`django:django.db.models.ForeignKey`: Placeholder the plugin belongs to
     placeholder = models.ForeignKey(Placeholder, on_delete=models.CASCADE, editable=False, null=True)
+    #: :class:`django:django.db.models.ForeignKey`: Parent plugin or ``None`` for plugins at root level in
+    #: the placeholder
     parent = models.ForeignKey('self', on_delete=models.CASCADE, blank=True, null=True, editable=False)
+    #: :class:`django:django.db.models.SmallIntegerField`: Position (unique for placeholder and language)
+    #: starting with 1 for the first plugin in the placeholder
     position = models.SmallIntegerField(_("position"), default=1, editable=False)
+    #: :class:`django:django.db.models.CharField`: Language of the plugin
     language = models.CharField(_("language"), max_length=15, blank=False, db_index=True, editable=False)
+    #: `django:django.db.models.CharField`: Plugin type (name of the class as string)
     plugin_type = models.CharField(_("plugin_name"), max_length=50, db_index=True, editable=False)
+    #: `django:django.db.models.DateTimeField`: Datetime the plugin was created
     creation_date = models.DateTimeField(_("creation date"), editable=False, default=timezone.now)
+    #: `django:django.db.models.DateTimeField`: Datetime the plugin was last changed
     changed_date = models.DateTimeField(auto_now=True)
     child_plugin_instances = None
 
@@ -212,15 +221,17 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return plugin_class(plugin_class.model, admin)
 
     def get_plugin_instance(self, admin=None):
-        '''
-        Given a plugin instance (usually as a CMSPluginBase), this method
-        returns a tuple containing:
-            instance - The instance AS THE APPROPRIATE SUBCLASS OF
-                       CMSPluginBase and not necessarily just 'self', which is
-                       often just a CMSPluginBase,
-            plugin   - the associated plugin class instance (subclass
-                       of CMSPlugin)
-        '''
+        """
+        For a plugin instance (usually as a CMSPluginBase), this method
+        returns the downcasted (i.e., correctly typed subclass of CMSPluginBase) instacnce and the plugin class
+
+        :return: Tuple (instance, plugin)
+
+        instance: The instance AS THE APPROPRIATE SUBCLASS OF CMSPluginBase and not necessarily just 'self', which is
+        often just a CMSPluginBase,
+
+        plugin: the associated plugin class instance (subclass of CMSPlugin)
+        """
         plugin = self.get_plugin_class_instance(admin)
 
         try:
@@ -354,79 +365,25 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'pk', 'position']:
             setattr(plugin, attr, getattr(self, attr))
 
-    def copy_plugin(self, target_placeholder, target_language, parent_cache, no_signals=False):
-        """
-        Copy this plugin and return the new plugin.
-
-        The logic of this method is the following:
-
-         # get a new generic plugin instance
-         # assign the position in the plugin tree
-         # save it to let mptt/treebeard calculate the tree attributes
-         # then get a copy of the current plugin instance
-         # assign to it the id of the generic plugin instance above;
-           this will effectively change the generic plugin created above
-           into a concrete one
-         # copy the tree related attributes from the generic plugin to
-           the concrete one
-         # save the concrete plugin
-         # trigger the copy relations
-         # return the generic plugin instance
-
-        This copy logic is required because we don't know what the fields of
-        the real plugin are. By getting another instance of it at step 4 and
-        then overwriting its ID at step 5, the ORM will copy the custom
-        fields for us.
-        """
-        try:
-            plugin_instance, cls = self.get_plugin_instance()
-        except KeyError:  # plugin type not found anymore
-            return
-
-        # set up some basic attributes on the new_plugin
-        new_plugin = CMSPlugin()
-        new_plugin.placeholder = target_placeholder
-        # we assign a parent to our new plugin
-        parent_cache[self.pk] = new_plugin
-        if self.parent:
-            parent = parent_cache[self.parent_id]
-            parent = CMSPlugin.objects.get(pk=parent.pk)
-            new_plugin.parent_id = parent.pk
-            new_plugin.parent = parent
-        new_plugin.language = target_language
-        new_plugin.plugin_type = self.plugin_type
-        if no_signals:
-            new_plugin._no_reorder = True
-        new_plugin.save()
-        if plugin_instance:
-            # get a new instance so references do not get mixed up
-            plugin_instance = plugin_instance.__class__.objects.get(pk=plugin_instance.pk)
-            plugin_instance.pk = new_plugin.pk
-            plugin_instance.id = new_plugin.pk
-            plugin_instance.placeholder = target_placeholder
-            plugin_instance.cmsplugin_ptr = new_plugin
-            plugin_instance.language = target_language
-            plugin_instance.parent = new_plugin.parent
-            plugin_instance.depth = new_plugin.depth
-            plugin_instance.path = new_plugin.path
-            plugin_instance.numchild = new_plugin.numchild
-            plugin_instance._no_reorder = True
-            plugin_instance.save()
-            old_instance = plugin_instance.__class__.objects.get(pk=self.pk)
-            plugin_instance.copy_relations(old_instance)
-        return new_plugin
-
     def post_copy(self, old_instance, new_old_ziplist):
         """
-        Handle more advanced cases (eg Text Plugins) after the original is
+        Can (should) be overridden to handle the copying of plugins which contain children plugins after the original
+        parent has been copied.
+
+        E.g., TextPlugins use this to correct the references in the text to child plugins.
         copied
         """
         pass
 
     def copy_relations(self, old_instance):
         """
-        Handle copying of any relations attached to this plugin. Custom plugins
-        have to do this themselves!
+        Handle copying of any relations attached to this plugin. Custom plugins have
+        to do this themselves.
+
+        See also: :ref:`Handling-Relations`, :meth:`post_copy`.
+
+        :param old_instance: Source plugin instance
+        :type old_instance: :class:`CMSPlugin` instance
         """
         pass
 
@@ -474,6 +431,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         """
         Method called when we auto add this plugin via default_plugins in
         CMS_PLACEHOLDER_CONF.
+
         Some specific plugins may have some special stuff to do when they are
         auto added.
         """
@@ -483,6 +441,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         """
         Method called when we auto add children to this plugin via
         default_plugins/<plugin>/children in CMS_PLACEHOLDER_CONF.
+
         Some specific plugins may have some special stuff to do when we add
         children to them. ie : TextPlugin must update its content to add HTML
         tags to be able to see his children in WYSIWYG.
@@ -490,6 +449,14 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         pass
 
     def get_action_urls(self, js_compat=True):
+        """
+        .. versionadd: 4.0
+
+        :return: dict of action urls for edit, add, delete, copy, and move plugin.
+
+        This method replaces the set of legacy methods `get_add_url`, ``get_edit_url`, `get_move_url`,
+        `get_delete_url`, `get_copy_url`.
+        """
         if js_compat:
             # TODO: Remove this condition
             # once the javascript files have been refactored

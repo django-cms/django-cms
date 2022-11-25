@@ -8,7 +8,7 @@ from django.template.context import Context
 from django.test.utils import override_settings
 from django.utils.translation import activate, override as force_language
 
-from cms.api import create_page, create_title
+from cms.api import create_page, create_page_content
 from cms.apphook_pool import apphook_pool
 from cms.cms_menus import get_visible_nodes
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page
@@ -323,7 +323,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             self.assertEqual(len(nodes), 0)
 
         for page in Page.objects.all():
-            create_title(
+            create_page_content(
                 language='de',
                 title=page.get_title('en'),
                 page=page,
@@ -989,7 +989,7 @@ class MenuTests(BaseMenuTest):
             template='nav_playground.html',
             in_navigation=True,
         )
-        create_title('fr', 'FR-P2', nl_page_2, in_navigation=True)
+        create_page_content('fr', 'FR-P2', nl_page_2, in_navigation=True)
 
         with self.settings(SITE_ID=2):
             request = self.get_request('/en/')

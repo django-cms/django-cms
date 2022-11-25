@@ -11,7 +11,7 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches
 from django.utils.translation import override as force_language
 
-from cms.api import create_page, create_title
+from cms.api import create_page, create_page_content
 from cms.models import PagePermission, Placeholder, UserSettings
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
@@ -202,7 +202,7 @@ class ViewTests(CMSTestCase):
         user_settings.save()
 
         page = create_page("page", "nav_playground.html", "en")
-        page_content = create_title("fr", "french home", page)
+        page_content = create_page_content("fr", "french home", page)
 
         page.set_as_homepage()
 
@@ -262,7 +262,7 @@ class ViewTests(CMSTestCase):
         """
         create_page("home", "nav_playground.html", "en")
         cms_page = create_page("stevejobs", "nav_playground.html", "en")
-        create_title("de", "jobs", cms_page)
+        create_page_content("de", "jobs", cms_page)
         response = self.client.get('/de/stevejobs/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/de/jobs/')
