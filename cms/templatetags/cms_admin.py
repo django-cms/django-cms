@@ -83,7 +83,7 @@ def tree_publish_row(context, page, language):
     cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
     text = _("no content")
 
-    if page.title_cache.get(language):
+    if page.page_content_cache.get(language):
         cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
         text = _("has contents")
 
