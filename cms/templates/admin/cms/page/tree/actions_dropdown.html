@@ -39,7 +39,7 @@
         </li>
         <li>
             {% if has_delete_permission %}
-                <a href="{% url opts|admin_urlname:'delete' page.id %}?language={{ preview_language }}" title="{% filter escapejs %}{% trans "Delete" %}{% endfilter %}">
+                <a href="{% url opts|admin_urlname:'delete' page.id %}" title="{% filter escapejs %}{% trans "Delete" %}{% endfilter %}">
             {% else %}
                 <a href="#" class="cms-pagetree-dropdown-item-disabled">
             {% endif %}

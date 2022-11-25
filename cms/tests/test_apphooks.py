@@ -12,7 +12,7 @@ from django.utils.timezone import now
 from django.utils.translation import override as force_language
 
 from cms.admin.forms import AdvancedSettingsForm
-from cms.api import create_page, create_title
+from cms.api import create_page, create_page_content
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import (
@@ -24,6 +24,7 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.compat import DJANGO_3
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -82,15 +83,15 @@ class ApphooksTestCase(CMSTestCase):
         self.superuser = superuser
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser)
-        create_title('de', page.get_title(), page)
+        create_page_content('de', page.get_title(), page)
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
-        create_title('de', child_page.get_title(), child_page)
+        create_page_content('de', child_page.get_title(), child_page)
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook=apphook,
                                        apphook_namespace=namespace)
-        create_title("de", child_child_page.get_title(), child_child_page)
-        # publisher_public is set to draft on publish, issue with one-to-one reverse
+        create_page_content("de", child_child_page.get_title(), child_child_page)
+        # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
         if isinstance(content_langs, str):
@@ -148,7 +149,7 @@ class ApphooksTestCase(CMSTestCase):
                     created_by=superuser, apphook="", slug='blankapp')
         english_title = page.pagecontent_set.all()[0]
         self.assertEqual(english_title.language, 'en')
-        create_title("de", "aphooked-page-de", page)
+        create_page_content("de", "aphooked-page-de", page)
         with force_language("en"):
             response = self.client.get(self.get_pages_root())
         self.assertTemplateUsed(response, 'sampleapp/home.html')
@@ -175,7 +176,7 @@ class ApphooksTestCase(CMSTestCase):
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("apphooked-page", "nav_playground.html", "en",
                            created_by=superuser, apphook="SampleApp")
-        create_title("de", "aphooked-page-de", page)
+        create_page_content("de", "aphooked-page-de", page)
 
         self.reload_urls()
 
@@ -285,7 +286,8 @@ class ApphooksTestCase(CMSTestCase):
         view_names = (
             ('sample-settings', 'sample_view'),
             ('sample-class-view', 'ClassView'),
-            ('sample-class-based-view', 'ClassBasedView'),
+            ('sample-class-based-view', 'ClassBasedView' if DJANGO_3 else 'view'),
+            # Naming convention changed in Django 4
         )
 
         with force_language("en"):
@@ -318,7 +320,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser, apphook=APP_NAME)
-        create_title('de', page.get_title(), page)
+        create_page_content('de', page.get_title(), page)
 
         with force_language("en"):
             path = reverse('sample-settings')
@@ -435,7 +437,7 @@ class ApphooksTestCase(CMSTestCase):
                             parent=de_title.page.get_parent_page(),
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
-        create_title("de", "de_title", page2, slug="slug")
+        create_page_content("de", "de_title", page2, slug="slug")
         clear_app_resolvers()
         clear_url_caches()
 
@@ -857,7 +859,7 @@ class ApphooksTestCase(CMSTestCase):
                             'en', created_by=self.superuser,
                             parent=titles[0].page.get_parent_page(),
                             apphook='VariableUrlsApp', reverse_id='page2')
-        create_title('de', 'de_title', page2, slug='slug')
+        create_page_content('de', 'de_title', page2, slug='slug')
 
         self.reload_urls()
 
@@ -899,7 +901,7 @@ class ApphooksTestCase(CMSTestCase):
                             parent=titles[0].page.get_parent_page(),
                             in_navigation=True,
                             apphook='VariableUrlsApp', reverse_id='page2')
-        create_title('de', 'de_title', page2, slug='slug')
+        create_page_content('de', 'de_title', page2, slug='slug')
         request = self.get_request('/page2/')
         renderer = menu_pool.get_renderer(request)
         nodes = renderer.get_nodes()
@@ -1003,15 +1005,15 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.create_homepage("home", "nav_playground.html", "en", created_by=superuser)
-        create_title('de', page.get_title(), page)
+        create_page_content('de', page.get_title(), page)
 
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
-        create_title('de', child_page.get_title(), child_page)
+        create_page_content('de', child_page.get_title(), child_page)
 
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook='SampleApp')
-        create_title("de", '%s_de' % child_child_page.get_title(), child_child_page)
+        create_page_content("de", '%s_de' % child_child_page.get_title(), child_child_page)
 
         # publisher_public is set to draft on publish, issue with one to one reverse
         child_child_page = self.reload(child_child_page)

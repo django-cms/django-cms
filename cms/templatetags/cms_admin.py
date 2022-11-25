@@ -67,14 +67,14 @@ def get_page_display_name(cms_page):
                 if not isinstance(item, EmptyPageContent):
                     language = lang
     if not language:
-        return _("Empty")
-    title = cms_page.page_content_cache[language]
-    if title.title:
-        return title.title
-    if title.page_title:
-        return title.page_title
-    if title.menu_title:
-        return title.menu_title
+        return _("Empty content. Create content using the pencil tool.")
+    page_content = cms_page.page_content_cache[language]
+    if page_content.title:
+        return page_content.title
+    if page_content.page_title:
+        return page_content.page_title
+    if page_content.menu_title:
+        return page_content.menu_title
     return cms_page.get_slug(language)
 
 
@@ -83,7 +83,7 @@ def tree_publish_row(context, page, language):
     cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
     text = _("no content")
 
-    if page.page_content_cache.get(language):
+    if page.title_cache.get(language):
         cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
         text = _("has contents")
 

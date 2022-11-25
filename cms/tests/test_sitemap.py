@@ -1,6 +1,6 @@
 import copy
 
-from cms.api import create_page, create_title
+from cms.api import create_page, create_page_content
 from cms.models import PageUrl
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
@@ -30,34 +30,34 @@ class SitemapTestCase(CMSTestCase):
         }
         with self.settings(CMS_PERMISSION=False):
             p1 = create_page('P1', in_navigation=True, **defaults)
-            create_title(language='de', title="other title %s" % p1.get_title('en'), page=p1)
+            create_page_content(language='de', title="other title %s" % p1.get_title('en'), page=p1)
 
             p4 = create_page('P4', in_navigation=True, **defaults)
-            create_title(language='de', title="other title %s" % p4.get_title('en'), page=p4)
+            create_page_content(language='de', title="other title %s" % p4.get_title('en'), page=p4)
 
             p6 = create_page('P6', in_navigation=False, **defaults)
-            create_title(language='de', title="other title %s" % p6.get_title('en'), page=p6)
+            create_page_content(language='de', title="other title %s" % p6.get_title('en'), page=p6)
 
             p2 = create_page('P2', in_navigation=True, parent=p1, **defaults)
-            create_title(language='de', title="other title %s" % p2.get_title('en'), page=p2)
+            create_page_content(language='de', title="other title %s" % p2.get_title('en'), page=p2)
 
             p3 = create_page('P3', in_navigation=True, parent=p2, **defaults)
-            create_title(language='de', title="other title %s" % p3.get_title('en'), page=p3)
+            create_page_content(language='de', title="other title %s" % p3.get_title('en'), page=p3)
 
             p5 = create_page('P5', in_navigation=True, parent=p4, **defaults)
-            create_title(language='de', title="other title %s" % p5.get_title('en'), page=p5)
+            create_page_content(language='de', title="other title %s" % p5.get_title('en'), page=p5)
 
             p7 = create_page('P7', in_navigation=True, parent=p6, **defaults)
-            create_title(language='de', title="other title %s" % p7.get_title('en'), page=p7)
+            create_page_content(language='de', title="other title %s" % p7.get_title('en'), page=p7)
 
             p8 = create_page('P8', in_navigation=True, parent=p6, **defaults)
-            create_title(language='de', title="other title %s" % p8.get_title('en'), page=p8)
+            create_page_content(language='de', title="other title %s" % p8.get_title('en'), page=p8)
 
             p9 = create_page('P9', in_navigation=True, parent=p1, **defaults)
-            create_title(language='de', title="other title %s" % p9.get_title('en'), page=p9)
+            create_page_content(language='de', title="other title %s" % p9.get_title('en'), page=p9)
 
             p10 = create_page('P10', in_navigation=True, parent=p9, **defaults)
-            create_title(language='de', title="other title %s" % p10.get_title('en'), page=p10)
+            create_page_content(language='de', title="other title %s" % p10.get_title('en'), page=p10)
 
             create_page('P11', in_navigation=True, parent=p9, **defaults)
 

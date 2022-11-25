@@ -28,9 +28,22 @@ from menus.utils import DefaultLanguageChanger
 
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
+"""
+The *Site* menu (that usually shows the project's domain name, *example.com* by default).
+``ADMIN_MENU_IDENTIFIER`` allows you to get hold of this object easily using
+:meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`.
+"""
 LANGUAGE_MENU_IDENTIFIER = 'language-menu'
+"""
+The *Language* menu. ``LANGUAGE_MENU_IDENTIFIER`` allows you to get hold of this object
+easily using :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`.
+"""
 TEMPLATE_MENU_BREAK = 'Template Menu Break'
 PAGE_MENU_IDENTIFIER = 'page'
+"""
+The *Page* menu. ``PAGE_MENU_IDENTIFIER`` allows you to get hold of this object
+easily using :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`.
+"""
 PAGE_MENU_ADD_IDENTIFIER = 'add_page'
 PAGE_MENU_FIRST_BREAK = 'Page Menu First Break'
 PAGE_MENU_SECOND_BREAK = 'Page Menu Second Break'

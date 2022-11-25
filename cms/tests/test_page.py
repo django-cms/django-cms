@@ -14,7 +14,7 @@ from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.api import add_plugin, create_page, create_title
+from cms.api import add_plugin, create_page, create_page_content
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, PageContent
 from cms.models.placeholdermodel import Placeholder
@@ -48,9 +48,9 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_absolute_url(self):
         page = self.create_homepage("page", "nav_playground.html", "en")
-        create_title("fr", "french home", page)
+        create_page_content("fr", "french home", page)
         page_2 = create_page("inner", "nav_playground.html", "en", parent=page)
-        create_title("fr", "french inner", page_2)
+        create_page_content("fr", "french inner", page_2)
 
         self.assertEqual(page_2.get_absolute_url(), '/en/inner/')
         self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
@@ -438,6 +438,7 @@ class PagesTestCase(TransactionCMSTestCase):
         content = page.get_content_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
+        page.save()
         sitemap = CMSSitemap()
         actual_last_modification_time = sitemap.lastmod(content)
         self.assertEqual(actual_last_modification_time.date(), now.date())
@@ -463,7 +464,7 @@ class PagesTestCase(TransactionCMSTestCase):
         grand_child2_content.save()
 
         self.assertFalse(hasattr(grand_child_content, '_template_cache'))
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(2):
             self.assertEqual(child_content.template, constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
@@ -472,7 +473,7 @@ class PagesTestCase(TransactionCMSTestCase):
             grand_child.get_template()
 
         self.assertFalse(hasattr(grand_child2_content, '_template_cache'))
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(1):
             self.assertEqual(child2_content.template, 'col_two.html')
             self.assertEqual(child2.get_template_name(), grand_child2.get_template_name())
 
@@ -906,7 +907,7 @@ class PageContentTests(CMSTestCase):
 
     def setUp(self):
         self.page = create_page("english-page", "nav_playground.html", "en")
-        self.german_content = create_title("de", "german content", self.page)
+        self.german_content = create_page_content("de", "german content", self.page)
         self.english_content = self.page.get_content_obj('en')
 
     def test_get_content_obj(self):

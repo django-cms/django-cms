@@ -6,7 +6,7 @@ from classytags.helpers import InclusionTag
 from django import template
 from django.contrib.sites.models import Site
 from django.urls import NoReverseMatch, reverse
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.translation import get_language, gettext
 
 from cms.utils.i18n import (
@@ -94,6 +94,7 @@ def flatten(nodes):
     return flat
 
 
+@register.tag(name="show_menu")
 class ShowMenu(InclusionTag):
     """
     render a nested list of all children of the pages
@@ -165,9 +166,7 @@ class ShowMenu(InclusionTag):
         return context
 
 
-register.tag(ShowMenu)
-
-
+@register.tag(name="show_menu_below_id")
 class ShowMenuBelowId(ShowMenu):
     name = 'show_menu_below_id'
     options = Options(
@@ -182,9 +181,7 @@ class ShowMenuBelowId(ShowMenu):
     )
 
 
-register.tag(ShowMenuBelowId)
-
-
+@register.tag(name="show_sub_menu")
 class ShowSubMenu(InclusionTag):
     """
     show the sub menu of the current nav-node.
@@ -257,9 +254,7 @@ class ShowSubMenu(InclusionTag):
         return context
 
 
-register.tag(ShowSubMenu)
-
-
+@register.tag(name="show_breadcrumb")
 class ShowBreadcrumb(InclusionTag):
     """
     Shows the breadcrumb from the node that has the same url as the current request
@@ -326,20 +321,17 @@ class ShowBreadcrumb(InclusionTag):
         return context
 
 
-register.tag(ShowBreadcrumb)
-
-
 def _raw_language_marker(language, lang_code):
     return language
 
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return force_text(gettext(language))
+        return force_str(gettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return force_text(gettext(language))
+    return force_str(gettext(language))
 
 
 def _short_language_marker(language, lang_code):
@@ -354,6 +346,7 @@ MARKERS = {
 }
 
 
+@register.tag(name="language_chooser")
 class LanguageChooser(InclusionTag):
     """
     Displays a language chooser
@@ -404,9 +397,7 @@ class LanguageChooser(InclusionTag):
         return context
 
 
-register.tag(LanguageChooser)
-
-
+@register.tag(name="page_language_url")
 class PageLanguageUrl(InclusionTag):
     """
     Displays the url of the current page in the defined language.
@@ -435,6 +426,3 @@ class PageLanguageUrl(InclusionTag):
             # use the default language changer
             url = DefaultLanguageChanger(request)(lang)
         return {'content': url}
-
-
-register.tag(PageLanguageUrl)

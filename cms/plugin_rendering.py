@@ -1,3 +1,5 @@
+import logging
+import sys
 from collections import OrderedDict
 from functools import partial
 
@@ -22,6 +24,8 @@ from cms.utils.placeholder import (
     restore_sekizai_context,
 )
 from cms.utils.plugins import get_plugin_restrictions
+
+logger = logging.getLogger(__name__)
 
 
 def _unpack_plugins(parent_plugin):
@@ -454,13 +458,30 @@ class ContentRenderer(BaseRenderer):
         # which is guaranteed by get_cached_template if the template returned by
         # plugin._get_render_template is either a string or an engine-specific template object
         context = PluginContext(context, instance, placeholder)
-        context = plugin.render(context, instance, placeholder.slot)
-        context = flatten_context(context)
+        try:
+            context = plugin.render(context, instance, placeholder.slot)
+            context = flatten_context(context)
+        except Exception:  # catch errors when executing a plugin's render method
+            context['exc_info'] = sys.exc_info()
+            content = self.render_exception('executing plugin.render', instance, context, placeholder, editable)
+            logger.error(
+                f"{instance.__class__.__name__}.render for plugin pk={instance.id} raised an exception",
+                exc_info=context['exc_info']
+            )
+        else:
+            template_name = plugin._get_render_template(context, instance, placeholder)
 
-        template = plugin._get_render_template(context, instance, placeholder)
-        template = self.templates.get_cached_template(template)
-
-        content = template.render(context)
+            try:
+                template = self.templates.get_cached_template(template_name)
+                content = template.render(context)
+            except Exception:  # catch errors when rendering a plugin's template
+                context['exc_info'] = sys.exc_info()
+                content = self.render_exception('rendering template', instance, context, placeholder, editable)
+                logger.error(
+                    f'Rendering "{template_name}" for plugin {instance.__class__.__name__} '
+                    f'(pk={instance.id}) raised an exception',
+                    exc_info=context['exc_info']
+                )
 
         for path in get_cms_setting('PLUGIN_PROCESSORS'):
             processor = import_string(path)
@@ -471,6 +492,20 @@ class ContentRenderer(BaseRenderer):
             placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
             placeholder_cache.setdefault('plugins', []).append(instance)
         return mark_safe(content)
+
+    def render_exception(self, action, instance, context, placeholder, editable):
+        if editable:
+            exc, value, traceback = context['exc_info']
+            return f'''
+                <div style="display: inline-block; border: none; background: rgba(0, 0, 0, 0.5);
+                   padding: 0.6em 0.3em; cursor: not-allowed; min-height: 2em; width:100%; vertical-align:middle;
+                   text-align:center;">
+                    <span style="font-weight: bold; color: darkred;">
+                      Exception when {action} in {instance.plugin_type} (id={instance.id})<br />
+                      {exc.__name__}: {value}
+                    </span>
+                </div>'''
+        return ''
 
     def render_plugins(self, placeholder, language, context, editable=False, template=None):
         plugins = self.get_plugins_to_render(

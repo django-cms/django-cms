@@ -138,7 +138,12 @@ class TreeNode(MP_Node):
 
 class Page(models.Model):
     """
-    A simple hierarchical page model
+    A ``Page`` is the basic unit of site structure in django CMS. The CMS uses a hierarchical page model: each page
+    stands in relation to other pages as parent, child or sibling. This hierarchy is managed by the `django-treebeard
+    <http://django-treebeard.readthedocs.io/en/latest/>`_ library.
+
+    A ``Page`` also has language-specific properties - for example, it will have a title and a slug for each language
+    it exists in. These properties are managed by the :class:`cms.models.titlemodel.PageContent model.
     """
 
     created_by = models.CharField(
@@ -190,7 +195,7 @@ class Page(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.urls_cache = {}
-        self.page_content_cache = {}
+        self.title_cache = {}
 
     def __str__(self):
         try:
@@ -219,7 +224,7 @@ class Page(models.Model):
 
     def _clear_internal_cache(self):
         self.urls_cache = {}
-        self.page_content_cache = {}
+        self.title_cache = {}
         self._clear_node_cache()
 
         if hasattr(self, '_prefetched_objects_cache'):
@@ -508,7 +513,7 @@ class Page(models.Model):
                     default_width=placeholder.default_width,
                 )
                 placeholder.copy_plugins(new_placeholder, language=new_title.language)
-            new_page.page_content_cache[new_title.language] = new_title
+            new_page.title_cache[new_title.language] = new_title
         new_page.update_languages([trans.language for trans in translations])
 
         if extensions:
@@ -721,7 +726,7 @@ class Page(models.Model):
 
     def set_translations_cache(self):
         for translation in self.pagecontent_set.all():
-            self.page_content_cache.setdefault(translation.language, translation)
+            self.title_cache.setdefault(translation.language, translation)
 
     def get_path_for_slug(self, slug, language):
         if self.is_home:
@@ -754,9 +759,8 @@ class Page(models.Model):
     # ## PageContent object access
 
     def get_content_obj(self, language=None, fallback=True, force_reload=False):
-        """
-        Helper function for accessing wanted / current page content.
-        If wanted page content doesn't exist, EmptyPageContent instance will be returned.
+        """Helper function for accessing wanted / current title.
+        If wanted title doesn't exist, EmptyPageContent instance will be returned.
         """
         language = self._get_page_content_cache(language, fallback, force_reload)
         if language in self.page_content_cache:
@@ -899,9 +903,7 @@ class Page(models.Model):
 
         force_reload = (force_reload or language not in self.page_content_cache)
         if force_reload:
-            from cms.models import PageContent
-            page_contents = PageContent.objects.filter(page=self)
-            for page_content in page_contents:
+            for page_content in self.pagecontent_set.all():
                 self.page_content_cache[page_content.language] = page_content
 
         if self.page_content_cache.get(language):
