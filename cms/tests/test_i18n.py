@@ -358,7 +358,7 @@ class TestLanguageFallbacks(CMSTestCase):
     )
     def test_session_language(self):
         page = self.create_homepage("home", "nav_playground.html", "en")
-        api.create_title('fr', "home", page)
+        api.create_page_content('fr', "home", page)
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/en/')

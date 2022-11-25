@@ -6,7 +6,7 @@ from django.conf import settings
 from django.template import Context
 from sekizai.context import SekizaiContext
 
-from cms.api import add_plugin, create_page, create_title
+from cms.api import add_plugin, create_page, create_page_content
 from cms.cache import invalidate_cms_page_cache
 from cms.cache.placeholder import (
     _get_placeholder_cache_key, _get_placeholder_cache_version,
@@ -609,7 +609,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
         self.page = create_page(
             'en test page', 'nav_playground.html', 'en')
         # Now create and publish as 'de' title
-        create_title('de', "de test page", self.page, template='nav_playground.html')
+        create_page_content('de', "de test page", self.page, template='nav_playground.html')
 
         self.placeholder_en = self.page.get_placeholders("en").filter(slot="body")[0]
         self.placeholder_de = self.page.get_placeholders("de").filter(slot="body")[0]

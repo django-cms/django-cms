@@ -253,7 +253,7 @@ class PageContent(models.Model):
 
 class EmptyPageContent():
     """
-    Empty title object, can be returned from Page.get_title_obj() if required
+    Empty title object, can be returned from :meth:`cms.models.pagemodel.Page.get_title_obj` if required
     title object doesn't exist.
     """
     title = ""

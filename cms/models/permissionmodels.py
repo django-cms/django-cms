@@ -28,10 +28,20 @@ if User is None:
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
+
+#: Access to the page itself
 ACCESS_PAGE = 1
-ACCESS_CHILDREN = 2  # just immediate children (1 level)
-ACCESS_PAGE_AND_CHILDREN = 3  # just immediate children (1 level)
+
+#: Access to immediate children (1 level)
+ACCESS_CHILDREN = 2
+
+#: Access to page itself and immediate children (1 level)
+ACCESS_PAGE_AND_CHILDREN = 3
+
+#: Access to all children (first level and allso their children)
 ACCESS_DESCENDANTS = 4
+
+#: Access to page itself and all children (first level and allso their children)
 ACCESS_PAGE_AND_DESCENDANTS = 5
 
 # binary masks for ACCESS permissions
@@ -204,7 +214,7 @@ class GlobalPagePermission(AbstractPagePermission):
 
 
 class PagePermission(AbstractPagePermission):
-    """Page permissions for single page
+    """Page permissions for a single page
     """
     grant_on = models.IntegerField(_("Grant on"), choices=ACCESS_CHOICES, default=ACCESS_PAGE_AND_DESCENDANTS)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("page"))

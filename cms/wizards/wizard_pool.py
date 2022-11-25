@@ -20,21 +20,34 @@ def entry_choices(user, page):
 
 
 class WizardPool():
+    """
+    .. deprecated:: 4.0
+    """
 
     def is_registered(self, entry, **kwargs):
         """
-        Returns True if the provided entry is registered.
+        .. deprecated:: 4.0
 
-        NOTE: This method is for backwards compatibility only
+        Returns True if the provided entry is registered.
         """
         # TODO: Add deprecation warning
         return entry.id in apps.get_app_config('cms').cms_extension.wizards
 
     def register(self, entry):
         """
-        Registers the provided «entry».
+        .. deprecated:: 4.0
 
-        Raises AlreadyRegisteredException if the entry is already registered.
+        You may notice from the example above that the last line in the sample code is::
+
+            wizard_pool.register(my_app_wizard)
+
+        This sort of thing should look very familiar, as a similar approach is used for
+        cms_apps, template tags and even Django's admin.
+
+        Calling the wizard pool's ``register`` method will register the provided wizard
+        into the pool, unless there is already a wizard of the same module and class
+        name. In this case, the register method will raise a
+        ``cms.wizards.wizard_pool.AlreadyRegisteredException``.
         """
         # TODO: Add deprecation warning
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
@@ -48,11 +61,11 @@ class WizardPool():
 
     def unregister(self, entry):
         """
+        .. deprecated:: 4.0
+
         If «entry» is registered into the pool, remove it.
 
         Returns True if the entry was successfully registered, else False.
-
-        NOTE: This method is here for backwards compatibility only.
         """
         # TODO: Add deprecation warning
         assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
@@ -63,15 +76,22 @@ class WizardPool():
 
     def get_entry(self, entry):
         """
+        .. deprecated:: 4.0 use :func:`cms.wizards.helpers.get_entry` instead
+
         Returns the wizard from the pool identified by «entry», which may be a
         Wizard instance or its "id" (which is the PK of its underlying
         content-type).
-
-        NOTE: This method is here for backwards compatibility only.
-        Use cms.wizards.helpers.get_enty when possible.
         """
         # TODO: Deprecated warning
         return get_entry(entry)
 
 
 wizard_pool = WizardPool()
+"""
+..  warning::
+    .. deprecated:: 4.0
+
+    Using wizard_pool is deprecated. Use `cms.wizards.helper` functions instead.
+    Since django CMS version 4 wizards are registered with the cms using
+    :class:`cms.app_base.CMSAppExtension` in ``cms_config.py``.
+"""

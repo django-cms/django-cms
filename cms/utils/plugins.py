@@ -143,6 +143,29 @@ def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_l
 
 def copy_plugins_to_placeholder(plugins, placeholder, language=None,
                                 root_plugin=None, start_positions=None):
+    """Copies an iterable of plugins to a placeholder
+
+    :param iterable plugins: Plugins to be copied
+    :param placeholder: Target placeholder
+    :type placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
+    :param str language: target language (if no root plugin is given)
+    :param root_plugin:
+    :type placeholder: :class:`cms.models.pluginmodel.CMSPlugin` instance
+    :param int start_positions: Cache for start positions by language
+
+    The logic of this method is the following:
+
+    #. Get bound plugins for each source plugin
+    #. Get the parent plugin (if it exists)
+    #. then get a copy of the source plugin instance
+    #. Set the id/pk to None to it the id of the generic plugin instance above;
+       this will effectively change the generic plugin created above
+       into a concrete one
+    #. find the position in the new plalceholder
+    #. save the concrete plugin (which creates a new plugin in the database)
+    #. trigger the copy relations
+    #. return the plugin ids
+    """
     plugin_pairs = []
     plugins_by_id = OrderedDict()
     # Keeps track of the next available position per language.
