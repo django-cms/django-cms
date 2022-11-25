@@ -438,6 +438,7 @@ class PagesTestCase(TransactionCMSTestCase):
         title = page.get_title_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
+        page.save()
         sitemap = CMSSitemap()
         actual_last_modification_time = sitemap.lastmod(title)
         self.assertEqual(actual_last_modification_time.date(), now.date())
@@ -463,7 +464,7 @@ class PagesTestCase(TransactionCMSTestCase):
         grand_child2_title.save()
 
         self.assertFalse(hasattr(grand_child_title, '_template_cache'))
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(2):
             self.assertEqual(child_title.template, constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
@@ -472,7 +473,7 @@ class PagesTestCase(TransactionCMSTestCase):
             grand_child.get_template()
 
         self.assertFalse(hasattr(grand_child2_title, '_template_cache'))
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(1):
             self.assertEqual(child2_title.template, 'col_two.html')
             self.assertEqual(child2.get_template_name(), grand_child2.get_template_name())
 
