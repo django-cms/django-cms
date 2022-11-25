@@ -26,7 +26,6 @@ def get_admin_url_for_language(page, language):
     return admin_url
 
 
-
 @register.simple_tag(takes_context=True)
 def show_admin_menu_for_pages(context, descendants, depth=1):
     admin = context['admin']

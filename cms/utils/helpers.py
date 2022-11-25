@@ -109,4 +109,3 @@ def is_editable_model(model_class):
     except KeyError:
         return False
     return isinstance(admin_class, FrontendEditableAdminMixin)
-

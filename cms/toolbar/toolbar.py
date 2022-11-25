@@ -520,6 +520,7 @@ class CMSToolbarBase(BaseToolbar):
         # return the toolbar content and the content below
         return '%s\n%s' % (toolbar, rendered_contents)
 
+
 # Add toolbar mixins from extensions to toolbar
 CMSToolbar = type("CMSToolbar", tuple(cms_toolbar_extensions + [CMSToolbarBase]), dict())
 
