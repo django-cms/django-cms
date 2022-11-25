@@ -143,7 +143,7 @@ class Page(models.Model):
     <http://django-treebeard.readthedocs.io/en/latest/>`_ library.
 
     A ``Page`` also has language-specific properties - for example, it will have a title and a slug for each language
-    it exists in. These properties are managed by the :class:`cms.models.titlemodel.PageContent model.
+    it exists in. These properties are managed by the :class:`~cms.models.contentmodel.PageContent` model.
     """
 
     created_by = models.CharField(
@@ -206,7 +206,7 @@ class Page(models.Model):
             except IndexError:
                 title = None
         if title is None:
-            title = u""
+            title = ""
         return force_str(title)
 
     def __repr__(self):
@@ -240,7 +240,7 @@ class Page(models.Model):
     def set_as_homepage(self, user=None):
         """
         Sets the given page as the homepage.
-        Updates the title paths for all affected pages.
+        Updates the url paths for all affected pages.
         Returns the old home page (if any).
         """
         if user:
@@ -513,7 +513,7 @@ class Page(models.Model):
                     default_width=placeholder.default_width,
                 )
                 placeholder.copy_plugins(new_placeholder, language=new_title.language)
-            new_page.title_cache[new_title.language] = new_title
+            new_page.page_content_cache[new_title.language] = new_title
         new_page.update_languages([trans.language for trans in translations])
 
         if extensions:
