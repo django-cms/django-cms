@@ -1,7 +1,7 @@
 from cms.exceptions import SubClassNeededError
 
-from .models import PageExtension, TitleExtension
 from ..models import PageContent
+from .models import PageExtension, TitleExtension
 
 
 class ExtensionPool():

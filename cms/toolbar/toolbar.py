@@ -3,6 +3,7 @@ import operator
 from collections import OrderedDict
 
 from classytags.utils import flatten_context
+from django.apps import apps
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
@@ -25,9 +26,6 @@ from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_site_language_from_request
-
-from django.apps import apps
-
 
 cms_toolbar_extensions = apps.get_app_config('cms').cms_extension.toolbar_mixins
 
