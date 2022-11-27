@@ -138,7 +138,12 @@ class TreeNode(MP_Node):
 
 class Page(models.Model):
     """
-    A simple hierarchical page model
+    A ``Page`` is the basic unit of site structure in django CMS. The CMS uses a hierarchical page model: each page
+    stands in relation to other pages as parent, child or sibling. This hierarchy is managed by the `django-treebeard
+    <http://django-treebeard.readthedocs.io/en/latest/>`_ library.
+
+    A ``Page`` also has language-specific properties - for example, it will have a title and a slug for each language
+    it exists in. These properties are managed by the :class:`cms.models.titlemodel.PageContent model.
     """
 
     created_by = models.CharField(
@@ -901,9 +906,7 @@ class Page(models.Model):
 
         force_reload = (force_reload or language not in self.title_cache)
         if force_reload:
-            from cms.models import PageContent
-            titles = PageContent.objects.filter(page=self)
-            for title in titles:
+            for title in self.pagecontent_set.all():
                 self.title_cache[title.language] = title
 
         if self.title_cache.get(language):

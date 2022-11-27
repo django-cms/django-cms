@@ -1,6 +1,6 @@
 from django.http import HttpResponse
 
-from cms.api import create_page, create_title
+from cms.api import create_page, create_page_content
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils.i18n import get_language_list
@@ -40,7 +40,7 @@ class MenuUtilsTests(CMSTestCase):
 
         for language in get_language_list(site_id=1):
             if language not in ('en', 'pt-br', 'es-mx'):
-                create_title(language, '%s-page' % language, cms_page)
+                create_page_content(language, '%s-page' % language, cms_page)
 
         request = self.get_request(
             path=cms_page.get_absolute_url(),

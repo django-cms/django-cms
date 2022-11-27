@@ -7,7 +7,7 @@ from .base import SubcommandsCommand
 
 def get_descendants(root):
     """
-    Returns the a generator of primary keys which represent
+    Returns a generator of primary keys which represent
     descendants of the given node ID (root_id)
     """
     # Note this is done because get_descendants() can't be trusted

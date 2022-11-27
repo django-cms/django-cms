@@ -18,7 +18,7 @@ from django.utils.html import escape
 from django.utils.translation import get_language, gettext_lazy as _, override
 
 from cms.admin.forms import RequestToolbarForm
-from cms.api import add_plugin, create_page, create_title
+from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_toolbars import (
     ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, LANGUAGE_MENU_IDENTIFIER,
     get_user_model,
@@ -518,7 +518,7 @@ class ToolbarTests(ToolbarTestBase):
             return admin_reverse('cms_pagecontent_delete', args=(pk,))
 
         page = create_page("english-page", "nav_playground.html", "en")
-        german_content = create_title("de", "german content", page)
+        german_content = create_page_content("de", "german content", page)
         english_content = page.get_title_obj('en')
         edit_url = get_object_edit_url(english_content)
         staff = self.get_staff()
@@ -654,7 +654,7 @@ class ToolbarTests(ToolbarTestBase):
         cms_page = create_page('test-en', 'nav_playground.html', 'en')
         page_content_en = self.get_page_title_obj(cms_page)
         edit_url_en = get_object_edit_url(page_content_en)
-        page_content_de = create_title('de', 'test-de', cms_page)
+        page_content_de = create_page_content('de', 'test-de', cms_page)
         edit_url_de = get_object_edit_url(page_content_de)
 
         en_request = self.get_page_request(cms_page, user, edit_url_en)
@@ -806,8 +806,8 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page(
             "toolbar-page", "nav_playground.html", "en"
         )
-        create_title(title="de page", language="de", page=page)
-        create_title(title="fr page", language="fr", page=page)
+        create_page_content(title="de page", language="de", page=page)
+        create_page_content(title="fr page", language="fr", page=page)
         page_content_en = self.get_page_title_obj(page)
         edit_url_en = get_object_edit_url(page_content_en)
         request = self.get_page_request(page, self.get_staff(), edit_url_en)
@@ -849,8 +849,8 @@ class ToolbarTests(ToolbarTestBase):
             [u'German...', u'Brazilian Portuguese...', u'French...', u'Espa\xf1ol...']
         )
 
-        create_title(title="de page", language="de", page=page)
-        create_title(title="fr page", language="fr", page=page)
+        create_page_content(title="de page", language="de", page=page)
+        create_page_content(title="fr page", language="fr", page=page)
         self.assertMenuItems(
             request, LANGUAGE_MENU_IDENTIFIER, 'Add Translation',
             [u'Brazilian Portuguese...', u'Espa\xf1ol...']
@@ -860,10 +860,10 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page("tbp", "nav_playground.html", "en")
         title_en = self.get_page_title_obj(page)
         edit_url_en = get_object_edit_url(title_en)
-        title_de = create_title('de', 'de page', page, template='nav_playground.html')
+        title_de = create_page_content('de', 'de page', page, template='nav_playground.html')
         edit_url_de = get_object_edit_url(title_de)
         add_plugin(title_de.placeholders.get(slot='body'), "TextPlugin", "de", body='de body')
-        title_fr = create_title('fr', 'fr page', page, template='nav_playground.html')
+        title_fr = create_page_content('fr', 'fr page', page, template='nav_playground.html')
         add_plugin(title_fr.placeholders.get(slot='body'), "TextPlugin", "fr", body='fr body')
 
         staff = self.get_staff()

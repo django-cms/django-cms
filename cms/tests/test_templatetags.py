@@ -18,7 +18,7 @@ from mock import patch
 from sekizai.context import SekizaiContext
 
 import cms
-from cms.api import add_plugin, create_page, create_title
+from cms.api import add_plugin, create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import (
     EmptyPageContent, Page, PageContent, PageUrl, Placeholder,
@@ -265,10 +265,10 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         """
         page_1 = create_page('Page 1', 'nav_playground.html', 'en',
                              in_navigation=True, reverse_id='page1')
-        create_title("de", "Seite 1", page_1, slug="seite-1")
+        create_page_content("de", "Seite 1", page_1, slug="seite-1")
         page_2 = create_page('Page 2', 'nav_playground.html', 'en', page_1,
                              in_navigation=True, reverse_id='page2')
-        create_title("de", "Seite 2", page_2, slug="seite-2")
+        create_page_content("de", "Seite 2", page_2, slug="seite-2")
         page_3 = create_page('Page 3', 'nav_playground.html', 'en', page_2,
                              in_navigation=True, reverse_id='page3')
         tpl = "{% load menu_tags %}{% page_language_url 'de' %}"
@@ -351,7 +351,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        create_title('fr', 'Fr Test', page)
+        create_page_content('fr', 'Fr Test', page)
         placeholder_en = page.get_placeholders('en')[0]
         placeholder_fr = page.get_placeholders('fr')[0]
         add_plugin(placeholder_en, TextPlugin, 'en', body='<b>En Test</b>')
