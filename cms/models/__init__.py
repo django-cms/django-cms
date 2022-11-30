@@ -3,7 +3,7 @@ from .pagemodel import *  # nopyflakes
 from .permissionmodels import *  # nopyflakes
 from .placeholdermodel import *  # nopyflakes
 from .pluginmodel import *  # nopyflakes
-from .titlemodels import *  # nopyflakes
+from .contentmodels import *  # nopyflakes
 from .placeholderpluginmodel import *  # nopyflakes
 from .static_placeholder import *  # nopyflakes
 from .aliaspluginmodel import *  # nopyflakes

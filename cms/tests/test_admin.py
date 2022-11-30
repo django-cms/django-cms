@@ -742,7 +742,7 @@ class AdminFormsTests(AdminTestsBase):
                                            overwrite_url='overwritten_url',
                                            menu_title='menu_title')
 
-            title = multi_title_page.get_title_obj()
+            title = multi_title_page.get_content_obj()
             title.page_title = 'page_title'
             title.save()
 

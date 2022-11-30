@@ -492,7 +492,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
             for page in page_tree:
-                content = page.get_title_obj('en')
+                content = page.get_content_obj('en')
                 edit_url = self.get_admin_url(PageContent, 'change', content.pk)
                 page_markup = row_markup % (edit_url, str(content))
                 self.assertContains(response, page_markup, html=True)
@@ -1056,7 +1056,7 @@ class PageTest(PageTestBase):
     def test_set_overwrite_url(self):
         superuser = self.get_superuser()
         cms_page = create_page('page', 'nav_playground.html', 'en')
-        translation = cms_page.get_title_obj('en', fallback=False)
+        translation = cms_page.get_content_obj('en', fallback=False)
         expected = (
             '<input id="id_overwrite_url" maxlength="255" '
             'value="new-url" name="overwrite_url" type="text" />'
@@ -1085,7 +1085,7 @@ class PageTest(PageTestBase):
         create_page('home', 'nav_playground.html', 'en')
         boo = create_page('boo', 'nav_playground.html', 'en')
         hoo = create_page('hoo', 'nav_playground.html', 'en')
-        translation = hoo.get_title_obj('en', fallback=False)
+        translation = hoo.get_content_obj('en', fallback=False)
         expected_error = (
             '<ul class="errorlist"><li>Page '
             '<a href="{}" target="_blank">boo</a> '
@@ -1113,7 +1113,7 @@ class PageTest(PageTestBase):
             language='en',
             overwrite_url='/new-url/',
         )
-        translation = cms_page.get_title_obj('en', fallback=False)
+        translation = cms_page.get_content_obj('en', fallback=False)
         expected = (
             '<input id="id_overwrite_url" maxlength="255" '
             'name="overwrite_url" type="text" />'
@@ -4154,7 +4154,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         translation = self._add_translation_to_page(page)
         endpoint = self.get_copy_plugin_uri(plugin)
         source_placeholder = plugin.placeholder
-        page.get_title_obj(translation.language)
+        page.get_content_obj(translation.language)
         target_placeholder = page.get_placeholders(translation.language).get(slot='right-column')
 
         data = {

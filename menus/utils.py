@@ -1,13 +1,10 @@
 from django.conf import settings
-from django.urls import NoReverseMatch, reverse, resolve
+from django.urls import NoReverseMatch, resolve, reverse
 
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import (
-    force_language,
-    get_default_language_for_site,
-    get_fallback_languages,
-    hide_untranslated,
-    is_valid_site_language,
+    force_language, get_default_language_for_site, get_fallback_languages,
+    hide_untranslated, is_valid_site_language,
 )
 
 

@@ -10,7 +10,7 @@ from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
-from cms.models.titlemodels import PageContent
+from cms.models.contentmodels import PageContent
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse
 
@@ -36,11 +36,11 @@ class GetAdminUrlForLanguage(AsTag):
             admin_url += '?cms_page={}&language={}'.format(page.pk, language)
             return admin_url
 
-        page_content = page.get_title_obj(language, fallback=False)
+        page_content = page.get_content_obj(language, fallback=False)
         return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
 
     def get_value(self, context, page, language):
-        if not page.get_title_obj(language).is_editable(context["request"]):
+        if not page.get_content_obj(language).is_editable(context["request"]):
             # Convention: If this tag returns None the page content cannot be edited
             return ""
         return self.get_admin_url_for_language(context, page, language)
@@ -74,30 +74,30 @@ def get_page_display_name(cms_page):
     from cms.models import EmptyPageContent
     language = get_language()
 
-    if not cms_page.title_cache:
+    if not cms_page.page_content_cache:
         cms_page.set_translations_cache()
 
-    if not cms_page.title_cache.get(language):
+    if not cms_page.page_content_cache.get(language):
         fallback_langs = i18n.get_fallback_languages(language)
         found = False
         for lang in fallback_langs:
-            if cms_page.title_cache.get(lang):
+            if cms_page.page_content_cache.get(lang):
                 found = True
                 language = lang
         if not found:
             language = None
-            for lang, item in cms_page.title_cache.items():
+            for lang, item in cms_page.page_content_cache.items():
                 if not isinstance(item, EmptyPageContent):
                     language = lang
     if not language:
         return _("Empty")
-    title = cms_page.title_cache[language]
-    if title.title:
-        return title.title
-    if title.page_title:
-        return title.page_title
-    if title.menu_title:
-        return title.menu_title
+    page_content = cms_page.page_content_cache[language]
+    if page_content.title:
+        return page_content.title
+    if page_content.page_title:
+        return page_content.page_title
+    if page_content.menu_title:
+        return page_content.menu_title
     return cms_page.get_slug(language)
 
 
@@ -130,7 +130,7 @@ class TreePublishRow(Tag):
             )
             return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
 
-        page_content = page.title_cache.get(language)
+        page_content = page.page_content_cache.get(language)
         cls, text = self.get_indicator(page_content)
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
@@ -154,7 +154,7 @@ class TreePublishRowMenu(AsTag):
     )
 
     def get_value(self, context, page, language):
-        page_content = page.title_cache.get(language)
+        page_content = page.page_content_cache.get(language)
         if context.get("has_change_permission", False):
             page_content_admin_class = admin.site._registry[PageContent]
             template, publish_menu_items = page_content_admin_class.get_indicator_menu(

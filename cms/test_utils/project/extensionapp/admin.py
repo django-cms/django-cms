@@ -1,8 +1,8 @@
 from django.contrib import admin
 
-from cms.extensions import PageExtensionAdmin, TitleExtensionAdmin
+from cms.extensions import PageContentExtensionAdmin, PageExtensionAdmin
 from cms.test_utils.project.extensionapp.models import (
-    MyPageExtension, MyTitleExtension,
+    MyPageContentExtension, MyPageExtension,
 )
 
 
@@ -13,8 +13,8 @@ class MyPageExtensionAdmin(PageExtensionAdmin):
 admin.site.register(MyPageExtension, MyPageExtensionAdmin)
 
 
-class MyTitleExtensionAdmin(TitleExtensionAdmin):
+class MyPageContentExtensionAdmin(PageContentExtensionAdmin):
     pass
 
 
-admin.site.register(MyTitleExtension, MyTitleExtensionAdmin)
+admin.site.register(MyPageContentExtension, MyPageContentExtensionAdmin)

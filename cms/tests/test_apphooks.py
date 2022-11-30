@@ -77,7 +77,7 @@ class ApphooksTestCase(CMSTestCase):
             if module in sys.modules:
                 del sys.modules[module]
 
-    def create_base_structure(self, apphook, title_langs, namespace=None):
+    def create_base_structure(self, apphook, content_langs, namespace=None):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         self.superuser = superuser
@@ -94,14 +94,14 @@ class ApphooksTestCase(CMSTestCase):
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, str):
-            titles = child_child_page.get_title_obj(title_langs)
+        if isinstance(content_langs, str):
+            contents = child_child_page.get_content_obj(content_langs)
         else:
-            titles = [child_child_page.get_title_obj(lang) for lang in title_langs]
+            contents = [child_child_page.get_content_obj(lang) for lang in content_langs]
 
         self.reload_urls()
 
-        return titles
+        return contents
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.fourth_urls_for_apphook_tests')
     def test_check_url_config(self):
@@ -628,7 +628,9 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
 
         # Testing a decorated view
@@ -644,11 +646,15 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertEqual(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].app_path,
             'cms.test_utils.project.sampleapp'
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
@@ -666,11 +672,15 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertEqual(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].app_path,
             'cms.test_utils.project.sampleapp'
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
@@ -684,7 +694,9 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
         self.assertTrue(
             toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].is_current_app
@@ -703,11 +715,15 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertEqual(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar']
+            .app_path,
             'cms.test_utils.project.placeholderapp'
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
         self.assertEqual(
             toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageExtensionToolbar'].app_path,

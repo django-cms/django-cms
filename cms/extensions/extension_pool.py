@@ -1,12 +1,12 @@
 from cms.exceptions import SubClassNeededError
 
-from .models import PageExtension, TitleExtension
+from .models import PageContentExtension, PageExtension
 
 
-class ExtensionPool():
+class ExtensionPool:
     def __init__(self):
         self.page_extensions = set()
-        self.title_extensions = set()
+        self.page_content_extensions = set()
 
     def register(self, extension):
         """
@@ -29,11 +29,11 @@ class ExtensionPool():
 
         if issubclass(extension, PageExtension):
             self.page_extensions.add(extension)
-        elif issubclass(extension, TitleExtension):
-            self.title_extensions.add(extension)
+        elif issubclass(extension, PageContentExtension):
+            self.page_content_extensions.add(extension)
         else:
             raise SubClassNeededError(
-                'Extension has to subclass either %r or %r. %r does not!' % (PageExtension, TitleExtension, extension)
+                f'Extension has to subclass either {PageExtension} or {PageContentExtension}. {extension} does not!'
             )
         return extension
 
@@ -46,8 +46,8 @@ class ExtensionPool():
         try:
             if issubclass(extension, PageExtension):
                 self.page_extensions.remove(extension)
-            elif issubclass(extension, TitleExtension):
-                self.title_extensions.remove(extension)
+            elif issubclass(extension, PageContentExtension):
+                self.page_content_extensions.remove(extension)
         except KeyError:
             pass
 
@@ -59,14 +59,14 @@ class ExtensionPool():
                 else:
                     instance.copy_to_public(target_page, language)
 
-    def _copy_title_extensions(self, source_page, target_page, language, clone=False):
-        source_title = source_page.pagecontent_set.get(language=language)
+    def _copy_content_extensions(self, source_page, target_page, language, clone=False):
+        source_content = source_page.pagecontent_set.get(language=language)
         if target_page:
             target_title = target_page.pagecontent_set.get(language=language)
         else:
-            target_title = source_title.publisher_public
-        for extension in self.title_extensions:
-            for instance in extension.objects.filter(extended_object=source_title):
+            target_title = source_content.publisher_public
+        for extension in self.page_content_extensions:
+            for instance in extension.objects.filter(extended_object=source_content):
                 if clone:
                     instance.copy(target_title, language)
                 else:
@@ -78,8 +78,8 @@ class ExtensionPool():
         if self.page_extensions:
             self._copy_page_extensions(source_page, target_page, None, clone=True)
         for language in languages:
-            if self.title_extensions:
-                self._copy_title_extensions(source_page, target_page, language, clone=True)
+            if self.page_content_extensions:
+                self._copy_content_extensions(source_page, target_page, language, clone=True)
 
     def get_page_extensions(self, page=None):
         extensions = []
@@ -90,11 +90,11 @@ class ExtensionPool():
                 extensions.extend(list(extension.objects.all()))
         return extensions
 
-    def get_title_extensions(self, title=None):
+    def get_page_content_extensions(self, page_content=None):
         extensions = []
-        for extension in self.title_extensions:
-            if title:
-                extensions.extend(list(extension.objects.filter(extended_object=title)))
+        for extension in self.page_content_extensions:
+            if page_content:
+                extensions.extend(list(extension.objects.filter(extended_object=page_content)))
             else:
                 extensions.extend(list(extension.objects.all()))
         return extensions

@@ -53,10 +53,10 @@ class MultilingualTestCase(CMSTestCase):
         )
 
         page = create_page(**page_data)
-        title = page.get_title_obj()
+        content = page.get_content_obj()
 
         # A title is set?
-        self.assertTrue(bool(title))
+        self.assertTrue(bool(content))
 
         # Has correct title and slug after calling save()?
         self.assertEqual(page.get_title(), page_data['title'])
@@ -82,7 +82,7 @@ class MultilingualTestCase(CMSTestCase):
 
             # Ensure that the language version is not returned
             # since it does not exist
-            self.assertTrue(isinstance(page.get_title_obj(language=TESTLANG2, fallback=False), EmptyPageContent))
+            self.assertTrue(isinstance(page.get_content_obj(language=TESTLANG2, fallback=False), EmptyPageContent))
 
             # Now create it
             self.client.post(self.get_page_add_uri(TESTLANG2, page), page_data2)

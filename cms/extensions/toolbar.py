@@ -70,7 +70,7 @@ class ExtensionToolbar(CMSToolbar):
         page = self._get_page()
         urls = []
         if language:
-            titles = page.get_title_obj(language),
+            titles = page.get_content_obj(language),
         else:
             titles = page.pagecontent_set.filter(language__in=get_language_list(page.node.site_id))
         # Titles

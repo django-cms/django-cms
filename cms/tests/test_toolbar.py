@@ -519,7 +519,7 @@ class ToolbarTests(ToolbarTestBase):
 
         page = create_page("english-page", "nav_playground.html", "en")
         german_content = create_page_content("de", "german content", page)
-        english_content = page.get_title_obj('en')
+        english_content = page.get_content_obj('en')
         edit_url = get_object_edit_url(english_content)
         staff = self.get_staff()
         self.client.force_login(staff)
@@ -1923,7 +1923,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         language = "en"
         user = self.get_superuser()
         page = create_page('Test', 'col_two.html', language)
-        title = page.get_title_obj(language)
+        title = page.get_content_obj(language)
         title.menu_title = 'Menu Test'
         title.page_title = 'Page Test'
         title.title = 'Main Test'
@@ -1979,7 +1979,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         url returned
         """
         page = create_page("home", 'nav_playground.html', "en")
-        page_content = page.get_title_obj()
+        page_content = page.get_content_obj()
         live_url = page.get_absolute_url()
 
         edit_url = get_object_edit_url(page_content)
@@ -2001,7 +2001,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         to the existing with &.
         """
         page = create_page("home", 'nav_playground.html', "en")
-        page_content = page.get_title_obj()
+        page_content = page.get_content_obj()
         app_label = page_content._meta.app_label
         model_name = page_content._meta.model_name
         live_url = page.get_absolute_url()
@@ -2033,7 +2033,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         don't add the querystring params
         """
         page = create_page("home", 'nav_playground.html', "en")
-        page_content = page.get_title_obj()
+        page_content = page.get_content_obj()
         content_type = ContentType.objects.get_for_model(page_content)
         language = get_language()
         with override(language):

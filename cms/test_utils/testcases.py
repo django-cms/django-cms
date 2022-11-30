@@ -534,19 +534,19 @@ class BaseCMSTestCase:
         return endpoint + '?' + urlencode(data)
 
     def get_page_change_uri(self, language, page):
-        content = page.get_title_obj(language, fallback=False)
+        content = page.get_content_obj(language, fallback=False)
         endpoint = admin_reverse('cms_pagecontent_change', args=(content.pk,))
         data = {'language': language}
         return endpoint + '?' + urlencode(data)
 
     def get_page_delete_translation_uri(self, language, page):
-        content = page.get_title_obj(language, fallback=False)
+        content = page.get_content_obj(language, fallback=False)
         endpoint = admin_reverse('cms_pagecontent_delete', args=(content.pk,))
         data = {'language': language}
         return endpoint + '?' + urlencode(data)
 
     def get_page_change_template_uri(self, language, page):
-        content = page.get_title_obj(language, fallback=False)
+        content = page.get_content_obj(language, fallback=False)
         endpoint = admin_reverse('cms_pagecontent_change_template', args=(content.pk,))
         data = {'language': language}
         return endpoint + '?' + urlencode(data)

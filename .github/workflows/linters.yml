@@ -40,4 +40,4 @@ jobs:
         uses: liskin/gh-problem-matcher-wrap@v1
         with:
           linters: isort
-          run: isort --check --diff cms
+          run: isort --check --diff cms menus
