@@ -67,7 +67,7 @@ class RenderingEmptyTestCase(CMSTestCase):
         """
         A page with EmptyPageContent returns 404 when you try to view it.
         """
-        page_content = self.page.get_title_obj('en', force_reload=True)
+        page_content = self.page.get_content_obj('en', force_reload=True)
         self.assertEqual(isinstance(page_content, EmptyPageContent), True)
 
         with self.assertRaises(Http404):

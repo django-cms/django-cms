@@ -39,7 +39,7 @@ def validate_url_uniqueness(site, path, language, user_language=None, exclude_pa
     except IndexError:
         return True
 
-    conflict_translation = conflict_page.get_title_obj(language, fallback=False)
+    conflict_translation = conflict_page.get_content_obj(language, fallback=False)
 
     if conflict_translation:  # No empty page content
         change_url = admin_reverse('cms_pagecontent_change', args=[conflict_translation.pk])

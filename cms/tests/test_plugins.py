@@ -683,14 +683,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = api.create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj('en')
+        content = page.get_content_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         page.save()
         plugin = self._create_link_plugin_on_page(page, slot='body')
         plugin = self.__edit_link_plugin(plugin, "fnord")
 
-        actual_last_modification_time = CMSSitemap().lastmod(title)
+        actual_last_modification_time = CMSSitemap().lastmod(content)
         actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)
         self.assertEqual(plugin.changed_date.date(), actual_last_modification_time.date())
         self.assertEqual(page.changed_date.date(), one_day_ago.date() + datetime.timedelta(days=1))

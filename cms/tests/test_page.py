@@ -435,12 +435,12 @@ class PagesTestCase(TransactionCMSTestCase):
         now -= datetime.timedelta(microseconds=now.microsecond)
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj('en')
+        content = page.get_content_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         page.save()
         sitemap = CMSSitemap()
-        actual_last_modification_time = sitemap.lastmod(title)
+        actual_last_modification_time = sitemap.lastmod(content)
         self.assertEqual(actual_last_modification_time.date(), now.date())
 
     def test_templates(self):
@@ -452,39 +452,39 @@ class PagesTestCase(TransactionCMSTestCase):
         grand_child = create_page("grand child", "nav_playground.html", "en", parent=child)
         child2 = create_page("child2", "col_two.html", "en", parent=parent)
         grand_child2 = create_page("grand child2", "nav_playground.html", "en", parent=child2)
-        child_title = child.get_title_obj("en")
-        child2_title = child2.get_title_obj("en")
-        child_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        grand_child_title = grand_child.get_title_obj("en")
-        grand_child_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        child_title.save()
-        grand_child_title.save()
-        grand_child2_title = grand_child2.get_title_obj("en")
-        grand_child2_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        grand_child2_title.save()
+        child_content = child.get_content_obj("en")
+        child2_content = child2.get_content_obj("en")
+        child_content.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child_content = grand_child.get_content_obj("en")
+        grand_child_content.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        child_content.save()
+        grand_child_content.save()
+        grand_child2_content = grand_child2.get_content_obj("en")
+        grand_child2_content.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        grand_child2_content.save()
 
-        self.assertFalse(hasattr(grand_child_title, '_template_cache'))
+        self.assertFalse(hasattr(grand_child_content, '_template_cache'))
         with self.assertNumQueries(2):
-            self.assertEqual(child_title.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+            self.assertEqual(child_content.template, constants.TEMPLATE_INHERITANCE_MAGIC)
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
         # test template cache
         with self.assertNumQueries(0):
             grand_child.get_template()
 
-        self.assertFalse(hasattr(grand_child2_title, '_template_cache'))
+        self.assertFalse(hasattr(grand_child2_content, '_template_cache'))
         with self.assertNumQueries(1):
-            self.assertEqual(child2_title.template, 'col_two.html')
+            self.assertEqual(child2_content.template, 'col_two.html')
             self.assertEqual(child2.get_template_name(), grand_child2.get_template_name())
 
         # test template cache
         with self.assertNumQueries(0):
             grand_child2.get_template()
 
-        parent_title = parent.get_title_obj("en")
-        parent_title.template = constants.TEMPLATE_INHERITANCE_MAGIC
-        parent_title.save()
-        self.assertEqual(parent_title.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+        parent_content = parent.get_content_obj("en")
+        parent_content.template = constants.TEMPLATE_INHERITANCE_MAGIC
+        parent_content.save()
+        self.assertEqual(parent_content.template, constants.TEMPLATE_INHERITANCE_MAGIC)
         self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
         self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
 
@@ -592,9 +592,9 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNone(non_saved_title.pk)
         self.assertIn('id=None', repr(non_saved_title))
 
-        saved_title = saved_page.get_title_obj()
-        self.assertIsNotNone(saved_title.pk)
-        self.assertIn('id={}'.format(saved_title.pk), repr(saved_title))
+        saved_content = saved_page.get_content_obj()
+        self.assertIsNotNone(saved_content.pk)
+        self.assertIn('id={}'.format(saved_content.pk), repr(saved_content))
 
     def test_page_overwrite_urls(self):
 
@@ -697,7 +697,7 @@ class PagesTestCase(TransactionCMSTestCase):
                 CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), ),
         ):
             page = create_page('home', 'placeholder_tests/base.html', 'en', slug='home')
-            page.title_cache['en'] = page.pagecontent_set.get(language='en')
+            page.page_content_cache['en'] = page.pagecontent_set.get(language='en')
             placeholders = list(page.get_placeholders('en'))
             for i, placeholder in enumerate(placeholders):
                 for j in range(5):
@@ -908,12 +908,12 @@ class PageContentTests(CMSTestCase):
     def setUp(self):
         self.page = create_page("english-page", "nav_playground.html", "en")
         self.german_content = create_page_content("de", "german content", self.page)
-        self.english_content = self.page.get_title_obj('en')
+        self.english_content = self.page.get_content_obj('en')
 
-    def test_get_title_obj(self):
+    def test_get_content_obj(self):
         """
         Cache partially populated, if no hit it should try to populate it
         """
-        del self.page.title_cache['de']
-        german_content = self.page.get_title_obj('de')
+        del self.page.page_content_cache['de']
+        german_content = self.page.get_content_obj('de')
         self.assertEqual(german_content.pk, self.german_content.pk)

@@ -180,7 +180,7 @@ def details(request, slug):
     if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(quote(request.get_full_path()), settings.LOGIN_URL)
 
-    content = page.get_title_obj(language=request_language)
+    content = page.get_content_obj(language=request_language)
     # use the page object with populated cache
     content.page = page
     if hasattr(request, 'toolbar'):

@@ -22,7 +22,7 @@ def render_page(request, page, current_language, slug):
 
     cant_view_page = any([
         not context['has_view_permissions'],
-        isinstance(page.get_title_obj(current_language), EmptyPageContent)
+        isinstance(page.get_content_obj(current_language), EmptyPageContent)
     ])
     if cant_view_page:
         return _handle_no_page(request)
@@ -75,5 +75,5 @@ def _render_welcome_page(request):
 def render_pagecontent(request, pagecontent):
     language = pagecontent.language
     request.current_page = page = pagecontent.page
-    page.title_cache[language] = pagecontent
+    page.page_content_cache[language] = pagecontent
     return render_page(request, page, language, page.get_slug(language))

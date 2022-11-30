@@ -732,7 +732,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj("en")
+        title = page.get_content_obj("en")
         for placeholder in page.get_placeholders("en"):
             title.placeholders.remove(placeholder)
             placeholder.pk += 1000

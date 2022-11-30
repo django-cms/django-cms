@@ -106,7 +106,7 @@ class PageExtension(BaseExtension):
         return self.extended_object
 
 
-class TitleExtension(BaseExtension):
+class PageContentExtension(BaseExtension):
     extended_object = models.OneToOneField(PageContent, on_delete=models.CASCADE, editable=False)
 
     class Meta:

@@ -106,7 +106,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     # Only run this if we have a translation in the requested language for this
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
     # but otherwise, just request the title normally
-    if page.title_cache.get(language) and page.application_urls:
+    if page.page_content_cache.get(language) and page.application_urls:
         # it means it is an apphook
         app = apphook_pool.get_apphook(page.application_urls)
 
@@ -126,7 +126,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
         attr['navigation_extenders'] = exts
 
     for lang in [language] + fallbacks:
-        translation = page.title_cache[lang]
+        translation = page.page_content_cache[lang]
 
         if translation:
             page_url = page.urls_cache[lang]
@@ -235,10 +235,10 @@ class CMSMenu(Menu):
         )
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
         # Build the blank title instances only once
-        blank_title_cache = {language: EmptyPageContent(language=language) for language in languages}
+        blank_page_content_cache = {language: EmptyPageContent(language=language) for language in languages}
 
-        if lang not in blank_title_cache:
-            blank_title_cache[lang] = EmptyPageContent(language=lang)
+        if lang not in blank_page_content_cache:
+            blank_page_content_cache[lang] = EmptyPageContent(language=lang)
 
         # Maps a node id to its page id
         node_id_to_page = {}
@@ -246,13 +246,13 @@ class CMSMenu(Menu):
         def _page_to_node(page):
             # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
-            page.title_cache = blank_title_cache.copy()
+            page.page_content_cache = blank_page_content_cache.copy()
 
             for page_url in page.filtered_urls:
                 page.urls_cache[page_url.language] = page_url
 
             for trans in page.filtered_translations:
-                page.title_cache[trans.language] = trans
+                page.page_content_cache[trans.language] = trans
 
             menu_node = get_menu_node_for_page(
                 self.renderer,

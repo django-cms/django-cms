@@ -355,7 +355,7 @@ class PageToolbar(CMSToolbar):
     watch_models = [Page, PageType]
 
     def get_page_content(self):
-        page_content = self.page.get_title_obj(language=self.current_lang, fallback=False)
+        page_content = self.page.get_content_obj(language=self.current_lang, fallback=False)
         return page_content or None
 
     def has_page_change_permission(self):
@@ -456,7 +456,7 @@ class PageToolbar(CMSToolbar):
                 )
                 disabled = len(remove) == 1
                 for code, name in remove:
-                    pagecontent = self.page.get_title_obj(code)
+                    pagecontent = self.page.get_content_obj(code)
                     translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
                     url = add_url_parameters(translation_delete_url, language=code)
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
@@ -469,7 +469,7 @@ class PageToolbar(CMSToolbar):
                 question = _('Are you sure you want to copy all plugins from %s?')
 
                 for code, name in copy:
-                    pagecontent = self.page.get_title_obj(code)
+                    pagecontent = self.page.get_content_obj(code)
                     page_copy_url = admin_reverse('cms_pagecontent_copy_language', args=(pagecontent.pk,))
                     copy_plugins_menu.add_ajax_item(
                         title % name, action=page_copy_url,

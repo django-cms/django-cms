@@ -705,7 +705,7 @@ class PageAdmin(admin.ModelAdmin):
 
     def edit_title_fields(self, request, page_id, language):
         page = self.get_object(request, object_id=page_id)
-        translation = page.get_title_obj(language, fallback=False)
+        translation = page.get_content_obj(language, fallback=False)
 
         if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(force_str(_("You do not have permission to edit this page")))
@@ -807,7 +807,7 @@ class PageContentAdmin(admin.ModelAdmin):
         obj = super().get_object(request, object_id, from_field)
 
         if obj:
-            obj.page.title_cache[obj.language] = obj
+            obj.page.page_content_cache[obj.language] = obj
         return obj
 
     def get_admin_url(self, action, *args):
@@ -1203,7 +1203,7 @@ class PageContentAdmin(admin.ModelAdmin):
         if not target_language or target_language not in get_language_list(site_id=page.node.site_id):
             return HttpResponseBadRequest(force_str(_("Language must be set to a supported language!")))
 
-        target_page_content = page.get_title_obj(target_language, fallback=False)
+        target_page_content = page.get_content_obj(target_language, fallback=False)
 
         for placeholder in source_page_content.get_placeholders():
             # TODO: Handle missing placeholder
@@ -1400,12 +1400,12 @@ class PageContentAdmin(admin.ModelAdmin):
         page_content_type = ContentType.objects.get_for_model(PageContent)
 
         def render_page_row(page):
-            page.title_cache = {trans.language: trans for trans in page.filtered_translations}
+            page.page_content_cache = {trans.language: trans for trans in page.filtered_translations}
 
             for _language in languages:
                 # EmptyPageContent is used to prevent the cms from trying
                 # to find a translation in the database
-                page.title_cache.setdefault(_language, EmptyPageContent(language=_language))
+                page.page_content_cache.setdefault(_language, EmptyPageContent(language=_language))
 
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
@@ -1420,7 +1420,7 @@ class PageContentAdmin(admin.ModelAdmin):
                 'opts': self.opts,
                 'site': site,
                 'page': page,
-                'page_content': page.get_title_obj(language, fallback=True),
+                'page_content': page.get_content_obj(language, fallback=True),
                 'page_content_type': page_content_type,
                 'node': page.node,
                 'ancestors': [node.item for node in page.node.get_cached_ancestors()],

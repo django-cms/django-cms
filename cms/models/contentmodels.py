@@ -251,9 +251,9 @@ class PageContent(models.Model):
         return self.page.get_absolute_url(language=language)
 
 
-class EmptyPageContent():
+class EmptyPageContent:
     """
-    Empty title object, can be returned from :meth:`cms.models.pagemodel.Page.get_title_obj` if required
+    Empty title object, can be returned from :meth:`cms.models.pagemodel.Page.get_content_obj` if required
     title object doesn't exist.
     """
     title = ""

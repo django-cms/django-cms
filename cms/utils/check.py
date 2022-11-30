@@ -316,7 +316,7 @@ def check_copy_relations(output):
                         c_to_s(rel.model),
                     ))
 
-        for extension in chain(extension_pool.page_extensions, extension_pool.title_extensions):
+        for extension in chain(extension_pool.page_extensions, extension_pool.page_content_extensions):
             if get_class('copy_relations', extension) is not BaseExtension:
                 # OK, looks like there is a 'copy_relations' defined in the
                 # extension... move along...
