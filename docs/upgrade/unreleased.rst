@@ -1,20 +1,18 @@
 .. _upgrade-to-enter-version-here:
 
-*******************
-4.X.X release notes
-*******************
+*****************
+4.1 release notes
+*****************
 
-*October 31, 2022*
+*December 20, 2022*
 
-Welcome to django CMS 4.X.X!
+Welcome to django CMS 4.1!
 
 These release notes cover the new features, as well as some backwards
 incompatible changes you’ll want to be aware of when upgrading from
-django CMS 4.0 or earlier. We’ve begun the deprecation process for some
-features.
+django CMS 4.0. If you are upgrading from django CMS 3.11 or learlier
+please urgently read the release notes of django CMS 4.0.
 
-See the How to upgrade to 4.X.X to a newer version guide if you’re
-updating an existing project.
 
 Django and Python compatibility
 ===============================
@@ -22,15 +20,19 @@ Django and Python compatibility
 django CMS supports **Django 3.2, 4.0, and 4.1**. We highly recommend and only
 support the latest release of each series.
 
-It supports **Python 3.7, 3.8, 3.9, and 3.10**. As for Django we highly recommend and only
+It supports **Python 3.8, 3.9, 3.10, and 3.11**. As for Django we highly recommend and only
 support the latest release of each series.
 
-*******************
-What's new in 4.X.X
-*******************
+*****************
+What's new in 4.1
+*****************
 
-Feature 1
-=========
+Status indicators in page tree
+==============================
+
+* Status indicators are shown in the page tree. For django CMS core only two states are available: public and empty.
+* Django CMS core provides hooks to allow other packages to patch the status indicators, e.g., djangocms-versioning. 
+* Djangocms-versioning will add more functionality to the indicators (e.g., publish from page tree). These changes will not affect django CMS version 4.0.x.
 
 Feature 2
 =========
@@ -53,9 +55,9 @@ Bug Fixes
 * The "Empty all" menus for placeholders now works.
 
 
-**************************************
-Backward incompatible changes in 4.X.X
-**************************************
+************************************
+Backward incompatible changes in 4.1
+************************************
 
 TitleExtension
 ==============
@@ -74,7 +76,10 @@ Miscellaneous
   if ``page_url`` could not reverse the url name. Since this version the
   outdated setting is ignored. If managers want to receive mails add
   ``django.middleware.common.BrokenLinkEmailsMiddleware`` to the project's
-  ``settings.MIDDLEWARE``. 
+  ``settings.MIDDLEWARE``.
+* ``cms.api.create_title`` has been renamed to :class:`~cms.api.create_page_content`. 
+  A compatibility shim remains and issues a deprecation warning.
+* ``cms.models.pluginmodel.CMSPlugin.copy_plugin`` was removed.
 
 Features deprecated in 4.X.X
 ============================
