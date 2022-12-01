@@ -40,14 +40,40 @@ class GetAdminUrlForLanguage(AsTag):
         return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
 
     def get_value(self, context, page, language):
-        if not page.get_content_obj(language).is_editable(context["request"]):
-            # Convention: If this tag returns None the page content cannot be edited
-            return ""
+        # if not page.get_content_obj(language).is_editable(context["request"]):
+        #     # Convention: If this tag returns None the page content cannot be edited
+        #     return ""
         return self.get_admin_url_for_language(context, page, language)
 
 
 register.tag(GetAdminUrlForLanguage.name, GetAdminUrlForLanguage)
 
+
+class GetPreviewUrl(AsTag):
+    """Classy tag that returns the url for editing PageContent in the admin."""
+    name = "get_preview_url"
+    page_content_type = None
+
+    options = Options(
+        Argument('page_content'),
+        'as',
+        Argument('varname', required=False, resolve=False)
+    )
+
+    def get_value(self, context, page_content):
+        if not page_content:
+            return ""
+        if GetPreviewUrl.page_content_type is None:
+            # Use class as cache
+            from django.contrib.contenttypes.models import ContentType
+
+            GetPreviewUrl.page_content_type = ContentType.objects.get_for_model(PageContent).pk
+
+        return admin_reverse('cms_placeholder_render_object_preview',
+                             args=[GetPreviewUrl.page_content_type, page_content.pk])
+
+
+register.tag(GetPreviewUrl.name, GetPreviewUrl)
 
 @register.simple_tag(takes_context=True)
 def show_admin_menu_for_pages(context, descendants, depth=1):
@@ -217,7 +243,7 @@ class PageSubmitRow(InclusionTag):
             'show_save_and_add_another': False,
             'show_save_and_continue': not is_popup and context['has_change_permission'],
             'is_popup': is_popup,
-            'show_save': True,
+            'show_save': context.get("can_change", True),
             'language': language,
             'language_is_filled': language in filled_languages,
             'object_id': context.get('object_id', None),

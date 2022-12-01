@@ -959,15 +959,12 @@ class PageContentAdmin(admin.ModelAdmin):
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         """
-        The 'change' admin view for the Page model.
+        The 'change' admin view for the PageContent model.
         """
         if extra_context is None:
             extra_context = {'basic_info': True}
 
         obj = self.get_object(request, object_id=object_id)
-
-        if not self.has_change_permission(request, obj):
-            raise PermissionDenied
 
         if obj is None:
             raise self._get_404_exception(object_id)
@@ -1058,9 +1055,6 @@ class PageContentAdmin(admin.ModelAdmin):
             return False
         site = get_site(request)
         return page_permissions.user_can_delete_page(request.user, page=obj.page, site=site)
-
-    def has_view_permission(self, request, obj=None):
-        return self.has_change_permission(request, obj)
 
     def has_change_advanced_settings_permission(self, request, obj=None):
         if not obj:
@@ -1421,7 +1415,6 @@ class PageContentAdmin(admin.ModelAdmin):
                 'site': site,
                 'page': page,
                 'page_content': page.get_content_obj(language, fallback=False),  # Show specific language
-                'page_content_type': page_content_type,
                 'node': page.node,
                 'ancestors': [node.item for node in page.node.get_cached_ancestors()],
                 'descendants': [node.item for node in page.node.get_cached_descendants()],

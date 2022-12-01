@@ -79,7 +79,7 @@
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
                     {% if page_content %}
-                        <a class="js-cms-pagetree-page-view" href="{% url 'admin:cms_placeholder_render_object_preview' page_content_type.pk page_content.pk %}"{% if lang in page_languages %} target="_top"{% endif %}">
+                        <a class="js-cms-pagetree-page-view" href="{% get_preview_url page_content %}"{% if lang in page_languages %} target="_top"{% endif %}">
                             <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
                         </a>
                     {% endif %}
@@ -113,17 +113,17 @@
                     {% if page_content and is_concrete and has_change_permission %}
                         <a href="{% url opts|admin_urlname:'change_innavigation' page_content.pk %}">
                     {% endif %}
-                        {% if is_concrete and page_content.in_navigation %}
-                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% autoescape on %}{% trans "in menu" %}{% endautoescape %}">
-                                <span class="cms-icon cms-icon-check-square"></span>
-                            </div>
-                        {% else %}
-                            <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
-                                data-cms-tooltip="{% autoescape on %}{% trans "not in menu" %}{% endautoescape %}">
-                                <span class="cms-icon cms-icon-minus-square"></span>
-                            </div>
-                        {% endif %}
+                    {% if is_concrete and page_content.in_navigation %}
+                        <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                            data-cms-tooltip="{% autoescape on %}{% trans "in menu" %}{% endautoescape %}">
+                            <span class="cms-icon cms-icon-check-square"></span>
+                        </div>
+                    {% else %}
+                        <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
+                            data-cms-tooltip="{% autoescape on %}{% trans "not in menu" %}{% endautoescape %}">
+                            <span class="cms-icon cms-icon-minus-square"></span>
+                        </div>
+                    {% endif %}
                     {% if has_change_permission %}
                         </a>
                     {% endif %}
@@ -138,7 +138,7 @@
                     {% get_admin_url_for_language page preview_language as content_admin_url %}
                     <div{% if has_change_permission and has_change_advanced_settings_permission and content_admin_url %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                         data-cms-tooltip="{% trans "Page settings (SHIFT click for advanced settings)" %}"{% endif %}>
-                        {% if has_change_permission and content_admin_url  %}
+                        {% if content_admin_url  %}
                         <a href="{{ content_admin_url }}"
                             class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-pencil"
                             {% if has_change_advanced_settings_permission %}

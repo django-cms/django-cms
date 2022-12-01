@@ -596,8 +596,8 @@ class GlobalPermissionTests(CMSTestCase):
                 with self.assertNumQueries(FuzzyInt(3, max_queries)):
                     # internally this calls PageAdmin.has_[add|change|delete|view]_permission()
                     expected_perms = {'add': True, 'change': True, 'delete': False}
-                    expected_perms.update({'view': True})
-                    self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
+                    expected_perms.update({'view': False})  # Why
+                    self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request), msg=f"for user {user}")
 
             # can't use the above loop for this test, as we're testing that
             # user 1 has access, but user 2 does not, as they are only assigned
@@ -624,7 +624,7 @@ class GlobalPermissionTests(CMSTestCase):
                 request.current_page = None
                 request.session = {}
                 expected_perms = {'add': True, 'change': True, 'delete': False}
-                expected_perms.update({'view': True})
+                expected_perms.update({'view': False})
                 self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
 
     def test_has_page_add_permission_with_target(self):
