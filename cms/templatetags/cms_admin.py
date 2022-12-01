@@ -75,6 +75,7 @@ class GetPreviewUrl(AsTag):
 
 register.tag(GetPreviewUrl.name, GetPreviewUrl)
 
+
 @register.simple_tag(takes_context=True)
 def show_admin_menu_for_pages(context, descendants, depth=1):
     admin = context['admin']

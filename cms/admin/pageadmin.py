@@ -1391,7 +1391,6 @@ class PageContentAdmin(admin.ModelAdmin):
         user_can_add = page_permissions.user_can_add_subpage
         user_can_change = page_permissions.user_can_change_page
         user_can_change_advanced = page_permissions.user_can_change_page_advanced_settings
-        page_content_type = ContentType.objects.get_for_model(PageContent)
 
         def render_page_row(page):
             page.page_content_cache = {trans.language: trans for trans in page.filtered_translations}
