@@ -137,11 +137,9 @@ class PageContent(models.Model):
         return display
 
     def update(self, **data):
-        cls = self.__class__
-        cls.objects.filter(pk=self.pk).update(**data)
-
         for field, value in data.items():
             setattr(self, field, value)
+        self.save(update_fields=data.keys())
         return
 
     def save(self, **kwargs):
