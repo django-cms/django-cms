@@ -903,7 +903,10 @@ var PageTree = new Class({
                     }
                 })
                 .fail(function(error) {
-                    that.showError(error.statusText);
+                    try {
+                        window.top.CMS.API.Toolbar.hideLoader();
+                    } catch (err) {}
+                    that.showError(error.responseText ? error.responseText : error.statusText);
                 });
         });
     },
