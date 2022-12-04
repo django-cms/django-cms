@@ -526,7 +526,6 @@
 
     a {
         @extend %icon;
-        @include icon(eye);
         font-size: $pagetree-icon-size;
         line-height: $pagetree-icon-size;
         height: $pagetree-icon-size;
