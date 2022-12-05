@@ -20,11 +20,13 @@ from cms.utils.i18n import get_language_object
 
 class Placeholder(models.Model):
     """
-    Attributes:
-        is_static       Set to "True" for static placeholders by the template tag
-        is_editable     If False the content of the placeholder is not editable in the frontend
+
+    ``Placeholders`` can be filled with plugins, which store or generate content.
+
     """
+    #: slot name that appears in the frontend
     slot = models.CharField(_("slot"), max_length=255, db_index=True, editable=False)
+    #: A default width is passed to the templace context as ``width``
     default_width = models.PositiveSmallIntegerField(_("width"), null=True, editable=False)
     content_type = models.ForeignKey(
         ContentType,
@@ -34,9 +36,9 @@ class Placeholder(models.Model):
     )
     object_id = models.PositiveIntegerField(blank=True, null=True)
     source = GenericForeignKey('content_type', 'object_id')
-    cache_placeholder = True
-    is_static = False
-    is_editable = True
+    cache_placeholder = True  #: Flag caching the palceholder's content
+    is_static = False  #: Set to "True" for static placeholders (by the template tag)
+    is_editable = True  #: If False the content of the placeholder is not editable in the frontend
 
     objects = PlaceholderManager()
 
@@ -44,7 +46,7 @@ class Placeholder(models.Model):
         app_label = 'cms'
         default_permissions = []
         permissions = (
-            (u"use_structure", u"Can use Structure mode"),
+            ("use_structure", "Can use Structure mode"),
         )
 
     def __str__(self):
@@ -61,6 +63,7 @@ class Placeholder(models.Model):
         return display
 
     def clear(self, language=None):
+        """Deletes all plugins from the placeholder"""
         self.get_plugins(language).delete()
 
     def get_label(self):
@@ -81,8 +84,7 @@ class Placeholder(models.Model):
 
     def has_change_permission(self, user):
         """
-        Returns True if user has permission
-        to change all models attached to this placeholder.
+        Returns ``True`` if user has permission to change all models attached to this placeholder.
         """
         from cms.utils.permissions import get_model_permission_codename
 
@@ -109,6 +111,9 @@ class Placeholder(models.Model):
         return True
 
     def has_add_plugin_permission(self, user, plugin_type):
+        """
+        Returns ``True`` if user has permission to add ``plugin_type`` to this placeholder.
+        """
         if not permissions.has_plugin_permission(user, plugin_type, "add"):
             return False
 
@@ -117,6 +122,9 @@ class Placeholder(models.Model):
         return True
 
     def has_add_plugins_permission(self, user, plugins):
+        """
+        Returns ``True`` if user has permission to add **all** plugins in ``plugins`` to this placeholder.
+        """
         if not self.has_change_permission(user):
             return False
 
@@ -126,6 +134,9 @@ class Placeholder(models.Model):
         return True
 
     def has_change_plugin_permission(self, user, plugin):
+        """
+        Returns ``True`` if user has permission to change ``plugin`` to this placeholder.
+        """
         if not permissions.has_plugin_permission(user, plugin.plugin_type, "change"):
             return False
 
@@ -134,6 +145,9 @@ class Placeholder(models.Model):
         return True
 
     def has_delete_plugin_permission(self, user, plugin):
+        """
+        Returns ``True`` if user has permission to delete ``plugin`` to this placeholder.
+        """
         if not permissions.has_plugin_permission(user, plugin.plugin_type, "delete"):
             return False
 
@@ -142,6 +156,9 @@ class Placeholder(models.Model):
         return True
 
     def has_move_plugin_permission(self, user, plugin, target_placeholder):
+        """
+        Returns ``True`` if user has permission to move ``plugin`` to the ``target_placeholder``.
+        """
         if not permissions.has_plugin_permission(user, plugin.plugin_type, "change"):
             return False
 
@@ -153,11 +170,17 @@ class Placeholder(models.Model):
         return True
 
     def has_clear_permission(self, user, languages):
+        """
+        Returns ``True`` if user has permission to delete all plugins in this placeholder
+        """
         if not self.has_change_permission(user):
             return False
         return self.has_delete_plugins_permission(user, languages)
 
     def has_delete_plugins_permission(self, user, languages):
+        """
+        Returns ``True`` if user has permission to delete all plugins in this placeholder
+        """
         plugin_types = (
             self
             .cmsplugin_set
@@ -268,17 +291,24 @@ class Placeholder(models.Model):
     def page_setter(self, value):
         self._page = value
 
+    #: Gives the page object if the placeholder belongs to a :class:`cms.models.titlemodels.PageContent` object
+    #: (and not to some other model.) If the placeholder is not attached to a page it returns ``None``
     page = property(page_getter, page_setter)
 
     def get_plugins_list(self, language=None):
+        """Returns a list of plugins attached to this placeholder. If language is given only plugins
+        in the given language are returned."""
         return list(self.get_plugins(language))
 
     def get_plugins(self, language=None):
+        """Returns a queryset of plugins attached to this placeholder. If language is given only plugins
+        in the given language are returned."""
         if language:
             return self.cmsplugin_set.filter(language=language)
         return self.cmsplugin_set.all()
 
     def has_plugins(self, language=None):
+        """Checks if placeholder is empty (``False``) or populated (``True``)"""
         return self.get_plugins(language).exists()
 
     def get_filled_languages(self):
@@ -314,7 +344,7 @@ class Placeholder(models.Model):
         Returns the number of seconds (from «response_timestamp») that this
         placeholder can be cached. This is derived from the plugins it contains.
 
-        This method must return: EXPIRE_NOW <= int <= MAX_EXPIRATION_IN_SECONDS
+        This method must return: ``EXPIRE_NOW <= int <= MAX_EXPIRATION_IN_SECONDS``
 
         :type request: HTTPRequest
         :type response_timestamp: datetime
@@ -482,6 +512,27 @@ class Placeholder(models.Model):
         return new_plugins
 
     def add_plugin(self, instance):
+        """
+        .. versionadded:: 4.0
+
+        Adds a plugin to the placeholder. The plugin's position field must be set to the target
+        position. Positions are enumerated from the start of the palceholder's plugin tree (1) to
+        the last plugin (*n*, where *n* is the number of plugins in the placeholder).
+
+        :param instance: Plugin to add. It's position parameter needs to be set.
+        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
+
+        .. note::
+            As of version 4 of django CMS the position counter does not re-start at 1 for the first
+            child plugin. The ``position`` field  and ``language`` field are unique for a placeholder.
+
+        Example::
+
+            new_child = MyCoolPlugin()
+            new_child.position = parent_plugin.position + 1  # add as first child: directly after parent
+            parent_plugin.placeholder.add(new_child)
+
+        """
         last_position = self.get_last_plugin_position(instance.language) or 0
         # A shift is only needed if the distance between the new plugin
         # and the last plugin is greater than 1 position.
@@ -504,6 +555,24 @@ class Placeholder(models.Model):
         return instance
 
     def move_plugin(self, plugin, target_position, target_placeholder=None, target_plugin=None):
+        """
+        .. versionadded:: 4.0
+
+        Moves a plugin within the placeholder (``target_placeholder=None``) or to another placeholder.
+
+        :param plugin: Plugin to move
+        :type plugin: :class:`cms.models.pluginmodel.CMSPlugin` instance
+        :param int target_position: The plugin's new position
+        :param  target_placeholder: Placeholder to move plugin to (or ``None``)
+        :type target_placeholder: :class:`cms.models.placeholdermodel.Placeholder` instance
+        :param target_plugin: New parent plugin (or ``None``). The target plugin must be in the same placeholder
+           or in the ``target_placeholder`` if one is given.
+        :type target_plugin: :class:`cms.models.pluginmodel.CMSPlugin` instance
+
+        The ``target_position`` is enumerated from the start of the palceholder's plugin tree (1) to
+        the last plugin (*n*, where *n* is the number of plugins in the placeholder).
+        """
+
         if target_placeholder:
             return self._move_plugin_to_placeholder(
                 plugin=plugin,
@@ -613,6 +682,14 @@ class Placeholder(models.Model):
         target_placeholder._recalculate_plugin_positions(plugin.language)
 
     def delete_plugin(self, instance):
+        """
+        .. versionadded:: 4.0
+
+        Removes a plugin and its descendants from the placeholder and database.
+
+        :param instance: Plugin to add. It's position parameter needs to be set.
+        :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
+        """
         instance.get_descendants().delete()
         instance.delete()
         last_plugin = self.get_last_plugin(instance.language)
@@ -629,6 +706,16 @@ class Placeholder(models.Model):
         return self.get_plugins(language).last()
 
     def get_next_plugin_position(self, language, parent=None, insert_order='first'):
+        """
+        .. versionadded:: 4.0
+
+        Helper to calculate plugin positions correctly.
+
+        :param str language: language for which the position is to be calculated
+        :param parent: Parent plugin or ``None`` (if position is on top level)
+        :type parent: :class:`cms.models.pluginmodel.CMSPlugin` instance
+        :param str insert_order: Either ``"first"`` (default) or ``"last"``
+        """
         if insert_order == 'first':
             position = self.get_first_plugin_position(language, parent=parent)
         else:

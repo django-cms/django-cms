@@ -18,7 +18,7 @@ from mock import patch
 from sekizai.context import SekizaiContext
 
 import cms
-from cms.api import add_plugin, create_page, create_title
+from cms.api import add_plugin, create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import (
     EmptyPageContent, Page, PageContent, PageUrl, Placeholder,
@@ -59,16 +59,16 @@ class TemplatetagTests(CMSTestCase):
         }
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
-                page.title_cache = {'en': PageContent(page_title="test2", title="test2")}
+                page.page_content_cache = {'en': PageContent(page_title="test2", title="test2")}
                 self.assertEqual('test2', force_str(get_page_display_name(page)))
-                page.title_cache = {'en': PageContent(page_title="test2")}
+                page.page_content_cache = {'en': PageContent(page_title="test2")}
                 self.assertEqual('test2', force_str(get_page_display_name(page)))
-                page.title_cache = {'en': PageContent(menu_title="test2")}
+                page.page_content_cache = {'en': PageContent(menu_title="test2")}
                 self.assertEqual('test2', force_str(get_page_display_name(page)))
-                page.title_cache = {'en': PageContent()}
+                page.page_content_cache = {'en': PageContent()}
                 page.urls_cache = {'en': PageUrl(slug='test2')}
                 self.assertEqual('test2', force_str(get_page_display_name(page)))
-                page.title_cache = {'en': PageContent(), 'fr': EmptyPageContent('fr')}
+                page.page_content_cache = {'en': PageContent(), 'fr': EmptyPageContent('fr')}
                 self.assertEqual('test2', force_str(get_page_display_name(page)))
 
     def test_get_site_id_from_nothing(self):
@@ -265,10 +265,10 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         """
         page_1 = create_page('Page 1', 'nav_playground.html', 'en',
                              in_navigation=True, reverse_id='page1')
-        create_title("de", "Seite 1", page_1, slug="seite-1")
+        create_page_content("de", "Seite 1", page_1, slug="seite-1")
         page_2 = create_page('Page 2', 'nav_playground.html', 'en', page_1,
                              in_navigation=True, reverse_id='page2')
-        create_title("de", "Seite 2", page_2, slug="seite-2")
+        create_page_content("de", "Seite 2", page_2, slug="seite-2")
         page_3 = create_page('Page 3', 'nav_playground.html', 'en', page_2,
                              in_navigation=True, reverse_id='page3')
         tpl = "{% load menu_tags %}{% page_language_url 'de' %}"
@@ -304,8 +304,8 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
         """
         page = create_page('Test', 'col_two.html', 'en')
         # I need to make it seem like the user added another placeholder to the SAME template.
-        page.title_cache['en'] = page.get_title_obj('en')
-        page.title_cache['en']._template_cache = 'col_three.html'
+        page.page_content_cache['en'] = page.get_content_obj('en')
+        page.page_content_cache['en']._template_cache = 'col_three.html'
 
         request = self.get_request(page=page)
         context = SekizaiContext()
@@ -351,7 +351,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        create_title('fr', 'Fr Test', page)
+        create_page_content('fr', 'Fr Test', page)
         placeholder_en = page.get_placeholders('en')[0]
         placeholder_fr = page.get_placeholders('fr')[0]
         add_plugin(placeholder_en, TextPlugin, 'en', body='<b>En Test</b>')
@@ -501,7 +501,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_placeholder_with_no_page(self):
         page = create_page('Test', 'col_two.html', 'en')
-        page.title_cache['en'] = page.pagecontent_set.get(language='en')
+        page.page_content_cache['en'] = page.pagecontent_set.get(language='en')
         template = "{% load cms_tags %}{% placeholder test or %}< --- empty --->{% endplaceholder %}"
         request = RequestFactory().get('/asdadsaasd/')
         user = self.get_superuser()
@@ -516,7 +516,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_placeholder_as_var(self):
         page = create_page('Test', 'col_two.html', 'en')
-        page.title_cache['en'] = page.pagecontent_set.get(language='en')
+        page.page_content_cache['en'] = page.pagecontent_set.get(language='en')
         template = "{% load cms_tags %}{% placeholder test or %}< --- empty --->{% endplaceholder %}"
         request = RequestFactory().get('/asdadsaasd/')
         user = self.get_superuser()

@@ -106,7 +106,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     # Only run this if we have a translation in the requested language for this
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
     # but otherwise, just request the title normally
-    if page.title_cache.get(language) and page.application_urls:
+    if page.page_content_cache.get(language) and page.application_urls:
         # it means it is an apphook
         app = apphook_pool.get_apphook(page.application_urls)
 
@@ -126,7 +126,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
         attr['navigation_extenders'] = exts
 
     for lang in [language] + fallbacks:
-        translation = page.title_cache[lang]
+        translation = page.page_content_cache[lang]
 
         if translation:
             page_url = page.urls_cache[lang]
@@ -177,7 +177,9 @@ class CMSNavigationNode(NavigationNode):
 
 
 class CMSMenu(Menu):
-
+    """Subclass of :class:`menus.base.Menu`. Its :meth:`~menus.base.Menu.get_nodes()` creates a list of NavigationNodes
+    based on a site's :class:`cms.models.pagemodel.Page` objects.
+    """
     def get_nodes(self, request):
         site = self.renderer.site
         lang = self.renderer.request_language
@@ -233,10 +235,10 @@ class CMSMenu(Menu):
         )
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
         # Build the blank title instances only once
-        blank_title_cache = {language: EmptyPageContent(language=language) for language in languages}
+        blank_page_content_cache = {language: EmptyPageContent(language=language) for language in languages}
 
-        if lang not in blank_title_cache:
-            blank_title_cache[lang] = EmptyPageContent(language=lang)
+        if lang not in blank_page_content_cache:
+            blank_page_content_cache[lang] = EmptyPageContent(language=lang)
 
         # Maps a node id to its page id
         node_id_to_page = {}
@@ -244,13 +246,13 @@ class CMSMenu(Menu):
         def _page_to_node(page):
             # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
-            page.title_cache = blank_title_cache.copy()
+            page.page_content_cache = blank_page_content_cache.copy()
 
             for page_url in page.filtered_urls:
                 page.urls_cache[page_url.language] = page_url
 
             for trans in page.filtered_translations:
-                page.title_cache[trans.language] = trans
+                page.page_content_cache[trans.language] = trans
 
             menu_node = get_menu_node_for_page(
                 self.renderer,
@@ -345,70 +347,66 @@ menu_pool.register_modifier(NavExtender)
 
 class SoftRootCutter(Modifier):
     """
-    Ask evildmp/superdmp if you don't understand softroots!
+    A soft root is a page that acts as the root for a menu navigation tree.
 
-    Softroot description from the docs:
+    Typically, this will be a page that is the root of a significant new
+    section on your site.
 
-        A soft root is a page that acts as the root for a menu navigation tree.
+    When the soft root feature is enabled, the navigation menu for any page
+    will start at the nearest soft root, rather than at the real root of
+    the site’s page hierarchy.
 
-        Typically, this will be a page that is the root of a significant new
-        section on your site.
+    This feature is useful when your site has deep page hierarchies (and
+    therefore multiple levels in its navigation trees). In such a case, you
+    usually don’t want to present site visitors with deep menus of nested
+    items.
 
-        When the soft root feature is enabled, the navigation menu for any page
-        will start at the nearest soft root, rather than at the real root of
-        the site’s page hierarchy.
+    For example, you’re on the page -Introduction to Bleeding-?, so the menu
+    might look like this:
 
-        This feature is useful when your site has deep page hierarchies (and
-        therefore multiple levels in its navigation trees). In such a case, you
-        usually don’t want to present site visitors with deep menus of nested
-        items.
+        * School of Medicine
+            * Medical Education
+            * Departments
+                * Department of Lorem Ipsum
+                * Department of Donec Imperdiet
+                * Department of Cras Eros
+                * Department of Mediaeval Surgery
+                    * Theory
+                    * Cures
+                    * Bleeding
+                        * Introduction to Bleeding <this is the current page>
+                        * Bleeding - the scientific evidence
+                        * Cleaning up the mess
+                        * Cupping
+                        * Leaches
+                        * Maggots
+                    * Techniques
+                    * Instruments
+                * Department of Curabitur a Purus
+                * Department of Sed Accumsan
+                * Department of Etiam
+            * Research
+            * Administration
+            * Contact us
+            * Impressum
 
-        For example, you’re on the page -Introduction to Bleeding-?, so the menu
-        might look like this:
+    which is frankly overwhelming.
 
-            School of Medicine
-                Medical Education
-                Departments
-                    Department of Lorem Ipsum
-                    Department of Donec Imperdiet
-                    Department of Cras Eros
-                    Department of Mediaeval Surgery
-                        Theory
-                        Cures
-                        Bleeding
-                            Introduction to Bleeding <this is the current page>
-                            Bleeding - the scientific evidence
-                            Cleaning up the mess
-                            Cupping
-                            Leaches
-                            Maggots
-                        Techniques
-                        Instruments
-                    Department of Curabitur a Purus
-                    Department of Sed Accumsan
-                    Department of Etiam
-                Research
-                Administration
-                Contact us
-                Impressum
+    By making "Department of Mediaeval Surgery" a soft root, the menu
+    becomes much more manageable:
 
-        which is frankly overwhelming.
-
-        By making -Department of Mediaeval Surgery-? a soft root, the menu
-        becomes much more manageable:
-
-            Department of Mediaeval Surgery
-                Theory
-                Cures
-                    Bleeding
-                        Introduction to Bleeding <current page>
-                        Bleeding - the scientific evidence
-                        Cleaning up the mess
-                    Cupping
-                    Leaches
-                    Maggots
-                Techniques
-                Instruments
+        * Department of Mediaeval Surgery
+            * Theory
+            * Cures
+                * Bleeding
+                    * Introduction to Bleeding <current page>
+                    * Bleeding - the scientific evidence
+                    * Cleaning up the mess
+                * Cupping
+                * Leaches
+                * Maggots
+            * Techniques
+            * Instruments
     """
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):

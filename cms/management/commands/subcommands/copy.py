@@ -51,9 +51,9 @@ class CopyLangCommand(SubcommandsCommand):
             # copy title
             if from_lang in page.get_languages():
 
-                title = page.get_title_obj(to_lang, fallback=False)
+                title = page.get_content_obj(to_lang, fallback=False)
                 if isinstance(title, EmptyPageContent):
-                    title = page.get_title_obj(from_lang)
+                    title = page.get_content_obj(from_lang)
                     if verbose:
                         self.stdout.write('copying title %s from language %s\n' % (title.title, from_lang))
                     title.id = None

@@ -1,11 +1,12 @@
-import copy
 from logging import getLogger
 from os.path import join
 
 from django.contrib.sites.models import Site
 from django.db import models
+from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
+from django.forms import model_to_dict
 from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
@@ -138,7 +139,12 @@ class TreeNode(MP_Node):
 
 class Page(models.Model):
     """
-    A simple hierarchical page model
+    A ``Page`` is the basic unit of site structure in django CMS. The CMS uses a hierarchical page model: each page
+    stands in relation to other pages as parent, child or sibling. This hierarchy is managed by the `django-treebeard
+    <http://django-treebeard.readthedocs.io/en/latest/>`_ library.
+
+    A ``Page`` also has language-specific properties - for example, it will have a title and a slug for each language
+    it exists in. These properties are managed by the :class:`~cms.models.contentmodel.PageContent` model.
     """
 
     created_by = models.CharField(
@@ -190,18 +196,18 @@ class Page(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.urls_cache = {}
-        self.title_cache = {}
+        self.page_content_cache = {}
 
     def __str__(self):
         try:
             title = self.get_menu_title(fallback=True)
         except LanguageError:
             try:
-                title = self.pagecontent_set.all()[0]
+                title = self.pagecontent_set(manager="admin_manager").current()[0]
             except IndexError:
                 title = None
         if title is None:
-            title = u""
+            title = ""
         return force_str(title)
 
     def __repr__(self):
@@ -219,7 +225,7 @@ class Page(models.Model):
 
     def _clear_internal_cache(self):
         self.urls_cache = {}
-        self.title_cache = {}
+        self.page_content_cache = {}
         self._clear_node_cache()
 
         if hasattr(self, '_prefetched_objects_cache'):
@@ -235,7 +241,7 @@ class Page(models.Model):
     def set_as_homepage(self, user=None):
         """
         Sets the given page as the homepage.
-        Updates the title paths for all affected pages.
+        Updates the url paths for all affected pages.
         Returns the old home page (if any).
         """
         if user:
@@ -439,7 +445,8 @@ class Page(models.Model):
         return placeholders
 
     def copy(self, site, parent_node=None, language=None,
-             translations=True, permissions=False, extensions=True):
+             translations=True, permissions=False, extensions=True, user=None):
+        from cms.models import PageContent
         from cms.utils.page import get_available_slug
 
         if parent_node:
@@ -449,16 +456,16 @@ class Page(models.Model):
             new_node = TreeNode.add_root(site=site)
             parent_page = None
 
-        new_page = copy.copy(self)
+        new_page = model_to_dict(self)
+        new_page.pop("id", None)  # Remove PK
+        new_page["node"] = new_node
+        # new_page["publisher_public_id"] = None
+        new_page["is_home"] = False
+        new_page["reverse_id"] = None
+        new_page["languages"] = ""
+        new_page = self.__class__.objects.create(**new_page)
         new_page._state = ModelState()
         new_page._clear_internal_cache()
-        new_page.pk = None
-        new_page.node = new_node
-        new_page.publisher_public_id = None
-        new_page.is_home = False
-        new_page.reverse_id = None
-        new_page.languages = ''
-        new_page.save()
 
         # Have the node remember its page.
         # This is done to save some queries
@@ -467,19 +474,19 @@ class Page(models.Model):
 
         if language and translations:
             page_urls = self.urls.filter(language=language)
-            translations = self.pagecontent_set.filter(language=language)
+            translations = self.pagecontent_set(manager="admin_manager").filter(language=language)
         elif translations:
             page_urls = self.urls.all()
-            translations = self.pagecontent_set.all()
+            translations = self.pagecontent_set(manager="admin_manager")
         else:
             page_urls = self.urls.none()
-            translations = self.pagecontent_set.none()
+            translations = self.pagecontent_set(manager="admin_manager").none()
         translations = translations.prefetch_related('placeholders')
 
         for page_url in page_urls:
-            new_url = copy.copy(page_url)
-            new_url.pk = None
-            new_url.page = new_page
+            new_url = model_to_dict(page_url)
+            new_url.pop("id", None)  # No PK
+            new_url["page"] = new_page
 
             if parent_page:
                 base = parent_page.get_path(page_url.language)
@@ -488,18 +495,16 @@ class Page(models.Model):
                 base = ''
                 path = page_url.slug
 
-            new_url.slug = get_available_slug(site, path, page_url.language)
-            new_url.path = '%s/%s' % (base, new_url.slug) if base else new_url.slug
-            new_url.save()
+            new_url["slug"] = get_available_slug(site, path, page_url.language)
+            new_url["path"] = '%s/%s' % (base, new_url["slug"]) if base else new_url["slug"]
+            PageUrl.objects.with_user(user).create(**new_url)
 
         # copy titles of this page
-        for title in translations:
-            new_title = copy.copy(title)
-            new_title.pk = None
-            new_title.page = new_page
-            new_title.template = title.template
-            new_title.xframe_options = title.xframe_options
-            new_title.save()
+        for title in translations.current_content_iterator():
+            new_title = model_to_dict(title)
+            new_title.pop("id", None)  # No PK
+            new_title["page"] = new_page
+            new_title = PageContent.objects.with_user(user).create(**new_title)
 
             for placeholder in title.placeholders.all():
                 # copy the placeholders (and plugins on those placeholders!)
@@ -508,7 +513,7 @@ class Page(models.Model):
                     default_width=placeholder.default_width,
                 )
                 placeholder.copy_plugins(new_placeholder, language=new_title.language)
-            new_page.title_cache[new_title.language] = new_title
+            new_page.page_content_cache[new_title.language] = new_title
         new_page.update_languages([trans.language for trans in translations])
 
         if extensions:
@@ -530,7 +535,7 @@ class Page(models.Model):
         return new_page
 
     def copy_with_descendants(self, target_node=None, position=None,
-                              copy_permissions=True, target_site=None):
+                              copy_permissions=True, target_site=None, user=None):
         """
         Copy a page [ and all its descendants to a new location ]
         """
@@ -546,12 +551,16 @@ class Page(models.Model):
 
         # Evaluate the descendants queryset BEFORE copying the page.
         # Otherwise, if the page is copied and pasted on itself, it will duplicate.
+        from cms.models import PageContent
         descendants = list(
             self.get_descendant_pages()
             .select_related('node')
-            .prefetch_related('urls', 'pagecontent_set')
+            .prefetch_related(
+                'urls',
+                Prefetch('pagecontent_set', queryset=PageContent.admin_manager.all()),
+            )
         )
-        new_root_page = self.copy(target_site, parent_node=parent_node)
+        new_root_page = self.copy(target_site, parent_node=parent_node, user=user)
         new_root_node = new_root_page.node
 
         if target_node and position in ('first-child'):
@@ -721,7 +730,7 @@ class Page(models.Model):
 
     def set_translations_cache(self):
         for translation in self.pagecontent_set.all():
-            self.title_cache.setdefault(translation.language, translation)
+            self.page_content_cache.setdefault(translation.language, translation)
 
     def get_path_for_slug(self, slug, language):
         if self.is_home:
@@ -753,30 +762,27 @@ class Page(models.Model):
 
     # ## PageContent object access
 
-    def get_title_obj(self, language=None, fallback=True, force_reload=False):
+    def get_content_obj(self, language=None, fallback=True, force_reload=False):
         """Helper function for accessing wanted / current title.
         If wanted title doesn't exist, EmptyPageContent instance will be returned.
         """
-        language = self._get_title_cache(language, fallback, force_reload)
-        if language in self.title_cache:
-            return self.title_cache[language]
+        language = self._get_page_content_cache(language, fallback, force_reload)
+        if language in self.page_content_cache:
+            return self.page_content_cache[language]
         from cms.models import EmptyPageContent
 
         return EmptyPageContent(language)
 
     def get_page_content_obj_attribute(self, attrname, language=None, fallback=True, force_reload=False):
-        """Helper function for getting attribute or None from wanted/current title.
-        """
+        """Helper function for getting attribute or None from wanted/current page content."""
         try:
-            attribute = getattr(self.get_title_obj(language, fallback, force_reload), attrname)
+            attribute = getattr(self.get_content_obj(language, fallback, force_reload), attrname)
             return attribute
         except AttributeError:
             return None
 
     def get_path(self, language, fallback=True):
-        """
-        get the path of the page depending on the given language
-        """
+        """Get the path of the page depending on the given language"""
         languages = [language]
 
         if fallback:
@@ -889,35 +895,33 @@ class Page(models.Model):
         """
         return self.get_page_content_obj_attribute("redirect", language, fallback, force_reload)
 
-    def _get_title_cache(self, language, fallback, force_reload):
+    def _get_page_content_cache(self, language, fallback, force_reload):
         def get_fallback_language(page, language):
             fallback_langs = i18n.get_fallback_languages(language)
             for lang in fallback_langs:
-                if page.title_cache.get(lang):
+                if page.page_content_cache.get(lang):
                     return lang
 
         if not language:
             language = get_language()
 
-        # Update titlecache from _prefetched_objects_cache if available
+        # Update page_content_cache from _prefetched_objects_cache if available
         prefetch_cache = getattr(self, "_prefetched_objects_cache", {})
         cached_page_content = prefetch_cache.get("pagecontent_set", [])
         for page_content in cached_page_content:
-            self.title_cache[page_content.language] = page_content
+            self.page_content_cache[page_content.language] = page_content
 
         # Reload if explicitly needed or language not in title cache
-        if force_reload or language not in self.title_cache:
-            from cms.models import PageContent
-            titles = PageContent.objects.filter(page=self)
-            for title in titles:
-                self.title_cache[title.language] = title
+        if force_reload or language not in self.page_content_cache:
+            for page_content in self.pagecontent_set.all():
+                self.page_content_cache[page_content.language] = page_content
 
-        if self.title_cache.get(language):
+        if self.page_content_cache.get(language):
             return language
 
         use_fallback = all([
             fallback,
-            not self.title_cache.get(language),
+            not self.page_content_cache.get(language),
             get_fallback_language(self, language)
         ])
         if use_fallback:
@@ -934,9 +938,9 @@ class Page(models.Model):
         return self.get_page_content_obj_attribute("soft_root")
 
     def get_template(self, language=None, fallback=True, force_reload=False):
-        title = self.get_title_obj(language, fallback, force_reload)
-        if title:
-            return title.get_template()
+        content = self.get_content_obj(language, fallback, force_reload)
+        if content:
+            return content.get_template()
         return get_cms_setting('TEMPLATES')[0][0]
 
     def get_template_name(self):
@@ -1033,7 +1037,7 @@ class Page(models.Model):
         return self.__class__.objects.get(pk=self.pk)
 
     def rescan_placeholders(self, language):
-        return self.get_title_obj(language=language).rescan_placeholders()
+        return self.get_content_obj(language=language).rescan_placeholders()
 
     def get_declared_placeholders(self):
         # inline import to prevent circular imports
@@ -1042,7 +1046,7 @@ class Page(models.Model):
         return get_placeholders(self.get_template())
 
     def get_xframe_options(self, language=None, fallback=True, force_reload=False):
-        title = self.get_title_obj(language, fallback, force_reload)
+        title = self.get_content_obj(language, fallback, force_reload)
         if title:
             return title.get_xframe_options()
 

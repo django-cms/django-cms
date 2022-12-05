@@ -85,14 +85,19 @@ class PageNodeManager(MP_NodeManager):
         return self.filter(site=site)
 
 
-class PageUrlManager(models.Manager):
+class WithUserMixin:
+    """empty mixin adds with_user """
+    def with_user(self, user):
+        return self
 
+
+class PageUrlManager(WithUserMixin, models.Manager):
     def get_for_site(self, site, **kwargs):
         kwargs['page__node__site'] = site
         return self.filter(**kwargs)
 
 
-class PageContentManager(models.Manager):
+class PageContentManager(WithUserMixin, models.Manager):
     def get_title(self, page, language, language_fallback=False):
         """
         Gets the latest content for a particular page and language. Falls back
@@ -118,8 +123,17 @@ class PageContentManager(models.Manager):
         return None
 
 
-class PlaceholderManager(models.Manager):
+class PageContentAdminQuerySet(models.QuerySet):
+    def current_content_iterator(self, **kwargs):
+        return iter(self.filter(**kwargs))
 
+
+class PageContentAdminManager(models.Manager):
+    def get_queryset(self):
+        return PageContentAdminQuerySet(self.model, using=self._db)
+
+
+class PlaceholderManager(models.Manager):
     def get_for_obj(self, obj):
         """
         Get all placeholders for given object

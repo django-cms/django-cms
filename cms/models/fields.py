@@ -8,7 +8,9 @@ from cms.models.placeholdermodel import Placeholder
 
 
 class PlaceholderField(models.ForeignKey):
-
+    """
+    A foreign key field to the :class:`cms.models.placeholdermodel.Placeholder` model.
+    """
     def __init__(self, slotname, default_width=None, actions=None, **kwargs):
         from cms.utils.placeholder import (
             PlaceholderNoAction, validate_placeholder_name,
@@ -82,6 +84,14 @@ class PlaceholderField(models.ForeignKey):
 
 
 class PageField(models.ForeignKey):
+    """
+    This is a foreign key field to the :class:`cms.models.Page` model
+    that defaults to the :class:`cms.forms.fields.PageSelectFormField` form
+    field when rendered in forms. It has the same API as the
+    :class:`django:django.db.models.ForeignKey` but does not require
+    the ``othermodel`` argument.
+    """
+
     default_form_class = PageSelectFormField
 
     def __init__(self, **kwargs):

@@ -10,7 +10,7 @@ from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
 
 from cms import constants
-from cms.api import add_plugin, create_page, create_title
+from cms.api import add_plugin, create_page, create_page_content
 from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
@@ -732,7 +732,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en")
-        title = page.get_title_obj("en")
+        title = page.get_content_obj("en")
         for placeholder in page.get_placeholders("en"):
             title.placeholders.remove(placeholder)
             placeholder.pk += 1000
@@ -797,7 +797,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         page = create_page('test page', 'col_two.html', 'en')
         for lang in avail_langs:
             if lang != 'en':
-                create_title(lang, 'test page %s' % lang, page)
+                create_page_content(lang, 'test page %s' % lang, page)
         placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         ###
         # add the test plugin
@@ -880,7 +880,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         )
 
         # check for another language = de
-        page_content_de = create_title('de', 'test page de', page)
+        page_content_de = create_page_content('de', 'test page de', page)
         self.assertQuerysetEqual(
             Placeholder.objects.get_for_obj(page_content_de),
             page_content_de.get_placeholders(),

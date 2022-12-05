@@ -12,7 +12,7 @@ from django.utils.timezone import now
 from django.utils.translation import override as force_language
 
 from cms.admin.forms import AdvancedSettingsForm
-from cms.api import create_page, create_title
+from cms.api import create_page, create_page_content
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import (
@@ -77,31 +77,31 @@ class ApphooksTestCase(CMSTestCase):
             if module in sys.modules:
                 del sys.modules[module]
 
-    def create_base_structure(self, apphook, title_langs, namespace=None):
+    def create_base_structure(self, apphook, content_langs, namespace=None):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         self.superuser = superuser
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser)
-        create_title('de', page.get_title(), page)
+        create_page_content('de', page.get_title(), page)
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
-        create_title('de', child_page.get_title(), child_page)
+        create_page_content('de', child_page.get_title(), child_page)
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook=apphook,
                                        apphook_namespace=namespace)
-        create_title("de", child_child_page.get_title(), child_child_page)
-        # publisher_public is set to draft on publish, issue with one-to-one reverse
+        create_page_content("de", child_child_page.get_title(), child_child_page)
+        # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, str):
-            titles = child_child_page.get_title_obj(title_langs)
+        if isinstance(content_langs, str):
+            contents = child_child_page.get_content_obj(content_langs)
         else:
-            titles = [child_child_page.get_title_obj(lang) for lang in title_langs]
+            contents = [child_child_page.get_content_obj(lang) for lang in content_langs]
 
         self.reload_urls()
 
-        return titles
+        return contents
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.fourth_urls_for_apphook_tests')
     def test_check_url_config(self):
@@ -149,7 +149,7 @@ class ApphooksTestCase(CMSTestCase):
                     created_by=superuser, apphook="", slug='blankapp')
         english_title = page.pagecontent_set.all()[0]
         self.assertEqual(english_title.language, 'en')
-        create_title("de", "aphooked-page-de", page)
+        create_page_content("de", "aphooked-page-de", page)
         with force_language("en"):
             response = self.client.get(self.get_pages_root())
         self.assertTemplateUsed(response, 'sampleapp/home.html')
@@ -176,7 +176,7 @@ class ApphooksTestCase(CMSTestCase):
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = create_page("apphooked-page", "nav_playground.html", "en",
                            created_by=superuser, apphook="SampleApp")
-        create_title("de", "aphooked-page-de", page)
+        create_page_content("de", "aphooked-page-de", page)
 
         self.reload_urls()
 
@@ -320,7 +320,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page = create_page("home", "nav_playground.html", "en",
                            created_by=superuser, apphook=APP_NAME)
-        create_title('de', page.get_title(), page)
+        create_page_content('de', page.get_title(), page)
 
         with force_language("en"):
             path = reverse('sample-settings')
@@ -437,7 +437,7 @@ class ApphooksTestCase(CMSTestCase):
                             parent=de_title.page.get_parent_page(),
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
-        create_title("de", "de_title", page2, slug="slug")
+        create_page_content("de", "de_title", page2, slug="slug")
         clear_app_resolvers()
         clear_url_caches()
 
@@ -628,7 +628,9 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
 
         # Testing a decorated view
@@ -644,11 +646,15 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertEqual(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].app_path,
             'cms.test_utils.project.sampleapp'
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.second_urls_for_apphook_tests')
@@ -666,11 +672,15 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertEqual(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].app_path,
             'cms.test_utils.project.sampleapp'
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
@@ -684,7 +694,9 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
         self.assertTrue(
             toolbar.toolbars['cms.test_utils.project.placeholderapp.cms_toolbars.Example1Toolbar'].is_current_app
@@ -703,11 +715,15 @@ class ApphooksTestCase(CMSTestCase):
             toolbar.toolbars['cms.test_utils.project.sampleapp.cms_toolbars.CategoryToolbar'].is_current_app
         )
         self.assertEqual(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].app_path,
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar']
+            .app_path,
             'cms.test_utils.project.placeholderapp'
         )
         self.assertFalse(
-            toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyTitleExtensionToolbar'].is_current_app
+            toolbar.toolbars[
+                'cms.test_utils.project.extensionapp.cms_toolbars.MyPageContentExtensionToolbar'
+            ].is_current_app
         )
         self.assertEqual(
             toolbar.toolbars['cms.test_utils.project.extensionapp.cms_toolbars.MyPageExtensionToolbar'].app_path,
@@ -843,7 +859,7 @@ class ApphooksTestCase(CMSTestCase):
                             'en', created_by=self.superuser,
                             parent=titles[0].page.get_parent_page(),
                             apphook='VariableUrlsApp', reverse_id='page2')
-        create_title('de', 'de_title', page2, slug='slug')
+        create_page_content('de', 'de_title', page2, slug='slug')
 
         self.reload_urls()
 
@@ -885,7 +901,7 @@ class ApphooksTestCase(CMSTestCase):
                             parent=titles[0].page.get_parent_page(),
                             in_navigation=True,
                             apphook='VariableUrlsApp', reverse_id='page2')
-        create_title('de', 'de_title', page2, slug='slug')
+        create_page_content('de', 'de_title', page2, slug='slug')
         request = self.get_request('/page2/')
         renderer = menu_pool.get_renderer(request)
         nodes = renderer.get_nodes()
@@ -989,15 +1005,15 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         page = self.create_homepage("home", "nav_playground.html", "en", created_by=superuser)
-        create_title('de', page.get_title(), page)
+        create_page_content('de', page.get_title(), page)
 
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
-        create_title('de', child_page.get_title(), child_page)
+        create_page_content('de', child_page.get_title(), child_page)
 
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook='SampleApp')
-        create_title("de", '%s_de' % child_child_page.get_title(), child_child_page)
+        create_page_content("de", '%s_de' % child_child_page.get_title(), child_child_page)
 
         # publisher_public is set to draft on publish, issue with one to one reverse
         child_child_page = self.reload(child_child_page)

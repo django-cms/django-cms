@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cms import constants
 from cms.models.fields import PlaceholderRelationField
-from cms.models.managers import PageContentManager
+from cms.models.managers import PageContentAdminManager, PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
 
@@ -118,6 +118,7 @@ class PageContent(models.Model):
     )
 
     objects = PageContentManager()
+    admin_manager = PageContentAdminManager()
 
     class Meta:
         default_permissions = []
@@ -251,9 +252,9 @@ class PageContent(models.Model):
         return self.page.get_absolute_url(language=language)
 
 
-class EmptyPageContent():
+class EmptyPageContent:
     """
-    Empty title object, can be returned from Page.get_title_obj() if required
+    Empty title object, can be returned from :meth:`cms.models.pagemodel.Page.get_content_obj` if required
     title object doesn't exist.
     """
     title = ""

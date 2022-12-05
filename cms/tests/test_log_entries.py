@@ -2,7 +2,7 @@ from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.forms.models import model_to_dict
 from django.utils.translation import gettext_lazy as _
 
-from cms.api import add_plugin, create_page, create_title
+from cms.api import add_plugin, create_page, create_page_content
 from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, Placeholder, UserSettings
 from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
@@ -182,7 +182,7 @@ class LogPageOperationsTests(CMSTestCase):
         """
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en")
-            title = create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
+            title = create_page_content(language='de', title="other title %s" % page.get_title('en'), page=page)
             endpoint = self.get_page_change_uri('en', page)
             data = model_to_dict(title, fields=['title', 'template'])
             data['title'] = 'my_new_title_field'
@@ -212,7 +212,7 @@ class LogPageOperationsTests(CMSTestCase):
         """
         with self.login_user_context(self._admin_user):
             page = create_page("page_a", "nav_playground.html", "en")
-            create_title(language='de', title="other title %s" % page.get_title('en'), page=page)
+            create_page_content(language='de', title="other title %s" % page.get_title('en'), page=page)
             endpoint = self.get_page_delete_translation_uri('en', page)
             post_data = {'post': 'yes', 'language': 'en'}
 

@@ -58,14 +58,15 @@ class PageExtensionAdmin(ExtensionAdmin):
         return super().add_view(request, form_url, extra_context)
 
 
-class TitleExtensionAdmin(ExtensionAdmin):
+class PageContentExtensionAdmin(ExtensionAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change and 'extended_object' in request.GET:
-            page_content = obj.extended_object = PageContent._base_manager.get(pk=request.GET['extended_object'])
+            obj.extended_object = PageContent.admin_manager.get(pk=request.GET['extended_object'])
+            content = PageContent.admin_manager.get(pk=request.GET['extended_object'])
         else:
-            page_content = obj.extended_object
-        if not user_can_change_page(request.user, page=page_content.page):
+            content = obj.extended_object
+        if not user_can_change_page(request.user, page=content.page):
             raise PermissionDenied()
         super().save_model(request, obj, form, change)
 
@@ -90,8 +91,8 @@ class TitleExtensionAdmin(ExtensionAdmin):
         extended_object_id = request.GET.get('extended_object', False)
         if extended_object_id:
             try:
-                page_content = PageContent._base_manager.get(pk=extended_object_id)
-                extension = self.model.objects.get(extended_object=page_content)
+                content = PageContent.admin_manager.get(pk=extended_object_id)
+                extension = self.model.objects.get(extended_object=content)
                 opts = self.model._meta
                 change_url = reverse(
                     'admin:%s_%s_change' % (opts.app_label, opts.model_name),

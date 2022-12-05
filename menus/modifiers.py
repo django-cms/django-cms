@@ -11,6 +11,7 @@ class Marker(Modifier):
     ancestors: ancestor = True
     """
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+        """"""
         if post_cut or breadcrumb:
             return nodes
         selected = None
@@ -59,6 +60,7 @@ class Level(Modifier):
     post_cut = True
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+        """"""
         if breadcrumb:
             return nodes
         for node in nodes:
@@ -86,6 +88,7 @@ class AuthVisibility(Modifier):
     Remove nodes that are login required or require a group
     """
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
+        """"""
         if post_cut or breadcrumb:
             return nodes
         final = []

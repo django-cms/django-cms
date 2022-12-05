@@ -289,7 +289,7 @@ class AddPageForm(BasePageContentForm):
 
         if 'meta_description' in data:
             title_kwargs['meta_description'] = data['meta_description']
-        return api.create_title(**title_kwargs)
+        return api.create_page_content(**title_kwargs)
 
     def from_source(self, source, parent=None):
         new_page = source.copy(
@@ -330,7 +330,7 @@ class AddPageForm(BasePageContentForm):
             new_page.save()
 
         translation = self.create_translation(new_page)
-        new_page.title_cache[translation.language] = translation
+        new_page.page_content_cache[translation.language] = translation
 
         if source:
             extension_pool.copy_extensions(
@@ -398,7 +398,7 @@ class AddPageTypeForm(AddPageForm):
             root_page.save()
 
         if not root_page.has_translation(self._language):
-            api.create_title(
+            api.create_page_content(
                 language=self._language,
                 title=gettext('Page Types'),
                 page=root_page,
@@ -902,7 +902,7 @@ class CopyPageForm(PageTreeForm):
     source_site = forms.ModelChoiceField(queryset=Site.objects.all(), required=True)
     copy_permissions = forms.BooleanField(initial=False, required=False)
 
-    def copy_page(self):
+    def copy_page(self, user):
         target, position = self.get_tree_options()
         copy_permissions = self.cleaned_data.get('copy_permissions', False)
         new_page = self.page.copy_with_descendants(
@@ -910,6 +910,7 @@ class CopyPageForm(PageTreeForm):
             position=position,
             copy_permissions=copy_permissions,
             target_site=self._site,
+            user=user,
         )
         return new_page
 
@@ -1360,8 +1361,11 @@ class RequestToolbarForm(forms.Form):
             raise forms.ValidationError(message)
 
         try:
-            # Use abse manager to also get objects that are hidden by custom managers
-            generic_obj = model_class._base_manager.get(pk=obj_id)
+            # Use admin manager if available for the toolbar form
+            if hasattr(model_class, "admin_manager"):
+                generic_obj = model_class.admin_manager.get(pk=obj_id)
+            else:
+                generic_obj = model_class.objects.get(pk=obj_id)
         except model_class.DoesNotExist:
             message = 'Invalid object lookup. Both obj_id and obj_type are required'
             raise forms.ValidationError(message)

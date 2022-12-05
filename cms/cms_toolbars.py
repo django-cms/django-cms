@@ -28,9 +28,22 @@ from menus.utils import DefaultLanguageChanger
 
 # Identifiers for search
 ADMIN_MENU_IDENTIFIER = 'admin-menu'
+"""
+The *Site* menu (that usually shows the project's domain name, *example.com* by default).
+``ADMIN_MENU_IDENTIFIER`` allows you to get hold of this object easily using
+:meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`.
+"""
 LANGUAGE_MENU_IDENTIFIER = 'language-menu'
+"""
+The *Language* menu. ``LANGUAGE_MENU_IDENTIFIER`` allows you to get hold of this object
+easily using :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`.
+"""
 TEMPLATE_MENU_BREAK = 'Template Menu Break'
 PAGE_MENU_IDENTIFIER = 'page'
+"""
+The *Page* menu. ``PAGE_MENU_IDENTIFIER`` allows you to get hold of this object
+easily using :meth:`cms.toolbar.toolbar.CMSToolbar.get_menu`.
+"""
 PAGE_MENU_ADD_IDENTIFIER = 'add_page'
 PAGE_MENU_FIRST_BREAK = 'Page Menu First Break'
 PAGE_MENU_SECOND_BREAK = 'Page Menu Second Break'
@@ -342,7 +355,7 @@ class PageToolbar(CMSToolbar):
     watch_models = [Page, PageType]
 
     def get_page_content(self):
-        page_content = self.page.get_title_obj(language=self.current_lang, fallback=False)
+        page_content = self.page.get_content_obj(language=self.current_lang, fallback=False)
         return page_content or None
 
     def has_page_change_permission(self):
@@ -442,7 +455,7 @@ class PageToolbar(CMSToolbar):
                 )
                 disabled = len(remove) == 1
                 for code, name in remove:
-                    pagecontent = self.page.get_title_obj(code)
+                    pagecontent = self.page.get_content_obj(code)
                     translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
                     url = add_url_parameters(translation_delete_url, language=code)
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
@@ -455,7 +468,7 @@ class PageToolbar(CMSToolbar):
                 question = _('Are you sure you want to copy all plugins from %s?')
 
                 for code, name in copy:
-                    pagecontent = self.page.get_title_obj(code)
+                    pagecontent = self.page.get_content_obj(code)
                     page_copy_url = admin_reverse('cms_pagecontent_copy_language', args=(pagecontent.pk,))
                     copy_plugins_menu.add_ajax_item(
                         title % name, action=page_copy_url,

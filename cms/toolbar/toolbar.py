@@ -31,8 +31,10 @@ cms_toolbar_extensions = apps.get_app_config('cms').cms_extension.toolbar_mixins
 
 
 class BaseToolbar(ToolbarAPIMixin):
-
+    #: Property; a list of models that the toolbar :ref:`watches for URL changes <url_changes>`,
+    #: so it can redirect to the new URL on saving.
     watch_models = []
+
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
     @cached_property
@@ -91,6 +93,7 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def edit_mode_active(self):
+        """``True`` if the structure board editing mode is active."""
         if not self.show_toolbar:
             return False
 
@@ -103,12 +106,14 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def preview_mode_active(self):
+        """``True`` if preview mode is active."""
         if self.is_staff and self._resolver_match:
             return self._resolver_match.url_name == 'cms_placeholder_render_object_preview'
         return False
 
     @cached_property
     def content_mode_active(self):
+        """``True`` if content mode is active."""
         if self.structure_mode_active:
             # Structure mode always takes precedence
             return False
@@ -129,7 +134,17 @@ class BaseToolbar(ToolbarAPIMixin):
 
 class CMSToolbarBase(BaseToolbar):
     """
-    The default CMS Toolbar
+    The toolbar is an instance of the :class:`~cms.toolbar.toolbar.CMSToolbar` class. This should not be
+    confused with the :class:`~cms.toolbar_base.CMSToolbar`, the base class for *toolbar modifier
+    classes* in other applications, that add items to and otherwise manipulates the toolbar.
+
+    It is strongly recommended that you **only** interact with the toolbar in your own code via:
+
+    #. the APIs documented here
+    #. toolbar modifier classes based on :class:`~cms.toolbar_base.CMSToolbar`
+
+    Several of the following methods to create and add objects other objects to the toolbar are
+    inherited from :class:`~cms.toolbar.items.ToolbarAPIMixin`.
     """
 
     def __init__(self, request, request_path=None, _async=False):
@@ -285,12 +300,17 @@ class CMSToolbarBase(BaseToolbar):
     # Public API
 
     def get_menu(self, key, verbose_name=None, side=LEFT, position=None):
+        """Will return the ``Menu`` identified with :option:`key`, or ``None``."""
         self.populate()
         if key in self.menus:
             return self.menus[key]
         return None
 
     def get_or_create_menu(self, key, verbose_name=None, disabled=False, side=LEFT, position=None):
+        """
+        If a :class:`~cms.toolbar.items.Menu` with :option:`key` already exists, this method will
+        return that menu. Otherwise it will create a menu with the ``key`` identifier.
+        """
         self.populate()
         if key in self.menus:
             menu = self.menus[key]
@@ -309,6 +329,7 @@ class CMSToolbarBase(BaseToolbar):
 
     def add_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
                    side=LEFT, position=None):
+        """Adds a :class:`~cms.toolbar.items.Button` to the toolbar."""
         self.populate()
         item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
         item.add_button(name, url, active=active, disabled=disabled, extra_classes=extra_classes)
@@ -317,6 +338,7 @@ class CMSToolbarBase(BaseToolbar):
 
     def add_modal_button(self, name, url, active=False, disabled=False, extra_classes=None, extra_wrapper_classes=None,
                          side=LEFT, position=None, on_close=REFRESH_PAGE):
+        """Adds a :class:`~cms.toolbar.items.ModalButton` to the toolbar."""
         self.populate()
         item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
         item.add_modal_button(
@@ -327,6 +349,8 @@ class CMSToolbarBase(BaseToolbar):
 
     def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None,
                              extra_wrapper_classes=None, side=LEFT, position=None, on_close=None):
+        """Adds a :class:`~cms.toolbar.items.SideframeButton` to the toolbar."""
+
         self.populate()
         item = ButtonList(extra_classes=extra_wrapper_classes, side=side)
         item.add_sideframe_button(
@@ -336,6 +360,7 @@ class CMSToolbarBase(BaseToolbar):
         return item
 
     def add_button_list(self, identifier=None, extra_classes=None, side=LEFT, position=None):
+        """Adds an (empty) :class:`~cms.toolbar.items.ButtonList` to the toolbar and returns it."""
         self.populate()
         item = ButtonList(identifier, extra_classes=extra_classes, side=side)
         self.add_item(item, position=position)
@@ -431,7 +456,7 @@ class CMSToolbarBase(BaseToolbar):
 
     def populate(self):
         """
-        Get the CMS items on the toolbar
+        Populates the toolbar with the CMS items.
         """
         if self.populated:
             return

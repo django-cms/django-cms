@@ -73,6 +73,11 @@ def _instance_overrides_method(base, instance, method_name):
 
 
 class FrontendEditableAdminMixin():
+    """
+    Adding ``FrontendEditableAdminMixin`` to  models admin class allows to open that admin
+    in the frontend by double-clicking on fields rendered with the ``render_model`` template
+    tag.
+    """
     frontend_editable_fields = []
 
     def get_urls(self):
@@ -154,7 +159,6 @@ class FrontendEditableAdminMixin():
 
 
 class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
-
     def __new__(cls, name, bases, attrs):
         super_new = super().__new__
         parents = [b for b in bases if isinstance(b, PlaceholderAdminMixinBase)]
@@ -164,11 +168,17 @@ class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
         warnings.warn(
             "PlaceholderAdminMixin is no longer needed and thus will be removed in django CMS 5.0",
             DeprecationWarning,
+            stacklevel=2,
         )
         return super_new(cls, name, bases, attrs)
 
 
 class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
+    """
+    .. warning::
+
+        PlaceholderAdminMixin is deprecated. It is no longer needed and thus will be removed
+    """
     pass
 
 

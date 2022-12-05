@@ -2,7 +2,7 @@ from django.urls import NoReverseMatch
 from django.utils.translation import gettext_lazy as _
 
 from cms.test_utils.project.extensionapp.models import (
-    MyPageExtension, MyTitleExtension,
+    MyPageContentExtension, MyPageExtension,
 )
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -11,7 +11,7 @@ from cms.utils.urlutils import admin_reverse
 
 
 @toolbar_pool.register
-class MyTitleExtensionToolbar(CMSToolbar):
+class MyPageContentExtensionToolbar(CMSToolbar):
     def populate(self):
         # always use draft if we have a page
         self.page = self.request.current_page
@@ -22,14 +22,18 @@ class MyTitleExtensionToolbar(CMSToolbar):
 
         if user_can_change_page(self.request.user, page=self.page):
             try:
-                mytitleextension = MyTitleExtension.objects.get(extended_object_id=self.page.id)
-            except MyTitleExtension.DoesNotExist:
-                mytitleextension = None
+                mypagecontentextension = MyPageContentExtension.objects.get(extended_object_id=self.page.id)
+            except MyPageContentExtension.DoesNotExist:
+                mypagecontentextension = None
             try:
-                if mytitleextension:
-                    url = admin_reverse('extensionapp_mytitleextension_change', args=(mytitleextension.pk,))
+                if mypagecontentextension:
+                    url = admin_reverse(
+                        'extensionapp_mypagecontentextension_change', args=(mypagecontentextension.pk,)
+                    )
                 else:
-                    url = admin_reverse('extensionapp_mytitleextension_add') + '?extended_object=%s' % self.page.pk
+                    url = admin_reverse(
+                        'extensionapp_mypagecontentextension_add'
+                    ) + '?extended_object=%s' % self.page.pk
             except NoReverseMatch:
                 # not in urls
                 pass

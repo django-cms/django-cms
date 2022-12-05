@@ -556,7 +556,7 @@ class ContentRenderer(BaseRenderer):
         if slots:
             placeholders = page.get_placeholders(self.request_language).filter(slot__in=slots)
         else:
-            title = page.get_title_obj(self.request_language, fallback=False)
+            title = page.get_content_obj(self.request_language, fallback=False)
 
             PageContent.page.field.set_cached_value(title, page)
             # Creates any placeholders missing on the page
