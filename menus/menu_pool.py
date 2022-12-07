@@ -13,7 +13,6 @@ from django.utils.translation import (
 )
 
 from cms.utils.conf import get_cms_setting
-
 from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
 from menus.models import CacheKey
