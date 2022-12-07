@@ -1,3 +1,5 @@
+name: Create a django CMS release
+
 on:
   workflow_dispatch:
     inputs:
@@ -10,13 +12,10 @@ on:
       - 'release/**'
 
 jobs:
-  print-tag:
+  make-release:
     runs-on: ubuntu-latest
-    if:  ${{ inputs.print_tags }}
     steps:
       - name: Check out
         uses: actions/checkout@v3
-      - name: Start the build process
-        run: echo  Start building version ${ input.version } from branch ${ branch }
-        run: pwd
-        run: ls ./scripts
+      - name: Start building version ${{ inputs.version }} from branch $GITHUB_REF
+        run: ./scripts/make-release ${{ inputs.version }} $GITHUB_REF
