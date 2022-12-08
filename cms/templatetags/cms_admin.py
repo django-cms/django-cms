@@ -38,7 +38,7 @@ class GetAdminUrlForLanguage(AsTag):
         admin_url = admin_reverse('cms_pagecontent_add')
         admin_url += '?cms_page={}&language={}'.format(page.pk, language)
         return admin_url
-        
+
 
 register.tag(GetAdminUrlForLanguage.name, GetAdminUrlForLanguage)
 
