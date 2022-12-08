@@ -93,5 +93,5 @@ wizard_pool = WizardPool()
 
     Using wizard_pool is deprecated. Use `cms.wizards.helper` functions instead.
     Since django CMS version 4 wizards are registered with the cms using
-    :class:`cms.app_base.CMSAppExtension` in ``cms_config.py``.
+    :class:`cms.app_base.CMSAppConfig` in ``cms_config.py``.
 """
