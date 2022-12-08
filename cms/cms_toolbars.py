@@ -364,17 +364,22 @@ class PageToolbar(CMSToolbar):
         return self.page_change_permission
 
     def in_apphook(self):
-        if self.toolbar.edit_mode_active:
-            return False
-
         with force_language(self.toolbar.request_language):
             try:
                 resolver = resolve(self.toolbar.request_path)
             except Resolver404:
                 return False
             else:
-                from cms.views import details
-                return resolver.func != details
+                from cms.views import (
+                    details, render_object_edit, render_object_preview,
+                    render_object_structure,
+                )
+                return resolver.func in (
+                    details,  # live view
+                    render_object_preview,  # preview endpoint
+                    render_object_structure,  # structure endpoint
+                    render_object_edit  # edit endpoint
+                )
 
     def in_apphook_root(self):
         """

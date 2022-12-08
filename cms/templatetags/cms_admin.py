@@ -1,12 +1,16 @@
-from classytags.core import Tag
-from classytags.helpers import InclusionTag
+from classytags.arguments import Argument
+from classytags.core import Options, Tag
+from classytags.helpers import AsTag, InclusionTag
 from django import template
 from django.conf import settings
+from django.contrib import admin
 from django.contrib.admin.views.main import ERROR_FLAG
+from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
+from cms.models.contentmodels import PageContent
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse
 
@@ -15,15 +19,61 @@ register = template.Library()
 CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
 
 
-@register.simple_tag(takes_context=False)
-def get_admin_url_for_language(page, language):
-    if language not in page.get_languages():
-        admin_url = admin_reverse('cms_pagecontent_add')
-        admin_url += '?cms_page={}&language={}'.format(page.pk, language)
-        return admin_url
+class GetAdminUrlForLanguage(AsTag):
+    """Classy tag that returns the url for editing PageContent in the admin."""
+    name = "get_admin_url_for_language"
 
-    page_content = page.get_content_obj(language, fallback=False)
-    return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
+    options = Options(
+        Argument('page'),
+        Argument('language'),
+        'as',
+        Argument('varname', required=False, resolve=False)
+    )
+
+    def get_admin_url_for_language(self, context, page, language):
+        if language not in page.get_languages():
+            admin_url = admin_reverse('cms_pagecontent_add')
+            admin_url += '?cms_page={}&language={}'.format(page.pk, language)
+            return admin_url
+
+        page_content = page.get_content_obj(language, fallback=False)
+        return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
+
+    def get_value(self, context, page, language):
+        # if not page.get_content_obj(language).is_editable(context["request"]):
+        #     # Convention: If this tag returns None the page content cannot be edited
+        #     return ""
+        return self.get_admin_url_for_language(context, page, language)
+
+
+register.tag(GetAdminUrlForLanguage.name, GetAdminUrlForLanguage)
+
+
+class GetPreviewUrl(AsTag):
+    """Classy tag that returns the url for editing PageContent in the admin."""
+    name = "get_preview_url"
+    page_content_type = None
+
+    options = Options(
+        Argument('page_content'),
+        'as',
+        Argument('varname', required=False, resolve=False)
+    )
+
+    def get_value(self, context, page_content):
+        if not page_content:
+            return ""
+        if GetPreviewUrl.page_content_type is None:
+            # Use class as cache
+            from django.contrib.contenttypes.models import ContentType
+
+            GetPreviewUrl.page_content_type = ContentType.objects.get_for_model(PageContent).pk
+
+        return admin_reverse('cms_placeholder_render_object_preview',
+                             args=[GetPreviewUrl.page_content_type, page_content.pk])
+
+
+register.tag(GetPreviewUrl.name, GetPreviewUrl)
 
 
 @register.simple_tag(takes_context=True)
@@ -67,7 +117,7 @@ def get_page_display_name(cms_page):
                 if not isinstance(item, EmptyPageContent):
                     language = lang
     if not language:
-        return _("Empty content. Create content using the pencil tool.")
+        return _("Empty")
     page_content = cms_page.page_content_cache[language]
     if page_content.title:
         return page_content.title
@@ -78,18 +128,72 @@ def get_page_display_name(cms_page):
     return cms_page.get_slug(language)
 
 
-@register.simple_tag(takes_context=True)
-def tree_publish_row(context, page, language):
-    cls = "cms-pagetree-node-state cms-pagetree-node-state-empty empty"
-    text = _("no content")
+class TreePublishRow(Tag):
+    """New template tag that renders a pontential menu to be offered with the
+    dirty indicators. The core will not display a menu."""
+    name = "tree_publish_row"
+    options = Options(
+        Argument('page'),
+        Argument('language')
+    )
 
-    if page.page_content_cache.get(language):
-        cls = "cms-pagetree-node-state cms-pagetree-node-state-published published"
-        text = _("has contents")
+    def get_indicator(self, page_content):
+        indicator = page_content.content_indicator()
+        page_content_admin_class = admin.site._registry[PageContent]
+        css_classes = f"cms-pagetree-node-state cms-pagetree-node-state-{indicator} {indicator}"
+        return css_classes, page_content_admin_class.indicator_descriptions.get(indicator, _("Unknown"))
 
-    return mark_safe(
-        '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
-        'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
+    def get_indicator_legend(self, descriptions):
+        return (
+            (f"cms-pagetree-node-state cms-pagetree-node-state-{state}", description)
+            for state, description in descriptions.items()
+        )
+
+    def render_tag(self, context, page, language):
+        if page is None:  # Retrieve all for legend
+            page_content_admin_class = admin.site._registry[PageContent]
+            context["indicator_legend_items"] = self.get_indicator_legend(
+                page_content_admin_class.indicator_descriptions
+            )
+            return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
+
+        page_content = page.page_content_cache.get(language)
+        cls, text = self.get_indicator(page_content)
+        return mark_safe(
+            '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
+            'data-cms-tooltip="%s"></span>' % (cls, force_str(text)))
+
+
+register.tag(TreePublishRow.name, TreePublishRow)
+
+
+@register.tag
+class TreePublishRowMenu(AsTag):
+    """New template tag that renders a potential menu to be offered with the
+    dirty indicators. The core will only display a menu for EmptyContent to allow
+    to create a new PageContent."""
+    name = "tree_publish_row_menu"
+    options = Options(
+        Argument('page'),
+        Argument('language'),
+        'as',
+        Argument('varname', required=False, resolve=False)
+    )
+
+    def get_value(self, context, page, language):
+        page_content = page.page_content_cache.get(language)
+        if context.get("has_change_permission", False):
+            page_content_admin_class = admin.site._registry[PageContent]
+            template, publish_menu_items = page_content_admin_class.get_indicator_menu(
+                context["request"], page_content
+            )
+            if template:
+                context["indicator_menu_items"] = publish_menu_items
+                return render_to_string(template, context.flatten())
+        return ''
+
+
+register.tag(TreePublishRowMenu.name, TreePublishRowMenu)
 
 
 @register.inclusion_tag('admin/cms/page/tree/filter.html')
@@ -140,7 +244,7 @@ class PageSubmitRow(InclusionTag):
             'show_save_and_add_another': False,
             'show_save_and_continue': not is_popup and context['has_change_permission'],
             'is_popup': is_popup,
-            'show_save': True,
+            'show_save': context.get("can_change", True),
             'language': language,
             'language_is_filled': language in filled_languages,
             'object_id': context.get('object_id', None),

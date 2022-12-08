@@ -1,0 +1,8 @@
+{% for cls, description in indicator_legend_items %}
+    <li>
+        <span class="cms-pagetree-dropdown-item">
+            <span class="{{ cls }}"></span>
+            <span>{{ description }}</span>
+        </span>
+    </li>
+{% endfor %}

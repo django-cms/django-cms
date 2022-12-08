@@ -6,6 +6,7 @@
 * Fix bug that created new page content not in the displayed language but the browser language
 * feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
+* Introduce dropdown menus in the page tree for status indicators
 
 === 4.0.0 (unreleased) ===
 

@@ -137,11 +137,9 @@ class PageContent(models.Model):
         return display
 
     def update(self, **data):
-        cls = self.__class__
-        cls.objects.filter(pk=self.pk).update(**data)
-
         for field, value in data.items():
             setattr(self, field, value)
+        self.save(update_fields=data.keys())
         return
 
     def save(self, **kwargs):
@@ -228,6 +226,22 @@ class PageContent(models.Model):
                 return t[1]
         return _("default")
 
+    def is_editable(self, request):
+        """returns True if page content object itself can be edited. Does not check
+        user permissions to do that.
+
+        :rtype: ``bool``
+        """
+        return True
+
+    def content_indicator(self):
+        """returns the content indicator status. Without additional packages like
+        djangocms-versioning page content always is public.
+
+        :rtype: ``str``
+        """
+        return "public" if self.get_absolute_url(language=self.language) else "unpublished-parent"
+
     def get_xframe_options(self):
         """ Finds X_FRAME_OPTION from tree if inherited """
         xframe_options = self.xframe_options or constants.X_FRAME_OPTIONS_INHERIT
@@ -267,13 +281,24 @@ class EmptyPageContent:
     soft_root = False
     in_navigation = False
 
-    def __init__(self, language):
+    def __init__(self, language, page=None):
         self.language = language
-
-    def __nonzero__(self):
-        # Python 2 compatibility
-        return False
+        self.page = page
 
     def __bool__(self):
-        # Python 3 compatibility
         return False
+
+    def content_indicator(self):
+        """returns the content indicator status. Empty page content always is empty
+
+        :rtype: ``str``
+        """
+        return "empty"
+
+    def is_editable(self, request):
+        """returns True if empty page content object itself can be edited. Since editing creates a new
+        page content object this should always be True
+
+        :rtype: ``bool``
+        """
+        return True

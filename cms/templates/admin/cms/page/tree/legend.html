@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n cms_admin %}
 {% spaceless %}
 <div class="cms-pagetree cms-pagetree-section cms-pagetree-section-condensed cms-pagetree-legend">
     <span class="cms-pagetree-dropdown js-cms-pagetree-dropdown">
@@ -9,30 +9,7 @@
 
         <div class="cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-condensed cms-pagetree-dropdown-menu-arrow-right-bottom js-cms-pagetree-dropdown-menu">
             <ul class="cms-pagetree-dropdown-menu-inner">
-                <li>
-                    <span class="cms-pagetree-dropdown-item">
-                        <span class="cms-pagetree-node-state cms-pagetree-node-state-published"></span>
-                        <span>{% trans "Published" %}</span>
-                    </span>
-                </li>
-                <li>
-                    <span class="cms-pagetree-dropdown-item">
-                        <span class="cms-pagetree-node-state cms-pagetree-node-state-dirty"></span>
-                        <span>{% trans "Changed" %}</span>
-                    </span>
-                </li>
-                <li>
-                    <span class="cms-pagetree-dropdown-item">
-                        <span class="cms-pagetree-node-state cms-pagetree-node-state-unpublished"></span>
-                        <span>{% trans "Unpublished" %}</span>
-                    </span>
-                </li>
-                <li>
-                    <span class="cms-pagetree-dropdown-item">
-                        <span class="cms-pagetree-node-state cms-pagetree-node-state-empty"></span>
-                        <span>{% trans "Empty" %}</span>
-                    </span>
-                </li>
+                {% tree_publish_row None preview_language %}
                 <li>
                     <span class="cms-pagetree-dropdown-item">
                         <span class="cms-icon cms-icon-check-square"></span>
