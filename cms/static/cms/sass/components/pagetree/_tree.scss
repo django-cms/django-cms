@@ -526,7 +526,6 @@
 
     a {
         @extend %icon;
-        @include icon(eye);
         font-size: $pagetree-icon-size;
         line-height: $pagetree-icon-size;
         height: $pagetree-icon-size;
@@ -553,7 +552,7 @@
 .cms-tree-item-lang {
     // required for tooltip
     position: relative;
-    .cms-tree-item-inner > a {
+    .cms-tree-item-inner > a, .cms-tree-item-inner > .cms-tree-lang-container {
         display: block;
         height: $pagetree-lang-size;
     }

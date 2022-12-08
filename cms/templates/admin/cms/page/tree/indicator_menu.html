@@ -1,0 +1,13 @@
+<div class="cms-pagetree-dropdown-menu cms-pagetree-dropdown-menu-arrow-right-top js-cms-pagetree-dropdown-menu">
+    <ul class="cms-pagetree-dropdown-menu-inner">
+        {% for title, icon, url, cls in indicator_menu_items %}
+            <li>
+                <a href="{{ url }}"{% if cls %} class="{{ cls }}"{% if "js-cms-pagetree-page-view" in cls %} target="_top"{% endif %}{% endif %}>
+                    {% if icon %}<span class="cms-icon {{ icon }}"></span>{% endif %}
+                    <span>{{ title}}</span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+

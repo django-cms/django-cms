@@ -29,113 +29,146 @@
     @if $filename == alias {
         $char: "E001";
     }
-    @if $filename == arrow-right {
+    @if $filename == archive {
         $char: "E002";
     }
-    @if $filename == arrow-wide {
+    @if $filename == arrow-right {
         $char: "E003";
     }
-    @if $filename == arrow {
+    @if $filename == arrow-wide {
         $char: "E004";
     }
-    @if $filename == bin {
+    @if $filename == arrow {
         $char: "E005";
     }
-    @if $filename == check-o {
+    @if $filename == bin {
         $char: "E006";
     }
-    @if $filename == check-square {
+    @if $filename == check-circle {
         $char: "E007";
     }
-    @if $filename == check {
+    @if $filename == check-o {
         $char: "E008";
     }
-    @if $filename == close {
+    @if $filename == check-square {
         $char: "E009";
     }
-    @if $filename == cogs {
+    @if $filename == check {
         $char: "E00A";
     }
-    @if $filename == copy {
+    @if $filename == close {
         $char: "E00B";
     }
-    @if $filename == eye {
+    @if $filename == cogs {
         $char: "E00C";
     }
-    @if $filename == forbidden {
+    @if $filename == copy {
         $char: "E00D";
     }
-    @if $filename == handler {
+    @if $filename == edit-new {
         $char: "E00E";
     }
-    @if $filename == highlight {
+    @if $filename == eye {
         $char: "E00F";
     }
-    @if $filename == home {
+    @if $filename == forbidden {
         $char: "E010";
     }
-    @if $filename == info {
+    @if $filename == handler {
         $char: "E011";
     }
-    @if $filename == loader {
+    @if $filename == highlight {
         $char: "E012";
     }
-    @if $filename == lock {
+    @if $filename == home {
         $char: "E013";
     }
-    @if $filename == logo {
+    @if $filename == info {
         $char: "E014";
     }
-    @if $filename == menu {
+    @if $filename == layers {
         $char: "E015";
     }
-    @if $filename == minimize {
+    @if $filename == list-ol {
         $char: "E016";
     }
-    @if $filename == minus-square-o {
+    @if $filename == loader {
         $char: "E017";
     }
-    @if $filename == minus-square {
+    @if $filename == lock {
         $char: "E018";
     }
-    @if $filename == minus {
+    @if $filename == logo {
         $char: "E019";
     }
-    @if $filename == paste {
+    @if $filename == menu {
         $char: "E01A";
     }
-    @if $filename == pencil {
+    @if $filename == minimize {
         $char: "E01B";
     }
-    @if $filename == pin {
+    @if $filename == minus-circle {
         $char: "E01C";
     }
-    @if $filename == plugins {
+    @if $filename == minus-square-o {
         $char: "E01D";
     }
-    @if $filename == plus-square-o {
+    @if $filename == minus-square {
         $char: "E01E";
     }
-    @if $filename == plus {
+    @if $filename == minus {
         $char: "E01F";
     }
-    @if $filename == puzzle {
+    @if $filename == paste {
         $char: "E020";
     }
-    @if $filename == scissors {
+    @if $filename == pencil {
         $char: "E021";
     }
-    @if $filename == search {
+    @if $filename == pin {
         $char: "E022";
     }
-    @if $filename == sitemap {
+    @if $filename == plugins {
         $char: "E023";
     }
-    @if $filename == squares {
+    @if $filename == plus-circle {
         $char: "E024";
     }
-    @if $filename == window {
+    @if $filename == plus-square-o {
         $char: "E025";
+    }
+    @if $filename == plus {
+        $char: "E026";
+    }
+    @if $filename == publish {
+        $char: "E027";
+    }
+    @if $filename == puzzle {
+        $char: "E028";
+    }
+    @if $filename == redo {
+        $char: "E029";
+    }
+    @if $filename == scissors {
+        $char: "E02A";
+    }
+    @if $filename == search {
+        $char: "E02B";
+    }
+    @if $filename == sitemap {
+        $char: "E02C";
+    }
+    @if $filename == squares {
+        $char: "E02D";
+    }
+    @if $filename == undo {
+        $char: "E02E";
+    }
+    @if $filename == unpublish {
+        $char: "E02F";
+    }
+    @if $filename == window {
+        $char: "E030";
     }
 
     @return $char;
@@ -161,6 +194,10 @@
     @include icon(alias);
 }
 
+.cms-icon-archive {
+    @include icon(archive);
+}
+
 .cms-icon-arrow-right {
     @include icon(arrow-right);
 }
@@ -175,6 +212,10 @@
 
 .cms-icon-bin {
     @include icon(bin);
+}
+
+.cms-icon-check-circle {
+    @include icon(check-circle);
 }
 
 .cms-icon-check-o {
@@ -201,6 +242,10 @@
     @include icon(copy);
 }
 
+.cms-icon-edit-new {
+    @include icon(edit-new);
+}
+
 .cms-icon-eye {
     @include icon(eye);
 }
@@ -225,6 +270,14 @@
     @include icon(info);
 }
 
+.cms-icon-layers {
+    @include icon(layers);
+}
+
+.cms-icon-list-ol {
+    @include icon(list-ol);
+}
+
 .cms-icon-loader {
     @include icon(loader);
 }
@@ -243,6 +296,10 @@
 
 .cms-icon-minimize {
     @include icon(minimize);
+}
+
+.cms-icon-minus-circle {
+    @include icon(minus-circle);
 }
 
 .cms-icon-minus-square-o {
@@ -273,6 +330,10 @@
     @include icon(plugins);
 }
 
+.cms-icon-plus-circle {
+    @include icon(plus-circle);
+}
+
 .cms-icon-plus-square-o {
     @include icon(plus-square-o);
 }
@@ -281,8 +342,16 @@
     @include icon(plus);
 }
 
+.cms-icon-publish {
+    @include icon(publish);
+}
+
 .cms-icon-puzzle {
     @include icon(puzzle);
+}
+
+.cms-icon-redo {
+    @include icon(redo);
 }
 
 .cms-icon-scissors {
@@ -299,6 +368,14 @@
 
 .cms-icon-squares {
     @include icon(squares);
+}
+
+.cms-icon-undo {
+    @include icon(undo);
+}
+
+.cms-icon-unpublish {
+    @include icon(unpublish);
 }
 
 .cms-icon-window {

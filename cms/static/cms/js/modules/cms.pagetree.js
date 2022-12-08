@@ -866,7 +866,22 @@ var PageTree = new Class({
             if (element.closest('.cms-pagetree-dropdown-item-disabled').length) {
                 return;
             }
+            if (element.attr('target') === '_top') {
+                // Post to target="_top" requires to create a form and submit it
+                var parent = window;
 
+                if (window.parent) {
+                    parent = window.parent;
+                }
+                var csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
+                    document.cookie.match(/csrftoken=([^;]*);?/)[1] + '">';
+
+                $('<form method="post" action="' + element.attr('href') + '">' +
+                    csrfToken + '</form>')
+                    .appendTo($(parent.document.body))
+                    .submit();
+                return;
+            }
             try {
                 window.top.CMS.API.Toolbar.showLoader();
             } catch (err) {}
@@ -888,7 +903,10 @@ var PageTree = new Class({
                     }
                 })
                 .fail(function(error) {
-                    that.showError(error.statusText);
+                    try {
+                        window.top.CMS.API.Toolbar.hideLoader();
+                    } catch (err) {}
+                    that.showError(error.responseText ? error.responseText : error.statusText);
                 });
         });
     },
