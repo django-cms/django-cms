@@ -200,18 +200,16 @@ git branch "${BUILD_BRANCH}"
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
 curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
-
+source ~/.bashrc
 cd cms
 
 # 2.2: make messages and push them
 
 status "- Creating transifex messages!"
 which tx
-~/tx --help
-~/tx --version
-~/tx update
-~/tx --verison
-~/tx init -t $TX_TOKEN
+tx --help
+tx --version
+tx init -t $TX_TOKEN
 "$SCRIPTS/transifex-send-strings"
 
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
