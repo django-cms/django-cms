@@ -17,5 +17,7 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
       - name: Start building version ${{ inputs.version }} from branch $GITHUB_REF
         run: ./scripts/make-release ${{ inputs.version }} $GITHUB_REF
