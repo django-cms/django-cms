@@ -157,14 +157,14 @@ pr_branch="release/build"
 git clean -dfx
 git restore --staged .
 git checkout .
-git pull "${base_branch}"
+#git pull "${base_branch}"
 
 
 # installing needed nodejs module
-status "- syncing fork"
+# status "- syncing fork"
 # updating the local repository, and pushing this to fork
-git pull upstream "${base_branch}"
-git push -u origin "${base_branch}"
+# git pull upstream "${base_branch}"
+# git push -u origin "${base_branch}"
 
 status "- preparing branch ${BRANCH}"
 # checking if the branch exists?
