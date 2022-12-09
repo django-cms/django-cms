@@ -41,11 +41,16 @@ fi
 
 if [ -n "$2" ]; then
     base_branch="$2"
+    if [[ $base_branch == /refs/head/* ]]
+        base_branch=$(echo $base_branch | cut -d/ -f3-)
+    fi
     if ! git branch -a | grep -q "${base_branch}\$"; then
         error "Can not find specified base branch ${base_branch}"
         exit 1
     fi
 fi
+
+echo Using base branch $base_base_branch
 
 check_version_string "${FULL_VERSION}"
 
