@@ -14,7 +14,7 @@ beautifulsoup4==4.11.1
     # via furo
 build==0.8.0
     # via pip-tools
-certifi==2022.6.15
+certifi==2022.12.7
     # via requests
 charset-normalizer==2.1.0
     # via requests
@@ -131,10 +131,6 @@ sphinxext-opengraph==0.6.3
     # via -r requirements.in
 sqlparse==0.4.2
     # via django
-tomli==2.0.1
-    # via
-    #   build
-    #   pep517
 tornado==6.2
     # via livereload
 urllib3==1.26.11
