@@ -201,6 +201,7 @@ git branch "${BUILD_BRANCH}"
 "${SCRIPTS}/prepare-buildenv"
 curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
 export PATH=$(pwd):$PATH
+sudo apt-get install gettext
 cd cms
 
 # 2.2: make messages and push them
