@@ -7,7 +7,9 @@ ROOT=$(git rev-parse --show-toplevel)
 
 cd "${ROOT}/cms"
 
+echo tx pull --force --token $TX_TOKEN
 tx pull --force --token $TX_TOKEN
+echo Done.
 django-admin compilemessages
 
 "${SCRIPTS}/filter-locale-changes"
