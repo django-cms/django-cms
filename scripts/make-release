@@ -127,6 +127,18 @@ if git tag | grep -q "\<${TAG}\>"; then
     exit 1
 fi
 
+# check if the build_branch is supplied
+if [ -z $BUILD_BRANCH ]; then
+    error "BUILD_BRANCH is not specified"
+    exit 1
+fi
+
+# check if the build_branch is supplied
+if [ -z $TX_TOKEN ]; then
+    error "TX_TOKEN is not specified. Get transifex token and add it as the TX_TOKEN secret."
+    exit 1
+fi
+
 ##
 ## Let's roll it
 ##
@@ -152,7 +164,6 @@ if [ "${upstream_source}" != "${upstream}" ]; then
 fi
 
 status "- Cleaning the environment:"
-pr_branch="release/build"
 # first go to ${base_branch} (default is develop) and ensure we got the latest and greatest
 git clean -dfx
 git restore --staged .
@@ -180,11 +191,11 @@ fi
 # cleaning on the branch
 git clean -f
 git checkout .
-if git branch -a | grep -q "remotes/origin/${pr_branch}\$"; then
-    git push origin --delete "${pr_branch}"
-    git branch -D "${pr_branch}"
+if git branch -a | grep -q "remotes/origin/${BUILD_BRANCH}\$"; then
+    git push origin --delete "${BUILD_BRANCH}"
+    git branch -D "${BUILD_BRANCH}"
 fi
-git branch "${pr_branch}"
+git branch "${BUILD_BRANCH}"
 
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
