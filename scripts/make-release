@@ -152,7 +152,7 @@ if [ "${upstream_source}" != "${upstream}" ]; then
 fi
 
 status "- Cleaning the environment:"
-pr_branch="release/new_release"
+pr_branch="release/build"
 # first go to ${base_branch} (default is develop) and ensure we got the latest and greatest
 git clean -dfx
 git restore --staged .
@@ -283,17 +283,17 @@ if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
 }" docs/upgrade/index.rst
 fi
 
-review CHANGELOG.rst
-review "${upgrade_doc}"
-review docs/upgrade/index.rst
-review docs/conf.py
-
+#review CHANGELOG.rst
+#review "${upgrade_doc}"
+#review docs/upgrade/index.rst
+#review docs/conf.py
+#
 # commit documentations
 git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX}updating latest docs" "${upgrade_doc}" CHANGELOG.rst docs/upgrade/index.rst docs/conf.py
 
 # update the blog post using the What's new section
 status "Uploading to fork"
-git push -u origin "${BRANCH}"
+git push
 
 success "Release process complete on the fork"
 echo -e "To complete the process:"
