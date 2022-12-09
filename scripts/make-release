@@ -205,11 +205,11 @@ cd cms
 
 status "- Creating transifex messages!"
 which tx
-tx --help
-tx --version
-tx update
-tx --verison
-tx init -t $TX_TOKEN
+~/tx --help
+~/tx --version
+~/tx update
+~/tx --verison
+~/tx init -t $TX_TOKEN
 "$SCRIPTS/transifex-send-strings"
 
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"

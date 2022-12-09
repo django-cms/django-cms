@@ -9,4 +9,4 @@ django-admin makemessages -l en -d djangojs --no-location
 
 "${SCRIPTS}/filter-locale-changes"
 
-tx push -s -l en -t $TX_TOKEN
+~/tx push -s -l en -t $TX_TOKEN
