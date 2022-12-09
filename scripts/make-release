@@ -119,6 +119,7 @@ fi
 
 OLDVER=$(python -c "import cms; print(cms.__version__)" )
 
+git fetch --all --tags
 if [ -z "$(git tag -l "${OLDVER}")" ]; then
     error "Can not find tag for version ${OLDVER} aborting ..."
     exit 1
