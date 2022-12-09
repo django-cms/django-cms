@@ -95,13 +95,9 @@ if echo "${origin}" | grep -q "${upstream_pattern}"; then
     # exit 1
 fi
 
-echo Origin: $origin
-echo Upstream pattern: $upstream_pattern
-
 # Create virtual environment
 python -m venv .venv
 source ./.venv/bin/activate
-
 
 check_virtual_env
 
@@ -135,20 +131,16 @@ fi
 ## Let's roll it
 ##
 
-status "****************************************************************************************"
-status "***                      django CMS OFFICIAL RELEASE PROCESS                         ***"
-status "****************************************************************************************"
+status "******************************************************************************"
+status "***                 django CMS OFFICIAL RELEASE PROCESS                    ***"
+status "******************************************************************************"
 echo ""
-echo -e "${RED}WARNING!${NORMAL} This script will ${RED}REVERT ALL LOCAL MODIFICATIONS!${NORMAL}"
 echo ""
 echo -e "Preparing to create a release ${GREEN}${VERSION}${VERSUFFIX}${NORMAL} from content of ${YELLOW}${base_branch}${NORMAL} (currently version ${YELLOW}${OLDVER}${NORMAL})"
-echo "using fork: ${origin}"
 echo ""
-status "(Ctrl-C to abort, ${BLUE}Enter${YELLOW} to continue)"
-read -r
 
 
-# checkinrg upstream really point to djangoCMS
+# checking upstream really point to djangoCMS
 status "- Setting up upstream to ${upstream_source}"
 
 upstream=$(git remote -v | grep fetch | grep upstream | awk '{print $2}')
@@ -160,11 +152,13 @@ if [ "${upstream_source}" != "${upstream}" ]; then
 fi
 
 status "- Cleaning the environment:"
+pr_branch="release/new_release"
 # first go to ${base_branch} (default is develop) and ensure we got the latest and greatest
 git clean -dfx
 git restore --staged .
 git checkout .
-git pull upstream "${base_branch}"
+git pull "${base_branch}"
+
 
 # installing needed nodejs module
 status "- syncing fork"
@@ -174,7 +168,7 @@ git push -u origin "${base_branch}"
 
 status "- preparing branch ${BRANCH}"
 # checking if the branch exists?
-if ! git branch -a | grep -q "remotes/upstream/${BRANCH}\$"; then
+if ! git branch -a | grep -q "remotes/origin/${BRANCH}\$"; then
     git checkout -b "${BRANCH}"
     git push upstream "${BRANCH}"
 else
@@ -186,6 +180,8 @@ fi
 # cleaning on the branch
 git clean -f
 git checkout .
+git push origin --delete "${pr_branch}"
+git checkout -f "${pr_branch}"
 
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
