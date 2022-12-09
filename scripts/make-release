@@ -95,6 +95,14 @@ if echo "${origin}" | grep -q "${upstream_pattern}"; then
     # exit 1
 fi
 
+echo Origin: $origin
+echo Upstream pattern: $upstream_pattern
+
+# Create virtual environment
+python -m venv .venv
+source ~/.venv/bin/activate
+
+
 check_virtual_env
 
 # bump the version
