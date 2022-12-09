@@ -204,6 +204,8 @@ cd cms
 # 2.2: make messages and push them
 
 status "- Creating transifex messages!"
+which tx
+tx --help
 tx --version
 tx update
 tx --verison
