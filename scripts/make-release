@@ -9,6 +9,8 @@
 #
 # License: MIT
 
+tx --version
+
 set -e
 
 base_branch=develop
@@ -95,8 +97,6 @@ if echo "${origin}" | grep -q "${upstream_pattern}"; then
     # exit 1
 fi
 
-gettext --version
-
 # Create virtual environment
 python -m venv .venv
 source ./.venv/bin/activate
@@ -117,7 +117,7 @@ fi
 
 OLDVER=$(python -c "import cms; print(cms.__version__)" )
 
-git fetch --all --tags
+git fetch --all --tags --quiet
 if [ -z "$(git tag -l "${OLDVER}")" ]; then
     error "Can not find tag for version ${OLDVER} aborting ..."
     exit 1
@@ -206,7 +206,7 @@ cd cms
 # 2.2: make messages and push them
 
 status "- Creating transifex messages!"
-
+tx init -t $TX_TOKEN
 "$SCRIPTS/transifex-send-strings"
 
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
