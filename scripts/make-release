@@ -181,7 +181,9 @@ fi
 git clean -f
 git checkout .
 git push origin --delete "${pr_branch}"
-git checkout -f "${pr_branch}"
+if ! git branch -a | grep -q "remotes/origin/${pr_branch}\$"; then
+    git checkout -f "${pr_branch}"
+fi
 
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
