@@ -100,7 +100,7 @@ echo Upstream pattern: $upstream_pattern
 
 # Create virtual environment
 python -m venv .venv
-source ~/.venv/bin/activate
+source ./.venv/bin/activate
 
 
 check_virtual_env
