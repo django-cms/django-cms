@@ -200,7 +200,7 @@ git branch "${BUILD_BRANCH}"
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
 curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
-source ~/.bashrc
+export PATH=$(pwd):$PATH
 cd cms
 
 # 2.2: make messages and push them
