@@ -182,8 +182,9 @@ git clean -f
 git checkout .
 if git branch -a | grep -q "remotes/origin/${pr_branch}\$"; then
     git push origin --delete "${pr_branch}"
+    git branch -D "${pr_branch}"
 fi
-git checkout -f "${pr_branch}"
+git branch "${pr_branch}"
 
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
