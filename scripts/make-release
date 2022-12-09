@@ -9,8 +9,6 @@
 #
 # License: MIT
 
-tx --version
-
 set -e
 
 base_branch=develop
@@ -206,6 +204,9 @@ cd cms
 # 2.2: make messages and push them
 
 status "- Creating transifex messages!"
+tx --version
+tx update
+tx --verison
 tx init -t $TX_TOKEN
 "$SCRIPTS/transifex-send-strings"
 
