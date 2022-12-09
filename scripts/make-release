@@ -68,6 +68,10 @@ if [ ! -d .git ] || [ ! -d "cms" ]; then
     exit 1
 fi
 
+# setup commit
+git config --local user.email "info@django-cms.org"
+git config --local user.name "Github Release Action"
+
 # check that git is configured for commit
 if ! git config user.name >/dev/null || ! git config user.email >/dev/null; then
     error "Git must be configured for commit, please run the following commands first:"
@@ -88,7 +92,7 @@ fi
 
 if echo "${origin}" | grep -q "${upstream_pattern}"; then
     error "please configure the origin to your fork, not official django CMS origin ${origin}"
-    exit 1
+    # exit 1
 fi
 
 check_virtual_env
