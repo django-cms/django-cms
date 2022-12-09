@@ -181,7 +181,7 @@ fi
 git clean -f
 git checkout .
 git push origin --delete "${pr_branch}"
-if ! git branch -a | grep -q "remotes/origin/${pr_branch}\$"; then
+if git branch -a | grep -q "remotes/origin/${pr_branch}\$"; then
     git checkout -f "${pr_branch}"
 fi
 
