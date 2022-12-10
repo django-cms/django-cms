@@ -99,11 +99,10 @@ fi
 python -m venv .venv
 source ./.venv/bin/activate
 
-# Create copy of scripts
+# Create copy of scripts so they are not lost when changing branches
 cp -R "$SCRIPTS" "$RUNNER_TEMP"/.scripts
 SCRIPTS="$RUNNER_TEMP/.scripts"
 echo $SCRIPTS
-ls $SCRIPTS
 
 check_virtual_env
 
@@ -157,31 +156,11 @@ echo ""
 echo -e "Preparing to create a release ${GREEN}${VERSION}${VERSUFFIX}${NORMAL} from content of ${YELLOW}${base_branch}${NORMAL} (currently version ${YELLOW}${OLDVER}${NORMAL})"
 echo ""
 
-
-# checking upstream really point to djangoCMS
-#status "- Setting up upstream to ${upstream_source}"
-#
-#upstream=$(git remote -v | grep fetch | grep upstream | awk '{print $2}')
-#if [ "${upstream_source}" != "${upstream}" ]; then
-#    if [ -n "${upstream}" ]; then
-#        git remote remove upstream
-#    fi
-#    git remote add upstream ${upstream_source}
-#fi
-#
 status "- Cleaning the environment:"
 # first go to ${base_branch} (default is develop) and ensure we got the latest and greatest
 git clean -dfx
 git restore --staged .
 git checkout .
-#git pull "${base_branch}"
-
-
-# installing needed nodejs module
-# status "- syncing fork"
-# updating the local repository, and pushing this to fork
-# git pull upstream "${base_branch}"
-# git push -u origin "${base_branch}"
 
 status "- preparing branch ${BRANCH}"
 # checking if the branch exists?
@@ -301,10 +280,6 @@ if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
 }" docs/upgrade/index.rst
 fi
 
-#review CHANGELOG.rst
-#review "${upgrade_doc}"
-#review docs/upgrade/index.rst
-#review docs/conf.py
 #
 # commit documentations
 git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX}updating latest docs" "${upgrade_doc}" CHANGELOG.rst docs/upgrade/index.rst docs/conf.py
@@ -315,7 +290,9 @@ git push --set-upstream origin "${BUILD_BRANCH}"
 
 success "Release process complete on the fork"
 echo -e "To complete the process:"
-echo -e "1. ${BLUE}Please create a Pull Request${NORMAL} from your fork to ${YELLOW}${BRANCH}${NORMAL}"
-echo -e "2. When the PR is merged in target branch, execute: ${BLUE}git tag ${TAG}; git push upstream ${TAG}"
-echo -e "3. Create a PR from ${BRANCH} to ${base_branch} then to develop when golden release is accepted"
+echo -e "1. Review and commit potential change of CHANGELOG.rst, ${upgrade_doc}, docs/upgrade/index.rst"
+echo -e "   and docs/conf.py to ${YELLOW}${BUILD_BRANCH}${NORMAL}"
+echo -e "2. ${BLUE}Please create a Pull Request${NORMAL} from ${YELLOW}${BUILD_BRANCH}${NORMAL} to ${YELLOW}${BRANCH}${NORMAL}"
+echo -e "3. When the PR is merged in target branch, execute: ${BLUE}git tag ${TAG}; git push upstream ${TAG}"
+echo -e "4. Create a PR from ${BRANCH} to ${base_branch} then to develop when golden release is accepted"
 success "Enjoy!"
