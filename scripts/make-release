@@ -202,7 +202,7 @@ if git branch -a | grep -q "remotes/origin/${BUILD_BRANCH}\$"; then
     git branch -D "${BUILD_BRANCH}"
 fi
 git checkout -b "${BUILD_BRANCH}" "${BRANCH}"
-git ls-tree "${BUILD_BRANCH}"
+git ls-tree "${BUILD_BRANCH}" -r
 
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
