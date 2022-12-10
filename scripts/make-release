@@ -311,7 +311,7 @@ git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX
 
 # update the blog post using the What's new section
 status "Pushing to repo"
-git push
+git push --set-upstream origin "${BUILD_BRANCH}"
 
 success "Release process complete on the fork"
 echo -e "To complete the process:"

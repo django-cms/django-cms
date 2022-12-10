@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v3
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v3
-      - name: Start building version ${{ inputs.version }} from branch ${GITHUB_REF}
+      - name: Start building version ${{ inputs.version }}
         env:
           BUILD_BRANCH: release/build
           TX_TOKEN: ${{ secrets.TX_TOKEN }}
