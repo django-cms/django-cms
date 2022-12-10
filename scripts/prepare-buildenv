@@ -38,7 +38,7 @@ if ! command -v gulp; then
 fi
 
 status "- Installing transifex cli"
-curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash
-export PATH=$(pwd):$PATH
+( cd "$SCRIPTS" && curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash )
+ls "$SCRIPTS"
 sudo apt-get -qq install gettext
 

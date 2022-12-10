@@ -7,8 +7,8 @@ ROOT=$(git rev-parse --show-toplevel)
 
 cd "${ROOT}/cms"
 
-echo tx pull --force --token $TX_TOKEN
-tx pull --force --token $TX_TOKEN
+echo tx pull --force
+"${SCRIPTS}/tx" pull --force
 echo Done.
 django-admin compilemessages
 
