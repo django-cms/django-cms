@@ -99,6 +99,11 @@ fi
 python -m venv .venv
 source ./.venv/bin/activate
 
+# Create copy of scripts
+cp -R "$SCRIPTS" ./.scripts
+SCRIPTS="`pwd`/.scripts"
+
+
 check_virtual_env
 
 # bump the version
