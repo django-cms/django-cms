@@ -195,7 +195,8 @@ if git branch -a | grep -q "remotes/origin/${BUILD_BRANCH}\$"; then
     git push origin --delete "${BUILD_BRANCH}"
     git branch -D "${BUILD_BRANCH}"
 fi
-git branch "${BUILD_BRANCH}"
+git checkout -b "${BUILD_BRANCH}" "${BRANCH}"
+git ls-tree "${BUILD_BRANCH}"
 
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
@@ -204,7 +205,7 @@ cd cms
 # 2.2: make messages and push them
 
 status "- Creating transifex messages!"
-# "$SCRIPTS/transifex-send-strings"
+"$SCRIPTS/transifex-send-strings"
 
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
 
@@ -224,7 +225,7 @@ sed -i -e "s/__version__ = '.*'/__version__ = '$FULL_VERSION'/" __init__.py
 git commit __init__.py -m "${COMMIT_PREFIX}Bumped version to ${FULL_VERSION}"
 
 status "- Fetching strings from transifex"
-#"${SCRIPTS}/transifex-pull-strings"
+"${SCRIPTS}/transifex-pull-strings"
 
 # Before compiling:
 # ignore changesets that only involves "^POT-Creation-Date:" "^PO-Revision-Date:"
