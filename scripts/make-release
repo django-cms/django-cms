@@ -100,9 +100,10 @@ python -m venv .venv
 source ./.venv/bin/activate
 
 # Create copy of scripts
-cp -R "$SCRIPTS" ./.scripts
-SCRIPTS="`pwd`/.scripts"
-
+cp -R "$SCRIPTS" "$RUNNER_TEMP"/.scripts
+SCRIPTS="$RUNNER_TEMP/.scripts"
+echo $SCRIPTS
+ls $SCRIPTS
 
 check_virtual_env
 
