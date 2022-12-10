@@ -29,8 +29,8 @@ load_nvm
 nvm install "${nvm_ver}"
 nvm use "${nvm_ver}"
 
-status "- Installing required node packages"
-npm install --loglevel warn
+status "- Installing required node packages (silent)"
+npm install &>/dev/null
 
 if ! command -v gulp; then
     npm install gulp@4.0.2 --loglevel warn
