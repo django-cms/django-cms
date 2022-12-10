@@ -213,9 +213,6 @@ status "************************************************************************
 status "***                      Preparing for actual release!!                              ***"
 status "****************************************************************************************"
 echo ""
-echo -e " This is your ${RED}LAST CHANCE TO CANCEL${NORMAL}"
-echo -e "(Ctrl-C to cancel, ${BLUE}Enter${NORMAL} to continue)"
-read -r
 
 
 # 2.3 Check sphinx configuration (check the doc for version or things should not be there)
