@@ -159,16 +159,16 @@ echo ""
 
 
 # checking upstream really point to djangoCMS
-status "- Setting up upstream to ${upstream_source}"
-
-upstream=$(git remote -v | grep fetch | grep upstream | awk '{print $2}')
-if [ "${upstream_source}" != "${upstream}" ]; then
-    if [ -n "${upstream}" ]; then
-        git remote remove upstream
-    fi
-    git remote add upstream ${upstream_source}
-fi
-
+#status "- Setting up upstream to ${upstream_source}"
+#
+#upstream=$(git remote -v | grep fetch | grep upstream | awk '{print $2}')
+#if [ "${upstream_source}" != "${upstream}" ]; then
+#    if [ -n "${upstream}" ]; then
+#        git remote remove upstream
+#    fi
+#    git remote add upstream ${upstream_source}
+#fi
+#
 status "- Cleaning the environment:"
 # first go to ${base_branch} (default is develop) and ensure we got the latest and greatest
 git clean -dfx
@@ -202,7 +202,8 @@ if git branch -a | grep -q "remotes/origin/${BUILD_BRANCH}\$"; then
     git branch -D "${BUILD_BRANCH}"
 fi
 git checkout -b "${BUILD_BRANCH}" "${BRANCH}"
-git ls-tree "${BUILD_BRANCH}" -r
+# For manipulation of branch take old version from this branch
+OLDVER=$(python -c "import cms; print(cms.__version__)" )
 
 # ensuring we have the proper env installed in pip
 "${SCRIPTS}/prepare-buildenv"
@@ -216,9 +217,9 @@ status "- Creating transifex messages!"
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
 
 echo ""
-status "****************************************************************************************"
-status "***                      Preparing for actual release!!                              ***"
-status "****************************************************************************************"
+status "******************************************************************************"
+status "***                 Preparing for actual release!!                         ***"
+status "******************************************************************************"
 echo ""
 
 
