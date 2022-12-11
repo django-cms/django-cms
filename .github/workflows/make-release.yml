@@ -13,7 +13,7 @@ on:
 
 jobs:
   make-release:
-    if: github.actor == 'marksweb' && github.actor == 'fsbraun'
+    if: github.actor == 'marksweb' || github.actor == 'fsbraun'
     runs-on: ubuntu-latest
     steps:
       - name: Check out
