@@ -23,6 +23,7 @@ fi
 nvm_ver="$(cat .nvmrc)"
 
 cd cms
+status "- Installing node/npm"
 
 load_nvm
 
