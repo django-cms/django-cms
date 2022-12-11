@@ -8,5 +8,5 @@ django-admin makemessages -l en --no-location
 django-admin makemessages -l en -d djangojs --no-location
 
 "${SCRIPTS}/filter-locale-changes"
-"${SCRIPTS}/tx" push --source -l en --translation
+"${SCRIPTS}/tx" push
 
