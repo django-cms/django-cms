@@ -187,6 +187,7 @@ cd cms
 # 2.2: make messages and push them
 
 status "- Creating transifex messages!"
+"${SCRIPTS}/tx" status
 "$SCRIPTS/transifex-send-strings"
 
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
