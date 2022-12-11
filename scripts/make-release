@@ -189,8 +189,8 @@ cd cms
 status "- Sending messages to transifex does not work currently"
 status "  Send them manually before creating a version"
 # status "- Creating transifex messages!"
-# "$SCRIPTS/tx" status
-# "$SCRIPTS/transifex-send-strings"
+"$SCRIPTS/tx" --token "$TX_TOKEN" status
+"$SCRIPTS/transifex-send-strings"
 
 git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
 
