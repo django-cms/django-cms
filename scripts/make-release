@@ -166,19 +166,17 @@ status "- preparing branch ${BRANCH}"
 # checking if the branch exists?
 if ! git branch -a | grep -q "remotes/origin/${BRANCH}\$"; then
     git checkout -b "${BRANCH}"
-#    git push upstream "${BRANCH}"
 else
     echo "You appear to already have a ${BRANCH} created, using it"
     git checkout "${BRANCH}"
-#    git pull upstream "${BRANCH}"
 fi
 
 # cleaning on the branch
 git clean -f
 git checkout .
 if git branch -a | grep -q "remotes/origin/${BUILD_BRANCH}\$"; then
-    git push origin --delete "${BUILD_BRANCH}"
     git branch -D "${BUILD_BRANCH}"
+    git push origin --delete "${BUILD_BRANCH}"
 fi
 git checkout -b "${BUILD_BRANCH}" "${BRANCH}"
 # For manipulation of branch take old version from this branch
