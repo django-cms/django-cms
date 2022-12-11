@@ -7,8 +7,8 @@ cd "${ROOT}/cms"
 django-admin makemessages -l en --no-location
 django-admin makemessages -l en -d djangojs --no-location
 
-cd "${ROOT}"
 
 "${SCRIPTS}/filter-locale-changes"
+cd "${ROOT}"
 "${SCRIPTS}/tx" push  -l en -t
 
