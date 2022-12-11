@@ -37,8 +37,7 @@ if ! command -v gulp; then
     check_command_exists gulp
 fi
 
-status "- Installing transifex cli"
-( cd "$SCRIPTS" && curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash )
-ls "$SCRIPTS"
-sudo apt-get -qq install gettext
+status "- Installing transifex cli and gettext"
+( cd "$SCRIPTS" && curl -o- https://raw.githubusercontent.com/transifex/cli/master/install.sh | bash &>/dev/null )
+sudo apt-get -qq install gettext &>/dev/null
 
