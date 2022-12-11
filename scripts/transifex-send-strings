@@ -9,6 +9,5 @@ django-admin makemessages -l en -d djangojs --no-location
 
 
 "${SCRIPTS}/filter-locale-changes"
-cd "${ROOT}"
-"${SCRIPTS}/tx" push  -l en -t
+"${SCRIPTS}/tx" push  -l en
 
