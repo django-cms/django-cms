@@ -102,7 +102,6 @@ source ./.venv/bin/activate
 # Create copy of scripts so they are not lost when changing branches
 cp -R "$SCRIPTS" "$RUNNER_TEMP"/.scripts
 SCRIPTS="$RUNNER_TEMP/.scripts"
-echo $SCRIPTS
 
 check_virtual_env
 
@@ -175,7 +174,6 @@ fi
 git clean -f
 git checkout .
 if git branch -a | grep -q "remotes/origin/${BUILD_BRANCH}\$"; then
-    git branch -D "${BUILD_BRANCH}"
     git push origin --delete "${BUILD_BRANCH}"
 fi
 git checkout -b "${BUILD_BRANCH}" "${BRANCH}"
