@@ -2,6 +2,8 @@
 Changelog
 =========
 
+3.11.1 (2022-12-12)
+===================
 
 Features:
 ---------
@@ -31,42 +33,45 @@ Refactoring and Cleanups:
 Statistics:
 -----------
 
-This release includes       40 pull requests, and was created with the help of the
-following contributors (in alphabetical order):
+This release  was created with the help of the following contributors (in alphabetical order):
 
-* Cage Johnson (1 pull request)
-* Christian Clauss (1 pull request)
-* Dapo Adedire (1 pull request)
-* Fabian Braun (11 pull requests)
-* G3RB3N (1 pull request)
-* Hussein Srour (1 pull request)
-* Marco Bonetti (2 pull requests)
-* Mark Walker (10 pull requests)
-* Micah Denbraver (1 pull request)
-* Qijia Liu (1 pull request)
-* Shivan Sivakumaran (1 pull request)
-* Vinit Kumar (1 pull request)
-* code-review-doctor (1 pull request)
-* dependabot[bot] (0 pull request)
-* ton77v (1 pull request)
-* viliammihalik (1 pull request)
-* wesleysima (1 pull request)
+* Fabian Braun
+* G3RB3N
+* Marco Benetti
+* Mark Walker
+* Micah Denbraver
+* Qijia Liu
+* Stefan van den Eertwegh
+* villiammihalik
+* Vinit Kumar
+
 
 With the review help of the following contributors:
 
+* Cage Johnson
 * Christian Clauss
 * Conrad
+* Dapo Adedire
 * Fabian Braun
 * Florian Delizy
+* G3RB3N
+* Hussein Srour
 * Marco Bonetti
 * Mark Walker
+* Micah Denbraver
 * Pankrat
 * Patrick Mazulo
+* Qijia Liu
+* Shivan Sivakumaran
 * Simon Krull
 * Vinit Kumar
+* code-review-doctor
 * dependabot[bot]
 * fsbraun
 * jefe
+* ton77v
+* viliammihalik
+* wesleysima
 
 Thanks to all contributors for their efforts!
 

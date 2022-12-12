@@ -1,4 +1,4 @@
-__version__ = '3.11.1rc1'
+__version__ = '3.11.1'
 
 try:
     import django
