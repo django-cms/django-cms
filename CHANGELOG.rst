@@ -2,11 +2,11 @@
 Changelog
 =========
 
+3.11.1 (2022-12-12)
+===================
 
 Features:
 ---------
-* Add github actions for publishing on pyi (#7438) (7c9fe65fc) -- Fabian Braun
-* Release/3.11.1 (#7431) (f99ba69ab) -- Fabian Braun
 * add Python 3.11 support for Django CMS (#7422) (3fe1449e6) -- Vinit Kumar
 * Support for Django 4.1 (#7404) (777864af3) -- Fabian Braun
 * Add support for tel: and mailto: URIs in Advanced Page Settings redirect field (#7370) (0fd058ed3) -- Mark Walker
@@ -33,10 +33,18 @@ Refactoring and Cleanups:
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release  was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (2 pull requests)
-* Github Release Action (2 pull requests)
+* Fabian Braun
+* G3RB3N
+* Marco Benetti
+* Mark Walker
+* Micah Denbraver
+* Qijia Liu
+* Stefan van den Eertwegh
+* villiammihalik
+* Vinit Kumar
+
 
 With the review help of the following contributors:
 
