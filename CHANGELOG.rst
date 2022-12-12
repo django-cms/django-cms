@@ -5,6 +5,8 @@ Changelog
 
 Features:
 ---------
+* Add github actions for publishing on pyi (#7438) (7c9fe65fc) -- Fabian Braun
+* Release/3.11.1 (#7431) (f99ba69ab) -- Fabian Braun
 * add Python 3.11 support for Django CMS (#7422) (3fe1449e6) -- Vinit Kumar
 * Support for Django 4.1 (#7404) (777864af3) -- Fabian Braun
 * Add support for tel: and mailto: URIs in Advanced Page Settings redirect field (#7370) (0fd058ed3) -- Mark Walker
@@ -31,42 +33,37 @@ Refactoring and Cleanups:
 Statistics:
 -----------
 
-This release includes       40 pull requests, and was created with the help of the
-following contributors (in alphabetical order):
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Cage Johnson (1 pull request)
-* Christian Clauss (1 pull request)
-* Dapo Adedire (1 pull request)
-* Fabian Braun (11 pull requests)
-* G3RB3N (1 pull request)
-* Hussein Srour (1 pull request)
-* Marco Bonetti (2 pull requests)
-* Mark Walker (10 pull requests)
-* Micah Denbraver (1 pull request)
-* Qijia Liu (1 pull request)
-* Shivan Sivakumaran (1 pull request)
-* Vinit Kumar (1 pull request)
-* code-review-doctor (1 pull request)
-* dependabot[bot] (0 pull request)
-* ton77v (1 pull request)
-* viliammihalik (1 pull request)
-* wesleysima (1 pull request)
+* Fabian Braun (2 pull requests)
+* Github Release Action (2 pull requests)
 
 With the review help of the following contributors:
 
+* Cage Johnson
 * Christian Clauss
 * Conrad
+* Dapo Adedire
 * Fabian Braun
 * Florian Delizy
+* G3RB3N
+* Hussein Srour
 * Marco Bonetti
 * Mark Walker
+* Micah Denbraver
 * Pankrat
 * Patrick Mazulo
+* Qijia Liu
+* Shivan Sivakumaran
 * Simon Krull
 * Vinit Kumar
+* code-review-doctor
 * dependabot[bot]
 * fsbraun
 * jefe
+* ton77v
+* viliammihalik
+* wesleysima
 
 Thanks to all contributors for their efforts!
 
