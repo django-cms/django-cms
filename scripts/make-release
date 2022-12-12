@@ -90,11 +90,6 @@ if [ -z "${origin}" ]; then
     exit 1
 fi
 
-if echo "${origin}" | grep -q "${upstream_pattern}"; then
-    error "please configure the origin to your fork, not official django CMS origin ${origin}"
-    # exit 1
-fi
-
 # Create virtual environment
 python -m venv .venv
 source ./.venv/bin/activate
