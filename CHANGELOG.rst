@@ -82,9 +82,6 @@ Highlights:
 -----------
 * Support for django 4
 * Dark mode support
-
-* Support for Python 3.11
-* Support for django 4.1
 * Allow to partially override ``CMS_CACHE_DURATIONS``
 * Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
 * Make javascript dark mode functions available to popups as CMS.API.getColorScheme
@@ -93,7 +90,7 @@ Highlights:
 * Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 * Fixed permission denied error after page create (#6866)
 * Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
-* Fix #3548 by reflecting the request language when resolving identical page slugs 
+* Fix #3548 by reflecting the request language when resolving identical page slugs
 * Deprecate usage of legacy SEND_BROKEN_LINK_EMAILS setting (removed since Django 1.8)
 * Add deprecation warning to ``cms.utils.i18n.get_current_language()`` (#6720)
 
