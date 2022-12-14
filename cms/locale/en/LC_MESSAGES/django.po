@@ -8,11 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-<<<<<<< HEAD
 "POT-Creation-Date: 2022-11-05 20:40+0100\n"
-=======
-"POT-Creation-Date: 2022-08-02 11:21+0200\n"
->>>>>>> develop
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -384,13 +380,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-<<<<<<< HEAD
 "This is an alias reference, you can edit the content only on the <a "
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
-=======
-"This is an alias reference, you can edit the content only on the <a href="
-"\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
->>>>>>> develop
 msgstr ""
 
 msgid "Getting started developer guide"
@@ -1220,11 +1211,7 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-<<<<<<< HEAD
 msgid "The following error occurred:"
-=======
-msgid "The following error occured:"
->>>>>>> develop
 msgstr ""
 
 msgid "Action successful."
@@ -1358,13 +1345,8 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-<<<<<<< HEAD
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
 "add\">Add the first page</a> to the system to continue.\n"
-=======
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
-"\">Add the first page</a> to the system to continue.\n"
->>>>>>> develop
 "                    "
 msgstr ""
 
@@ -1372,13 +1354,8 @@ msgstr ""
 msgid ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
-<<<<<<< HEAD
 "                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
 "add\">add a page</a> manually.\n"
-=======
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
-"\">add a page</a> manually.\n"
->>>>>>> develop
 "                    "
 msgstr ""
 
@@ -1444,13 +1421,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-<<<<<<< HEAD
 "A template tag couldn't find the page with lookup arguments "
 "`%(page_lookup)s\n"
-=======
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
->>>>>>> develop
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
 
