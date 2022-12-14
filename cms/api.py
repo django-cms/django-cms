@@ -536,7 +536,7 @@ def publish_page(page, user, language):
 
         For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
     """
-    warnings.warn('This API function has been removed. For publishing functionality use djangocms-versioning.',
+    warnings.warn('This API function has been removed. For publishing functionality use a package that adds publishing, such as: djangocms-versioning.',
                   UserWarning, stacklevel=2)
 
 
