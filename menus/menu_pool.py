@@ -104,8 +104,7 @@ class MenuRenderer(object):
         self.request_language = get_language_from_request(request, check_path=True)
         self.site = Site.objects.get_current(request)
         toolbar = getattr(request, "toolbar", None)
-        # No toolbar - no draft mode
-        self.draft_mode_active = toolbar.edit_mode_active or toolbar.preview_mode_active if toolbar else False
+        self.edit_or_preview = toolbar.edit_mode_active or toolbar.preview_mode_active if toolbar else False
 
     @property
     def cache_key(self):
@@ -116,8 +115,8 @@ class MenuRenderer(object):
         if self.request.user.is_authenticated:
             key += '_%s_user' % self.request.user.pk
 
-        if self.draft_mode_active:
-            key += ':draft'
+        if self.edit_or_preview:
+            key += ':edit'
         else:
             key += ':public'
         return key
