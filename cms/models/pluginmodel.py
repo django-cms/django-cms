@@ -313,7 +313,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         """
 
         warnings.warn(f"{inspect.stack()[0][3]} is deprecated and will be removed in django CMS 4.1. "
-                      f"Use Placeholder.copy_plugins() instead.",
+                      f"From version 4 on, please use cms.utils.copy_plugins_to_placeholder instead.",
                       DeprecationWarning, stacklevel=2)
 
         try:
