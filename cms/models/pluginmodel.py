@@ -1,3 +1,4 @@
+import inspect
 import json
 import os
 import warnings
@@ -310,6 +311,11 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         then overwriting its ID at step 5, the ORM will copy the custom
         fields for us.
         """
+
+        warnings.warn(f"{inspect.stack()[0][3]} is deprecated and will be removed in django CMS 4.1. "
+                      f"Use Placeholder.copy_plugins() instead.",
+                      DeprecationWarning, stacklevel=2)
+
         try:
             plugin_instance, cls = self.get_plugin_instance()
         except KeyError:  # plugin type not found anymore
