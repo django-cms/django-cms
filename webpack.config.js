@@ -68,6 +68,27 @@ module.exports = function(opts) {
                     exclude: /(node_modules|libs|addons\/jquery.*)/,
                     include: path.join(__dirname, 'cms')
                 },
+                // diff-dom transpile
+                {
+                    test: /\.js$/,
+                    use: [
+                        {
+                            loader: 'babel-loader',
+                            options: {
+                                retainLines: true,
+                                presets: [
+                                    [
+                                        'env',
+                                        {
+                                            forceAllTransforms: true,
+                                        },
+                                    ],
+                                ],
+                            },
+                        },
+                    ],
+                    include: /(diff-dom.*)/,                    
+                },                
                 {
                     test: /(modules\/jquery|libs\/pep|select2\/select2)/,
                     use: [
