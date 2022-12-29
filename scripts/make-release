@@ -226,7 +226,7 @@ git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 
 
 status "- preparing documentation"
-"${SCRIPTS}/make-changelog" "${FULL_VERSION}"
+"${SCRIPTS}/make-changelog" "${FULL_VERSION}" || echo "Manual update of changelog necessary"
 
 upgrade_doc="docs/upgrade/${VERSION}.rst"
 
