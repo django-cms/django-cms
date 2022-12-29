@@ -41,9 +41,9 @@ class CreateCMSPageForm(AddPageForm):
     meta_description = None
 
     content = forms.CharField(
-        label=_(u'Content'), widget=text_widget, required=False,
-        help_text=_(u"Optional. If supplied, will be automatically added "
-                    u"within a new text plugin.")
+        label=_('Content'), widget=text_widget, required=False,
+        help_text=_("Optional. If supplied, will be automatically added "
+                    "within a new text plugin.")
     )
 
     class Media:
@@ -55,10 +55,10 @@ class CreateCMSPageForm(AddPageForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['title'].help_text = _(u"Provide a title for the new page.")
+        self.fields['title'].help_text = _("Provide a title for the new page.")
         self.fields['slug'].required = False
         self.fields['slug'].widget = SlugWidget()
-        self.fields['slug'].help_text = _(u"Leave empty for automatic slug, or override as required.")
+        self.fields['slug'].help_text = _("Leave empty for automatic slug, or override as required.")
 
     def get_placeholder(self, page_content, slot=None):
         """

@@ -1,13 +1,16 @@
 import hashlib
 
+from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _, override as force_language
 
+from cms.toolbar.utils import get_object_preview_url
 
-class WizardBase():
+
+class WizardBase:
     """
 
     """
@@ -16,15 +19,18 @@ class WizardBase():
     def __init__(self, title, weight, form, model=None, template_name=None,
                  description=None):
         """
-        :param title: This is used on the start form.
+        :param title: The title of the wizard. It will appear in a large font size on the wizard “menu”
         :param weight: Used for determining the order of the wizards on the
                        creation form.
-        :param form: The form to use.
+        :param form: The form to use for this wizard. This is mandatory, but can
+                     be sub-classed from :class:`django.forms.Form` or clas:`django.forms.ModelForm`.
         :param model: Required either here or in the form's Meta class. This is
                       used to determine uniqueness of the wizards, so, only one
                       wizard per model.
         :param template_name: The full-path to the template to use, if any.
-        :param description: This is used on the start form.
+        :param description: This is used on the start form. The description is optional, but if it is
+                            not supplied, the CMS will create one from the pattern:
+                            "Create a new «model.verbose_name» instance."
         """
         # NOTE: If class attributes or properties are changed, consider updating
         # cms.templatetags.cms_wizard_tags.WizardProperty too.
@@ -134,13 +140,15 @@ class Wizard(WizardBase):
         :param object obj: The created object
         :param dict kwargs: Arbitrary keyword arguments
         """
-        if 'language' in kwargs:
-            with force_language(kwargs['language']):
-                url = obj.get_absolute_url()
-        else:
-            url = obj.get_absolute_url()
+        extension = apps.get_app_config('cms').cms_extension
 
-        return url
+        if obj.__class__ in extension.toolbar_enabled_models:
+            return get_object_preview_url(obj, language=kwargs.get("language", None))
+        else:
+            if "language" in kwargs:
+                with force_language(language=kwargs["language"]):
+                    return obj.get_absolute_url()
+            return obj.get_absolute_url()
 
     def get_model(self):
         if self.model:

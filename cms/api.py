@@ -311,6 +311,7 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
         path = page.get_path_for_slug(slug, language)
 
     if created_by and isinstance(created_by, get_user_model()):
+        _thread_locals.user = created_by
         created_by = get_clean_username(created_by)
 
     page.urls.create(
@@ -321,7 +322,9 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
         language=language,
     )
 
-    page_content = PageContent.objects.create(
+    # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
+    user = getattr(_thread_locals, "user", "unknown user")
+    page_content = PageContent.objects.with_user(user).create(
         language=language,
         title=title,
         menu_title=menu_title,
@@ -533,7 +536,9 @@ def publish_page(page, user, language):
 
         For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
     """
-    warnings.warn('This API function has been removed', UserWarning)
+    warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
+                  'publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
 
 
 def publish_pages(include_unpublished=False, language=None, site=None):
@@ -544,7 +549,9 @@ def publish_pages(include_unpublished=False, language=None, site=None):
 
         For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
     """
-    warnings.warn('This API function has been removed', UserWarning)
+    warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
+                  'publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
 
 
 def get_page_draft(page):
@@ -555,7 +562,9 @@ def get_page_draft(page):
 
         For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
     """
-    warnings.warn('This API function has been removed', UserWarning)
+    warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
+                  'publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
 
 
 def copy_plugins_to_language(page, source_language, target_language,

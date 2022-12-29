@@ -23,6 +23,7 @@ class CMSCoreExtensions(CMSAppExtension):
     def __init__(self):
         self.wizards = {}
         self.toolbar_enabled_models = {}
+        self.toolbar_mixins = []
 
     def configure_wizards(self, cms_config):
         """
@@ -56,6 +57,11 @@ class CMSCoreExtensions(CMSAppExtension):
             else:
                 self.toolbar_enabled_models[model] = render_func
 
+    def configure_toolbar_mixin(self, cms_config):
+        if not issubclass(cms_config.cms_toolbar_mixin, object):
+            raise ImproperlyConfigured("cms_toolbar_mixin must be class")
+        self.toolbar_mixins.append(cms_config.cms_toolbar_mixin)
+
     def configure_app(self, cms_config):
         # The cms_wizards settings is optional. If it's not here
         # just move on.
@@ -63,3 +69,5 @@ class CMSCoreExtensions(CMSAppExtension):
             self.configure_wizards(cms_config)
         if hasattr(cms_config, 'cms_toolbar_enabled_models'):
             self.configure_toolbar_enabled_models(cms_config)
+        if hasattr(cms_config, 'cms_toolbar_mixin'):
+            self.configure_toolbar_mixin(cms_config)

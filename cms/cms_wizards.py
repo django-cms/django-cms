@@ -23,6 +23,10 @@ class CMSPageWizard(Wizard):
             has_perm = user_can_add_page(user)
         return has_perm
 
+    def get_success_url(self, obj, **kwargs):
+        page_content = obj.pagecontent_set(manager="admin_manager").first()
+        return super().get_success_url(page_content, **kwargs)
+
 
 class CMSSubPageWizard(Wizard):
 
@@ -33,19 +37,23 @@ class CMSSubPageWizard(Wizard):
             return False
         return user_can_add_subpage(user, target=page)
 
+    def get_success_url(self, obj, **kwargs):
+        page_content = obj.pagecontent_set(manager="admin_manager").first()
+        return super().get_success_url(page_content, **kwargs)
+
 
 cms_page_wizard = CMSPageWizard(
-    title=_(u"New page"),
+    title=_("New page"),
     weight=100,
     form=CreateCMSPageForm,
     model=Page,
-    description=_(u"Create a new page next to the current page.")
+    description=_("Create a new page next to the current page.")
 )
 
 cms_subpage_wizard = CMSSubPageWizard(
-    title=_(u"New sub page"),
+    title=_("New sub page"),
     weight=110,
     form=CreateCMSSubPageForm,
     model=Page,
-    description=_(u"Create a page below the current page.")
+    description=_("Create a page below the current page.")
 )

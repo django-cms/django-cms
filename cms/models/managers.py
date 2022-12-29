@@ -41,7 +41,6 @@ class PageManager(models.Manager):
         from cms.plugin_pool import plugin_pool
 
         qs = self.get_queryset()
-        qs = qs.public()
 
         if current_site_only:
             site = Site.objects.get_current()
@@ -63,7 +62,7 @@ class PageManager(models.Manager):
             if related_query_name and not related_query_name.startswith('+'):
                 for field in cmsplugin.search_fields:
                     qp |= Q(**{
-                        'placeholders__cmsplugin__{0}__{1}__icontains'.format(
+                        'pagecontent_set__placeholders__cmsplugin__{0}__{1}__icontains'.format(
                             related_query_name,
                             field,
                         ): q})
@@ -86,14 +85,19 @@ class PageNodeManager(MP_NodeManager):
         return self.filter(site=site)
 
 
-class PageUrlManager(models.Manager):
+class WithUserMixin:
+    """empty mixin adds with_user """
+    def with_user(self, user):
+        return self
 
+
+class PageUrlManager(WithUserMixin, models.Manager):
     def get_for_site(self, site, **kwargs):
         kwargs['page__node__site'] = site
         return self.filter(**kwargs)
 
 
-class PageContentManager(models.Manager):
+class PageContentManager(WithUserMixin, models.Manager):
     def get_title(self, page, language, language_fallback=False):
         """
         Gets the latest content for a particular page and language. Falls back
@@ -119,8 +123,17 @@ class PageContentManager(models.Manager):
         return None
 
 
-class PlaceholderManager(models.Manager):
+class PageContentAdminQuerySet(models.QuerySet):
+    def current_content_iterator(self, **kwargs):
+        return iter(self.filter(**kwargs))
 
+
+class PageContentAdminManager(PageContentManager):
+    def get_queryset(self):
+        return PageContentAdminQuerySet(self.model, using=self._db)
+
+
+class PlaceholderManager(models.Manager):
     def get_for_obj(self, obj):
         """
         Get all placeholders for given object

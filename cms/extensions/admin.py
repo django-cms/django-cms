@@ -62,8 +62,8 @@ class PageContentExtensionAdmin(ExtensionAdmin):
 
     def save_model(self, request, obj, form, change):
         if not change and 'extended_object' in request.GET:
-            obj.extended_object = PageContent.objects.get(pk=request.GET['extended_object'])
-            content = PageContent.objects.get(pk=request.GET['extended_object'])
+            obj.extended_object = PageContent.admin_manager.get(pk=request.GET['extended_object'])
+            content = PageContent.admin_manager.get(pk=request.GET['extended_object'])
         else:
             content = obj.extended_object
         if not user_can_change_page(request.user, page=content.page):
@@ -91,7 +91,7 @@ class PageContentExtensionAdmin(ExtensionAdmin):
         extended_object_id = request.GET.get('extended_object', False)
         if extended_object_id:
             try:
-                content = PageContent.objects.get(pk=extended_object_id)
+                content = PageContent.admin_manager.get(pk=extended_object_id)
                 extension = self.model.objects.get(extended_object=content)
                 opts = self.model._meta
                 change_url = reverse(

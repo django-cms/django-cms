@@ -30,20 +30,14 @@ class GetAdminUrlForLanguage(AsTag):
         Argument('varname', required=False, resolve=False)
     )
 
-    def get_admin_url_for_language(self, context, page, language):
-        if language not in page.get_languages():
-            admin_url = admin_reverse('cms_pagecontent_add')
-            admin_url += '?cms_page={}&language={}'.format(page.pk, language)
-            return admin_url
-
-        page_content = page.get_content_obj(language, fallback=False)
-        return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
-
     def get_value(self, context, page, language):
-        # if not page.get_content_obj(language).is_editable(context["request"]):
-        #     # Convention: If this tag returns None the page content cannot be edited
-        #     return ""
-        return self.get_admin_url_for_language(context, page, language)
+        if language in page.get_languages():
+            page_content = page.get_content_obj(language, fallback=False)
+            if page_content:
+                return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
+        admin_url = admin_reverse('cms_pagecontent_add')
+        admin_url += '?cms_page={}&language={}'.format(page.pk, language)
+        return admin_url
 
 
 register.tag(GetAdminUrlForLanguage.name, GetAdminUrlForLanguage)

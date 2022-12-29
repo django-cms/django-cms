@@ -3,6 +3,7 @@ import operator
 from collections import OrderedDict
 
 from classytags.utils import flatten_context
+from django.apps import apps
 from django.conf import settings
 from django.middleware.csrf import get_token
 from django.template.loader import render_to_string
@@ -25,6 +26,8 @@ from cms.utils.compat import DJANGO_VERSION, PYTHON_VERSION
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_site_language_from_request
+
+cms_toolbar_extensions = apps.get_app_config('cms').cms_extension.toolbar_mixins
 
 
 class BaseToolbar(ToolbarAPIMixin):
@@ -129,7 +132,7 @@ class BaseToolbar(ToolbarAPIMixin):
         return get_cms_setting('SIDEFRAME_ENABLED')
 
 
-class CMSToolbar(BaseToolbar):
+class CMSToolbarBase(BaseToolbar):
     """
     The toolbar is an instance of the :class:`~cms.toolbar.toolbar.CMSToolbar` class. This should not be
     confused with the :class:`~cms.toolbar_base.CMSToolbar`, the base class for *toolbar modifier
@@ -541,6 +544,10 @@ class CMSToolbar(BaseToolbar):
             toolbar = render_to_string('cms/toolbar/toolbar_with_structure.html', flatten_context(context))
         # return the toolbar content and the content below
         return '%s\n%s' % (toolbar, rendered_contents)
+
+
+# Add toolbar mixins from extensions to toolbar
+CMSToolbar = type("CMSToolbar", tuple(cms_toolbar_extensions + [CMSToolbarBase]), dict())
 
 
 class EmptyToolbar(BaseToolbar):

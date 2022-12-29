@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cms import constants
 from cms.models.fields import PlaceholderRelationField
-from cms.models.managers import PageContentManager
+from cms.models.managers import PageContentAdminManager, PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
 
@@ -118,6 +118,13 @@ class PageContent(models.Model):
     )
 
     objects = PageContentManager()
+    admin_manager = PageContentAdminManager()
+    """Admin_manager does lack additional functionality of objects and must only
+    be used inside admin objects or admin forms. One of its key properties is that
+    it can access all objects of type PageContent (irrespevtively of some objects
+    being hidden by third-party packages, e.g. due to viewing rights, publication
+    or moderation status.
+    """
 
     class Meta:
         default_permissions = []

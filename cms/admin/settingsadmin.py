@@ -17,7 +17,6 @@ from django.utils.translation import override
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
-from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -67,6 +66,8 @@ class SettingsAdmin(ModelAdmin):
         )
 
     def get_toolbar(self, request):
+        from cms.toolbar.toolbar import CMSToolbar
+
         form = RequestToolbarForm(request.GET or None)
 
         if not form.is_valid():

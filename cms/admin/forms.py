@@ -35,7 +35,6 @@ from cms.operations.helpers import (
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
-from cms.utils import helpers
 from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
@@ -903,7 +902,7 @@ class CopyPageForm(PageTreeForm):
     source_site = forms.ModelChoiceField(queryset=Site.objects.all(), required=True)
     copy_permissions = forms.BooleanField(initial=False, required=False)
 
-    def copy_page(self):
+    def copy_page(self, user):
         target, position = self.get_tree_options()
         copy_permissions = self.cleaned_data.get('copy_permissions', False)
         new_page = self.page.copy_with_descendants(
@@ -911,6 +910,7 @@ class CopyPageForm(PageTreeForm):
             position=position,
             copy_permissions=copy_permissions,
             target_site=self._site,
+            user=user,
         )
         return new_page
 
@@ -1361,7 +1361,11 @@ class RequestToolbarForm(forms.Form):
             raise forms.ValidationError(message)
 
         try:
-            generic_obj = helpers.get_admin_model_object_by_id(model_class, obj_id)
+            # Use admin manager if available for the toolbar form
+            if hasattr(model_class, "admin_manager"):
+                generic_obj = model_class.admin_manager.get(pk=obj_id)
+            else:
+                generic_obj = model_class.objects.get(pk=obj_id)
         except model_class.DoesNotExist:
             message = 'Invalid object lookup. Both obj_id and obj_type are required'
             raise forms.ValidationError(message)

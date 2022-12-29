@@ -370,16 +370,10 @@ class PageToolbar(CMSToolbar):
             except Resolver404:
                 return False
             else:
-                from cms.views import (
-                    details, render_object_edit, render_object_preview,
-                    render_object_structure,
+                cms_views = (
+                    "render_object_edit", "render_object_preview", "render_object_structure", "details"
                 )
-                return resolver.func in (
-                    details,  # live view
-                    render_object_preview,  # preview endpoint
-                    render_object_structure,  # structure endpoint
-                    render_object_edit  # edit endpoint
-                )
+                return resolver.func.__name__ not in cms_views
 
     def in_apphook_root(self):
         """

@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
+from django.db import models
 from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.utils.timezone import now as tz_now
@@ -464,8 +465,9 @@ class PagesTestCase(TransactionCMSTestCase):
         grand_child2_content.save()
 
         self.assertFalse(hasattr(grand_child_content, '_template_cache'))
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(0):
             self.assertEqual(child_content.template, constants.TEMPLATE_INHERITANCE_MAGIC)
+        with self.assertNumQueries(2):
             self.assertEqual(parent.get_template_name(), grand_child.get_template_name())
 
         # test template cache
@@ -917,3 +919,16 @@ class PageContentTests(CMSTestCase):
         del self.page.page_content_cache['de']
         german_content = self.page.get_content_obj('de')
         self.assertEqual(german_content.pk, self.german_content.pk)
+
+    def test_page_content_manager(self):
+        from cms.models.managers import PageContentAdminQuerySet
+
+        # check if admin_manager exists
+        self.assertTrue(isinstance(PageContent.admin_manager, models.Manager))
+        self.assertTrue(isinstance(PageContent.admin_manager.none(), PageContentAdminQuerySet))
+
+        # setup created to page contents for self.page. Test if admin_manager sees them
+        self.assertEqual(PageContent.admin_manager.filter(page=self.page).count(), 2)
+
+        # test if the current_content_iterator sees both page contents
+        self.assertEqual(len(list(PageContent.admin_manager.all().current_content_iterator(page=self.page))), 2)
