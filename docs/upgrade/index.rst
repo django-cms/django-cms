@@ -45,6 +45,7 @@ possible:
 .. toctree::
     :maxdepth: 1
 
+    4.1.0
     4.0
     3.8
     3.7.4
@@ -100,4 +101,3 @@ possible:
     2.3
     2.2
     2.1
-    unreleased

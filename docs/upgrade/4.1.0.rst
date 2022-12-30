@@ -10,7 +10,7 @@ Welcome to django CMS 4.1!
 
 These release notes cover the new features, as well as some backwards
 incompatible changes you’ll want to be aware of when upgrading from
-django CMS 4.0. If you are upgrading from django CMS 3.11 or learlier
+django CMS 4.0. If you are upgrading from django CMS 3.11 or earlier
 please urgently read the release notes of django CMS 4.0.
 
 
@@ -30,18 +30,13 @@ What's new in 4.1
 Status indicators in page tree
 ==============================
 
-* Status indicators are shown in the page tree. For django CMS core only two states are available: public and empty.
-* Django CMS core provides hooks to allow other packages to patch the status indicators, e.g., djangocms-versioning. 
-* Djangocms-versioning will add more functionality to the indicators (e.g., publish from page tree). These changes will not affect django CMS version 4.0.x.
+* Status indicators are shown in the page tree. For django CMS core only two
+  states are available: public and empty.
+* Django CMS core provides hooks to allow other packages to patch the status
+  indicators, e.g., djangocms-versioning.
+* Djangocms-versioning will add more functionality to the indicators (e.g.,
+  publish from page tree).
 
-Feature 2
-=========
-
-Feature 3
-=========
-
-Minor features
-==============
 
 Bug Fixes
 =========
@@ -68,6 +63,12 @@ TitleExtension
 Any packages using ``TitleExtension`` will need to adapt the name change in
 their code base.
 
+Monkey patching
+===============
+
+django CMS v4.1 does not support monkey patching as for djangocms-versioning
+before version 2.0. Please only use djangocms-versioning >= 2.0
+
 Miscellaneous
 =============
 
@@ -77,17 +78,6 @@ Miscellaneous
   outdated setting is ignored. If managers want to receive mails add
   ``django.middleware.common.BrokenLinkEmailsMiddleware`` to the project's
   ``settings.MIDDLEWARE``.
-* ``cms.api.create_title`` has been renamed to :class:`~cms.api.create_page_content`. 
+* ``cms.api.create_title`` has been renamed to :class:`~cms.api.create_page_content`.
   A compatibility shim remains and issues a deprecation warning.
 * ``cms.models.pluginmodel.CMSPlugin.copy_plugin`` was removed.
-
-Features deprecated in 4.X.X
-============================
-
-Empty sections are to be removed before release.
-
-Removal of deprecated functionality
-===================================
-
-Empty sections are to be removed before release.
-

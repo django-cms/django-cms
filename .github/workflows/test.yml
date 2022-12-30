@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, '3.10' ]  # latest release minus two
+        python-version: [ 3.8, 3.9, '3.10' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.0.txt,
@@ -21,11 +21,6 @@ jobs:
           django-4.0.txt,
           django-4.1.txt,
         ]
-        exclude:
-          - python-version: 3.7
-            requirements-file: django-4.0.txt
-          - python-version: 3.7
-            requirements-file: django-4.1.txt
         os: [
           ubuntu-20.04,
         ]
