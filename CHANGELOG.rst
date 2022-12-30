@@ -1,5 +1,8 @@
-unreleased
-==========
+4.1.0rc1 (unpublished)
+======================
+
+Highlights:
+-----------
 
 * Django 4.1 and 4.0 support
 * Python 3.10 support
@@ -26,6 +29,23 @@ unreleased
 
 
 
+
+Features:
+---------
+* add release scripts for develop-4 branch (#7466) (ddbc99a53) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
 
 3.6.0 (2019-01-29)
 ==================
