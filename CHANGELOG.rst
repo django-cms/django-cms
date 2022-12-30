@@ -1,9 +1,6 @@
 4.1.0rc1 (unpublished)
 ======================
 
-Highlights:
------------
-
 * Django 4.1 and 4.0 support
 * Python 3.10 support
 * Fix bug that broke page tree if it contained empty page content
@@ -11,6 +8,7 @@ Highlights:
 * feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
 * Introduce dropdown menus in the page tree for status indicators
+* add release scripts for develop-4 branch (#7466) (ddbc99a53) -- Fabian Braun
 
 4.0.0 (unreleased)
 ==================
@@ -26,26 +24,6 @@ Highlights:
 * Backported from develop: Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
 * Backported from develop: Remove travis integration from the project as the project has moved to Github Actions.
 * Fixed usage of ``get_object`` in ``edit_title_fields`` of the page admin.
-
-
-
-
-Features:
----------
-* add release scripts for develop-4 branch (#7466) (ddbc99a53) -- Fabian Braun
-
-Statistics:
------------
-
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
-
-* Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
-
-With the review help of the following contributors:
-
-
-Thanks to all contributors for their efforts!
 
 3.6.0 (2019-01-29)
 ==================
