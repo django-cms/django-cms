@@ -273,7 +273,7 @@ if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
     sed -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
 }" docs/upgrade/index.rst
 fi
-
+status "Commit documentations"
 #
 # commit documentations
 git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX}updating latest docs" "${upgrade_doc}" CHANGELOG.rst docs/upgrade/index.rst docs/conf.py
