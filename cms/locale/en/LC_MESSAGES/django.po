@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-07-27 11:19+0100\n"
+"POT-Creation-Date: 2022-12-30 16:56+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -273,6 +273,19 @@ msgstr "Title and plugins with language %(language)s was deleted"
 msgid "You do not have permission to change this page's in_navigation status"
 msgstr "You do not have permission to change this page's in_navigation status"
 
+#, fuzzy
+#| msgid "no content"
+msgid "Public content"
+msgstr "no content"
+
+msgid "Empty"
+msgstr "Empty"
+
+#, fuzzy
+#| msgid "Content"
+msgid "Create Content"
+msgstr "Content"
+
 msgid "View restriction"
 msgstr "View restriction"
 
@@ -362,8 +375,8 @@ msgstr "Create Alias"
 
 #, python-format
 msgid ""
-"This is an alias reference, you can edit the content only on the <a href="
-"\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
+"This is an alias reference, you can edit the content only on the <a "
+"href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
 msgid "Create"
@@ -497,11 +510,11 @@ msgstr "Select a valid page"
 
 #, fuzzy, python-format
 #| msgid ""
-#| "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| "\"."
+#| "Page %(pages)s has the same url '%(url)s' as current page "
+#| "\"%(instance)s\"."
 #| msgid_plural ""
-#| "Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s"
-#| "\"."
+#| "Pages %(pages)s have the same url '%(url)s' as current page "
+#| "\"%(instance)s\"."
 msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
@@ -510,11 +523,11 @@ msgstr ""
 
 #, fuzzy, python-format
 #| msgid ""
-#| "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s"
-#| "\"."
+#| "Page %(pages)s has the same url '%(url)s' as current page "
+#| "\"%(instance)s\"."
 #| msgid_plural ""
-#| "Pages %(pages)s have the same url '%(url)s' as current page \"%(instance)s"
-#| "\"."
+#| "Pages %(pages)s have the same url '%(url)s' as current page "
+#| "\"%(instance)s\"."
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
 msgstr ""
 "Page %(pages)s has the same url '%(url)s' as current page \"%(instance)s\"."
@@ -628,6 +641,51 @@ msgstr "Grant on"
 msgid "page"
 msgstr "page"
 
+msgid "no limit set"
+msgstr ""
+
+msgid "for logged in users only"
+msgstr "for logged in users only"
+
+msgid "for anonymous users only"
+msgstr "for anonymous users only"
+
+msgid "Inherit from parent page"
+msgstr "Inherit from parent page"
+
+msgid "Deny"
+msgstr "Deny"
+
+msgid "Only this website"
+msgstr "Only this website"
+
+msgid "Allow"
+msgstr "Allow"
+
+msgid "title"
+msgstr "title"
+
+msgid "overwrite the title (html title tag)"
+msgstr "overwrite the title (html title tag)"
+
+msgid "overwrite the title in the menu"
+msgstr "overwrite the title in the menu"
+
+msgid "description"
+msgstr "description"
+
+msgid "The text displayed in search engines."
+msgstr "The text displayed in search engines."
+
+msgid "redirect"
+msgstr "redirect"
+
+msgid "The template used to render the content."
+msgstr "The template used to render the content."
+
+msgid "default"
+msgstr "default"
+
 msgid ""
 "A unique identifier that is used with the page_url templatetag for linking "
 "to this page"
@@ -637,9 +695,6 @@ msgstr ""
 
 msgid "pages"
 msgstr "pages"
-
-msgid "default"
-msgstr "default"
 
 msgid "slug"
 msgstr "slug"
@@ -779,48 +834,6 @@ msgstr "static placeholders"
 
 msgid "A static placeholder with the same site and code already exists"
 msgstr "A static placeholder with the same site and code already exists"
-
-msgid "no limit set"
-msgstr ""
-
-msgid "for logged in users only"
-msgstr "for logged in users only"
-
-msgid "for anonymous users only"
-msgstr "for anonymous users only"
-
-msgid "Inherit from parent page"
-msgstr "Inherit from parent page"
-
-msgid "Deny"
-msgstr "Deny"
-
-msgid "Only this website"
-msgstr "Only this website"
-
-msgid "Allow"
-msgstr "Allow"
-
-msgid "title"
-msgstr "title"
-
-msgid "overwrite the title (html title tag)"
-msgstr "overwrite the title (html title tag)"
-
-msgid "overwrite the title in the menu"
-msgstr "overwrite the title in the menu"
-
-msgid "description"
-msgstr "description"
-
-msgid "The text displayed in search engines."
-msgstr "The text displayed in search engines."
-
-msgid "redirect"
-msgstr "redirect"
-
-msgid "The template used to render the content."
-msgstr "The template used to render the content."
 
 msgid "Advanced options"
 msgstr "Advanced options"
@@ -1110,8 +1123,8 @@ msgid ""
 msgstr ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
-"\">add a page</a> manually.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
+"add\">add a page</a> manually.\n"
 "                    "
 
 msgid "Copy options"
@@ -1125,19 +1138,6 @@ msgstr "Close"
 
 msgid "Legend"
 msgstr ""
-
-#, fuzzy
-#| msgid "published"
-msgid "Published"
-msgstr "published"
-
-#, fuzzy
-#| msgid "unpublished"
-msgid "Unpublished"
-msgstr "unpublished"
-
-msgid "Empty"
-msgstr "Empty"
 
 #, fuzzy
 #| msgid "in menu"
@@ -1404,27 +1404,27 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
-"\">Add the first page</a> to the system to continue.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
+"add\">Add the first page</a> to the system to continue.\n"
 "                    "
 msgstr ""
 "\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
-"\">Add the first page</a> to the system to continue.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
+"add\">Add the first page</a> to the system to continue.\n"
 "                    "
 
 #, python-format
 msgid ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
-"\">add a page</a> manually.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
+"add\">add a page</a> manually.\n"
 "                    "
 msgstr ""
 "\n"
 "                        JavaScript seems to be disabled so please\n"
-"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-add"
-"\">add a page</a> manually.\n"
+"                        <a href=\"%(admin_add_page)s\" class=\"js-welcome-"
+"add\">add a page</a> manually.\n"
 "                    "
 
 msgid "Installation Notes"
@@ -1525,13 +1525,8 @@ msgstr "Please choose an option from below to proceed to the next step."
 msgid "Next"
 msgstr "Next"
 
-msgid "no content"
-msgstr "no content"
-
-#, fuzzy
-#| msgid "no content"
-msgid "has contents"
-msgstr "no content"
+msgid "Unknown"
+msgstr ""
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1539,12 +1534,12 @@ msgstr "Page not found on %(domain)s"
 
 #, python-format
 msgid ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments "
+"`%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 msgstr ""
-"A template tag couldn't find the page with lookup arguments `"
-"%(page_lookup)s\n"
+"A template tag couldn't find the page with lookup arguments "
+"`%(page_lookup)s\n"
 "`. The URL of the request was: http://%(host)s%(path)s"
 
 msgid "Two columns"
@@ -1739,6 +1734,21 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#, fuzzy
+#~| msgid "published"
+#~ msgid "Published"
+#~ msgstr "published"
+
+#, fuzzy
+#~| msgid "unpublished"
+#~ msgid "Unpublished"
+#~ msgstr "unpublished"
+
+#, fuzzy
+#~| msgid "no content"
+#~ msgid "has contents"
+#~ msgstr "no content"
 
 #~ msgid "X Frame Options"
 #~ msgstr "X Frame Options"
@@ -2067,11 +2077,11 @@ msgstr "A wizard has already been registered for model: %s"
 #~ msgstr "Info"
 
 #~ msgid ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
-#~ "\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
+#~ "class=\"addlink\">Add page</a> now."
 #~ msgstr ""
-#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" class="
-#~ "\"addlink\">Add page</a> now."
+#~ "<em>There is no page around yet.</em><br /><a href=\"add/\" "
+#~ "class=\"addlink\">Add page</a> now."
 
 #~ msgid "insert above"
 #~ msgstr "insert above"
