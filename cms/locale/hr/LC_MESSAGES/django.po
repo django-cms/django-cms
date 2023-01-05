@@ -6,15 +6,16 @@
 # Aleks Acimovic, 2022
 # Damir <damir.arbula@gmail.com>, 2013-2015,2018
 # Dino Ilic <dino.ilic@gmail.com>, 2017
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # legendri <legendri@gmail.com>, 2012
 # legendri <legendri@gmail.com>, 2012
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-02 11:21+0200\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Aleks Acimovic, 2022\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Croatian (http://www.transifex.com/divio/django-cms/language/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1217,7 +1218,7 @@ msgstr "Razvojna verzija koristi django CMS %(cms_version)s, Django %(django_ver
 msgid "Cancel"
 msgstr "Odustani"
 
-msgid "The following error occured:"
+msgid "The following error occurred:"
 msgstr "Došlo je do sljedeće pogreške:"
 
 msgid "Action successful."
