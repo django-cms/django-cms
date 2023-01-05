@@ -416,10 +416,10 @@ msgid "User guide"
 msgstr "Gebruikershandleiding"
 
 msgid "Support Forum"
-msgstr ""
+msgstr "Helpforum"
 
 msgid "Support Slack"
-msgstr ""
+msgstr "Help bij Slack"
 
 msgid "What's new"
 msgstr "Wat is nieuw"
@@ -1588,7 +1588,7 @@ msgid "Add plugin to %(plugin_name)s"
 msgstr "Voeg plugin toe aan %(plugin_name)s"
 
 msgid "Community forum"
-msgstr ""
+msgstr "Gemeenschapsforum"
 
 msgid "Getting started"
 msgstr "Aan de slag"
@@ -1614,7 +1614,7 @@ msgstr "Deze placeholder bevat al het maximale aantal (%(limit)s) van toegestane
 
 #, python-format
 msgid "This placeholder already has the maximum number of child plugins (%s)."
-msgstr ""
+msgstr "Deze placeholder bevat al het maximale aantal (%s) van toegestane plugins."
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
