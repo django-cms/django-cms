@@ -226,6 +226,9 @@ git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 
 
 status "- preparing documentation"
+sed -i 's/^django-cms=.*$/\.\./g' docs/requirements.txt
+git add docs/requirements.txt
+
 "${SCRIPTS}/make-changelog" "${FULL_VERSION}"
 
 upgrade_doc="docs/upgrade/${VERSION}.rst"
