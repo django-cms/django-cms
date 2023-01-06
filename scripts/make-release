@@ -228,7 +228,7 @@ git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 status "- preparing documentation"
 # Adjust docs/requirements.txt so that it refers to the local version of django CMS
 # (and not to a pypi version)
-sed -i 's/^django-cms=.*$/\.\./g' docs/requirements.txt
+sed -i 's/^django-cms=.*$/\./g' docs/requirements.txt
 git add docs/requirements.txt
 
 "${SCRIPTS}/make-changelog" "${FULL_VERSION}"
