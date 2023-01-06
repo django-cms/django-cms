@@ -8,6 +8,7 @@
 # angularcircle, 2012
 # ar4s <arkadiusz.adamski@gmail.com>, 2014-2015
 # Arkadiusz Błasiak <ares1112@gmail.com>, 2015
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # filip klosowski <filip@geoida.pl>, 2017
 # Grzegorz Biały <grzegorz@elcodo.pl>, 2017
 # Jakub Paczkowski <jakub@paczkowski.eu>, 2013
@@ -31,9 +32,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-02 11:21+0200\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Maciej Kostuch <kostuchmaciek@gmail.com>, 2017-2018,2020\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Polish (http://www.transifex.com/divio/django-cms/language/pl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1237,7 +1238,7 @@ msgstr "Wersja deweloperska używa djangoCMS %(cms_version)s, Django %(django_ve
 msgid "Cancel"
 msgstr "Anuluj"
 
-msgid "The following error occured:"
+msgid "The following error occurred:"
 msgstr "Wystąpił następujący błąd:"
 
 msgid "Action successful."
