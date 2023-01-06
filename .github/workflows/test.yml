@@ -51,7 +51,7 @@ jobs:
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
-        pip install -r docs/requirements.txt
+        (cd docs && pip install -r requirements.txt)
         python setup.py install
 
     - name: Test with django test runner
@@ -104,7 +104,7 @@ jobs:
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
-        pip install -r docs/requirements.txt
+        (cd docs && pip install -r requirements.txt)
         python setup.py install
 
 
@@ -145,7 +145,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install -r docs/requirements.txt
+        (cd docs && pip install -r requirements.txt)
         python setup.py install
 
     - name: Test with django test runner
