@@ -11,5 +11,6 @@ datetime
 codespell
 coverage
 django~=3.2
-django-cms
 pip-tools
+# This version of django CMS:
+..
