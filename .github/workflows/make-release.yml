@@ -1,0 +1,27 @@
+name: Create a django CMS release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number to create, e.g., "3.11.1rc1"'
+        required: true
+        type: string
+    branches:
+      - 'develop*'
+      - 'release/**'
+
+jobs:
+  make-release:
+    if: github.actor == 'marksweb' || github.actor == 'fsbraun'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v3
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v3
+      - name: Start building version ${{ inputs.version }}
+        env:
+          BUILD_BRANCH: release/build
+          TX_TOKEN: ${{ secrets.TX_TOKEN }}
+        run: ./scripts/make-release ${{ inputs.version }} ${GITHUB_REF}

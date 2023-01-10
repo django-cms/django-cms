@@ -4,13 +4,14 @@
 # 
 # Translators:
 # death_ashaman <admiral_proton@yahoo.de>, 2014
-# Alexander Elvers <alexanderelvers@online.de>, 2017
+# Alexander Elvers <transifex@alex.kandru.de>, 2017
 # Angelo Dini <angelo.dini@divio.ch>, 2015-2017
 # Arne Schauf <transifex2@asmaps.de>, 2014
 # Michael P. Jung <michael.jung@terreon.de>, 2013
 # Kim Thoenen <kim@smuzey.ch>, 2015
 # death_ashaman <admiral_proton@yahoo.de>, 2014
 # Diana Dünki <diana.duenki@divio.ch>, 2015
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # giammi <gian-maria.daffre@giammi.org>, 2017
 # Hendrik Richter <hendrikr@gnome.org>, 2014
 # Jannik Vieten <me@exploide.net>, 2016
@@ -34,9 +35,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-26 17:28+0800\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Peter Wischer <peter.wischer@lwl.org>, 2017-2022\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: German (http://www.transifex.com/divio/django-cms/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1238,7 +1239,7 @@ msgstr "Development version nutzt django CMS %(cms_version)s, Django %(django_ve
 msgid "Cancel"
 msgstr "Abbrechen"
 
-msgid "The following error occured:"
+msgid "The following error occurred:"
 msgstr "Der folgende Fehler ist aufgetreten:"
 
 msgid "Action successful."
