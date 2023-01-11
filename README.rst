@@ -1,6 +1,9 @@
 ##########
 django CMS
 ##########
+.. image:: https://static.pepy.tech/badge/django-cms
+    :target: https://pepy.tech/project/django-cms
+    :alt: Downloads
 .. image:: https://travis-ci.org/django-cms/django-cms.svg?branch=develop
     :target: https://travis-ci.org/django-cms/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
@@ -12,10 +15,6 @@ django CMS
 .. image:: https://codeclimate.com/github/divio/django-cms/badges/gpa.svg
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
-
-.. image:: https://static.pepy.tech/badge/django-cms
-    :target: https://pepy.tech/project/django-cms
-    :alt: Downloades
 
 *******************************************
 Contribute to this project and win rewards
