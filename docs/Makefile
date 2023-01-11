@@ -41,7 +41,8 @@ html:
 install:
 	@echo "... setting up virtualenv"
 	python3 -m venv env
-	. $(VENV); pip install -r requirements.txt
+	 sed "s/^django-cms=.*$//\./g" requirements.txt > requirements.local.txt
+	. $(VENV); ( cd .. ; pip install -r docs/requirements.local.txt )
 
 	@echo "\n" \
 	      "-------------------------------------------------------------------------------------------------- \n" \
