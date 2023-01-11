@@ -13,7 +13,9 @@ django CMS
    :target: https://codeclimate.com/github/divio/django-cms
    :alt: Code Climate
 
-Open source enterprise content management system based on the Django framework and backed by the non-profit django CMS Association (`Sponsor us! <https://www.django-cms.org/en/memberships/>`_).
+.. image:: https://static.pepy.tech/badge/django-cms
+    :target: https://pepy.tech/project/django-cms
+    :alt: Downloades
 
 *******************************************
 Contribute to this project and win rewards
