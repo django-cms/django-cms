@@ -990,16 +990,16 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         from cms.models.fields import get_placeholder_from_slot
 
         poll = FancyPoll.objects.create(name='poll 1')
-        slot_1 = get_related_slot(poll.placeholders, slot="slot_1")  # Get placeholder
+        slot_1 = get_placeholder_from_slot(poll.placeholders, slot="slot_1")  # Get placeholder
         self.assertTrue(isinstance(slot_1, Placeholder))  # Correct type
         self.assertEqual(slot_1.slot, "slot_1")  # Correct slot
         self.assertEqual(poll.placeholders.all().count(), 1)  # Has been created?
 
-        slot_2 = get_related_slot(poll.placeholders, "slot_2")  # Get 2nd placeholder
+        slot_2 = get_placeholder_from_slot(poll.placeholders, "slot_2")  # Get 2nd placeholder
         self.assertEqual(slot_2.slot, "slot_2")  # right slot
         self.assertEqual(poll.placeholders.all().count(), 2)  # Two should have been created
 
-        self.assertEqual(slot_1, get_related_slot(poll.placeholders, "slot_1"))  # Still the first slot
+        self.assertEqual(slot_1, get_placeholder_from_slot(poll.placeholders, "slot_1"))  # Still the first slot
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
