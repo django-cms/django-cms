@@ -612,7 +612,7 @@ class ButtonList(BaseItem):
         return item
 
     def add_sideframe_button(self, name, url, active=False, disabled=False, extra_classes=None, on_close=None):
-        """Adds a :class:`~cms.toolbar.items.SideFrameButton` to the button list and returns it."""
+        """Adds a :class:`~cms.toolbar.items.SideframeButton` to the button list and returns it."""
 
         item = SideframeButton(
             name, url,

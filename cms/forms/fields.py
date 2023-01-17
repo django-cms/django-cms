@@ -28,7 +28,7 @@ class LazyChoiceField(forms.ChoiceField):
 class PageSelectFormField(forms.MultiValueField):
     """
     Behaves like a :class:`django.forms.ModelChoiceField` field for the
-    :class:`cms.models.Page` model, but displays itself as a split
+    :class:`cms.models.pagemodel.Page` model, but displays itself as a split
     field with a select drop-down for the site and one for the page. It also
     indents the page names based on what level they're on, so that the page
     select drop-down is easier to use. This takes the same arguments as
