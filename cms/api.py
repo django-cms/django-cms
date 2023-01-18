@@ -413,7 +413,7 @@ def publish_page(page, user, language):
 
     See docs/extending_cms/api_reference.rst for more info
     """
-    warnings.warn('This API function will be removed  in django CMS 4. For publishing functionality use a package '
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
                   'that adds publishing, such as: djangocms-versioning.',
                   UserWarning, stacklevel=2)
 
@@ -433,7 +433,7 @@ def publish_pages(include_unpublished=False, language=None, site=None):
     """
     Create published public version of selected drafts.
     """
-    warnings.warn('This API function will be removed  in django CMS 4. For publishing functionality use a package '
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
                   'that adds publishing, such as: djangocms-versioning.',
                   UserWarning, stacklevel=2)
 
@@ -472,7 +472,7 @@ def get_page_draft(page):
     :return page: draft version of the page
     :type page: :class:`cms.models.pagemodel.Page` instance
     """
-    warnings.warn('This API function will be removed  in django CMS 4. For publishing functionality use a package '
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
                   'that adds publishing, such as: djangocms-versioning.',
                   UserWarning, stacklevel=2)
 
