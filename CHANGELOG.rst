@@ -2,9 +2,88 @@
 Changelog
 =========
 
-unreleased
-==========
+3.11.1 (2022-12-12)
+===================
 
+Features:
+---------
+* add Python 3.11 support for Django CMS (#7422) (3fe1449e6) -- Vinit Kumar
+* Support for Django 4.1 (#7404) (777864af3) -- Fabian Braun
+* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field (#7370) (0fd058ed3) -- Mark Walker
+* Improved dutch translations -- Stefan van den Eertwegh
+
+Bug Fixes:
+----------
+* Prefer titles matching request language (#7144) (06c9a85df) -- Micah Denbraver
+* Adds a deprecation warning for SEND_BROKEN_LINK_EMAILS (#7420) (d38f4a1cc) -- Fabian Braun
+* Added deprecation warning to `get_current_language()` (#7410) (2788f75e6) -- Mark Walker
+* CMS check management command fixed [#7412] (#7413) (dcf394bd5) -- ton77v
+* Changing color scheme resets session settings to defaults (#7407) (fcfe77f63) -- Fabian Braun
+* Clear page permission cache on page create (#6866) (e59c179dd) -- G3RB3N
+* Unlocalize page and node ids when rendering the page tree in the admin (#7188) (9e3c57946) -- Marco Bonetti
+* Allow partially overriding CMS_CACHE_DURATIONS (#7339) (162ff8dd8) -- Qijia Liu
+* CMS check management command fixed [#7386] (cdcf260aa) -- Marco Bonetti
+* default light mode (#7381) (abc6e6c5b) -- viliammihalik
+* Added language to page cache key (#7354) (d5a9f49e6) -- Mark Walker
+
+Refactoring and Cleanups:
+-------------------------
+* Move js API functions to CMS.Helpers to make them available also to the admin site (#7384) (a7f8cd44f) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release  was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun
+* G3RB3N
+* Marco Benetti
+* Mark Walker
+* Micah Denbraver
+* Qijia Liu
+* Stefan van den Eertwegh
+* villiammihalik
+* Vinit Kumar
+
+
+With the review help of the following contributors:
+
+* Cage Johnson
+* Christian Clauss
+* Conrad
+* Dapo Adedire
+* Fabian Braun
+* Florian Delizy
+* G3RB3N
+* Hussein Srour
+* Marco Bonetti
+* Mark Walker
+* Micah Denbraver
+* Pankrat
+* Patrick Mazulo
+* Qijia Liu
+* Shivan Sivakumaran
+* Simon Krull
+* Vinit Kumar
+* code-review-doctor
+* dependabot[bot]
+* fsbraun
+* jefe
+* ton77v
+* viliammihalik
+* wesleysima
+
+Thanks to all contributors for their efforts!
+
+3.11.0 (2022-08-02)
+===================
+
+Highlights:
+-----------
+* Support for django 4
+* Dark mode support
+
+* Support for Python 3.11
 * Support for django 4.1
 * Allow to partially override ``CMS_CACHE_DURATIONS``
 * Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
@@ -14,6 +93,10 @@ unreleased
 * Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 * Fixed permission denied error after page create (#6866)
 * Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
+* Fix #3548 by reflecting the request language when resolving identical page slugs 
+* Deprecate usage of legacy SEND_BROKEN_LINK_EMAILS setting (removed since Django 1.8)
+* Add deprecation warning to ``cms.utils.i18n.get_current_language()`` (#6720)
+
 
 3.11.0 (2022-08-02)
 ===================

@@ -362,7 +362,7 @@
     margin: 0;
     padding: $messages-padding;
     border-radius: 0 0 $messages-border-radius $messages-border-radius;
-    background: rgba($messages-bgcolor, 0.74);
+    background: $messages-bgcolor;
     transition: top $speed-base;
     * {
         color: $messages-color;
@@ -578,7 +578,6 @@
     width: 100%;
     height: 100%;
     background-color: $screenblock-bgcolor;
-    background: rgba($screenblock-bgcolor, 0.9);
 }
 
 .cms-screenblock-inner {

@@ -4,6 +4,7 @@
 # 
 # Translators:
 # Daniel Bassa Perez <danbasper@gmail.com>, 2013
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # Roger Pons <rogerpons@gmail.com>, 2012-2016
 # whoami <whoami@live.de>, 2013
 # whoami <whoami@live.de>, 2013
@@ -11,9 +12,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-26 17:28+0800\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Roger Pons <rogerpons@gmail.com>, 2012-2016\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Catalan (http://www.transifex.com/divio/django-cms/language/ca/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1215,7 +1216,7 @@ msgstr "Versió de desenvolupament utilitzant django CMS %(cms_version)s, Django
 msgid "Cancel"
 msgstr "Cancel·lar"
 
-msgid "The following error occured:"
+msgid "The following error occurred:"
 msgstr "S´ha produït el següent error:"
 
 msgid "Action successful."

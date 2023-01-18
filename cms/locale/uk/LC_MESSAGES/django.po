@@ -9,6 +9,7 @@
 # Anton Linevich <linevich@swebion.com>, 2016
 # Nick Nck <asteryx82@gmail.com>, 2015
 # Nick Nck <asteryx82@gmail.com>, 2015
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # roman_grankin <grankin.roman@hotmail.com>, 2014
 # yakky <i.spalletti@nephila.it>, 2015
 # Maxym Lynnyk <yakudzam@gmail.com>, 2013
@@ -26,9 +27,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-03-26 17:28+0800\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Andrii Vozniuk, 2021\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Ukrainian (http://www.transifex.com/divio/django-cms/language/uk/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1232,7 +1233,7 @@ msgstr "Версія, що знаходиться у розробці з вик�
 msgid "Cancel"
 msgstr "Скасувати"
 
-msgid "The following error occured:"
+msgid "The following error occurred:"
 msgstr "Сталася помилка:"
 
 msgid "Action successful."
