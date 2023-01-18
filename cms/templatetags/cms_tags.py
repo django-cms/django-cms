@@ -2,9 +2,7 @@ from collections import OrderedDict, namedtuple
 from copy import copy
 from datetime import datetime
 
-from classytags.arguments import (
-    Argument, MultiKeywordArgument, MultiValueArgument,
-)
+from classytags.arguments import Argument, MultiKeywordArgument, MultiValueArgument
 from classytags.core import Options, Tag
 from classytags.helpers import AsTag, InclusionTag
 from classytags.parser import Parser
@@ -15,22 +13,17 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.db.models import Model
-from django.middleware.common import BrokenLinkEmailsMiddleware
 from django.template.loader import render_to_string
 from django.urls import reverse
-from django.utils.encoding import force_str, smart_str
+from django.utils.encoding import smart_str
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.translation import (
-    get_language, gettext_lazy as _, override as force_language,
-)
+from django.utils.translation import get_language, gettext_lazy as _, override as force_language
 from sekizai.templatetags.sekizai_tags import RenderBlock, SekizaiParser
 
 from cms.cache.page import get_page_url_cache, set_page_url_cache
 from cms.exceptions import PlaceholderNotFound
-from cms.models import (
-    CMSPlugin, Page, Placeholder as PlaceholderModel, StaticPlaceholder,
-)
+from cms.models import CMSPlugin, Page, Placeholder as PlaceholderModel, StaticPlaceholder
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request, get_site_id
@@ -98,12 +91,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
             if getattr(settings, 'SEND_BROKEN_LINK_EMAILS', False):
                 mail_managers(subject, body, fail_silently=True)
             elif 'django.middleware.common.BrokenLinkEmailsMiddleware' in mw:
-                middle = BrokenLinkEmailsMiddleware()
-                domain = request.get_host()
-                path = request.get_full_path()
-                referer = force_str(request.headers.get('Referer', ''), errors='replace')
-                if not middle.is_ignorable_request(request, path, domain, referer):
-                    mail_managers(subject, body, fail_silently=True)
+                mail_managers(subject, body, fail_silently=True)
             return None
 
 
@@ -213,7 +201,7 @@ class PageUrl(AsTag):
         # return Exceptions regardless of the setting of settings.DEBUG.
         #
         # We wish to maintain backwards functionality where the non-as-variant
-        # of using this tag will raise DNE exceptions only when
+        # of using this tag will raise DoesNotExist exceptions only when
         # settings.DEBUG=False.
         #
         try:
@@ -492,7 +480,7 @@ class CMSEditableObject(InclusionTag):
     def _get_editable_context(self, context, instance, language, edit_fields,
                               view_method, view_url, querystring, editmode=True):
         """
-        Populate the contex with the requested attributes to trigger the changeform
+        Populate the context with the requested attributes to trigger the change form
         """
         request = context['request']
         if hasattr(request, 'toolbar'):
@@ -508,16 +496,16 @@ class CMSEditableObject(InclusionTag):
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = "%s %s list" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {} list".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = "%s %s" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {}".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(edit_fields) \
                                                         if not isinstance('edit_fields', str) else edit_fields
             else:
-                instance.get_plugin_name = "%s %s" % (smart_str(_('Add')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {}".format(smart_str(_('Add')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
             extra_context['generic'] = opts
@@ -535,12 +523,12 @@ class CMSEditableObject(InclusionTag):
                 # The default view_url is the default admin changeform for the
                 # current instance
                 if not editmode:
-                    view_url = 'admin:%s_%s_add' % (
+                    view_url = 'admin:{}_{}_add'.format(
                         opts.app_label, opts.model_name)
                     url_base = reverse(view_url)
                 elif not edit_fields:
                     if not view_url:
-                        view_url = 'admin:%s_%s_change' % (
+                        view_url = 'admin:{}_{}_change'.format(
                             opts.app_label, opts.model_name)
                     if isinstance(instance, Page):
                         url_base = reverse(view_url, args=(instance.pk, language))
@@ -548,7 +536,7 @@ class CMSEditableObject(InclusionTag):
                         url_base = reverse(view_url, args=(instance.pk,))
                 else:
                     if not view_url:
-                        view_url = 'admin:%s_%s_edit_field' % (
+                        view_url = 'admin:{}_{}_edit_field'.format(
                             opts.app_label, opts.model_name)
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
@@ -556,7 +544,7 @@ class CMSEditableObject(InclusionTag):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             if editmode:
-                extra_context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+                extra_context['edit_url'] = f"{url_base}?{urlencode(querystring)}"
             else:
                 extra_context['edit_url'] = "%s" % url_base
             extra_context['refresh_page'] = True
@@ -654,13 +642,13 @@ class CMSEditableObject(InclusionTag):
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
         if edit_fields == 'changelist':
-            view_url = 'admin:%s_%s_changelist' % (
+            view_url = 'admin:{}_{}_changelist'.format(
                 instance._meta.app_label, instance._meta.model_name)
         querystring = OrderedDict((('language', language),))
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")
         # If the toolbar is not enabled the following part is just skipped: it
-        # would cause a perfomance hit for no reason
+        # would cause a performance hit for no reason
         if self._is_editable(context.get('request', None)):
             extra_context.update(self._get_editable_context(
                 extra_context, instance, language, edit_fields, view_method,

@@ -24,11 +24,11 @@ CMS.config = {
         'toolbar': '{% language cms_toolbar.request_language %}{% cms_admin_url "cms_usersettings_get_toolbar" %}{% endlanguage %}'
     },
     'lang': {
-        {% if user.is_authenticated %}
+        {% if debug and user.is_authenticated %}
         'debug': '{% filter escapejs %}{% blocktrans %}Development version using django CMS {{ cms_version }}, Django {{ django_version }}, Python {{ python_version }}{% endblocktrans %}{% endfilter %}',
         {% endif %}
         'cancel': '{% filter escapejs %}{% trans "Cancel" %}{% endfilter %}',
-        'error': '<strong>{% filter escapejs %}{% trans "The following error occured:" %}{% endfilter %}</strong> ',
+        'error': '<strong>{% filter escapejs %}{% trans "The following error occurred:" %}{% endfilter %}</strong> ',
         'success': '{% filter escapejs %}{% trans "Action successful." %}{% endfilter %}',
         'confirm': '{% filter escapejs %}{% trans "Are you sure you want to delete this plugin?" %}{% endfilter %}',
         'publish': '{% filter escapejs %}{% trans "Are you sure you want to publish this page?" %}{% endfilter %}',
@@ -120,6 +120,7 @@ CMS.config = {
         'structure': '{{ cms_structure_on }}',
         'legacy_mode': {{ cms_toolbar.uses_legacy_structure_mode|yesno:'true,false' }}
     },
+    'color_scheme' : '{{ cms_color_scheme }}',
     'clipboard': {
         'id': '{{ cms_toolbar.clipboard.pk|unlocalize }}',
         'url': '{% if cms_toolbar.clipboard.pk %}{% cms_admin_url "cms_page_clear_placeholder" cms_toolbar.clipboard.pk %}{% endif %}'

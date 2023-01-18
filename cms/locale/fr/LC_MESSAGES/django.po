@@ -4,7 +4,7 @@
 # 
 # Translators:
 # adrien.delhorme, 2014
-# Adrien Delhorme, 2017,2019
+# Adrien Delhorme, 2017,2019,2021
 # Adrien Delhorme, 2014
 # Alban Tiberghien <alban.tiberghien@gmail.com>, 2017
 # Alexandre Cloquet <Alexandre.cloquet@gmail.com>, 2014-2015
@@ -12,7 +12,7 @@
 # Samir ASNOUN <samir.asnoun@gmail.com>, 2015
 # Assma Buifruri <assma.buifruri@hotmail.com>, 2017
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012-2013,2015
-# bmassot <bmassot@free.fr>, 2019
+# Bernard Massot <bmassot@free.fr>, 2019
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012
 # Simon Charette <charette.s@gmail.com>, 2011-2012
 # Chary titouan <>, 2011
@@ -21,6 +21,7 @@
 # Christophe CHAUVET <christophe.chauvet@gmail.com>, 2013
 # a270031086f2a0d3514bc0cb507b48f6, 2019
 # Dylann CORDEL <cordel.d@free.fr>, 2014-2015
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # Florian Delizy <florian.delizy@gmail.com>, 2021
 # Freddy L. <freddy.limpens@gmail.com>, 2014
 # Gabriel Le Breton <lebreton.gabriel@gmail.com>, 2015
@@ -32,6 +33,7 @@
 # mbi0 <marco@cruncher.ch>, 2013
 # Nicolas PASCAL <np.pascal@gmail.com>, 2018-2019
 # Patrick Lauber <patrick.lauber@divio.ch>, 2014
+# Robin Durner, 2022
 # Samuel Sorin, 2016
 # kalvn <screamflydream@gmail.com>, 2014
 # Sébastien Fievet <_@sebastien-fievet.fr>, 2013
@@ -41,15 +43,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-06-20 22:17+0800\n"
-"PO-Revision-Date: 2021-06-02 16:35+0000\n"
-"Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"PO-Revision-Date: 2010-11-30 06:47+0000\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: fr\n"
-"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 msgid "All"
 msgstr "Tout"
@@ -129,6 +131,9 @@ msgstr "Configurations de l'application"
 
 msgid "Language independent options"
 msgstr "Options indépendantes de la langue"
+
+msgid "You entered an invalid URL."
+msgstr "Vous avez saisi une URL non valide."
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -322,10 +327,10 @@ msgid "The page is not eligible to be home."
 msgstr "La page ne peut pas être la page d'accueil."
 
 msgid "View restriction"
-msgstr "Voir la restriction"
+msgstr "Restriction d'affichage"
 
 msgid "View restrictions"
-msgstr "Voir les restrictions"
+msgstr "Restrictions d'affichage"
 
 #, python-format
 msgid "Field %s not found"
@@ -415,6 +420,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "Ceci est une référence liée ; le contenu ne peut être modifié que sur la page <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>."
 
+msgid "Getting started developer guide"
+msgstr "Guide de démarrage pour développeurs"
+
+msgid "Documentation"
+msgstr "Documentation"
+
+msgid "User guide"
+msgstr "Manuel d'utilisation"
+
+msgid "Support Forum"
+msgstr "Forum d'assistance"
+
+msgid "Support Slack"
+msgstr "Assistance sur Slack"
+
+msgid "What's new"
+msgstr "Quoi de neuf"
+
 msgid "Create"
 msgstr "Créer"
 
@@ -454,6 +477,9 @@ msgstr "Se déconnecter"
 
 msgid "Language"
 msgstr "Langue"
+
+msgid "Help"
+msgstr "Aide"
 
 msgid "Structure"
 msgstr "Structure"
@@ -655,7 +681,7 @@ msgid "login required"
 msgstr "identification requise"
 
 msgid "menu visibility"
-msgstr "visibilité du menu"
+msgstr "visibilité dans le menu"
 
 msgid "application"
 msgstr "application"
@@ -740,7 +766,7 @@ msgid "on page level"
 msgstr "au niveau de la page"
 
 msgid "frontend view restriction"
-msgstr "restriction de vue client"
+msgstr "restriction d'affichage client"
 
 msgid "Please select user or group."
 msgstr "Veuillez sélectionner un utilisateur ou un groupe."
@@ -926,6 +952,7 @@ msgid "Please correct the error below."
 msgid_plural "Please correct the errors below."
 msgstr[0] "Veuillez corriger l'erreur suivante."
 msgstr[1] "Veuillez corriger les erreurs suivantes."
+msgstr[2] "Veuillez corriger les erreurs suivantes."
 
 msgid "All permissions"
 msgstr "Toutes les permissions"
@@ -1221,8 +1248,8 @@ msgstr "Version de développement utilisant django CMS %(cms_version)s, Django %
 msgid "Cancel"
 msgstr "Annuler"
 
-msgid "The following error occured:"
-msgstr "L\\'erreur suivante est survenue:"
+msgid "The following error occurred:"
+msgstr "L'erreur suivante est survenue:"
 
 msgid "Action successful."
 msgstr "Action réussie !"
@@ -1371,9 +1398,6 @@ msgstr "Notes d’installation"
 
 msgid "Support"
 msgstr "Assistance"
-
-msgid "Documentation"
-msgstr "Documentation"
 
 msgid ""
 "\n"
@@ -1577,6 +1601,15 @@ msgstr "Ajouter le bloc au placeholder « %(placeholder_label)s »"
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Ajouter le bloc à %(plugin_name)s"
+
+msgid "Community forum"
+msgstr "Forum de la communauté"
+
+msgid "Getting started"
+msgstr "Guide de démarrage"
+
+msgid "Talk to us"
+msgstr "Communiquez avec nous"
 
 msgid "CMS - your user account was created."
 msgstr "CMS — votre compte utilisateur a été créé."

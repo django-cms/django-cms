@@ -73,7 +73,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # set the entries here to get an up to date list of entries.
+        # set the entries here to get an up-to-date list of entries.
         self.fields['entry'].choices = entry_choices(
             user=self.user,
             page=self.page,
@@ -82,7 +82,7 @@ class WizardStep1Form(BaseFormMixin, forms.Form):
     def get_wizard_entries(self):
         for entry in self['entry']:
             wizard = wizard_pool.get_entry(entry.choice_value)
-            yield(entry, wizard)
+            yield (entry, wizard)
 
 
 class WizardStep2BaseForm(BaseFormMixin):

@@ -3,7 +3,8 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Daigo Sakamoto <superdaigo@gmail.com>, 2011
+# Daigo Sakamoto <daigo@soregashi.me>, 2011
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # Jonas Obrist <me@ojii.ch>, 2011
 # Jonas Obrist <ojiidotch@gmail.com>, 2012,2015
 # Paulo Alvarado <paulo.alvarado@divio.ch>, 2017
@@ -14,9 +15,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
-"Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"PO-Revision-Date: 2010-11-30 06:47+0000\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Japanese (http://www.transifex.com/divio/django-cms/language/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -102,6 +103,9 @@ msgstr "アプリケーション設定"
 
 msgid "Language independent options"
 msgstr "言語に依存しないオプション"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -388,6 +392,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr "これはエイリアス参照です。内容の編集ができるページは <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> だけです。"
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "ドキュメント"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "作成"
 
@@ -427,6 +449,9 @@ msgstr "ログアウト"
 
 msgid "Language"
 msgstr "言語"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "ストラクチャ"
@@ -1193,7 +1218,7 @@ msgstr "Django CMS %(cms_version)s, Django %(django_version)s と Python %(pytho
 msgid "Cancel"
 msgstr "キャンセル"
 
-msgid "The following error occured:"
+msgid "The following error occurred:"
 msgstr "次のエラーが発生:"
 
 msgid "Action successful."
@@ -1343,9 +1368,6 @@ msgstr "インストールのメモ"
 
 msgid "Support"
 msgstr "サポート"
-
-msgid "Documentation"
-msgstr "ドキュメント"
 
 msgid ""
 "\n"
@@ -1548,6 +1570,15 @@ msgstr "プースホルダ #%(placeholder_label)s\" にプラグインを追加"
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
+msgstr ""
+
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
 msgstr ""
 
 msgid "CMS - your user account was created."

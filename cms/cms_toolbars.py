@@ -5,9 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
-from django.utils.translation import (
-    gettext, gettext_lazy as _, override as force_language,
-)
+from django.utils.translation import gettext, gettext_lazy as _, override as force_language
 
 from cms.api import can_change_page, get_page_draft
 from cms.constants import PUBLISHER_STATE_PENDING, TEMPLATE_INHERITANCE_MAGIC
@@ -18,9 +16,7 @@ from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict, get_language_tuple
-from cms.utils.page_permissions import (
-    user_can_change_page, user_can_delete_page, user_can_publish_page,
-)
+from cms.utils.page_permissions import user_can_change_page, user_can_delete_page, user_can_publish_page
 from cms.utils.urlutils import add_url_parameters, admin_reverse
 from menus.utils import DefaultLanguageChanger
 
@@ -94,6 +90,22 @@ class PlaceholderToolbar(CMSToolbar):
                                       disabled=disabled,
                                       on_close=REFRESH_PAGE)
 
+@toolbar_pool.register
+class AppearanceToolbar(CMSToolbar):
+    """
+    Adds appearance switches, esp. for dark and light mode
+    """
+    color_scheme_toggle = get_cms_setting('COLOR_SCHEME_TOGGLE')
+
+    def populate(self):
+        if self.color_scheme_toggle:
+            dark_mode_toggle = TemplateItem(
+                template="cms/toolbar/items/dark_mode_toggle.html",
+                side=self.toolbar.RIGHT,
+            )
+            self.toolbar.add_item(dark_mode_toggle)
+
+
 
 @toolbar_pool.register
 class BasicToolbar(CMSToolbar):
@@ -129,7 +141,7 @@ class BasicToolbar(CMSToolbar):
                 sites_menu.add_sideframe_item(_('Admin Sites'), url=admin_reverse('sites_site_changelist'))
                 sites_menu.add_break(ADMIN_SITES_BREAK)
                 for site in sites_queryset:
-                    sites_menu.add_link_item(site.name, url='https://%s' % site.domain,
+                    sites_menu.add_link_item(site.name, url='http://%s' % site.domain,
                                              active=site.pk == self.current_site.pk)
 
             # admin
@@ -178,8 +190,8 @@ class BasicToolbar(CMSToolbar):
         if User in admin.site._registry:
             opts = User._meta
 
-            if self.request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename('change', opts))):
-                user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.model_name))
+            if self.request.user.has_perm('{}.{}'.format(opts.app_label, get_permission_codename('change', opts))):
+                user_changelist_url = admin_reverse(f'{opts.app_label}_{opts.model_name}_changelist')
                 parent.add_sideframe_item(_('Users'), url=user_changelist_url)
 
     def add_logout_button(self, parent):
@@ -481,7 +493,7 @@ class PageToolbar(CMSToolbar):
         self.toolbar.add_item(TemplateItem(template, extra_context=context, side=self.toolbar.RIGHT), position=pos)
 
     def add_page_settings_button(self, extra_classes=('cms-btn-action',)):
-        url = '%s?language=%s' % (admin_reverse('cms_page_change', args=[self.page.pk]), self.toolbar.request_language)
+        url = '{}?language={}'.format(admin_reverse('cms_page_change', args=[self.page.pk]), self.toolbar.request_language)
         self.toolbar.add_modal_button(_('Page settings'), url, side=self.toolbar.RIGHT, extra_classes=extra_classes)
 
     # Menus
@@ -514,7 +526,7 @@ class PageToolbar(CMSToolbar):
 
             if add:
                 add_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-add', _('Add Translation')
                 )
 
                 if self.page.is_page_type:
@@ -533,7 +545,7 @@ class PageToolbar(CMSToolbar):
                     translation_delete_url = admin_reverse('cms_page_delete_translation', args=(self.page.pk,))
 
                 remove_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-del', _('Delete Translation')
                 )
                 disabled = len(remove) == 1
                 for code, name in remove:
@@ -542,7 +554,7 @@ class PageToolbar(CMSToolbar):
 
             if copy:
                 copy_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-copy', _('Copy all plugins')
                 )
                 title = _('from %s')
                 question = _('Are you sure you want to copy all plugins from %s?')

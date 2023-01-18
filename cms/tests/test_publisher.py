@@ -8,12 +8,8 @@ from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import add_plugin, create_page, create_title
-from cms.constants import (
-    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING,
-)
-from cms.management.commands.subcommands.publisher_publish import (
-    PublishCommand,
-)
+from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING
+from cms.management.commands.subcommands.publisher_publish import PublishCommand
 from cms.models import CMSPlugin, Page, Title, TreeNode
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.testcases import CMSTestCase as TestCase
@@ -728,7 +724,7 @@ class PublishingTests(TestCase):
         other = self.create_page("Another Page", published=True)
         child = self.create_page("Child", published=True, parent=home)
         child2 = self.create_page("Child", published=True, parent=other)
-        self.assertTrue(Page.objects.filter(is_home=True).count(), 2)
+        self.assertEqual(Page.objects.filter(is_home=True).count(), 2)
         self.assertTrue(home.is_home)
 
         home = home.reload()

@@ -7,13 +7,14 @@
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
 # Björn Sandberg <adaptivelogic@gmail.com>, 2013
 # Christofer Huynh <christofer.huynh@gmail.com>, 2018
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # hula <fredrik@1px.se>, 2014
 # hannseman <hannseman@gmail.com>, 2011
 # hannseman <hannseman@gmail.com>, 2011
 # hula <fredrik@1px.se>, 2014
-# jakob.hedman <jakob.hedman@gmail.com>, 2014
-# jakob.hedman <jakob.hedman@gmail.com>, 2014
-# jakob.hedman <jakob.hedman@gmail.com>, 2014
+# Jakob Hedman <jakob.hedman@gmail.com>, 2014
+# Jakob Hedman <jakob.hedman@gmail.com>, 2014
+# Jakob Hedman <jakob.hedman@gmail.com>, 2014
 # joelbitar <joel@joelbitar.se>, 2014
 # joelbitar <joel@joelbitar.se>, 2014,2017
 # Mattias Lindvall <mattias.lindvall@gmail.com>, 2013
@@ -29,9 +30,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-19 21:14+0800\n"
-"PO-Revision-Date: 2021-05-19 13:14+0000\n"
-"Last-Translator: Florian Delizy <florian.delizy@gmail.com>\n"
+"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"PO-Revision-Date: 2010-11-30 06:47+0000\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
 "Language-Team: Swedish (http://www.transifex.com/divio/django-cms/language/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -117,6 +118,9 @@ msgstr "Applikationskonfiguration"
 
 msgid "Language independent options"
 msgstr "Språkoberoende alternativ"
+
+msgid "You entered an invalid URL."
+msgstr ""
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -403,6 +407,24 @@ msgid ""
 "href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a> page."
 msgstr ""
 
+msgid "Getting started developer guide"
+msgstr ""
+
+msgid "Documentation"
+msgstr "Dokumentation"
+
+msgid "User guide"
+msgstr ""
+
+msgid "Support Forum"
+msgstr ""
+
+msgid "Support Slack"
+msgstr ""
+
+msgid "What's new"
+msgstr ""
+
 msgid "Create"
 msgstr "Skapa"
 
@@ -442,6 +464,9 @@ msgstr "Logga ut"
 
 msgid "Language"
 msgstr "Språk"
+
+msgid "Help"
+msgstr ""
 
 msgid "Structure"
 msgstr "Struktur"
@@ -1209,7 +1234,7 @@ msgstr ""
 msgid "Cancel"
 msgstr "Avbryt"
 
-msgid "The following error occured:"
+msgid "The following error occurred:"
 msgstr "Följande fel inträffade:"
 
 msgid "Action successful."
@@ -1359,9 +1384,6 @@ msgstr ""
 
 msgid "Support"
 msgstr "Support"
-
-msgid "Documentation"
-msgstr "Dokumentation"
 
 msgid ""
 "\n"
@@ -1565,6 +1587,15 @@ msgstr "Lägg till plugins till placeholder \"%(placeholder_label)s\""
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Lägg till plugins till %(plugin_name)s"
+
+msgid "Community forum"
+msgstr ""
+
+msgid "Getting started"
+msgstr ""
+
+msgid "Talk to us"
+msgstr ""
 
 msgid "CMS - your user account was created."
 msgstr "CMS - ditt användarkonto har skapats."

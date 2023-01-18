@@ -7,11 +7,9 @@ from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
-from django.http import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
-)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.http.request import QueryDict
-from django.urls import re_path
+from django.urls import Resolver404, re_path, resolve
 from django.utils.translation import override
 
 from cms.admin.forms import RequestToolbarForm
@@ -97,6 +95,10 @@ class SettingsAdmin(ModelAdmin):
         request = copy.copy(request)
         request.GET = data
         request.current_page = current_page
+        try:
+            request.resolver_match = resolve(origin_url.path)
+        except Resolver404:
+            pass
         request.toolbar = CMSToolbar(request, request_path=origin_url.path, _async=True)
         request.toolbar.set_object(attached_obj or current_page)
         return HttpResponse(request.toolbar.render())
@@ -123,7 +125,7 @@ class SettingsAdmin(ModelAdmin):
                 args=[obj.id, ],
                 current_app=self.admin_site.name
             )
-        return HttpResponseRedirect("{0}?reload_window".format(post_url))
+        return HttpResponseRedirect(f"{post_url}?reload_window")
 
     def has_change_permission(self, request, obj=None):
         if obj and obj.user == request.user:
