@@ -987,7 +987,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         This tests the get slot method of PlaceholderRelationField
         """
 
-        from cms.models.fields import get_placeholder_from_slot
+        from cms.utils.placeholder import get_placeholder_from_slot
 
         poll = FancyPoll.objects.create(name='poll 1')
         slot_1 = get_placeholder_from_slot(poll.placeholders, slot="slot_1")  # Get placeholder

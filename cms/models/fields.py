@@ -120,7 +120,7 @@ class PlaceholderRelationField(GenericRelation):
 
     If you create a model which contains placeholders you first create the ``PlaceHolderRelationField``::
 
-        from cms.models.fields import get_placeholder_from_slot
+        from cms.utils.placeholder import get_placeholder_from_slot
 
         class Post(models.Model):
             ...
@@ -152,22 +152,3 @@ class PlaceholderRelationField(GenericRelation):
 
     def run_checks(self, placeholder, user):
         return all(check_(placeholder, user) for check_ in self.checks)
-
-
-def get_placeholder_from_slot(placeholder_relation: models.Manager, slot: str, template_obj=None) -> Placeholder:
-    """Retrieves the placeholder instance for a PlaceholderRelationField either by scaning the template
-    of the template_obj (if given) or by creating or getting a Placeholder in the database"""
-    if hasattr(template_obj, "get_template"):
-        # Tries to get a placeholder (based on the template for the template_obj
-        # or - if non exists - raises a Placeholder.DoesNotExist exception
-        # Placeholders are marked in the template with {% placeholder %}
-        try:
-            return placeholder_relation.get(slot=slot)
-        except Placeholder.DoesNotExist:
-            from cms.utils.placeholder import rescan_placeholders_for_obj
-            rescan_placeholders_for_obj(template_obj)
-            return placeholder_relation.placeholders.get(slot=slot)
-    else:
-        # Gets or creates the placeholder in any model. Placeholder is
-        # rendered by {% render_placeholder %}
-        return placeholder_relation.get_or_create(slot=slot)[0]
