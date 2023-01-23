@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import models
 from django.db.models.query_utils import Q
 from django.template import (
     Context, NodeList, Template, TemplateSyntaxError, Variable, engines,
@@ -14,6 +15,7 @@ from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
 from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
+from cms.models import Placeholder
 from cms.utils.conf import get_cms_setting
 
 
@@ -359,6 +361,27 @@ def rescan_placeholders_for_obj(obj):
 
 
 def get_declared_placeholders_for_obj(obj):
+    """Returns declared placeholders for an object. The object is supposed to have a method ``get_template``
+    which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
+    a list of placeholders used in the template by the ``{% placeholder %}`` template tag."""
     if not hasattr(obj, 'get_template'):
         raise NotImplementedError('%s should implement get_template' % obj.__class__.__name__)
     return get_placeholders(obj.get_template())
+
+
+def get_placeholder_from_slot(placeholder_relation: models.Manager, slot: str, template_obj=None) -> Placeholder:
+    """Retrieves the placeholder instance for a PlaceholderRelationField either by scaning the template
+    of the template_obj (if given) or by creating or getting a Placeholder in the database"""
+    if hasattr(template_obj, "get_template"):
+        # Tries to get a placeholder (based on the template for the template_obj
+        # or - if non exists - raises a Placeholder.DoesNotExist exception
+        # Placeholders are marked in the template with {% placeholder %}
+        try:
+            return placeholder_relation.get(slot=slot)
+        except Placeholder.DoesNotExist:
+            rescan_placeholders_for_obj(template_obj)
+            return placeholder_relation.placeholders.get(slot=slot)
+    else:
+        # Gets or creates the placeholder in any model. Placeholder is
+        # rendered by {% render_placeholder %}
+        return placeholder_relation.get_or_create(slot=slot)[0]

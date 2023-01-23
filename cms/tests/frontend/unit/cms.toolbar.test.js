@@ -289,7 +289,7 @@ describe('CMS.Toolbar', function () {
                         return {
                             fail: function (callback) {
                                 callback({
-                                    responseText: 'An error occured',
+                                    responseText: 'An error occurred',
                                     status: 418,
                                     statusText: "I'm a teapot"
                                 });
@@ -304,7 +304,7 @@ describe('CMS.Toolbar', function () {
             });
 
             expect(CMS.API.Messages.open).toHaveBeenCalledWith({
-                message: "An error occured | 418 I'm a teapot",
+                message: "An error occurred | 418 I'm a teapot",
                 error: true
             });
         });
@@ -357,7 +357,7 @@ describe('CMS.Toolbar', function () {
                         return {
                             fail: function (callback) {
                                 callback({
-                                    responseText: 'An error occured',
+                                    responseText: 'An error occurred',
                                     status: 418,
                                     statusText: "I'm a teapot"
                                 });
