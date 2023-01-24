@@ -133,7 +133,8 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
 
 class GlobalPagePermissionAdmin(admin.ModelAdmin):
     list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
-    list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+    list_filter = ['sites', 'user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+    list_display_links = ['user', 'group']
 
     form = GlobalPagePermissionAdminForm
     search_fields = []
