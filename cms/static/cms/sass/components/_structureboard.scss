@@ -564,19 +564,6 @@
     }
 }
 
-
-@at-root .cms-structure-mode-structure {
-    // overflow: hidden;
-
-    // min-height is necessary for iOS9
-    // when we have a page that has content
-    // that takes less than a screen structureboard
-    // becomes unusable because it tries to fit
-    // in the size of the content and not the size
-    // of the device screen
-    min-height: 100%;
-}
-
 // hide elements when dragging
 @at-root .ui-sortable-helper.cms-draggable .cms-submenu-btn {
     display: none !important;
@@ -595,7 +582,7 @@
     left: 0;
     top: 0;
     bottom: 0;
-    background: #fff !important;
+    background: $white !important;
     opacity: .5;
     z-index: 9999;
 }
