@@ -346,13 +346,13 @@ $messages-color: $white;
 $messages-font-size: 12px;
 $messages-line-height: 16px;
 $messages-border-radius: $border-radius-base;
-$messages-bgcolor: $black;
+$messages-bgcolor: rgba(var(--dca-shadow), 0.74);
 $messages-font-weight: 200;
 $messages-close-area-size: 20px;
 $messages-close-icon-size: 10px;
 
 $screenblock-color: $white;
-$screenblock-bgcolor: $black;
+$screenblock-bgcolor: rgba(var(--dca-shadow), 0.9);
 $screenblock-inner-position: 300px;
 
 $login-form-input-font-size: $font-size-normal;
