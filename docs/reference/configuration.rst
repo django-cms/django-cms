@@ -1190,3 +1190,13 @@ when the "Content" field is filled in. There should be no need to change it,
 unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
 your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
 body field **different** than ``body``.
+
+..  setting:: CMS_REDIRECT_PRESERVE_QUERY_PARAMS
+
+CMS_REDIRECT_PRESERVE_QUERY_PARAMS
+===================================
+
+default
+    ``False``
+
+This indicates to the CMS that redirects should preserve the query parameters.
