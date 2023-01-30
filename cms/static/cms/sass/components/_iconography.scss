@@ -26,161 +26,185 @@
 @function icon-char($filename) {
     $char: "";
 
-    @if $filename == alias {
+    @if $filename == advanced-settings {
         $char: "E001";
     }
-    @if $filename == archive {
+    @if $filename == alias {
         $char: "E002";
     }
-    @if $filename == arrow-right {
+    @if $filename == archive {
         $char: "E003";
     }
-    @if $filename == arrow-wide {
+    @if $filename == arrow-right {
         $char: "E004";
     }
-    @if $filename == arrow {
+    @if $filename == arrow-wide {
         $char: "E005";
     }
-    @if $filename == bin {
+    @if $filename == arrow {
         $char: "E006";
     }
-    @if $filename == check-circle {
+    @if $filename == bin {
         $char: "E007";
     }
-    @if $filename == check-o {
+    @if $filename == broadcast-off {
         $char: "E008";
     }
-    @if $filename == check-square {
+    @if $filename == broadcast-on {
         $char: "E009";
     }
-    @if $filename == check {
+    @if $filename == check-circle {
         $char: "E00A";
     }
-    @if $filename == close {
+    @if $filename == check-o {
         $char: "E00B";
     }
-    @if $filename == cogs {
+    @if $filename == check-square {
         $char: "E00C";
     }
-    @if $filename == comment {
+    @if $filename == check {
         $char: "E00D";
     }
-    @if $filename == copy {
+    @if $filename == close {
         $char: "E00E";
     }
-    @if $filename == edit-new {
+    @if $filename == cogs {
         $char: "E00F";
     }
-    @if $filename == eye {
+    @if $filename == comment {
         $char: "E010";
     }
-    @if $filename == forbidden {
+    @if $filename == copy {
         $char: "E011";
     }
-    @if $filename == handler {
+    @if $filename == edit-new {
         $char: "E012";
     }
-    @if $filename == highlight {
+    @if $filename == eye {
         $char: "E013";
     }
-    @if $filename == home {
+    @if $filename == forbidden {
         $char: "E014";
     }
-    @if $filename == info {
+    @if $filename == handler {
         $char: "E015";
     }
-    @if $filename == layers {
+    @if $filename == highlight {
         $char: "E016";
     }
-    @if $filename == list-ol {
+    @if $filename == home {
         $char: "E017";
     }
-    @if $filename == loader {
+    @if $filename == info {
         $char: "E018";
     }
-    @if $filename == lock {
+    @if $filename == layers {
         $char: "E019";
     }
-    @if $filename == logo {
+    @if $filename == list-ol {
         $char: "E01A";
     }
-    @if $filename == menu {
+    @if $filename == loader {
         $char: "E01B";
     }
-    @if $filename == minimize {
+    @if $filename == lock {
         $char: "E01C";
     }
-    @if $filename == minus-circle {
+    @if $filename == logo {
         $char: "E01D";
     }
-    @if $filename == minus-square-o {
+    @if $filename == menu {
         $char: "E01E";
     }
-    @if $filename == minus-square {
+    @if $filename == minimize {
         $char: "E01F";
     }
-    @if $filename == minus {
+    @if $filename == minus-circle {
         $char: "E020";
     }
-    @if $filename == paste {
+    @if $filename == minus-square-o {
         $char: "E021";
     }
-    @if $filename == pencil {
+    @if $filename == minus-square {
         $char: "E022";
     }
-    @if $filename == pin {
+    @if $filename == minus {
         $char: "E023";
     }
-    @if $filename == plugins {
+    @if $filename == moderate {
         $char: "E024";
     }
-    @if $filename == plus-circle {
+    @if $filename == moon {
         $char: "E025";
     }
-    @if $filename == plus-square-o {
+    @if $filename == paste {
         $char: "E026";
     }
-    @if $filename == plus {
+    @if $filename == pencil {
         $char: "E027";
     }
-    @if $filename == publish {
+    @if $filename == pin {
         $char: "E028";
     }
-    @if $filename == puzzle {
+    @if $filename == plugins {
         $char: "E029";
     }
-    @if $filename == redo {
+    @if $filename == plus-circle {
         $char: "E02A";
     }
-    @if $filename == scissors {
+    @if $filename == plus-square-o {
         $char: "E02B";
     }
-    @if $filename == search {
+    @if $filename == plus {
         $char: "E02C";
     }
-    @if $filename == sitemap {
+    @if $filename == publish {
         $char: "E02D";
     }
-    @if $filename == squares {
+    @if $filename == puzzle {
         $char: "E02E";
     }
-    @if $filename == undo {
+    @if $filename == redo {
         $char: "E02F";
     }
-    @if $filename == unlock {
+    @if $filename == rename {
         $char: "E030";
     }
-    @if $filename == unpublish {
+    @if $filename == scissors {
         $char: "E031";
     }
-    @if $filename == validate-2 {
+    @if $filename == search {
         $char: "E032";
     }
-    @if $filename == validate {
+    @if $filename == settings {
         $char: "E033";
     }
-    @if $filename == window {
+    @if $filename == sitemap {
         $char: "E034";
+    }
+    @if $filename == squares {
+        $char: "E035";
+    }
+    @if $filename == sun {
+        $char: "E036";
+    }
+    @if $filename == undo {
+        $char: "E037";
+    }
+    @if $filename == unlock {
+        $char: "E038";
+    }
+    @if $filename == unpublish {
+        $char: "E039";
+    }
+    @if $filename == validate-2 {
+        $char: "E03A";
+    }
+    @if $filename == validate {
+        $char: "E03B";
+    }
+    @if $filename == window {
+        $char: "E03C";
     }
 
     @return $char;
@@ -201,6 +225,10 @@
 // for decorative icons
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
 
+
+.cms-icon-advanced-settings {
+    @include icon(advanced-settings);
+}
 
 .cms-icon-alias {
     @include icon(alias);
@@ -224,6 +252,14 @@
 
 .cms-icon-bin {
     @include icon(bin);
+}
+
+.cms-icon-broadcast-off {
+    @include icon(broadcast-off);
+}
+
+.cms-icon-broadcast-on {
+    @include icon(broadcast-on);
 }
 
 .cms-icon-check-circle {
@@ -330,6 +366,14 @@
     @include icon(minus);
 }
 
+.cms-icon-moderate {
+    @include icon(moderate);
+}
+
+.cms-icon-moon {
+    @include icon(moon);
+}
+
 .cms-icon-paste {
     @include icon(paste);
 }
@@ -370,6 +414,10 @@
     @include icon(redo);
 }
 
+.cms-icon-rename {
+    @include icon(rename);
+}
+
 .cms-icon-scissors {
     @include icon(scissors);
 }
@@ -378,12 +426,20 @@
     @include icon(search);
 }
 
+.cms-icon-settings {
+    @include icon(settings);
+}
+
 .cms-icon-sitemap {
     @include icon(sitemap);
 }
 
 .cms-icon-squares {
     @include icon(squares);
+}
+
+.cms-icon-sun {
+    @include icon(sun);
 }
 
 .cms-icon-undo {

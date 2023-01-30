@@ -131,7 +131,7 @@
             &[data-cms-icon=bin] {
                 @include icon(bin);
             }
-            &[href*=alias_plugin] {
+            &[data-cms-icon=alias] {
                 @include icon(alias);
             }
             &[data-cms-icon=highlight] {
