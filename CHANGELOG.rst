@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+* Unified icon font with icons for versioning, moderation and version locking
 * Django 4.1 and 4.0 support
 * Python 3.10 support
 * Fix bug that broke page tree if it contained empty page content
