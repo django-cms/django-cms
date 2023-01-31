@@ -700,7 +700,7 @@ class PageAdmin(admin.ModelAdmin):
                                   "translated in any of the languages configured by the target site."))
             return jsonify_request(HttpResponseBadRequest(message))
 
-        new_page = form.copy_page(request.user)
+        new_page = form.copy_page(user)
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
 
     def edit_title_fields(self, request, page_id, language):
