@@ -449,7 +449,9 @@ class Page(models.Model):
         from cms.models import PageContent
         from cms.utils.page import get_available_slug
 
-        assert user is not None, "No anonymous page copying"
+        if user is None:
+            raise ValueError("Since django CMS 4 the page.copy method requires a user argument")
+
         if parent_node:
             new_node = parent_node.add_child(site=site)
             parent_page = parent_node.item
