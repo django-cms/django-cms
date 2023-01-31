@@ -180,7 +180,7 @@ class BasePageContentForm(forms.ModelForm):
 
 class AddPageForm(BasePageContentForm):
     source = forms.ModelChoiceField(
-        label=_(u'Page type'),
+        label=_('Page type'),
         queryset=Page.objects.filter(is_page_type=True),
         required=False,
     )
@@ -299,6 +299,7 @@ class AddPageForm(BasePageContentForm):
             translations=False,
             permissions=False,
             extensions=False,
+            user=self._user,
         )
         new_page.update(is_page_type=False)
         return new_page
