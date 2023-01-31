@@ -1327,7 +1327,12 @@ class PageContentAdmin(admin.ModelAdmin):
         page_content = self.get_object(request, object_id=object_id)
 
         if not self.has_change_permission(request, obj=page_content):
-            message = _("You do not have permission to change this page's in_navigation status")
+            if self.has_change_permission(request):
+                # General (permission) problem
+                message = _("You do not have permission to change a page's navigation status")
+            else:
+                # Only this page? Can be permissions or versioning, or ...
+                message = _("You cannot change this page's navigation status")
             return HttpResponseForbidden(force_str(message))
 
         if page_content is None:
