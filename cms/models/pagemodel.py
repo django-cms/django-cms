@@ -449,6 +449,9 @@ class Page(models.Model):
         from cms.models import PageContent
         from cms.utils.page import get_available_slug
 
+        if not user:
+            raise ValueError("Since django CMS 4 the page.copy method requires a user argument")
+
         if parent_node:
             new_node = parent_node.add_child(site=site)
             parent_page = parent_node.item
@@ -583,6 +586,7 @@ class Page(models.Model):
                 parent_node=parent,
                 translations=True,
                 permissions=copy_permissions,
+                user=user
             )
             nodes_by_id[page.node_id] = new_page.node
         return new_root_page

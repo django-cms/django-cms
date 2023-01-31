@@ -334,7 +334,8 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         out = StringIO()
         management.call_command(
-            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', '--userid=%d' % self.get_superuser().id,
+            interactive=False, stdout=out
         )
         pages = Page.objects.on_site(site)
         for page in pages:
@@ -379,6 +380,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         out = StringIO()
         management.call_command(
             'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', '--skip-content',
+            '--userid=%d' % self.get_superuser().id,
             interactive=False, stdout=out
         )
         pages = Page.objects.on_site(site)
@@ -429,6 +431,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         out = StringIO()
         management.call_command(
             'cms', 'copy', 'site', '--from-site=%s' % site_1_pk, '--to-site=%s' % site_2_pk,
+            '--userid=%d' % self.get_superuser().id,
             stdout=out
         )
 
@@ -479,7 +482,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         out = StringIO()
         management.call_command(
-            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de',
+            '--userid=%d' % self.get_superuser().id,
+            interactive=False, stdout=out
         )
         pages = Page.objects.on_site(site)
         for page in pages:
@@ -509,7 +514,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         out = StringIO()
         management.call_command(
-            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', interactive=False, stdout=out
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de',
+            '--userid=%d' % self.get_superuser().id,
+            interactive=False, stdout=out
         )
 
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -536,7 +543,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
         out = StringIO()
         management.call_command(
-            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', '--force', interactive=False,
+            'cms', 'copy', 'lang', '--from-lang=en', '--to-lang=de', '--force',
+            '--userid=%d' % self.get_superuser().id,
+            interactive=False,
             stdout=out
         )
 
@@ -555,7 +564,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         site = 1
         out = StringIO()
         management.call_command(
-            'cms', 'copy', 'lang', '--from-lang=de', '--to-lang=fr', verbosity=3,
+            'cms', 'copy', 'lang', '--from-lang=de', '--to-lang=fr',
+            '--userid=%d' % self.get_superuser().id,
+            verbosity=3,
             interactive=False, stdout=out
         )
         text = out.getvalue()
@@ -592,6 +603,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         out = StringIO()
         management.call_command(
             'cms', 'copy', 'lang', '--from-lang=de', '--to-lang=fr', '--site=%s' % site_active,
+            '--userid=%d' % self.get_superuser().id,
             interactive=False, stdout=out
         )
 
@@ -614,8 +626,9 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         out = StringIO()
         with self.assertRaises(CommandError) as command_error:
             management.call_command(
-                'cms', 'copy', 'lang', '--from-lang=it', '--to-lang=fr', interactive=False,
-                stdout=out
+                'cms', 'copy', 'lang', '--from-lang=it', '--to-lang=fr',
+                '--userid=%d' % self.get_superuser().id,
+                interactive=False, stdout=out
             )
 
         self.assertEqual(

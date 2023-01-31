@@ -1,13 +1,32 @@
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.management import CommandError
 from django.db import transaction
 
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import EmptyPageContent, Page, StaticPlaceholder
+from cms.models import EmptyPageContent, Page, PageContent, StaticPlaceholder
 from cms.utils import get_language_list
 from cms.utils.plugins import copy_plugins_to_placeholder
+
+User = get_user_model()
+
+
+def get_user(options):
+    if options["userid"] and options["username"]:  # pragma: no cover
+        raise CommandError("Only either one of the options '--userid' or '--username' may be given")
+    if options["userid"]:
+        try:
+            return User.objects.get(pk=options["userid"])
+        except User.DoesNotExist:
+            raise CommandError(f"No user with id {options['userid']} found")
+    if options["username"]:  # pragma: no cover
+        try:
+            return User.objects.get(username=options["username"])
+        except User.DoesNotExist:
+            raise CommandError(f"No user with name {options['username']} found")
+    return None  # pragma: no cover
 
 
 class CopyLangCommand(SubcommandsCommand):
@@ -29,6 +48,9 @@ class CopyLangCommand(SubcommandsCommand):
         parser.add_argument('--skip-content', action='store_false', dest='copy_content',
                             default=True, help='If set content is not copied, and the command '
                                                'will only create titles in the given language.')
+        parser.add_argument("--username", type=str, dest='username', default="",
+                            help="Username of user needed create new content objects")
+        parser.add_argument("--userid", type=int, help="User id of user needed create new content objects")
 
     def handle(self, *args, **options):
         verbose = options.get('verbosity') > 1
@@ -36,6 +58,8 @@ class CopyLangCommand(SubcommandsCommand):
         copy_content = options.get('copy_content')
         from_lang = options.get('from_lang')
         to_lang = options.get('to_lang')
+        user = get_user(options)
+
         try:
             site = int(options.get('site', None))
         except Exception:
@@ -55,13 +79,19 @@ class CopyLangCommand(SubcommandsCommand):
                 if isinstance(title, EmptyPageContent):
                     title = page.get_content_obj(from_lang)
                     if verbose:
-                        self.stdout.write('copying title %s from language %s\n' % (title.title, from_lang))
-                    title.id = None
-                    title.language = to_lang
+                        self.stdout.write('copying page content %s from language %s\n' % (title.title, from_lang))
+                    if not user:
+                        raise CommandError('Specify either --userid or --username')
+                    from django.forms import model_to_dict
+                    new_title = model_to_dict(title)
+                    new_title.pop("id", None)  # No PK
+                    new_title["language"] = to_lang
+                    new_title["page"] = page
+                    PageContent.objects.with_user(user).create(**new_title)
 
                     if to_lang not in page.get_languages():
                         page.update_languages(page.get_languages() + [to_lang])
-                    title.save()
+
                 if copy_content:
                     # copy plugins using API
                     if verbose:
@@ -108,6 +138,9 @@ class CopySiteCommand(SubcommandsCommand):
                             help='Language to copy the content from.')
         parser.add_argument('--to-site', action='store', dest='to_site', required=True,
                             help='Language to copy the content to.')
+        parser.add_argument("--username", type=str, dest='username', default="",
+                            help="Username of user needed create new content objects")
+        parser.add_argument("--userid", type=int, help="User id of user needed create new content objects")
 
     def handle(self, *args, **options):
         try:
@@ -125,6 +158,9 @@ class CopySiteCommand(SubcommandsCommand):
 
         from_site = self.get_site(from_site)
         to_site = self.get_site(to_site)
+        user = get_user(options)
+        if not user:
+            raise CommandError('Specify either --userid or --username')
 
         pages = (
             Page
@@ -140,6 +176,7 @@ class CopySiteCommand(SubcommandsCommand):
                 new_page = page.copy_with_descendants(
                     target_node=None,
                     target_site=to_site,
+                    user=user,
                 )
 
                 if page.is_home:
