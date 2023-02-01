@@ -700,7 +700,7 @@ class PageAdmin(admin.ModelAdmin):
                                   "translated in any of the languages configured by the target site."))
             return jsonify_request(HttpResponseBadRequest(message))
 
-        new_page = form.copy_page(request.user)
+        new_page = form.copy_page(user)
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
 
     def edit_title_fields(self, request, page_id, language):
@@ -1327,7 +1327,12 @@ class PageContentAdmin(admin.ModelAdmin):
         page_content = self.get_object(request, object_id=object_id)
 
         if not self.has_change_permission(request, obj=page_content):
-            message = _("You do not have permission to change this page's in_navigation status")
+            if self.has_change_permission(request):
+                # General (permission) problem
+                message = _("You do not have permission to change a page's navigation status")
+            else:
+                # Only this page? Can be permissions or versioning, or ...
+                message = _("You cannot change this page's navigation status")
             return HttpResponseForbidden(force_str(message))
 
         if page_content is None:
