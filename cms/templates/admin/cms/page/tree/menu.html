@@ -62,7 +62,7 @@
                                 <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                                     data-cms-tooltip="{% autoescape on %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endautoescape %}">
                                     <a href="{% url 'admin:cms_page_advanced' page.pk %}">
-                                        <span class="cms-icon cms-icon-puzzle"></span>
+                                        <span class="cms-icon cms-icon-apphook"></span>
                                     </a>
                                 </div>
                             </div>
@@ -79,7 +79,7 @@
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
                     {% if page_content %}
-                        <a class="js-cms-pagetree-page-view cms-icon-eye" href="{% get_preview_url page_content %}"{% if lang in page_languages %} target="_top"{% endif %}">
+                        <a class="js-cms-pagetree-page-view cms-icon-view" href="{% get_preview_url page_content %}"{% if lang in page_languages %} target="_top"{% endif %}">
                             <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
                         </a>
                     {% endif %}
@@ -189,7 +189,7 @@
                             </li>
                             <li class="">
                                 <a href="#" class="cms-pagetree-dropdown-item-disabled" title="{% autoescape on %}{% trans 'Cut' %}{% endautoescape %}">
-                                    <span class="cms-icon cms-icon-scissors"></span>
+                                    <span class="cms-icon cms-icon-cut"></span>
                                     <span>{% autoescape on %}{% trans 'Cut' %}{% endautoescape %}<span>
                                 </a>
                             </li>

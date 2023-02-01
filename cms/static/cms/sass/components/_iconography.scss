@@ -32,179 +32,191 @@
     @if $filename == alias {
         $char: "E002";
     }
-    @if $filename == archive {
+    @if $filename == apphook {
         $char: "E003";
     }
-    @if $filename == arrow-right {
+    @if $filename == archive {
         $char: "E004";
     }
-    @if $filename == arrow-wide {
+    @if $filename == arrow-right {
         $char: "E005";
     }
-    @if $filename == arrow {
+    @if $filename == arrow-wide {
         $char: "E006";
     }
-    @if $filename == bin {
+    @if $filename == arrow {
         $char: "E007";
     }
-    @if $filename == broadcast-off {
+    @if $filename == bin {
         $char: "E008";
     }
-    @if $filename == broadcast-on {
+    @if $filename == broadcast-off {
         $char: "E009";
     }
-    @if $filename == check-circle {
+    @if $filename == broadcast-on {
         $char: "E00A";
     }
-    @if $filename == check-o {
+    @if $filename == check-circle {
         $char: "E00B";
     }
-    @if $filename == check-square {
+    @if $filename == check-o {
         $char: "E00C";
     }
-    @if $filename == check {
+    @if $filename == check-square {
         $char: "E00D";
     }
-    @if $filename == close {
+    @if $filename == check {
         $char: "E00E";
     }
-    @if $filename == cogs {
+    @if $filename == close {
         $char: "E00F";
     }
-    @if $filename == comment {
+    @if $filename == cogs {
         $char: "E010";
     }
-    @if $filename == copy {
+    @if $filename == comment {
         $char: "E011";
     }
-    @if $filename == edit-new {
+    @if $filename == compare {
         $char: "E012";
     }
-    @if $filename == edit {
+    @if $filename == copy {
         $char: "E013";
     }
-    @if $filename == eye {
+    @if $filename == cut {
         $char: "E014";
     }
-    @if $filename == forbidden {
+    @if $filename == edit-new {
         $char: "E015";
     }
-    @if $filename == handler {
+    @if $filename == edit {
         $char: "E016";
     }
-    @if $filename == highlight {
+    @if $filename == eye {
         $char: "E017";
     }
-    @if $filename == home {
+    @if $filename == forbidden {
         $char: "E018";
     }
-    @if $filename == info {
+    @if $filename == handler {
         $char: "E019";
     }
-    @if $filename == layers {
+    @if $filename == highlight {
         $char: "E01A";
     }
-    @if $filename == list-ol {
+    @if $filename == home {
         $char: "E01B";
     }
-    @if $filename == loader {
+    @if $filename == info {
         $char: "E01C";
     }
-    @if $filename == lock {
+    @if $filename == layers {
         $char: "E01D";
     }
-    @if $filename == logo {
+    @if $filename == list-ol {
         $char: "E01E";
     }
-    @if $filename == manage-versions {
+    @if $filename == loader {
         $char: "E01F";
     }
-    @if $filename == menu {
+    @if $filename == lock {
         $char: "E020";
     }
-    @if $filename == minimize {
+    @if $filename == logo {
         $char: "E021";
     }
-    @if $filename == minus-circle {
+    @if $filename == manage-versions {
         $char: "E022";
     }
-    @if $filename == minus-square-o {
+    @if $filename == menu {
         $char: "E023";
     }
-    @if $filename == minus-square {
+    @if $filename == minimize {
         $char: "E024";
     }
-    @if $filename == minus {
+    @if $filename == minus-circle {
         $char: "E025";
     }
-    @if $filename == moderate {
+    @if $filename == minus-square-o {
         $char: "E026";
     }
-    @if $filename == moon {
+    @if $filename == minus-square {
         $char: "E027";
     }
-    @if $filename == paste {
+    @if $filename == minus {
         $char: "E028";
     }
-    @if $filename == pencil {
+    @if $filename == moderate {
         $char: "E029";
     }
-    @if $filename == pin {
+    @if $filename == moon {
         $char: "E02A";
     }
-    @if $filename == plugins {
+    @if $filename == paste {
         $char: "E02B";
     }
-    @if $filename == plus-circle {
+    @if $filename == pencil {
         $char: "E02C";
     }
-    @if $filename == plus-square-o {
+    @if $filename == pin {
         $char: "E02D";
     }
-    @if $filename == plus {
+    @if $filename == plugins {
         $char: "E02E";
     }
-    @if $filename == publish {
+    @if $filename == plus-circle {
         $char: "E02F";
     }
-    @if $filename == puzzle {
+    @if $filename == plus-square-o {
         $char: "E030";
     }
-    @if $filename == redo {
+    @if $filename == plus {
         $char: "E031";
     }
-    @if $filename == rename {
+    @if $filename == publish {
         $char: "E032";
     }
-    @if $filename == scissors {
+    @if $filename == puzzle {
         $char: "E033";
     }
-    @if $filename == search {
+    @if $filename == redo {
         $char: "E034";
     }
-    @if $filename == settings {
+    @if $filename == rename {
         $char: "E035";
     }
-    @if $filename == sitemap {
+    @if $filename == scissors {
         $char: "E036";
     }
-    @if $filename == squares {
+    @if $filename == search {
         $char: "E037";
     }
-    @if $filename == sun {
+    @if $filename == settings {
         $char: "E038";
     }
-    @if $filename == undo {
+    @if $filename == sitemap {
         $char: "E039";
     }
-    @if $filename == unlock {
+    @if $filename == squares {
         $char: "E03A";
     }
-    @if $filename == unpublish {
+    @if $filename == sun {
         $char: "E03B";
     }
-    @if $filename == window {
+    @if $filename == undo {
         $char: "E03C";
+    }
+    @if $filename == unlock {
+        $char: "E03D";
+    }
+    @if $filename == unpublish {
+        $char: "E03E";
+    }
+    @if $filename == view {
+        $char: "E03F";
+    }
+    @if $filename == window {
+        $char: "E040";
     }
 
     @return $char;
@@ -232,6 +244,10 @@
 
 .cms-icon-alias {
     @include icon(alias);
+}
+
+.cms-icon-apphook {
+    @include icon(apphook);
 }
 
 .cms-icon-archive {
@@ -290,8 +306,16 @@
     @include icon(comment);
 }
 
+.cms-icon-compare {
+    @include icon(compare);
+}
+
 .cms-icon-copy {
     @include icon(copy);
+}
+
+.cms-icon-cut {
+    @include icon(cut);
 }
 
 .cms-icon-edit-new {
@@ -460,6 +484,10 @@
 
 .cms-icon-unpublish {
     @include icon(unpublish);
+}
+
+.cms-icon-view {
+    @include icon(view);
 }
 
 .cms-icon-window {
