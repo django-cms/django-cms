@@ -10,15 +10,17 @@ from django.http import (
     Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
 )
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.timezone import now
 from django.utils.translation import get_language_from_request
 from django.views.decorators.http import require_POST
 
+from cms.apphook_pool import apphook_pool
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
+from cms.models import PageContent
 from cms.models.pagemodel import TreeNode
 from cms.page_rendering import (
     _handle_no_page, _render_welcome_page, render_pagecontent,
@@ -242,7 +244,23 @@ def render_object_edit(request, content_type_id, object_id):
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     try:
-        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+        if issubclass(model, PageContent):
+            content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
+            request.current_page = content_type_obj.page
+            if (
+                content_type_obj.page.application_urls and  # noqa: W504
+                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
+            ):
+                try:
+                    absolute_url = content_type_obj.get_absolute_url()
+                    from cms.toolbar.toolbar import CMSToolbar
+                    request.toolbar = CMSToolbar(request, request_path=absolute_url)
+                    view_func, args, kwargs = resolve(absolute_url)
+                    return view_func(request, *args, **kwargs)
+                except Resolver404:
+                    pass
+        else:
+            content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
 
@@ -266,7 +284,23 @@ def render_object_preview(request, content_type_id, object_id):
         model = content_type.model_class()
 
     try:
-        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+        if issubclass(model, PageContent):
+            content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
+            request.current_page = content_type_obj.page
+            if (
+                content_type_obj.page.application_urls and  # noqa: W504
+                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
+            ):
+                try:
+                    absolute_url = content_type_obj.get_absolute_url()
+                    from cms.toolbar.toolbar import CMSToolbar
+                    request.toolbar = CMSToolbar(request, request_path=absolute_url)
+                    view_func, args, kwargs = resolve(absolute_url)
+                    return view_func(request, *args, **kwargs)
+                except Resolver404:
+                    pass
+        else:
+            content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
 
