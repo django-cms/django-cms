@@ -38,15 +38,20 @@ class BaseToolbar(ToolbarAPIMixin):
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
     @cached_property
-    def _resolver_match(self):
+    def resolver_match(self):
         if getattr(self.request, 'resolver_match', None):
             return self.request.resolver_match
-
         try:
-            match = resolve(self.request.path_info)
+            if hasattr(self, "request_path"):
+                match = resolve(self.request_path)
+            else:
+                match = resolve(self.request.path_info)
         except Resolver404:
             match = None
         return match
+
+    def _resolver_match(self):
+        return self.resolver_match
 
     @cached_property
     def site_language(self):
@@ -87,8 +92,8 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def structure_mode_active(self):
-        if self.is_staff and self._resolver_match:
-            return self._resolver_match.url_name == 'cms_placeholder_render_object_structure'
+        if self.is_staff and self.resolver_match:
+            return self.resolver_match.url_name == 'cms_placeholder_render_object_structure'
         return False
 
     @cached_property
@@ -100,15 +105,15 @@ class BaseToolbar(ToolbarAPIMixin):
         if self.structure_mode_active:
             return True
 
-        if self._resolver_match:
-            return self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+        if self.resolver_match:
+            return self.resolver_match.url_name == 'cms_placeholder_render_object_edit'
         return False
 
     @cached_property
     def preview_mode_active(self):
         """``True`` if preview mode is active."""
-        if self.is_staff and self._resolver_match:
-            return self._resolver_match.url_name == 'cms_placeholder_render_object_preview'
+        if self.is_staff and self.resolver_match:
+            return self.resolver_match.url_name == 'cms_placeholder_render_object_preview'
         return False
 
     @cached_property
@@ -210,6 +215,7 @@ class CMSToolbarBase(BaseToolbar):
 
     def init_toolbar(self, request, request_path=None):
         self.request = request
+        self.request_path = request_path or request.path_info  # TODO: Used to be request.path. Why?
         self.is_staff = self.request.user.is_staff
         self.show_toolbar = self.is_staff
 
@@ -217,15 +223,15 @@ class CMSToolbarBase(BaseToolbar):
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
-        # Handle showing the toolbar for anonymouse users when they supply
+        # Handle showing the toolbar for anonymous users when they supply
         # the enable toolbar parameter
         if (anonymous_on and request.user.is_anonymous) and enable_toolbar in self.request.GET:
             self.show_toolbar = True
 
         if self.show_toolbar:
             edit_mode = (
-                self._resolver_match
-                and self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
+                self.resolver_match
+                and self.resolver_match.url_name == 'cms_placeholder_render_object_edit'
             )
             if enable_toolbar in self.request.GET or edit_mode:
                 self.show_toolbar = True
@@ -250,7 +256,6 @@ class CMSToolbarBase(BaseToolbar):
         if hasattr(self, 'toolbars'):
             for key, toolbar in self.toolbars.items():
                 self.toolbars[key].request = self.request
-        self.request_path = request_path or request.path
 
     @cached_property
     def user_settings(self):
