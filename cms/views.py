@@ -232,7 +232,7 @@ def render_object_structure(request, content_type_id, object_id):
     return render(request, 'cms/toolbar/structure.html', context)
 
 
-def render_object_edit(request, content_type_id, object_id):
+def render_object_endpoint(request, content_type_id, object_id, require_editable):
     try:
         content_type = ContentType.objects.get_for_id(content_type_id)
     except ContentType.DoesNotExist:
@@ -240,7 +240,7 @@ def render_object_edit(request, content_type_id, object_id):
     else:
         model = content_type.model_class()
 
-    if not is_editable_model(model):
+    if require_editable and not is_editable_model(model):
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     try:
@@ -273,43 +273,11 @@ def render_object_edit(request, content_type_id, object_id):
     toolbar.set_object(content_type_obj)
     render_func = extension.toolbar_enabled_models[model]
     return render_func(request, content_type_obj)
+
+
+def render_object_edit(request, content_type_id, object_id):
+    return render_object_endpoint(request, content_type_id, object_id, require_editable=True)
 
 
 def render_object_preview(request, content_type_id, object_id):
-    try:
-        content_type = ContentType.objects.get_for_id(content_type_id)
-    except ContentType.DoesNotExist:
-        raise Http404
-    else:
-        model = content_type.model_class()
-
-    try:
-        if issubclass(model, PageContent):
-            content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
-            request.current_page = content_type_obj.page
-            if (
-                content_type_obj.page.application_urls and  # noqa: W504
-                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
-            ):
-                try:
-                    absolute_url = content_type_obj.get_absolute_url()
-                    from cms.toolbar.toolbar import CMSToolbar
-                    request.toolbar = CMSToolbar(request, request_path=absolute_url)
-                    view_func, args, kwargs = resolve(absolute_url)
-                    return view_func(request, *args, **kwargs)
-                except Resolver404:
-                    pass
-        else:
-            content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404
-
-    extension = apps.get_app_config('cms').cms_extension
-
-    if model not in extension.toolbar_enabled_models:
-        return HttpResponseBadRequest('Requested object does not support frontend rendering')
-
-    toolbar = get_toolbar_from_request(request)
-    toolbar.set_object(content_type_obj)
-    render_func = extension.toolbar_enabled_models[model]
-    return render_func(request, content_type_obj)
+    return render_object_endpoint(request, content_type_id, object_id, require_editable=False)
