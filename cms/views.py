@@ -23,7 +23,8 @@ from cms.forms.login import CMSToolbarLoginForm
 from cms.models import PageContent
 from cms.models.pagemodel import TreeNode
 from cms.page_rendering import (
-    _handle_no_page, _render_welcome_page, render_pagecontent, _handle_no_apphook,
+    _handle_no_apphook, _handle_no_page, _render_welcome_page,
+    render_pagecontent,
 )
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
