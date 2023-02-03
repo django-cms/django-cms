@@ -38,7 +38,7 @@ class BaseToolbar(ToolbarAPIMixin):
     disable_url = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
     @cached_property
-    def resolver_match(self):
+    def _resolver_match(self):
         if getattr(self.request, 'resolver_match', None):
             return self.request.resolver_match
         try:
@@ -49,9 +49,6 @@ class BaseToolbar(ToolbarAPIMixin):
         except Resolver404:
             match = None
         return match
-
-    def _resolver_match(self):
-        return self.resolver_match
 
     @cached_property
     def site_language(self):
@@ -92,8 +89,8 @@ class BaseToolbar(ToolbarAPIMixin):
 
     @cached_property
     def structure_mode_active(self):
-        if self.is_staff and self.resolver_match:
-            return self.resolver_match.url_name == 'cms_placeholder_render_object_structure'
+        if self.is_staff and self._resolver_match:
+            return self._resolver_match.url_name == 'cms_placeholder_render_object_structure'
         return False
 
     @cached_property
@@ -105,15 +102,15 @@ class BaseToolbar(ToolbarAPIMixin):
         if self.structure_mode_active:
             return True
 
-        if self.resolver_match:
-            return self.resolver_match.url_name == 'cms_placeholder_render_object_edit'
+        if self._resolver_match:
+            return self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
         return False
 
     @cached_property
     def preview_mode_active(self):
         """``True`` if preview mode is active."""
-        if self.is_staff and self.resolver_match:
-            return self.resolver_match.url_name == 'cms_placeholder_render_object_preview'
+        if self.is_staff and self._resolver_match:
+            return self._resolver_match.url_name == 'cms_placeholder_render_object_preview'
         return False
 
     @cached_property
@@ -230,8 +227,8 @@ class CMSToolbarBase(BaseToolbar):
 
         if self.show_toolbar:
             edit_mode = (
-                self.resolver_match
-                and self.resolver_match.url_name == 'cms_placeholder_render_object_edit'
+                self._resolver_match
+                and self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
             )
             if enable_toolbar in self.request.GET or edit_mode:
                 self.show_toolbar = True
