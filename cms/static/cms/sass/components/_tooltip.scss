@@ -4,7 +4,7 @@
 // used when hover over plugins in edit mode
 .cms-tooltip,
 .cms-tooltip-touch {
-    @include icon(pencil);
+    @include icon(edit);
     visibility: hidden;
     position: absolute;
     top: 0;

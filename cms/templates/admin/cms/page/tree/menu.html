@@ -62,7 +62,7 @@
                                 <div class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                                     data-cms-tooltip="{% autoescape on %}{% blocktrans with page.application_urls as apphook%}Application: {{ apphook }}{% endblocktrans %}{% endautoescape %}">
                                     <a href="{% url 'admin:cms_page_advanced' page.pk %}">
-                                        <span class="cms-icon cms-icon-puzzle"></span>
+                                        <span class="cms-icon cms-icon-apphook"></span>
                                     </a>
                                 </div>
                             </div>
@@ -79,7 +79,7 @@
                 {% if page.id|slugify == request.GET.page_id|slugify %} cms-tree-preview-active{% endif %}">
                 <div class="cms-tree-item-inner cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% autoescape on %}{% trans "View on site" %}{% endautoescape %}">
                     {% if page_content %}
-                        <a class="js-cms-pagetree-page-view cms-icon-eye" href="{% get_preview_url page_content %}"{% if lang in page_languages %} target="_top"{% endif %}">
+                        <a class="js-cms-pagetree-page-view cms-icon-view" href="{% get_preview_url page_content %}"{% if lang in page_languages %} target="_top"{% endif %}">
                             <span class="sr-only">{% autoescape on %}{% trans "View on site" %}{% endautoescape %}</span>
                         </a>
                     {% endif %}
@@ -138,15 +138,15 @@
                     {% get_admin_url_for_language page preview_language as content_admin_url %}
                     <div{% if has_change_permission and has_change_advanced_settings_permission and content_admin_url %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                         data-cms-tooltip="{% trans "Page settings (SHIFT click for advanced settings)" %}"{% endif %}>
-                        {% if content_admin_url  %}
+                        {% if content_admin_url and page_content %}
                         <a href="{{ content_admin_url }}"
-                            class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-pencil"
+                            class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-settings"
                             {% if has_change_advanced_settings_permission %}
                             data-url="{% url 'admin:cms_page_advanced' page.id %}"
                             {% endif %}
                             >
                         {% else %}
-                            <span class="cms-btn cms-btn-default cms-btn-disabled js-cms-tree-advanced-settings cms-icon cms-icon-pencil">
+                            <span class="cms-btn cms-btn-default cms-btn-disabled js-cms-tree-advanced-settings cms-icon cms-icon-settings">
                         {% endif %}
                             <span class="sr-only">{% trans "Page settings (SHIFT click for advanced settings)" %}</span>
                         {% if has_change_permission and content_admin_url or has_change_advanced_settings_permission %}
@@ -189,13 +189,13 @@
                             </li>
                             <li class="">
                                 <a href="#" class="cms-pagetree-dropdown-item-disabled" title="{% autoescape on %}{% trans 'Cut' %}{% endautoescape %}">
-                                    <span class="cms-icon cms-icon-scissors"></span>
+                                    <span class="cms-icon cms-icon-cut"></span>
                                     <span>{% autoescape on %}{% trans 'Cut' %}{% endautoescape %}<span>
                                 </a>
                             </li>
                             <li>
                                 <a href="#" data-node-id="{{ node.pk }}" data-id="{{ page.pk }}" class="cms-pagetree-dropdown-item-disabled">
-                                    <span class="cms-icon cms-icon-alias"></span>
+                                    <span class="cms-icon cms-icon-paste"></span>
                                     <span>{% autoescape on %}{% trans "Paste" %}{% endautoescape %}</span>
                                 </a>
                             </li>
@@ -207,7 +207,7 @@
                             </li>
                             <li>
                                 <a class="cms-pagetree-dropdown-item-disabled" href="#" title="{% autoescape on %}{% trans "Advanced settings" %}{% endautoescape %}">
-                                    <span class="cms-icon cms-icon-cogs"></span>
+                                    <span class="cms-icon cms-icon-advanced-settings"></span>
                                     <span>{% autoescape on %}{% trans "Advanced settings" %}{% endautoescape %}</span>
                                 </a>
                             </li>

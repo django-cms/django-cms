@@ -26,149 +26,197 @@
 @function icon-char($filename) {
     $char: "";
 
-    @if $filename == alias {
+    @if $filename == advanced-settings {
         $char: "E001";
     }
-    @if $filename == archive {
+    @if $filename == alias {
         $char: "E002";
     }
-    @if $filename == arrow-right {
+    @if $filename == apphook {
         $char: "E003";
     }
-    @if $filename == arrow-wide {
+    @if $filename == archive {
         $char: "E004";
     }
-    @if $filename == arrow {
+    @if $filename == arrow-right {
         $char: "E005";
     }
-    @if $filename == bin {
+    @if $filename == arrow-wide {
         $char: "E006";
     }
-    @if $filename == check-circle {
+    @if $filename == arrow {
         $char: "E007";
     }
-    @if $filename == check-o {
+    @if $filename == bin {
         $char: "E008";
     }
-    @if $filename == check-square {
+    @if $filename == broadcast-off {
         $char: "E009";
     }
-    @if $filename == check {
+    @if $filename == broadcast-on {
         $char: "E00A";
     }
-    @if $filename == close {
+    @if $filename == check-circle {
         $char: "E00B";
     }
-    @if $filename == cogs {
+    @if $filename == check-o {
         $char: "E00C";
     }
-    @if $filename == copy {
+    @if $filename == check-square {
         $char: "E00D";
     }
-    @if $filename == edit-new {
+    @if $filename == check {
         $char: "E00E";
     }
-    @if $filename == eye {
+    @if $filename == close {
         $char: "E00F";
     }
-    @if $filename == forbidden {
+    @if $filename == cogs {
         $char: "E010";
     }
-    @if $filename == handler {
+    @if $filename == comment {
         $char: "E011";
     }
-    @if $filename == highlight {
+    @if $filename == compare {
         $char: "E012";
     }
-    @if $filename == home {
+    @if $filename == copy {
         $char: "E013";
     }
-    @if $filename == info {
+    @if $filename == cut {
         $char: "E014";
     }
-    @if $filename == layers {
+    @if $filename == edit-new {
         $char: "E015";
     }
-    @if $filename == list-ol {
+    @if $filename == edit {
         $char: "E016";
     }
-    @if $filename == loader {
+    @if $filename == eye {
         $char: "E017";
     }
-    @if $filename == lock {
+    @if $filename == forbidden {
         $char: "E018";
     }
-    @if $filename == logo {
+    @if $filename == handler {
         $char: "E019";
     }
-    @if $filename == menu {
+    @if $filename == highlight {
         $char: "E01A";
     }
-    @if $filename == minimize {
+    @if $filename == home {
         $char: "E01B";
     }
-    @if $filename == minus-circle {
+    @if $filename == info {
         $char: "E01C";
     }
-    @if $filename == minus-square-o {
+    @if $filename == layers {
         $char: "E01D";
     }
-    @if $filename == minus-square {
+    @if $filename == list-ol {
         $char: "E01E";
     }
-    @if $filename == minus {
+    @if $filename == loader {
         $char: "E01F";
     }
-    @if $filename == paste {
+    @if $filename == lock {
         $char: "E020";
     }
-    @if $filename == pencil {
+    @if $filename == logo {
         $char: "E021";
     }
-    @if $filename == pin {
+    @if $filename == manage-versions {
         $char: "E022";
     }
-    @if $filename == plugins {
+    @if $filename == menu {
         $char: "E023";
     }
-    @if $filename == plus-circle {
+    @if $filename == minimize {
         $char: "E024";
     }
-    @if $filename == plus-square-o {
+    @if $filename == minus-circle {
         $char: "E025";
     }
-    @if $filename == plus {
+    @if $filename == minus-square-o {
         $char: "E026";
     }
-    @if $filename == publish {
+    @if $filename == minus-square {
         $char: "E027";
     }
-    @if $filename == puzzle {
+    @if $filename == minus {
         $char: "E028";
     }
-    @if $filename == redo {
+    @if $filename == moderate {
         $char: "E029";
     }
-    @if $filename == scissors {
+    @if $filename == moon {
         $char: "E02A";
     }
-    @if $filename == search {
+    @if $filename == paste {
         $char: "E02B";
     }
-    @if $filename == sitemap {
+    @if $filename == pencil {
         $char: "E02C";
     }
-    @if $filename == squares {
+    @if $filename == pin {
         $char: "E02D";
     }
-    @if $filename == undo {
+    @if $filename == plugins {
         $char: "E02E";
     }
-    @if $filename == unpublish {
+    @if $filename == plus-circle {
         $char: "E02F";
     }
-    @if $filename == window {
+    @if $filename == plus-square-o {
         $char: "E030";
+    }
+    @if $filename == plus {
+        $char: "E031";
+    }
+    @if $filename == publish {
+        $char: "E032";
+    }
+    @if $filename == puzzle {
+        $char: "E033";
+    }
+    @if $filename == redo {
+        $char: "E034";
+    }
+    @if $filename == rename {
+        $char: "E035";
+    }
+    @if $filename == scissors {
+        $char: "E036";
+    }
+    @if $filename == search {
+        $char: "E037";
+    }
+    @if $filename == settings {
+        $char: "E038";
+    }
+    @if $filename == sitemap {
+        $char: "E039";
+    }
+    @if $filename == squares {
+        $char: "E03A";
+    }
+    @if $filename == sun {
+        $char: "E03B";
+    }
+    @if $filename == undo {
+        $char: "E03C";
+    }
+    @if $filename == unlock {
+        $char: "E03D";
+    }
+    @if $filename == unpublish {
+        $char: "E03E";
+    }
+    @if $filename == view {
+        $char: "E03F";
+    }
+    @if $filename == window {
+        $char: "E040";
     }
 
     @return $char;
@@ -190,8 +238,16 @@
 // DOCS: http://filamentgroup.com/lab/bulletproof_icon_fonts.html
 
 
+.cms-icon-advanced-settings {
+    @include icon(advanced-settings);
+}
+
 .cms-icon-alias {
     @include icon(alias);
+}
+
+.cms-icon-apphook {
+    @include icon(apphook);
 }
 
 .cms-icon-archive {
@@ -212,6 +268,14 @@
 
 .cms-icon-bin {
     @include icon(bin);
+}
+
+.cms-icon-broadcast-off {
+    @include icon(broadcast-off);
+}
+
+.cms-icon-broadcast-on {
+    @include icon(broadcast-on);
 }
 
 .cms-icon-check-circle {
@@ -238,12 +302,28 @@
     @include icon(cogs);
 }
 
+.cms-icon-comment {
+    @include icon(comment);
+}
+
+.cms-icon-compare {
+    @include icon(compare);
+}
+
 .cms-icon-copy {
     @include icon(copy);
 }
 
+.cms-icon-cut {
+    @include icon(cut);
+}
+
 .cms-icon-edit-new {
     @include icon(edit-new);
+}
+
+.cms-icon-edit {
+    @include icon(edit);
 }
 
 .cms-icon-eye {
@@ -290,6 +370,10 @@
     @include icon(logo);
 }
 
+.cms-icon-manage-versions {
+    @include icon(manage-versions);
+}
+
 .cms-icon-menu {
     @include icon(menu);
 }
@@ -312,6 +396,14 @@
 
 .cms-icon-minus {
     @include icon(minus);
+}
+
+.cms-icon-moderate {
+    @include icon(moderate);
+}
+
+.cms-icon-moon {
+    @include icon(moon);
 }
 
 .cms-icon-paste {
@@ -354,12 +446,20 @@
     @include icon(redo);
 }
 
+.cms-icon-rename {
+    @include icon(rename);
+}
+
 .cms-icon-scissors {
     @include icon(scissors);
 }
 
 .cms-icon-search {
     @include icon(search);
+}
+
+.cms-icon-settings {
+    @include icon(settings);
 }
 
 .cms-icon-sitemap {
@@ -370,12 +470,24 @@
     @include icon(squares);
 }
 
+.cms-icon-sun {
+    @include icon(sun);
+}
+
 .cms-icon-undo {
     @include icon(undo);
 }
 
+.cms-icon-unlock {
+    @include icon(unlock);
+}
+
 .cms-icon-unpublish {
     @include icon(unpublish);
+}
+
+.cms-icon-view {
+    @include icon(view);
 }
 
 .cms-icon-window {

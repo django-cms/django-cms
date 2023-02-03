@@ -495,8 +495,8 @@
         bottom: $pagetree-cell-inner-height / 2 + 7px;
     }
 }
-.cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil:not(.cms-btn-disabled)[data-url] {
-    @include icon(cogs);
+.cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-settings:not(.cms-btn-disabled)[data-url] {
+    @include icon(advanced-settings);
 }
 
 //###########################################################
@@ -520,7 +520,7 @@
 
 //###########################################################
 // PREVIEW
-// shows preview eye icon
+// shows preview icon
 .cms-tree-item-preview {
     position: relative;
 
