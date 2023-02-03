@@ -23,7 +23,7 @@ from cms.forms.login import CMSToolbarLoginForm
 from cms.models import PageContent
 from cms.models.pagemodel import TreeNode
 from cms.page_rendering import (
-    _handle_no_page, _render_welcome_page, render_pagecontent,
+    _handle_no_page, _render_welcome_page, render_pagecontent, _handle_no_apphook,
 )
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
@@ -258,7 +258,8 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     view_func, args, kwargs = resolve(absolute_url)
                     return view_func(request, *args, **kwargs)
                 except Resolver404:
-                    pass
+                    # Apphook does not provide a view for its "root"
+                    return _handle_no_apphook(request)
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
