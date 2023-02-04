@@ -124,8 +124,8 @@ class PageContentManager(WithUserMixin, models.Manager):
 
 
 class PageContentAdminQuerySet(models.QuerySet):
-    def current_content_iterator(self, **kwargs):
-        return iter(self.filter(**kwargs))
+    def current_content(self, **kwargs):
+        return self.filter(**kwargs)
 
 
 class PageContentAdminManager(PageContentManager):
