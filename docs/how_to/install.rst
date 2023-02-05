@@ -211,11 +211,18 @@ Sekizai
 =======
 
 `Django Sekizai <https://github.com/ojii/django-sekizai>`_ is required by the CMS for static files management. You need
-to have::
+to have ``'sekizai'`` listed in ``INSTALLED_APPS``, 
 
-     'sekizai'
+.. code-block:: python
 
-listed in ``INSTALLED_APPS``, and ``'sekizai.context_processors.sekizai'`` in the ``TEMPLATES['OPTIONS']['context_processors']``:
+    INSTALLED_APPS = [
+        ...,
+        'sekizai',
+        ...,
+    ]
+
+
+and ``'sekizai.context_processors.sekizai'`` in the ``TEMPLATES['OPTIONS']['context_processors']``:
 
 ..  code-block:: python
 
