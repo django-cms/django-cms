@@ -215,11 +215,7 @@ to have::
 
      'sekizai'
 
-listed in ``INSTALLED_APPS``, and::
-
-    'sekizai.context_processors.sekizai'
-
-in the ``TEMPLATES['OPTIONS']['context_processors']``:
+listed in ``INSTALLED_APPS``, and ``'sekizai.context_processors.sekizai'`` in the ``TEMPLATES['OPTIONS']['context_processors']``:
 
 ..  code-block:: python
 
