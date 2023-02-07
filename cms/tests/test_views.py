@@ -152,6 +152,31 @@ class ViewTests(CMSTestCase):
             response = self.client.get(self.get_toolbar_disable_url(page_url))
             self.assertEqual(response.status_code, 302)
 
+    def test_redirect_not_preserving_query_parameters(self):
+        # test redirect checking that the query parameters aren't preserved
+        redirect = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = one.get_absolute_url()
+        params = "?param_name=param_value"
+        request = self.get_request(url + params)
+        response = details(request, one.get_path())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect)
+
+    @override_settings(CMS_REDIRECT_PRESERVE_QUERY_PARAMS=True)
+    def test_redirect_preserving_query_parameters(self):
+        # test redirect checking that query parameters are preserved
+        redirect = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = one.get_absolute_url()
+        params = "?param_name=param_value"
+        request = self.get_request(url + params)
+        response = details(request, one.get_path())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect + params)
+
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", published=True, login_required=True)
         plain_url = '/accounts/'
