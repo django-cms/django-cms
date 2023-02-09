@@ -128,9 +128,9 @@ class PageContentAdminQuerySet(models.QuerySet):
         """Returns the currently valid content that matches the filter given in kwargs.
         (if a versioning package is installed). Without versioning every page us current."""
         return self.filter(**kwargs)
-    
+
     def latest(self):
-        """Returns the latest version (if a versioning package is installed) including discared 
+        """Returns the latest version (if a versioning package is installed) including discared
         or unpublished page content. Without versioning every page content is the latest."""
         return self
 
