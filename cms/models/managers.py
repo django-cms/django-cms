@@ -130,8 +130,8 @@ class PageContentAdminQuerySet(models.QuerySet):
         return self.filter(**kwargs)
 
     def latest_content(self, **kwargs):
-        """Returns the latest version (if a versioning package is installed) that matches the 
-        filter given in kwargsincluding discared or unpublished page content. Without versioning 
+        """Returns the latest version (if a versioning package is installed) that matches the
+        filter given in kwargsincluding discared or unpublished page content. Without versioning
         every page content is the latest."""
         return self.filter(**kwargs)
 
