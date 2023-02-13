@@ -18,8 +18,7 @@ from cms.utils.conf import get_cms_setting
 def _get_nodelist(tpl):
     if hasattr(tpl, 'template'):
         return tpl.template.nodelist
-    else:
-        return tpl.nodelist
+    return tpl.nodelist
 
 
 def get_context(extend_node):
@@ -27,8 +26,7 @@ def get_context(extend_node):
         context = Context()
         context.template = Template('', origin=extend_node.origin)
         return context
-    else:
-        return {}
+    return {}
 
 
 def get_placeholder_conf(setting, placeholder, template=None, default=None):
