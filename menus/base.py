@@ -64,8 +64,7 @@ class NavigationNode:
     def get_ancestors(self):
         if getattr(self, 'parent', None):
             return [self.parent] + self.parent.get_ancestors()
-        else:
-            return []
+        return []
 
     def is_selected(self, request):
         node_abs_url = self.get_absolute_url()
