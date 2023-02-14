@@ -178,6 +178,15 @@ Functions and constants
     :param site: Specify a site to publish pages for specified site only; if not specified pages from all sites are published
     :type site: :class:`django.contrib.sites.models.Site` instance
 
+    .. note::
+
+        This function is a generator, so you'll need to iterate over the result to actually publish
+        all pages. This can be done in a single line using ``list()``:
+
+        .. code-block:: python
+
+            list(publish_pages())
+
 .. function:: get_page_draft(page):
 
     Returns the draft version of a page, regardless if the passed in
