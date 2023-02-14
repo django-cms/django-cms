@@ -102,7 +102,7 @@ class AliasPlugin(CMSPluginBase):
     def create_alias(self, request):
         if not request.user.is_staff:
             return HttpResponseForbidden("not enough privileges")
-        if not 'plugin_id' in request.POST and not 'placeholder_id' in request.POST:
+        if "plugin_id" not in request.POST and "placeholder_id" not in request.POST:
             return HttpResponseBadRequest("plugin_id or placeholder_id POST parameter missing.")
         plugin = None
         placeholder = None

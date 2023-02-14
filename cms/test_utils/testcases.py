@@ -28,7 +28,7 @@ from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
-from cms.exceptions import DuplicatePlaceholderWarning
+# from cms.exceptions import DuplicatePlaceholderWarning
 from menus.menu_pool import menu_pool
 
 URL_CMS_PAGE = "/en/admin/cms/page/"

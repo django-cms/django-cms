@@ -1,0 +1,20 @@
+ line-length = 120
+
+# Enable flake8-bugbear (`B`) rules.
+select = ["E", "F"]
+
+# Never enforce `E501` (line length violations).
+ignore = ["E501", "F403"]
+
+# Avoid trying to fix flake8-bugbear (`B`) violations.
+unfixable = ["B"]
+
+exclude = [
+    "migrations"
+]
+
+# Ignore `E402` (import violations) in all `__init__.py` files, and in `path/to/file.py`.
+[per-file-ignores]
+"__init__.py" = ["E402", "F401"]
+"path/to/file.py" = ["E402"]
+"cms/test_utils/project/brokenpluginapp/cms_plugins.py" = ["F401"]

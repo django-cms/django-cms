@@ -957,7 +957,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(page_id)
 
-        if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
+        if not target_language or target_language not in get_language_list(site_id=page.node.site_id):
             return HttpResponseBadRequest(force_str(_("Language must be set to a supported language!")))
 
         for placeholder in page.get_placeholders():
