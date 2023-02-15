@@ -246,6 +246,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
 
     try:
         if issubclass(model, PageContent):
+            # An apphook might be attached to a PageContent object
             content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
             request.current_page = content_type_obj.page
             if (
@@ -253,13 +254,16 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                 content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
             ):
                 try:
+                    # If so, try get the absolute URL and pass it to the toolbar as request_path
+                    # The apphook's view function will be called.
                     absolute_url = content_type_obj.get_absolute_url()
                     from cms.toolbar.toolbar import CMSToolbar
                     request.toolbar = CMSToolbar(request, request_path=absolute_url)
+                    # Resovle the apphook's url to get its view function
                     view_func, args, kwargs = resolve(absolute_url)
                     return view_func(request, *args, **kwargs)
                 except Resolver404:
-                    # Apphook does not provide a view for its "root"
+                    # Apphook does not provide a view for its "root", show warning message
                     return _handle_no_apphook(request)
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
