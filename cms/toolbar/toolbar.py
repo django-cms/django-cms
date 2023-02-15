@@ -41,6 +41,7 @@ class BaseToolbar(ToolbarAPIMixin):
     def _resolver_match(self):
         if getattr(self.request, 'resolver_match', None):
             return self.request.resolver_match
+
         try:
             if hasattr(self, "request_path"):
                 match = resolve(self.request_path)
