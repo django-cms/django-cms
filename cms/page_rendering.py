@@ -64,7 +64,6 @@ def _handle_no_page(request):
 
 
 def _handle_no_apphook(request):
-    print("handle no apphook")
     context = {
         "absolute_url": request.toolbar.request_path,
     }
