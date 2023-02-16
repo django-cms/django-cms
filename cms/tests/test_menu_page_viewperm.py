@@ -146,7 +146,7 @@ class ViewPermissionTests(CMSTestCase):
             user = self._create_user(username, is_staff)
             if groupname:
                 group, _ = Group.objects.get_or_create(name=groupname)
-                user_set = getattr(group, 'user_set')
+                user_set = group.user_set
                 user_set.add(user)
                 group.save()
 
@@ -241,7 +241,7 @@ class ViewPermissionTests(CMSTestCase):
             if get_user_model().USERNAME_FIELD == 'email':
                 username = username + '@django-cms.org'
 
-            query = dict()
+            query = {}
             query[get_user_model().USERNAME_FIELD+'__iexact'] = username
             user = get_user_model().objects.get(**query)
         request = self.get_request(user)
@@ -583,7 +583,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     def _setup_user(self):
         user = self._create_user('user_6', True)
         group = Group.objects.create(name=self.GROUPNAME_6)
-        user_set = getattr(group, 'user_set')
+        user_set = group.user_set
         user_set.add(user)
         group.save()
 

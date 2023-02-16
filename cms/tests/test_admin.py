@@ -432,7 +432,7 @@ class AdminTests(AdminTestsBase):
     def get_admin(self):
         User = get_user_model()
 
-        fields = dict(email="admin@django-cms.org", is_staff=True, is_superuser=True)
+        fields = {"email": "admin@django-cms.org", "is_staff": True, "is_superuser": True}
 
         if (User.USERNAME_FIELD != 'email'):
             fields[User.USERNAME_FIELD] = "admin"
@@ -445,7 +445,7 @@ class AdminTests(AdminTestsBase):
     def get_permless(self):
         User = get_user_model()
 
-        fields = dict(email="permless@django-cms.org", is_staff=True)
+        fields = {"email": "permless@django-cms.org", "is_staff": True}
 
         if (User.USERNAME_FIELD != 'email'):
             fields[User.USERNAME_FIELD] = "permless"
@@ -744,7 +744,7 @@ class PluginPermissionTests(AdminTestsBase):
     def _get_admin(self):
         User = get_user_model()
 
-        fields = dict(email="admin@django-cms.org", is_staff=True, is_active=True)
+        fields = {"email": "admin@django-cms.org", "is_staff": True, "is_active": True}
 
         if (User.USERNAME_FIELD != 'email'):
             fields[User.USERNAME_FIELD] = "admin"
@@ -806,7 +806,7 @@ class PluginPermissionTests(AdminTestsBase):
 
         self._give_permission(normal_guy, Text, 'change')
         url = '{}/edit-plugin/{}/'.format(admin_reverse('cms_page_edit_plugin', args=[plugin.id]), plugin.id)
-        response = self.client.post(url, dict())
+        response = self.client.post(url, {})
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTrue("Plugin not found" in force_str(response.content))
 

@@ -71,10 +71,10 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        overrides = dict(
-            CMS_PAGE_CACHE=False,
-            MIDDLEWARE=[mw for mw in settings.MIDDLEWARE if mw not in exclude],
-        )
+        overrides = {
+            "CMS_PAGE_CACHE": False,
+            "MIDDLEWARE": [mw for mw in settings.MIDDLEWARE if mw not in exclude],
+        }
         with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(13, 25)):
                 self.client.get(page1_url)

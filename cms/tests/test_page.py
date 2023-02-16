@@ -201,7 +201,7 @@ class PagesTestCase(TransactionCMSTestCase):
         """ Checks cms.utils.page.get_available_slug for infinite recursion
         """
         site = get_current_site()
-        for x in range(0, 12):
+        for _x in range(0, 12):
             create_page('test copy', 'nav_playground.html', 'en', published=True)
         new_slug = get_available_slug(site, 'test-copy', 'en')
         self.assertTrue(new_slug, 'test-copy-11')

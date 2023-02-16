@@ -602,7 +602,7 @@ class ExtensionAdminTestCase(CMSTestCase):
                 if current_page_menu:
                     position = 0
                     urls = self.get_title_extension_admin()
-                    for title_extension, url in urls:
+                    for _title_extension, url in urls:
                         current_page_menu.add_modal_item(
                             'TestItem',
                             url=url,

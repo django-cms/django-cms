@@ -958,7 +958,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         in the plugin pool when a placeholder is specified
         """
         ParentRequiredPlugin = type('ParentRequiredPlugin', (CMSPluginBase,),
-                                    dict(require_parent=True, render_plugin=False))
+                                    {"require_parent": True, "render_plugin": False})
 
         with register_plugins(ParentRequiredPlugin):
             page = api.create_page("page", "nav_playground.html", "en", published=True)
@@ -1028,7 +1028,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = page.placeholders.get(slot='body')
         ChildClassesPlugin = type(
             'ChildClassesPlugin', (CMSPluginBase,),
-            dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html')
+            {"child_classes": ['TextPlugin'], "render_template": 'allow_children_plugin.html'}
         )
 
         with register_plugins(ChildClassesPlugin):
@@ -1053,7 +1053,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = page.placeholders.get(slot='body')
         ParentClassesPlugin = type(
             'ParentClassesPlugin', (CMSPluginBase,),
-            dict(parent_classes=['TextPlugin'], render_plugin=False)
+            {"parent_classes": ['TextPlugin'], "render_plugin": False}
         )
 
         with register_plugins(ParentClassesPlugin):
@@ -1077,11 +1077,11 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ParentPlugin = type(
-            'ParentPlugin', (CMSPluginBase,), dict(render_plugin=False)
+            'ParentPlugin', (CMSPluginBase,), {"render_plugin": False}
         )
         ChildPlugin = type(
             'ChildPlugin', (CMSPluginBase,),
-            dict(parent_classes=['ParentPlugin'], render_plugin=False)
+            {"parent_classes": ['ParentPlugin'], "render_plugin": False}
         )
 
         with register_plugins(ParentPlugin, ChildPlugin):
@@ -1097,11 +1097,11 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = page.placeholders.get(slot='body')
         ParentPlugin = type(
             'ParentPlugin', (CMSPluginBase,),
-            dict(render_plugin=False)
+            {"render_plugin": False}
         )
         ChildPlugin = type(
             'ChildPlugin', (CMSPluginBase,),
-            dict(require_parent=True, render_plugin=False)
+            {"require_parent": True, "render_plugin": False}
         )
 
         with register_plugins(ParentPlugin, ChildPlugin):

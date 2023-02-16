@@ -95,7 +95,7 @@ class FormsTestCase(CMSTestCase):
         # boilerplate (creating a page)
         User = get_user_model()
 
-        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+        fields = {"is_staff": True, "is_active": True, "is_superuser": True, "email": "super@super.com"}
 
         if User.USERNAME_FIELD != 'email':
             fields[User.USERNAME_FIELD] = "super"
@@ -136,7 +136,7 @@ class FormsTestCase(CMSTestCase):
         # boilerplate (creating a page)
         User = get_user_model()
 
-        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+        fields = {"is_staff": True, "is_active": True, "is_superuser": True, "email": "super@super.com"}
 
         if User.USERNAME_FIELD != 'email':
             fields[User.USERNAME_FIELD] = "super"

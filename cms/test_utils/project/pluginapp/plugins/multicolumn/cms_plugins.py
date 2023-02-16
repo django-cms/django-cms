@@ -19,7 +19,7 @@ class MultiColumnPlugin(CMSPluginBase):
         response = super().save_model(
             request, obj, form, change
         )
-        for x in range(int(form.cleaned_data['create'])):
+        for _x in range(int(form.cleaned_data['create'])):
             col = CMSPlugin(
                 parent=obj,
                 placeholder=obj.placeholder,

@@ -386,7 +386,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         fieldsets = super().get_fieldsets(request, obj)
 
-        for name, data in fieldsets:
+        for _name, data in fieldsets:
             if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets
                 return fieldsets
 

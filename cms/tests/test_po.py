@@ -34,7 +34,7 @@ def compile_messages():
         raise CommandError("This script should be run from the Django SVN tree or your project or app tree, or with the settings module specified.")
 
     for basedir in basedirs:
-        for dirpath, dirnames, filenames in os.walk(basedir):
+        for dirpath, _dirnames, filenames in os.walk(basedir):
             for f in filenames:
                 if f.endswith('.po'):
                     if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:

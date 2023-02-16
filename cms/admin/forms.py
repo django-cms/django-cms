@@ -1021,9 +1021,9 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
                 # We can't set a queryset on a raw id lookup, but we can use
                 # the fact that it respects the limit_choices_to parameter.
                 if limit_choices:
-                    self.fields['user'].widget.rel.limit_choices_to = dict(
-                        id__in=list(sub_users.values_list('pk', flat=True))
-                    )
+                    self.fields['user'].widget.rel.limit_choices_to = {
+                        "id__in": list(sub_users.values_list('pk', flat=True))
+                    }
         else:
             self.fields['user'].widget = UserSelectAdminWidget()
             self.fields['user'].queryset = sub_users

@@ -171,7 +171,7 @@ def get_templates():
             template_module = _load_from_file(config_path)
             templates = [(os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()]
         else:
-            templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
+            templates = [(os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir)]
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
     if get_cms_setting('TEMPLATE_INHERITANCE'):

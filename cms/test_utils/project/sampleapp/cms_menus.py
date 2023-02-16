@@ -68,7 +68,7 @@ class StaticMenu4(CMSAttachMenu):
     name = _("Static Menu4")
 
     def get_nodes(self, request):
-        nodes = list()
+        nodes = []
         nodes.append(NavigationNode('static fresh', '/static/fresh/', 'static fresh'))
         nodes.append(NavigationNode('sample2-root', reverse('sample2-root'), 'sample2-root'))
         return nodes

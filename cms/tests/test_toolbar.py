@@ -689,7 +689,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         renderer = toolbar.get_content_renderer()
         # TextPlugin needs request in context
-        renderer.render_static_placeholder(static_placeholder, RequestContext(request, dict(request=request)))
+        renderer.render_static_placeholder(static_placeholder, RequestContext(request, {"request": request}))
         toolbar.populate()
         toolbar.post_template_populate()
 
@@ -1017,9 +1017,9 @@ class ToolbarTests(ToolbarTestBase):
         }
         self.assertIn(name, list(menu))
         if items is not None:
-            sub_menu = list(
+            sub_menu = [
                 force_str(getattr(item, 'name', '|')) for item in menu[name].get_items()
-            )
+            ]
             self.assertEqual(sorted(sub_menu), sorted(items))
 
     def test_remove_language(self):
