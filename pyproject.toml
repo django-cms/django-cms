@@ -5,13 +5,10 @@ exclude = [
     "**/migrations/**",
 ]
 ignore = [
-    "E501",
-    "E701",
-    "E713",
-    "E714",
-    "E731",
-    "F401",
-    "F403",
+    "E501",  # line too long
+    "F403",  # 'from module import *' used; unable to detect undefined names
+    "E701",  # multiple statements on one line (colon)
+    "F401",  # module imported but unused
 ]
 line-length = 119
 select = [
