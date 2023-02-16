@@ -1,3 +1,4 @@
+[tool.ruff]
 exclude = [
     ".env",
     ".venv",
