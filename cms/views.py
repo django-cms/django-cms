@@ -162,6 +162,10 @@ def details(request, slug):
             toolbar.redirect_url = redirect_url
         elif redirect_url not in own_urls:
             # prevent redirect to self
+            if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
+                query_string = request.META.get('QUERY_STRING')
+                if query_string:
+                    redirect_url += "?" + query_string
             return HttpResponseRedirect(redirect_url)
 
     # permission checks
