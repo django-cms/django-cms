@@ -931,4 +931,4 @@ class PageContentTests(CMSTestCase):
         self.assertEqual(PageContent.admin_manager.filter(page=self.page).count(), 2)
 
         # test if the current_content_iterator sees both page contents
-        self.assertEqual(len(list(PageContent.admin_manager.all().current_content_iterator(page=self.page))), 2)
+        self.assertEqual(len(list(PageContent.admin_manager.filter(page=self.page).current_content())), 2)
