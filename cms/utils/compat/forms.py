@@ -33,7 +33,7 @@ if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
         if hasattr(custom_forms, 'UserChangeForm'):
             UserChangeForm = custom_forms.UserChangeForm
         else:
-            from django.contrib.auth.forms import UserChangeForm # noqa
+            from django.contrib.auth.forms import UserChangeForm  # noqa
     except ImportError:
         from django.contrib.auth.forms import UserChangeForm  # noqa
         from django.contrib.auth.forms import UserCreationForm  # noqa
