@@ -141,6 +141,14 @@ class PageContentAdminManager(PageContentManager):
     def get_queryset(self):
         return PageContentAdminQuerySet(self.model, using=self._db)
 
+    def current_content(self, **kwargs):
+        """Syntactic sugar: admin_manager.current_content()"""
+        return self.get_queryset().current_content(**kwargs)
+
+    def latest_content(self, **kwargs):
+        """Syntactic sugar: admin_manager.latest_content()"""
+        return self.get_queryset().latest_content(**kwargs)
+
 
 class PlaceholderManager(models.Manager):
     def get_for_obj(self, obj):
