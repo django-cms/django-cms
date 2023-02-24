@@ -503,7 +503,7 @@ class Page(models.Model):
             PageUrl.objects.with_user(user).create(**new_url)
 
         # copy titles of this page
-        for title in translations.current_content_iterator():
+        for title in translations.current_content():
             new_title = model_to_dict(title)
             new_title.pop("id", None)  # No PK
             new_title["page"] = new_page

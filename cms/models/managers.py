@@ -124,13 +124,30 @@ class PageContentManager(WithUserMixin, models.Manager):
 
 
 class PageContentAdminQuerySet(models.QuerySet):
-    def current_content_iterator(self, **kwargs):
-        return iter(self.filter(**kwargs))
+    def current_content(self, **kwargs):
+        """If a versioning package is installed, this returns the currently valid content
+        that matches the filter given in kwargs. Used to find content to be copied, e.g..
+        Without versioning every page is current."""
+        return self.filter(**kwargs)
+
+    def latest_content(self, **kwargs):
+        """If a versioning package is installed, returns the latest version that matches the
+        filter given in kwargs including discared or unpublished page content. Without versioning
+        every page content is the latest."""
+        return self.filter(**kwargs)
 
 
 class PageContentAdminManager(PageContentManager):
     def get_queryset(self):
         return PageContentAdminQuerySet(self.model, using=self._db)
+
+    def current_content(self, **kwargs):
+        """Syntactic sugar: admin_manager.current_content()"""
+        return self.get_queryset().current_content(**kwargs)
+
+    def latest_content(self, **kwargs):
+        """Syntactic sugar: admin_manager.latest_content()"""
+        return self.get_queryset().latest_content(**kwargs)
 
 
 class PlaceholderManager(models.Manager):
