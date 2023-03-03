@@ -328,6 +328,7 @@ class BasicToolbar(CMSToolbar):
         if settings.USE_I18N and not self._language_menu:
             languages = get_language_tuple(self.current_site.pk)
             if len(languages) > 1:
+                # Menu only meaningful if more than one language is installed
                 self._language_menu = self.toolbar.get_or_create_menu(
                     LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1
                 )
