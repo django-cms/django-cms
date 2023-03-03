@@ -2180,7 +2180,7 @@ class TestLanguageMenu(CMSTestCase):
     @override_settings(
         LANGUAGE_CODE='en',
         LANGUAGES=(('en', 'English'),),
-        CMS_LANGUAGES = {
+        CMS_LANGUAGES={
             1: [
                 {'code': 'en',
                  'name': 'English',
