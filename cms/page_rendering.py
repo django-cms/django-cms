@@ -63,6 +63,13 @@ def _handle_no_page(request):
     raise Http404('CMS Page not found: %s' % request.path)
 
 
+def _handle_no_apphook(request):
+    context = {
+        "absolute_url": request.toolbar.request_path,
+    }
+    return TemplateResponse(request, "cms/noapphook.html", context)
+
+
 def _render_welcome_page(request):
     context = {
         'cms_version': __version__,
