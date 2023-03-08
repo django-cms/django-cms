@@ -94,7 +94,6 @@ def details(request, slug):
         # and there's no pages
         return _render_welcome_page(request)
 
-
     if not page and get_cms_setting("REDIRECT_TO_LOWERCASE_SLUG"):
         # Redirect to the lowercase version of the slug
         if slug.lower() != slug:
@@ -105,7 +104,6 @@ def details(request, slug):
                 if query_string:
                     redirect_url += "?" + query_string
             return HttpResponseRedirect(redirect_url)
-
 
     if not page:
         # raise 404
