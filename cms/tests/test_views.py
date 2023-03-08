@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings
-from django.urls import clear_url_caches
+from django.urls import clear_url_caches, reverse
 from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_page_content
