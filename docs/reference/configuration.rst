@@ -1141,6 +1141,17 @@ PageContent edit/preview endpoint.
 This indicates to the CMS that redirects should preserve the query parameters.
 
 
+ ..  setting:: CMS_REDIRECT_PRESERVE_QUERY_PARAMS
+
+ CMS_REDIRECT_PRESERVE_QUERY_PARAMS
+ ===================================
+
+ default
+     ``False``
+
+ This indicates to the CMS that redirects should preserve the query parameters.
+
+
 ..  setting:: CMS_REDIRECT_TO_LOWERCASE_SLUG
 
 CMS_REDIRECT_TO_LOWERCASE_SLUG

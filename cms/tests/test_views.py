@@ -133,6 +133,31 @@ class ViewTests(CMSTestCase):
         response = details(request, one.get_path('en'))
         self.assertEqual(response.status_code, 200)
 
+    def test_redirect_not_preserving_query_parameters(self):
+        # test redirect checking that the query parameters aren't preserved
+        redirect = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = one.get_absolute_url()
+        params = "?param_name=param_value"
+        request = self.get_request(url + params)
+        response = details(request, one.get_path(language="en"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect)
+
+    @override_settings(CMS_REDIRECT_PRESERVE_QUERY_PARAMS=True)
+    def test_redirect_preserving_query_parameters(self):
+        # test redirect checking that query parameters are preserved
+        redirect = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = one.get_absolute_url()
+        params = "?param_name=param_value"
+        request = self.get_request(url + params)
+        response = details(request, one.get_path(language="en"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect + params)
+
     @override_settings(CMS_REDIRECT_TO_LOWERCASE_SLUG=True)
     def test_redirecting_to_lowercase_slug(self):
         redirect = '/en/one/'

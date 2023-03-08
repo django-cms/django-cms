@@ -187,6 +187,10 @@ def details(request, slug):
         if request.user.is_staff and toolbar.edit_mode_active:
             toolbar.redirect_url = redirect_url
         elif redirect_url not in own_urls:
+            if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
+                query_string = request.META.get('QUERY_STRING')
+                if query_string:
+                    redirect_url += "?" + query_string
             # prevent redirect to self
             return HttpResponseRedirect(redirect_url)
 
