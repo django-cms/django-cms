@@ -8,7 +8,7 @@ from django.core.cache import cache
 from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings
-from django.urls import clear_url_caches
+from django.urls import clear_url_caches, reverse
 from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_page_content
@@ -132,6 +132,42 @@ class ViewTests(CMSTestCase):
         request = self.get_request(url)
         response = details(request, one.get_path('en'))
         self.assertEqual(response.status_code, 200)
+
+    def test_redirect_not_preserving_query_parameters(self):
+        # test redirect checking that the query parameters aren't preserved
+        redirect = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = one.get_absolute_url()
+        params = "?param_name=param_value"
+        request = self.get_request(url + params)
+        response = details(request, one.get_path(language="en"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect)
+
+    @override_settings(CMS_REDIRECT_PRESERVE_QUERY_PARAMS=True)
+    def test_redirect_preserving_query_parameters(self):
+        # test redirect checking that query parameters are preserved
+        redirect = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = one.get_absolute_url()
+        params = "?param_name=param_value"
+        request = self.get_request(url + params)
+        response = details(request, one.get_path(language="en"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect + params)
+
+    @override_settings(CMS_REDIRECT_TO_LOWERCASE_SLUG=True)
+    def test_redirecting_to_lowercase_slug(self):
+        redirect = '/en/one/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = reverse('pages-details-by-slug', kwargs={"slug": "One"})
+        request = self.get_request(url)
+        response = details(request, one.get_path(language="en"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect)
 
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", login_required=True)
