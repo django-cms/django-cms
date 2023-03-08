@@ -133,6 +133,17 @@ class ViewTests(CMSTestCase):
         response = details(request, one.get_path('en'))
         self.assertEqual(response.status_code, 200)
 
+     @override_settings(CMS_REDIRECT_TO_LOWERCASE_SLUG=True)
+    def test_redirecting_to_lowercase_slug(self):
+        redirect = '/en/one/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = reverse('pages-details-by-slug', kwargs={"slug": "One"})
+        request = self.get_request(url)
+        response = details(request, one.get_path())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect)
+
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", login_required=True)
         plain_url = '/accounts/'
