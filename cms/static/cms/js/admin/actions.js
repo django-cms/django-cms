@@ -62,7 +62,6 @@
 
     // Create burger menu:
     $(function() {
-
          let createBurgerMenu = function createBurgerMenu(row) {
 
             let actions = $(row).children('.field-list_actions');
@@ -92,13 +91,7 @@
             ul.setAttribute('class', 'cms-actions-dropdown-menu-inner');
 
             /* get the existing actions and move them into the options container */
-            $(actions[0]).children('.cms-versioning-action-btn').each(function (index, item) {
-              /* exclude preview and edit buttons */
-              if (item.classList.contains('cms-versioning-action-preview') ||
-                  item.classList.contains('cms-versioning-action-edit')) {
-                return;
-              }
-
+            $(actions[0]).children('.cms-burger-action-btn').each(function (index, item) {
               let li = document.createElement('li');
               /* create an anchor from the item */
               let li_anchor = document.createElement('a');
@@ -167,8 +160,8 @@
         let closeBurgerMenu = function closeBurgerMenu() {
             $('.cms-actions-dropdown-menu').removeClass('open');
             $('.cms-actions-dropdown-menu').addClass('closed');
-            $('.cms-versioning-action-btn').removeClass('open');
-            $('.cms-versioning-action-btn').addClass('closed');
+            $('.cms-action-btn').removeClass('open');
+            $('.cms-action-btn').addClass('closed');
         };
 
         $('#result_list').find('tr').each(function (index, item) {
