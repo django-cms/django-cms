@@ -42,7 +42,7 @@
                 }
             });
 
-        $('.js-versioning-close-sideframe').on('click', function () {
+        $('.js-close-sideframe').on('click', function () {
             try {
                 window.top.CMS.API.Sideframe.close();
             } catch (e) {}
@@ -84,7 +84,7 @@
             let icon = document.createElement('span');
 
             icon.setAttribute('class', 'cms-icon cms-icon-menu');
-            anchor.setAttribute('class', 'btn cms-versioning-action-btn closed');
+            anchor.setAttribute('class', 'btn cms-action-btn cms-burger-menu closed');
             anchor.setAttribute('title', 'Actions');
             anchor.appendChild(icon);
 

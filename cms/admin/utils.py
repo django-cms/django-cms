@@ -1,5 +1,6 @@
 from urllib.parse import parse_qsl
 
+from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import ValidationError, ImproperlyConfigured
 from django.db import models
@@ -10,6 +11,7 @@ from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
 from django.utils.html import format_html_join
 from django.utils.http import urlencode
+from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.toolbar.utils import get_object_preview_url
@@ -26,8 +28,7 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
             "cms/js/admin/actions.js",
         )
         css = {"all": (
-            static_with_version("cms/css/cms.icons.css"),
-            "djangocms_versioning/css/actions.css",  # move to core
+            static_with_version("cms/css/cms.admin.css"),
         )}
 
     def get_actions_list(self):
@@ -44,15 +45,17 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
                 list_display = ('name', ..., 'admin_list_actions')
 
         """
-        def actions(obj):
+        def list_actions(obj):
+            """The name of this inner function must not change. css styling and js depends on it."""
+            EMPTY = mark_safe('<span class="cms-empty-action"></span>')
             return format_html_join(
                 "",
                 "{}",
-                ((action(obj, request),) for action in self.get_actions_list()),
+                ((action(obj, request) or EMPTY,) for action in self.get_actions_list()),
             )
 
-        actions.short_description = _("Actions")
-        return actions
+        list_actions.short_description = _("Actions")
+        return list_actions
 
     def admin_list_actions(self, obj):
         raise ValueError(
@@ -114,8 +117,8 @@ class GrouperChangeListBase(ChangeList):
         return lookup_params
 
 
-class GrouperAdminMixin(AdminListActionsMixin, metaclass=forms.MediaDefiningClass):
-    """Mixin for language grouper"""
+class GrouperModelAdmin(AdminListActionsMixin, ModelAdmin):
+    """Easy-to-use ModelAdmin for grouper models"""
 
     extra_grouping_fields = ()
     change_list_template = "admin/cms/grouper/change_list.html"
@@ -170,17 +173,22 @@ class GrouperAdminMixin(AdminListActionsMixin, metaclass=forms.MediaDefiningClas
         self.get_grouping_from_request(request)
         return super().get_changelist_instance(request)
 
-    def change_view(self, request, object_id, form_url='', extra_context=None):
-        """Set language property"""
+    def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
+        """Set grouper properties for both add and change"""
         self.get_grouping_from_request(request)
-        return super().change_view(request, object_id, form_url,
+        return super().changeform_view(request, object_id, form_url,
                                    {**(extra_context or {}), **self.get_extra_context(request, object_id=object_id)})
 
-    def add_view(self, request, form_url='', extra_context=None):
-        """Add view with extra context"""
+    def delete_view(self, request, object_id, extra_context=None):
+        """Set grouper properties for delete"""
         self.get_grouping_from_request(request)
-        return super().add_view(request, form_url,
-                                {**(extra_context or {}), **self.get_extra_context(request, object_id=None)})
+        return super().delete_view(request, object_id, extra_context)
+
+    def history_view(self, request, object_id, extra_context=None):
+        """Set grouper properties for history"""
+        self.get_grouping_from_request(request)
+        return super().history_view(request, object_id, extra_context)
+
 
     def get_preserved_filters(self, request):
         """Always preserve grouping get parameters! Also, add them to changelist filters:
@@ -393,6 +401,7 @@ class GrouperAdminMixin(AdminListActionsMixin, metaclass=forms.MediaDefiningClas
             # Finally force grouper field to point to grouper
             setattr(form._content_instance, self.get_grouper_field_name(), obj)
             form._content_instance.save()
+        self.clear_content_cache()  # Make new or changed content objects visible
 
     def get_grouper_field_name(self):
         """Class property or lower case model name"""
@@ -462,23 +471,3 @@ def GrouperChangeFormMixin(grouper_model_or_form):
             "_content_fields": grouper_model_or_form.base_fields.keys(),
         },
     )
-
-
-# class ContentInlineAdmin(InlineModelAdmin):
-#     template = "admin/cms/grouper/content_inline.html"
-#     min_num = 0
-#     max_num = 1
-#     extra = 0
-#
-#     def __init__(self, *args, **kwargs):
-#         if hasattr(self, "extra_grouping_fields"):
-#             class Meta:
-#                 widgets = {field: forms.HiddenInput for field in self.extra_grouping_fields}
-#             self.form = type(self.form.__name__, (self.form,), dict(Meta=Meta))
-#         super().__init__(*args, **kwargs)
-#
-#     def get_queryset(self, request):
-#         self.language = get_language_from_request(request)
-#         return self.model.admin_manager.get_queryset().current_content(
-#             language=self.language
-#         )
