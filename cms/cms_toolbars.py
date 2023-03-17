@@ -326,16 +326,22 @@ class BasicToolbar(CMSToolbar):
 
     def add_language_menu(self):
         if settings.USE_I18N and not self._language_menu:
-            self._language_menu = self.toolbar.get_or_create_menu(
-                LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1
-            )
-            language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
-            for code, name in get_language_tuple(self.current_site.pk):
-                try:
-                    url = language_changer(code)
-                except NoReverseMatch:
-                    url = DefaultLanguageChanger(self.request)(code)
-                self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+            languages = get_language_tuple(self.current_site.pk)
+            if len(languages) > 1:
+                # Menu only meaningful if more than one language is installed
+                self._language_menu = self.toolbar.get_or_create_menu(
+                    LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1
+                )
+                language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
+                for code, name in languages:
+                    try:
+                        url = language_changer(code)
+                    except NoReverseMatch:
+                        url = DefaultLanguageChanger(self.request)(code)
+                    self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+            else:
+                # We do not have to check every time the toolbar is created
+                self._language_menu = True  # Pretend the language menu is already there
 
     def get_username(self, user=None, default=''):
         user = user or self.request.user

@@ -172,7 +172,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
     """
     if published is not None or publication_date is not None or publication_end_date is not None:
         warnings.warn('This API function no longer accepts a "published", "publication_date", or '
-                      '"publication_end_date" argument', UserWarning)
+                      '"publication_end_date" argument', UserWarning, stacklevel=2)
 
     # validate template
     if not template == TEMPLATE_INHERITANCE_MAGIC:

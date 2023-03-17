@@ -2174,3 +2174,30 @@ class ToolbarAPITests(TestCase):
         result += 2
         self.assertEqual(result.item, item)
         self.assertEqual(result.index, 4)
+
+
+class TestLanguageMenu(CMSTestCase):
+    @override_settings(
+        LANGUAGE_CODE='en',
+        LANGUAGES=(('en', 'English'),),
+        CMS_LANGUAGES={
+            1: [
+                {'code': 'en',
+                 'name': 'English',
+                 'public': True},
+            ],
+        }
+    )
+    def test_no_language_menu(self):
+        """No language menu appears if only one language is available"""
+        request = self.get_page_request(None, self.get_superuser(), '/')
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        self.assertNotIn(LANGUAGE_MENU_IDENTIFIER, toolbar.menus)
+
+    def test_language_menu(self):
+        """A language menu appears if more than one language is available"""
+        request = self.get_page_request(None, self.get_superuser(), '/')
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        self.assertIn(LANGUAGE_MENU_IDENTIFIER, toolbar.menus)
