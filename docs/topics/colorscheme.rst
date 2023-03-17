@@ -71,7 +71,7 @@ Here's some recommendations for making your app work as seamlessly as possible:
 * Try avoiding using ``color``, ``background-color``, or other color styles where possible and meaningful.
 * If necessary use as few as possible standard django CMS colors (preferably from the list below with plain Django fallback colors)
 * Use the following pattern: ``var(--dca-color-var, var(--fallback-color-var, #xxxxxx))`` where ``#xxxxxx`` represents the light version of the color. This tries django CMS color scheme first and falls back to Django color scheme if djangocms-admin-style is not available.
-* Avoid media queries like ``@media (prefers-color-scheme: dark)` since they would ignore forced settings to light or dark.
+* Avoid media queries like ``@media (prefers-color-scheme: dark)`` since they would ignore forced settings to light or dark.
 
 
 The admin frontend pulls the style from django admin styles and - if present - from djangocms-admin-style. Django itself also uses css variables to implement admin mode, these can be used as dark mode-aware fall-back colors.
