@@ -21,6 +21,17 @@ from cms.utils.urlutils import admin_reverse, static_with_version
 
 
 class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
+    """AdminListActionsMixin is a mixin for the ModelAdmin class. It adds the ability to have
+     action buttons and a burger menu in the admin's change list view. Unlike actions that affect
+     multiple listed items the list action buttons only affect one item at a time.
+
+     Use :meth:`~cms.admin.utils.AdminListActionsMixin.get_action_list` to register actions and
+     :meth:`~cms.admin.utils.AdminListActionsMixin.admin_action_button` to define the button
+     behavior.
+
+     To activate the actions make sure ``"admin_list_actions"`` is in the admin classes
+     :prop:`~django.contrib.admin.ModelAdmin.list_display` property.
+     """
 
     class Media:
         js = (
@@ -32,7 +43,15 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
         )}
 
     def get_actions_list(self):
-        """Collect rendered actions from implemented methods and return as list"""
+        """Collect list actions from implemented methods and return as list. Make sure to call
+        it's ``super()`` instance when overwriting::
+
+            class MyModelAdmin(admin.ModelAdmin):
+                ...
+
+                def get_actions_list(self):
+                    return super().get_actions_list() + [self.my_first_action, self.my_second_action]
+        """
         return []
 
     def get_admin_list_actions(self, request):
@@ -92,6 +111,16 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
         :param bool keepsideframe:  If ``False`` the side frame (if open) will be closed before execcuting the action.
         :param str name: A string that will be added to the class list of the button/menu item:
                          ``cms-action-{{ name }}``
+
+        To add an action button to the change list use the following pattern in your admin class::
+
+                 def my_custom_button(self, obj, request, disabled=False):
+                    # do preparations, e.g., check permissions, get url, ...
+                    url = admin_reverse("...", args=[obj.pk])
+                    if permissions_ok:
+                        return self.admin_action_button(url, "info",  _("View usage"), disabled=disabled)
+                    return ""  # No button
+
         """
         return render_to_string(
             "admin/cms/icons/base.html",
