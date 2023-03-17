@@ -30,10 +30,11 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
             "djangocms_versioning/css/actions.css",  # move to core
         )}
 
-    def get_admin_list_actions(self):
+    def get_actions_list(self):
+        """Collect rendered actions from implemented methods and return as list"""
         return []
 
-    def admin_list_actions(self, request):
+    def get_admin_list_actions(self, request):
         """Method to register the admin action menu with the admin's list display
 
         Usage (in your model admin)::
@@ -47,11 +48,23 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
             return format_html_join(
                 "",
                 "{}",
-                ((action(obj, request),) for action in self.get_admin_list_actions()),
+                ((action(obj, request),) for action in self.get_actions_list()),
             )
 
         actions.short_description = _("Actions")
         return actions
+
+    def admin_list_actions(self, obj):
+        raise ValueError(
+            "ModelAdmin.display_list contains \"admin_list_actions\" as a placeholder for list action icons. "
+            "AdminListActionsMixin is not loaded, however. If you implement \"get_list_display\" make "
+            "sure it calls super().get_list_display."
+        )  # pragma: no cover
+
+    def get_list_display(self, request):
+        list_display = super().get_list_display(request)
+        return tuple(self.get_admin_list_actions(request) if item == "admin_list_actions" else item
+                         for item in list_display)
 
     @staticmethod
     def admin_action_button(
@@ -266,8 +279,7 @@ class GrouperAdminMixin(AdminListActionsMixin, metaclass=forms.MediaDefiningClas
 
     def _get_settings_action(self, obj, request):
         edit_url = admin_reverse(f"{obj._meta.app_label}_{obj._meta.model_name}_change", args=(obj.pk,))
-        if hasattr(self, "content_filter"):
-            edit_url += f'?{urlencode(self.content_filter)}'
+        edit_url += f'?{urlencode(self.content_filter)}'
         return self.admin_action_button(
             url=edit_url,
             icon="settings" if self.get_content_obj(obj) else "plus",
@@ -276,7 +288,7 @@ class GrouperAdminMixin(AdminListActionsMixin, metaclass=forms.MediaDefiningClas
             name="settings",
         )
 
-    def get_admin_list_actions(self):
+    def get_actions_list(self):
         return [self._get_view_action, self._get_settings_action]
 
     def endpoint_url(self, admin, obj):

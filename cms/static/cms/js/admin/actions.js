@@ -3,34 +3,43 @@
         // INFO: it is not possible to put a form inside a form, so
         // the versioning actions have to create their own form on click.
         // Note for any apps inheriting the burger menu, this will also capture those events.
-        $(` .js-action,
-            .cms-js-edit-btn,
-            .cms-actions-dropdown-menu-item-anchor`)
-            .on('click', function(e) {
-                e.preventDefault();
 
+        function closeSideFrame() {
+            try {
+                window.top.CMS.API.Sideframe.close();
+            } catch (err) {}
+        }
+        $(`.js-action,
+           .cms-js-edit-btn,
+           .cms-actions-dropdown-menu-item-anchor`)
+            .on('click', function(e) {
                 let action = $(e.currentTarget);
                 let formMethod = action.attr('class').indexOf('cms-form-get-method') !== -1 ? 'GET': 'POST';
-                let csrfToken = formMethod == 'GET' ? '' : '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-                            document.cookie.match(/csrftoken=([^;]*);?/)[1] + '">';
-                let fakeForm = $(
-                    '<form style="display: none" action="' + action.attr('href') + '" method="' +
-                           formMethod + '">' + csrfToken +
-                    '</form>'
-                );
-                let body = window.top.document.body;
                 let keepSideFrame = action.attr('class').indexOf('js-keep-sideframe') !== -1;
-                // always break out of the sideframe, cause it was never meant to open cms views inside it
-                try {
-                    if (!keepSideFrame)
-                    {
-                        window.top.CMS.API.Sideframe.close();
+
+                if (formMethod === 'GET') {
+                    if (!keepSideFrame) {
+                        action.attr('target', '_top');
+                        closeSideFrame();
                     }
-                } catch (err) {}
-                if (keepSideFrame) {
-                    body = window.document.body;
+                } else {
+                    e.preventDefault();
+                    let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
+                                document.cookie.match(/csrftoken=([^;]*);?/)[1] + '">';
+                    let fakeForm = $(
+                        '<form style="display: none" action="' + action.attr('href') + '" method="' +
+                               formMethod + '">' + csrfToken +
+                        '</form>'
+                    );
+                    let body = window.top.document.body;
+
+                    if (keepSideFrame) {
+                        body = window.document.body;
+                    } else {
+                        closeSideFrame();
+                    }
+                    fakeForm.appendTo(body).submit();
                 }
-                fakeForm.appendTo(body).submit();
             });
 
         $('.js-versioning-close-sideframe').on('click', function () {
