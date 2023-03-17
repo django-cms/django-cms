@@ -1,10 +1,10 @@
 from urllib.parse import parse_qsl
 
+from django import forms
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.views.main import ChangeList
-from django.core.exceptions import ValidationError, ImproperlyConfigured
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django import forms
 from django.forms import modelform_factory
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -16,8 +16,8 @@ from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request
-from cms.utils.i18n import get_language_tuple, get_language_dict
-from cms.utils.urlutils import static_with_version, admin_reverse
+from cms.utils.i18n import get_language_dict, get_language_tuple
+from cms.utils.urlutils import admin_reverse, static_with_version
 
 
 class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
@@ -67,7 +67,7 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
     def get_list_display(self, request):
         list_display = super().get_list_display(request)
         return tuple(self.get_admin_list_actions(request) if item == "admin_list_actions" else item
-                         for item in list_display)
+                     for item in list_display)
 
     @staticmethod
     def admin_action_button(
@@ -86,10 +86,12 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
         :param str icon: Name of the icon shown in the button or before the title in the burger menu.
         :param str title: Human-readable string describing the action.
         :param bool burger_menu: If ``True`` the action item will be part of a burger menu right og all buttons.
-        :param str action: Either ``"get"`` or ``"post"`` defining the html method used for the url. Some urls reqzure a post method.
+        :param str action: Either ``"get"`` or ``"post"`` defining the html method used for the url. Some urls
+                           require a post method.
         :param bool disabled: If ``True`` the item is grayed out and cannot be selected.
         :param bool keepsideframe:  If ``False`` the side frame (if open) will be closed before execcuting the action.
-        :param str name: A string that will be added to the class list of the button/menu item: ``cms-action-{{ name }}``
+        :param str name: A string that will be added to the class list of the button/menu item:
+                         ``cms-action-{{ name }}``
         """
         return render_to_string(
             "admin/cms/icons/base.html",
@@ -109,6 +111,7 @@ class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
 class GrouperChangeListBase(ChangeList):
     """Subclass ChangeList to disregard language get parameter as filter"""
     _extra_grouping_fields = []
+
     def get_filters_params(self, params=None):
         lookup_params = super().get_filters_params(params)
         for field in self._extra_grouping_fields:
@@ -176,8 +179,10 @@ class GrouperModelAdmin(AdminListActionsMixin, ModelAdmin):
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):
         """Set grouper properties for both add and change"""
         self.get_grouping_from_request(request)
-        return super().changeform_view(request, object_id, form_url,
-                                   {**(extra_context or {}), **self.get_extra_context(request, object_id=object_id)})
+        return super().changeform_view(
+            request, object_id, form_url,
+            {**(extra_context or {}), **self.get_extra_context(request, object_id=object_id)},
+        )
 
     def delete_view(self, request, object_id, extra_context=None):
         """Set grouper properties for delete"""
@@ -188,7 +193,6 @@ class GrouperModelAdmin(AdminListActionsMixin, ModelAdmin):
         """Set grouper properties for history"""
         self.get_grouping_from_request(request)
         return super().history_view(request, object_id, extra_context)
-
 
     def get_preserved_filters(self, request):
         """Always preserve grouping get parameters! Also, add them to changelist filters:
@@ -308,13 +312,13 @@ class GrouperModelAdmin(AdminListActionsMixin, ModelAdmin):
             cls = content.__class__
             pk = content.pk
 
-        if GrouperAdminMixin._content_content_type is None:
+        if GrouperModelAdmin._content_content_type is None:
             # Use class as cache
             from django.contrib.contenttypes.models import ContentType
 
-            GrouperAdminMixin._content_content_type = ContentType.objects.get_for_model(cls).pk
+            GrouperModelAdmin._content_content_type = ContentType.objects.get_for_model(cls).pk
         try:
-            return admin_reverse(admin, args=[GrouperAdminMixin._content_content_type, pk])
+            return admin_reverse(admin, args=[GrouperModelAdmin._content_content_type, pk])
         except NoReverseMatch:
             return ""
 
@@ -344,7 +348,7 @@ class GrouperModelAdmin(AdminListActionsMixin, ModelAdmin):
         if obj is None or self._is_content_obj(obj):
             return obj
         else:
-            if not obj in self._content_obj_cache:
+            if obj not in self._content_obj_cache:
                 self._content_obj_cache[obj] = self._get_content_queryset(obj) \
                     .filter(**self.content_filter) \
                     .first()
@@ -381,7 +385,11 @@ class GrouperModelAdmin(AdminListActionsMixin, ModelAdmin):
         if hasattr(self, "can_change_content"):
             if not self.can_change_content(request, content_obj):
                 # Only allow content object fields to be edited if user can change them
-                fields += tuple(set(self.form._content_fields).difference(self.extra_grouping_fields, (self.get_grouper_field_name(),)))  # <= content fields
+                fields += tuple(
+                    set(self.form._content_fields).difference(
+                        self.extra_grouping_fields, (self.get_grouper_field_name(),),  # <= content fields
+                    )
+                )
         return fields
 
     def save_model(self, request, obj, form, change):
@@ -448,7 +456,7 @@ class _GrouperChangeFormMixin:
             if self._content_instance:
                 kwargs["initial"] = {
                     **{field: getattr(self._content_instance, field)
-                   for field in self._content_fields},
+                       for field in self._content_fields},
                     **kwargs.get("initial", {})
                 }
         else:
