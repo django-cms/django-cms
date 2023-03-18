@@ -20,7 +20,7 @@ from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 
-class AdminListActionsMixin(metaclass=forms.MediaDefiningClass):
+class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
     """AdminListActionsMixin is a mixin for the ModelAdmin class. It adds the ability to have
      action buttons and a burger menu in the admin's change list view. Unlike actions that affect
      multiple listed items the list action buttons only affect one item at a time.
@@ -149,7 +149,7 @@ class GrouperChangeListBase(ChangeList):
         return lookup_params
 
 
-class GrouperModelAdmin(AdminListActionsMixin, ModelAdmin):
+class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     """Easy-to-use ModelAdmin for grouper models"""
 
     extra_grouping_fields = ()
@@ -447,14 +447,32 @@ class GrouperModelAdmin(AdminListActionsMixin, ModelAdmin):
         return self.model.__name__.lower()
 
 
-class ExtraGrouperFormMixin:
+class _GrouperModelFormMixin:
     def __init__(self, *args, **kwargs):
         assert hasattr(self, "_admin")
+
+        if "instance" in kwargs and kwargs["instance"]:
+            # Instance provided? Initialize fields from content model
+            instance = kwargs["instance"]
+            self._content_instance = self._admin.get_content_obj(instance)
+            if self._content_instance:
+                kwargs["initial"] = {
+                    **{field: getattr(self._content_instance, field)
+                       for field in self._content_fields},
+                    **kwargs.get("initial", {})
+                }
+        else:
+            self._content_instance = None
+        super().__init__(*args, **kwargs)
+
         kwargs["initial"] = {
             **self._admin.content_filter,
             **kwargs.get("initial", {}),
         }
+
         super().__init__(*args, **kwargs)
+        self.fields[self._admin.get_grouper_field_name()].widget = forms.HiddenInput()
+        self.fields[self._admin.get_grouper_field_name()].required = False  # Will be set on admin model save
         self.update_field_names(self._content_fields)
 
     def update_field_names(self, fields):
@@ -475,33 +493,24 @@ class ExtraGrouperFormMixin:
         return super().clean()
 
 
-class _GrouperChangeFormMixin:
-    def __init__(self, *args, **kwargs):
-        if "instance" in kwargs and kwargs["instance"]:
-            # Instance provided? Initialize fields from content model
-            instance = kwargs["instance"]
-            if hasattr(self, "_admin"):
-                self._content_instance = self._admin.get_content_obj(instance)
-            if self._content_instance:
-                kwargs["initial"] = {
-                    **{field: getattr(self._content_instance, field)
-                       for field in self._content_fields},
-                    **kwargs.get("initial", {})
-                }
-        else:
-            self._content_instance = None
-        super().__init__(*args, **kwargs)
-        self.fields[self._admin.get_grouper_field_name()].widget = forms.HiddenInput()
-        self.fields[self._admin.get_grouper_field_name()].required = False  # Will be set on admin model save
+def GrouperModelFormMixin(grouper_model_or_form):
+    """Actually a factory function that creates the mixin. Pass the Model or ModelForm as a
+    parameter::
 
+        class MyGrouperModelForm(GrouperModelFormMixin(ContentModel), forms.ModelForm):
+            model = GrouperModel
+            ...
 
-def GrouperChangeFormMixin(grouper_model_or_form):
-    """Actually a factory function the creates the mixin."""
+    .. warning:
+
+        This mixin only works when used together with :class:`~cms.admin.utils.GrouperModelAdmin`.
+    """
     if isinstance(grouper_model_or_form, models.base.ModelBase):
+        # If a Model is passed turn it into a ModelForm
         grouper_model_or_form = modelform_factory(grouper_model_or_form, fields="__all__")
     return forms.forms.DeclarativeFieldsMetaclass(
-        GrouperChangeFormMixin.__name__,
-        (_GrouperChangeFormMixin,),
+        _GrouperModelFormMixin.__name__,
+        (_GrouperModelFormMixin,),
         {
             **grouper_model_or_form.base_fields,
             "_content_model": grouper_model_or_form._meta.model,
