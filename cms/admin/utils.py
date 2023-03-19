@@ -493,8 +493,9 @@ class _GrouperModelFormMixin:
         return super().clean()
 
 
-def GrouperModelFormMixin(grouper_model_or_form):
-    """Actually a factory function that creates the mixin. Pass the Model or ModelForm as a
+class GrouperModelFormMixin:
+
+    """Actually a factory class that creates the mixin. Pass the Model or ModelForm as a
     parameter::
 
         class MyGrouperModelForm(GrouperModelFormMixin(ContentModel), forms.ModelForm):
@@ -505,15 +506,17 @@ def GrouperModelFormMixin(grouper_model_or_form):
 
         This mixin only works when used together with :class:`~cms.admin.utils.GrouperModelAdmin`.
     """
-    if isinstance(grouper_model_or_form, models.base.ModelBase):
-        # If a Model is passed turn it into a ModelForm
-        grouper_model_or_form = modelform_factory(grouper_model_or_form, fields="__all__")
-    return forms.forms.DeclarativeFieldsMetaclass(
-        _GrouperModelFormMixin.__name__,
-        (_GrouperModelFormMixin,),
-        {
-            **grouper_model_or_form.base_fields,
-            "_content_model": grouper_model_or_form._meta.model,
-            "_content_fields": grouper_model_or_form.base_fields.keys(),
-        },
-    )
+
+    def __new__(cls, content_model_or_form):
+        if isinstance(content_model_or_form, models.base.ModelBase):
+            # If a Model is passed turn it into a ModelForm
+            content_model_or_form = modelform_factory(content_model_or_form, fields="__all__")
+        return forms.forms.DeclarativeFieldsMetaclass(
+            _GrouperModelFormMixin.__name__,
+            (_GrouperModelFormMixin,),
+            {
+                **content_model_or_form.base_fields,  # inherit the content model form's fields
+                "_content_model": content_model_or_form._meta.model,  # remember the model
+                "_content_fields": content_model_or_form.base_fields.keys(),  # and which fields are from the content form
+            },
+        )
