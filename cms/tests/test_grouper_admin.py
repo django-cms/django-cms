@@ -1,7 +1,9 @@
 from django.utils.crypto import get_random_string
 
+from cms.test_utils.project.sampleapp.models import (
+    GrouperModel, GrouperModelContent,
+)
 from cms.test_utils.testcases import CMSTestCase
-from cms.test_utils.project.sampleapp.models import GrouperModel, ContentModel
 from cms.utils.urlutils import admin_reverse
 
 
@@ -28,20 +30,17 @@ class GrouperChangeListTestCase(CMSTestCase):
     def test_with_content(self):
         """Create one content object and see if it appears in the right admin"""
         random_content = get_random_string(16)
-        content = ContentModel.objects.create(
+        GrouperModelContent.objects.create(
             grouper=self.grouper_instance,
             language="de",
             secret_greeting=random_content,
         )
 
         with self.login_user_context(self.admin_user):
-            response = self.client.get(self.changelist_url + f"?language=de")
+            response = self.client.get(self.changelist_url + "?language=de")
             self.assertContains(response, "Grouper Category")
             self.assertContains(response, random_content)
 
             for language in ("en", "it"):
                 response = self.client.get(self.changelist_url + f"?language={language}")
                 self.assertContains(response, "Empty content")
-
-
-

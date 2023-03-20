@@ -137,7 +137,7 @@ class PageContentAdminQuerySet(models.QuerySet):
         return self.filter(**kwargs)
 
 
-class PageContentAdminManager(PageContentManager):
+class ContentAdminManager(PageContentManager):
     def get_queryset(self):
         return PageContentAdminQuerySet(self.model, using=self._db)
 

@@ -1,8 +1,8 @@
 from django.db import models
 from django.urls import reverse
-from django.utils.translation import get_language
 from treebeard.mp_tree import MP_Node
 
+from cms.models import ContentAdminManager
 from cms.models.fields import PlaceholderField
 
 
@@ -42,7 +42,7 @@ class GrouperModel(models.Model):
     category_name = models.CharField(max_length=200, default="")
 
 
-class ContentModel(models.Model):
+class GrouperModelContent(models.Model):
     grouper = models.ForeignKey(
         GrouperModel,
         on_delete=models.CASCADE,
@@ -73,3 +73,6 @@ class ContentModel(models.Model):
     secret_greeting = models.TextField(
         max_length=100,
     )
+
+    objects = models.Manager()
+    admin_manager = ContentAdminManager()

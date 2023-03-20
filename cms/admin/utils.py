@@ -2,8 +2,13 @@ from urllib.parse import parse_qsl
 
 from django import forms
 from django.contrib.admin import ModelAdmin
+from django.contrib.admin.checks import ModelAdminChecks
+from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core import checks
+from django.core.exceptions import (
+    FieldDoesNotExist, ImproperlyConfigured, ValidationError,
+)
 from django.db import models
 from django.forms import modelform_factory
 from django.shortcuts import get_object_or_404
@@ -137,6 +142,45 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
         )
 
 
+class GrouperModelAdminChecks(ModelAdminChecks):
+    def _check_list_display_item(self, obj, item, label):
+        if isinstance(item, str) and item.startswith("content:"):
+            item = item[8:].strip()
+            if hasattr(obj.content_model, item):
+                return []
+        if callable(item):
+            return []
+        elif hasattr(obj, item):
+            return []
+        try:
+            field = obj.model._meta.get_field(item)
+        except FieldDoesNotExist:
+            try:
+                field = getattr(obj.model, item)
+            except AttributeError:
+                return [
+                    checks.Error(
+                        "The value of '%s' refers to '%s', which is not a "
+                        "callable, an attribute of '%s', or an attribute or "
+                        "method on '%s'." % (
+                            label, item, obj.__class__.__name__,
+                            obj.model._meta.label,
+                        ),
+                        obj=obj.__class__,
+                        id='admin.E108',
+                    )
+                ]
+        if isinstance(field, models.ManyToManyField):
+            return [
+                checks.Error(
+                    "The value of '%s' must not be a ManyToManyField." % label,
+                    obj=obj.__class__,
+                    id='admin.E109',
+                )
+            ]
+        return []
+
+
 class GrouperChangeListBase(ChangeList):
     """Subclass ChangeList to disregard language get parameter as filter"""
     _extra_grouping_fields = []
@@ -162,10 +206,31 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             "cms/js/admin/language-selector.js",
         )
 
+    checks_class = GrouperModelAdminChecks
+    CONTENT_MARKER = "content:"
+    EMPTY_CONTENT_VALUE = _("Empty content")
+
     _content_obj_cache = {}
     _content_qs_cache = {}
     _content_content_type = None
-    _related_field = None
+    content_model = None
+    content_related_field = None
+
+    def __init__(self, model, admin_site):
+        super().__init__(model, admin_site)
+        if self.content_model is None:  # Did the Admin class specify a content model?
+            # If not, try identifying using the naming convention {GrouperName}Content
+            from django.apps import apps
+
+            self.content_model = apps.get_model(f"{self.opts.app_label}.{self.model.__name__}Content")
+
+        if not self.content_related_field:
+            for related_object in model._meta.related_objects:
+                if related_object.related_model is self.content_model:
+                    self.content_related_field = related_object.get_accessor_name()
+                    break
+            else:
+                raise ImproperlyConfigured(f"Related field for grouper model {model.__name__} not found")
 
     @property
     def content_filter(self):
@@ -199,6 +264,43 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             if value != getattr(self, field, None):
                 setattr(self, field, value)
                 self.clear_content_cache()  # Cache belongs to different grouping
+
+    def get_list_display(self, request):
+        def get_list_display_entries(request, item):
+            if isinstance(item, str):
+                if item.startswith(self.CONTENT_MARKER):
+                    # list display item to be fetched from content model?
+                    item = item[len(self.CONTENT_MARKER):].strip()
+                    if hasattr(self, item) and callable(getattr(self, item)):  # admin method?
+                        return self._content_list_display_method(request, getattr(self, item))
+                    return self._content_list_display_field(request, item)
+            return item
+
+        list_display = super().get_list_display(request)
+        return tuple(get_list_display_entries(request, item) for item in list_display)
+
+    def _content_list_display_field(self, request, fieldname: str):
+        def get_content_field(obj):
+            self.get_grouping_from_request(request)
+            content_obj = self.get_content_obj(obj)
+            return getattr(content_obj, fieldname, None)
+        get_content_field.short_description = label_for_field(fieldname, self.content_model)
+        if not hasattr(get_content_field, "empty_value_display"):
+            get_content_field.empty_value_display = self.EMPTY_CONTENT_VALUE
+        return get_content_field
+
+    def _content_list_display_method(self, request, method):
+        def get_content_method(obj):
+            self.get_grouping_from_request(request)
+            content_obj = self.get_content_obj(obj)
+            return method(content_obj=content_obj)  # name argument to avoid mix up with grouper objects
+
+        # Copy over display_list_attributes set by the admin.display decorator
+        # ordering currently is not supported
+        for key in ("boolean", "short_description", "empty_value_display"):
+            if hasattr(method, key):
+                setattr(get_content_method, key, getattr(method, key))
+        return get_content_method
 
     def get_changelist_instance(self, request):
         """Set language property"""
@@ -341,31 +443,22 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             cls = content.__class__
             pk = content.pk
 
-        if GrouperModelAdmin._content_content_type is None:
-            # Use class as cache
+        if self._content_content_type is None:
             from django.contrib.contenttypes.models import ContentType
 
-            GrouperModelAdmin._content_content_type = ContentType.objects.get_for_model(cls).pk
+            self._content_content_type = ContentType.objects.get_for_model(cls).pk
         try:
-            return admin_reverse(admin, args=[GrouperModelAdmin._content_content_type, pk])
+            return admin_reverse(admin, args=[self._content_content_type, pk])
         except NoReverseMatch:
             return ""
 
-    @staticmethod
-    def _is_content_obj(obj):
-        """Naming convention: Model classes of content objects end with "Content" """
-        return obj.__class__.__name__.endswith("Content")
+    def _is_content_obj(self, obj):
+        return isinstance(obj, self.content_model)
 
     def _get_content_queryset(self, obj):
         if obj not in self._content_qs_cache:
-            if not self._related_field:
-                for related_object in obj._meta.related_objects:
-                    if related_object.related_model.__name__ == obj.__class__.__name__ + "Content":
-                        self._related_field = related_object.name
-                        break
-                else:
-                    raise AssertionError("Related field not found")
-            self._content_qs_cache[obj] = getattr(obj, self._related_field)(manager="admin_manager").latest_content()
+            self._content_qs_cache[obj] = getattr(obj, self.content_related_field)(manager="admin_manager")\
+                .latest_content()
         return self._content_qs_cache[obj]
 
     def clear_content_cache(self):
@@ -516,7 +609,7 @@ class GrouperModelFormMixin:
             (_GrouperModelFormMixin,),
             {
                 **content_model_or_form.base_fields,  # inherit the content model form's fields
-                "_content_model": content_model_or_form._meta.model,  # remember the model
-                "_content_fields": content_model_or_form.base_fields.keys(),  # and which fields are from the content form
+                "_content_model": content_model_or_form._meta.model,  # remember the model and
+                "_content_fields": content_model_or_form.base_fields.keys(),  # fields that come from the content form
             },
         )
