@@ -39,13 +39,11 @@ class SomeEditableModel(models.Model):
 
 
 class GrouperModel(models.Model):
-    class Meta:
-        content_model = "GrouperModel.Content"
     category_name = models.CharField(max_length=200, default="")
 
 
 class GrouperModelContent(models.Model):
-    grouper = models.ForeignKey(
+    groupermodel = models.ForeignKey(
         GrouperModel,
         on_delete=models.CASCADE,
     )
@@ -70,6 +68,11 @@ class GrouperModelContent(models.Model):
             ("asia", "Asia"),
             ("australia", "Australia")
         )
+    )
+
+    uptodate = models.BooleanField(
+        verbose_name="Yes/No",
+        default=False,
     )
 
     secret_greeting = models.TextField(

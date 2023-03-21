@@ -19,7 +19,7 @@
         $('.js-language-tabs').each(function (i, e) {
             var element = $(e);
 
-            element.data('dirty', element.parents("#content-main").find(".errors").length > 0);
+            element.data('dirty', element.parents("#content-main").find(".errors, .errorlist").length > 0);
             element.parents("#content-main").find('form input').change(function () {
                 element.data('dirty', true);
             });

@@ -1,10 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 
-from cms.admin.utils import GrouperModelFormMixin
-from cms.test_utils.project.sampleapp.models import (
-    Category, GrouperModel, GrouperModelContent,
-)
+from cms.test_utils.project.sampleapp.models import Category
 
 
 class LoginForm(AuthenticationForm):
@@ -25,9 +22,3 @@ class SampleWizardForm(forms.ModelForm):
     class Meta:
         model = Category
         exclude = []
-
-
-class GrouperAdminForm(GrouperModelFormMixin(GrouperModelContent), forms.ModelForm):
-    class Meta:
-        model = GrouperModel
-        fields = "__all__"

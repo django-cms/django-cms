@@ -2,7 +2,6 @@ from django.contrib import admin
 
 from cms.admin.placeholderadmin import FrontendEditableAdminMixin
 from cms.admin.utils import GrouperModelAdmin
-from cms.test_utils.project.sampleapp.forms import GrouperAdminForm
 from cms.test_utils.project.sampleapp.models import (
     Category, GrouperModel, Picture, SampleAppConfig, SomeEditableModel,
 )
@@ -21,9 +20,11 @@ class SomeEditableAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
 
 
 class GrouperAdmin(GrouperModelAdmin):
-    form = GrouperAdminForm
     extra_grouping_fields = ("language",)
-    list_display = ("category_name", "content: secret_greeting",)
+    list_display = ("category_name", "content__secret_greeting", "admin_list_actions")
+
+    def can_change_content(self, request, content_obj):
+        return getattr(self, "change_content", True)
 
 
 admin.site.register(Category, CategoryAdmin)
