@@ -1,3 +1,4 @@
+from django.contrib.admin import site
 from django.utils.crypto import get_random_string
 
 from cms.test_utils.project.sampleapp.models import (
@@ -20,14 +21,20 @@ class GrouperChangeListTestCase(CMSTestCase):
     def tearDown(self) -> None:
         self.grouper_instance.delete()
 
-    def test_empty_content(self):
+    def test_content_model_detected(self) -> None:
+        from django.contrib.admin import site
+
+        admin = site._registry[GrouperModel]
+        self.assertEqual(admin.content_model, GrouperModelContent)
+
+    def test_empty_content(self) -> None:
         """Without any content being created the changelist shows an empty content text"""
         with self.login_user_context(self.admin_user):
             for language in ("en", "de", "it"):
                 response = self.client.get(self.changelist_url + f"?language={language}")
                 self.assertContains(response, "Empty content")
 
-    def test_with_content(self):
+    def test_with_content(self) -> None:
         """Create one content object and see if it appears in the right admin"""
         random_content = get_random_string(16)
         GrouperModelContent.objects.create(

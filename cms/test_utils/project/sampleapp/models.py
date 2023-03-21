@@ -39,6 +39,8 @@ class SomeEditableModel(models.Model):
 
 
 class GrouperModel(models.Model):
+    class Meta:
+        content_model = "GrouperModel.Content"
     category_name = models.CharField(max_length=200, default="")
 
 
