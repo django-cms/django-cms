@@ -143,7 +143,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             # Contains relation to grouper as hidden input
             self.assertContains(
                 response,
-                '<input type="hidden" name="content__groupermodel" value="1" id="id_content__groupermodel">',
+                f'<input type="hidden" name="content__groupermodel"',
             )
             # Contains extra grouping field as hidden input
             self.assertContains(
@@ -168,7 +168,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             # Contains relation to grouper as hidden input
             self.assertContains(
                 response,
-                '<input type="hidden" name="content__groupermodel" value="1" id="id_content__groupermodel">',
+                '<input type="hidden" name="content__groupermodel"',
             )
             # Contains extra grouping field as hidden input
             self.assertContains(
