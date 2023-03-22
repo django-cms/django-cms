@@ -205,7 +205,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             self.assertEqual(self.grouper_instance.category_name, data["category_name"])
 
     def test_save_content_model(self) -> None:
-        random_content = self.createContentInstance("en")
+        self.createContentInstance("en")
         data = {
             "content__language": "en",
             "category_name": self.grouper_instance.category_name,

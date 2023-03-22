@@ -17,7 +17,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
-from cms.models.managers import WithUserMixin
+from cms.models.managers import ContentAdminManager
 from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_language_dict, get_language_tuple
@@ -234,6 +234,10 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             from django.apps import apps
 
             self.content_model = apps.get_model(f"{self.opts.app_label}.{self.model.__name__}Content")
+
+        # Add an admin manager if the content model does not have one.
+        if not hasattr(self.content_model, "admin_manager"):
+            self.content_model.add_to_class("admin_manager", ContentAdminManager())
 
         # Find name of related field
         if not self.content_related_field:
