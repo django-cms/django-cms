@@ -198,3 +198,15 @@ a.cms-actions-dropdown-menu-item-anchor.inactive {
         }
     }
 }
+
+
+body:not(.djangocms-admin-style) #page_form_lang_tabs input[type="button"].selected {
+    background-color: var(--button-bg);
+    color: var(--button-fg)
+}
+
+body:not(.djangocms-admin-style) #page_form_lang_tabs input[type="button"] {
+    background-color: var(--darkened-bg);
+    border: 1px solid var(--border-color);
+    color: var(--body-fg)
+}

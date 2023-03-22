@@ -43,7 +43,8 @@ class GrouperModel(models.Model):
 
 
 class GrouperModelContent(models.Model):
-    groupermodel = models.ForeignKey(
+    # grouper field name: snake case of GrouperModel
+    grouper_model = models.ForeignKey(
         GrouperModel,
         on_delete=models.CASCADE,
     )

@@ -33,7 +33,7 @@ class SetupMixin:
         to be able to check if it appears in forms etc."""
         random_content = get_random_string(16)
         GrouperModelContent.objects.create(
-            groupermodel=self.grouper_instance,
+            grouper_model=self.grouper_instance,
             language=language,
             secret_greeting=random_content,
         )
@@ -143,7 +143,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             # Contains relation to grouper as hidden input
             self.assertContains(
                 response,
-                '<input type="hidden" name="content__groupermodel"',
+                '<input type="hidden" name="content__grouper_model"',
             )
             # Contains extra grouping field as hidden input
             self.assertContains(
@@ -168,7 +168,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             # Contains relation to grouper as hidden input
             self.assertContains(
                 response,
-                '<input type="hidden" name="content__groupermodel"',
+                '<input type="hidden" name="content__grouper_model"',
             )
             # Contains extra grouping field as hidden input
             self.assertContains(
