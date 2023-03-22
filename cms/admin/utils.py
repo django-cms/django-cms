@@ -405,8 +405,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             else:
                 filled_languages = []
 
-            language_tuple = self.get_language_tuple()
-            extra_context["language_tabs"] = language_tuple
+            extra_context["language_tabs"] = self.get_language_tuple()
             extra_context["language"] = language
             extra_context["filled_languages"] = filled_languages
             if content_instance is None:
@@ -414,6 +413,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 extra_context["subtitle"] = subtitle
 
         # TODO: Add context for other grouping fields to be shown as a dropdown
+        print(f"{extra_context=}")
         return extra_context
 
     def get_form(self, request, obj=None, **kwargs):
