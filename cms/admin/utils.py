@@ -340,7 +340,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return super().get_changelist_instance(request)
 
     def changeform_view(
-        self, request:HttpRequest,
+        self, request: HttpRequest,
         object_id: typing.Optional[str] = None,
         form_url: str = "",
         extra_context: dict = None,
