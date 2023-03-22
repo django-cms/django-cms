@@ -105,6 +105,13 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
 
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
+    def test_language_selector(self):
+        """All languages available to select"""
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.changelist_url)
+        for lang, verb in self.admin.get_language_tuple():
+            self.assertContains(response, f'<option value="{lang}"')
+
     def test_empty_content(self) -> None:
         """Without any content being created the changelist shows an empty content text"""
         with self.login_user_context(self.admin_user):

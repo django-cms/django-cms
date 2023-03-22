@@ -413,7 +413,6 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 extra_context["subtitle"] = subtitle
 
         # TODO: Add context for other grouping fields to be shown as a dropdown
-        print(f"{extra_context=}")
         return extra_context
 
     def get_form(self, request, obj=None, **kwargs):
