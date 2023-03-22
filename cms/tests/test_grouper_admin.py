@@ -184,7 +184,6 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
 
     def test_with_write_permit(self) -> None:
         """If change permissions exist for content model its fields are not readonly."""
-        """If change permissions exist for content model its fields are not readonly."""
         self.assertNotIn("content__secret_greeting", self.admin.get_readonly_fields(None))
 
     @wo_content_permission
@@ -192,13 +191,74 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         self.assertIn("content__secret_greeting", self.admin.get_readonly_fields(None))
 
     def test_save_grouper_model(self) -> None:
-        ...
+        random_content = self.createContentInstance("en")
+        data = {
+            "content__language": "en",
+            "category_name": "Changed content",
+            "content__region": "world",
+            "content__secret_greeting": random_content,
+        }
+        with self.login_user_context(self.admin_user):
+            response = self.client.post(self.change_url + "?language=en", data=data)
+            self.grouper_instance.refresh_from_db()
+            self.assertEqual(response.status_code, 302)  # Expecting redirect
+            self.assertEqual(self.grouper_instance.category_name, data["category_name"])
 
     def test_save_content_model(self) -> None:
-        ...
+        random_content = self.createContentInstance("en")
+        data = {
+            "content__language": "en",
+            "category_name": self.grouper_instance.category_name,
+            "content__region": "world",
+            "content__secret_greeting": "New greeting",
+        }
+        with self.login_user_context(self.admin_user):
+            response = self.client.post(self.change_url + "?language=en", data=data)
+            self.assertEqual(response.status_code, 302)  # Expecting redirect
+
+        content_instance = GrouperModelContent.objects.filter(language="en").first()
+        self.assertIsNotNone(content_instance)
+        self.assertEqual(content_instance.secret_greeting, data["content__secret_greeting"])
 
     def test_create_grouper_model(self) -> None:
-        ...
+        data = {
+            "content__language": "de",
+            "category_name": "My new category",
+            "content__region": "world",
+            "content__secret_greeting": "Some new content",
+        }
+        with self.login_user_context(self.admin_user):
+            response = self.client.post(self.add_url + "?language=de", data=data)
+            self.assertEqual(response.status_code, 302)  # Expecting redirect
+
+        self.assertEqual(GrouperModel.objects.all().count(), 2)
+
+        grouper_instance = GrouperModel.objects.filter(category_name=data["category_name"]).first()
+        self.assertIsNotNone(grouper_instance)
+
+        content_instance = grouper_instance.groupermodelcontent_set.filter(language="en").first()  # Get English
+        self.assertIsNone(content_instance)  # Should not exist
+
+        content_instance = grouper_instance.groupermodelcontent_set.filter(language="de").first()  # Get German
+        self.assertIsNotNone(content_instance)  # Should exist
+        self.assertEqual(content_instance.secret_greeting, data["content__secret_greeting"])  # Has new content
 
     def test_create_content_model(self) -> None:
-        ...
+        random_content = self.createContentInstance("en")
+        data = {
+            "content__language": "de",
+            "category_name": self.grouper_instance.category_name,
+            "content__region": "world",
+            "content__secret_greeting": "New German content",
+        }
+        with self.login_user_context(self.admin_user):
+            response = self.client.post(self.change_url + "?language=de", data=data)
+            self.assertEqual(response.status_code, 302)  # Expecting redirect
+
+        content_instance = GrouperModelContent.objects.filter(language="en").first()  # Get English
+        self.assertIsNotNone(content_instance)
+        self.assertEqual(content_instance.secret_greeting, random_content)  # unchanged
+
+        content_instance = GrouperModelContent.objects.filter(language="de").first()  # New German instance
+        self.assertIsNotNone(content_instance)  # Exists?
+        self.assertEqual(content_instance.secret_greeting, data["content__secret_greeting"])  # Has new content

@@ -17,6 +17,7 @@ from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
+from cms.models.managers import WithUserMixin
 from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_language_dict, get_language_tuple
@@ -547,9 +548,13 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             for field in form._content_fields if CONTENT_PREFIX + field in form.cleaned_data
         }
         if form._content_instance is None or form._content_instance.pk is None:
-            # Create new using with_user syntax - requires WithUserMixin for non-versioned content models
             content_dict[self._grouper_field_name] = form.instance
-            form._content_model.objects.with_user(request.user).create(**content_dict)
+            if hasattr(form._content_model.objects, "with_user"):
+                # Create new using with_user syntax if available ...
+                form._content_model.objects.with_user(request.user).create(**content_dict)
+            else:  # pragma: no cover
+                # ... without otherwise
+                form._content_model.objects.create(**content_dict)
         elif not hasattr(self, "can_change_content") or self.can_change_content(request, form._content_instance):
             # Update content instance (only if can_change_content allows it)
             for key, value in content_dict.items():
