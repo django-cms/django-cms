@@ -5,9 +5,7 @@ from django import forms
 from django.contrib.admin import ModelAdmin
 from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
-from django.core.exceptions import (
-    ImproperlyConfigured, ValidationError,
-)
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
 from django.forms import modelform_factory
 from django.shortcuts import get_object_or_404
@@ -23,7 +21,6 @@ from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
-
 
 #: Prefix for content model fields to be added to the grouper admin and to the change form.
 CONTENT_PREFIX = "content__"
