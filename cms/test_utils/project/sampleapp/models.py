@@ -79,6 +79,3 @@ class GrouperModelContent(models.Model):
     secret_greeting = models.TextField(
         max_length=100,
     )
-
-    objects = models.Manager()
-    admin_manager = ContentAdminManager()

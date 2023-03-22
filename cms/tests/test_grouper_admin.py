@@ -26,7 +26,7 @@ class SetupMixin:
 
     def tearDown(self) -> None:
         self.grouper_instance.delete()
-        self.admin.clear_content_cache()  # The admin does this automatically when items are added/deleted.
+        self.admin.clear_content_cache()  # The admin does this automatically for each new request.
 
     def createContentInstance(self, language="en"):
         """Creates a content instance with a random content for a language. The random content is returned
@@ -37,7 +37,7 @@ class SetupMixin:
             language=language,
             secret_greeting=random_content,
         )
-        self.admin.clear_content_cache()  # The admin does this automatically when items are added.
+        self.admin.clear_content_cache()  # The admin does this automatically for each new request.
         return random_content
 
 
