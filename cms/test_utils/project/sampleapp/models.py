@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 from treebeard.mp_tree import MP_Node
 
-from cms.models import ContentAdminManager
 from cms.models.fields import PlaceholderField
 
 
