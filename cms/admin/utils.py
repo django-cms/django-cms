@@ -430,7 +430,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     def get_extra_context(
         self, request: HttpRequest, object_id: typing.Optional[str] = None
-    ) -> dict[str, typing.Any]:
+    ) -> typing.Dict[str, typing.Any]:
         """Provide the grouping fields to the change view."""
         if object_id:
             # Instance provided? Get corresponding postconent
