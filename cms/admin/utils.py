@@ -51,7 +51,7 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
 
     def get_actions_list(
         self,
-    ) -> typing.List[typing.Callable[[models.Model, HttpRequest], str], ...]:
+    ) -> typing.List[typing.Callable[[models.Model, HttpRequest], str]]:
         """Collect list actions from implemented methods and return as list. Make sure to call
         it's ``super()`` instance when overwriting::
 
