@@ -31,27 +31,27 @@ CONTENT_PREFIX = "content__"
 
 class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
     """AdminListActionsMixin is a mixin for the ModelAdmin class. It adds the ability to have
-     action buttons and a burger menu in the admin's change list view. Unlike actions that affect
-     multiple listed items the list action buttons only affect one item at a time.
+    action buttons and a burger menu in the admin's change list view. Unlike actions that affect
+    multiple listed items the list action buttons only affect one item at a time.
 
-     Use :meth:`~cms.admin.utils.AdminListActionsMixin.get_action_list` to register actions and
-     :meth:`~cms.admin.utils.AdminListActionsMixin.admin_action_button` to define the button
-     behavior.
+    Use :meth:`~cms.admin.utils.AdminListActionsMixin.get_action_list` to register actions and
+    :meth:`~cms.admin.utils.AdminListActionsMixin.admin_action_button` to define the button
+    behavior.
 
-     To activate the actions make sure ``"admin_list_actions"`` is in the admin classes
-     :prop:`~django.contrib.admin.ModelAdmin.list_display` property.
-     """
+    To activate the actions make sure ``"admin_list_actions"`` is in the admin classes
+    :prop:`~django.contrib.admin.ModelAdmin.list_display` property.
+    """
 
     class Media:
         js = (
             "admin/js/jquery.init.js",
             "cms/js/admin/actions.js",
         )
-        css = {"all": (
-            static_with_version("cms/css/cms.admin.css"),
-        )}
+        css = {"all": (static_with_version("cms/css/cms.admin.css"),)}
 
-    def get_actions_list(self) -> list:
+    def get_actions_list(
+        self,
+    ) -> typing.List[typing.Callable[[models.Model, HttpRequest], str], ...]:
         """Collect list actions from implemented methods and return as list. Make sure to call
         it's ``super()`` instance when overwriting::
 
@@ -63,7 +63,9 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
         """
         return []
 
-    def get_admin_list_actions(self, request: HttpRequest) -> str:
+    def get_admin_list_actions(
+        self, request: HttpRequest
+    ) -> typing.Callable[[models.Model], str]:
         """Method to register the admin action menu with the admin's list display
 
         Usage (in your model admin)::
@@ -73,13 +75,17 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
                 list_display = ('name', ..., 'admin_list_actions')
 
         """
-        def list_actions(obj):
+
+        def list_actions(obj: models.Model) -> str:
             """The name of this inner function must not change. css styling and js depends on it."""
             EMPTY = mark_safe('<span class="cms-empty-action"></span>')
             return format_html_join(
                 "",
                 "{}",
-                ((action(obj, request) or EMPTY,) for action in self.get_actions_list()),
+                (
+                    (action(obj, request) or EMPTY,)
+                    for action in self.get_actions_list()
+                ),
             )
 
         list_actions.short_description = _("Actions")
@@ -87,15 +93,21 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
 
     def admin_list_actions(self, obj: models.Model) -> None:
         raise ValueError(
-            "ModelAdmin.display_list contains \"admin_list_actions\" as a placeholder for list action icons. "
-            "AdminListActionsMixin is not loaded, however. If you implement \"get_list_display\" make "
+            'ModelAdmin.display_list contains "admin_list_actions" as a placeholder for list action icons. '
+            'AdminListActionsMixin is not loaded, however. If you implement "get_list_display" make '
             "sure it calls super().get_list_display."
         )  # pragma: no cover
 
-    def get_list_display(self, request: HttpRequest) -> tuple:
+    def get_list_display(
+        self, request: HttpRequest
+    ) -> typing.Tuple[typing.Union[str, typing.Callable[[models.Model], str]], ...]:
         list_display = super().get_list_display(request)
-        return tuple(self.get_admin_list_actions(request) if item == "admin_list_actions" else item
-                     for item in list_display)
+        return tuple(
+            self.get_admin_list_actions(request)
+            if item == "admin_list_actions"
+            else item
+            for item in list_display
+        )
 
     @staticmethod
     def admin_action_button(
@@ -117,7 +129,7 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
         :param str action: Either ``"get"`` or ``"post"`` defining the html method used for the url. Some urls
                            require a post method.
         :param bool disabled: If ``True`` the item is grayed out and cannot be selected.
-        :param bool keepsideframe:  If ``False`` the side frame (if open) will be closed before execcuting the action.
+        :param bool keepsideframe:  If ``False`` the side frame (if open) will be closed before executing the action.
         :param str name: A string that will be added to the class list of the button/menu item:
                          ``cms-action-{{ name }}``
 
@@ -142,12 +154,13 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
                 "title": title,
                 "burger_menu": burger_menu,
                 "name": name,
-            }
+            },
         )
 
 
 class GrouperChangeListBase(ChangeList):
     """Subclass ChangeList to disregard grouping fields get parameter as filter"""
+
     _extra_grouping_fields = []
 
     def get_filters_params(self, params: typing.Optional[dict] = None):
@@ -191,7 +204,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     #: The name of the ``ForeignKey`` in the content model that points to the grouper instance. If not given
     #: it is assumed to be the snake case name of the grouper model class, e.g. ``"blog_post"`` for the
     #: ``"BlogPost"`` model.
-    grouper_field_name = None
+    grouper_field_name: typing.Optional[str] = None
     #: Indicates additional grouping fields such as ``"language"`` for example. Additional grouping fields create
     #: tabs in the change form and a dropdown menu in the change list view.
     #:
@@ -200,16 +213,16 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     #:      All fields serving as extra grouping fields must be part of the admin's
     #:      :attr:`~django.contrib.admin.ModelAdmin.fieldsets` setting for ``GrouperModelAdmin`` to work properly.
     #:      In the change form the fields will be invisible.
-    extra_grouping_fields = ()
+    extra_grouping_fields: typing.Tuple[str, ...] = ()
     #: The content model class to be used. Defaults to the model class named like the grouper model class
     #: plus ``"Content"`` at the end from the same app as the grouper model class, e.g., ``BlogPostContent`` if
     #: the grouper is ``BlogPost``.
-    content_model = None
+    content_model: typing.Optional[models.Model] = None
     #: Name of the inverse relation field giving the set of content models belonging to a grouper model. Defaults to
     #: the first field found as an inverse relation. If you have more than one inverse relation please make sure
     #: to specify this field. An example would be if the blog post content model contained a many-to-many
     #: relationship to the grouper model for, say, related blog posts.
-    content_related_field = None
+    content_related_field: typing.Optional[str] = None
 
     change_list_template = "admin/cms/grouper/change_list.html"
     change_form_template = "admin/cms/grouper/change_form.html"
@@ -235,7 +248,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             # If not, try identifying using the naming convention {GrouperName}Content
             from django.apps import apps
 
-            self.content_model = apps.get_model(f"{self.opts.app_label}.{self.model.__name__}Content")
+            self.content_model = apps.get_model(
+                f"{self.opts.app_label}.{self.model.__name__}Content"
+            )
 
         # Add an admin manager if the content model does not have one.
         if not hasattr(self.content_model, "admin_manager"):
@@ -248,29 +263,39 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     self.content_related_field = related_object.get_accessor_name()
                     break
             else:
-                raise ImproperlyConfigured(f"Related field for grouper model {model.__name__} not found")
+                raise ImproperlyConfigured(
+                    f"Related field for grouper model {model.__name__} not found"
+                )
 
         # Auto-generate ModelForm for Grouper if not specified (using GrouperAdminFormMixin)
         if not issubclass(self.form, _GrouperAdminFormMixin):
-            self.form = type("AutoGeneratedGrouperAdminForm",
-                             (GrouperAdminFormMixin(self.content_model), self.form),
-                             dict())
+            self.form = type(
+                "AutoGeneratedGrouperAdminForm",
+                (GrouperAdminFormMixin(self.content_model), self.form),
+                dict(),
+            )
 
         # Generate accessor functions for content model fields
         for content_field in self.form._content_fields:
             if (
-                not hasattr(self, CONTENT_PREFIX + content_field) and  # noqa: W504
-                content_field != self._grouper_field_name and  # noqa: W504
-                content_field not in self.extra_grouping_fields
+                not hasattr(self, CONTENT_PREFIX + content_field)
+                and content_field != self._grouper_field_name  # noqa: W504
+                and content_field not in self.extra_grouping_fields  # noqa: W504
             ):
-                setattr(self, CONTENT_PREFIX + content_field, self._getter_factory(content_field))
+                setattr(
+                    self,
+                    CONTENT_PREFIX + content_field,
+                    self._getter_factory(content_field),
+                )
 
-    def _getter_factory(self, field: str) -> callable:
+    def _getter_factory(self, field: str) -> typing.Callable[[models.Model], typing.Any]:
         """Creates a getter function with ``short_description`` and ``boolean`` properties suitable
         for the :attr:`~django.contrib.admin.ModelAdmin.list_display` field."""
         getter = lambda obj: self.get_content_field(obj, field, request=None)
         getter.short_description = label_for_field(field, self.content_model)
-        getter.boolean = isinstance(self.form.base_fields[CONTENT_PREFIX + field], forms.BooleanField)
+        getter.boolean = isinstance(
+            self.form.base_fields[CONTENT_PREFIX + field], forms.BooleanField
+        )
         if not getter.boolean:
             # First non-boolean field will show empty content value by default.
             for display in getattr(self, "list_display", ()):
@@ -280,7 +305,12 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     break
         return getter
 
-    def get_content_field(self, obj: models.Model, field_name: str, request: typing.Optional[HttpRequest] = None):
+    def get_content_field(
+        self,
+        obj: models.Model,
+        field_name: str,
+        request: typing.Optional[HttpRequest] = None,
+    ) -> typing.Any:
         """Retrieves the content of a field stored in the content model. If request is given extra
         grouping fields are processed before."""
         if request:
@@ -293,7 +323,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         """Property or lower case model name"""
         if getattr(self, "grouper_field_name", None):
             return self.grouper_field_name
-        return re.sub('(?!^)([A-Z]+)', r'_\1', self.model.__name__).lower()
+        return re.sub("(?!^)([A-Z]+)", r"_\1", self.model.__name__).lower()
         return self.model.__name__.lower()
 
     def get_language_from_request(self, request: HttpRequest) -> str:
@@ -317,7 +347,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 setattr(self, field, value)
 
     @property
-    def current_content_filters(self) -> dict:
+    def current_content_filters(self) -> typing.Dict[str, typing.Any]:
         """Filters needed to get the correct content model instance"""
         return {field: getattr(self, field) for field in self.extra_grouping_fields}
 
@@ -325,14 +355,17 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         """Hook on how to get the current language. By default, Django provides it."""
         return get_language()
 
-    def get_language_tuple(self) -> typing.Tuple[tuple, ...]:
+    def get_language_tuple(self) -> typing.Tuple[typing.Tuple[str, str], ...]:
         """Hook on how to get all available languages for the language selector."""
         return get_language_tuple()
 
     def get_changelist(self, request: HttpRequest, **kwargs) -> type:
         """Allow for extra grouping fields as a non-filter parameter"""
-        return type(GrouperChangeListBase.__name__, (GrouperChangeListBase,),
-                    dict(_extra_grouping_fields=self.extra_grouping_fields))
+        return type(
+            GrouperChangeListBase.__name__,
+            (GrouperChangeListBase,),
+            dict(_extra_grouping_fields=self.extra_grouping_fields),
+        )
 
     def get_changelist_instance(self, request: HttpRequest) -> GrouperChangeListBase:
         """Update grouping field properties and get changelist instance"""
@@ -340,7 +373,8 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return super().get_changelist_instance(request)
 
     def changeform_view(
-        self, request: HttpRequest,
+        self,
+        request: HttpRequest,
         object_id: typing.Optional[str] = None,
         form_url: str = "",
         extra_context: dict = None,
@@ -348,8 +382,13 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         """Update grouping field properties for both add and change views"""
         self.get_grouping_from_request(request)
         return super().changeform_view(
-            request, object_id, form_url,
-            {**(extra_context or {}), **self.get_extra_context(request, object_id=object_id)},
+            request,
+            object_id,
+            form_url,
+            {
+                **(extra_context or {}),
+                **self.get_extra_context(request, object_id=object_id),
+            },
         )
 
     def delete_view(
@@ -374,9 +413,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     def get_preserved_filters(self, request: HttpRequest) -> str:
         """Always preserve grouping get parameters! Also, add them to changelist filters:
-            * Save and continue will keep the grouping parameters
-            * Save and returning to changelist will keep the grouping parameters
-         """
+        * Save and continue will keep the grouping parameters
+        * Save and returning to changelist will keep the grouping parameters
+        """
         preserved_filters = dict(parse_qsl(super().get_preserved_filters(request)))
         # Extra grouping fields from property
         grouping_filters = {}
@@ -389,17 +428,23 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             preserved_filters["_changelist_filters"] = urlencode(grouping_filters)
         return urlencode(preserved_filters)
 
-    def get_extra_context(self, request: HttpRequest, object_id: typing.Optional[str] = None) -> dict:
+    def get_extra_context(
+        self, request: HttpRequest, object_id: typing.Optional[str] = None
+    ) -> dict[str, typing.Any]:
         """Provide the grouping fields to the change view."""
         if object_id:
             # Instance provided? Get corresponding postconent
             obj = get_object_or_404(self.model, pk=object_id)
             content_instance = self.get_content_obj(obj)
-            title = _("%(object_name)s Properties") % dict(object_name=obj._meta.verbose_name.capitalize())
+            title = _("%(object_name)s Properties") % dict(
+                object_name=obj._meta.verbose_name.capitalize()
+            )
         else:
             obj = None
             content_instance = None
-            title = _("Add new %(object_name)s") % dict(object_name=self.model._meta.verbose_name)
+            title = _("Add new %(object_name)s") % dict(
+                object_name=self.model._meta.verbose_name
+            )
 
         if content_instance:
             subtitle = str(content_instance)
@@ -407,18 +452,24 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             subtitle = _("Add content")
 
         extra_context = {
-            "changed_message": _("Content for the current language has been changed. Click \"Cancel\" to "
-                                 "return to the form and save changes. Click \"OK\" to discard changes."),
+            "changed_message": _(
+                'Content for the current language has been changed. Click "Cancel" to '
+                'return to the form and save changes. Click "OK" to discard changes.'
+            ),
             "title": title,
             "content_instance": content_instance,
-            "subtitle": subtitle
+            "subtitle": subtitle,
         }
 
         """Provide the grouping fields to edit"""
         if "language" in self.extra_grouping_fields:
             language = self.language
             if obj:
-                filled_languages = self.get_content_objects(obj).values_list("language", flat=True).distinct()
+                filled_languages = (
+                    self.get_content_objects(obj)
+                    .values_list("language", flat=True)
+                    .distinct()
+                )
             else:
                 filled_languages = []
 
@@ -426,13 +477,17 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             extra_context["language"] = language
             extra_context["filled_languages"] = filled_languages
             if content_instance is None:
-                subtitle = _("Add %(language)s content") % dict(language=get_language_dict().get(self.language))
+                subtitle = _("Add %(language)s content") % dict(
+                    language=get_language_dict().get(self.language)
+                )
                 extra_context["subtitle"] = subtitle
 
         # TODO: Add context for other grouping fields to be shown as a dropdown
         return extra_context
 
-    def get_form(self, request: HttpRequest, obj: typing.Optional[models.Model] = None, **kwargs) -> type:
+    def get_form(
+        self, request: HttpRequest, obj: typing.Optional[models.Model] = None, **kwargs
+    ) -> type:
         """Adds the language from the request to the form class"""
         form_class = super().get_form(request, obj, **kwargs)
         form_class._admin = self
@@ -468,8 +523,10 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         return ""
 
     def _get_settings_action(self, obj: models.Model, request: HttpRequest) -> str:
-        edit_url = admin_reverse(f"{obj._meta.app_label}_{obj._meta.model_name}_change", args=(obj.pk,))
-        edit_url += f'?{urlencode(self.current_content_filters)}'
+        edit_url = admin_reverse(
+            f"{obj._meta.app_label}_{obj._meta.model_name}_change", args=(obj.pk,)
+        )
+        edit_url += f"?{urlencode(self.current_content_filters)}"
         return self.admin_action_button(
             url=edit_url,
             icon="settings" if self.get_content_obj(obj) else "plus",
@@ -504,21 +561,28 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     def _get_content_queryset(self, obj: models.Model) -> models.QuerySet:
         if obj not in self._content_qs_cache:
-            self._content_qs_cache[obj] = getattr(obj, self.content_related_field)(manager="admin_manager")\
-                .latest_content()
+            self._content_qs_cache[obj] = getattr(obj, self.content_related_field)(
+                manager="admin_manager"
+            ).latest_content()
         return self._content_qs_cache[obj]
 
-    def get_content_obj(self, obj: typing.Optional[models.Model]) -> typing.Optional[models.Model]:
+    def get_content_obj(
+        self, obj: typing.Optional[models.Model]
+    ) -> typing.Optional[models.Model]:
         if obj is None or self._is_content_obj(obj):
             return obj
         else:
             if obj not in self._content_obj_cache:
-                self._content_obj_cache[obj] = self._get_content_queryset(obj) \
-                    .filter(**self.current_content_filters) \
+                self._content_obj_cache[obj] = (
+                    self._get_content_queryset(obj)
+                    .filter(**self.current_content_filters)
                     .first()
+                )
             return self._content_obj_cache[obj]
 
-    def get_content_objects(self, obj: typing.Optional[models.Model]) -> models.QuerySet:
+    def get_content_objects(
+        self, obj: typing.Optional[models.Model]
+    ) -> models.QuerySet:
         if obj is None:
             return None
         if self._is_content_obj(obj):
@@ -545,7 +609,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         content_obj = self.get_content_obj(obj)
         return get_object_preview_url(content_obj) if content_obj else None
 
-    def get_readonly_fields(self, request: HttpRequest, obj: typing.Optional[models.Model] = None):
+    def get_readonly_fields(
+        self, request: HttpRequest, obj: typing.Optional[models.Model] = None
+    ):
         """Allow access to content fields to be controlled by a method "can_change_content":
         This allows versioned content to be protected if needed"""
         # First, get read-only fields for grouper
@@ -555,27 +621,36 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             if not self.can_change_content(request, content_obj):
                 # Only allow content object fields to be edited if user can change them
                 fields += tuple(
-                    CONTENT_PREFIX + field for field in self.form._content_fields
-                    if field != self._grouper_field_name and field not in self.extra_grouping_fields
+                    CONTENT_PREFIX + field
+                    for field in self.form._content_fields
+                    if field != self._grouper_field_name
+                    and field not in self.extra_grouping_fields
                 )
         return fields
 
-    def save_model(self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool) -> None:
+    def save_model(
+        self, request: HttpRequest, obj: models.Model, form: forms.Form, change: bool
+    ) -> None:
         """Save/create both grouper and content object"""
         super().save_model(request, obj or form.instance, form, change)
         content_dict = {
             field: form.cleaned_data[CONTENT_PREFIX + field]
-            for field in form._content_fields if CONTENT_PREFIX + field in form.cleaned_data
+            for field in form._content_fields
+            if CONTENT_PREFIX + field in form.cleaned_data
         }
         if form._content_instance is None or form._content_instance.pk is None:
             content_dict[self._grouper_field_name] = form.instance
             if hasattr(form._content_model.objects, "with_user"):
                 # Create new using with_user syntax if available ...
-                form._content_model.objects.with_user(request.user).create(**content_dict)
+                form._content_model.objects.with_user(request.user).create(
+                    **content_dict
+                )
             else:  # pragma: no cover
                 # ... without otherwise
                 form._content_model.objects.create(**content_dict)
-        elif not hasattr(self, "can_change_content") or self.can_change_content(request, form._content_instance):
+        elif not hasattr(self, "can_change_content") or self.can_change_content(
+            request, form._content_instance
+        ):
             # Update content instance (only if can_change_content allows it)
             for key, value in content_dict.items():
                 setattr(form._content_instance, key, value)
@@ -585,10 +660,14 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
 
 class _GrouperAdminFormMixin:
+    _content_fields: list = []
+
     def __init__(self, *args, **kwargs):
         if not hasattr(self, "_admin"):
-            raise ValueError("GrouperModelFormMixin forms can only be instantiated if the class attribute '_admin' "
-                             "has been set and points to the instantiating admin instance.")
+            raise ValueError(
+                "GrouperModelFormMixin forms can only be instantiated if the class attribute '_admin' "
+                "has been set and points to the instantiating admin instance."
+            )
 
         if "instance" in kwargs and kwargs["instance"]:
             # Instance provided? Initialize fields from content model
@@ -596,9 +675,12 @@ class _GrouperAdminFormMixin:
             self._content_instance = self._admin.get_content_obj(instance)
             if self._content_instance:
                 kwargs["initial"] = {
-                    **{CONTENT_PREFIX + field: getattr(self._content_instance, field)
-                       for field in self._content_fields if CONTENT_PREFIX + field in self.base_fields},
-                    **kwargs.get("initial", {})
+                    **{
+                        CONTENT_PREFIX + field: getattr(self._content_instance, field)
+                        for field in self._content_fields
+                        if CONTENT_PREFIX + field in self.base_fields
+                    },
+                    **kwargs.get("initial", {}),
                 }
         else:
             self._content_instance = None
@@ -613,12 +695,16 @@ class _GrouperAdminFormMixin:
         super().__init__(*args, **kwargs)
 
         # Hide grouper foreign key
-        self.fields[CONTENT_PREFIX + self._admin._grouper_field_name].widget = forms.HiddenInput()
+        self.fields[
+            CONTENT_PREFIX + self._admin._grouper_field_name
+        ].widget = forms.HiddenInput()
         # Will be set on admin model save
         self.fields[CONTENT_PREFIX + self._admin._grouper_field_name].required = False
         self.update_labels(self._content_fields)
         if hasattr(self._admin, "can_change_content") and False:
-            if not self._admin.can_change_content(self._request, self._content_instance):
+            if not self._admin.can_change_content(
+                self._request, self._content_instance
+            ):
                 # Only allow content object fields to be edited if user can change them
                 for field in self._additional_content_fields:
                     self.fields[field].disabled = True
@@ -638,14 +724,22 @@ class _GrouperAdminFormMixin:
                         self._meta.labels = {}
                     self._meta.labels.setdefault(
                         CONTENT_PREFIX + field,
-                        label_for_field(field, self._admin.content_model) + language_postfix,
+                        label_for_field(field, self._admin.content_model)
+                        + language_postfix,
                     )
 
     def clean(self) -> dict:
-        if self.cleaned_data.get(CONTENT_PREFIX + "language", None) not in get_language_dict():
+        if (
+            self.cleaned_data.get(CONTENT_PREFIX + "language", None)
+            not in get_language_dict()
+        ):
             raise ValidationError(
-                _("Invalid language %(value)s. This form cannot be processed. Try changing languages."),
-                params=dict(value=self.cleaned_data.get("language", _("<unspecified>"))),
+                _(
+                    "Invalid language %(value)s. This form cannot be processed. Try changing languages."
+                ),
+                params=dict(
+                    value=self.cleaned_data.get("language", _("<unspecified>"))
+                ),
                 code="invalid-language",
             )
         return super().clean()
