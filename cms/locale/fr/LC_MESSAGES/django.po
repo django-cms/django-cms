@@ -1414,7 +1414,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr "\n<p class=\"cms-welcome-notes\">Vous voyez ce message parce que vous avet <code>DEBUG = True</code> dans le fichier paramètres de django et que vous n'avez pas encore ajouté de pages.\n</p>"
+msgstr "\n<p class=\"cms-welcome-notes\">Vous voyez ce message parce que vous avez <code>DEBUG = True</code> dans le fichier paramètres de django et que vous n'avez pas encore ajouté de page.\n</p>"
 
 msgid "Welcome to django CMS"
 msgstr "Bienvenue sur django CMS"
