@@ -166,6 +166,16 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             self.assertContains(response, '<textarea name="content__secret_greeting"')
             self.assertContains(response, random_content)
 
+    def test_change_form_contains_defaults_for_groupers(self) -> None:
+        with self.login_user_context(self.admin_user):
+            response = self.client.get(self.change_url + "?language=en")
+            self.assertContains(response, 'name="content__language" value="en"')
+            self.assertNotContains(response, 'name="content__language" value="de"')
+
+            response = self.client.get(self.change_url + "?language=de")
+            self.assertContains(response, 'name="content__language" value="de"')
+            self.assertNotContains(response, 'name="content__language" value="en"')
+
     @wo_content_permission
     def test_change_form_wo_write_permit(self) -> None:
         """If no change permission exists for content mark content fields readonly."""

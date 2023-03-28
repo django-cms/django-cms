@@ -687,7 +687,7 @@ class _GrouperAdminFormMixin:
 
         # set values for grouping fields
         kwargs["initial"] = {
-            **self._admin.current_content_filters,
+            **{CONTENT_PREFIX + key: value for key, value in self._admin.current_content_filters.items()},
             **kwargs.get("initial", {}),
         }
 
