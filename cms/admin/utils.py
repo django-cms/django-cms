@@ -8,12 +8,12 @@ from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.db.models import OuterRef, Subquery, functions
 from django.forms import modelform_factory
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import NoReverseMatch
-from django.utils.functional import cached_property
 from django.utils.html import format_html_join
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
@@ -24,9 +24,6 @@ from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request
 from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
-
-#: Prefix for content model fields to be added to the grouper admin and to the change form.
-CONTENT_PREFIX = "content__"
 
 
 class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
@@ -158,6 +155,10 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
         )
 
 
+#: Prefix for content model fields to be added to the grouper admin and to the change form.
+CONTENT_PREFIX = "content__"
+
+
 class GrouperChangeListBase(ChangeList):
     """Subclass ChangeList to disregard grouping fields get parameter as filter"""
 
@@ -234,11 +235,13 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         )
 
     EMPTY_CONTENT_VALUE = _("Empty content")
+    LC_SORTED_FIELDS = (models.CharField,)
 
     _content_obj_cache = {}
     _content_cache_request_hash = None
     _content_qs_cache = {}
     _content_content_type = None
+    _content_subquery_fields = []
 
     def __init__(self, model, admin_site):
         super().__init__(model, admin_site)
@@ -267,6 +270,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     f"Related field for grouper model {model.__name__} not found"
                 )
 
+        # Set grouper field name to camel case grouper model name if not given explicitly
+        if not self.grouper_field_name:
+            self.grouper_field_name = re.sub("(?!^)([A-Z]+)", r"_\1", self.model.__name__).lower()
         # Auto-generate ModelForm for Grouper if not specified (using GrouperAdminFormMixin)
         if not issubclass(self.form, _GrouperAdminFormMixin):
             self.form = type(
@@ -279,9 +285,12 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         for content_field in self.form._content_fields:
             if (
                 not hasattr(self, CONTENT_PREFIX + content_field)
-                and content_field != self._grouper_field_name  # noqa: W504
+                and content_field != self.grouper_field_name  # noqa: W504
                 and content_field not in self.extra_grouping_fields  # noqa: W504
             ):
+                if CONTENT_PREFIX + content_field in self.list_display:
+                    # Identify content fields in list_display to annotate to queryset
+                    self._content_subquery_fields.append(content_field)
                 setattr(
                     self,
                     CONTENT_PREFIX + content_field,
@@ -293,6 +302,10 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         for the :attr:`~django.contrib.admin.ModelAdmin.list_display` field."""
         getter = lambda obj: self.get_content_field(obj, field, request=None)
         getter.short_description = label_for_field(field, self.content_model)
+        if field in self._content_subquery_fields:
+            getter.admin_order_field = CONTENT_PREFIX + field
+            if isinstance(self.content_model._meta.get_field(field), self.LC_SORTED_FIELDS):
+                getter.admin_order_field += "__lc"
         getter.boolean = isinstance(
             self.form.base_fields[CONTENT_PREFIX + field], forms.BooleanField
         )
@@ -313,18 +326,30 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     ) -> typing.Any:
         """Retrieves the content of a field stored in the content model. If request is given extra
         grouping fields are processed before."""
+        if hasattr(obj, CONTENT_PREFIX + field_name):
+            # Annotated?
+            return getattr(obj, CONTENT_PREFIX + field_name)
         if request:
             self.get_grouping_from_request(request)
         content_obj = self.get_content_obj(obj)
         return getattr(content_obj, field_name) if content_obj else None
 
-    @cached_property
-    def _grouper_field_name(self) -> str:
-        """Property or lower case model name"""
-        if getattr(self, "grouper_field_name", None):
-            return self.grouper_field_name
-        return re.sub("(?!^)([A-Z]+)", r"_\1", self.model.__name__).lower()
-        return self.model.__name__.lower()
+    def _get_annotation(self):
+        contents = self.content_model.admin_manager.latest_content(
+            **{self.grouper_field_name: OuterRef("pk"), **self.current_content_filters}
+        )
+        annotation = {}
+        for field in self._content_subquery_fields:
+            annotation[CONTENT_PREFIX + field] = Subquery(contents.values(field)[:1])
+            if isinstance(self.content_model._meta.get_field(field), self.LC_SORTED_FIELDS):
+                # Sort CharFields independently of case
+                annotation[CONTENT_PREFIX + field + "__lc"] = functions.Lower(Subquery(contents.values(field)[:1]))
+        return annotation
+
+    def get_queryset(self, request: HttpRequest) -> models.QuerySet:
+        """Annotates content fields with the name "content__{field_name}" to the grouper queryset if
+        for all content fields that appear in the """
+        return super().get_queryset(request).annotate(**self._get_annotation())
 
     def get_language_from_request(self, request: HttpRequest) -> str:
         """Hook for get_language_from_request which by default uses the cms utility"""
@@ -623,7 +648,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 fields += tuple(
                     CONTENT_PREFIX + field
                     for field in self.form._content_fields
-                    if field != self._grouper_field_name
+                    if field != self.grouper_field_name
                     and field not in self.extra_grouping_fields
                 )
         return fields
@@ -639,7 +664,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             if CONTENT_PREFIX + field in form.cleaned_data
         }
         if form._content_instance is None or form._content_instance.pk is None:
-            content_dict[self._grouper_field_name] = form.instance
+            content_dict[self.grouper_field_name] = form.instance
             if hasattr(form._content_model.objects, "with_user"):
                 # Create new using with_user syntax if available ...
                 form._content_model.objects.with_user(request.user).create(
@@ -655,7 +680,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             for key, value in content_dict.items():
                 setattr(form._content_instance, key, value)
             # Finally force grouper field to point to grouper
-            setattr(form._content_instance, self._grouper_field_name, obj)
+            setattr(form._content_instance, self.grouper_field_name, obj)
             form._content_instance.save()
 
 
@@ -696,10 +721,10 @@ class _GrouperAdminFormMixin:
 
         # Hide grouper foreign key
         self.fields[
-            CONTENT_PREFIX + self._admin._grouper_field_name
+            CONTENT_PREFIX + self._admin.grouper_field_name
         ].widget = forms.HiddenInput()
         # Will be set on admin model save
-        self.fields[CONTENT_PREFIX + self._admin._grouper_field_name].required = False
+        self.fields[CONTENT_PREFIX + self._admin.grouper_field_name].required = False
         self.update_labels(self._content_fields)
         if hasattr(self._admin, "can_change_content") and False:
             if not self._admin.can_change_content(
