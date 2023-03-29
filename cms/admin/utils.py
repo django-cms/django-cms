@@ -298,9 +298,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 )
 
     def _getter_factory(self, field: str) -> typing.Callable[[models.Model], typing.Any]:
-        """Creates a getter function with ``short_description`` and ``boolean`` properties suitable
-        for the :attr:`~django.contrib.admin.ModelAdmin.list_display` field."""
-        getter = lambda obj: getattr(obj, field)  # self.get_content_field(obj, field, request=None)
+        """Creates a getter function with ``short_description``, ``admin_order_field``, and ``boolean``
+        properties suitable for the :attr:`~django.contrib.admin.ModelAdmin.list_display` field."""
+        getter = lambda obj: getattr(obj, CONTENT_PREFIX + field)
         getter.short_description = label_for_field(field, self.content_model)
         if field in self._content_subquery_fields:
             getter.admin_order_field = CONTENT_PREFIX + field
