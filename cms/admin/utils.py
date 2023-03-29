@@ -270,9 +270,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                     f"Related field for grouper model {model.__name__} not found"
                 )
 
-        # Set grouper field name to camel case grouper model name if not given explicitly
+        # Set grouper field name to snake case grouper model name if not given explicitly
         if not self.grouper_field_name:
-            self.grouper_field_name = re.sub("(?!^)([A-Z]+)", r"_\1", self.model.__name__).lower()
+            self.grouper_field_name = re.sub("(?!^)([A-Z]+)", r"_\1", self.model.__name__).lower()  # To snake case
         # Auto-generate ModelForm for Grouper if not specified (using GrouperAdminFormMixin)
         if not issubclass(self.form, _GrouperAdminFormMixin):
             self.form = type(
@@ -300,7 +300,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def _getter_factory(self, field: str) -> typing.Callable[[models.Model], typing.Any]:
         """Creates a getter function with ``short_description`` and ``boolean`` properties suitable
         for the :attr:`~django.contrib.admin.ModelAdmin.list_display` field."""
-        getter = lambda obj: self.get_content_field(obj, field, request=None)
+        getter = lambda obj: getattr(obj, field)  # self.get_content_field(obj, field, request=None)
         getter.short_description = label_for_field(field, self.content_model)
         if field in self._content_subquery_fields:
             getter.admin_order_field = CONTENT_PREFIX + field
