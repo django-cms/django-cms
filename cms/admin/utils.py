@@ -8,7 +8,8 @@ from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django.db.models import OuterRef, Subquery, functions
+from django.db.models import OuterRef, Subquery, functions, DateField
+from django.db.models.functions import Cast
 from django.forms import modelform_factory
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404
@@ -300,7 +301,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def _getter_factory(self, field: str) -> typing.Callable[[models.Model], typing.Any]:
         """Creates a getter function with ``short_description``, ``admin_order_field``, and ``boolean``
         properties suitable for the :attr:`~django.contrib.admin.ModelAdmin.list_display` field."""
-        getter = lambda obj: getattr(obj, CONTENT_PREFIX + field)
+        getter = lambda obj: self.get_content_field(obj, field)
         getter.short_description = label_for_field(field, self.content_model)
         if field in self._content_subquery_fields:
             getter.admin_order_field = CONTENT_PREFIX + field
@@ -339,11 +340,18 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
             **{self.grouper_field_name: OuterRef("pk"), **self.current_content_filters}
         )
         annotation = {}
-        for field in self._content_subquery_fields:
-            annotation[CONTENT_PREFIX + field] = Subquery(contents.values(field)[:1])
-            if isinstance(self.content_model._meta.get_field(field), self.LC_SORTED_FIELDS):
+        for field_name in self._content_subquery_fields:
+            annotation[CONTENT_PREFIX + field_name] = Subquery(contents.values(field_name)[:1])
+            field = self.content_model._meta.get_field(field_name)
+            if isinstance(field, DateField):
+                # MySql needs an explicit cast, or it will return a string and not a date object
+                annotation[CONTENT_PREFIX + field_name] = Cast(
+                    annotation[CONTENT_PREFIX + field_name],
+                    field.__class__()
+                )
+            if isinstance(field, self.LC_SORTED_FIELDS):
                 # Sort CharFields independently of case
-                annotation[CONTENT_PREFIX + field + "__lc"] = functions.Lower(Subquery(contents.values(field)[:1]))
+                annotation[CONTENT_PREFIX + field_name + "__lc"] = functions.Lower(Subquery(contents.values(field_name)[:1]))
         return annotation
 
     def get_queryset(self, request: HttpRequest) -> models.QuerySet:
