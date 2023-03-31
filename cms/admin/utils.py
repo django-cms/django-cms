@@ -8,7 +8,7 @@ from django.contrib.admin.utils import label_for_field
 from django.contrib.admin.views.main import ChangeList
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
-from django.db.models import OuterRef, Subquery, functions, DateField
+from django.db.models import DateField, OuterRef, Subquery, functions
 from django.db.models.functions import Cast
 from django.forms import modelform_factory
 from django.http import HttpRequest, HttpResponse
@@ -351,7 +351,9 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 )
             if isinstance(field, self.LC_SORTED_FIELDS):
                 # Sort CharFields independently of case
-                annotation[CONTENT_PREFIX + field_name + "__lc"] = functions.Lower(Subquery(contents.values(field_name)[:1]))
+                annotation[CONTENT_PREFIX + field_name + "__lc"] = functions.Lower(
+                    Subquery(contents.values(field_name)[:1])
+                )
         return annotation
 
     def get_queryset(self, request: HttpRequest) -> models.QuerySet:

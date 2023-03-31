@@ -17,23 +17,22 @@ $pagetree: true;
 
 a.btn.cms-action-btn {
     position: relative;
-    display: -webkit-inline-box;
-    display: -ms-inline-flexbox;
     display: inline-flex;
     padding: 0 !important;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
-    -webkit-box-pack: center;
-        -ms-flex-pack: center;
-            justify-content: center;
+    align-items: center;
+    justify-content: center;
     width: 34px;
-    height: 34px;
     margin-top: -12px !important;
+    box-sizing: border-box;
     bottom: -6px;
-    -webkit-box-sizing: border-box;
-            box-sizing: border-box;
     cursor: pointer;
+    height: 34px;
+}
+
+span.cms-empty-action {
+    width: calc( 34px + 4px);
+    display: inline-flex;
+    position: relative;
 }
 
 a.btn.cms-action-btn span
