@@ -642,7 +642,10 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def view_on_site(self, obj: models.Model) -> typing.Optional[str]:
         # Adds the View on Site button to the admin
         content_obj = self.get_content_obj(obj)
-        return get_object_preview_url(content_obj) if content_obj else None
+        if content_obj:
+            # Try getting the language from the content object
+            return get_object_preview_url(content_obj, language=getattr(content_obj, "language", None))
+        return None
 
     def get_readonly_fields(
         self, request: HttpRequest, obj: typing.Optional[models.Model] = None
