@@ -1,4 +1,3 @@
-import copy
 import json
 from collections import namedtuple
 
@@ -894,8 +893,6 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if obj is None:
             raise self._get_404_exception(object_id)
-
-        request = copy.copy(request)
 
         if request.method == 'GET':
             # source is a field in the form

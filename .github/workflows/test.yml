@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8, 3.9, '3.10' ]  # latest release minus two
+        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.0.txt,
@@ -20,6 +20,7 @@ jobs:
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
+          django-4.2.txt
         ]
         os: [
           ubuntu-20.04,
@@ -66,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, '3.10' ]  # latest release minus two
+        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.0.txt,
@@ -74,19 +75,15 @@ jobs:
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
+          django-4.2.txt
         ]
-        exclude:
-          - python-version: 3.7
-            requirements-file: django-4.0.txt
-          - python-version: 3.7
-            requirements-file: django-4.1.txt
         os: [
           ubuntu-20.04,
         ]
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -124,7 +121,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9, '3.10' ]  # latest release minus two
+        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.0.txt,
@@ -132,12 +129,8 @@ jobs:
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
+          django-4.2.txt
         ]
-        exclude:
-          - python-version: 3.7
-            requirements-file: django-4.0.txt
-          - python-version: 3.7
-            requirements-file: django-4.1.txt
         os: [
           ubuntu-20.04,
         ]
