@@ -269,7 +269,9 @@ class PageContent(models.Model):
             return None
 
     def get_absolute_url(self, language=None):
-        return self.page.get_absolute_url(language=language)
+        """Get the absolute url for the page content. If language is specified it will return
+        the absolute url of the corresponding "sister" content."""
+        return self.page.get_absolute_url(language=language or self.language)
 
 
 class EmptyPageContent:

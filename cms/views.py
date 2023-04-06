@@ -117,6 +117,8 @@ def details(request, slug):
         user_languages = get_public_languages(site_id=site.pk)
 
     request_language = get_language_from_request(request, check_path=True)
+    if not request_language:
+        request_language = get_default_language_for_site(get_current_site().pk)
 
     if not page.is_home and request_language not in user_languages:
         # The homepage is treated differently because
