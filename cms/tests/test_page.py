@@ -62,6 +62,25 @@ class PagesTestCase(TransactionCMSTestCase):
             self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
             self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
 
+    def test_absolute_url_page_content(self):
+        page = self.create_homepage("page", "nav_playground.html", "en")
+        create_page_content("fr", "french home", page)
+        page_2 = create_page("inner", "nav_playground.html", "en", parent=page)
+        content_2 = create_page_content("fr", "french inner", page_2)
+
+        # content_2 is French
+        self.assertEqual(content_2.get_absolute_url(), '/fr/french-inner/')
+        # if language specified, get the language version's url
+        self.assertEqual(content_2.get_absolute_url(language='en'), '/en/inner/')
+        # for completeness: specify own language
+        self.assertEqual(content_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+
+        # The above result does not change if language is changed
+        with force_language('en'):
+            self.assertEqual(content_2.get_absolute_url(), '/fr/french-inner/')
+            self.assertEqual(content_2.get_absolute_url(language='en'), '/en/inner/')
+            self.assertEqual(content_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+
     def test_get_root_page(self):
         _create = functools.partial(
             create_page,
