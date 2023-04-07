@@ -12,6 +12,7 @@ ignore = [
 ]
 line-length = 119
 select = [
+    "I",
     "E",
     "F",
     "W",
