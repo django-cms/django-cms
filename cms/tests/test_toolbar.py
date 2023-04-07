@@ -22,8 +22,13 @@ from django.utils.translation import gettext_lazy as _
 from cms.admin.forms import RequestToolbarForm
 from cms.api import add_plugin, create_page, create_title
 from cms.cms_toolbars import (
-    ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, DEFAULT_HELP_MENU_ITEMS, HELP_MENU_IDENTIFIER,
-    LANGUAGE_MENU_IDENTIFIER, AppearanceToolbar, get_user_model,
+    ADMIN_MENU_IDENTIFIER,
+    ADMINISTRATION_BREAK,
+    DEFAULT_HELP_MENU_ITEMS,
+    HELP_MENU_IDENTIFIER,
+    LANGUAGE_MENU_IDENTIFIER,
+    AppearanceToolbar,
+    get_user_model,
 )
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.middleware.toolbar import ToolbarMiddleware

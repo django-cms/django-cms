@@ -10,7 +10,10 @@ from cms.extensions import PageExtension, TitleExtension, extension_pool
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.models import Page, PageType
 from cms.test_utils.project.extensionapp.models import (
-    MultiTablePageExtension, MultiTableTitleExtension, MyPageExtension, MyTitleExtension,
+    MultiTablePageExtension,
+    MultiTableTitleExtension,
+    MyPageExtension,
+    MyTitleExtension,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_pool import toolbar_pool

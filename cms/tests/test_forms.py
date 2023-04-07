@@ -7,7 +7,10 @@ from django.utils.translation import override as force_language
 
 from cms.admin import forms
 from cms.admin.forms import (
-    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, PageUserGroupForm, ViewRestrictionInlineAdminForm,
+    GlobalPagePermissionAdminForm,
+    PagePermissionInlineAdminForm,
+    PageUserGroupForm,
+    ViewRestrictionInlineAdminForm,
 )
 from cms.api import assign_user_to_page, create_page, create_title
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator

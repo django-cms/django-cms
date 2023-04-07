@@ -27,8 +27,13 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED,
-    URL_CMS_TRANSLATION_DELETE, CMSTestCase,
+    URL_CMS_PAGE,
+    URL_CMS_PAGE_CHANGE,
+    URL_CMS_PAGE_CHANGE_LANGUAGE,
+    URL_CMS_PAGE_DELETE,
+    URL_CMS_PAGE_PUBLISHED,
+    URL_CMS_TRANSLATION_DELETE,
+    CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse

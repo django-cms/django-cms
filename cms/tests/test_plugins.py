@@ -27,16 +27,32 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
-    Article, ArticlePluginModel, FKModel, M2MTargetModel, Section,
+    Article,
+    ArticlePluginModel,
+    FKModel,
+    M2MTargetModel,
+    Section,
 )
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
-    TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5,
+    TestPlugin,
+    TestPlugin2,
+    TestPlugin3,
+    TestPlugin4,
+    TestPlugin5,
 )
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
-    DynTemplate, NonExisitngRenderTemplate, NoRender, NoRenderButChildren,
+    DynTemplate,
+    NonExisitngRenderTemplate,
+    NoRender,
+    NoRenderButChildren,
 )
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PUBLISH, URL_CMS_PLUGIN_ADD, CMSTestCase,
+    URL_CMS_PAGE,
+    URL_CMS_PAGE_ADD,
+    URL_CMS_PAGE_CHANGE,
+    URL_CMS_PAGE_PUBLISH,
+    URL_CMS_PLUGIN_ADD,
+    CMSTestCase,
 )
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
@@ -1513,8 +1529,15 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
 
     def test_related_name(self):
         from cms.test_utils.project.mti_pluginapp.models import (
-            AbstractPluginParent, LessMixedPlugin, MixedPlugin, NonPluginModel, ProxiedAlphaPluginModel,
-            ProxiedBetaPluginModel, TestPluginAlphaModel, TestPluginBetaModel, TestPluginGammaModel,
+            AbstractPluginParent,
+            LessMixedPlugin,
+            MixedPlugin,
+            NonPluginModel,
+            ProxiedAlphaPluginModel,
+            ProxiedBetaPluginModel,
+            TestPluginAlphaModel,
+            TestPluginBetaModel,
+            TestPluginGammaModel,
         )
 
         # the first concrete class of the following four plugins is TestPluginAlphaModel

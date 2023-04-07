@@ -9,7 +9,8 @@ from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
 from django.utils.encoding import force_str
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from cms import api
 from cms.apphook_pool import apphook_pool
@@ -20,7 +21,15 @@ from cms.extensions import extension_pool
 from cms.forms.validators import validate_overwrite_url, validate_relative_url, validate_url_uniqueness
 from cms.forms.widgets import AppHookSelect, ApplicationConfigSelect, UserSelectAdminWidget
 from cms.models import (
-    CMSPlugin, GlobalPagePermission, Page, PagePermission, PageType, PageUser, PageUserGroup, Placeholder, Title,
+    CMSPlugin,
+    GlobalPagePermission,
+    Page,
+    PagePermission,
+    PageType,
+    PageUser,
+    PageUserGroup,
+    Placeholder,
+    Title,
     TreeNode,
 )
 from cms.models.permissionmodels import User
@@ -30,7 +39,10 @@ from cms.utils.compat.forms import UserChangeForm
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_language_object
 from cms.utils.permissions import (
-    get_current_user, get_subordinate_groups, get_subordinate_users, get_user_permission_level,
+    get_current_user,
+    get_subordinate_groups,
+    get_subordinate_users,
+    get_user_permission_level,
 )
 from menus.menu_pool import menu_pool
 
