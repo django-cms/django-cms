@@ -93,7 +93,7 @@ Highlights:
 * Unlocalize page and node ids when rendering the page tree in the admin (#7175)
 * Fixed permission denied error after page create (#6866)
 * Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
-* Fix #3548 by reflecting the request language when resolving identical page slugs 
+* Fix #3548 by reflecting the request language when resolving identical page slugs
 * Deprecate usage of legacy SEND_BROKEN_LINK_EMAILS setting (removed since Django 1.8)
 * Add deprecation warning to ``cms.utils.i18n.get_current_language()`` (#6720)
 
@@ -1273,7 +1273,7 @@ Thanks to all contributors for their efforts!
 - Fix issue on django >= 1.6 with page form fields.
 - Resolve jQuery namespace issues in admin page tree and changeform
 - Fix issues for PageField in Firefox/Safari
-- Fix some Python 3.4 compatibility issue when using proxy modles
+- Fix some Python 3.4 compatibility issue when using proxy models
 - Fix corner case in plugin copy
 - Documentation fixes
 - Minor code cleanups
