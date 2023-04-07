@@ -173,9 +173,9 @@ class BaseCMSTestCase:
         """
         User = get_user_model()
 
-        fields = {"email": username + '@django-cms.org', "last_login": now(),
-                      "is_staff": is_staff, "is_active": is_active, "is_superuser": is_superuser
-        }
+        fields = dict(email=username + '@django-cms.org', last_login=now(),
+                      is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
+        )
 
         # Check for special case where email is used as username
         if (get_user_model().USERNAME_FIELD != 'email'):
@@ -201,7 +201,7 @@ class BaseCMSTestCase:
 
     def get_superuser(self):
         try:
-            query = {}
+            query = dict()
 
             if get_user_model().USERNAME_FIELD != "email":
                 query[get_user_model().USERNAME_FIELD] = "admin"
@@ -472,7 +472,7 @@ class BaseCMSTestCase:
 
     def apphook_clear(self):
         from cms.apphook_pool import apphook_pool
-        for name, _label in list(apphook_pool.get_apphooks()):
+        for name, label in list(apphook_pool.get_apphooks()):
             if apphook_pool.apps[name].__class__.__module__ in sys.modules:
                 del sys.modules[apphook_pool.apps[name].__class__.__module__]
         apphook_pool.clear()
