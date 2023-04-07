@@ -76,6 +76,19 @@ def details(request, slug):
         # and there's no pages
         return _render_welcome_page(request)
 
+
+    if not page and get_cms_setting("REDIRECT_TO_LOWERCASE_SLUG"):
+        # Redirect to the lowercase version of the slug
+        if slug.lower() != slug:
+            # Only redirect if the slug changes
+            redirect_url = reverse("pages-details-by-slug", kwargs={"slug": slug.lower()})
+            if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
+                query_string = request.META.get('QUERY_STRING')
+                if query_string:
+                    redirect_url += "?" + query_string
+            return HttpResponseRedirect(redirect_url)
+
+
     if not page:
         # raise 404
         _handle_no_page(request)
@@ -162,6 +175,10 @@ def details(request, slug):
             toolbar.redirect_url = redirect_url
         elif redirect_url not in own_urls:
             # prevent redirect to self
+            if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
+                query_string = request.META.get('QUERY_STRING')
+                if query_string:
+                    redirect_url += "?" + query_string
             return HttpResponseRedirect(redirect_url)
 
     # permission checks

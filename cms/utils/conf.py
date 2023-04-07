@@ -89,6 +89,8 @@ DEFAULTS = {
     ),
     'COLOR_SCHEME': 'light',
     'COLOR_SCHEME_TOGGLE': False,
+    'REDIRECT_PRESERVE_QUERY_PARAMS': False,
+    'REDIRECT_TO_LOWERCASE_SLUG': False,
 }
 
 
