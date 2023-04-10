@@ -191,7 +191,7 @@ class CMSToolbar(BaseToolbar):
             self.clipboard = user_settings.clipboard
 
         if hasattr(self, 'toolbars'):
-            for key, _toolbar in self.toolbars.items():
+            for key in self.toolbars:
                 self.toolbars[key].request = self.request
         self.request_path = request_path or request.path
 
