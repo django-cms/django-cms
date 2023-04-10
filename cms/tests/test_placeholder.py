@@ -28,7 +28,11 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.placeholder import (
-    MLNGPlaceholderActions, PlaceholderNoAction, _get_nodelist, _scan_placeholders, get_placeholder_conf,
+    MLNGPlaceholderActions,
+    PlaceholderNoAction,
+    _get_nodelist,
+    _scan_placeholders,
+    get_placeholder_conf,
     get_placeholders,
 )
 from cms.utils.plugins import assign_plugins, has_reached_plugin_limit

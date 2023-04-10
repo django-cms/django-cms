@@ -410,7 +410,7 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
             include_parents=True,
             include_hidden=False,
         )
-        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+        return [obj for obj in fields if not isinstance(obj.field, ManyToManyField)]
 
     def get_position_in_placeholder(self):
         """

@@ -6,7 +6,8 @@ from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
 from django.test.utils import override_settings
-from django.utils.translation import activate, override as force_language
+from django.utils.translation import activate
+from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_title
 from cms.apphook_pool import apphook_pool
@@ -36,7 +37,7 @@ class BaseMenuTest(CMSTestCase):
         node4 = NavigationNode('4', '/4/', 4, 2)
         node5 = NavigationNode('5', '/5/', 5)
         nodes = [node1, node2, node3, node4, node5]
-        tree = _build_nodes_inner_for_one_menu([n for n in nodes], "test")
+        tree = _build_nodes_inner_for_one_menu(list(nodes), "test")
         request = self.get_request(path)
         renderer = menu_pool.get_renderer(request)
         renderer.apply_modifiers(tree, request)
@@ -162,7 +163,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                 # (which is not) and checks the key name for the StaticMenu instances
                 static_menus = 2
                 static_menus_2 = 1
-                for key, menu in menus.items():
+                for key, _menu in menus.items():
                     if key.startswith('StaticMenu:'):
                         static_menus -= 1
                         self.assertTrue(key.endswith(str(page.get_public_object().pk)) or key.endswith(str(page.get_draft_object().pk)))
@@ -518,7 +519,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             context['request'].session['cms_edit'] = True
             Template("{% load menu_tags %}{% show_menu %}").render(context)
         # All nodes should be public nodes because the request page is public
-        nodes = [node for node in context['children']]
+        nodes = list(context['children'])
         node_ids = [node.id for node in nodes]
         page_count = Page.objects.public().filter(pk__in=node_ids).count()
         self.assertEqual(len(node_ids), page_count, msg='Not all pages in the public menu are public')
@@ -1856,7 +1857,7 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         C1 C2  C3 C4
         """
         template = 'nav_playground.html'
-        kw = dict(published=True, in_navigation=True)
+        kw = {"published": True, "in_navigation": True}
         a = create_page('a', template, 'en', **kw)
         b1 = create_page('b1', template, 'en', parent=a, **kw)
         b2 = create_page('b2', template, 'en', parent=a, **kw)

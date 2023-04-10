@@ -217,7 +217,7 @@ class Placeholder(models.Model):
             include_parents=True,
             include_hidden=False,
         )
-        return list(obj for obj in fields)
+        return list(fields)
 
     def _get_attached_fields(self):
         """
@@ -568,7 +568,7 @@ class Placeholder(models.Model):
                             'value': force_str(vary_on),
                         })
 
-        return sorted(list(vary_list))
+        return sorted(vary_list)
 
     def copy_plugins(self, target_placeholder, language=None, root_plugin=None):
         from cms.utils.plugins import copy_plugins_to_placeholder

@@ -8,7 +8,10 @@ from cms.models import Page
 from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
 from cms.test_utils.testcases import URL_CMS_PAGE_ADD, CMSTestCase
 from cms.utils.page_permissions import (
-    get_change_id_list, user_can_add_subpage, user_can_publish_page, user_can_view_page,
+    get_change_id_list,
+    user_can_add_subpage,
+    user_can_publish_page,
+    user_can_view_page,
 )
 
 

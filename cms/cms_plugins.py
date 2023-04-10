@@ -1,7 +1,8 @@
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
 from django.middleware.csrf import get_token
 from django.urls import re_path
-from django.utils.translation import get_language, gettext, gettext_lazy as _
+from django.utils.translation import get_language, gettext
+from django.utils.translation import gettext_lazy as _
 
 from cms.models import CMSPlugin, Placeholder
 from cms.models.aliaspluginmodel import AliasPluginModel
@@ -102,7 +103,7 @@ class AliasPlugin(CMSPluginBase):
     def create_alias(self, request):
         if not request.user.is_staff:
             return HttpResponseForbidden("not enough privileges")
-        if not 'plugin_id' in request.POST and not 'placeholder_id' in request.POST:
+        if "plugin_id" not in request.POST and "placeholder_id" not in request.POST:
             return HttpResponseBadRequest("plugin_id or placeholder_id POST parameter missing.")
         plugin = None
         placeholder = None

@@ -24,7 +24,7 @@ class UrlconfRevision(models.Model):
         if revision is None:
             revision = str(uuid.uuid4())
         obj, created = cls.objects.get_or_create(
-            pk=1, defaults=dict(revision=revision))
+            pk=1, defaults={"revision": revision})
         return obj.revision, created
 
     @classmethod
@@ -33,7 +33,7 @@ class UrlconfRevision(models.Model):
         Convenience method for updating the revision.
         """
         obj, created = cls.objects.get_or_create(
-            pk=1, defaults=dict(revision=revision))
+            pk=1, defaults={"revision": revision})
         if not created:
             obj.revision = revision
             obj.save()

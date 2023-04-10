@@ -243,5 +243,5 @@ class PythonAPITests(CMSTestCase):
         rightmost = create_page('r', 'nav_playground.html', 'en', parent=parent)
         leftmost = create_page('l', 'nav_playground.html', 'en', parent=rightmost, position='left')
         create_page('m', 'nav_playground.html', 'en', parent=leftmost, position='right')
-        children_titles = list(p.get_title('de') for p in parent.get_child_pages())
+        children_titles = [p.get_title('de') for p in parent.get_child_pages()]
         self.assertEqual(children_titles, ['l', 'm', 'r'])
