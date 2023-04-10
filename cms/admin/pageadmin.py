@@ -1,4 +1,3 @@
-import copy
 import json
 import re
 import sys
@@ -257,8 +256,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         if page is None:
             raise self._get_404_exception(object_id)
-
-        request = copy.copy(request)
 
         if request.method == 'GET':
             # source is a field in the form
