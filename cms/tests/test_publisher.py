@@ -875,7 +875,7 @@ class PublishingTests(TestCase):
 
         child_nodes = list(TreeNode.objects.filter(parent__isnull=False))
 
-        for idx, node in enumerate(child_nodes):
+        for _idx, node in enumerate(child_nodes):
             self.assertEqual(node.path[0:4], node.parent.path[0:4])
             self.assertTrue(node.parent in node.get_ancestors())
             self.assertTrue(node in node.parent.get_descendants())
@@ -889,7 +889,7 @@ class PublishingTests(TestCase):
 
         child_nodes = list(TreeNode.objects.filter(parent__isnull=False))
 
-        for idx, node in enumerate(child_nodes):
+        for _idx, node in enumerate(child_nodes):
             self.assertEqual(node.path[0:4], node.parent.path[0:4])
             self.assertTrue(node.parent in node.get_ancestors())
             self.assertTrue(node in node.parent.get_descendants())

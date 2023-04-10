@@ -190,7 +190,7 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         wizard_pool.register(self.page_wizard)
         wizard_pool.register(self.user_settings_wizard)
         wizards = [self.page_wizard, self.user_settings_wizard]
-        wizards = sorted(wizards, key=lambda e: getattr(e, 'weight'))
+        wizards = sorted(wizards, key=lambda e: e.weight)
         entries = wizard_pool.get_entries()
         self.assertSequencesEqual(entries, wizards)
 
@@ -198,7 +198,7 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         wizard_pool.register(self.user_settings_wizard)
         wizard_pool.register(self.page_wizard)
         wizards = [self.page_wizard, self.user_settings_wizard]
-        wizards = sorted(wizards, key=lambda e: getattr(e, 'weight'))
+        wizards = sorted(wizards, key=lambda e: e.weight)
         entries = wizard_pool.get_entries()
         self.assertSequencesEqual(entries, wizards)
 

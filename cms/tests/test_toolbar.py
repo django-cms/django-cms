@@ -22,8 +22,13 @@ from django.utils.translation import gettext_lazy as _
 from cms.admin.forms import RequestToolbarForm
 from cms.api import add_plugin, create_page, create_title
 from cms.cms_toolbars import (
-    ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, DEFAULT_HELP_MENU_ITEMS, HELP_MENU_IDENTIFIER,
-    LANGUAGE_MENU_IDENTIFIER, AppearanceToolbar, get_user_model,
+    ADMIN_MENU_IDENTIFIER,
+    ADMINISTRATION_BREAK,
+    DEFAULT_HELP_MENU_ITEMS,
+    HELP_MENU_IDENTIFIER,
+    LANGUAGE_MENU_IDENTIFIER,
+    AppearanceToolbar,
+    get_user_model,
 )
 from cms.constants import PUBLISHER_STATE_DIRTY
 from cms.middleware.toolbar import ToolbarMiddleware
@@ -689,7 +694,7 @@ class ToolbarTests(ToolbarTestBase):
         toolbar = CMSToolbar(request)
         renderer = toolbar.get_content_renderer()
         # TextPlugin needs request in context
-        renderer.render_static_placeholder(static_placeholder, RequestContext(request, dict(request=request)))
+        renderer.render_static_placeholder(static_placeholder, RequestContext(request, {"request": request}))
         toolbar.populate()
         toolbar.post_template_populate()
 
@@ -1017,9 +1022,9 @@ class ToolbarTests(ToolbarTestBase):
         }
         self.assertIn(name, list(menu))
         if items is not None:
-            sub_menu = list(
+            sub_menu = [
                 force_str(getattr(item, 'name', '|')) for item in menu[name].get_items()
-            )
+            ]
             self.assertEqual(sorted(sub_menu), sorted(items))
 
     def test_remove_language(self):

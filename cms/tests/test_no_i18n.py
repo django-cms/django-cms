@@ -16,13 +16,13 @@ from cms.test_utils.testcases import URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE_TEMPL
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 
-overrides = dict(
-    LANGUAGE_CODE='en-us',
-    LANGUAGES=[],
-    CMS_LANGUAGES={},
-    USE_I18N=False,
-    ROOT_URLCONF='cms.test_utils.project.urls_no18n',
-    TEMPLATE_CONTEXT_PROCESSORS=[
+overrides = {
+    "LANGUAGE_CODE": 'en-us',
+    "LANGUAGES": [],
+    "CMS_LANGUAGES": {},
+    "USE_I18N": False,
+    "ROOT_URLCONF": 'cms.test_utils.project.urls_no18n',
+    "TEMPLATE_CONTEXT_PROCESSORS": [
         'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
         'django.core.context_processors.debug',
@@ -33,7 +33,7 @@ overrides = dict(
         'sekizai.context_processors.sekizai',
         'django.core.context_processors.static',
     ],
-    MIDDLEWARE=[
+    "MIDDLEWARE": [
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
@@ -44,7 +44,7 @@ overrides = dict(
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
     ]
-)
+}
 
 
 @override_settings(**overrides)
@@ -112,11 +112,11 @@ class TestNoI18N(CMSTestCase):
             self.assertEqual(url, "%s" % path)
 
     def test_url_redirect(self):
-        overrides = dict(
-            USE_I18N=True,
-            CMS_LANGUAGES={1: []},
-            LANGUAGES=[('en-us', 'English')],
-            MIDDLEWARE=[
+        overrides = {
+            "USE_I18N": True,
+            "CMS_LANGUAGES": {1: []},
+            "LANGUAGES": [('en-us', 'English')],
+            "MIDDLEWARE": [
                 'django.contrib.sessions.middleware.SessionMiddleware',
                 'django.contrib.auth.middleware.AuthenticationMiddleware',
                 'django.contrib.messages.middleware.MessageMiddleware',
@@ -128,7 +128,7 @@ class TestNoI18N(CMSTestCase):
                 'cms.middleware.page.CurrentPageMiddleware',
                 'cms.middleware.toolbar.ToolbarMiddleware',
             ]
-        )
+        }
         with self.settings(**overrides):
             homepage = create_page(
                 "home",

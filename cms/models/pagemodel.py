@@ -11,13 +11,18 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import get_language, gettext_lazy as _, override as force_language
+from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import override as force_language
 from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import (
-    PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING, TEMPLATE_INHERITANCE_MAGIC,
+    PUBLISHER_STATE_DEFAULT,
+    PUBLISHER_STATE_DIRTY,
+    PUBLISHER_STATE_PENDING,
+    TEMPLATE_INHERITANCE_MAGIC,
 )
 from cms.exceptions import LanguageError, PublicIsUnmodifiable, PublicVersionNeeded
 from cms.models.managers import PageManager, PageNodeManager

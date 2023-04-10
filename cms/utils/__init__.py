@@ -25,12 +25,12 @@ def get_language_from_request(request, current_page=None):
     site_id = current_page.node.site_id if current_page else None
     if language:
         language = get_language_code(language)
-        if not language in get_language_list(site_id):
+        if language not in get_language_list(site_id):
             language = None
     if not language:
         language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
     if language:
-        if not language in get_language_list(site_id):
+        if language not in get_language_list(site_id):
             language = None
 
     if not language and current_page:

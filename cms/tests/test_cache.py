@@ -7,16 +7,26 @@ from sekizai.context import SekizaiContext
 from cms.api import add_plugin, create_page, create_title
 from cms.cache import _get_cache_version, invalidate_cms_page_cache
 from cms.cache.placeholder import (
-    _get_placeholder_cache_key, _get_placeholder_cache_version, _get_placeholder_cache_version_key,
-    _set_placeholder_cache_version, clear_placeholder_cache, get_placeholder_cache, set_placeholder_cache,
+    _get_placeholder_cache_key,
+    _get_placeholder_cache_version,
+    _get_placeholder_cache_version_key,
+    _set_placeholder_cache_version,
+    clear_placeholder_cache,
+    get_placeholder_cache,
+    set_placeholder_cache,
 )
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.project.pluginapp.plugins.caching.cms_plugins import (
-    DateTimeCacheExpirationPlugin, LegacyCachePlugin, NoCachePlugin, SekizaiPlugin, TimeDeltaCacheExpirationPlugin,
-    TTLCacheExpirationPlugin, VaryCacheOnPlugin,
+    DateTimeCacheExpirationPlugin,
+    LegacyCachePlugin,
+    NoCachePlugin,
+    SekizaiPlugin,
+    TimeDeltaCacheExpirationPlugin,
+    TTLCacheExpirationPlugin,
+    VaryCacheOnPlugin,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -71,10 +81,10 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        overrides = dict(
-            CMS_PAGE_CACHE=False,
-            MIDDLEWARE=[mw for mw in settings.MIDDLEWARE if mw not in exclude],
-        )
+        overrides = {
+            "CMS_PAGE_CACHE": False,
+            "MIDDLEWARE": [mw for mw in settings.MIDDLEWARE if mw not in exclude],
+        }
         with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(13, 25)):
                 self.client.get(page1_url)
