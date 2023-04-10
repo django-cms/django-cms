@@ -7,7 +7,10 @@ from django.utils.translation import override as force_language
 
 from cms.admin import forms
 from cms.admin.forms import (
-    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, PageUserGroupForm, ViewRestrictionInlineAdminForm,
+    GlobalPagePermissionAdminForm,
+    PagePermissionInlineAdminForm,
+    PageUserGroupForm,
+    ViewRestrictionInlineAdminForm,
 )
 from cms.api import assign_user_to_page, create_page, create_title
 from cms.forms.fields import PageSelectFormField, SuperLazyIterator
@@ -95,7 +98,7 @@ class FormsTestCase(CMSTestCase):
         # boilerplate (creating a page)
         User = get_user_model()
 
-        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+        fields = {"is_staff": True, "is_active": True, "is_superuser": True, "email": "super@super.com"}
 
         if User.USERNAME_FIELD != 'email':
             fields[User.USERNAME_FIELD] = "super"
@@ -136,7 +139,7 @@ class FormsTestCase(CMSTestCase):
         # boilerplate (creating a page)
         User = get_user_model()
 
-        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+        fields = {"is_staff": True, "is_active": True, "is_superuser": True, "email": "super@super.com"}
 
         if User.USERNAME_FIELD != 'email':
             fields[User.USERNAME_FIELD] = "super"

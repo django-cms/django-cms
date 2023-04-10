@@ -15,7 +15,7 @@ class Compatibility4xTestCase(testcases.TestCase):
         migration = os.path.join("cms", "migrations")
         MAX = 22
 
-        for root, _, files in os.walk(migration):
+        for _root, _, files in os.walk(migration):
             for name in files:
                 if name == "__init__.py" or not name.endswith(".py"):
                     continue

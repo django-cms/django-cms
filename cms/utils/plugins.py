@@ -32,7 +32,7 @@ def get_plugins(request, placeholder, template, lang=None):
         return []
     if not hasattr(placeholder, '_plugins_cache'):
         assign_plugins(request, [placeholder], template, lang)
-    return getattr(placeholder, '_plugins_cache')
+    return placeholder._plugins_cache
 
 
 def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=False):
@@ -80,9 +80,9 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     groups.update(plugin_groups)
     for placeholder in placeholders:
         # This is all the plugins.
-        setattr(placeholder, '_all_plugins_cache', all_plugins_groups.get(placeholder.pk, []))
+        placeholder._all_plugins_cache = all_plugins_groups.get(placeholder.pk, [])
         # This one is only the root plugins.
-        setattr(placeholder, '_plugins_cache', groups.get(placeholder.pk, []))
+        placeholder._plugins_cache = groups.get(placeholder.pk, [])
 
 
 def create_default_plugins(request, placeholders, template, lang):

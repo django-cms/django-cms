@@ -327,7 +327,7 @@ class NavExtender(Modifier):
 
         # find all not assigned nodes
         for menu in self.renderer.menus.items():
-            if (hasattr(menu[1], 'cms_enabled') and menu[1].cms_enabled and not menu[0] in exts):
+            if (hasattr(menu[1], 'cms_enabled') and menu[1].cms_enabled and menu[0] not in exts):
                 for node in nodes:
                     if node.namespace == menu[0]:
                         removed.append(node)

@@ -113,7 +113,7 @@ class WizardPool:
         """
         self._discover()
         return [value for (key, value) in sorted(
-            self._entries.items(), key=lambda e: getattr(e[1], 'weight'))]
+            self._entries.items(), key=lambda e: e[1].weight)]
 
 
 wizard_pool = WizardPool()

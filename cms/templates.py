@@ -13,7 +13,7 @@ class TemplatesCache:
         if hasattr(template, 'render'):
             return template
 
-        if not template in self._cached_templates:
+        if template not in self._cached_templates:
             # this always return a engine-specific template object
             self._cached_templates[template] = get_template(template)
         return self._cached_templates[template]

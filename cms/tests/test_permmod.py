@@ -11,7 +11,10 @@ from cms.api import add_plugin, assign_user_to_page, create_page, create_page_us
 from cms.cms_menus import get_visible_nodes
 from cms.models import ACCESS_PAGE, CMSPlugin, Page, Title
 from cms.models.permissionmodels import (
-    ACCESS_DESCENDANTS, ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
+    ACCESS_DESCENDANTS,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    GlobalPagePermission,
+    PagePermission,
 )
 from cms.test_utils.testcases import URL_CMS_PAGE_ADD, CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt

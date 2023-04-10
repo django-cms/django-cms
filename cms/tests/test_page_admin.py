@@ -30,7 +30,12 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_MOVE, CMSTestCase,
+    URL_CMS_PAGE,
+    URL_CMS_PAGE_ADD,
+    URL_CMS_PAGE_ADVANCED_CHANGE,
+    URL_CMS_PAGE_CHANGE,
+    URL_CMS_PAGE_MOVE,
+    CMSTestCase,
 )
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
 from cms.utils.compat.dj import installed_apps

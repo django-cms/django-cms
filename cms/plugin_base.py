@@ -7,7 +7,8 @@ from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist
 from django.shortcuts import render as render_to_response
 from django.utils.encoding import force_str
 from django.utils.html import escapejs
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -386,7 +387,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         fieldsets = super().get_fieldsets(request, obj)
 
-        for name, data in fieldsets:
+        for _name, data in fieldsets:
             if data.get('fields'):  # if fieldset with non-empty fields is found, return fieldsets
                 return fieldsets
 

@@ -1,3 +1,4 @@
+# isort: skip_file
 from .settingmodels import *  # nopyflakes
 from .pagemodel import *  # nopyflakes
 from .permissionmodels import *  # nopyflakes

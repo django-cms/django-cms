@@ -17,7 +17,12 @@ from django.core.exceptions import ObjectDoesNotExist, PermissionDenied, Validat
 from django.db import router, transaction
 from django.db.models import Prefetch, Q
 from django.http import (
-    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden, HttpResponseRedirect, QueryDict,
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+    QueryDict,
 )
 from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
@@ -26,20 +31,37 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import NoReverseMatch, re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
-from django.utils.translation import get_language, gettext, gettext_lazy as _
+from django.utils.translation import get_language, gettext
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from cms import operations
 from cms.admin.forms import (
-    AddPageForm, AddPageTypeForm, AdvancedSettingsForm, ChangeListForm, ChangePageForm, CopyPageForm,
-    CopyPermissionForm, DuplicatePageForm, MovePageForm, PagePermissionForm, PublicationDatesForm,
+    AddPageForm,
+    AddPageTypeForm,
+    AdvancedSettingsForm,
+    ChangeListForm,
+    ChangePageForm,
+    CopyPageForm,
+    CopyPermissionForm,
+    DuplicatePageForm,
+    MovePageForm,
+    PagePermissionForm,
+    PublicationDatesForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.cache.permissions import clear_permission_cache
 from cms.constants import PUBLISHER_STATE_PENDING
 from cms.models import (
-    CMSPlugin, EmptyTitle, GlobalPagePermission, Page, PagePermission, PageType, StaticPlaceholder, Title,
+    CMSPlugin,
+    EmptyTitle,
+    GlobalPagePermission,
+    Page,
+    PagePermission,
+    PageType,
+    StaticPlaceholder,
+    Title,
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals import post_obj_operation, pre_obj_operation
@@ -954,7 +976,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         if page is None:
             raise self._get_404_exception(page_id)
 
-        if not target_language or not target_language in get_language_list(site_id=page.node.site_id):
+        if not target_language or target_language not in get_language_list(site_id=page.node.site_id):
             return HttpResponseBadRequest(force_str(_("Language must be set to a supported language!")))
 
         for placeholder in page.get_placeholders():

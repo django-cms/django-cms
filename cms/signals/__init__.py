@@ -6,8 +6,16 @@ from django.dispatch import Signal
 from cms.models import GlobalPagePermission, PagePermission, PageUser, PageUserGroup, User
 from cms.signals.apphook import debug_server_restart, trigger_server_restart
 from cms.signals.permissions import (
-    post_save_user, post_save_user_group, pre_delete_globalpagepermission, pre_delete_group, pre_delete_pagepermission,
-    pre_delete_user, pre_save_globalpagepermission, pre_save_group, pre_save_pagepermission, pre_save_user,
+    post_save_user,
+    post_save_user_group,
+    pre_delete_globalpagepermission,
+    pre_delete_group,
+    pre_delete_pagepermission,
+    pre_delete_user,
+    pre_save_globalpagepermission,
+    pre_save_group,
+    pre_save_pagepermission,
+    pre_save_user,
 )
 from cms.utils.conf import get_cms_setting
 

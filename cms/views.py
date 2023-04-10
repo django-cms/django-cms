@@ -1,7 +1,8 @@
 from urllib.parse import quote
 
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -21,8 +22,12 @@ from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_default_language_for_site, get_fallback_languages, get_language_list, get_public_languages,
-    get_redirect_on_fallback, is_language_prefix_patterns_used,
+    get_default_language_for_site,
+    get_fallback_languages,
+    get_language_list,
+    get_public_languages,
+    get_redirect_on_fallback,
+    is_language_prefix_patterns_used,
 )
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_change_page
