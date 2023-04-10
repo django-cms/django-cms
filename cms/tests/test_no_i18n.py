@@ -139,6 +139,7 @@ class TestNoI18N(CMSTestCase):
             )
             homepage.set_as_homepage()
             response = self.client.get('/', follow=False)
+            self.assertEqual(response.status_code, 302) # Needs to redirect
             self.assertTrue(response['Location'].endswith("/foobar/"))
 
     def test_plugin_add_edit(self):
