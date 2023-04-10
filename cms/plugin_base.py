@@ -145,7 +145,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         self.cms_plugin_instance = None
         # The _cms_initial_attributes acts as a hook to set
         # certain values when the form is saved.
-        # Currently this only happens on plugin creation.
+        # Currently, this only happens on plugin creation.
         self._cms_initial_attributes = {}
         self._operation_token = None
 
@@ -260,7 +260,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             # This is a nasty edge-case.
             # If the parent plugin is a ghost plugin, fetching the plugin tree
             # will fail because the downcasting function filters out all ghost plugins.
-            # Currently this case is only present in the djangocms-text-ckeditor app
+            # Currently, this case is only present in the djangocms-text-ckeditor app
             # which uses ghost plugins to create inline plugins on the text.
             root = obj
 
@@ -433,7 +433,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # we allow other plugins to affect
         # the list of child plugin candidates.
         # Useful in cases like djangocms-text-ckeditor
-        # where only text only plugins are allowed.
+        # where only text-enabled plugins are allowed.
         from cms.plugin_pool import plugin_pool
         return plugin_pool.registered_plugins
 
