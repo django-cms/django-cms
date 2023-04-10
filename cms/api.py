@@ -446,7 +446,7 @@ def publish_pages(include_unpublished=False, language=None, site=None):
         qs = qs.filter(node__site=site)
 
     output_language = None
-    for _i, page in enumerate(qs):
+    for page in qs:
         add = True
         titles = page.title_set
         if not include_unpublished:
