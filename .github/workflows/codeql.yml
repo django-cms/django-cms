@@ -1,0 +1,42 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "develop", "develop-4", "release/0.10.x", "release/2.1.x", "release/2.2.x", "release/2.3.x", "release/2.4.x", "release/3.0.x", "release/3.1.x", "release/3.2.x", "release/3.3.x", "release/3.4.x", "release/3.5.x", "release/3.6.x", "release/3.7.x", "release/3.8.x", "release/3.9.x", "release/3.10.x", "release/3.11.x", "release/4.0.x", "release/4.0.0.x", "release/4.0.1.x", "release/4.1.x" ]
+  pull_request:
+    branches: [ "develop" ]
+  schedule:
+    - cron: "40 4 * * 6"
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ python, javascript ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v2
+        if: ${{ matrix.language == 'python' || matrix.language == 'javascript' }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          category: "/language:${{ matrix.language }}"
