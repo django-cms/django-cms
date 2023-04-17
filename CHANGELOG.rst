@@ -23,7 +23,6 @@ This release includes 21 pull requests, and was created with the help of the fol
 * Corentin Bettiol (1 pull request)
 * Danny Waser (1 pull request)
 * Fabian Braun (10 pull requests)
-* Github Release Action (2 pull requests)
 * Ivo Branco (1 pull request)
 * Jasper (1 pull request)
 * Nihal Rahman (1 pull request)
