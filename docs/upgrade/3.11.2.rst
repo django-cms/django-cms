@@ -4,7 +4,7 @@
  release notes 3.11.2
 ######################
 
-This release focuses on Django 4.2 suppoprt which will be LTS.
+This release focuses on Django 4.2 support which will be LTS. django CMS version 3.11.x will be supported until the end of life of Django 4.2 estimated for April 2026.
 
 ********************
 What's new in 3.11.2
