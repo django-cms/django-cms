@@ -6,7 +6,7 @@ Features:
 ---------
 * add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
 * add setting to redirect slugs to lowercase (#7509) (01aedee9f) -- pajowu
-* add setting so redirect preserve params (#7489) (dcb9c4b3a) -- Ivo Branco
+* add setting so redirect preserves params (#7489) (dcb9c4b3a) -- Ivo Branco
 * add download statistics to readme (#7474) (25b2303f7) -- Fabian Braun
 
 Bug Fixes:
