@@ -1,7 +1,7 @@
 .. _upgrade-to-3.11.2:
 
 ######################
- release notes 3.11.w
+ release notes 3.11.2
 ######################
 
 This release focuses on Django 4.2 suppoprt which will be LTS.
