@@ -83,7 +83,9 @@ Highlights:
 * Support for django 4
 * Dark mode support
 
-* Added dark mode support to css, dark mode settings and toggle button
+Bug fixes:
+----------
+
 * Fix publishing of static placeholders outside of CMS pages
 * Allow to override the template rendered after a plugin has been saved.
 * Revert change to the toolbar sites menu to use ``http`` protocol.
@@ -1250,7 +1252,7 @@ Thanks to all contributors for their efforts!
 - Fix issue on django >= 1.6 with page form fields.
 - Resolve jQuery namespace issues in admin page tree and changeform
 - Fix issues for PageField in Firefox/Safari
-- Fix some Python 3.4 compatibility issue when using proxy modles
+- Fix some Python 3.4 compatibility issue when using proxy models
 - Fix corner case in plugin copy
 - Documentation fixes
 - Minor code cleanups

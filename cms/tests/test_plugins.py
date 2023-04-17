@@ -27,16 +27,32 @@ from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.sitemaps.cms_sitemap import CMSSitemap
 from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
-    Article, ArticlePluginModel, FKModel, M2MTargetModel, Section,
+    Article,
+    ArticlePluginModel,
+    FKModel,
+    M2MTargetModel,
+    Section,
 )
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
-    TestPlugin, TestPlugin2, TestPlugin3, TestPlugin4, TestPlugin5,
+    TestPlugin,
+    TestPlugin2,
+    TestPlugin3,
+    TestPlugin4,
+    TestPlugin5,
 )
 from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
-    DynTemplate, NonExisitngRenderTemplate, NoRender, NoRenderButChildren,
+    DynTemplate,
+    NonExisitngRenderTemplate,
+    NoRender,
+    NoRenderButChildren,
 )
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE, URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_PUBLISH, URL_CMS_PLUGIN_ADD, CMSTestCase,
+    URL_CMS_PAGE,
+    URL_CMS_PAGE_ADD,
+    URL_CMS_PAGE_CHANGE,
+    URL_CMS_PAGE_PUBLISH,
+    URL_CMS_PLUGIN_ADD,
+    CMSTestCase,
 )
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.toolbar import CMSToolbar
@@ -958,7 +974,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         in the plugin pool when a placeholder is specified
         """
         ParentRequiredPlugin = type('ParentRequiredPlugin', (CMSPluginBase,),
-                                    dict(require_parent=True, render_plugin=False))
+                                    {"require_parent": True, "render_plugin": False})
 
         with register_plugins(ParentRequiredPlugin):
             page = api.create_page("page", "nav_playground.html", "en", published=True)
@@ -1028,7 +1044,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = page.placeholders.get(slot='body')
         ChildClassesPlugin = type(
             'ChildClassesPlugin', (CMSPluginBase,),
-            dict(child_classes=['TextPlugin'], render_template='allow_children_plugin.html')
+            {"child_classes": ['TextPlugin'], "render_template": 'allow_children_plugin.html'}
         )
 
         with register_plugins(ChildClassesPlugin):
@@ -1053,7 +1069,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = page.placeholders.get(slot='body')
         ParentClassesPlugin = type(
             'ParentClassesPlugin', (CMSPluginBase,),
-            dict(parent_classes=['TextPlugin'], render_plugin=False)
+            {"parent_classes": ['TextPlugin'], "render_plugin": False}
         )
 
         with register_plugins(ParentClassesPlugin):
@@ -1077,11 +1093,11 @@ class PluginsTestCase(PluginsTestBaseCase):
         page = api.create_page("page", "nav_playground.html", "en", published=True)
         placeholder = page.placeholders.get(slot='body')
         ParentPlugin = type(
-            'ParentPlugin', (CMSPluginBase,), dict(render_plugin=False)
+            'ParentPlugin', (CMSPluginBase,), {"render_plugin": False}
         )
         ChildPlugin = type(
             'ChildPlugin', (CMSPluginBase,),
-            dict(parent_classes=['ParentPlugin'], render_plugin=False)
+            {"parent_classes": ['ParentPlugin'], "render_plugin": False}
         )
 
         with register_plugins(ParentPlugin, ChildPlugin):
@@ -1097,11 +1113,11 @@ class PluginsTestCase(PluginsTestBaseCase):
         placeholder = page.placeholders.get(slot='body')
         ParentPlugin = type(
             'ParentPlugin', (CMSPluginBase,),
-            dict(render_plugin=False)
+            {"render_plugin": False}
         )
         ChildPlugin = type(
             'ChildPlugin', (CMSPluginBase,),
-            dict(require_parent=True, render_plugin=False)
+            {"require_parent": True, "render_plugin": False}
         )
 
         with register_plugins(ParentPlugin, ChildPlugin):
@@ -1513,8 +1529,15 @@ class MTIPluginsTestCase(PluginsTestBaseCase):
 
     def test_related_name(self):
         from cms.test_utils.project.mti_pluginapp.models import (
-            AbstractPluginParent, LessMixedPlugin, MixedPlugin, NonPluginModel, ProxiedAlphaPluginModel,
-            ProxiedBetaPluginModel, TestPluginAlphaModel, TestPluginBetaModel, TestPluginGammaModel,
+            AbstractPluginParent,
+            LessMixedPlugin,
+            MixedPlugin,
+            NonPluginModel,
+            ProxiedAlphaPluginModel,
+            ProxiedBetaPluginModel,
+            TestPluginAlphaModel,
+            TestPluginBetaModel,
+            TestPluginGammaModel,
         )
 
         # the first concrete class of the following four plugins is TestPluginAlphaModel

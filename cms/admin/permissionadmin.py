@@ -9,7 +9,9 @@ from django.db import OperationalError
 from django.utils.translation import gettext_lazy as _
 
 from cms.admin.forms import (
-    GlobalPagePermissionAdminForm, PagePermissionInlineAdminForm, ViewRestrictionInlineAdminForm,
+    GlobalPagePermissionAdminForm,
+    PagePermissionInlineAdminForm,
+    ViewRestrictionInlineAdminForm,
 )
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
@@ -133,7 +135,8 @@ class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
 
 class GlobalPagePermissionAdmin(admin.ModelAdmin):
     list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
-    list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+    list_filter = ['sites', 'user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+    list_display_links = ['user', 'group']
 
     form = GlobalPagePermissionAdminForm
     search_fields = []

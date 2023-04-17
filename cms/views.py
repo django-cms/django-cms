@@ -1,7 +1,8 @@
 from urllib.parse import quote
 
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
@@ -21,8 +22,12 @@ from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_default_language_for_site, get_fallback_languages, get_language_list, get_public_languages,
-    get_redirect_on_fallback, is_language_prefix_patterns_used,
+    get_default_language_for_site,
+    get_fallback_languages,
+    get_language_list,
+    get_public_languages,
+    get_redirect_on_fallback,
+    is_language_prefix_patterns_used,
 )
 from cms.utils.page import get_page_from_request
 from cms.utils.page_permissions import user_can_change_page
@@ -75,6 +80,19 @@ def details(request, slug):
         # render the welcome page if the requested path is root "/"
         # and there's no pages
         return _render_welcome_page(request)
+
+
+    if not page and get_cms_setting("REDIRECT_TO_LOWERCASE_SLUG"):
+        # Redirect to the lowercase version of the slug
+        if slug.lower() != slug:
+            # Only redirect if the slug changes
+            redirect_url = reverse("pages-details-by-slug", kwargs={"slug": slug.lower()})
+            if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
+                query_string = request.META.get('QUERY_STRING')
+                if query_string:
+                    redirect_url += "?" + query_string
+            return HttpResponseRedirect(redirect_url)
+
 
     if not page:
         # raise 404
@@ -162,6 +180,10 @@ def details(request, slug):
             toolbar.redirect_url = redirect_url
         elif redirect_url not in own_urls:
             # prevent redirect to self
+            if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
+                query_string = request.META.get('QUERY_STRING')
+                if query_string:
+                    redirect_url += "?" + query_string
             return HttpResponseRedirect(redirect_url)
 
     # permission checks

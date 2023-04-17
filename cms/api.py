@@ -6,6 +6,7 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -412,6 +413,10 @@ def publish_page(page, user, language):
 
     See docs/extending_cms/api_reference.rst for more info
     """
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
+                  'that adds publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
+
     page = page.reload()
 
     if not page.has_publish_permission(user):
@@ -428,6 +433,10 @@ def publish_pages(include_unpublished=False, language=None, site=None):
     """
     Create published public version of selected drafts.
     """
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
+                  'that adds publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
+
     qs = Page.objects.drafts()
 
     if not include_unpublished:
@@ -437,7 +446,7 @@ def publish_pages(include_unpublished=False, language=None, site=None):
         qs = qs.filter(node__site=site)
 
     output_language = None
-    for i, page in enumerate(qs):
+    for page in qs:
         add = True
         titles = page.title_set
         if not include_unpublished:
@@ -463,6 +472,10 @@ def get_page_draft(page):
     :return page: draft version of the page
     :type page: :class:`cms.models.pagemodel.Page` instance
     """
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
+                  'that adds publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
+
     if page:
         if page.publisher_is_draft:
             return page
@@ -478,7 +491,7 @@ def copy_plugins_to_language(page, source_language, target_language,
     Copy the plugins to another language in the same page for all the page
     placeholders.
 
-    By default plugins are copied only if placeholder has no plugin for the
+    By default, plugins are copied only if placeholder has no plugin for the
     target language; use ``only_empty=False`` to change this.
 
     .. warning: This function skips permissions checks

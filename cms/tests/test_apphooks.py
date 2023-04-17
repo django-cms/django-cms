@@ -582,7 +582,7 @@ class ApphooksTestCase(CMSTestCase):
     def test_apphooks_receive_url_params(self):
         # make sure that urlparams actually reach the apphook views
         self.create_base_structure(APP_NAME, 'en')
-        path = reverse('sample-params', kwargs=dict(my_params='is-my-param-really-in-the-context-QUESTIONMARK'))
+        path = reverse('sample-params', kwargs={"my_params": 'is-my-param-really-in-the-context-QUESTIONMARK'})
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'sampleapp/home.html')

@@ -41,7 +41,7 @@ def debug_server_restart(**kwargs):
         except NameError: #python3
             from imp import reload
             reload(cms.urls)
-    if not 'test' in sys.argv:
+    if 'test' not in sys.argv:
         msg = 'Application url changed and urls_need_reloading signal fired. ' \
               'Please reload the urls.py or restart the server.\n'
         styles = color_style()

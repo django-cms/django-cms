@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # adrien.delhorme, 2014
 # Adrien Delhorme, 2017,2019,2021
@@ -152,7 +152,7 @@ msgid "An application instance with this name already exists."
 msgstr "Il existe déjà une instance d'application portant ce nom."
 
 msgid "You can't move the home page inside another page"
-msgstr "Vous ne pouvez pas déplacer la page d'accueil sous une autre page"
+msgstr "Vous ne pouvez pas déplacer la page d′accueil sous une autre page"
 
 msgid "Yes"
 msgstr "Oui"
@@ -324,7 +324,7 @@ msgid "New page"
 msgstr "Nouvelle page"
 
 msgid "The page is not eligible to be home."
-msgstr "La page ne peut pas être la page d'accueil."
+msgstr "La page ne peut pas être la page d′accueil."
 
 msgid "View restriction"
 msgstr "Restriction d'affichage"
@@ -1021,7 +1021,7 @@ msgid "Paste"
 msgstr "Coller"
 
 msgid "Set as home"
-msgstr "Défini comme page d'accueil"
+msgstr "Défini comme page d′accueil"
 
 msgid "is restricted"
 msgstr "est restreint"
@@ -1414,7 +1414,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr "\n<p class=\"cms-welcome-notes\">Vous voyez ce message parce que vous avet <code>DEBUG = True</code> dans le fichier paramètres de django et que vous n'avez pas encore ajouté de pages.\n</p>"
+msgstr "\n<p class=\"cms-welcome-notes\">Vous voyez ce message parce que vous avez <code>DEBUG = True</code> dans le fichier paramètres de django et que vous n'avez pas encore ajouté de page.\n</p>"
 
 msgid "Welcome to django CMS"
 msgstr "Bienvenue sur django CMS"
