@@ -1,10 +1,10 @@
 .. _upgrade-to-3.11.2:
 
 ######################
- release notes 3.11.1
+ release notes 3.11.w
 ######################
 
-This release focuses on support for django 4 and dark mode.
+This release focuses on Django 4.2 suppoprt which will be LTS.
 
 ********************
 What's new in 3.11.2
@@ -12,67 +12,37 @@ What's new in 3.11.2
 
 Features:
 ---------
-* add Python 3.11 support for Django CMS (#7422) (3fe1449e6) -- Vinit Kumar
-* Support for Django 4.1 (#7404) (777864af3) -- Fabian Braun
-* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field (#7370) (0fd058ed3) -- Mark Walker
-* Improved dutch translations -- Stefan van den Eertwegh
+* add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
+* add setting to redirect slugs to lowercase (#7509) (01aedee9f) -- pajowu
+* add setting so redirect preserve params (#7489) (dcb9c4b3a) -- Ivo Branco
+* add download statistics to readme (#7474) (25b2303f7) -- Fabian Braun
 
 Bug Fixes:
 ----------
-* Prefer titles matching request language (#7144) (06c9a85df) -- Micah Denbraver
-* Adds a deprecation warning for SEND_BROKEN_LINK_EMAILS (#7420) (d38f4a1cc) -- Fabian Braun
-* Added deprecation warning to `get_current_language()` (#7410) (2788f75e6) -- Mark Walker
-* CMS check management command fixed [#7412] (#7413) (dcf394bd5) -- ton77v
-* Changing color scheme resets session settings to defaults (#7407) (fcfe77f63) -- Fabian Braun
-* Clear page permission cache on page create (#6866) (e59c179dd) -- G3RB3N
-* Unlocalize page and node ids when rendering the page tree in the admin (#7188) (9e3c57946) -- Marco Bonetti
-* Allow partially overriding CMS_CACHE_DURATIONS (#7339) (162ff8dd8) -- Qijia Liu
-* CMS check management command fixed [#7386] (cdcf260aa) -- Marco Bonetti
-* default light mode (#7381) (abc6e6c5b) -- viliammihalik
-* Added language to page cache key (#7354) (d5a9f49e6) -- Mark Walker
-
-Refactoring and Cleanups:
--------------------------
-* Move js API functions to CMS.Helpers to make them available also to the admin site (#7384) (a7f8cd44f) -- Fabian Braun
+* replace ' by ′ in fr translation − no more "page d\u0027accueil"! (#7488) (b4acc9a6b) -- Corentin Bettiol
+* Link both user and group from global page permissions to change form (#7486) (6cb47629b) -- Fabian Braun
+* Build docs always from the current local version (#7472) (#7475) (7aaddd45a) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes       40 pull requests, and was created with the help of the
-following contributors (in alphabetical order):
+This release includes 21 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Cage Johnson (1 pull request)
-* Christian Clauss (1 pull request)
-* Dapo Adedire (1 pull request)
-* Fabian Braun (11 pull requests)
-* G3RB3N (1 pull request)
-* Hussein Srour (1 pull request)
-* Marco Bonetti (2 pull requests)
-* Mark Walker (10 pull requests)
-* Micah Denbraver (1 pull request)
-* Qijia Liu (1 pull request)
-* Shivan Sivakumaran (1 pull request)
-* Vinit Kumar (1 pull request)
-* code-review-doctor (1 pull request)
-* dependabot[bot] (0 pull request)
-* ton77v (1 pull request)
-* viliammihalik (1 pull request)
-* wesleysima (1 pull request)
+* Corentin Bettiol (1 pull request)
+* Danny Waser (1 pull request)
+* Fabian Braun (10 pull requests)
+* Github Release Action (2 pull requests)
+* Ivo Branco (1 pull request)
+* Jasper (1 pull request)
+* Nihal Rahman (1 pull request)
+* Vinit Kumar (3 pull requests)
+* pajowu (1 pull request)
 
 With the review help of the following contributors:
 
-* Christian Clauss
-* Conrad
 * Fabian Braun
-* Florian Delizy
-* Marco Bonetti
-* Mark Walker
-* Pankrat
-* Patrick Mazulo
-* Simon Krull
+* Nihal
 * Vinit Kumar
-* dependabot[bot]
-* jefe
 
 Thanks to all contributors for their efforts!
 
