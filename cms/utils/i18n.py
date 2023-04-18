@@ -196,8 +196,8 @@ def hide_untranslated(language, site_id=None):
 
 def is_language_prefix_patterns_used():
     """
-    Returns `True` if the `LocaleRegexURLResolver` or `LocalePrefixPattern` 
-    is used at root level of the urlpatterns and doesn't have empty 
+    Returns `True` if the `LocaleRegexURLResolver` or `LocalePrefixPattern`
+    is used at root level of the urlpatterns and doesn't have empty
     language_prefix, else it returns `False`.
     """
     for url_pattern in get_resolver(None).url_patterns:
