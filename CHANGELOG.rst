@@ -2,6 +2,41 @@
 Changelog
 =========
 
+Features:
+---------
+* add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
+* add setting to redirect slugs to lowercase (#7509) (01aedee9f) -- pajowu
+* add setting so redirect preserves params (#7489) (dcb9c4b3a) -- Ivo Branco
+* add download statistics to readme (#7474) (25b2303f7) -- Fabian Braun
+
+Bug Fixes:
+----------
+* replace ' by ′ in fr translation − no more "page d\u0027accueil"! (#7488) (b4acc9a6b) -- Corentin Bettiol
+* Link both user and group from global page permissions to change form (#7486) (6cb47629b) -- Fabian Braun
+* Build docs always from the current local version (#7472) (#7475) (7aaddd45a) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 21 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Corentin Bettiol (1 pull request)
+* Danny Waser (1 pull request)
+* Fabian Braun (10 pull requests)
+* Ivo Branco (1 pull request)
+* Jasper (1 pull request)
+* Nihal Rahman (1 pull request)
+* Vinit Kumar (3 pull requests)
+* pajowu (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Nihal
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 3.11.1 (2022-12-12)
 ===================
 
