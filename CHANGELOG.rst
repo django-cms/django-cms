@@ -2,6 +2,41 @@
 Changelog
 =========
 
+Features:
+---------
+* add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
+* add setting to redirect slugs to lowercase (#7509) (01aedee9f) -- pajowu
+* add setting so redirect preserves params (#7489) (dcb9c4b3a) -- Ivo Branco
+* add download statistics to readme (#7474) (25b2303f7) -- Fabian Braun
+
+Bug Fixes:
+----------
+* replace ' by ′ in fr translation − no more "page d\u0027accueil"! (#7488) (b4acc9a6b) -- Corentin Bettiol
+* Link both user and group from global page permissions to change form (#7486) (6cb47629b) -- Fabian Braun
+* Build docs always from the current local version (#7472) (#7475) (7aaddd45a) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 21 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Corentin Bettiol (1 pull request)
+* Danny Waser (1 pull request)
+* Fabian Braun (10 pull requests)
+* Ivo Branco (1 pull request)
+* Jasper (1 pull request)
+* Nihal Rahman (1 pull request)
+* Vinit Kumar (3 pull requests)
+* pajowu (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Nihal
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 3.11.1 (2022-12-12)
 ===================
 
@@ -83,30 +118,9 @@ Highlights:
 * Support for django 4
 * Dark mode support
 
-* Support for Python 3.11
-* Support for django 4.1
-* Allow to partially override ``CMS_CACHE_DURATIONS``
-* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field.
-* Make javascript dark mode functions available to popups as CMS.API.getColorScheme
-  and CMS.API.setColorScheme
-* Fix bug where switching color scheme affects other settings
-* Unlocalize page and node ids when rendering the page tree in the admin (#7175)
-* Fixed permission denied error after page create (#6866)
-* Improved performance when using CMS_RAW_ID_USERS=True on a Postgres DB with many users
-* Fix #3548 by reflecting the request language when resolving identical page slugs
-* Deprecate usage of legacy SEND_BROKEN_LINK_EMAILS setting (removed since Django 1.8)
-* Add deprecation warning to ``cms.utils.i18n.get_current_language()`` (#6720)
+Bug fixes:
+----------
 
-
-3.11.0 (2022-08-02)
-===================
-
-Highlights:
------------
-* Support for django 4
-* Dark mode support
-
-* Added dark mode support to css, dark mode settings and toggle button
 * Fix publishing of static placeholders outside of CMS pages
 * Allow to override the template rendered after a plugin has been saved.
 * Revert change to the toolbar sites menu to use ``http`` protocol.
