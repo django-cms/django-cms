@@ -2,7 +2,9 @@ import re
 from urllib.parse import quote
 
 from django.contrib.auth.models import (
-    AbstractBaseUser, PermissionsMixin, UserManager,
+    AbstractBaseUser,
+    PermissionsMixin,
+    UserManager,
 )
 from django.core import validators
 from django.core.mail import send_mail
@@ -43,7 +45,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         help_text=_('Required. 300 characters or fewer. Letters, numbers and '
                     '@/./+/-/_ characters'),
         validators=[
-            validators.RegexValidator(re.compile('^[\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
+            validators.RegexValidator(re.compile('^[\\w.@+-]+$'), _('Enter a valid username.'), 'invalid')
         ]
     )
     email = models.EmailField(_('email address'), blank=True)

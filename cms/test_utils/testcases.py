@@ -24,7 +24,9 @@ from cms.api import add_plugin, create_page
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import Page, PageContent
 from cms.models.permissionmodels import (
-    GlobalPagePermission, PagePermission, PageUser,
+    GlobalPagePermission,
+    PagePermission,
+    PageUser,
 )
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext

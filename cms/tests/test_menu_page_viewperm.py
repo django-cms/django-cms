@@ -6,8 +6,12 @@ from django.test.utils import override_settings
 from cms.api import create_page
 from cms.cms_menus import get_visible_nodes
 from cms.models import (
-    ACCESS_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN,
-    ACCESS_PAGE_AND_DESCENDANTS, Page,
+    ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS,
+    ACCESS_PAGE,
+    ACCESS_PAGE_AND_CHILDREN,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    Page,
 )
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import CMSTestCase

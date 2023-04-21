@@ -7,7 +7,9 @@ from cms.utils import get_current_site
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import (
-    cached_func, get_model_permission_codename, get_page_actions_for_user,
+    cached_func,
+    get_model_permission_codename,
+    get_page_actions_for_user,
     has_global_permission,
 )
 

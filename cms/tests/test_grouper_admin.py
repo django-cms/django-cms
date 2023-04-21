@@ -5,7 +5,8 @@ from django.utils.crypto import get_random_string
 
 from cms.admin.utils import CONTENT_PREFIX
 from cms.test_utils.project.sampleapp.models import (
-    GrouperModel, GrouperModelContent,
+    GrouperModel,
+    GrouperModelContent,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.grouper import wo_content_permission

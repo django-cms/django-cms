@@ -754,7 +754,9 @@ class Placeholder(models.Model):
 
     def _recalculate_plugin_positions(self, language):
         from cms.models.pluginmodel import (
-            CMSPlugin, _get_database_cursor, _get_database_vendor,
+            CMSPlugin,
+            _get_database_cursor,
+            _get_database_vendor,
         )
 
         cursor = _get_database_cursor('write')

@@ -7,7 +7,12 @@ from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.db.models.query_utils import Q
 from django.template import (
-    Context, NodeList, Template, TemplateSyntaxError, Variable, engines,
+    Context,
+    NodeList,
+    Template,
+    TemplateSyntaxError,
+    Variable,
+    engines,
 )
 from django.template.base import VariableNode
 from django.template.loader import get_template

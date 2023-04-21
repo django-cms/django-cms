@@ -33,9 +33,13 @@ if settings.AUTH_USER_MODEL != 'auth.User':  # pragma: no cover
         else:
             from django.contrib.auth.forms import UserChangeForm
     except ImportError:
-        from django.contrib.auth.forms import UserChangeForm  # nopyflakes
-        from django.contrib.auth.forms import UserCreationForm  # nopyflakes
+        from django.contrib.auth.forms import (
+            UserChangeForm,  # nopyflakes
+            UserCreationForm,  # nopyflakes
+        )
 else:
     from django.contrib.auth.admin import UserAdmin  # nopyflakes
-    from django.contrib.auth.forms import UserChangeForm  # nopyflakes
-    from django.contrib.auth.forms import UserCreationForm  # nopyflakes
+    from django.contrib.auth.forms import (
+        UserChangeForm,  # nopyflakes
+        UserCreationForm,  # nopyflakes
+    )

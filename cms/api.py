@@ -50,7 +50,9 @@ from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import PageContent
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import (
-    ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    GlobalPagePermission,
+    PagePermission,
     PageUser,
 )
 from cms.models.placeholdermodel import Placeholder

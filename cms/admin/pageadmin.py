@@ -10,15 +10,21 @@ from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import (
-    ObjectDoesNotExist, PermissionDenied, ValidationError,
+    ObjectDoesNotExist,
+    PermissionDenied,
+    ValidationError,
 )
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
 from django.forms.fields import IntegerField
 from django.http import (
-    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-    HttpResponseRedirect, QueryDict,
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+    QueryDict,
 )
 from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
@@ -32,17 +38,29 @@ from django.views.decorators.http import require_POST
 
 from cms import operations
 from cms.admin.forms import (
-    AddPageForm, AdvancedSettingsForm, ChangeListForm, ChangePageForm,
-    CopyPageForm, CopyPermissionForm, DuplicatePageForm, MovePageForm,
+    AddPageForm,
+    AdvancedSettingsForm,
+    ChangeListForm,
+    ChangePageForm,
+    CopyPageForm,
+    CopyPermissionForm,
+    DuplicatePageForm,
+    MovePageForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
 from cms.models import (
-    CMSPlugin, EmptyPageContent, GlobalPagePermission, Page, PageContent,
-    PagePermission, Placeholder,
+    CMSPlugin,
+    EmptyPageContent,
+    GlobalPagePermission,
+    Page,
+    PageContent,
+    PagePermission,
+    Placeholder,
 )
 from cms.operations.helpers import (
-    send_post_page_operation, send_pre_page_operation,
+    send_post_page_operation,
+    send_pre_page_operation,
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
@@ -50,7 +68,9 @@ from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_language_list, get_language_object, get_language_tuple,
+    get_language_list,
+    get_language_object,
+    get_language_tuple,
     get_site_language_from_request,
 )
 from cms.utils.plugins import copy_plugins_to_placeholder
@@ -146,7 +166,8 @@ class PageAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^list/$', self.get_list),
@@ -842,7 +863,8 @@ class PageContentAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^get-tree/$', self.get_tree),

@@ -2,12 +2,16 @@ from urllib.parse import quote
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import (
-    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
 )
 from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse
@@ -23,7 +27,9 @@ from cms.forms.login import CMSToolbarLoginForm
 from cms.models import PageContent
 from cms.models.pagemodel import TreeNode
 from cms.page_rendering import (
-    _handle_no_apphook, _handle_no_page, _render_welcome_page,
+    _handle_no_apphook,
+    _handle_no_page,
+    _render_welcome_page,
     render_pagecontent,
 )
 from cms.toolbar.utils import get_toolbar_from_request
@@ -32,8 +38,11 @@ from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import (
-    get_default_language_for_site, get_fallback_languages, get_language_list,
-    get_public_languages, get_redirect_on_fallback,
+    get_default_language_for_site,
+    get_fallback_languages,
+    get_language_list,
+    get_public_languages,
+    get_redirect_on_fallback,
     is_language_prefix_patterns_used,
 )
 from cms.utils.page import get_page_from_request

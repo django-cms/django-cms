@@ -9,7 +9,10 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 
 from cms.api import (
-    _verify_plugin_type, add_plugin, assign_user_to_page, create_page,
+    _verify_plugin_type,
+    add_plugin,
+    assign_user_to_page,
+    create_page,
 )
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
