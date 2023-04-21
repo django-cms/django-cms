@@ -23,4 +23,6 @@ jobs:
           python -m pip install --upgrade pip
           pip install ruff
       - name: Run Ruff
-        run: ruff cms
+        run: |
+          ruff cms
+          ruff menus
