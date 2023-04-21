@@ -14,10 +14,10 @@
     box-shadow: $dropdown-shadow;
     transform: translateZ(0);
 
-    a,
+    a, a:visited, a:link, a:link:visited,
     .cms-pagetree-dropdown-item {
         display: block;
-        color: $gray;
+        color: $dropdown-link-color;
         line-height: 1.5;
         text-align: left;
         padding: 10px $pagetree-dropdown-padding-horizontal;
@@ -26,8 +26,8 @@
     a:active,
     a:focus {
         // to override admin styles
-        color: $white !important;
-        background: $color-primary;
+        color: $dropdown-link-active-color !important;
+        background: $dropdown-link-active-bg;
     }
     li:first-child > a {
         border-top-left-radius: $border-radius-normal;
@@ -39,7 +39,7 @@
     }
     .cms-pagetree-dropdown-item-disabled {
         opacity: 0.2;
-        color: $gray-darker;
+        color: $dropdown-link-disabled-color;
         cursor: default;
         &:hover,
         &:focus {
@@ -59,7 +59,7 @@
 
     .label {
         display: block;
-        color: $gray-light;
+        color: $dropdown-link-color;
         font-size: 90%;
         font-weight: normal;
         line-height: 1.5;

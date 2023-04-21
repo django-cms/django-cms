@@ -123,7 +123,7 @@ class PageContentManager(WithUserMixin, models.Manager):
         return None
 
 
-class PageContentAdminQuerySet(models.QuerySet):
+class ContentAdminQuerySet(models.QuerySet):
     def current_content(self, **kwargs):
         """If a versioning package is installed, this returns the currently valid content
         that matches the filter given in kwargs. Used to find content to be copied, e.g..
@@ -137,9 +137,9 @@ class PageContentAdminQuerySet(models.QuerySet):
         return self.filter(**kwargs)
 
 
-class PageContentAdminManager(PageContentManager):
+class ContentAdminManager(WithUserMixin, models.Manager):
     def get_queryset(self):
-        return PageContentAdminQuerySet(self.model, using=self._db)
+        return ContentAdminQuerySet(self.model, using=self._db)
 
     def current_content(self, **kwargs):
         """Syntactic sugar: admin_manager.current_content()"""
