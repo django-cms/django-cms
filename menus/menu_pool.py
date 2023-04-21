@@ -9,7 +9,10 @@ from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import (
-    get_language_from_request, gettext_lazy as _,
+    get_language_from_request,
+)
+from django.utils.translation import (
+    gettext_lazy as _,
 )
 
 from cms.utils import get_current_site
