@@ -19,6 +19,7 @@ jinja2==3.0.3  # next release incompatible with pinned sphinx version
 sphinxcontrib-spelling<7.0.0  # restriction for py35 tests
 unittest-xml-reporting==1.11.0
 
-djangocms-text-ckeditor
+# FIXME: - Remove when a django 3.0 compatible djangocms-text-ckeditor version is released
+https://github.com/djangocms-text-ckeditor/djangocms-text-ckeditor/archive/feature/cms-40-django-30-support-.zip
 https://github.com/ojii/django-better-test/archive/8aa2407d097fe3789b74682f0e6bd7d15d449416.zip#egg=django-better-test
 https://github.com/ojii/django-app-manage/archive/65da18ef234a4e985710c2c0ec760023695b40fe.zip#egg=django-app-manage
