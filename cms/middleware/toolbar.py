@@ -6,7 +6,7 @@ from django.contrib.admin.models import ADDITION, CHANGE, LogEntry
 from django.core.exceptions import ValidationError
 from django.urls import Resolver404, resolve
 
-from cms.toolbar.toolbar import CMSToolbar, EmptyToolbar
+from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.request_ip_resolvers import get_request_ip_resolver
@@ -80,7 +80,7 @@ class ToolbarMiddleware:
 
         toolbar = get_toolbar_from_request(request)
 
-        if not isinstance(toolbar, EmptyToolbar) and toolbar._cache_disabled:
+        if toolbar._cache_disabled:
             add_never_cache_headers(response)
 
         if hasattr(request, 'user') and request.user.is_staff and response.status_code != 500:

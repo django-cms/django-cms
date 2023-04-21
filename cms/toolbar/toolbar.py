@@ -484,13 +484,14 @@ class CMSToolbar(BaseToolbar):
 
 
 class EmptyToolbar(BaseToolbar):
+    """Toolbar object of non-CMS pages"""
     is_staff = False
     show_toolbar = False
 
     # Backwards compatibility
     edit_mode = False
 
-    _cache_disabled = True
+    _cache_disabled = False  # Do not interfere with caching of non-CMS requests
 
     def __init__(self, request):
         self.request = request
