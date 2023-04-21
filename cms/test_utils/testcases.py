@@ -21,6 +21,7 @@ from django.utils.timezone import now
 
 from cms.api import create_page
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING
+from cms.exceptions import DuplicatePlaceholderWarning
 from cms.models import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission, PageUser
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
@@ -28,7 +29,6 @@ from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
-from cms.exceptions import DuplicatePlaceholderWarning
 from menus.menu_pool import menu_pool
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
