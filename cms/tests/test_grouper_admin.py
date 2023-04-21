@@ -44,32 +44,35 @@ class SetupMixin:
 class ChangeListActionsTestCase(SetupMixin, CMSTestCase):
     def test_action_js_css(self):
         """Are js and css files loaded?
-        The js and css files are supposed to be arranged by the GrouperAdminMixin.
-        No action here. Just assert the result."""
+        The js and css files are supposed to be arranged by the GrouperAdminMixin."""
         with self.login_user_context(self.admin_user):
+            # Act
             response = self.client.get(self.changelist_url + "?language=en")
+            # Assert
             self.assertContains(response, static("admin/js/jquery.init.js"))
             self.assertContains(response, static("cms/js/admin/actions.js"))
             self.assertContains(response, static_with_version("cms/css/cms.admin.css"))
 
     def test_add_action(self):
         """Change list offers an add button if no content object exists for grouper.
-        The button is supposed to be arranged by the GrouperAdminMixin.
-        No action here. Just assert the result."""
+        The button is supposed to be arranged by the GrouperAdminMixin."""
         with self.login_user_context(self.admin_user):
+            # Act
             response = self.client.get(self.changelist_url + "?language=en")
+            # Assert
             self.assertContains(response, 'class="cms-icon cms-icon-plus"')
             self.assertContains(response, f'href="/en/admin/sampleapp/groupermodel/{self.grouper_instance.pk}'
                                           f'/change/?language=en"')
             self.assertNotContains(response, 'class="cms-icon cms-icon-view"')
 
     def test_change_action(self):
-        """Change list offers a settings button if content object exists for grouper
-        The button is supposed to be arranged by the GrouperAdminMixin.
-        No action here. Just assert the result."""
+        """Change list offers a settings button if content object exists for grouper"""
+        # Arrange
         self.createContentInstance("en")
         with self.login_user_context(self.admin_user):
+            # Act
             response = self.client.get(self.changelist_url + "?language=en")
+            # Assert
             self.assertContains(response, 'class="cms-icon cms-icon-view"')
             self.assertContains(response, f'href="/en/admin/sampleapp/groupermodel/{self.grouper_instance.pk}'
                                           f'/change/?language=en"')
@@ -80,18 +83,22 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
     def test_form_class_created(self):
         """The form class has automatically been enhanced with the GrouperAdminFormMixin for
         the appropriate content model (actually its parent class _GrouperAdminFormMixin)"""
+        # Arrange
         from cms.admin.utils import _GrouperAdminFormMixin
 
+        # Assert
         self.assertTrue(issubclass(self.admin.form, _GrouperAdminFormMixin))
         self.assertEqual(self.admin.form._content_model, GrouperModelContent)
 
     def test_form_class_content_fields(self):
         """The content fields appear in the admin form with a prefix"""
+        # Assert
         for field in self.admin.form._content_fields:
             self.assertIn(CONTENT_PREFIX + field, self.admin.form.base_fields)
 
     def test_content_model_detected(self) -> None:
         """Content model has been detected correctly for grouper admin"""
+        # Assert
         admin = site._registry[GrouperModel]
         self.assertEqual(admin.content_model, GrouperModelContent)
 
@@ -99,8 +106,10 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
     def test_language_selector(self):
         """All languages available to select"""
+        # Act
         with self.login_user_context(self.admin_user):
             response = self.client.get(self.changelist_url)
+        # Assert
         for lang, verb in self.admin.get_language_tuple():
             self.assertContains(response, f'<option value="{lang}"')
 
@@ -108,27 +117,37 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
         """Without any content being created the changelist shows an empty content text"""
         with self.login_user_context(self.admin_user):
             for language in ("en", "de", "it"):
+                # Act
                 response = self.client.get(self.changelist_url + f"?language={language}")
+                # Assert
                 self.assertContains(response, "Empty content")
 
     def test_with_content(self) -> None:
         """Create one content object and see if it appears in the right admin"""
+        # Arrange
         random_content = self.createContentInstance("de")
         with self.login_user_context(self.admin_user):
+            # Act
             response = self.client.get(self.changelist_url + "?language=de")
+            # Assert
             self.assertContains(response, "Grouper Category")
             self.assertContains(response, random_content.secret_greeting)
 
             for language in ("en", "it"):
+                # Act
                 response = self.client.get(self.changelist_url + f"?language={language}")
+                # Assert
                 self.assertContains(response, "Empty content")
 
     def test_with_content_only(self) -> None:
         """Create one content object and see if it appears in the right admin"""
+        # Arrange
         random_content = {lang: self.createContentInstance(lang).secret_greeting for lang in get_language_list()}
         with self.login_user_context(self.admin_user):
             for language in get_language_list():
+                # Act
                 response = self.client.get(self.changelist_url + f"?language={language}")
+                # Assert
                 self.assertContains(response, "Grouper Category")
                 self.assertContains(response, random_content[language])
 
@@ -136,9 +155,12 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
 class GrouperChangeTestCase(SetupMixin, CMSTestCase):
     def test_mixed_change_form(self):
         """Change form contains input for both grouper and content objects"""
+        # Arrange
         random_content = self.createContentInstance("en")
         with self.login_user_context(self.admin_user):
+            # Act
             response = self.client.get(self.change_url + "?language=en")
+            # Assert
             # Contains relation to grouper as hidden input
             self.assertContains(
                 response,
@@ -160,20 +182,27 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
 
     def test_change_form_contains_defaults_for_groupers(self) -> None:
         with self.login_user_context(self.admin_user):
+            # Act
             response = self.client.get(self.change_url + "?language=en")
+            # Assert
             self.assertContains(response, 'name="content__language" value="en"')
             self.assertNotContains(response, 'name="content__language" value="de"')
 
+            # Act
             response = self.client.get(self.change_url + "?language=de")
+            # Assert
             self.assertContains(response, 'name="content__language" value="de"')
             self.assertNotContains(response, 'name="content__language" value="en"')
 
     @wo_content_permission
     def test_change_form_wo_write_permit(self) -> None:
         """If no change permission exists for content mark content fields readonly."""
+        # Arrange
         random_content = self.createContentInstance("en")
         with self.login_user_context(self.admin_user):
+            # Act
             response = self.client.get(self.change_url + "?language=en")
+            # Assert
             # Contains relation to grouper as hidden input
             self.assertContains(
                 response,
@@ -193,13 +222,16 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
 
     def test_admin_with_write_permit(self) -> None:
         """If change permissions exist for content model its fields in the admin are not readonly."""
+        # Assert
         self.assertNotIn("content__secret_greeting", self.admin.get_readonly_fields(None))
 
     @wo_content_permission
     def test_admin_wo_write_permit(self) -> None:
+        # Assert
         self.assertIn("content__secret_greeting", self.admin.get_readonly_fields(None))
 
     def test_save_grouper_model(self) -> None:
+        # Arrange
         random_content = self.createContentInstance("en")
         data = {
             "content__language": "en",
@@ -208,12 +240,15 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             "content__secret_greeting": random_content.secret_greeting,
         }
         with self.login_user_context(self.admin_user):
+            # Act
             response = self.client.post(self.change_url + "?language=en", data=data)
+            # Assert
             self.grouper_instance.refresh_from_db()
             self.assertEqual(response.status_code, 302)  # Expecting redirect
             self.assertEqual(self.grouper_instance.category_name, data["category_name"])
 
     def test_save_content_model(self) -> None:
+        # Arrange
         self.createContentInstance("en")
         data = {
             "content__language": "en",
@@ -221,38 +256,40 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             "content__region": "world",
             "content__secret_greeting": "New greeting",
         }
+        # Act
         with self.login_user_context(self.admin_user):
             response = self.client.post(self.change_url + "?language=en", data=data)
-            self.assertEqual(response.status_code, 302)  # Expecting redirect
-
-        content_instance = GrouperModelContent.objects.filter(language="en").first()
+            content_instance = GrouperModelContent.objects.filter(language="en").first()
+        # Assert
+        self.assertEqual(response.status_code, 302)  # Expecting redirect
         self.assertIsNotNone(content_instance)
         self.assertEqual(content_instance.secret_greeting, data["content__secret_greeting"])
 
     def test_create_grouper_model(self) -> None:
+        # Arrange
         data = {
             "content__language": "de",
             "category_name": "My new category",
             "content__region": "world",
             "content__secret_greeting": "Some new content",
         }
+        # Act
         with self.login_user_context(self.admin_user):
             response = self.client.post(self.add_url + "?language=de", data=data)
-            self.assertEqual(response.status_code, 302)  # Expecting redirect
+            grouper_instance = GrouperModel.objects.filter(category_name=data["category_name"]).first()
+            content_instance_en = grouper_instance.groupermodelcontent_set.filter(language="en").first()  # Get English
+            content_instance_de = grouper_instance.groupermodelcontent_set.filter(language="de").first()  # Get German
 
+        # Assert
+        self.assertEqual(response.status_code, 302)  # Expecting redirect
         self.assertEqual(GrouperModel.objects.all().count(), 2)
-
-        grouper_instance = GrouperModel.objects.filter(category_name=data["category_name"]).first()
         self.assertIsNotNone(grouper_instance)
-
-        content_instance = grouper_instance.groupermodelcontent_set.filter(language="en").first()  # Get English
-        self.assertIsNone(content_instance)  # Should not exist
-
-        content_instance = grouper_instance.groupermodelcontent_set.filter(language="de").first()  # Get German
-        self.assertIsNotNone(content_instance)  # Should exist
-        self.assertEqual(content_instance.secret_greeting, data["content__secret_greeting"])  # Has new content
+        self.assertIsNone(content_instance_en)  # Should not exist
+        self.assertIsNotNone(content_instance_de)  # Should exist
+        self.assertEqual(content_instance_de.secret_greeting, data["content__secret_greeting"])  # Has new content
 
     def test_create_content_model(self) -> None:
+        # Arrange
         random_content = self.createContentInstance("en")
         data = {
             "content__language": "de",
@@ -260,14 +297,14 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             "content__region": "world",
             "content__secret_greeting": "New German content",
         }
+        # Act
         with self.login_user_context(self.admin_user):
             response = self.client.post(self.change_url + "?language=de", data=data)
-            self.assertEqual(response.status_code, 302)  # Expecting redirect
-
-        content_instance = GrouperModelContent.objects.filter(language="en").first()  # Get English
-        self.assertIsNotNone(content_instance)
-        self.assertEqual(content_instance.secret_greeting, random_content.secret_greeting)  # unchanged
-
-        content_instance = GrouperModelContent.objects.filter(language="de").first()  # New German instance
-        self.assertIsNotNone(content_instance)  # Exists?
-        self.assertEqual(content_instance.secret_greeting, data["content__secret_greeting"])  # Has new content
+            content_instance_en = GrouperModelContent.objects.filter(language="en").first()  # Get English
+            content_instance_de = GrouperModelContent.objects.filter(language="de").first()  # New German instance
+        # Assert
+        self.assertEqual(response.status_code, 302)  # Expecting redirect
+        self.assertIsNotNone(content_instance_en)
+        self.assertEqual(content_instance_en.secret_greeting, random_content.secret_greeting)  # unchanged
+        self.assertIsNotNone(content_instance_de)  # Exists?
+        self.assertEqual(content_instance_de.secret_greeting, data["content__secret_greeting"])  # Has new content
