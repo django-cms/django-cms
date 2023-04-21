@@ -43,7 +43,9 @@ class SetupMixin:
 
 class ChangeListActionsTestCase(SetupMixin, CMSTestCase):
     def test_action_js_css(self):
-        """Are js and css files loaded?"""
+        """Are js and css files loaded?
+        The js and css files are supposed to be arranged by the GrouperAdminMixin.
+        No action here. Just assert the result."""
         with self.login_user_context(self.admin_user):
             response = self.client.get(self.changelist_url + "?language=en")
             self.assertContains(response, static("admin/js/jquery.init.js"))
@@ -51,7 +53,9 @@ class ChangeListActionsTestCase(SetupMixin, CMSTestCase):
             self.assertContains(response, static_with_version("cms/css/cms.admin.css"))
 
     def test_add_action(self):
-        """Change list offers an add button if no content object exists for grouper"""
+        """Change list offers an add button if no content object exists for grouper.
+        The button is supposed to be arranged by the GrouperAdminMixin.
+        No action here. Just assert the result."""
         with self.login_user_context(self.admin_user):
             response = self.client.get(self.changelist_url + "?language=en")
             self.assertContains(response, 'class="cms-icon cms-icon-plus"')
@@ -60,7 +64,9 @@ class ChangeListActionsTestCase(SetupMixin, CMSTestCase):
             self.assertNotContains(response, 'class="cms-icon cms-icon-view"')
 
     def test_change_action(self):
-        """Change list offers a settings button if content object exists for grouper"""
+        """Change list offers a settings button if content object exists for grouper
+        The button is supposed to be arranged by the GrouperAdminMixin.
+        No action here. Just assert the result."""
         self.createContentInstance("en")
         with self.login_user_context(self.admin_user):
             response = self.client.get(self.changelist_url + "?language=en")
