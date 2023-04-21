@@ -194,7 +194,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             )
             # Contains grouper field with category (and its value)
             self.assertContains(response, '<input type="text" name="category_name" value="Grouper Category"')
-            # Contains content secret message as textarea
+            # Does not contain content secret message as textarea
             self.assertContains(response, 'field-content__secret_greeting"')
 
             self.assertContains(response, random_content)
