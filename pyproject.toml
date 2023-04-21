@@ -1,0 +1,19 @@
+[tool.ruff]
+exclude = [
+    ".env",
+    ".venv",
+    "**/migrations/**",
+]
+ignore = [
+    "E501",  # line too long
+    "F403",  # 'from module import *' used; unable to detect undefined names
+    "E701",  # multiple statements on one line (colon)
+    "F401",  # module imported but unused
+]
+line-length = 119
+select = [
+    "I",
+    "E",
+    "F",
+    "W",
+]
