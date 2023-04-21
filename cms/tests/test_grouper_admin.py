@@ -8,6 +8,7 @@ from cms.test_utils.project.sampleapp.models import (
     GrouperModel, GrouperModelContent,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.test_utils.util.grouper import wo_content_permission
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse, static_with_version
 
@@ -31,28 +32,13 @@ class SetupMixin:
     def createContentInstance(self, language="en"):
         """Creates a content instance with a random content for a language. The random content is returned
         to be able to check if it appears in forms etc."""
-        random_content = get_random_string(16)
-        GrouperModelContent.objects.create(
+        instance = GrouperModelContent.objects.create(
             grouper_model=self.grouper_instance,
             language=language,
-            secret_greeting=random_content,
+            secret_greeting=get_random_string(16),
         )
         self.admin.clear_content_cache()  # The admin does this automatically for each new request.
-        return random_content
-
-
-def wo_content_permission(method):
-    """Decorator to temporarily switch of write permissions to content"""
-    def inner(self, *args, **kwargs):
-        self.admin.change_content = False
-        try:
-            return_value = method(self, *args, **kwargs)
-        except Exception:
-            raise
-        finally:
-            self.admin.change_content = True
-        return return_value
-    return inner
+        return instance
 
 
 class ChangeListActionsTestCase(SetupMixin, CMSTestCase):
@@ -125,7 +111,7 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
         with self.login_user_context(self.admin_user):
             response = self.client.get(self.changelist_url + "?language=de")
             self.assertContains(response, "Grouper Category")
-            self.assertContains(response, random_content)
+            self.assertContains(response, random_content.secret_greeting)
 
             for language in ("en", "it"):
                 response = self.client.get(self.changelist_url + f"?language={language}")
@@ -133,7 +119,7 @@ class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
 
     def test_with_content_only(self) -> None:
         """Create one content object and see if it appears in the right admin"""
-        random_content = {lang: self.createContentInstance(lang) for lang in get_language_list()}
+        random_content = {lang: self.createContentInstance(lang).secret_greeting for lang in get_language_list()}
         with self.login_user_context(self.admin_user):
             for language in get_language_list():
                 response = self.client.get(self.changelist_url + f"?language={language}")
@@ -164,7 +150,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             )
             # Contains content secret message as textarea
             self.assertContains(response, '<textarea name="content__secret_greeting"')
-            self.assertContains(response, random_content)
+            self.assertContains(response, random_content.secret_greeting)
 
     def test_change_form_contains_defaults_for_groupers(self) -> None:
         with self.login_user_context(self.admin_user):
@@ -197,14 +183,14 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             # Does not contain content secret message as textarea
             self.assertContains(response, 'field-content__secret_greeting"')
 
-            self.assertContains(response, random_content)
+            self.assertContains(response, random_content.secret_greeting)
 
-    def test_with_write_permit(self) -> None:
-        """If change permissions exist for content model its fields are not readonly."""
+    def test_admin_with_write_permit(self) -> None:
+        """If change permissions exist for content model its fields in the admin are not readonly."""
         self.assertNotIn("content__secret_greeting", self.admin.get_readonly_fields(None))
 
     @wo_content_permission
-    def test_wo_write_permit(self) -> None:
+    def test_admin_wo_write_permit(self) -> None:
         self.assertIn("content__secret_greeting", self.admin.get_readonly_fields(None))
 
     def test_save_grouper_model(self) -> None:
@@ -213,7 +199,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             "content__language": "en",
             "category_name": "Changed content",
             "content__region": "world",
-            "content__secret_greeting": random_content,
+            "content__secret_greeting": random_content.secret_greeting,
         }
         with self.login_user_context(self.admin_user):
             response = self.client.post(self.change_url + "?language=en", data=data)
@@ -274,7 +260,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
 
         content_instance = GrouperModelContent.objects.filter(language="en").first()  # Get English
         self.assertIsNotNone(content_instance)
-        self.assertEqual(content_instance.secret_greeting, random_content)  # unchanged
+        self.assertEqual(content_instance.secret_greeting, random_content.secret_greeting)  # unchanged
 
         content_instance = GrouperModelContent.objects.filter(language="de").first()  # New German instance
         self.assertIsNotNone(content_instance)  # Exists?
