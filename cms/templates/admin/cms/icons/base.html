@@ -1,0 +1,5 @@
+{% spaceless %}
+<a class="btn{% if disabled %} inactive{% endif %}{% if get|default_if_none:True %} cms-form-get-method{% endif %}{% if burger_menu %} cms-burger-action-btn{% endif %} cms-action-btn cms-action-{% block name %}{{ name }}{% endblock %}{% if action|default_if_none:True %} js-action{% endif %} {% if keepsideframe|default_if_none:True %}js-keep-sideframe{% else %}js-close-sideframe{% endif %}"{% if not disabled %} href="{{ url }}"{% endif %} title="{% block title %}{{ title }}{% endblock %}">
+    <span class="cms-icon cms-icon-{% block icon %}{{ icon }}{% endblock %}"></span>
+</a>
+{% endspaceless %}

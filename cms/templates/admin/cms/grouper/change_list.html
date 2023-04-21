@@ -1,0 +1,11 @@
+{% extends "admin/change_list.html" %}{% load i18n %}
+{% block search %}
+  <div class="language-selector" style="width: fit-content; margin-bottom: 1em;">
+    <label>{% trans "Language" %}:&nbsp;</label>
+    <select class="language-selector js-language-selector" style="min-width: 180px;">
+      {% for code, lang in cl.model_admin.get_language_tuple %}
+        <option value="{{ code }}"{% if cl.model_admin.language == code %} selected{% endif %}>{{ lang }}</option>
+      {% endfor %}
+    </select>
+  </div>{{ block.super }}
+{% endblock %}
