@@ -116,7 +116,9 @@ def details(request, slug):
     else:
         user_languages = get_public_languages(site_id=site.pk)
 
-    request_language = get_language_from_request(request, check_path=True)
+    request_language = None
+    if is_language_prefix_patterns_used():
+        request_language = get_language_from_request(request, check_path=True)
     if not request_language:
         request_language = get_default_language_for_site(get_current_site().pk)
 
