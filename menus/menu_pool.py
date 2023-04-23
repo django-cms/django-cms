@@ -18,7 +18,8 @@ from django.utils.translation import (
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_default_language_for_site, is_language_prefix_patterns_used,
+    get_default_language_for_site,
+    is_language_prefix_patterns_used,
 )
 from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
