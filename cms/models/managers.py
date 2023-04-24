@@ -278,7 +278,7 @@ class PagePermissionManager(BasicPagePermissionManager):
                                         A
                                     /      \
                                   user     B,E
-                                /     \\      \
+                                /     \      \
                               C,X     D,Y    user
                                             /    \
                                            I      J,A
