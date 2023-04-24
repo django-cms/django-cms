@@ -11,6 +11,7 @@ from django.http import Http404, HttpResponseBadRequest, HttpResponseNotFound
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_str, smart_str
+from django.utils.http import urlencode
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 
@@ -627,7 +628,7 @@ class AdminTests(AdminTestsBase):
                     'placeholder_id': body.pk,
                     'target_language': 'en',
                 }
-                response = self.client.post(url, data)
+                response = self.client.post(f'{url}?{urlencode(data)}')
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
     def test_too_many_plugins_type(self):
@@ -651,11 +652,10 @@ class AdminTests(AdminTestsBase):
                     'target_language': 'en',
                     'plugin_parent': '',
                 }
-                response = self.client.post(url, data)
+                response = self.client.post(f'{url}?{urlencode(data)}')
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
     def test_too_many_plugins_global_children(self):
-        from urllib.parse import urlencode
         conf = {
             'body': {
                 'limits': {
