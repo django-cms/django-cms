@@ -1,16 +1,52 @@
 4.1.0rc2 (unpublished)
 ======================
 
+Features:
+---------
+
+* Graceful plugin exceptions (#7423)
+* Reintroduce indicator menus (#7426)
+* Add release scripts for develop-4 branch (#7466)
+* Icon update (#7494)
+* Add setting to redirect slugs to lowercase et al. (#7510)
+* Grouper model admin class
+* Change `TitleExtension` to `PageContentExtension` (#7369)
+* Optimize populating page content cache for Page model. (#7177)
 * Unified icon font with icons for versioning, moderation and version locking
-* Django 4.1 and 4.0 support
-* Python 3.10 support
+* Django 4.2, 4.1 and 4.0 support
+* Python 3.11, 3.10 support
+* Remove patching of PageContent by djangocms-versioning (#7446)
+* Utility function get_placeholder_from_slot for PlaceholderRelationField (#7479)
+
+Bug Fixes:
+----------
+
+* Language switching in page settings (#7507)
+* Show language menu in toolbar only if at least two languages are configured (#7508)
+* Moving plugins between placeholders, plugin api (#7394)
+* Apphooks at endpoints (#7496)
 * Fix bug that broke page tree if it contained empty page content
 * Fix bug that created new page content not in the displayed language but the browser language
-* feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
-* Introduce dropdown menus in the page tree for status indicators
 * Fixed redirect issues when i18n_patterns had prefix_default_language = False
 * add release scripts for develop-4 branch (#7466) (ddbc99a53) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 145 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (55 pull requests)
+* Mark Walker (1 pull request)
+* Nebojsa Knezevic ( 1 pull request)
+
+With the review help of the following contributors:
+
+* Andrew Aikman
+* Fabian Braun
+* Mark Walker
+
+Thanks to all contributors for their efforts!
 
 4.0.0 (unreleased)
 ==================
