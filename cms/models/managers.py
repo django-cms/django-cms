@@ -1,4 +1,4 @@
-# noqa W605
+# ruff: noqa: W605
 import functools
 import operator
 
