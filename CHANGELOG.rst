@@ -2,19 +2,34 @@
 Changelog
 =========
 
+3.11.3 (2023-04-25)
+===================
+
+Bug Fixes:
+----------
+* Remove superflous curly bracket left behind on PR 7488 (#7529) -- Corentin Bettiol
+* Fix admin tests (#6848) for some post requests (#7535) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 2 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Corentin Bettiol (1 pull request)
+* Fabian Braun (1 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+3.11.2 (2023-04-18)
+===================
+
 Features:
 ---------
-* add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
-* add setting to redirect slugs to lowercase (#7509) (01aedee9f) -- pajowu
-* add setting so redirect preserve params (#7489) (dcb9c4b3a) -- Ivo Branco
-* add download statistics to readme (#7474) (25b2303f7) -- Fabian Braun
-* add django 4.2 support (#7481) (89a42ddb9) -- Vinit Kumar
-* add setting to redirect slugs to lowercase (#7509) (7e852ec2c) -- pajowu
-* add setting so redirect preserve params (#7489) (4d7ed46ee) -- Ivo Branco
-* add download statistics to readme (#7474) (99e9ab025) -- Fabian Braun
-* add Python 3.11 support for Django CMS (#7422) (3fe1449e6) -- Vinit Kumar
-* Support for Django 4.1 (#7404) (777864af3) -- Fabian Braun
-* Add support for tel: and mailto: URIs in Advanced Page Settings redirect field (#7370) (0fd058ed3) -- Mark Walker
 * add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
 * add setting to redirect slugs to lowercase (#7509) (01aedee9f) -- pajowu
 * add setting so redirect preserves params (#7489) (dcb9c4b3a) -- Ivo Branco
@@ -24,98 +39,27 @@ Bug Fixes:
 ----------
 * replace ' by ′ in fr translation − no more "page d\u0027accueil"! (#7488) (b4acc9a6b) -- Corentin Bettiol
 * Link both user and group from global page permissions to change form (#7486) (6cb47629b) -- Fabian Braun
-* replace ' by ′ in fr translation − no more "page d\u0027accueil"! (#7488) (99c884381) -- Corentin Bettiol
-* Link both user and group from global page permissions to change form (#7486) (5135ca3d7) -- Fabian Braun
 * Build docs always from the current local version (#7472) (#7475) (7aaddd45a) -- Fabian Braun
-* Build docs always from the current local version (#7472) (8c91e33f3) -- Fabian Braun
-* cms-messages background color (#7465) (7132ee3f3) -- Fabian Braun
-* Prefer titles matching request language (#7144) (06c9a85df) -- Micah Denbraver
-* Adds a deprecation warning for SEND_BROKEN_LINK_EMAILS (#7420) (d38f4a1cc) -- Fabian Braun
-* Added deprecation warning to `get_current_language()` (#7410) (2788f75e6) -- Mark Walker
-* CMS check management command fixed [#7412] (#7413) (dcf394bd5) -- ton77v
-* Changing color scheme resets session settings to defaults (#7407) (fcfe77f63) -- Fabian Braun
-* Clear page permission cache on page create (#6866) (e59c179dd) -- G3RB3N
-* Unlocalize page and node ids when rendering the page tree in the admin (#7188) (9e3c57946) -- Marco Bonetti
-* Allow partially overriding CMS_CACHE_DURATIONS (#7339) (162ff8dd8) -- Qijia Liu
-* CMS check management command fixed [#7386] (cdcf260aa) -- Marco Bonetti
-* default light mode (#7381) (abc6e6c5b) -- viliammihalik
-* Added language to page cache key (#7354) (d5a9f49e6) -- Mark Walker
-* replace ' by ′ in fr translation − no more "page d\u0027accueil"! (#7488) (b4acc9a6b) -- Corentin Bettiol
-* Link both user and group from global page permissions to change form (#7486) (6cb47629b) -- Fabian Braun
-* Build docs always from the current local version (#7472) (#7475) (7aaddd45a) -- Fabian Braun
-
-Refactoring and Cleanups:
--------------------------
-* Move js API functions to CMS.Helpers to make them available also to the admin site (#7384) (a7f8cd44f) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes 85 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 21 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Cage Johnson (1 pull request)
-* Christian Clauss (1 pull request)
-* Corentin Bettiol (2 pull requests)
-* Danny Waser (2 pull requests)
-* Dapo Adedire (1 pull request)
-* Fabian Braun (31 pull requests)
-* G3RB3N (1 pull request)
-* Github Release Action (2 pull requests)
-* Hussein Srour (1 pull request)
-* Ivo Branco (2 pull requests)
-* Jasper (2 pull requests)
-* Marco Bonetti (2 pull requests)
-* Mark Walker (10 pull requests)
-* Micah Denbraver (1 pull request)
-* Nihal Rahman (2 pull requests)
-* Qijia Liu (1 pull request)
-* Shivan Sivakumaran (1 pull request)
-* Vinit Kumar (5 pull requests)
-* code-review-doctor (1 pull request)
-* dependabot[bot] (0 pull request)
-* lgtm-com[bot] (0 pull request)
-* pajowu (2 pull requests)
-* ton77v (1 pull request)
-* viliammihalik (1 pull request)
-* wesleysima (1 pull request)
+* Corentin Bettiol (1 pull request)
+* Danny Waser (1 pull request)
+* Fabian Braun (10 pull requests)
+* Ivo Branco (1 pull request)
+* Jasper (1 pull request)
+* Nihal Rahman (1 pull request)
+* Vinit Kumar (3 pull requests)
+* pajowu (1 pull request)
 
 With the review help of the following contributors:
 
-* Cage Johnson
-* Christian Clauss
-* Conrad
-* Corentin Bettiol
-* Danny Waser
-* Dapo Adedire
 * Fabian Braun
-* Fabien MICHEL
-* Florian Delizy
-* G3RB3N
-* Github Release Action
-* Hussein Srour
-* Ivo Branco
-* Jasper
-* LGTM Migrator
-* Marco Bonetti
-* Mark Walker
-* Micah Denbraver
 * Nihal
-* Nihal Rahman
-* Pankrat
-* Patrick Mazulo
-* Qijia Liu
-* Shivan Sivakumaran
-* Simon Krull
 * Vinit Kumar
-* code-review-doctor
-* dependabot[bot]
-* fsbraun
-* jefe
-* jillalberts
-* pajowu
-* ton77v
-* viliammihalik
-* wesleysima
 
 Thanks to all contributors for their efforts!
 
