@@ -9,11 +9,18 @@ from cms.models.placeholdermodel import Placeholder
 
 class PlaceholderField(models.ForeignKey):
     """
-    A foreign key field to the :class:`cms.models.placeholdermodel.Placeholder` model.
+    .. warning::
+        This field is for django CMS versions below 4 only. It may only used for migrations.
+
+    The ``PlaceholderField`` has been replaced by the :class:`~cms.models.fields.PlaceholderRelationField`,
+    the built-in migrations will automatically take care of the replacement.
+
+    See documentation of :class:`~cms.models.fields.PlaceholderRelationField` for how to replace the code.
     """
     def __init__(self, slotname, default_width=None, actions=None, **kwargs):
         from cms.utils.placeholder import (
-            PlaceholderNoAction, validate_placeholder_name,
+            PlaceholderNoAction,
+            validate_placeholder_name,
         )
 
         if not actions:
@@ -85,8 +92,8 @@ class PlaceholderField(models.ForeignKey):
 
 class PageField(models.ForeignKey):
     """
-    This is a foreign key field to the :class:`cms.models.Page` model
-    that defaults to the :class:`cms.forms.fields.PageSelectFormField` form
+    This is a foreign key field to the :class:`cms.models.pagemodel.Page` model
+    that defaults to the :class:`~cms.forms.fields.PageSelectFormField` form
     field when rendered in forms. It has the same API as the
     :class:`django:django.db.models.ForeignKey` but does not require
     the ``othermodel`` argument.
@@ -110,6 +117,23 @@ class PageField(models.ForeignKey):
 
 
 class PlaceholderRelationField(GenericRelation):
+    """:class:`~django.contrib.contenttypes.fields.GenericForeignKey` to placeholders.
+
+    If you create a model which contains placeholders you first create the ``PlaceHolderRelationField``::
+
+        from cms.utils.placeholder import get_placeholder_from_slot
+
+        class Post(models.Model):
+            ...
+            placeholders = PlaceholderRelationField()  # Generic relation
+
+            @cached_property
+            def content(self):
+                return get_placeholder_from_slot(self.placeholders, "content")  # A specific placeholder
+
+
+
+    """
     default_checks = []
 
     def __init__(self, checks=None, **kwargs):

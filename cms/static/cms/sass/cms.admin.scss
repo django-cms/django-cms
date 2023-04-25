@@ -1,0 +1,211 @@
+@charset "utf-8";
+/*!
+ * @copyright: https://github.com/django-cms/django-cms
+ */
+
+$pagetree: true;
+
+//##############################################################################
+// IMPORT SETTINGS
+@import "settings/all";
+@import "mixins/all";
+
+//##############################################################################
+// IMPORT COMPONENTS
+@import "components/iconography";
+
+
+a.btn.cms-action-btn {
+    position: relative;
+    display: inline-flex;
+    padding: 0 !important;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    margin-top: -12px !important;
+    box-sizing: border-box;
+    bottom: -6px;
+    cursor: pointer;
+    height: 34px;
+}
+
+span.cms-empty-action {
+    width: calc( 34px + 4px);
+    display: inline-flex;
+    position: relative;
+}
+
+a.btn.cms-action-btn span
+{
+    font-family: django-cms-iconfont;
+    font-size: 120%;
+}
+
+a.btn.cms-action-btn img {
+    width: 20px;
+    height: 20px;
+}
+
+a.btn.cms-action-btn.inactive:link,
+a.btn.cms-action-btn.inactive:visited {
+    color: var(--dca-gray-lighter, var(--border-color, #ccc))  !important;
+}
+
+
+/* disable clicking for inactive buttons */
+.btn.cms-action-btn.inactive {
+    pointer-events: none;
+}
+
+.btn.cms-action-btn.inactive img {
+    opacity: 0.5;
+}
+
+/* set size and spacing between for the action icons */
+a.btn.cms-action-btn img {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+}
+
+
+/*-------------------------------------
+This governs the drop-down behaviour
+extending the pagetree classes provided by CMS
+---------------------------------------*/
+
+.cms-actions-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 30px;
+    right: -1px;
+    z-index: 1000;
+    min-width: 180px;
+    margin: 0;
+    padding: 0 !important;
+    border-radius: 5px;
+    background: #fff;
+    box-shadow: 0 0 10px rgba(0,0,0,.25);
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+}
+
+/* Dropdown menu shadow */
+.cms-actions-dropdown-menu::before {
+    content: "";
+    position: absolute;
+    left: 100%;
+    z-index: -1;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    background-color: var(--dca-white, var(--body-bg, #fff));
+    box-shadow: 0 0 10px rgba(0,0,0,.25);
+    -webkit-transform: rotate(45deg) translateZ(0);
+    transform: rotate(45deg) translateZ(0);
+  }
+
+.cms-actions-dropdown-menu.open {
+    display: block;
+    width: fit-content;
+}
+
+.cms-actions-dropdown-menu.closed {
+    display: none;
+}
+
+.cms-actions-dropdown-menu-arrow-right-top::before {
+    top: 16px;
+}
+
+/* add shadow on burger menu trigger */
+a.btn.cms-action-btn:hover, a.btn.cms-action-btn.open {
+    box-shadow: inset 0 3px 5px rgba(0,0,0,.125);
+}
+
+/* style for each option row */
+ul.cms-actions-dropdown-menu-inner {
+    margin: 0;
+    padding: 0 !important;
+    border-radius: 5px;
+    background-color: var(--dca-white, var(--body-bg, #fff));
+    overflow: hidden;
+}
+
+ul.cms-actions-dropdown-menu-inner li {
+    border: 0px solid transparent;
+    padding: 0;
+    list-style-type: none;
+    a, a:visited, a:link, a:link:visited {
+        color: $dropdown-link-color;
+        &:hover {
+            color: $white;
+            border: 0px solid $gray-lighter;
+            background-color: $color-primary;
+
+        }
+    }
+}
+ul.cms-actions-dropdown-menu-inner li a:hover {
+}
+
+a.cms-actions-dropdown-menu-item-anchor {
+    display: block;
+    line-height: 1.5;
+    text-align: left;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+/* set the size of the option icon */
+a.cms-actions-dropdown-menu-item-anchor span.cms-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+    vertical-align: middle;
+}
+/* disable any inactive option */
+a.cms-actions-dropdown-menu-item-anchor.inactive {
+    cursor: not-allowed;
+    pointer-events: none;
+    opacity: 0.3;
+    filter: alpha(opacity=30);
+}
+
+/* Finally center indicators in django changelist view */
+
+.change-list table tbody td .cms-pagetree-node-state,
+.change-list table tbody td .cms-pagetree-dropdown-trigger {
+    vertical-align: middle;
+}
+
+.change-list table tbody .field-indicator,
+.change-list table thead .column-indicator
+ {
+    text-align: center;
+}
+
+.change-list table {
+    tbody .field-list_actions,
+    thead .column-list_actions  {
+        width: 1%;
+        white-space: nowrap;
+        .cms-burger-menu {
+            margin-left: auto;
+        }
+    }
+}
+
+
+body:not(.djangocms-admin-style) #page_form_lang_tabs input[type="button"].selected {
+    background-color: var(--button-bg);
+    color: var(--button-fg)
+}
+
+body:not(.djangocms-admin-style) #page_form_lang_tabs input[type="button"] {
+    background-color: var(--darkened-bg);
+    border: 1px solid var(--border-color);
+    color: var(--body-fg)
+}

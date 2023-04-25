@@ -6,7 +6,9 @@ from cms.test_utils.util.mock import AttributeObject
 from cms.utils.i18n import get_language_list
 from menus.templatetags.menu_tags import PageLanguageUrl
 from menus.utils import (
-    DefaultLanguageChanger, find_selected, language_changer_decorator,
+    DefaultLanguageChanger,
+    find_selected,
+    language_changer_decorator,
 )
 
 

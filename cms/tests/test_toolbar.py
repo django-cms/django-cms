@@ -15,31 +15,43 @@ from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
-from django.utils.translation import get_language, gettext_lazy as _, override
+from django.utils.translation import get_language, override
+from django.utils.translation import gettext_lazy as _
 
 from cms.admin.forms import RequestToolbarForm
 from cms.api import add_plugin, create_page, create_page_content
 from cms.cms_toolbars import (
-    ADMIN_MENU_IDENTIFIER, ADMINISTRATION_BREAK, LANGUAGE_MENU_IDENTIFIER,
+    ADMIN_MENU_IDENTIFIER,
+    ADMINISTRATION_BREAK,
+    LANGUAGE_MENU_IDENTIFIER,
     get_user_model,
 )
 from cms.models import PagePermission, UserSettings
 from cms.test_utils.project.placeholderapp.models import (
-    CharPksExample, Example1,
+    CharPksExample,
+    Example1,
 )
 from cms.test_utils.project.placeholderapp.views import (
-    ClassDetail, detail_view,
+    ClassDetail,
+    detail_view,
 )
 from cms.test_utils.testcases import URL_CMS_USERSETTINGS, CMSTestCase
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar import utils
 from cms.toolbar.items import (
-    AjaxItem, Break, ItemSearchResult, LinkItem, SubMenu, ToolbarAPIMixin,
+    AjaxItem,
+    Break,
+    ItemSearchResult,
+    LinkItem,
+    SubMenu,
+    ToolbarAPIMixin,
 )
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
-    add_live_url_querystring_param, get_object_edit_url,
-    get_object_preview_url, get_object_structure_url,
+    add_live_url_querystring_param,
+    get_object_edit_url,
+    get_object_preview_url,
+    get_object_structure_url,
 )
 from cms.toolbar_pool import toolbar_pool
 from cms.utils.conf import get_cms_setting
@@ -987,7 +999,7 @@ class ToolbarTests(ToolbarTestBase):
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
 class EditModelTemplateTagTest(ToolbarTestBase):
-    edit_fields_rx = "(\?|&amp;)edit_fields=%s"
+    edit_fields_rx = "(\\?|&amp;)edit_fields=%s"
 
     def tearDown(self):
         Example1.objects.all().delete()
@@ -2174,3 +2186,30 @@ class ToolbarAPITests(TestCase):
         result += 2
         self.assertEqual(result.item, item)
         self.assertEqual(result.index, 4)
+
+
+class TestLanguageMenu(CMSTestCase):
+    @override_settings(
+        LANGUAGE_CODE='en',
+        LANGUAGES=(('en', 'English'),),
+        CMS_LANGUAGES={
+            1: [
+                {'code': 'en',
+                 'name': 'English',
+                 'public': True},
+            ],
+        }
+    )
+    def test_no_language_menu(self):
+        """No language menu appears if only one language is available"""
+        request = self.get_page_request(None, self.get_superuser(), '/')
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        self.assertNotIn(LANGUAGE_MENU_IDENTIFIER, toolbar.menus)
+
+    def test_language_menu(self):
+        """A language menu appears if more than one language is available"""
+        request = self.get_page_request(None, self.get_superuser(), '/')
+        toolbar = CMSToolbar(request)
+        toolbar.populate()
+        self.assertIn(LANGUAGE_MENU_IDENTIFIER, toolbar.menus)

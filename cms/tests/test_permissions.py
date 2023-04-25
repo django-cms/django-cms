@@ -3,12 +3,15 @@ from django.test.utils import override_settings
 
 from cms.api import assign_user_to_page, create_page
 from cms.cache.permissions import (
-    clear_user_permission_cache, get_permission_cache, set_permission_cache,
+    clear_user_permission_cache,
+    get_permission_cache,
+    set_permission_cache,
 )
 from cms.models.permissionmodels import GlobalPagePermission
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import (
-    get_change_id_list, user_can_publish_page,
+    get_change_id_list,
+    user_can_publish_page,
 )
 
 

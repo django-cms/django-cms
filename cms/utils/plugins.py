@@ -9,6 +9,7 @@ from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
 from cms.utils.placeholder import get_placeholder_conf
@@ -17,12 +18,14 @@ logger = logging.getLogger(__name__)
 
 
 @lru_cache(maxsize=None)
-def get_plugin_class(plugin_type):
+def get_plugin_class(plugin_type: str) -> CMSPluginBase:
+    """Returns the plugin class for a given plugin_type (str)"""
     return plugin_pool.get_plugin(plugin_type)
 
 
 @lru_cache()
-def get_plugin_model(plugin_type):
+def get_plugin_model(plugin_type: str) -> CMSPlugin:
+    """Returns the plugin model class for a given plugin_type (str)"""
     return get_plugin_class(plugin_type).model
 
 
@@ -262,7 +265,7 @@ def get_bound_plugins(plugins):
         plugin_model = get_plugin(plugin_type).model
         plugin_queryset = plugin_model.objects.filter(pk__in=pks)
 
-        # put them in a map so we can replace the base CMSPlugins with their
+        # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
         for instance in plugin_queryset.iterator():
             plugin_lookup[instance.pk] = instance
@@ -306,7 +309,7 @@ def downcast_plugins(plugins,
         if select_placeholder:
             plugin_qs = plugin_qs.select_related('placeholder')
 
-        # put them in a map so we can replace the base CMSPlugins with their
+        # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
         for instance in plugin_qs.iterator():
             placeholder = placeholders_by_id.get(instance.placeholder_id)
@@ -330,8 +333,8 @@ def downcast_plugins(plugins,
 
 def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
     """
-    Checks if placeholder has reached it's global plugin limit,
-    if not then it checks if it has reached it's plugin_type limit.
+    Checks if placeholder has reached its global plugin limit,
+    if not then it checks if it has reached its plugin_type limit.
     """
     limits = get_placeholder_conf("limits", placeholder.slot, template)
     if limits:

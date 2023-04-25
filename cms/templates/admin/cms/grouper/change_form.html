@@ -1,0 +1,21 @@
+{% extends "admin/change_form.html" %}{% load i18n %}
+{% block field_sets %}
+  {% block language-tabs %}
+    {% if language_tabs %}
+      <div id="page_form_lang_tabs" class="js-language-tabs" data-message="{{ changed_message|escape }}">
+          {% for lang_code, lang_name in language_tabs %}
+              <input type="button" data-url="{{ lang_code }}"
+                  class="language_button {% if lang_code == language %}selected{% else %}{% if not lang_code in filled_languages %} notfilled{% endif %}{% endif %}"
+                  id="{{lang_code}}button" name="{{lang_code}}" value="{{lang_name}}"/>
+          {% endfor %}
+          <div class="lang_tabs_line"></div>
+      </div>
+    {% endif %}
+  {% endblock %}
+  {% if content_instance.versions and content_instance.versions.first.state != "draft" %}
+    <div class="errornote">
+      <p><i>{% trans "Some fields cannot be changed since they are not draft content." %}</i></p>
+    </div>
+  {% endif %}
+  {{ block.super }}
+{% endblock %}

@@ -2,26 +2,35 @@ from urllib.parse import quote
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth import login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import (
-    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseRedirect,
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
 )
 from django.shortcuts import render
-from django.urls import reverse
+from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.timezone import now
 from django.utils.translation import get_language_from_request
 from django.views.decorators.http import require_POST
 
+from cms.apphook_pool import apphook_pool
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
+from cms.models import PageContent
 from cms.models.pagemodel import TreeNode
 from cms.page_rendering import (
-    _handle_no_page, _render_welcome_page, render_pagecontent,
+    _handle_no_apphook,
+    _handle_no_page,
+    _render_welcome_page,
+    render_pagecontent,
 )
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site
@@ -29,8 +38,11 @@ from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import is_editable_model
 from cms.utils.i18n import (
-    get_default_language_for_site, get_fallback_languages, get_language_list,
-    get_public_languages, get_redirect_on_fallback,
+    get_default_language_for_site,
+    get_fallback_languages,
+    get_language_list,
+    get_public_languages,
+    get_redirect_on_fallback,
     is_language_prefix_patterns_used,
 )
 from cms.utils.page import get_page_from_request
@@ -91,6 +103,17 @@ def details(request, slug):
         # and there's no pages
         return _render_welcome_page(request)
 
+    if not page and get_cms_setting("REDIRECT_TO_LOWERCASE_SLUG"):
+        # Redirect to the lowercase version of the slug
+        if slug.lower() != slug:
+            # Only redirect if the slug changes
+            redirect_url = reverse("pages-details-by-slug", kwargs={"slug": slug.lower()})
+            if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
+                query_string = request.META.get('QUERY_STRING')
+                if query_string:
+                    redirect_url += "?" + query_string
+            return HttpResponseRedirect(redirect_url)
+
     if not page:
         # raise 404
         _handle_no_page(request)
@@ -102,7 +125,11 @@ def details(request, slug):
     else:
         user_languages = get_public_languages(site_id=site.pk)
 
-    request_language = get_language_from_request(request, check_path=True)
+    request_language = None
+    if is_language_prefix_patterns_used():
+        request_language = get_language_from_request(request, check_path=True)
+    if not request_language:
+        request_language = get_default_language_for_site(get_current_site().pk)
 
     if not page.is_home and request_language not in user_languages:
         # The homepage is treated differently because
@@ -173,6 +200,10 @@ def details(request, slug):
         if request.user.is_staff and toolbar.edit_mode_active:
             toolbar.redirect_url = redirect_url
         elif redirect_url not in own_urls:
+            if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
+                query_string = request.META.get('QUERY_STRING')
+                if query_string:
+                    redirect_url += "?" + query_string
             # prevent redirect to self
             return HttpResponseRedirect(redirect_url)
 
@@ -230,7 +261,7 @@ def render_object_structure(request, content_type_id, object_id):
     return render(request, 'cms/toolbar/structure.html', context)
 
 
-def render_object_edit(request, content_type_id, object_id):
+def render_object_endpoint(request, content_type_id, object_id, require_editable):
     try:
         content_type = ContentType.objects.get_for_id(content_type_id)
     except ContentType.DoesNotExist:
@@ -238,11 +269,32 @@ def render_object_edit(request, content_type_id, object_id):
     else:
         model = content_type.model_class()
 
-    if not is_editable_model(model):
+    if require_editable and not is_editable_model(model):
         return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     try:
-        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+        if issubclass(model, PageContent):
+            # An apphook might be attached to a PageContent object
+            content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
+            request.current_page = content_type_obj.page
+            if (
+                content_type_obj.page.application_urls and  # noqa: W504
+                content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
+            ):
+                try:
+                    # If so, try get the absolute URL and pass it to the toolbar as request_path
+                    # The apphook's view function will be called.
+                    absolute_url = content_type_obj.get_absolute_url()
+                    from cms.toolbar.toolbar import CMSToolbar
+                    request.toolbar = CMSToolbar(request, request_path=absolute_url)
+                    # Resovle the apphook's url to get its view function
+                    view_func, args, kwargs = resolve(absolute_url)
+                    return view_func(request, *args, **kwargs)
+                except Resolver404:
+                    # Apphook does not provide a view for its "root", show warning message
+                    return _handle_no_apphook(request)
+        else:
+            content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
 
@@ -255,27 +307,11 @@ def render_object_edit(request, content_type_id, object_id):
     toolbar.set_object(content_type_obj)
     render_func = extension.toolbar_enabled_models[model]
     return render_func(request, content_type_obj)
+
+
+def render_object_edit(request, content_type_id, object_id):
+    return render_object_endpoint(request, content_type_id, object_id, require_editable=True)
 
 
 def render_object_preview(request, content_type_id, object_id):
-    try:
-        content_type = ContentType.objects.get_for_id(content_type_id)
-    except ContentType.DoesNotExist:
-        raise Http404
-    else:
-        model = content_type.model_class()
-
-    try:
-        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404
-
-    extension = apps.get_app_config('cms').cms_extension
-
-    if model not in extension.toolbar_enabled_models:
-        return HttpResponseBadRequest('Requested object does not support frontend rendering')
-
-    toolbar = get_toolbar_from_request(request)
-    toolbar.set_object(content_type_obj)
-    render_func = extension.toolbar_enabled_models[model]
-    return render_func(request, content_type_obj)
+    return render_object_endpoint(request, content_type_id, object_id, require_editable=False)

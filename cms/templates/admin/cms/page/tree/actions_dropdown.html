@@ -24,7 +24,7 @@
         >
             <a{% if not has_move_page_permission %} class="cms-pagetree-dropdown-item-disabled"{% endif %}
                 href="#"                 title="{% filter escapejs %}{% trans "Cut" %}{% endfilter %}">
-                <span class="cms-icon cms-icon-scissors"></span>
+                <span class="cms-icon cms-icon-cut"></span>
                 <span>{% filter escapejs %}{% trans "Cut" %}{% endfilter %}<span>
             </a>
         </li>
@@ -33,7 +33,7 @@
                 data-node-id="{{ node.pk }}"
                 class="{% if has_add_permission %}js-cms-tree-item-paste{% endif %}
                 {% if not has_add_permission or not paste_enabled %} cms-pagetree-dropdown-item-disabled{% endif %}">
-                <span class="cms-icon cms-icon-alias"></span>
+                <span class="cms-icon cms-icon-paste"></span>
                 <span>{% filter escapejs %}{% trans "Paste" %}{% endfilter %}</span>
             </a>
         </li>
@@ -68,7 +68,7 @@
             {% else %}
                 <a href="#" class="cms-pagetree-dropdown-item-disabled">
             {% endif %}
-                    <span class="cms-icon cms-icon-cogs"></span>
+                    <span class="cms-icon cms-icon-advanced-settings"></span>
                     <span>{% filter escapejs %}{% trans "Advanced settings" %}{% endfilter %}</span>
                 </a>
         </li>

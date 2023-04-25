@@ -1,6 +1,7 @@
 4.1.0rc1 (unpublished)
 ======================
 
+* Unified icon font with icons for versioning, moderation and version locking
 * Django 4.1 and 4.0 support
 * Python 3.10 support
 * Fix bug that broke page tree if it contained empty page content
@@ -8,6 +9,7 @@
 * feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
 * Introduce dropdown menus in the page tree for status indicators
+* Fixed redirect issues when i18n_patterns had prefix_default_language = False
 * add release scripts for develop-4 branch (#7466) (ddbc99a53) -- Fabian Braun
 
 4.0.0 (unreleased)

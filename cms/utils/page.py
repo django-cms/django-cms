@@ -125,7 +125,7 @@ def get_available_slug(site, path, language, suffix='copy', modified=False):
 
         if match and modified:
             _next = int(match.groups()[-1]) + 1
-            slug = SUFFIX_REGEX.sub('\g<1>-{}'.format(_next), slug)
+            slug = SUFFIX_REGEX.sub('\\g<1>-{}'.format(_next), slug)
         elif suffix:
             slug += '-' + suffix + '-2'
         else:

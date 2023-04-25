@@ -18,7 +18,9 @@ from cms.models import Placeholder, UserSettings
 from cms.templates import TemplatesCache
 from cms.toolbar.items import ButtonList, Menu, ToolbarAPIMixin
 from cms.toolbar.utils import (
-    get_object_edit_url, get_object_preview_url, get_object_structure_url,
+    get_object_edit_url,
+    get_object_preview_url,
+    get_object_structure_url,
 )
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request
@@ -43,7 +45,10 @@ class BaseToolbar(ToolbarAPIMixin):
             return self.request.resolver_match
 
         try:
-            match = resolve(self.request.path_info)
+            if hasattr(self, "request_path"):
+                match = resolve(self.request_path)
+            else:
+                match = resolve(self.request.path_info)
         except Resolver404:
             match = None
         return match
@@ -210,6 +215,7 @@ class CMSToolbarBase(BaseToolbar):
 
     def init_toolbar(self, request, request_path=None):
         self.request = request
+        self.request_path = request_path or request.path_info  # TODO: Used to be request.path. Why?
         self.is_staff = self.request.user.is_staff
         self.show_toolbar = self.is_staff
 
@@ -217,7 +223,7 @@ class CMSToolbarBase(BaseToolbar):
         enable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__ENABLE')
         disable_toolbar = get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
 
-        # Handle showing the toolbar for anonymouse users when they supply
+        # Handle showing the toolbar for anonymous users when they supply
         # the enable toolbar parameter
         if (anonymous_on and request.user.is_anonymous) and enable_toolbar in self.request.GET:
             self.show_toolbar = True
@@ -250,7 +256,6 @@ class CMSToolbarBase(BaseToolbar):
         if hasattr(self, 'toolbars'):
             for key, toolbar in self.toolbars.items():
                 self.toolbars[key].request = self.request
-        self.request_path = request_path or request.path
 
     @cached_property
     def user_settings(self):

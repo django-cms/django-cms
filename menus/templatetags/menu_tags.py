@@ -10,7 +10,9 @@ from django.utils.encoding import force_str
 from django.utils.translation import get_language, gettext
 
 from cms.utils.i18n import (
-    force_language, get_language_list, get_language_object,
+    force_language,
+    get_language_list,
+    get_language_object,
     get_public_languages,
 )
 from menus.menu_pool import menu_pool

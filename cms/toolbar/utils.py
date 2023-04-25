@@ -4,7 +4,11 @@ from collections import defaultdict, deque
 from django.contrib.contenttypes.models import ContentType
 from django.utils.encoding import force_str
 from django.utils.translation import (
-    get_language, gettext, override as force_language,
+    get_language,
+    gettext,
+)
+from django.utils.translation import (
+    override as force_language,
 )
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS

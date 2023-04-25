@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from cms import constants
 from cms.models.fields import PlaceholderRelationField
-from cms.models.managers import PageContentAdminManager, PageContentManager
+from cms.models.managers import ContentAdminManager, PageContentManager
 from cms.models.pagemodel import Page
 from cms.utils.conf import get_cms_setting
 
@@ -118,7 +118,7 @@ class PageContent(models.Model):
     )
 
     objects = PageContentManager()
-    admin_manager = PageContentAdminManager()
+    admin_manager = ContentAdminManager()
     """Admin_manager does lack additional functionality of objects and must only
     be used inside admin objects or admin forms. One of its key properties is that
     it can access all objects of type PageContent (irrespevtively of some objects
@@ -269,7 +269,9 @@ class PageContent(models.Model):
             return None
 
     def get_absolute_url(self, language=None):
-        return self.page.get_absolute_url(language=language)
+        """Get the absolute url for the page content. If language is specified it will return
+        the absolute url of the corresponding "sister" content."""
+        return self.page.get_absolute_url(language=language or self.language)
 
 
 class EmptyPageContent:

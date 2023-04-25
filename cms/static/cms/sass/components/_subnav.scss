@@ -42,7 +42,7 @@
 }
 
 .cms-submenu-edit {
-    @include icon(pencil);
+    @include icon(edit);
     right: $submenu-right * 3 + $submenu-icon-area-size * 2;
 }
 .cms-submenu-add {
@@ -125,13 +125,13 @@
             &[data-cms-icon=paste] {
                 @include icon(paste);
             }
-            &[data-cms-icon=scissors] {
-                @include icon(scissors);
+            &[data-cms-icon=cut] {
+                @include icon(cut);
             }
             &[data-cms-icon=bin] {
                 @include icon(bin);
             }
-            &[href*=alias_plugin] {
+            &[data-cms-icon=alias] {
                 @include icon(alias);
             }
             &[data-cms-icon=highlight] {

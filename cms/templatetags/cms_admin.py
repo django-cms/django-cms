@@ -8,7 +8,8 @@ from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language, gettext_lazy as _
+from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 
 from cms.models.contentmodels import PageContent
 from cms.utils import i18n
@@ -32,7 +33,7 @@ class GetAdminUrlForLanguage(AsTag):
 
     def get_value(self, context, page, language):
         if language in page.get_languages():
-            page_content = page.get_content_obj(language, fallback=False)
+            page_content = page.pagecontent_set(manager="admin_manager").current_content(language=language).first()
             if page_content:
                 return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
         admin_url = admin_reverse('cms_pagecontent_add')

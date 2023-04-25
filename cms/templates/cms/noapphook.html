@@ -1,0 +1,25 @@
+<!doctype html>{% load i18n static cms_tags cms_static sekizai_tags %}
+<html lang="{{ LANGUAGE_CODE }}">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{% trans "django CMS" %}</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <link rel="icon" type="image/png" href="{% static 'cms/img/favicon.png' %}">
+    {% render_block "css" %}
+    <link rel="stylesheet" href="{% static_with_version 'cms/css/cms.base.css' %}">
+</head>
+<body class="cms-welcome-bg">
+    {% cms_toolbar %}
+    {% language request.toolbar.toolbar_language %}
+    <div class="cms">
+        <div class="cms-screenblock">
+            <div class="cms-screenblock-inner">
+                <h1>{% trans "This page has no preview!" %}</h1>
+                <p>{% trans "Potentially the attached apphook does not provide content for its root." %}</p>
+                <p>{% trans "It is being redirected to:" %} <a href="{{ absolute_url }}">{{ absolute_url }}</a></p>
+            </div>
+        </div>
+    </div>
+    {% endlanguage %}
+</body>

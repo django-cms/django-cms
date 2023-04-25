@@ -1,4 +1,3 @@
-import copy
 import json
 from collections import namedtuple
 
@@ -11,15 +10,21 @@ from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import (
-    ObjectDoesNotExist, PermissionDenied, ValidationError,
+    ObjectDoesNotExist,
+    PermissionDenied,
+    ValidationError,
 )
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
 from django.forms.fields import IntegerField
 from django.http import (
-    Http404, HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-    HttpResponseRedirect, QueryDict,
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseRedirect,
+    QueryDict,
 )
 from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
@@ -33,17 +38,29 @@ from django.views.decorators.http import require_POST
 
 from cms import operations
 from cms.admin.forms import (
-    AddPageForm, AdvancedSettingsForm, ChangeListForm, ChangePageForm,
-    CopyPageForm, CopyPermissionForm, DuplicatePageForm, MovePageForm,
+    AddPageForm,
+    AdvancedSettingsForm,
+    ChangeListForm,
+    ChangePageForm,
+    CopyPageForm,
+    CopyPermissionForm,
+    DuplicatePageForm,
+    MovePageForm,
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
 from cms.models import (
-    CMSPlugin, EmptyPageContent, GlobalPagePermission, Page, PageContent,
-    PagePermission, Placeholder,
+    CMSPlugin,
+    EmptyPageContent,
+    GlobalPagePermission,
+    Page,
+    PageContent,
+    PagePermission,
+    Placeholder,
 )
 from cms.operations.helpers import (
-    send_post_page_operation, send_pre_page_operation,
+    send_post_page_operation,
+    send_pre_page_operation,
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
@@ -51,7 +68,9 @@ from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_language_list, get_language_object, get_language_tuple,
+    get_language_list,
+    get_language_object,
+    get_language_tuple,
     get_site_language_from_request,
 )
 from cms.utils.plugins import copy_plugins_to_placeholder
@@ -147,7 +166,8 @@ class PageAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^list/$', self.get_list),
@@ -700,7 +720,7 @@ class PageAdmin(admin.ModelAdmin):
                                   "translated in any of the languages configured by the target site."))
             return jsonify_request(HttpResponseBadRequest(message))
 
-        new_page = form.copy_page(request.user)
+        new_page = form.copy_page(user)
         return HttpResponse(json.dumps({"id": new_page.pk}), content_type='application/json')
 
     def edit_title_fields(self, request, page_id, language):
@@ -843,7 +863,8 @@ class PageContentAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
 
         url_patterns = [
             pat(r'^get-tree/$', self.get_tree),
@@ -894,8 +915,6 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if obj is None:
             raise self._get_404_exception(object_id)
-
-        request = copy.copy(request)
 
         if request.method == 'GET':
             # source is a field in the form
@@ -1327,7 +1346,12 @@ class PageContentAdmin(admin.ModelAdmin):
         page_content = self.get_object(request, object_id=object_id)
 
         if not self.has_change_permission(request, obj=page_content):
-            message = _("You do not have permission to change this page's in_navigation status")
+            if self.has_change_permission(request):
+                # General (permission) problem
+                message = _("You do not have permission to change a page's navigation status")
+            else:
+                # Only this page? Can be permissions or versioning, or ...
+                message = _("You cannot change this page's navigation status")
             return HttpResponseForbidden(force_str(message))
 
         if page_content is None:

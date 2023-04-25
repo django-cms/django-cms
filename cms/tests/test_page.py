@@ -24,7 +24,9 @@ from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import (
-    get_available_slug, get_current_site, get_page_from_request,
+    get_available_slug,
+    get_current_site,
+    get_page_from_request,
 )
 
 
@@ -61,6 +63,25 @@ class PagesTestCase(TransactionCMSTestCase):
             self.assertEqual(page_2.get_absolute_url(), '/fr/french-inner/')
             self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
             self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+
+    def test_absolute_url_page_content(self):
+        page = self.create_homepage("page", "nav_playground.html", "en")
+        create_page_content("fr", "french home", page)
+        page_2 = create_page("inner", "nav_playground.html", "en", parent=page)
+        content_2 = create_page_content("fr", "french inner", page_2)
+
+        # content_2 is French
+        self.assertEqual(content_2.get_absolute_url(), '/fr/french-inner/')
+        # if language specified, get the language version's url
+        self.assertEqual(content_2.get_absolute_url(language='en'), '/en/inner/')
+        # for completeness: specify own language
+        self.assertEqual(content_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+
+        # The above result does not change if language is changed
+        with force_language('en'):
+            self.assertEqual(content_2.get_absolute_url(), '/fr/french-inner/')
+            self.assertEqual(content_2.get_absolute_url(language='en'), '/en/inner/')
+            self.assertEqual(content_2.get_absolute_url(language='fr'), '/fr/french-inner/')
 
     def test_get_root_page(self):
         _create = functools.partial(
@@ -921,14 +942,14 @@ class PageContentTests(CMSTestCase):
         self.assertEqual(german_content.pk, self.german_content.pk)
 
     def test_page_content_manager(self):
-        from cms.models.managers import PageContentAdminQuerySet
+        from cms.models.managers import ContentAdminQuerySet
 
         # check if admin_manager exists
         self.assertTrue(isinstance(PageContent.admin_manager, models.Manager))
-        self.assertTrue(isinstance(PageContent.admin_manager.none(), PageContentAdminQuerySet))
+        self.assertTrue(isinstance(PageContent.admin_manager.none(), ContentAdminQuerySet))
 
         # setup created to page contents for self.page. Test if admin_manager sees them
         self.assertEqual(PageContent.admin_manager.filter(page=self.page).count(), 2)
 
         # test if the current_content_iterator sees both page contents
-        self.assertEqual(len(list(PageContent.admin_manager.all().current_content_iterator(page=self.page))), 2)
+        self.assertEqual(len(list(PageContent.admin_manager.filter(page=self.page).current_content())), 2)

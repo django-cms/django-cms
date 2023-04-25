@@ -27,7 +27,8 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
 from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
 from cms.test_utils.util.context_managers import (
-    LanguageOverride, UserLoginContext,
+    LanguageOverride,
+    UserLoginContext,
 )
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
@@ -454,7 +455,7 @@ class PageTest(PageTestBase):
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute changed_by %} changed "
                 "on {% page_attribute changed_date as page_change %}"
-                "{{ page_change|date:'Y-m-d\TH:i:s' }}"
+                "{{ page_change|date:'Y-m-d\\TH:i:s' }}"
             )
             req = HttpRequest()
             page.save()

@@ -13,7 +13,7 @@ from cms.utils.urlutils import admin_reverse, static_with_version
 
 class PageSelectWidget(MultiWidget):
     """A widget that allows selecting a page by first selecting a site and then
-    a page on that site in a two step process.
+    a page on that site in a two-step process.
     """
     template_name = 'cms/widgets/pageselectwidget.html'
 
@@ -96,6 +96,7 @@ class PageSelectWidget(MultiWidget):
 
 
 class PageSmartLinkWidget(TextInput):
+    """Presents the user with a Select2 widget to select a page and returns the link to this page as a string."""
     template_name = 'cms/widgets/pagesmartlinkwidget.html'
 
     class Media:

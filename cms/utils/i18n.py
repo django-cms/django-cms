@@ -196,16 +196,16 @@ def hide_untranslated(language, site_id=None):
 
 def is_language_prefix_patterns_used():
     """
-    Returns `True` if the `LocaleRegexURLResolver` or `LocalePrefixPattern` is
-    used at root level of the urlpatterns, else it returns `False`.
+    Returns `True` if the `LocaleRegexURLResolver` or `LocalePrefixPattern`
+    is used at root level of the urlpatterns and doesn't have empty
+    language_prefix, else it returns `False`.
     """
-    return any(
-        isinstance(
-            getattr(url_pattern, 'pattern', url_pattern),
-            LocalePrefixPattern
-        )
-        for url_pattern in get_resolver(None).url_patterns
-    )
+    for url_pattern in get_resolver(None).url_patterns:
+        pattern = getattr(url_pattern, 'pattern', url_pattern)
+        if isinstance(pattern, LocalePrefixPattern):
+            if pattern.language_prefix != '':
+                return True
+    return False
 
 
 def is_valid_site_language(language, site_id):

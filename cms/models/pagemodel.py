@@ -12,7 +12,13 @@ from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
-    get_language, gettext_lazy as _, override as force_language,
+    get_language,
+)
+from django.utils.translation import (
+    gettext_lazy as _,
+)
+from django.utils.translation import (
+    override as force_language,
 )
 from treebeard.mp_tree import MP_Node
 
@@ -449,6 +455,9 @@ class Page(models.Model):
         from cms.models import PageContent
         from cms.utils.page import get_available_slug
 
+        if not user:
+            raise ValueError("Since django CMS 4 the page.copy method requires a user argument")
+
         if parent_node:
             new_node = parent_node.add_child(site=site)
             parent_page = parent_node.item
@@ -500,7 +509,7 @@ class Page(models.Model):
             PageUrl.objects.with_user(user).create(**new_url)
 
         # copy titles of this page
-        for title in translations.current_content_iterator():
+        for title in translations.current_content():
             new_title = model_to_dict(title)
             new_title.pop("id", None)  # No PK
             new_title["page"] = new_page
@@ -583,6 +592,7 @@ class Page(models.Model):
                 parent_node=parent,
                 translations=True,
                 permissions=copy_permissions,
+                user=user
             )
             nodes_by_id[page.node_id] = new_page.node
         return new_root_page

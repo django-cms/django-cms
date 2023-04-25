@@ -4,12 +4,15 @@ import re
 from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import (
-    ImproperlyConfigured, ObjectDoesNotExist, ValidationError,
+    ImproperlyConfigured,
+    ObjectDoesNotExist,
+    ValidationError,
 )
 from django.shortcuts import render
 from django.utils.encoding import force_str, smart_str
 from django.utils.html import escapejs
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -81,7 +84,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                 ]
         # Set default name
         if not new_plugin.name:
-            new_plugin.name = re.sub("([a-z])([A-Z])", "\g<1> \g<2>", name)
+            new_plugin.name = re.sub("([a-z])([A-Z])", "\\g<1> \\g<2>", name)
 
         # By flagging the plugin class, we avoid having to call these class
         # methods for every plugin all the time.

@@ -11,7 +11,8 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from cms import api
 from cms.apphook_pool import apphook_pool
@@ -22,16 +23,27 @@ from cms.extensions import extension_pool
 from cms.forms.fields import PageSmartLinkField
 from cms.forms.validators import validate_relative_url, validate_url_uniqueness
 from cms.forms.widgets import (
-    AppHookSelect, ApplicationConfigSelect, UserSelectAdminWidget,
+    AppHookSelect,
+    ApplicationConfigSelect,
+    UserSelectAdminWidget,
 )
 from cms.models import (
-    CMSPlugin, GlobalPagePermission, Page, PageContent, PagePermission,
-    PageType, PageUser, PageUserGroup, Placeholder, TreeNode,
+    CMSPlugin,
+    GlobalPagePermission,
+    Page,
+    PageContent,
+    PagePermission,
+    PageType,
+    PageUser,
+    PageUserGroup,
+    Placeholder,
+    TreeNode,
 )
 from cms.models.permissionmodels import User
 from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION
 from cms.operations.helpers import (
-    send_post_page_operation, send_pre_page_operation,
+    send_post_page_operation,
+    send_pre_page_operation,
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
@@ -40,7 +52,9 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
 from cms.utils.permissions import (
-    get_current_user, get_subordinate_groups, get_subordinate_users,
+    get_current_user,
+    get_subordinate_groups,
+    get_subordinate_users,
     get_user_permission_level,
 )
 from menus.menu_pool import menu_pool
@@ -180,7 +194,7 @@ class BasePageContentForm(forms.ModelForm):
 
 class AddPageForm(BasePageContentForm):
     source = forms.ModelChoiceField(
-        label=_(u'Page type'),
+        label=_('Page type'),
         queryset=Page.objects.filter(is_page_type=True),
         required=False,
     )
@@ -299,6 +313,7 @@ class AddPageForm(BasePageContentForm):
             translations=False,
             permissions=False,
             extensions=False,
+            user=self._user,
         )
         new_page.update(is_page_type=False)
         return new_page

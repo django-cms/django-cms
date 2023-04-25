@@ -693,7 +693,7 @@ describe('CMS.Plugin', function() {
                 },
                 lang: {
                     success: 'Voila!',
-                    error: 'Test error occured: '
+                    error: 'Test error occurred: '
                 }
             };
             CMS.settings = {
@@ -778,7 +778,7 @@ describe('CMS.Plugin', function() {
             });
             plugin.copyPlugin(plugin.options);
             expect(CMS.API.Messages.open).toHaveBeenCalledWith({
-                message: 'Test error occured: everything is wrong',
+                message: 'Test error occurred: everything is wrong',
                 error: true
             });
         });
@@ -879,7 +879,7 @@ describe('CMS.Plugin', function() {
                 },
                 lang: {
                     success: 'Voila!',
-                    error: 'Test error occured: '
+                    error: 'Test error occurred: '
                 }
             };
             CMS.settings = {
@@ -977,7 +977,7 @@ describe('CMS.Plugin', function() {
             });
             plugin.cutPlugin();
             expect(CMS.API.Messages.open).toHaveBeenCalledWith({
-                message: 'Test error occured: Cannot cut a plugin',
+                message: 'Test error occurred: Cannot cut a plugin',
                 error: true
             });
         });
@@ -1052,7 +1052,7 @@ describe('CMS.Plugin', function() {
                 },
                 lang: {
                     success: 'Voila!',
-                    error: 'Test error occured: '
+                    error: 'Test error occurred: '
                 }
             };
             CMS.settings = {
@@ -1195,7 +1195,7 @@ describe('CMS.Plugin', function() {
                 },
                 lang: {
                     success: 'Voila!',
-                    error: 'Test error occured: '
+                    error: 'Test error occurred: '
                 }
             };
             CMS.settings = {
@@ -1339,7 +1339,7 @@ describe('CMS.Plugin', function() {
             });
             plugin.movePlugin();
             expect(CMS.API.Messages.open).toHaveBeenCalledWith({
-                message: 'Test error occured: Cannot cut a plugin',
+                message: 'Test error occurred: Cannot cut a plugin',
                 error: true
             });
         });
