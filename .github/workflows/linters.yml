@@ -6,38 +6,23 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-jobs:
-  flake8:
-    name: flake8
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Set up Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.9
-          cache: 'pip'
-      - run: pip install --upgrade flake8
-      - name: flake8
-        uses: liskin/gh-problem-matcher-wrap@v1
-        with:
-          linters: flake8
-          run: flake8
 
-  isort:
+jobs:
+  ruff:
+    name: ruff
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.9
+          python-version: "3.11"
           cache: 'pip'
-      - run: python -m pip install isort
-      - name: isort
-        uses: liskin/gh-problem-matcher-wrap@v1
-        with:
-          linters: isort
-          run: isort --check --diff cms menus
+      - run: |
+          python -m pip install --upgrade pip
+          pip install ruff
+      - name: Run Ruff
+        run: |
+          ruff cms
+          ruff menus

@@ -18,7 +18,8 @@ from django.urls import NoReverseMatch
 from django.utils.html import format_html_join
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language, gettext_lazy as _
+from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 
 from cms.models.managers import ContentAdminManager
 from cms.toolbar.utils import get_object_preview_url
@@ -301,7 +302,8 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     def _getter_factory(self, field: str) -> typing.Callable[[models.Model], typing.Any]:
         """Creates a getter function with ``short_description``, ``admin_order_field``, and ``boolean``
         properties suitable for the :attr:`~django.contrib.admin.ModelAdmin.list_display` field."""
-        getter = lambda obj: self.get_content_field(obj, field)
+        def getter(obj):
+            return self.get_content_field(obj, field)
         getter.short_description = label_for_field(field, self.content_model)
         if field in self._content_subquery_fields:
             getter.admin_order_field = CONTENT_PREFIX + field

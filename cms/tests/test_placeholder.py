@@ -23,18 +23,26 @@ from cms.test_utils.project.placeholder_relation_field_app.models import (
     FancyPoll,
 )
 from cms.test_utils.project.placeholderapp.models import (
-    DynamicPlaceholderSlotExample, Example1, TwoPlaceholderExample,
+    DynamicPlaceholderSlotExample,
+    Example1,
+    TwoPlaceholderExample,
 )
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
 from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.utils import (
-    get_object_edit_url, get_object_structure_url, get_toolbar_from_request,
+    get_object_edit_url,
+    get_object_structure_url,
+    get_toolbar_from_request,
 )
 from cms.utils.placeholder import (
-    MLNGPlaceholderActions, PlaceholderNoAction, _get_nodelist,
-    _scan_placeholders, get_placeholder_conf, get_placeholders,
+    MLNGPlaceholderActions,
+    PlaceholderNoAction,
+    _get_nodelist,
+    _scan_placeholders,
+    get_placeholder_conf,
+    get_placeholders,
 )
 from cms.utils.urlutils import admin_reverse
 

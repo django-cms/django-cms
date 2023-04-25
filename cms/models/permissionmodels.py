@@ -9,7 +9,8 @@ from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
 from cms.models.managers import (
-    GlobalPagePermissionManager, PagePermissionManager,
+    GlobalPagePermissionManager,
+    PagePermissionManager,
 )
 
 # Cannot use contrib.auth.get_user_model() at compile time.

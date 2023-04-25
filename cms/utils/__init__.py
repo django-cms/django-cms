@@ -4,7 +4,9 @@ from django.core.files.storage import get_storage_class
 from django.utils.functional import LazyObject
 
 from cms.utils.i18n import (
-    get_default_language, get_language_code, get_language_list,
+    get_default_language,
+    get_language_code,
+    get_language_list,
 )
 
 

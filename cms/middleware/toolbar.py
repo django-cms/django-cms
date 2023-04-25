@@ -4,6 +4,7 @@ Edit Toolbar middleware
 from django import forms
 from django.core.exceptions import ValidationError
 from django.urls import resolve
+from django.urls.exceptions import Resolver404
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
@@ -23,7 +24,7 @@ class ToolbarMiddleware(MiddlewareMixin):
     def is_edit_mode(self, request):
         try:
             match = resolve(request.path_info)
-        except:
+        except Resolver404:
             return False
 
         return match.url_name == 'cms_placeholder_render_object_edit'
@@ -47,7 +48,7 @@ class ToolbarMiddleware(MiddlewareMixin):
 
         try:
             match = resolve(request.path_info)
-        except:
+        except Resolver404:
             return False
 
         return match.url_name in ('pages-root', 'pages-details-by-slug')

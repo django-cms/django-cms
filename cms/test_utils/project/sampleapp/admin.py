@@ -3,7 +3,11 @@ from django.contrib import admin
 from cms.admin.placeholderadmin import FrontendEditableAdminMixin
 from cms.admin.utils import GrouperModelAdmin
 from cms.test_utils.project.sampleapp.models import (
-    Category, GrouperModel, Picture, SampleAppConfig, SomeEditableModel,
+    Category,
+    GrouperModel,
+    Picture,
+    SampleAppConfig,
+    SomeEditableModel,
 )
 
 

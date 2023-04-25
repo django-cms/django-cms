@@ -20,7 +20,9 @@ from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
 from cms.test_utils import testcases as base
 from cms.test_utils.testcases import (
-    URL_CMS_PAGE_DELETE, URL_CMS_PAGE_PUBLISHED, CMSTestCase,
+    URL_CMS_PAGE_DELETE,
+    URL_CMS_PAGE_PUBLISHED,
+    CMSTestCase,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list

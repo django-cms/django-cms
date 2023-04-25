@@ -16,7 +16,9 @@ from cms.api import create_page, create_page_content
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import (
-    applications_page_check, clear_app_resolvers, get_app_patterns,
+    applications_page_check,
+    clear_app_resolvers,
+    get_app_patterns,
 )
 from cms.middleware.page import get_page
 from cms.models import PageContent

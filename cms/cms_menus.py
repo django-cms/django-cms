@@ -8,7 +8,9 @@ from cms.apphook_pool import apphook_pool
 from cms.models import EmptyPageContent, PageContent, PageUrl
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    get_fallback_languages, get_public_languages, hide_untranslated,
+    get_fallback_languages,
+    get_public_languages,
+    hide_untranslated,
     is_valid_site_language,
 )
 from cms.utils.page import get_page_queryset
@@ -324,7 +326,7 @@ class NavExtender(Modifier):
         # find all not assigned nodes
         for menu in self.renderer.menus.items():
             if (hasattr(menu[1], 'cms_enabled')
-                    and menu[1].cms_enabled and not menu[0] in exts):
+                    and menu[1].cms_enabled and menu[0] not in exts):
                 for node in nodes:
                     if node.namespace == menu[0]:
                         removed.append(node)

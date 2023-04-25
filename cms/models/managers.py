@@ -1,3 +1,4 @@
+# ruff: noqa: W605
 import functools
 import operator
 
@@ -331,8 +332,11 @@ class PagePermissionManager(BasicPagePermissionManager):
         # permissions should be managed on the draft page only
 
         from cms.models import (
-            ACCESS_CHILDREN, ACCESS_DESCENDANTS, ACCESS_PAGE,
-            ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS,
+            ACCESS_CHILDREN,
+            ACCESS_DESCENDANTS,
+            ACCESS_PAGE,
+            ACCESS_PAGE_AND_CHILDREN,
+            ACCESS_PAGE_AND_DESCENDANTS,
         )
 
         paths = page.node.get_ancestor_paths()

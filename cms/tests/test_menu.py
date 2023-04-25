@@ -6,7 +6,8 @@ from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
 from django.test.utils import override_settings
-from django.utils.translation import activate, override as force_language
+from django.utils.translation import activate
+from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_page_content
 from cms.apphook_pool import apphook_pool
@@ -14,13 +15,20 @@ from cms.cms_menus import get_visible_nodes
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (
-    ExtendedMenusFixture, MenusFixture, SoftrootFixture, SubMenusFixture,
+    ExtendedMenusFixture,
+    MenusFixture,
+    SoftrootFixture,
+    SubMenusFixture,
 )
 from cms.test_utils.project.sampleapp.cms_apps import (
-    NamespacedApp, SampleApp, SampleApp2,
+    NamespacedApp,
+    SampleApp,
+    SampleApp2,
 )
 from cms.test_utils.project.sampleapp.cms_menus import (
-    SampleAppMenu, StaticMenu, StaticMenu2,
+    SampleAppMenu,
+    StaticMenu,
+    StaticMenu2,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.context_managers import LanguageOverride, apphooks
@@ -1278,7 +1286,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         A
         |-B
           |-C
-          \-D (not in nav)
+          \\-D (not in nav)
     """
     def test_not_in_navigation(self):
         a = create_page('A', 'nav_playground.html', 'en', in_navigation=True, reverse_id='a')
@@ -1406,7 +1414,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             A
             |-B
               |-C
-              \-D (not in nav)
+              \\-D (not in nav)
         """
         a = create_page('A', 'nav_playground.html', 'en',
                         in_navigation=True, reverse_id='a')

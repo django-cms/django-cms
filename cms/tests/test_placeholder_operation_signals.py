@@ -1,8 +1,15 @@
 from cms.api import add_plugin
 from cms.models import Placeholder, UserSettings
 from cms.operations import (
-    ADD_PLUGIN, ADD_PLUGINS_FROM_PLACEHOLDER, CHANGE_PLUGIN, CLEAR_PLACEHOLDER,
-    CUT_PLUGIN, DELETE_PLUGIN, MOVE_PLUGIN, PASTE_PLACEHOLDER, PASTE_PLUGIN,
+    ADD_PLUGIN,
+    ADD_PLUGINS_FROM_PLACEHOLDER,
+    CHANGE_PLUGIN,
+    CLEAR_PLACEHOLDER,
+    CUT_PLUGIN,
+    DELETE_PLUGIN,
+    MOVE_PLUGIN,
+    PASTE_PLACEHOLDER,
+    PASTE_PLUGIN,
 )
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.test_utils.testcases import CMSTestCase

@@ -3,7 +3,9 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.utils.cache import (
-    add_never_cache_headers, patch_response_headers, patch_vary_headers,
+    add_never_cache_headers,
+    patch_response_headers,
+    patch_vary_headers,
 )
 from django.utils.encoding import iri_to_uri
 from django.utils.timezone import now
