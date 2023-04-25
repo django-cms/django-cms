@@ -7,7 +7,7 @@ Changelog
 
 Bug Fixes:
 ----------
-* Remove superflous curly bracket left behind on PR 7488 (#7529) -- Corentin Bettiol
+* Remove superfluous curly bracket left behind on PR 7488 (#7529) -- Corentin Bettiol
 * Fix admin tests (#6848) for some post requests (#7535) -- Fabian Braun
 
 Statistics:
