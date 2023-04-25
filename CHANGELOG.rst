@@ -2,6 +2,32 @@
 Changelog
 =========
 
+3.11.3 (2023-04-25)
+===================
+
+Bug Fixes:
+----------
+* Remove superfluous curly bracket left behind on PR 7488 (#7529) -- Corentin Bettiol
+* Fix admin tests (#6848) for some post requests (#7535) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 2 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Corentin Bettiol (1 pull request)
+* Fabian Braun (1 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+3.11.2 (2023-04-18)
+===================
+
 Features:
 ---------
 * add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
