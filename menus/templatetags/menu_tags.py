@@ -1,14 +1,13 @@
 from urllib.parse import unquote
 
-from django import template
-from django.contrib.sites.models import Site
-from django.urls import reverse, NoReverseMatch
-from django.utils.encoding import force_str
-from django.utils.translation import get_language, gettext
-
-from classytags.arguments import IntegerArgument, Argument, StringArgument
+from classytags.arguments import Argument, IntegerArgument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
+from django import template
+from django.contrib.sites.models import Site
+from django.urls import NoReverseMatch, reverse
+from django.utils.encoding import force_str
+from django.utils.translation import get_language, gettext
 
 from cms.utils.i18n import (
     force_language,
@@ -16,10 +15,8 @@ from cms.utils.i18n import (
     get_language_object,
     get_public_languages,
 )
-
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
-
 
 register = template.Library()
 
@@ -379,7 +376,7 @@ class LanguageChooser(InclusionTag):
             i18n_mode = _tmp
         if template is NOT_PROVIDED:
             template = "menu/language_chooser.html"
-        if not i18n_mode in MARKERS:
+        if i18n_mode not in MARKERS:
             i18n_mode = 'raw'
         if 'request' not in context:
             # If there's an exception (500), default context_processors may not be called.
