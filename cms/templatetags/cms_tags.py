@@ -412,7 +412,7 @@ class PageAttribute(AsTag):
     ]
 
     def get_value(self, context, name, page_lookup, site):
-        if not 'request' in context:
+        if 'request' not in context:
             return ''
         name = name.lower()
         request = context['request']
