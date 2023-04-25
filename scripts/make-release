@@ -166,7 +166,7 @@ else
     git checkout "${BRANCH}"
 
     status "git merge ${base_branch}"
-    if ! git merge ${base_branch}; then
+    if ! git merge --no-edit --commit ${base_branch}; then
         git merge --abort || true
         error "##################################################################"
         error "Cannot automatically merge ${base_branch} into ${BRANCH}."
