@@ -1,5 +1,5 @@
-unreleased
-==========
+4.1.0rc1 (unpublished)
+======================
 
 * Unified icon font with icons for versioning, moderation and version locking
 * Django 4.1 and 4.0 support
@@ -10,7 +10,7 @@ unreleased
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
 * Introduce dropdown menus in the page tree for status indicators
 * Fixed redirect issues when i18n_patterns had prefix_default_language = False
-
+* add release scripts for develop-4 branch (#7466) (ddbc99a53) -- Fabian Braun
 
 4.0.0 (unreleased)
 ==================
@@ -26,9 +26,6 @@ unreleased
 * Backported from develop: Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
 * Backported from develop: Remove travis integration from the project as the project has moved to Github Actions.
 * Fixed usage of ``get_object`` in ``edit_title_fields`` of the page admin.
-
-
-
 
 3.6.0 (2019-01-29)
 ==================

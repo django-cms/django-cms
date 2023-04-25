@@ -387,7 +387,6 @@ msgstr "no content"
 msgid "Empty"
 msgstr "Empty"
 
-#: admin/pageadmin.py:1476
 #, fuzzy
 #| msgid "Content"
 msgid "Create Content"
