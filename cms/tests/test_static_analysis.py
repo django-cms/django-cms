@@ -1,15 +1,13 @@
-# NOTE: we don't care about pyflakes or flake8 anymore
-# from unittest import TestCase
+import os
+from unittest import TestCase
 
-# from cms.test_utils.util.static_analysis import pyflakes
+from ruff.__main__ import find_ruff_bin
 
 
-# class AboveStaticAnalysisCodeTest(TestCase):
-#     """
-#     Name is pretty lame, but ensure it's executed before every other test
-#     """
-#     def test_pyflakes(self):
-#         import cms
-#         import menus
-#         errors, message = pyflakes((cms, menus))
-#         self.assertEqual(errors, 0, message)
+class AboveStaticAnalysisCodeTest(TestCase):
+    """
+    Name is pretty lame, but ensure it's executed before every other test
+    """
+    def test_ruff(self):
+        ruff = find_ruff_bin()
+        self.assertEqual(os.spawnv(os.P_WAIT, ruff, ["ruff", "cms", "menus"]), 0)

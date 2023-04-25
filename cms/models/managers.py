@@ -1,3 +1,4 @@
+# noqa W605
 import functools
 import operator
 
