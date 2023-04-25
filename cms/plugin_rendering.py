@@ -13,14 +13,16 @@ from django.utils.safestring import mark_safe
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models import PageContent
 from cms.toolbar.utils import (
-    get_placeholder_toolbar_js, get_plugin_toolbar_js,
+    get_placeholder_toolbar_js,
+    get_plugin_toolbar_js,
     get_toolbar_from_request,
 )
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import (
-    get_toolbar_plugin_struct, rescan_placeholders_for_obj,
+    get_toolbar_plugin_struct,
+    rescan_placeholders_for_obj,
     restore_sekizai_context,
 )
 from cms.utils.plugins import get_plugin_restrictions

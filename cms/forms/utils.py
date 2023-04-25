@@ -5,7 +5,9 @@ from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from cms.cache.choices import (
-    _page_cache_key, _site_cache_key, clean_page_choices_cache,
+    _page_cache_key,
+    _site_cache_key,
+    clean_page_choices_cache,
     clean_site_choices_cache,
 )
 from cms.models import Page

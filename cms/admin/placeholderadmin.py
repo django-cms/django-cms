@@ -9,8 +9,11 @@ from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import (
-    HttpResponse, HttpResponseBadRequest, HttpResponseForbidden,
-    HttpResponseNotFound, HttpResponseRedirect,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseForbidden,
+    HttpResponseNotFound,
+    HttpResponseRedirect,
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
@@ -18,7 +21,8 @@ from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
-from django.utils.translation import get_language_from_path, gettext as _
+from django.utils.translation import get_language_from_path
+from django.utils.translation import gettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
@@ -36,11 +40,14 @@ from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import (
-    copy_plugins_to_placeholder, has_reached_plugin_limit,
+    copy_plugins_to_placeholder,
+    has_reached_plugin_limit,
 )
 from cms.utils.urlutils import admin_reverse
 from cms.views import (
-    render_object_edit, render_object_preview, render_object_structure,
+    render_object_edit,
+    render_object_preview,
+    render_object_structure,
 )
 
 _no_default = object()
@@ -85,7 +92,8 @@ class FrontendEditableAdminMixin():
         Register the url for the single field edit view
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name="%s_%s" % (info, fn.__name__))
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
@@ -201,7 +209,8 @@ class PlaceholderAdmin(admin.ModelAdmin):
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
-        pat = lambda regex, fn: re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name="%s_%s" % (info, fn.__name__))
         url_patterns = [
             pat(r'^copy-plugins/$', self.copy_plugins),
             pat(r'^add-plugin/$', self.add_plugin),

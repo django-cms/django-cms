@@ -11,7 +11,9 @@ from cms.api import assign_user_to_page, create_page, create_page_user
 from cms.cms_menus import get_visible_nodes
 from cms.models import ACCESS_PAGE, Page, PageContent
 from cms.models.permissionmodels import (
-    ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    GlobalPagePermission,
+    PagePermission,
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt

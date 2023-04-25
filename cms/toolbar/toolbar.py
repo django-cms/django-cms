@@ -18,7 +18,9 @@ from cms.models import Placeholder, UserSettings
 from cms.templates import TemplatesCache
 from cms.toolbar.items import ButtonList, Menu, ToolbarAPIMixin
 from cms.toolbar.utils import (
-    get_object_edit_url, get_object_preview_url, get_object_structure_url,
+    get_object_edit_url,
+    get_object_preview_url,
+    get_object_structure_url,
 )
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request

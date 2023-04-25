@@ -5,7 +5,8 @@ from django.template.engine import Engine
 from django.views.generic import DetailView
 
 from cms.test_utils.project.placeholderapp.models import (
-    CharPksExample, Example1,
+    CharPksExample,
+    Example1,
 )
 
 

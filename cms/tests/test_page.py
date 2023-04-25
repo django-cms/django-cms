@@ -24,7 +24,9 @@ from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import (
-    get_available_slug, get_current_site, get_page_from_request,
+    get_available_slug,
+    get_current_site,
+    get_page_from_request,
 )
 
 
@@ -940,11 +942,11 @@ class PageContentTests(CMSTestCase):
         self.assertEqual(german_content.pk, self.german_content.pk)
 
     def test_page_content_manager(self):
-        from cms.models.managers import PageContentAdminQuerySet
+        from cms.models.managers import ContentAdminQuerySet
 
         # check if admin_manager exists
         self.assertTrue(isinstance(PageContent.admin_manager, models.Manager))
-        self.assertTrue(isinstance(PageContent.admin_manager.none(), PageContentAdminQuerySet))
+        self.assertTrue(isinstance(PageContent.admin_manager.none(), ContentAdminQuerySet))
 
         # setup created to page contents for self.page. Test if admin_manager sees them
         self.assertEqual(PageContent.admin_manager.filter(page=self.page).count(), 2)

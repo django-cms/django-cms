@@ -17,7 +17,9 @@ from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.toolbar.utils import (
-    get_object_edit_url, get_object_preview_url, get_object_structure_url,
+    get_object_edit_url,
+    get_object_preview_url,
+    get_object_structure_url,
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
@@ -172,13 +174,13 @@ class ViewTests(CMSTestCase):
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", login_required=True)
         plain_url = '/accounts/'
-        login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
+        login_rx = re.compile("%s\\?(signin=|next=/en/)&" % plain_url)
         with self.settings(LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/en/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
             self.assertTrue(login_rx.search(response['Location']))
-        login_rx = re.compile("%s\?(signin=|next=/)&" % plain_url)
+        login_rx = re.compile("%s\\?(signin=|next=/)&" % plain_url)
         with self.settings(USE_I18N=False, LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/')
             response = details(request, '')

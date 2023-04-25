@@ -287,7 +287,8 @@ def check_copy_relations(output):
     from cms.models.pluginmodel import CMSPlugin
     from cms.plugin_pool import plugin_pool
 
-    c_to_s = lambda klass: '%s.%s' % (klass.__module__, klass.__name__)
+    def c_to_s(klass):
+        return '%s.%s' % (klass.__module__, klass.__name__)
 
     def get_class(method_name, model):
         for cls in inspect.getmro(model):

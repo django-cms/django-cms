@@ -2,7 +2,9 @@ from django.contrib import admin
 
 from cms.admin.placeholderadmin import FrontendEditableAdminMixin
 from cms.test_utils.project.placeholderapp.models import (
-    CharPksExample, Example1, TwoPlaceholderExample,
+    CharPksExample,
+    Example1,
+    TwoPlaceholderExample,
 )
 
 

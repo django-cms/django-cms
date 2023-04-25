@@ -2,8 +2,11 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 
 from cms.app_registration import (
-    autodiscover_cms_configs, backwards_compatibility_config,
-    configure_cms_apps, get_cms_extension_apps, ready_cms_apps,
+    autodiscover_cms_configs,
+    backwards_compatibility_config,
+    configure_cms_apps,
+    get_cms_extension_apps,
+    ready_cms_apps,
 )
 from cms.utils.compat.dj import is_installed as app_is_installed
 

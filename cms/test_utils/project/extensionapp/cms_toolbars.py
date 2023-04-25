@@ -2,7 +2,8 @@ from django.urls import NoReverseMatch
 from django.utils.translation import gettext_lazy as _
 
 from cms.test_utils.project.extensionapp.models import (
-    MyPageContentExtension, MyPageExtension,
+    MyPageContentExtension,
+    MyPageExtension,
 )
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool

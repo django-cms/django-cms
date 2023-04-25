@@ -26,7 +26,9 @@ from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
 from cms.wizards.helpers import get_entries, get_entry
 from cms.wizards.wizard_base import Wizard
 from cms.wizards.wizard_pool import (
-    AlreadyRegisteredException, entry_choices, wizard_pool,
+    AlreadyRegisteredException,
+    entry_choices,
+    wizard_pool,
 )
 
 CreateCMSPageForm = step2_form_factory(

@@ -35,3 +35,46 @@ class SampleAppConfig(models.Model):
 
 class SomeEditableModel(models.Model):
     pass
+
+
+class GrouperModel(models.Model):
+    category_name = models.CharField(max_length=200, default="")
+
+
+class GrouperModelContent(models.Model):
+    # grouper field name: snake case of GrouperModel
+    grouper_model = models.ForeignKey(
+        GrouperModel,
+        on_delete=models.CASCADE,
+    )
+
+    language = models.TextField(
+        default="en",
+        choices=(
+            ("en", "English"),
+            ("de", "German"),
+            ("it", "Italian"),
+        )
+    )
+
+    region = models.TextField(
+        default="world",
+        max_length=10,
+        choices=(
+            ("world", "World"),
+            ("americas", "Americas"),
+            ("europe", "Europe"),
+            ("africa", "Africa"),
+            ("asia", "Asia"),
+            ("australia", "Australia")
+        )
+    )
+
+    uptodate = models.BooleanField(
+        verbose_name="Yes/No",
+        default=False,
+    )
+
+    secret_greeting = models.TextField(
+        max_length=100,
+    )

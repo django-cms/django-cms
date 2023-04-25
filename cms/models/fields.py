@@ -19,7 +19,8 @@ class PlaceholderField(models.ForeignKey):
     """
     def __init__(self, slotname, default_width=None, actions=None, **kwargs):
         from cms.utils.placeholder import (
-            PlaceholderNoAction, validate_placeholder_name,
+            PlaceholderNoAction,
+            validate_placeholder_name,
         )
 
         if not actions:
