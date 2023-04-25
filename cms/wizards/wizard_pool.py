@@ -1,6 +1,5 @@
-# -*- coding: utf-8 -*-
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from .wizard_base import Wizard
 
@@ -19,7 +18,7 @@ def entry_choices(user, page):
             yield (entry.id, entry.title)
 
 
-class WizardPool(object):
+class WizardPool:
     _entries = {}
     _discovered = False
 
@@ -114,6 +113,7 @@ class WizardPool(object):
         """
         self._discover()
         return [value for (key, value) in sorted(
-            self._entries.items(), key=lambda e: getattr(e[1], 'weight'))]
+            self._entries.items(), key=lambda e: e[1].weight)]
+
 
 wizard_pool = WizardPool()

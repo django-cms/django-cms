@@ -1,17 +1,15 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import re
 
-from django.db.models import Q
+from django.db.models import ExpressionWrapper, Q
+from django.db.models.fields import BooleanField
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 
 from cms.constants import PAGE_USERNAME_MAX_LENGTH
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft
-
 
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
@@ -53,7 +51,7 @@ def get_page_template_from_request(request):
 
 def get_clean_username(user):
     try:
-        username = force_text(user)
+        username = force_str(user)
     except AttributeError:
         # AnonymousUser may not have USERNAME_FIELD
         username = "anonymous"
@@ -78,10 +76,15 @@ def get_page_queryset(site, draft=True, published=False):
     return Page.objects.public().on_site(site)
 
 
-def get_page_from_path(site, path, preview=False, draft=False):
+def get_page_from_path(site, path, preview=False, draft=False, language_code=None):
     """
     Resolves a url path to a single page object.
     Returns None if page does not exist
+
+    Preferres page results based on language code in this order:
+    - Matches sublanguage (e.g. de-at)
+    - Matches language (e.g. de)
+    - All other pages matching the path
     """
     from cms.models import Title
 
@@ -94,6 +97,22 @@ def get_page_from_path(site, path, preview=False, draft=False):
         titles = titles.filter(publisher_is_draft=False)
     else:
         titles = titles.filter(published=True, publisher_is_draft=False)
+    if language_code is not None:
+        # since a language code is provided, prefer pages that match that language
+        sublanguage = language_code
+        language = sublanguage.split("-", maxsplit=1)[0]
+        # use `annotate()` to add two new fields to our queryset in order to prefer the request language code
+        # `matches_sublanguage` will be true when the full code (both language and sublanguage) match
+        # `matches_language` will be true for all pages matching the top-level language code
+        # https://docs.djangoproject.com/en/stable/ref/models/querysets/#django.db.models.query.QuerySet.annotate
+        titles = titles.annotate(
+            matches_sublanguage=ExpressionWrapper(
+                Q(language=sublanguage), output_field=BooleanField()
+            ),
+            matches_language=ExpressionWrapper(
+                Q(language=language), output_field=BooleanField()
+            ),
+        ).order_by("-matches_sublanguage", "-matches_language")
     titles = titles.filter(path=(path or ''))
 
     for title in titles.iterator():
@@ -143,7 +162,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     """
     from cms.utils.page_permissions import user_can_view_page_draft
 
-    if hasattr(request, '_current_page_cache'):
+    if not bool(use_path) and hasattr(request, '_current_page_cache'):
         # The following is set by CurrentPageMiddleware
         return request._current_page_cache
 
@@ -165,10 +184,15 @@ def get_page_from_request(request, use_path=None, clean_path=None):
             path = path[:-1]
 
     site = get_current_site()
-    page = get_page_from_path(site, path, preview, draft)
+    request_language_code = getattr(request, "LANGUAGE_CODE", None)
+    page = get_page_from_path(
+        site, path, preview, draft, language_code=request_language_code
+    )
 
     if draft and page and not user_can_view_page_draft(request.user, page):
-        page = get_page_from_path(site, path, preview, draft=False)
+        page = get_page_from_path(
+            site, path, preview, draft=False, language_code=request_language_code
+        )
 
     # For public pages, check if any parent is hidden due to published dates
     # In this case the selected page is not reachable
@@ -178,8 +202,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
             page
             .get_ancestor_pages()
             .filter(
-                Q(publication_date__gt=now)
-                | Q(publication_end_date__lt=now),
+                Q(publication_date__gt=now) | Q(publication_end_date__lt=now),
             )
         )
         if unpublished_ancestors.exists():
@@ -193,20 +216,24 @@ def get_all_pages_from_path(site, path, language):
     return pages.filter(title_set__language=language)
 
 
-def get_available_slug(site, path, language, suffix='copy', modified=False):
+def get_available_slug(site, path, language, suffix='copy', modified=False, current=None):
     """
     Generates slug for path.
     If path is used, appends the value of suffix to the end.
     """
     base, _, slug = path.rpartition('/')
     pages = get_all_pages_from_path(site, path, language)
+    if current:
+        pages = pages.exclude(
+            Q(pk=current.pk) | Q(publisher_public_id=current.pk) | Q(publisher_draft__pk=current.pk)
+        )
 
     if pages.exists():
         match = SUFFIX_REGEX.match(slug)
 
         if match and modified:
             _next = int(match.groups()[-1]) + 1
-            slug = SUFFIX_REGEX.sub('\g<1>-{}'.format(_next), slug)
+            slug = SUFFIX_REGEX.sub(r'\g<1>-{}'.format(_next), slug)
         elif suffix:
             slug += '-' + suffix + '-2'
         else:

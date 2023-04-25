@@ -1,11 +1,12 @@
-from __future__ import unicode_literals
+import re
 
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext
+from django.utils.translation import gettext
 
+from cms.constants import NEGATE_SLUG_REGEXP
 from cms.utils.page import get_all_pages_from_path
 from cms.utils.urlutils import admin_reverse, relative_url_regex
 
@@ -21,6 +22,28 @@ def validate_url(value):
     except ValidationError:
         # Fallback to absolute urls
         URLValidator()(value)
+
+
+def validate_url_extra(value):
+    try:
+        # Try normal validator first
+        validate_url(value)
+    except ValidationError:
+        # Fallback to absolute urls
+        if re.match(r'^tel:[0-9\+\#\*\-\.\(\)]+$', value):
+            pass
+        elif re.match(r'^mailto:\S+$', value):
+            pass
+        else:
+            raise
+
+
+def validate_overwrite_url(value):
+    try:
+        RegexValidator(regex=NEGATE_SLUG_REGEXP)(value)
+    except ValidationError:
+        return True
+    return False
 
 
 def validate_url_uniqueness(site, path, language, exclude_page=None):
@@ -59,12 +82,12 @@ def validate_url_uniqueness(site, path, language, exclude_page=None):
 
     conflict_url = '<a href="%(change_url)s" target="_blank">%(page_title)s</a>' % {
         'change_url': change_url,
-        'page_title': force_text(conflict_page),
+        'page_title': force_str(conflict_page),
     }
 
     if exclude_page:
-        message = ugettext('Page %(conflict_page)s has the same url \'%(url)s\' as current page "%(instance)s".')
+        message = gettext('Page %(conflict_page)s has the same url \'%(url)s\' as current page "%(instance)s".')
     else:
-        message = ugettext('Page %(conflict_page)s has the same url \'%(url)s\' as current page.')
+        message = gettext('Page %(conflict_page)s has the same url \'%(url)s\' as current page.')
     message = message % {'conflict_page': conflict_url, 'url': path, 'instance': exclude_page}
     raise ValidationError(mark_safe(message))

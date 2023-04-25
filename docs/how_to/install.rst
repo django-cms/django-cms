@@ -32,14 +32,22 @@ django CMS also has other requirements, which it lists as dependencies in its ``
 ..  important::
 
     We strongly recommend doing all of the following steps in a virtual environment. You ought to know how to create,
-    activate and dispose of virtual environments using `virtualenv <https://virtualenv.pypa.io>`_. If you don't, you
+    activate and dispose of virtual environments using `venv <https://docs.python.org/3.9/library/venv.html>`_. If you don't, you
     can use the steps below to get started, but you are advised to take a few minutes to learn the basics of using
     virtualenv before proceeding further.
 
     ..  code-block:: bash
 
-        virtualenv django-cms-site  # create a virtualenv
-        source django-cms-site/bin/activate  # activate it
+        python3 -m venv venv # create a virtualenv
+        source venv/bin/activate  # activate it
+
+    For the cms to work correctly, you will need django version 3.2.
+    Work with newer versions can be unstable.
+    You can install recommended version of django with following command:
+
+    .. code-block:: bash
+
+        pip install django==3.2
 
 In an activated virtualenv, run::
 
@@ -60,16 +68,17 @@ Create a new project
 
 Create a new project::
 
-    django-admin.py startproject myproject
+    django-admin startproject myproject
 
 If this is new to you, you ought to read the `official Django tutorial
-<https://docs.djangoproject.com/en/dev/intro/tutorial01/>`_, which covers starting a new project.
+<https://docs.djangoproject.com/en/3.2/intro/tutorial01/>`_, which covers starting a new project.
 
 Your new project will look like this::
 
     myproject
         myproject
             __init__.py
+            asgi.py
             settings.py
             urls.py
             wsgi.py
@@ -99,8 +108,10 @@ You will need to add the following to its list of ``INSTALLED_APPS``::
 * `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django CMS's page and plugin tree
   structures.
 
-django CMS installs `django CMS admin style <https://github.com/divio/djangocms-admin-style>`_. This provides some styling that helps make django CMS administration components easier to work with. Technically it's an optional
-component and does not need to be enabled in your project, but it's strongly recommended.
+django CMS installs `django CMS admin style <https://github.com/django-cms/djangocms-admin-style>`_.
+This provides some styling that helps make django CMS administration components easier to work with.
+Technically it's an optional component and does not need to be enabled in your project,
+but it's strongly recommended.
 
 In the ``INSTALLED_APPS``, **before** ``django.contrib.admin``, add::
 
@@ -132,7 +143,14 @@ django CMS requires a relational database backend. Each django CMS installation 
 
 You can use SQLite, which is included in Python and doesn't need to be installed separately or configured further. You
 are unlikely to be using that for a project in production, but it's ideal for development and exploration, especially
-as it is configured by default in a new Django project's :setting:`django:DATABASES`.
+as it is configured by default in a new Django project's :setting:`django:DATABASES`::
+
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 ..  note::
 
@@ -174,7 +192,8 @@ Create an admin superuser::
 Using ``cms check`` for configuration
 *************************************
 
-Once you have completed the minimum required set-up described above, you can use django CMS's built-in ``cms check`` command to help you identify and install other components. Run::
+Once you have completed the minimum required set-up described above, you can use django CMS's built-in ``cms check``
+command to help you identify and install other components. Run::
 
     python manage.py cms check
 
@@ -192,18 +211,20 @@ Sekizai
 =======
 
 `Django Sekizai <https://github.com/ojii/django-sekizai>`_ is required by the CMS for static files management. You need
-to have::
+to have ``'sekizai'`` listed in ``INSTALLED_APPS``, 
 
-     'sekizai'
+.. code-block:: python
 
-listed in ``INSTALLED_APPS``, and::
+    INSTALLED_APPS = [
+        ...,
+        'sekizai',
+        ...,
+    ]
 
-    'sekizai.context_processors.sekizai'
 
-in the ``TEMPLATES['OPTIONS']['context_processors']``:
+and ``'sekizai.context_processors.sekizai'`` in the ``TEMPLATES['OPTIONS']['context_processors']``:
 
 ..  code-block:: python
-    :emphasize-lines: 7
 
     TEMPLATES = [
         {
@@ -236,11 +257,16 @@ to the list.
 You can also add ``'cms.middleware.utils.ApphookReloadMiddleware'``. It's not absolutely necessary, but it's
 :ref:`useful <reloading_apphooks>`. If included, should be at the start of the list.
 
+add the following configuration to your ``settings.py``::
+
+    X_FRAME_OPTIONS = 'SAMEORIGIN'
 
 Context processors
 ==================
 
 Add ``'cms.context_processors.cms_settings'`` to ``TEMPLATES['OPTIONS']['context_processors']``.
+
+Also add ``'django.template.context_processors.i18n'`` if it's not already present.
 
 ``cms check`` should now be unable to identify any further issues with your project. Some additional configuration is
 required however.
@@ -253,23 +279,28 @@ Further required configuration
 URLs
 ====
 
-In the project's ``urls.py``, add ``url(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
-other patterns, so that specific URLs for other applications can be detected first. Note: when using Django 2.0 or later the syntax is ``re_path(r'^', include('cms.urls'))``
+In the project's ``urls.py``, add ``re_path(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
+other patterns, so that specific URLs for other applications can be detected first.
 
-You'll also need to have an import for ``django.conf.urls.include``. For example:
+You'll also need to have an import for ``django.urls.include``. For example:
 
 ..  code-block:: python
-    :emphasize-lines: 1,5
 
-    from django.conf.urls import url, include
+    from django.urls import re_path, include
 
     urlpatterns = [
-        url(r'^admin/', admin.site.urls),
-        url(r'^', include('cms.urls')),
+        re_path(r'^admin/', admin.site.urls),
+        re_path(r'^', include('cms.urls')),
     ]
 
-The django CMS project will now run, as you'll see if you launch it with ``python manage.py runserver``. You'll be able
-to reach it at http://localhost:8000/, and the admin at http://localhost:8000/admin/. You won't yet actually be able to
+The django CMS project will now run, as you'll see if you launch it with
+
+..  code-block:: bash
+
+    python manage.py runserver
+
+
+You'll be able to reach it at http://localhost:8000/, and the admin at http://localhost:8000/admin/. You won't yet actually be able to
 do anything very useful with it though.
 
 
@@ -278,8 +309,8 @@ do anything very useful with it though.
 Templates
 =========
 
-django CMS requires at least one template for its pages. The first template in the :setting:`CMS_TEMPLATES` list will
-be the project's default template.
+django CMS requires at least one template for its pages, so you'll need to add :setting:`CMS_TEMPLATES` to your
+settings. The first template in the :setting:`CMS_TEMPLATES` list will be the project's default template.
 
 ::
 
@@ -322,7 +353,6 @@ This is worth explaining in a little detail:
 Django needs to be know where to look for its templates, so add ``templates`` to the ``TEMPLATES['DIRS']`` list:
 
 ..  code-block:: python
-    :emphasize-lines: 4
 
     TEMPLATES = [
         {
@@ -366,7 +396,6 @@ For deployment, you need to configure suitable media file serving. **For develop
 work in your ``urls.py``:
 
 ..  code-block:: python
-    :emphasize-lines: 1,2,6
 
     from django.conf import settings
     from django.conf.urls.static import static
@@ -445,7 +474,7 @@ Django CMS CKEditor
 
 `Django CMS CKEditor`_ is the default text editor for django CMS.
 
-.. _Django CMS CKEditor: https://github.com/divio/djangocms-text-ckeditor
+.. _Django CMS CKEditor: https://github.com/django-cms/djangocms-text-ckeditor
 
 Install: ``pip install djangocms-text-ckeditor``.
 
@@ -462,18 +491,17 @@ Miscellaneous plugins
 There are plugins for django CMS that cover a vast range of functionality. To get started, it's useful to be able to
 rely on a set of well-maintained plugins that cover some general content management needs.
 
-* `djangocms-link <https://github.com/divio/djangocms-link>`_
-* `djangocms-file <https://github.com/divio/djangocms-file>`_
-* `djangocms-picture <https://github.com/divio/djangocms-picture>`_
-* `djangocms-video <https://github.com/divio/djangocms-video>`_
-* `djangocms-googlemap <https://github.com/divio/djangocms-googlemap>`_
-* `djangocms-snippet <https://github.com/divio/djangocms-snippet>`_
-* `djangocms-style <https://github.com/divio/djangocms-style>`_
-* `djangocms-column <https://github.com/divio/djangocms-column>`_
+* `djangocms-link <https://github.com/django-cms/djangocms-link>`_
+* `djangocms-file <https://github.com/django-cms/djangocms-file>`_
+* `djangocms-picture <https://github.com/django-cms/djangocms-picture>`_
+* `djangocms-video <https://github.com/django-cms/djangocms-video>`_
+* `djangocms-googlemap <https://github.com/django-cms/djangocms-googlemap>`_
+* `djangocms-snippet <https://github.com/django-cms/djangocms-snippet>`_
+* `djangocms-style <https://github.com/django-cms/djangocms-style>`_
 
 To install::
 
-    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet djangocms-style djangocms-column
+    pip install djangocms-link djangocms-file djangocms-picture djangocms-video djangocms-googlemap djangocms-snippet djangocms-style
 
 and add::
 
@@ -484,13 +512,12 @@ and add::
     'djangocms_googlemap',
     'djangocms_snippet',
     'djangocms_style',
-    'djangocms_column',
 
 to ``INSTALLED_APPS``.
 
 Then run migrations::
 
-    python manage.py migrate.
+    python manage.py migrate
 
 These and other plugins are described in more detail in :ref:`commonly-used-plugins`. More are listed
 plugins available on the `django CMS Marketplace <https://marketplace.django-cms.org/en/addons/>`_.
@@ -514,8 +541,6 @@ done so already.
 **********
 Next steps
 **********
-
-If this is your first django CMS project, read through the :ref:`user-tutorial` for a walk-through of some basics.
 
 The :ref:`tutorials for developers <tutorials>` will help you understand how to approach django CMS as a developer.
 Note that the tutorials assume you have installed the CMS using the django CMS Installer, but with a little

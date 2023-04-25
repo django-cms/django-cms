@@ -21,7 +21,7 @@ should come *after* ``cms``.
 .. _middleware:
 
 **********************************
-The ``MIDDLEWARE_CLASSES`` setting
+The ``MIDDLEWARE`` setting
 **********************************
 
 .. _ApphookReloadMiddleware:
@@ -29,7 +29,7 @@ The ``MIDDLEWARE_CLASSES`` setting
 ``cms.middleware.utils.ApphookReloadMiddleware``
 ================================================
 
-Adding ``ApphookReloadMiddleware`` to the ``MIDDLEWARE_CLASSES`` tuple will enable automatic server
+Adding ``ApphookReloadMiddleware`` to the ``MIDDLEWARE`` tuple will enable automatic server
 restarts when changes are made to apphook configurations. It should be placed as near to the top of
 the classes as possible.
 
@@ -155,8 +155,7 @@ python module, by creating a ``__init__.py`` file in the templates directory.
 The file contains a single ``TEMPLATES`` dictionary with the list of templates
 as keys and template names as values::::
 
-    # -*- coding: utf-8 -*-
-    from django.utils.translation import ugettext_lazy as _
+    from django.utils.translation import gettext_lazy as _
     TEMPLATES = {
         'col_two.html': _('Two columns'),
         'col_three.html': _('Three columns'),
@@ -409,8 +408,8 @@ A list of plugin processors. Plugin processors are callables that modify all
 plugins' output *after* rendering. See :doc:`/how_to/custom_plugins`
 for more information.
 
-..  setting:: CMS_APPHOOKS
 
+..  setting:: CMS_APPHOOKS
 
 CMS_APPHOOKS
 ============
@@ -432,6 +431,22 @@ Example::
         'otherapp.cms_app.MyFancyApp',
         'sampleapp.cms_app.SampleApp',
     )
+
+
+..  setting:: CMS_ADMIN_NAMESPACE
+
+CMS_ADMIN_NAMESPACE
+=====================
+
+default
+    ``admin``
+
+Used to configure the namespace of the admin interface.
+
+When using a custom instance of Django's
+:class:`~django.contrib.admin.AdminSite`, provide the unique instance name as
+``CMS_ADMIN_NAMESPACE``. This instance name is used when :ref:`reversing admin
+URLs <django:admin-reverse-urls>`.
 
 
 .. _i18n_l10n_reference:
@@ -836,11 +851,16 @@ This setting only applies if :setting:`CMS_PERMISSION` is ``True``
 
 The ``view restrictions`` and ``page permissions`` inlines on the
 :class:`cms.models.Page` admin change forms can cause performance problems
-where there are many thousands of users being put into simple select boxes. If
-set to a positive integer, this setting forces the inlines on that page to use
+where there are many thousands of users being put into simple select boxes.
+
+If set to a positive integer, this setting forces the inlines on that page to use
 standard Django admin raw ID widgets rather than select boxes if the number of
 users in the system is greater than that number, dramatically improving
 performance.
+
+If set to ``True`` it forces the inlines on Page admin to use raw ID widgets
+without even counting the number of users, giving an additional performance
+improvement.
 
 .. note:: Using raw ID fields in combination with ``limit_choices_to`` causes
           errors due to excessively long URLs if you have many thousands of
@@ -874,6 +894,7 @@ CMS_CACHE_DURATIONS
 ===================
 
 This dictionary carries the various cache duration settings.
+You can override it partially, e.g. ``{'content': 3600}``.
 
 
 ``'content'``
@@ -950,6 +971,22 @@ If the toolbar is visible the page is not cached as well.
 
 ..  setting:: CMS_PLACEHOLDER_CACHE
 
+CMS_INVALIDATE_PAGE_CACHE_ON_STARTUP
+====================================
+
+default
+    ``True``
+
+Should the cache version be invalidated on startup?
+In a instance where you cannot access the cache in the init phase (for example,
+Google App Engine) or where you don't want to invalidate the page cache on the
+startup of a new instance (for example, with many instances scaling up and down
+rapidly), you may want to keep the page cache version in the cache rather than
+reset it on the start of every new instance.
+
+
+..  setting:: INVALIDATE_PAGE_CACHE_ON_STARTUP
+
 CMS_PLACEHOLDER_CACHE
 =====================
 
@@ -974,6 +1011,18 @@ Default value of the ``cache`` attribute of plugins. Should plugins be cached by
 .. warning::
     If you disable the plugin cache be sure to restart the server and clear the cache afterwards.
 
+
+..  setting:: CMS_LIMIT_TTL_CACHE_FUNCTION
+
+CMS_LIMIT_TTL_CACHE_FUNCTION
+============================
+
+default
+    ``None``
+
+If defined, specifies the function to be called that allows to limit the page cache ttl value
+using a business logic. The function receives one argument, the `response`, and returns an `int`
+the max business value of the page cache ttl.
 
 ..  setting:: CMS_MAX_PAGE_PUBLISH_REVERSIONS
 
@@ -1004,6 +1053,49 @@ Example::
 
 .. _unihandecode.js: https://github.com/ojii/unihandecode.js
 
+
+CMS_ENABLE_HELP
+===============
+
+default
+    ``True``
+
+This setting controls if the help menu appears in the toolbar.
+
+
+CMS_EXTRA_HELP_MENU_ITEMS
+=========================
+
+Example::
+
+    CMS_EXTRA_HELP_MENU_ITEMS = (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    )
+
+This setting adds to the default links of the support menu allowing project or company support links.
+
+
+CMS_COLOR_SCHEME
+================
+
+default
+    ``"light"``
+
+Sets the color scheme for django CMS' editing system. Valid values are ``"light"``,
+``"dark"``, and ``"auto"``. ``"auto"`` will take the user's preference from
+the browser or operating system setting (or light if no preference is available).
+
+CMS_COLOR_SCHEME_TOGGLE
+=======================
+
+default
+    ``False``
+
+If set to ``True`` the toolbar will show a moon or sun icon allowing the user
+to change the current color scheme from light to dark and vice versa.
 
 CMS_TOOLBAR_ANONYMOUS_ON
 ========================
@@ -1045,24 +1137,6 @@ This should be an integer preferably taken from the ``cms.constants`` e.g.
 - X_FRAME_OPTIONS_ALLOW
 - X_FRAME_OPTIONS_SAMEORIGIN
 - X_FRAME_OPTIONS_DENY
-
-
-.. _CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE:
-
-CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE
-=================================
-
-default:
-    ``True``
-
-The new structure board operates by default in "simple" mode. The older mode used absolute
-positioning. Setting this attribute to ``False`` will allow the absolute positioning used in
-versions prior to 3.2. This setting will be removed in 3.3.
-
-
-Example::
-
-    CMS_TOOLBAR_SIMPLE_STRUCTURE_MODE = False
 
 
 ..  setting:: CMS_PAGE_WIZARD_DEFAULT_TEMPLATE
@@ -1116,3 +1190,25 @@ when the "Content" field is filled in. There should be no need to change it,
 unless you **don't** use ``djangocms-text-ckeditor`` in your project **and**
 your custom plugin defined in :setting:`CMS_PAGE_WIZARD_CONTENT_PLUGIN` have a
 body field **different** than ``body``.
+
+..  setting:: CMS_REDIRECT_PRESERVE_QUERY_PARAMS
+
+CMS_REDIRECT_PRESERVE_QUERY_PARAMS
+===================================
+
+default
+    ``False``
+
+This indicates to the CMS that redirects should preserve the query parameters.
+
+
+..  setting:: CMS_REDIRECT_TO_LOWERCASE_SLUG
+
+CMS_REDIRECT_TO_LOWERCASE_SLUG
+==============================
+
+default
+    ``False``
+
+This indicates to the CMS that it should redirect requests with an non-lowercase
+slug to its lowercase version if no page with that slug is found.

@@ -1,11 +1,6 @@
-# -*- coding: utf-8 -*-
-import tempfile
 import codecs
-
-try:
-    from cStringIO import StringIO
-except ImportError:
-    from io import StringIO
+import tempfile
+from io import StringIO
 
 from django.core.management import call_command
 

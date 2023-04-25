@@ -1,7 +1,7 @@
-# -*- coding: utf-8 -*-
 import json
 import sys
 import warnings
+from urllib.parse import unquote, urljoin
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -15,30 +15,20 @@ from django.template.context import Context
 from django.test import testcases
 from django.test.client import RequestFactory
 from django.urls import reverse
+from django.utils import translation
 from django.utils.http import urlencode
-from django.utils.six.moves.urllib.parse import unquote, urljoin
 from django.utils.timezone import now
-from django.utils.translation import activate
-from menus.menu_pool import menu_pool
 
 from cms.api import create_page
-from cms.constants import (
-    PUBLISHER_STATE_DEFAULT,
-    PUBLISHER_STATE_DIRTY,
-    PUBLISHER_STATE_PENDING,
-)
-from cms.plugin_rendering import ContentRenderer, StructureRenderer
+from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY, PUBLISHER_STATE_PENDING
 from cms.models import Page
-from cms.models.permissionmodels import (
-    GlobalPagePermission,
-    PagePermission,
-    PageUser,
-)
+from cms.models.permissionmodels import GlobalPagePermission, PagePermission, PageUser
+from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
-
+from menus.menu_pool import menu_pool
 
 URL_CMS_PAGE = "/en/admin/cms/page/"
 URL_CMS_PAGE_ADD = urljoin(URL_CMS_PAGE, "add/")
@@ -66,7 +56,7 @@ URL_CMS_TRANSLATION_DELETE = urljoin(URL_CMS_PAGE_CHANGE_BASE, "delete-translati
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
-class _Warning(object):
+class _Warning:
     def __init__(self, message, category, filename, lineno):
         self.message = message
         self.category = category
@@ -87,7 +77,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
         if v is not None:
             try:
                 v.__warningregistry__ = None
-            except:
+            except:  # noqa: E722
                 # Don't specify a particular exception type to handle in case
                 # some wacky object raises some wacky exception in response to
                 # the setattr attempt.
@@ -105,13 +95,13 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
     return result
 
 
-class BaseCMSTestCase(object):
+class BaseCMSTestCase:
     counter = 1
 
     def _fixture_setup(self):
-        super(BaseCMSTestCase, self)._fixture_setup()
+        super()._fixture_setup()
         self.create_fixtures()
-        activate("en")
+        translation.activate("en")
 
     def create_fixtures(self):
         pass
@@ -119,7 +109,7 @@ class BaseCMSTestCase(object):
     def _post_teardown(self):
         menu_pool.clear()
         cache.clear()
-        super(BaseCMSTestCase, self)._post_teardown()
+        super()._post_teardown()
         set_current_user(None)
 
     def login_user_context(self, user):
@@ -304,7 +294,7 @@ class BaseCMSTestCase(object):
         """
         for page in qs.order_by('path'):
             ident = "  " * page.level
-            print(u"%s%s (%s), path: %s, depth: %s, numchild: %s" % (ident, page,
+            print("{}{} ({}), path: {}, depth: {}, numchild: {}".format(ident, page,
             page.pk, page.path, page.depth, page.numchild))
 
     def print_node_structure(self, nodes, *extra):
@@ -313,7 +303,7 @@ class BaseCMSTestCase(object):
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print(u"%s%s: %s" % (ident, node.title, attrs))
+                print(f"{ident}{node.title}: {attrs}")
                 _rec(node.children, level + 1)
 
         _rec(nodes)
@@ -401,17 +391,14 @@ class BaseCMSTestCase(object):
         request = request or self.get_request()
         return StructureRenderer(request)
 
-    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None):
+    def get_request(self, path=None, language=None, post_data=None, enforce_csrf_checks=False, page=None, domain=None):
         factory = RequestFactory()
 
         if not path:
             path = self.get_pages_root()
 
         if not language:
-            if settings.USE_I18N:
-                language = settings.LANGUAGES[0][0]
-            else:
-                language = settings.LANGUAGE_CODE
+            language = translation.get_language()
 
         if post_data:
             request = factory.post(path, post_data)
@@ -420,13 +407,16 @@ class BaseCMSTestCase(object):
         request.session = self.client.session
         request.user = getattr(self, 'user', AnonymousUser())
         request.LANGUAGE_CODE = language
+        if domain:
+            request.META["SERVER_NAME"] = domain
+            request.SERVER_NAME = domain
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
         if page:
             request.current_page = page
         else:
             request.current_page = None
 
-        class MockStorage(object):
+        class MockStorage:
 
             def __len__(self):
                 return 0
@@ -445,15 +435,24 @@ class BaseCMSTestCase(object):
 
     def failUnlessWarns(self, category, message, f, *args, **kwargs):
         warningsShown = []
+        cleanwarningsShown = []
         result = _collectWarnings(warningsShown.append, f, *args, **kwargs)
 
         if not warningsShown:
             self.fail("No warnings emitted")
-        first = warningsShown[0]
-        for other in warningsShown[1:]:
-            if ((other.message, other.category)
-                != (first.message, first.category)):
+
+        for warning in warningsShown:
+            # this specific warning is present due to the way Django
+            # handle asyncio
+            # https://stackoverflow.com/questions/70303895/python-3-10-asyncio-gather-shows-deprecationwarning-there-is-no-current-event
+            if (warning.category != DeprecationWarning and warning.message != 'There is no current event loop'):
+                cleanwarningsShown.append(warning)
+
+        first = cleanwarningsShown[0]
+        for other in cleanwarningsShown[1:]:
+            if ((other.message, other.category) != (first.message, first.category)):
                 self.fail("Can't handle different warnings")
+
         self.assertEqual(first.message, message)
         self.assertTrue(first.category is category)
 
@@ -480,7 +479,7 @@ class BaseCMSTestCase(object):
 
     def get_admin_url(self, model, action, *args):
         opts = model._meta
-        url_name = "{}_{}_{}".format(opts.app_label, opts.model_name, action)
+        url_name = f"{opts.app_label}_{opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_permissions_test_page(self):
@@ -511,7 +510,7 @@ class BaseCMSTestCase(object):
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = placeholder.get_add_url()
         data = {
@@ -532,7 +531,7 @@ class BaseCMSTestCase(object):
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'edit_plugin', plugin.pk)
         endpoint += '?' + urlencode({'cms_path': path})
@@ -545,7 +544,7 @@ class BaseCMSTestCase(object):
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'move_plugin')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -558,7 +557,7 @@ class BaseCMSTestCase(object):
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -571,7 +570,7 @@ class BaseCMSTestCase(object):
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -584,7 +583,7 @@ class BaseCMSTestCase(object):
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(container, 'delete_plugin', plugin.pk)
         endpoint += '?' + urlencode({'cms_path': path})
@@ -597,7 +596,7 @@ class BaseCMSTestCase(object):
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = self.get_admin_url(
             container,

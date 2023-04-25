@@ -1,25 +1,16 @@
-# -*- coding: utf-8 -*-
-
-from __future__ import unicode_literals
-
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.text import slugify
-from django.utils.translation import (
-    ugettext,
-    ugettext_lazy as _,
-)
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from cms.admin.forms import AddPageForm
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site, permissions
-from cms.utils.page import get_available_slug
-from cms.utils.page_permissions import (
-    user_can_add_page,
-    user_can_add_subpage,
-)
 from cms.utils.conf import get_cms_setting
+from cms.utils.page import get_available_slug
+from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
 from cms.utils.urlutils import static_with_version
 
 try:
@@ -52,9 +43,11 @@ class CreateCMSPageForm(AddPageForm):
     meta_description = None
 
     content = forms.CharField(
-        label=_(u'Content'), widget=text_widget, required=False,
-        help_text=_(u"Optional. If supplied, will be automatically added "
-                    u"within a new text plugin.")
+        label=_('Content'), widget=text_widget, required=False,
+        help_text=_(
+            "Optional. If supplied, will be automatically added "
+            "within a new text plugin."
+        )
     )
 
     class Media:
@@ -68,11 +61,11 @@ class CreateCMSPageForm(AddPageForm):
         self._site = get_current_site()
         self._user = self.user
         self._language = self.language_code
-        super(CreateCMSPageForm, self).__init__(*args, **kwargs)
-        self.fields['title'].help_text = _(u"Provide a title for the new page.")
+        super().__init__(*args, **kwargs)
+        self.fields['title'].help_text = _("Provide a title for the new page.")
         self.fields['slug'].required = False
         self.fields['slug'].widget = SlugWidget()
-        self.fields['slug'].help_text = _(u"Leave empty for automatic slug, or override as required.")
+        self.fields['slug'].help_text = _("Leave empty for automatic slug, or override as required.")
 
     @staticmethod
     def get_placeholder(page, slot=None):
@@ -141,7 +134,7 @@ class CreateCMSPageForm(AddPageForm):
             has_perm = user_can_add_page(self.user)
 
         if not has_perm:
-            message = ugettext('You don\'t have the permissions required to add a page.')
+            message = gettext('You don\'t have the permissions required to add a page.')
             raise ValidationError(message)
         return parent_page.node if parent_page else None
 
@@ -157,7 +150,7 @@ class CreateCMSPageForm(AddPageForm):
     def save(self, **kwargs):
         from cms.api import add_plugin
 
-        new_page = super(CreateCMSPageForm, self).save(**kwargs)
+        new_page = super().save(**kwargs)
 
         if self.cleaned_data.get("page_type"):
             return new_page

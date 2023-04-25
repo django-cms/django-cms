@@ -14,7 +14,7 @@ Details for caching can be found here: https://docs.djangoproject.com/en/dev/top
 In your middleware settings be sure to add ``django.middleware.cache.UpdateCacheMiddleware`` at the first and
 ``django.middleware.cache.FetchFromCacheMiddleware`` at the last position::
 
-    MIDDLEWARE_CLASSES=[
+    MIDDLEWARE=[
             'django.middleware.cache.UpdateCacheMiddleware',
             ...
             'cms.middleware.language.LanguageCookieMiddleware',
@@ -27,8 +27,6 @@ In your middleware settings be sure to add ``django.middleware.cache.UpdateCache
 
 Plugins
 =======
-
-.. versionadded:: 3.0
 
 Normally all plugins will be cached. If you have a plugin that is dynamic based on the current user or other
 dynamic properties of the request set the ``cache=False`` attribute on the plugin class::
@@ -56,6 +54,7 @@ Have a look at the following settings to enable/disable various caching behaviou
 - :setting:`CMS_PAGE_CACHE`
 - :setting:`CMS_PLACEHOLDER_CACHE`
 - :setting:`CMS_PLUGIN_CACHE`
+- :setting:`CMS_LIMIT_TTL_CACHE_FUNCTION`
 
 
 

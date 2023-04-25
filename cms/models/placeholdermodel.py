@@ -1,32 +1,22 @@
-# -*- coding: utf-8 -*-
 
 import warnings
-
 from datetime import datetime, timedelta
 
 from django.contrib import admin
 from django.db import models
 from django.template.defaultfilters import title
-from django.utils import six
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 
 from cms.cache.placeholder import clear_placeholder_cache
+from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL, PUBLISHER_STATE_DIRTY
 from cms.exceptions import LanguageError
-from cms.utils import get_site_id
+from cms.utils import get_language_from_request, get_site_id, permissions
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_object
 from cms.utils.urlutils import admin_reverse
-from cms.constants import (
-    EXPIRE_NOW,
-    MAX_EXPIRATION_TTL,
-    PUBLISHER_STATE_DIRTY,
-)
-from cms.utils import get_language_from_request
-from cms.utils import permissions
-from cms.utils.conf import get_cms_setting
 
 
-@python_2_unicode_compatible
 class Placeholder(models.Model):
     """
     Attributes:
@@ -42,7 +32,7 @@ class Placeholder(models.Model):
     class Meta:
         app_label = 'cms'
         permissions = (
-            (u"use_structure", u"Can use Structure mode"),
+            ("use_structure", "Can use Structure mode"),
         )
 
     def __str__(self):
@@ -227,7 +217,7 @@ class Placeholder(models.Model):
             include_parents=True,
             include_hidden=False,
         )
-        return list(obj for obj in fields)
+        return list(fields)
 
     def _get_attached_fields(self):
         """
@@ -261,12 +251,12 @@ class Placeholder(models.Model):
                     try:
                         if field.exists():
                             self._attached_fields_cache.append(rel.field)
-                    except:
+                    except:  # noqa: E722
                         pass
         return self._attached_fields_cache
 
     def _get_attached_field(self):
-        from cms.models import CMSPlugin, StaticPlaceholder, Page
+        from cms.models import CMSPlugin, Page, StaticPlaceholder
         if not hasattr(self, '_attached_field_cache'):
             self._attached_field_cache = None
             relations = self._get_related_objects()
@@ -285,7 +275,7 @@ class Placeholder(models.Model):
                         if field.exists():
                             self._attached_field_cache = rel.field
                             break
-                    except:
+                    except:  # noqa: E722
                         pass
         return self._attached_field_cache
 
@@ -359,6 +349,12 @@ class Placeholder(models.Model):
             return self.cmsplugin_set.filter(language=language).order_by('path')
         else:
             return self.cmsplugin_set.all().order_by('path')
+
+    def get_child_plugins(self, language=None):
+        if language:
+            return self.cmsplugin_set.filter(language=language, parent__isnull=True).order_by('path')
+        else:
+            return self.cmsplugin_set.filter(parent__isnull=True).order_by('path')
 
     def get_filled_languages(self):
         """
@@ -450,7 +446,7 @@ class Placeholder(models.Model):
                             'ignoring.' % {
                                 'plugin_class': plugin.__class__.__name__,
                                 'pk': instance.pk,
-                                'value': force_text(plugin_expiration),
+                                'value': force_str(plugin_expiration),
                             })
                         continue
                 else:
@@ -468,7 +464,7 @@ class Placeholder(models.Model):
                         'get_cache_expiration(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
-                            'value': force_text(plugin_expiration),
+                            'value': force_str(plugin_expiration),
                         })
                     continue
 
@@ -510,6 +506,10 @@ class Placeholder(models.Model):
         elif attached_model is StaticPlaceholder:
             StaticPlaceholder.objects.filter(draft=self).update(dirty=True)
 
+        # Force to clear cache when attached model is not a Page or a StaticPlaceholder, otherwise cache is never invalidated when using PlaceholderField
+        elif clear_cache is False:
+            self.clear_cache(language)
+
     def get_plugin_tree_order(self, language, parent_id=None):
         """
         Returns a list of plugin ids matching the given language
@@ -550,7 +550,7 @@ class Placeholder(models.Model):
             if not vary_on:
                 # None, or an empty iterable
                 continue
-            if isinstance(vary_on, six.string_types):
+            if isinstance(vary_on, str):
                 if vary_on.lower() not in vary_list:
                     vary_list.add(vary_on.lower())
             else:
@@ -565,10 +565,10 @@ class Placeholder(models.Model):
                         'get_vary_cache_on(), ignoring.' % {
                             'plugin_class': plugin.__class__.__name__,
                             'pk': instance.pk,
-                            'value': force_text(vary_on),
+                            'value': force_str(vary_on),
                         })
 
-        return sorted(list(vary_list))
+        return sorted(vary_list)
 
     def copy_plugins(self, target_placeholder, language=None, root_plugin=None):
         from cms.utils.plugins import copy_plugins_to_placeholder

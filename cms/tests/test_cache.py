@@ -1,22 +1,19 @@
-# -*- coding: utf-8 -*-
-
 import time
 
 from django.conf import settings
 from django.template import Context
-
 from sekizai.context import SekizaiContext
 
 from cms.api import add_plugin, create_page, create_title
 from cms.cache import _get_cache_version, invalidate_cms_page_cache
 from cms.cache.placeholder import (
-    _get_placeholder_cache_version_key,
-    _get_placeholder_cache_version,
-    _set_placeholder_cache_version,
     _get_placeholder_cache_key,
-    set_placeholder_cache,
-    get_placeholder_cache,
+    _get_placeholder_cache_version,
+    _get_placeholder_cache_version_key,
+    _set_placeholder_cache_version,
     clear_placeholder_cache,
+    get_placeholder_cache,
+    set_placeholder_cache,
 )
 from cms.exceptions import PluginAlreadyRegistered
 from cms.models import Page
@@ -41,12 +38,12 @@ from cms.utils.helpers import get_timezone_name
 class CacheTestCase(CMSTestCase):
     def tearDown(self):
         from django.core.cache import cache
-        super(CacheTestCase, self).tearDown()
+        super().tearDown()
         cache.clear()
 
     def setUp(self):
         from django.core.cache import cache
-        super(CacheTestCase, self).setUp()
+        super().setUp()
         cache.clear()
 
     def test_cache_placeholder(self):
@@ -84,19 +81,19 @@ class CacheTestCase(CMSTestCase):
             'django.middleware.cache.UpdateCacheMiddleware',
             'django.middleware.cache.FetchFromCacheMiddleware'
         ]
-        overrides = dict(
-            CMS_PAGE_CACHE=False,
-            MIDDLEWARE=[mw for mw in settings.MIDDLEWARE if mw not in exclude],
-        )
+        overrides = {
+            "CMS_PAGE_CACHE": False,
+            "MIDDLEWARE": [mw for mw in settings.MIDDLEWARE if mw not in exclude],
+        }
         with self.settings(**overrides):
             with self.assertNumQueries(FuzzyInt(13, 25)):
                 self.client.get(page1_url)
-            with self.assertNumQueries(FuzzyInt(5, 11)):
+            with self.assertNumQueries(FuzzyInt(5, 14)):
                 self.client.get(page1_url)
 
         overrides['CMS_PLACEHOLDER_CACHE'] = False
         with self.settings(**overrides):
-            with self.assertNumQueries(FuzzyInt(7, 15)):
+            with self.assertNumQueries(FuzzyInt(7, 18)):
                 self.client.get(page1_url)
 
     def test_no_cache_plugin(self):
@@ -172,7 +169,7 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(5):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
-                with self.assertNumQueries(FuzzyInt(8, 14)):
+                with self.assertNumQueries(FuzzyInt(8, 17)):
                     response = self.client.get(page1_url)
                     resp2 = response.content.decode('utf8').split("$$$")[1]
             self.assertNotEqual(output, output2)
@@ -335,7 +332,7 @@ class CacheTestCase(CMSTestCase):
             with self.assertNumQueries(FuzzyInt(14, 26)):
                 response = self.client.get(page1_url)
                 resp1 = response.content.decode('utf8').split("$$$")[1]
-            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])  # noqa
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
             cache_control1 = response['Cache-Control']
             expires1 = response['Expires']
 
@@ -517,7 +514,7 @@ class CacheTestCase(CMSTestCase):
 
             # Assert no cached content was used
             with self.assertNumQueries(FuzzyInt(1, 24)):
-                response = self.client.get('{}?edit'.format(page1_url))
+                response = self.client.get(f'{page1_url}?edit')
             self.assertEqual(response.status_code, 200)
 
     def test_invalidate_restart(self):
@@ -634,7 +631,7 @@ class CacheTestCase(CMSTestCase):
         ###
         # add the test plugin
         ##
-        test_plugin = add_plugin(ph1, u"TextPlugin", u"en", body="Some text")
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some text")
         test_plugin.save()
 
         request = self.get_request()
@@ -654,11 +651,64 @@ class CacheTestCase(CMSTestCase):
         text = content_renderer.render_placeholder(ph1, context)
         self.assertEqual(text, "Other text")
 
+    def test_render_placeholderfield_cache_in_custom_model(self):
+        """
+        Regression test for #6912
+
+        Assert that placeholder of a placeholderfield in custom model has its cache cleared correctly when mark_as_dirty is called in the admin
+        """
+
+        invalidate_cms_page_cache()
+
+        # Create an instance of a custom model containing a placeholderfield
+        ex = Example1(char_1="one", char_2="two", char_3="tree", char_4="four")
+        ex.save()
+        ph1 = ex.placeholder
+
+        # Add a first plugin
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some text")
+        test_plugin.save()
+
+        # Create a first request using render_placeholder to ensure that the content is equal to the first plugin content
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some text")
+
+        # Add a second plugin in the placeholder
+        test_plugin = add_plugin(ph1, "TextPlugin", "en", body="Some other text")
+        test_plugin.save()
+
+        # Clear plugins cache to ensure that cms.utils.plugins.get_plugins() will refetch the plugins
+        del ph1._plugins_cache
+
+        # Create a second request using render_placeholder to ensure that the content is still equal to the first plugin content as cache was not cleared yet
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some text")
+
+        # Mark placeholder as dirty as it is done in cms.admin.placeholderadmin file
+        ph1.mark_as_dirty("en", clear_cache=False)
+
+        # Create a last request to ensure that rendered content contains the two plugins content
+        request = self.get_request()
+        content_renderer = self.get_content_renderer(request)
+        context = SekizaiContext()
+        context["request"] = self.get_request()
+
+        text = content_renderer.render_placeholder(ph1, context, use_cache=True)
+        self.assertEqual(text, "Some textSome other text")
+
 
 class PlaceholderCacheTestCase(CMSTestCase):
     def setUp(self):
         from django.core.cache import cache
-        super(PlaceholderCacheTestCase, self).setUp()
+        super().setUp()
         cache.clear()
 
         self.page = create_page(
@@ -688,7 +738,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
     def tearDown(self):
         from django.core.cache import cache
-        super(PlaceholderCacheTestCase, self).tearDown()
+        super().tearDown()
         plugin_pool.unregister_plugin(VaryCacheOnPlugin)
         cache.clear()
 
@@ -712,7 +762,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
 
     def test_get_placeholder_cache_key(self):
         version, vary_on_list = _get_placeholder_cache_version(self.placeholder, 'en', 1)
-        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',
@@ -732,7 +782,7 @@ class PlaceholderCacheTestCase(CMSTestCase):
         en_us_key = _get_placeholder_cache_key(self.placeholder, 'en', 1, self.en_us_request)
         self.assertNotEqual(en_key, en_us_key)
 
-        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(  # noqa
+        desired_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}|country-code:{cc}'.format(
             prefix=get_cms_setting('CACHE_PREFIX'),
             id=self.placeholder.pk,
             lang='en',
@@ -817,3 +867,45 @@ class PlaceholderCacheTestCase(CMSTestCase):
             # Prove it still works as expected
             cached_en_crazy_content = get_placeholder_cache(self.placeholder, 'en', 1, en_crazy_request)
             self.assertEqual(en_crazy_content, cached_en_crazy_content)
+
+    def test_cache_limit_ttl(self):
+        """"
+        Test the `CMS_LIMIT_TTL_CACHE_FUNCTION` setting that allows to change the default 40 seconds
+        default ttl cache value with a business logic function.
+        """
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+        page1_url = page1.get_absolute_url()
+
+        limit_page_cache_ttl_function = ".".join([PlaceholderCacheTestCase.__module__, limit_page_cache_ttl_test_5.__name__])
+        with self.settings(CMS_LIMIT_TTL_CACHE_FUNCTION=limit_page_cache_ttl_function):
+            page1.publish('en')
+            request = self.get_request(page1_url)
+            request.current_page = Page.objects.get(pk=page1.pk)
+            response = self.client.get(page1_url)
+            self.assertTrue('max-age=5' in response['Cache-Control'], response['Cache-Control'])
+
+    def test_cache_limit_ttl_greater_than_default_cache_ttl(self):
+        """
+        Test the `CMS_LIMIT_TTL_CACHE_FUNCTION` setting with a class that returns a value much
+        greater than the default value of 40 seconds.
+        """
+        page1 = create_page('test page 1', 'nav_playground.html', 'en',
+                            published=True)
+        page1_url = page1.get_absolute_url()
+
+        limit_page_cache_ttl_function = ".".join([PlaceholderCacheTestCase.__module__, limit_page_cache_ttl_test_500.__name__])
+        with self.settings(CMS_LIMIT_TTL_CACHE_FUNCTION=limit_page_cache_ttl_function):
+            page1.publish('en')
+            request = self.get_request(page1_url)
+            request.current_page = Page.objects.get(pk=page1.pk)
+            response = self.client.get(page1_url)
+            self.assertTrue('max-age=40' in response['Cache-Control'], response['Cache-Control'])
+
+
+def limit_page_cache_ttl_test_5(response):
+    return 5
+
+
+def limit_page_cache_ttl_test_500(response):
+    return 40

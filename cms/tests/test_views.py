@@ -7,17 +7,16 @@ from django.core.cache import cache
 from django.http import Http404
 from django.template import Variable
 from django.test.utils import override_settings
-from django.urls import clear_url_caches
+from django.urls import clear_url_caches, reverse
 
 from cms.api import create_page, create_title, publish_page
-from cms.models import PagePermission, UserSettings, Placeholder
+from cms.models import PagePermission, Placeholder, UserSettings
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
 from cms.utils.conf import get_cms_setting
 from cms.views import details
 from menus.menu_pool import menu_pool
-
 
 APP_NAME = 'SampleApp'
 APP_MODULE = "cms.test_utils.project.sampleapp.cms_apps"
@@ -33,7 +32,7 @@ class ViewTests(CMSTestCase):
         clear_url_caches()
 
     def tearDown(self):
-        super(ViewTests, self).tearDown()
+        super().tearDown()
         clear_url_caches()
 
     def test_welcome_screen_debug_on(self):
@@ -153,16 +152,54 @@ class ViewTests(CMSTestCase):
             response = self.client.get(self.get_toolbar_disable_url(page_url))
             self.assertEqual(response.status_code, 302)
 
+    def test_redirect_not_preserving_query_parameters(self):
+        # test redirect checking that the query parameters aren't preserved
+        redirect = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = one.get_absolute_url()
+        params = "?param_name=param_value"
+        request = self.get_request(url + params)
+        response = details(request, one.get_path())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect)
+
+    @override_settings(CMS_REDIRECT_PRESERVE_QUERY_PARAMS=True)
+    def test_redirect_preserving_query_parameters(self):
+        # test redirect checking that query parameters are preserved
+        redirect = '/en/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = one.get_absolute_url()
+        params = "?param_name=param_value"
+        request = self.get_request(url + params)
+        response = details(request, one.get_path())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect + params)
+
+    @override_settings(CMS_REDIRECT_TO_LOWERCASE_SLUG=True)
+    def test_redirecting_to_lowercase_slug(self):
+        redirect = '/en/one/'
+        one = create_page("one", "nav_playground.html", "en", published=True,
+                          redirect=redirect)
+        url = reverse('pages-details-by-slug', kwargs={"slug": "One"})
+        request = self.get_request(url)
+        response = details(request, one.get_path())
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], redirect)
+
+
     def test_login_required(self):
         self.create_homepage("page", "nav_playground.html", "en", published=True, login_required=True)
         plain_url = '/accounts/'
-        login_rx = re.compile("%s\?(signin=|next=/en/)&" % plain_url)
+        login_rx = re.compile(r"%s\?(signin=|next=/en/)&" % plain_url)
         with self.settings(LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/en/')
             response = details(request, '')
             self.assertEqual(response.status_code, 302)
             self.assertTrue(login_rx.search(response['Location']))
-        login_rx = re.compile("%s\?(signin=|next=/)&" % plain_url)
+
+        login_rx = re.compile(r"%s\?(signin=|next=/)&" % plain_url)
         with self.settings(USE_I18N=False, LOGIN_URL=plain_url + '?signin'):
             request = self.get_request('/')
             response = details(request, '')
@@ -306,7 +343,7 @@ class ContextTests(CMSTestCase):
 
         # Number of queries when context processors is enabled
         with self.settings(**original_context):
-            with self.assertNumQueries(FuzzyInt(13, 26)) as context:
+            with self.assertNumQueries(FuzzyInt(13, 28)) as context:
                 response = self.client.get("/en/page-2/")
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)

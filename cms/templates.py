@@ -2,7 +2,7 @@ from django.template.loader import get_template
 from django.utils.functional import cached_property
 
 
-class TemplatesCache(object):
+class TemplatesCache:
 
     def __init__(self):
         self._cached_templates = {}
@@ -13,7 +13,7 @@ class TemplatesCache(object):
         if hasattr(template, 'render'):
             return template
 
-        if not template in self._cached_templates:
+        if template not in self._cached_templates:
             # this always return a engine-specific template object
             self._cached_templates[template] = get_template(template)
         return self._cached_templates[template]

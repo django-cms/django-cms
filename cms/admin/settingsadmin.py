@@ -1,17 +1,16 @@
-# -*- coding: utf-8 -*-
-from functools import update_wrapper
 import copy
 import json
+from functools import update_wrapper
+from urllib.parse import urlparse
 
-from django.conf.urls import url
 from django.contrib import admin
 from django.contrib.admin import ModelAdmin
 from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.http.request import QueryDict
+from django.urls import Resolver404, re_path, resolve
 from django.utils.translation import override
-from django.utils.six.moves.urllib.parse import urlparse
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
@@ -32,16 +31,16 @@ class SettingsAdmin(ModelAdmin):
         info = self.model._meta.app_label, self.model._meta.model_name
 
         return [
-            url(r'^session_store/$',
+            re_path(r'^session_store/$',
                 self.session_store,
                 name='%s_%s_session_store' % info),
-            url(r'^cms-toolbar/$',
+            re_path(r'^cms-toolbar/$',
                 wrap(self.get_toolbar),
                 name='%s_%s_get_toolbar' % info),
-            url(r'^$',
+            re_path(r'^$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
-            url(r'^(.+)/$',
+            re_path(r'^(.+)/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
         ]
@@ -54,7 +53,7 @@ class SettingsAdmin(ModelAdmin):
             obj = model.objects.get(user=request.user)
         except model.DoesNotExist:
             return self.add_view(request)
-        return super(SettingsAdmin, self).change_view(request, str(obj.pk))
+        return super().change_view(request, str(obj.pk))
 
     def session_store(self, request):
         """
@@ -96,6 +95,10 @@ class SettingsAdmin(ModelAdmin):
         request = copy.copy(request)
         request.GET = data
         request.current_page = current_page
+        try:
+            request.resolver_match = resolve(origin_url.path)
+        except Resolver404:
+            pass
         request.toolbar = CMSToolbar(request, request_path=origin_url.path, _async=True)
         request.toolbar.set_object(attached_obj or current_page)
         return HttpResponse(request.toolbar.render())
@@ -122,7 +125,7 @@ class SettingsAdmin(ModelAdmin):
                 args=[obj.id, ],
                 current_app=self.admin_site.name
             )
-        return HttpResponseRedirect("{0}?reload_window".format(post_url))
+        return HttpResponseRedirect(f"{post_url}?reload_window")
 
     def has_change_permission(self, request, obj=None):
         if obj and obj.user == request.user:

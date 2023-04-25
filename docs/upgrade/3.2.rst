@@ -19,7 +19,7 @@ apphook configuration changes will make life simpler for all users.
 What's new in 3.2
 *****************
 
-* :ref:`new welcome page <create-first-page>` to help new users
+* New welcome page to help new users
 * touch-screen support for most editing interfaces, for sizes from small tablets to table-top
   devices
 * enhanced and polished user interface
@@ -93,8 +93,7 @@ Content wizards
 :doc:`/reference/wizards` can help simplify production of content, and can be created to handle
 non-CMS content too.
 
-For a quick introduction to using a wizard as a content editor, see the :ref:`user tutorial
-<create-first-page>`.
+For a quick introduction to using a wizard as a content editor, see the user tutorial. 
 
 
 
@@ -170,7 +169,7 @@ Automated spelling checks for documentation
 
 Documentation is now checked for spelling. A ``make spelling`` command is available now when
 working on documentation, and our `Travis Continuous Integration server
-<https://travis-ci.org/divio/django-cms>`_ also runs these checks.
+<https://travis-ci.com/django-cms/django-cms>`_ also runs these checks.
 
 See the :ref:`spelling` section in the documentation.
 
@@ -201,7 +200,7 @@ New startup page
 ================
 
 A new startup mode makes it easier for users (especially new users) to dive straight into editing
-when launching a new site. See the :ref:`user-tutorial` for more.
+when launching a new site.
 
 
 ************
@@ -209,7 +208,7 @@ Known issues
 ************
 
 The `sub-pages of a page with an apphook will be unreachable
-<https://github.com/divio/django-cms/issues/4758>`_ (``404 page not found``), due to internal URL
+<https://github.com/django-cms/django-cms/issues/4758>`_ (``404 page not found``), due to internal URL
 resolution mechanisms in the CMS. Though it's unlikely that most users will need sub-pages of this
 kind (typically, an apphooked page will create its own sub-pages) this issue will be addressed in a
 forthcoming release.

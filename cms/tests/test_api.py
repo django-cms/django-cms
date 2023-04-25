@@ -3,19 +3,12 @@ import sys
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.exceptions import FieldError
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import FieldError, PermissionDenied
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
-from menus.menu_pool import menu_pool
 
-from cms.api import (
-    create_page,
-    _verify_plugin_type,
-    assign_user_to_page,
-    publish_page,
-)
+from cms.api import _verify_plugin_type, assign_user_to_page, create_page, publish_page
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
@@ -24,6 +17,7 @@ from cms.plugin_base import CMSPluginBase
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.menu_extender import TestMenu
 from cms.tests.test_apphooks import APP_MODULE, APP_NAME
+from menus.menu_pool import menu_pool
 
 
 def _grant_page_permission(user, codename):
@@ -57,7 +51,7 @@ class PythonAPITests(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
         apphooks = (
-            '%s.%s' % (APP_MODULE, APP_NAME),
+            f'{APP_MODULE}.{APP_NAME}',
         )
 
         with self.settings(CMS_APPHOOKS=apphooks):
@@ -203,7 +197,7 @@ class PythonAPITests(CMSTestCase):
     def test_create_reverse_id_collision(self):
         create_page('home', 'nav_playground.html', 'en', published=True, reverse_id="foo")
         self.assertRaises(FieldError, create_page, 'foo', 'nav_playground.html', 'en', published=True, reverse_id="foo")
-        self.assertTrue(Page.objects.count(), 2)
+        self.assertEqual(Page.objects.count(), 2)
 
     def test_publish_page(self):
         page_attrs = self._get_default_create_page_arguments()
@@ -242,3 +236,12 @@ class PythonAPITests(CMSTestCase):
     def test_create_page_page_title(self):
         page = create_page(**dict(self._get_default_create_page_arguments(), page_title='page title'))
         self.assertEqual(page.get_title_obj_attribute('page_title'), 'page title')
+
+    def test_create_page_with_position_regression_6345(self):
+        # ref: https://github.com/divio/django-cms/issues/6345
+        parent = create_page('p', 'nav_playground.html', 'en')
+        rightmost = create_page('r', 'nav_playground.html', 'en', parent=parent)
+        leftmost = create_page('l', 'nav_playground.html', 'en', parent=rightmost, position='left')
+        create_page('m', 'nav_playground.html', 'en', parent=leftmost, position='right')
+        children_titles = [p.get_title('de') for p in parent.get_child_pages()]
+        self.assertEqual(children_titles, ['l', 'm', 'r'])

@@ -11,10 +11,10 @@ __webpack_public_path__ = require('../modules/get-dist-path')('bundle.forms.apph
 // APP HOOK SELECT
 require.ensure([], function (require) {
     var $ = require('jquery');
-    var apphooks_configuration = window.apphooks_configuration || {};
 
     // shorthand for jQuery(document).ready();
     $(function () {
+        var apphooks_configuration = window.apphooks_configuration || {};
         var appHooks = $('#application_urls, #id_application_urls');
         var selected = appHooks.find('option:selected');
         var appNsRow = $('.form-row.application_namespace, .form-row.field-application_namespace');

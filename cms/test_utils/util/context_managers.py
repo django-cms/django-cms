@@ -1,23 +1,23 @@
-# -*- coding: utf-8 -*-
+import io
 import sys
 from contextlib import contextmanager
 from shutil import rmtree as _rmtree
-from tempfile import template, mkdtemp, _exists
-from cms.apphook_pool import apphook_pool
+from tempfile import _exists, mkdtemp, template
 
 from django.contrib.auth import get_user_model
-from django.utils.six.moves import StringIO
-from django.utils.translation import get_language, activate
+from django.utils.translation import activate, get_language
+
+from cms.apphook_pool import apphook_pool
 
 
 class NULL:
     pass
 
 
-class StdOverride(object):
+class StdOverride:
     def __init__(self, std='out', buffer=None):
         self.std = std
-        self.buffer = buffer or StringIO()
+        self.buffer = buffer or io.StringIO()
 
     def __enter__(self):
         setattr(sys, 'std%s' % self.std, self.buffer)
@@ -39,10 +39,10 @@ class StdoutOverride(StdOverride):
         lines = buffer.getvalue()
     """
     def __init__(self, buffer=None):
-        super(StdoutOverride, self).__init__('out', buffer)
+        super().__init__('out', buffer)
 
 
-class LanguageOverride(object):
+class LanguageOverride:
     def __init__(self, language):
         self.newlang = language
 
@@ -62,7 +62,7 @@ class TemporaryDirectory:
         with TemporaryDirectory() as tmpdir:
             ...
 
-    Upon exiting the context, the directory and everthing contained
+    Upon exiting the context, the directory and everything contained
     in it are removed.
     """
 
@@ -80,7 +80,7 @@ class TemporaryDirectory:
         self.cleanup()
 
 
-class UserLoginContext(object):
+class UserLoginContext:
     def __init__(self, testcase, user):
         self.testcase = testcase
         self.user = user
@@ -99,7 +99,7 @@ class UserLoginContext(object):
         self.testcase.client.logout()
 
 
-class ChangeModel(object):
+class ChangeModel:
     """
     Changes attributes on a model while within the context.
 
@@ -164,7 +164,7 @@ def signal_tester(*signals):
             signal.disconnect(env)
 
 
-class SignalTester(object):
+class SignalTester:
 
     def __init__(self):
         self.call_count = 0

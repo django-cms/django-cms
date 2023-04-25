@@ -1,18 +1,14 @@
-# -*- coding: utf-8 -*-
 from django.apps import apps
-from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
-from django.utils.encoding import force_text, python_2_unicode_compatible
-from django.utils.translation import ugettext_lazy as _
+from django.db import models
+from django.utils.encoding import force_str
+from django.utils.translation import gettext_lazy as _
 
 from cms.models import Page
-from cms.models.managers import (PagePermissionManager,
-                                 GlobalPagePermissionManager)
-from cms.utils.compat import DJANGO_1_11
-
+from cms.models.managers import GlobalPagePermissionManager, PagePermissionManager
 
 # Cannot use contrib.auth.get_user_model() at compile time.
 user_app_name, user_model_name = settings.AUTH_USER_MODEL.rsplit('.', 1)
@@ -85,7 +81,7 @@ class AbstractPagePermission(models.Model):
         app_label = 'cms'
 
     def clean(self):
-        super(AbstractPagePermission, self).clean()
+        super().clean()
 
         if not self.user and not self.group:
             raise ValidationError(_('Please select user or group.'))
@@ -128,13 +124,13 @@ class AbstractPagePermission(models.Model):
         """Return audience by priority, so: All or User, Group
         """
         targets = filter(lambda item: item, (self.user, self.group,))
-        return ", ".join([force_text(t) for t in targets]) or 'No one'
+        return ", ".join([force_str(t) for t in targets]) or 'No one'
 
     def save(self, *args, **kwargs):
         if not self.user and not self.group:
             # don't allow `empty` objects
             return
-        return super(AbstractPagePermission, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def get_configured_actions(self):
         actions = [action for action in self.get_permissions_by_action()
@@ -177,7 +173,6 @@ class AbstractPagePermission(models.Model):
         return permissions_by_action
 
 
-@python_2_unicode_compatible
 class GlobalPagePermission(AbstractPagePermission):
     """Permissions for all pages (global).
     """
@@ -204,7 +199,6 @@ class GlobalPagePermission(AbstractPagePermission):
         return "%s :: GLOBAL" % self.audience
 
 
-@python_2_unicode_compatible
 class PagePermission(AbstractPagePermission):
     """Page permissions for single page
     """
@@ -219,11 +213,11 @@ class PagePermission(AbstractPagePermission):
         app_label = 'cms'
 
     def __str__(self):
-        page = self.page_id and force_text(self.page) or "None"
-        return "%s :: %s has: %s" % (page, self.audience, force_text(self.get_grant_on_display()))
+        page = self.page_id and force_str(self.page) or "None"
+        return f"{page} :: {self.audience} has: {force_str(self.get_grant_on_display())}"
 
     def clean(self):
-        super(PagePermission, self).clean()
+        super().clean()
 
         if self.can_add and self.grant_on == ACCESS_PAGE:
             # this is a misconfiguration - user can add/move page to current
@@ -241,8 +235,7 @@ class PagePermission(AbstractPagePermission):
         if self.grant_on & MASK_CHILDREN:
             children = self.page.get_child_pages().values_list('pk', flat=True)
 
-            for child in children:
-                yield child
+            yield from children
         elif self.grant_on & MASK_DESCENDANTS:
             node = self.page.node
 
@@ -251,8 +244,7 @@ class PagePermission(AbstractPagePermission):
             else:
                 descendants = self.page.get_descendant_pages().values_list('pk', flat=True).iterator()
 
-            for descendant in descendants:
-                yield descendant
+            yield from descendants
 
 
 class PageUserManager(UserManager):
@@ -281,5 +273,3 @@ class PageUserGroup(Group):
         verbose_name = _('User group (page)')
         verbose_name_plural = _('User groups (page)')
         app_label = 'cms'
-        if DJANGO_1_11:
-            manager_inheritance_from_future = True

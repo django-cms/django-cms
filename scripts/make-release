@@ -1,0 +1,303 @@
+#!/bin/bash
+
+#
+# This script is only meant to be used by release managers.
+# It assumes the following:
+# 1. you have a github fork on the ready where you can push&pull
+# 2. you can push new refs to djangoCMS origin
+# 3. you have a transifex account with access to djangoCMS project
+#
+# License: MIT
+
+set -e
+
+base_branch=develop
+upstream_source=git@github.com:django-cms/django-cms.git
+upstream_pattern='github\.com.django-cms/django-cms\.git$'
+
+SCRIPTS=$(dirname "$(realpath "$0")")
+#shellcheck disable=SC1090
+source "${SCRIPTS}/functions"
+
+# Preparations:
+
+# checking we have all necessary tools
+check_command_exists python git awk sed pip npm xargs grep "${EDITOR}"
+load_nvm
+
+# -- argument checks
+
+FULL_VERSION=$1
+if [ -z "$1" ]; then
+    error "Missing version argument:"
+    echo "Usage: "
+    echo ""
+    echo "$0 <VERSION>[suffix] [branch]"
+    echo ""
+    echo "example:"
+    echo "$0 3.9.0rc1"
+    exit 1
+fi
+
+if [ -n "$2" ]; then
+    base_branch="$2"
+    if [[ $base_branch == refs/heads/* ]]; then
+        base_branch=$(echo $base_branch | cut -d/ -f3-)
+    fi
+    if ! git branch -a | grep -q "${base_branch}\$"; then
+        error "Can not find specified base branch ${base_branch}"
+        exit 1
+    fi
+fi
+
+check_version_string "${FULL_VERSION}"
+
+VERSION=$(get_main_version "${FULL_VERSION}")
+VERSUFFIX=$(get_version_suffix "${FULL_VERSION}")
+
+BRANCH_SUFFIX=$(echo "${FULL_VERSION}" | awk -F '.' -e '{print $1 "." $2 ".x"}')
+BRANCH="release/${BRANCH_SUFFIX}"
+TAG="${FULL_VERSION}"
+
+COMMIT_PREFIX="[${FULL_VERSION} release process] "
+
+# Sanity checks:
+
+if [ ! -d .git ] || [ ! -d "cms" ]; then
+    error "Must be a django-cms source repo, can not find .git or 'cms'... aborting"
+    exit 1
+fi
+
+# setup commit
+git config --local user.email "info@django-cms.org"
+git config --local user.name "Github Release Action"
+
+# check that git is configured for commit
+if ! git config user.name >/dev/null || ! git config user.email >/dev/null; then
+    error "Git must be configured for commit, please run the following commands first:"
+    echo ""
+    echo 'git config --local user.email "you@example.com"'
+    echo 'git config --local user.name "Your Name"'
+    echo ""
+    echo "or use --global to configure your git for all repo by default"
+    exit 1
+fi
+
+origin=$(git remote -v | grep push | grep origin | awk '{print $2}')
+
+if [ -z "${origin}" ]; then
+    error "no 'origin' remote configured, please configure the origin to your fork"
+    exit 1
+fi
+
+# Create virtual environment
+python -m venv .venv
+source ./.venv/bin/activate
+
+# Create copy of scripts so they are not lost when changing branches
+cp -R "$SCRIPTS" "$RUNNER_TEMP"/.scripts
+SCRIPTS="$RUNNER_TEMP/.scripts"
+
+check_virtual_env
+
+# bump the version
+current_branch=$(git branch --show-current)
+if [ "${current_branch}" != "${base_branch}" ]; then
+    echo -e "${RED}**WARNING**: ${NORMAL}Branch mismatch:"
+    echo -e "You appear to be on branch ${RED}${current_branch}${NORMAL} but will create the release from ${YELLOW}${base_branch}${NORMAL}"
+    echo "do you want to checkout ${base_branch}?"
+    echo -e "${BLUE}Enter${NORMAL} to checkout ${base_branch} now, Ctrl-C to abort"
+    read -r
+
+    git checkout "${base_branch}"
+fi
+
+OLDVER=$(python -c "import cms; print(cms.__version__)" )
+
+git fetch --all --tags --quiet
+if [ -z "$(git tag -l "${OLDVER}")" ]; then
+    error "Can not find tag for version ${OLDVER} aborting ..."
+    exit 1
+fi
+
+# check if the tag does not already exist
+if git tag | grep -q "\<${TAG}\>"; then
+    error "It appears tag ${TAG} already exists! aborting"
+    exit 1
+fi
+
+# check if the build_branch is supplied
+if [ -z $BUILD_BRANCH ]; then
+    error "BUILD_BRANCH is not specified"
+    exit 1
+fi
+
+# check if the build_branch is supplied
+if [ -z $TX_TOKEN ]; then
+    error "TX_TOKEN is not specified. Get transifex token and add it as the TX_TOKEN secret."
+    exit 1
+fi
+
+##
+## Let's roll it
+##
+
+status "******************************************************************************"
+status "***                 django CMS OFFICIAL RELEASE PROCESS                    ***"
+status "******************************************************************************"
+echo ""
+echo ""
+echo -e "Preparing to create a release ${GREEN}${VERSION}${VERSUFFIX}${NORMAL} from content of ${YELLOW}${base_branch}${NORMAL} (currently version ${YELLOW}${OLDVER}${NORMAL})"
+echo ""
+
+status "- Cleaning the environment:"
+# first go to ${base_branch} (default is develop) and ensure we got the latest and greatest
+git clean -dfx
+git restore --staged .
+git checkout .
+
+status "- preparing branch ${BRANCH}"
+# checking if the branch exists?
+if ! git branch -a | grep -q "remotes/origin/${BRANCH}\$"; then
+    git checkout -b "${BRANCH}"
+else
+    echo "You appear to already have a ${BRANCH} created, using it"
+    git checkout "${BRANCH}"
+fi
+
+# cleaning on the branch
+git clean -f
+git checkout .
+if git branch -a | grep -q "remotes/origin/${BUILD_BRANCH}\$"; then
+    git push origin --delete "${BUILD_BRANCH}"
+fi
+git checkout -b "${BUILD_BRANCH}" "${BRANCH}"
+# For manipulation of branch take old version from this branch
+OLDVER=$(python -c "import cms; print(cms.__version__)" )
+
+# ensuring we have the proper env installed in pip
+"${SCRIPTS}/prepare-buildenv"
+cd cms
+
+# 2.2: make messages and push them
+
+status "- Sending messages to transifex does not work currently"
+status "  Send them manually before creating a version"
+# status "- Creating transifex messages!"
+"$SCRIPTS/tx" --token "$TX_TOKEN" status
+"$SCRIPTS/transifex-send-strings"
+
+git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
+
+echo ""
+status "******************************************************************************"
+status "***                 Preparing for actual release!!                         ***"
+status "******************************************************************************"
+echo ""
+
+
+# 2.3 Check sphinx configuration (check the doc for version or things should not be there)
+# Trigger a travis build on the current develop state
+
+status "- Bumping version to ${FULL_VERSION}"
+# bump the version
+sed -i -e "s/__version__ = '.*'/__version__ = '$FULL_VERSION'/" __init__.py
+git commit __init__.py -m "${COMMIT_PREFIX}Bumped version to ${FULL_VERSION}"
+
+status "- Fetching strings from transifex"
+"${SCRIPTS}/transifex-pull-strings"
+
+# Before compiling:
+# ignore changesets that only involves "^POT-Creation-Date:" "^PO-Revision-Date:"
+git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}compilemessages"
+cd ..
+
+status "- generating assets/static"
+
+gulp icons
+gulp sass
+gulp bundle
+
+
+# remove old versions
+git rm -rf "cms/static/cms/css/${OLDVER}" "cms/static/cms/fonts/${OLDVER}" "cms/static/cms/js/dist/${OLDVER}"
+git add "cms/static/cms/css/${FULL_VERSION}" "cms/static/cms/fonts/${FULL_VERSION}" "cms/static/cms/js/dist/${FULL_VERSION}"
+git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
+
+
+status "- preparing documentation"
+# Adjust docs/requirements.txt so that it refers to the local version of django CMS
+# (and not to a pypi version)
+sed -i 's/^django-cms=.*$/\./g' docs/requirements.txt
+git add docs/requirements.txt
+
+"${SCRIPTS}/make-changelog" "${FULL_VERSION}"
+
+upgrade_doc="docs/upgrade/${VERSION}.rst"
+
+if [ ! -f "docs/upgrade/${VERSION}.rst" ]; then
+    echo "Creating upgrade instructions"
+
+    # looking for last upgrade by version number:
+    needle=$OLDVER
+    while [ -n "${needle}" ] && [ ! -f "docs/upgrade/${needle}.rst" ]; do
+        last=$(echo "${needle}" | awk -F '.' '{print $NF}')
+        echo "looking for docs/upgrade/${needle}.rst as base template"
+        if [ "${last}" -gt 0 ]; then
+            last=$(( last - 1 ))
+            #shellcheck disable=SC2001
+            needle=$(echo "${needle}" | sed -e "s/\.[0-9]\+\$/.${last}/")
+        else
+            #shellcheck disable=SC2001
+            needle=$(echo "${needle}" | sed -e 's/\.[0-9]\+$//')
+        fi
+    done
+
+    while [ ! -f "docs/upgrade/${needle}.rst" ]; do
+        error "Can not find docs/upgrade/${needle}.rst"
+        status "Can not find base version to create upgrade instructions (from $OLDVER)"
+        echo  -e "Please ${BLUE}enter base version${NORMAL} to use (ex: 3.8) (Ctrl-C to abort)"
+        ls docs/upgrades/
+        read -r needle
+    done
+
+    cp "docs/upgrade/${needle}.rst" "${upgrade_doc}"
+    git add "docs/upgrade/${VERSION}.rst"
+
+    sed -i "${upgrade_doc}" \
+        -e "s/^.. _upgrade-to-.*:$/.. _upgrade-to-${VERSION}:/" \
+        -e "s/^${needle}.* release notes$/${VERSION} release notes/i" \
+        -e "s/^What's new in ${needle}.*$/What's new in ${VERSION}/i" \
+        -e "s/^How to upgrade to ${needle}.*$/How to upgrade to ${VERSION}/i" \
+        -e "s/^We assume you are upgrading from django CMS.*\.$/We assume you are upgrading from django CMS ${needle}./"
+fi
+
+if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
+    status "Adding ${VERSION} to doc index"
+    # note: the new line in the following command is not a mistake, it is needed for sed to process the command
+    sed -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
+}" docs/upgrade/index.rst
+fi
+
+#
+# commit documentations
+git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX}updating latest docs" "${upgrade_doc}" CHANGELOG.rst docs/upgrade/index.rst docs/conf.py
+
+# update the blog post using the What's new section
+status "Pushing to repo"
+git push --set-upstream origin "${BUILD_BRANCH}"
+echo ""
+success "Release process complete on the fork"
+echo ""
+echo -e "To complete the process:"
+echo -e "1. Review"
+echo -e "   * CHANGELOG.rst,"
+echo -e "   * ${upgrade_doc},"
+echo -e "   * docs/upgrade/index.rst, and"
+echo -e "   * docs/conf.py"
+echo -e "2. Commit potential changes to ${YELLOW}${BUILD_BRANCH}${NORMAL}"
+echo -e "3. ${BLUE}Please create a Pull Request${NORMAL} from ${YELLOW}${BUILD_BRANCH}${NORMAL} to ${YELLOW}${BRANCH}${NORMAL}"
+echo -e "4. When the PR is merged in target branch, execute:"
+echo .e "   ${BLUE}git tag ${TAG}; git push upstream ${TAG}"
+echo -e "5. Create a PR from ${BRANCH} to ${base_branch} then to develop when golden release is accepted"
+success "Enjoy!"

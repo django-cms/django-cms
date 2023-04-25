@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
 from django.db.models import Q
 from django.utils import timezone
-
 from treebeard.mp_tree import MP_NodeQuerySet
 
-from cms.publisher.query import PublisherQuerySet
 from cms.exceptions import NoHomeFound
+from cms.publisher.query import PublisherQuerySet
 
 
 class PageQuerySet(PublisherQuerySet):

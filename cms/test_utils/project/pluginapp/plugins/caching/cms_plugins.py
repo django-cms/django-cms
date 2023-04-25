@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime, timedelta
 
 from django.utils import timezone
@@ -93,7 +92,7 @@ class VaryCacheOnPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         request = context.get('request')
-        country_code = request.META.get('HTTP_COUNTRY_CODE') or "any"
+        country_code = request.headers.get('Country-Code') or "any"
         context['now'] = country_code
         return context
 

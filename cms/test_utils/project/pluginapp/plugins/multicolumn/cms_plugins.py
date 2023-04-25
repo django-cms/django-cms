@@ -16,10 +16,10 @@ class MultiColumnPlugin(CMSPluginBase):
     form = MultiColumnForm
 
     def save_model(self, request, obj, form, change):
-        response = super(MultiColumnPlugin, self).save_model(
+        response = super().save_model(
             request, obj, form, change
         )
-        for x in range(int(form.cleaned_data['create'])):
+        for _x in range(int(form.cleaned_data['create'])):
             col = CMSPlugin(
                 parent=obj,
                 placeholder=obj.placeholder,

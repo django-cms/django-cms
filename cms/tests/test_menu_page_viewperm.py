@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group
 from django.contrib.sites.models import Site
@@ -6,15 +5,18 @@ from django.test.utils import override_settings
 
 from cms.api import create_page
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page
-from cms.models import ACCESS_DESCENDANTS, ACCESS_CHILDREN, ACCESS_PAGE
-from cms.models import ACCESS_PAGE_AND_CHILDREN, ACCESS_PAGE_AND_DESCENDANTS
+from cms.models import (
+    ACCESS_CHILDREN,
+    ACCESS_DESCENDANTS,
+    ACCESS_PAGE,
+    ACCESS_PAGE_AND_CHILDREN,
+    ACCESS_PAGE_AND_DESCENDANTS,
+    Page,
+)
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import user_can_view_page
-
 from menus.menu_pool import menu_pool
-
 
 __all__ = [
     'ViewPermissionTreeBugTests',
@@ -58,10 +60,10 @@ class ViewPermissionTests(CMSTestCase):
     def setUp(self):
         self.site = Site()
         self.site.pk = 1
-        super(ViewPermissionTests, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(ViewPermissionTests, self).tearDown()
+        super().tearDown()
 
     def _setup_tree_pages(self):
         stdkwargs = {
@@ -149,7 +151,7 @@ class ViewPermissionTests(CMSTestCase):
             user = self._create_user(username, is_staff)
             if groupname:
                 group, _ = Group.objects.get_or_create(name=groupname)
-                user_set = getattr(group, 'user_set')
+                user_set = group.user_set
                 user_set.add(user)
                 group.save()
 
@@ -227,9 +229,10 @@ class ViewPermissionTests(CMSTestCase):
                 in_restricted = True
             if page_id in public_page_ids:
                 in_public = True
-            self.assertTrue((in_public and not in_restricted) or
-                            (not in_public and in_restricted),
-                            msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted))
+            self.assertTrue(
+                (in_public and not in_restricted) or (not in_public and in_restricted),
+                msg=f"page_id {page_id} in_public: {in_public}, in_restricted: {in_restricted}"
+            )
 
     def assertGrantedVisibility(self, all_pages, expected_granted_pages, username=None):
         """
@@ -243,7 +246,7 @@ class ViewPermissionTests(CMSTestCase):
             if get_user_model().USERNAME_FIELD == 'email':
                 username = username + '@django-cms.org'
 
-            query = dict()
+            query = {}
             query[get_user_model().USERNAME_FIELD+'__iexact'] = username
             user = get_user_model().objects.get(**query)
         request = self.get_request(user)
@@ -274,7 +277,7 @@ class ViewPermissionTests(CMSTestCase):
         return type('Request', (object,), attrs)
 
     def get_url_dict(self, pages, language='en'):
-        return dict((page.get_absolute_url(language=language), page) for page in pages)
+        return {page.get_absolute_url(language=language): page for page in pages}
 
 
 @override_settings(
@@ -585,7 +588,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     def _setup_user(self):
         user = self._create_user('user_6', True)
         group = Group.objects.create(name=self.GROUPNAME_6)
-        user_set = getattr(group, 'user_set')
+        user_set = group.user_set
         user_set.add(user)
         group.save()
 

@@ -1,0 +1,49 @@
+#!/bin/bash
+
+set -e
+
+SCRIPTS=$(dirname "$(realpath "$0")")
+#shellcheck disable=SC1090
+source "${SCRIPTS}/functions"
+
+check_command_exists python git twine
+
+if [ ! -d cms ] || [ ! -d .git ] || [ ! -f setup.py ] ; then
+    error "Please run this script from a django CMS root folder"
+    exit 1
+fi
+
+if ! command -v twine >/dev/null ; then
+    grep -v django-cms docs/requirements.txt | xargs pip install --quiet twine 
+    check_command_exists twine
+fi
+
+
+if version=$(git describe --exact-match --tags "$(git log -n1 --pretty='%h' )" 2>/dev/null) ; then
+    status "preparing distribution of version ${version}"
+else
+    if [ -z "${1}" ]; then
+        error "No version provided, and can not deduce version from tag"
+        echo "Please provide a version as argument"
+        exit 1
+    fi
+    version="${1}"
+    check_version_string "${version}"
+    status "preparing checkout and distribution of version ${version}"
+
+    echo "WARNING: you are not on the tag, we can fix that for you but we will clean your working copy"
+    echo -e "${YELLOW}=> ${RED}ALL YOUR LOCAL CHANGES WILL BE LOST!!${YELLOW} <= ${NORMAL}"
+    echo "Press ${BLUE}Enter${NORMAL} to continue ${RED}Ctrl-C${NORMAL} to abort"
+    read -r
+
+    git restore --staged .
+    git checkout .
+    git clean -dfx
+    git checkout "${version}"
+    git clean -dfx
+fi
+
+status "building the archive:"
+python setup.py sdist bdist_wheel
+
+twine upload "dist/django_cms-${version}*"

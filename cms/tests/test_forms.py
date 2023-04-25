@@ -1,23 +1,23 @@
-# -*- coding: utf-8 -*-
+from html import unescape
+
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.utils.translation import override as force_language
 
 from cms.admin import forms
-from cms.admin.forms import (PagePermissionInlineAdminForm,
-                             ViewRestrictionInlineAdminForm, GlobalPagePermissionAdminForm,
-                             PageUserGroupForm)
-from cms.api import create_page, create_title, assign_user_to_page
-from cms.forms.fields import PageSelectFormField, SuperLazyIterator
-
-from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
-
-from cms.forms.utils import update_site_and_page_choices, get_site_choices, get_page_choices
-from cms.forms.widgets import ApplicationConfigSelect
-from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS
+from cms.admin.forms import (
+    GlobalPagePermissionAdminForm,
+    PagePermissionInlineAdminForm,
+    PageUserGroupForm,
+    ViewRestrictionInlineAdminForm,
 )
+from cms.api import assign_user_to_page, create_page, create_title
+from cms.forms.fields import PageSelectFormField, SuperLazyIterator
+from cms.forms.utils import get_page_choices, get_site_choices, update_site_and_page_choices
+from cms.forms.widgets import ApplicationConfigSelect
+from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
+from cms.test_utils.testcases import URL_CMS_PAGE_PERMISSION_CHANGE, URL_CMS_PAGE_PERMISSIONS, CMSTestCase
 from cms.utils import get_current_site
 
 
@@ -98,7 +98,7 @@ class FormsTestCase(CMSTestCase):
         # boilerplate (creating a page)
         User = get_user_model()
 
-        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+        fields = {"is_staff": True, "is_active": True, "is_superuser": True, "email": "super@super.com"}
 
         if User.USERNAME_FIELD != 'email':
             fields[User.USERNAME_FIELD] = "super"
@@ -139,7 +139,7 @@ class FormsTestCase(CMSTestCase):
         # boilerplate (creating a page)
         User = get_user_model()
 
-        fields = dict(is_staff=True, is_active=True, is_superuser=True, email="super@super.com")
+        fields = {"is_staff": True, "is_active": True, "is_superuser": True, "email": "super@super.com"}
 
         if User.USERNAME_FIELD != 'email':
             fields[User.USERNAME_FIELD] = "super"
@@ -168,7 +168,7 @@ class FormsTestCase(CMSTestCase):
                             'nav_playground.html', 'en',
                             site=site, parent=page1)
         # enforce the choices to be casted to a list
-        site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
+        site_choices, page_choices = (list(bit) for bit in update_site_and_page_choices('en'))
         self.assertEqual(page_choices, [
             ('', '----'),
             (site.name, [
@@ -181,7 +181,7 @@ class FormsTestCase(CMSTestCase):
         self.assertEqual(site_choices, [(site.pk, site.name)])
 
     def test_app_config_select_escaping(self):
-        class FakeAppConfig(object):
+        class FakeAppConfig:
             def __init__(self, pk, config):
                 self.pk = pk
                 self.config = config
@@ -189,7 +189,7 @@ class FormsTestCase(CMSTestCase):
             def __str__(self):
                 return self.config
 
-        class FakeApp(object):
+        class FakeApp:
             def __init__(self, name, configs=()):
                 self.name = name
                 self.configs = configs
@@ -280,10 +280,10 @@ class PermissionFormTestCase(CMSTestCase):
             }
             form = PagePermissionInlineAdminForm(data=data, files=None)
 
-            error_message = ("<li>Users can&#39;t create a page without permissions "
+            error_message = ("<li>Users can't create a page without permissions "
                              "to change the created page. Edit permissions required.</li>")
             self.assertFalse(form.is_valid())
-            self.assertTrue(error_message in str(form.errors))
+            self.assertTrue(error_message in unescape(str(form.errors)))
             data = {
                 'page': page.pk,
                 'grant_on': ACCESS_PAGE,
@@ -295,8 +295,8 @@ class PermissionFormTestCase(CMSTestCase):
             form = PagePermissionInlineAdminForm(data=data, files=None)
             self.assertFalse(form.is_valid())
             self.assertTrue('<li>Add page permission requires also access to children, or '
-                            'descendants, otherwise added page can&#39;t be changed by its '
-                            'creator.</li>' in str(form.errors))
+                            'descendants, otherwise added page can\'t be changed by its '
+                            'creator.</li>' in unescape(str(form.errors)))
 
     def test_inlines(self):
         user = self._create_user("randomuser", is_staff=True, add_default_permissions=True)

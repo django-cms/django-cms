@@ -4,6 +4,8 @@
 // INFO: please note that all related styles to the pagetree itself are
 // handled through theming after the "PAGETREE THEME" section in this file.
 
+@use "sass:math";
+
 .cms-admin-sideframe:not(.djangocms-admin-style) {
     margin-top: $toolbar-height;
 }
@@ -49,6 +51,7 @@
     // important is to fight with admin-style
     padding: 0 !important;
     box-shadow: $pagetree-box-shadow !important;
+    flex-direction: column;
 }
 .cms-pagetree {
     border: $pagetree-border;
@@ -206,12 +209,12 @@
         border-radius: $border-radius-base;
 
         &:hover {
-            background: darken($color-primary, 5%) !important;
+            background: darken($color-primary-fallback, 5%) !important;
         }
         &:active,
         &:focus {
             color: $white !important;
-            background: darken($color-primary, 15%) !important;
+            background: darken($color-primary-fallback, 15%) !important;
         }
     }
     .cms-pagetree-header-filter {
@@ -334,7 +337,7 @@
 
     .cms-pagetree-dropdown-menu {
         right: 50%;
-        margin-right: -$pagetree-header-height / 2 - 1px !important;
+        margin-right:  math.div(-$pagetree-header-height, 2) - 1px !important;
     }
 }
 
@@ -349,6 +352,11 @@
 .djangocms-admin-style .cms-pagetree-breadcrumbs {
     margin-bottom: -30px !important;
     border: none !important;
+}
+
+// MAIN TREE
+#changelist-form {
+    width: 100%;
 }
 
 //###########################################################
@@ -385,7 +393,7 @@
     position: absolute;
     right: 4px;
     top: 50%;
-    margin-top: -($pagetree-cell-inner-height + 6px) / 2;
+    margin-top: math.div(-($pagetree-cell-inner-height + 6px), 2);
 
     .cms-pagetree-dropdown-menu {
         right: 40px;
@@ -476,7 +484,7 @@
 .cms-tree-item-button .cms-hover-tooltip {
     &:before,
     &:after {
-        bottom: $pagetree-cell-inner-height / 2 + 7px;
+        bottom: math.div($pagetree-cell-inner-height, 2) + 7px;
     }
 }
 .cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-pencil:not(.cms-btn-disabled)[data-url] {
@@ -662,7 +670,7 @@
     // parent and children ul
     .jstree-container-ul,
     .jstree-children,
-    // children and childrens children li
+    // children and children's children li
     .jstree-leaf,
     .jstree-node  {
         list-style-type: none;
@@ -816,6 +824,7 @@
         background-repeat: no-repeat;
         background-position: -1px center;;
         image-rendering: pixelated;
+        white-space: normal;
 
         &:hover {
             color: $gray !important;
@@ -865,7 +874,7 @@
     // hover states
     .jstree-hovered,
     .jstree-clicked {
-        background-color: lighten($gray-lightest, 3%) !important;
+        background-color: $gray-lightest !important;
     }
 
     // special case for paste header
@@ -950,12 +959,12 @@
         > .jstree-anchor {
             border-style: solid;
             border-right: none;
-            background-color: white !important;
+            background-color: $white !important;
             border-bottom: $pagetree-border;
 
             &.jstree-hovered,
             &.jstree-clicked {
-                background-color: lighten($gray-lightest, 3%) !important;
+                background-color: $gray-lightest !important;
             }
         }
 
@@ -993,11 +1002,12 @@
     }
 
     .cms-page-tree-cell-shared--false {
-        background-color: white;
+        background-color: $white;
 
         &.jstree-hovered,
         &.jstree-clicked {
-            background-color: lighten($gray-lightest, 3%) !important;
+                 background-color: $gray-lightest !important;
+                filter: brightness(1.1);
         }
     }
 

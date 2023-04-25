@@ -1,26 +1,28 @@
-# -*- coding: utf-8 -*-
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
+from django.http import HttpResponse
 from django.template import Template
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
+from django.utils.translation import trans_null
 
 from cms.api import create_page
+from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.models import Page, CMSPlugin
-from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_ADD,
-                                      URL_CMS_PAGE_CHANGE_TEMPLATE)
+from cms.models import CMSPlugin, Page
+from cms.test_utils.testcases import URL_CMS_PAGE_ADD, URL_CMS_PAGE_CHANGE_TEMPLATE, CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.utils.conf import get_cms_setting
 
-overrides = dict(
-    LANGUAGE_CODE='en-us',
-    LANGUAGES=[],
-    CMS_LANGUAGES={},
-    USE_I18N=False,
-    ROOT_URLCONF='cms.test_utils.project.urls_no18n',
-    TEMPLATE_CONTEXT_PROCESSORS=[
+overrides = {
+    "LANGUAGE_CODE": 'en-us',
+    "LANGUAGES": [],
+    "CMS_LANGUAGES": {},
+    "USE_I18N": False,
+    "ROOT_URLCONF": 'cms.test_utils.project.urls_no18n',
+    "TEMPLATE_CONTEXT_PROCESSORS": [
         'django.contrib.auth.context_processors.auth',
         'django.contrib.messages.context_processors.messages',
         'django.core.context_processors.debug',
@@ -31,7 +33,7 @@ overrides = dict(
         'sekizai.context_processors.sekizai',
         'django.core.context_processors.static',
     ],
-    MIDDLEWARE=[
+    "MIDDLEWARE": [
         'django.contrib.sessions.middleware.SessionMiddleware',
         'django.contrib.auth.middleware.AuthenticationMiddleware',
         'django.contrib.messages.middleware.MessageMiddleware',
@@ -42,18 +44,19 @@ overrides = dict(
         'cms.middleware.page.CurrentPageMiddleware',
         'cms.middleware.toolbar.ToolbarMiddleware',
     ]
-)
+}
 
 
 @override_settings(**overrides)
 class TestNoI18N(CMSTestCase):
 
     def setUp(self):
+        self.request = HttpResponse()
         clear_url_caches()
-        super(TestNoI18N, self).setUp()
+        super().setUp()
 
     def tearDown(self):
-        super(TestNoI18N, self).tearDown()
+        super().tearDown()
         clear_url_caches()
 
     def get_page_request(self, page, user, path=None, edit=False, lang_code='en', disable=False):
@@ -74,8 +77,7 @@ class TestNoI18N(CMSTestCase):
         if disable:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
         request.current_page = page
-        mid = ToolbarMiddleware()
-        mid.process_request(request)
+        ToolbarMiddleware(lambda req: HttpResponse()).__call__(request)
         if hasattr(request, 'toolbar'):
             request.toolbar.populate()
         return request
@@ -110,11 +112,11 @@ class TestNoI18N(CMSTestCase):
             self.assertEqual(url, "%s" % path)
 
     def test_url_redirect(self):
-        overrides = dict(
-            USE_I18N=True,
-            CMS_LANGUAGES={1: []},
-            LANGUAGES=[('en-us', 'English')],
-            MIDDLEWARE=[
+        overrides = {
+            "USE_I18N": True,
+            "CMS_LANGUAGES": {1: []},
+            "LANGUAGES": [('en-us', 'English')],
+            "MIDDLEWARE": [
                 'django.contrib.sessions.middleware.SessionMiddleware',
                 'django.contrib.auth.middleware.AuthenticationMiddleware',
                 'django.contrib.messages.middleware.MessageMiddleware',
@@ -126,7 +128,7 @@ class TestNoI18N(CMSTestCase):
                 'cms.middleware.page.CurrentPageMiddleware',
                 'cms.middleware.toolbar.ToolbarMiddleware',
             ]
-        )
+        }
         with self.settings(**overrides):
             homepage = create_page(
                 "home",
@@ -137,6 +139,7 @@ class TestNoI18N(CMSTestCase):
             )
             homepage.set_as_homepage()
             response = self.client.get('/', follow=False)
+            self.assertEqual(response.status_code, 302) # Needs to redirect
             self.assertTrue(response['Location'].endswith("/foobar/"))
 
     def test_plugin_add_edit(self):
@@ -184,3 +187,11 @@ class TestNoI18N(CMSTestCase):
         toolbar = CMSToolbar(request)
         toolbar.set_object(sub)
         self.assertEqual(toolbar.get_object_public_url(), '/test/sub/')
+
+    @patch('django.utils.translation._trans', new=trans_null)
+    def test_inherit_label(self):
+        page = create_page('test', 'nav_playground.html', 'en-us', published=True)
+        with self.login_user_context(self.get_superuser()):
+            endpoint = self.get_admin_url(Page, 'advanced', page.pk)
+            response = self.client.get(endpoint)
+            self.assertContains(response, '<option value="%s">' % TEMPLATE_INHERITANCE_MAGIC)

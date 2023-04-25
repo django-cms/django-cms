@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 import operator
 import warnings
 from collections import OrderedDict
@@ -6,12 +5,10 @@ from collections import OrderedDict
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models.query_utils import Q
-from django.template import TemplateSyntaxError, NodeList, Variable, Context, Template, engines
+from django.template import Context, NodeList, Template, TemplateSyntaxError, Variable, engines
 from django.template.base import VariableNode
 from django.template.loader import get_template
 from django.template.loader_tags import BlockNode, ExtendsNode, IncludeNode
-from django.utils import six
-
 from sekizai.helpers import get_varname
 
 from cms.exceptions import DuplicatePlaceholderWarning
@@ -21,17 +18,15 @@ from cms.utils.conf import get_cms_setting
 def _get_nodelist(tpl):
     if hasattr(tpl, 'template'):
         return tpl.template.nodelist
-    else:
-        return tpl.nodelist
+    return tpl.nodelist
 
 
-def get_context():
+def get_context(extend_node):
     if engines is not None:
         context = Context()
-        context.template = Template('')
+        context.template = Template('', origin=extend_node.origin)
         return context
-    else:
-        return {}
+    return {}
 
 
 def get_placeholder_conf(setting, placeholder, template=None, default=None):
@@ -52,7 +47,7 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
         placeholder_conf = get_cms_setting('PLACEHOLDER_CONF')
         # 1st level
         if template:
-            keys.append(u'%s %s' % (template, placeholder))
+            keys.append(f'{template} {placeholder}')
         # 2nd level
         keys.append(placeholder)
         # 3rd level
@@ -113,7 +108,7 @@ def get_toolbar_plugin_struct(plugins, slot=None, page=None):
 
 
 def validate_placeholder_name(name):
-    if not isinstance(name, six.string_types):
+    if not isinstance(name, str):
         raise ImproperlyConfigured("Placeholder identifier names need to be of type string. ")
 
     if not all(ord(char) < 128 for char in name):
@@ -124,7 +119,7 @@ def validate_placeholder_name(name):
                                    "key to specify a verbose name.")
 
 
-class PlaceholderNoAction(object):
+class PlaceholderNoAction:
     can_copy = False
 
     def copy(self, **kwargs):
@@ -178,7 +173,7 @@ def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blo
 
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.
-        # This is important to avoid processing overriden block nodes.
+        # This is important to avoid processing overridden block nodes.
         ignore_blocks = []
 
     for node in nodelist:
@@ -253,7 +248,7 @@ def get_placeholders(template):
         if slot in clean_placeholders:
             warnings.warn("Duplicate {{% placeholder \"{0}\" %}} "
                           "in template {1}."
-                          .format(slot, template, slot),
+                          .format(slot, template),
                           DuplicatePlaceholderWarning)
         else:
             validate_placeholder_name(slot)
@@ -279,7 +274,7 @@ def get_static_placeholders(template, context):
 
 
 def _get_block_nodes(extend_node):
-    parent = extend_node.get_parent(get_context())
+    parent = extend_node.get_parent(get_context(extend_node))
     parent_nodelist = _get_nodelist(parent)
     parent_nodes = parent_nodelist.get_nodes_by_type(BlockNode)
     parent_extend_nodes = parent_nodelist.get_nodes_by_type(ExtendsNode)
@@ -328,9 +323,9 @@ def _get_placeholder_nodes_from_extend(extend_node, node_class):
 
 
 def _find_topmost_template(extend_node):
-    parent_template = extend_node.get_parent(get_context())
+    parent_template = extend_node.get_parent(get_context(extend_node))
     for node in _get_nodelist(parent_template).get_nodes_by_type(ExtendsNode):
         # Their can only be one extend block in a template, otherwise django raises an exception
         return _find_topmost_template(node)
         # No ExtendsNode
-    return extend_node.get_parent(get_context())
+    return extend_node.get_parent(get_context(extend_node))

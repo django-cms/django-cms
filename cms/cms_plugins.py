@@ -1,14 +1,15 @@
-# -*- coding: utf-8 -*-
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseForbidden
+from django.middleware.csrf import get_token
+from django.urls import re_path
+from django.utils.translation import get_language, gettext
+from django.utils.translation import gettext_lazy as _
+
 from cms.models import CMSPlugin, Placeholder
 from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
 from cms.utils.urlutils import admin_reverse
-from django.conf.urls import url
-from django.http import HttpResponseForbidden, HttpResponseBadRequest, HttpResponse
-from django.middleware.csrf import get_token
-from django.utils.translation import ugettext, ugettext_lazy as _, get_language
 
 
 class PlaceholderPlugin(CMSPluginBase):
@@ -34,7 +35,7 @@ class AliasPlugin(CMSPluginBase):
 
     @classmethod
     def get_render_queryset(cls):
-        queryset = super(AliasPlugin, cls).get_render_queryset()
+        queryset = super().get_render_queryset()
         return queryset.select_related('plugin', 'alias_placeholder')
 
     @classmethod
@@ -59,12 +60,12 @@ class AliasPlugin(CMSPluginBase):
 
     def get_plugin_urls(self):
         return [
-            url(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
+            re_path(r'^create_alias/$', self.create_alias, name='cms_create_alias'),
         ]
 
     @classmethod
     def get_empty_change_form_text(cls, obj=None):
-        original = super(AliasPlugin, cls).get_empty_change_form_text(obj=obj)
+        original = super().get_empty_change_form_text(obj=obj)
 
         if not obj:
             return original
@@ -94,7 +95,7 @@ class AliasPlugin(CMSPluginBase):
         page_url = origin_page.get_absolute_url(language=obj.language)
         page_title = origin_page.get_title(language=obj.language)
 
-        message = ugettext('This is an alias reference, '
+        message = gettext('This is an alias reference, '
                            'you can edit the content only on the '
                            '<a href="%(page_url)s?edit" target="_parent">%(page_title)s</a> page.')
         return message % {'page_url': page_url, 'page_title': page_title}
@@ -102,7 +103,7 @@ class AliasPlugin(CMSPluginBase):
     def create_alias(self, request):
         if not request.user.is_staff:
             return HttpResponseForbidden("not enough privileges")
-        if not 'plugin_id' in request.POST and not 'placeholder_id' in request.POST:
+        if "plugin_id" not in request.POST and "placeholder_id" not in request.POST:
             return HttpResponseBadRequest("plugin_id or placeholder_id POST parameter missing.")
         plugin = None
         placeholder = None

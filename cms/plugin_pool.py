@@ -1,15 +1,13 @@
-# -*- coding: utf-8 -*-
 from operator import attrgetter
 
 from django.core.exceptions import ImproperlyConfigured
-from django.conf.urls import url, include
+from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import slugify
-from django.utils import six
-from django.utils.encoding import force_text
+from django.urls import include, re_path
+from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language, deactivate_all, activate
-from django.template import TemplateDoesNotExist, TemplateSyntaxError
+from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
 from cms.plugin_base import CMSPluginBase
@@ -17,7 +15,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import normalize_name
 
 
-class PluginPool(object):
+class PluginPool:
 
     def __init__(self):
         self.plugins = {}
@@ -38,7 +36,7 @@ class PluginPool(object):
             return
         from cms.cache import invalidate_cms_page_cache
 
-        if get_cms_setting("PAGE_CACHE"):
+        if get_cms_setting("PAGE_CACHE") and get_cms_setting("INVALIDATE_PAGE_CACHE_ON_STARTUP"):
             invalidate_cms_page_cache()
 
         autodiscover_modules('cms_plugins')
@@ -52,18 +50,17 @@ class PluginPool(object):
     def validate_templates(self, plugin=None):
         """
         Plugins templates are validated at this stage
-
         """
         if plugin:
             plugins = [plugin]
         else:
             plugins = self.plugins.values()
         for plugin in plugins:
-            if (plugin.render_plugin and not type(plugin.render_plugin) == property
-                    or hasattr(plugin.model, 'render_template')
-                    or hasattr(plugin, 'get_render_template')):
-                if (plugin.render_template is None and
-                        not hasattr(plugin, 'get_render_template')):
+            if (plugin.render_plugin and not type(
+                    plugin.render_plugin) == property or hasattr(
+                    plugin.model, 'render_template') or hasattr(plugin, 'get_render_template')):
+
+                if (plugin.render_template is None and not hasattr(plugin, 'get_render_template')):
                     raise ImproperlyConfigured(
                         "CMS Plugins must define a render template, "
                         "a get_render_template method or "
@@ -77,7 +74,7 @@ class PluginPool(object):
                     from django.template import loader
 
                     template = plugin.render_template
-                    if isinstance(template, six.string_types) and template:
+                    if isinstance(template, str) and template:
                         try:
                             loader.get_template(template)
                         except TemplateDoesNotExist as e:
@@ -85,7 +82,7 @@ class PluginPool(object):
                             # TemplateDoesNotExist if the plugin's render_template
                             # does in fact exist, but it includes a template that
                             # doesn't.
-                            if six.text_type(e) == template:
+                            if str(e) == template:
                                 raise ImproperlyConfigured(
                                     "CMS Plugins must define a render template (%s) that exists: %s"
                                     % (plugin, template)
@@ -199,9 +196,9 @@ class PluginPool(object):
             url_patterns = []
             for plugin in self.registered_plugins:
                 p = plugin()
-                slug = slugify(force_text(normalize_name(p.__class__.__name__)))
+                slug = slugify(force_str(normalize_name(p.__class__.__name__)))
                 url_patterns += [
-                    url(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                    re_path(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
                 ]
         finally:
             # Reactivate translation

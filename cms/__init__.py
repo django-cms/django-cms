@@ -1,5 +1,10 @@
-# -*- coding: utf-8 -*-
+__version__ = '3.11.2'
 
-__version__ = '3.6.0'
+try:
+    import django
 
-default_app_config = 'cms.apps.CMSConfig'
+    if django.VERSION < (3, 2):
+        default_app_config = 'cms.apps.CMSConfig'
+except (ImportError, ModuleNotFoundError):
+    # Allow setup.py to import __version__ before dependencies are installed
+    pass

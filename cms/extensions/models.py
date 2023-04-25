@@ -1,8 +1,7 @@
+from django.db import models
 from django.db.models import ManyToManyField
 
 from cms.constants import PUBLISHER_STATE_DIRTY
-from django.db import models
-
 from cms.models import Page, Title
 
 
@@ -38,7 +37,7 @@ class BaseExtension(models.Model):
             include_parents=True,
             include_hidden=False,
         )
-        return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
+        return [obj for obj in fields if not isinstance(obj.field, ManyToManyField)]
 
     def copy(self, target, language):
         """
@@ -60,7 +59,7 @@ class BaseExtension(models.Model):
 
         # If the target we're copying already has a publisher counterpart, then
         # connect the dots.
-        target_prime = getattr(target, 'publisher_public')
+        target_prime = target.publisher_public
         if target_prime:
             related_name = self.__class__.__name__.lower()
             clone_prime = getattr(target_prime, related_name)

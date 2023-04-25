@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import render
@@ -65,7 +64,7 @@ def _handle_no_page(request):
         resolve('%s$' % request.path)
     except Resolver404 as e:
         # raise a django http 404 page
-        exc = Http404(dict(path=request.path, tried=e.args[0]['tried']))
+        exc = Http404({"path": request.path, "tried": e.args[0]['tried']})
         raise exc
     raise Http404('CMS Page not found: %s' % request.path)
 

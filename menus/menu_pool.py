@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from functools import partial
 from logging import getLogger
 
@@ -9,11 +8,13 @@ from django.core.exceptions import ValidationError
 from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language_from_request, ugettext_lazy as _
+from django.utils.translation import get_language_from_request
+from django.utils.translation import gettext_lazy as _
 
+from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from cms.utils.i18n import get_default_language_for_site, is_language_prefix_patterns_used
 from cms.utils.moderator import use_draft
-
 from menus.base import Menu
 from menus.exceptions import NamespaceAlreadyRegistered
 from menus.models import CacheKey
@@ -22,10 +23,10 @@ logger = getLogger('menus')
 
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
-    '''
+    """
     This is an easier to test "inner loop" building the menu tree structure
     for one menu (one language, one site)
-    '''
+    """
     done_nodes = {}  # Dict of node.id:Node
     final_nodes = []
 
@@ -88,7 +89,7 @@ def _get_menu_class_for_instance(menu_class, instance):
     return meta_class(class_name, (menu_class,), attrs)
 
 
-class MenuRenderer(object):
+class MenuRenderer:
     # The main logic behind this class is to decouple
     # the singleton menu pool from the menu rendering logic.
     # By doing this we can be sure that each request has it's
@@ -102,9 +103,11 @@ class MenuRenderer(object):
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
-        self.request_language = get_language_from_request(request, check_path=True)
+        if is_language_prefix_patterns_used():
+            self.request_language = get_language_from_request(request, check_path=True)
+        else:
+            self.request_language = get_default_language_for_site(get_current_site().pk)
         self.site = Site.objects.get_current(request)
-        self.draft_mode_active = use_draft(request)
 
     @property
     def cache_key(self):
@@ -120,6 +123,17 @@ class MenuRenderer(object):
         else:
             key += ':public'
         return key
+
+    @cached_property
+    def draft_mode_active(self):
+        try:
+            # Under certain conditions, the request page won't match
+            # the requested state.
+            # For example, user requests draft page but gets public.
+            _use_draft = self.request.current_page.publisher_is_draft
+        except AttributeError:
+            _use_draft = use_draft(self.request)
+        return _use_draft
 
     @cached_property
     def is_cached(self):
@@ -170,12 +184,15 @@ class MenuRenderer(object):
                 # exist, skip them instead of crashing
                 nodes = []
                 if toolbar and toolbar.is_staff:
-                    messages.error(self.request,
+                    messages.error(
+                        self.request,
                         _('Menu %s cannot be loaded. Please, make sure all '
-                          'its urls exist and can be resolved.') %
-                        menu_class_name)
-                logger.error("Menu %s could not be loaded." %
-                    menu_class_name, exc_info=True)
+                          'its urls exist and can be resolved.') % menu_class_name
+                    )
+                logger.error(
+                    "Menu %s could not be loaded." % menu_class_name,
+                    exc_info=True
+                )
             # nodes is a list of navigation nodes (page tree in cms + others)
             final_nodes += _build_nodes_inner_for_one_menu(nodes, menu_class_name)
 
@@ -228,7 +245,7 @@ class MenuRenderer(object):
         return MenuClass(renderer=self)
 
 
-class MenuPool(object):
+class MenuPool:
 
     def __init__(self):
         self.menus = {}
@@ -302,9 +319,9 @@ class MenuPool(object):
         return self.modifiers
 
     def clear(self, site_id=None, language=None, all=False):
-        '''
+        """
         This invalidates the cache for a given menu (site_id and language)
-        '''
+        """
         if all:
             cache_keys = CacheKey.objects.get_keys()
         else:

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # django cms documentation build configuration file, created by
 # sphinx-quickstart on Tue Sep 15 10:47:03 2009.
@@ -12,6 +11,7 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
+import cms
 import datetime
 import os
 import sys
@@ -33,17 +33,20 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 
 extensions = [
     'djangocms',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinx.ext.autodoc',
-    'sphinxcontrib.spelling'
-    ]
+    'sphinxcontrib.spelling',
+    "sphinx_copybutton",
+    "sphinxext.opengraph",
+]
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/3/', None),
-    'django': ('https://docs.djangoproject.com/en/1.11/', 'https://docs.djangoproject.com/en/1.11/_objects/'),
-    'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
-    'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
-    'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
+    'python': ('https://docs.python.org/3/', None),
+    'django': ('https://docs.djangoproject.com/en/3.2/', 'https://docs.djangoproject.com/en/3.2/_objects/'),
+    'classytags': ('https://django-classy-tags.readthedocs.io/en/latest/', None),
+    'sekizai': ('https://django-sekizai.readthedocs.io/en/latest/', None),
+    'treebeard': ('https://django-treebeard.readthedocs.io/en/latest/', None),
 }
 
 # Add any paths that contain templates here, relative to this directory.
@@ -60,8 +63,8 @@ master_doc = 'index'
 
 current_year = datetime.datetime.now().year
 # General information about the project.
-project = u'django cms'
-copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
+project = 'django cms'
+copyright = '2009-{}, django CMS Association and contributors'.format(current_year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -72,7 +75,6 @@ copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
 path = os.path.split(os.path.dirname(__file__))[0]
 path = os.path.split(path)[0]
 sys.path.insert(0, path)
-import cms
 
 version = cms.__version__
 # The full version, including alpha/beta/rc tags.
@@ -84,7 +86,7 @@ language = "en"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['build', 'env']
+exclude_patterns = ['build', 'env', 'README.rst']
 
 # There are two options for replacing |today|: either, you set today to some
 # non-false value, then it is used:
@@ -129,41 +131,16 @@ todo_include_todos = True
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
 try:
-    import divio_docs_theme
-    html_theme = 'divio_docs_theme'
-    html_theme_path = [divio_docs_theme.get_html_theme_path()]
-except:
+    import furo
+
+    html_theme = 'furo'
+    html_theme_options = {
+        "navigation_with_keys": True,
+    }
+except ImportError:
     html_theme = 'default'
 
 show_cloud_banner = True
-
-# The theme to use for HTML and HTML Help pages.  Major themes that come with
-# Sphinx are currently 'default' and 'sphinxdoc'.
-# html_theme = 'default'
-
-# Theme options are theme-specific and customize the look and feel of a theme
-# further.  For a list of options available for each theme, see the
-# documentation.
-#html_theme_options = {}
-
-# Add any paths that contain custom themes here, relative to this directory.
-#html_theme_path = []
-
-# The name for this set of Sphinx documents.  If None, it defaults to
-# "<project> v<release> documentation".
-#html_title = None
-
-# A shorter title for the navigation bar.  Default is the same as html_title.
-#html_short_title = None
-
-# The name of an image file (relative to this directory) to place at the top
-# of the sidebar.
-#html_logo = None
-
-# The name of an image file (within the static path) to use as favicon of the
-# docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
-# pixels large.
-#html_favicon = None
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -220,8 +197,8 @@ latex_paper_size = 'a4'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-    ('index', 'djangocms.tex', u'django cms Documentation',
-     u'Divio AG and contributors', 'manual'),
+    ('index', 'djangocms.tex', 'django cms Documentation',
+     'django CMS Association and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top

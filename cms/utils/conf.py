@@ -1,15 +1,12 @@
-# -*- coding: utf-8 -*-
-from functools import update_wrapper
 import os
+from functools import update_wrapper
+from urllib.parse import urljoin
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
-from django.utils.six.moves.urllib.parse import urljoin
+from django.utils.translation import gettext_lazy as _
 
-from cms import constants
-from cms import __version__
-
+from cms import __version__, constants
 
 __all__ = ['get_cms_setting']
 
@@ -21,11 +18,11 @@ def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
     """
-    from imp import load_module, PY_SOURCE
+    from imp import PY_SOURCE, load_module
 
     imported = None
     if module_path:
-        with open(module_path, 'r') as openfile:
+        with open(module_path) as openfile:
             imported = load_module("mod", openfile, module_path, ('imported', 'r', PY_SOURCE))
     return imported
 
@@ -46,7 +43,6 @@ def default(name):
 DEFAULTS = {
     'TEMPLATE_INHERITANCE': True,
     'DEFAULT_X_FRAME_OPTIONS': constants.X_FRAME_OPTIONS_INHERIT,
-    'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
     'PERMISSION': False,
     # Whether to use raw ID lookups for users when PERMISSION is True
@@ -60,9 +56,10 @@ DEFAULTS = {
     'PAGE_MEDIA_PATH': 'cms_page_media/',
     'TITLE_CHARACTER': '+',
     'PAGE_CACHE': True,
+    'INVALIDATE_PAGE_CACHE_ON_STARTUP': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
-    'CACHE_PREFIX': 'cms_{}_'.format(__version__),
+    'CACHE_PREFIX': f'cms_{__version__}_',
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
     'UNIHANDECODE_VERSION': None,
@@ -82,6 +79,18 @@ DEFAULTS = {
     'PAGE_WIZARD_CONTENT_PLUGIN': 'TextPlugin',
     'PAGE_WIZARD_CONTENT_PLUGIN_BODY': 'body',
     'PAGE_WIZARD_CONTENT_PLACEHOLDER': None,  # Use first placeholder it finds.
+    'ENABLE_HELP': True,  # Adds help menu toolbar
+    'EXTRA_HELP_MENU_ITEMS': (),
+    'HELP_MENU_ITEMS': (
+        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
+        (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
+        (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
+    ),
+    'COLOR_SCHEME': 'light',
+    'COLOR_SCHEME_TOGGLE': False,
+    'REDIRECT_PRESERVE_QUERY_PARAMS': False,
+    'REDIRECT_TO_LOWERCASE_SLUG': False,
 }
 
 
@@ -89,11 +98,13 @@ def get_cache_durations():
     """
     Returns the setting: CMS_CACHE_DURATIONS or the defaults.
     """
-    return getattr(settings, 'CMS_CACHE_DURATIONS', {
+    cache_durations = {
         'menus': 60 * 60,
         'content': 60,
         'permissions': 60 * 60,
-    })
+    }
+    cache_durations.update(getattr(settings, 'CMS_CACHE_DURATIONS', {}))
+    return cache_durations
 
 
 @default('CMS_MEDIA_ROOT')
@@ -129,12 +140,12 @@ def get_toolbar_url__disable():
 def get_templates():
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
-        # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory
+        # CMS_TEMPLATES_DIR can either be a string pointing to the templates directory
         # or a dictionary holding 'site: template dir' entries
         if isinstance(tpldir, dict):
             tpldir = tpldir[settings.SITE_ID]
-        # We must extract the relative path of CMS_TEMPLATES_DIR to the neares
-        # valid templates directory. Here we mimick what the filesystem and
+        # We must extract the relative path of CMS_TEMPLATES_DIR to the nearest
+        # valid templates directory. Here we mimic what the filesystem and
         # app_directories template loaders do
         prefix = ''
         # Relative to TEMPLATE['DIRS'] for filesystem loader
@@ -161,7 +172,7 @@ def get_templates():
             template_module = _load_from_file(config_path)
             templates = [(os.path.join(prefix, data[0].strip()), data[1]) for data in template_module.TEMPLATES.items()]
         else:
-            templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
+            templates = [(os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir)]
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
     if get_cms_setting('TEMPLATE_INHERITANCE'):
@@ -201,16 +212,16 @@ def _ensure_languages_settings(languages):
             for required_key in required_language_keys:
                 if required_key not in language_object:
                     raise ImproperlyConfigured("CMS_LANGUAGES has a language which is missing the required key %r "
-                                               "in site %r" % (key, site))
+                                               "in site %r" % (required_key, site))
             language_code = language_object['code']
             for key in language_object:
                 if key not in valid_language_keys:
                     raise ImproperlyConfigured(
-                        "CMS_LANGUAGES has invalid key %r in language %r in site %r" % (key, language_code, site)
+                        f"CMS_LANGUAGES has invalid key {key!r} in language {language_code!r} in site {site!r}"
                     )
 
             if 'fallbacks' not in language_object:
-                if default_fallbacks:
+                if isinstance(default_fallbacks, list):
                     language_object['fallbacks'] = default_fallbacks
                 else:
                     needs_fallbacks.append((site, language_object))

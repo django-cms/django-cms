@@ -1,16 +1,16 @@
-# -*- coding: utf-8 -*-
 import sys
-import mock
+from unittest import mock
 
 from django.contrib.admin.models import CHANGE, LogEntry
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.core import checks
 from django.core.cache import cache
+from django.core.checks.urls import check_url_config
 from django.test.utils import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, resolve, reverse
-from django.utils import six
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 
@@ -20,17 +20,17 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.constants import PUBLISHER_STATE_DIRTY
-from cms.models import Title, Page
 from cms.middleware.page import get_page
+from cms.models import Page, Title
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
+from cms.utils.compat import DJANGO_2_2, DJANGO_3
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
-
 
 APP_NAME = 'SampleApp'
 NS_APP_NAME = 'NamespacedApp'
@@ -98,32 +98,47 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
         self.superuser = superuser
-        page = create_page("home", "nav_playground.html", "en",
-                           created_by=superuser, published=True)
+        page = create_page(
+            "home", "nav_playground.html", "en",
+            created_by=superuser, published=True
+        )
         create_title('de', page.get_title(), page)
         page.publish('de')
-        child_page = create_page("child_page", "nav_playground.html", "en",
-                                 created_by=superuser, published=True, parent=page)
+        child_page = create_page(
+            "child_page", "nav_playground.html", "en",
+            created_by=superuser, published=True, parent=page
+        )
         create_title('de', child_page.get_title(), child_page)
         child_page.publish('de')
-        child_child_page = create_page("child_child_page", "nav_playground.html",
-                                       "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
-                                       apphook_namespace=namespace)
+        child_child_page = create_page(
+            "child_child_page", "nav_playground.html",
+            "en", created_by=superuser, published=True, parent=child_page, apphook=apphook,
+            apphook_namespace=namespace
+        )
         create_title("de", child_child_page.get_title(), child_child_page)
         child_child_page.publish('de')
         # publisher_public is set to draft on publish, issue with onetoone reverse
         child_child_page = self.reload(child_child_page)
 
-        if isinstance(title_langs, six.string_types):
+        if isinstance(title_langs, str):
             titles = child_child_page.publisher_public.get_title_obj(title_langs)
         else:
-            titles = [child_child_page.publisher_public.get_title_obj(l) for l in title_langs]
+            titles = [child_child_page.publisher_public.get_title_obj(lang) for lang in title_langs]
 
         self.reload_urls()
 
         return titles
 
-    @override_settings(CMS_APPHOOKS=['%s.%s' % (APP_MODULE, APP_NAME)])
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.fourth_urls_for_apphook_tests')
+    def test_check_url_config(self):
+        """
+        Test for urls config check.
+        """
+        self.apphook_clear()
+        result = check_url_config(None)
+        self.assertEqual(len(result), 0)
+
+    @override_settings(CMS_APPHOOKS=[f'{APP_MODULE}.{APP_NAME}'])
     def test_explicit_apphooks(self):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.
@@ -171,6 +186,17 @@ class ApphooksTestCase(CMSTestCase):
         response = self.client.get('/en/blankapp/')
         self.assertTemplateUsed(response, 'nav_playground.html')
 
+        self.apphook_clear()
+
+    @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
+    def test_apphook_does_not_crash_django_checks(self):
+        # This test case reproduced the situation causing the error reported in issue #6717.
+        self.apphook_clear()
+        superuser = get_user_model().objects.create_superuser('admin', 'admin@admin.com', 'admin')
+        create_page("apphooked-page", "nav_playground.html", "en",
+                    created_by=superuser, published=True, apphook="SampleApp")
+        self.reload_urls()
+        checks.run_checks()
         self.apphook_clear()
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
@@ -281,7 +307,7 @@ class ApphooksTestCase(CMSTestCase):
         view_names = (
             ('sample-settings', 'sample_view'),
             ('sample-class-view', 'ClassView'),
-            ('sample-class-based-view', 'ClassBasedView'),
+            ('sample-class-based-view', 'view' if not (DJANGO_3 or DJANGO_2_2) else 'ClassBasedView' ),
         )
 
         with force_language("en"):
@@ -556,7 +582,7 @@ class ApphooksTestCase(CMSTestCase):
     def test_apphooks_receive_url_params(self):
         # make sure that urlparams actually reach the apphook views
         self.create_base_structure(APP_NAME, 'en')
-        path = reverse('sample-params', kwargs=dict(my_params='is-my-param-really-in-the-context-QUESTIONMARK'))
+        path = reverse('sample-params', kwargs={"my_params": 'is-my-param-really-in-the-context-QUESTIONMARK'})
         response = self.client.get(path)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'sampleapp/home.html')

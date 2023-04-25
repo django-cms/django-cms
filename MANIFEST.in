@@ -1,7 +1,8 @@
-include AUTHORS
 include LICENSE
 include README.rst
-include CHANGELOG.txt
+include CHANGELOG.rst
+include CODE_OF_CONDUCT.rst
+include CONTRIBUTING.rst
 recursive-include cms/locale *
 recursive-include cms/templates *
 recursive-include cms/static *
@@ -9,5 +10,5 @@ recursive-include cms/plugins *
 recursive-include menus/templates *
 recursive-include stacks/templates *
 recursive-include docs *
-recursive-exclude * *.pyc
+recursive-exclude * *.py[co]
 recursive-exclude * *.scssc

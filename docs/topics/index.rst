@@ -11,12 +11,14 @@ concerned with explaining *how to do things* than with helping you understand
 .. toctree::
     :maxdepth: 1
 
+    plugins
     apphooks
     publishing
     multiple_languages
     i18n
     permissions
     touch
+    colorscheme
     menu_system
     commonly_used_plugins
     searchdocs

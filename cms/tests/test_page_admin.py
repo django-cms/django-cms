@@ -1,24 +1,25 @@
-# -*- coding: utf-8 -*-
 import datetime
 import json
 import sys
+from unittest import skipUnless
 
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.forms.models import model_to_dict
 from django.http import HttpRequest
+from django.http.response import HttpResponse
 from django.test.html import HTMLParseError, Parser
 from django.test.utils import override_settings
 from django.urls import clear_url_caches
-from django.utils import six
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.timezone import now as tz_now
 from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.admin.pageadmin import PageAdmin
-from cms.api import create_page, add_plugin, create_title
+from cms.api import add_plugin, create_page, create_title
 from cms.appresolver import clear_app_resolvers
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import PUBLISHER_STATE_DEFAULT, PUBLISHER_STATE_DIRTY
@@ -27,14 +28,18 @@ from cms.models.pagemodel import Page, PageType
 from cms.models.permissionmodels import PagePermission
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import EmptyTitle, Title
-from cms.test_utils.testcases import (
-    CMSTestCase, URL_CMS_PAGE, URL_CMS_PAGE_MOVE,
-    URL_CMS_PAGE_ADVANCED_CHANGE, URL_CMS_PAGE_CHANGE, URL_CMS_PAGE_ADD
-)
 from cms.test_utils.project.sampleapp.models import SampleAppConfig
+from cms.test_utils.testcases import (
+    URL_CMS_PAGE,
+    URL_CMS_PAGE_ADD,
+    URL_CMS_PAGE_ADVANCED_CHANGE,
+    URL_CMS_PAGE_CHANGE,
+    URL_CMS_PAGE_MOVE,
+    CMSTestCase,
+)
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
-from cms.utils.conf import get_cms_setting
 from cms.utils.compat.dj import installed_apps
+from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -163,7 +168,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             self.assertEqual(Title.objects.all().count(), 0)
             self.assertEqual(Page.objects.all().count(), 0)
-            # crate home and auto publish
+            # create home and auto publish
             response = self.client.post(URL_CMS_PAGE_ADD, page_data)
             self.assertRedirects(response, URL_CMS_PAGE)
             page_data = self.get_new_page_data()
@@ -194,8 +199,8 @@ class PageTest(PageTestBase):
         with the request language pointing to a language
         not configured for the current site
         """
-        from django.test import Client
         from django.contrib.auth import get_user_model
+        from django.test import Client
 
         client = Client()
         superuser = self.get_superuser()
@@ -552,7 +557,7 @@ class PageTest(PageTestBase):
             t = template.Template(
                 "{% load cms_tags %}{% page_attribute changed_by %} changed "
                 "on {% page_attribute changed_date as page_change %}"
-                "{{ page_change|date:'Y-m-d\TH:i:s' }}"
+                r"{{ page_change|date:'Y-m-d\TH:i:s' }}"
             )
             req = HttpRequest()
             page.save()
@@ -562,7 +567,7 @@ class PageTest(PageTestBase):
             req.GET = {}
 
             actual_result = t.render(template.Context({"request": req}))
-            desired_result = "{0} changed on {1}".format(
+            desired_result = "{} changed on {}".format(
                 change_user,
                 actual_result[-19:]
             )
@@ -678,7 +683,7 @@ class PageTest(PageTestBase):
                 placeholder,
                 plugin_type='LinkPlugin',
                 language=language,
-                name='Link {}'.format(language),
+                name=f'Link {language}',
                 external_link='https://www.django-cms.org',
             )
 
@@ -689,7 +694,7 @@ class PageTest(PageTestBase):
         for language in languages:
             self.assertTrue(new_placeholder.get_plugins(language).exists())
             plugin = new_placeholder.get_plugins(language)[0].get_bound_plugin()
-            self.assertEqual(plugin.name, 'Link {}'.format(language))
+            self.assertEqual(plugin.name, f'Link {language}')
 
     def test_copy_page_to_root(self):
         """
@@ -1042,7 +1047,6 @@ class PageTest(PageTestBase):
                 {
                     'code': 'en',
                     'name': 'English',
-                    'fallbacks': ['fr', 'de'],
                     'public': True,
                     'fallbacks': ['fr']
                 },
@@ -1056,15 +1060,15 @@ class PageTest(PageTestBase):
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
                 page.title_cache = {'en': Title(slug='test', page_title="test2", title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', page_title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test', menu_title="test2")}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2')}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
                 page.title_cache = {'en': Title(slug='test2'), 'fr': EmptyTitle('fr')}
-                self.assertEqual('test2', force_text(page.get_admin_tree_title()))
+                self.assertEqual('test2', force_str(page.get_admin_tree_title()))
 
     def test_language_change(self):
         superuser = self.get_superuser()
@@ -1342,6 +1346,25 @@ class PageTest(PageTestBase):
         request._current_page_cache = mock_page
         page = get_page_from_request(request)
         self.assertEqual(page, mock_page)
+
+
+    @override_settings(CMS_PERMISSION=False)
+    def test_set_overwrite_url_with_invalid_value(self):
+        # User cannot add reserved characters in the "overwrite_url" input.
+        superuser = self.get_superuser()
+        cms_page = create_page('page', 'nav_playground.html', 'en', published=True)
+        expected_error_message = "You entered an invalid URL"
+
+        endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
+
+        with self.login_user_context(superuser):
+            page_data = {
+                'overwrite_url': 'https://django-cms.org',
+                'template': cms_page.template,
+            }
+            response = self.client.post(endpoint, page_data)
+            self.assertContains(response, expected_error_message)
+
 
     @override_settings(CMS_PERMISSION=False)
     def test_set_overwrite_url(self):
@@ -1661,9 +1684,8 @@ class PageTest(PageTestBase):
             page = self.get_page()
             form_url = admin_reverse("cms_page_change", args=(page.pk,))
             # Middleware is needed to correctly setup the environment for the admin
-            middleware = CurrentUserMiddleware()
             request = self.get_request()
-            middleware.process_request(request)
+            CurrentUserMiddleware(lambda req: HttpResponse).__call__(request)
             response = pageadmin.change_view(
                 request, str(page.pk),
                 form_url=form_url)
@@ -1682,14 +1704,14 @@ class PageTest(PageTestBase):
             document.finalize()
             # Removing ROOT element if it's not necessary
             if len(document.children) == 1:
-                if not isinstance(document.children[0], six.string_types):
+                if not isinstance(document.children[0], str):
                     document = document.children[0]
             return document
 
         try:
             dom = _parse_html(content)
         except HTMLParseError as e:
-            standardMsg = '%s\n%s' % ("Response's content is not valid HTML", e.msg)
+            standardMsg = '{}\n{}'.format("Response's content is not valid HTML", e.msg)
             self.fail(self._formatMessage(None, standardMsg))
         return dom
 
@@ -1710,8 +1732,8 @@ class PageTest(PageTestBase):
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
                 parsed = self._parse_page_tree(response, parser_class=PageTreeOptionsParser)
-                content = force_text(parsed)
-                self.assertIn(u'(Shift-Klick für erweiterte Einstellungen)', content)
+                content = force_str(parsed)
+                self.assertIn('(Shift-Klick für erweiterte Einstellungen)', content)
 
     def test_page_get_tree_endpoint_flat(self):
         superuser = self.get_superuser()
@@ -1732,7 +1754,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn(tree, content)
             self.assertNotIn('<li>\nBeta\n</li>', content)
 
@@ -1764,7 +1786,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn(tree, content)
 
     def test_page_changelist_search(self):
@@ -1780,7 +1802,7 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint, data={'q': 'alpha'})
             self.assertEqual(response.status_code, 200)
             parsed = self._parse_page_tree(response, parser_class=PageTreeLiParser)
-            content = force_text(parsed)
+            content = force_str(parsed)
             self.assertIn('<li>\nAlpha\n</li>', content)
             self.assertNotIn('<li>\nHome\n</li>', content)
             self.assertNotIn('<li>\nBeta\n</li>', content)
@@ -1897,6 +1919,75 @@ class PageTest(PageTestBase):
             self.assertEqual(page.reload().get_publisher_state("en"), PUBLISHER_STATE_DIRTY)
 
 
+    @skipUnless(
+        'sqlite' in settings.DATABASES.get('default').get('ENGINE').lower(),
+        'This test only works in SQLITE',
+    )
+    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+    def test_page_tree_render_localized_page_ids(self):
+        from django.db import connection
+
+        # Artificially increment the sequence number on cms_page and cms_treenode (below)
+        # to be > 1000, to trigger a THOUSAND_SEPARATOR localization in the
+        # rendered template
+
+        admin_user = self.get_superuser()
+        root = create_page(
+            "home", "nav_playground.html", "fr", created_by=admin_user, published=True
+        )
+        with connection.cursor() as c:
+            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_page"')
+            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_treenode"')
+
+        page = create_page(
+            "child-page",
+            "nav_playground.html",
+            "fr",
+            created_by=admin_user,
+            published=True,
+            parent=root,
+            slug="child-page",
+        )
+
+        sub_page = create_page(
+            "grand-child-page",
+            "nav_playground.html",
+            "fr",
+            created_by=admin_user,
+            published=True,
+            parent=page,
+            slug="grand-child-page",
+        )
+        self.assertTrue(page.id > 1000)
+        self.assertTrue(sub_page.id > 1000)
+
+        self.assertTrue(page.node.id > 1000)
+        self.assertTrue(sub_page.node.id > 1000)
+
+        # make sure the rendered page tree doesn't
+        # localize page or node ids
+        with self.login_user_context(admin_user):
+            data = {'openNodes[]': [root.node.pk, page.node.pk], 'language': 'fr'}
+
+            endpoint = self.get_admin_url(Page, 'get_tree')
+            response = self.client.get(endpoint, data=data)
+
+            self.assertEqual(response.status_code, 200)
+            content = force_str(response.content)
+            self.assertFalse(f'parent_node={page.node.pk:,}"' in content)
+            self.assertTrue(f'parent_node={page.node.pk}"' in content)
+
+        # if per chance we have localized node ids in our localstorage,
+        # make sure DjangoCMS doesn't choke on them when they are passed
+        # into the view
+        with self.login_user_context(admin_user):
+            data = {'openNodes[]': [root.node.pk, f'{page.node.pk:,}'], 'language': 'fr'}
+            endpoint = self.get_admin_url(Page, 'get_tree')
+            response = self.client.get(endpoint, data=data)
+            self.assertEqual(response.status_code, 200)
+
+
+
 class PermissionsTestCase(PageTestBase):
 
     def _add_translation_to_page(self, page):
@@ -1945,7 +2036,7 @@ class PermissionsTestCase(PageTestBase):
 
         for attr, value in kwargs.items():
             if attr not in non_inline:
-                attr = 'pagepermission_set-2-0-{}'.format(attr)
+                attr = f'pagepermission_set-2-0-{attr}'
             data[attr] = value
         return data
 
@@ -1978,7 +2069,7 @@ class PermissionsTestCase(PageTestBase):
 
         for attr, value in kwargs.items():
             if attr not in non_inline:
-                attr = 'pagepermission_set-0-{}'.format(attr)
+                attr = f'pagepermission_set-0-{attr}'
             data[attr] = value
         return data
 

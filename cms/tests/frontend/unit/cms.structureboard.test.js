@@ -2118,7 +2118,7 @@ describe('CMS.StructureBoard', function() {
 
             expect($.ajax).toHaveBeenCalledWith({
                 url: jasmine.stringMatching(
-                    /TOOLBAR_URL\?obj_id=100&amp;obj_type=cms.page&amp;cms_path=%2Fcontext.html.*/
+                    /TOOLBAR_URL\?obj_id=100&obj_type=cms.page&cms_path=%2Fcontext.html.*/
                 )
             });
         });

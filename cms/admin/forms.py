@@ -1,37 +1,47 @@
-# -*- coding: utf-8 -*-
 from django import forms
 from django.apps import apps
-from django.contrib.auth import get_user_model, get_permission_codename
+from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
 from django.template.defaultfilters import slugify
-from django.utils.encoding import force_text
-from django.utils.translation import ugettext, ugettext_lazy as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext
+from django.utils.translation import gettext_lazy as _
 
 from cms import api
 from cms.apphook_pool import apphook_pool
 from cms.cache.permissions import clear_permission_cache
+from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
 from cms.exceptions import PluginLimitReached
 from cms.extensions import extension_pool
-from cms.constants import PAGE_TYPES_ID, PUBLISHER_STATE_DIRTY, ROOT_USER_LEVEL
-from cms.forms.validators import validate_relative_url, validate_url_uniqueness
-from cms.forms.widgets import UserSelectAdminWidget, AppHookSelect, ApplicationConfigSelect
-from cms.models import (CMSPlugin, Page, PageType, PagePermission, PageUser, PageUserGroup, Title,
-                        Placeholder, GlobalPagePermission, TreeNode)
+from cms.forms.validators import validate_overwrite_url, validate_relative_url, validate_url_uniqueness
+from cms.forms.widgets import AppHookSelect, ApplicationConfigSelect, UserSelectAdminWidget
+from cms.models import (
+    CMSPlugin,
+    GlobalPagePermission,
+    Page,
+    PagePermission,
+    PageType,
+    PageUser,
+    PageUserGroup,
+    Placeholder,
+    Title,
+    TreeNode,
+)
 from cms.models.permissionmodels import User
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
-from cms.utils.conf import get_cms_setting
 from cms.utils.compat.forms import UserChangeForm
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_language_object
 from cms.utils.permissions import (
     get_current_user,
-    get_subordinate_users,
     get_subordinate_groups,
+    get_subordinate_users,
     get_user_permission_level,
 )
 from menus.menu_pool import menu_pool
@@ -69,8 +79,7 @@ def get_page_changed_by_filter_choices():
 def get_page_template_filter_choices():
     yield ('', _('All'))
 
-    for value, name in get_cms_setting('TEMPLATES'):
-        yield (value, name)
+    yield from get_cms_setting('TEMPLATES')
 
 
 def save_permissions(data, obj):
@@ -93,7 +102,7 @@ def save_permissions(data, obj):
             # add permission `key` for model `model`
             codename = get_permission_codename(key, model._meta)
             permission = Permission.objects.get(content_type=content_type, codename=codename)
-            field = 'can_%s_%s' % (key, name)
+            field = f'can_{key}_{name}'
 
             if data.get(field):
                 permission_accessor.add(permission)
@@ -145,7 +154,7 @@ class BasePageForm(forms.ModelForm):
 
 class AddPageForm(BasePageForm):
     source = forms.ModelChoiceField(
-        label=_(u'Page type'),
+        label=_('Page type'),
         queryset=Page.objects.filter(
             is_page_type=True,
             publisher_is_draft=True,
@@ -163,7 +172,7 @@ class AddPageForm(BasePageForm):
         fields = ['source']
 
     def __init__(self, *args, **kwargs):
-        super(AddPageForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         source_field = self.fields.get('source')
 
@@ -198,7 +207,7 @@ class AddPageForm(BasePageForm):
         if parent_node:
             slug = data['slug']
             parent_path = parent_node.item.get_path(self._language)
-            path = u'%s/%s' % (parent_path, slug) if parent_path else slug
+            path = f'{parent_path}/{slug}' if parent_path else slug
         else:
             path = data['slug']
 
@@ -267,7 +276,7 @@ class AddPageForm(BasePageForm):
             for lang in source.get_languages():
                 source._copy_contents(new_page, lang)
         else:
-            new_page = super(AddPageForm, self).save(commit=False)
+            new_page = super().save(commit=False)
             new_page.template = self.get_template()
             new_page.set_tree_node(self._site, target=parent, position='last-child')
             new_page.save()
@@ -328,7 +337,7 @@ class AddPageTypeForm(AddPageForm):
         if not root_page.has_translation(self._language):
             api.create_title(
                 language=self._language,
-                title=ugettext('Page Types'),
+                title=gettext('Page Types'),
                 page=root_page,
                 slug=PAGE_TYPES_ID,
                 path=PAGE_TYPES_ID,
@@ -336,7 +345,7 @@ class AddPageTypeForm(AddPageForm):
         return root_page.node
 
     def clean_parent_node(self):
-        parent_node = super(AddPageTypeForm, self).clean_parent_node()
+        parent_node = super().clean_parent_node()
 
         if parent_node and not parent_node.item.is_page_type:
             raise ValidationError("Parent has to be a page type.")
@@ -360,7 +369,7 @@ class AddPageTypeForm(AddPageForm):
         return new_page
 
     def save(self, *args, **kwargs):
-        new_page = super(AddPageTypeForm, self).save(*args, **kwargs)
+        new_page = super().save(*args, **kwargs)
 
         if not self.cleaned_data.get('source'):
             # User has created a page-type via "Add page"
@@ -392,7 +401,7 @@ class ChangePageForm(BasePageForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(ChangePageForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title_obj = self.instance.get_title_obj(
             language=self._language,
             fallback=False,
@@ -404,7 +413,7 @@ class ChangePageForm(BasePageForm):
                 self.fields[field].initial = getattr(self.title_obj, field)
 
     def clean(self):
-        data = super(ChangePageForm, self).clean()
+        data = super().clean()
 
         if self._errors:
             # Form already has errors, best to let those be
@@ -430,7 +439,7 @@ class ChangePageForm(BasePageForm):
         if page.parent_page:
             slug = data['slug']
             parent_path = page.parent_page.get_path(self._language)
-            path = u'%s/%s' % (parent_path, slug) if parent_path else slug
+            path = f'{parent_path}/{slug}' if parent_path else slug
         else:
             path = data['slug']
 
@@ -450,7 +459,7 @@ class ChangePageForm(BasePageForm):
 
     def save(self, commit=True):
         data = self.cleaned_data
-        cms_page = super(ChangePageForm, self).save(commit=False)
+        cms_page = super().save(commit=False)
 
         translation_data = {field: data[field]
                             for field in self.translation_fields if field in data}
@@ -473,8 +482,9 @@ class ChangePageForm(BasePageForm):
 
         if update_count == 0:
             api.create_title(language=self._language, page=cms_page, **translation_data)
-        else:
-            cms_page._update_title_path_recursive(self._language)
+        # _update_title_path_recursive should be called if the new page is the parent
+        # of already created children in multilingual sites.
+        cms_page._update_title_path_recursive(self._language, slug=self.data['slug'])
         cms_page.clear_cache(menu=True)
         return cms_page
 
@@ -486,7 +496,7 @@ class PublicationDatesForm(forms.ModelForm):
         fields = ['publication_date', 'publication_end_date']
 
     def save(self, *args, **kwargs):
-        page = super(PublicationDatesForm, self).save(*args, **kwargs)
+        page = super().save(*args, **kwargs)
         page.clear_cache(menu=True)
         return page
 
@@ -544,7 +554,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         ]
 
     def __init__(self, *args, **kwargs):
-        super(AdvancedSettingsForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.title_obj = self.instance.get_title_obj(
             language=self._language,
             fallback=False,
@@ -582,7 +592,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
                 if page_data.get('application_urls', False) and page_data['application_urls'] in app_configs:
                     configs = app_configs[page_data['application_urls']].get_configs()
-                    self.fields['application_configs'].widget.choices = [(config.pk, force_text(config)) for config in configs]
+                    self.fields['application_configs'].widget.choices = [(config.pk, force_str(config)) for config in configs]
 
                     try:
                         config = configs.get(namespace=self.initial['application_namespace'])
@@ -616,7 +626,15 @@ class AdvancedSettingsForm(forms.ModelForm):
         ).exclude(pk=self.instance.pk).exists()
 
     def clean(self):
-        cleaned_data = super(AdvancedSettingsForm, self).clean()
+        cleaned_data = super().clean()
+        if cleaned_data.get("overwrite_url"):
+            # Assuming that the user enters a full URL in the overwrite_url input.
+            # Here we validate it before publishing the page and if it contains
+            # reserved characters (e.g. $?:#), we add error in the form.
+            # issue 6934
+            url = cleaned_data.get("overwrite_url")
+            if url and not validate_overwrite_url(value=url):
+                self._errors['overwrite_url'] = self.error_class([_('You entered an invalid URL.')])
 
         if self._errors:
             # Fail fast if there's errors in the form
@@ -762,7 +780,7 @@ class AdvancedSettingsForm(forms.ModelForm):
 
     def save(self, *args, **kwargs):
         data = self.cleaned_data
-        page = super(AdvancedSettingsForm, self).save(*args, **kwargs)
+        page = super().save(*args, **kwargs)
         page.update_translations(
             self._language,
             path=data['path'],
@@ -785,7 +803,7 @@ class PagePermissionForm(forms.ModelForm):
         fields = ['login_required', 'limit_visibility_in_menu']
 
     def save(self, *args, **kwargs):
-        page = super(PagePermissionForm, self).save(*args, **kwargs)
+        page = super().save(*args, **kwargs)
         page.clear_cache(menu=True)
         clear_permission_cache()
         return page
@@ -799,7 +817,7 @@ class PageTreeForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.page = kwargs.pop('page')
         self._site = kwargs.pop('site', Site.objects.get_current())
-        super(PageTreeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['target'].queryset = Page.objects.drafts().filter(
             node__site=self._site,
             is_page_type=self.page.is_page_type,
@@ -808,7 +826,8 @@ class PageTreeForm(forms.Form):
     def get_root_nodes(self):
         # TODO: this needs to avoid using the pages accessor directly
         nodes = TreeNode.get_root_nodes()
-        return nodes.exclude(cms_pages__is_page_type=not(self.page.is_page_type))
+        is_page_type = self.page.is_page_type
+        return nodes.exclude(cms_pages__is_page_type=not is_page_type)
 
     def get_tree_options(self):
         position = self.cleaned_data['position']
@@ -849,14 +868,14 @@ class PageTreeForm(forms.Form):
 class MovePageForm(PageTreeForm):
 
     def clean(self):
-        cleaned_data = super(MovePageForm, self).clean()
+        cleaned_data = super().clean()
 
         if self.page.is_home and cleaned_data.get('target'):
-            self.add_error('target', force_text(_('You can\'t move the home page inside another page')))
+            self.add_error('target', force_str(_('You can\'t move the home page inside another page')))
         return cleaned_data
 
     def get_tree_options(self):
-        options = super(MovePageForm, self).get_tree_options()
+        options = super().get_tree_options()
         target_node, target_node_position = options
 
         if target_node_position != 'left':
@@ -903,7 +922,7 @@ class CopyPageForm(PageTreeForm):
 
     def _get_tree_options_for_root(self, position):
         try:
-            return super(CopyPageForm, self)._get_tree_options_for_root(position)
+            return super()._get_tree_options_for_root(position)
         except IndexError:
             # The user is copying a page to a site with no pages
             # Add the node as the last root node.
@@ -925,7 +944,7 @@ class ChangeListForm(forms.Form):
     soft_root = forms.ChoiceField(required=False, choices=BOOLEAN_CHOICES)
 
     def __init__(self, *args, **kwargs):
-        super(ChangeListForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['changed_by'].choices = get_page_changed_by_filter_choices()
         self.fields['template'].choices = get_page_template_filter_choices()
 
@@ -945,7 +964,7 @@ class ChangeListForm(forms.Form):
 
     def run_filters(self, queryset):
         for field, value in self.get_filter_items():
-            query = {'{}__exact'.format(field): value}
+            query = {f'{field}__exact': value}
             queryset = queryset.filter(**query)
         return queryset
 
@@ -953,7 +972,7 @@ class ChangeListForm(forms.Form):
 class BasePermissionAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
-        super(BasePermissionAdminForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         permission_fields = self._meta.model.get_all_permissions()
 
         for field in permission_fields:
@@ -976,7 +995,7 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
     )
 
     def __init__(self, *args, **kwargs):
-        super(PagePermissionInlineAdminForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         user = get_current_user() # current user from threadlocals
         site = Site.objects.get_current()
         sub_users = get_subordinate_users(user, site)
@@ -1007,15 +1026,16 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
         # raw id field for the user
         if use_raw_id:
             from django.contrib.admin.widgets import ForeignKeyRawIdWidget
+
             # This check will be False if the number of users in the system
             # is less than the threshold set by the RAW_ID_USERS setting.
             if isinstance(self.fields['user'].widget, ForeignKeyRawIdWidget):
                 # We can't set a queryset on a raw id lookup, but we can use
                 # the fact that it respects the limit_choices_to parameter.
                 if limit_choices:
-                    self.fields['user'].widget.rel.limit_choices_to = dict(
-                        id__in=list(sub_users.values_list('pk', flat=True))
-                    )
+                    self.fields['user'].widget.rel.limit_choices_to = {
+                        "id__in": list(sub_users.values_list('pk', flat=True))
+                    }
         else:
             self.fields['user'].widget = UserSelectAdminWidget()
             self.fields['user'].queryset = sub_users
@@ -1085,7 +1105,7 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
 
 
 class GenericCmsPermissionForm(forms.ModelForm):
-    """Generic form for User & Grup permissions in cms
+    """Generic form for User & Group permissions in cms
     """
     _current_user = None
 
@@ -1111,10 +1131,10 @@ class GenericCmsPermissionForm(forms.ModelForm):
             initial = initial or {}
             initial.update(self.populate_initials(instance))
             kwargs['initial'] = initial
-        super(GenericCmsPermissionForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean(self):
-        data = super(GenericCmsPermissionForm, self).clean()
+        data = super().clean()
 
         # Validate Page options
         if not data.get('can_change_page'):
@@ -1162,11 +1182,11 @@ class GenericCmsPermissionForm(forms.ModelForm):
             permissions = permission_accessor.filter(content_type=content_type).values_list('codename', flat=True)
             for key in ('add', 'change', 'delete'):
                 codename = get_permission_codename(key, model._meta)
-                initials['can_%s_%s' % (key, name)] = codename in permissions
+                initials[f'can_{key}_{name}'] = codename in permissions
         return initials
 
     def save(self, commit=True):
-        instance = super(GenericCmsPermissionForm, self).save(commit=False)
+        instance = super().save(commit=False)
         instance.save()
         save_permissions(self.cleaned_data, instance)
         return instance
@@ -1182,7 +1202,7 @@ class PageUserAddForm(forms.ModelForm):
         model = PageUser
 
     def __init__(self, *args, **kwargs):
-        super(PageUserAddForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.fields['user'].queryset = self.get_subordinates()
 
     def get_subordinates(self):
@@ -1191,7 +1211,7 @@ class PageUserAddForm(forms.ModelForm):
 
     def save(self, commit=True):
         user = self.cleaned_data['user']
-        instance = super(PageUserAddForm, self).save(commit=False)
+        instance = super().save(commit=False)
         instance.created_by = self._current_user
 
         for field in user._meta.fields:
@@ -1214,7 +1234,7 @@ class PageUserChangeForm(UserChangeForm):
         model = PageUser
 
     def __init__(self, *args, **kwargs):
-        super(PageUserChangeForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if not self._current_user.is_superuser:
             # Limit permissions to include only
@@ -1244,7 +1264,7 @@ class PageUserGroupForm(GenericCmsPermissionForm):
     def save(self, commit=True):
         if not self.instance.pk:
             self.instance.created_by = self._current_user
-        return super(PageUserGroupForm, self).save(commit=commit)
+        return super().save(commit=commit)
 
 
 class PluginAddValidationForm(forms.Form):
@@ -1265,7 +1285,7 @@ class PluginAddValidationForm(forms.Form):
         try:
             plugin_pool.get_plugin(plugin_type)
         except KeyError:
-            message = ugettext("Invalid plugin type '%s'") % plugin_type
+            message = gettext("Invalid plugin type '%s'") % plugin_type
             raise ValidationError(message)
         return plugin_type
 
@@ -1282,18 +1302,18 @@ class PluginAddValidationForm(forms.Form):
         parent_plugin = data.get('plugin_parent')
 
         if language not in get_language_list():
-            message = ugettext("Language must be set to a supported language!")
+            message = gettext("Language must be set to a supported language!")
             self.add_error('plugin_language', message)
             return self.cleaned_data
 
         if parent_plugin:
             if parent_plugin.language != language:
-                message = ugettext("Parent plugin language must be same as language!")
+                message = gettext("Parent plugin language must be same as language!")
                 self.add_error('plugin_language', message)
                 return self.cleaned_data
 
             if parent_plugin.placeholder_id != placeholder.pk:
-                message = ugettext("Parent plugin placeholder must be same as placeholder!")
+                message = gettext("Parent plugin placeholder must be same as placeholder!")
                 self.add_error('placeholder_id', message)
                 return self.cleaned_data
 
@@ -1305,10 +1325,11 @@ class PluginAddValidationForm(forms.Form):
                 placeholder,
                 data['plugin_type'],
                 language,
-                template=template
+                template=template,
+                parent_plugin=parent_plugin
             )
         except PluginLimitReached as error:
-            self.add_error(None, force_text(error))
+            self.add_error(None, force_str(error))
         return self.cleaned_data
 
 

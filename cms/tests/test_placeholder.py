@@ -1,42 +1,41 @@
-# -*- coding: utf-8 -*-
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.core.exceptions import ImproperlyConfigured
-from django.template import TemplateSyntaxError, Template
+from django.template import Template, TemplateSyntaxError
 from django.template.loader import get_template
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
-from cms.exceptions import DuplicatePlaceholderWarning
+from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
-from cms.tests.test_toolbar import ToolbarTestBase
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.placeholderapp.models import (
-    DynamicPlaceholderSlotExample,
-    Example1,
-    TwoPlaceholderExample,
-)
+from cms.test_utils.project.placeholderapp.models import DynamicPlaceholderSlotExample, Example1, TwoPlaceholderExample
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
+from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.compat.tests import UnittestCompatMixin
 from cms.utils.conf import get_cms_setting
-from cms.utils.placeholder import (PlaceholderNoAction, MLNGPlaceholderActions,
-                                   get_placeholder_conf, get_placeholders, _get_nodelist,
-                                   _scan_placeholders)
-from cms.utils.plugins import assign_plugins
+from cms.utils.placeholder import (
+    MLNGPlaceholderActions,
+    PlaceholderNoAction,
+    _get_nodelist,
+    _scan_placeholders,
+    get_placeholder_conf,
+    get_placeholders,
+)
+from cms.utils.plugins import assign_plugins, has_reached_plugin_limit
 from cms.utils.urlutils import admin_reverse
 
 
@@ -51,7 +50,7 @@ def _render_placeholder(placeholder, context, **kwargs):
     return content_renderer.render_placeholder(placeholder, context, **kwargs)
 
 
-class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
+class PlaceholderTestCase(TransactionCMSTestCase):
     def setUp(self):
         u = self._create_user("test", True, True)
 
@@ -63,74 +62,80 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_scanning_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_one.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'three']))
 
     def test_placeholder_scanning_variable_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_variable_extends.html')
-        self.assertEqual(placeholders, [u'one', u'two', u'three', u'four'])
+        self.assertEqual(placeholders, ['one', 'two', 'three', 'four'])
 
     def test_placeholder_scanning_inherit_from_variable_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_inherit_from_variable_extends.html')
-        self.assertEqual(placeholders, [u'one', u'two', u'three', u'four'])
+        self.assertEqual(placeholders, ['one', 'two', 'three', 'four'])
 
     def test_placeholder_scanning_sekizai_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_one_sekizai.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'three']))
 
     def test_placeholder_scanning_include(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_two.html')
-        self.assertEqual(sorted(placeholders), sorted([u'child', u'three']))
+        self.assertEqual(sorted(placeholders), sorted(['child', 'three']))
 
     def test_placeholder_scanning_double_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_three.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'new_three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'new_three']))
 
     def test_placeholder_scanning_sekizai_double_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_three_sekizai.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'new_three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'new_three']))
 
     def test_placeholder_scanning_complex(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_four.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'child', u'four']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'child', 'four']))
 
     def test_placeholder_scanning_super(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_five.html')
-        self.assertEqual(sorted(placeholders), sorted([u'one', u'extra_one', u'two', u'three']))
+        self.assertEqual(sorted(placeholders), sorted(['one', 'extra_one', 'two', 'three']))
 
     def test_placeholder_scanning_nested(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_six.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'new_two', u'new_three']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'new_two', 'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
-        placeholders = self.assertWarns(DuplicatePlaceholderWarning,
-                                        'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
-                                        _get_placeholder_slots, 'placeholder_tests/test_seven.html')
-        self.assertEqual(sorted(placeholders), sorted([u'one']))
+        placeholders = self.assertWarns(
+            DuplicatePlaceholderWarning,
+            'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
+            _get_placeholder_slots, 'placeholder_tests/test_seven.html'
+        )
+        self.assertEqual(sorted(placeholders), sorted(['one']))
 
     def test_placeholder_scanning_extend_outside_block(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'base_outside']))
+
+    def test_placeholder_recursive_extend(self):
+        placeholders = _get_placeholder_slots('placeholder_tests/recursive_extend.html')
+        self.assertEqual(sorted(placeholders), sorted(['recursed_one', 'recursed_two', 'three']))
 
     def test_placeholder_scanning_sekizai_extend_outside_block(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_sekizai.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'base_outside']))
 
     def test_placeholder_scanning_extend_outside_block_nested(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_nested.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'base_outside']))
 
     def test_placeholder_scanning_sekizai_extend_outside_block_nested(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_nested_sekizai.html')
-        self.assertEqual(sorted(placeholders), sorted([u'new_one', u'two', u'base_outside']))
+        self.assertEqual(sorted(placeholders), sorted(['new_one', 'two', 'base_outside']))
 
     def test_placeholder_scanning_var(self):
         t = Template('{%load cms_tags %}{% include name %}{% placeholder "a_placeholder" %}')
         phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
-        self.assertListEqual(phs, sorted([u'a_placeholder']))
+        self.assertListEqual(phs, sorted(['a_placeholder']))
 
         t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
         phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
-        self.assertListEqual(phs, sorted([u'two', u'new_one', u'base_outside']))
+        self.assertListEqual(phs, sorted(['two', 'new_one', 'base_outside']))
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
@@ -265,10 +270,10 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         )
         ex.save()
         ph1 = ex.placeholder
-        ###
+        #
         # add the test plugin
-        ###
-        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        #
+        test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
         endpoint = self.get_change_plugin_uri(test_plugin, container=Example1)
         response = self.client.post(endpoint, {})
@@ -282,10 +287,10 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         """
         page = create_page('page', 'col_two.html', 'en')
         ph1 = page.placeholders.get(slot='col_left')
-        ###
+        #
         # add the test plugin
-        ###
-        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        #
+        test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
 
         endpoint = self.get_change_plugin_uri(test_plugin)
@@ -343,19 +348,19 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
                 ],
             },
             'layout/home.html main': {
-                'name': u'main content with FilerImagePlugin and limit',
+                'name': 'main content with FilerImagePlugin and limit',
                 'plugins': ['TextPlugin', 'FilerImagePlugin', 'LinkPlugin'],
                 'inherit': 'main',
                 'limits': {'global': 1},
             },
             'layout/other.html main': {
-                'name': u'main content with FilerImagePlugin and no limit',
+                'name': 'main content with FilerImagePlugin and no limit',
                 'inherit': 'layout/home.html main',
                 'limits': {},
                 'excluded_plugins': ['LinkPlugin']
             },
             None: {
-                'name': u'All',
+                'name': 'All',
                 'plugins': ['FilerImagePlugin', 'LinkPlugin'],
                 'limits': {},
             },
@@ -400,16 +405,16 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         }
 
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
-            self.assertEqual(force_text(placeholder_1.get_label()), 'left column')
-            self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
-            self.assertEqual(force_text(placeholder_3.get_label()), 'fallback')
+            self.assertEqual(force_str(placeholder_1.get_label()), 'left column')
+            self.assertEqual(force_str(placeholder_2.get_label()), 'renamed left column')
+            self.assertEqual(force_str(placeholder_3.get_label()), 'fallback')
 
         del TEST_CONF[None]
 
         with self.settings(CMS_PLACEHOLDER_CONF=TEST_CONF):
-            self.assertEqual(force_text(placeholder_1.get_label()), 'left column')
-            self.assertEqual(force_text(placeholder_2.get_label()), 'renamed left column')
-            self.assertEqual(force_text(placeholder_3.get_label()), 'No_Name')
+            self.assertEqual(force_str(placeholder_1.get_label()), 'left column')
+            self.assertEqual(force_str(placeholder_2.get_label()), 'renamed left column')
+            self.assertEqual(force_str(placeholder_3.get_label()), 'No_Name')
 
     def test_placeholders_from_blocks_order(self):
         placeholders = _get_placeholder_slots('placeholder_tests/test_with_block.html')
@@ -417,7 +422,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
 
     def test_placeholder_scanning_nested_super(self):
         placeholders = _get_placeholder_slots('placeholder_tests/nested_super_level1.html')
-        self.assertEqual(sorted(placeholders), sorted([u'level1', u'level2', u'level3', u'level4']))
+        self.assertEqual(sorted(placeholders), sorted(['level1', 'level2', 'level3', 'level4']))
 
     def test_placeholder_field_no_related_name(self):
         self.assertRaises(ValueError, PlaceholderField, 'placeholder', related_name='+')
@@ -485,13 +490,13 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         context_de['request'] = self.get_request(language="de", page=page_en)
 
         # First test the default (fallback) behavior)
-        ## English page should have the text plugin
+        # English page should have the text plugin
         content_en = _render_placeholder(placeholder_en, context_en)
-        self.assertRegexpMatches(content_en, "^en body$")
+        self.assertRegex(content_en, "^en body$")
 
-        ## Deutsch page have text due to fallback
+        # Deutsch page have text due to fallback
         content_de = _render_placeholder(placeholder_de, context_de)
-        self.assertRegexpMatches(content_de, "^en body$")
+        self.assertRegex(content_de, "^en body$")
         self.assertEqual(len(content_de), 7)
 
         conf = {
@@ -501,11 +506,11 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         }
         # configure non fallback
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            ## Deutsch page should have no text
-            del(placeholder_de._plugins_cache)
+            # Deutsch page should have no text
+            del placeholder_de._plugins_cache
             cache.clear()
             content_de = _render_placeholder(placeholder_de, context_de)
-            ## Deutsch page should inherit english content
+            # Deutsch page should inherit english content
             self.assertNotRegex(content_de, "^en body$")
             context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
@@ -513,17 +518,17 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             request.user = self.get_superuser()
             request.toolbar = CMSToolbar(request)
             context_de2['request'] = request
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             content_de2 = _render_placeholder(placeholder_de, context_de2)
             self.assertFalse("en body" in content_de2)
             # remove the cached plugins instances
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_de, 'TextPlugin', 'de', body='de body')
             content_de = _render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "^de body$")
+            self.assertRegex(content_de, "^de body$")
 
     def test_nested_plugins_language_fallback(self):
         """ Tests language_fallback placeholder configuration for nested plugins"""
@@ -546,20 +551,20 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         }
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
             content_de = _render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/en\"")
-            self.assertRegexpMatches(content_de, "en body")
+            self.assertRegex(content_de, "<a href=\"http://example.com/en\"")
+            self.assertRegex(content_de, "en body")
             context_de2 = SekizaiContext()
             request = self.get_request(language="de", page=page_en)
             request.session['cms_edit'] = True
             request.user = self.get_superuser()
             request.toolbar = CMSToolbar(request)
             context_de2['request'] = request
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             content_de2 = _render_placeholder(placeholder_de, context_de2)
             self.assertFalse("en body" in content_de2)
             # remove the cached plugins instances
-            del(placeholder_de._plugins_cache)
+            del placeholder_de._plugins_cache
             cache.clear()
             # Then we add a plugin to check for proper rendering
             link_de = add_plugin(
@@ -571,8 +576,8 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             )
             add_plugin(placeholder_en, 'TextPlugin', 'de',  target=link_de, body='de body')
             content_de = _render_placeholder(placeholder_de, context_de)
-            self.assertRegexpMatches(content_de, "<a href=\"http://example.com/de\"")
-            self.assertRegexpMatches(content_de, "de body")
+            self.assertRegex(content_de, "<a href=\"http://example.com/de\"")
+            self.assertRegex(content_de, "de body")
 
     def test_plugins_non_default_language_fallback(self):
         """ Tests language_fallback placeholder configuration """
@@ -588,16 +593,16 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         context_de['request'] = self.get_request(language="de", page=page_en)
 
         # First test the default (fallback) behavior)
-        ## Deutsch page should have the text plugin
+        # Deutsch page should have the text plugin
         content_de = _render_placeholder(placeholder_en, context_de)
         self.assertRegexpMatches(content_de, "^de body$")
-        del(placeholder_en._plugins_cache)
+        del placeholder_en._plugins_cache
         cache.clear()
-        ## English page should have no text
+        # English page should have no text
         content_en = _render_placeholder(placeholder_en, context_en)
-        self.assertRegexpMatches(content_en, "^de body$")
+        self.assertRegex(content_en, "^de body$")
         self.assertEqual(len(content_en), 7)
-        del(placeholder_en._plugins_cache)
+        del placeholder_en._plugins_cache
         cache.clear()
         conf = {
             'col_left': {
@@ -606,17 +611,17 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         }
         # configure non-fallback
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            ## English page should have deutsch text
+            # English page should have deutsch text
             content_en = _render_placeholder(placeholder_en, context_en)
             self.assertNotRegex(content_en, "^de body$")
 
             # remove the cached plugins instances
-            del(placeholder_en._plugins_cache)
+            del placeholder_en._plugins_cache
             cache.clear()
             # Then we add a plugin to check for proper rendering
             add_plugin(placeholder_en, 'TextPlugin', 'en', body='en body')
             content_en = _render_placeholder(placeholder_en, context_en)
-            self.assertRegexpMatches(content_en, "^en body$")
+            self.assertRegex(content_en, "^en body$")
 
     def test_plugins_discarded_with_language_fallback(self):
         """
@@ -644,10 +649,10 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
                            [placeholder_sidebar_en, placeholder_en], 'col_two.html')
             # if the normal, non fallback enabled placeholder still has content
             content_en = _render_placeholder(placeholder_sidebar_en, context_en)
-            self.assertRegexpMatches(content_en, "^en body$")
+            self.assertRegex(content_en, "^en body$")
 
             # remove the cached plugins instances
-            del(placeholder_sidebar_en._plugins_cache)
+            del placeholder_sidebar_en._plugins_cache
             cache.clear()
 
     def test_plugins_prepopulate(self):
@@ -674,7 +679,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             context['request'] = self.get_request(language="en", page=page)
             # Our page should have "en default body 1" AND "en default body 2"
             content = _render_placeholder(placeholder, context)
-            self.assertRegexpMatches(content, "^<p>en default body 1</p>\s*<p>en default body 2</p>$")
+            self.assertRegex(content, r"^<p>en default body 1</p>\s*<p>en default body 2</p>$")
 
     def test_plugins_children_prepopulate(self):
         """
@@ -759,7 +764,7 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set([u'en', u'de', u'fr'])
+        avail_langs = {'en', 'de', 'fr'}
         # Setup instance
         ex = Example1(
             char_1='one',
@@ -768,14 +773,14 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
             char_4='four'
         )
         ex.save()
-        ###
+        #
         # add the test plugin
-        ###
+        #
         for lang in avail_langs:
-            add_plugin(ex.placeholder, u"EmptyPlugin", lang)
+            add_plugin(ex.placeholder, "EmptyPlugin", lang)
         # reload instance from database
         ex = Example1.objects.get(pk=ex.pk)
-        #get languages
+        # get languages
         langs = [lang['code'] for lang in ex.placeholder.get_filled_languages()]
         self.assertEqual(avail_langs, set(langs))
 
@@ -784,18 +789,18 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set([u'en', u'de', u'fr'])
+        avail_langs = {'en', 'de', 'fr'}
         # Setup instances
-        page = create_page('test page', 'col_two.html', u'en')
+        page = create_page('test page', 'col_two.html', 'en')
         for lang in avail_langs:
-            if lang != u'en':
+            if lang != 'en':
                 create_title(lang, 'test page %s' % lang, page)
         placeholder = page.placeholders.get(slot='col_sidebar')
-        ###
+        #
         # add the test plugin
-        ###
+        #
         for lang in avail_langs:
-            add_plugin(placeholder, u"EmptyPlugin", lang)
+            add_plugin(placeholder, "EmptyPlugin", lang)
         # reload placeholder from database
         placeholder = page.placeholders.get(slot='col_sidebar')
         # get languages
@@ -816,18 +821,22 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         """
 
         nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
-        self.assertNotIn('one',
+        self.assertNotIn(
+            'one',
             nodelist[0].blocks.keys(),
             "test_super_extends_1.html contains a block called 'one', "
-            "but _2.html does not.")
+            "but _2.html does not."
+        )
 
         _get_placeholder_slots("placeholder_tests/test_super_extends_2.html")
 
         nodelist = _get_nodelist(get_template("placeholder_tests/test_super_extends_2.html"))
-        self.assertNotIn('one',
+        self.assertNotIn(
+            'one',
             nodelist[0].blocks.keys(),
             "test_super_extends_1.html still should not contain a block "
-            "called 'one' after rescanning placeholders.")
+            "called 'one' after rescanning placeholders."
+        )
 
     @override_settings(TEMPLATE_LOADERS=(
         ('django.template.loaders.cached.Loader', (
@@ -843,15 +852,17 @@ class PlaceholderTestCase(TransactionCMSTestCase, UnittestCompatMixin):
         """
         template = get_template("placeholder_tests/test_super_extends_2.html")
         output = template.render({})
-        self.assertEqual(['Whee'], [o for o in output.split('\n')
-            if 'Whee' in o])
+        self.assertEqual(
+            ['Whee'], [o for o in output.split('\n') if 'Whee' in o]
+        )
 
         _get_placeholder_slots("placeholder_tests/test_super_extends_2.html")
 
         template = get_template("placeholder_tests/test_super_extends_2.html")
         output = template.render({})
-        self.assertEqual(['Whee'], [o for o in output.split('\n')
-            if 'Whee' in o])
+        self.assertEqual(
+            ['Whee'], [o for o in output.split('\n') if 'Whee' in o]
+        )
 
 
 class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
@@ -877,9 +888,9 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         )
         EN = ('en', 'English')
         FR = ('fr', 'French')
-        self.assertEqual(set(fr_copy_languages), set([EN]))
-        self.assertEqual(set(de_copy_languages), set([EN, FR]))
-        self.assertEqual(set(en_copy_languages), set([FR]))
+        self.assertEqual(set(fr_copy_languages), {EN})
+        self.assertEqual(set(de_copy_languages), {EN, FR})
+        self.assertEqual(set(en_copy_languages), {FR})
 
     def test_mlng_placeholder_actions_copy(self):
         actions = MLNGPlaceholderActions()
@@ -959,8 +970,8 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 
     def test_check_unicode_rendering(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        result = force_text(ph)
-        self.assertEqual(result, u'test')
+        result = force_str(ph)
+        self.assertEqual(result, 'test')
 
     def test_excercise_get_attached_model(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
@@ -1008,8 +1019,8 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         self.assertIn("slot=''", repr(unsaved_ph))
 
         saved_ph = Placeholder.objects.create(slot='test')
-        self.assertIn('id={}'.format(saved_ph.pk), repr(saved_ph))
-        self.assertIn("slot='{}'".format(saved_ph.slot), repr(saved_ph))
+        self.assertIn(f'id={saved_ph.pk}', repr(saved_ph))
+        self.assertIn(f"slot='{saved_ph.slot}'", repr(saved_ph))
 
 
 class PlaceholderConfTests(TestCase):
@@ -1047,3 +1058,41 @@ class PlaceholderConfTests(TestCase):
             plugins = plugin_pool.get_all_plugins(placeholder, page)
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
+
+    def test_plugins_limit_global(self):
+        """ Tests placeholder limit configuration for nested plugins"""
+        page = create_page('page', 'col_two.html', 'en')
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_left': {
+                'limits': {
+                    'global': 1,
+                },
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            add_plugin(placeholder, 'LinkPlugin', 'en', name='name', external_link='http://example.com/en')
+            self.assertRaises(
+                PluginLimitReached, has_reached_plugin_limit, placeholder=placeholder, plugin_type='LinkPlugin',
+                language='en', template=None, parent_plugin=None
+            )
+
+    def test_plugins_limit_global_children(self):
+        """ Tests placeholder limit configuration for nested plugins"""
+        page = create_page('page', 'col_two.html', 'en')
+        placeholder = page.placeholders.get(slot='col_left')
+        conf = {
+            'col_left': {
+                'limits': {
+                    'global_children': 1,
+                },
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            link = add_plugin(placeholder, 'LinkPlugin', 'en', name='name', external_link='http://example.com/en')
+            add_plugin(placeholder, 'TextPlugin', 'en', target=link)
+            add_plugin(placeholder, 'TextPlugin', 'en', target=link)
+            self.assertRaises(
+                PluginLimitReached, has_reached_plugin_limit, placeholder=placeholder, plugin_type='LinkPlugin',
+                language='en', template=None, parent_plugin=None
+            )

@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
-from cms.publisher.manager import PublisherManager
 from django.db.models.base import ModelBase
+
+from cms.publisher.manager import PublisherManager
 
 
 class PageMetaClass(ModelBase):

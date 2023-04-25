@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 import os
 
@@ -8,19 +7,14 @@ from django.core.files.storage import FileSystemStorage
 from django.forms import Form
 from django.template.response import SimpleTemplateResponse
 from django.urls import NoReverseMatch
-
 from formtools.wizard.views import SessionWizardView
 
 from cms.models import Page
 from cms.utils import get_current_site
 from cms.utils.i18n import get_site_language_from_request
 
+from .forms import WizardStep1Form, WizardStep2BaseForm, step2_form_factory
 from .wizard_pool import wizard_pool
-from .forms import (
-    WizardStep1Form,
-    WizardStep2BaseForm,
-    step2_form_factory,
-)
 
 
 class WizardCreateView(SessionWizardView):
@@ -41,7 +35,7 @@ class WizardCreateView(SessionWizardView):
         if not user.is_active or not user.is_staff:
             raise PermissionDenied
         self.site = get_current_site()
-        return super(WizardCreateView, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
     def get_current_step(self):
         """Returns the current step, if possible, else None."""
@@ -59,7 +53,7 @@ class WizardCreateView(SessionWizardView):
         return step == '1'
 
     def get_context_data(self, **kwargs):
-        context = super(WizardCreateView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
 
         if self.is_second_step():
             context['wizard_entry'] = self.get_selected_entry()
@@ -79,11 +73,11 @@ class WizardCreateView(SessionWizardView):
 
         if self.is_second_step(step):
             self.form_list[step] = self.get_step_2_form(step, data, files)
-        return super(WizardCreateView, self).get_form(step, data, files)
+        return super().get_form(step, data, files)
 
     def get_form_kwargs(self, step=None):
         """This is called by self.get_form()"""
-        kwargs = super(WizardCreateView, self).get_form_kwargs()
+        kwargs = super().get_form_kwargs()
         kwargs['wizard_user'] = self.request.user
         if self.is_second_step(step):
             kwargs['wizard_page'] = self.get_origin_page()
@@ -102,7 +96,7 @@ class WizardCreateView(SessionWizardView):
 
     def get_form_initial(self, step):
         """This is called by self.get_form()"""
-        initial = super(WizardCreateView, self).get_form_initial(step)
+        initial = super().get_form_initial(step)
         if self.is_first_step(step):
             initial['page'] = self.request.GET.get('page')
             initial['language'] = self.request.GET.get('language')

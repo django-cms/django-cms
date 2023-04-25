@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from cms.plugin_base import CMSPluginBase
 
 

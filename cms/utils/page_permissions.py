@@ -1,13 +1,11 @@
-# -*- coding: utf-8 -*-
 from functools import wraps
-
-from django.utils.decorators import available_attrs
 
 from cms.api import get_page_draft
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import GRANT_ALL_PERMISSIONS
 from cms.models import Page, Placeholder
 from cms.utils import get_current_site
+from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import (
     cached_func,
@@ -15,7 +13,6 @@ from cms.utils.permissions import (
     get_page_actions_for_user,
     has_global_permission,
 )
-
 
 PAGE_ADD_CODENAME = get_model_permission_codename(Page, 'add')
 PAGE_CHANGE_CODENAME = get_model_permission_codename(Page, 'change')

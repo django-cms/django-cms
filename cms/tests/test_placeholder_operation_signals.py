@@ -1,24 +1,22 @@
-# -*- coding: utf-8 -*-
 from cms.api import add_plugin
 from cms.models import Page, Placeholder, UserSettings
 from cms.operations import (
     ADD_PLUGIN,
     ADD_PLUGINS_FROM_PLACEHOLDER,
-    CLEAR_PLACEHOLDER,
     CHANGE_PLUGIN,
-    DELETE_PLUGIN,
+    CLEAR_PLACEHOLDER,
     CUT_PLUGIN,
+    DELETE_PLUGIN,
     MOVE_PLUGIN,
-    PASTE_PLUGIN,
     PASTE_PLACEHOLDER,
+    PASTE_PLUGIN,
 )
-from cms.signals import pre_placeholder_operation, post_placeholder_operation
+from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.tests import UnittestCompatMixin
 from cms.test_utils.util.context_managers import signal_tester
 
 
-class PagePlaceholderTestCase(CMSTestCase, UnittestCompatMixin):
+class PagePlaceholderTestCase(CMSTestCase):
 
     def _add_plugin(self, placeholder=None, plugin_type='LinkPlugin', language='en'):
         placeholder = placeholder or self._placeholder_1

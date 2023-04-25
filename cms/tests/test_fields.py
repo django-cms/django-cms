@@ -1,14 +1,16 @@
 from cms.api import create_page
-from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.project.sampleapp.models import (
-    PageOnDeleteCascade, PageOnDeleteSetNull,
-    PlaceholderOnDeleteCascade, PlaceholderOnDeleteSetNull,
+    PageOnDeleteCascade,
+    PageOnDeleteSetNull,
+    PlaceholderOnDeleteCascade,
+    PlaceholderOnDeleteSetNull,
 )
+from cms.test_utils.testcases import CMSTestCase
 
 
 class PageFieldOnDeleteTestCase(CMSTestCase):
     def setUp(self):
-        super(PageFieldOnDeleteTestCase, self).setUp()
+        super().setUp()
         self.page = create_page(
             'on delete test page',
             template='nav_playground.html',
@@ -38,7 +40,7 @@ class PageFieldOnDeleteTestCase(CMSTestCase):
 
 class PlaceholderFieldOnDeleteTestCase(CMSTestCase):
     def setUp(self):
-        super(PlaceholderFieldOnDeleteTestCase, self).setUp()
+        super().setUp()
         self.page = create_page(
             'on delete test page',
             template='nav_playground.html',

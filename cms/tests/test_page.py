@@ -1,9 +1,9 @@
-# -*- coding: utf-8 -*-
 import datetime
-import os.path
 import functools
+import os.path
 from unittest import skipIf
 
+import mock
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
@@ -12,10 +12,11 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponse, HttpResponseNotFound
 from django.urls import reverse
 from django.utils.timezone import now as tz_now
+from django.utils.translation import activate
 from django.utils.translation import override as force_language
 
 from cms import constants
-from cms.api import create_page, add_plugin, create_title, publish_page
+from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.exceptions import PublicIsUnmodifiable, PublicVersionNeeded
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, Title
@@ -24,11 +25,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils.conf import get_cms_setting
-from cms.utils.page import (
-    get_available_slug,
-    get_current_site,
-    get_page_from_request,
-)
+from cms.utils.page import get_available_slug, get_current_site, get_page_from_request
 
 
 class PageMigrationTestCase(CMSTestCase):
@@ -160,8 +157,8 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertTrue(page.is_home)
         self.assertTrue(page.publisher_public.is_home)
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u''])
-        self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [u''])
+        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [''])
+        self.assertEqual(list(Title.objects.public().values_list('path', flat=True)), [''])
 
     @skipIf(has_no_custom_user(), 'No custom user')
     def test_create_page_api_with_long_username(self):
@@ -180,12 +177,12 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(Page.objects.count(), 1)
 
         self.assertLessEqual(len(page.created_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegexpMatches(page.created_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.created_by, r'V+\.{3} \(id=\d+\)')
 
         self.assertLessEqual(len(page.changed_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegexpMatches(page.changed_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.changed_by, r'V+\.{3} \(id=\d+\)')
 
-        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), [u'root'])
+        self.assertEqual(list(Title.objects.drafts().values_list('path', flat=True)), ['root'])
 
     def test_delete_page_no_template(self):
         page_data = {
@@ -205,10 +202,18 @@ class PagesTestCase(TransactionCMSTestCase):
         """ Checks cms.utils.page.get_available_slug for infinite recursion
         """
         site = get_current_site()
-        for x in range(0, 12):
+        for _x in range(0, 12):
             create_page('test copy', 'nav_playground.html', 'en', published=True)
         new_slug = get_available_slug(site, 'test-copy', 'en')
         self.assertTrue(new_slug, 'test-copy-11')
+
+    def test_get_available_slug_recursion_exclude_current(self):
+        """ Checks cms.utils.page.get_available_slug for excluding the current page
+        """
+        site = get_current_site()
+        base = create_page('test', 'nav_playground.html', 'en', published=True)
+        new_slug = get_available_slug(site, 'test', 'en', current=base)
+        self.assertTrue(new_slug, 'test')
 
     def test_path_collisions_api_1(self):
         """ Checks for slug collisions on sibling pages - uses API to create pages
@@ -521,7 +526,7 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
-        with open(path, 'r') as fobj:
+        with open(path) as fobj:
             old = fobj.read()
         try:
             new = old.replace(
@@ -675,6 +680,41 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertIsNotNone(found_page)
         self.assertFalse(found_page.publisher_is_draft)
 
+    def test_language_homograph(self):
+        # a page about boots you can wear
+        wearable_boot = create_page("boot", "nav_playground.html", "en", slug="boot",
+                           published=True)
+        create_title('de', 'stiefel', wearable_boot, slug='stiefel')
+        wearable_boot.publish('de')
+        # a page about boats that float on water
+        floating_boat = create_page("boat", "nav_playground.html", "en", slug="boat",
+                           published=True)
+        create_title('de', 'boot', floating_boat, slug='boot')
+        floating_boat.publish('de')
+
+        activate('en')
+        request = self.get_request('/en/boot/')
+        page = get_page_from_request(request)
+        self.assertEqual(page.pk, wearable_boot.publisher_public_id)
+
+        activate('de')
+        request = self.get_request('/de/boot/', language='de')
+        page = get_page_from_request(request)
+        self.assertEqual(page.pk, floating_boat.publisher_public_id)
+
+    def test_no_request_language_code(self):
+        request = self.get_request('/any-page/')
+        del request.LANGUAGE_CODE
+        with mock.patch('cms.utils.page.get_page_from_path') as mock_page_from_path:
+            get_page_from_request(request)
+        self.assertIsNone(mock_page_from_path.call_args.kwargs['language_code'])
+
+    def test_get_page_from_request_without_cache_when_has_use_path_argument(self):
+        request = self.get_request('/test')
+        request._current_page_cache = True
+        found_page = get_page_from_request(request, 'page_path')
+        self.assertIsNone(found_page)
+
     def test_ancestor_expired(self):
         yesterday = tz_now() - datetime.timedelta(days=1)
         tomorrow = tz_now() + datetime.timedelta(days=1)
@@ -760,6 +800,16 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(page3.get_absolute_url(),
                          self.get_pages_root() + 'test-page-4/test-page-3/')
 
+        superuser = self.get_superuser()
+        with self.login_user_context(superuser):
+            copied = self.copy_page(page2, page2)
+            self.assertEqual(copied.get_absolute_url(),
+                             self.get_pages_root() + 'test-page-2/test-page-2/')
+            copied = self.move_page(copied, page2, position='left')
+            copied.reload()
+            self.assertEqual(copied.get_absolute_url(),
+                             self.get_pages_root() + 'test-page-2-copy-2/')
+
     def test_page_and_title_repr(self):
         non_saved_page = Page()
         self.assertIsNone(non_saved_page.pk)
@@ -767,8 +817,8 @@ class PagesTestCase(TransactionCMSTestCase):
 
         saved_page = create_page('test saved page', 'nav_playground.html', 'en')
         self.assertIsNotNone(saved_page.pk)
-        self.assertIn('id={}'.format(saved_page.pk), repr(saved_page))
-        self.assertIn('is_draft={}'.format(saved_page.publisher_is_draft), repr(saved_page))
+        self.assertIn(f'id={saved_page.pk}', repr(saved_page))
+        self.assertIn(f'is_draft={saved_page.publisher_is_draft}', repr(saved_page))
 
         non_saved_title = Title()
         self.assertIsNone(non_saved_title.pk)
@@ -776,8 +826,8 @@ class PagesTestCase(TransactionCMSTestCase):
 
         saved_title = saved_page.get_title_obj()
         self.assertIsNotNone(saved_title.pk)
-        self.assertIn('id={}'.format(saved_title.pk), repr(saved_title))
-        self.assertIn('is_draft={}'.format(saved_title.publisher_is_draft), repr(saved_title))
+        self.assertIn(f'id={saved_title.pk}', repr(saved_title))
+        self.assertIn(f'is_draft={saved_title.publisher_is_draft}', repr(saved_title))
 
     def test_page_overwrite_urls(self):
 
@@ -1017,18 +1067,11 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_xframe_options_with_cms_page_cache_and_clickjacking_middleware(self):
         # Refs: 6346
-        if getattr(settings, 'MIDDLEWARE', None):
-            override = {
-                'MIDDLEWARE': settings.MIDDLEWARE + [
-                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-                ]
-            }
-        else:
-            override = {
-                'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES + [
-                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-                ]
-            }
+        override = {
+            'MIDDLEWARE': settings.MIDDLEWARE + [
+                'django.middleware.clickjacking.XFrameOptionsMiddleware',
+            ]
+        }
 
         override['CMS_PAGE_CACHE'] = True
 
@@ -1145,6 +1188,59 @@ class PagesTestCase(TransactionCMSTestCase):
             resp = self.client.get(endpoint)
             self.assertContains(resp, public_text)
             self.assertNotContains(resp, draft_text)
+
+    def test_translated_subpage_title_path_regeneration(self):
+        """
+        When a child page is created with multiple translations before parent translation,
+        child title translation path should be regenerated to take into account parent path.
+
+        This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
+        where the slug was not regenerated.
+        """
+        parent = create_page(
+            'en-parent', "nav_playground.html", 'en',
+            slug='en-parent', published=True
+        )
+        child = create_page(
+            'en-child', "nav_playground.html", 'en',
+            slug='en-child', parent=parent, published=True
+        )
+        create_title('de', 'de-child', child, slug='de-child')
+
+        # Parent 'de' title created after child translation
+        create_title('de', 'de-parent', parent, slug='de-parent')
+        parent._update_title_path_recursive('de', slug='de-parent')
+        parent.clear_cache(menu=True)
+
+        parent.publish('de')
+        child.publish('de')
+
+        response = self.client.get('/de/de-parent/de-child/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_subpage_title_path_regeneration_after_parent_slug_change(self):
+        """
+        When a parent page slug changes,
+        the child title path should be regenerated.
+
+        This test enforces the issues found in: https://github.com/django-cms/django-cms/issues/6622,
+        where the slug was not regenerated.
+        """
+        parent = create_page('BadFoo', "nav_playground.html", 'en',
+                             slug = 'badfoo', published=True)
+        child = create_page('Bar', "nav_playground.html", 'en',
+                            slug = 'bar', parent=parent, published=True)
+        title = parent.get_title_obj(language='en', fallback=False)
+        title.title='Foo'
+        title.save()
+        parent._update_title_path_recursive('en', slug='foo')
+        parent.clear_cache(menu=True)
+
+        parent.publish('en')
+        child.publish('en')
+
+        response = self.client.get('/en/foo/bar/')
+        self.assertEqual(response.status_code, 200)
 
 
 class PageTreeTests(CMSTestCase):

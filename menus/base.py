@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 from django.utils.encoding import smart_str
 
 
-class Menu(object):
+class Menu:
     namespace = None
 
     def __init__(self, renderer):
@@ -18,7 +17,7 @@ class Menu(object):
         raise NotImplementedError
 
 
-class Modifier(object):
+class Modifier:
 
     def __init__(self, renderer):
         self.renderer = renderer
@@ -27,7 +26,7 @@ class Modifier(object):
         pass
 
 
-class NavigationNode(object):
+class NavigationNode:
 
     selected = None
     sibling = False
@@ -65,8 +64,7 @@ class NavigationNode(object):
     def get_ancestors(self):
         if getattr(self, 'parent', None):
             return [self.parent] + self.parent.get_ancestors()
-        else:
-            return []
+        return []
 
     def is_selected(self, request):
         node_abs_url = self.get_absolute_url()

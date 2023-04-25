@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
 
+from cms.menu_bases import CMSAttachMenu
 from menus.base import NavigationNode
 from menus.menu_pool import menu_pool
-from cms.menu_bases import CMSAttachMenu
 
 
 class TestMenu(CMSAttachMenu):
@@ -19,5 +18,6 @@ class TestMenu(CMSAttachMenu):
         nodes.append(n3)
         nodes.append(n4)
         return nodes
+
 
 menu_pool.register_menu(TestMenu)

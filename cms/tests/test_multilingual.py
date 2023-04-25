@@ -1,21 +1,16 @@
-# -*- coding: utf-8 -*-
 import copy
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
-from cms.api import create_page, create_title, publish_page, add_plugin
-from cms.forms.utils import update_site_and_page_choices
+from cms.api import add_plugin, create_page, create_title, publish_page
 from cms.exceptions import LanguageError
-from cms.models import Title, EmptyTitle
-from cms.test_utils.testcases import (CMSTestCase,
-                                      URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH)
-from cms.utils.conf import get_cms_setting
-from cms.utils.conf import get_languages
-
+from cms.forms.utils import update_site_and_page_choices
+from cms.models import EmptyTitle, Title
+from cms.test_utils.testcases import URL_CMS_PAGE_CHANGE_LANGUAGE, URL_CMS_PAGE_PUBLISH, CMSTestCase
+from cms.utils.conf import get_cms_setting, get_languages
 from menus.menu_pool import menu_pool
-
 
 TEMPLATE_NAME = 'tests/rendering/base.html'
 
@@ -327,37 +322,37 @@ class MultilingualTestCase(CMSTestCase):
         p1 = create_page("page", "nav_playground.html", "en", published=True)
         public = p1.get_public_object()
         draft = p1.get_draft_object()
-        self.assertEqual(set(public.get_languages()), set(('en',)))
-        self.assertEqual(set(public.get_published_languages()), set(('en',)))
-        self.assertEqual(set(draft.get_languages()), set(('en',)))
-        self.assertEqual(set(draft.get_published_languages()), set(('en',)))
+        self.assertEqual(set(public.get_languages()), {'en'})
+        self.assertEqual(set(public.get_published_languages()), {'en'})
+        self.assertEqual(set(draft.get_languages()), {'en'})
+        self.assertEqual(set(draft.get_published_languages()), {'en'})
 
         p1 = create_title('de', 'page de', p1).page
         public = p1.get_public_object()
         draft = p1.get_draft_object()
-        self.assertEqual(set(public.get_languages()), set(('en',)))
-        self.assertEqual(set(public.get_published_languages()), set(('en',)))
-        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
-        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_languages()), {'en'})
+        self.assertEqual(set(public.get_published_languages()), {'en'})
+        self.assertEqual(set(draft.get_languages()), {'en', 'de'})
+        self.assertEqual(set(draft.get_published_languages()), {'en', 'de'})
 
         p1.publish('de')
         p1 = p1.reload()
         public = p1.get_public_object()
         draft = p1.get_draft_object()
-        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
-        self.assertEqual(set(public.get_published_languages()), set(('en', 'de')))
-        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
-        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_languages()), {'en', 'de'})
+        self.assertEqual(set(public.get_published_languages()), {'en', 'de'})
+        self.assertEqual(set(draft.get_languages()), {'en', 'de'})
+        self.assertEqual(set(draft.get_published_languages()), {'en', 'de'})
 
         p1.unpublish('de')
         p1 = p1.reload()
 
         public = p1.get_public_object()
         draft = p1.get_draft_object()
-        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
-        self.assertEqual(set(public.get_published_languages()), set(('en',)))
-        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
-        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_languages()), {'en', 'de'})
+        self.assertEqual(set(public.get_published_languages()), {'en'})
+        self.assertEqual(set(draft.get_languages()), {'en', 'de'})
+        self.assertEqual(set(draft.get_published_languages()), {'en', 'de'})
 
         p1.publish('de')
         p1 = p1.reload()
@@ -366,10 +361,10 @@ class MultilingualTestCase(CMSTestCase):
 
         public = p1.get_public_object()
         draft = p1.get_draft_object()
-        self.assertEqual(set(public.get_languages()), set(('en', 'de')))
-        self.assertEqual(set(public.get_published_languages()), set(('de',)))
-        self.assertEqual(set(draft.get_languages()), set(('en', 'de')))
-        self.assertEqual(set(draft.get_published_languages()), set(('en', 'de')))
+        self.assertEqual(set(public.get_languages()), {'en', 'de'})
+        self.assertEqual(set(public.get_published_languages()), {'de'})
+        self.assertEqual(set(draft.get_languages()), {'en', 'de'})
+        self.assertEqual(set(draft.get_published_languages()), {'en', 'de'})
 
     def test_no_english_defined(self):
         with self.settings(TEMPLATE_CONTEXT_PROCESSORS=[],

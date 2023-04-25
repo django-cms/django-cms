@@ -61,6 +61,61 @@ This allows you to review your changes in your local browser using ``http://loca
     It then watches the ``docs`` directory; when it spots changes, it will automatically rebuild
     the documentation, and refresh the page in your browser.
 
+**************************
+Documentation requirements
+**************************
+
+The packages required by the documentation are managed by `pip-tools`_, which
+compiles ``requirements.txt`` ensuring compatibility between packages.
+
+The packages that the documentation requires are in ``requirements.in`` which
+looks like a regular requirements file. Specific versions of packages can be
+specified, or left without a version in which case the latest version which is
+compatible with the other packages will be used.
+
+Example ``requirements.in``:
+
+.. code-block::
+
+   furo
+   Sphinx>4
+   sphinx-copybutton
+   sphinxext-opengraph
+   sphinxcontrib-spelling
+   pyenchant>3
+
+By running ``pip-compile`` the requirements are compiled into ``requirements.txt``.
+
+Periodically requirements should be updated to ensure that new versions, most
+importantly security patches, are used. This is done using the ``-U`` flag:
+
+.. code-block::
+
+   cd docs
+   pip-compile -U
+
+The generated ``requirements.txt`` pins specific versions and explains where
+each required package comes from, for example:
+
+.. code-block::
+
+   datetime==4.3
+       # via -r requirements.in
+   django==3.2.5
+       # via
+       #   django-classy-tags
+       #   django-cms
+       #   django-formtools
+       #   django-sekizai
+       #   django-treebeard
+   django-classy-tags==2.0.0
+       # via
+       #   django-cms
+       #   django-sekizai
+   django-cms==3.9.0
+       # via -r requirements.in
+   django-formtools==2.3
+       # via django-cms
 
 .. _spelling:
 
@@ -138,7 +193,7 @@ caught by the spelling checker.
     You may well find that some words that pass the spelling test on one system but not on another.
     Dictionaries on different systems contain different words and even behave differently. The
     important thing is that the spelling tests pass on `Travis
-    <https://travis-ci.org/divio/django-cms>`_ when you submit a pull request.
+    <https://travis-ci.com/django-cms/django-cms>`_ when you submit a pull request.
 
 
 *********************
@@ -165,8 +220,8 @@ Our documentation is divided into the following main sections:
   and so on
 * :doc:`/contributing/index` (``contributing``)
 * :doc:`/upgrade/index` (``upgrade``)
-* :doc:`/user/index` (``user``): guides for *using* rather than setting up or developing for the
-  CMS
+* :doc:`/whoisbehind/index` (``who``): who is behind the django CMS project
+
 
 
 ********************
@@ -270,5 +325,6 @@ rather than relative links - ``:doc:`/../toolbar```. This makes it easier to
 run search-and-replaces when items are moved in the structure.
 
 
+.. _pip-tools: https://github.com/jazzband/pip-tools
 .. _restructuredText: http://docutils.sourceforge.net/docs/ref/rst/introduction.html
 .. _Sphinx: http://sphinx-doc.org//

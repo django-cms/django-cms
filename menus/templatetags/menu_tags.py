@@ -1,14 +1,13 @@
-# -*- coding: utf-8 -*-
-from django import template
-from django.contrib.sites.models import Site
-from django.urls import reverse, NoReverseMatch
-from django.utils.encoding import force_text
-from django.utils.six.moves.urllib.parse import unquote
-from django.utils.translation import get_language, ugettext
+from urllib.parse import unquote
 
-from classytags.arguments import IntegerArgument, Argument, StringArgument
+from classytags.arguments import Argument, IntegerArgument, StringArgument
 from classytags.core import Options
 from classytags.helpers import InclusionTag
+from django import template
+from django.contrib.sites.models import Site
+from django.urls import NoReverseMatch, reverse
+from django.utils.encoding import force_str
+from django.utils.translation import get_language, gettext
 
 from cms.utils.i18n import (
     force_language,
@@ -16,10 +15,8 @@ from cms.utils.i18n import (
     get_language_object,
     get_public_languages,
 )
-
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
-
 
 register = template.Library()
 
@@ -157,20 +154,18 @@ class ShowMenu(InclusionTag):
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
             children = menu_renderer.apply_modifiers(children, namespace, root_id, post_cut=True)
 
-        try:
-            context['children'] = children
-            context['template'] = template
-            context['from_level'] = from_level
-            context['to_level'] = to_level
-            context['extra_inactive'] = extra_inactive
-            context['extra_active'] = extra_active
-            context['namespace'] = namespace
-        except:
-            context = {"template": template}
+        context['children'] = children
+        context['template'] = template
+        context['from_level'] = from_level
+        context['to_level'] = to_level
+        context['extra_inactive'] = extra_inactive
+        context['extra_active'] = extra_active
+        context['namespace'] = namespace
+
         return context
 
 
-register.tag(ShowMenu)
+register.tag("show_menu", ShowMenu)
 
 
 class ShowMenuBelowId(ShowMenu):
@@ -187,7 +182,7 @@ class ShowMenuBelowId(ShowMenu):
     )
 
 
-register.tag(ShowMenuBelowId)
+register.tag("show_menu_below_id", ShowMenuBelowId)
 
 
 class ShowSubMenu(InclusionTag):
@@ -262,7 +257,7 @@ class ShowSubMenu(InclusionTag):
         return context
 
 
-register.tag(ShowSubMenu)
+register.tag("show_sub_menu", ShowSubMenu)
 
 
 class ShowBreadcrumb(InclusionTag):
@@ -293,8 +288,9 @@ class ShowBreadcrumb(InclusionTag):
             start_level = 0
         try:
             only_visible = bool(int(only_visible))
-        except:
+        except TypeError:
             only_visible = bool(only_visible)
+
         ancestors = []
 
         menu_renderer = context.get('cms_menu_renderer')
@@ -305,12 +301,10 @@ class ShowBreadcrumb(InclusionTag):
         nodes = menu_renderer.get_nodes(breadcrumb=True)
 
         # Find home
-        home = None
         root_url = unquote(reverse("pages-root"))
         home = next((node for node in nodes if node.get_absolute_url() == root_url), None)
 
         # Find selected
-        selected = None
         selected = next((node for node in nodes if node.selected), None)
 
         if selected and selected != home:
@@ -331,7 +325,7 @@ class ShowBreadcrumb(InclusionTag):
         return context
 
 
-register.tag(ShowBreadcrumb)
+register.tag("show_breadcrumb", ShowBreadcrumb)
 
 
 def _raw_language_marker(language, lang_code):
@@ -340,11 +334,11 @@ def _raw_language_marker(language, lang_code):
 
 def _native_language_marker(language, lang_code):
     with force_language(lang_code):
-        return force_text(ugettext(language))
+        return force_str(gettext(language))
 
 
 def _current_language_marker(language, lang_code):
-    return force_text(ugettext(language))
+    return force_str(gettext(language))
 
 
 def _short_language_marker(language, lang_code):
@@ -382,7 +376,7 @@ class LanguageChooser(InclusionTag):
             i18n_mode = _tmp
         if template is NOT_PROVIDED:
             template = "menu/language_chooser.html"
-        if not i18n_mode in MARKERS:
+        if i18n_mode not in MARKERS:
             i18n_mode = 'raw'
         if 'request' not in context:
             # If there's an exception (500), default context_processors may not be called.
@@ -409,7 +403,7 @@ class LanguageChooser(InclusionTag):
         return context
 
 
-register.tag(LanguageChooser)
+register.tag("language_chooser", LanguageChooser)
 
 
 class PageLanguageUrl(InclusionTag):
@@ -442,4 +436,4 @@ class PageLanguageUrl(InclusionTag):
         return {'content': url}
 
 
-register.tag(PageLanguageUrl)
+register.tag("page_language_url", PageLanguageUrl)

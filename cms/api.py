@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 Public Python API to create CMS contents.
 
@@ -7,16 +6,14 @@ You must implement the necessary permission checks in your own code before
 calling these methods!
 """
 import datetime
+import warnings
 
 from django.contrib.auth import get_user_model
 from django.contrib.sites.models import Site
-from django.core.exceptions import FieldError
-from django.core.exceptions import PermissionDenied
-from django.core.exceptions import ValidationError
+from django.core.exceptions import FieldError, PermissionDenied, ValidationError
 from django.db import transaction
 from django.template.defaultfilters import slugify
 from django.template.loader import get_template
-from django.utils import six
 from django.utils.translation import activate
 
 from cms import constants
@@ -24,8 +21,7 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models.pagemodel import Page
-from cms.models.permissionmodels import (PageUser, PagePermission, GlobalPagePermission,
-                                         ACCESS_PAGE_AND_DESCENDANTS)
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission, PagePermission, PageUser
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.models.titlemodels import Title
@@ -38,10 +34,9 @@ from cms.utils.page import get_available_slug
 from cms.utils.permissions import _thread_locals, current_user
 from menus.menu_pool import menu_pool
 
-
-#===============================================================================
+# ===============================================================================
 # Helpers/Internals
-#===============================================================================
+# ===============================================================================
 
 
 def _verify_apphook(apphook, namespace):
@@ -58,7 +53,7 @@ def _verify_apphook(apphook, namespace):
         apphook_name = apphook.__class__.__name__
     elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
         return apphook.__name__
-    elif isinstance(apphook, six.string_types):
+    elif isinstance(apphook, str):
         try:
             assert apphook in apphook_pool.apps
         except AssertionError:
@@ -77,12 +72,11 @@ def _verify_plugin_type(plugin_type):
     Verifies the given plugin_type is valid and returns a tuple of
     (plugin_model, plugin_type)
     """
-    if (hasattr(plugin_type, '__module__') and
-            issubclass(plugin_type, CMSPluginBase)):
+    if hasattr(plugin_type, '__module__') and issubclass(plugin_type, CMSPluginBase):
         plugin_model = plugin_type.model
         assert plugin_type in plugin_pool.plugins.values()
         plugin_type = plugin_type.__name__
-    elif isinstance(plugin_type, six.string_types):
+    elif isinstance(plugin_type, str):
         try:
             plugin_model = plugin_pool.get_plugin(plugin_type).model
         except KeyError:
@@ -94,9 +88,9 @@ def _verify_plugin_type(plugin_type):
     return plugin_model, plugin_type
 
 
-#===============================================================================
+# ===============================================================================
 # Public API
-#===============================================================================
+# ===============================================================================
 
 @transaction.atomic
 def create_page(title, template, language, menu_title=None, slug=None,
@@ -419,6 +413,10 @@ def publish_page(page, user, language):
 
     See docs/extending_cms/api_reference.rst for more info
     """
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
+                  'that adds publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
+
     page = page.reload()
 
     if not page.has_publish_permission(user):
@@ -435,6 +433,10 @@ def publish_pages(include_unpublished=False, language=None, site=None):
     """
     Create published public version of selected drafts.
     """
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
+                  'that adds publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
+
     qs = Page.objects.drafts()
 
     if not include_unpublished:
@@ -444,7 +446,7 @@ def publish_pages(include_unpublished=False, language=None, site=None):
         qs = qs.filter(node__site=site)
 
     output_language = None
-    for i, page in enumerate(qs):
+    for page in qs:
         add = True
         titles = page.title_set
         if not include_unpublished:
@@ -470,6 +472,10 @@ def get_page_draft(page):
     :return page: draft version of the page
     :type page: :class:`cms.models.pagemodel.Page` instance
     """
+    warnings.warn('This API function will be removed in django CMS 4. For publishing functionality use a package '
+                  'that adds publishing, such as: djangocms-versioning.',
+                  UserWarning, stacklevel=2)
+
     if page:
         if page.publisher_is_draft:
             return page
@@ -485,7 +491,7 @@ def copy_plugins_to_language(page, source_language, target_language,
     Copy the plugins to another language in the same page for all the page
     placeholders.
 
-    By default plugins are copied only if placeholder has no plugin for the
+    By default, plugins are copied only if placeholder has no plugin for the
     target language; use ``only_empty=False`` to change this.
 
     .. warning: This function skips permissions checks

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
@@ -6,8 +5,8 @@ from django.forms.models import ModelForm
 from django.template import TemplateSyntaxError
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils.encoding import smart_text
-from django.utils.translation import ugettext as _
+from django.utils.encoding import smart_str
+from django.utils.translation import gettext as _
 
 from cms.api import create_page, publish_page
 from cms.cms_wizards import CMSPageWizard
@@ -17,10 +16,9 @@ from cms.models import Page, PageType, UserSettings
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.wizards.forms import step2_form_factory, WizardStep2BaseForm
+from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
 from cms.wizards.wizard_base import Wizard
-from cms.wizards.wizard_pool import wizard_pool, AlreadyRegisteredException
-
+from cms.wizards.wizard_pool import AlreadyRegisteredException, wizard_pool
 
 CreateCMSPageForm = step2_form_factory(
     mixin_cls=WizardStep2BaseForm,
@@ -48,7 +46,7 @@ class BadModelForm(ModelForm):
         pass
 
 
-class WizardTestMixin(object):
+class WizardTestMixin:
     page_wizard = None
     title_wizard = None
 
@@ -121,7 +119,7 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             title="Sample Page",
             template=TEMPLATE_INHERITANCE_MAGIC,
             language="en",
-            created_by=smart_text(user),
+            created_by=smart_str(user),
             parent=None,
             in_navigation=True,
             published=False
@@ -192,7 +190,7 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         wizard_pool.register(self.page_wizard)
         wizard_pool.register(self.user_settings_wizard)
         wizards = [self.page_wizard, self.user_settings_wizard]
-        wizards = sorted(wizards, key=lambda e: getattr(e, 'weight'))
+        wizards = sorted(wizards, key=lambda e: e.weight)
         entries = wizard_pool.get_entries()
         self.assertSequencesEqual(entries, wizards)
 
@@ -200,7 +198,7 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         wizard_pool.register(self.user_settings_wizard)
         wizard_pool.register(self.page_wizard)
         wizards = [self.page_wizard, self.user_settings_wizard]
-        wizards = sorted(wizards, key=lambda e: getattr(e, 'weight'))
+        wizards = sorted(wizards, key=lambda e: e.weight)
         entries = wizard_pool.get_entries()
         self.assertSequencesEqual(entries, wizards)
 

@@ -1,16 +1,15 @@
-# -*- coding: utf-8 -*-
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
-from django.forms.fields import EMPTY_VALUES
-from django.utils.translation import ugettext_lazy as _
+from django.core.validators import EMPTY_VALUES
+from django.utils.translation import gettext_lazy as _
 
-from cms.forms.utils import get_site_choices, get_page_choices
-from cms.forms.validators import validate_url
+from cms.forms.utils import get_page_choices, get_site_choices
+from cms.forms.validators import validate_url_extra
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
 
 
-class SuperLazyIterator(object):
+class SuperLazyIterator:
     def __init__(self, func):
         self.func = func
 
@@ -29,11 +28,11 @@ class LazyChoiceField(forms.ChoiceField):
 class PageSelectFormField(forms.MultiValueField):
     widget = PageSelectWidget
     default_error_messages = {
-        'invalid_site': _(u'Select a valid site'),
-        'invalid_page': _(u'Select a valid page'),
+        'invalid_site': _('Select a valid site'),
+        'invalid_page': _('Select a valid page'),
     }
 
-    def __init__(self, queryset=None, empty_label=u"---------", cache_choices=False,
+    def __init__(self, queryset=None, empty_label="---------", cache_choices=False,
                  required=True, widget=None, to_field_name=None, limit_choices_to=None,
                   *args, **kwargs):
         errors = self.default_error_messages.copy()
@@ -43,11 +42,12 @@ class PageSelectFormField(forms.MultiValueField):
         page_choices = SuperLazyIterator(get_page_choices)
         self.limit_choices_to = limit_choices_to
         kwargs['required'] = required
+        kwargs.pop('blank', None)
         fields = (
             LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
             LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
-        super(PageSelectFormField, self).__init__(fields, *args, **kwargs)
+        super().__init__(fields, *args, **kwargs)
 
     def compress(self, data_list):
         if data_list:
@@ -71,7 +71,7 @@ class PageSelectFormField(forms.MultiValueField):
             # this will cause django to always return True because of the '1'
             # so we simply follow django's default behavior when initial is None and data is "empty"
             data = ['' for x in range(0, len(data))]
-        return super(PageSelectFormField, self).has_changed(initial, data)
+        return super().has_changed(initial, data)
 
     def _has_changed(self, initial, data):
         return self.has_changed(initial, data)
@@ -79,20 +79,20 @@ class PageSelectFormField(forms.MultiValueField):
 
 class PageSmartLinkField(forms.CharField):
     widget = PageSmartLinkWidget
-    default_validators = [validate_url]
+    default_validators = [validate_url_extra]
 
     def __init__(self, max_length=None, min_length=None, placeholder_text=None,
                  ajax_view=None, *args, **kwargs):
         self.placeholder_text = placeholder_text
         widget = self.widget(ajax_view=ajax_view)
-        super(PageSmartLinkField, self).__init__(max_length=max_length, min_length=min_length,
+        super().__init__(max_length=max_length, min_length=min_length,
                                                  widget=widget, *args, **kwargs)
 
     def widget_attrs(self, widget):
-        attrs = super(PageSmartLinkField, self).widget_attrs(widget)
+        attrs = super().widget_attrs(widget)
         attrs.update({'placeholder_text': self.placeholder_text})
         return attrs
 
     def clean(self, value):
         value = self.to_python(value).strip()
-        return super(PageSmartLinkField, self).clean(value)
+        return super().clean(value)

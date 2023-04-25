@@ -1,12 +1,11 @@
-# -*- coding: utf-8 -*-
-from copy import deepcopy
 from collections import defaultdict
+from copy import deepcopy
+from functools import lru_cache
 from itertools import groupby, starmap
 from operator import attrgetter, itemgetter
 
-from django.utils.encoding import force_text
-from django.utils.lru_cache import lru_cache
-from django.utils.translation import ugettext as _
+from django.utils.encoding import force_str
+from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
 from cms.models.pluginmodel import CMSPlugin
@@ -33,7 +32,7 @@ def get_plugins(request, placeholder, template, lang=None):
         return []
     if not hasattr(placeholder, '_plugins_cache'):
         assign_plugins(request, [placeholder], template, lang)
-    return getattr(placeholder, '_plugins_cache')
+    return placeholder._plugins_cache
 
 
 def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=False):
@@ -52,10 +51,11 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     fallbacks = defaultdict(list)
     # If no plugin is present in the current placeholder we loop in the fallback languages
     # and get the first available set of plugins
-    if (not is_fallback and
-        not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active)):
-        disjoint_placeholders = (ph for ph in placeholders
-                                 if all(ph.pk != p.placeholder_id for p in plugins))
+    if not is_fallback and not (hasattr(request, 'toolbar') and request.toolbar.edit_mode_active):
+        disjoint_placeholders = (
+            ph for ph in placeholders
+            if all(ph.pk != p.placeholder_id for p in plugins)
+        )
         for placeholder in disjoint_placeholders:
             if get_placeholder_conf("language_fallback", placeholder.slot, template, True):
                 for fallback_language in get_fallback_languages(lang):
@@ -72,7 +72,7 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     plugins = downcast_plugins(plugins, non_fallback_phs, request=request)
     # split the plugins up by placeholder
     # Plugins should still be sorted by placeholder
-    plugin_groups = dict((key, list(plugins)) for key, plugins in groupby(plugins, attrgetter('placeholder_id')))
+    plugin_groups = {key: list(plugins) for key, plugins in groupby(plugins, attrgetter('placeholder_id'))}
     all_plugins_groups = plugin_groups.copy()
     for group in plugin_groups:
         plugin_groups[group] = build_plugin_tree(plugin_groups[group])
@@ -80,9 +80,9 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
     groups.update(plugin_groups)
     for placeholder in placeholders:
         # This is all the plugins.
-        setattr(placeholder, '_all_plugins_cache', all_plugins_groups.get(placeholder.pk, []))
+        placeholder._all_plugins_cache = all_plugins_groups.get(placeholder.pk, [])
         # This one is only the root plugins.
-        setattr(placeholder, '_plugins_cache', groups.get(placeholder.pk, []))
+        placeholder._plugins_cache = groups.get(placeholder.pk, [])
 
 
 def create_default_plugins(request, placeholders, template, lang):
@@ -95,7 +95,7 @@ def create_default_plugins(request, placeholders, template, lang):
 
     def _create_default_plugins(placeholder, confs, parent=None):
         """
-        Auxillary function that builds all of a placeholder's default plugins
+        Auxiliary function that builds all of a placeholder's default plugins
         at the current level and drives the recursion down the tree.
         Returns the plugins at the current level along with all descendants.
         """
@@ -195,6 +195,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None, root_plugin
             new_plugin = deepcopy(source_plugin)
             new_plugin.pk = None
             new_plugin.id = None
+            new_plugin._state.adding = True
             new_plugin.language = language or new_plugin.language
             new_plugin.placeholder = placeholder
             new_plugin.parent = parent
@@ -281,7 +282,7 @@ def downcast_plugins(plugins,
 
         # put them in a map so we can replace the base CMSPlugins with their
         # downcasted versions
-        for instance in plugin_qs.iterator():
+        for instance in plugin_qs.all():
             placeholder = placeholders_by_id.get(instance.placeholder_id)
 
             if placeholder:
@@ -330,7 +331,7 @@ def reorder_plugins(placeholder, parent_id, language, order=None):
     return plugins
 
 
-def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
+def has_reached_plugin_limit(placeholder, plugin_type, language, template=None, parent_plugin=None):
     """
     Checks if placeholder has reached it's global plugin limit,
     if not then it checks if it has reached it's plugin_type limit.
@@ -352,8 +353,12 @@ def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
                 .count()
             )
             if type_count >= type_limit:
-                plugin_name = force_text(plugin_pool.get_plugin(plugin_type).name)
+                plugin_name = force_str(plugin_pool.get_plugin(plugin_type).name)
                 raise PluginLimitReached(_(
                     "This placeholder already has the maximum number (%(limit)s) of allowed %(plugin_name)s plugins.") \
                                          % {'limit': type_limit, 'plugin_name': plugin_name})
+        global_children_limit = limits.get("global_children")
+        children_count = placeholder.get_child_plugins(language=language).count()
+        if not parent_plugin and global_children_limit and children_count >= global_children_limit:
+            raise PluginLimitReached(_("This placeholder already has the maximum number of child plugins (%s)." % children_count))
     return False

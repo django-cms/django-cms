@@ -1,23 +1,22 @@
-# -*- coding: utf-8 -*-
 from copy import deepcopy
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
+from django.test.utils import isolate_apps
+from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
 from cms.api import add_plugin
-from cms.models.pluginmodel import CMSPlugin
 from cms.models.placeholdermodel import Placeholder
-from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+from cms.models.pluginmodel import CMSPlugin
 from cms.test_utils.project.extensionapp.models import MyPageExtension
-from cms.utils.check import FileOutputWrapper, check, FileSectionWrapper
-
-from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import ArticlePluginModel
+from cms.utils.check import FileOutputWrapper, FileSectionWrapper, check
 
 
 class TestOutput(FileOutputWrapper):
     def __init__(self):
-        super(TestOutput, self).__init__(None, None)
+        super().__init__(None, None)
         self.section_wrapper = TestSectionOutput
 
     def write(self, message):
@@ -35,7 +34,7 @@ class TestSectionOutput(FileSectionWrapper):
         pass
 
 
-class CheckAssertMixin(object):
+class CheckAssertMixin:
     def assertCheck(self, successful, **assertions):
         """
         asserts that checks are successful or not
@@ -45,7 +44,7 @@ class CheckAssertMixin(object):
         check(output)
         self.assertEqual(output.successful, successful)
         for key, value in assertions.items():
-            self.assertEqual(getattr(output, key), value, "%s %s expected, got %s" % (value, key, getattr(output, key)))
+            self.assertEqual(getattr(output, key), value, f"{value} {key} expected, got {getattr(output, key)}")
 
 
 class CheckTests(CheckAssertMixin, TestCase):
@@ -117,6 +116,20 @@ class CheckTests(CheckAssertMixin, TestCase):
         self.assertCheck(True, warnings=0, errors=0)
         with self.settings(SITE_ID='broken'):
             self.assertCheck(False, warnings=0, errors=1)
+
+    @isolate_apps("test_app")
+    def test_placeholder_field(self):
+        from django.contrib import admin
+        from django.db import models
+
+        from cms.models.fields import PlaceholderField
+
+        class ModelTest(models.Model):
+            field_a = PlaceholderField(slotname="test")
+
+        admin.site.register(ModelTest)
+        self.assertCheck(False, warnings=0, errors=1)
+        admin.site.unregister(ModelTest)
 
 
 class CheckWithDatabaseTests(CheckAssertMixin, TestCase):

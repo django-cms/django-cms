@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-from django.contrib.auth.models import (AbstractBaseUser, BaseUserManager,
-                                        PermissionsMixin)
+from urllib.parse import quote
+
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.core.mail import send_mail
 from django.db import models
-from django.utils.http import urlquote
 from django.utils import timezone
 
 
@@ -92,13 +91,13 @@ class AbstractEmailUser(AbstractBaseUser, PermissionsMixin):
         abstract = True
 
     def get_absolute_url(self):
-        return "/users/%s/" % urlquote(self.pk)
+        return "/users/%s/" % quote(self.pk)
 
     def get_full_name(self):
         """
         Returns the first_name plus the last_name, with a space in between.
         """
-        full_name = '%s %s' % (self.first_name, self.last_name)
+        full_name = f'{self.first_name} {self.last_name}'
         return full_name.strip()
 
     def get_short_name(self):

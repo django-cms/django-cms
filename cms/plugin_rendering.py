@@ -1,11 +1,7 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 from collections import OrderedDict
-
 from functools import partial
 
 from classytags.utils import flatten_context
-
 from django.contrib.sites.models import Site
 from django.template import Context
 from django.utils.functional import cached_property
@@ -13,11 +9,7 @@ from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
-from cms.toolbar.utils import (
-    get_placeholder_toolbar_js,
-    get_plugin_toolbar_js,
-    get_toolbar_from_request,
-)
+from cms.toolbar.utils import get_placeholder_toolbar_js, get_plugin_toolbar_js, get_toolbar_from_request
 from cms.utils import get_language_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import has_plugin_permission
@@ -36,7 +28,7 @@ def _unpack_plugins(parent_plugin):
     return found_plugins
 
 
-class RenderedPlaceholder(object):
+class RenderedPlaceholder:
     __slots__ = (
         'language',
         'site_id',
@@ -68,7 +60,7 @@ class RenderedPlaceholder(object):
         return hash(self.placeholder)
 
 
-class BaseRenderer(object):
+class BaseRenderer:
 
     load_structure = False
     placeholder_edit_template = ''
@@ -145,7 +137,7 @@ class BaseRenderer(object):
     def get_plugin_class(self, plugin):
         plugin_type = plugin.plugin_type
 
-        if not plugin_type in self._cached_plugin_classes:
+        if plugin_type not in self._cached_plugin_classes:
             self._cached_plugin_classes[plugin_type] = self.plugin_pool.get_plugin(plugin_type)
         return self._cached_plugin_classes[plugin_type]
 
@@ -194,7 +186,7 @@ class ContentRenderer(BaseRenderer):
     )
 
     def __init__(self, request):
-        super(ContentRenderer, self).__init__(request)
+        super().__init__(request)
         self._placeholders_are_editable = bool(self.toolbar.edit_mode_active)
 
     def placeholder_cache_is_enabled(self):
@@ -344,16 +336,15 @@ class ContentRenderer(BaseRenderer):
             )
         parent_page = current_page.parent_page
         should_inherit = (
-            inherit
-            and not content and parent_page
+            inherit and not content and parent_page
             # The placeholder cache is primed when the first placeholder
             # is loaded. If the current page's parent is not in there,
             # it means its cache was never primed as it wasn't necessary.
-            and parent_page.pk in placeholder_cache
+            and parent_page.pk in placeholder_cache  # noqa: W503
             # don't display inherited plugins in edit mode, so that the user doesn't
             # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
             # there for possible enhancements
-            and not self.toolbar.edit_mode_active
+            and not self.toolbar.edit_mode_active  # noqa: W503
         )
 
         if should_inherit:
@@ -476,7 +467,7 @@ class ContentRenderer(BaseRenderer):
                 request=self.request,
             )
 
-            if cached_value != None:
+            if cached_value is not None:
                 # None means nothing in the cache
                 # Anything else is a valid value
                 language_cache[placeholder.pk] = cached_value
@@ -514,7 +505,8 @@ class ContentRenderer(BaseRenderer):
             # has not been cached.
             placeholders_to_fetch = [
                 placeholder for placeholder in placeholders
-                if _cached_content(placeholder, self.request_language) == None]
+                if _cached_content(placeholder, self.request_language) is None
+            ]
         else:
             # cache is disabled, prefetch plugins for all
             # placeholders in the page.
@@ -569,7 +561,7 @@ class StructureRenderer(BaseRenderer):
     )
 
     def get_plugins_to_render(self, *args, **kwargs):
-        plugins = super(StructureRenderer, self).get_plugins_to_render(*args, **kwargs)
+        plugins = super().get_plugins_to_render(*args, **kwargs)
 
         for plugin in plugins:
             yield plugin
@@ -655,7 +647,7 @@ class LegacyRenderer(ContentRenderer):
     )
 
     def get_editable_placeholder_context(self, placeholder, page=None):
-        context = super(LegacyRenderer, self).get_editable_placeholder_context(placeholder, page)
+        context = super().get_editable_placeholder_context(placeholder, page)
         context['plugin_menu_js'] = self.get_placeholder_plugin_menu(placeholder, page=page)
         return context
 
@@ -670,7 +662,7 @@ class PluginContext(Context):
 
     def __init__(self, dict_, instance, placeholder, processors=None, current_app=None):
         dict_ = flatten_context(dict_)
-        super(PluginContext, self).__init__(dict_)
+        super().__init__(dict_)
 
         if not processors:
             processors = []

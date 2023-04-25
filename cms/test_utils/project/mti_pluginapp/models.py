@@ -1,11 +1,9 @@
-# -*- coding: utf-8 -*-
-
 from django.db import models
 
 from cms.models import CMSPlugin
 
 
-class SomeParent(object):
+class SomeParent:
     pass
 
 
@@ -42,7 +40,7 @@ class ProxiedAlphaPluginModel(TestPluginAlphaModel):
 class TestPluginBetaModel(TestPluginAlphaModel):
     """
     NOTE: This is the subject of our test. A plugin which inherits from
-    another concrete plugin via MTI or Multi-Table Inheritence.
+    another concrete plugin via MTI or Multi-Table Inheritance.
     """
     beta = models.CharField('name', blank=False, default='test plugin beta', max_length=32)
 

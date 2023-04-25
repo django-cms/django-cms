@@ -1,32 +1,31 @@
-# -*- coding: utf-8 -*-
 import copy
-from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser, Permission, Group
+from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
 from django.template import Template, TemplateSyntaxError
 from django.template.context import Context
 from django.test.utils import override_settings
-from django.utils.translation import activate, override as force_language
-from cms.apphook_pool import apphook_pool
-from menus.base import NavigationNode
-from menus.menu_pool import menu_pool, _build_nodes_inner_for_one_menu
-from menus.models import CacheKey
-from menus.utils import mark_descendants, find_selected, cut_levels
+from django.utils.translation import activate
+from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_title
+from cms.apphook_pool import apphook_pool
 from cms.cms_menus import get_visible_nodes
-from cms.models import Page, ACCESS_PAGE_AND_DESCENDANTS, Title
+from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page, Title
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
+from cms.test_utils.fixtures.menus import ExtendedMenusFixture, MenusFixture, SoftrootFixture, SubMenusFixture
+from cms.test_utils.project.sampleapp.cms_apps import NamespacedApp, SampleApp, SampleApp2
 from cms.test_utils.project.sampleapp.cms_menus import SampleAppMenu, StaticMenu, StaticMenu2
-from cms.test_utils.fixtures.menus import (MenusFixture, SubMenusFixture,
-                                           SoftrootFixture, ExtendedMenusFixture)
-from cms.test_utils.testcases import CMSTestCase, URL_CMS_PAGE_ADD, URL_CMS_PAGE
-from cms.test_utils.util.context_managers import apphooks, LanguageOverride
+from cms.test_utils.testcases import URL_CMS_PAGE, URL_CMS_PAGE_ADD, CMSTestCase
+from cms.test_utils.util.context_managers import LanguageOverride, apphooks
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
+from menus.base import NavigationNode
+from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
+from menus.models import CacheKey
+from menus.utils import cut_levels, find_selected, mark_descendants
 
 
 class BaseMenuTest(CMSTestCase):
@@ -38,14 +37,14 @@ class BaseMenuTest(CMSTestCase):
         node4 = NavigationNode('4', '/4/', 4, 2)
         node5 = NavigationNode('5', '/5/', 5)
         nodes = [node1, node2, node3, node4, node5]
-        tree = _build_nodes_inner_for_one_menu([n for n in nodes], "test")
+        tree = _build_nodes_inner_for_one_menu(list(nodes), "test")
         request = self.get_request(path)
         renderer = menu_pool.get_renderer(request)
         renderer.apply_modifiers(tree, request)
         return tree, nodes
 
     def setUp(self):
-        super(BaseMenuTest, self).setUp()
+        super().setUp()
         if not menu_pool.discovered:
             menu_pool.discover_menus()
         self.old_menu = menu_pool.menus
@@ -55,7 +54,7 @@ class BaseMenuTest(CMSTestCase):
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
-        super(BaseMenuTest, self).tearDown()
+        super().tearDown()
 
     def get_page(self, num):
         return Page.objects.public().get(title_set__title='P%s' % num)
@@ -64,7 +63,7 @@ class BaseMenuTest(CMSTestCase):
 class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
     def setUp(self):
-        super(MenuDiscoveryTest, self).setUp()
+        super().setUp()
         menu_pool.discovered = False
         self.old_menu = menu_pool.menus
         menu_pool.menus = {}
@@ -75,7 +74,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
 
     def tearDown(self):
         menu_pool.menus = self.old_menu
-        super(MenuDiscoveryTest, self).tearDown()
+        super().tearDown()
 
     def test_menu_registered(self):
         menu_pool.discovered = False
@@ -164,7 +163,7 @@ class MenuDiscoveryTest(ExtendedMenusFixture, CMSTestCase):
                 # (which is not) and checks the key name for the StaticMenu instances
                 static_menus = 2
                 static_menus_2 = 1
-                for key, menu in menus.items():
+                for key, _menu in menus.items():
                     if key.startswith('StaticMenu:'):
                         static_menus -= 1
                         self.assertTrue(key.endswith(str(page.get_public_object().pk)) or key.endswith(str(page.get_draft_object().pk)))
@@ -503,6 +502,28 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         self.assertEqual(CacheKey.objects.count(), 1)
         tpl.render(context)
         self.assertEqual(CacheKey.objects.count(), 1)
+
+    def test_menu_nodes_request_page_takes_precedence(self):
+        """
+        Tests a condition where the user requests a draft page
+        but the page object on the request is a public page.
+        This can happen when the user has no permissions to edit
+        the requested draft page.
+        """
+        public_page = self.get_page(1)
+        draft_page = public_page.publisher_public
+        edit_on_path = draft_page.get_absolute_url() + '?%s' % get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
+
+        with self.login_user_context(self.get_superuser()):
+            context = self.get_context(path=edit_on_path, page=public_page)
+            context['request'].session['cms_edit'] = True
+            Template("{% load menu_tags %}{% show_menu %}").render(context)
+        # All nodes should be public nodes because the request page is public
+        nodes = list(context['children'])
+        node_ids = [node.id for node in nodes]
+        page_count = Page.objects.public().filter(pk__in=node_ids).count()
+        self.assertEqual(len(node_ids), page_count, msg='Not all pages in the public menu are public')
+        self.assertEqual(nodes[0].selected, True)
 
     def test_menu_cache_draft_only(self):
         # Tests that the cms uses a separate cache for draft & live
@@ -946,7 +967,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
 class MenuTests(BaseMenuTest):
 
     def test_build_nodes_inner_for_worst_case_menu(self):
-        '''
+        """
             Tests the worst case scenario
 
             node5
@@ -954,7 +975,7 @@ class MenuTests(BaseMenuTest):
               node3
                node2
                 node1
-        '''
+        """
         node1 = NavigationNode('Test1', '/test1/', 1, 2)
         node2 = NavigationNode('Test2', '/test2/', 2, 3)
         node3 = NavigationNode('Test3', '/test3/', 3, 4)
@@ -981,26 +1002,26 @@ class MenuTests(BaseMenuTest):
         self.assertEqual(node5.children, [node4])
 
     def test_build_nodes_inner_for_circular_menu(self):
-        '''
+        """
         TODO:
             To properly handle this test we need to have a circular dependency
             detection system.
             Go nuts implementing it :)
-        '''
+        """
         pass
 
     def test_build_nodes_inner_for_broken_menu(self):
-        '''
+        """
             Tests a broken menu tree (non-existing parent)
 
             node5
              node4
               node3
 
-            <non-existant>
+            <non-existent>
              node2
               node1
-        '''
+        """
         node1 = NavigationNode('Test1', '/test1/', 1, 2)
         node2 = NavigationNode('Test2', '/test2/', 2, 12)
         node3 = NavigationNode('Test3', '/test3/', 3, 4)
@@ -1267,6 +1288,7 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
     def tearDown(self):
         Page.objects.all().delete()
         menu_pool.clear(all=True)
+        super().tearDown()
 
     def get_page(self, name):
         return Page.objects.public().get(title_set__slug=name)
@@ -1277,13 +1299,13 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
 
         This is recursive over the tree
         """
-        msg = '%r != %r with %r, %r' % (len(a), len(b), a, b)
+        msg = f'{len(a)!r} != {len(b)!r} with {a!r}, {b!r}'
         self.assertEqual(len(a), len(b), msg)
         for n1, n2 in zip(a, b):
             for attr in attrs:
                 a1 = getattr(n1, attr)
                 a2 = getattr(n2, attr)
-                msg = '%r != %r with %r, %r (%s)' % (a1, a2, n1, n2, attr)
+                msg = f'{a1!r} != {a2!r} with {n1!r}, {n2!r} ({attr})'
                 self.assertEqual(a1, a2, msg)
             self.assertTreeQuality(n1.children, n2.children)
 
@@ -1450,17 +1472,25 @@ class ShowMenuBelowIdTests(BaseMenuTest):
         A
         |-B
           |-C
-          \-D (not in nav)
+          |-D (not in nav)
     """
     def test_not_in_navigation(self):
-        a = create_page('A', 'nav_playground.html', 'en', published=True,
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', parent=b,
-                        published=True, in_navigation=True)
-        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
-                    published=True, in_navigation=False)
+        a = create_page(
+            'A', 'nav_playground.html', 'en',
+            published=True, in_navigation=True, reverse_id='a'
+        )
+        b = create_page(
+            'B', 'nav_playground.html', 'en',
+            parent=a, published=True, in_navigation=True
+        )
+        c = create_page(
+            'C', 'nav_playground.html', 'en',
+            parent=b, published=True, in_navigation=True
+        )
+        create_page(
+            'D', 'nav_playground.html', 'en',
+            parent=self.reload(b), published=True, in_navigation=False
+        )
         context = self.get_context(a.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
         tpl.render(context)
@@ -1586,16 +1616,24 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             A
             |-B
               |-C
-              \-D (not in nav)
+              |-D (not in nav)
         """
-        a = create_page('A', 'nav_playground.html', 'en', published=True,
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                        published=True, in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', parent=b,
-                        published=True, in_navigation=True)
-        create_page('D', 'nav_playground.html', 'en', parent=self.reload(b),
-                    published=True, in_navigation=False)
+        a = create_page(
+            'A', 'nav_playground.html', 'en',
+            published=True, in_navigation=True, reverse_id='a'
+        )
+        b = create_page(
+            'B', 'nav_playground.html', 'en',
+            parent=a, published=True, in_navigation=True
+        )
+        c = create_page(
+            'C', 'nav_playground.html', 'en',
+            parent=b, published=True, in_navigation=True
+        )
+        create_page(
+            'D', 'nav_playground.html', 'en',
+            parent=self.reload(b), published=True, in_navigation=False
+        )
 
         with LanguageOverride('en'):
             context = self.get_context(a.get_absolute_url())
@@ -1611,6 +1649,7 @@ class ShowMenuBelowIdTests(BaseMenuTest):
                 # Actually seems to run:
                 tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' 0 100 100 100 %}")
                 tpl.render(context)
+
             nodes = context['children']
             self.assertEqual(len(nodes), 1, nodes)
             node = nodes[0]
@@ -1630,12 +1669,18 @@ class ShowMenuBelowIdTests(BaseMenuTest):
             |-B
             C (soft_root)
         """
-        a = create_page('A', 'nav_playground.html', 'en', published=True,
-                        in_navigation=True, reverse_id='a')
-        b = create_page('B', 'nav_playground.html', 'en', parent=a,
-                       published=True, in_navigation=True)
-        c = create_page('C', 'nav_playground.html', 'en', published=True,
-                        in_navigation=True, soft_root=True)
+        a = create_page(
+            'A', 'nav_playground.html', 'en',
+            published=True, in_navigation=True, reverse_id='a'
+        )
+        b = create_page(
+            'B', 'nav_playground.html', 'en',
+            parent=a, published=True, in_navigation=True
+        )
+        c = create_page(
+            'C', 'nav_playground.html', 'en',
+            published=True, in_navigation=True, soft_root=True
+        )
         context = self.get_context(a.get_absolute_url())
         tpl = Template("{% load menu_tags %}{% show_menu_below_id 'a' %}")
         tpl.render(context)
@@ -1811,24 +1856,26 @@ class PublicViewPermissionMenuTests(CMSTestCase):
         B1     B2
         C1 C2  C3 C4
         """
-        l = 'nav_playground.html'
-        kw = dict(published=True, in_navigation=True)
-        a = create_page('a', l, 'en', **kw)
-        b1 = create_page('b1', l, 'en', parent=a, **kw)
-        b2 = create_page('b2', l, 'en', parent=a, **kw)
-        c1 = create_page('c1', l, 'en', parent=b1, **kw)
-        c2 = create_page('c2', l, 'en', parent=b1, **kw)
-        c3 = create_page('c3', l, 'en', parent=b2, **kw)
-        c4 = create_page('c4', l, 'en', parent=b2, **kw)
+        template = 'nav_playground.html'
+        kw = {"published": True, "in_navigation": True}
+        a = create_page('a', template, 'en', **kw)
+        b1 = create_page('b1', template, 'en', parent=a, **kw)
+        b2 = create_page('b2', template, 'en', parent=a, **kw)
+        c1 = create_page('c1', template, 'en', parent=b1, **kw)
+        c2 = create_page('c2', template, 'en', parent=b1, **kw)
+        c3 = create_page('c3', template, 'en', parent=b2, **kw)
+        c4 = create_page('c4', template, 'en', parent=b2, **kw)
         self.pages = [a, b1, c1, c2, b2, c3, c4] # tree order
         self.site = get_current_site()
 
         self.user = self._create_user("standard", is_staff=False, is_superuser=False)
         self.other = self._create_user("other", is_staff=False, is_superuser=False)
-        PagePermission.objects.create(page=b1, user=self.user, can_view=True,
-                                      grant_on=ACCESS_PAGE_AND_DESCENDANTS)
-        PagePermission.objects.create(page=b2, user=self.other, can_view=True,
-                                      grant_on=ACCESS_PAGE_AND_DESCENDANTS)
+        PagePermission.objects.create(
+            page=b1, user=self.user, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS
+        )
+        PagePermission.objects.create(
+            page=b2, user=self.other, can_view=True, grant_on=ACCESS_PAGE_AND_DESCENDANTS
+        )
         attrs = {
             'user': self.user,
             'REQUEST': {},

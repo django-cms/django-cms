@@ -3,7 +3,8 @@ from django.shortcuts import render
 from django.template import RequestContext
 from django.template.engine import Engine
 from django.views.generic import DetailView
-from cms.test_utils.project.placeholderapp.models import Example1, CharPksExample
+
+from cms.test_utils.project.placeholderapp.models import CharPksExample, Example1
 
 
 def example_view(request):
@@ -69,9 +70,9 @@ class ClassDetail(DetailView):
             template = engine.from_string(self.template_string)
             return HttpResponse(template.render(context))
         else:
-            return super(ClassDetail, self).render_to_response(context, **response_kwargs)
+            return super().render_to_response(context, **response_kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(ClassDetail, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['instance_class'] = self.model
         return context

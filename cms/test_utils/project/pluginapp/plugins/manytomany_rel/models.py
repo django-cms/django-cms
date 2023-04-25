@@ -1,19 +1,16 @@
 from django.db import models
-from django.utils.encoding import python_2_unicode_compatible
 
 from cms.models import CMSPlugin
 
 
-@python_2_unicode_compatible
 class Article(models.Model):
     title = models.CharField(max_length=50)
     section = models.ForeignKey('Section', on_delete=models.CASCADE)
 
     def __str__(self):
-        return u"%s -- %s" % (self.title, self.section)
+        return "%s -- %s" % (self.title, self.section)
 
 
-@python_2_unicode_compatible
 class Section(models.Model):
     name = models.CharField(max_length=50)
 
@@ -21,7 +18,6 @@ class Section(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class ArticlePluginModel(CMSPlugin):
     title = models.CharField(max_length=50)
     sections = models.ManyToManyField('Section')

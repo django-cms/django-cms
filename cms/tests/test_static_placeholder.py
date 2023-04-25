@@ -1,12 +1,10 @@
-# -*- coding: utf-8 -*-
 
 from django.contrib.admin.sites import site
 from django.template import Context
 from django.template.base import Template
-from django.utils import six
 
 from cms.api import add_plugin
-from cms.models import StaticPlaceholder, Placeholder, UserSettings
+from cms.models import Placeholder, StaticPlaceholder, UserSettings
 from cms.tests.test_plugins import PluginsTestBaseCase
 from cms.utils.urlutils import admin_reverse
 
@@ -18,13 +16,14 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
 
     def fill_placeholder(self, placeholder=None):
         if placeholder is None:
-            placeholder = Placeholder(slot=u"some_slot")
+            placeholder = Placeholder(slot="some_slot")
             placeholder.save()  # a good idea, if not strictly necessary
 
 
         # plugin in placeholder
-        plugin_1 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"01",
+        plugin_1 = add_plugin(
+            placeholder, "TextPlugin", "en",
+            body="01",
         )
         plugin_1.save()
 
@@ -33,8 +32,9 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         # properly.
 
         # child of plugin_1
-        plugin_2 = add_plugin(placeholder, u"TextPlugin", u"en",
-                              body=u"02",
+        plugin_2 = add_plugin(
+            placeholder, "TextPlugin", "en",
+            body="02",
         )
         plugin_1 = self.reload(plugin_1)
         plugin_2.parent = plugin_1
@@ -178,4 +178,4 @@ class StaticPlaceholderTestCase(PluginsTestBaseCase):
         without_code = StaticPlaceholder.objects.create(site_id=1)
 
         self.assertEqual(without_name.get_name(), without_name.code)
-        self.assertEqual(without_code.get_name(), six.text_type(without_code.pk))
+        self.assertEqual(without_code.get_name(), str(without_code.pk))

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
@@ -9,17 +8,11 @@ from cms.api import get_page_draft
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyTitle
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import (
-    get_fallback_languages,
-    get_public_languages,
-    hide_untranslated,
-    is_valid_site_language,
-)
-from cms.utils.permissions import get_view_restrictions
+from cms.utils.i18n import get_fallback_languages, get_public_languages, hide_untranslated, is_valid_site_language
 from cms.utils.page import get_page_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
-
-from menus.base import Menu, NavigationNode, Modifier
+from cms.utils.permissions import get_view_restrictions
+from menus.base import Menu, Modifier, NavigationNode
 from menus.menu_pool import menu_pool
 
 
@@ -86,7 +79,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     if fallbacks is None:
         fallbacks = []
 
-    # Theses are simple to port over, since they are not calculated.
+    # These are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
     attr = {
         'is_page': True,
@@ -107,8 +100,8 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     if page.navigation_extenders:
         if page.navigation_extenders in renderer.menus:
             extenders.append(page.navigation_extenders)
-        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in renderer.menus:
-            extenders.append("{0}:{1}".format(page.navigation_extenders, page.pk))
+        elif f"{page.navigation_extenders}:{page.pk}" in renderer.menus:
+            extenders.append(f"{page.navigation_extenders}:{page.pk}")
     # Is this page an apphook? If so, we need to handle the apphooks's nodes
     # Only run this if we have a translation in the requested language for this
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
@@ -124,7 +117,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
         if hasattr(ext, "get_instances"):
             # CMSAttachMenus are treated a bit differently to allow them to be
             # able to be attached to multiple points in the navigation.
-            exts.append("{0}:{1}".format(ext.__name__, page.pk))
+            exts.append(f"{ext.__name__}:{page.pk}")
         elif hasattr(ext, '__name__'):
             exts.append(ext.__name__)
         else:
@@ -161,7 +154,7 @@ class CMSNavigationNode(NavigationNode):
         self.path = kwargs.pop('path')
         # language is only used when we're dealing with a fallback
         self.language = kwargs.pop('language', None)
-        super(CMSNavigationNode, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def is_selected(self, request):
         try:
@@ -265,7 +258,7 @@ class CMSMenu(Menu):
 
             for trans in page.filtered_translations:
                 page.title_cache[trans.language] = trans
-            menu_node =  get_menu_node_for_page(
+            menu_node = get_menu_node_for_page(
                 self.renderer,
                 page,
                 language=lang,
@@ -334,8 +327,7 @@ class NavExtender(Modifier):
 
         # find all not assigned nodes
         for menu in self.renderer.menus.items():
-            if (hasattr(menu[1], 'cms_enabled')
-                    and menu[1].cms_enabled and not menu[0] in exts):
+            if (hasattr(menu[1], 'cms_enabled') and menu[1].cms_enabled and menu[0] not in exts):
                 for node in nodes:
                     if node.namespace == menu[0]:
                         removed.append(node)
@@ -351,6 +343,7 @@ class NavExtender(Modifier):
         for node in removed:
             nodes.remove(node)
         return nodes
+
 
 menu_pool.register_modifier(NavExtender)
 

@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 from django import template
 from django.utils.safestring import mark_safe
 
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.plugins import downcast_plugins, build_plugin_tree
-
+from cms.utils.plugins import build_plugin_tree, downcast_plugins
 
 register = template.Library()
 
@@ -18,7 +16,7 @@ def render_alias_plugin(context, instance):
 
     # In edit mode, content is shown regardless of the source page publish status.
     # In published mode, content is shown only if the source page is published.
-    if not(toolbar.edit_mode_active) and source and source.page:
+    if not toolbar.edit_mode_active and source and source.page:
         # this is bad but showing unpublished content is worse
         can_see_content = source.page.is_published(instance.language)
     else:

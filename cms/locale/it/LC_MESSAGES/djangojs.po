@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # yakky <i.spalletti@nephila.it>, 2015
 # Marco Barberis <mbarberis@gmail.com>, 2011
 # Stefano Brentegani <sbrentegani@gmail.com>, 2013
@@ -14,15 +13,21 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-01-29 08:34+0100\n"
-"PO-Revision-Date: 2018-01-11 16:38+0000\n"
-"Last-Translator: Paulo Alvarado <paulo.alvarado@divio.ch>\n"
+"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"PO-Revision-Date: 2010-11-30 06:49+0000\n"
+"Last-Translator: yakky <i.spalletti@nephila.it>, 2015\n"
 "Language-Team: Italian (http://www.transifex.com/divio/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: it\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
+
+msgid "/"
+msgstr ""
+
+msgid ":"
+msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Vuoi davvero cambiare scheda senza salvare prima la pagina?"
