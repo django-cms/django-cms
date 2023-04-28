@@ -148,7 +148,7 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
             {
                 "url": url or "",
                 "icon": icon,
-                "get": action == "get",
+                "method": action,
                 "disabled": disabled,
                 "keepsideframe": keepsideframe,
                 "title": title,
