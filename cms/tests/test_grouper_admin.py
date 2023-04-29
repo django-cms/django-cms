@@ -79,6 +79,30 @@ class ChangeListActionsTestCase(SetupMixin, CMSTestCase):
                                           f'/change/?language=en"')
             self.assertContains(response, 'class="cms-icon cms-icon-view"')
 
+    def test_get_action(self):
+        admin = site._registry[GrouperModel]
+
+        get_action = admin.admin_action_button(
+            "/some/url",
+            icon="info",
+            title="Info",
+            action="get",
+        )
+        self.assertIn("cms-form-get-method", get_action)
+        self.assertNotIn("cms-form-post-method", get_action)
+
+    def test_post_action(self):
+        admin = site._registry[GrouperModel]
+
+        get_action = admin.admin_action_button(
+            "/some/url",
+            icon="bin",
+            title="Delete",
+            action="post",
+        )
+        self.assertNotIn("cms-form-get-method", get_action)
+        self.assertIn("cms-form-post-method", get_action)
+
 
 class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
     def test_form_class_created(self):
