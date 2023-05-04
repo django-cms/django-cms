@@ -6,8 +6,9 @@ from django.db import transaction
 
 from cms.api import copy_plugins_to_language
 from cms.management.commands.subcommands.base import SubcommandsCommand
-from cms.models import EmptyPageContent, Page, PageContent, StaticPlaceholder
+from cms.models import EmptyPageContent, Page, PageContent, PageUrl, StaticPlaceholder
 from cms.utils import get_language_list
+from cms.utils.page import get_available_slug
 from cms.utils.plugins import copy_plugins_to_placeholder
 
 User = get_user_model()
@@ -71,7 +72,8 @@ class CopyLangCommand(SubcommandsCommand):
         except AssertionError:
             raise CommandError('Both languages have to be present in settings.LANGUAGES and settings.CMS_LANGUAGES')
 
-        for page in Page.objects.on_site(site):
+        # obey node path (tree order) to make sure parent records are created before children (for slug generation)
+        for page in Page.objects.on_site(site).order_by('node__path'):
             # copy title
             if from_lang in page.get_languages():
 
@@ -91,6 +93,26 @@ class CopyLangCommand(SubcommandsCommand):
 
                     if to_lang not in page.get_languages():
                         page.update_languages(page.get_languages() + [to_lang])
+
+                    # copy PageUrls - inspired from pagemodels.Page.copy() - possibly refactorable
+                    page_url = page.urls.get(language=from_lang)
+                    parent_page = page.node.parent.cms_pages.first()
+
+                    new_url = model_to_dict(page_url)
+                    new_url.pop("id", None)  # No PK
+                    new_url["page"] = page
+                    new_url["language"] = to_lang
+
+                    if parent_page:
+                        base = parent_page.get_path(to_lang)
+                        path = '%s/%s' % (base, page_url.slug) if base else page_url.slug
+                    else:
+                        base = ''
+                        path = page_url.slug
+
+                    new_url["slug"] = get_available_slug(site, path, to_lang)
+                    new_url["path"] = '%s/%s' % (base, new_url["slug"]) if base else new_url["slug"]
+                    PageUrl.objects.with_user(user).create(**new_url)
 
                 if copy_content:
                     # copy plugins using API
