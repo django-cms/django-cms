@@ -423,7 +423,7 @@ var Toolbar = new Class({
 
         // set color scheme
         Helpers.setColorScheme (
-            localStorage.getItem('theme') ||'auto'
+            localStorage.getItem('theme') || 'auto'
         );
 
         // check if there are messages and display them

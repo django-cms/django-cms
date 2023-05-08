@@ -535,6 +535,7 @@ export const Helpers = {
             }
         } else {
             // Auto (light) -> Dark -> Light
+            // eslint-disable-next-line no-lonely-if
             if (currentTheme === 'auto') {
                 this.setColorScheme('dark');
             } else if (currentTheme === 'dark') {
