@@ -471,30 +471,18 @@ export const Helpers = {
     },
 
     /**
-     * Get color scheme either from :root[data-color-scheme] or user system setting
+     * Get color scheme either from :root[data-theme] or user system setting
      *
      * @method get_color_scheme
      * @public
      * @returns {String}
      */
     getColorScheme: function () {
-        let state = $('html').attr('data-color-scheme');
+        let state = $('html').attr('data-theme');
 
         if (!state) {
-            if (!CMS.settings) {
-                // Settings loaded? If not, pls. load.
-                this.getSettings();
-            }
-            state = CMS.settings.color_scheme;
-            if (!state && window.matchMedia) {
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    state = 'dark'; // dark mode
-                } else {
-                    state = 'light';
-                }
-            }
+            state = localStorage.getItem('theme') || 'auto';
         }
-
         return state;
     },
 
@@ -504,34 +492,58 @@ export const Helpers = {
      * @method setColorScheme
      * @public
      * @param scheme {String}
-     * @retiurns {void}
+     * @returns {void}
      */
 
-    setColorScheme: function (scheme) {
+    setColorScheme: function (mode) {
         let body = $('html');
+        let scheme = (mode !== 'light' && mode !== 'dark') ? 'auto' : mode;
 
-        if (!CMS.settings) {
-            // Settings loaded? If not, pls. load.
-            this.getSettings();
-        }
-        CMS.settings.color_scheme = scheme;
-        this.setSettings(CMS.settings);
-        if (scheme === 'auto') {
-            body.removeAttr('data-color-scheme');
-            body.find('div.cms iframe').each(function(i, e) {
-                delete e.contentDocument.documentElement.dataset.colorScheme;
-            });
+        localStorage.setItem('theme', scheme);
+
+        body.attr('data-theme', scheme);
+        body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
+            if (e.contentDocument) {
+                e.contentDocument.documentElement.dataset.theme = scheme;
+                // ckeditor (and potentially other apps) have iframes inside their admin forms
+                // also set color scheme there
+                $(e.contentDocument).find('iframe').each(setFrameColorScheme);
+            }
+        });
+    },
+
+    /**
+     * Cycles the color scheme for the current document and all iframes contained.
+     * Follows the logic introduced in Django's 4.2 admin
+     *
+     * @method setColorScheme
+     * @public}
+     * @returns {void}
+     */
+    toggleColorScheme: function () {
+        const currentTheme = this.getColorScheme();
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (prefersDark) {
+            // Auto (dark) -> Light -> Dark
+            if (currentTheme === 'auto') {
+                this.setColorScheme('light');
+            } else if (currentTheme === 'light') {
+                this.setColorScheme('dark');
+            } else {
+                this.setColorScheme('auto');
+            }
         } else {
-            body.attr('data-color-scheme', scheme);
-            body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
-                if (e.contentDocument) {
-                    e.contentDocument.documentElement.dataset.colorScheme = scheme;
-                    // ckeditor (and potentially other apps) have iframes inside their admin forms
-                    // also set color scheme there
-                    $(e.contentDocument).find('iframe').each(setFrameColorScheme);
-                }
-            });
+            // Auto (light) -> Dark -> Light
+            if (currentTheme === 'auto') {
+                this.setColorScheme('dark');
+            } else if (currentTheme === 'dark') {
+                this.setColorScheme('light');
+            } else {
+                this.setColorScheme('auto');
+            }
         }
+
     }
 };
 

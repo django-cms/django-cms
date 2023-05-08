@@ -421,11 +421,10 @@ var Toolbar = new Class({
             this._debug();
         }
 
-        if (CMS.settings.color_scheme) {
-            Helpers.setColorScheme (CMS.settings.color_scheme);
-        } else if (CMS.config.color_scheme) {
-            Helpers.setColorScheme (CMS.config.color_scheme);
-        }
+        // set color scheme
+        Helpers.setColorScheme (
+            localStorage.getItem('theme') ||'auto'
+        );
 
         // check if there are messages and display them
         if (CMS.config.messages) {
@@ -623,16 +622,7 @@ var Toolbar = new Class({
                 });
                 break;
             case 'color-toggle':
-                switch (Helpers.getColorScheme()) {
-                    case 'light':
-                        Helpers.setColorScheme('dark');
-                        break;
-                    case 'dark':
-                        Helpers.setColorScheme('light');
-                        break;
-                    default:
-                        break;
-                }
+                Helpers.toggleColorScheme();
                 break;
             default:
                 Helpers._getWindow().location.href = el.attr('href');

@@ -7,7 +7,7 @@ $speed-base: 200ms;
 // COLORS
 $white: var(--dca-white);
 $black: var(--dca-black);
-:root, :root[data-color-scheme="light"] {
+:root, :root[data-theme="light"], :root[data-theme="auto"] {
     --dca-light-mode: 1;
     --dca-dark-mode: 0;
     --dca-white: #FFFFFF;
@@ -26,15 +26,15 @@ $black: var(--dca-black);
     --focus-brightness: 0.95;
 }
 
-:root {
+:root, :root[data-them="auto"] {
     color-scheme: dark light;
 }
 
-:root[data-color-scheme="light"] {
+:root[data-theme="light"] {
     color-scheme: light;
 }
 
-:root[data-color-scheme="dark"] {
+:root[data-theme="dark"] {
     color-scheme: dark;
     --dca-light-mode: 0;
     --dca-dark-mode: 1;
@@ -54,7 +54,7 @@ $black: var(--dca-black);
 }
 
 @media (prefers-color-scheme: dark) {
-    :root:not([data-color-scheme]) {
+    :root:not([data-theme]), :root[data-theme="auto"] {
         --dca-light-mode: 0;
         --dca-dark-mode: 1;
         --dca-white: #2A2C2E;
