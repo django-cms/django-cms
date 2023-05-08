@@ -1,0 +1,75 @@
+.. _upgrade-to-3.11.2:
+
+######################
+ release notes 3.11.2
+######################
+
+This release focuses on Django 4.2 support which will be LTS. django CMS version 3.11.x will be supported until the end of life of Django 4.2 estimated for April 2026.
+
+********************
+What's new in 3.11.2
+********************
+
+Features:
+---------
+* add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
+* add setting to redirect slugs to lowercase (#7509) (01aedee9f) -- pajowu
+* add setting so redirect preserves params (#7489) (dcb9c4b3a) -- Ivo Branco
+* add download statistics to readme (#7474) (25b2303f7) -- Fabian Braun
+
+Bug Fixes:
+----------
+* replace ' by ′ in fr translation − no more "page d\u0027accueil"! (#7488) (b4acc9a6b) -- Corentin Bettiol
+* Link both user and group from global page permissions to change form (#7486) (6cb47629b) -- Fabian Braun
+* Build docs always from the current local version (#7472) (#7475) (7aaddd45a) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 21 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Corentin Bettiol (1 pull request)
+* Danny Waser (1 pull request)
+* Fabian Braun (10 pull requests)
+* Ivo Branco (1 pull request)
+* Jasper (1 pull request)
+* Nihal Rahman (1 pull request)
+* Vinit Kumar (3 pull requests)
+* pajowu (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Nihal
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+
+************************
+How to upgrade to
+************************
+
+We assume you are upgrading from django CMS 3.11.1.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Check your settings of `CMS_LANGUAGES` (if used), as it was ignored by default in preceding versions.
+For more information, please see: https://github.com/django-cms/django-cms/pull/6795
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.
