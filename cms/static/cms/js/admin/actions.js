@@ -14,7 +14,7 @@
            .cms-actions-dropdown-menu-item-anchor`)
             .on('click', function(e) {
                 let action = $(e.currentTarget);
-                let formMethod = action.attr('class').indexOf('cms-form-get-method') !== -1 ? 'GET': 'POST';
+                let formMethod = action.attr('class').indexOf('cms-form-post-method') !== -1 ? 'POST': 'GET';
                 let keepSideFrame = action.attr('class').indexOf('js-keep-sideframe') !== -1;
 
                 if (formMethod === 'GET') {

@@ -48,6 +48,8 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
         )
         css = {"all": (static_with_version("cms/css/cms.admin.css"),)}
 
+    EMPTY_ACTION = mark_safe('<span class="cms-empty-action"></span>')
+
     def get_actions_list(
         self,
     ) -> typing.List[typing.Callable[[models.Model, HttpRequest], str]]:
@@ -77,12 +79,11 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
 
         def list_actions(obj: models.Model) -> str:
             """The name of this inner function must not change. css styling and js depends on it."""
-            EMPTY = mark_safe('<span class="cms-empty-action"></span>')
             return format_html_join(
                 "",
                 "{}",
                 (
-                    (action(obj, request) or EMPTY,)
+                    (action(obj, request),)
                     for action in self.get_actions_list()
                 ),
             )
@@ -147,7 +148,7 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
             {
                 "url": url or "",
                 "icon": icon,
-                "action": action,
+                "method": action,
                 "disabled": disabled,
                 "keepsideframe": keepsideframe,
                 "title": title,
@@ -557,7 +558,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 keepsideframe=False,
                 name="view",
             )
-        return ""
+        return self.EMPTY_ACTION
 
     def _get_settings_action(self, obj: models.Model, request: HttpRequest) -> str:
         edit_url = admin_reverse(
