@@ -434,7 +434,6 @@ class Page(models.Model):
             .values_list('language', flat=True)
         )
 
-<<<<<<< HEAD
         for language in languages:
             if not self.is_home:
                 self._update_url_path(language)

@@ -35,7 +35,6 @@ unreleased
 ==================
 
 * Introduced Django 2.2 support.
-=======
 * Removed the ``cms moderator`` command.
 * Dropped Django < 1.11 support.
 * Removed the translatable content get / set methods from ``CMSPlugin`` model.
