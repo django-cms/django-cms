@@ -481,7 +481,7 @@ export const Helpers = {
         let state = $('html').attr('data-theme');
 
         if (!state) {
-            state = localStorage.getItem('theme') || 'auto';
+            state = localStorage.getItem('theme') || CMS.config.color_scheme || 'auto';
         }
         return state;
     },
