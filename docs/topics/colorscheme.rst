@@ -47,7 +47,7 @@ setting in your project's ``setting.py``:
 
 .. versionchanged:: 3.11.4
 
-    Before version 3.11.4 the color scheme was set by ``data-color-scheme``. Since verison 3.11.4 django CMS uses ``data-theme`` just as Django since version 4.2.
+    Before version 3.11.4 the color scheme was set by ``data-color-scheme``. Since version 3.11.4 django CMS uses ``data-theme`` just as Django since version 4.2.
 
 
 .. important::
