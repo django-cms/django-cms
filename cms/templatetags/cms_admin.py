@@ -11,9 +11,10 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, override
 from django.utils.translation import gettext_lazy as _
 
+from cms.models import Page
 from cms.models.contentmodels import PageContent
 from cms.toolbar.utils import get_object_preview_url
-from cms.utils import i18n
+from cms.utils import get_language_from_request, i18n
 from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
@@ -57,6 +58,11 @@ class GetPreviewUrl(AsTag):
     )
 
     def get_value(self, context, page_content):
+        if isinstance(page_content, Page):
+            # Advanced settings wants a preview for a Page object.
+            page_content = page_content.get_content_obj(
+                language=get_language_from_request(context["request"])
+            )
         if not page_content:
             return ""
         return get_object_preview_url(page_content, language=page_content.language)
