@@ -8,7 +8,7 @@ from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language
+from django.utils.translation import get_language, override
 from django.utils.translation import gettext_lazy as _
 
 from cms.models.contentmodels import PageContent
@@ -63,9 +63,9 @@ class GetPreviewUrl(AsTag):
             from django.contrib.contenttypes.models import ContentType
 
             GetPreviewUrl.page_content_type = ContentType.objects.get_for_model(PageContent).pk
-
-        return admin_reverse('cms_placeholder_render_object_preview',
-                             args=[GetPreviewUrl.page_content_type, page_content.pk])
+        with override(page_content.language):
+            return admin_reverse('cms_placeholder_render_object_preview',
+                                 args=[GetPreviewUrl.page_content_type, page_content.pk])
 
 
 register.tag(GetPreviewUrl.name, GetPreviewUrl)
