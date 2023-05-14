@@ -27,7 +27,7 @@ from cms.models import (
     PageUrl,
     Placeholder,
 )
-from cms.templatetags.cms_admin import get_page_display_name
+from cms.templatetags.cms_admin import GetPreviewUrl, get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
@@ -43,6 +43,20 @@ from cms.utils.placeholder import get_placeholders
 
 
 class TemplatetagTests(CMSTestCase):
+
+    def test_get_preview_url(self):
+        """The get_preview_url template tag returns the content preview url for its language:
+        If a page is given, take the current language (en), if a page_content is given,
+        take its language (de for this test)"""
+        page = create_page("page_a", "nav_playground.html", "en")
+        german_content = create_page_content("de", "Seite_a", page)
+
+        page_preview_url = GetPreviewUrl.get_value(None, context={"request": None}, page_content=page)
+        german_content_preview_url = GetPreviewUrl.get_value(None, context={}, page_content=german_content)
+
+        self.assertIn("/en", page_preview_url)
+        self.assertIn("/de/", german_content_preview_url)
+
 
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en")

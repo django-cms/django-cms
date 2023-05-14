@@ -1,6 +1,7 @@
 unreleased
 ==========
 
+* Fixed a bug where menu link is outdated when page moved.
 * Unified icon font with icons for versioning, moderation and version locking
 * Django 4.1 and 4.0 support
 * Python 3.10 support
