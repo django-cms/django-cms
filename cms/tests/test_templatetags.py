@@ -27,7 +27,7 @@ from cms.models import (
     PageUrl,
     Placeholder,
 )
-from cms.templatetags.cms_admin import get_page_display_name, GetPreviewUrl
+from cms.templatetags.cms_admin import GetPreviewUrl, get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
