@@ -12,6 +12,7 @@ from django.utils.translation import get_language, override
 from django.utils.translation import gettext_lazy as _
 
 from cms.models.contentmodels import PageContent
+from cms.toolbar.utils import get_object_preview_url
 from cms.utils import i18n
 from cms.utils.urlutils import admin_reverse
 
@@ -58,14 +59,7 @@ class GetPreviewUrl(AsTag):
     def get_value(self, context, page_content):
         if not page_content:
             return ""
-        if GetPreviewUrl.page_content_type is None:
-            # Use class as cache
-            from django.contrib.contenttypes.models import ContentType
-
-            GetPreviewUrl.page_content_type = ContentType.objects.get_for_model(PageContent).pk
-        with override(page_content.language):
-            return admin_reverse('cms_placeholder_render_object_preview',
-                                 args=[GetPreviewUrl.page_content_type, page_content.pk])
+        return get_object_preview_url(page_content, language=page_content.language)
 
 
 register.tag(GetPreviewUrl.name, GetPreviewUrl)
