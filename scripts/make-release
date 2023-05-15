@@ -162,18 +162,7 @@ if ! git branch -a | grep -q "remotes/origin/${BRANCH}\$"; then
     git checkout -b "${BRANCH}"
 else
     echo "You appear to already have a ${BRANCH} created, using it"
-    status "git checkout ${BRANCH}"
     git checkout "${BRANCH}"
-
-    status "git merge origin/${base_branch}"
-    if ! git merge --no-edit --commit origin/${base_branch}; then
-        git merge --abort || true
-        error "##################################################################"
-        error "Cannot automatically merge ${base_branch} into ${BRANCH}."
-        error "Please merge manually, resolving any conflicts"
-        error "##################################################################"
-        exit 1
-    fi
 fi
 
 # cleaning on the branch
