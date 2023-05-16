@@ -438,7 +438,7 @@ class Page(models.Model):
             if not self.is_home:
                 self._update_url_path(language)
             self._update_url_path_recursive(language)
-        self.clear_cache()
+        self.clear_cache(menu=True)
         return self
 
     def _clear_placeholders(self, language):
@@ -921,7 +921,7 @@ class Page(models.Model):
         for page_content in cached_page_content:
             self.page_content_cache[page_content.language] = page_content
 
-        # Reload if explicitly needed or language not in title cache
+        # Reload if explicitly needed or language not in content cache
         if force_reload or language not in self.page_content_cache:
             for page_content in self.pagecontent_set.all():
                 self.page_content_cache[page_content.language] = page_content
