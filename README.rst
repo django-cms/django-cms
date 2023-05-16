@@ -1,8 +1,6 @@
 ##########
 django CMS
 ##########
-.. image:: https://travis-ci.org/django-cms/django-cms.svg?branch=develop
-    :target: https://travis-ci.org/django-cms/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/badge/wheel-yes-green.svg

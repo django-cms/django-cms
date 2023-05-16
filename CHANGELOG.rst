@@ -1,17 +1,51 @@
-unreleased
-==========
+Features:
+---------
 
-* Fixed a bug where menu link is outdated when page moved.
+* Fixed a bug where menu link is outdated when page moved (#7558)
+* Fixed a bug where the preview button lead to the wrong languge (#7558)
+* Graceful plugin exceptions (#7423)
+* Reintroduce indicator menus (#7426)
+* Add release scripts for develop-4 branch (#7466)
+* Icon update (#7494)
+* Add setting to redirect slugs to lowercase et al. (#7510)
+* Grouper model admin class
+* Change `TitleExtension` to `PageContentExtension` (#7369)
+* Optimize populating page content cache for Page model. (#7177)
 * Unified icon font with icons for versioning, moderation and version locking
-* Django 4.1 and 4.0 support
-* Python 3.10 support
+* Django 4.2, 4.1 and 4.0 support
+* Python 3.11, 3.10 support
+* Remove patching of PageContent by djangocms-versioning (#7446)
+* Utility function get_placeholder_from_slot for PlaceholderRelationField (#7479)
+
+Bug Fixes:
+----------
+
+* Language switching in page settings (#7507)
+* Show language menu in toolbar only if at least two languages are configured (#7508)
+* Moving plugins between placeholders, plugin api (#7394)
+* Apphooks at endpoints (#7496)
 * Fix bug that broke page tree if it contained empty page content
 * Fix bug that created new page content not in the displayed language but the browser language
-* feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
-* Introduce dropdown menus in the page tree for status indicators
 * Fixed redirect issues when i18n_patterns had prefix_default_language = False
+* add release scripts for develop-4 branch (#7466) (ddbc99a53) -- Fabian Braun
 
+Statistics:
+-----------
+
+This release includes 145 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (55 pull requests)
+* Mark Walker (1 pull request)
+* Nebojsa Knezevic ( 1 pull request)
+
+With the review help of the following contributors:
+
+* Andrew Aikman
+* Fabian Braun
+* Mark Walker
+
+Thanks to all contributors for their efforts!
 
 4.0.0 (unreleased)
 ==================
@@ -28,8 +62,65 @@ unreleased
 * Backported from develop: Remove travis integration from the project as the project has moved to Github Actions.
 * Fixed usage of ``get_object`` in ``edit_title_fields`` of the page admin.
 
+Features:
+---------
+* hide legacy features in v4 admin/toolbar (#7521) (59fa62cc0) -- Fabian Braun
+* Admin for grouper-content-model combinations (#7513) (ee4e7d731) -- Fabian Braun
+* Django 4.2 support (#7517) (fc2d1b1a4) -- Fabian Braun
+* add setting to redirect slugs to lowercase et al. (#7510) (70a768663) -- Fabian Braun
+* Icon update (#7494) (715039852) -- Fabian Braun
 
+Bug Fixes:
+----------
+* Redirect behavior if prefix_default_language = False (port forward of #6851 to v4) (#7527) (bdab9e9e8) -- Fabian Braun
+* page content's `get_absolute_url` needs to return URL of page content's language (#7519) (06a08a737) -- Fabian Braun
+* apphooks at endpoints (#7496) (6fe35721d) -- Fabian Braun
+* Show language menu in toolbar only if at least two languages are configured (#7508) (f805d5a93) -- Fabian Braun
+* Language switching in page settings (#7507) (12fd119a0) -- Fabian Braun
+* Copy page did not create versions for subpages (#7493) (7bb471c8e) -- Fabian Braun
 
+Statistics:
+-----------
+
+This release includes 145 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Adam Murray (2 pull requests)
+* Aiky30 (35 pull requests)
+* Andrew Aikman (1 pull request)
+* Chematronix (1 pull request)
+* Fabian Braun (31 pull requests)
+* Github Release Action (3 pull requests)
+* Jonathan Sundqvist (7 pull requests)
+* Krzysztof Socha (17 pull requests)
+* Malinda Perera (3 pull requests)
+* Mark Walker (8 pull requests)
+* Mateusz Kamycki (1 pull request)
+* Nebojsa Knezevic (1 pull request)
+* Paulo (18 pull requests)
+* Paulo Alvarado (12 pull requests)
+* Simon (1 pull request)
+* Vadim Sikora (11 pull requests)
+* Vinit Kumar (1 pull request)
+* anirbanlahiri-fidelity (1 pull request)
+* monikasulik (3 pull requests)
+
+With the review help of the following contributors:
+
+* Adam Murray
+* Aiky30
+* Andrew Aikman
+* Angelo Dini
+* Fabian Braun
+* Florian Delizy
+* Krzysztof Socha
+* Mark Walker
+* Radek Stępień
+* Radosław Stępień
+* Raffaele Salmaso
+* Vinit Kumar
+* pajowu
+
+Thanks to all contributors for their efforts!
 
 3.6.0 (2019-01-29)
 ==================
