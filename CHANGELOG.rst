@@ -21,7 +21,6 @@ Features:
 Bug Fixes:
 ----------
 * empty actions shown without unwanted spaces (#7545) (#7552) (aee76b492) -- Fabian Braun
-
 * Language switching in page settings (#7507)
 * Show language menu in toolbar only if at least two languages are configured (#7508)
 * Moving plugins between placeholders, plugin api (#7394)
