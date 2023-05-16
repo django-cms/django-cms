@@ -5,7 +5,7 @@ Features:
 ---------
 
 * Fixed a bug where menu link is outdated when page moved (#7558)
-* Fixed a bug where the preview button lead to the wrong languge (#7558)
+* Fixed a bug where the preview button lead to the wrong language (#7558)
 * Graceful plugin exceptions (#7423)
 * Reintroduce indicator menus (#7426)
 * Add release scripts for develop-4 branch (#7466)
