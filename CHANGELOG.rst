@@ -4,8 +4,6 @@
 Features:
 ---------
 
-* Fixed a bug where menu link is outdated when page moved (#7558)
-* Fixed a bug where the preview button lead to the wrong language (#7558)
 * Graceful plugin exceptions (#7423)
 * Reintroduce indicator menus (#7426)
 * Add release scripts for develop-4 branch (#7466)
@@ -22,6 +20,8 @@ Features:
 
 Bug Fixes:
 ----------
+* Menu link is outdated when page moved (#7558)
+* Preview button lead to the wrong language (#7558)
 * empty actions shown without unwanted spaces (#7545) (#7552) (aee76b492) -- Fabian Braun
 * Language switching in page settings (#7507)
 * Show language menu in toolbar only if at least two languages are configured (#7508)
