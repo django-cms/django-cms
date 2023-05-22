@@ -481,7 +481,7 @@ export const Helpers = {
         let state = $('html').attr('data-theme');
 
         if (!state) {
-            state = localStorage.getItem('theme') || 'auto';
+            state = localStorage.getItem('theme') || CMS.config.color_scheme || 'auto';
         }
         return state;
     },
@@ -499,7 +499,11 @@ export const Helpers = {
         let body = $('html');
         let scheme = (mode !== 'light' && mode !== 'dark') ? 'auto' : mode;
 
-        localStorage.setItem('theme', scheme);
+        if (localStorage.getItem('theme') || CMS.config.color_scheme !== scheme) {
+            // Only set local storage if it is either already set or if scheme differs from preset
+            // to avoid fixing the user setting to the preset (which would ignore a change in presets)
+            localStorage.setItem('theme', scheme);
+        }
 
         body.attr('data-theme', scheme);
         body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
