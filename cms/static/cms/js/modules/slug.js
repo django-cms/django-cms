@@ -13,6 +13,7 @@ module.exports = function addSlugHandlers(title, slug) {
         prefill = true;
     }
     if (window.unihandecode) {
+        // eslint-disable-next-line new-cap
         window.UNIHANDECODER = window.unihandecode.Unihan(slug.data('decoder'));
     }
 
