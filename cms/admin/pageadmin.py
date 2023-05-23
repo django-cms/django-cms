@@ -354,22 +354,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
             raise self._get_404_exception(object_id)
         return self.change_view(request, object_id, extra_context={'show_permissions': True, 'title': _("Change Permissions")})
 
-    def get_unihandecode_context(self, language):
-        if language[:2] in get_cms_setting('UNIHANDECODE_DECODERS'):
-            uhd_lang = language[:2]
-        else:
-            uhd_lang = get_cms_setting('UNIHANDECODE_DEFAULT_DECODER')
-        uhd_host = get_cms_setting('UNIHANDECODE_HOST')
-        uhd_version = get_cms_setting('UNIHANDECODE_VERSION')
-        if uhd_lang and uhd_host and uhd_version:
-            uhd_urls = [
-                f'{uhd_host}unihandecode-{uhd_version}.core.min.js',
-                f'{uhd_host}unihandecode-{uhd_version}.{uhd_lang}.min.js',
-            ]
-        else:
-            uhd_urls = []
-        return {'unihandecode_lang': uhd_lang, 'unihandecode_urls': uhd_urls}
-
     def add_view(self, request, form_url='', extra_context=None):
         if extra_context is None:
             extra_context = {}
@@ -378,7 +362,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         extra_context.update({
             'language': language,
         })
-        extra_context.update(self.get_unihandecode_context(language))
         return super().add_view(request, form_url, extra_context=extra_context)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -411,7 +394,6 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
 
         site = self.get_site(request)
         tab_language = get_site_language_from_request(request, site_id=site.pk)
-        extra_context.update(self.get_unihandecode_context(tab_language))
 
         response = super().change_view(
             request, object_id, form_url=form_url, extra_context=extra_context)

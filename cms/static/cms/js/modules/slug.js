@@ -12,6 +12,9 @@ module.exports = function addSlugHandlers(title, slug) {
     if (slug.val().trim() === '') {
         prefill = true;
     }
+    if (window.unihandecode) {
+        window.UNIHANDECODER = unihandecode.Unihan(slug.data('decoder'));
+    }
 
     // always bind the title > slug generation and do the validation inside for better ux
     title.on('keyup keypress', function() {
