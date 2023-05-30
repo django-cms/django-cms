@@ -24,7 +24,8 @@
                     }
                 } else {
                     e.preventDefault();
-                    /* Get csrftoken either from form (admin) or from the toolbar */ector('form input[name="csrfmiddlewaretoken"]');
+                    /* Get csrftoken either from form (admin) or from the toolbar */
+                    let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
                     let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
                         ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
                     let fakeForm = $(
