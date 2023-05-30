@@ -24,15 +24,15 @@
                     }
                 } else {
                     e.preventDefault();
+                    /* Get csrftoken either from form (admin) or from the toolbar */ector('form input[name="csrfmiddlewaretoken"]');
                     let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-                                document.cookie.match(/csrftoken=([^;]*);?/)[1] + '">';
+                        ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
                     let fakeForm = $(
                         '<form style="display: none" action="' + action.attr('href') + '" method="' +
                                formMethod + '">' + csrfToken +
                         '</form>'
                     );
                     let body = window.top.document.body;
-
                     if (keepSideFrame) {
                         body = window.document.body;
                     } else {
