@@ -4,7 +4,7 @@
   "devDependencies": {
     "autoprefixer": "^6.3.6",
     "babel-core": "^6.24.1",
-    "babel-eslint": "^7.2.3",
+    "babel-eslint": "^8.2.6",
     "babel-loader": "^7.1.0",
     "babel-plugin-lodash": "^3.2.11",
     "babel-plugin-rewire": "^1.1.0",
@@ -13,7 +13,7 @@
     "browser-sync": "^2.26.12",
     "browserslist-saucelabs": "^0.2.3",
     "djangocms-casper-helpers": "^3.0.0",
-    "eslint-plugin-compat": "^1.0.2",
+    "eslint-plugin-compat": "^4.1.4",
     "exports-loader": "^0.7.0",
     "graceful-fs": "4.2.2",
     "gulp": "^4.0.2",
@@ -58,7 +58,7 @@
     "prevent-parent-scroll": "0.0.6",
     "urijs": "^1.19.7",
     "webpack2-polyfill-plugin": "0.0.2"
- },
+  },
   "scripts": {
     "upgrade-interactive": "npm-check --update"
   }

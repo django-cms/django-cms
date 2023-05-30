@@ -54,7 +54,7 @@
     $('document').ready(function(){
         // Targeting first item returned (there's only ever one messagelist per template):
         let messageList = document.getElementsByClassName("messagelist")[0];
-        if (messageList != undefined){
+        if (messageList !== undefined){
           for(let item of messageList.children){
             item.style.opacity = 1;
             setTimeout(() => {
