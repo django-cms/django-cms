@@ -21,16 +21,13 @@ except ImportError:
     text_widget = forms.Textarea
 
 
-class SlugWidget(forms.widgets.TextInput):
-    """
-    Special widget for the slug field that requires PageContent field to be there.
-    Adds the js for the slugifying.
-    """
-    class Media:
-        js = (
-            'admin/js/urlify.js',
-            static_with_version('cms/js/dist/bundle.forms.slugwidget.min.js'),
-        )
+class SlugWidget(AdminSlugWidget):
+    """Compatibility shim with deprecation warning:
+    SlugWidget has moved to cms.admin.forms"""
+    def __init__(self, *args, **kwargs):
+        warnings.warn("Import SlugWidget from cms.admin.forms. SlugWidget will be removed from cms.forms.wizards",
+                      DeprecationWarning, stacklevel=2)
+        super().__init__(*args, **kwargs)
 
 
 class CreateCMSPageForm(AddPageForm):
