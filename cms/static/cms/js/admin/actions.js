@@ -24,15 +24,16 @@
                     }
                 } else {
                     e.preventDefault();
+                    /* Get csrftoken either from form (admin) or from the toolbar */
+                    let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
                     let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-                                document.cookie.match(/csrftoken=([^;]*);?/)[1] + '">';
+                        ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
                     let fakeForm = $(
                         '<form style="display: none" action="' + action.attr('href') + '" method="' +
                                formMethod + '">' + csrfToken +
                         '</form>'
                     );
                     let body = window.top.document.body;
-
                     if (keepSideFrame) {
                         body = window.document.body;
                     } else {
@@ -53,7 +54,7 @@
     $('document').ready(function(){
         // Targeting first item returned (there's only ever one messagelist per template):
         let messageList = document.getElementsByClassName("messagelist")[0];
-        if (messageList != undefined){
+        if (messageList !== undefined){
           for(let item of messageList.children){
             item.style.opacity = 1;
             setTimeout(() => {
