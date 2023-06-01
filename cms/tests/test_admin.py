@@ -621,7 +621,7 @@ class AdminFormsTests(AdminTestsBase):
 
         with self.login_user_context(superuser):
             # Invalid slug
-            response = self.client.post(self.get_admin_url(Page, 'add'), new_page_data)
+            response = self.client.post(endpoint, new_page_data)
             expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
                              'underscores or hyphens.</li></ul>'
             self.assertEqual(response.status_code, 200)

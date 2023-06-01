@@ -186,7 +186,7 @@ class BasePageContentForm(forms.ModelForm):
         widget=forms.TextInput(),
         help_text=_('The default title')
     )
-    slug = forms.CharField(
+    slug = forms.SlugField(
         label=_("Slug"),
         max_length=255,
         widget=forms.TextInput(),
