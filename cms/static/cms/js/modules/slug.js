@@ -13,7 +13,8 @@ module.exports = function addSlugHandlers(title, slug) {
         prefill = true;
     }
     if (window.unihandecode) {
-        window.UNIHANDECODER = unihandecode.Unihan(slug.data('decoder'));
+        // eslint-disable-next-line new-cap
+        window.UNIHANDECODER = window.unihandecode.Unihan(slug.data('decoder'));
     }
 
     // always bind the title > slug generation and do the validation inside for better ux
