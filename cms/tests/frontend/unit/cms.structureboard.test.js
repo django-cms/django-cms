@@ -250,6 +250,7 @@ describe('CMS.StructureBoard', function() {
                 });
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
+                // eslint-disable-next-line compat/compat
                 spyOn(board, '_loadStructure').and.returnValue(Promise.resolve());
                 done();
             });
@@ -343,7 +344,9 @@ describe('CMS.StructureBoard', function() {
                 };
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
+                // eslint-disable-next-line compat/compat
                 spyOn(board, 'show').and.returnValue(Promise.resolve());
+                // eslint-disable-next-line compat/compat
                 spyOn(board, 'hide').and.returnValue(Promise.resolve());
                 spyOn(Plugin, '_highlightPluginStructure');
                 spyOn(Plugin, '_highlightPluginContent');
@@ -420,7 +423,9 @@ describe('CMS.StructureBoard', function() {
                 });
                 CMS.StructureBoard._initializeGlobalHandlers();
                 board = new CMS.StructureBoard();
+                // eslint-disable-next-line compat/compat
                 spyOn(board, '_loadContent').and.returnValue(Promise.resolve());
+                // eslint-disable-next-line compat/compat
                 spyOn(board, '_loadStructure').and.returnValue(Promise.resolve());
                 done();
             });
