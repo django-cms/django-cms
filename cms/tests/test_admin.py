@@ -1,4 +1,5 @@
 import json
+from unittest import skipIf
 
 from django.contrib import admin
 from django.contrib.admin.sites import site
@@ -24,6 +25,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_PUBLISHED,
     CMSTestCase,
 )
+from cms.utils.compat import DJANGO_2_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
@@ -622,9 +624,12 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Invalid slug
             response = self.client.post(endpoint, new_page_data)
-            expected_error = '<ul class="errorlist"><li>Slug must not be empty.</li></ul>'
+            expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
+                             'underscores or hyphens.</li></ul>'
+            expected_error_22 = '<ul class="errorlist"><li>Enter a valid &#39;slug&#39; consisting of letters, ' \
+                               'numbers, underscores or hyphens.</li></ul>'
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_error, html=True)
+            self.assertContains(response, expected_error_22 if DJANGO_2_2 else expected_error, html=True)
 
         page2 = api.create_page("test", get_cms_setting('TEMPLATES')[0][0], "en")
         new_page_data = {
