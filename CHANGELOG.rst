@@ -1,35 +1,50 @@
-unreleased
-==========
+4.1.0rc3 (unpublished)
+======================
 
-* Fixed a bug where menu link is outdated when page moved.
+Features:
+---------
+
+* Graceful plugin exceptions (#7423)
+* Reintroduce indicator menus (#7426)
+* Add release scripts for develop-4 branch (#7466)
+* Icon update (#7494)
+* Add setting to redirect slugs to lowercase et al. (#7510)
+* Grouper model admin class
+* Change `TitleExtension` to `PageContentExtension` (#7369)
+* Optimize populating page content cache for Page model. (#7177)
 * Unified icon font with icons for versioning, moderation and version locking
-* Django 4.1 and 4.0 support
-* Python 3.10 support
+* Django 4.2, 4.1 and 4.0 support
+* Python 3.11, 3.10 support
+* Remove patching of PageContent by djangocms-versioning (#7446)
+* Utility function get_placeholder_from_slot for PlaceholderRelationField (#7479)
+
+Bug Fixes:
+----------
+* Menu link is outdated when page moved (#7558)
+* Preview button lead to the wrong language (#7558)
+* empty actions shown without unwanted spaces (#7545) (#7552) (aee76b492) -- Fabian Braun
+* Language switching in page settings (#7507)
+* Show language menu in toolbar only if at least two languages are configured (#7508)
+* Moving plugins between placeholders, plugin api (#7394)
+* Apphooks at endpoints (#7496)
 * Fix bug that broke page tree if it contained empty page content
 * Fix bug that created new page content not in the displayed language but the browser language
-* feat: graceful plugin exceptions. Exceptions when rendering a plugin are caught and logged
 * Remove outdated Django setting SEND_BROKEN_LINK_EMAILS
-* Introduce dropdown menus in the page tree for status indicators
 * Fixed redirect issues when i18n_patterns had prefix_default_language = False
+* add release scripts for develop-4 branch (#7466) (ddbc99a53) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 3 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (2 pull requests)
+
+With the review help of the following contributors:
 
 
-4.0.0 (unreleased)
-==================
-
-* feat: Added live-url querystring parameter option for PageContent edit and preview endpoints
-* Backported from develop: Upgrade Gulp and NodeJs
-* feat: Re-enable showing the toolbar to anonymous users
-* Backport django 3.2 support
-* Backport django 3.1 support
-* Backport django 3.0 support
-* Allow Pagecontent.limit_visibility_in_menu to be reset once it has been set
-* Backported from develop: Added support for Github Actions based CI.
-* Backported from develop: Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
-* Backported from develop: Remove travis integration from the project as the project has moved to Github Actions.
-* Fixed usage of ``get_object`` in ``edit_title_fields`` of the page admin.
-
-
-
+Thanks to all contributors for their efforts!
 
 3.6.0 (2019-01-29)
 ==================
