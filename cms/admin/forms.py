@@ -11,7 +11,7 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.translation import gettext, get_language
+from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext_lazy as _
 
 from cms import api
@@ -189,7 +189,6 @@ class BasePageContentForm(forms.ModelForm):
     slug = forms.SlugField(
         label=_("Slug"),
         max_length=255,
-        widget=forms.TextInput(),
         help_text=_('The part of the title that is used in the URL')
     )
     menu_title = forms.CharField(
@@ -221,7 +220,6 @@ class BasePageContentForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['slug'].widget = SlugWidget(attrs={"language": self._language})
-
 
     @cached_property
     def _language(self):
