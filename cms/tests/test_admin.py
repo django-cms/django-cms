@@ -1,5 +1,7 @@
 import json
+from unittest import skipIf
 
+from cms.utils.compat import DJANGO_2_2
 from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
@@ -624,8 +626,10 @@ class AdminFormsTests(AdminTestsBase):
             response = self.client.post(endpoint, new_page_data)
             expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
                              'underscores or hyphens.</li></ul>'
+            expected_error_22 = '<ul class="errorlist"><li>Enter a valid &#39;slug&#39; consisting of letters, ' \
+                               'numbers, underscores or hyphens.</li></ul>'
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_error, html=True)
+            self.assertContains(response, expected_error_22 if DJANGO_2_2 else expected_error, html=True)
 
         page2 = api.create_page("test", get_cms_setting('TEMPLATES')[0][0], "en")
         new_page_data = {
