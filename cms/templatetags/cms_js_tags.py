@@ -43,6 +43,24 @@ def render_cms_structure_js(renderer, obj):
             placeholder_js = renderer.render_placeholder(obj_placeholder, language=None, page=obj)
             markup_bits.append(placeholder_js)
 
+
+    # https://github.com/django-cms/django-cms/commit/0f12156c8ed85914d4e3b14b30bce87becefe92b
+    static_placeholders = []
+    # declared_static_placeholders = cms_page.get_declared_static_placeholders(context)
+
+    for placeholder_node in declared_placeholders:
+        obj_placeholder = obj_placeholders_by_slot.get(placeholder_node.slot)
+
+        # if obj_placeholder:
+        #     placeholder_js = renderer.render_placeholder(obj_placeholder, language=None, page=obj)
+        #     markup_bits.append(placeholder_js)
+
+        static_placeholders.append(obj_placeholder)
+
+    for placeholder in static_placeholders:
+        placeholder_js = renderer.render_static_placeholder(placeholder)
+        markup_bits.append(placeholder_js)
+
     return mark_safe('\n'.join(markup_bits))
 
 
