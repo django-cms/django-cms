@@ -48,14 +48,29 @@ def render_cms_structure_js(renderer, obj):
     static_placeholders = []
     # declared_static_placeholders = cms_page.get_declared_static_placeholders(context)
 
-    for placeholder_node in declared_placeholders:
-        obj_placeholder = obj_placeholders_by_slot.get(placeholder_node.slot)
+    # djangocms-alias is hacked in here, needs a configuration mechanism tuned in
+    #  Potentially a configure Page Sticky placeholders
+    #   By default it's empty.
+    # A 3rd party package will add the config.
+    # Needs to be like: get_declared_placeholders_for_obj
+    #
+    # Also needs to be decided if the Alias can be edited inline or if the link takes the user off to edit the alias.
 
+
+    from djangocms_alias.models import Alias
+
+    # HACK to test by code
+    Alias.objects.all().update(static_code="static")
+
+    alias_set = Alias.objects.filter(static_code="static")
+
+    for alias in alias_set:
+
+        alias_placeholder = alias.get_placeholder(language="en", show_draft_content=True)
         # if obj_placeholder:
         #     placeholder_js = renderer.render_placeholder(obj_placeholder, language=None, page=obj)
         #     markup_bits.append(placeholder_js)
-
-        static_placeholders.append(obj_placeholder)
+        static_placeholders.append(alias_placeholder)
 
     for placeholder in static_placeholders:
         placeholder_js = renderer.render_static_placeholder(placeholder)
