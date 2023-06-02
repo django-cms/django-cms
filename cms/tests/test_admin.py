@@ -1,7 +1,6 @@
 import json
 from unittest import skipIf
 
-from cms.utils.compat import DJANGO_2_2
 from django.contrib import admin
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
@@ -26,6 +25,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_PUBLISHED,
     CMSTestCase,
 )
+from cms.utils.compat import DJANGO_2_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
