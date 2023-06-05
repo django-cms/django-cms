@@ -11,7 +11,7 @@ from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.translation import gettext
+from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext_lazy as _
 
 from cms import api
@@ -57,6 +57,7 @@ from cms.utils.permissions import (
     get_subordinate_users,
     get_user_permission_level,
 )
+from cms.utils.urlutils import static_with_version
 from menus.menu_pool import menu_pool
 
 
@@ -134,6 +135,47 @@ class CopyPermissionForm(forms.Form):
     )
 
 
+class SlugWidget(forms.widgets.TextInput):
+    """
+    Special widget for the slug field that requires Title field to be there.
+    Adds the js for the slugifying.
+    """
+
+    def __init__(self, attrs=None):
+        if attrs is None:
+            attrs = {}
+        else:
+            attrs = attrs.copy()
+        language = attrs.get("language", get_language())
+        self.uhd_lang, self.uhd_urls = self.get_unihandecode_settings(language)
+        attrs["data-decoder"] = self.uhd_lang
+        super().__init__(attrs)
+
+    def get_unihandecode_settings(self, language):
+        if language[:2] in get_cms_setting('UNIHANDECODE_DECODERS'):
+            uhd_lang = language[:2]
+        else:
+            uhd_lang = get_cms_setting('UNIHANDECODE_DEFAULT_DECODER')
+        uhd_host = get_cms_setting('UNIHANDECODE_HOST')
+        uhd_version = get_cms_setting('UNIHANDECODE_VERSION')
+        if uhd_lang and uhd_host and uhd_version:
+            uhd_urls = [
+                f'{uhd_host}unihandecode-{uhd_version}.core.min.js',
+                f'{uhd_host}unihandecode-{uhd_version}.{uhd_lang}.min.js',
+            ]
+        else:
+            uhd_urls = []
+        return uhd_lang, uhd_urls
+
+    @property
+    def media(self):
+        js_media = [
+            'admin/js/urlify.js',
+            static_with_version('cms/js/dist/bundle.forms.slugwidget.min.js'),
+        ] + self.uhd_urls
+        return forms.Media(js=js_media)
+
+
 class BasePageContentForm(forms.ModelForm):
     _site = None
     _request = None
@@ -144,10 +186,9 @@ class BasePageContentForm(forms.ModelForm):
         widget=forms.TextInput(),
         help_text=_('The default title')
     )
-    slug = forms.CharField(
+    slug = forms.SlugField(
         label=_("Slug"),
         max_length=255,
-        widget=forms.TextInput(),
         help_text=_('The part of the title that is used in the URL')
     )
     menu_title = forms.CharField(
@@ -176,12 +217,9 @@ class BasePageContentForm(forms.ModelForm):
         model = PageContent
         fields = []
 
-    def clean_slug(self):
-        slug = slugify(self.cleaned_data['slug'])
-
-        if not slug:
-            raise ValidationError(_("Slug must not be empty."))
-        return slug
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['slug'].widget = SlugWidget(attrs={"language": self._language})
 
     @cached_property
     def _language(self):

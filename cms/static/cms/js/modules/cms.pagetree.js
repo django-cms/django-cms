@@ -873,8 +873,9 @@ var PageTree = new Class({
                 if (window.parent) {
                     parent = window.parent;
                 }
-                var csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
-                    document.cookie.match(/csrftoken=([^;]*);?/)[1] + '">';
+                let formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
+                let csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
+                    ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
 
                 $('<form method="post" action="' + element.attr('href') + '">' +
                     csrfToken + '</form>')
