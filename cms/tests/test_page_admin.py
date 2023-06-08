@@ -1,7 +1,9 @@
 import datetime
 import json
 import sys
+from unittest import skipUnless
 
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.sites.models import Site
 from django.core.cache import cache
@@ -1485,6 +1487,72 @@ class PageTest(PageTestBase):
                 self.assertEqual(response.status_code, 400)
                 self.assertEqual(response.content,
                                  b"This placeholder already has the maximum number (1) of allowed Text plugins.")
+
+    @skipUnless(
+        'sqlite' in settings.DATABASES.get('default').get('ENGINE').lower(),
+        'This test only works in SQLITE',
+    )
+    @override_settings(USE_THOUSAND_SEPARATOR=True, USE_L10N=True)
+    def test_page_tree_render_localized_page_ids(self):
+        from django.db import connection
+
+        # Artificially increment the sequence number on cms_page and cms_treenode (below)
+        # to be > 1000, to trigger a THOUSAND_SEPARATOR localization in the
+        # rendered template
+
+        admin_user = self.get_superuser()
+        root = create_page(
+            "home", "nav_playground.html", "fr", created_by=admin_user, published=True
+        )
+        with connection.cursor() as c:
+            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_page"')
+            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_treenode"')
+
+        page = create_page(
+            "child-page",
+            "nav_playground.html",
+            "fr",
+            created_by=admin_user,
+            published=True,
+            parent=root,
+            slug="child-page",
+        )
+
+        sub_page = create_page(
+            "grand-child-page",
+            "nav_playground.html",
+            "fr",
+            created_by=admin_user,
+            published=True,
+            parent=page,
+            slug="grand-child-page",
+        )
+        self.assertTrue(page.id > 1000)
+        self.assertTrue(sub_page.id > 1000)
+
+        self.assertTrue(page.node.id > 1000)
+        self.assertTrue(sub_page.node.id > 1000)
+
+        # make sure the rendered page tree doesn't
+        # localize page or node ids
+        with self.login_user_context(admin_user):
+            data = {'openNodes[]': [root.node.pk, page.node.pk], 'language': 'fr'}
+
+            endpoint = self.get_admin_url(PageContent, 'get_tree')
+            response = self.client.get(endpoint, data=data)
+
+            self.assertEqual(response.status_code, 200)
+            self.assertNotContains(response, f'parent_node={page.node.pk:,}')
+            self.assertContains(response, f'parent_node={page.node.pk}')
+
+        # if per chance we have localized node ids in our localstorage,
+        # make sure DjangoCMS doesn't choke on them when they are passed
+        # into the view
+        with self.login_user_context(admin_user):
+            data = {'openNodes[]': [root.node.pk, f'{page.node.pk:,}'], 'language': 'fr'}
+            endpoint = self.get_admin_url(PageContent, 'get_tree')
+            response = self.client.get(endpoint, data=data)
+            self.assertEqual(response.status_code, 200)
 
 
 class PermissionsTestCase(PageTestBase):
