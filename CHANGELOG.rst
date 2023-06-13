@@ -2,6 +2,10 @@
 Changelog
 =========
 
+3.8.1 (2022-06-13)
+==================
+
+* Pin django-treebeard to version < 4.5 to avoid incompatibilities
 
 3.8.0 (2020-10-28)
 ==================
