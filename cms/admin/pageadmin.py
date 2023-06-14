@@ -1,4 +1,5 @@
 import json
+import re
 from collections import namedtuple
 
 import django
@@ -1351,9 +1352,12 @@ class PageContentAdmin(admin.ModelAdmin):
         """
         site = get_site(request)
         pages = Page.objects.on_site(site).order_by('node__path')
-        node_id = request.GET.get('nodeId')
-        open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
-
+        node_id = re.sub(r'[^\d]', '', request.GET.get('nodeId', '')) or None
+        open_nodes = list(map(
+            int,
+            [re.sub(r'[^\d]', '', node) for node in
+             request.GET.getlist('openNodes[]')]
+        ))
         if node_id:
             page = get_object_or_404(pages, node_id=int(node_id))
             pages = page.get_descendant_pages().filter(Q(node__in=open_nodes) | Q(node__parent__in=open_nodes))
