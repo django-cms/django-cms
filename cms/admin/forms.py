@@ -684,6 +684,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         fields = [
             'login_required',
             'reverse_id',
+            'navigation_extenders',
             'application_urls',
             'application_namespace',
             'application_configs',
