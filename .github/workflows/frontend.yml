@@ -1,0 +1,26 @@
+name: django CMS frontend.yml
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  frontend:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        node-version: ['16']
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        node-version: ${{ matrix.node-version }}
+    - run: npm install
+    - run: npm install -g gulp@4.0.2
+    - run: |
+          gulp unitTest
+          gulp lint

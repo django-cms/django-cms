@@ -1,0 +1,159 @@
+name: django CMS test.yml
+
+on: [push, pull_request]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  database-postgres:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.8', '3.9', '3.10', '3.11']
+        requirements-file: [
+          django-2.2.txt,
+          django-3.1.txt,
+          django-3.2.txt,
+          django-4.0.txt,
+          django-4.1.txt,
+          django-4.2.txt,
+        ]
+        os: [
+          ubuntu-20.04,
+        ]
+
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install pytest
+        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install -r test_requirements/databases.txt
+        pip install -r docs/requirements.txt
+        python setup.py install
+
+    - name: Test with django test runner
+      run: |
+        python manage.py test
+      env:
+        DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
+
+
+  database-mysql:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.8', '3.9', '3.10', '3.11']
+        requirements-file: [
+          django-2.2.txt,
+          django-3.1.txt,
+          django-3.2.txt,
+          django-4.0.txt,
+          django-4.1.txt,
+          django-4.2.txt,
+        ]
+        os: [
+          ubuntu-20.04,
+        ]
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: djangocms_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+
+
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install pytest
+        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install -r test_requirements/databases.txt
+        pip install -r docs/requirements.txt
+        python setup.py install
+
+
+    - name: Test with django test runner
+      run: |
+        python manage.py test
+      env:
+        DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
+
+  database-sqlite:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ '3.8', '3.9', '3.10', '3.11']
+        requirements-file: [
+          django-2.2.txt,
+          django-3.1.txt,
+          django-3.2.txt,
+          django-4.0.txt,
+          django-4.1.txt,
+          django-4.2.txt,
+        ]
+        os: [
+          ubuntu-20.04,
+        ]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install pytest
+        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install -r docs/requirements.txt
+        python setup.py install
+
+    - name: Test with django test runner
+      run: |
+        python manage.py test
+      env:
+        DATABASE_URL: sqlite://localhost/testdb.sqlite
