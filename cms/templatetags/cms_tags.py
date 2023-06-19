@@ -30,7 +30,7 @@ from cms.models import Placeholder as PlaceholderModel
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils import get_current_site, get_language_from_request, get_site_id
-from cms.utils.moderator import use_draft
+from cms.utils.moderator import _use_draft
 from cms.utils.page import get_page_queryset
 from cms.utils.placeholder import validate_placeholder_name
 from cms.utils.urlutils import admin_reverse
@@ -69,7 +69,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
     try:
         if 'pk' in page_lookup:
             page = Page.objects.select_related('node').get(**page_lookup)
-            if request and use_draft(request):
+            if request and _use_draft(request):
                 if page.publisher_is_draft:
                     return page
                 else:
@@ -80,7 +80,7 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                 else:
                     return page
         else:
-            pages = get_page_queryset(site, draft=use_draft(request))
+            pages = get_page_queryset(site, draft=_use_draft(request))
             return pages.select_related('node').get(**page_lookup)
     except Page.DoesNotExist:
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
