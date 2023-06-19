@@ -139,7 +139,7 @@ tornado==6.2
     # via livereload
 urllib3==1.26.11
     # via requests
-wheel==0.37.1
+wheel==0.38.1
     # via pip-tools
 zope-interface==5.4.0
     # via datetime
