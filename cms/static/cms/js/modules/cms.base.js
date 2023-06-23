@@ -1,4 +1,4 @@
-/**cmsbase.js
+/**
  * CMS.API.Helpers
  * Multiple helpers used across all CMS features
  */
