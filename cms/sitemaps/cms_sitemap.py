@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from django.contrib.sitemaps import Sitemap
-from django.db.models import Q, Subquery, OuterRef
+from django.db.models import OuterRef, Q, Subquery
 
 from cms.models import PageContent, PageUrl
 from cms.utils import get_current_site
