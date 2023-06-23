@@ -48,20 +48,10 @@ class CMSSitemap(Sitemap):
         site = get_current_site()
         languages = get_public_languages(site_id=site.pk)
 
-        (
-            PageUrl
-            .objects
-            .get_for_site(site)
-            .select_related('page')
-            .filter(language__in=languages, path__isnull=False, page__login_required=False)
-            .order_by('page__node__path')
-        )
-
         return list(
             PageUrl
             .objects
             .get_for_site(site)
-            .select_related('page')
             .filter(language__in=languages, path__isnull=False, page__login_required=False)
             .order_by('page__node__path')
             .annotate(content_pk=Subquery(
