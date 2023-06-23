@@ -1,4 +1,4 @@
-/**
+/**cmsbase.js
  * CMS.API.Helpers
  * Multiple helpers used across all CMS features
  */
@@ -107,7 +107,7 @@ export const Helpers = {
         if (ajax) {
             // Check if this is running inside a sideframe and then access
             // the CMS APIs from the parent window
-            if (parent.CMS && parent.CMS.API && parent.CMS.API.locked) {
+            if (parent.CMS && parent.CMS.API) {
                 parent.CMS.API.locked = true;
                 // check if the url has changed, if true redirect to the new path
                 // this requires an ajax request
