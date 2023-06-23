@@ -56,7 +56,8 @@ class CMSSitemap(Sitemap):
             .order_by('page__node__path')
             .annotate(content_pk=Subquery(
                 PageContent.objects
-                .filter(Q(redirect="") | Q(redirect=None), page=OuterRef("page"), language=OuterRef("language"))
+                .filter(page=OuterRef("page"), language=OuterRef("language"))
+                .filter(Q(redirect="") | Q(redirect=None))
                 .values_list("pk")[:1]
             ))
             .filter(content_pk__isnull=False)  # Remove page content with redirects
