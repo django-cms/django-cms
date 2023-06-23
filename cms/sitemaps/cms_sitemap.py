@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from django.contrib.sitemaps import Sitemap
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef
 
 from cms.models import PageContent, PageUrl
 from cms.utils import get_current_site
@@ -47,35 +47,17 @@ class CMSSitemap(Sitemap):
         # supply a new items() method which doesn't filter out the redirects.
         site = get_current_site()
         languages = get_public_languages(site_id=site.pk)
-        all_urls = (
-            PageUrl
-            .objects
-            .get_for_site(site)
-            .select_related('page')
-            .filter(language__in=languages, path__isnull=False, page__login_required=False)
-            .order_by('page__node__path')
-        )
-        excluded_titles_by_page = defaultdict(set)
-        excluded_translations = (
+
+        included_contents= (
             PageContent
             .objects
-            .filter(language__in=languages, page__node__site=site)
-            .exclude(Q(redirect='') | Q(redirect__isnull=True))
-            .values_list('page', 'language')
+            .filter(language__in=languages, page__node__site=site, page__login_required=False)
+            .filter(Q(redirect='') | Q(redirect__isnull=True))
+            .order_by('page__node__path')
+            .annotate(url=Subquery(PageUrl.objects.filter(language=OuterRef("language"), path__isnull=False))[:1])
         )
 
-        for page_id, language in excluded_translations:
-            excluded_titles_by_page[page_id].add(language)
-
-        valid_urls = []
-
-        for page_url in all_urls:
-            excluded = excluded_titles_by_page.get(page_url.page_id, [])
-
-            if page_url.language in excluded:
-                continue
-            valid_urls.append(page_url)
-        return valid_urls
+        return [page_content.url for page_content in included_contents if page_content.url]
 
     def lastmod(self, page_url):
         return page_url.page.changed_date
