@@ -48,16 +48,29 @@ class CMSSitemap(Sitemap):
         site = get_current_site()
         languages = get_public_languages(site_id=site.pk)
 
-        included_contents= (
-            PageContent
+        (
+            PageUrl
             .objects
-            .filter(language__in=languages, page__node__site=site, page__login_required=False)
-            .filter(Q(redirect='') | Q(redirect__isnull=True))
+            .get_for_site(site)
+            .select_related('page')
+            .filter(language__in=languages, path__isnull=False, page__login_required=False)
             .order_by('page__node__path')
-            .annotate(url=Subquery(PageUrl.objects.filter(language=OuterRef("language"), path__isnull=False))[:1])
         )
 
-        return [page_content.url for page_content in included_contents if page_content.url]
+        return list(
+            PageUrl
+            .objects
+            .get_for_site(site)
+            .select_related('page')
+            .filter(language__in=languages, path__isnull=False, page__login_required=False)
+            .order_by('page__node__path')
+            .annotate(content_pk=Subquery(
+                PageContent.objects
+                .filter(Q(redirect="") | Q(redirect=None), page=OuterRef("page"), language=OuterRef("language"))
+                .values_list("pk")[:1]
+            ))
+            .filter(content_pk__isnull=False)  # Remove page content with redirects
+        )
 
     def lastmod(self, page_url):
         return page_url.page.changed_date
