@@ -72,7 +72,9 @@ var PageTreeStickyHeader = new Class({
         var win = Helpers._getWindow();
 
         if (win && win.parent && win.parent !== win) {
-            return true;
+            // add a check to make sure, we are indeed inside the sideframe
+            // and not get confused when it is run inside cypress.
+            return win.parent.CMS !== undefined && win.parent.CMS.$ !== undefined && win.parent.CMS.API !== undefined;
         }
 
         return false;
