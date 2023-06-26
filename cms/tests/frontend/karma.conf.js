@@ -59,7 +59,7 @@ module.exports = function (config) {
     };
 
     var browsers = {
-        ChromeHeadless: 'used for local testing'
+        Chrome: 'used for local testing'
     };
 
     var settings = {
