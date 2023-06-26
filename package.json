@@ -18,7 +18,7 @@
     "graceful-fs": "4.2.2",
     "gulp": "^4.0.2",
     "gulp-clean-css": "^3.0.4",
-    "gulp-eslint": "^6.0.0",
+    "gulp-eslint": "^3.0.1",
     "gulp-iconfont": "11.0.0",
     "gulp-iconfont-css": "3.0.0",
     "gulp-if": "1.2.5",
@@ -41,8 +41,8 @@
     "karma-sourcemap-loader": "^0.4.0",
     "karma-webpack": "^3.0.5",
     "minimist": "1.2.3",
-    "puppeteer": "^20.7.3",
     "raw-loader": "^0.5.1",
+    "puppeteer": "^20.7.3",
     "sass": "^1.27.0",
     "webpack": "^3.0.0"
   },

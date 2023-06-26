@@ -7,7 +7,7 @@
 'use strict';
 
 process.env.NODE_ENV = 'test';
-process.env.CHROME_BIN = require('puppeteer').executablePath()
+process.env.CHROME_BIN = require('puppeteer').executablePath();
 
 
 var baseConf = require('./base.conf');
