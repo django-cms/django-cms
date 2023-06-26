@@ -203,20 +203,29 @@
     @if $filename == sun {
         $char: "E03B";
     }
-    @if $filename == undo {
+    @if $filename == theme-auto {
         $char: "E03C";
     }
-    @if $filename == unlock {
+    @if $filename == theme-dark {
         $char: "E03D";
     }
-    @if $filename == unpublish {
+    @if $filename == theme-light {
         $char: "E03E";
     }
-    @if $filename == view {
+    @if $filename == undo {
         $char: "E03F";
     }
-    @if $filename == window {
+    @if $filename == unlock {
         $char: "E040";
+    }
+    @if $filename == unpublish {
+        $char: "E041";
+    }
+    @if $filename == view {
+        $char: "E042";
+    }
+    @if $filename == window {
+        $char: "E043";
     }
 
     @return $char;
@@ -472,6 +481,18 @@
 
 .cms-icon-sun {
     @include icon(sun);
+}
+
+.cms-icon-theme-auto {
+    @include icon(theme-auto);
+}
+
+.cms-icon-theme-dark {
+    @include icon(theme-dark);
+}
+
+.cms-icon-theme-light {
+    @include icon(theme-light);
 }
 
 .cms-icon-undo {
