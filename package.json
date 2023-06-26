@@ -57,8 +57,7 @@
     "nprogress": "^0.2.0",
     "prevent-parent-scroll": "0.0.6",
     "urijs": "^1.19.7",
-    "uuid": "^7.0.3",
-    "webpack2-polyfill-plugin": "0.0.2"
+    "uuid": "^7.0.3"
   },
   "scripts": {
     "upgrade-interactive": "npm-check --update"
