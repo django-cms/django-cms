@@ -41,11 +41,11 @@ $black: var(--dca-black);
     --dca-white: #2A2C2E;
     --dca-black: #FFF;
     --dca-primary: #58D1FC;
-    --dca-gray: #999; // $gray-light;
+    --dca-gray: #ccc; // $gray-light;
     --dca-gray-lightest: #444; //$gray-darkest;
     --dca-gray-lighter: #666; //$gray-darker;
     --dca-gray-light: #888; // $gray-light;
-    --dca-gray-darker: #aaa; //$gray;
+    --dca-gray-darker: #ddd; //$gray;
     --dca-gray-darkest: #eee; // $gray-lighter;
     --dca-gray-super-lightest: #333;
 
@@ -406,8 +406,8 @@ $dropdown-link-hover-color:    $submenu-item-hover-color;
 $dropdown-link-hover-bg:       $color-primary;
 $dropdown-link-active-color:   $submenu-item-hover-color;
 $dropdown-link-active-bg:      $color-primary;
-$dropdown-link-disabled-color: black;
-$dropdown-link-disabled-bg:    white;
+$dropdown-link-disabled-color: $gray-light;
+$dropdown-link-disabled-bg:    $white;
 
 //##############################################################################
 // Add plugin

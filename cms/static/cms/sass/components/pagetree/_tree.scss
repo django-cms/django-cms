@@ -883,7 +883,6 @@
     .jstree-hovered,
     .jstree-clicked {
         background-color: $gray-lightest !important;
-        filter: brightness(1.1);
     }
 
     // special case for paste header
@@ -974,7 +973,6 @@
             &.jstree-hovered,
             &.jstree-clicked {
                 background-color: $gray-lightest !important;
-                filter: brightness(1.1);
             }
         }
 
@@ -1017,7 +1015,6 @@
         &.jstree-hovered,
         &.jstree-clicked {
             background-color: $gray-lightest !important;
-            filter: brightness(1.1);
           }
     }
 
