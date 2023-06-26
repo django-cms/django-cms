@@ -219,7 +219,8 @@ class BasePageContentForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['slug'].widget = SlugWidget(attrs={"language": self._language})
+        attrs = dict(self.fields['slug'].widget.attrs or {}, language=self._language)
+        self.fields['slug'].widget = SlugWidget(attrs=attrs)
 
     @cached_property
     def _language(self):
@@ -684,6 +685,7 @@ class AdvancedSettingsForm(forms.ModelForm):
         fields = [
             'login_required',
             'reverse_id',
+            'navigation_extenders',
             'application_urls',
             'application_namespace',
             'application_configs',

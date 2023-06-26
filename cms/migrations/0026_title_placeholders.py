@@ -20,6 +20,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='placeholder',
             name='title_id',
-            field=models.PositiveSmallIntegerField(null=True),
+            field=models.PositiveIntegerField(null=True),
         ),
     ]
