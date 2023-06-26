@@ -12,6 +12,8 @@
     "babel-preset-env": "^1.4.0",
     "browser-sync": "^2.26.12",
     "browserslist-saucelabs": "^0.2.3",
+    "chokidar": "^3.5.3",
+    "core-js": "^3.31.0",
     "djangocms-casper-helpers": "^3.0.0",
     "eslint-plugin-compat": "^4.1.4",
     "exports-loader": "^0.7.0",
@@ -41,9 +43,11 @@
     "karma-sourcemap-loader": "^0.4.0",
     "karma-webpack": "^3.0.5",
     "minimist": "1.2.3",
-    "raw-loader": "^0.5.1",
     "puppeteer": "^20.7.3",
+    "raw-loader": "^0.5.1",
     "sass": "^1.27.0",
+    "uuid": "^8.3.2",
+    "watchpack": "^2.4.0",
     "webpack": "^3.0.0"
   },
   "dependencies": {
@@ -55,8 +59,7 @@
     "lodash": "4.17.21",
     "nprogress": "^0.2.0",
     "prevent-parent-scroll": "0.0.6",
-    "urijs": "^1.19.7",
-    "uuid": "^7.0.3"
+    "urijs": "^1.19.7"
   },
   "scripts": {
     "upgrade-interactive": "npm-check --update"
