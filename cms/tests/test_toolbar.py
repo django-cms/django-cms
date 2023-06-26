@@ -159,7 +159,7 @@ class ToolbarTests(ToolbarTestBase):
 
     def get_page_item(self, toolbar):
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        page_item = [item for item in items if force_str(item.name) == 'Page']
+        page_item = [item for item in items if force_str(getattr(item, "name", None)) == 'Page']
         self.assertEqual(len(page_item), 1)
         return page_item[0]
 
@@ -307,8 +307,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.populate()
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + admin-menu + logout
-        self.assertEqual(len(items), 3, items)
+        # Logo + admin-menu + color scheme + logout
+        self.assertEqual(len(items), 4, items)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 12, admin_items)
 
@@ -318,8 +318,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.populate()
         toolbar.post_template_populate()
         items = toolbar.get_left_items() + toolbar.get_right_items()
-        # Logo + edit-mode + admin-menu + logout
-        self.assertEqual(len(items), 3)
+        # Logo + edit-mode + admin-menu + color scheme + logout
+        self.assertEqual(len(items), 4)
         admin_items = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER, 'Test').get_items()
         self.assertEqual(len(admin_items), 13, admin_items)
 
@@ -407,8 +407,8 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get('/en/example/latest/')
         self.assertEqual(response.status_code, 200)
         toolbar = response.wsgi_request.toolbar
-        self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
-        edit_button = toolbar.get_right_items()[1].buttons[0]
+        self.assertEqual(len(toolbar.get_right_items()[2].buttons), 1)
+        edit_button = toolbar.get_right_items()[2].buttons[0]
         self.assertEqual(edit_button.name, 'Edit')
         self.assertEqual(edit_button.url, obj_edit_url)
         self.assertEqual(
@@ -423,8 +423,8 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(obj_edit_url)
         self.assertEqual(response.status_code, 200)
         toolbar = response.wsgi_request.toolbar
-        self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
-        preview_button = toolbar.get_right_items()[1].buttons[0]
+        self.assertEqual(len(toolbar.get_right_items()[2].buttons), 1)
+        preview_button = toolbar.get_right_items()[2].buttons[0]
         self.assertEqual(preview_button.name, 'Preview')
         self.assertEqual(preview_button.url, obj_preview_url)
         self.assertEqual(
@@ -649,8 +649,8 @@ class ToolbarTests(ToolbarTestBase):
         self.assertFalse(page.has_publish_permission(request.user))
 
         items = request.toolbar.get_left_items() + request.toolbar.get_right_items()
-        # Logo + page-menu + admin-menu + logout
-        self.assertEqual(len(items), 4, items)
+        # Logo + page-menu + admin-menu + color scheme + logout
+        self.assertEqual(len(items), 5, items)
         page_items = items[1].get_items()
         # The page menu should only have the "Create page" item enabled.
         self.assertFalse(page_items[0].disabled)
@@ -674,15 +674,15 @@ class ToolbarTests(ToolbarTestBase):
         en_toolbar.set_object(page_content_en)
         en_toolbar.populate()
         en_toolbar.post_template_populate()
-        # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 5)
+        # Logo + templates + page-menu + admin-menu + color scheme + logout
+        self.assertEqual(len(en_toolbar.get_left_items() + en_toolbar.get_right_items()), 6)
         de_request = self.get_page_request(cms_page, user, edit_url_de, lang_code='de')
         de_toolbar = CMSToolbar(de_request)
         de_toolbar.set_object(page_content_de)
         de_toolbar.populate()
         de_toolbar.post_template_populate()
-        # Logo + templates + page-menu + admin-menu + logout
-        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 5)
+        # Logo + templates + page-menu + admin-menu + color scheme + logout
+        self.assertEqual(len(de_toolbar.get_left_items() + de_toolbar.get_right_items()), 6)
 
     def test_double_menus(self):
         """
@@ -774,7 +774,7 @@ class ToolbarTests(ToolbarTestBase):
 
         self.assertEqual(menu1, menu2)
         self.assertEqual(menu1.name, 'Test')
-        self.assertEqual(len(toolbar.get_right_items()), 1)
+        self.assertEqual(len(toolbar.get_right_items()), 2)  # Including color scheme switch
 
     def test_negative_position_left(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
@@ -797,8 +797,8 @@ class ToolbarTests(ToolbarTestBase):
         toolbar.get_or_create_menu("menu2", "Menu2", side=toolbar.RIGHT)
         menu3 = toolbar.get_or_create_menu("menu3", "Menu3", side=toolbar.RIGHT, position=-1)
         menu4 = toolbar.get_or_create_menu("menu4", "Menu4", side=toolbar.RIGHT, position=-2)
-        self.assertEqual(toolbar.get_right_items().index(menu3), 3)
-        self.assertEqual(toolbar.get_right_items().index(menu4), 2)
+        self.assertEqual(toolbar.get_right_items().index(menu3), 4)  # Including color scheme
+        self.assertEqual(toolbar.get_right_items().index(menu4), 3)  # Including color scheme
 
     def assertMenuItems(self, request, menu_id, name, items=None):
         toolbar = CMSToolbar(request)
