@@ -59,7 +59,7 @@ module.exports = function (config) {
     };
 
     var browsers = {
-        Chrome: 'used for local testing'
+        ChromeHeadlessCI: 'used for local testing'
     };
 
     var settings = {
@@ -149,6 +149,13 @@ module.exports = function (config) {
 
         // start these browsers
         browsers: Object.keys(browsers),
+
+        customLaunchers: {
+            ChromeHeadlessCI: {
+                base: 'ChromeHeadless',
+                flags: ['--window-size=1280,1080']
+            }
+        },
 
         concurrency: Infinity,
 
