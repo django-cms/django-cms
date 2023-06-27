@@ -59,6 +59,7 @@
     "lodash": "4.17.21",
     "nprogress": "^0.2.0",
     "prevent-parent-scroll": "0.0.6",
+    "promise-polyfill": "8.3.0",
     "urijs": "^1.19.7"
   },
   "scripts": {
