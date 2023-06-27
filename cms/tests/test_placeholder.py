@@ -1,6 +1,18 @@
 import copy
 import os
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.core.cache import cache
+from django.core.exceptions import ImproperlyConfigured
+from django.template import Template, TemplateSyntaxError
+from django.template.loader import get_template
+from django.test import TestCase
+from django.test.utils import override_settings
+from django.utils.encoding import force_str
+from django.utils.numberformat import format
+from sekizai.context import SekizaiContext
+
 import cms
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
@@ -29,17 +41,6 @@ from cms.utils.placeholder import (
 )
 from cms.utils.plugins import assign_plugins, has_reached_plugin_limit
 from cms.utils.urlutils import admin_reverse
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.core.cache import cache
-from django.core.exceptions import ImproperlyConfigured
-from django.template import Template, TemplateSyntaxError
-from django.template.loader import get_template
-from django.test import TestCase
-from django.test.utils import override_settings
-from django.utils.encoding import force_str
-from django.utils.numberformat import format
-from sekizai.context import SekizaiContext
 
 
 def _get_placeholder_slots(template):
