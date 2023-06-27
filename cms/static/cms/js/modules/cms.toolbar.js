@@ -8,7 +8,7 @@ import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import Plugin from './cms.plugins';
-import DiffDOM from 'diff-dom';
+import { DiffDOM } from 'diff-dom';
 import { filter, throttle, uniq } from 'lodash';
 import { showLoader, hideLoader } from './loader';
 import { Helpers, KEYS } from './cms.base';

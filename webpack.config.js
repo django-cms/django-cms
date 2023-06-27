@@ -1,6 +1,5 @@
 var webpack = require('webpack');
 var path = require('path');
-var Webpack2Polyfill = require('webpack2-polyfill-plugin');
 
 module.exports = function(opts) {
     'use strict';
@@ -37,7 +36,6 @@ module.exports = function(opts) {
             jsonpFunction: 'cmsWebpackJsonp'
         },
         plugins: [
-            new Webpack2Polyfill(),
             // this way admin.pagetree bundle won't
             // include deps already required in admin.base bundle
             new webpack.optimize.CommonsChunkPlugin({
