@@ -21,7 +21,7 @@ module.exports = {
     },
     plugins: ['compat'],
     settings: {
-        polyfills: ['document-currentscript', 'Promise']
+        polyfills: ['document-currentscript']
     },
     rules: {
         // Possible Errors
