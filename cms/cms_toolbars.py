@@ -14,7 +14,7 @@ from django.utils.translation import (
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import Page, PageType, Placeholder
-from cms.toolbar.items import REFRESH_PAGE, ButtonList
+from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
 from cms.toolbar.utils import (
     get_object_edit_url,
     get_object_preview_url,
@@ -217,6 +217,22 @@ class PlaceholderToolbar(CMSToolbar):
             disabled=False,
             extra_classes='cms-content-btn',
         )
+
+
+@toolbar_pool.register
+class AppearanceToolbar(CMSToolbar):
+    """
+    Adds appearance switches, esp. for dark and light mode
+    """
+    color_scheme_toggle = get_cms_setting('COLOR_SCHEME_TOGGLE')
+
+    def populate(self):
+        if self.color_scheme_toggle:
+            dark_mode_toggle = TemplateItem(
+                template="cms/toolbar/items/dark_mode_toggle.html",
+                side=self.toolbar.RIGHT,
+            )
+            self.toolbar.add_item(dark_mode_toggle)
 
 
 @toolbar_pool.register
