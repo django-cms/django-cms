@@ -11,8 +11,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.test_utils.fixtures.fakemlng import FakemlngFixtures
 from cms.test_utils.project.fakemlng.models import Translations
-from cms.test_utils.project.placeholderapp.models import (
-    DynamicPlaceholderSlotExample, Example1, TwoPlaceholderExample)
+from cms.test_utils.project.placeholderapp.models import DynamicPlaceholderSlotExample, Example1, TwoPlaceholderExample
 from cms.test_utils.project.sampleapp.models import Category
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
 from cms.test_utils.util.mock import AttributeObject
@@ -20,9 +19,14 @@ from cms.tests.test_toolbar import ToolbarTestBase
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
-from cms.utils.placeholder import (MLNGPlaceholderActions, PlaceholderNoAction,
-                                   _get_nodelist, _scan_placeholders,
-                                   get_placeholder_conf, get_placeholders)
+from cms.utils.placeholder import (
+    MLNGPlaceholderActions,
+    PlaceholderNoAction,
+    _get_nodelist,
+    _scan_placeholders,
+    get_placeholder_conf,
+    get_placeholders,
+)
 from cms.utils.plugins import assign_plugins, has_reached_plugin_limit
 from cms.utils.urlutils import admin_reverse
 from django.conf import settings
