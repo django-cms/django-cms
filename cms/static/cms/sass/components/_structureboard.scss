@@ -1,5 +1,6 @@
 //##############################################################################
 // STRUCTURE
+@use "sass:math";
 
 .cms-droppable {
     position: relative;
@@ -135,7 +136,8 @@
                 color: $btn-default-color !important;
                 font-size: $font-size-small !important;
                 &:hover {
-                    color: darken($btn-default-color, 10%) !important;
+                    color: $btn-default-color !important;
+                    filter: brightness(0.9);
                 }
             }
         }
@@ -265,7 +267,7 @@
             margin: 0;
             border: 2px solid $color-primary;
             border-radius: $border-radius-base;
-            background-color: mix(white, $color-primary, 90%);
+            background-color: rgba($color-primary-fallback, 20%);
             box-shadow: none;
             transform: translateY(0) !important;
             &:before {
@@ -315,7 +317,7 @@
             background-image: none !important;
             &:before {
                 display: none;
-                color: white;
+                color: $white;
             }
             .cms-draggables {
                 display: none;
@@ -365,7 +367,7 @@
             left: $structure-dragitem-icon-space - $structure-dragarea-padding-horizontal - 10px;
             color: $submenu-icon-color;
             font-size: $structure-dragitem-icon-size;
-            margin-top: -$structure-dragitem-icon-size/2;
+            margin-top: math.div(-$structure-dragitem-icon-size, 2);
             margin-left: $structure-dragarea-padding-horizontal - 10px;
             cursor: pointer;
             transform: rotate(180deg);
@@ -381,7 +383,7 @@
 
     .cms-draggable-selected .cms-dragitem,
     .cms-draggable-selected .cms-dragitem strong {
-        color: adjust-hue($color-primary, 15deg);
+        color: adjust-hue($color-primary-fallback, 15deg);
     }
     .cms-draggable-selected .cms-draggable .cms-dragitem,
     .cms-draggable-selected .cms-draggable .cms-dragitem strong {
@@ -391,13 +393,13 @@
     .cms-draggable-allowed,
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
-        color: lighten($color-primary, 40%);
-        border-color: lighten($color-primary, 40%);
+        color: lighten($color-primary-fallback, 40%);
+        border-color: lighten($color-primary-fallback, 40%);
     }
     .cms-draggable-hover-allowed,
     .cms-draggable-placeholder {
         color: $white;
-        background: rgba($color-primary, 0.2);
+        background: rgba($color-primary, 0.2);  // TODO
     }
 
     .cms-draggable-disallowed,
@@ -445,7 +447,7 @@
         right: $submenu-right;
         width: $submenu-icon-area-size;
         height: $submenu-icon-area-size;
-        margin-top: -($submenu-icon-area-size / 2);
+        margin-top: -(math.div($submenu-icon-area-size, 2));
         .cms-icon {
             $submenu-icon-size: 20px;
             position: absolute;
@@ -453,9 +455,8 @@
             left: 50%;
             color: $submenu-icon-color;
             font-size: $submenu-icon-size;
-            margin-top: -($submenu-icon-size / 2);
-            margin-left: -($submenu-icon-size / 2);
-        }
+            margin-top: -(math.div($submenu-icon-size, 2));
+            margin-left: -(math.div($submenu-icon-size, 2));        }
     }
 
     // end of dragarea
@@ -543,7 +544,7 @@
     left: -2px;
     z-index: z(structure, content, droppable);
     border: 1px solid $color-primary !important;
-    background: mix(white, $color-primary, 80%) !important;
+    background: rgba($color-primary-fallback, 20%) !important;
     border-radius: $border-radius-base;
     opacity: 0.6;
 
@@ -563,18 +564,6 @@
 }
 
 
-@at-root .cms-structure-mode-structure {
-    // overflow: hidden;
-
-    // min-height is necessary for iOS9
-    // when we have a page that has content
-    // that takes less than a screen structureboard
-    // becomes unusable because it tries to fit
-    // in the size of the content and not the size
-    // of the device screen
-    min-height: 100%;
-}
-
 // hide elements when dragging
 @at-root .ui-sortable-helper.cms-draggable .cms-submenu-btn {
     display: none !important;
@@ -593,7 +582,7 @@
     left: 0;
     top: 0;
     bottom: 0;
-    background: #fff !important;
+    background: $white !important;
     opacity: .5;
     z-index: 9999;
 }

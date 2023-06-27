@@ -200,7 +200,7 @@ class ViewTests(CMSTestCase):
         with self.login_user_context(user):
             response = self.client.get(page_preview_url)
         toolbar = response.wsgi_request.toolbar
-        edit_button = toolbar.get_right_items()[1].buttons[0]
+        edit_button = toolbar.get_right_items()[2].buttons[0]
         self.assertEqual(edit_button.name, 'Edit')
         self.assertEqual(edit_button.url, get_object_edit_url(page_content))
         self.assertEqual(
@@ -215,13 +215,13 @@ class ViewTests(CMSTestCase):
         with self.login_user_context(user):
             response = self.client.get(page_preview_url)
         toolbar = response.wsgi_request.toolbar
-        self.assertEqual(len(toolbar.get_right_items()), 1)  # Only has Create button
+        self.assertEqual(len(toolbar.get_right_items()), 2)  # Only has Create button and color switch
 
         PagePermission.objects.create(can_change=True, user=user, page=page)
         with self.login_user_context(user):
             response = self.client.get(page_preview_url)
         toolbar = response.wsgi_request.toolbar
-        edit_button = toolbar.get_right_items()[1].buttons[0]
+        edit_button = toolbar.get_right_items()[2].buttons[0]
         self.assertEqual(edit_button.name, 'Edit')
         self.assertEqual(edit_button.url, get_object_edit_url(page_content))
         self.assertEqual(
@@ -267,8 +267,8 @@ class ViewTests(CMSTestCase):
                 html=True,
             )
             toolbar = response.wsgi_request.toolbar
-            self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
-            preview_button = toolbar.get_right_items()[1].buttons[0]
+            self.assertEqual(len(toolbar.get_right_items()[2].buttons), 1)
+            preview_button = toolbar.get_right_items()[2].buttons[0]
             self.assertEqual(preview_button.name, _('Preview'))
             self.assertEqual(preview_button.url, preview_url)
             self.assertEqual(
@@ -284,8 +284,8 @@ class ViewTests(CMSTestCase):
                 html=True,
             )
             toolbar = response.wsgi_request.toolbar
-            self.assertEqual(len(toolbar.get_right_items()[1].buttons), 1)
-            edit_button = toolbar.get_right_items()[1].buttons[0]
+            self.assertEqual(len(toolbar.get_right_items()[2].buttons), 1)
+            edit_button = toolbar.get_right_items()[2].buttons[0]
             self.assertEqual(edit_button.name, _('Edit'))
             self.assertEqual(edit_button.url, edit_url)
             self.assertEqual(

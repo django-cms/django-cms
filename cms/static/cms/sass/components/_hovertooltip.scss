@@ -1,5 +1,6 @@
 //##############################################################################
 // TOOLTIP
+@use "sass:math";
 
 .cms-hover-tooltip {
     position: relative;
@@ -84,7 +85,7 @@
 }
 
 .cms-hover-tooltip:after {
-    margin-left: -$hover-tooltip-width / 2;
+    margin-left: math.div(-$hover-tooltip-width, 2);
 }
 
 .cms-hover-tooltip:hover:before,
