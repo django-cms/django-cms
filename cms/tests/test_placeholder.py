@@ -13,8 +13,8 @@ from django.utils.encoding import force_str
 from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
 
-import cms
 from cms import constants
+from cms import __file__ as cms_root_path
 from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models.fields import PlaceholderField
@@ -122,11 +122,12 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
     def test_placeholder_recursive_deeper_extend(self):
         template_settings = copy.deepcopy(settings.TEMPLATES)
+        cms_root_dir = os.path.dirname(cms_root_path)
         template_settings[0]["DIRS"] = [
-            os.path.join(os.path.dirname(cms.__file__), 'test_utils', 'project', 'placeholderapp',
+            os.path.join(cms_root_dir, 'test_utils', 'project', 'placeholderapp',
                          'nested_placeholderapp', 'templates'),
-            os.path.join(os.path.dirname(cms.__file__), 'test_utils', 'project', 'placeholderapp', 'templates'),
-            os.path.join(os.path.dirname(cms.__file__), 'test_utils', 'project', 'templates'),
+            os.path.join(cms_root_dir, 'test_utils', 'project', 'placeholderapp', 'templates'),
+            os.path.join(cms_root_dir, 'test_utils', 'project', 'templates'),
         ]
         with override_settings(TEMPLATES=template_settings):
             placeholders = _get_placeholder_slots('placeholder_tests/nested_extend.html')
