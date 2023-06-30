@@ -273,8 +273,10 @@ def get_static_placeholders(template, context):
     return placeholders_with_code
 
 
-def _get_block_nodes(extend_node):
-    parent = extend_node.get_parent(get_context(extend_node))
+def _get_block_nodes(extend_node, previous_context=None):
+    if not previous_context:
+        previous_context = get_context(extend_node)
+    parent = extend_node.get_parent(previous_context)
     parent_nodelist = _get_nodelist(parent)
     parent_nodes = parent_nodelist.get_nodes_by_type(BlockNode)
     parent_extend_nodes = parent_nodelist.get_nodes_by_type(ExtendsNode)
@@ -282,7 +284,7 @@ def _get_block_nodes(extend_node):
     if parent_extend_nodes:
         # Start at the top
         # Scan the extends node from the parent (if any)
-        nodes = _get_block_nodes(parent_extend_nodes[0])
+        nodes = _get_block_nodes(parent_extend_nodes[0], previous_context=previous_context)
     else:
         nodes = OrderedDict()
 
@@ -322,10 +324,12 @@ def _get_placeholder_nodes_from_extend(extend_node, node_class):
     return placeholders
 
 
-def _find_topmost_template(extend_node):
-    parent_template = extend_node.get_parent(get_context(extend_node))
+def _find_topmost_template(extend_node, previous_context=None):
+    if not previous_context:
+        previous_context = get_context(extend_node)
+    parent_template = extend_node.get_parent(previous_context)
     for node in _get_nodelist(parent_template).get_nodes_by_type(ExtendsNode):
         # Their can only be one extend block in a template, otherwise django raises an exception
-        return _find_topmost_template(node)
-        # No ExtendsNode
-    return extend_node.get_parent(get_context(extend_node))
+        return _find_topmost_template(node, previous_context=previous_context)
+    # No ExtendsNode
+    return parent_template
