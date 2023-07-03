@@ -42,7 +42,7 @@
     "karma-sauce-launcher": "^4.3.6",
     "karma-sourcemap-loader": "^0.4.0",
     "karma-webpack": "^3.0.5",
-    "minimist": "1.2.3",
+    "minimist": "1.2.6",
     "puppeteer": "^20.7.3",
     "raw-loader": "^0.5.1",
     "sass": "^1.27.0",
