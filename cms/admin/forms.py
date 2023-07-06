@@ -7,7 +7,6 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
-from django.template.defaultfilters import slugify
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
