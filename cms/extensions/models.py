@@ -1,3 +1,5 @@
+import warnings
+
 from django.db import models
 from django.db.models import ManyToManyField
 
@@ -20,7 +22,7 @@ class BaseExtension(models.Model):
     def get_page(self):  # pragma: no cover
         raise NotImplementedError('Function must be overwritten in subclasses and return the extended page object.')
 
-    def copy_relations(self, oldinstance, language):
+    def copy_relations(self, oldinstance):
         """
         Copy relations like many to many or foreign key relations to the public version.
         Similar to the same named cms plugin function.
@@ -38,10 +40,13 @@ class BaseExtension(models.Model):
         )
         return list(obj for obj in fields if not isinstance(obj.field, ManyToManyField))
 
-    def copy(self, target, language):
+    def copy(self, target, language=None):
         """
         This method copies this extension to an unrelated-target.
         """
+        if language is not None:
+            warnings.warn(f"The language argument is deprecated when copying a {self.__class__} extension")
+
         clone = self.__class__.objects.get(pk=self.pk)  # get a copy of this instance
         clone.pk = None
         clone.public_extension = None
@@ -53,7 +58,7 @@ class BaseExtension(models.Model):
                 setattr(clone, parent._meta.pk.attname, None)
 
         clone.save()
-        clone.copy_relations(self, language)
+        clone.copy_relations(self)
         return clone
 
     def copy_to_public(self, public_object, language):
