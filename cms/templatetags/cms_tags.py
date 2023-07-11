@@ -1,6 +1,7 @@
 from collections import OrderedDict, namedtuple
 from copy import copy
 from datetime import datetime
+import logging
 
 from classytags.arguments import Argument, MultiKeywordArgument, MultiValueArgument
 from classytags.core import Options, Tag
@@ -39,6 +40,7 @@ NULL = object()
 DeclaredPlaceholder = namedtuple('DeclaredPlaceholder', ['slot', 'inherit'])
 DeclaredStaticPlaceholder = namedtuple('DeclaredStaticPlaceholder', ['slot', 'site_bound'])
 
+logger = logging.getLogger(__name__)
 
 register = template.Library()
 
@@ -67,8 +69,15 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
         raise TypeError('The page_lookup argument can be either a Dictionary, Integer, Page, or String.')
     site = Site.objects._get_site_by_id(site_id)
     try:
+        warning_message = _('The page_url tag unexpectedly found multiple pages matching the request: %(page_lookup)s') % {'page_lookup': page_lookup}
         if 'pk' in page_lookup:
-            page = Page.objects.select_related('node').get(**page_lookup)
+            try:
+                page = Page.objects.select_related('node').get(**page_lookup)
+            except Model.MultipleObjectsReturned:
+                messages.warning(request, warning_message)
+                logger.warning(warning_message)
+                page = Page.objects.select_related('node').filter(**page_lookup).first()
+
             if request and _use_draft(request):
                 if page.publisher_is_draft:
                     return page
@@ -81,7 +90,12 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
                     return page
         else:
             pages = get_page_queryset(site, draft=_use_draft(request))
-            return pages.select_related('node').get(**page_lookup)
+            try:
+                return pages.select_related('node').get(**page_lookup)
+            except Model.MultipleObjectsReturned:
+                messages.warning(request, warning_message)
+                logger.warning(warning_message)
+                return pages.select_related('node').filter(**page_lookup).first()
     except Page.DoesNotExist:
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _("A template tag couldn't find the page with lookup arguments `%(page_lookup)s\n`. "
