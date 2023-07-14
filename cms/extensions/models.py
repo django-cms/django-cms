@@ -56,6 +56,20 @@ class BaseExtension(models.Model):
         clone.copy_relations(self, language)
         return clone
 
+    def copy_to_public(self, public_object, language):
+        """
+        .. warning::
+
+            This method used to "publish" this extension as part of the a larger operation on the target.
+            Publishing pages has been removed from django CMS core in version 4 onward.
+
+            For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        """
+        import warnings
+        warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
+                      'publishing, such as: djangocms-versioning.',
+                      UserWarning, stacklevel=2)
+
 
 class PageExtension(BaseExtension):
     extended_object = models.OneToOneField(Page, on_delete=models.CASCADE, editable=False)
