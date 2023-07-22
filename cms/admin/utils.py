@@ -240,13 +240,14 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     EMPTY_CONTENT_VALUE = _("Empty content")
     LC_SORTED_FIELDS = (models.CharField,)
 
-    _content_obj_cache = {}
     _content_cache_request_hash = None
-    _content_qs_cache = {}
     _content_content_type = None
-    _content_subquery_fields = []
 
     def __init__(self, model, admin_site):
+        self._content_subquery_fields = []
+        self._content_obj_cache = {}
+        self._content_qs_cache = {}
+
         super().__init__(model, admin_site)
 
         # Identify content model
