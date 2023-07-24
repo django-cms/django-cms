@@ -127,10 +127,8 @@ def details(request, slug):
 
     request_language = None
     if hasattr(request, "LANGUAGE_CODE"):
-        # use language from middleware - e.g. django.middleware.locale.LocaleMiddleware
+        # use language from middleware - usually django.middleware.locale.LocaleMiddleware
         request_language = request.LANGUAGE_CODE
-    elif is_language_prefix_patterns_used():
-        request_language = get_language_from_request(request, check_path=True)
     if not request_language:
         request_language = get_default_language_for_site(site.pk)
 
