@@ -1,3 +1,6 @@
+import copy
+import os
+
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
@@ -10,6 +13,7 @@ from django.utils.encoding import force_str
 from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
 
+from cms import __file__ as cms_root_path
 from cms import constants
 from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
@@ -115,6 +119,19 @@ class PlaceholderTestCase(TransactionCMSTestCase):
     def test_placeholder_recursive_extend(self):
         placeholders = _get_placeholder_slots('placeholder_tests/recursive_extend.html')
         self.assertEqual(sorted(placeholders), sorted(['recursed_one', 'recursed_two', 'three']))
+
+    def test_placeholder_recursive_deeper_extend(self):
+        template_settings = copy.deepcopy(settings.TEMPLATES)
+        cms_root_dir = os.path.dirname(cms_root_path)
+        template_settings[0]["DIRS"] = [
+            os.path.join(cms_root_dir, 'test_utils', 'project', 'placeholderapp',
+                         'nested_placeholderapp', 'templates'),
+            os.path.join(cms_root_dir, 'test_utils', 'project', 'placeholderapp', 'templates'),
+            os.path.join(cms_root_dir, 'test_utils', 'project', 'templates'),
+        ]
+        with override_settings(TEMPLATES=template_settings):
+            placeholders = _get_placeholder_slots('placeholder_tests/nested_extend.html')
+            self.assertEqual(sorted(placeholders), sorted(['recursed_one', 'two', 'recursed_three']))
 
     def test_placeholder_scanning_sekizai_extend_outside_block(self):
         placeholders = _get_placeholder_slots('placeholder_tests/outside_sekizai.html')

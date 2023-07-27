@@ -105,35 +105,39 @@ export const Helpers = {
 
         // if there is an ajax reload, prioritize
         if (ajax) {
-            parent.CMS.API.locked = true;
-            // check if the url has changed, if true redirect to the new path
-            // this requires an ajax request
-            $.ajax({
-                async: false,
-                type: 'GET',
-                url: parent.CMS.config.request.url,
-                data: data || {
-                    model: parent.CMS.config.request.model,
-                    pk: parent.CMS.config.request.pk
-                },
-                success: function(response) {
-                    parent.CMS.API.locked = false;
+            // Check if this is running inside a sideframe and then access
+            // the CMS APIs from the parent window
+            if (parent.CMS && parent.CMS.API) {
+                parent.CMS.API.locked = true;
+                // check if the url has changed, if true redirect to the new path
+                // this requires an ajax request
+                $.ajax({
+                    async: false,
+                    type: 'GET',
+                    url: parent.CMS.config.request.url,
+                    data: data || {
+                        model: parent.CMS.config.request.model,
+                        pk: parent.CMS.config.request.pk
+                    },
+                    success: function(response) {
+                        parent.CMS.API.locked = false;
 
-                    if (response === '' && !url) {
-                        // cancel if response is empty
-                        return false;
-                    } else if (parent.location.pathname !== response && response !== '') {
-                        // api call to the backend to check if the current path is still the same
-                        that.reloadBrowser(response);
-                    } else if (url === 'REFRESH_PAGE') {
-                        // if on_close provides REFRESH_PAGE, only do a reload
-                        that.reloadBrowser();
-                    } else if (url) {
-                        // on_close can also provide a url, reload to the new destination
-                        that.reloadBrowser(url);
+                        if (response === '' && !url) {
+                            // cancel if response is empty
+                            return false;
+                        } else if (parent.location.pathname !== response && response !== '') {
+                            // api call to the backend to check if the current path is still the same
+                            that.reloadBrowser(response);
+                        } else if (url === 'REFRESH_PAGE') {
+                            // if on_close provides REFRESH_PAGE, only do a reload
+                            that.reloadBrowser();
+                        } else if (url) {
+                            // on_close can also provide a url, reload to the new destination
+                            that.reloadBrowser(url);
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // cancel further operations
             return false;
