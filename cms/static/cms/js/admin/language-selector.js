@@ -29,7 +29,7 @@
                     window.location.search = replaceQueryParam('language', this.dataset.url, window.location.search);
                 }
             });
-
+            $('#content input:not(.language_button):not([type="hidden"])').first().focus();
             /* Set the content inline language defaults */
             var selected_language = element.find('input.selected').attr('name');
 
