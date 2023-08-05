@@ -119,6 +119,30 @@ The django CMS Association is a non-profit organization that was founded in 2020
 
 The non-profit django CMS Association is dependent on donations to fulfill its purpose. The best way to donate is to become a member of the association and pay membership fees. The funding will be funneled back into core development and community projects.
 
+
+**********************
+The django CMS Working
+**********************
+
+Django CMS is an open-source content management system (CMS) based on the Django web framework. It allows developers to build dynamic and feature-rich websites with ease. The primary goal of Django CMS is to provide an intuitive and flexible platform for managing content and creating complex web applications.
+
+Key features of Django CMS include:
+
+1.Drag-and-drop interface: The CMS provides an easy-to-use drag-and-drop interface, enabling users to create and organize content blocks easily.
+
+2.Reusable content plugins: Django CMS supports reusable content plugins, which are small, self-contained components that can be easily added to pages, providing various functionalities like text, images, videos, and more.
+
+3.Multilingual support: It offers built-in support for multilingual websites, allowing content to be translated and managed efficiently.
+
+4.Extensibility: Django CMS is highly extensible, allowing developers to create custom plugins, templates, and applications to meet specific project requirements.
+
+5.Frontend editing: Content editors can directly modify content on the website's frontend, providing a live preview of changes.
+
+6.SEO-friendly: The CMS is designed to be SEO-friendly, ensuring that websites built with Django CMS can achieve good search engine rankings.
+
+7.Version control: Django CMS offers version control, allowing you to track changes to content and revert to previous versions if necessary.
+
+
 `Join the django CMS Association <https://www.django-cms.org/en/contribute/>`_.
 
 
