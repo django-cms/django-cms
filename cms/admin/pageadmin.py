@@ -1,4 +1,5 @@
 import json
+import re
 from collections import namedtuple
 
 import django
@@ -924,22 +925,6 @@ class PageContentAdmin(admin.ModelAdmin):
             request.GET['source'] = obj.page_id
         return self.add_view(request)
 
-    def get_unihandecode_context(self, language):
-        if language[:2] in get_cms_setting('UNIHANDECODE_DECODERS'):
-            uhd_lang = language[:2]
-        else:
-            uhd_lang = get_cms_setting('UNIHANDECODE_DEFAULT_DECODER')
-        uhd_host = get_cms_setting('UNIHANDECODE_HOST')
-        uhd_version = get_cms_setting('UNIHANDECODE_VERSION')
-        if uhd_lang and uhd_host and uhd_version:
-            uhd_urls = [
-                '%sunihandecode-%s.core.min.js' % (uhd_host, uhd_version),
-                '%sunihandecode-%s.%s.min.js' % (uhd_host, uhd_version, uhd_lang),
-            ]
-        else:
-            uhd_urls = []
-        return {'unihandecode_lang': uhd_lang, 'unihandecode_urls': uhd_urls}
-
     def add_view(self, request, form_url='', extra_context=None):
         site = get_site(request)
         language = get_site_language_from_request(request, site_id=site.pk)
@@ -973,7 +958,6 @@ class PageContentAdmin(admin.ModelAdmin):
             extra_context['filled_languages'] = self.get_filled_languages(request, cms_page)
             extra_context['show_language_tabs'] = len(extra_context['language_tabs'])
         extra_context['language'] = language
-        extra_context.update(self.get_unihandecode_context(language))
         return super().add_view(request, form_url, extra_context=extra_context)
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
@@ -1004,8 +988,6 @@ class PageContentAdmin(admin.ModelAdmin):
             _has_advanced_settings_perm = self.has_change_advanced_settings_permission(request, obj=obj)
             context['can_change_advanced_settings'] = _has_advanced_settings_perm
 
-        tab_language = get_site_language_from_request(request, site_id=site.pk)
-        context.update(self.get_unihandecode_context(tab_language))
         return super().change_view(request, object_id, form_url=form_url, extra_context=context)
 
     def get_filled_languages(self, request, page):
@@ -1370,9 +1352,12 @@ class PageContentAdmin(admin.ModelAdmin):
         """
         site = get_site(request)
         pages = Page.objects.on_site(site).order_by('node__path')
-        node_id = request.GET.get('nodeId')
-        open_nodes = list(map(int, request.GET.getlist('openNodes[]')))
-
+        node_id = re.sub(r'[^\d]', '', request.GET.get('nodeId', '')) or None
+        open_nodes = list(map(
+            int,
+            [re.sub(r'[^\d]', '', node) for node in
+             request.GET.getlist('openNodes[]')]
+        ))
         if node_id:
             page = get_object_or_404(pages, node_id=int(node_id))
             pages = page.get_descendant_pages().filter(Q(node__in=open_nodes) | Q(node__parent__in=open_nodes))

@@ -100,7 +100,7 @@ class LogPageOperationsTests(CMSTestCase):
             page_data['template'] = 'nav_playground.html'
 
             # Get and edit the page
-            page_data['slug'] = 'changed slug'
+            page_data['slug'] = 'changed-slug'
             response = self.client.post(self.get_page_change_uri('en', page), page_data)
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)

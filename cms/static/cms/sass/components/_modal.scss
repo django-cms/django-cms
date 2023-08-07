@@ -254,6 +254,10 @@
     @extend .cms-toolbar-item-buttons;
     float: right;
     margin-left: $margin;
+
+    .cancel-link {
+        display: none;
+    }
 }
 .cms-modal-item-buttons-left {
     float: left;

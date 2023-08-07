@@ -1,3 +1,5 @@
+import warnings
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -6,12 +8,12 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from cms.admin.forms import AddPageForm
+from cms.admin.forms import SlugWidget as AdminSlugWidget
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_available_slug
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
-from cms.utils.urlutils import static_with_version
 
 try:
     # djangocms_text_ckeditor is not guaranteed to be available
@@ -21,16 +23,13 @@ except ImportError:
     text_widget = forms.Textarea
 
 
-class SlugWidget(forms.widgets.TextInput):
-    """
-    Special widget for the slug field that requires PageContent field to be there.
-    Adds the js for the slugifying.
-    """
-    class Media:
-        js = (
-            'admin/js/urlify.js',
-            static_with_version('cms/js/dist/bundle.forms.slugwidget.min.js'),
-        )
+class SlugWidget(AdminSlugWidget):
+    """Compatibility shim with deprecation warning:
+    SlugWidget has moved to cms.admin.forms"""
+    def __init__(self, *args, **kwargs):
+        warnings.warn("Import SlugWidget from cms.admin.forms. SlugWidget will be removed from cms.forms.wizards",
+                      DeprecationWarning, stacklevel=2)
+        super().__init__(*args, **kwargs)
 
 
 class CreateCMSPageForm(AddPageForm):
@@ -58,7 +57,6 @@ class CreateCMSPageForm(AddPageForm):
         super().__init__(*args, **kwargs)
         self.fields['title'].help_text = _("Provide a title for the new page.")
         self.fields['slug'].required = False
-        self.fields['slug'].widget = SlugWidget()
         self.fields['slug'].help_text = _("Leave empty for automatic slug, or override as required.")
 
     def get_placeholder(self, page_content, slot=None):
@@ -91,7 +89,12 @@ class CreateCMSPageForm(AddPageForm):
         if self._errors:
             return data
 
-        slug = data.get('slug') or slugify(data['title'])
+        slug = slugify(data.get('slug')) or slugify(data['title'])
+        if not slug:
+            data["slug"] = ""
+            forms.ValidationError({
+                "slug": [_("Cannot automatically create slug. Please provide one manually.")],
+            })
 
         parent_node = data.get('parent_node')
 
@@ -106,7 +109,7 @@ class CreateCMSPageForm(AddPageForm):
         data['path'] = '%s/%s' % (base, data['slug']) if base else data['slug']
 
         if not data['slug']:
-            raise forms.ValidationError("Please provide a valid slug.")
+            raise forms.ValidationError(_("Please provide a valid slug."))
         return data
 
     def clean_parent_node(self):
@@ -133,11 +136,6 @@ class CreateCMSPageForm(AddPageForm):
             message = gettext('You don\'t have the permissions required to add a page.')
             raise ValidationError(message)
         return parent_page.node if parent_page else None
-
-    def clean_slug(self):
-        # Don't let the PageAddForm validate this
-        # on the wizard it is not a required field
-        return self.cleaned_data['slug']
 
     def get_template(self):
         return get_cms_setting('PAGE_WIZARD_DEFAULT_TEMPLATE')
