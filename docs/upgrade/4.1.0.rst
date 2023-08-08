@@ -4,7 +4,7 @@
 4.1 release notes
 *****************
 
-*December 20, 2022*
+*August 8, 2023*
 
 Welcome to django CMS 4.1!
 
@@ -17,7 +17,7 @@ please urgently read the release notes of django CMS 4.0.
 Django and Python compatibility
 ===============================
 
-django CMS supports **Django 3.2, 4.0, and 4.1**. We highly recommend and only
+django CMS supports **Django 3.2, 4.0, 4.1, and 4.2**. We highly recommend and only
 support the latest release of each series.
 
 It supports **Python 3.8, 3.9, 3.10, and 3.11**. As for Django we highly recommend and only
