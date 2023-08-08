@@ -42,6 +42,9 @@ def _clean_redirect_url(redirect_url, language):
     already starting with the language prefix, it adds the language prefix at the beginning
     of the URL.
 
+    Note:
+        This is a private function, it is not recommended to use it in third party code.
+
     Parameters:
         redirect_url (str): The original redirect URL that may need to be modified.
         language (str): The language code to be used as the prefix in the URL.
