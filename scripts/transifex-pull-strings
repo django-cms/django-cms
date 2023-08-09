@@ -5,9 +5,10 @@ set -e
 SCRIPTS=$(dirname "$(realpath "$0")")
 ROOT=$(git rev-parse --show-toplevel)
 
-cd "${ROOT}/cms"
-
+cd "${ROOT}"
 "${SCRIPTS}/tx" --token "$TX_TOKEN" pull --force
+
+cd "${ROOT}/cms"
 django-admin compilemessages
 
 "${SCRIPTS}/filter-locale-changes"
