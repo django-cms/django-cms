@@ -208,7 +208,7 @@ def check_i18n(output):
                              "'en_US'): '%s' provided" % lang[0])
         if settings.SITE_ID == hash(settings.SITE_ID):
             for site, items in get_cms_setting('LANGUAGES').items():
-                if type(site) == int:
+                if isinstance(site, int):
                     for lang in items:
                         if lang['code'].find('_') > -1:
                             section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: "
