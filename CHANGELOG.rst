@@ -41,7 +41,6 @@ This release includes 3 pull requests, and was created with the help of the foll
 * Fabian Braun (1 pull request)
 * Github Release Action (2 pull requests)
 
-With the review help of the following contributors:
 
 
 Thanks to all contributors for their efforts!
