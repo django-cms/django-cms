@@ -1,3 +1,4 @@
+import contextlib
 from collections import OrderedDict
 from functools import partial
 
@@ -288,7 +289,8 @@ class ContentRenderer(BaseRenderer):
             self._rendered_placeholders[placeholder.pk] = rendered_placeholder
 
         if editable:
-            with override(context["request"].toolbar.toolbar_language):
+            request = context.get("request", None)
+            with override(request.toolbar.toolbar_language) if request else contextlib.nullcontext:
                 data = self.get_editable_placeholder_context(placeholder, page=page)
             data['content'] = placeholder_content
             placeholder_content = self.placeholder_edit_template.format(**data)
