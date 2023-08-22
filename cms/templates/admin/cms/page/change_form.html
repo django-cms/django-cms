@@ -108,13 +108,6 @@
 {{ block.super }}
 {% endblock %}
 
-{% for url in unihandecode_urls %}<script src="{{ url }}" type="text/javascript"></script>{% endfor %}
-{% if unihandecode_urls %}
-<script>
-    var UNIHANDECODER = unihandecode.Unihan('{{ unihandecode_lang }}');
-</script>
-{% endif %}
-
 {# JavaScript for prepopulated fields #}
 {% prepopulated_fields_js %}
 
