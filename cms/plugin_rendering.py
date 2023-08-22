@@ -7,6 +7,7 @@ from django.template import Context
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
+from django.utils.translation import override
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.toolbar.utils import get_placeholder_toolbar_js, get_plugin_toolbar_js, get_toolbar_from_request
@@ -287,7 +288,8 @@ class ContentRenderer(BaseRenderer):
             self._rendered_placeholders[placeholder.pk] = rendered_placeholder
 
         if editable:
-            data = self.get_editable_placeholder_context(placeholder, page=page)
+            with override(context["request"].toolbar.toolbar_language):
+                data = self.get_editable_placeholder_context(placeholder, page=page)
             data['content'] = placeholder_content
             placeholder_content = self.placeholder_edit_template.format(**data)
 
