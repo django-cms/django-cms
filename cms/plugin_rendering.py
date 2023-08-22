@@ -290,7 +290,7 @@ class ContentRenderer(BaseRenderer):
 
         if editable:
             request = context.get("request", None)
-            with override(request.toolbar.toolbar_language) if request else contextlib.nullcontext:
+            with override(request.toolbar.toolbar_language) if request else contextlib.nullcontext():
                 data = self.get_editable_placeholder_context(placeholder, page=page)
             data['content'] = placeholder_content
             placeholder_content = self.placeholder_edit_template.format(**data)
