@@ -138,8 +138,7 @@ class ViewTests(CMSTestCase):
     def test_redirect_not_preserving_query_parameters(self):
         # test redirect checking that the query parameters aren't preserved
         redirect = '/en/'
-        one = create_page("one", "nav_playground.html", "en", published=True,
-                          redirect=redirect)
+        one = create_page("one", "nav_playground.html", "en", redirect=redirect)
         url = one.get_absolute_url()
         params = "?param_name=param_value"
         request = self.get_request(url + params)
@@ -151,8 +150,7 @@ class ViewTests(CMSTestCase):
     def test_redirect_preserving_query_parameters(self):
         # test redirect checking that query parameters are preserved
         redirect = '/en/'
-        one = create_page("one", "nav_playground.html", "en", published=True,
-                          redirect=redirect)
+        one = create_page("one", "nav_playground.html", "en", redirect=redirect)
         url = one.get_absolute_url()
         params = "?param_name=param_value"
         request = self.get_request(url + params)
@@ -163,8 +161,7 @@ class ViewTests(CMSTestCase):
     @override_settings(CMS_REDIRECT_TO_LOWERCASE_SLUG=True)
     def test_redirecting_to_lowercase_slug(self):
         redirect = '/en/one/'
-        one = create_page("one", "nav_playground.html", "en", published=True,
-                          redirect=redirect)
+        one = create_page("one", "nav_playground.html", "en", redirect=redirect)
         url = reverse('pages-details-by-slug', kwargs={"slug": "One"})
         request = self.get_request(url)
         response = details(request, one.get_path(language="en"))
