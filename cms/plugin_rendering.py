@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import sys
 from collections import OrderedDict
@@ -9,6 +10,7 @@ from django.template import Context
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
+from django.utils.translation import override
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.models import PageContent
@@ -300,7 +302,9 @@ class ContentRenderer(BaseRenderer):
             self._rendered_placeholders[placeholder.pk] = rendered_placeholder
 
         if editable:
-            data = self.get_editable_placeholder_context(placeholder, page=page)
+            request = context.get("request", None)
+            with override(request.toolbar.toolbar_language) if request else contextlib.nullcontext():
+                data = self.get_editable_placeholder_context(placeholder, page=page)
             data['content'] = placeholder_content
             placeholder_content = self.placeholder_edit_template.format(**data)
 

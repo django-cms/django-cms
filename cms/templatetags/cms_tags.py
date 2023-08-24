@@ -24,6 +24,7 @@ from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.translation import (
     get_language,
+    override,
 )
 from django.utils.translation import (
     gettext_lazy as _,
@@ -993,6 +994,10 @@ class CMSAdminURL(AsTag):
     )
 
     def get_value(self, context, viewname, args, kwargs):
+        request = context.get("request", None)
+        if request and hasattr(request, "toolbar"):
+            with override(request.toolbar.request.toolbar.toolbar_language):
+                return admin_reverse(viewname, args=args, kwargs=kwargs)
         return admin_reverse(viewname, args=args, kwargs=kwargs)
 
 
