@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-25 16:36+0000\n"
+"POT-Creation-Date: 2023-08-25 14:47+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -55,9 +55,6 @@ msgstr "Description meta tag"
 
 msgid "A description of the page used by search engines."
 msgstr "A description of the page used by search engines."
-
-msgid "Slug must not be empty."
-msgstr "Slug must not be empty."
 
 msgid "Page type"
 msgstr "Page type"
@@ -1652,3 +1649,6 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#~ msgid "Slug must not be empty."
+#~ msgstr "Slug must not be empty."

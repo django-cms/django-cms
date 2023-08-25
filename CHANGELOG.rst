@@ -1,9 +1,9 @@
-4.1.0rc3 (unpublished)
+4.1.0rc4 (unpublished)
 ======================
 
 Features:
 ---------
-
+* Dark mode for v4 branch (#7597) (e0c923836) -- Fabian Braun
 * Graceful plugin exceptions (#7423)
 * Reintroduce indicator menus (#7426)
 * Add release scripts for develop-4 branch (#7466)
@@ -20,6 +20,23 @@ Features:
 
 Bug Fixes:
 ----------
+* Open new plugin window in language of toolbar not of page (#7632) (ac74c2127) -- Fabian Braun
+* Update transifex source file (#7629) (06ecf3a8e) -- Fabian Braun
+* Remove publish/draft reference from grouper admin message (fcc2f7ad5) -- Fabian Braun
+* Update _modal.scss (4ab1f58cd) -- Fabian Braun
+* Better action feedback (94cc9b0f5) -- Fabian Braun
+* modal.scss dark-mode compatibilitiy (318d417a4) -- Fabian Braun
+* remove `copy_to_public` from page and page content extensions (#7604) (81ad858e9) -- Fabian Braun
+* Cross-talk between grouper admins due to common list initialization (#7613) (1f932b097) -- Fabian Braun
+* Remove admin view provided cancel button from modals (since it has its own cancel button) (#7603) (5caf8d5c2) -- Fabian Braun
+* Upgrade js build system to node.js 18 (#7601) (a0977a7f9) -- Vinit Kumar
+* update diff-dom and karma, run frontend tests on Chrome Headless (#7599) (69a6cef63) -- Fabian Braun
+* Sitemaps in v4 relied on availability of `PageUrl` instead of `PageContent` (#7596) (1c208a8cb) -- Fabian Braun
+* page settings does not correctly focus (#7576) (e100087c3) -- Fabian Braun
+* Add (back) navigation extenders to advanced settings (#7578) (3e3a86b4f) -- Fabian Braun
+* Unlocalize ids to avoid js errors for ids greater than 999 (#7577) (52e6f8751) -- Fabian Braun
+* create page wizard fails with Asian page titles/unicode slugs (#7572) (79a063f21) -- Fabian Braun
+* take csrf token from admin form or cms toolbar instead of cookie (6a6ebecff) -- Fabian Braun
 * Menu link is outdated when page moved (#7558)
 * Preview button lead to the wrong language (#7558)
 * empty actions shown without unwanted spaces (#7545) (#7552) (aee76b492) -- Fabian Braun
@@ -36,13 +53,50 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 3 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 191 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (2 pull requests)
+* Adam Murray (2 pull requests)
+* Aiky30 (35 pull requests)
+* Andrew Aikman (1 pull request)
+* Chematronix (1 pull request)
+* Fabian Braun (73 pull requests)
+* Github Release Action (4 pull requests)
+* Jacob Rief (2 pull requests)
+* Jonathan Sundqvist (7 pull requests)
+* Krzysztof Socha (17 pull requests)
+* Malinda Perera (3 pull requests)
+* Mark Walker (8 pull requests)
+* Mateusz Kamycki (1 pull request)
+* Nebojsa Knezevic (1 pull request)
+* Paulo (18 pull requests)
+* Paulo Alvarado (12 pull requests)
+* Simon (1 pull request)
+* Vadim Sikora (11 pull requests)
+* Vinit Kumar (2 pull requests)
+* anirbanlahiri-fidelity (1 pull request)
+* monikasulik (3 pull requests)
 
 With the review help of the following contributors:
 
+* Adam Murray
+* Aiky30
+* Andrew Aikman
+* Angelo Dini
+* Bartosz Płóciennik
+* Fabian Braun
+* Florian Delizy
+* Github Release Action
+* Iacopo Spalletti
+* Krzysztof Socha
+* Marco Bonetti
+* Mark Walker
+* Radek Stępień
+* Radosław Stępień
+* Raffaele Salmaso
+* Stuart Axon
+* Vinit Kumar
+* pajowu
+* Éric Araujo
 
 Thanks to all contributors for their efforts!
 
