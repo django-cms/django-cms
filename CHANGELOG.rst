@@ -4,7 +4,6 @@
 Features:
 ---------
 * Dark mode for v4 branch (#7597) (e0c923836) -- Fabian Braun
-
 * Graceful plugin exceptions (#7423)
 * Reintroduce indicator menus (#7426)
 * Add release scripts for develop-4 branch (#7466)
@@ -21,7 +20,6 @@ Features:
 
 Bug Fixes:
 ----------
-* Broken page actions menu if CMS_PERMISSIONS is set (33f93d63f) -- Fabian Braun
 * Open new plugin window in language of toolbar not of page (#7632) (ac74c2127) -- Fabian Braun
 * Update transifex source file (#7629) (06ecf3a8e) -- Fabian Braun
 * Remove publish/draft reference from grouper admin message (fcc2f7ad5) -- Fabian Braun
@@ -31,7 +29,7 @@ Bug Fixes:
 * remove `copy_to_public` from page and page content extensions (#7604) (81ad858e9) -- Fabian Braun
 * Cross-talk between grouper admins due to common list initialization (#7613) (1f932b097) -- Fabian Braun
 * Remove admin view provided cancel button from modals (since it has its own cancel button) (#7603) (5caf8d5c2) -- Fabian Braun
-* try to upgrade node.js to 18 (#7601) (a0977a7f9) -- Vinit Kumar
+* Upgrade js build system to node.js 18 (#7601) (a0977a7f9) -- Vinit Kumar
 * update diff-dom and karma, run frontend tests on Chrome Headless (#7599) (69a6cef63) -- Fabian Braun
 * Sitemaps in v4 relied on availability of `PageUrl` instead of `PageContent` (#7596) (1c208a8cb) -- Fabian Braun
 * page settings does not correctly focus (#7576) (e100087c3) -- Fabian Braun
