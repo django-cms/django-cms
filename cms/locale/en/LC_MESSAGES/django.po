@@ -940,7 +940,7 @@ msgid "Password:"
 msgstr "Password:"
 
 msgid "Add a page"
-msgstr "Add a Page"
+msgstr "Add a page"
 
 msgid "Change a page"
 msgstr "Change a page"
