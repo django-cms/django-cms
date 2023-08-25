@@ -1236,8 +1236,8 @@ msgstr ""
 msgid "Cancel"
 msgstr "Cancel"
 
-msgid "The following error occured:"
-msgstr "The following error occured:"
+msgid "The following error occurred:"
+msgstr "The following error occurred:"
 
 msgid "Action successful."
 msgstr "Action successful."
