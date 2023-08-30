@@ -18,7 +18,7 @@ from django.urls import reverse
 from django.utils.encoding import smart_str
 from django.utils.html import escape
 from django.utils.http import urlencode
-from django.utils.translation import get_language
+from django.utils.translation import get_language, override
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import override as force_language
 from sekizai.templatetags.sekizai_tags import RenderBlock, SekizaiParser
@@ -985,8 +985,10 @@ class CMSAdminURL(AsTag):
     )
 
     def get_value(self, context, viewname, args, kwargs):
+        if hasattr(context.get("request"), "toolbar"):
+            with override(context["request"].toolbar.toolbar_language):
+                return admin_reverse(viewname, args=args, kwargs=kwargs)
         return admin_reverse(viewname, args=args, kwargs=kwargs)
-
 
 
 register.tag('page_attribute', PageAttribute)

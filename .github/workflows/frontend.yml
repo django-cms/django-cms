@@ -24,3 +24,5 @@ jobs:
     - run: |
           gulp unitTest
           gulp lint
+    - run: gulp icons
+    - run: gulp sass
