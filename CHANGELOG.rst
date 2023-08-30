@@ -76,7 +76,6 @@ This release includes 191 pull requests, and was created with the help of the fo
 * anirbanlahiri-fidelity (1 pull request)
 * monikasulik (3 pull requests)
 
-With the review help of the following contributors:
 
 * Adam Murray
 * Aiky30
