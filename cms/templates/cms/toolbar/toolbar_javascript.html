@@ -27,7 +27,7 @@ CMS.config = {
         'debug': '{% filter escapejs %}{% blocktrans %}Development version using django CMS {{ cms_version }}, Django {{ django_version }}, Python {{ python_version }}{% endblocktrans %}{% endfilter %}',
         {% endif %}
         'cancel': '{% filter escapejs %}{% trans "Cancel" %}{% endfilter %}',
-        'error': '<strong>{% filter escapejs %}{% trans "The following error occured:" %}{% endfilter %}</strong> ',
+        'error': '<strong>{% filter escapejs %}{% trans "The following error occurred:" %}{% endfilter %}</strong> ',
         'success': '{% filter escapejs %}{% trans "Action successful." %}{% endfilter %}',
         'confirm': '{% filter escapejs %}{% trans "Are you sure you want to delete this plugin?" %}{% endfilter %}',
         'publish': '{% filter escapejs %}{% trans "Are you sure you want to publish this page?" %}{% endfilter %}',

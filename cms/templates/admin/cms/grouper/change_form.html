@@ -14,7 +14,7 @@
   {% endblock %}
   {% if content_instance.versions and content_instance.versions.first.state != "draft" %}
     <div class="errornote">
-      <p><i>{% trans "Some fields cannot be changed since they are not draft content." %}</i></p>
+      <p><i>{% trans "Some fields cannot be changed since they are read-only content." %}</i></p>
     </div>
   {% endif %}
   {{ block.super }}
