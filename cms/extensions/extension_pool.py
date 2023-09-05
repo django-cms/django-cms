@@ -51,35 +51,26 @@ class ExtensionPool:
         except KeyError:
             pass
 
-    def _copy_page_extensions(self, source_page, target_page, language, clone=False):
+    def _copy_page_extensions(self, source_page, target_page, language):
         for extension in self.page_extensions:
             for instance in extension.objects.filter(extended_object=source_page):
-                if clone:
-                    instance.copy(target_page, language)
-                else:
-                    instance.copy_to_public(target_page, language)
+                instance.copy(target_page, language)
 
-    def _copy_content_extensions(self, source_page, target_page, language, clone=False):
+    def _copy_content_extensions(self, source_page, target_page, language):
         source_content = source_page.pagecontent_set(manager="admin_manager").get(language=language)
-        if target_page:
-            target_title = target_page.pagecontent_set(manager="admin_manager").get(language=language)
-        else:
-            target_title = source_content.publisher_public
+        target_title = target_page.pagecontent_set(manager="admin_manager").get(language=language)
         for extension in self.page_content_extensions:
             for instance in extension.objects.filter(extended_object=source_content):
-                if clone:
-                    instance.copy(target_title, language)
-                else:
-                    instance.copy_to_public(target_title, language)
+                instance.copy(target_title, language)
 
     def copy_extensions(self, source_page, target_page, languages=None):
         if not languages:
             languages = target_page.get_languages()
         if self.page_extensions:
-            self._copy_page_extensions(source_page, target_page, None, clone=True)
+            self._copy_page_extensions(source_page, target_page, None)
         for language in languages:
             if self.page_content_extensions:
-                self._copy_content_extensions(source_page, target_page, language, clone=True)
+                self._copy_content_extensions(source_page, target_page, language)
 
     def get_page_extensions(self, page=None):
         extensions = []

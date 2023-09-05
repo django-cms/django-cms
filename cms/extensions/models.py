@@ -40,9 +40,7 @@ class BaseExtension(models.Model):
 
     def copy(self, target, language):
         """
-        This method copies this extension to an unrelated-target. If you intend
-        to "publish" this extension to the publisher counterpart of target, then
-        use copy_to_publish() instead.
+        This method copies this extension to an unrelated-target.
         """
         clone = self.__class__.objects.get(pk=self.pk)  # get a copy of this instance
         clone.pk = None
@@ -60,40 +58,17 @@ class BaseExtension(models.Model):
 
     def copy_to_public(self, public_object, language):
         """
-        This method is used to "publish" this extension as part of the a larger
-        operation on the target. If you intend to copy this extension to an
-        unrelated object, use copy() instead.
+        .. warning::
+
+            This method used to "publish" this extension as part of the a larger operation on the target.
+            Publishing pages has been removed from django CMS core in version 4 onward.
+
+            For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
         """
-        this = self.__class__.objects.get(pk=self.pk)  # get a copy of this instance
-        public_extension = self.public_extension  # get the public version of this instance if any
-
-        this.extended_object = public_object  # set the new public object
-
-        if public_extension:
-            # overwrite current public extension
-            this.pk = public_extension.pk
-            # remove public extension, or it will point to itself and raise duplicate entry
-            this.public_extension = None
-
-            # Set public_extension concrete parents PKs. See issue #5494
-            for parent, field in this._meta.parents.items():
-                if field:
-                    setattr(this, parent._meta.pk.attname, getattr(public_extension, parent._meta.pk.attname))
-        else:
-            this.pk = None  # create new public extension
-
-            # Nullify all concrete parent primary keys. See issue #5494
-            for parent, field in this._meta.parents.items():
-                if field:
-                    setattr(this, parent._meta.pk.attname, None)
-
-            this.save()
-            self.public_extension = this
-            self.save()
-
-        this.copy_relations(self, language)
-        this.save(force_update=True)
-        return this
+        import warnings
+        warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
+                      'publishing, such as: djangocms-versioning.',
+                      UserWarning, stacklevel=2)
 
 
 class PageExtension(BaseExtension):
