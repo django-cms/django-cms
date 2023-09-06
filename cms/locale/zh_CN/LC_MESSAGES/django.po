@@ -21,6 +21,7 @@
 # ofive <glacier_05@yahoo.com.cn>, 2011
 # Ryan <ouyang.em@gmail.com>, 2013
 # Ryan <ouyang.em@gmail.com>, 2013
+# Scott Jiang, 2023
 # spaceoi <zhangzhaoyu@gmail.com>, 2014
 # ufo <user@ufoym.com>, 2015
 # wenze <wangwenze@live.cn>, 2015
@@ -32,10 +33,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
-"Language-Team: Chinese (China) (http://www.transifex.com/divio/django-cms/language/zh_CN/)\n"
+"Last-Translator: Scott Jiang, 2023\n"
+"Language-Team: Chinese (China) (http://app.transifex.com/divio/django-cms/language/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -58,29 +59,26 @@ msgid "Slug"
 msgstr "缩略名"
 
 msgid "The part of the title that is used in the URL"
-msgstr "标题中被用在URL中的部分"
+msgstr "部分标题被用在URL中"
 
 msgid "Menu Title"
 msgstr "菜单标题"
 
 msgid "Overwrite what is displayed in the menu"
-msgstr "覆盖菜单上的显示"
+msgstr "替代菜单上的显示"
 
 msgid "Page Title"
 msgstr "页面标题"
 
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "覆盖显示在浏览器顶部标题栏或书签中的信息"
+msgstr "替代显示在浏览器顶部的标题或书签中的信息"
 
 msgid "Description meta tag"
 msgstr "描述性的原标签"
 
 msgid "A description of the page used by search engines."
-msgstr "被搜索引擎收录的常见关键字列表"
-
-msgid "Slug must not be empty."
-msgstr "缩略名不能为空。"
+msgstr "供予搜索引擎收录的页面解释"
 
 msgid "Page type"
 msgstr "页面类型"
@@ -113,7 +111,7 @@ msgid "Redirects to this URL."
 msgstr "转到这个链接"
 
 msgid "Start typing..."
-msgstr "开始输入……"
+msgstr "开始键入……"
 
 msgid "Application configurations"
 msgstr "应用程序设置"
@@ -122,17 +120,17 @@ msgid "Language independent options"
 msgstr "与语言无关的选项"
 
 msgid "You entered an invalid URL."
-msgstr ""
+msgstr "你输入了一个无效的URL"
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
 msgstr "在编辑高级设置之前请先设置 %(language)s 的短连接"
 
 msgid "A page with this reverse URL id exists already."
-msgstr "该URL id已经被使用。"
+msgstr "该反向URL id已经存在。"
 
 msgid "Invalid application config value"
-msgstr ""
+msgstr "无效的应用设置值"
 
 msgid "An application instance using this configuration already exists."
 msgstr "已经存在使用此设置的应用实例。"
@@ -141,7 +139,7 @@ msgid "An application instance with this name already exists."
 msgstr "已经存在使用此名称的应用实例。"
 
 msgid "You can't move the home page inside another page"
-msgstr ""
+msgstr "你不能将主页移入到另一页面"
 
 msgid "Yes"
 msgstr "是"
@@ -153,7 +151,7 @@ msgid "user"
 msgstr "用户"
 
 msgid "can_view"
-msgstr "can_view"
+msgstr "可看"
 
 msgid "Add"
 msgstr "新建"
@@ -167,32 +165,32 @@ msgstr "删除"
 msgid ""
 "Users can't create a page without permissions to change the created page. "
 "Edit permissions required."
-msgstr "用户没有权限修改已创建的页面，不能创建页面。需要编辑权限。"
+msgstr "用户需要有修改已创建页面的权限才可以创建页面。请修改权限。"
 
 msgid ""
 "Users can't delete a page without permissions to change the page. Edit "
 "permissions required."
-msgstr "用户没有权限修改页面，不能删除页面。需要编辑权限。"
+msgstr "用户需要有修改已创建页面的权限才可以删除页面。请修改权限。"
 
 msgid ""
 "Users can't set page permissions without permissions to change a page. Edit "
 "permissions required."
-msgstr "用户没有权限修改页面，不能设置页面的权限。需要编辑权限。"
+msgstr "用户需要有修改已创建页面的权限才可以设置页面权限。请修改权限。"
 
 msgid ""
 "Users can't delete page permissions without permissions to change a page. "
 "Edit permissions required."
-msgstr "用户没有修改页面的权限，不能删除页面的权限。需要编辑权限。"
+msgstr "用户需要有修改已创建页面的权限才可以删除页面权限。请修改权限。"
 
 msgid ""
 "Users can't create page permissions without permissions to change the "
 "created permission. Edit permissions required."
-msgstr "用户没有修改已创建页面的权限，不能创建页面权限。需要编辑权限。"
+msgstr "用户需要有修改已创建页面的权限才可以创建页面权限。请修改权限。"
 
 msgid ""
 "Users can't delete page permissions without permissions to change "
 "permissions. Edit permissions required."
-msgstr "用户没有修改权限的权限，不能删除页面权限。需要编辑权限。"
+msgstr "用户需要有修改已创建页面的权限才可以删除页面权限。请修改权限。"
 
 #, python-format
 msgid "Invalid plugin type '%s'"
@@ -586,6 +584,12 @@ msgid "Provide a title for the new page."
 msgstr "给新建页面标题"
 
 msgid "Leave empty for automatic slug, or override as required."
+msgstr ""
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr ""
+
+msgid "Please provide a valid slug."
 msgstr ""
 
 msgid "You don't have the permissions required to add a page."
