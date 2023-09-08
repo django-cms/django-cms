@@ -5,21 +5,9 @@ Changelog
 Features:
 ---------
 * Update dark mode switch to be compatible with Django 4.2 admin dark mode (#7549) (1106ae6d7) -- Fabian Braun
-* Update dark mode switch to be compatible with Django 4.2 admin dark mode (#7549) (1106ae6d7) -- Fabian Braun
 
 Bug Fixes:
 ----------
-* Toolbar action button becomes hard to read in dark mode (c626022ba) -- Fabian Braun
-* Backport v4.1.0rc4 fixes - Admin language and styling (#7630) (#7641) (90b72ebea) -- Fabian Braun
-* diff-dom freezing on content refresh: #7460 (#7600) (d8e9c527e) -- Vinit Kumar
-* Fixed RecursionError when extending templates (#7594) (c99f78759) -- mihalikv
-* JS issues with running CMS under cypress (#7591) (ce4c29948) -- Vinit Kumar
-* Mitigate performance hit due to deprecation warnings for v4.1 (#7587) (9908d7e70) -- Fabian Braun
-* create page wizard fails with Asian page titles/unicode slugs (#7565) (0ab640ce3) -- Fabian Braun
-* require Django >= 3.2 (#7562) (a77358b93) -- Fabian Braun
-* respect pre-set (48353c2d6) -- Fabian Braun
-* lint menus app (#7534) (927b60b47) -- Vinit Kumar
-* remove curly bracket left behind on PR 7488 (#7529) (123f7df91) -- Corentin Bettiol
 * Toolbar action button becomes hard to read in dark mode (c626022ba) -- Fabian Braun
 * Backport v4.1.0rc4 fixes - Admin language and styling (#7630) (#7641) (90b72ebea) -- Fabian Braun
 * diff-dom freezing on content refresh: #7460 (#7600) (d8e9c527e) -- Vinit Kumar
@@ -39,11 +27,10 @@ This release includes 46 pull requests, and was created with the help of the fol
 
 * ChengDaqi2023 (1 pull request)
 * Corentin Bettiol (1 pull request)
-* Fabian Braun (31 pull requests)
+* Fabian Braun (15 pull requests)
 * Github Release Action (3 pull requests)
 * Vinit Kumar (3 pull requests)
 * caption (1 pull request)
-* dependabot[bot] (0 pull request)
 * mihalikv (1 pull request)
 * suryadev99 (1 pull request)
 
