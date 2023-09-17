@@ -2,6 +2,9 @@
 Changelog
 =========
 
+3.11.4 (2023-09-06)
+===================
+
 Features:
 ---------
 * Update dark mode switch to be compatible with Django 4.2 admin dark mode (#7549) (1106ae6d7) -- Fabian Braun
