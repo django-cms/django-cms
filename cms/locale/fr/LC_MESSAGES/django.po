@@ -1,10 +1,10 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-#
+# 
 # Translators:
 # adrien.delhorme, 2014
-# Adrien Delhorme, 2017,2019,2021
+# Adrien Delhorme, 2017,2019,2021,2023
 # Adrien Delhorme, 2014
 # Alban Tiberghien <alban.tiberghien@gmail.com>, 2017
 # Alexandre Cloquet <Alexandre.cloquet@gmail.com>, 2014-2015
@@ -16,12 +16,13 @@
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012
 # Simon Charette <charette.s@gmail.com>, 2011-2012
 # Chary titouan <>, 2011
-# Frigory33 <chironsylvain@orange.fr>, 2016
+# Sylvain Chiron <chironsylvain@orange.fr>, 2016
 # chrisglass <tribaal@gmail.com>, 2011
 # Christophe CHAUVET <christophe.chauvet@gmail.com>, 2013
+# Corentin Bettiol, 2023
 # a270031086f2a0d3514bc0cb507b48f6, 2019
 # Dylann CORDEL <cordel.d@free.fr>, 2014-2015
-# Fabian Braun <fsbraun@gmx.de>, 2022
+# Fabian Braun <fsbraun@gmx.de>, 2022-2023
 # Florian Delizy <florian.delizy@gmail.com>, 2021
 # Freddy L. <freddy.limpens@gmail.com>, 2014
 # Gabriel Le Breton <lebreton.gabriel@gmail.com>, 2015
@@ -43,10 +44,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
-"Language-Team: French (http://www.transifex.com/divio/django-cms/language/fr/)\n"
+"Last-Translator: Corentin Bettiol, 2023\n"
+"Language-Team: French (http://app.transifex.com/divio/django-cms/language/fr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -89,9 +90,6 @@ msgstr "Balise méta de description"
 
 msgid "A description of the page used by search engines."
 msgstr "Une description de la page utilisée par les moteurs de recherche."
-
-msgid "Slug must not be empty."
-msgstr "Le slug est obligatoire."
 
 msgid "Page type"
 msgstr "Type de page"
@@ -152,7 +150,7 @@ msgid "An application instance with this name already exists."
 msgstr "Il existe déjà une instance d'application portant ce nom."
 
 msgid "You can't move the home page inside another page"
-msgstr "Vous ne pouvez pas déplacer la page d′accueil sous une autre page"
+msgstr "Vous ne pouvez pas déplacer la page d'accueil sous une autre page"
 
 msgid "Yes"
 msgstr "Oui"
@@ -598,6 +596,12 @@ msgstr "Fournit un titre à la nouvelle page."
 
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Laissez vide pour un slug automatique, ou écrasez si nécessaire."
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr "Le slug ne peut être auto-généré. Spécifiez-le manuellement, s'il vous plaît."
+
+msgid "Please provide a valid slug."
+msgstr "Saisissez un slug valide."
 
 msgid "You don't have the permissions required to add a page."
 msgstr "Vous n'avez pas la permission nécessaire pour créer une page."
@@ -1177,7 +1181,7 @@ msgid "Clipboard"
 msgstr "Presse-papiers"
 
 msgid "Add plugin"
-msgstr "ajouter un bloc"
+msgstr "Ajouter un bloc"
 
 msgid "Copy all"
 msgstr "Copier tout"
@@ -1284,10 +1288,10 @@ msgid "Shortcuts"
 msgstr "Raccourcis"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr "La page a été entre-temps changée, rechargement..."
+msgstr "La page a été modifiée entre-temps, rechargement..."
 
 msgid "CMS-wide Shortcuts"
-msgstr "CMS raccourcis clavier"
+msgstr "Raccourcis clavier du CMS"
 
 msgid "Bring up this help dialog"
 msgstr "Afficher cette fenêtre d'aide"
@@ -1476,7 +1480,7 @@ msgid "email address"
 msgstr "adresse électronique"
 
 msgid "staff status"
-msgstr "état de l'équipe"
+msgstr "Statut équipe"
 
 msgid "Designates whether the user can log into this admin site."
 msgstr "Précise si l'utilisateur peut se connecter à ce site d'administration."
