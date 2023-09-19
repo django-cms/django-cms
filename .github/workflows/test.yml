@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  database-postgres:
+  postgres:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -61,7 +61,7 @@ jobs:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
 
-  database-mysql:
+  mysql:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -114,7 +114,7 @@ jobs:
       env:
         DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
 
-  database-sqlite:
+  sqlite:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
