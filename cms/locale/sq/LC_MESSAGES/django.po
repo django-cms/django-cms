@@ -9,10 +9,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
-"Language-Team: Albanian (http://www.transifex.com/divio/django-cms/language/sq/)\n"
+"Language-Team: Albanian (http://app.transifex.com/divio/django-cms/language/sq/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -55,9 +55,6 @@ msgstr "Etiketë meta përshkrimi"
 
 msgid "A description of the page used by search engines."
 msgstr "Përshkrim i faqes i përdorur nga motorë kërkimesh."
-
-msgid "Slug must not be empty."
-msgstr "Identifikuesi s’duhet të jetë i zbrazët."
 
 msgid "Page type"
 msgstr "Lloj faqeje"
@@ -564,6 +561,12 @@ msgstr "Jepni një titull për faqen e re."
 
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Lëreni të zbrazët për identifikues të automatizuar, ose anashkalojeni siç kërkohet."
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr "S’mund të krijohet identifikues automatikisht. Ju lutemi, jepni një dorazi."
+
+msgid "Please provide a valid slug."
+msgstr "Ju lutemi, jepni një identifikues të vlefshëm."
 
 msgid "You don't have the permissions required to add a page."
 msgstr "S’keni lejet e domosdoshme për të krijuar një faqe."

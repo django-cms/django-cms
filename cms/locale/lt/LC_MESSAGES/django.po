@@ -11,10 +11,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
-"Language-Team: Lithuanian (http://www.transifex.com/divio/django-cms/language/lt/)\n"
+"Language-Team: Lithuanian (http://app.transifex.com/divio/django-cms/language/lt/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -57,9 +57,6 @@ msgstr "Aprašymo meta žymenys"
 
 msgid "A description of the page used by search engines."
 msgstr "Puslapio aprašymas naudojamas paieškos sistemose."
-
-msgid "Slug must not be empty."
-msgstr "Nuoroda negali būti tuščia."
 
 msgid "Page type"
 msgstr "Puslapio tipas"
@@ -566,6 +563,12 @@ msgstr "Sukurkite antraštę naujam puslapiui."
 
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Palikti tuščią kad nuoroda būtų sugeneruota automatiškai, arba galite pakeisti kaip Jums reikia."
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr ""
+
+msgid "Please provide a valid slug."
+msgstr ""
 
 msgid "You don't have the permissions required to add a page."
 msgstr "Jūs neturite teisių reikalingų norint pridėti puslapį."
