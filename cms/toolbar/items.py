@@ -43,7 +43,7 @@ class ItemSearchResult():
 
 def may_be_lazy(thing):
     if isinstance(thing, Promise):
-        return thing._proxy____args[0]
+        return thing._args[0]
     else:
         return thing
 
