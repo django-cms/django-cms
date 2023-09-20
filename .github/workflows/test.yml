@@ -237,6 +237,7 @@ jobs:
     - name: Test with django test runner
       run: |
         python -c "from django import __version__ ; print(f'Django version {__version__}')"
+        python -c "from django import __version__ ; print(f'Django version {__version__}')"
         python manage.py test
       env:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
