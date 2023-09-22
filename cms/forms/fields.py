@@ -24,7 +24,7 @@ class LazyChoiceField(forms.ChoiceField):
         return self._choices
 
     @choices.setter
-    def _set_choices(self, value):
+    def choices(self, value):
         # we overwrite this function so no normalize(value) is called
         self._choices = self.widget.choices = value
 
