@@ -43,7 +43,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v2
@@ -101,7 +101,7 @@ jobs:
 
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v2
@@ -148,7 +148,7 @@ jobs:
             python-version: 3.9
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
       uses: actions/setup-python@v2
@@ -167,3 +167,138 @@ jobs:
       run: python manage.py test
       env:
         DATABASE_URL: sqlite://localhost/testdb.sqlite
+
+  django-main-sqlite:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11']
+        requirements-file: ['requirements_base.txt']
+        django-version: [
+          'https://github.com/django/django/archive/main.tar.gz'
+        ]
+        os: [
+          ubuntu-20.04,
+        ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install pytest ${{ matrix.django-version }}
+        python setup.py install
+
+    - name: Test with django test runner
+      run: python manage.py test
+      continue-on-error: true
+      env:
+        DATABASE_URL: sqlite://localhost/testdb.sqlite
+
+  django-main-postgres:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11']
+        requirements-file: ['requirements_base.txt']
+        django-version: [
+          'https://github.com/django/django/archive/main.tar.gz'
+        ]
+        os: [
+          ubuntu-20.04,
+        ]
+
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install pytest ${{ matrix.django-version }}
+        pip install -r test_requirements/databases.txt
+        python setup.py install
+
+    - name: Test with django test runner
+      run: |
+        python -c "from django import __version__ ; print(f'Django version {__version__}')"
+        python manage.py test
+      continue-on-error: true
+      env:
+        DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
+
+  django-main-mysql:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11']
+        requirements-file: ['requirements_base.txt']
+        django-version: [
+          'https://github.com/django/django/archive/main.tar.gz'
+        ]
+        os: [
+          ubuntu-20.04,
+        ]
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: djangocms_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install pytest ${{ matrix.django-version }}
+        pip install -r test_requirements/databases.txt
+        python setup.py install
+
+    - name: Test with django test runner
+      run: |
+        python manage.py test
+      continue-on-error: true
+      env:
+        DATABASE_URL: mysql://root@127.0.0.1/djangocms_test

@@ -21,11 +21,11 @@ class LazyChoiceField(forms.ChoiceField):
 
     @property
     def choices(self):
-        return super().choices()
+        return self._choices
 
     @choices.setter
-    def _set_choices(self, value):
-        # we overwrite this function so no list(value) is called
+    def choices(self, value):
+        # we overwrite this function so no normalize(value) is called
         self._choices = self.widget.choices = value
 
 

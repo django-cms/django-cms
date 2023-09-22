@@ -1,7 +1,4 @@
 # TODO: this is just stuff from utils.py - should be splitted / moved
-from django.conf import settings
-from django.core.files.storage import get_storage_class
-from django.utils.functional import LazyObject
 
 from cms.utils.i18n import (
     get_default_language,
@@ -50,14 +47,3 @@ def get_language_from_request(request, current_page=None):
         language = get_default_language(site_id=site_id)
 
     return language
-
-
-default_storage = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-
-class ConfiguredStorage(LazyObject):
-    def _setup(self):
-        self._wrapped = get_storage_class(getattr(settings, 'STATICFILES_STORAGE', default_storage))()
-
-
-configured_storage = ConfiguredStorage()
