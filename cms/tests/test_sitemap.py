@@ -4,8 +4,10 @@ from cms.api import create_page, create_title
 from cms.models import Page, Title
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 
+protocol = "http" if DJANGO_4_2 else "https"
 
 class SitemapTestCase(CMSTestCase):
     def setUp(self):
@@ -93,9 +95,9 @@ class SitemapTestCase(CMSTestCase):
         urlset = sitemap.get_urls()
         for item in urlset:
             if item['item'].path:
-                url = 'http://example.com/{}/{}/'.format(item['item'].language, item['item'].path)
+                url = f'{protocol}://example.com/{item["item"].language}/{item["item"].path}/'
             else:
-                url = 'http://example.com/{}/{}'.format(item['item'].language, item['item'].path)
+                url = f'{protocol}://example.com/{item["item"].language}/'
             self.assertEqual(item['location'], url)
 
     def test_sitemap_published_titles(self):
@@ -110,9 +112,9 @@ class SitemapTestCase(CMSTestCase):
         for title in Title.objects.public():
             page = title.page.get_public_object()
             if title.path:
-                url = f'http://example.com/{title.language}/{title.path}/'
+                url = f'{protocol}://example.com/{title.language}/{title.path}/'
             else:
-                url = f'http://example.com/{title.language}/{title.path}'
+                url = f'{protocol}://example.com/{title.language}/{title.path}'
             if page.is_published('en') and not page.publisher_is_draft:
                 self.assertTrue(url in locations)
             else:
@@ -142,9 +144,9 @@ class SitemapTestCase(CMSTestCase):
         for path in unpublished_titles:
             title = Title.objects.get(path=path)
             if title.path:
-                url = f'http://example.com/{title.language}/{title.path}/'
+                url = f'{protocol}://example.com/{title.language}/{title.path}/'
             else:
-                url = f'http://example.com/{title.language}/{title.path}'
+                url = f'{protocol}://example.com/{title.language}/{title.path}'
             self.assertFalse(url in locations)
 
     def test_sitemap_uses_public_languages_only(self):
@@ -159,7 +161,7 @@ class SitemapTestCase(CMSTestCase):
 
         with self.settings(CMS_LANGUAGES=lang_settings):
             for item in CMSSitemap().get_urls():
-                url = 'http://example.com/en/'
+                url = f'{protocol}://example.com/en/'
 
                 if item['item'].path:
                     url += item['item'].path + '/'
