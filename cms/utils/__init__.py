@@ -1,7 +1,7 @@
 # TODO: this is just stuff from utils.py - should be splitted / moved
 from django.conf import settings
-from django.utils.module_loading import import_string
 from django.utils.functional import LazyObject
+from django.utils.module_loading import import_string
 
 from cms.utils.i18n import (
     get_default_language,
