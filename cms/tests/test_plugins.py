@@ -680,8 +680,9 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin_type='TextPlugin',
             placeholder=placeholder,
             position=1,
-            language=self.FIRST_LANG
+            language=self.FIRST_LANG,
         )
+        a.save()
 
         self.assertEqual(a.get_short_description(), "<Empty>")
 

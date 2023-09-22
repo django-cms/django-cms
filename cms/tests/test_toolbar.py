@@ -54,6 +54,7 @@ from cms.toolbar.utils import (
     get_object_structure_url,
 )
 from cms.toolbar_pool import toolbar_pool
+from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
@@ -1273,7 +1274,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
                 '</h1>'.format(
                     'placeholderapp', 'example1', 'date_field', ex1.pk,
-                    ex1.date_field.strftime("%b. %d, %Y")))
+                    ex1.date_field.strftime("%b. %d, %Y" if DJANGO_4_2 else "%b. %-d, %Y")))
 
             template_text = '''{% extends "base.html" %}
 {% load cms_tags %}

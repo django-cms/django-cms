@@ -7,7 +7,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  database-postgres:
+  postgres:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -15,16 +15,20 @@ jobs:
         python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
-          django-4.2.txt
+          django-4.2.txt,
+          django-5.0.txt
         ]
         os: [
           ubuntu-20.04,
         ]
+        exclude:
+          - requirements-file: django-5.0.txt
+            python-version: 3.8
+          - requirements-file: django-5.0.txt
+            python-version: 3.9
 
     services:
       postgres:
@@ -62,7 +66,7 @@ jobs:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
 
-  database-mysql:
+  mysql:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -70,16 +74,20 @@ jobs:
         python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
-          django-4.2.txt
+          django-4.2.txt,
+          django-5.0.txt
         ]
         os: [
           ubuntu-20.04,
         ]
+        exclude:
+          - requirements-file: django-5.0.txt
+            python-version: 3.8
+          - requirements-file: django-5.0.txt
+            python-version: 3.9
 
     services:
       mysql:
@@ -116,7 +124,7 @@ jobs:
       env:
         DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
 
-  database-sqlite:
+  sqlite:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -124,16 +132,20 @@ jobs:
         python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
-          django-4.2.txt
+          django-4.2.txt,
+          django-5.0.txt
         ]
         os: [
           ubuntu-20.04,
         ]
+        exclude:
+          - requirements-file: django-5.0.txt
+            python-version: 3.8
+          - requirements-file: django-5.0.txt
+            python-version: 3.9
 
     steps:
     - uses: actions/checkout@v1

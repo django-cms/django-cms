@@ -134,10 +134,6 @@ class PluginModelBase(ModelBase):
         # if there is a RenderMeta in attrs, use this one
         # else try to use the one from the superclass (if present)
         meta = attr_meta or getattr(new_class, '_render_meta', None)
-        treebeard_view_fields = (f for f in new_class._meta.fields
-                                 if f.name in ('depth', 'numchild', 'path'))
-        for field in treebeard_view_fields:
-            field.editable = False
         # set a new BoundRenderMeta to prevent leaking of state
         new_class._render_meta = BoundRenderMeta(meta)
         return new_class
