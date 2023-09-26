@@ -8,7 +8,7 @@ import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import Plugin from './cms.plugins';
-import DiffDOM from 'diff-dom';
+import { DiffDOM } from 'diff-dom';
 import { filter, throttle, uniq } from 'lodash';
 import { showLoader, hideLoader } from './loader';
 import { Helpers, KEYS } from './cms.base';
@@ -437,6 +437,11 @@ var Toolbar = new Class({
             });
         }
 
+        // set color scheme
+        Helpers.setColorScheme (
+            localStorage.getItem('theme') || CMS.config.color_scheme || 'auto'
+        );
+
         // add toolbar ready class to body and fire event
         this.ui.body.addClass('cms-ready');
         this.ui.document.trigger('cms-ready');
@@ -589,6 +594,9 @@ var Toolbar = new Class({
                     onSuccess: el.data('on-success')
                 });
                 break;
+            case 'color-toggle':
+                Helpers.toggleColorScheme();
+                break;
             case 'sideframe':
                 // If the sideframe is enabled, show it
                 if (typeof CMS.settings.sideframe_enabled === 'undefined' || CMS.settings.sideframe_enabled) {
@@ -603,6 +611,7 @@ var Toolbar = new Class({
                     break;
                 }
                 // Else fall through to default, the sideframe is disabled
+
             default:
                 Helpers._getWindow().location.href = el.attr('href');
         }

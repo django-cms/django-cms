@@ -1502,7 +1502,7 @@ class PageTest(PageTestBase):
 
         admin_user = self.get_superuser()
         root = create_page(
-            "home", "nav_playground.html", "fr", created_by=admin_user, published=True
+            "home", "nav_playground.html", "fr", created_by=admin_user,
         )
         with connection.cursor() as c:
             c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_page"')
@@ -1513,7 +1513,6 @@ class PageTest(PageTestBase):
             "nav_playground.html",
             "fr",
             created_by=admin_user,
-            published=True,
             parent=root,
             slug="child-page",
         )
@@ -1523,7 +1522,6 @@ class PageTest(PageTestBase):
             "nav_playground.html",
             "fr",
             created_by=admin_user,
-            published=True,
             parent=page,
             slug="grand-child-page",
         )

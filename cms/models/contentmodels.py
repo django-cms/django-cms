@@ -127,6 +127,8 @@ class PageContent(models.Model):
     """
 
     class Meta:
+        verbose_name = _("page content")
+        verbose_name_plural = _("page contents")
         default_permissions = []
         unique_together = (('language', 'page'),)
         app_label = 'cms'
