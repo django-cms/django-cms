@@ -11,7 +11,7 @@ from django.urls import NoReverseMatch
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
 from cms.models.placeholdermodel import Placeholder
@@ -208,7 +208,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         instance = self.get_plugin_instance()[0]
         if instance is not None:
             return force_str(instance)
-        return _("<Empty>")
+        return gettext("<Empty>")
 
     def get_plugin_class(self):
         from cms.plugin_pool import plugin_pool
