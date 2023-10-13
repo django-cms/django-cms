@@ -199,18 +199,15 @@ class AdminTestCase(AdminTestsBase):
             response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'de'})
             self.assertEqual(response.status_code, 200)
             self.assertContains(
-                response, 
+                response,
                 'Are you sure you want to delete the title "delete-page-translation-2 (delete-page-translation-2, de)"?'
             )
-
             response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk + "?delete_language=de&cms_path=/en/?edit&language=en")
-            
             self.assertEqual(response.status_code, 200)
             self.assertContains(
-                response, 
+                response,
                 'Are you sure you want to delete the title "delete-page-translation-2 (delete-page-translation-2, de)"?'
             )
-            
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'de'})
             self.assertRedirects(response, URL_CMS_PAGE)
             response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'es-mx'})
