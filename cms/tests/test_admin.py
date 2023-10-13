@@ -216,11 +216,7 @@ class AdminTestCase(AdminTestsBase):
             response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'es-mx'})
             self.assertEqual(response.status_code, 200)
             response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'es-mx'})
-            self.assertRedirects(response, URL_CMS_PAGE)
-
-            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'de'})
-
-            
+            self.assertRedirects(response, URL_CMS_PAGE)            
 
     def test_change_dates(self):
         admin_user, staff = self._get_guys()
