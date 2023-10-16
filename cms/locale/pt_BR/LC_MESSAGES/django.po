@@ -31,10 +31,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
-"Language-Team: Portuguese (Brazil) (http://www.transifex.com/divio/django-cms/language/pt_BR/)\n"
+"Language-Team: Portuguese (Brazil) (http://app.transifex.com/divio/django-cms/language/pt_BR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -78,9 +78,6 @@ msgstr "Descrição da tag meta"
 msgid "A description of the page used by search engines."
 msgstr "Uma descrição da página as vezes utilizada por sites de busca."
 
-msgid "Slug must not be empty."
-msgstr "Slug não pode ser vazio."
-
 msgid "Page type"
 msgstr "Tipo de página"
 
@@ -121,7 +118,7 @@ msgid "Language independent options"
 msgstr "Opções independentes de idioma"
 
 msgid "You entered an invalid URL."
-msgstr ""
+msgstr "Introduziu um URL inválido."
 
 #, python-format
 msgid "Please set the %(language)s slug before editing its advanced settings."
@@ -409,22 +406,22 @@ msgid ""
 msgstr "Esta é uma referência do pseudônimo, você pode editar o conteúdo apenas na página <a href=\"%(page_url)s?edit\" target=\"_parent\">%(page_title)s</a>"
 
 msgid "Getting started developer guide"
-msgstr ""
+msgstr "Guia inicial do programador"
 
 msgid "Documentation"
 msgstr "Documentação"
 
 msgid "User guide"
-msgstr ""
+msgstr "Manual de Instruções"
 
 msgid "Support Forum"
-msgstr ""
+msgstr "Fórum de Suporte"
 
 msgid "Support Slack"
-msgstr ""
+msgstr "Suporte Slack"
 
 msgid "What's new"
-msgstr ""
+msgstr "Novidades"
 
 msgid "Create"
 msgstr "Criar"
@@ -467,7 +464,7 @@ msgid "Language"
 msgstr "Idioma"
 
 msgid "Help"
-msgstr ""
+msgstr "Ajuda"
 
 msgid "Structure"
 msgstr "Estrutura"
@@ -586,6 +583,12 @@ msgstr "Forneça um título para a nova página"
 
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Deixe em branco para slug automático, ou sobrescreva se necessário."
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr ""
+
+msgid "Please provide a valid slug."
+msgstr ""
 
 msgid "You don't have the permissions required to add a page."
 msgstr "Você não tem as permissões necessárias para adicionar uma página."
@@ -1296,7 +1299,7 @@ msgid "Focus on Toolbar"
 msgstr "Foco na barra de ferramentas"
 
 msgid "Structureboard"
-msgstr ""
+msgstr "Estruturas"
 
 msgid "Focus on placeholders"
 msgstr "Concentre-se em espaço reservado"
@@ -1393,7 +1396,7 @@ msgid ""
 "                    you linked the <code>static/cms</code> folder to your\n"
 "                    static files.</p>\n"
 "            "
-msgstr ""
+msgstr "\n                <p class=\"cms-welcome-notes\">Se não vê o logotipo do django CMS no topo, certifique-se\n                    que fez link da pasta <code>static/cms</code> para os seus\n                    ficheiros estáticos.</p>\n            "
 
 msgid ""
 "\n"
@@ -1402,7 +1405,7 @@ msgid ""
 "                        haven't added any pages yet.\n"
 "                    </p>\n"
 "                "
-msgstr ""
+msgstr "\n                    <p class=\"cms-welcome-notes\">Está a ver esta mensagem porque tem \n                        <code>DEBUG = True</code> no seu ficheiro de configurações django e\n                        ainda não adicionou nenhuma página.\n                    </p>\n                "
 
 msgid "Welcome to django CMS"
 msgstr "Seja bem vindo ao Django CMS"
@@ -1511,7 +1514,7 @@ msgid "Sample App"
 msgstr "Aplicação de exemplo"
 
 msgid "Sample App with config"
-msgstr ""
+msgstr "Aplicação de exemplo configurável"
 
 msgid "Sample App with excluded permissions"
 msgstr "Aplicativo de exemplo com permissões excluidas"
@@ -1584,20 +1587,20 @@ msgstr "Configurações de usuário"
 
 #, python-format
 msgid "Add plugin to placeholder \"%(placeholder_label)s\""
-msgstr ""
+msgstr "Adicionar plugin ao espaço de conteúdo \"%(placeholder_label)s\""
 
 #, python-format
 msgid "Add plugin to %(plugin_name)s"
 msgstr "Adicionar plugin para %(plugin_name)s"
 
 msgid "Community forum"
-msgstr ""
+msgstr "Fórum da Comunidade"
 
 msgid "Getting started"
-msgstr ""
+msgstr "Primeiros Passos"
 
 msgid "Talk to us"
-msgstr ""
+msgstr "Fale Connosco"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - sua conta de usuário foi criada."
@@ -1617,7 +1620,7 @@ msgstr "Este espaço reservado já tem o número máximo (%(limit)s) de plugins 
 
 #, python-format
 msgid "This placeholder already has the maximum number of child plugins (%s)."
-msgstr ""
+msgstr "Já foi atingido o número máximo de plugins para este espaço (%s)."
 
 #, python-brace-format
 msgid "Unable to find the specified CMS_REQUEST_IP_RESOLVER module: \"{0}\"."
