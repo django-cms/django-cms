@@ -84,7 +84,6 @@ class AbstractPagePermission(models.Model):
     can_add = models.BooleanField(_("can add"), default=True)
     can_delete = models.BooleanField(_("can delete"), default=True)
     can_change_advanced_settings = models.BooleanField(_("can change advanced settings"), default=False)
-    can_publish = models.BooleanField(_("can publish"), default=True)
     can_change_permissions = models.BooleanField(
         _("can change permissions"), default=False, help_text=_("on page level")
     )
@@ -111,11 +110,6 @@ class AbstractPagePermission(models.Model):
 
         if self.can_delete:
             message = _("Users can't delete a page without permissions "
-                        "to change the page. Edit permissions required.")
-            raise ValidationError(message)
-
-        if self.can_publish:
-            message = _("Users can't publish a page without permissions "
                         "to change the page. Edit permissions required.")
             raise ValidationError(message)
 
@@ -162,7 +156,6 @@ class AbstractPagePermission(models.Model):
             'can_add',
             'can_change',
             'can_delete',
-            'can_publish',
             'can_change_advanced_settings',
             'can_change_permissions',
             'can_move_page',
@@ -182,7 +175,6 @@ class AbstractPagePermission(models.Model):
             'delete_page': ['can_change', 'can_delete'],
             'delete_page_translation': ['can_change', 'can_delete'],
             'move_page': ['can_change', 'can_move_page'],
-            'publish_page': ['can_change', 'can_publish'],
             'view_page': ['can_view'],
         }
         return permissions_by_action
