@@ -4,8 +4,10 @@ from cms.api import create_page, create_page_content
 from cms.models import PageUrl
 from cms.sitemaps import CMSSitemap
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 
+protocol = "http" if DJANGO_4_2 else "https"
 
 class SitemapTestCase(CMSTestCase):
     def setUp(self):
@@ -78,9 +80,9 @@ class SitemapTestCase(CMSTestCase):
         urlset = sitemap.get_urls()
         for item in urlset:
             if item['item'].path:
-                url = 'http://example.com/%s/%s/' % (item['item'].language, item['item'].path)
+                url = f'{protocol}://example.com/{item["item"].language}/{item["item"].path}/'
             else:
-                url = 'http://example.com/%s/%s' % (item['item'].language, item['item'].path)
+                url = f'{protocol}://example.com/{item["item"].language}/'
             self.assertEqual(item['location'], url)
 
     def test_sitemap_urls(self):
@@ -94,9 +96,9 @@ class SitemapTestCase(CMSTestCase):
             locations.append(item['location'])
         for page_url in PageUrl.objects.all():
             if page_url.path:
-                url = 'http://example.com/%s/%s/' % (page_url.language, page_url.path)
+                url = f'{protocol}://example.com/{page_url.language}/{page_url.path}/'
             else:
-                url = 'http://example.com/%s/%s' % (page_url.language, page_url.path)
+                url = f'{protocol}://example.com/{page_url.language}/'
             self.assertTrue(url in locations)
 
     def test_sitemap_uses_public_languages_only(self):
@@ -111,7 +113,7 @@ class SitemapTestCase(CMSTestCase):
 
         with self.settings(CMS_LANGUAGES=lang_settings):
             for item in CMSSitemap().get_urls():
-                url = 'http://example.com/en/'
+                url = f'{protocol}://example.com/en/'
 
                 if item['item'].path:
                     url += item['item'].path + '/'
