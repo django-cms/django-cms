@@ -16,7 +16,6 @@ from cms.utils.permissions import (
 PAGE_ADD_CODENAME = get_model_permission_codename(Page, 'add')
 PAGE_CHANGE_CODENAME = get_model_permission_codename(Page, 'change')
 PAGE_DELETE_CODENAME = get_model_permission_codename(Page, 'delete')
-PAGE_PUBLISH_CODENAME = get_model_permission_codename(Page, 'publish')
 PAGE_VIEW_CODENAME = get_model_permission_codename(Page, 'view')
 
 
@@ -29,8 +28,6 @@ _django_permissions_by_action = {
     'delete_page': [PAGE_CHANGE_CODENAME, PAGE_DELETE_CODENAME],
     'delete_page_translation': [PAGE_CHANGE_CODENAME, PAGE_DELETE_CODENAME],
     'move_page': [PAGE_CHANGE_CODENAME],
-    'publish_page': [PAGE_CHANGE_CODENAME, PAGE_PUBLISH_CODENAME],
-    'revert_page_to_live': [PAGE_CHANGE_CODENAME]
 }
 
 
@@ -197,18 +194,6 @@ def user_can_delete_page_translation(user, page, language, site=None):
         if not placeholder.has_delete_plugins_permission(user, [language]):
             return False
     return True
-
-
-@cached_func
-@auth_permission_required('publish_page')
-def user_can_publish_page(user, page, site=None):
-    has_perm = has_generic_permission(
-        page=page,
-        user=user,
-        action='publish_page',
-        site=site,
-    )
-    return has_perm
 
 
 @cached_func
@@ -431,21 +416,6 @@ def get_move_page_id_list(user, site, check_global=True, use_cache=True):
     return page_ids
 
 
-def get_publish_id_list(user, site, check_global=True, use_cache=True):
-    """
-    Give a list of page where the user has publish rights or the string "All" if
-    the user has all rights.
-    """
-    page_ids = _get_page_ids_for_action(
-        user=user,
-        site=site,
-        action='publish_page',
-        check_global=check_global,
-        use_cache=use_cache,
-    )
-    return page_ids
-
-
 def get_view_id_list(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can view.
     """
@@ -472,7 +442,6 @@ def has_generic_permission(page, user, action, site=None, check_global=True):
         'delete_page': get_delete_id_list,
         'delete_page_translation': get_delete_id_list,
         'move_page': get_move_page_id_list,
-        'publish_page': get_publish_id_list,
         'view_page': get_view_id_list,
     }
 

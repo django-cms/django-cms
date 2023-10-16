@@ -646,7 +646,6 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, user, edit_url, disable=False)
         request.toolbar.post_template_populate()
         self.assertFalse(page.has_change_permission(request.user))
-        self.assertFalse(page.has_publish_permission(request.user))
 
         items = request.toolbar.get_left_items() + request.toolbar.get_right_items()
         # Logo + page-menu + admin-menu + color scheme + logout
