@@ -13,7 +13,6 @@ def gettext(s):
 
 warnings.filterwarnings('ignore', category=DontUsePageAttributeWarning)
 
-
 def install_auth_user_model(settings, value):
     if value is None:
         return
