@@ -40,8 +40,7 @@ class TemplatesConfig(CMSTestCase):
         """
         config_path = os.path.join(settings.CMS_TEMPLATES_DIR, '__init__.py')
         try:
-            with open(config_path, 'r') as openfile:
-                mod = SourceFileLoader("mod", config_path).load_module()
+            mod = SourceFileLoader("mod", config_path).load_module()
         except FileNotFoundError:
             print(f"file not found at {config_path}")
         except Exception as e:

@@ -22,8 +22,7 @@ def _load_from_file(module_path):
 
     imported = None
     if module_path:
-        with open(module_path) as openfile:
-            imported = SourceFileLoader("mod", module_path).load_module()
+        imported = SourceFileLoader("mod", module_path).load_module()
     return imported
 
 
