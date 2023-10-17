@@ -196,13 +196,23 @@ class AdminTestCase(AdminTestsBase):
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
         create_title("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
         with self.login_user_context(admin_user):
-            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'de'})
             self.assertEqual(response.status_code, 200)
-            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+            self.assertContains(
+                response,
+                'Are you sure you want to delete the title "delete-page-translation-2 (delete-page-translation-2, de)"?'
+            )
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk + "?delete_language=de&cms_path=/en/?edit&language=en")
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(
+                response,
+                'Are you sure you want to delete the title "delete-page-translation-2 (delete-page-translation-2, de)"?'
+            )
+            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'de'})
             self.assertRedirects(response, URL_CMS_PAGE)
-            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'es-mx'})
             self.assertEqual(response.status_code, 200)
-            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
+            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'es-mx'})
             self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_change_dates(self):
