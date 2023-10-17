@@ -384,10 +384,12 @@ class PageToolbar(CMSToolbar):
 
     def get_page_content(self):
         if not getattr(self, "page", None):
+            # No page, no page content
             return None
         if hasattr(self, "obj") and isinstance(self.obj, PageContent):
             # Toolbar object already set (e.g., in edit or preview mode)
             return self.obj
+        # Get from db
         page_content = self.page.get_content_obj(language=self.current_lang, fallback=False)
         return page_content or None
 
