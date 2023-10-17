@@ -45,7 +45,7 @@ class TemplatesConfig(CMSTestCase):
         except FileNotFoundError:
             print(f"file not found at {config_path}")
         except Exception as e:
-            print(f"An error ocurred: {e}")
+            print(f"An error occurred: {e}")
         original_labels = [force_str(_(template[1])) for template in mod.TEMPLATES.items()]
         original_files = [os.path.join(PATH_PREFIX, template[0].strip()) for template in mod.TEMPLATES.items()]
         templates = get_cms_setting('TEMPLATES')
