@@ -34,6 +34,31 @@ from cms.utils.page_permissions import user_can_change_page
 
 
 def _clean_redirect_url(redirect_url, language):
+    """
+    Cleans the redirect URL based on the given language.
+
+    This function checks if the URL is using language prefix patterns and if the provided
+    redirect URL needs to be modified to include the language prefix. If the URL is not
+    already starting with the language prefix, it adds the language prefix at the beginning
+    of the URL.
+
+    Note:
+        This is a private function, it is not recommended to use it in third party code.
+
+    Parameters:
+        redirect_url (str): The original redirect URL that may need to be modified.
+        language (str): The language code to be used as the prefix in the URL.
+
+    Returns:
+        str: The cleaned redirect URL with the appropriate language prefix.
+
+    Example:
+        For example, if the language is 'en' and the redirect_url is '/about/', this function
+        will return '/en/about/' if language prefix patterns are used.
+
+        If the language is 'es' and the redirect_url is '/contact/', and language prefix
+        patterns are not used, the function will return '/es/contact/' as well.
+    """
     if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
             '/%s/' % language)):
         # add language prefix to url

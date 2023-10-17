@@ -4,6 +4,7 @@
 # 
 # Translators:
 # bentengshan <zhhqng@gmail.com>, 2012
+# Fabian Braun <fsbraun@gmx.de>, 2022
 # kochin <kochinc@outlook.com>, 2013
 # kochin <kochinc@outlook.com>, 2013
 # Wei Ming Liao <bone@ms8.hinet.net>, 2014
@@ -12,10 +13,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: bentengshan <zhhqng@gmail.com>, 2012\n"
-"Language-Team: Chinese (Taiwan) (http://www.transifex.com/divio/django-cms/language/zh_TW/)\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
+"Language-Team: Chinese (Taiwan) (http://app.transifex.com/divio/django-cms/language/zh_TW/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -58,9 +59,6 @@ msgstr "描述媒體標籤"
 
 msgid "A description of the page used by search engines."
 msgstr "用逗號分隔的關鍵字列表，有時會被搜索引擎使用。"
-
-msgid "Slug must not be empty."
-msgstr ""
 
 msgid "Page type"
 msgstr "頁面型態"
@@ -566,6 +564,12 @@ msgid "Provide a title for the new page."
 msgstr ""
 
 msgid "Leave empty for automatic slug, or override as required."
+msgstr ""
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr ""
+
+msgid "Please provide a valid slug."
 msgstr ""
 
 msgid "You don't have the permissions required to add a page."
