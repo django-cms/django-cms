@@ -612,7 +612,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # First test the default (fallback) behavior)
         # Deutsch page should have the text plugin
         content_de = _render_placeholder(placeholder_en, context_de)
-        self.assertRegexpMatches(content_de, "^de body$")
+        self.assertRegex(content_de, "^de body$")
         del placeholder_en._plugins_cache
         cache.clear()
         # English page should have no text
