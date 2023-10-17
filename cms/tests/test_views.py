@@ -4,15 +4,17 @@ import sys
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.core.cache import cache
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.template import Variable
 from django.test.utils import override_settings
 from django.urls import clear_url_caches, reverse
 from django.utils.translation import override as force_language
 
 from cms.api import create_page, create_page_content
-from cms.models import PagePermission, Placeholder, UserSettings
+from cms.middleware.toolbar import ToolbarMiddleware
+from cms.models import PageContent, PagePermission, Placeholder, UserSettings
 from cms.page_rendering import _handle_no_page
 from cms.test_utils.testcases import CMSTestCase
 from cms.test_utils.util.fuzzy_int import FuzzyInt
@@ -23,7 +25,7 @@ from cms.toolbar.utils import (
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
-from cms.views import details, login
+from cms.views import details, login, render_object_structure
 from menus.menu_pool import menu_pool
 
 APP_NAME = 'SampleApp'
@@ -388,3 +390,25 @@ class ContextTests(CMSTestCase):
                 response = self.client.get("/en/page-2/")
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)
+
+class EndpointTests(CMSTestCase):
+
+    def setUp(self) -> None:
+        page_template = "simple.html"
+        self.page = self.create_homepage("page", page_template, "en")
+        self.page_content = self.page.get_content_obj()
+        self.content_type = ContentType.objects.get_for_model(PageContent)
+        self.client.force_login(self.get_superuser())
+
+    def tearDown(self) -> None:
+        self.page.delete()
+
+    def test_render_object_structure(self):
+        request = self.get_request("/")
+        request.user = self.get_superuser()
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        response = render_object_structure(request, self.content_type.id, self.page_content.pk)
+
+        self.assertEqual(request.current_page, self.page)
+        self.assertContains(response, '<div class="cms-toolbar">')
