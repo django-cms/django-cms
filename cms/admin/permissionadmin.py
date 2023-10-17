@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.admin import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
@@ -16,7 +15,7 @@ PERMISSION_ADMIN_INLINES = []
 
 user_model = get_user_model()
 admin_class = UserAdmin
-for model, admin_instance in site._registry.items():
+for model, admin_instance in admin.site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__
 
