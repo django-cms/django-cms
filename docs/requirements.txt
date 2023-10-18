@@ -74,7 +74,7 @@ matplotlib==3.7.3
     # via
     #   -r requirements.in
     #   sphinxext-opengraph
-numpy==1.26.1
+numpy==1.24.3
     # via
     #   contourpy
     #   matplotlib

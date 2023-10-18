@@ -5,6 +5,7 @@ sphinx
 sphinx-autobuild
 sphinxext-opengraph
 matplotlib==3.7.3
+numpy==1.24.3
 sphinxcontrib-spelling
 pyenchant>3
 sphinx-autobuild
