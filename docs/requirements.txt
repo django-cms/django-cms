@@ -70,8 +70,10 @@ markupsafe==2.1.1
     # via
     #   -r requirements.in
     #   jinja2
-matplotlib==3.8.0
-    # via sphinxext-opengraph
+matplotlib==3.7.3
+    # via
+    #   -r requirements.in
+    #   sphinxext-opengraph
 numpy==1.26.1
     # via
     #   contourpy
