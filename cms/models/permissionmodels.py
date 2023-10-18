@@ -39,10 +39,10 @@ ACCESS_CHILDREN = 2
 #: Access to page itself and immediate children (1 level)
 ACCESS_PAGE_AND_CHILDREN = 3
 
-#: Access to all children (first level and allso their children)
+#: Access to all children (first level and also their children)
 ACCESS_DESCENDANTS = 4
 
-#: Access to page itself and all children (first level and allso their children)
+#: Access to page itself and all children (first level and also their children)
 ACCESS_PAGE_AND_DESCENDANTS = 5
 
 # binary masks for ACCESS permissions

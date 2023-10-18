@@ -3,7 +3,7 @@ Python APIs for creating CMS content. This is done in :mod:`cms.api` and not
 on the models and managers, because the direct API via models and managers is
 slightly counterintuitive for developers.
 
-Teh api for both Pages and Plugins has changed significantly since django CMS
+The api for both Pages and Plugins has changed significantly since django CMS
 Version 4.
 
 Also, the functions defined in this module do sanity checks on arguments.

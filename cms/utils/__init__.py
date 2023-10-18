@@ -1,4 +1,4 @@
-# TODO: this is just stuff from utils.py - should be splitted / moved
+# TODO: this is just stuff from utils.py - should be split / moved
 
 from cms.utils.i18n import (
     get_default_language,
