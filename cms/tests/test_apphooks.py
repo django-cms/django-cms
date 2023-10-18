@@ -26,7 +26,6 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat import DJANGO_3
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -288,8 +287,7 @@ class ApphooksTestCase(CMSTestCase):
         view_names = (
             ('sample-settings', 'sample_view'),
             ('sample-class-view', 'ClassView'),
-            ('sample-class-based-view', 'ClassBasedView' if DJANGO_3 else 'view'),
-            # Naming convention changed in Django 4
+            ('sample-class-based-view', 'ClassBasedView' ),
         )
 
         with force_language("en"):
