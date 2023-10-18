@@ -560,7 +560,7 @@ class GlobalPermissionTests(CMSTestCase):
         ]
         for user in USERS:
             user.set_password('staff')
-            # re-use the same methods the UserPage form does.
+            # reuse the same methods the UserPage form does.
             # Note that it internally calls .save(), as we've not done so.
             save_permissions({
                 'can_add_page': True,

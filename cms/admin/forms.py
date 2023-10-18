@@ -1154,7 +1154,7 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
 
 
 class GenericCmsPermissionForm(forms.ModelForm):
-    """Generic form for User & Grup permissions in cms
+    """Generic form for User & Group permissions in cms
     """
     _current_user = None
 
