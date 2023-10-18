@@ -70,7 +70,7 @@ class GrouperModelContent(models.Model):
         )
     )
 
-    up-to-date = models.BooleanField(
+    uptodate = models.BooleanField(
         verbose_name="Yes/No",
         default=False,
     )
