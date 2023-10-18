@@ -607,13 +607,13 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # check the stored placeholders org vs copy
             msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk)
-            self.assertNotEquals(page_two_ph_one.pk, page_one_ph_one.pk, msg)
+            self.assertNotEqual(page_two_ph_one.pk, page_one_ph_one.pk, msg)
             msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_two.pk, page_one_ph_two.pk, page_two.pk)
-            self.assertNotEquals(page_two_ph_two.pk, page_one_ph_two.pk, msg)
+            self.assertNotEqual(page_two_ph_two.pk, page_one_ph_two.pk, msg)
             msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_three.pk, page_one_ph_three.pk, page_two.pk)
-            self.assertNotEquals(page_two_ph_three.pk, page_one_ph_three.pk, msg)
+            self.assertNotEqual(page_two_ph_three.pk, page_one_ph_three.pk, msg)
             # get the plugins from the original page
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
             self.assertEqual(len(org_placeholder_one_plugins), 1)
@@ -664,9 +664,9 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                         copied_nested_text_plugin = instance
                         break
             msg = "orginal nested text plugin not found"
-            self.assertNotEquals(org_nested_text_plugin, None, msg=msg)
+            self.assertNotEqual(org_nested_text_plugin, None, msg=msg)
             msg = "copied nested text plugin not found"
-            self.assertNotEquals(copied_nested_text_plugin, None, msg=msg)
+            self.assertNotEqual(copied_nested_text_plugin, None, msg=msg)
             # get the children ids of the texplugin with a nested link
             # to check if the body of the text is genrated correctly
             org_link_child_plugin = org_nested_text_plugin.get_children()[0]
@@ -839,13 +839,13 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             # check the stored placeholders org vs copy
             msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk)
-            self.assertNotEquals(page_two_ph_one.pk, page_one_ph_one.pk, msg)
+            self.assertNotEqual(page_two_ph_one.pk, page_one_ph_one.pk, msg)
             msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_two.pk, page_one_ph_two.pk, page_two.pk)
-            self.assertNotEquals(page_two_ph_two.pk, page_one_ph_two.pk, msg)
+            self.assertNotEqual(page_two_ph_two.pk, page_one_ph_two.pk, msg)
             msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_three.pk, page_one_ph_three.pk, page_two.pk)
-            self.assertNotEquals(page_two_ph_three.pk, page_one_ph_three.pk, msg)
+            self.assertNotEqual(page_two_ph_three.pk, page_one_ph_three.pk, msg)
             # get the plugins from the original page
             org_placeholder_one_plugins = page_one_ph_one.get_plugins()
             self.assertEqual(len(org_placeholder_one_plugins), 1)
@@ -896,9 +896,9 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
                         copied_nested_text_plugin = instance
                         break
             msg = "orginal nested text plugin not found"
-            self.assertNotEquals(org_nested_text_plugin, None, msg=msg)
+            self.assertNotEqual(org_nested_text_plugin, None, msg=msg)
             msg = "copied nested text plugin not found"
-            self.assertNotEquals(copied_nested_text_plugin, None, msg=msg)
+            self.assertNotEqual(copied_nested_text_plugin, None, msg=msg)
             # get the children ids of the texplugin with a nested link
             # to check if the body of the text is generated correctly
             org_link_child_plugin = org_nested_text_plugin.get_children()[0]

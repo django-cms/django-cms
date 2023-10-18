@@ -989,13 +989,13 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page3_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
+            self.assertEqual(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with view permissions, redirect
             response = self.client.get(page4_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
+            self.assertEqual(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
