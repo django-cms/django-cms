@@ -1,8 +1,8 @@
+furo==2023.09.10
 MarkupSafe
-Pygments
-furo
-Sphinx>=4.2.0
-sphinx-copybutton
+Pygments>=2.16.1
+sphinx
+sphinx-autobuild
 sphinxext-opengraph
 sphinxcontrib-spelling
 pyenchant>3
@@ -12,4 +12,3 @@ codespell
 coverage
 django~=3.2
 django-cms
-pip-tools

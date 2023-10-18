@@ -12,14 +12,10 @@ babel==2.10.3
     # via sphinx
 beautifulsoup4==4.12.2
     # via furo
-build==0.8.0
-    # via pip-tools
 certifi==2022.9.24
     # via requests
 charset-normalizer==2.1.1
     # via requests
-click==8.1.3
-    # via pip-tools
 codespell==2.2.6
     # via -r requirements.in
 colorama==0.4.6
@@ -58,7 +54,7 @@ docutils==0.19
     # via sphinx
 fonttools==4.43.1
     # via matplotlib
-furo==2023.3.27
+furo==2023.9.10
     # via -r requirements.in
 idna==3.4
     # via requests
@@ -82,20 +78,15 @@ numpy==1.26.1
     #   matplotlib
 packaging==21.3
     # via
-    #   build
     #   matplotlib
     #   sphinx
-pep517==0.13.0
-    # via build
 pillow==10.1.0
     # via matplotlib
-pip-tools==6.9.0
-    # via -r requirements.in
 pyenchant==3.2.2
     # via
     #   -r requirements.in
     #   sphinxcontrib-spelling
-pygments==2.13.0
+pygments==2.16.1
     # via
     #   -r requirements.in
     #   furo
@@ -121,21 +112,18 @@ snowballstemmer==2.2.0
     # via sphinx
 soupsieve==2.5
     # via beautifulsoup4
-sphinx==5.3.0
+sphinx==7.1.2
     # via
     #   -r requirements.in
     #   furo
     #   sphinx-autobuild
     #   sphinx-basic-ng
-    #   sphinx-copybutton
     #   sphinxcontrib-spelling
     #   sphinxext-opengraph
 sphinx-autobuild==2021.3.14
     # via -r requirements.in
 sphinx-basic-ng==1.0.0b2
     # via furo
-sphinx-copybutton==0.5.2
-    # via -r requirements.in
 sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
@@ -158,11 +146,8 @@ tornado==6.2
     # via livereload
 urllib3==1.26.12
     # via requests
-wheel==0.37.1
-    # via pip-tools
 zope-interface==5.5.0
     # via datetime
 
 # The following packages are considered to be unsafe in a requirements file:
-# pip
 # setuptools
