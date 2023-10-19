@@ -124,7 +124,7 @@ def get_page_display_name(cms_page):
 
 
 class TreePublishRow(Tag):
-    """New template tag that renders a pontential menu to be offered with the
+    """New template tag that renders a potential menu to be offered with the
     dirty indicators. The core will not display a menu."""
     name = "tree_publish_row"
     options = Options(

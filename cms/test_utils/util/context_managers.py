@@ -62,7 +62,7 @@ class TemporaryDirectory:
         with TemporaryDirectory() as tmpdir:
             ...
 
-    Upon exiting the context, the directory and everthing contained
+    Upon exiting the context, the directory and everything contained
     in it are removed.
     """
 

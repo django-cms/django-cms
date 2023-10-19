@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
+        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -57,6 +57,7 @@ jobs:
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
+        pip install -r docs/requirements.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -71,7 +72,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
+        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -115,6 +116,7 @@ jobs:
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
+        pip install -r docs/requirements.txt
         python setup.py install
 
 
@@ -129,7 +131,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
+        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -142,8 +144,6 @@ jobs:
           ubuntu-20.04,
         ]
         exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.8
           - requirements-file: django-5.0.txt
             python-version: 3.9
 
@@ -161,6 +161,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install -r docs/requirements.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -173,7 +174,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
         requirements-file: ['requirements_base.txt']
         django-version: [
           'https://github.com/django/django/archive/main.tar.gz'
@@ -195,6 +196,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install pytest ${{ matrix.django-version }}
+        pip install --upgrade setuptools
         python setup.py install
 
     - name: Test with django test runner
@@ -208,7 +210,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
         requirements-file: ['requirements_base.txt']
         django-version: [
           'https://github.com/django/django/archive/main.tar.gz'
@@ -244,6 +246,7 @@ jobs:
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install pytest ${{ matrix.django-version }}
         pip install -r test_requirements/databases.txt
+        pip install -r docs/requirements.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -259,7 +262,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
         requirements-file: ['requirements_base.txt']
         django-version: [
           'https://github.com/django/django/archive/main.tar.gz'
@@ -294,6 +297,7 @@ jobs:
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install pytest ${{ matrix.django-version }}
         pip install -r test_requirements/databases.txt
+        pip install -r docs/requirements.txt
         python setup.py install
 
     - name: Test with django test runner
