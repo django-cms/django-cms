@@ -212,7 +212,7 @@ class PageUrl(AsTag):
         # return Exceptions regardless of the setting of settings.DEBUG.
         #
         # We wish to maintain backwards functionality where the non-as-variant
-        # of using this tag will raise NONE exceptions only when
+        # of using this tag will raise DoesNotExist exceptions only when
         # settings.DEBUG=False.
         #
         try:
