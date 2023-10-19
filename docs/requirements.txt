@@ -40,7 +40,7 @@ django-classy-tags==3.0.1
     # via
     #   django-cms
     #   django-sekizai
-django-cms==3.11.0
+django-cms @ https://github.com/django-cms/django-cms/archive/refs/heads/develop-4.zip
     # via -r requirements.in
 django-formtools==2.4
     # via django-cms
@@ -78,6 +78,7 @@ numpy==1.26.1
     #   matplotlib
 packaging==21.3
     # via
+    #   django-cms
     #   matplotlib
     #   sphinx
 pillow==10.1.0

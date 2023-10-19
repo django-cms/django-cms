@@ -11,4 +11,4 @@ datetime
 codespell
 coverage
 django~=3.2
-django-cms
+django-cms @ https://github.com/django-cms/django-cms/archive/refs/heads/develop-4.zip
