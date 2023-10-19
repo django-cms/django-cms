@@ -127,11 +127,13 @@ todo_include_todos = True
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
+
 try:
-    import divio_docs_theme
-    html_theme = 'divio_docs_theme'
-    html_theme_path = [divio_docs_theme.get_html_theme_path()]
+    import furo
+
+    html_theme = 'furo'
     html_theme_options = {
+        "navigation_with_keys": True,
         'show_cloud_banner': True,
         'cloud_banner_markup': """
             <div class="divio-cloud">
@@ -143,9 +145,8 @@ try:
             </div>
         """,
     }
-except:  # NOQA
+except ImportError:
     html_theme = 'default'
-
 
 show_cloud_banner = True
 
