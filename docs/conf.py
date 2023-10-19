@@ -134,16 +134,6 @@ try:
     html_theme = 'furo'
     html_theme_options = {
         "navigation_with_keys": True,
-        'show_cloud_banner': True,
-        'cloud_banner_markup': """
-            <div class="divio-cloud">
-                <span class="divio-cloud-caption">The django CMS Association</span>
-                <p>The django CMS Association is a non-profit organisation that funds and
-                steers the development of django CMS, and nurtures its world-wide
-                community of developers and users.</p>
-                <a class="btn-neutral divio-cloud-btn" target="_blank" href="https://www.django-cms.org/en/about-us/">Join us</a>
-            </div>
-        """,
     }
 except ImportError:
     html_theme = 'default'
