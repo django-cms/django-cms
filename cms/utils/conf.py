@@ -18,12 +18,11 @@ def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
     """
-    from imp import PY_SOURCE, load_module
+    from importlib.machinery import SourceFileLoader
 
     imported = None
     if module_path:
-        with open(module_path) as openfile:
-            imported = load_module("mod", openfile, module_path, ('imported', 'r', PY_SOURCE))
+        imported = SourceFileLoader("mod", module_path).load_module()
     return imported
 
 
