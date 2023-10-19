@@ -828,7 +828,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 self.assertEqual(response.status_code, 200)
                 old_response_size = len(response.content)
                 old_user_count = get_user_model().objects.count()
-                # create additionals user and reload the page
+                # create additional user and reload the page
                 get_user_model().objects.create_user(username=USER_NAME, email=USER_NAME + '@django-cms.org',
                                                      password=USER_NAME)
                 user_count = get_user_model().objects.count()
@@ -1065,12 +1065,12 @@ class AdminPageTreeTests(AdminTestsBase):
     def test_create_page_language(self):
         """tests if the New Page button creates a page content object in the language specified
         by the language selectors. The creates pages in all languages and checks if the "+" button
-        creats a child in the same language"""
+        creates a child in the same language"""
 
         admin_user, staff = self._get_guys()
         pagecontent_admin = self.pagecontent_admin_class
 
-        languages = get_language_list()  # Run trough all languages
+        languages = get_language_list()  # Run through all languages
         url = admin_reverse("cms_pagecontent_changelist")
         add_url = admin_reverse("cms_pagecontent_add")  # "Add page" button
         self.assertIn("/en/", add_url + "?language=en")  # English admin (default in tests)
