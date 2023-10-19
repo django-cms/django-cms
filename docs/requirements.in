@@ -4,9 +4,7 @@ Pygments>=2.16.1
 sphinx
 sphinx-autobuild
 sphinxext-opengraph
-matplotlib==3.7.3
-numpy==1.24.3
-sphinxcontrib-spelling==8.0.0
+sphinxcontrib-spelling
 pyenchant>3
 sphinx-autobuild
 datetime
