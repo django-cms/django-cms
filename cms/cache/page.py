@@ -9,6 +9,7 @@ from django.utils.cache import (
 )
 from django.utils.encoding import iri_to_uri
 from django.utils.timezone import now
+from django.utils import translation
 
 from cms.cache import _get_cache_key, _get_cache_version, _set_cache_version
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
@@ -20,10 +21,11 @@ from cms.utils.helpers import get_timezone_name
 
 def _page_cache_key(request):
     # sha1 key of current path
-    cache_key = "%s:%d:%s" % (
+    cache_key = "%s:%d:%s:%s" % (
         get_cms_setting("CACHE_PREFIX"),
         settings.SITE_ID,
-        hashlib.sha1(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
+        hashlib.sha1(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest(),
+        translation.get_language()
     )
     if settings.USE_TZ:
         cache_key += '.%s' % get_timezone_name()
