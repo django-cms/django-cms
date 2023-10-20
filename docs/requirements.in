@@ -1,13 +1,14 @@
+furo==2023.09.10
 MarkupSafe
-Pygments
+Pygments>=2.16.1
 sphinx
-sphinxcontrib-spelling
+sphinx-autobuild
+sphinxext-opengraph
+sphinxcontrib-spelling==8.0.0
 pyenchant>3
 sphinx-autobuild
-divio-docs-theme
 datetime
+codespell
 coverage
 django~=3.2
-django-sekizai<4  # for python 3.7
-django-cms
-pip-tools
+django-cms @ https://github.com/django-cms/django-cms/archive/refs/heads/develop-4.zip

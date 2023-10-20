@@ -470,7 +470,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
     def test_copy_existing_title(self):
         """
-        Even if a title already exists the copy is successfull, the original
+        Even if a title already exists the copy is successful, the original
         title remains untouched
         """
         site = 1
