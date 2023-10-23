@@ -63,7 +63,7 @@ def _get_database_cursor(action):
 @lru_cache(maxsize=None)
 def plugin_supports_cte():
     # This has to be as function because when it's a var it evaluates before
-    # db is connected and we get OperationalError. MySQL version is retrived
+    # db is connected and we get OperationalError. MySQL version is retrieved
     # from db, and it's cached_property.
     connection = _get_database_connection('write')
     db_vendor = _get_database_vendor('write')
@@ -480,7 +480,7 @@ def get_plugin_media_path(instance, filename):
     Django requires that unbound function used in fields' definitions to be
     defined outside the parent class.
      (see https://docs.djangoproject.com/en/dev/topics/migrations/#serializing-values)
-    This function is used withing field definition:
+    This function is used within field definition:
 
         file = models.FileField(_("file"), upload_to=get_plugin_media_path)
 

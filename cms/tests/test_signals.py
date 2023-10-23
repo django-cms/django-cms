@@ -41,7 +41,7 @@ class SignalTests(CMSTestCase):
                     self.assertRedirects(response, redirect_to)
                     self.assertEqual(env.call_count, 1)
                     new_revision, _ = UrlconfRevision.get_or_create_revision()
-                    self.assertNotEquals(current_revision, new_revision)
+                    self.assertNotEqual(current_revision, new_revision)
 
     def test_urls_need_reloading_signal_delete(self):
         superuser = self.get_superuser()
@@ -63,7 +63,7 @@ class SignalTests(CMSTestCase):
                     self.client.post(endpoint, {'post': 'yes'})
                     self.assertEqual(env.call_count, 1)
                     new_revision, _ = UrlconfRevision.get_or_create_revision()
-                    self.assertNotEquals(current_revision, new_revision)
+                    self.assertNotEqual(current_revision, new_revision)
 
     def test_urls_need_reloading_signal_change_slug(self):
         superuser = self.get_superuser()
@@ -92,4 +92,4 @@ class SignalTests(CMSTestCase):
                     self.assertRedirects(response, redirect_to)
                     self.assertEqual(env.call_count, 1)
                     new_revision, _ = UrlconfRevision.get_or_create_revision()
-                    self.assertNotEquals(current_revision, new_revision)
+                    self.assertNotEqual(current_revision, new_revision)

@@ -4,7 +4,7 @@
 4.0.0 release notes
 ###################
 
-This release of django CMS is a complete rewrite of the core, hugely simplyfying what django-cms does
+This release of django CMS is a complete rewrite of the core, hugely simplifying what django-cms does
 out of the box. The main reasons for the changes:
 - Limitations with publishing, where only 2 versions can ever exist
 - Too many "opinions" of how parts of the CMS should work baked in
@@ -70,7 +70,7 @@ Do we comment on changes that have already happened in previous v3 versions, suc
 * Ported Fix 'urls.W001' warning with custom apphook urls (https://github.com/django-cms/django-cms/commit/75978fb1c3ad25d1efba39a5d32215314358ba71)
 * Ported Override urlconf_module so that Django system checks don't crash (https://github.com/django-cms/django-cms/commit/f1226a57b767d4b9f66a0cfec4374b5157c49e4e)
 * Feat Added raise a 404 when EmptyPageContent is returned (https://github.com/django-cms/django-cms/commit/8e7cdb12d20e63e552ea2cc010f586c3dfbb396a)
-* Feat Added the ability to disable the sideframe witht he setting `CMS_SIDEFRAME_ENABLED` (https://github.com/django-cms/django-cms/commit/a1ac04d3f81777f6404af62a9c31ff74715b7028)
+* Feat Added the ability to disable the sideframe with he setting `CMS_SIDEFRAME_ENABLED` (https://github.com/django-cms/django-cms/commit/a1ac04d3f81777f6404af62a9c31ff74715b7028)
 * Feat Added dedicated edit and preview toolbar buttons (https://github.com/django-cms/django-cms/commit/5005cd933e12332e9296cdda3e0a9eeaea3fc9a2)
 * Feat Added expose the sideframe in CMS.API (https://github.com/django-cms/django-cms/commit/4dadf9f1e1f2cf4da6bc68f8367236b040255fbc)
 * Feat Removed resolve View (https://github.com/django-cms/django-cms/commit/e3a23a7fc757892c7d58e4af6b78e853ddecab87)
@@ -360,7 +360,7 @@ To be able to use `media` again, we can create a property like the below example
 
 Placeholder endpoints
 =====================
-The Placeholder endpoints are designed in a way that allows other third party packages to reuse the edit and preview modes. The major benifit of the reuse is that a third party package can use the views to manage plugins.
+The Placeholder endpoints are designed in a way that allows other third party packages to reuse the edit and preview modes. The major benefit of the reuse is that a third party package can use the views to manage plugins.
 
 Preview end-point
 -----------------
@@ -419,4 +419,4 @@ Within your packages cms_config add the following entry::
 Static Placeholders
 -------------------
 
-Static Placeholders have been superceeded by djangocms-alias, because they cannot be versioned.
+Static Placeholders have been superseded by djangocms-alias, because they cannot be versioned.

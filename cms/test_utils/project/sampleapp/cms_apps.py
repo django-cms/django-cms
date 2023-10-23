@@ -72,7 +72,7 @@ class SampleApp2(CMSApp):
 
 
 class SampleApp3(CMSApp):
-    # CMSApp which returns the url directly rather than trough another Python module
+    # CMSApp which returns the url directly rather than through another Python module
     name = _("Sample App 3")
 
     def get_urls(self, page=None, language=None, **kwargs):
