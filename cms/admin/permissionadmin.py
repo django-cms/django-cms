@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
@@ -64,7 +65,7 @@ class PagePermissionInlineAdmin(PagePermissionAdminMixin, admin.TabularInline):
     # use special form, so we can override of user and group field
     # form = PagePermissionInlineAdminForm
     classes = ['collapse', 'collapsed']
-    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_change_advanced_settings',
+    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_publish', 'can_change_advanced_settings',
               'can_change_permissions', 'can_move_page', 'grant_on',
               ]
     extra = 0  # edit page load time boost
@@ -120,16 +121,14 @@ class ViewRestrictionInlineAdmin(PagePermissionAdminMixin, admin.TabularInline):
 
 
 class GlobalPagePermissionAdmin(admin.ModelAdmin):
-    list_display = ['user', 'group', 'can_change', 'can_delete', 'can_change_permissions']
-    list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_change_permissions']
-
-    search_fields = []
-    for field in admin_class.search_fields:
-        search_fields.append("user__%s" % field)
-    search_fields.append('group__name')
-
-    list_display.append('can_change_advanced_settings')
-    list_filter.append('can_change_advanced_settings')
+    list_display = ['user', 'group', 'can_change', 'can_delete', 'can_change_permissions',
+                    'can_change_advanced_settings']
+    list_filter = ['can_change', 'can_delete', 'can_change_permissions', 'can_change_advanced_settings']
+    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_publish', 'can_change_advanced_settings',
+              'can_change_permissions', 'can_move_page', 'can_view', 'can_set_as_home', 'sites']
+    search_fields = ['user__{}'.format(field) for field in admin_class.search_fields] + ['group__name']
+    autocomplete_fields = ['user', 'group']
+    filter_horizontal = ['sites']
 
     def get_list_filter(self, request):
         list_filter = list(super().get_list_filter(request))
