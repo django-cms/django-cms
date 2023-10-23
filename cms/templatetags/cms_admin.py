@@ -7,6 +7,7 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
@@ -19,7 +20,7 @@ from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
 
-CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
+CMS_ADMIN_ICON_BASE = "{}admin/img/".format(settings.STATIC_URL)
 
 
 class GetAdminUrlForLanguage(AsTag):
@@ -217,8 +218,9 @@ def render_filter_field(request, field):
 @register.filter
 def boolean_icon(value):
     BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(
-        '<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
+    return format_html(
+        '<img src="{0}icon-{1}.svg" alt="{2}" />', CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value
+    )
 
 
 @register.tag(name="page_submit_row")
