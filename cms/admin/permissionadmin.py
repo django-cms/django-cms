@@ -65,7 +65,7 @@ class PagePermissionInlineAdmin(PagePermissionAdminMixin, admin.TabularInline):
     # use special form, so we can override of user and group field
     # form = PagePermissionInlineAdminForm
     classes = ['collapse', 'collapsed']
-    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_publish', 'can_change_advanced_settings',
+    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_change_advanced_settings',
               'can_change_permissions', 'can_move_page', 'grant_on',
               ]
     extra = 0  # edit page load time boost
@@ -124,7 +124,7 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     list_display = ['user', 'group', 'can_change', 'can_delete', 'can_change_permissions',
                     'can_change_advanced_settings']
     list_filter = ['can_change', 'can_delete', 'can_change_permissions', 'can_change_advanced_settings']
-    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_publish', 'can_change_advanced_settings',
+    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_change_advanced_settings',
               'can_change_permissions', 'can_move_page', 'can_view', 'can_set_as_home', 'sites']
     search_fields = ['user__{}'.format(field) for field in admin_class.search_fields] + ['group__name']
     autocomplete_fields = ['user', 'group']
