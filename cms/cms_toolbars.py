@@ -551,7 +551,7 @@ class PageToolbar(CMSToolbar):
                 )
                 disabled = len(remove) == 1
                 for code, name in remove:
-                    url = add_url_parameters(translation_delete_url, language=code)
+                    url = add_url_parameters(translation_delete_url, delete_language=code)
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
