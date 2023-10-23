@@ -217,11 +217,11 @@ def render_filter_field(request, field):
 
 @register.filter
 def boolean_icon(value):
-    BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
+    mapped_icon = {True: 'yes', False: 'no'}.get(value, 'unknown')
     return format_html(
-        '<img src="{0}icon-{1}.svg" alt="{2}" />',
+        '<img src="{0}icon-{1}.svg" alt="{1}" />',
         CMS_ADMIN_ICON_BASE,
-        BOOLEAN_MAPPING.get(value, 'unknown'),
+        mapped_icon,
     )
 
 @register.tag(name="page_submit_row")

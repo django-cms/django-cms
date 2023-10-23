@@ -245,7 +245,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         return queryset.filter(functools.reduce(operator.or_, queries)).exists()
 
     def subordinate_to_user(self, user, site):
-        """
+        r"""
         Get all page permission objects on which user/group is lover in
         hierarchy then given user and given user can change permissions on them.
 
