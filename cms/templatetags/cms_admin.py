@@ -20,7 +20,7 @@ from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
 
-CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
+CMS_ADMIN_ICON_BASE = "{}admin/img/".format(settings.STATIC_URL)
 
 
 class GetAdminUrlForLanguage(AsTag):
