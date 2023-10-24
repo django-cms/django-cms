@@ -488,7 +488,7 @@ def create_page_user(created_by, user,
 
 def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
                         can_add=False, can_change=False, can_delete=False,
-                        can_change_advanced_settings=False, can_publish=False,
+                        can_change_advanced_settings=False, can_publish=None,
                         can_change_permissions=False, can_move_page=False,
                         can_recover_page=True, can_view=False,
                         grant_all=False, global_permission=False):
@@ -507,13 +507,16 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
     """
+    if can_publish is not None:
+        warnings.warn('This API function no longer accepts a "can_publish" argument.',
+                      UserWarning, stacklevel=2)
+
     grant_all = grant_all and not global_permission
     data = {
         'can_add': can_add or grant_all,
         'can_change': can_change or grant_all,
         'can_delete': can_delete or grant_all,
         'can_change_advanced_settings': can_change_advanced_settings or grant_all,
-        'can_publish': can_publish or grant_all,
         'can_change_permissions': can_change_permissions or grant_all,
         'can_move_page': can_move_page or grant_all,
         'can_view': can_view or grant_all,

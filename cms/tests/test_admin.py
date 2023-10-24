@@ -70,7 +70,6 @@ class AdminTestsBase(CMSTestCase):
                 can_change=True,
                 can_delete=True,
                 can_change_advanced_settings=False,
-                can_publish=True,
                 can_change_permissions=False,
                 can_move_page=True,
             )
@@ -519,7 +518,6 @@ class PluginPermissionTests(AdminTestsBase):
             can_change=True,
             can_delete=True,
             can_change_advanced_settings=False,
-            can_publish=True,
             can_change_permissions=False,
             can_move_page=True,
         )
