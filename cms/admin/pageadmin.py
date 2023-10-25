@@ -375,6 +375,9 @@ class PageAdmin(admin.ModelAdmin):
         if 'placeholder' in perms_needed:
             perms_needed.remove('placeholder')
 
+        if 'Seiten-Inhalt' in perms_needed:  # dwinter feel even worse in german version this is in german
+            perms_needed.remove('Seiten-Inhalt')
+
         if 'page content' in perms_needed:
             perms_needed.remove('page content')
 
