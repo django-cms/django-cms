@@ -6,6 +6,7 @@ from django.test.utils import override_settings
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
+from django.utils.translation import get_language
 from cms.utils.compat import DJANGO_2_2
 
 
@@ -34,7 +35,7 @@ class TestLanguages(CMSTestCase):
 
     def test_language_code(self):
         self.assertEqual(i18n.get_language_code('en'), 'en')
-        self.assertEqual(i18n.get_current_language(), 'en')
+        self.assertEqual(get_language(), 'en')
 
     def test_get_languages_default_site(self):
         result = i18n.get_languages()
@@ -161,7 +162,7 @@ class TestLanguageCodesEnUS(CMSTestCase):
 
     def test_language_code(self):
         self.assertEqual(i18n.get_language_code('en-us'), 'en-us')
-        self.assertEqual(i18n.get_current_language(), 'en-us')
+        self.assertEqual(get_language(), 'en-us')
 
     def test_get_languages_default_site(self):
         result = i18n.get_languages()
@@ -231,7 +232,7 @@ class TestLanguageCodesEnGB(CMSTestCase):
 
     def test_language_code(self):
         self.assertEqual(i18n.get_language_code('en-gb'), 'en-gb')
-        self.assertEqual(i18n.get_current_language(), 'en-gb')
+        self.assertEqual(get_language(), 'en-gb')
 
     def test_get_languages_default_site(self):
         result = i18n.get_languages()

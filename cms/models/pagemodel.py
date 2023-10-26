@@ -28,7 +28,7 @@ from cms.exceptions import LanguageError, PublicIsUnmodifiable, PublicVersionNee
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_current_language
+from django.utils.translation import get_language
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
@@ -436,7 +436,7 @@ class Page(models.Model):
 
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
-            language = get_current_language()
+            language = get_language()
 
         with force_language(language):
             if self.is_home:

@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from cms.cache.choices import _page_cache_key, _site_cache_key, clean_page_choices_cache, clean_site_choices_cache
 from cms.models import Page, Title
 from cms.utils import i18n
+from django.utils.translation import get_language
 
 
 def get_sites():
@@ -56,7 +57,7 @@ def get_page_choices_for_site(site, language):
 
 def update_site_and_page_choices(language=None):
     if language is None:
-        language = i18n.get_current_language()
+        language = get_language()
 
     site_choices = []
     page_choices = [('', '----')]
@@ -78,7 +79,7 @@ def update_site_and_page_choices(language=None):
 
 def get_site_choices(lang=None):
     from django.core.cache import cache
-    lang = lang or i18n.get_current_language()
+    lang = lang or get_language()
     site_choices = cache.get(_site_cache_key(lang))
     if site_choices is None:
         site_choices = update_site_and_page_choices(lang)[0]
@@ -87,7 +88,7 @@ def get_site_choices(lang=None):
 
 def get_page_choices(lang=None):
     from django.core.cache import cache
-    lang = lang or i18n.get_current_language()
+    lang = lang or get_language()
     page_choices = cache.get(_page_cache_key(lang))
     if page_choices is None:
         page_choices = update_site_and_page_choices(lang)[1]

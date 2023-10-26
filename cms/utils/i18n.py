@@ -5,6 +5,7 @@ from django.conf import settings
 from django.urls import LocalePrefixPattern, get_resolver
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language
 
 from cms.exceptions import LanguageError
 from cms.utils.conf import get_cms_setting, get_site_id
@@ -12,7 +13,7 @@ from cms.utils.conf import get_cms_setting, get_site_id
 
 @contextmanager
 def force_language(new_lang):
-    old_lang = get_current_language()
+    old_lang = get_language()
     if old_lang != new_lang:
         translation.activate(new_lang)
     yield
@@ -71,20 +72,20 @@ def get_language_code(language_code, site_id=None):
     return language_code
 
 
-def get_current_language():
-    """
-    Returns the currently active language
+# def get_language():
+#     """
+#     Returns the currently active language
 
-    It's a replacement for Django's translation.get_language() to make sure the LANGUAGE_CODE will be found in LANGUAGES.
-    Overcomes this issue: https://code.djangoproject.com/ticket/9340
-    """
-    warnings.warn(
-        "get_current_language() is deprecated; use django.utils.translation.get_language().",
-        DeprecationWarning,
-        stacklevel=2
-    )
-    language_code = translation.get_language()
-    return get_language_code(language_code)
+#     It's a replacement for Django's translation.get_language() to make sure the LANGUAGE_CODE will be found in LANGUAGES.
+#     Overcomes this issue: https://code.djangoproject.com/ticket/9340
+#     """
+#     warnings.warn(
+#         "get_language() is deprecated; use django.utils.translation.get_language().",
+#         DeprecationWarning,
+#         stacklevel=2
+#     )
+#     language_code = translation.get_language()
+#     return get_language_code(language_code)
 
 
 def get_language_list(site_id=None):
