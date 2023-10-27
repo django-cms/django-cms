@@ -25,6 +25,11 @@ jobs:
         os: [
           ubuntu-20.04,
         ]
+        exclude:
+          - requirements-file: django-5.0.txt
+            python-version: 3.8
+          - requirements-file: django-5.0.txt
+            python-version: 3.9
 
     services:
       postgres:
