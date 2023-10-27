@@ -4,15 +4,15 @@ from cms.extensions import PageExtensionAdmin, TitleExtensionAdmin
 from cms.test_utils.project.extensionapp.models import MyPageExtension, MyTitleExtension
 
 
+@admin.register(MyPageExtension)
 class MyPageExtensionAdmin(PageExtensionAdmin):
     pass
 
 
-admin.site.register(MyPageExtension, MyPageExtensionAdmin)
 
 
+@admin.register(MyTitleExtension)
 class MyTitleExtensionAdmin(TitleExtensionAdmin):
     pass
 
 
-admin.site.register(MyTitleExtension, MyTitleExtensionAdmin)

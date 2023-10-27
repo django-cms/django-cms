@@ -4,6 +4,7 @@ from cms.admin.placeholderadmin import PlaceholderAdminMixin
 from cms.models import StaticPlaceholder
 
 
+@admin.register(StaticPlaceholder)
 class StaticPlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     list_display = ('get_name', 'code', 'site', 'creation_method')
     search_fields = ('name', 'code',)
@@ -11,4 +12,3 @@ class StaticPlaceholderAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
     list_filter = ('creation_method', 'site')
 
 
-admin.site.register(StaticPlaceholder, StaticPlaceholderAdmin)
