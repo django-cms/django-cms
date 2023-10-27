@@ -21,7 +21,7 @@ jobs:
           django-5.0.txt,
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
@@ -80,7 +80,7 @@ jobs:
           django-5.0.txt,
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
@@ -139,7 +139,7 @@ jobs:
           django-5.0.txt,
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
