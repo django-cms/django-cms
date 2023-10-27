@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
-from django.urls import re_path, reverse
+from django.urls import path, reverse
 from django.utils.translation import gettext_lazy as _
 
 from cms.app_base import CMSApp
@@ -80,7 +80,7 @@ class SampleApp3(CMSApp):
             return HttpResponse("Sample App 3 Response")
 
         return [
-            re_path(r'^$', my_view, name='sample3-root'),
+            path('', my_view, name='sample3-root'),
         ]
 
 

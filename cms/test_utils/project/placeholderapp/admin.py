@@ -8,18 +8,18 @@ from cms.test_utils.project.placeholderapp.models import (
 )
 
 
+@admin.register(Example1)
 class ExampleAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1", "char_2")
 
 
+@admin.register(CharPksExample)
 class CharPksAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
     frontend_editable_fields = ("char_1",)
 
 
+@admin.register(TwoPlaceholderExample)
 class TwoPlaceholderExampleAdmin(admin.ModelAdmin):
     pass
 
 
-admin.site.register(Example1, ExampleAdmin)
-admin.site.register(CharPksExample, CharPksAdmin)
-admin.site.register(TwoPlaceholderExample, TwoPlaceholderExampleAdmin)

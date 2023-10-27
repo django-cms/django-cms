@@ -49,7 +49,7 @@ from cms.utils.page import get_page_from_request
 
 if DJANGO_2_2:
     from django.utils.http import (
-        is_safe_url as url_has_allowed_host_and_scheme,
+        url_has_allowed_host_and_scheme as url_has_allowed_host_and_scheme,
     )
 else:
     from django.utils.http import url_has_allowed_host_and_scheme

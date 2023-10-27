@@ -7,15 +7,15 @@ from cms.test_utils.project.extensionapp.models import (
 )
 
 
+@admin.register(MyPageExtension)
 class MyPageExtensionAdmin(PageExtensionAdmin):
     pass
 
 
-admin.site.register(MyPageExtension, MyPageExtensionAdmin)
 
 
+@admin.register(MyPageContentExtension)
 class MyPageContentExtensionAdmin(PageContentExtensionAdmin):
     pass
 
 
-admin.site.register(MyPageContentExtension, MyPageContentExtensionAdmin)

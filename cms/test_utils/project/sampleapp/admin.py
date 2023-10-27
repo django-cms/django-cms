@@ -15,14 +15,17 @@ class PictureInline(admin.StackedInline):
     model = Picture
 
 
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [PictureInline]
 
 
+@admin.register(SomeEditableModel)
 class SomeEditableAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
     pass
 
 
+@admin.register(GrouperModel)
 class GrouperAdmin(GrouperModelAdmin):
     extra_grouping_fields = ("language",)
     list_display = ("category_name", "content__secret_greeting", "admin_list_actions")
@@ -31,7 +34,4 @@ class GrouperAdmin(GrouperModelAdmin):
         return getattr(self, "change_content", True)
 
 
-admin.site.register(Category, CategoryAdmin)
 admin.site.register(SampleAppConfig)
-admin.site.register(SomeEditableModel, SomeEditableAdmin)
-admin.site.register(GrouperModel, GrouperAdmin)

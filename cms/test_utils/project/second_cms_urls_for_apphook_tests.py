@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import include, re_path
+from django.urls import include, path, re_path
 
 from cms.apphook_pool import apphook_pool
 from cms.views import details
@@ -11,9 +11,9 @@ else:
 
 urlpatterns = [
     # Public pages
-    re_path(r'^example/', include('cms.test_utils.project.sampleapp.urls_example', namespace="example1")),
-    re_path(r'^example2/', include('cms.test_utils.project.sampleapp.urls_example', namespace="example2")),
-    re_path(r'^$', details, {'slug': ''}, name='pages-root'),
+    path('example/', include('cms.test_utils.project.sampleapp.urls_example', namespace="example1")),
+    path('example2/', include('cms.test_utils.project.sampleapp.urls_example', namespace="example2")),
+    path('', details, {'slug': ''}, name='pages-root'),
     reg,
 ]
 

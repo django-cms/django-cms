@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import include, re_path
+from django.urls import include, path, re_path
 
 from cms import views
 from cms.apphook_pool import apphook_pool
@@ -20,8 +20,8 @@ else:
 
 
 urlpatterns.extend([
-    re_path(r'^cms_login/$', views.login, name='cms_login'),
-    re_path(r'^cms_wizard/', include('cms.wizards.urls')),
+    path('cms_login/', views.login, name='cms_login'),
+    path('cms_wizard/', include('cms.wizards.urls')),
     re_path(regexp, views.details, name='pages-details-by-slug'),
-    re_path(r'^$', views.details, {'slug': ''}, name='pages-root'),
+    path('', views.details, {'slug': ''}, name='pages-root'),
 ])

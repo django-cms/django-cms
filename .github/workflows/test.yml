@@ -14,7 +14,6 @@ jobs:
       matrix:
         python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
         requirements-file: [
-          django-2.2.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
@@ -22,11 +21,9 @@ jobs:
           django-5.0.txt
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.8
           - requirements-file: django-5.0.txt
             python-version: 3.9
 
@@ -82,11 +79,9 @@ jobs:
           django-5.0.txt
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.8
           - requirements-file: django-5.0.txt
             python-version: 3.9
 
@@ -133,7 +128,6 @@ jobs:
       matrix:
         python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
         requirements-file: [
-          django-2.2.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
@@ -141,7 +135,7 @@ jobs:
           django-5.0.txt
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
@@ -180,7 +174,7 @@ jobs:
           'https://github.com/django/django/archive/main.tar.gz'
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
 
     steps:
@@ -216,7 +210,7 @@ jobs:
           'https://github.com/django/django/archive/main.tar.gz'
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
 
     services:
@@ -268,7 +262,7 @@ jobs:
           'https://github.com/django/django/archive/main.tar.gz'
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
 
     services:

@@ -5,6 +5,7 @@ from .forms import UserChangeForm, UserCreationForm
 from .models import EmailUser
 
 
+@admin.register(EmailUser)
 class UserAdmin(OriginalUserAdmin):
     # The form to add and change user instances
     form = UserChangeForm
@@ -39,4 +40,3 @@ class UserAdmin(OriginalUserAdmin):
 
 
 # Now register the emailuser admin
-admin.site.register(EmailUser, UserAdmin)

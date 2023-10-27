@@ -1,7 +1,7 @@
-from django.urls import re_path
+from django.urls import path
 
 from .views import WizardCreateView
 
 urlpatterns = [
-    re_path(r"^create/$", WizardCreateView.as_view(), name="cms_wizard_create"),
+    path("create/", WizardCreateView.as_view(), name="cms_wizard_create"),
 ]
