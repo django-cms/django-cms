@@ -14,8 +14,6 @@ jobs:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12']
         requirements-file: [
-          django-2.2.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
@@ -75,8 +73,6 @@ jobs:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12']
         requirements-file: [
-          django-2.2.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
@@ -136,8 +132,6 @@ jobs:
       matrix:
         python-version: ['3.9', '3.10', '3.11', '3.12']
         requirements-file: [
-          django-2.2.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
