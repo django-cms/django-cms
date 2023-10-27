@@ -4,8 +4,8 @@ from contextlib import contextmanager
 from django.conf import settings
 from django.urls import LocalePrefixPattern, get_resolver
 from django.utils import translation
-from django.utils.translation import gettext_lazy as _
 from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import LanguageError
 from cms.utils.conf import get_cms_setting, get_site_id

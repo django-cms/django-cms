@@ -28,7 +28,6 @@ from cms.exceptions import LanguageError, PublicIsUnmodifiable, PublicVersionNee
 from cms.models.managers import PageManager, PageNodeManager
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
-from django.utils.translation import get_language
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 

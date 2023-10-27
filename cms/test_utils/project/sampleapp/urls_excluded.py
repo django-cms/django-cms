@@ -1,5 +1,4 @@
-from django.urls import path
-from django.urls import include
+from django.urls import include, path
 
 urlpatterns = [
     path('excluded/',

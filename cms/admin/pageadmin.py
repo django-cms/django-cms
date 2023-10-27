@@ -28,8 +28,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
-from django.urls import path
-from django.urls import NoReverseMatch, re_path
+from django.urls import NoReverseMatch, path, re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.translation import get_language, gettext

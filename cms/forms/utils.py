@@ -3,11 +3,11 @@ from django.db.models import Prefetch
 from django.db.models.signals import post_delete, post_save
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
+from django.utils.translation import get_language
 
 from cms.cache.choices import _page_cache_key, _site_cache_key, clean_page_choices_cache, clean_site_choices_cache
 from cms.models import Page, Title
 from cms.utils import i18n
-from django.utils.translation import get_language
 
 
 def get_sites():

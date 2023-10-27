@@ -1,7 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
-from django.urls import path
-from django.urls import reverse
+from django.urls import path, reverse
 from django.utils.translation import gettext_lazy as _
 
 from cms.app_base import CMSApp

@@ -2,11 +2,11 @@ from importlib import import_module
 
 from django.conf import settings
 from django.test.utils import override_settings
+from django.utils.translation import get_language
 
 from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
-from django.utils.translation import get_language
 from cms.utils.compat import DJANGO_2_2
 
 
