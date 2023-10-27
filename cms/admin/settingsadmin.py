@@ -9,8 +9,7 @@ from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
 from django.http.request import QueryDict
-from django.urls import path
-from django.urls import Resolver404, re_path, resolve
+from django.urls import Resolver404, path, re_path, resolve
 from django.utils.translation import override
 
 from cms.admin.forms import RequestToolbarForm

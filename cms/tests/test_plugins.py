@@ -10,8 +10,7 @@ from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWid
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
-from django.urls import path
-from django.urls import reverse
+from django.urls import path, reverse
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import urlencode
