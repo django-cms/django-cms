@@ -10,7 +10,8 @@ from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWid
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
-from django.urls import re_path, reverse
+from django.urls import path
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.http import urlencode
@@ -104,7 +105,7 @@ class DumbFixturePluginWithUrls(DumbFixturePlugin):
 
     def get_plugin_urls(self):
         return [
-            re_path(r'^testview/$', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
+            path('testview/', admin.site.admin_view(self._test_view), name='dumbfixtureplugin'),
         ]
 
 

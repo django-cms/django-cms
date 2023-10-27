@@ -3,6 +3,7 @@ from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
 from django.contrib.auth.views import LoginView
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.urls import path
 from django.urls import include, re_path
 from django.views.i18n import JavaScriptCatalog
 from django.views.static import serve
@@ -25,15 +26,15 @@ urlpatterns = [
 urlpatterns += staticfiles_urlpatterns()
 
 urlpatterns += i18n_patterns(
-    re_path(r'^sample/login_other/$', LoginView.as_view(),
+    path('sample/login_other/', LoginView.as_view(),
             kwargs={'authentication_form': LoginForm2}),
-    re_path(r'^sample/login/$', LoginView.as_view(),
+    path('sample/login/', LoginView.as_view(),
             kwargs={'authentication_form': LoginForm}),
-    re_path(r'^sample/login3/$', LoginView.as_view(),
+    path('sample/login3/', LoginView.as_view(),
             kwargs={'authentication_form': LoginForm3}),
     re_path(r'^admin/', admin.site.urls),
-    re_path(r'^example/$', example_view),
-    re_path(r'^example/latest/$', latest_view),
-    re_path(r'^plain_view/$', plain_view),
-    re_path(r'^', include('cms.urls')),
+    path('example/', example_view),
+    path('example/latest/', latest_view),
+    path('plain_view/', plain_view),
+    path('', include('cms.urls')),
 )

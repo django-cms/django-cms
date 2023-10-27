@@ -28,6 +28,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template.defaultfilters import escape
 from django.template.loader import get_template
 from django.template.response import SimpleTemplateResponse, TemplateResponse
+from django.urls import path
 from django.urls import NoReverseMatch, re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
@@ -91,11 +92,13 @@ class TreeNodeAdmin(admin.ModelAdmin):
         'page__reverse_id',
     )
 
+    @admin.display(
+        description='parent'
+    )
     def parent_display(self, obj):
         if obj.parent_id:
             return str(obj.parent)
         return ''
-    parent_display.short_description = 'parent'
 
 
 class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
@@ -1640,6 +1643,7 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
+@admin.register(Page)
 class PageAdmin(BasePageAdmin):
 
     def add_view(self, request, form_url='', extra_context=None):
@@ -1677,7 +1681,7 @@ class PageAdmin(BasePageAdmin):
         url_patterns = [
             pat(r'^([0-9]+)/set-home/$', self.set_home),
             pat(r'^published-pages/$', self.get_published_pagelist),
-            re_path(r'^resolve/$', self.resolve, name="cms_page_resolve"),
+            path('resolve/', self.resolve, name="cms_page_resolve"),
         ]
 
         if plugin_pool.registered_plugins:
@@ -1751,6 +1755,7 @@ class PageAdmin(BasePageAdmin):
         return HttpResponseForbidden()
 
 
+@admin.register(PageType)
 class PageTypeAdmin(BasePageAdmin):
 
     add_form = AddPageTypeForm
@@ -1761,5 +1766,3 @@ class PageTypeAdmin(BasePageAdmin):
         return queryset.exclude(is_page_type=False)
 
 
-admin.site.register(Page, PageAdmin)
-admin.site.register(PageType, PageTypeAdmin)
