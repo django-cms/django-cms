@@ -300,9 +300,10 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     if require_editable:
         if not is_editable_model(model):
             return HttpResponseBadRequest('Requested object does not support frontend rendering')
-        # Does the object provide a "user_can_edit" method? If so, call.
-        user_can_edit = not hasattr(content_type_obj, "user_can_edit") or content_type_obj.user_can_edit(request.user)
-        if not user_can_edit:
+        # Does the object provide a "is_editable" method? If so, call.
+        is_editable = not hasattr(content_type_obj, "is_editable") or content_type_obj.is_editable(request)
+        if not is_editable:
+            # If not, switch to preview endpoint
             return HttpResponseRedirect(get_object_preview_url(content_type_obj))
 
     extension = apps.get_app_config('cms').cms_extension
