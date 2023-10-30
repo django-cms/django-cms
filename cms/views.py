@@ -272,7 +272,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
         model = content_type.model_class()
 
     if require_editable and not is_editable_model(model):
-            return HttpResponseBadRequest('Requested object does not support frontend rendering')
+        return HttpResponseBadRequest('Requested object does not support frontend rendering')
 
     try:
         if issubclass(model, PageContent):
