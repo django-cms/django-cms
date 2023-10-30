@@ -271,6 +271,9 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     else:
         model = content_type.model_class()
 
+    if require_editable and not is_editable_model(model):
+            return HttpResponseBadRequest('Requested object does not support frontend rendering')
+
     try:
         if issubclass(model, PageContent):
             # An apphook might be attached to a PageContent object
@@ -297,15 +300,6 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     except ObjectDoesNotExist:
         raise Http404
 
-    if require_editable:
-        if not is_editable_model(model):
-            return HttpResponseBadRequest('Requested object does not support frontend rendering')
-        # Does the object provide a "is_editable" method? If so, call.
-        is_editable = not hasattr(content_type_obj, "is_editable") or content_type_obj.is_editable(request)
-        if not is_editable:
-            # If not, switch to preview endpoint
-            return HttpResponseRedirect(get_object_preview_url(content_type_obj))
-
     extension = apps.get_app_config('cms').cms_extension
 
     if model not in extension.toolbar_enabled_models:
@@ -313,6 +307,11 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
+
+    if require_editable and not toolbar.object_is_editable():
+        # If not editable, switch from edit to preview endpoint
+        return HttpResponseRedirect(get_object_preview_url(content_type_obj))
+
     render_func = extension.toolbar_enabled_models[model]
     return render_func(request, content_type_obj)
 
