@@ -32,7 +32,7 @@ from cms.page_rendering import (
     _render_welcome_page,
     render_pagecontent,
 )
-from cms.toolbar.utils import get_toolbar_from_request
+from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
@@ -271,9 +271,6 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     else:
         model = content_type.model_class()
 
-    if require_editable and not is_editable_model(model):
-        return HttpResponseBadRequest('Requested object does not support frontend rendering')
-
     try:
         if issubclass(model, PageContent):
             # An apphook might be attached to a PageContent object
@@ -299,6 +296,14 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist:
         raise Http404
+
+    if require_editable:
+        if not is_editable_model(model):
+            return HttpResponseBadRequest('Requested object does not support frontend rendering')
+        # Does the object provide a "user_can_edit" method? If so, call.
+        user_can_edit = not hasattr(content_type_obj, "user_can_edit") or content_type_obj.user_can_edit(request.user)
+        if not user_can_edit:
+            return HttpResponseRedirect(get_object_preview_url(content_type_obj))
 
     extension = apps.get_app_config('cms').cms_extension
 
