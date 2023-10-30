@@ -289,7 +289,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     absolute_url = content_type_obj.get_absolute_url()
                     from cms.toolbar.toolbar import CMSToolbar
                     request.toolbar = CMSToolbar(request, request_path=absolute_url)
-                    # Resovle the apphook's url to get its view function
+                    # Resolve the apphook's url to get its view function
                     view_func, args, kwargs = resolve(absolute_url)
                     return view_func(request, *args, **kwargs)
                 except Resolver404:

@@ -192,7 +192,6 @@ class Page(models.Model):
         default_permissions = ('add', 'change', 'delete')
         permissions = (
             ('view_page', 'Can view page'),
-            ('publish_page', 'Can publish page'),
             ('edit_static_placeholder', 'Can edit static placeholders'),
         )
         verbose_name = _('page')
@@ -1000,10 +999,6 @@ class Page(models.Model):
     def has_delete_translation_permission(self, user, language):
         from cms.utils.page_permissions import user_can_delete_page_translation
         return user_can_delete_page_translation(user, page=self, language=language)
-
-    def has_publish_permission(self, user):
-        from cms.utils.page_permissions import user_can_publish_page
-        return user_can_publish_page(user, page=self)
 
     def has_advanced_settings_permission(self, user):
         from cms.utils.page_permissions import (

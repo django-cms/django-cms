@@ -1099,7 +1099,6 @@ class PagePermissionInlineAdminForm(BasePermissionAdminForm):
             'can_add',
             'can_change',
             'can_delete',
-            'can_publish',
             'can_change_advanced_settings',
             'can_change_permissions',
             'can_move_page',
@@ -1143,7 +1142,6 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
             'can_add',
             'can_change',
             'can_delete',
-            'can_publish',
             'can_change_advanced_settings',
             'can_change_permissions',
             'can_move_page',
@@ -1154,7 +1152,7 @@ class GlobalPagePermissionAdminForm(BasePermissionAdminForm):
 
 
 class GenericCmsPermissionForm(forms.ModelForm):
-    """Generic form for User & Grup permissions in cms
+    """Generic form for User & Group permissions in cms
     """
     _current_user = None
 

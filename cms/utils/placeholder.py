@@ -187,7 +187,7 @@ def _scan_placeholders(nodelist, node_class=None, current_block=None, ignore_blo
 
     if ignore_blocks is None:
         # List of BlockNode instances to ignore.
-        # This is important to avoid processing overriden block nodes.
+        # This is important to avoid processing overridden block nodes.
         ignore_blocks = []
 
     for node in nodelist:
@@ -375,7 +375,7 @@ def get_declared_placeholders_for_obj(obj):
 
 
 def get_placeholder_from_slot(placeholder_relation: models.Manager, slot: str, template_obj=None) -> Placeholder:
-    """Retrieves the placeholder instance for a PlaceholderRelationField either by scaning the template
+    """Retrieves the placeholder instance for a PlaceholderRelationField either by scanning the template
     of the template_obj (if given) or by creating or getting a Placeholder in the database"""
     if hasattr(template_obj, "get_template"):
         # Tries to get a placeholder (based on the template for the template_obj
