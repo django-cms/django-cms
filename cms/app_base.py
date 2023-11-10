@@ -6,7 +6,7 @@ class CMSApp:
     To create an AppHook subclass ``CMSApp`` in ``cms_apps.py``
     ::
         class MyAppHook(CMSApp):
-            name = "Problem sovler"
+            name = "Problem solver"
     """
     #: list of urlconfs: example: ``_urls = ["myapp.urls"]``
     _urls = []
@@ -126,7 +126,7 @@ class CMSAppConfig():
     CMSAppConfig live in a file called ``cms_config.py``.
 
     Apps subclassing ``CMSAppConfig`` can set ``cms_enabled = True`` for their app config to
-    use django CMS' wizzard functionality. Additional wizzwards are listed in the app config's
+    use django CMS' wizard functionality. Additional wizzwards are listed in the app config's
     ``cms_wizzards`` property.
 
     The second functionality that django CMS offers is attaching Model objects to the toolbar. To use

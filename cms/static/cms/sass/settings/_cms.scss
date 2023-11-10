@@ -26,7 +26,7 @@ $black: var(--dca-black);
     --focus-brightness: 0.95;
 }
 
-:root, :root[data-them="auto"] {
+:root, :root[data-theme="auto"] {
     color-scheme: dark light;
 }
 

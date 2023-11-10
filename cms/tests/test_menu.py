@@ -873,7 +873,7 @@ class MenuTests(BaseMenuTest):
              node4
               node3
 
-            <non-existant>
+            <non-existent>
              node2
               node1
         '''

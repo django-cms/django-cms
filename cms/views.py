@@ -257,6 +257,8 @@ def render_object_structure(request, content_type_id, object_id):
         'object': content_type_obj,
         'cms_toolbar': request.toolbar,
     }
+    if isinstance(content_type_obj, PageContent):
+        request.current_page = content_type_obj.page
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)
@@ -288,7 +290,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     absolute_url = content_type_obj.get_absolute_url()
                     from cms.toolbar.toolbar import CMSToolbar
                     request.toolbar = CMSToolbar(request, request_path=absolute_url)
-                    # Resovle the apphook's url to get its view function
+                    # Resolve the apphook's url to get its view function
                     view_func, args, kwargs = resolve(absolute_url)
                     return view_func(request, *args, **kwargs)
                 except Resolver404:

@@ -14,4 +14,22 @@ class Migration(migrations.Migration):
             name='pagecontent',
             options={'default_permissions': [], 'verbose_name': 'page content', 'verbose_name_plural': 'page contents'},
         ),
+        migrations.AlterModelOptions(
+            name='page',
+            options={'default_permissions': ('add', 'change', 'delete'), 'permissions': (
+            ('view_page', 'Can view page'), ('edit_static_placeholder', 'Can edit static placeholders')),
+                     'verbose_name': 'page', 'verbose_name_plural': 'pages'},
+        ),
+        migrations.AlterModelOptions(
+            name='pagecontent',
+            options={'default_permissions': [], 'verbose_name': 'page content', 'verbose_name_plural': 'page contents'},
+        ),
+        migrations.RemoveField(
+            model_name='globalpagepermission',
+            name='can_publish',
+        ),
+        migrations.RemoveField(
+            model_name='pagepermission',
+            name='can_publish',
+        ),
     ]

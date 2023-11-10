@@ -54,6 +54,7 @@ from cms.toolbar.utils import (
     get_object_structure_url,
 )
 from cms.toolbar_pool import toolbar_pool
+from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
@@ -646,7 +647,6 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, user, edit_url, disable=False)
         request.toolbar.post_template_populate()
         self.assertFalse(page.has_change_permission(request.user))
-        self.assertFalse(page.has_publish_permission(request.user))
 
         items = request.toolbar.get_left_items() + request.toolbar.get_right_items()
         # Logo + page-menu + admin-menu + color scheme + logout
@@ -988,13 +988,13 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page3_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
+            self.assertEqual(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with view permissions, redirect
             response = self.client.get(page4_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
+            self.assertEqual(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
@@ -1273,7 +1273,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model"></template>'
                 '</h1>'.format(
                     'placeholderapp', 'example1', 'date_field', ex1.pk,
-                    ex1.date_field.strftime("%b. %d, %Y")))
+                    ex1.date_field.strftime("%b. %d, %Y" if DJANGO_4_2 else "%b. %-d, %Y")))
 
             template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
