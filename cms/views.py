@@ -16,6 +16,7 @@ from django.http import (
 from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
 from django.utils.translation import get_language_from_request
 from django.views.decorators.http import require_POST
@@ -45,9 +46,6 @@ from cms.utils.i18n import (
     is_language_prefix_patterns_used,
 )
 from cms.utils.page import get_page_from_request
-
-
-from django.utils.http import url_has_allowed_host_and_scheme
 
 
 def _clean_redirect_url(redirect_url, language):

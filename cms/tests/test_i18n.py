@@ -7,6 +7,7 @@ from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
 
+
 @override_settings(
     LANGUAGE_CODE='en',
     LANGUAGES=(('fr', 'French'),

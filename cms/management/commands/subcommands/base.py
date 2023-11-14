@@ -5,7 +5,6 @@ from django.core.management.base import BaseCommand, CommandParser
 from django.core.management.color import color_style, no_style
 
 
-
 def add_builtin_arguments(parser):
     parser.add_argument(
         '--noinput',
