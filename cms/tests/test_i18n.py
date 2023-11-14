@@ -364,7 +364,6 @@ class TestLanguageFallbacks(CMSTestCase):
         self.client.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 
         #   ugly and long set of session
-        session = self.client.session
         self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'fr'
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)

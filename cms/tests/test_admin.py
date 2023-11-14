@@ -623,8 +623,6 @@ class AdminFormsTests(AdminTestsBase):
             response = self.client.post(endpoint, new_page_data)
             expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
                              'underscores or hyphens.</li></ul>'
-            expected_error_22 = '<ul class="errorlist"><li>Enter a valid &#39;slug&#39; consisting of letters, ' \
-                               'numbers, underscores or hyphens.</li></ul>'
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
