@@ -7,15 +7,14 @@ django-formtools
 django-sekizai>=0.7
 django-treebeard>=4.3
 djangocms-admin-style>=1.5
-docutils<0.18  # Fix for: https://github.yuuza.net/sphinx-doc/sphinx/issues/9727
 iptools
 mock>=2.0.0
 Pillow
-pyenchant==3.0.1
+pyenchant
 pyflakes>=2.1
 python-coveralls>2.5.0
-unittest-xml-reporting==1.11.0
-ruff==0.1.0
+unittest-xml-reporting
+ruff
 
 # FIXME: - Remove when a django 3.0 compatible djangocms-text-ckeditor version is released
 https://github.com/Aiky30/djangocms-text-ckeditor/archive/feature/cms-40-django-30-support-.zip
