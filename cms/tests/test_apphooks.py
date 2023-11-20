@@ -288,7 +288,8 @@ class ApphooksTestCase(CMSTestCase):
         view_names = (
             ('sample-settings', 'sample_view'),
             ('sample-class-view', 'ClassView'),
-            ('sample-class-based-view', 'view' if not DJANGO_3 else 'ClassBasedView' ),
+            ('sample-class-based-view', 'ClassBasedView' if DJANGO_3 else 'view'),
+            # Naming convention changed in Django 4
         )
 
         with force_language("en"):
