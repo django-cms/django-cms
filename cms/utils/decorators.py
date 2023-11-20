@@ -20,6 +20,8 @@ def cms_perms(func):
         return func(request, *args, **kwargs)
     inner.__module__ = func.__module__
     inner.__doc__ = func.__doc__
+    if hasattr(func, "view_class"):
+        inner.view_class = func.view_class
     if hasattr(func, '__name__'):
         inner.__name__ = func.__name__
     elif hasattr(func, '__class__'):
