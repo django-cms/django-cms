@@ -7,6 +7,7 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
+
 try:
     from django.utils.http import url_has_allowed_host_and_scheme  # Not available in Django 2.2
 except ImportError:
