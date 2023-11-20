@@ -951,7 +951,7 @@ class MenuTests(BaseMenuTest):
         create_page('FR-P2', in_navigation=True, **fr_defaults)
 
         with self.settings(SITE_ID=2):
-            request = self.get_request('/en/')
+            request = self.get_request('/fr/')
             context = Context()
             context['request'] = request
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -972,7 +972,7 @@ class MenuTests(BaseMenuTest):
         menu_pool.clear(site_id=2)
 
         with self.settings(SITE_ID=2):
-            request = self.get_request('/en/de-p2/')
+            request = self.get_request('/fr/de-p2/')
             context = Context()
             context['request'] = request
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1033,7 +1033,7 @@ class MenuTests(BaseMenuTest):
         create_page_content('fr', 'FR-P2', nl_page_2, in_navigation=True)
 
         with self.settings(SITE_ID=2):
-            request = self.get_request('/en/')
+            request = self.get_request('/fr/')
             context = Context()
             context['request'] = request
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")
@@ -1052,7 +1052,7 @@ class MenuTests(BaseMenuTest):
         menu_pool.clear(site_id=2)
 
         with self.settings(SITE_ID=2):
-            request = self.get_request('/en/de-p2/')
+            request = self.get_request('/fr/de-p2/')
             context = Context()
             context['request'] = request
             tpl = Template("{% load menu_tags %}{% show_menu 0 100 100 100 %}")

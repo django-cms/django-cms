@@ -23,7 +23,7 @@ from cms.exceptions import LanguageError
 from cms.models.managers import PageManager, PageNodeManager, PageUrlManager
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_current_language
+from cms.utils.i18n import get_current_language, get_languages
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
@@ -363,7 +363,7 @@ class Page(models.Model):
             if self.is_home:
                 return reverse('pages-root')
             path = self.get_path(language, fallback) or self.get_slug(language, fallback)  # TODO: Disallow get_slug
-            return reverse('pages-details-by-slug', kwargs={"slug": path})
+            return reverse('pages-details-by-slug', kwargs={"slug": path}) if path else None
 
     def set_tree_node(self, site, target=None, position='first-child'):
         assert position in ('last-child', 'first-child', 'left', 'right')
@@ -810,6 +810,9 @@ class Page(models.Model):
         try:
             return self.urls_cache[language].path
         except (AttributeError, KeyError):
+
+            print(f"\n--> {self.urls_cache=} {languages=} {page_languages=}", end="")
+            print("    ", get_languages(self.node.site_id))
             return None
 
     def get_slug(self, language, fallback=True):
