@@ -307,7 +307,7 @@ class ApphooksTestCase(CMSTestCase):
         view_names = (
             ('sample-settings', 'sample_view'),
             ('sample-class-view', 'ClassView'),
-            ('sample-class-based-view', 'ClassBasedView' ),
+            ('sample-class-based-view', 'view' if not DJANGO_3 else 'ClassBasedView' ),
         )
 
         with force_language("en"):
