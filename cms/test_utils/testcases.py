@@ -30,6 +30,7 @@ from cms.models.permissionmodels import (
 )
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.utils.compat import DJANGO_4_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
@@ -664,4 +665,6 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 
 class TransactionCMSTestCase(CMSTestCase, testcases.TransactionTestCase):
-    pass
+    if DJANGO_4_1:
+        def assertQuerySetEqual(self, *args, **kwargs):
+            return self.assertQuerysetEqual(*args, **kwargs)
