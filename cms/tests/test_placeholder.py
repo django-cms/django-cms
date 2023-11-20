@@ -880,7 +880,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         # check for en
         page_content_en = self.get_page_title_obj(page)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Placeholder.objects.get_for_obj(page_content_en),
             page_content_en.get_placeholders(),
             transform=lambda x: x,
@@ -889,7 +889,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         # check for another language = de
         page_content_de = create_page_content('de', 'test page de', page)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Placeholder.objects.get_for_obj(page_content_de),
             page_content_de.get_placeholders(),
             transform=lambda x: x,
@@ -983,7 +983,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         with self.login_user_context(self.get_superuser()):
             self.client.get(get_object_edit_url(poll))
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             poll.placeholders.all(),
             Placeholder.objects.get_for_obj(poll),
             transform=lambda x: x,
