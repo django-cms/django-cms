@@ -281,7 +281,12 @@ class Page(models.Model):
 
     def _get_path_sql_value(self, base_path=''):
         if base_path:
-            new_path = Concat(models.Value(base_path), models.Value('/'), models.F('slug'))
+            new_path = Concat(
+                models.Value(base_path),
+                models.Value('/'),
+                models.F('slug'),
+                output_field=models.CharField(),
+            )
         elif base_path is None:
             new_path = None
         else:
