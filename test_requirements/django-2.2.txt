@@ -2,3 +2,4 @@
 Django>=2.2,<3.0
 pyenchant==3.0.1
 django-formtools==2.2
+psycopg2<2.9
