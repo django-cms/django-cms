@@ -36,6 +36,7 @@ from cms.test_utils.testcases import (
     URL_CMS_TRANSLATION_DELETE,
     CMSTestCase,
 )
+from cms.utils.compat import DJANGO_2_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -897,6 +898,8 @@ class AdminFormsTests(AdminTestsBase):
             response = self.client.post(self.get_admin_url(Page, 'add'), new_page_data)
             expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
                              'underscores or hyphens.</li></ul>'
+            if DJANGO_2_2:
+                expected_error = expected_error.replace("“", "&#39").replace("”", "&#39")
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
