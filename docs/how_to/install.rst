@@ -550,7 +550,7 @@ Next steps
 **********
 
 The :ref:`tutorials for developers <tutorials>` will help you understand how to approach django CMS as a developer.
-Note that the tutorials assume you have installed the CMS using the django CMS Installer, but with a little
+Note that the tutorials assume you have installed the CMS using the django CMS Quistart project, but with a little
 adaptation you'll be able to use it as a basis.
 
 To deploy your django CMS project on a production web server, please refer to the :doc:`Django deployment documentation
