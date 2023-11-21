@@ -13,6 +13,7 @@ REQUIREMENTS = [
     'django-sekizai>=0.7',
     'djangocms-admin-style>=1.2',
     'packaging',
+    'setuptools',
 ]
 
 

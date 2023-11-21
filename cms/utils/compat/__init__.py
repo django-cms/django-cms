@@ -8,4 +8,5 @@ PYTHON_VERSION = python_version()
 
 DJANGO_3_2 = Version(DJANGO_VERSION) < Version('3.3')
 DJANGO_3 = Version(DJANGO_VERSION) < Version('4.0')
+DJANGO_4_1 = Version(DJANGO_VERSION) < Version('4.2')
 DJANGO_4_2 = Version(DJANGO_VERSION) < Version('4.3')
