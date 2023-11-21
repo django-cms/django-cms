@@ -731,7 +731,7 @@ class Page(models.Model):
             self.update_languages(page_languages)
 
     def update_languages(self, languages):
-        languages = ",".join(languages)
+        languages = ",".join(set(languages))
         # Update current instance
         self.languages = languages
         # Commit. It's important to not call save()
