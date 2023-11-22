@@ -216,14 +216,6 @@ def check_i18n(output):
         else:
             section.error("SITE_ID must be an integer, not %r" % settings.SITE_ID)
 
-    # django.template.context_processors.i18n
-        processors = list(
-            chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
-        if 'django.template.context_processors.i18n' in processors:
-            section.success("Django's i18n template context processor is installed")
-        else:
-            section.error("Django's i18n context processor is not installed, could not find "
-                          "'django.template.context_processors.i18n' in TEMPLATES option context_processors")
 
 @define_check
 def check_middlewares(output):
@@ -256,6 +248,7 @@ def check_context_processors(output):
             chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
         required_processors = (
             'cms.context_processors.cms_settings',
+            'django.template.context_processors.i18n'
         )
         for processor in required_processors:
             if processor not in processors:
