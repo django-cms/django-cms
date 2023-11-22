@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.urls import NoReverseMatch, resolve, Resolver404, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import (
