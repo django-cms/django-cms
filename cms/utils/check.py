@@ -216,6 +216,14 @@ def check_i18n(output):
         else:
             section.error("SITE_ID must be an integer, not %r" % settings.SITE_ID)
 
+    # django.template.context_processors.i18n
+        processors = list(
+            chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
+        if 'django.template.context_processors.i18n' in processors:
+            section.success("Django's i18n template context processor is installed")
+        else:
+            section.error("Django's i18n context processor is not installed, could not find "
+                          "'django.template.context_processors.i18n' in TEMPLATES option context_processors")
 
 @define_check
 def check_middlewares(output):
@@ -338,9 +346,9 @@ def check_copy_relations(output):
                     ))
 
         if not section.warnings:
-            section.finish_success('All plugins and page/title extensions have "copy_relations" method if needed.')
+            section.finish_success('All plugins and page/page content extensions have "copy_relations" method if needed.')
         else:
-            section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\n'
+            section.finish_success('Some plugins or page/page content extensions do not define a "copy_relations" method.\n'
                                    'This might lead to data loss when publishing or copying plugins/extensions.\n'
                                    'See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
                                    'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
@@ -354,7 +362,8 @@ def check(output):
 
     Returns whether the configuration/environment are okay (has no errors)
     """
-    title = "Checking django CMS installation"
+    import cms
+    title = f"Checking django CMS {cms.__version__} installation"
     border = '*' * len(title)
     output.write_line(output.colorize(border, opts=['bold']))
     output.write_line(output.colorize(title, opts=['bold']))
