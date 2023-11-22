@@ -624,8 +624,11 @@ class PageToolbar(CMSToolbar):
 
             # page edit
             with force_language(self.current_lang):
+                disabled = (
+                    edit_mode or not self.toolbar.object_is_editable()
+                )
                 page_edit_url = get_object_edit_url(self.page_content) if self.page_content else ''
-                current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
+                current_page_menu.add_link_item(_('Edit this Page'), disabled=disabled, url=page_edit_url)
 
             # page settings
             page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.request_language)

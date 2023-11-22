@@ -11,7 +11,7 @@ from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.urls import reverse
+from django.urls import resolve, reverse
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
@@ -882,14 +882,15 @@ class ToolbarTests(ToolbarTestBase):
 
         request = self.get_page_request(page, staff, edit_url_en)
         self.assertMenuItems(
-            request, LANGUAGE_MENU_IDENTIFIER, 'Copy all plugins',
+            request, LANGUAGE_MENU_IDENTIFIER, _('Copy all plugins'),
             [u'from German', u'from French']
         )
 
         request = self.get_page_request(page, staff, edit_url_de, lang_code='de')
+        request.toolbar.toolbar_language = "en"
         self.assertMenuItems(
-            request, LANGUAGE_MENU_IDENTIFIER, 'Copy all plugins',
-            [u'from English', u'from French']
+            request, LANGUAGE_MENU_IDENTIFIER, _('Copy all plugins'),
+            ['from English', 'from French', ]
         )
 
     def get_username(self, user=None, default=''):
