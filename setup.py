@@ -48,7 +48,7 @@ CLASSIFIERS = [
 
 
 setup(
-    name='cms',
+    name='django-cms',
     version=__version__,
     author='Django CMS Association and contributors',
     author_email='info@django-cms.org',
