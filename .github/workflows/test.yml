@@ -55,6 +55,7 @@ jobs:
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
         pip install pytest
+        pip install -e .
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
         python setup.py install
@@ -113,6 +114,7 @@ jobs:
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
         pip install pytest
+        pip install -e .
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
         python setup.py install
@@ -158,6 +160,7 @@ jobs:
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
         pip install pytest
+        pip install -e .
         pip install -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
@@ -191,6 +194,7 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
+        pip install -e .
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install pytest ${{ matrix.django-version }}
         python setup.py install
@@ -239,6 +243,7 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
+        pip install -e .
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install pytest ${{ matrix.django-version }}
         pip install -r test_requirements/databases.txt
@@ -289,6 +294,7 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
+        pip install -e .
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install pytest ${{ matrix.django-version }}
         pip install -r test_requirements/databases.txt
