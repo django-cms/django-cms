@@ -16,10 +16,10 @@ class CMSCommandLineUtility:
             self.prog_name = "python -m cms"
 
     def execute(self):
-        command = load_command_class("cms", "startproject")
+        command = load_command_class("cms", "startcmsproject")
         if self.argv[1:] == ["--version"]:
             from cms import __version__
-            sys.stdout.write(__version__)
+            sys.stdout.write(__version__ + "\n")
         elif  self.argv[1:] == ["--help"]:
             command.print_help(self.prog_name, "")
         else:
