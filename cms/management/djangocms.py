@@ -1,32 +1,24 @@
 import os
 import sys
 
-from django.core.checks.security.base import SECRET_KEY_INSECURE_PREFIX
 from django.core.management import load_command_class
-from django.core.management.utils import get_random_secret_key
-
-
-class CMSCommandLineUtility:
-    commands = {"startproject": "cms"}
-
-    def __init__(self, argv=None):
-        self.argv = argv or sys.argv[:]
-        self.prog_name = os.path.basename(self.argv[0])
-        if self.prog_name == "__main__.py":
-            self.prog_name = "python -m cms"
-
-    def execute(self):
-        command = load_command_class("cms", "startcmsproject")
-        if self.argv[1:] == ["--version"]:
-            from cms import __version__
-            sys.stdout.write(__version__ + "\n")
-        elif  self.argv[1:] == ["--help"]:
-            command.print_help(self.prog_name, "")
-        else:
-            command.run_from_argv([self.argv[0], ""] + self.argv[1:])  #  fake"empty" subcommand
 
 
 def execute_from_command_line(argv=None):
-    """Run a ManagementUtility."""
-    utility = CMSCommandLineUtility(argv)
-    utility.execute()
+    """Run the startcmsproject management command."""
+
+    # Prepare arguments
+    argv = argv or sys.argv[:]
+    argv[0] = os.path.basename(argv[0])
+    if argv[0] == "__main__.py":
+        argv[0] = "python -m cms"
+
+    # Find command
+    command = load_command_class("cms", "startcmsproject")
+    if argv[1:] == ["--version"]:
+        from cms import __version__
+        sys.stdout.write(__version__ + "\n")
+    elif argv[1:] == ["--help"]:
+        command.print_help(argv[0], "")
+    else:
+        command.run_from_argv([argv[0], ""] + argv[1:])  # fake"empty" subcommand

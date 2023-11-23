@@ -78,7 +78,7 @@ Enjoy!
         for req_file in ("requirements.txt", "requirements.in"):
             requirements = os.path.join(project, req_file)
             if os.path.isfile(requirements):
-                if self.running_in_venv():
+                if self.running_in_venv() or os.environ.get("DJANGOCMS_ALLOW_PIP_INSTALL", "False") == "True":
                     self.stdout.write(self.HEADING(f"Installing requirements in {requirements}"))
                     result = subprocess.run(
                         [sys.executable, "-m", "pip", "install", "-r", requirements],
@@ -101,7 +101,7 @@ Enjoy!
         if result.returncode:
             if capture_output:
                 self.stderr.write(self.style.ERROR(result.stderr.decode()))
-            raise CommandError(f"./manage.py {' '.join(commands)} failed.")
+            raise CommandError(f"{sys.executable} manage.py {' '.join(commands)} failed.")
 
     @staticmethod
     def running_in_venv():
