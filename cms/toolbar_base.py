@@ -2,7 +2,7 @@ from django.forms import MediaDefiningClass
 
 from cms.exceptions import LanguageError
 from cms.utils import get_current_site, get_language_from_request
-from cms.utils.i18n import get_language_object
+from cms.utils.i18n import get_language_code
 
 
 class CMSToolbar(metaclass=MediaDefiningClass):
@@ -15,9 +15,9 @@ class CMSToolbar(metaclass=MediaDefiningClass):
         self.app_path = app_path
         self.current_site = get_current_site()
         try:
-            self.current_lang = get_language_object(
+            self.current_lang = get_language_code(
                 get_language_from_request(self.request), self.current_site.pk
-            )['code']
+            )
         except LanguageError:
             self.current_lang = None
 

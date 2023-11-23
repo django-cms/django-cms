@@ -317,7 +317,7 @@ class RenderingTestCase(CMSTestCase):
         instance._inst = instance
 
         context = PluginContext(
-            {'original_context_var': 'original_context_var_ok'},
+            {'original_context_var': 'original_context_var_ok', "request": None},
             instance,
             self.test_placeholders['main'], processors=(test_passed_plugin_context_processor,)
         )

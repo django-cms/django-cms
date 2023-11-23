@@ -13,6 +13,7 @@ from django.utils.translation import (
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.models import PageContent
+from cms.utils import get_language_list
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -147,7 +148,8 @@ def add_live_url_querystring_param(obj, url, language=None):
 def get_object_edit_url(obj, language=None):
     content_type = ContentType.objects.get_for_model(obj)
 
-    if not language:
+    language = getattr(obj, "language", language)  # Object trumps parameter
+    if language not in get_language_list():
         language = get_language()
 
     with force_language(language):
@@ -160,7 +162,8 @@ def get_object_edit_url(obj, language=None):
 def get_object_preview_url(obj, language=None):
     content_type = ContentType.objects.get_for_model(obj)
 
-    if not language:
+    language = getattr(obj, "language", language)  # Object trumps parameter
+    if language not in get_language_list():
         language = get_language()
 
     with force_language(language):
@@ -173,7 +176,8 @@ def get_object_preview_url(obj, language=None):
 def get_object_structure_url(obj, language=None):
     content_type = ContentType.objects.get_for_model(obj)
 
-    if not language:
+    language = getattr(obj, "language", language)  # Object trumps parameter
+    if language not in get_language_list():
         language = get_language()
 
     with force_language(language):
