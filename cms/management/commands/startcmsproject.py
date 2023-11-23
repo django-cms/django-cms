@@ -18,20 +18,41 @@ class Command(TemplateCommand):
     )
     missing_args_message = "You must provide a project name."
 
+    def add_arguments(self, parser):
+        super().add_arguments(parser)
+        parser.add_argument(
+            "--noinput",
+            "--no-input",
+            action="store_false",
+            dest="interactive",
+            help=(
+                "Tells Django to NOT prompt the user for input of any kind. "
+                "Superusers created with --noinput will "
+                "not be able to log in until they're given a valid password."
+            ),
+        )
+
     def get_default_template(self):
         from cms import __version__
 
         version = ".".join(__version__.split(".")[:2])  # get major.minor
         return f"https://github.com/django-cms/cms-template/archive/{version}.tar.gz"
 
-    def postprocess(self, project):
+    def postprocess(self, project, options):
         self.HEADING = self.style.SQL_FIELD
         self.install_requirements(project)
         os.chdir(project)
         self.stdout.write(self.HEADING("Create migrations"))
         self.run_management_command(["migrate"], capture_output=True)
         self.stdout.write(self.HEADING("Create superuser"))
-        self.run_management_command(["createsuperuser"])
+        if options["interactive"]:
+            self.run_management_command(["createsuperuser"])
+        else:
+            username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
+            usermail = os.environ.get("DJANGO_SUPERUSER_EMAIL", "none@nowhere.com")
+            self.run_management_command([
+                "createsuperuser", "--username", username, "--email", usermail, "--noinput"]
+            )
         self.stdout.write(self.HEADING("Check installation"))
         self.run_management_command(["cms", "check"])
 
@@ -64,7 +85,7 @@ Enjoy!
                         capture_output=True,
                     )
                     if result.returncode:
-                        self.stderr.write(result.stderr)
+                        self.stderr.write(self.style.ERROR(result.stderr.decode()))
                         raise CommandError(f"Failed to install requirements in {requirements}")
                     break
                 else:
@@ -74,12 +95,12 @@ Enjoy!
 
     def run_management_command(self, commands, capture_output=False):
         result = subprocess.run(
-            [sys.executable, "./manage.py"] + commands,
+            [sys.executable, "manage.py"] + commands,
             capture_output=capture_output
         )
         if result.returncode:
             if capture_output:
-                self.stderr.write(self.style.ERROR(result.stderr))
+                self.stderr.write(self.style.ERROR(result.stderr.decode()))
             raise CommandError(f"./manage.py {' '.join(commands)} failed.")
 
     @staticmethod
@@ -94,12 +115,12 @@ Enjoy!
     def handle(self, **options):
         # Capture target and name for postprocessing
         name = options.pop("name")
-        target = options.pop("target", None)
+        directory = options.pop("directory", None)
         # Create a random SECRET_KEY to put it in the main settings.
         options["secret_key"] = SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
-        super().handle(app_or_project="project", name=name, target=target, **options)
-        if target is None:
+        super().handle("project", name, directory, **options)
+        if directory is None:
             top_dir = os.path.join(os.getcwd(), name)
         else:
-            top_dir = os.path.abspath(os.path.expanduser(target))
-        self.postprocess(top_dir)
+            top_dir = os.path.abspath(os.path.expanduser(directory))
+        self.postprocess(top_dir, options)
