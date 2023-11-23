@@ -66,7 +66,7 @@ the lean enterprise content management powered by Django!
 Now, to start the development server first go to your newly
 created project:
 $ {self.style.SUCCESS("cd " + project)}
-$ {self.style.SUCCESS("./manage.py runserver")}
+$ {self.style.SUCCESS("python manage.py runserver")}
 
 Learn more at https://docs.django-cms.org/
 Join the django CMS Slack channel http://www.django-cms.org/slack
