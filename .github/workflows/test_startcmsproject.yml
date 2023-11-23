@@ -7,16 +7,16 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  django-main-sqlite:
+  create-project:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11']
-        requirements-file: ['requirements_base.txt']
         django-version: [
           '3.2', '4.2',
         ]
+        python-version: ['3.11']
+        requirements-file: ['requirements_base.txt']
         os: [
           ubuntu-20.04,
         ]
