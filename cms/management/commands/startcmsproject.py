@@ -89,8 +89,10 @@ Enjoy!
                         raise CommandError(f"Failed to install requirements in {requirements}")
                     break
                 else:
-                    self.stdout(self.style.ERROR("To automatically install requirements for your new django CMS "
-                                "project use this command in an virtual environment."))
+                    self.stderr.write(
+                        self.style.ERROR("To automatically install requirements for your new django CMS "
+                                         "project use this command in an virtual environment.")
+                    )
                     raise CommandError("Requirements not installed")
 
     def run_management_command(self, commands, capture_output=False):
