@@ -4,6 +4,8 @@ import sys
 from tempfile import TemporaryDirectory
 from unittest import TestCase, skipIf
 
+from cms.utils.compat import DJANGO_2_2
+
 
 def has_no_internet():
     try:
@@ -18,6 +20,7 @@ def has_no_internet():
 
 class DjangocmsCommandTest(TestCase):
     @skipIf(has_no_internet(), "No internet")
+    @skipIf(DJANGO_2_2, "Only available for Django>=3.2")
     def test_djangocms_command(self):
         with TemporaryDirectory() as dir:
             result = subprocess.run(
