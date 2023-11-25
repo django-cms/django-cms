@@ -100,7 +100,7 @@ The demo platform is kindly provided by Divio, platinum member of the django CMS
 Getting Help
 ************
 
-Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ or our `discourse forum <https://discourse.django-cms.org/>`_ for support.
+Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ for support.
 
 ********************
 Professional support
