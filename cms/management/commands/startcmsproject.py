@@ -31,6 +31,14 @@ class Command(TemplateCommand):
                 "not be able to log in until they're given a valid password."
             ),
         )
+        parser.add_argument(
+            "--username",
+            help="Specifies the login for the superuser to be created",
+        )
+        parser.add_argument(
+            "--email",
+            help="Specifies the email for the superuser to be created"
+        )
 
     def get_default_template(self):
         from cms import __version__
@@ -40,19 +48,35 @@ class Command(TemplateCommand):
 
     def postprocess(self, project, options):
         self.HEADING = self.style.SQL_FIELD
+
+        # Install requirements
         self.install_requirements(project)
         os.chdir(project)
-        self.stdout.write(self.HEADING("Create migrations"))
+
+        # Create database by running migrations
+        self.stdout.write(self.HEADING("Run migrations"))
         self.run_management_command(["migrate"], capture_output=True)
+
+        # Create superuser (respecting command line arguments)
         self.stdout.write(self.HEADING("Create superuser"))
-        if options["interactive"]:
-            self.run_management_command(["createsuperuser"])
-        else:
-            username = os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin")
-            usermail = os.environ.get("DJANGO_SUPERUSER_EMAIL", "none@nowhere.com")
-            self.run_management_command([
-                "createsuperuser", "--username", username, "--email", usermail, "--noinput"]
-            )
+        command = ["createsuperuser"]
+        if options.get("username"):
+            command.append("--username")
+            command.append(options.get("username"))
+        if options.get("email"):
+            command.append("--email")
+            command.append(options.get("email"))
+        if not options["interactive"]:
+            if "--username" not in command:
+                command.append("--username")
+                command.append(os.environ.get("DJANGO_SUPERUSER_USERNAME", "admin"))
+            if "--email" not in command:
+                command.append("--email")
+                command.append(os.environ.get("DJANGO_SUPERUSER_EMAIL", "none@nowhere.com"))
+            command.append("--noinput")
+        self.run_management_command(command)
+
+        # Check installation
         self.stdout.write(self.HEADING("Check installation"))
         self.run_management_command(["cms", "check"])
 
@@ -79,7 +103,7 @@ Enjoy!
             requirements = os.path.join(project, req_file)
             if os.path.isfile(requirements):
                 if self.running_in_venv() or os.environ.get("DJANGOCMS_ALLOW_PIP_INSTALL", "False") == "True":
-                    self.stdout.write(self.HEADING(f"Installing requirements in {requirements}"))
+                    self.stdout.write(self.HEADING(f"Install requirements in {requirements}"))
                     result = subprocess.run(
                         [sys.executable, "-m", "pip", "install", "-r", requirements],
                         capture_output=True,
@@ -120,7 +144,9 @@ Enjoy!
         directory = options.pop("directory", None)
         # Create a random SECRET_KEY to put it in the main settings.
         options["secret_key"] = SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
-        super().handle("project", name, directory, **options)
+
+        super().handle("project", name, directory, cms_version=cms_version, **options)
+
         if directory is None:
             top_dir = os.path.join(os.getcwd(), name)
         else:
