@@ -77,21 +77,15 @@ to stay updated with the latest news and to connect with other users across the 
 You can join us online:
 
 * in our `django CMS Slack channel <https://www.django-cms.org/slack>`_
-* on our `Discourse forum <https://discourse.django-cms.org>`_
 * on `StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_
 
 You should make sure to join our Slack workspace. It is our main communication platform. Users from all over the world
 use Slack to talk about django CMS and to support each other in answering support requests.
-For people who prefer to use a traditional user board, we have set up a Discourse forum.
-It contains question and answer threads about django CMS and is actively monitored by our team of supporters.
-It can also be used to request features.
-Our Discord server is used for ad hoc online meetings or for after work hangouts.
 StackOverflow is a very popular, community-based space to find and contribute answers to technical challenges
 
 
 You can also follow:
 
-* the `Travis Continuous Integration build reports <https://travis-ci.com/django-cms/django-cms>`_
 * the `@djangocms <https://twitter.com/djangocms>`_ Twitter account for general announcements
 * the `django CMS Association LinkedIn <https://www.linkedin.com/company/django-cms-association>`_ account
 

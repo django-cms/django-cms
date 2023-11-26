@@ -42,5 +42,4 @@ hand, rather than using the quickstart project, see :doc:`/how_to/install` and t
 rest of the tutorials.
 
 Either way, you'll be able to find support and help from the numerous friendly members of the
-django CMS community, either on our `Discourse forum <https://discourse.django-cms.org>`_ or `our
-Slack group <https://www.django-cms.org/slack>`_.
+django CMS community on `our Slack group <https://www.django-cms.org/slack>`_.

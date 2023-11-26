@@ -1069,7 +1069,7 @@ CMS_EXTRA_HELP_MENU_ITEMS
 Example::
 
     CMS_EXTRA_HELP_MENU_ITEMS = (
-        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Community chat'), 'https://www.django-cms.org/slack'),
         (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
         (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
         (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
