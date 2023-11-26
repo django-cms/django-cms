@@ -26,7 +26,7 @@ class Command(TemplateCommand):
             action="store_false",
             dest="interactive",
             help=(
-                "Tells Django to NOT prompt the user for input of any kind. "
+                "Tells django CMS to NOT prompt the user for input of any kind. "
                 "Superusers created with --noinput will "
                 "not be able to log in until they're given a valid password."
             ),
