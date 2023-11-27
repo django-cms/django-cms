@@ -47,11 +47,12 @@ class Command(TemplateCommand):
         return f"https://github.com/django-cms/cms-template/archive/{version}.tar.gz"
 
     def postprocess(self, project, options):
-        self.HEADING = self.style.SQL_FIELD
+        # Go to project dir
+        self.write_command(f'cd "{project}"')
+        os.chdir(project)
 
         # Install requirements
         self.install_requirements(project)
-        os.chdir(project)
 
         # Create database by running migrations
         self.stdout.write(self.HEADING("Run migrations"))
@@ -78,10 +79,12 @@ class Command(TemplateCommand):
 
         # Check installation
         self.stdout.write(self.HEADING("Check installation"))
-        self.run_management_command(["cms", "check"])
+        self.run_management_command(["cms", "check"], capture_output=True)
 
+        # Display success message
         message = f"django CMS {cms_version} installed successfully"
-        separator = "=" * len(message)
+        separator = "*" * len(message)
+        self.stdout.write()
         self.stdout.write(self.HEADING(f"{separator}\n{message}\n{separator}"))
         self.stdout.write(f"""
 Congratulations! You have successfully installed django CMS,
@@ -104,6 +107,7 @@ Enjoy!
             if os.path.isfile(requirements):
                 if self.running_in_venv() or os.environ.get("DJANGOCMS_ALLOW_PIP_INSTALL", "False") == "True":
                     self.stdout.write(self.HEADING(f"Install requirements in {requirements}"))
+                    self.write_command(f'python -m pip install -r "{requirements}"')
                     result = subprocess.run(
                         [sys.executable, "-m", "pip", "install", "-r", requirements],
                         capture_output=True,
@@ -120,6 +124,7 @@ Enjoy!
                     raise CommandError("Requirements not installed")
 
     def run_management_command(self, commands, capture_output=False):
+        self.write_command("python manage.py " + " ".join(commands))
         result = subprocess.run(
             [sys.executable, "manage.py"] + commands,
             capture_output=capture_output
@@ -128,6 +133,9 @@ Enjoy!
             if capture_output:
                 self.stderr.write(self.style.ERROR(result.stderr.decode()))
             raise CommandError(f"{sys.executable} manage.py {' '.join(commands)} failed.")
+
+    def write_command(self, command):
+        self.stderr.write(self.COMMAND(command))
 
     @staticmethod
     def running_in_venv():
@@ -144,7 +152,20 @@ Enjoy!
         directory = options.pop("directory", None)
         # Create a random SECRET_KEY to put it in the main settings.
         options["secret_key"] = SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
+        self.app_or_project = "project"
 
+        # Configure formatting
+        self.HEADING = self.style.SQL_FIELD
+        self.COMMAND = self.style.HTTP_SUCCESS
+
+        self.stdout.write(self.HEADING("Clone template using django-admin"))
+        command = f'django-admin startproject "{name}" ' \
+                  f'--template {options["template"] or self.get_default_template()}'
+        if directory:
+            command += f' --directory "{directory}"'
+        self.write_command(command)
+
+        # Run startproject command
         super().handle("project", name, directory, cms_version=cms_version, **options)
 
         if directory is None:
