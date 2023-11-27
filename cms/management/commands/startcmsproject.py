@@ -18,6 +18,16 @@ class Command(TemplateCommand):
     )
     missing_args_message = "You must provide a project name."
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Version major.minor
+        self.major_minor = ".".join(cms_version.split(".")[:2])
+
+        # Configure formatting
+        self.HEADING = lambda text: "\n" + self.style.SQL_FIELD(text)
+        self.COMMAND = self.style.HTTP_SUCCESS
+
     def add_arguments(self, parser):
         super().add_arguments(parser)
         parser.add_argument(
@@ -35,16 +45,10 @@ class Command(TemplateCommand):
             "--username",
             help="Specifies the login for the superuser to be created",
         )
-        parser.add_argument(
-            "--email",
-            help="Specifies the email for the superuser to be created"
-        )
+        parser.add_argument("--email", help="Specifies the email for the superuser to be created")
 
     def get_default_template(self):
-        from cms import __version__
-
-        version = ".".join(__version__.split(".")[:2])  # get major.minor
-        return f"https://github.com/django-cms/cms-template/archive/{version}.tar.gz"
+        return f"https://github.com/django-cms/cms-template/archive/{self.major_minor}.tar.gz"
 
     def postprocess(self, project, options):
         # Go to project dir
@@ -85,7 +89,8 @@ class Command(TemplateCommand):
         message = f"django CMS {cms_version} installed successfully"
         separator = "*" * len(message)
         self.stdout.write(self.HEADING(f"{separator}\n{message}\n{separator}"))
-        self.stdout.write(f"""
+        self.stdout.write(
+            f"""
 Congratulations! You have successfully installed django CMS,
 the lean enterprise content management powered by Django!
 
@@ -98,7 +103,8 @@ Learn more at https://docs.django-cms.org/
 Join the django CMS Slack channel http://www.django-cms.org/slack
 
 Enjoy!
-""")
+"""
+        )
 
     def install_requirements(self, project):
         for req_file in ("requirements.txt", "requirements.in"):
@@ -117,17 +123,16 @@ Enjoy!
                     break
                 else:
                     self.stderr.write(
-                        self.style.ERROR("To automatically install requirements for your new django CMS "
-                                         "project use this command in an virtual environment.")
+                        self.style.ERROR(
+                            "To automatically install requirements for your new django CMS "
+                            "project use this command in an virtual environment."
+                        )
                     )
                     raise CommandError("Requirements not installed")
 
     def run_management_command(self, commands, capture_output=False):
         self.write_command("python -m manage " + " ".join(commands))
-        result = subprocess.run(
-            [sys.executable, "-m", "manage"] + commands,
-            capture_output=capture_output
-        )
+        result = subprocess.run([sys.executable, "-m", "manage"] + commands, capture_output=capture_output)
         if result.returncode:
             if capture_output:
                 self.stderr.write(self.style.ERROR(result.stderr.decode()))
@@ -151,21 +156,19 @@ Enjoy!
         directory = options.pop("directory", None)
         # Create a random SECRET_KEY to put it in the main settings.
         options["secret_key"] = SECRET_KEY_INSECURE_PREFIX + get_random_secret_key()
-        self.app_or_project = "project"
-
-        # Configure formatting
-        self.HEADING = lambda text: "\n" + self.style.SQL_FIELD(text)
-        self.COMMAND = self.style.HTTP_SUCCESS
 
         self.stdout.write(self.HEADING("Clone template using django-admin"))
-        command = f'django-admin startproject "{name}" ' \
-                  f'--template {options["template"] or self.get_default_template()}'
+        command = (
+            f'django-admin startproject "{name}" ' f'--template {options["template"] or self.get_default_template()}'
+        )
         if directory:
             command += f' --directory "{directory}"'
         self.write_command(command)
 
         # Run startproject command
-        super().handle("project", name, directory, cms_version=cms_version, **options)
+        super().handle(
+            "project", name, directory, cms_version=cms_version, cms_docs_version=self.major_minor, **options
+        )
 
         if directory is None:
             top_dir = os.path.join(os.getcwd(), name)
