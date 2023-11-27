@@ -84,7 +84,6 @@ class Command(TemplateCommand):
         # Display success message
         message = f"django CMS {cms_version} installed successfully"
         separator = "*" * len(message)
-        self.stdout.write()
         self.stdout.write(self.HEADING(f"{separator}\n{message}\n{separator}"))
         self.stdout.write(f"""
 Congratulations! You have successfully installed django CMS,
@@ -155,7 +154,7 @@ Enjoy!
         self.app_or_project = "project"
 
         # Configure formatting
-        self.HEADING = self.style.SQL_FIELD
+        self.HEADING = lambda text: "\n" + self.style.SQL_FIELD(text)
         self.COMMAND = self.style.HTTP_SUCCESS
 
         self.stdout.write(self.HEADING("Clone template using django-admin"))
