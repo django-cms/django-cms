@@ -90,7 +90,7 @@ Congratulations! You have successfully installed django CMS,
 the lean enterprise content management powered by Django!
 
 Now, to start the development server first go to your newly
-created project:
+created project and then call the runserver management command:
 $ {self.style.SUCCESS("cd " + project)}
 $ {self.style.SUCCESS("python -m manage runserver")}
 
