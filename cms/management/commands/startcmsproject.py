@@ -93,7 +93,7 @@ the lean enterprise content management powered by Django!
 Now, to start the development server first go to your newly
 created project:
 $ {self.style.SUCCESS("cd " + project)}
-$ {self.style.SUCCESS("python manage.py runserver")}
+$ {self.style.SUCCESS("python -m manage runserver")}
 
 Learn more at https://docs.django-cms.org/
 Join the django CMS Slack channel http://www.django-cms.org/slack
@@ -124,15 +124,15 @@ Enjoy!
                     raise CommandError("Requirements not installed")
 
     def run_management_command(self, commands, capture_output=False):
-        self.write_command("python manage.py " + " ".join(commands))
+        self.write_command("python -m manage " + " ".join(commands))
         result = subprocess.run(
-            [sys.executable, "manage.py"] + commands,
+            [sys.executable, "-m", "manage"] + commands,
             capture_output=capture_output
         )
         if result.returncode:
             if capture_output:
                 self.stderr.write(self.style.ERROR(result.stderr.decode()))
-            raise CommandError(f"{sys.executable} manage.py {' '.join(commands)} failed.")
+            raise CommandError(f"{sys.executable} -m manage {' '.join(commands)} failed.")
 
     def write_command(self, command):
         self.stderr.write(self.COMMAND(command))
