@@ -21,4 +21,4 @@ def execute_from_command_line(argv=None):
     elif argv[1:] == ["--help"]:
         command.print_help(argv[0], "")
     else:
-        command.run_from_argv([argv[0], ""] + argv[1:])  # fake"empty" subcommand
+        command.run_from_argv([argv[0], ""] + argv[1:])  # fake "empty" subcommand
