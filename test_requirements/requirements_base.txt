@@ -1,3 +1,4 @@
+-e .
 argparse
 coverage<5
 dj-database-url
