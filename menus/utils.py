@@ -144,13 +144,13 @@ class DefaultLanguageChanger(object):
         if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
             with force_language(lang):
                 try:
-                    return self.request.toolbar.obj.get_absolute_url()
+                    return self.request.toolbar.obj.get_absolute_url(lang)
                 except:  # NOQA
                     pass
         elif view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
-                view_name = "%s:%s" % (view.namespace, view_name)
+                view_name = '{}:{}'.format(view.namespace, view_name)
             url = None
             with force_language(lang):
                 try:
@@ -159,4 +159,4 @@ class DefaultLanguageChanger(object):
                     pass
             if url:
                 return url
-        return '%s%s' % (self.get_page_path(lang), self.app_path)
+        return '{}{}'.format(self.get_page_path(lang), self.app_path)
