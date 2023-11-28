@@ -1,7 +1,7 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# 
+#
 # Translators:
 # djangoger <thomas.meitz@retailify.de>, 2023
 # Alexander Elvers <transifex@alex.kandru.de>, 2023
@@ -513,7 +513,7 @@ msgid "Duplicate this Page"
 msgstr "Diese Seite duplizieren"
 
 msgid "Edit this Page"
-msgstr "Diese Seite berabeiten"
+msgstr "Diese Seite bearbeiten"
 
 msgid "Page settings"
 msgstr "Seiten-Einstellungen"
