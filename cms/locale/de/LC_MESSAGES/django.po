@@ -718,7 +718,7 @@ msgid "page content"
 msgstr "Seiten-Inhalt"
 
 msgid "page contents"
-msgstr "Seite-Inhalte"
+msgstr "Seiten-Inhalte"
 
 msgid "default"
 msgstr "Standard"
