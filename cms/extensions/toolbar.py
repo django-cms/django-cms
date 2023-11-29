@@ -58,11 +58,11 @@ class ExtensionToolbar(CMSToolbar):
             model_name = self.model.__name__.lower()
             if page_extension:
                 admin_url = admin_reverse(
-                    '%s_%s_change' % (self.model._meta.app_label, model_name),
+                    '{}_{}_change'.format(self.model._meta.app_label, model_name),
                     args=(page_extension.pk,))
             else:
-                admin_url = "%s?extended_object=%s" % (
-                    admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
+                admin_url = "{}?extended_object={}".format(
+                    admin_reverse('{}_{}_add'.format(self.model._meta.app_label, model_name)),
                     self.page.pk)
         except NoReverseMatch:  # pragma: no cover
             admin_url = None
@@ -112,14 +112,14 @@ class ExtensionToolbar(CMSToolbar):
         except self.model.DoesNotExist:
             pagecontent_extension = None
         try:
-            model_name = self.model.__name__.lower()
+            app_label, model_name = self.model._meta.app_label, self.model.__name__.lower()
             if pagecontent_extension:
                 admin_url = admin_reverse(
-                    '%s_%s_change' % (self.model._meta.app_label, model_name),
+                    '{}_{}_change'.format(app_label, model_name),
                     args=(pagecontent_extension.pk,))
             else:
-                admin_url = "%s?extended_object=%s" % (
-                    admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
+                admin_url = "{}?extended_object={}".format(
+                    admin_reverse('{}_{}_add'.format(app_label, model_name)),
                     page_content.pk)
         except NoReverseMatch:  # pragma: no cover
             admin_url = None
