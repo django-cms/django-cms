@@ -2,6 +2,7 @@ import warnings
 
 from django.urls import NoReverseMatch
 
+from cms.models import PageContent
 from cms.toolbar_base import CMSToolbar
 from cms.utils import get_language_list
 from cms.utils.page_permissions import user_can_change_page
@@ -11,6 +12,7 @@ from cms.utils.urlutils import admin_reverse
 class ExtensionToolbar(CMSToolbar):
     model = None
     page = None
+    page_content = None
 
     def _setup_extension_toolbar(self):
         """
@@ -29,7 +31,13 @@ class ExtensionToolbar(CMSToolbar):
 
     def _get_page(self):
         if not self.page:
-            self.page = self.request.current_page
+            if self.toolbar.obj and isinstance(self.toolbar.obj, PageContent):
+                self.page = self.toolbar.obj.page
+                self.page_content = self.toolbar.obj
+            else:
+                self.page = self.request.current_page
+                self.page_content = self.page.get_content_obj(self.current_lang)
+
         return self.page
 
     def get_page_extension_admin(self):
@@ -79,10 +87,10 @@ class ExtensionToolbar(CMSToolbar):
         """
         page = self._get_page()
         urls = []
-        page_contents = page.pagecontent_set(manager="admin_manager").latest_content()
         if language:
-            page_contents = page_contents.filter(language=language)
+            page_contents = self.page_content,
         else:
+            page_contents = page.pagecontent_set(manager="admin_manager").latest_content()
             page_contents = page_contents.filter(language__in=get_language_list(page.node.site_id))
         # PageContent
         for page_content in page_contents:
