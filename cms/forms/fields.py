@@ -25,8 +25,9 @@ class LazyChoiceField(forms.ChoiceField):
 
     @choices.setter
     def _set_choices(self, value):
-        # we overwrite this function so no list(value) is called
-        self._choices = self.widget.choices = value
+        # we overwrite this function so no list(value) or normalize_choices(value) is called
+        # also, do not call the widget's setter
+        self._choices = self.widget._choices = value
 
 
 class PageSelectFormField(forms.MultiValueField):
