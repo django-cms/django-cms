@@ -10,7 +10,7 @@ from cms.utils.urlutils import admin_reverse
 
 
 class ExtensionToolbar(CMSToolbar):
-    """"Offers simplified API for providing the user access to the admin of page extensions and
+    """Offers simplified API for providing the user access to the admin of page extensions and
     page content extensions through the toolbar."""
     model = None
     page = None
