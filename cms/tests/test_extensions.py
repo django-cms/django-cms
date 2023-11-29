@@ -407,7 +407,7 @@ class ExtensionAdminTestCase(CMSTestCase):
                 current_page_menu = self._setup_extension_toolbar()
                 if current_page_menu:
                     position = 0
-                    urls = self.get_title_extension_admin()
+                    urls = self.get_page_content_extension_admin()
                     for title_extension, url in urls:
                         current_page_menu.add_modal_item(
                             'TestItem',

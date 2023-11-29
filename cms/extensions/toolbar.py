@@ -1,3 +1,5 @@
+import warnings
+
 from django.urls import NoReverseMatch
 
 from cms.toolbar_base import CMSToolbar
@@ -59,40 +61,49 @@ class ExtensionToolbar(CMSToolbar):
         return page_extension, admin_url
 
     def get_title_extension_admin(self, language=None):
-        """
-        Get the admin urls for the title extensions menu items, depending on whether a TitleExtension instance exists
-        for each PageContent in the current page.
-        A single language can be passed to only work on a single title.
+        warnings.warn(
+            "get_title_extension_admin has been renamed to get_page_content_extension_admin and is deprecated",
+            DeprecationWarning, stacklevel=2,
+        )
+        return self.get_page_content_extension_admin(language)
 
-        Return a list of tuples of the title extension and the url; the extension is None if no instance exists,
-        the url is None is no admin is registered for the extension.
+    def get_page_content_extension_admin(self, language=None):
+        """
+        Get the admin urls for the page content extensions menu items, depending on whether a
+        :class:`~cms.extensions.models.PageContentExtension` instance exists for each
+        :class:`~cms.models.contentmodels.PageContent` in the current page.
+        A single language can be passed to only work on a single page content object.
+
+        Return a list of tuples of the page content extension and the url; the extension is None
+        if no instance exists, the url is None is no admin is registered for the extension.
         """
         page = self._get_page()
         urls = []
+        page_contents = page.pagecontent_set(manager="admin_manager").latest_content()
         if language:
-            titles = page.get_content_obj(language),
+            page_contents = page_contents.filter(language=language)
         else:
-            titles = page.pagecontent_set.filter(language__in=get_language_list(page.node.site_id))
-        # Titles
-        for title in titles:
+            page_contents = page_contents.filter(language__in=get_language_list(page.node.site_id))
+        # PageContent
+        for page_content in page_contents:
             try:
-                title_extension = self.model.objects.get(extended_object_id=title.pk)
+                pagecontent_extension = self.model.objects.get(extended_object_id=page_content.pk)
             except self.model.DoesNotExist:
-                title_extension = None
+                pagecontent_extension = None
             try:
                 model_name = self.model.__name__.lower()
-                if title_extension:
+                if pagecontent_extension:
                     admin_url = admin_reverse(
                         '%s_%s_change' % (self.model._meta.app_label, model_name),
-                        args=(title_extension.pk,))
+                        args=(pagecontent_extension.pk,))
                 else:
                     admin_url = "%s?extended_object=%s" % (
                         admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
-                        title.pk)
+                        page_content.pk)
             except NoReverseMatch:  # pragma: no cover
                 admin_url = None
             if admin_url:
-                urls.append((title_extension, admin_url))
+                urls.append((pagecontent_extension, admin_url))
         return urls
 
     def _get_sub_menu(self, current_menu, key, label, position=None):
