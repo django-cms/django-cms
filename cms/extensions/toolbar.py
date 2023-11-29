@@ -105,7 +105,7 @@ class ExtensionToolbar(CMSToolbar):
         Return a tuple of the page content extension and the url; the extension is None
         if no instance exists, the url is None is no admin is registered for the extension.
         """
-        page = self._get_page()
+        self._get_page()
         page_content = page_content_obj or self.page_content
         try:
             pagecontent_extension = self.model.objects.get(extended_object_id=page_content.pk)
