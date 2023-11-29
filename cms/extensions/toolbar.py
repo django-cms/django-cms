@@ -26,7 +26,7 @@ class ExtensionToolbar(CMSToolbar):
         page = self._get_page()
 
         if page and user_can_change_page(self.request.user, page=page):
-            return self.toolbar.get_or_create_menu('page')
+            return self.toolbar.get_or_create_menu("page")
         return
 
     def _get_page(self):
@@ -58,12 +58,12 @@ class ExtensionToolbar(CMSToolbar):
             model_name = self.model.__name__.lower()
             if page_extension:
                 admin_url = admin_reverse(
-                    '{}_{}_change'.format(self.model._meta.app_label, model_name),
-                    args=(page_extension.pk,))
+                    f"{self.model._meta.app_label}_{model_name}_change", args=(page_extension.pk,)
+                )
             else:
                 admin_url = "{}?extended_object={}".format(
-                    admin_reverse('{}_{}_add'.format(self.model._meta.app_label, model_name)),
-                    self.page.pk)
+                    admin_reverse(f"{self.model._meta.app_label}_{model_name}_add"), self.page.pk
+                )
         except NoReverseMatch:  # pragma: no cover
             admin_url = None
         return page_extension, admin_url
@@ -80,12 +80,16 @@ class ExtensionToolbar(CMSToolbar):
         """
         warnings.warn(
             "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin",
-            DeprecationWarning, stacklevel=2,
+            DeprecationWarning,
+            stacklevel=2,
         )
         page = self._get_page()
 
-        page_contents = page.pagecontent_set(manager="admin_manager").latest_content()\
+        page_contents = (
+            page.pagecontent_set(manager="admin_manager")
+            .latest_content()
             .filter(language__in=get_language_list(page.node.site_id))
+        )
         urls = []
 
         for page_content in page_contents:
@@ -114,13 +118,11 @@ class ExtensionToolbar(CMSToolbar):
         try:
             app_label, model_name = self.model._meta.app_label, self.model.__name__.lower()
             if pagecontent_extension:
-                admin_url = admin_reverse(
-                    '{}_{}_change'.format(app_label, model_name),
-                    args=(pagecontent_extension.pk,))
+                admin_url = admin_reverse(f"{app_label}_{model_name}_change", args=(pagecontent_extension.pk,))
             else:
                 admin_url = "{}?extended_object={}".format(
-                    admin_reverse('{}_{}_add'.format(app_label, model_name)),
-                    page_content.pk)
+                    admin_reverse(f"{app_label}_{model_name}_add"), page_content.pk
+                )
         except NoReverseMatch:  # pragma: no cover
             admin_url = None
         return pagecontent_extension, admin_url
@@ -129,6 +131,5 @@ class ExtensionToolbar(CMSToolbar):
         """
         Utility function to get a submenu of the current menu
         """
-        extension_menu = current_menu.get_or_create_menu(
-            key, label, position=position)
+        extension_menu = current_menu.get_or_create_menu(key, label, position=position)
         return extension_menu
