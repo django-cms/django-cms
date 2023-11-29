@@ -254,10 +254,8 @@ class FormsTestCase(CMSTestCase):
             choices_called = True
             return ("", "-----"),
 
-        LazyChoiceField(
-            choices=get_choices
-        )
-        self.assertFalse(choices_called)
+        LazyChoiceField(choices=SuperLazyIterator(get_choices))
+        self.assertFalse(choices_called, "Lazy choice function called")
 
 
 class PermissionFormTestCase(CMSTestCase):

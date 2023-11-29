@@ -29,9 +29,9 @@ class LazyChoiceField(forms.ChoiceField):
         # we overwrite this function so no list(value) or normalize_choices(value) is called
         # also, do not call the widget's setter as of Django 5
         if DJANGO_4_2:
-            self._choices = self.widget._choices = value
-        else:
             self._choices = self.widget.choices = value
+        else:
+            self._choices = self.widget._choices = value
 
 
 class PageSelectFormField(forms.MultiValueField):
