@@ -4,8 +4,9 @@
 How to install django CMS by hand
 #################################
 
-The easiest way to install django CMS is by using the automated `django CMS installer
-<https://github.com/nephila/djangocms-installer>`_. This is the recommended way to start with new projects, and it's
+The easiest way to install django CMS is by using the automated `django CMS quckstart
+<https://github.com/django-cms/django-cms-quickstart>`_ project. This is the
+recommended way to start with (docker-based) new projects, and it's
 what we use in the :ref:`tutorial section of this documentation <tutorials>`.
 
 If you prefer to do things manually, this how-to guide will take you through the process.
@@ -211,7 +212,7 @@ Sekizai
 =======
 
 `Django Sekizai <https://github.com/ojii/django-sekizai>`_ is required by the CMS for static files management. You need
-to have ``'sekizai'`` listed in ``INSTALLED_APPS``, 
+to have ``'sekizai'`` listed in ``INSTALLED_APPS``,
 
 .. code-block:: python
 
@@ -232,11 +233,17 @@ and ``'sekizai.context_processors.sekizai'`` in the ``TEMPLATES['OPTIONS']['cont
             'OPTIONS': {
                 'context_processors': [
                     ...
+                    'django.template.context_processors.i18n',
                     'sekizai.context_processors.sekizai',
                 ],
             },
         },
     ]
+
+.. note::
+
+    ``django.template.context_processors.i18n`` is needed for the
+    wizards to work properly.
 
 
 Middleware
@@ -543,7 +550,7 @@ Next steps
 **********
 
 The :ref:`tutorials for developers <tutorials>` will help you understand how to approach django CMS as a developer.
-Note that the tutorials assume you have installed the CMS using the django CMS Installer, but with a little
+Note that the tutorials assume you have installed the CMS using the django CMS Quistart project, but with a little
 adaptation you'll be able to use it as a basis.
 
 To deploy your django CMS project on a production web server, please refer to the :doc:`Django deployment documentation

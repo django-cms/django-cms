@@ -87,7 +87,7 @@ The `django CMS Association <https://www.django-cms.org/en/about-us/>`_ is a non
 organisation that exists to support the development of django CMS and its community.
 
 
-.. rst-class:: column column3
+.. rst-class:: column column2
 
 Slack
 =====
@@ -97,16 +97,7 @@ Join `our friendly Slack group <https://www.django-cms.org/slack>`_ for
 other members of the community.
 
 
-.. rst-class:: column column3
-
-Discourse
-=========
-
-Our `Discourse forum <https://discourse.django-cms.org>`_ is also used for
-discussion of django CMS, particularly to manage its technical development process.
-
-
-.. rst-class:: column column3
+.. rst-class:: column column2
 
 StackOverflow
 =============
@@ -162,7 +153,7 @@ django CMS   Python                                  Django
 -----------  -----------------------------  ----------------------------------------
 \            3.11 3.10 3.9 3.8 3.7 3.6 3.5  4.2 4.1 4.0 3.2 3.1 3.0 2.2 2.1 2.0 1.11
 ===========  ==== ==== === === === === ===  === === === === === === === === === ====
-4.1.x        ✓    ✓    ✓   ✓   ✓   ×   ×    ✓   ✓   ✓   ✓   ✓   ✓   ✓   ×   ×   ×
+4.1.x        ✓    ✓    ✓   ×   ×   ×   ×    LTS ✓   ✓   LTS ×   ×   ×   ×   ×   ×
 3.11.3+      ✓    ✓    ✓   ✓   ✓   ×   ×    LTS ✓   ✓   LTS ×   ×   ×   ×   ×   ×
 3.11.1       ✓    ✓    ✓   ✓   ✓   ×   ×    ×   ✓   ✓   ✓   ×   ×   ×   ×   ×   ×
 3.11.0       ✓    ✓    ✓   ✓   ✓   ×   ×    ×   ×   ✓   ✓   ×   ×   ×   ×   ×   ×

@@ -12,10 +12,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11']
+        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12']
         requirements-file: [
-          django-2.2.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
@@ -52,7 +50,6 @@ jobs:
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
-        pip install -r docs/requirements.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -67,10 +64,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11']
+        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12']
         requirements-file: [
-          django-2.2.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
@@ -107,7 +102,6 @@ jobs:
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
         pip install -r test_requirements/databases.txt
-        pip install -r docs/requirements.txt
         python setup.py install
 
 
@@ -122,10 +116,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ '3.8', '3.9', '3.10', '3.11']
+        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12']
         requirements-file: [
-          django-2.2.txt,
-          django-3.1.txt,
           django-3.2.txt,
           django-4.0.txt,
           django-4.1.txt,
@@ -149,7 +141,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install -r docs/requirements.txt
         python setup.py install
 
     - name: Test with django test runner
