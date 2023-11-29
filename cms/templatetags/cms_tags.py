@@ -212,7 +212,7 @@ class PageUrl(AsTag):
         # return Exceptions regardless of the setting of settings.DEBUG.
         #
         # We wish to maintain backwards functionality where the non-as-variant
-        # of using this tag will raise DNE exceptions only when
+        # of using this tag will raise DoesNotExist exceptions only when
         # settings.DEBUG=False.
         #
         try:
@@ -491,7 +491,7 @@ class CMSEditableObject(InclusionTag):
     def _get_editable_context(self, context, instance, language, edit_fields,
                               view_method, view_url, querystring, editmode=True):
         """
-        Populate the contex with the requested attributes to trigger the changeform
+        Populate the context with the requested attributes to trigger the changeform
         """
         request = context['request']
         if hasattr(request, 'toolbar'):
@@ -660,7 +660,7 @@ class CMSEditableObject(InclusionTag):
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")
         # If the toolbar is not enabled the following part is just skipped: it
-        # would cause a perfomance hit for no reason
+        # would cause a performance hit for no reason
         if self._is_editable(context.get('request', None)):
             extra_context.update(self._get_editable_context(
                 extra_context, instance, language, edit_fields, view_method,

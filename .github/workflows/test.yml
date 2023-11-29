@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
+        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -71,7 +71,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
+        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -129,7 +129,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.8, 3.9, '3.10', '3.11' ]  # latest release minus two
+        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -142,8 +142,6 @@ jobs:
           ubuntu-20.04,
         ]
         exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.8
           - requirements-file: django-5.0.txt
             python-version: 3.9
 
@@ -173,7 +171,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
         requirements-file: ['requirements_base.txt']
         django-version: [
           'https://github.com/django/django/archive/main.tar.gz'
@@ -208,7 +206,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
         requirements-file: ['requirements_base.txt']
         django-version: [
           'https://github.com/django/django/archive/main.tar.gz'
@@ -259,7 +257,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.11']
+        python-version: ['3.12']
         requirements-file: ['requirements_base.txt']
         django-version: [
           'https://github.com/django/django/archive/main.tar.gz'

@@ -206,7 +206,7 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
     def test_unregister_unregistered_wizard(self):
         """
         Test for backwards compatibility of the unregister method.
-        Returns False if wizard not fount.
+        Returns False if wizard not found.
         """
         was_unregistered = wizard_pool.unregister(self.page_wizard)
         self.assertFalse(was_unregistered)
@@ -248,7 +248,7 @@ class TestWizardPool(WizardTestMixin, CMSTestCase):
         # NOTE: Because of how the override_settings decorator works,
         # we can't use it for this test as the app registry first
         # gets loaded with the default apps and then again with
-        # the overriden ones.
+        # the overridden ones.
         INSTALLED_APPS = [
             'cms',
             'treebeard',

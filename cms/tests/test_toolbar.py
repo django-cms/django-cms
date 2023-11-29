@@ -11,7 +11,7 @@ from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.urls import reverse
+from django.urls import resolve, reverse
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
@@ -647,7 +647,6 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, user, edit_url, disable=False)
         request.toolbar.post_template_populate()
         self.assertFalse(page.has_change_permission(request.user))
-        self.assertFalse(page.has_publish_permission(request.user))
 
         items = request.toolbar.get_left_items() + request.toolbar.get_right_items()
         # Logo + page-menu + admin-menu + color scheme + logout
@@ -883,14 +882,15 @@ class ToolbarTests(ToolbarTestBase):
 
         request = self.get_page_request(page, staff, edit_url_en)
         self.assertMenuItems(
-            request, LANGUAGE_MENU_IDENTIFIER, 'Copy all plugins',
+            request, LANGUAGE_MENU_IDENTIFIER, _('Copy all plugins'),
             [u'from German', u'from French']
         )
 
         request = self.get_page_request(page, staff, edit_url_de, lang_code='de')
+        request.toolbar.toolbar_language = "en"
         self.assertMenuItems(
-            request, LANGUAGE_MENU_IDENTIFIER, 'Copy all plugins',
-            [u'from English', u'from French']
+            request, LANGUAGE_MENU_IDENTIFIER, _('Copy all plugins'),
+            ['from English', 'from French', ]
         )
 
     def get_username(self, user=None, default=''):
@@ -989,13 +989,13 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page3_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
+            self.assertEqual(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
             # Published page with view permissions, redirect
             response = self.client.get(page4_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertEquals(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
+            self.assertEqual(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')

@@ -133,7 +133,7 @@ class ContentAdminQuerySet(models.QuerySet):
 
     def latest_content(self, **kwargs):
         """If a versioning package is installed, returns the latest version that matches the
-        filter given in kwargs including discared or unpublished page content. Without versioning
+        filter given in kwargs including discarded or unpublished page content. Without versioning
         every page content is the latest."""
         return self.filter(**kwargs)
 
@@ -245,7 +245,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         return queryset.filter(functools.reduce(operator.or_, queries)).exists()
 
     def subordinate_to_user(self, user, site):
-        """
+        r"""
         Get all page permission objects on which user/group is lover in
         hierarchy then given user and given user can change permissions on them.
 

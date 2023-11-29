@@ -11,6 +11,7 @@ from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
 from django.http import HttpResponse
+from django.middleware.locale import LocaleMiddleware
 from django.template import engines
 from django.template.context import Context
 from django.test import testcases
@@ -30,6 +31,7 @@ from cms.models.permissionmodels import (
 )
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.utils.compat import DJANGO_4_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
@@ -121,7 +123,6 @@ class BaseCMSTestCase:
             'can_change': False,
             'can_delete': False,
             'can_change_advanced_settings': False,
-            'can_publish': False,
             'can_change_permissions': False,
             'can_move_page': False,
             'can_recover_page': False,
@@ -139,7 +140,6 @@ class BaseCMSTestCase:
             'can_change': False,
             'can_delete': False,
             'can_change_advanced_settings': False,
-            'can_publish': False,
             'can_change_permissions': False,
             'can_move_page': False,
             'page': page,
@@ -196,7 +196,6 @@ class BaseCMSTestCase:
         user.user_permissions.add(Permission.objects.get(codename='delete_link'))
         user.user_permissions.add(Permission.objects.get(codename='change_link'))
         # Page permissions
-        user.user_permissions.add(Permission.objects.get(codename='publish_page'))
         user.user_permissions.add(Permission.objects.get(codename='add_page'))
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
         user.user_permissions.add(Permission.objects.get(codename='delete_page'))
@@ -453,6 +452,8 @@ class BaseCMSTestCase:
         if persist is not None:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__PERSIST')] = persist
         request.current_page = page
+        mid = LocaleMiddleware(lambda req: HttpResponse(""))
+        mid(request)
         mid = ToolbarMiddleware(lambda req: HttpResponse(""))
         mid(request)
         if hasattr(request, 'toolbar'):
@@ -667,4 +668,6 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 
 class TransactionCMSTestCase(CMSTestCase, testcases.TransactionTestCase):
-    pass
+    if DJANGO_4_1:
+        def assertQuerySetEqual(self, *args, **kwargs):
+            return self.assertQuerysetEqual(*args, **kwargs)
