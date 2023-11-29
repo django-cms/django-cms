@@ -10,6 +10,8 @@ from cms.utils.urlutils import admin_reverse
 
 
 class ExtensionToolbar(CMSToolbar):
+    """"Offers simplified API for providing the user access to the admin of page extensions and
+    page content extensions through the toolbar."""
     model = None
     page = None
     page_content = None
@@ -68,6 +70,10 @@ class ExtensionToolbar(CMSToolbar):
 
     def get_title_extension_admin(self, language=None):
         """
+        Deprecated.
+
+        Reflects now obsolete behavior in django CMS 3.x:
+
         Get the admin urls for the page content extensions menu items, depending on whether a
         :class:`~cms.extensions.models.PageContentExtension` instance exists for each
         :class:`~cms.models.contentmodels.PageContent` in the current page.
@@ -95,8 +101,6 @@ class ExtensionToolbar(CMSToolbar):
             if admin_url:
                 urls.append(admin_url)
         return urls
-
-        return self.get_page_content_extension_admin(language)
 
     def get_page_content_extension_admin(self, page_content_obj=None):
         """
