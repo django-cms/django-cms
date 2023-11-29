@@ -55,14 +55,12 @@ class ExtensionToolbar(CMSToolbar):
         except self.model.DoesNotExist:
             page_extension = None
         try:
-            model_name = self.model.__name__.lower()
+            app_label, model_name = self.model._meta.app_label, self.model.__name__.lower()
             if page_extension:
-                admin_url = admin_reverse(
-                    f"{self.model._meta.app_label}_{model_name}_change", args=(page_extension.pk,)
-                )
+                admin_url = admin_reverse(f"{app_label}_{model_name}_change", args=(page_extension.pk,))
             else:
                 admin_url = "{}?extended_object={}".format(
-                    admin_reverse(f"{self.model._meta.app_label}_{model_name}_add"), self.page.pk
+                    admin_reverse(f"{app_label}_{model_name}_add"), self.page.pk
                 )
         except NoReverseMatch:  # pragma: no cover
             admin_url = None
