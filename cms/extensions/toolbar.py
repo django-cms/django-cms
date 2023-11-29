@@ -31,13 +31,13 @@ class ExtensionToolbar(CMSToolbar):
 
     def _get_page(self):
         if not self.page:
-            if self.toolbar.obj and isinstance(self.toolbar.obj, PageContent):
-                self.page = self.toolbar.obj.page
-                self.page_content = self.toolbar.obj
+            obj = self.toolbar.get_object()  # Try getting the PageContent object from the toolbar
+            if isinstance(obj, PageContent):
+                self.page = obj.page
+                self.page_content = obj
             else:
-                self.page = self.request.current_page
+                self.page = self.request.current_page  # Otherwise get Page object from the request
                 self.page_content = self.page.get_content_obj(self.current_lang)
-
         return self.page
 
     def get_page_extension_admin(self):
