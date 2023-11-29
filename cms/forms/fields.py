@@ -7,6 +7,7 @@ from cms.forms.utils import get_page_choices, get_site_choices
 from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
+from cms.utils.compat import DJANGO_4_2
 
 
 class SuperLazyIterator():
