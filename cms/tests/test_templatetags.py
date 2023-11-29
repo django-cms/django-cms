@@ -319,7 +319,7 @@ class TemplatetagDatabaseTests(TwoPagesFixture, CMSTestCase):
 
     def test_create_placeholder_if_not_exist_in_template(self):
         """
-        Tests that adding a new placeholder to a an exising page's template
+        Tests that adding a new placeholder to a an existing page's template
         creates the placeholder.
         """
         page = create_page('Test', 'col_two.html', 'en')

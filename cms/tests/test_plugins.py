@@ -1080,7 +1080,7 @@ class PluginsMetaOptionsTests(TestCase):
     # these plugins are inlined because, due to the nature of the #992
     # ticket, we cannot actually import a single file with all the
     # plugin variants in, because that calls __new__, at which point the
-    # error with splitted occurs.
+    # error with split occurs.
 
     def test_meta_options_as_defaults(self):
         ''' handling when a CMSPlugin meta options are computed defaults '''

@@ -21,13 +21,16 @@ class LazyChoiceField(forms.ChoiceField):
 
     @property
     def choices(self):
-        return super().choices()
+        return self._choices
 
     @choices.setter
-    def _set_choices(self, value):
+    def choices(self, value):
         # we overwrite this function so no list(value) or normalize_choices(value) is called
-        # also, do not call the widget's setter
-        self._choices = self.widget._choices = value
+        # also, do not call the widget's setter as of Django 5
+        if DJANGO_4_2:
+            self._choices = self.widget._choices = value
+        else:
+            self._choices = self.widget.choices = value
 
 
 class PageSelectFormField(forms.MultiValueField):

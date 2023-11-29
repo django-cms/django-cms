@@ -39,7 +39,7 @@ def debug_server_restart(**kwargs):
         try:
             reload(cms.urls)
         except NameError:  # python3
-            from imp import reload
+            from importlib import reload
             reload(cms.urls)
     if 'test' not in sys.argv:
         msg = 'Application url changed and urls_need_reloading signal fired. ' \

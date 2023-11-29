@@ -3,7 +3,7 @@ Python APIs for creating CMS content. This is done in :mod:`cms.api` and not
 on the models and managers, because the direct API via models and managers is
 slightly counterintuitive for developers.
 
-Teh api for both Pages and Plugins has changed significantly since django CMS
+The api for both Pages and Plugins has changed significantly since django CMS
 Version 4.
 
 Also, the functions defined in this module do sanity checks on arguments.
@@ -81,7 +81,6 @@ def _verify_apphook(apphook, namespace):
         try:
             assert apphook.__class__ in [app.__class__ for app in apphook_pool.apps.values()]
         except AssertionError:
-            print(apphook_pool.apps.values())
             raise
         apphook_name = apphook.__class__.__name__
     elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
@@ -488,7 +487,7 @@ def create_page_user(created_by, user,
 
 def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
                         can_add=False, can_change=False, can_delete=False,
-                        can_change_advanced_settings=False, can_publish=False,
+                        can_change_advanced_settings=False, can_publish=None,
                         can_change_permissions=False, can_move_page=False,
                         can_recover_page=True, can_view=False,
                         grant_all=False, global_permission=False):
@@ -507,13 +506,16 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
     """
+    if can_publish is not None:
+        warnings.warn('This API function no longer accepts a "can_publish" argument.',
+                      UserWarning, stacklevel=2)
+
     grant_all = grant_all and not global_permission
     data = {
         'can_add': can_add or grant_all,
         'can_change': can_change or grant_all,
         'can_delete': can_delete or grant_all,
         'can_change_advanced_settings': can_change_advanced_settings or grant_all,
-        'can_publish': can_publish or grant_all,
         'can_change_permissions': can_change_permissions or grant_all,
         'can_move_page': can_move_page or grant_all,
         'can_view': can_view or grant_all,

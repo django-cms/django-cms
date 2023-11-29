@@ -1,33 +1,34 @@
 from django.conf import settings
 from django.http import Http404
 from django.template.response import TemplateResponse
-from django.urls import Resolver404, resolve, reverse
+from django.urls import Resolver404, get_resolver, resolve, reverse
 
 from cms import __version__, constants
 from cms.cache.page import set_page_cache
 from cms.models import EmptyPageContent
-from cms.utils.page import get_page_template_from_request
 from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 
 
-def render_page(request, page, current_language, slug):
+def render_page(request, page, current_language, slug=None):
     """
     Renders a page
     """
+    page_content = page.page_content_cache.get(current_language, page.get_content_obj(current_language))
     context = {}
     context['lang'] = current_language
     context['current_page'] = page
+    context['current_pagecontent'] = page_content
     context['has_change_permissions'] = user_can_change_page(request.user, page)
     context['has_view_permissions'] = user_can_view_page(request.user, page)
 
     cant_view_page = any([
         not context['has_view_permissions'],
-        isinstance(page.get_content_obj(current_language), EmptyPageContent)
+        isinstance(page_content, EmptyPageContent)
     ])
     if cant_view_page:
         return _handle_no_page(request)
 
-    template = get_page_template_from_request(request)
+    template = page_content.get_template()
     response = TemplateResponse(request, template, context)
     response.add_post_render_callback(set_page_cache)
 
@@ -83,4 +84,4 @@ def render_pagecontent(request, pagecontent):
     language = pagecontent.language
     request.current_page = page = pagecontent.page
     page.page_content_cache[language] = pagecontent
-    return render_page(request, page, language, page.get_slug(language))
+    return render_page(request, page, language)
