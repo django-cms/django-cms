@@ -51,7 +51,6 @@ DEFAULT_HELP_MENU_ITEMS = (
     (_("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
     (_("Documentation"), 'https://docs.django-cms.org/en/latest/'),
     (_("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/'),
-    (_("Support Forum"), 'https://discourse.django-cms.org/'),
     (_("Support Slack"), 'https://www.django-cms.org/slack'),
     (_("What's new"), 'https://www.django-cms.org/en/blog/'),
 )

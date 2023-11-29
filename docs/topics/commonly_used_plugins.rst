@@ -25,12 +25,12 @@ that has been created.
 django CMS Core Addons
 **********************
 
-We maintain a set of *Core Addons* for django CMS. 
+We maintain a set of *Core Addons* for django CMS.
 
 You don't need to use them, and for many of them alternatives exist, but they represent a good way
 to get started with a reliable project set-up. We recommend them for new users of django CMS in
 particular. For example, if you start a project on `Divio Cloud <https://divio.com/>`_ or using the
-`django CMS installer <https://github.com/nephila/djangocms-installer>`_, this is the set of addons
+`django CMS quickstart <https://github.com/django-cms/django-cms-quickstart>`_, this is the set of addons
 you'll have installed by default.
 
 The django CMS Core Addons are:
@@ -82,7 +82,7 @@ Deprecated addons
 Some older plugins that you may have encountered are now deprecated and we advise against
 incorporating them into new projects.
 
-These are: 
+These are:
 
 * `cmsplugin-filer <https://github.com/divio/cmsplugin-filer>`_
 * `Aldryn Style <https://github.com/aldryn/aldryn-style>`_
