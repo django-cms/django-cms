@@ -397,7 +397,7 @@ class ExtensionAdminTestCase(CMSTestCase):
             self.assertIn("TestItem", response.rendered_content)
         toolbar_pool.toolbars = old_toolbars
 
-    def test_toolbar_title_extension(self):
+    def test_toolbar_page_content_extension(self):
         old_toolbars = deepcopy(toolbar_pool.toolbars)
 
         class SampleExtension(ExtensionToolbar):
@@ -407,18 +407,40 @@ class ExtensionAdminTestCase(CMSTestCase):
                 current_page_menu = self._setup_extension_toolbar()
                 if current_page_menu:
                     position = 0
-                    urls = self.get_title_extension_admin()
-                    for title_extension, url in urls:
-                        current_page_menu.add_modal_item(
-                            'TestItem',
-                            url=url,
-                            disabled=not self.toolbar.edit_mode_active,
-                            position=position
-                        )
+                    pagecontent_extension, url = self.get_page_content_extension_admin()
+                    current_page_menu.add_modal_item(
+                        'TestItem',
+                        url=url,
+                        disabled=not self.toolbar.edit_mode_active,
+                        position=position
+                    )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
             response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
             self.assertIn("TestItem", response.rendered_content)
+        toolbar_pool.toolbars = old_toolbars
+
+    def test_deprecated_title_extension(self):
+        urls = []
+        old_toolbars = deepcopy(toolbar_pool.toolbars)
+
+        class SampleExtensionToolbar2(ExtensionToolbar):
+            model = MyPageContentExtension
+            def populate(self):
+                nonlocal urls
+                urls = self.get_title_extension_admin()
+
+        toolbar_pool.register(SampleExtensionToolbar2)
+
+        message = "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin"
+        with self.login_user_context(self.admin):
+            self.assertWarns(
+                DeprecationWarning,
+                message,
+                lambda: self.client.get(self.page.get_absolute_url()),
+            )
+
+        self.assertEqual(len(urls), 2)
         toolbar_pool.toolbars = old_toolbars
 
     def test_admin_title_extension(self):
