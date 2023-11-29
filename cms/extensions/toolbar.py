@@ -69,13 +69,6 @@ class ExtensionToolbar(CMSToolbar):
         return page_extension, admin_url
 
     def get_title_extension_admin(self, language=None):
-        warnings.warn(
-            "get_title_extension_admin has been renamed to get_page_content_extension_admin and is deprecated",
-            DeprecationWarning, stacklevel=2,
-        )
-        return self.get_page_content_extension_admin(language)
-
-    def get_page_content_extension_admin(self, language=None):
         """
         Get the admin urls for the page content extensions menu items, depending on whether a
         :class:`~cms.extensions.models.PageContentExtension` instance exists for each
@@ -85,34 +78,52 @@ class ExtensionToolbar(CMSToolbar):
         Return a list of tuples of the page content extension and the url; the extension is None
         if no instance exists, the url is None is no admin is registered for the extension.
         """
+        warnings.warn(
+            "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin",
+            DeprecationWarning, stacklevel=2,
+        )
         page = self._get_page()
+
+        page_contents = page.pagecontent_set(manager="admin_manager").latest_content()\
+            .filter(language__in=get_language_list(page.node.site_id))
         urls = []
-        if language:
-            page_contents = self.page_content,
-        else:
-            page_contents = page.pagecontent_set(manager="admin_manager").latest_content()
-            page_contents = page_contents.filter(language__in=get_language_list(page.node.site_id))
-        # PageContent
+
         for page_content in page_contents:
-            try:
-                pagecontent_extension = self.model.objects.get(extended_object_id=page_content.pk)
-            except self.model.DoesNotExist:
-                pagecontent_extension = None
-            try:
-                model_name = self.model.__name__.lower()
-                if pagecontent_extension:
-                    admin_url = admin_reverse(
-                        '%s_%s_change' % (self.model._meta.app_label, model_name),
-                        args=(pagecontent_extension.pk,))
-                else:
-                    admin_url = "%s?extended_object=%s" % (
-                        admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
-                        page_content.pk)
-            except NoReverseMatch:  # pragma: no cover
-                admin_url = None
+            admin_url = self.get_page_content_extension_admin(page_content)
             if admin_url:
-                urls.append((pagecontent_extension, admin_url))
+                urls.append(admin_url)
         return urls
+
+        return self.get_page_content_extension_admin(language)
+
+    def get_page_content_extension_admin(self, page_content_obj=None):
+        """
+        Get the admin url for the page content extensions menu item, depending on whether a
+        :class:`~cms.extensions.models.PageContentExtension` instance exists for the
+        :class:`~cms.models.contentmodels.PageContent` displayed.
+
+        Return a tuple of the page content extension and the url; the extension is None
+        if no instance exists, the url is None is no admin is registered for the extension.
+        """
+        page = self._get_page()
+        page_content = page_content_obj or self.page_content
+        try:
+            pagecontent_extension = self.model.objects.get(extended_object_id=page_content.pk)
+        except self.model.DoesNotExist:
+            pagecontent_extension = None
+        try:
+            model_name = self.model.__name__.lower()
+            if pagecontent_extension:
+                admin_url = admin_reverse(
+                    '%s_%s_change' % (self.model._meta.app_label, model_name),
+                    args=(pagecontent_extension.pk,))
+            else:
+                admin_url = "%s?extended_object=%s" % (
+                    admin_reverse('%s_%s_add' % (self.model._meta.app_label, model_name)),
+                    page_content.pk)
+        except NoReverseMatch:  # pragma: no cover
+            admin_url = None
+        return pagecontent_extension, admin_url
 
     def _get_sub_menu(self, current_menu, key, label, position=None):
         """
