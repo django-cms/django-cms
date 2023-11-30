@@ -89,7 +89,6 @@ def _verify_apphook(apphook, namespace):
         try:
             assert apphook in apphook_pool.apps
         except AssertionError:
-            print(apphook_pool.apps.values())
             raise
         apphook_name = apphook
     else:

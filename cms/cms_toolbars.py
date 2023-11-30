@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-from django.urls import NoReverseMatch, Resolver404, resolve, reverse
+from django.urls import Resolver404, resolve, reverse
 from django.utils.translation import (
     gettext_lazy as _,
 )
@@ -17,8 +17,10 @@ from cms.models import Page, PageContent, PageType, Placeholder
 from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
 from cms.toolbar.utils import (
     get_object_edit_url,
+    get_object_for_language,
     get_object_preview_url,
     get_object_structure_url,
+    get_object_toolbar_url,
 )
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
@@ -354,13 +356,18 @@ class BasicToolbar(CMSToolbar):
                 self._language_menu = self.toolbar.get_or_create_menu(
                     LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1
                 )
-                language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
                 for code, name in languages:
-                    try:
-                        url = language_changer(code)
-                    except NoReverseMatch:
-                        url = DefaultLanguageChanger(self.request)(code)
-                    self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+                    obj = get_object_for_language(self.toolbar.obj, code, latest=True)
+                    if obj:
+                        try:
+                            self._language_menu.add_link_item(
+                                name,
+                                url=get_object_toolbar_url(self.toolbar, obj, code),
+                                active=self.current_lang == code,
+                            )
+                        except TypeError as e:
+                            input(e)
+                            pass
             else:
                 # We do not have to check every time the toolbar is created
                 self._language_menu = True  # Pretend the language menu is already there
@@ -395,7 +402,7 @@ class PageToolbar(CMSToolbar):
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
-            self.page_change_permission = can_change_page(self.request)
+            self.page_change_permission = can_change_page(self.request) and self.toolbar.object_is_editable()
         return self.page_change_permission
 
     def in_apphook(self):
@@ -472,7 +479,6 @@ class PageToolbar(CMSToolbar):
             )
         else:
             can_change = False
-
         if can_change:
             language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
             if not language_menu:

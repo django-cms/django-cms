@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 
-from cms.toolbar.utils import get_object_edit_url, get_object_preview_url
+from cms.toolbar.utils import get_object_edit_url, get_object_for_language, get_object_preview_url
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import (
     force_language,
@@ -149,13 +149,15 @@ class DefaultLanguageChanger(object):
         ):
             # Toolbar object
             if self.request.toolbar.edit_mode_active:
-                return get_object_edit_url(self.request.toolbar.obj, language=lang)
+                lang_obj = get_object_for_language(self.request.toolbar.obj, lang, latest=True)
+                return '' if lang_obj is None else get_object_edit_url(lang_obj, language=lang)
             if self.request.toolbar.preview_mode_active:
-                return get_object_preview_url(self.request.toolbar.obj, language=lang)
+                lang_obj = get_object_for_language(self.request.toolbar.obj, lang, latest=True)
+                return '' if lang_obj is None else get_object_preview_url(lang_obj, language=lang)
             try:
                 # First see, if object can get language-specific absolute urls (like PageContent)
                 return self.request.toolbar.obj.get_absolute_url(language=lang)
-            except TypeError:
+            except (TypeError, NoReverseMatch):
                 # Object's get_absolute_url does not accept language parameter, set the language
                 with force_language(lang):
                     try:

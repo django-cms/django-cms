@@ -21,6 +21,7 @@ from cms.toolbar.utils import (
     get_object_edit_url,
     get_object_preview_url,
     get_object_structure_url,
+    get_object_toolbar_url,
 )
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request
@@ -403,11 +404,18 @@ class CMSToolbarBase(BaseToolbar):
             return get_object_structure_url(self.obj, language=self.request_language)
         return ''
 
-    def object_is_editable(self):
-        if self.obj:
-            if hasattr(self.obj, "is_editable"):
+    def get_toolbar_url(self, obj=None):
+        obj = obj or self.obj
+        if obj:
+            return get_object_toolbar_url(self, obj) or ''
+        return ''
+
+    def object_is_editable(self, obj=None):
+        obj = obj or self.obj
+        if obj:
+            if hasattr(obj, "is_editable"):
                 # Object can decide itself
-                return self.obj.is_editable(self.request)
+                return obj.is_editable(self.request)
             return True
         return False
 
