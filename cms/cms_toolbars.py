@@ -3,7 +3,7 @@ from django.contrib import admin
 from django.contrib.auth import get_permission_codename, get_user_model
 from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
-from django.urls import Resolver404, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.translation import (
     gettext_lazy as _,
 )
@@ -356,18 +356,14 @@ class BasicToolbar(CMSToolbar):
                 self._language_menu = self.toolbar.get_or_create_menu(
                     LANGUAGE_MENU_IDENTIFIER, _('Language'), position=-1
                 )
+                language_changer = getattr(self.request, '_language_changer', DefaultLanguageChanger(self.request))
                 for code, name in languages:
-                    obj = get_object_for_language(self.toolbar.obj, code, latest=True)
-                    if obj:
-                        try:
-                            self._language_menu.add_link_item(
-                                name,
-                                url=get_object_toolbar_url(self.toolbar, obj, code),
-                                active=self.current_lang == code,
-                            )
-                        except TypeError as e:
-                            input(e)
-                            pass
+                    try:
+                        url = language_changer(code)
+                    except NoReverseMatch:
+                        url = DefaultLanguageChanger(self.request)(code)
+                    if url:
+                        self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
             else:
                 # We do not have to check every time the toolbar is created
                 self._language_menu = True  # Pretend the language menu is already there
