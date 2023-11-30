@@ -242,35 +242,3 @@ def get_object_for_language(obj: models.Model, language: str, latest: bool = Fal
         result.language: result for result in qs.filter(**grouper_filter)
     }
     return obj._sibling_objects_for_language_cache.get(language)
-
-
-def get_object_toolbar_url(toolbar, obj: models.Model, language: str = None) -> Optional[str]:
-    """Returns the toolbar url for the given object in the given language. The object must be frontend-editable
-    and registered as such with cms.
-
-    The toolbar url keeps the toolbar mode: edit mode, preview mode, and the view on site mode.
-
-    If the object has a language property, the language parameter is ignored.
-    """
-    # Edit mode: stay in edit mode
-    if toolbar.edit_mode_active:
-        return get_object_edit_url(obj, language)
-    # Preview mode: stay in preview mode
-    if toolbar.preview_mode_active:
-        return get_object_preview_url(obj, language)
-    # On site: try get_absolute_url, first with language and fallback parameter, then
-    # language only and finally with force_language
-    try:
-        return obj.get_absolute_url(language, fallback=False)
-    except (AttributeError, TypeError, NoReverseMatch):
-        pass
-    try:
-        return obj.get_absolute_url(language)
-    except (AttributeError, TypeError, NoReverseMatch):
-        pass
-    with force_language(language):
-        try:
-            return obj.get_absolute_url()
-        except (AttributeError, NoReverseMatch):
-            pass
-    return None
