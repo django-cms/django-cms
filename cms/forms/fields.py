@@ -1,16 +1,22 @@
+import warnings
+
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.core.validators import EMPTY_VALUES
+from django.forms import ChoiceField
 from django.utils.translation import gettext_lazy as _
 
 from cms.forms.utils import get_page_choices, get_site_choices
 from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
+from cms.utils.compat import DJANGO_4_2
 
 
-class SuperLazyIterator():
+class SuperLazyIterator:
     def __init__(self, func):
+        warnings.warn("SuperLazyIterator is deprecated.",
+                      DeprecationWarning, stacklevel=2)
         self.func = func
 
     def __iter__(self):
@@ -19,14 +25,23 @@ class SuperLazyIterator():
 
 class LazyChoiceField(forms.ChoiceField):
 
+    def __init__(self, *args, **kwargs):
+        warnings.warn("LazyChoiceField is deprecated. Use Django's ChoiceField instead.",
+                      DeprecationWarning, stacklevel=2)
+        super().__init__(*args, **kwargs)
+
     @property
     def choices(self):
         return self._choices
 
     @choices.setter
     def choices(self, value):
-        # we overwrite this function so no normalize(value) is called
-        self._choices = self.widget.choices = value
+        # we overwrite this function so no list(value) or normalize_choices(value) is called
+        # also, do not call the widget's setter as of Django 5
+        if DJANGO_4_2:
+            self._choices = self.widget.choices = value
+        else:
+            self._choices = self.widget._choices = value
 
 
 class PageSelectFormField(forms.MultiValueField):
@@ -49,13 +64,11 @@ class PageSelectFormField(forms.MultiValueField):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
-        site_choices = SuperLazyIterator(get_site_choices)
-        page_choices = SuperLazyIterator(get_page_choices)
         self.limit_choices_to = limit_choices_to
         kwargs['required'] = required
         fields = (
-            LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
-            LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
+            ChoiceField(choices=get_site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
+            ChoiceField(choices=get_page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
 
         # Remove the unexpected blank kwarg if it's supplied,
