@@ -17,10 +17,8 @@ from cms.models import Page, PageContent, PageType, Placeholder
 from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
 from cms.toolbar.utils import (
     get_object_edit_url,
-    get_object_for_language,
     get_object_preview_url,
     get_object_structure_url,
-    get_object_toolbar_url,
 )
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
