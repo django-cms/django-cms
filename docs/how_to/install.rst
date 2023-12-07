@@ -42,14 +42,6 @@ django CMS also has other requirements, which it lists as dependencies in its ``
         python3 -m venv venv # create a virtualenv
         source venv/bin/activate  # activate it
 
-    For the cms to work correctly, you will need django version 3.2.
-    Work with newer versions can be unstable.
-    You can install recommended version of django with following command:
-
-    .. code-block:: bash
-
-        pip install django==3.2
-
 In an activated virtualenv, run::
 
 	pip install --upgrade pip
@@ -63,34 +55,79 @@ Then::
 to install the latest stable version of django CMS.
 
 
-****************************************
-Create a new project
-****************************************
+************************************
+Create a new project from a template
+************************************
 
 Create a new project::
 
-    django-admin startproject myproject
+    django-admin startproject myproject  --template https://github.com/django-cms/cms-template/archive/3.11.tar.gz
 
 If this is new to you, you ought to read the `official Django tutorial
 <https://docs.djangoproject.com/en/3.2/intro/tutorial01/>`_, which covers starting a new project.
 
+It installs additional optional packages which are used in the template project. Those are
+
+* `djangocms-text-ckeditor <https://github.com/django-cms/djangocms-text-ckeditor>`_ for rich text input.
+* `djangocms-frontend <https://github.com/django-cms/djangocms-frontend>`_ for `Bootstrap5 <https://getbootstrap.com>`_ support.
+* `django-filer <https://github.com/django-cms/django-filer>`_ for managing media files like images.
+* `djangocms_admin_style <https://github.com/django-cms/djangocms-admin-style>`_ for a consistent user experience with django CMS and Django admin.
+
 Your new project will look like this::
 
-    myproject
-        myproject
+     myproject/
+        LICENSE
+        README.md
+        db.sqlite3
+        myproject/
+            static/
+            templates/
+                base.html
             __init__.py
             asgi.py
             settings.py
             urls.py
             wsgi.py
         manage.py
+        requirements.in
+
+The ``LICENSE`` and ``README.md`` files are not needed and can be deleted or replaced by appropriate files for your project.
+
+``requirements.in`` contains dependencies for the project. Add your dependencies here. We suggest to use `pip-compile <https://github.com/jazzband/pip-tools>`_  to freeze your requirements as, for example, discussed in `this blog post <https://blog.typodrive.com/2020/02/04/always-freeze-requirements-with-pip-compile-to-avoid-unpleasant-surprises/>`_.
+
+Now, enter the project directory and create the database::
+
+    cd myproject
+    python -m manage migrate
+
+To run the project, you at least need a superuser to log in::
+
+    python -m manage createsuperuser
+
+Finally, run the ``cms check`` command to see if everything worked fine::
+
+    python -m manage cms check
+
+Fix any errors that are displayed. Once done, you are ready to spin up Django's development server by running::
+
+    python -m manage runserver
+
+You can visit your project's web site by pointing your browser to ``localhost:8000``.
+
+Use the newly created superuser's credentials to authenticate and create your first page!
+
+|it-works-cms|
+
+.. |it-works-cms| image:: ../images/it-works-cms.png
 
 
-********************************************
-Minimally-required applications and settings
-********************************************
+***********************************************
+Adding django CMS to an existing Django project
+***********************************************
 
-Open the new project's ``settings.py`` file in your text editor.
+django CMS is nothing more than a powerful set of Django apps. Hence you can add django CMS to any Django project. It might require some settings and URLs to be modified, however. The template project comes with suitable settings. When adding django CMS to your existing project, you need to adjust the settings yourself.
+
+Open the your project's ``settings.py`` file in your text editor.
 
 
 INSTALLED_APPS
@@ -103,11 +140,9 @@ You will need to add the following to its list of ``INSTALLED_APPS``::
     'menus',
     'treebeard',
 
-* django CMS needs to use Django's :mod:`django:django.contrib.sites` framework. You'll need to set a ``SITE_ID``
-  in the settings - ``SITE_ID = 1`` will suffice.
+* django CMS needs to use Django's :mod:`django:django.contrib.sites` framework. You'll need to set a ``SITE_ID``   in the settings - ``SITE_ID = 1`` will suffice.
 * ``cms`` and ``menus`` are the core django CMS modules.
-* `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django CMS's page and plugin tree
-  structures.
+* `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django CMS's page and plugin tree structures.
 
 django CMS installs `django CMS admin style <https://github.com/django-cms/djangocms-admin-style>`_.
 This provides some styling that helps make django CMS administration components easier to work with.
@@ -136,13 +171,12 @@ For example::
 ``LANGUAGE_CODE`` setting to ``en``.)
 
 
-********
-Database
-********
+Database settings
+=================
 
-django CMS requires a relational database backend. Each django CMS installation should have its own database.
+django CMS requires a relational database backend. Each django CMS installation should have its own database. If you're adding django CMS to an existing project, you will most likely already have your database configured.
 
-You can use SQLite, which is included in Python and doesn't need to be installed separately or configured further. You
+If not, you can use SQLite, which is included in Python and doesn't need to be installed separately or configured further. You
 are unlikely to be using that for a project in production, but it's ideal for development and exploration, especially
 as it is configured by default in a new Django project's :setting:`django:DATABASES`::
 
@@ -173,39 +207,12 @@ as it is configured by default in a new Django project's :setting:`django:DATABA
     for your chosen database backend.
 
 
-Database tables
-===============
+Migrating database tables
+=========================
 
 Now run migrations to create database tables for the new applications::
 
-    python manage.py migrate
-
-
-Admin user
-==========
-
-Create an admin superuser::
-
-    python manage.py createsuperuser
-
-
-*************************************
-Using ``cms check`` for configuration
-*************************************
-
-Once you have completed the minimum required set-up described above, you can use django CMS's built-in ``cms check``
-command to help you identify and install other components. Run::
-
-    python manage.py cms check
-
-This will check your configuration, your applications and your database, and report on any problems.
-
-..  note::
-
-    If key components are be missing, django CMS will be unable to run the ``cms check command`` and will simply raise
-    an error instead.
-
-After each of the steps below run ``cms check`` to verify that you have resolved that item in its checklist.
+    python -m manage migrate
 
 
 Sekizai
@@ -279,12 +286,8 @@ Also add ``'django.template.context_processors.i18n'`` if it's not already prese
 required however.
 
 
-******************************
-Further required configuration
-******************************
-
-URLs
-====
+Adding django CMS' URLs
+=======================
 
 In the project's ``urls.py``, add ``re_path(r'^', include('cms.urls'))`` to the ``urlpatterns`` list. It should come after
 other patterns, so that specific URLs for other applications can be detected first.
@@ -304,7 +307,7 @@ The django CMS project will now run, as you'll see if you launch it with
 
 ..  code-block:: bash
 
-    python manage.py runserver
+    python -m manage runserver
 
 
 You'll be able to reach it at http://localhost:8000/, and the admin at http://localhost:8000/admin/. You won't yet actually be able to
@@ -414,6 +417,23 @@ work in your ``urls.py``:
 (See the Django documentation for guidance on :doc:`serving media files in production
 <django:howto/static-files/index>`.)
 
+Using ``cms check`` for configuration
+=====================================
+
+Once you have completed the minimum required set-up described above, you can use django CMS's built-in ``cms check``
+command to help you identify and install other components. Run::
+
+    python -m manage cms check
+
+This will check your configuration, your applications and your database, and report on any problems.
+
+..  note::
+
+    If key components are be missing, django CMS will be unable to run the ``cms check command`` and will simply raise
+    an error instead.
+
+After each of the steps below run ``cms check`` to verify that you have resolved that item in its checklist.
+
 
 *************************************
 Adding content-handling functionality
@@ -442,8 +462,8 @@ To install::
     pip install django-filer
 
 A number of applications will be installed as dependencies. `Easy Thumbnails
-<https://github.com/SmileyChris/easy-thumbnails>`_ is required to create new versions of images in different sizes;
-`Django MPTT <https://github.com/django-mptt/django-mptt/>`_ manages the tree structure of the folders in Django Filer.
+<https://github.com/SmileyChris/easy-thumbnails>`_ is required to create new versions of images in different sizes; in older versions of Django Filer
+`Django MPTT <https://github.com/django-mptt/django-mptt/>`_ manages the tree structure of the folders in Django Filer - you will not need it if you use Django Filer version 3 and above.
 
 Pillow, the Python imaging library, will be installed. `Pillow <https://github.com/python-pillow/Pillow>`_ needs some
 system-level libraries - the `Pillow documentation <https://pillow.readthedocs.io>`_ describes in detail what is
@@ -453,7 +473,6 @@ Add::
 
     'filer',
     'easy_thumbnails',
-    'mptt',
 
 to ``INSTALLED_APPS``.
 
@@ -470,10 +489,10 @@ You also need to add::
 
 New database tables will need to be created for Django Filer and Easy Thumbnails, so run migrations::
 
-    python manage.py migrate filer
-    python manage.py migrate easy_thumbnails
+    python -m manage migrate filer
+    python -m manage migrate easy_thumbnails
 
-(or simply, ``python manage.py migrate``).
+(or simply, ``python -m manage migrate``).
 
 
 Django CMS CKEditor
@@ -489,7 +508,7 @@ Add ``djangocms_text_ckeditor`` to your ``INSTALLED_APPS``.
 
 Run migrations::
 
-    python manage.py migrate djangocms_text_ckeditor
+    python -m manage migrate djangocms_text_ckeditor
 
 
 Miscellaneous plugins
@@ -524,26 +543,11 @@ to ``INSTALLED_APPS``.
 
 Then run migrations::
 
-    python manage.py migrate
+    python -m manage migrate
 
 These and other plugins are described in more detail in :ref:`commonly-used-plugins`. More are listed
 plugins available on the `django CMS Marketplace <https://marketplace.django-cms.org/en/addons/>`_.
 
-
-******************
-Launch the project
-******************
-
-Start up the runserver::
-
-    python manage.py runserver
-
-and access the new site, which you should now be able to reach at ``http://localhost:8000``. Login if you haven't
-done so already.
-
-|it-works-cms|
-
-.. |it-works-cms| image:: ../images/it-works-cms.png
 
 **********
 Next steps
