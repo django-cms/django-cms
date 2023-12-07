@@ -7,7 +7,12 @@ from django.contrib.auth.views import redirect_to_login
 from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
-from django.utils.http import url_has_allowed_host_and_scheme
+
+try:
+    from django.utils.http import url_has_allowed_host_and_scheme  # Not available in Django 2.2
+except ImportError:
+    # Django 2.2 only
+    from django.utils.http import is_safe_url as url_has_allowed_host_and_scheme
 from django.utils.timezone import now
 from django.utils.translation import get_language_from_request
 from django.views.decorators.http import require_POST

@@ -51,7 +51,6 @@ DEFAULT_HELP_MENU_ITEMS = (
     (_("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
     (_("Documentation"), 'https://docs.django-cms.org/en/latest/'),
     (_("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/'),
-    (_("Support Forum"), 'https://discourse.django-cms.org/'),
     (_("Support Slack"), 'https://www.django-cms.org/slack'),
     (_("What's new"), 'https://www.django-cms.org/en/blog/'),
 )
@@ -551,7 +550,7 @@ class PageToolbar(CMSToolbar):
                 )
                 disabled = len(remove) == 1
                 for code, name in remove:
-                    url = add_url_parameters(translation_delete_url, language=code)
+                    url = add_url_parameters(translation_delete_url, delete_language=code)
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
