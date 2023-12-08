@@ -1,6 +1,7 @@
 from django.conf import settings
-from django.urls import NoReverseMatch, resolve, reverse
+from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 
+from cms.toolbar.utils import get_object_edit_url, get_object_for_language, get_object_preview_url
 from cms.utils import get_current_site, get_language_from_request
 from cms.utils.i18n import (
     force_language,
@@ -139,24 +140,41 @@ class DefaultLanguageChanger(object):
         with force_language(page_language):
             try:
                 view = resolve(self.request.path_info)
-            except:  # NOQA
+            except (NoReverseMatch, Resolver404):  # NOQA
                 view = None
-        if hasattr(self.request, 'toolbar') and self.request.toolbar.obj:
-            with force_language(lang):
-                try:
-                    return self.request.toolbar.obj.get_absolute_url()
-                except:  # NOQA
-                    pass
+        if (
+            hasattr(self.request, 'toolbar') and
+            self.request.toolbar.obj and
+            hasattr(self.request.toolbar.obj, "get_absolute_url")
+        ):
+            # Toolbar object
+            if self.request.toolbar.edit_mode_active:
+                lang_obj = get_object_for_language(self.request.toolbar.obj, lang, latest=True)
+                return '' if lang_obj is None else get_object_edit_url(lang_obj, language=lang)
+            if self.request.toolbar.preview_mode_active:
+                lang_obj = get_object_for_language(self.request.toolbar.obj, lang, latest=True)
+                return '' if lang_obj is None else get_object_preview_url(lang_obj, language=lang)
+            try:
+                # First see, if object can get language-specific absolute urls (like PageContent)
+                return self.request.toolbar.obj.get_absolute_url(language=lang)
+            except (TypeError, NoReverseMatch):
+                # Object's get_absolute_url does not accept language parameter, set the language
+                with force_language(lang):
+                    try:
+                        url = self.request.toolbar.obj.get_absolute_url()
+                    except NoReverseMatch:
+                        url = None
+                if url:
+                    return url
         elif view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
                 view_name = "%s:%s" % (view.namespace, view_name)
-            url = None
             with force_language(lang):
                 try:
                     url = reverse(view_name, args=view.args, kwargs=view.kwargs, current_app=view.app_name)
                 except NoReverseMatch:
-                    pass
+                    url = None
             if url:
                 return url
         return '%s%s' % (self.get_page_path(lang), self.app_path)

@@ -360,7 +360,8 @@ class BasicToolbar(CMSToolbar):
                         url = language_changer(code)
                     except NoReverseMatch:
                         url = DefaultLanguageChanger(self.request)(code)
-                    self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+                    if url:
+                        self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
             else:
                 # We do not have to check every time the toolbar is created
                 self._language_menu = True  # Pretend the language menu is already there
@@ -395,7 +396,7 @@ class PageToolbar(CMSToolbar):
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
-            self.page_change_permission = can_change_page(self.request)
+            self.page_change_permission = can_change_page(self.request) and self.toolbar.object_is_editable()
         return self.page_change_permission
 
     def in_apphook(self):
@@ -472,7 +473,6 @@ class PageToolbar(CMSToolbar):
             )
         else:
             can_change = False
-
         if can_change:
             language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
             if not language_menu:
@@ -508,9 +508,10 @@ class PageToolbar(CMSToolbar):
                 disabled = len(remove) == 1
                 for code, name in remove:
                     pagecontent = self.page.get_content_obj(code)
-                    translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
-                    url = add_url_parameters(translation_delete_url, language=code)
-                    remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
+                    if pagecontent:
+                        translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
+                        url = add_url_parameters(translation_delete_url, language=code)
+                        remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
                 copy_plugins_menu = language_menu.get_or_create_menu(
