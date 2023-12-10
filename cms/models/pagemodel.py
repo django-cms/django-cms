@@ -281,7 +281,12 @@ class Page(models.Model):
 
     def _get_path_sql_value(self, base_path=''):
         if base_path:
-            new_path = Concat(models.Value(base_path), models.Value('/'), models.F('slug'))
+            new_path = Concat(
+                models.Value(base_path),
+                models.Value('/'),
+                models.F('slug'),
+                output_field=models.CharField(),
+            )
         elif base_path is None:
             new_path = None
         else:
@@ -726,7 +731,7 @@ class Page(models.Model):
             self.update_languages(page_languages)
 
     def update_languages(self, languages):
-        languages = ",".join(languages)
+        languages = ",".join(set(languages))
         # Update current instance
         self.languages = languages
         # Commit. It's important to not call save()

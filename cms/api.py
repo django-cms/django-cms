@@ -3,7 +3,7 @@ Python APIs for creating CMS content. This is done in :mod:`cms.api` and not
 on the models and managers, because the direct API via models and managers is
 slightly counterintuitive for developers.
 
-Teh api for both Pages and Plugins has changed significantly since django CMS
+The api for both Pages and Plugins has changed significantly since django CMS
 Version 4.
 
 Also, the functions defined in this module do sanity checks on arguments.
@@ -81,7 +81,6 @@ def _verify_apphook(apphook, namespace):
         try:
             assert apphook.__class__ in [app.__class__ for app in apphook_pool.apps.values()]
         except AssertionError:
-            print(apphook_pool.apps.values())
             raise
         apphook_name = apphook.__class__.__name__
     elif hasattr(apphook, '__module__') and issubclass(apphook, CMSApp):
@@ -90,7 +89,6 @@ def _verify_apphook(apphook, namespace):
         try:
             assert apphook in apphook_pool.apps
         except AssertionError:
-            print(apphook_pool.apps.values())
             raise
         apphook_name = apphook
     else:

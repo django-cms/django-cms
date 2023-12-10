@@ -95,13 +95,13 @@ Will render to:
 
 .. code-block:: html+django
 
-    <template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-1"></tempate>
+    <template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-1"></template>
         <h3>Menu</h3>
         <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/another">another</a></li>
             [...]
-    <template class="cms-plugin cms-plugin-end cms-plugin-cms-page-changelist-1"></tempate>
+    <template class="cms-plugin cms-plugin-end cms-plugin-cms-page-changelist-1"></template>
 
 .. warning:
 

@@ -13,7 +13,7 @@ from django.utils.translation import (
 
 from cms.api import can_change_page
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import Page, PageType, Placeholder
+from cms.models import Page, PageContent, PageType, Placeholder
 from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
 from cms.toolbar.utils import (
     get_object_edit_url,
@@ -360,7 +360,8 @@ class BasicToolbar(CMSToolbar):
                         url = language_changer(code)
                     except NoReverseMatch:
                         url = DefaultLanguageChanger(self.request)(code)
-                    self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+                    if url:
+                        self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
             else:
                 # We do not have to check every time the toolbar is created
                 self._language_menu = True  # Pretend the language menu is already there
@@ -383,12 +384,19 @@ class PageToolbar(CMSToolbar):
     watch_models = [Page, PageType]
 
     def get_page_content(self):
+        if not getattr(self, "page", None):
+            # No page, no page content
+            return None
+        if hasattr(self, "obj") and isinstance(self.obj, PageContent):
+            # Toolbar object already set (e.g., in edit or preview mode)
+            return self.obj
+        # Get from db
         page_content = self.page.get_content_obj(language=self.current_lang, fallback=False)
         return page_content or None
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
-            self.page_change_permission = can_change_page(self.request)
+            self.page_change_permission = can_change_page(self.request) and self.toolbar.object_is_editable()
         return self.page_change_permission
 
     def in_apphook(self):
@@ -428,11 +436,28 @@ class PageToolbar(CMSToolbar):
         # page, if DEBUG == False this could cause a 404
         return reverse('pages-root')
 
-    # Populate
+    @property
+    def title(self):
+        import warnings
 
+        warnings.warn(
+            "Title property of PageToolbar will be removed. Use page_content property instead.",
+            DeprecationWarning, stacklevel=2)
+        return self.page_content
+
+    @title.setter
+    def title(self, page_content):
+        import warnings
+
+        warnings.warn(
+            "Title property of PageToolbar will be removed. Use page_content property instead.",
+            DeprecationWarning, stacklevel=2)
+        self.page_content = page_content
+
+    # Populate
     def populate(self):
         self.page = self.request.current_page
-        self.title = self.get_page_content() if self.page else None
+        self.page_content = self.get_page_content()
         self.permissions_activated = get_cms_setting('PERMISSION')
         self.change_admin_menu()
         self.add_page_menu()
@@ -448,7 +473,6 @@ class PageToolbar(CMSToolbar):
             )
         else:
             can_change = False
-
         if can_change:
             language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
             if not language_menu:
@@ -484,9 +508,10 @@ class PageToolbar(CMSToolbar):
                 disabled = len(remove) == 1
                 for code, name in remove:
                     pagecontent = self.page.get_content_obj(code)
-                    translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
-                    url = add_url_parameters(translation_delete_url, language=code)
-                    remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
+                    if pagecontent:
+                        translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
+                        url = add_url_parameters(translation_delete_url, language=code)
+                        remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
                 copy_plugins_menu = language_menu.get_or_create_menu(
@@ -526,7 +551,7 @@ class PageToolbar(CMSToolbar):
             self._changed_admin_menu = True
 
     def add_page_menu(self):
-        if self.page and self.title:
+        if self.page and self.page_content:
             edit_mode = self.toolbar.edit_mode_active
             refresh = self.toolbar.REFRESH_PAGE
             can_change = user_can_change_page(
@@ -548,8 +573,8 @@ class PageToolbar(CMSToolbar):
 
             add_page_url = admin_reverse('cms_pagecontent_add')
             advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
-            page_settings_url = admin_reverse('cms_pagecontent_change', args=(self.title.pk,))
-            duplicate_page_url = admin_reverse('cms_pagecontent_duplicate', args=[self.title.pk])
+            page_settings_url = admin_reverse('cms_pagecontent_change', args=(self.page_content.pk,))
+            duplicate_page_url = admin_reverse('cms_pagecontent_duplicate', args=[self.page_content.pk])
 
             can_add_root_page = page_permissions.user_can_add_page(
                 user=self.request.user,
@@ -600,8 +625,11 @@ class PageToolbar(CMSToolbar):
 
             # page edit
             with force_language(self.current_lang):
-                page_edit_url = get_object_edit_url(self.title) if self.title else ''
-                current_page_menu.add_link_item(_('Edit this Page'), disabled=edit_mode, url=page_edit_url)
+                disabled = (
+                    edit_mode or not self.toolbar.object_is_editable()
+                )
+                page_edit_url = get_object_edit_url(self.page_content) if self.page_content else ''
+                current_page_menu.add_link_item(_('Edit this Page'), disabled=disabled, url=page_edit_url)
 
             # page settings
             page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.request_language)
@@ -617,7 +645,7 @@ class PageToolbar(CMSToolbar):
 
             # templates menu
             if edit_mode:
-                action = admin_reverse('cms_pagecontent_change_template', args=(self.title.pk,))
+                action = admin_reverse('cms_pagecontent_change_template', args=(self.page_content.pk,))
 
                 if can_change_advanced:
                     templates_menu = current_page_menu.get_or_create_menu(
@@ -627,16 +655,16 @@ class PageToolbar(CMSToolbar):
                     )
 
                     for path, name in get_cms_setting('TEMPLATES'):
-                        active = self.page.template == path
+                        active = self.page_content.template == path
                         if path == TEMPLATE_INHERITANCE_MAGIC:
                             templates_menu.add_break(TEMPLATE_MENU_BREAK)
                         templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
                                                      on_success=refresh)
 
             # navigation toggle
-            in_navigation = self.title.in_navigation
+            in_navigation = self.page_content.in_navigation
             nav_title = _('Hide in navigation') if in_navigation else _('Display in navigation')
-            nav_action = admin_reverse('cms_pagecontent_change_innavigation', args=(self.title.pk,))
+            nav_action = admin_reverse('cms_pagecontent_change_innavigation', args=(self.page_content.pk,))
             current_page_menu.add_ajax_item(
                 nav_title,
                 action=nav_action,

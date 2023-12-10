@@ -61,15 +61,30 @@ class CheckTests(CheckAssertMixin, TestCase):
         with self.settings(INSTALLED_APPS=apps):
             self.assertCheck(False, errors=1)
 
+    def test_no_django_i18n_context_processor(self):
+        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
+            'sekizai.context_processors.sekizai',
+            'cms.context_processors.cms_settings'
+        ]
+        with self.settings(**override):
+            self.assertCheck(False, errors=1)
+
     def test_no_cms_settings_context_processor(self):
         override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = ['sekizai.context_processors.sekizai']
+        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
+            'sekizai.context_processors.sekizai',
+            'django.template.context_processors.i18n',
+        ]
         with self.settings(**override):
             self.assertCheck(False, errors=1)
 
     def test_no_sekizai_template_context_processor(self):
         override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = ['cms.context_processors.cms_settings']
+        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
+            'cms.context_processors.cms_settings',
+            'django.template.context_processors.i18n',
+        ]
         with self.settings(**override):
             self.assertCheck(False, errors=2)
 

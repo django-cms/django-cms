@@ -372,10 +372,10 @@ class PageAdmin(admin.ModelAdmin):
         )
 
         # This is bad and I should feel bad.
-        if 'placeholder' in perms_needed:
+        if _('placeholder') in perms_needed:
             perms_needed.remove('placeholder')
 
-        if 'page content' in perms_needed:
+        if _('page content') in perms_needed:
             perms_needed.remove('page content')
 
         if request.POST and not protected:  # The user has confirmed the deletion.

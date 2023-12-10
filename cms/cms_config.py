@@ -15,7 +15,7 @@ logger = getLogger(__name__)
 class CMSCoreConfig(CMSAppConfig):
     cms_enabled = True
     cms_wizards = [cms_page_wizard, cms_subpage_wizard]
-    cms_toolbar_enabled_models = [(PageContent, render_pagecontent)]
+    cms_toolbar_enabled_models = [(PageContent, render_pagecontent, "page")]
 
 
 class CMSCoreExtensions(CMSAppExtension):
@@ -23,6 +23,7 @@ class CMSCoreExtensions(CMSAppExtension):
     def __init__(self):
         self.wizards = {}
         self.toolbar_enabled_models = {}
+        self.model_groupers = {}
         self.toolbar_mixins = []
 
     def configure_wizards(self, cms_config):
@@ -49,13 +50,15 @@ class CMSCoreExtensions(CMSAppExtension):
     def configure_toolbar_enabled_models(self, cms_config):
         if not isinstance(cms_config.cms_toolbar_enabled_models, Iterable):
             raise ImproperlyConfigured("cms_toolbar_enabled_models must be iterable")
-        for model, render_func in cms_config.cms_toolbar_enabled_models:
+        for model, render_func, *grouper in cms_config.cms_toolbar_enabled_models:
             if model in self.toolbar_enabled_models:
                 logger.warning(
                     "Model {} already registered for frontend rendering".format(model),
                 )
             else:
                 self.toolbar_enabled_models[model] = render_func
+                if grouper:
+                    self.model_groupers[model] = grouper[0]
 
     def configure_toolbar_mixin(self, cms_config):
         if not issubclass(cms_config.cms_toolbar_mixin, object):
