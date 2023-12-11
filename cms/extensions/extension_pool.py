@@ -58,10 +58,10 @@ class ExtensionPool:
 
     def _copy_content_extensions(self, source_page, target_page, language):
         source_content = source_page.pagecontent_set(manager="admin_manager").current_content(language=language).get()
-        target_title = target_page.pagecontent_set(manager="admin_manager").current_content(language=language).get()
+        target_content = target_page.pagecontent_set(manager="admin_manager").current_content(language=language).get()
         for extension in self.page_content_extensions:
             for instance in extension.objects.filter(extended_object=source_content):
-                instance.copy(target_title, language)
+                instance.copy(target_content, language)
 
     def copy_extensions(self, source_page, target_page, languages=None):
         if not languages:
