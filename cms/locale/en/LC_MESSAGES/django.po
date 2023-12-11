@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-25 14:47+0000\n"
+"POT-Creation-Date: 2023-12-11 19:18+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -205,6 +205,12 @@ msgstr "Advanced Settings"
 msgid "The page is not eligible to be home."
 msgstr "The page is not eligible to be home."
 
+msgid "placeholder"
+msgstr "placeholder"
+
+msgid "page content"
+msgstr "page content"
+
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "The %(name)s \"%(obj)s\" was deleted successfully."
@@ -331,9 +337,6 @@ msgstr "You do not have permission to clear this placeholder"
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "The placeholder \"%(obj)s\" was cleared successfully."
-
-msgid "placeholder"
-msgstr "placeholder"
 
 msgid "Page permissions"
 msgstr "Page permissions"
@@ -697,9 +700,6 @@ msgstr "redirect"
 msgid "The template used to render the content."
 msgstr "The template used to render the content."
 
-msgid "page content"
-msgstr "page content"
-
 msgid "page contents"
 msgstr "page contents"
 
@@ -745,13 +745,6 @@ msgstr "frontend view restriction"
 
 msgid "Please select user or group."
 msgstr "Please select user or group."
-
-msgid ""
-"Users can't publish a page without permissions to change the page. Edit "
-"permissions required."
-msgstr ""
-"Users can't publish a page without permissions to change the page. Edit "
-"permissions required."
 
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
@@ -1598,6 +1591,9 @@ msgstr "Change Category"
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Thanks for spending some quality time with the Web site today."
 
+msgid "Lazy"
+msgstr ""
+
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Inherit the template of the nearest ancestor"
 
@@ -1649,6 +1645,13 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#~ msgid ""
+#~ "Users can't publish a page without permissions to change the page. Edit "
+#~ "permissions required."
+#~ msgstr ""
+#~ "Users can't publish a page without permissions to change the page. Edit "
+#~ "permissions required."
 
 #~ msgid "Slug must not be empty."
 #~ msgstr "Slug must not be empty."
