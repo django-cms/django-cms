@@ -3,17 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Fabian Braun <fsbraun@gmx.de>, 2023
 # Christofer Huynh <christofer.huynh@gmail.com>, 2023
 # joelbitar <joel@joelbitar.se>, 2023
+# Fabian Braun <fsbraun@gmx.de>, 2023
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-22 12:50+0200\n"
+"POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: joelbitar <joel@joelbitar.se>, 2023\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
 "Language-Team: Swedish (https://app.transifex.com/divio/teams/58664/sv/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1607,3 +1607,6 @@ msgstr "Skapa en ny %s instans."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr ""
+
+#~ msgid "Slug must not be empty."
+#~ msgstr "URL-rubrik kan inte vara tom"

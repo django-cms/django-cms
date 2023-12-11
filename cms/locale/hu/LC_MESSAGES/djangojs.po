@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # fazekasda <fazekasda@gmail.com>, 2012
 # fazekasda <fazekasda@gmail.com>, 2012
 # Szabo L. <lortechnet@gmail.com>, 2013
@@ -11,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 16:56+0000\n"
+"POT-Creation-Date: 2022-11-05 20:40+0100\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Szabo L. <lortechnet@gmail.com>, 2013\n"
 "Language-Team: Hungarian (http://app.transifex.com/divio/django-cms/language/hu/)\n"
@@ -21,13 +20,10 @@ msgstr ""
 "Language: hu\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "pathname"
+msgid "/"
 msgstr ""
 
-msgid "urnpath"
-msgstr ""
-
-msgid "reserved"
+msgid ":"
 msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"

@@ -1,4 +1,4 @@
-4.1.0rc4 (unpublished)
+4.1.0rc5 (unpublished)
 ======================
 
 Features:
@@ -20,6 +20,9 @@ Features:
 
 Bug Fixes:
 ----------
+* Remove `can_publish` permission from django CMS 4 core (#7635) (807a87b1d) -- Fabian Braun
+* Release script discards changes in compiled mo files (#7636) (a2721bf5b) -- Fabian Braun
+* Pull transifex strings from the root directory (3581399f6) -- Fabian Braun
 * Open new plugin window in language of toolbar not of page (#7632) (ac74c2127) -- Fabian Braun
 * Update transifex source file (#7629) (06ecf3a8e) -- Fabian Braun
 * Remove publish/draft reference from grouper admin message (fcc2f7ad5) -- Fabian Braun
@@ -53,13 +56,13 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 191 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 201 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Adam Murray (2 pull requests)
 * Aiky30 (35 pull requests)
 * Andrew Aikman (1 pull request)
 * Chematronix (1 pull request)
-* Fabian Braun (73 pull requests)
+* Fabian Braun (83 pull requests)
 * Github Release Action (4 pull requests)
 * Jacob Rief (2 pull requests)
 * Jonathan Sundqvist (7 pull requests)
@@ -76,6 +79,7 @@ This release includes 191 pull requests, and was created with the help of the fo
 * anirbanlahiri-fidelity (1 pull request)
 * monikasulik (3 pull requests)
 
+With the review help of the following contributors:
 
 * Adam Murray
 * Aiky30
@@ -86,6 +90,7 @@ This release includes 191 pull requests, and was created with the help of the fo
 * Florian Delizy
 * Github Release Action
 * Iacopo Spalletti
+* Jacob Rief
 * Krzysztof Socha
 * Marco Bonetti
 * Mark Walker
@@ -94,7 +99,11 @@ This release includes 191 pull requests, and was created with the help of the fo
 * Raffaele Salmaso
 * Stuart Axon
 * Vinit Kumar
+* Will Hoey
+* dwintergruen
 * pajowu
+* wfehr
+* wintergruen
 * Éric Araujo
 
 Thanks to all contributors for their efforts!
