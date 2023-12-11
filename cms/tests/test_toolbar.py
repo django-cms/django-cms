@@ -50,6 +50,7 @@ from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
     add_live_url_querystring_param,
     get_object_edit_url,
+    get_object_for_language,
     get_object_preview_url,
     get_object_structure_url,
 )
@@ -690,20 +691,26 @@ class ToolbarTests(ToolbarTestBase):
         """
         user = self.get_staff()
         page = create_page('test', 'nav_playground.html', 'en')
+        for code, verbose in get_language_tuple():
+            if code != "en":
+                create_page_content(code, f"test {code}", page)
         page_content = self.get_page_title_obj(page)
         edit_url = get_object_edit_url(page_content)
         en_request = self.get_page_request(None, user, edit_url)
         toolbar = CMSToolbar(en_request)
+        toolbar.set_object(page_content)
         toolbar.populated = False
         toolbar.populate()
         toolbar.populated = False
         toolbar.populate()
         toolbar.populated = False
         toolbar.post_template_populate()
+        get_object_for_language(page_content, "de")
         admin = toolbar.get_left_items()[0]
         lang = toolbar.get_left_items()[1]
         self.assertEqual(len(admin.get_items()), 15)
         self.assertEqual(len(lang.get_items()), len(get_language_tuple(1)))
+        self.assertIn(edit_url, [item.url for item in lang.get_items()])  # Edit urls returned
 
     @override_settings(CMS_PLACEHOLDER_CONF={'col_left': {'name': 'PPPP'}})
     def test_placeholder_name(self):
@@ -2092,6 +2099,35 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         self.assertEqual(preview_url, expected_preview_url)
         self.assertEqual(edit_url.count("?"), 0)
         self.assertEqual(preview_url.count("?"), 0)
+
+    def test_get_object_for_language_one_language(self):
+        page = create_page('Test', 'col_two.html', 'en')
+        page_content = self.get_page_title_obj(page, "en")
+
+        self.assertEqual(page_content, get_object_for_language(page_content, "en"))
+        self.assertTrue(not hasattr(page_content, "_sibling_objects_for_language_cache"))
+        self.assertIsNone(get_object_for_language(page_content, "de"))
+        self.assertTrue(hasattr(page_content, "_sibling_objects_for_language_cache"))
+        self.assertEqual(len(page_content._sibling_objects_for_language_cache), 1)
+
+    def test_get_object_for_language_multiple_languages(self):
+        page = create_page('Test', 'col_two.html', 'en')
+        # Additional pages to ensure not a page content of another page is returned
+        for code, verbose in get_language_tuple():
+            create_page(f"Not this page ({verbose})", "col_two.html", code)
+
+        page_content = {
+            "en": self.get_page_title_obj(page, "en")
+        }
+        for code, verbose in get_language_tuple():
+            if code != "en":
+                page_content[code] = create_page_content(code, verbose, page)
+
+        self.assertEqual(page_content["en"], get_object_for_language(page_content["en"], "en"))
+        self.assertTrue(not hasattr(page_content["en"], "_sibling_objects_for_language_cache"))
+        self.assertEqual(get_object_for_language(page_content["en"], "de"), page_content["de"])
+        self.assertTrue(hasattr(page_content["en"], "_sibling_objects_for_language_cache"))
+        self.assertEqual(len(page_content["en"]._sibling_objects_for_language_cache), len(get_language_tuple()))
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):

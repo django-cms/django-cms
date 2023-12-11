@@ -1,7 +1,11 @@
 import json
 from collections import defaultdict, deque
+from typing import Optional
 
+from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
+from django.db import models
+from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
     get_language,
@@ -145,7 +149,13 @@ def add_live_url_querystring_param(obj, url, language=None):
     return url
 
 
-def get_object_edit_url(obj, language=None):
+def get_object_edit_url(obj: models.Model, language: str = None) -> str:
+    """
+    Returns the url of the edit endpoint for the given object. The object must be frontend-editable
+    and registered as such with cms.
+
+    If the object has a language property, the language parameter is ignored.
+    """
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
@@ -159,7 +169,13 @@ def get_object_edit_url(obj, language=None):
     return url
 
 
-def get_object_preview_url(obj, language=None):
+def get_object_preview_url(obj:models.Model, language: str = None) -> str:
+    """
+    Returns the url of the preview endpoint for the given object. The object must be frontend-editable
+    and registered as such with cms.
+
+    If the object has a language property, the language parameter is ignored.
+    """
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
@@ -173,7 +189,14 @@ def get_object_preview_url(obj, language=None):
     return url
 
 
-def get_object_structure_url(obj, language=None):
+def get_object_structure_url(obj: models.Model, language: str = None) -> str:
+    """
+    Returns the url of the structure endpoint for the given object. The object must be frontend-editable
+    and registered as such with cms.
+
+    If the object has a language property, the language parameter is ignored.
+    """
+
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
@@ -182,3 +205,40 @@ def get_object_structure_url(obj, language=None):
 
     with force_language(language):
         return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+
+def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> Optional[models.Model]:
+    """
+    Retrieves the correct content object for the target language. The object must be frontend-editable
+    and registered as such with cms.
+
+    Two cases have to be distinguished:
+
+    1. **Object has a language property:** If the language of the passed object is different,
+       sibling objects are retrieved from the database and cached in the object passed.
+    2. **Object has no language property:** The placeholders of the object contain the different
+       language content. The object itself is returned
+    """
+    if getattr(obj, "language", language) == language:
+        # Object does not have language field or language is requested language
+        # Return object itself
+        return obj
+    # Does the object have a cache with sister objects
+    cached_object = getattr(obj, "_sibling_objects_for_language_cache", {})
+    if cached_object:
+        return cached_object.get(language)
+
+    extension = apps.get_app_config('cms').cms_extension
+    model = obj.__class__
+    field = extension.model_groupers.get(model)
+    if not field:
+        # Cannot infer sister object if grouper field is unknown
+        return None
+    # Grouper model not registered or does not have a get_content_obj method,
+    # or get_content_obj does not accept language parameter
+    # Now query db
+    grouper_filter = {field: getattr(obj, field)}
+    qs = model.admin_manager.latest_content() if latest and hasattr(model, "admin_manager") else model.objects
+    obj._sibling_objects_for_language_cache = {
+        result.language: result for result in qs.filter(**grouper_filter)
+    }
+    return obj._sibling_objects_for_language_cache.get(language)
