@@ -213,7 +213,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         #
         language_fun = ('en', 'de', 'it', 'de-formal')
         # symmetric and asymmetric plugin numbers in target placeholder, source placeholder
-        # (1, 10) One plugin in the target palceholder, 10 plugins to be moved
+        # (1, 10) One plugin in the target placeholder, 10 plugins to be moved
         # (5, 5) Same size situation
         # (10, 1) Ten plugins in the target placeholder, 1 plugin to be moved
         for n1, n2 in ((1, 10), (10, 1), (5, 5)):
@@ -252,7 +252,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             )
             # The result in theory:
             # Parent Target Placeholder
-            #   Parent Source Palceholder         <-- Moved plugin parent
+            #   Parent Source Placeholder         <-- Moved plugin parent
             #     Children Source Placeholder     <-- Moved plugin children
             #   Children Target Placeholder
             left = (
@@ -880,7 +880,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         # check for en
         page_content_en = self.get_page_title_obj(page)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Placeholder.objects.get_for_obj(page_content_en),
             page_content_en.get_placeholders(),
             transform=lambda x: x,
@@ -889,7 +889,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         # check for another language = de
         page_content_de = create_page_content('de', 'test page de', page)
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             Placeholder.objects.get_for_obj(page_content_de),
             page_content_de.get_placeholders(),
             transform=lambda x: x,
@@ -983,7 +983,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         with self.login_user_context(self.get_superuser()):
             self.client.get(get_object_edit_url(poll))
 
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             poll.placeholders.all(),
             Placeholder.objects.get_for_obj(poll),
             transform=lambda x: x,

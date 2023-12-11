@@ -41,7 +41,7 @@ class classproperty():
 
 def normalize_name(name):
     """
-    Converts camel-case style names into underscore seperated words. Example::
+    Converts camel-case style names into underscore separated words. Example::
 
         >>> normalize_name('oneTwoThree')
         'one_two_three'

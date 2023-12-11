@@ -32,7 +32,7 @@ from cms.page_rendering import (
     _render_welcome_page,
     render_pagecontent,
 )
-from cms.toolbar.utils import get_toolbar_from_request
+from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
@@ -256,6 +256,8 @@ def render_object_structure(request, content_type_id, object_id):
         'object': content_type_obj,
         'cms_toolbar': request.toolbar,
     }
+    if isinstance(content_type_obj, PageContent):
+        request.current_page = content_type_obj.page
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)
@@ -287,7 +289,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     absolute_url = content_type_obj.get_absolute_url()
                     from cms.toolbar.toolbar import CMSToolbar
                     request.toolbar = CMSToolbar(request, request_path=absolute_url)
-                    # Resovle the apphook's url to get its view function
+                    # Resolve the apphook's url to get its view function
                     view_func, args, kwargs = resolve(absolute_url)
                     return view_func(request, *args, **kwargs)
                 except Resolver404:
@@ -305,6 +307,11 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
+
+    if require_editable and not toolbar.object_is_editable():
+        # If not editable, switch from edit to preview endpoint
+        return HttpResponseRedirect(get_object_preview_url(content_type_obj))
+
     render_func = extension.toolbar_enabled_models[model]
     return render_func(request, content_type_obj)
 

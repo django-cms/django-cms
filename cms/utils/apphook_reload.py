@@ -3,7 +3,7 @@ import sys
 import uuid
 
 # Py2 and Py3 compatible reload
-from imp import reload
+from importlib import reload
 from threading import local
 
 from django.conf import settings

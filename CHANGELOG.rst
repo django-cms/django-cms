@@ -936,7 +936,7 @@ Thanks to all contributors for their efforts!
 - Fix issue on django >= 1.6 with page form fields.
 - Resolve jQuery namespace issues in admin page tree and changeform
 - Fix issues for PageField in Firefox/Safari
-- Fix some Python 3.4 compatibility issue when using proxy modles
+- Fix some Python 3.4 compatibility issue when using proxy models
 - Fix corner case in plugin copy
 - Documentation fixes
 - Minor code cleanups

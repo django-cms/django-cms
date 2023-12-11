@@ -13,7 +13,7 @@ from cms.admin.forms import (
     ViewRestrictionInlineAdminForm,
 )
 from cms.api import assign_user_to_page, create_page, create_page_content
-from cms.forms.fields import PageSelectFormField, SuperLazyIterator
+from cms.forms.fields import LazyChoiceField, PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import (
     get_page_choices,
     get_site_choices,
@@ -246,6 +246,17 @@ class FormsTestCase(CMSTestCase):
 
         self.assertEqual(normal_result, list(lazy_result))
 
+    def test_lazy_choice_field_behaves_properly(self):
+        """Ensure LazyChoiceField is really lazy"""
+        choices_called = False
+        def get_choices():
+            nonlocal choices_called
+            choices_called = True
+            return ("", "-----"),
+
+        LazyChoiceField(choices=SuperLazyIterator(get_choices))
+        self.assertFalse(choices_called, "Lazy choice function called")
+
 
 class PermissionFormTestCase(CMSTestCase):
 
@@ -353,3 +364,13 @@ class PermissionFormTestCase(CMSTestCase):
         form._current_user = user
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
+
+
+class FieldsTestCase(CMSTestCase):
+    def test_lazy_choice_field(self):
+        """LazyChoiceField does not resolve lazy choice objects"""
+        from django.utils.functional import Promise
+        from django.utils.translation import gettext_lazy as _
+
+        field = LazyChoiceField(choices=_("Lazy"))
+        self.assertIsInstance(field.choices, Promise)

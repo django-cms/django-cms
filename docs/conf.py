@@ -127,25 +127,16 @@ todo_include_todos = True
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-try:
-    import divio_docs_theme
-    html_theme = 'divio_docs_theme'
-    html_theme_path = [divio_docs_theme.get_html_theme_path()]
-    html_theme_options = {
-        'show_cloud_banner': True,
-        'cloud_banner_markup': """
-            <div class="divio-cloud">
-                <span class="divio-cloud-caption">The django CMS Association</span>
-                <p>The django CMS Association is a non-profit organisation that funds and
-                steers the development of django CMS, and nurtures its world-wide
-                community of developers and users.</p>
-                <a class="btn-neutral divio-cloud-btn" target="_blank" href="https://www.django-cms.org/en/about-us/">Join us</a>
-            </div>
-        """,
-    }
-except:  # NOQA
-    html_theme = 'default'
 
+try:
+    import furo
+
+    html_theme = 'furo'
+    html_theme_options = {
+        "navigation_with_keys": True,
+    }
+except ImportError:
+    html_theme = 'default'
 
 show_cloud_banner = True
 

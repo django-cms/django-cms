@@ -7,6 +7,7 @@ from django.utils.encoding import force_str
 from django.utils.functional import Promise
 
 from cms.constants import LEFT, REFRESH_PAGE, RIGHT, URL_CHANGE
+from cms.utils.compat import DJANGO_4_2
 
 
 class ItemSearchResult():
@@ -41,11 +42,18 @@ class ItemSearchResult():
         return self.index
 
 
-def may_be_lazy(thing):
-    if isinstance(thing, Promise):
-        return thing._proxy____args[0]
-    else:
-        return thing
+if DJANGO_4_2:
+    def may_be_lazy(thing):
+        if isinstance(thing, Promise):
+            return thing._proxy____args[0]
+        else:
+            return thing
+else:
+    def may_be_lazy(thing):
+        if isinstance(thing, Promise):
+            return thing._args[0]
+        else:
+            return thing
 
 
 class ToolbarAPIMixin(metaclass=ABCMeta):
@@ -107,7 +115,7 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
         return item
 
     def find_items(self, item_type, **attributes):
-        """Returns a list of :class:`ItemSearchResult` objects matching all items of ``item_type``
+        """Returns a list of :class:`~cms.toolbar.items.ItemSearchResult` objects matching all items of ``item_type``
         (e.g. ``LinkItem``)."""
         results = []
         attr_items = attributes.items()
@@ -118,8 +126,8 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
         return results
 
     def find_first(self, item_type, **attributes):
-        """Returns the first :class:`ItemSearchResult` that matches the search, or ``None``. The
-        search strategy is the same as in :meth:`find_items`. The return value of this method is
+        """Returns the first :class:`~cms.toolbar.items.ItemSearchResult` that matches the search, or ``None``.
+        The search strategy is the same as in :meth:`find_items`. The return value of this method is
         safe to use as the :option:`position` argument of the various APIs to add items."""
         try:
             return self.find_items(item_type, **attributes)[0]
@@ -155,7 +163,7 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
 
     def add_sideframe_item(self, name, url, active=False, disabled=False,
                            extra_classes=None, on_close=None, side=LEFT, position=None):
-        """Adds a :class:`SideframeItem` that opens ``url`` in the sideframe and returns it."""
+        """Adds a :class:`~cms.toolbar.items.SideframeItem` that opens ``url`` in the sideframe and returns it."""
 
         item = SideframeItem(
             name, url,
@@ -170,7 +178,7 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
 
     def add_modal_item(self, name, url, active=False, disabled=False,
                        extra_classes=None, on_close=REFRESH_PAGE, side=LEFT, position=None):
-        """Similar to :meth:`add_sideframe_item`, but adds a :class:`ModalItem` that opens the
+        """Similar to :meth:`add_sideframe_item`, but adds a :class:`~cms.toolbar.items.ModalItem` that opens the
         ``url`` in a modal dialog instead of the sideframe, and returns it."""
 
         item = ModalItem(
@@ -186,7 +194,7 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
 
     def add_link_item(self, name, url, active=False, disabled=False,
                       extra_classes=None, side=LEFT, position=None):
-        """Adds a :class:`LinkItem` that opens ``url``, and returns it."""
+        """Adds a :class:`~cms.toolbar.items.LinkItem` that opens ``url``, and returns it."""
 
         item = LinkItem(
             name, url,
@@ -201,7 +209,7 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
     def add_ajax_item(self, name, action, active=False, disabled=False,
                       extra_classes=None, data=None, question=None,
                       side=LEFT, position=None, on_success=None, method='POST'):
-        """Adds :class:`AjaxItem` that sends a POST request to ``action`` with ``data``, and returns
+        """Adds :class:`~cms.toolbar.items.AjaxItem` that sends a POST request to ``action`` with ``data``, and returns
         it. ``data`` should be ``None`` or a dictionary. The CSRF token will automatically be added
         to the item.
 
@@ -362,6 +370,11 @@ class LinkItem(BaseItem):
 
 
 class FrameItem(BaseItem):
+    """
+    Base class for :class:`~cms.toolbar.items.ModalItem` and :class:`~cms.toolbar.items.SideframeItem`.
+    Frame items have three dots besides their name indicating that some frame or dialog will open
+    when selected.
+    """
     # Be sure to define the correct template
 
     def __init__(self, name, url, active=False, disabled=False,
