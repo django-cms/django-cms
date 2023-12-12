@@ -1,4 +1,4 @@
-4.1.0rc4 (unpublished)
+4.1.0rc5 (unpublished)
 ======================
 
 Features:
@@ -53,13 +53,13 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 191 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 201 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Adam Murray (2 pull requests)
 * Aiky30 (35 pull requests)
 * Andrew Aikman (1 pull request)
 * Chematronix (1 pull request)
-* Fabian Braun (73 pull requests)
+* Fabian Braun (83 pull requests)
 * Github Release Action (4 pull requests)
 * Jacob Rief (2 pull requests)
 * Jonathan Sundqvist (7 pull requests)
@@ -76,6 +76,7 @@ This release includes 191 pull requests, and was created with the help of the fo
 * anirbanlahiri-fidelity (1 pull request)
 * monikasulik (3 pull requests)
 
+With the review help of the following contributors:
 
 * Adam Murray
 * Aiky30
@@ -86,6 +87,7 @@ This release includes 191 pull requests, and was created with the help of the fo
 * Florian Delizy
 * Github Release Action
 * Iacopo Spalletti
+* Jacob Rief
 * Krzysztof Socha
 * Marco Bonetti
 * Mark Walker
@@ -94,7 +96,11 @@ This release includes 191 pull requests, and was created with the help of the fo
 * Raffaele Salmaso
 * Stuart Axon
 * Vinit Kumar
+* Will Hoey
+* dwintergruen
 * pajowu
+* wfehr
+* wintergruen
 * Éric Araujo
 
 Thanks to all contributors for their efforts!
