@@ -41,17 +41,28 @@ This is a very basic example of an apphook for a django CMS application:
         def get_urls(self, page=None, language=None, **kwargs):
             return ["polls.urls"]
 
+Alternatively, you can also specify the URL patterns directly, for instance:
+
+ .. code-block:: python
+     from django.urls import path
+     from polls import views
+     ...
+     class PollsApphook(CMSApp):
+         ...
+         def get_urls(self, page=None, language=None, **kwargs):
+             return [
+                 path('<int:pk>/results/', views.ResultsView.as_view(), name='results'),
+                 path('<int:pk>/vote/', views.vote, name='vote'),
+                 path('<int:pk>/', views.DetailView.as_view(), name='detail'),
+                 path('', views.IndexView.as_view(), name='index'),
+             ]
+
 
 In this ``PollsApphook`` class, we have done several key things:
 
-* ``app_name`` attribute gives the system a unique way to refer to the apphook. You can see from
-  `Django Polls <https://github.com/divio/django-polls/blob/master/polls/urls.py#L6>`_ that the
-  application namespace ``polls`` is hard-coded into the application, so this attribute **must**
-  also be ``polls``.
-* ``name`` is a human-readable name, and will be displayed to the admin user.
-* ``get_urls()`` method is what actually hooks the application in, returning a
-  list of URL configurations that will be made active wherever the apphook is used - in this case,
-  it will use the ``urls.py`` from ``polls``.
+ * ``app_name`` this optional attribute gives the system a unique way to refer to the apphook. It is used the create a reverse mapping for the URL's namespace.
+ * ``name`` is a human-readable name, and will be displayed to the user in the *Advanced settings* of the CMS pages attaching to this apphook.
+ * ``get_urls()`` method is what actually hooks the application in, returning a list of URL configurations that will be made active wherever the apphook is used - in this case, it will either use the ``urls.py`` from ``polls``, or declare its own list of URL patterns.
 
 
 Remove the old ``polls`` entry from the project's ``urls.py``
@@ -59,7 +70,7 @@ Remove the old ``polls`` entry from the project's ``urls.py``
 
 You must now remove the entry for the Polls application::
 
-    re_path(r'^polls/', include('polls.urls', namespace='polls'))
+    path('polls/', include('polls.urls', namespace='polls'))
 
 from your project's ``urls.py``.
 
@@ -73,10 +84,9 @@ receive a warning in the logs::
 Restart the runserver
 =====================
 
-**Restart the runserver**. This is necessary because we have created a new file containing Python
-code that won't be loaded until the server restarts. You only have to do this the first time the
-new file has been created.
+**Restart the runserver**. This is necessary because we have created a new file containing Python code that won't be loaded until the server restarts. You have to restart the server each time you  want to apply a modification made to this file or any views attached to thereof.
 
+Restarting the server after a change can be prevented, if the :ref:`ApphookReloadMiddleware` has been added to the ``MIDDLEWARE`` in your ``settings.py``.
 
 .. _apply_apphook:
 
@@ -86,12 +96,11 @@ Apply the apphook to a page
 
 Now we need to create a new page, and attach the Polls application to it through this apphook.
 
-Create and save a new page, then publish it.
+Create and save a new page.
 
-..  note:: Your apphook won't work until the page has been published.
+..  note:: Your apphook only will work for languages you have created a page content object.
 
-In its *Advanced settings* (from the toolbar, select *Page > Advanced settings...*) choose "Polls
-Application" from the *Application* pop-up menu, and save once more.
+In its *Advanced settings* (from the toolbar, select *Page > Advanced settings...*) choose "Polls Application" from the *Application* pop-up menu, and save once more.
 
 .. image:: /introduction/images/select-application.png
    :alt: select the 'Polls' application

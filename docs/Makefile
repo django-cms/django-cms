@@ -117,3 +117,9 @@ spelling:
 
 run:
 	. $(VENV); sphinx-autobuild $(ALLSPHINXOPTS) build/html --host 0.0.0.0 --port $(PORT)
+
+text:
+	. $(VENV); $(SPHINXBUILD) -b text $(ALLSPHINXOPTS) build/text
+	@echo
+	@echo "Build finished. The HTML pages are in build/text."
+

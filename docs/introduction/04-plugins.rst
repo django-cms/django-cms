@@ -84,7 +84,13 @@ A reasonable convention for plugin naming is:
 * ``PollPluginModel``: the *model* class
 * ``PollPluginPublisher``: the *plugin* class
 
-You don't need to follow this convention, but choose one that makes sense and stick to it.
+A second convention is also countered quite frequently:
+
+* ``Poll``: the *model* class
+* ``PollPlugin``: the *plugin* class
+
+
+You don't need to follow either of those convention, but choose one that makes sense and stick to it.
 
 
 The template

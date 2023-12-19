@@ -1,5 +1,5 @@
 ####################
-Menus and navigation
+User site navigation
 ####################
 
 .. highlight:: html+django
@@ -254,36 +254,23 @@ If true this node is a :ref:`soft root <soft-root>`. A page can be marked as a *
 in its 'Advanced Settings'.
 
 
-******************************
-Modifying & Extending the menu
-******************************
-
-Please refer to the :doc:`/how_to/menus` documentation
-
-
 ********************************
 Menu system classes and function
 ********************************
 
-``menu`` application
-====================
-
-..  class:: menus.base.Menu
-
-    The base class for all menu-generating classes.
-
-    ..  method:: get_nodes(self, request)
-
-        Each sub-class of ``Menu`` should return a list of NavigationNode instances.
+.. autoclass:: menus.base.Menu
+    :members:
 
 
-..  class:: menus.base.Modifier
+.. autoclass:: menus.base.Modifier
+    :members:
 
-    The base class for all menu-modifying classes. A modifier add, removes or changes NavigationNodes in the list.
+.. autoclass:: menus.base.NavigationNode
+    :members:
 
-    ..  method:: modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb)
 
-        Each sub-class of ``Modifier`` should implement a ``modify()`` method.
+.. autoclass:: menus.menu_pool.MenuPool
+    :members:
 
 
 ..  class:: menus.menu_pool.MenuPool
@@ -309,80 +296,36 @@ Menu system classes and function
 
     ..  method:: get_context()
 
-
-..  class:: menus.base.NavigationNode(title, url, id[, parent_id=None][, parent_namespace=None][, attr=None][, visible=True])
-
-    Each node in a menu tree is represented by a ``NavigationNode`` instance.
-
-    :param str title: The title to display this menu item with.
-    :param str url: The URL associated with this menu item.
-    :param id: Unique (for the current tree) ID of this item.
-    :param parent_id: Optional, ID of the parent item.
-    :param parent_namespace: Optional, namespace of the parent.
-    :param dict attr: Optional, dictionary of additional information to store on
-                      this node.
-    :param bool visible: Optional, defaults to ``True``, whether this item is
-                         visible or not.
+..  autoclass:: menus.base.NavigationNode
+    :members:
+    :special-members: __init__
 
 
-    .. attribute:: attr
+..  autoclass:: menus.modifiers.Marker
+    :members:
 
-        A dictionary, provided in order that arbitrary attributes may be added to the node -
-        placing them directly on the node itself could cause a clash with an existing or future attribute.
+..  autoclass:: menus.modifiers.AuthVisibility
+    :members:
 
-        An important key in this dictionary is ``is_page``: if ``True``, the node represents a django CMS ``Page``
-        object.
-
-        Nodes that represent CMS pages have the following keys in ``attr``:
-
-        * **auth_required** (*bool*) – is authentication required to access this page
-        * **is_page** (*bool*) – Always True
-        * **navigation_extenders** (*list*) – navigation extenders connected to this node
-        * **redirect_url** (*str*) – redirect URL of page (if any)
-        * **reverse_id** (*str*) – unique identifier for the page
-        * **soft_root** (*bool*) – whether page is a soft root
-        * **visible_for_authenticated** (*bool*) – visible for authenticated users
-        * **visible_for_anonymous** (*bool*) – visible for anonymous users
-
-    .. method:: get_descendants
-
-        Returns a list of all children beneath the current menu item.
-
-    .. method:: get_ancestors
-
-        Returns a list of all parent items, excluding the current menu item.
-
-    .. method:: get_absolute_url
-
-        Utility method to return the URL associated with this menu item,
-        primarily to follow naming convention asserted by Django.
-
-    .. method:: get_menu_title
-
-        Utility method to return the associated title, using the same naming
-        convention used by :class:`cms.models.Page`.
+..  autoclass:: menus.modifiers.Level
+    :members:
 
 
-..  class:: menus.modifiers.Marker
-
-..  class:: menus.modifiers.AuthVisibility
-
-..  class:: menus.modifiers.Level
-
-    ..  method:: mark_levels()
-
+#########
+CMS menus
+#########
 
 ``cms`` application
 ===================
 
-..  class:: cms.menu.CMSMenu
+.. autoclass:: cms.cms_menus.CMSMenu
+    :members:
 
-    Subclass of :class:`menus.base.Menu`. Its :meth:`~menus.base.Menu.get_nodes()` creates a list of NavigationNodes
-    based on ``Page`` objects.
+..  autoclass:: cms.cms_menus.NavExtender
+    :members:
 
+..  autoclass:: cms.cms_menus.SoftRootCutter
+    :members:
 
-..  class:: cms.menu.NavExtender
-
-..  class:: cms.menu.SoftRootCutter
-
-..  class:: cms.menu_bases.CMSAttachMenu
+..  autoclass:: cms.menu_bases.CMSAttachMenu
+    :members:

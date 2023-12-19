@@ -1,14 +1,15 @@
-furo==2023.09.10
 MarkupSafe
-Pygments>=2.16.1
-sphinx
-sphinx-autobuild
+Pygments
+furo
+Sphinx>=4.2.0
+sphinx-copybutton
 sphinxext-opengraph
-sphinxcontrib-spelling==8.0.0
+sphinxcontrib-spelling
 pyenchant>3
 sphinx-autobuild
 datetime
-codespell
 coverage
 django~=3.2
-django-cms @ https://github.com/django-cms/django-cms/archive/refs/heads/develop-4.zip
+git+https://github.com/django-cms/django-cms@release/4.1.x
+codespell
+pip-tools

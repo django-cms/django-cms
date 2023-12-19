@@ -10,7 +10,7 @@ easy it is to work with django CMS as a developer who wants to customise it and
 get it working according to their own requirements.
 
 These tutorials take you step-by-step through some key aspects of this work.
-They're not intended to explain the :doc:`topics in depth </topics/index>`, or
+They're not intended to explain the :doc:`topics in depth </explanation/index>`, or
 provide :doc:`reference material </reference/index>`, but they will leave you
 with a good idea of what is possible to achieve in just a few steps, and how
 to go about it.
@@ -25,7 +25,6 @@ in the order presented here.
 
 .. toctree::
     :maxdepth: 1
-    :numbered:
 
     01-install
     02-templates_placeholders
@@ -35,12 +34,9 @@ in the order presented here.
     06-toolbar
     07-menu
     08-wizards
-    09-third_party
 
 If you want to install django CMS into an existing project, or prefer to configure django CMS by
-hand, rather than using the automated installer, see :doc:`/how_to/install` and then follow the
+hand, rather than using the django CMS quistart project, see :doc:`/introduction/01-install` and then follow the
 rest of the tutorials.
 
-Either way, you'll be able to find support and help from the numerous friendly members of the
-django CMS community, either on our `Discourse forum <https://discourse.django-cms.org>`_ or `our
-Slack group <https://www.django-cms.org/slack>`_.
+Either way, you'll be able to find support and help from the numerous friendly members of the django CMS community on `our Slack group <https://www.django-cms.org/slack>`_.
