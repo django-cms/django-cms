@@ -1,29 +1,28 @@
 .. _colorscheme:
 
-##########################################
 Color schemes (light/dark) with django CMS
-##########################################
+==========================================
 
 .. important::
 
     These notes about the color scheme apply only to the **django CMS admin and editing
-    interfaces**. The visitor-facing published site is **wholly independent** of this, and the
-    responsibility of the site developer.
+    interfaces**. The visitor-facing published site is **wholly independent** of this,
+    and the responsibility of the site developer.
 
     The admin interfaces will only reflect the described behavior if the package
-    ``djangocms-admin-style`` is installed (version 3.2 or later). If it is not installed, the admin
-    interface is managed by your underlying Django installation, which usually
-    uses the browser's color scheme.
+    ``djangocms-admin-style`` is installed (version 3.2 or later). If it is not
+    installed, the admin interface is managed by your underlying Django installation,
+    which usually uses the browser's color scheme.
 
-************************
 Setting the color scheme
-************************
+------------------------
 
-Django CMS' default color scheme is ``"light"``. To change the color scheme use the ``CMS_COLOR_SCHEME``
-setting in your project's ``setting.py``:
+Django CMS' default color scheme is ``"light"``. To change the color scheme use the
+``CMS_COLOR_SCHEME`` setting in your project's ``setting.py``:
 
 ``CMS_COLOR_SCHEME = "light"``
-    This is the default appearance and shows the interface with dark text on a white background.
+    This is the default appearance and shows the interface with dark text on a white
+    background.
 
 ``CMS_COLOR_SCHEME = "dark"``
     This so-called dark mode shows light text on a dark background.
@@ -42,62 +41,71 @@ setting in your project's ``setting.py``:
         <html data-theme="light">
 
     This will pin the color scheme early when loading pages and avoid potential
-    flickering if the browser preference differs from the ``CMS_COLOR_SCHEME``
-    setting.
+    flickering if the browser preference differs from the ``CMS_COLOR_SCHEME`` setting.
 
 .. versionchanged:: 3.11.4
 
-    Before version 3.11.4 the color scheme was set by ``data-color-scheme``. Since version 3.11.4 django CMS uses ``data-theme`` just as Django since version 4.2.
-
+    Before version 3.11.4 the color scheme was set by ``data-color-scheme``. Since
+    version 3.11.4 django CMS uses ``data-theme`` just as Django since version 4.2.
 
 .. important::
 
-    Not all plugin admin interfaces might support a dark color scheme, especially
-    if plugin forms contain custom widgets.
+    Not all plugin admin interfaces might support a dark color scheme, especially if
+    plugin forms contain custom widgets.
 
-**********************************
 Toggle button for the color scheme
-**********************************
+----------------------------------
 
-The setting ``CMS_COLOR_SCHEME_TOGGLE`` in the project's ``settings.py`` determines if  a toggle icon (sun/moon/auto) is shown in the toolbar. It allows a user to switch their color scheme for their session.
+The setting ``CMS_COLOR_SCHEME_TOGGLE`` in the project's ``settings.py`` determines if a
+toggle icon (sun/moon/auto) is shown in the toolbar. It allows a user to switch their
+color scheme for their session.
 
 By default, ``CMS_COLOR_SCHEME_TOGGLE`` is set to ``True``.
 
-
-******************************************
 Make your own admin CSS color scheme aware
-******************************************
+------------------------------------------
 
-Plugin forms or any admin forms use Django's admin app which itself supports light and dark color schemes. djangocms-admin-style introduces django CMS' color scheme to the admin app. Just as Django does, djangocms-admin-style defines CSS variables for frequent colors.
+Plugin forms or any admin forms use Django's admin app which itself supports light and
+dark color schemes. djangocms-admin-style introduces django CMS' color scheme to the
+admin app. Just as Django does, djangocms-admin-style defines CSS variables for frequent
+colors.
 
-We recommend writing at least your reusable apps in a way which allows  them to respect the color scheme with djangocms-admin-style and with Django's admin style.
+We recommend writing at least your reusable apps in a way which allows them to respect
+the color scheme with djangocms-admin-style and with Django's admin style.
 
 Here are some recommendations for making your app work as seamlessly as possible:
 
-* Try avoiding using ``color``, ``background-color``, or other color styles where possible and meaningful.
-* If necessary, use as few as possible standard django CMS colors (preferably from the list below with plain Django fallback colors)
-* Use the following pattern: ``var(--dca-color-var, var(--fallback-color-var, #xxxxxx))`` where ``#xxxxxx`` represents the light version of the color. This tries django CMS color scheme first and falls back to Django color scheme if djangocms-admin-style is not available.
-* Avoid media queries like ``@media (prefers-color-scheme: dark)`` since they would ignore forced settings to light or dark.
+- Try avoiding using ``color``, ``background-color``, or other color styles where
+  possible and meaningful.
+- If necessary, use as few as possible standard django CMS colors (preferably from the
+  list below with plain Django fallback colors)
+- Use the following pattern: ``var(--dca-color-var, var(--fallback-color-var,
+  #xxxxxx))`` where ``#xxxxxx`` represents the light version of the color. This tries
+  django CMS color scheme first and falls back to Django color scheme if
+  djangocms-admin-style is not available.
+- Avoid media queries like ``@media (prefers-color-scheme: dark)`` since they would
+  ignore forced settings to light or dark.
 
-
-The admin frontend pulls the style from django admin styles and - if present - from djangocms-admin-style. Django itself also uses CSS variables to implement admin mode, these can be used as dark mode-aware fall-back colors.
+The admin frontend pulls the style from django admin styles and - if present - from
+djangocms-admin-style. Django itself also uses CSS variables to implement admin mode,
+these can be used as dark mode-aware fall-back colors.
 
 Here's a table of django CMS' CSS color variables and their Django fallbacks:
 
-=============================== =========== ======================= ===========
-Variable name                   Color       Fallback                Color
-=============================== =========== ======================= ===========
-``--dca-white``                 ``#ffffff`` ``--body-bg``           ``#ffffff``
-``--dca-gray``                  ``#666``    ``--body-quiet-color``  ``#666``
-``--dca-gray-lightest``         ``#f2f2f2`` ``--darkened-bg``       ``#f8f8f8``
-``--dca-gray-lighter``          ``#ddd``    ``--border-color``      ``#ccc``
-``--dca-gray-light``            ``#999``    ``--close-button-bg``   ``#888``
-``--dca-gray-darker``           ``#454545``
-``--dca-gray-darkest``          ``#333``
-``--dca-gray-super-lightest``   ``#f7f7f7``
-``--dca-primary``               ``#00bbff`` ``--primary``           ``#79aec8``
-``--dca-black``                 ``#000``    ``--body-fg``           ``#303030``
-=============================== =========== ======================= ===========
+============================= =========== ====================== ===========
+Variable name                 Color       Fallback               Color
+============================= =========== ====================== ===========
+``--dca-white``               ``#ffffff`` ``--body-bg``          ``#ffffff``
+``--dca-gray``                ``#666``    ``--body-quiet-color`` ``#666``
+``--dca-gray-lightest``       ``#f2f2f2`` ``--darkened-bg``      ``#f8f8f8``
+``--dca-gray-lighter``        ``#ddd``    ``--border-color``     ``#ccc``
+``--dca-gray-light``          ``#999``    ``--close-button-bg``  ``#888``
+``--dca-gray-darker``         ``#454545``
+``--dca-gray-darkest``        ``#333``
+``--dca-gray-super-lightest`` ``#f7f7f7``
+``--dca-primary``             ``#00bbff`` ``--primary``          ``#79aec8``
+``--dca-black``               ``#000``    ``--body-fg``          ``#303030``
+============================= =========== ====================== ===========
 
 This leaves these recommendations for color scheme dependent colors:
 

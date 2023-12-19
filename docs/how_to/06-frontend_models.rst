@@ -245,7 +245,7 @@ Will render to:
     </div>
 
 
-.. filters:
+.. _filters:
 
 *******
 Filters

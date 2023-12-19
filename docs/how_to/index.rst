@@ -1,16 +1,13 @@
 .. _how-to:
 
-#############
 How-to guides
-#############
+=============
 
-These guides presuppose some familiarity with django CMS. They cover some of
-the same territory as the :doc:`/introduction/index`, but in more detail.
+These guides presuppose some familiarity with django CMS. They cover some of the same
+territory as the :doc:`/introduction/index`, but in more detail.
 
-
-************************
 Using core functionality
-************************
+------------------------
 
 .. toctree::
     :maxdepth: 1
@@ -24,10 +21,8 @@ Using core functionality
     Create sitemaps <07-sitemaps>
     Manage Page Types <08-page_types>
 
-
-**************************
 Creating new functionality
-**************************
+--------------------------
 
 .. toctree::
     :maxdepth: 1
@@ -43,11 +38,10 @@ Creating new functionality
     Extend Page & Title models <18-extending_page_contents>
     Test your extensions <19-testing>
 
-*********************
 Sharing functionality
-*********************
+---------------------
 
-..  toctree::
-  :maxdepth: 1
+.. toctree::
+    :maxdepth: 1
 
-  CMS application configuration <20-cms-config.rst>
+    CMS application configuration <20-cms-config.rst>

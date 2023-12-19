@@ -216,8 +216,10 @@ example above:
         def get_menus(self, page=None, language=None, **kwargs):
             return [MyAppMenu]
 
-.. versionchanged:: 3.3 ``CMSApp.get_menus()`` replaces ``CMSApp.menus``. The ``menus`` attribute is now deprecated and
-has been removed in version 3.5.
+.. versionchanged:: 3.3
+
+    ``CMSApp.get_menus()`` replaces ``CMSApp.menus``. The ``menus`` attribute is now
+    deprecated and has been removed in version 3.5.
 
 The menus returned in the ``get_menus()`` method need to return a list of nodes, in
 their ``get_nodes()`` methods. :ref:`integration_attach_menus` has more information on

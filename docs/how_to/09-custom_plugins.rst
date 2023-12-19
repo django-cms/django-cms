@@ -1,21 +1,20 @@
 .. _custom-plugins:
 
-
-#####################
 How to create Plugins
-#####################
+=====================
 
-*******************
 The simplest plugin
-*******************
+-------------------
 
 We'll start with an example of a very simple plugin.
 
-You may use ``python -m manage startapp`` to set up the basic layout for your
-plugin app (remember to add your plugin to ``INSTALLED_APPS``). Alternatively, just add a file called ``cms_plugins.py`` to an
-existing Django application.
+You may use ``python -m manage startapp`` to set up the basic layout for your plugin app
+(remember to add your plugin to ``INSTALLED_APPS``). Alternatively, just add a file
+called ``cms_plugins.py`` to an existing Django application.
 
-Place your plugins in ``cms_plugins.py``. For our example, include the following code::
+Place your plugins in ``cms_plugins.py``. For our example, include the following code:
+
+.. code-block::
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
@@ -28,64 +27,60 @@ Place your plugins in ``cms_plugins.py``. For our example, include the following
         render_template = "hello_plugin.html"
         cache = False
 
-Now we're almost done. All that's left is to add the template. Add the
-following into the root template directory in a file called
-``hello_plugin.html``:
+Now we're almost done. All that's left is to add the template. Add the following into
+the root template directory in a file called ``hello_plugin.html``:
 
 .. code-block:: html+django
 
     <h1>Hello {% if request.user.is_authenticated %}{{ request.user.first_name }} {{ request.user.last_name}}{% else %}Guest{% endif %}</h1>
 
-This plugin will now greet the users on your website either by their name if
-they're logged in, or as Guest if they're not.
+This plugin will now greet the users on your website either by their name if they're
+logged in, or as Guest if they're not.
 
-Now let's take a closer look at what we did there. The ``cms_plugins.py`` files
-are where you should define your sub-classes of
-:class:`cms.plugin_base.CMSPluginBase`, these classes define the different
-plugins.
+Now let's take a closer look at what we did there. The ``cms_plugins.py`` files are
+where you should define your sub-classes of :class:`cms.plugin_base.CMSPluginBase`,
+these classes define the different plugins.
 
 There are two required attributes on those classes:
 
-* ``model``: The model you wish to use for storing information about this plugin.
-  If you do not require any special information, for example configuration, to
-  be stored for your plugins, you can simply use
-  :class:`cms.models.pluginmodel.CMSPlugin` (we'll look at that model more
-  closely in a bit). In a normal admin class, you don't need to supply this
-  information because ``admin.site.register(Model, Admin)`` takes care of it,
-  but a plugin is not registered in that way.
-* ``name``: The name of your plugin as displayed in the admin. It is generally
-  good practice to mark this string as translatable using
-  :func:`django.utils.translation.gettext_lazy`, however this is optional. By
-  default the name is a nicer version of the class name.
+- ``model``: The model you wish to use for storing information about this plugin. If you
+  do not require any special information, for example configuration, to be stored for
+  your plugins, you can simply use :class:`cms.models.pluginmodel.CMSPlugin` (we'll look
+  at that model more closely in a bit). In a normal admin class, you don't need to
+  supply this information because ``admin.site.register(Model, Admin)`` takes care of
+  it, but a plugin is not registered in that way.
+- ``name``: The name of your plugin as displayed in the admin. It is generally good
+  practice to mark this string as translatable using
+  :func:`django.utils.translation.gettext_lazy`, however this is optional. By default
+  the name is a nicer version of the class name.
 
-And one of the following **must** be defined if ``render_plugin`` attribute
-is ``True`` (the default):
+And one of the following **must** be defined if ``render_plugin`` attribute is ``True``
+(the default):
 
-* ``render_template``: The template to render this plugin with.
+- ``render_template``: The template to render this plugin with.
 
 **or**
 
-* ``get_render_template``: A method that returns a template path to render the
-  plugin with.
+- ``get_render_template``: A method that returns a template path to render the plugin
+  with.
 
 In addition to those attributes, you can also override the
-:meth:`~cms.plugin_base.CMSPluginBase.render()` method
-which determines the template context variables that are used to render your
-plugin. By default, this method only adds ``instance`` and ``placeholder``
-objects to your context, but plugins can override this to include any context
-that is required.
+:meth:`~cms.plugin_base.CMSPluginBase.render()` method which determines the template
+context variables that are used to render your plugin. By default, this method only adds
+``instance`` and ``placeholder`` objects to your context, but plugins can override this
+to include any context that is required.
 
 A number of other methods are available for overriding on your CMSPluginBase
 sub-classes. See: :class:`~cms.plugin_base.CMSPluginBase` for further details.
 
-
-***************
 Troubleshooting
-***************
+---------------
 
-Since plugin modules are found and loaded by django's importlib, you might
-experience errors because the path environment is different at runtime. If
-your `cms_plugins` isn't loaded or accessible, try the following::
+Since plugin modules are found and loaded by django's importlib, you might experience
+errors because the path environment is different at runtime. If your `cms_plugins` isn't
+loaded or accessible, try the following:
+
+.. code-block::
 
     $ python -m manage shell
     >>> from importlib import import_module
@@ -94,14 +89,13 @@ your `cms_plugins` isn't loaded or accessible, try the following::
 
 .. _storing configuration:
 
-*********************
 Storing configuration
-*********************
+---------------------
 
-In many cases, you want to store configuration for your plugin instances. For
-example, if you have a plugin that shows the latest blog posts, you might want
-to be able to choose the amount of entries shown. Another example would be a
-gallery plugin where you want to choose the pictures to show for the plugin.
+In many cases, you want to store configuration for your plugin instances. For example,
+if you have a plugin that shows the latest blog posts, you might want to be able to
+choose the amount of entries shown. Another example would be a gallery plugin where you
+want to choose the pictures to show for the plugin.
 
 To do so, you create a Django model by sub-classing
 :class:`cms.models.pluginmodel.CMSPlugin` in the ``models.py`` of an installed
@@ -110,7 +104,9 @@ application.
 Let's improve our ``HelloPlugin`` from above by making its fallback name for
 non-authenticated users configurable.
 
-In our ``models.py`` we add the following::
+In our ``models.py`` we add the following:
+
+.. code-block::
 
     from cms.models.pluginmodel import CMSPlugin
 
@@ -119,14 +115,14 @@ In our ``models.py`` we add the following::
     class Hello(CMSPlugin):
         guest_name = models.CharField(max_length=50, default='Guest')
 
-
-If you followed the Django tutorial, this shouldn't look too new to you. The
-only difference to normal models is that you sub-class
-:class:`cms.models.pluginmodel.CMSPlugin` rather than
-:class:`django.db.models.Model`.
+If you followed the Django tutorial, this shouldn't look too new to you. The only
+difference to normal models is that you sub-class
+:class:`cms.models.pluginmodel.CMSPlugin` rather than :class:`django.db.models.Model`.
 
 Now we need to change our plugin definition to use this model, so our new
-``cms_plugins.py`` looks like this::
+``cms_plugins.py`` looks like this:
+
+.. code-block::
 
     from cms.plugin_base import CMSPluginBase
     from cms.plugin_pool import plugin_pool
@@ -145,11 +141,10 @@ Now we need to change our plugin definition to use this model, so our new
             context = super().render(context, instance, placeholder)
             return context
 
-We changed the ``model`` attribute to point to our newly created ``Hello``
-model and pass the model instance to the context.
+We changed the ``model`` attribute to point to our newly created ``Hello`` model and
+pass the model instance to the context.
 
-As a last step, we have to update our template to make use of this
-new configuration:
+As a last step, we have to update our template to make use of this new configuration:
 
 .. code-block:: html+django
 
@@ -160,57 +155,58 @@ new configuration:
     {% endif %}</h1>
 
 The only thing we changed there is that we use the template variable ``{{
-instance.guest_name }}`` instead of the hard-coded ``Guest`` string in the else
-clause.
+instance.guest_name }}`` instead of the hard-coded ``Guest`` string in the else clause.
 
 .. warning::
 
-    You cannot name your model fields the same as any installed plugins lower-
-    cased model name, due to the implicit one-to-one relation Django uses for
-    sub-classed models. If you use all core plugins, this includes: ``file``,
-    ``googlemap``, ``link``, ``picture``, ``snippetptr``, ``teaser``,
-    ``twittersearch``, ``twitterrecententries`` and ``video``.
+    You cannot name your model fields the same as any installed plugins lower- cased
+    model name, due to the implicit one-to-one relation Django uses for sub-classed
+    models. If you use all core plugins, this includes: ``file``, ``googlemap``,
+    ``link``, ``picture``, ``snippetptr``, ``teaser``, ``twittersearch``,
+    ``twitterrecententries`` and ``video``.
 
-    Additionally, it is *recommended* that you avoid using ``page`` as a model
-    field, as it is declared as a property of
-    :class:`cms.models.pluginmodel.CMSPlugin`. While the use of ``CMSPlugin.page``
-    is deprecated the property still exists as a compatiblity shim.
+    Additionally, it is *recommended* that you avoid using ``page`` as a model field, as
+    it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`. While the
+    use of ``CMSPlugin.page`` is deprecated the property still exists as a compatiblity
+    shim.
 
 .. _handling-relations:
 
 Handling Relations
-==================
+~~~~~~~~~~~~~~~~~~
 
-Some user interactions make it necessary to create a copy of the plugin, most
-notably if a user copies and pastes contents of a placeholder.
-So if your custom plugin has foreign key (to it, or from it) or many-to-many
-relations you are responsible for copying those related objects, if required,
-whenever the CMS copies the plugin - **it won't do it for you automatically**.
+Some user interactions make it necessary to create a copy of the plugin, most notably if
+a user copies and pastes contents of a placeholder. So if your custom plugin has foreign
+key (to it, or from it) or many-to-many relations you are responsible for copying those
+related objects, if required, whenever the CMS copies the plugin - **it won't do it for
+you automatically**.
 
 Every plugin model inherits the empty
-:meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` method from the base
-class, and it's called when your plugin is copied. So, it's there for you to
-adapt to your purposes as required.
+:meth:`cms.models.pluginmodel.CMSPlugin.copy_relations` method from the base class, and
+it's called when your plugin is copied. So, it's there for you to adapt to your purposes
+as required.
 
-Typically, you will want it to copy related objects. To do this you should
-create a method called ``copy_relations`` on your plugin model, that receives
-the **old instance** of the plugin as an argument.
+Typically, you will want it to copy related objects. To do this you should create a
+method called ``copy_relations`` on your plugin model, that receives the **old
+instance** of the plugin as an argument.
 
-You may however decide that the related objects shouldn't be copied - you may
-want to leave them alone, for example. Or, you might even want to choose some
-altogether different relations for it, or to create new ones when it's
-copied... it depends on your plugin and the way you want it to work.
+You may however decide that the related objects shouldn't be copied - you may want to
+leave them alone, for example. Or, you might even want to choose some altogether
+different relations for it, or to create new ones when it's copied... it depends on your
+plugin and the way you want it to work.
 
-If you do want to copy related objects, you'll need to do this in two slightly
-different ways, depending on whether your plugin has relations *to* or *from*
-other objects that need to be copied too:
+If you do want to copy related objects, you'll need to do this in two slightly different
+ways, depending on whether your plugin has relations *to* or *from* other objects that
+need to be copied too:
 
 For foreign key relations *from* other objects
-----------------------------------------------
+++++++++++++++++++++++++++++++++++++++++++++++
 
-Your plugin may have items with foreign keys to it, which will typically be
-the case if you set it up so that they are inlines in its admin. So you might
-have two models, one for the plugin and one for those items::
+Your plugin may have items with foreign keys to it, which will typically be the case if
+you set it up so that they are inlines in its admin. So you might have two models, one
+for the plugin and one for those items:
+
+.. code-block::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
@@ -221,9 +217,10 @@ have two models, one for the plugin and one for those items::
             related_name="associated_item"
         )
 
-You'll then need the ``copy_relations()`` method on your plugin model to loop
-over the associated items and copy them, giving the copies foreign keys to the
-new plugin::
+You'll then need the ``copy_relations()`` method on your plugin model to loop over the
+associated items and copy them, giving the copies foreign keys to the new plugin:
+
+.. code-block::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
@@ -242,16 +239,19 @@ new plugin::
                 associated_item.save()
 
 For many-to-many or foreign key relations *to* other objects
-------------------------------------------------------------
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Let's assume these are the relevant bits of your plugin::
+Let's assume these are the relevant bits of your plugin:
+
+.. code-block::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
         sections = models.ManyToManyField(Section)
 
-Now when the plugin gets copied, you want to make sure the sections stay, so
-it becomes::
+Now when the plugin gets copied, you want to make sure the sections stay, so it becomes:
+
+.. code-block::
 
     class ArticlePluginModel(CMSPlugin):
         title = models.CharField(max_length=50)
@@ -260,28 +260,29 @@ it becomes::
         def copy_relations(self, oldinstance):
             self.sections.set(oldinstance.sections.all())
 
-If your plugins have relational fields of both kinds, you may of course need
-to use *both* the copying techniques described above.
+If your plugins have relational fields of both kinds, you may of course need to use
+*both* the copying techniques described above.
 
 Relations *between* plugins
----------------------------
++++++++++++++++++++++++++++
 
-It is much harder to manage the copying of relations when they are from one plugin
-to another.
+It is much harder to manage the copying of relations when they are from one plugin to
+another.
 
-See the GitHub issue `copy_relations() does not work for relations between cmsplugins #4143
-<https://github.com/django-cms/django-cms/issues/4143>`_ for more details.
+See the GitHub issue `copy_relations() does not work for relations between cmsplugins
+#4143 <https://github.com/django-cms/django-cms/issues/4143>`_ for more details.
 
-********
 Advanced
-********
+--------
 
 Inline Admin
-============
+~~~~~~~~~~~~
 
 If you want to have the foreign key relation as a inline admin, you can create an
-``admin.StackedInline`` class and put it in the Plugin to "inlines". Then you can use the inline
-admin form for your foreign key references::
+``admin.StackedInline`` class and put it in the Plugin to "inlines". Then you can use
+the inline admin form for your foreign key references:
+
+.. code-block::
 
     class ItemInlineAdmin(admin.StackedInline):
         model = AssociatedItem
@@ -301,64 +302,59 @@ admin form for your foreign key references::
             })
             return context
 
-
 Plugin form
-===========
+~~~~~~~~~~~
 
 Since :class:`cms.plugin_base.CMSPluginBase` extends
-:class:`django:django.contrib.admin.ModelAdmin`, you can customise the form
-for your plugins just as you would customise your admin interfaces.
+:class:`django:django.contrib.admin.ModelAdmin`, you can customise the form for your
+plugins just as you would customise your admin interfaces.
 
 The template that the plugin editing mechanism uses is
-``cms/templates/admin/cms/page/plugin/change_form.html``. You might need to
-change this.
+``cms/templates/admin/cms/page/plugin/change_form.html``. You might need to change this.
 
 If you want to customise this the best way to do it is:
 
-* create a template of your own that extends
-  ``cms/templates/admin/cms/page/plugin/change_form.html`` to provide the
-  functionality you require;
-* provide your :class:`cms.plugin_base.CMSPluginBase` sub-class with a
+- create a template of your own that extends
+  ``cms/templates/admin/cms/page/plugin/change_form.html`` to provide the functionality
+  you require;
+- provide your :class:`cms.plugin_base.CMSPluginBase` sub-class with a
   ``change_form_template`` attribute pointing at your new template.
 
-Extending ``admin/cms/page/plugin/change_form.html`` ensures that you'll keep
-a unified look and functionality across your plugins.
+Extending ``admin/cms/page/plugin/change_form.html`` ensures that you'll keep a unified
+look and functionality across your plugins.
 
-There are various reasons *why* you might want to do this. For example, you
-might have a snippet of JavaScript that needs to refer to a template
-variable), which you'd likely place in ``{% block extrahead %}``, after a ``{{
-block.super }}`` to inherit the existing items that were in the parent
-template.
-
+There are various reasons *why* you might want to do this. For example, you might have a
+snippet of JavaScript that needs to refer to a template variable), which you'd likely
+place in ``{% block extrahead %}``, after a ``{{ block.super }}`` to inherit the
+existing items that were in the parent template.
 
 .. _custom-plugins-handling-media:
 
 Handling media
-==============
+~~~~~~~~~~~~~~
 
-If your plugin depends on certain media files, JavaScript or stylesheets, you
-can include them from your plugin template using `django-sekizai`_. Your CMS
-templates are always enforced to have the ``css`` and ``js`` sekizai namespaces,
-therefore those should be used to include the respective files. For more
-information about django-sekizai, please refer to the
-`django-sekizai documentation`_.
+If your plugin depends on certain media files, JavaScript or stylesheets, you can
+include them from your plugin template using django-sekizai_. Your CMS templates are
+always enforced to have the ``css`` and ``js`` sekizai namespaces, therefore those
+should be used to include the respective files. For more information about
+django-sekizai, please refer to the `django-sekizai documentation`_.
 
-Note that sekizai **can't** help you with the **admin-side** plugin templates -
-what follows is for your plugins' **output templates**.
+Note that sekizai **can't** help you with the **admin-side** plugin templates - what
+follows is for your plugins' **output templates**.
 
 Sekizai style
--------------
++++++++++++++
 
-To fully harness the power of django-sekizai, it is helpful to have a consistent
-style on how to use it. Here is a set of conventions that should be followed
-(but don't necessarily need to be):
+To fully harness the power of django-sekizai, it is helpful to have a consistent style
+on how to use it. Here is a set of conventions that should be followed (but don't
+necessarily need to be):
 
-* One bit per ``addtoblock``. Always include one external CSS or JS file per
-  ``addtoblock`` or one snippet per ``addtoblock``. This is needed so
-  django-sekizai properly detects duplicate files.
-* External files should be on one line, with no spaces or newlines between the
+- One bit per ``addtoblock``. Always include one external CSS or JS file per
+  ``addtoblock`` or one snippet per ``addtoblock``. This is needed so django-sekizai
+  properly detects duplicate files.
+- External files should be on one line, with no spaces or newlines between the
   ``addtoblock`` tag and the HTML tags.
-* When using embedded javascript or CSS, the HTML tags should be on a newline.
+- When using embedded javascript or CSS, the HTML tags should be on a newline.
 
 A **good** example:
 
@@ -394,32 +390,34 @@ A **bad** example:
         });
     </script>{% endaddtoblock %}
 
+.. note::
+
+    If the Plugin requires javascript code to be rendered properly, the class
+    ``'cms-execute-js-to-render'`` can be added to the script tag. This will download
+    and execute all scripts with this class, which weren't present before, when the
+    plugin is first added to the page. If the javascript code is protected from
+    prematurely executing by the EventListener for the event ``'load'`` and/or
+    ``'DOMContentLoaded'``, the following classes can be added to the script tag:
+
+    =========================================== =============================
+    Classname                                   Corresponding javascript code
+    =========================================== =============================
+    cms-trigger-event-document-DOMContentLoaded ``document.dispatchEvent(new
+                                                Event('DOMContentLoaded')``
+    cms-trigger-event-window-DOMContentLoaded   ``window.dispatchEvent(new
+                                                Event('DOMContentLoaded')``
+    cms-trigger-event-window-load               ``window.dispatchEvent(new
+                                                Event('load')``
+    =========================================== =============================
+
+    The events will be triggered once after all scripts are successfully injected into
+    the DOM.
 
 .. note::
-        If the Plugin requires javascript code to be rendered properly,
-        the class ``'cms-execute-js-to-render'`` can be added to the script tag.
-        This will download and execute all scripts with this class, which weren't present before,
-        when the plugin is first added to the page.
-        If the javascript code is protected from prematurely executing by
-        the EventListener for the event ``'load'`` and/or ``'DOMContentLoaded'``,
-        the following classes can be added to the script tag:
 
-        ===========================================  ========================================================
-        Classname                                    Corresponding javascript code
-        ===========================================  ========================================================
-        cms-trigger-event-document-DOMContentLoaded  ``document.dispatchEvent(new Event('DOMContentLoaded')``
-        cms-trigger-event-window-DOMContentLoaded    ``window.dispatchEvent(new Event('DOMContentLoaded')``
-        cms-trigger-event-window-load                ``window.dispatchEvent(new Event('load')``
-        ===========================================  ========================================================
-
-
-        The events will be triggered once after all scripts are successfully injected into the DOM.
-
-
-.. note::
-    Some plugins might need to run a certain bit of javascript after a content
-    refresh. In such a case, you can use the ``cms-content-refresh`` event to
-    take care of that, by adding something like:
+    Some plugins might need to run a certain bit of javascript after a content refresh.
+    In such a case, you can use the ``cms-content-refresh`` event to take care of that,
+    by adding something like:
 
     .. code-block:: html+django
 
@@ -434,35 +432,36 @@ A **bad** example:
 
 .. _plugin-context-processors:
 
-
 Plugin Context
-==============
+~~~~~~~~~~~~~~
 
-The plugin has access to the django template context. You can override
-variables using the ``with`` tag.
+The plugin has access to the django template context. You can override variables using
+the ``with`` tag.
 
-Example::
+Example:
+
+.. code-block::
 
     {% with 320 as width %}{% placeholder "content" %}{% endwith %}
 
-
 Plugin Context Processors
-=========================
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Plugin context processors are callables that modify all plugins' context before
-rendering. They are enabled using the :setting:`CMS_PLUGIN_CONTEXT_PROCESSORS`
-setting.
+rendering. They are enabled using the :setting:`CMS_PLUGIN_CONTEXT_PROCESSORS` setting.
 
 A plugin context processor takes 3 arguments:
 
-* ``instance``: The instance of the plugin model
-* ``placeholder``: The instance of the placeholder this plugin appears in.
-* ``context``: The context that is in use, including the request.
+- ``instance``: The instance of the plugin model
+- ``placeholder``: The instance of the placeholder this plugin appears in.
+- ``context``: The context that is in use, including the request.
 
-The return value should be a dictionary containing any variables to be added to
-the context.
+The return value should be a dictionary containing any variables to be added to the
+context.
 
-Example::
+Example:
+
+.. code-block::
 
     def add_verbose_name(instance, placeholder, context):
         '''
@@ -470,44 +469,46 @@ Example::
         '''
         return {'verbose_name': instance._meta.verbose_name}
 
-
-
 Plugin Processors
-=================
+~~~~~~~~~~~~~~~~~
 
-Plugin processors are callables that modify all plugins' output after rendering.
-They are enabled using the :setting:`CMS_PLUGIN_PROCESSORS` setting.
+Plugin processors are callables that modify all plugins' output after rendering. They
+are enabled using the :setting:`CMS_PLUGIN_PROCESSORS` setting.
 
 A plugin processor takes 4 arguments:
 
-* ``instance``: The instance of the plugin model
-* ``placeholder``: The instance of the placeholder this plugin appears in.
-* ``rendered_content``: A string containing the rendered content of the plugin.
-* ``original_context``: The original context for the template used to render
-  the plugin.
+- ``instance``: The instance of the plugin model
+- ``placeholder``: The instance of the placeholder this plugin appears in.
+- ``rendered_content``: A string containing the rendered content of the plugin.
+- ``original_context``: The original context for the template used to render the plugin.
 
-.. note:: Plugin processors are also applied to plugins embedded in Text
-          plugins (and any custom plugin allowing nested plugins). Depending on
-          what your processor does, this might break the output. For example,
-          if your processor wraps the output in a ``<div>`` tag, you might end up
-          having ``<div>`` tags inside of ``<p>`` tags, which is invalid. You can
-          prevent such cases by returning ``rendered_content`` unchanged if
-          ``instance._render_meta.text_enabled`` is ``True``, which is the case
-          when rendering an embedded plugin.
+.. note::
+
+    Plugin processors are also applied to plugins embedded in Text plugins (and any
+    custom plugin allowing nested plugins). Depending on what your processor does, this
+    might break the output. For example, if your processor wraps the output in a
+    ``<div>`` tag, you might end up having ``<div>`` tags inside of ``<p>`` tags, which
+    is invalid. You can prevent such cases by returning ``rendered_content`` unchanged
+    if ``instance._render_meta.text_enabled`` is ``True``, which is the case when
+    rendering an embedded plugin.
 
 Example
--------
++++++++
 
-Suppose you want to wrap each plugin in the main placeholder in a colored box
-but it would be too complicated to edit each individual plugin's template:
+Suppose you want to wrap each plugin in the main placeholder in a colored box but it
+would be too complicated to edit each individual plugin's template:
 
-In your ``settings.py``::
+In your ``settings.py``:
+
+.. code-block::
 
     CMS_PLUGIN_PROCESSORS = (
         'yourapp.cms_plugin_processors.wrap_in_colored_box',
     )
 
-In your ``yourapp.cms_plugin_processors.py``::
+In your ``yourapp.cms_plugin_processors.py``:
+
+.. code-block::
 
     def wrap_in_colored_box(instance, placeholder, rendered_content, original_context):
         '''
@@ -532,17 +533,17 @@ In your ``yourapp.cms_plugin_processors.py``::
             # Finally, render the content through that template, and return the output
             return t.render(c)
 
+.. _django admin documentation: http://docs.djangoproject.com/en/dev/ref/contrib/admin/
 
-.. _Django admin documentation: http://docs.djangoproject.com/en/dev/ref/contrib/admin/
 .. _django-sekizai: https://github.com/ojii/django-sekizai
+
 .. _django-sekizai documentation: https://django-sekizai.readthedocs.io
 
-
 Nested Plugins
-==============
+~~~~~~~~~~~~~~
 
-You can nest CMS Plugins in themselves. There's a few things required to
-achieve this functionality:
+You can nest CMS Plugins in themselves. There's a few things required to achieve this
+functionality:
 
 ``models.py``:
 
@@ -554,17 +555,17 @@ achieve this functionality:
     class ChildPlugin(CMSPlugin):
         # add your fields here
 
-
 ``cms_plugins.py``:
 
 .. code-block:: python
 
     from .models import ParentPlugin, ChildPlugin
 
+
     @plugin_pool.register_plugin
     class ParentCMSPlugin(CMSPluginBase):
-        render_template = 'parent.html'
-        name = 'Parent'
+        render_template = "parent.html"
+        name = "Parent"
         model = ParentPlugin
         allow_children = True  # This enables the parent plugin to accept child plugins
         # You can also specify a list of plugins that are accepted as children,
@@ -578,10 +579,12 @@ achieve this functionality:
 
     @plugin_pool.register_plugin
     class ChildCMSPlugin(CMSPluginBase):
-        render_template = 'child.html'
-        name = 'Child'
+        render_template = "child.html"
+        name = "Child"
         model = ChildPlugin
-        require_parent = True  # Is it required that this plugin is a child of another plugin?
+        require_parent = (
+            True  # Is it required that this plugin is a child of another plugin?
+        )
         # You can also specify a list of plugins that are accepted as parents,
         # or leave it away completely to accept all
         # parent_classes = ['ParentCMSPlugin']
@@ -589,7 +592,6 @@ achieve this functionality:
         def render(self, context, instance, placeholder):
             context = super(ChildCMSPlugin, self).render(context, instance, placeholder)
             return context
-
 
 ``parent.html``:
 
@@ -603,7 +605,6 @@ achieve this functionality:
         {% endfor %}
     </div>
 
-
 `child.html`:
 
 .. code-block:: html+django
@@ -612,9 +613,8 @@ achieve this functionality:
         {{ instance }}
     </div>
 
-
-If you have attributes of the parent plugin which you need to access in the
-child you can access the parent instance using ``get_bound_plugin``:
+If you have attributes of the parent plugin which you need to access in the child you
+can access the parent instance using ``get_bound_plugin``:
 
 .. code-block:: django
 
@@ -629,25 +629,24 @@ child you can access the parent instance using ``get_bound_plugin``:
             if self.instance:
                 parent, parent_cls = self.instance.parent.get_bound_plugin()
 
-
 .. _extending_context_menus:
 
 Extending context menus of placeholders or plugins
-==================================================
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-There are three possibilities to extend the context menus
-of placeholders or plugins.
+There are three possibilities to extend the context menus of placeholders or plugins.
 
-* You can either extend a placeholder context menu.
-* You can extend all plugin context menus.
-
+- You can either extend a placeholder context menu.
+- You can extend all plugin context menus.
 
 For this purpose you can overwrite the two methods on CMSPluginBase.
 
-* :meth:`~cms.plugin_base.CMSPluginBase.get_extra_placeholder_menu_items`
-* :meth:`~cms.plugin_base.CMSPluginBase.get_extra_plugin_menu_items`
+- :meth:`~cms.plugin_base.CMSPluginBase.get_extra_placeholder_menu_items`
+- :meth:`~cms.plugin_base.CMSPluginBase.get_extra_plugin_menu_items`
 
-Example::
+Example:
+
+.. code-block::
 
     class AliasPlugin(CMSPluginBase):
         name = _("Alias")
@@ -746,24 +745,23 @@ Example::
             alias.save()
             return HttpResponse("ok")
 
-
 .. _placeholder-plugin-api:
 
-**************************************
 Creating and deleting plugin instances
-**************************************
+--------------------------------------
 
 .. versionadded:: 4.0
 
-Plugins live inside placeholders. Since django CMS version 4 placeholders manage
-the creation, and especially the deletion of plugins. Besides creating (or deleting)
+Plugins live inside placeholders. Since django CMS version 4 placeholders manage the
+creation, and especially the deletion of plugins. Besides creating (or deleting)
 database entries for the plugins the placeholders make all necessary changes to the
-entire plugin tree. **Not using the placeholders to create or delete plugins can
-lead to corrupted plugin trees.**
+entire plugin tree. **Not using the placeholders to create or delete plugins can lead to
+corrupted plugin trees.**
 
+- Use :meth:`cms.models.placeholdermodel.Placeholder.add_plugin` or
+  :func:`cms.api.add_plugin` to create plugins:
 
-* Use :meth:`cms.models.placeholdermodel.Placeholder.add_plugin` or
-  :func:`cms.api.add_plugin` to create plugins::
+  .. code-block::
 
       new_instance = MyPluginModel(
           plugin_data="secret"
@@ -774,7 +772,9 @@ lead to corrupted plugin trees.**
       placeholder_to_add_to.add_plugin(new_instance)
       assert new_instance_pk is not None  # Saved to db
 
-  or::
+  or:
+
+  .. code-block::
 
       new_plugin = cms.api.add_plugin(
           placeholder_to_add_to,
@@ -783,20 +783,19 @@ lead to corrupted plugin trees.**
           data=dict(plugin_data="secret"),
       )
 
+- Use :meth:`cms.models.placeholdermodel.Placeholder.delete_plugin` to delete a plugin
+      **including its children**:
 
-* Use :meth:`cms.models.placeholdermodel.Placeholder.delete_plugin` to delete a plugin
-    **including its children**::
+      .. code-block::
 
-         old_instance.placeholder.delete_plugin(old_instance)
-
+          old_instance.placeholder.delete_plugin(old_instance)
 
 .. warning::
 
     **Do not** use ``PluginModel.objects.create(...)`` or
-    ``PluginModel.objects.delete()`` to create or delete plugin instances.
-    This most likely either throw a database integrity exception or create
-    a inconsistent plugin tree leading to unexpected behavior.
+    ``PluginModel.objects.delete()`` to create or delete plugin instances. This most
+    likely either throw a database integrity exception or create a inconsistent plugin
+    tree leading to unexpected behavior.
 
-    Also, **do not** use ``queryset.delete()`` to remove multiple plugins
-    at the same time. This will most likely damage the plugin tree.
-
+    Also, **do not** use ``queryset.delete()`` to remove multiple plugins at the same
+    time. This will most likely damage the plugin tree.
