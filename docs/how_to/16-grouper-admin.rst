@@ -2,8 +2,8 @@
 
 .. _grouper_admin:
 
-How to crate an admin class for a grouper model
-===============================================
+How to create an admin class for a grouper model
+================================================
 
 What is a grouper model?
 ------------------------
@@ -36,7 +36,7 @@ language-specific content is collected in the content model.
 **Extra grouping fields** define fields of the content model by which they are grouped:
 :class:`~cms.models.contentmodels.PageContent` uses ``language`` as an extra grouping
 field. This means that one :class:`~cms.models.pagemodel.Page` object can have multiple
-:class:`~cms.models.contentmodels.PageContent` objets assign to which differ in their
+:class:`~cms.models.contentmodels.PageContent` objects assign to which differ in their
 language.
 
 If not extra grouping fields are given each grouper object can have at most one content

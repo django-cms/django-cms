@@ -87,7 +87,7 @@ The ``static_placeholder`` template tag does **not** work with django CMS 4. It 
 
 .. note::
 
-    As a replacement use `django CMS Alias <https://github.com/django-cms/djangocms-alias>`_ instead. Once installed use ``{% laod djangocms_alias_tags %}`` and ``{% static_alias "footer" %}`` as a replacement for ``static_placeholder``
+    As a replacement use `django CMS Alias <https://github.com/django-cms/djangocms-alias>`_ instead. Once installed use ``{% load djangocms_alias_tags %}`` and ``{% static_alias "footer" %}`` as a replacement for ``static_placeholder``
 
     In connection with django CMS Versioning you can better manage versions of page parts that appear at several instances on your pages.
 

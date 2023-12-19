@@ -42,7 +42,7 @@ When instantiating a Wizard object, use the keywords:
 
 .. important::
 
-    As of verison 4 of django CMS wizards are no longer registered with the
+    As of version 4 of django CMS wizards are no longer registered with the
     ``wizard_pool``. Instead you need to create a app config in ``cms_config.py``
     to register wizards.
 

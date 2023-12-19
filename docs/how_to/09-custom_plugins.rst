@@ -167,7 +167,7 @@ instance.guest_name }}`` instead of the hard-coded ``Guest`` string in the else 
 
     Additionally, it is *recommended* that you avoid using ``page`` as a model field, as
     it is declared as a property of :class:`cms.models.pluginmodel.CMSPlugin`. While the
-    use of ``CMSPlugin.page`` is deprecated the property still exists as a compatiblity
+    use of ``CMSPlugin.page`` is deprecated the property still exists as a compatibility
     shim.
 
 .. _handling-relations:
@@ -424,7 +424,7 @@ A **bad** example:
         {% if request.toolbar and request.toolbar.edit_mode_active %}
             <script>
             CMS.$(window).on('cms-content-refresh', function () {
-                // Here comes your code of the plugin's javscript which
+                // Here comes your code of the plugin's javascript which
                 // needs to be run after a content refresh
             });
             </script>

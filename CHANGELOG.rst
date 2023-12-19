@@ -139,7 +139,7 @@ Features:
 * Use get_title_obj on Page toolbar (#6508) (4981c6229) -- Krzysztof Socha
 * Add frontend editing & rendering registry (#6500) (db4ff4162) -- Krzysztof Socha
 * Added placeholder checks (#6505) (53171cf2b) -- Krzysztof Socha
-* Added language switcher to page tree + reenabled tests (#6506) (70db27c49) -- Vadim Sikora
+* Added language switcher to page tree + re-enabled tests (#6506) (70db27c49) -- Vadim Sikora
 * Added PageContent admin (#6503) (2e090d6c2) -- Paulo Alvarado
 * Integrated Placeholder source field (#6496) (b075f44d3) -- Malinda Perera
 * Added BaseToolbar.preview_mode_active property (#6499) (39562aeb9) -- Krzysztof Socha
@@ -191,7 +191,7 @@ Bug Fixes:
 * page tree display and status alignment (#7263) (914558d28) -- Mark Walker
 * Removed bad migration character (#6834) (d6cabc49f) -- Aiky30
 * Remove exclude as no longer supported (#6830) (7aeacb045) -- Jonathan Sundqvist
-* Replaced incorrect model being saved when a foreign key to placeholder is remapped to use the generic foriegn key (#6802) (5bfb1d144) -- Aiky30
+* Replaced incorrect model being saved when a foreign key to placeholder is remapped to use the generic foreign key (#6802) (5bfb1d144) -- Aiky30
 * Raise 404 on when page has no content (#6803) (8e7cdb12d) -- Jonathan Sundqvist
 * Fix add translation form, as AddPageForm expects cms_page parameter (#6534) (017a7e472) -- Krzysztof Socha
 * Fixed a bug with deleting a model from changelist inside modal (597488954) -- Vadim Sikora

@@ -16,7 +16,7 @@ can be used outside the CMS in custom applications using the
 :class:`~cms.models.fields.PlaceholderRelationField`.
 
 By defining a :class:`~cms.models.fields.PlaceholderRelationField` on a
-custom model you can take advantage of the full power of :class:`~cms.models.pluginmodel.CMSPlugin` in one or more placholders.
+custom model you can take advantage of the full power of :class:`~cms.models.pluginmodel.CMSPlugin` in one or more placeholders.
 
 
 .. warning::

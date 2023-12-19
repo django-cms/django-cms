@@ -1,9 +1,8 @@
-###########################################
 Page extensions and page content extensions
-###########################################
+===========================================
 
 Extensions
-##########
+----------
 
 .. autoclass:: cms.extensions.models.PageExtension
     :members:
@@ -13,9 +12,8 @@ Extensions
     :members:
     :exclude-members: DoesNotExist, MultipleObjectsReturned
 
-
 Admin
-#####
+-----
 
 .. autoclass:: cms.extensions.admin.PageExtensionAdmin
     :members:
@@ -26,7 +24,7 @@ Admin
     :exclude-members: DoesNotExist, MultipleObjectsReturned
 
 Toolbar
-#######
+-------
 
 .. autoclass:: cms.extensions.toolbar.ExtensionToolbar
     :members:

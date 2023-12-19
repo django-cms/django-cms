@@ -28,7 +28,7 @@ ways to install django CMS for free.
    It is a good way for a developer locally without an external vendor and we use this
    option in this django CMS demo.
 3. The last option is to install is creating a django CMS project manually into a local
-   virutal environment by running the ``djangocms`` command. This will create a new
+   virtual environment by running the ``djangocms`` command. This will create a new
    Django project set up for running django CMS based on a django CMS-specific project
    template. See :ref:`Installing django CMS by hand <install-django-cms-by-hand>` for
    details. This option is a good way for developers that want to install everything by
@@ -316,7 +316,7 @@ You will need to add the following to its list of ``INSTALLED_APPS``:
 - `django-treebeard <http://django-treebeard.readthedocs.io>`_ is used to manage django
   CMS's page tree structures.
 
-django CMS als installs `django CMS admin style
+django CMS also installs `django CMS admin style
 <https://github.com/django-cms/djangocms-admin-style>`_. This provides some styling that
 helps make django CMS administration components easier to work with. Technically it's an
 optional component and does not need to be enabled in your project, but it's strongly

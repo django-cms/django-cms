@@ -10,7 +10,7 @@ them. Accordingly, all changes you make are visible immediately.
 `djangocms-versioning <https://github.com/django-cms/djangocms-versioning>`_ is a
 general purpose package that manages versions within different categories, like
 **published**, **draft**, **unpublished**, or **archived**. django CMS, however, is not
-restricted to work with djangocms-verisoning. You can use other versioning packages or
+restricted to work with djangocms-versioning. You can use other versioning packages or
 come up with your own either from scratch or by forking djangocms-versioning.
 
 This section gives a short introduction on how to work with djangocms-versioning. For
@@ -73,7 +73,7 @@ forms**:
 
     PageContent.admin_manager.filter(page=my_page, language="en")
 
-will retrieve page content objects of all versions. Alternativley, to get the current
+will retrieve page content objects of all versions. Alternatively, to get the current
 draft version you can to filter the ``Version`` object:
 
 .. code-block::

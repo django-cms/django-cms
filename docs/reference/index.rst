@@ -1,8 +1,7 @@
 .. _reference:
 
-#########
 Reference
-#########
+=========
 
 Technical reference material.
 
