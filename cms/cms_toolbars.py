@@ -16,8 +16,8 @@ from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
-from cms.utils.conf import get_cms_setting
 from cms.utils.compat import DJANGO_5_0
+from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import user_can_change_page, user_can_delete_page, user_can_publish_page
 from cms.utils.urlutils import add_url_parameters, admin_reverse
