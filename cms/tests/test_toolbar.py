@@ -40,7 +40,7 @@ from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.items import AjaxItem, Break, ItemSearchResult, LinkItem, SubMenu, ToolbarAPIMixin
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat import DJANGO_4_2
+from cms.utils.compat import DJANGO_4_2, DJANGO_5_0
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_tuple
 from cms.utils.urlutils import admin_reverse
@@ -641,7 +641,10 @@ class ToolbarTests(ToolbarTestBase):
     def test_admin_logout_staff(self):
         with override_settings(CMS_PERMISSION=True):
             with self.login_user_context(self.get_staff()):
-                response = self.client.get('/en/admin/logout/')
+                if DJANGO_5_0:
+                    response = self.client.post('/en/admin/logout/')
+                else:
+                    response = self.client.get('/en/admin/logout/')
                 self.assertEqual(response.status_code, 200)
 
     def test_show_toolbar_without_edit(self):

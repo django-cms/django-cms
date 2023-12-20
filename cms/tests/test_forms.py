@@ -13,7 +13,7 @@ from cms.admin.forms import (
     ViewRestrictionInlineAdminForm,
 )
 from cms.api import assign_user_to_page, create_page, create_title
-from cms.forms.fields import PageSelectFormField, SuperLazyIterator
+from cms.forms.fields import LazyChoiceField, PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import get_page_choices, get_site_choices, update_site_and_page_choices
 from cms.forms.widgets import ApplicationConfigSelect
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
