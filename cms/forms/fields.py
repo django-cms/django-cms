@@ -15,8 +15,6 @@ from cms.utils.compat import DJANGO_4_2
 
 class SuperLazyIterator:
     def __init__(self, func):
-        warnings.warn("SuperLazyIterator is deprecated.",
-                      DeprecationWarning, stacklevel=2)
         self.func = func
 
     def __iter__(self):
