@@ -25,10 +25,6 @@ class SuperLazyIterator:
 
 class LazyChoiceField(forms.ChoiceField):
 
-    def __init__(self, *args, **kwargs):
-        warnings.warn("LazyChoiceField is deprecated. Use Django's ChoiceField instead.",
-                      DeprecationWarning, stacklevel=2)
-        super().__init__(*args, **kwargs)
 
     @property
     def choices(self):
