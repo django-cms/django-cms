@@ -105,6 +105,134 @@ With the review help of the following contributors:
 
 Thanks to all contributors for their efforts!
 
+4.0 (unreleased)
+================
+
+Features:
+---------
+* Added pre-migrate hook to check version 4 is intentional (#7249) (ff6cb9b5d) -- Mark Walker
+* Add live-url url query parameter to PageContent cms Preview and Edit endpoints (#7359) (ee89fe4f4) -- Adam Murray
+* backport - Upgrade Gulp and Nodejs (#7255) (f110ddb25) -- Aiky30
+* Re-enable showing the toolbar to anonymous users (#7221) (2008ca8a8) -- Aiky30
+* backport - django-cms 4.0.x - Django 3.2 support  (#7153) (b0deaedd7) -- Aiky30
+* backport - django-cms 4.0.x - Django 3.1 support (#7145) (fb0d4f235) -- Aiky30
+* backport - django-cms 4.0.x - Django 3.0 support (#7105) (c44b6beda) -- Aiky30
+* djangocms 4.0.x documentation updates (#7007) (#7130) (28f41fe9c) -- Aiky30
+* Split database packages so that tests can be run with sqlite (same changes as develop) (#7042) (c77b5e08a) -- Mark Walker
+* Back ported migrating from Travis.ci to Github actions from develop (#7006) (29ae26eaf) -- Aiky30
+* Add CMSAppExtension.ready which is called after all cms app configs are loaded (#6554) (c02308fc5) -- Krzysztof Socha
+* Deprecate the core Alias plugin (#6918) (0fec81224) -- Aiky30
+* Refactor get_title_cache to be straightforward and populate when only partially populated (#6829) (80911296b) -- Jonathan Sundqvist
+* Add Oracle support to custom plugin queries. (#6832) (90bb064fa) -- Jonathan Sundqvist
+* Provide a general get method that can be monkeypatched (#6806) (e429b4584) -- Jonathan Sundqvist
+* Adding support for Django 2.2 LTS to django-cms 4.0 (#6790) (1b80000cf) -- Jonathan Sundqvist
+* Optionally disable the sideframe (#6553) (a1ac04d3f) -- Aiky30
+* Dedicated edit preview buttons (#6528) (5005cd933) -- Malinda Perera
+* Use PageContent instance in wizard form instead of Page instance (#6532) (4307e1b8c) -- Krzysztof Socha
+* Expose sideframe in CMS.API (4dadf9f1e) -- Vadim Sikora
+* Add toolbar persist GET parameter (#6516) (fb27c34e2) -- Krzysztof Socha
+* Rename default persist param (a7df58dc5) -- Krzysztof Socha
+* Removed resolve view (e3a23a7fc) -- Paulo
+* Removed resolve page (0e885ca9e) -- Vadim Sikora
+* Add toolbar_persist GET parameter, defaulting to true. If set to false disabling/enabling toolbar won't be saving in the session (77a48d6ee) -- Krzysztof Socha
+* Added language to Page translation operations (ca16415b1) -- Paulo
+* Use get_title_obj on Page toolbar (#6508) (4981c6229) -- Krzysztof Socha
+* Add frontend editing & rendering registry (#6500) (db4ff4162) -- Krzysztof Socha
+* Added placeholder checks (#6505) (53171cf2b) -- Krzysztof Socha
+* Added language switcher to page tree + re-enabled tests (#6506) (70db27c49) -- Vadim Sikora
+* Added PageContent admin (#6503) (2e090d6c2) -- Paulo Alvarado
+* Integrated Placeholder source field (#6496) (b075f44d3) -- Malinda Perera
+* Added BaseToolbar.preview_mode_active property (#6499) (39562aeb9) -- Krzysztof Socha
+* Renamed Title model to PageContent (#6489) (2894ae8bc) -- Aiky30
+* Added warning for create_page published arg (f48b8698f) -- Paulo Alvarado
+* Fixed frontend to use new edit/structure urls (e960ce726) -- Vadim Sikora
+* Added Preview, Structure and Edit endpoints (#6490) (0f12156c8) -- Malinda Perera
+* Removed publisher from core (#6486) (9f2507545) -- Paulo Alvarado
+* Moved certain Page fields to Title model (#6477) (d7e2d26a6) -- Krzysztof Socha
+* Moved permission creation logic out of _create_user (cd74dc85d) -- Paulo Alvarado
+* Replaced custom app plugin endpoints with placeholder endpoints (#6469) (685361d47) -- Aiky30
+* Frontend for new plugin architecture (bda219b7f) -- Vadim Sikora
+* Removed default plugin creation for placeholders (#6468) (eef5cbbfe) -- Krzysztof Socha
+* Added MySQL and SQLite compatibility to plugin tree (#6461) (4dfaa1c36) -- Mateusz Kamycki
+* Added Placeholder admin plugin endpoints (#6465) (bf1af91bf) -- Aiky30
+* Refactored plugin tree (#6437) (83d38dbb2) -- Paulo Alvarado
+* Register Placeholder model with admin (#6458) (5a1c89316) -- Aiky30
+* Removed placeholder content fallbacks (#6456) (a9947fed1) -- Aiky30
+* Added Generic Foreign Key field to Placeholder model (#6452) (0aedfbbd1) -- anirbanlahiri-fidelity
+* Removed revert to live feature (#6454) (1d7894684) -- Aiky30
+* Removed publisher_publish management command (#6453) (cb19c6069) -- monikasulik
+* Removed publish / unpublish buttons from page changelist (#6445) (9905ca6ec) -- Aiky30
+* Introduced Django 2.0 & 2.1 support (#6447) (30f2d28cc) -- Paulo Alvarado
+* Removed logic which publishes the first page page as soon as it is created (#6446) (cf442f756) -- Aiky30
+* Removed unpublish button from toolbar (#6438) (14110d067) -- Aiky30
+* Moved placeholders from Page to Title model (#6442) (37082d074) -- Aiky30
+* Added app registration integration for wizards (#6436) (c8f56a969) -- monikasulik
+* Log all page and placeholder operations (#6419) (039415336) -- Aiky30
+* Added request to page create form (#6425) (61150ed91) -- Paulo Alvarado
+* Introduced app registration system (#6421) (97515c81d) -- monikasulik
+* Update apphooks.rst (#6255) (98380b5d7) -- Chematronix
+* Removed Publish button from the toolbar (#6414) (41c4ab0dc) -- Aiky30
+
+Bug Fixes:
+----------
+* Structure mode toggle button disappearing from toolbar (#7272) (7dafe846a) -- Fabian Braun
+* Placeholder copy orphaned plugin children (#7065) (#7131) (39483cf32) -- Aiky30
+* Update support options in README.rst (#7059) (22395d7c5) -- Simon
+* Fix being able to reset the setting PageContent.limit_visibility_in_menu (#7016) (66c70394c) -- Aiky30
+* Patch defects (#6930) (d88932559) -- Adam Murray
+* Pagecontent template not changing when the UI option is changed (#6921) (68947484a) -- Aiky30
+* Replace deprecated Jquery .load() call with .on('load', (#6922) (c9cd9fbf2) -- Aiky30
+* Added missing softroot to the migration copy from Page to PageContent (#6888) (c8fbde737) -- Aiky30
+* Display the correct url in change_language_menu (#6828) (026ff1c86) -- Jonathan Sundqvist
+* Prevent JS injection in the admin add plugin url (#6885) (72025947d) -- Aiky30
+* Fix 'urls.W001' warning with custom apphook urls  (#6874) (75978fb1c) -- Aiky30
+* Override urlconf_module so that Django system checks don't crash. (#6873) (f1226a57b) -- Aiky30
+* ``get_object`` call was missing request argument (#7302) (98959dc12) -- Mark Walker
+* page tree display and status alignment (#7263) (914558d28) -- Mark Walker
+* Removed bad migration character (#6834) (d6cabc49f) -- Aiky30
+* Remove exclude as no longer supported (#6830) (7aeacb045) -- Jonathan Sundqvist
+* Replaced incorrect model being saved when a foreign key to placeholder is remapped to use the generic foreign key (#6802) (5bfb1d144) -- Aiky30
+* Raise 404 on when page has no content (#6803) (8e7cdb12d) -- Jonathan Sundqvist
+* Fix add translation form, as AddPageForm expects cms_page parameter (#6534) (017a7e472) -- Krzysztof Socha
+* Fixed a bug with deleting a model from changelist inside modal (597488954) -- Vadim Sikora
+* Fix data validation (085ab6d13) -- Krzysztof Socha
+* Failing log entry tests (59441e5a5) -- Paulo
+* Broken migration (3c3bf884b) -- Paulo
+* Page list language switcher bugs (cfeb3a74c) -- Paulo
+* Missing permissions bug (ba60a1c3a) -- Paulo
+* Fixed a bug with expanding static placeholder by clicking on "Expand All" button (e0c940ce3) -- Vadim Sikora
+* Fixed a bug with not enabling plugins that are not rendered in content (dca32358a) -- Vadim Sikora
+
+Statistics:
+-----------
+
+This release includes 107 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Aiky30 (35 pull requests)
+* Krzysztof Socha (17 pull requests)
+* Paulo Alvarado (12 pull requests)
+* Vadim Sikora (11 pull requests)
+* Jonathan Sundqvist (7 pull requests)
+* Mark Walker (6 pull requests)
+* Paulo (6 pull requests)
+* Malinda Perera (3 pull requests)
+* monikasulik (3 pull requests)
+* Adam Murray (2 pull requests)
+* Chematronix (1 pull request)
+* Fabian Braun (1 pull request)
+* Mateusz Kamycki (1 pull request)
+* Simon (1 pull request)
+* anirbanlahiri-fidelity (1 pull request)
+
+
+With the review help of the following contributors:
+
+* Adam Murray
+* Aiky30
+* Angelo Dini
+* Krzysztof Socha
+
+
 3.6.0 (2019-01-29)
 ==================
 

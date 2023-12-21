@@ -4,8 +4,17 @@
 4.0.0 release notes
 ###################
 
+.. note::
+
+    Version 4.1 is the first **community release of django CMS 4**. It includes all of the changes mentioned in this section and those mentioned in :ref:`upgrade-to-4.1`. django CMS 3 users seeking to upgrade **should immediately go to version 4.1**.
+
+    Version 4.0 has never been released on pypi but is available on `github <https://github.com/django-cms/django-cms/tree/release/4.0.x>`_.
+
+
+
 This release of django CMS is a complete rewrite of the core, hugely simplifying what django-cms does
 out of the box. The main reasons for the changes:
+
 - Limitations with publishing, where only 2 versions can ever exist
 - Too many "opinions" of how parts of the CMS should work baked in
 
@@ -16,6 +25,7 @@ out of the box. The main reasons for the changes:
     process of upgrading from 3.5+ to 4.0.0
 
 The core principles of django-cms 4.0+
+
 - The CMS core such be simplified
 - The core should not force any opinions
 - The app registry, plugin and wizard pools should be simplified and allow easy registration
@@ -70,7 +80,7 @@ Do we comment on changes that have already happened in previous v3 versions, suc
 * Ported Fix 'urls.W001' warning with custom apphook urls (https://github.com/django-cms/django-cms/commit/75978fb1c3ad25d1efba39a5d32215314358ba71)
 * Ported Override urlconf_module so that Django system checks don't crash (https://github.com/django-cms/django-cms/commit/f1226a57b767d4b9f66a0cfec4374b5157c49e4e)
 * Feat Added raise a 404 when EmptyPageContent is returned (https://github.com/django-cms/django-cms/commit/8e7cdb12d20e63e552ea2cc010f586c3dfbb396a)
-* Feat Added the ability to disable the sideframe with he setting `CMS_SIDEFRAME_ENABLED` (https://github.com/django-cms/django-cms/commit/a1ac04d3f81777f6404af62a9c31ff74715b7028)
+* Feat Added the ability to disable the sideframe with the setting `CMS_SIDEFRAME_ENABLED` (https://github.com/django-cms/django-cms/commit/a1ac04d3f81777f6404af62a9c31ff74715b7028)
 * Feat Added dedicated edit and preview toolbar buttons (https://github.com/django-cms/django-cms/commit/5005cd933e12332e9296cdda3e0a9eeaea3fc9a2)
 * Feat Added expose the sideframe in CMS.API (https://github.com/django-cms/django-cms/commit/4dadf9f1e1f2cf4da6bc68f8367236b040255fbc)
 * Feat Removed resolve View (https://github.com/django-cms/django-cms/commit/e3a23a7fc757892c7d58e4af6b78e853ddecab87)
@@ -120,6 +130,7 @@ Model changes
 
 Page, Title (now PageContent) and Placeholder refactor
 ------------------------------------------------------
+
 There are various changes to the model structure for the Page and PageContents (formerly Title). The most notable is the fact that plugins from different Title instances were all saved in the same Placeholder instance. This has now changed in DjangoCMS 4, a PageContent (formerly Title) instance now contains a dedicated set of Placeholder instances.
 
 The model structure was changed to allow flexibility in the core of the cms, this allowed a package such as djangocms-versioning to create infinite PageContent models.
@@ -218,7 +229,8 @@ https://github.com/django-cms/django-cms/pull/6421 app registration docs in the 
 - CMSApp is an existing term from v2.5, it is how apphooks are declared in the newer versions of the cms.
 - CMSAPPConfig is a class, which defines the configuration for a specific add-on, this is then passed to CMSAppExtension. It provides a way of telling the core that an app wants to access something from another app config (the centralized way of handling app config). For example: Alias wants to tell versioning to version it. This requires two components, versioning must define CMSAppExtension, all it needs to do is implement one method, called `configure_app`, which takes an instance of the CMSAppConfig. In order for an alias app to be linked to it set `app_name_enabled=True`. When the extension is configured like this the cms will take all the config settings and pass them to the relevant extension, specify models that need to be versioned and which apps need to access this config. CMSAppExtension is the way to register the add-ons and in the future plugins (or plugin_pools) with have their configs defined in CMSAPPConfig.
 
-### App configuration example
+App configuration example
+-------------------------
 An application that defines an app extension can be used by other apps by registering as "enabled" in the CMSAppConfig by adding: "package_with_extension_enabled"::
 
     # A package that defines an app extension for other apps to register with
@@ -257,9 +269,9 @@ Publishing has been moved to djangocms-versioning
 - To enable publishing the package djangocms-versioning or other similar package that is Django CMS 4.0+ compatible should be installed.
 - The reason that publishing was removed from the core is because the solution baked in made a lot of assumptions that enforced various limitations on developers. By not providing a publishing method it allows developers to provide their own solutions to the publishing
   paradigm.
-- Goal is to migrate the monkey patching of versioning into the core to allow a "simple" mode in djangocns-versioning that replaces the 3.x draft/live mode when installing (default option).
+- Goal is to migrate the monkey patching of versioning into the core to allow a "simple" mode in djangocms-versioning that replaces the 3.x draft/live mode when installing (default option).
 
-djangocms-versioning documentation: https://divio-djangocms-versioning.readthedocs-hosted.com/en/latest/
+See here for the `djangocms-versioning documentation <https://divio-djangocms-versioning.readthedocs-hosted.com/en/latest/>`_.
 
 
 djangocms-versioning overrides queries from PageContent
@@ -291,10 +303,6 @@ Plugin refactor
 - Plugins used to utilise Treebeard. The Treebeard implementation was not coping with this, it was prone to breakage and tree corruption. The refactor simplifies and avoids this by utilising a parent child relationship with plugins. The main issue when replacing the Treebeard implementation was performance, here the standard Django ORM could not provide the query complexity and performance required, individual implementations for the different SQL dialects was implemented to aid performance of plugin queries.
 - Initial plugin refactor: https://github.com/django-cms/django-cms/commit/83d38dbb2e51b4cb65aff5726a1c415de7a1c376
 - Support for other SQL dialects for the plugin tree structure: https://github.com/django-cms/django-cms/commit /4dfaa1c360c2a15f6572b89fc994a254be9e961d
-
-Page, Title (now PageContent) and Placeholder refactor
-
-There are various changes to the model structure for the Page and PageContents (formerly Title). The most notable is the fact that plugins from different Title instances were all saved in the same Placeholder instance. This has now changed in DjangoCMS 4, a PageContent (formerly Title) instance now contains a dedicated set of Placeholder instances. Please see the illustration below:
 
 
 Signals

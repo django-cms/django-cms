@@ -11,10 +11,22 @@
 # All configuration values have a default; values that are commented out serve
 # to show the default.
 
+
 import cms
 import datetime
 import os
 import sys
+
+# Initialize Django for autodoc
+
+sys.path.append(os.path.abspath('./'))
+
+import django, django_settings
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_settings')
+django.setup()
+
+
 
 # If extensions (or modules to document with autodoc) are in another
 # directory, add these directories to sys.path here. If the directory is
@@ -33,18 +45,24 @@ sys.path.append(os.path.join(os.path.abspath('.'), '_ext'))
 
 extensions = [
     'djangocms',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.autosummary',
+    'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
-    'sphinx.ext.autodoc',
-    'sphinxcontrib.spelling'
+    'sphinxcontrib.spelling',
+    "sphinx_copybutton",
+    "sphinxext.opengraph",
     ]
 intersphinx_mapping = {
     'python': ('http://docs.python.org/3/', None),
-    'django': ('https://docs.djangoproject.com/en/2.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
+    'django': ('https://docs.djangoproject.com/en/3.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
     'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
     'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
     'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
 }
+
+autodoc_member_order = "groupwise"
 
 # Add any paths that contain templates here, relative to this directory.
 # templates_path = ['_templates']
@@ -55,13 +73,13 @@ source_suffix = '.rst'
 # The encoding of source files.
 source_encoding = 'utf-8'
 
-# The master toctree document.
+# The main toctree document.
 master_doc = 'index'
 
 current_year = datetime.datetime.now().year
 # General information about the project.
-project = u'django cms'
-copyright = u'2009-{}, Divio AG and contributors'.format(current_year)
+project = 'django cms'
+copyright = '2009-{}, django CMS Association and contributors'.format(current_year)
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -127,7 +145,6 @@ todo_include_todos = True
 # on_rtd is whether we are on readthedocs.org
 on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
 
-
 try:
     import furo
 
@@ -135,8 +152,9 @@ try:
     html_theme_options = {
         "navigation_with_keys": True,
     }
-except ImportError:
+except:  # NOQA
     html_theme = 'default'
+
 
 show_cloud_banner = True
 
@@ -224,7 +242,7 @@ latex_paper_size = 'a4'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
     ('index', 'djangocms.tex', u'django cms Documentation',
-     u'Divio AG and contributors', 'manual'),
+     u'django CMS Association and contributors', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top
@@ -261,3 +279,8 @@ spelling_lang = 'en_GB'
 spelling_word_list_filename = 'spelling_wordlist'
 
 spelling_ignore_pypi_package_names = True
+
+#Split common contractions from words so they are not flagged as errors by the spellchecker.
+#https://github.com/sphinx-contrib/spelling/blob/master/sphinxcontrib/spelling/filters.py
+#See https://sphinxcontrib-spelling.readthedocs.io/en/latest/customize.html#word-filters
+spelling_filters=["sphinxcontrib.spelling.filters.ContractionFilter"]
