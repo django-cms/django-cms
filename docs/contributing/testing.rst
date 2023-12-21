@@ -126,13 +126,10 @@ We have two types of frontend tests: unit tests and integration tests. For unit 
 are using `Karma <http://karma-runner.github.io/>`_ as a test runner and `Jasmine
 <http://jasmine.github.io/>`_ as a test framework.
 
-Integration tests run on `PhantomJS <http://phantomjs.org/>`_ and are built using
-`CasperJS <http://casperjs.org/>`_.
-
 In order to be able to run them you need to install necessary dependencies as outlined
 in :ref:`frontend tooling installation instructions <contributing_frontend>`.
 
-Linting runs against the test files as well with ``gulp tests:lint``. In order to run
+Linting runs against the test files as well with ``gulp lint``. In order to run
 linting continuously, do:
 
 .. code-block::
@@ -146,20 +143,20 @@ Unit tests can be run like this:
 
 .. code-block::
 
-    gulp tests:unit
+    gulp unitTest
 
 If your code is failing and you want to run only specific files, you can provide the
 ``--tests`` parameter with comma separated file names, like this:
 
 .. code-block::
 
-    gulp tests:unit --tests=cms.base,cms.modal
+    gulp unitTest --tests=cms.base,cms.modal
 
 If you want to run tests continuously you can use the watch command:
 
 .. code-block::
 
-    gulp tests:unit:watch
+    gulp unitTest --watch
 
 This will rerun the suite whenever source or test file is changed. By default the tests
 are running on `PhantomJS <http://phantomjs.org/>`_, but when running Karma in watch
@@ -173,62 +170,6 @@ marker in the commit message, similar to how you would skip the build entirely u
 ``[skip ci]``.
 
 We're using Jasmine as a test framework and Istanbul as a code coverage tool.
-
-Integration tests
-~~~~~~~~~~~~~~~~~
-
-In order to run integration tests you'll have to install at least the version of django
-CMS from the current directory and django-app-helper into into your virtualenv. All
-commands should be run from the root of the repository. If you do not have virtualenv
-yet, create and activate it first:
-
-.. code-block::
-
-    virtualenv env
-    . env/bin/activate
-
-Then install minimum required dependencies:
-
-.. code-block::
-
-    pip install -r test_requirements/django-1.8.txt
-    pip install -e .
-
-Now you'll be able to run a tests with this command:
-
-.. code-block::
-
-    gulp tests:integration
-
-The command will start a server, wait for a minute for the migrations to run and will
-run integration tests against it. It will use ``testdb.sqlite`` as the database. If you
-want to start with a clean state you could use ``--clean`` argument.
-
-Some tests require different server configuration, so it is possible that the server
-will stop, and another variation will start with different arguments. Take a look inside
-`testserver.py` if you need to customise the test server settings.
-
-While debugging you can use the ``--tests`` parameter as well in order to run test
-suites separately.:
-
-.. code-block::
-
-    gulp tests:integration --tests=pagetree
-    gulp tests:integration --tests=loginAdmin,toolbar
-
-If specified tests require different servers they will be grouped to speed things up, so
-the order might not be the same as you specify in the argument.
-
-When running locally, it sometimes helps to visualise the tests output. For that you can
-install `casperjs visual debugging utility
-<https://github.com/vxsx/casperjs-visual-debugging>`_, and run the tests with additional
-``--visual`` argument. It will try to communicate with the server and display the
-progress of the test, which you then can also rewind.
-
-It might sometimes be useful not to restart the server when creating the tests, for that
-you can run ``python testserver.py`` with necessary arguments in one shell and ``gulp
-tests:integration --no-server`` in another. However you would need to clean the state
-yourself if the test you've been writing fails.
 
 Writing tests
 -------------
