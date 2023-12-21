@@ -13,7 +13,7 @@ from cms.admin.forms import (
     ViewRestrictionInlineAdminForm,
 )
 from cms.api import assign_user_to_page, create_page, create_title
-from cms.forms.fields import PageSelectFormField, SuperLazyIterator
+from cms.forms.fields import LazyChoiceField, PageSelectFormField, SuperLazyIterator
 from cms.forms.utils import get_page_choices, get_site_choices, update_site_and_page_choices
 from cms.forms.widgets import ApplicationConfigSelect
 from cms.models import ACCESS_PAGE, ACCESS_PAGE_AND_CHILDREN
@@ -237,6 +237,17 @@ class FormsTestCase(CMSTestCase):
         lazy_result = SuperLazyIterator(get_page_choices)
 
         self.assertEqual(normal_result, list(lazy_result))
+
+    def test_lazy_choice_field_behaves_properly(self):
+        """Ensure LazyChoiceField is really lazy"""
+        choices_called = False
+        def get_choices():
+            nonlocal choices_called
+            choices_called = True
+            return ("", "-----"),
+
+        LazyChoiceField(choices=SuperLazyIterator(get_choices))
+        self.assertFalse(choices_called, "Lazy choice function called")
 
 
 class PermissionFormTestCase(CMSTestCase):
