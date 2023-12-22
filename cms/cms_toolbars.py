@@ -344,7 +344,7 @@ class BasicToolbar(CMSToolbar):
             action=admin_reverse('logout'),
             active=True,
             on_success=on_success,
-            method='GET' if DJANGO_4_2 else 'POST',
+            method='POST',
         )
 
     def add_language_menu(self):
