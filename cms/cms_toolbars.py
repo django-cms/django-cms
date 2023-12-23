@@ -23,6 +23,7 @@ from cms.toolbar.utils import (
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
+from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
@@ -343,7 +344,7 @@ class BasicToolbar(CMSToolbar):
             action=admin_reverse('logout'),
             active=True,
             on_success=on_success,
-            method='GET',
+            method='POST',
         )
 
     def add_language_menu(self):
