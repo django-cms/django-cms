@@ -53,7 +53,7 @@ Bug Fixes:
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 201 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
 * Adam Murray (2 pull requests)
 * Aiky30 (35 pull requests)
