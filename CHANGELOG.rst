@@ -55,8 +55,26 @@ Statistics:
 
 This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
+* Adam Murray (2 pull requests)
+* Aiky30 (35 pull requests)
+* Andrew Aikman (1 pull request)
+* Chematronix (1 pull request)
+* Fabian Braun (83 pull requests)
+* Github Release Action (4 pull requests)
+* Jacob Rief (2 pull requests)
+* Jonathan Sundqvist (7 pull requests)
+* Krzysztof Socha (17 pull requests)
+* Malinda Perera (3 pull requests)
+* Mark Walker (8 pull requests)
+* Mateusz Kamycki (1 pull request)
+* Nebojsa Knezevic (1 pull request)
+* Paulo (18 pull requests)
+* Paulo Alvarado (12 pull requests)
+* Simon (1 pull request)
+* Vadim Sikora (11 pull requests)
+* Vinit Kumar (2 pull requests)
+* anirbanlahiri-fidelity (1 pull request)
+* monikasulik (3 pull requests)
 
 With the review help of the following contributors:
 
