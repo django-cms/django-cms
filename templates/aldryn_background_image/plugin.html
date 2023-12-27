@@ -1,0 +1,8 @@
+{% load cms_tags %}
+{% spaceless %}
+<{{ instance.tag_type }}{% if instance.id_name %} id="{{ instance.id_name }}"{% endif %} class="{% if instance.additional_class_names %}{{ instance.get_additional_class_names }}{% endif %}" style="{% if instance.background_image %}background-image: url('{{ instance.background_image.url }}');{% endif %}{% if instance.background_position %} background-position: {{ instance.background_position }};{% endif %}{% if instance.background_size %} background-size: {{ instance.background_size }};{% endif %}{% if instance.background_repeat %} background-repeat: {{ instance.background_repeat }};{% endif %}">
+{% for plugin in instance.child_plugin_instances %}
+	{% render_plugin plugin %}
+{% endfor %}
+</{{ instance.tag_type }}>
+{% endspaceless %}
