@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "djangocms_history"
+    ],
+    "package-name": "djangocms-history"
+}
