@@ -1,0 +1,26 @@
+{% load cms_tags %}
+
+<div class="djangocms-googlemap-marker js-djangocms-googlemap-marker"
+    data-title="{{ instance.title }}"
+    data-address="{{ instance.address }}"
+    data-lat="{{ instance.lat|default:"false"|stringformat:"f" }}"
+    data-lng="{{ instance.lng|default:"false"|stringformat:"f" }}"
+    data-icon="{{ instance.icon.url }}"
+    data-show-content="{{ instance.show_content|lower }}"
+    {% if request.toolbar and request.toolbar.edit_mode_active or request.toolbar and request.toolbar.edit_mode %}
+    data-admin="{{ instance.get_edit_url }}"
+    {% endif %}
+    hidden
+>
+    {{ instance.info_content|safe }}
+</div>
+
+{% comment %}
+    {{ instance.title }}
+    {{ instance.address }}
+    {{ instance.lat }}
+    {{ instance.lng }}
+    {{ instance.icon }}
+    {{ instance.show_content }}
+    {{ instance.info_content }}
+{% endcomment %}
