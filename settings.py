@@ -19,6 +19,7 @@ INSTALLED_ADDONS = [
     "aldryn-django",
     "aldryn-sso",
     "aldryn-django-cms",
+    "aldryn-background-image",
     "djangocms-file",
     "djangocms-googlemap",
     "djangocms-history",
