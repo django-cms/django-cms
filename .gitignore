@@ -1,4 +1,8 @@
-# <DEFAULT>  # Warning: text inside the DEFAULT tags is auto-generated. Manual changes will be overwritten.
+# Include your project-specific ignores in this file
+# Read about how to use .gitignore: https://help.github.com/articles/ignoring-files
+# Useful .gitignore templates: https://github.com/github/gitignore
+
+# <DEFAULT>  # Warning: text inside the DEFAULT tags is auto-generated on Divio Cloud. Manual changes will be overwritten.
 # OS generated
 .DS_Store
 .DS_Store?
@@ -15,6 +19,7 @@ Thumbs.db
 
 # Aldryn
 /.env
+/.env-local
 .aldryn
 .divio
 /data

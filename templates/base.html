@@ -1,0 +1,59 @@
+{% load static i18n cms_tags menu_tags sekizai_tags %}
+<!doctype html>
+<html class="no-js" lang="{{ LANGUAGE_CODE }}">
+
+<head>
+  <meta charset="utf-8">
+  <title>{% block title %}{% page_attribute page_title %} - {{ request.site.name }}{% endblock title %}</title>
+  <meta name="description" content="{% page_attribute 'meta_description' %}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <meta property="og:title" content="">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+
+  <link rel="manifest" href="{% static 'site.webmanifest' %}">
+  <link rel="apple-touch-icon" href="{% static 'icon.png' %}">
+  <link rel="shortcut icon" href="{% static 'favicon.ico' %}">
+
+  <link rel="stylesheet" href="{% static 'css/normalize.css' %}">
+  <link rel="stylesheet" href="{% static 'css/main.css' %}">
+
+  {% render_block "css" %}
+  {{ ALDRYN_SNAKE.render_head }}
+
+  <meta name="theme-color" content="#fafafa">
+</head>
+
+<body>
+  {% cms_toolbar %}
+  <!--[if IE]>
+    <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade your browser</a> to improve your experience and security.</p>
+  <![endif]-->
+
+  <ul>
+    {% show_menu 0 0 100 100 %}
+  </ul>
+
+  {% block content %}
+    <!-- Add your site or application content here -->
+    <p>Hello world! This is HTML5 Boilerplate.</p>
+  {% endblock %}
+
+  <script src="{% static 'js/vendor/modernizr-3.11.2.min.js' %}"></script>
+  <script src="{% static 'js/plugins.js' %}"></script>
+  <script src="{% static 'js/main.js' %}"></script>
+
+  <!-- Google Analytics: change UA-XXXXX-Y to be your site's ID. -->
+  <script>
+    window.ga = function () { ga.q.push(arguments) }; ga.q = []; ga.l = +new Date;
+    ga('create', 'UA-XXXXX-Y', 'auto'); ga('set', 'anonymizeIp', true); ga('set', 'transport', 'beacon'); ga('send', 'pageview')
+  </script>
+  <script src="https://www.google-analytics.com/analytics.js" async></script>
+
+  {% render_block "js" %}
+  {{ ALDRYN_SNAKE.render_tail }}
+</body>
+
+</html>
