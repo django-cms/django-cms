@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "djangocms_video"
+    ],
+    "package-name": "djangocms-video"
+}
