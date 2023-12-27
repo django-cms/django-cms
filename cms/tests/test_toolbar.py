@@ -630,7 +630,7 @@ class ToolbarTests(ToolbarTestBase):
     def test_admin_logout_staff(self):
         with override_settings(CMS_PERMISSION=True):
             with self.login_user_context(self.get_staff()):
-                response = self.client.get('/en/admin/logout/')
+                response = self.client.post('/en/admin/logout/')
                 self.assertTrue(response.status_code, 200)
 
     def test_show_toolbar_without_edit(self):

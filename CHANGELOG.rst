@@ -1,5 +1,5 @@
-4.1.0rc5 (unpublished)
-======================
+4.1.0 (2023-12-22)
+==================
 
 Features:
 ---------
@@ -232,6 +232,7 @@ With the review help of the following contributors:
 * Angelo Dini
 * Krzysztof Socha
 
+Thanks to all contributors for their efforts!
 
 3.6.0 (2019-01-29)
 ==================
