@@ -9,6 +9,7 @@ https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-link/3.1.0/9409e587
 https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-picture/3.0.0/a3be9a52-45ab-42f5-9de5-3a33934ed666/djangocms-picture-3.0.0.tar.gz#egg=djangocms-picture==3.0.0
 https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-snippet/3.0.0/436700f0-3a6e-4787-a007-38eedaf66d07/djangocms-snippet-3.0.0.tar.gz#egg=djangocms-snippet==3.0.0
 https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-style/3.0.0/7f83861c-9e68-4dcc-949b-48d429e4fead/djangocms-style-3.0.0.tar.gz#egg=djangocms-style==3.0.0
+https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-text-ckeditor/5.1.1/1d5bddba-6e12-41a4-9d47-676a1ac6155d/djangocms-text-ckeditor-5.1.1.tar.gz#egg=djangocms-text-ckeditor==5.1.1
 https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-video/3.0.0/a36bdd84-5189-4d20-9ad9-eab9e64d9e25/djangocms-video-3.0.0.tar.gz#egg=djangocms-video==3.0.0
 https://divio-addons.s3-eu-central-1.amazonaws.com/django-filer/2.2.6/de2941f5-d8de-40ca-8ca1-b3533b0f61db/django-filer-2.2.6.tar.gz#egg=django-filer==2.2.6
 # </INSTALLED_ADDONS>
