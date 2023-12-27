@@ -18,6 +18,7 @@ INSTALLED_ADDONS = [
     "aldryn-addons",
     "aldryn-sso",
     "djangocms-link",
+    "djangocms-snippet",
     "django-filer",
     # </INSTALLED_ADDONS>
 ]
