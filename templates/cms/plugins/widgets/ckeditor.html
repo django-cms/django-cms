@@ -1,0 +1,10 @@
+{% load i18n l10n static cms_static sekizai_tags %}{{ ckeditor_settings|json_script:ckeditor_settings_id }}
+<script>
+    (function () {
+        window._cmsCKEditors = window._cmsCKEditors || [];
+        window._cmsCKEditors.push([
+            '{{ ckeditor_selector }}',
+            {{ plugin_pk|default:"''"|unlocalize }}
+        ]);
+    })();
+</script>

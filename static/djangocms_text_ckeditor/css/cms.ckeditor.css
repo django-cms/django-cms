@@ -1,0 +1,107 @@
+@charset "utf-8";
+/* everything has to be !important because of the way css is loaded */
+
+/* float left with the label */
+.cke_chrome {
+    float: left !important;
+    width: 100% !important;
+}
+
+/* special case when inside a text plugin */
+.djangocms_text_ckeditor-text .form-row label {
+    display: none !important;
+}
+.djangocms_text_ckeditor-text .cke_chrome {
+    float: none !important;
+}
+
+/* ensure dialog has relative positioning for absolute positioned content */
+.cms-ckeditor-dialog .cke_dialog {
+    position: fixed !important;
+}
+.cke_dialog_contents {
+    user-select: none !important;
+}
+.cke_dialog_contents_body {
+    position: relative !important;
+}
+
+/* show cmsplugin label */
+.cke_button__cmsplugins .cke_button_label {
+    display: inline !important;
+    padding-right: 5px !important;
+    padding-left: 5px !important;
+}
+
+/* make dropdow larger */
+.cke_combopanel,
+.cke_panel {
+    min-width: 200px !important;
+}
+
+
+/* add / edit plugin modal */
+.cke_dialog_body {
+    border: 1px solid #d1d1d1 !important;
+}
+.cms-ckeditor-dialog .cke_dialog_contents_body {
+    padding: 3px 0 !important;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents {
+    width: 100% !important;
+    height: 100% !important;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents table {
+    display: block !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents table tbody,
+.cms-ckeditor-dialog .cke_dialog_page_contents table tr,
+.cms-ckeditor-dialog .cke_dialog_page_contents table td {
+    display: block !important;
+    height: 100% !important;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents table .cke_dialog_ui_vbox_child {
+    display: block !important;
+    overflow-y: auto !important;
+    height: 100% !important;
+    padding: 0 !important;
+
+    -webkit-overflow-scrolling: touch !important;
+}
+.cms-ckeditor-dialog .cke_dialog_page_contents table .cke_dialog_ui_vbox_child iframe {
+    display: block !important;
+    position: static !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* scrollable dropdowns on touch */
+.cke_panel {
+    overflow-y: auto !important;
+    height: auto !important;
+    max-height: 300px !important;
+
+    -webkit-overflow-scrolling: touch !important;
+}
+.cke_panel .cke_panel_frame {
+    display: block !important;
+    position: static !important;
+    overflow: hidden !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+}
+
+/* cms-resizer */
+.cms-ckeditor-resizer {
+    overflow: auto !important;
+    font-size: 12px !important;
+    width: auto !important;
+    height: auto !important;
+    border: none !important;
+}
