@@ -22,6 +22,7 @@ INSTALLED_ADDONS = [
     "djangocms-link",
     "djangocms-picture",
     "djangocms-snippet",
+    "djangocms-style",
     "djangocms-video",
     "django-filer",
     # </INSTALLED_ADDONS>

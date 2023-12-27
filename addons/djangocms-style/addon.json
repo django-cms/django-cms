@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "djangocms_style"
+    ],
+    "package-name": "djangocms-style"
+}
