@@ -1,0 +1,40 @@
+# This docker-compose.yml file is used to set up your project in the local
+# development environment *only*. It is *not* used in deployment to our cloud
+# servers, and has no effect whatsoever in cloud deployments.
+#
+# See our Developer Handbook for more information:
+# http://docs.divio.com/en/latest/reference/docker-docker-compose.html
+version: "2"
+
+services:
+  # The web container is an instance of exactly the same Docker image as your
+  # Cloud application container.
+  web:
+    build: "."
+    links:
+      - "db:postgres"
+    # Change the port if you'd like to expose your project locally on a
+    # different port, for example if you already use port 8000 for
+    # something else.
+    ports:
+      - "8000:80"
+    volumes:
+      - ".:/app:rw"
+      - "./data:/data:rw"
+    # The default command that the container starts with. If you'd like to run
+    # the project locally in Live configuration, you will need to change this.
+    # See https://docs.divio.com/en/latest/how-to/local-in-live-configuration/
+    command: python manage.py runserver 0.0.0.0:80
+    # Add any environment variables your project needs to the .env-local file.
+    # See https://docs.divio.com/en/latest/reference/configuration-environment-variables.html.
+    env_file: .env-local
+
+  # On the Cloud, your database runs on a dedicated cluster. Locally, we
+  # replicate it in a Docker container called "db".
+  db:
+    image: postgres:13.5-alpine
+    environment:
+      POSTGRES_DB: "db"
+      POSTGRES_HOST_AUTH_METHOD: "trust"
+    volumes:
+      - ".:/app:rw"
