@@ -1,6 +1,7 @@
 # <INSTALLED_ADDONS>  # Warning: text inside the INSTALLED_ADDONS tags is auto-generated. Manual changes will be overwritten.
 https://divio-addons.s3-eu-central-1.amazonaws.com/aldryn-addons/2.2.0/8c3dde04-debd-4e6e-bc8d-fd913ca258e2/aldryn-addons-2.2.0.tar.gz#egg=aldryn-addons==2.2.0
 https://divio-addons.s3-eu-central-1.amazonaws.com/aldryn-sso/2.1.0/e29cc97c-b0f6-49d9-a46f-ed1a34cc9bf7/aldryn-sso-2.1.0.tar.gz#egg=aldryn-sso==2.1.0
+https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-file/3.0.0/3d2621db-220e-4e62-a731-f651d6c81fc6/djangocms-file-3.0.0.tar.gz#egg=djangocms-file==3.0.0
 https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-googlemap/2.0.0/2d0f6ff3-5f0b-48d0-8ee1-317c1d3e5baa/djangocms-googlemap-2.0.0.tar.gz#egg=djangocms-googlemap==2.0.0
 https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-link/3.1.0/9409e587-c5a9-4ac3-9d20-5cdb19907acc/djangocms-link-3.1.0.tar.gz#egg=djangocms-link==3.1.0
 https://divio-addons.s3-eu-central-1.amazonaws.com/djangocms-snippet/3.0.0/436700f0-3a6e-4787-a007-38eedaf66d07/djangocms-snippet-3.0.0.tar.gz#egg=djangocms-snippet==3.0.0
