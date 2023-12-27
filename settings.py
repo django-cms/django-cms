@@ -14,9 +14,8 @@
 INSTALLED_ADDONS = [
     # Important: Items listed inside the next block are auto-generated.
     # Manual changes will be overwritten.
-    # <INSTALLED_ADDONS>
-    "aldryn-addons",
-    "aldryn-django",
+    # <INSTALLED_ADDONS>  # Warning: text inside the INSTALLED_ADDONS tags is auto-generated. Manual changes will be overwritten.
+    "aldryn-sso",
     # </INSTALLED_ADDONS>
 ]
 
