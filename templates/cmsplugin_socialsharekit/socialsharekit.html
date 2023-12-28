@@ -1,0 +1,28 @@
+{% load sekizai_tags staticfiles socialsharekit_tags %}
+{% spaceless %}
+<div class="ssk-group ssk-{{ instance.size }}
+            {% if instance.sticky %} ssk-sticky{% endif %}
+            {% if instance.count %} ssk-count{% endif %}
+            {% if instance.button_position %} ssk-{{ instance.button_position }}{% endif %}
+            {% ifnotequal instance.style 'square' %} ssk-{{ instance.style }}
+            {% endifnotequal %}{% if instance.center %} ssk-center{% endif %}
+            {% if instance.greyscale %} ssk-grayscale{% endif %}"
+     {% if instance.align_width %} style="width:{{ instance.align_width }}"{% endif %}
+     id="ssk-{{ instance.pk }}">
+    {% for socialbutton in instance.buttons.all %}
+        <a href="" class="ssk
+                          ssk-{{ socialbutton.button }}
+                          {% if socialbutton.icononly and not instance.greyscale %} ssk-icon{% endif %}
+                          {% if socialbutton.text %} ssk-text{% endif %}">
+            {% if socialbutton.text %}{{ socialbutton.text|safe }}{% endif %}</a>
+    {% endfor %}
+</div>
+{% endspaceless %}
+
+{% addtoblock "css" %}<link rel="stylesheet" href="{% static 'cmsplugin_socialsharekit/css/social-share-kit.css' %}">{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{% static 'cmsplugin_socialsharekit/js/social-share-kit.min.js' %}"></script>{% endaddtoblock %}
+{% addtoblock "js" %}
+<script>
+    SocialShareKit.init({selector: '#ssk-{{ instance.pk }} .ssk'{% if instance.forceinit %}, forceInit: true{% endif %}});
+</script>
+{% endaddtoblock %}

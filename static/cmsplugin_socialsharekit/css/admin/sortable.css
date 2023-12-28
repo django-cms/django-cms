@@ -1,0 +1,31 @@
+div.inline-group .tabular tr > td {
+    padding: 7px 5px !important;
+}
+div.inline-group .tabular tr > td.delete {
+    padding-left: 20px !important;
+}
+div.inline-group table.ui-sortable tr.form-row td.original {
+    padding: 0 !important;
+}
+div.inline-group table.ui-sortable tr.form-row td.original p {
+    display: none !important;
+}
+
+div.inline-group table.ui-sortable td.drag {
+    background: url(../../img/admin/drag-norepeat.png) 5px repeat-x!important;
+    width: 58px !important;
+    background-size: 8px 30px!important;
+}
+
+.inline-group .module:not(.aligned) .form-row input {
+    width: 100% !important;
+}
+
+/*form fieldset {
+    width: 100%;
+}*/
+
+.tabular.inline-related table .form-row select {
+    max-width: 100%!important;
+    min-width: 100% !important;
+}
