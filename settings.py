@@ -23,6 +23,7 @@ INSTALLED_ADDONS = [
     "camc-cms-breadcrumb",
     "camc-cms-image-gallery",
     "cmsplugin-socialsharekit",
+    "djangocms-blog",
     "djangocms-file",
     "djangocms-googlemap",
     "djangocms-history",
