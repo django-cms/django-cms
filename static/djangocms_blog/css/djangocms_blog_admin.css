@@ -1,0 +1,58 @@
+.select2-container-multi .select2-choices .select2-search-field input {
+    min-width: 100px;
+}
+
+.selector select[multiple] {
+    display: block;
+}
+
+.selector {
+    width: auto;
+    margin-right: 12px;
+}
+
+.selector-available, .selector-chosen {
+    width: auto;
+}
+
+.selector .selector-available input, .selector .selector-chosen input {
+    margin: 0;
+}
+
+form select {
+    max-width: 266px;
+}
+
+.as-selections.vTextField {
+    width: 100%;
+}
+
+.as-results ul.as-list {
+    margin-left: 0;
+    margin-top: 0;
+    padding-left: 0;
+    box-shadow: none !important;
+    border: 1px solid #888888 !important;
+}
+.as-results ul.as-list li {
+    list-style: none;
+}
+ul.as-selections.vTextField {
+    padding-left: 10px;
+    margin-left: 0;
+    margin-bottom: 0;
+}
+
+ul.as-selections {
+    border-top-width: 1px;
+}
+
+ul.as-selections li {
+    list-style: none;
+    padding: 0;
+}
+
+ul.as-selections li.as-original {
+    border-top: 0;
+    width: 100%;
+}

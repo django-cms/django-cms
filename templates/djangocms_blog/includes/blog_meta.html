@@ -1,0 +1,33 @@
+{% load i18n easy_thumbnails_tags cms_tags apphooks_config_tags %}
+
+<ul class="post-detail">
+    {% if post.author %}
+    <li>
+        {% trans "by" %} <a href="{% namespace_url 'posts-author' post.author.get_username namespace=post.app_config.namespace %}">{% if post.author.get_full_name %}{{ post.author.get_full_name }}{% else %}{{ post.author }}{% endif %}</a>
+    </li>
+    {% endif %}
+    {% if post.date_published %}
+    <li>
+        {{ post.date_published|date:"DATE_FORMAT" }}
+    </li>
+    {% endif %}
+    {% if post.date_featured %}
+    <li>
+        {{ post.date_featured|date:"DATE_FORMAT" }}
+    </li>
+    {% endif %}
+</ul>
+<ul class="post-detail tags">
+    {% if post.categories.exists %}
+        {% for category in post.categories.all %}
+            {% if category.slug %}
+                <li class="category_{{ forloop.counter }}"><a href="{% namespace_url 'posts-category' category=category.slug namespace=category.app_config.namespace %}" class="blog-categories-{{ category.count }} blog-categories-{{ category.slug }}">{{ category.name }}</a>{% if not forloop.last %}, {% endif %}</li>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    {% if post.tags.exists %}
+        {% for tag in post.tags.all %}
+            <li class="tag_{{ forloop.counter }}"><a href="{% namespace_url 'posts-tagged' tag=tag.slug namespace=post.app_config.namespace %}" class="blog-tag blog-tag-{{ tag.count }} blog-tag-{{ tag.slug }}">{{ tag.name }}</a>{% if not forloop.last %}, {% endif %}</li>
+        {% endfor %}
+    {% endif %}
+</ul>

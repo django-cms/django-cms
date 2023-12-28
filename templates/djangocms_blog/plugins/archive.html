@@ -1,0 +1,31 @@
+{% load i18n apphooks_config_tags %}{% spaceless %}
+<div class="plugin plugin-blog">
+    <h3>{% trans "Archive" %}</h3>
+    {% regroup dates by date.year as years %}
+    {% with current_year=year current_month=month %}
+    <ul class="blog-archive">
+        {% for year in years %}
+        <li{% if year.grouper == current_year %} class="active"{% endif %}>
+            <a href="{% namespace_url 'posts-archive' year=year.grouper namespace=instance.app_config.namespace %}">{{ year.grouper }}</a>
+            <ul>
+                {% for month in year.list %}
+                <li{% if year.grouper == current_year and month.date.month == current_month %} class="active"{% else %} class="month"{% endif %}>
+                    <a href="{% namespace_url 'posts-archive' year=year.grouper month=month.date|date:"n" namespace=instance.app_config.namespace %}">
+                        {{ month.date|date:"F" }}
+                        <span>(
+                            {% if month.count > 0 %}
+                            {% blocktrans count articles=month.count %}1 article{% plural %}{{ articles }} articles{% endblocktrans %}
+                            {% else %}{% trans "0 articles" %}{% endif %}
+                        )</span>
+                    </a>
+                </li>
+                {% endfor %}
+            </ul>
+        </li>
+        {% empty %}
+        <li class="blog-empty"><p>{% trans "No article found." %}</p></li>
+        {% endfor %}
+    </ul>
+    {% endwith %}
+</div>
+{% endspaceless %}

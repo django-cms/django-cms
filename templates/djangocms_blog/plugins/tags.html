@@ -1,0 +1,21 @@
+{% load i18n apphooks_config_tags %}
+
+{% spaceless %}
+<div class="plugin plugin-blog">
+    <h3>{% trans "Tags" %}</h3>
+    <ul class="blog-tags">
+        {% for tag in tags %}
+            <li><a href="{% namespace_url 'posts-tagged' tag=tag.slug namespace=instance.app_config.namespace %}" class="blog-tag-{{ tag.count }}">
+                {{ tag.name }}
+                <span>(
+                    {% if tag.count > 0 %}
+                    {% blocktrans count articles=tag.count %}1 article{% plural %}{{ articles }} articles{% endblocktrans %}
+                    {% else %}{% trans "0 articles" %}{% endif %}
+                )</span>
+            </a></li>
+        {% empty %}
+        <li class="blog-empty"><p>{% trans "No article found." %}</p></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endspaceless %}

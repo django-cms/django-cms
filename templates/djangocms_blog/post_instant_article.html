@@ -1,0 +1,34 @@
+{% load easy_thumbnails_tags cms_tags %}
+<!doctype html>
+<html lang="{{ post.get_current_language }}" prefix="op: http://media.facebook.com/op#">
+  <head>
+    <meta charset="utf-8">
+    {% block canonical_url %}<link rel="canonical" href="{{ meta.url }}"/>{% endblock canonical_url %}
+    <meta property="op:markup_version" content="v1.0">
+  </head>
+  <body>
+    <article>
+      <header>
+        <h1>{{ post.title }}</h1>
+        {% if post.subtitle %}
+            <h2>{{ post.subtitle }}</h2>
+        {% endif %}
+        <time class="op-published" datetime="{{ post.date_published|date:"Y-m-d\TH:i:sO" }}">{{ post.date_published|date:"DATE_FORMAT" }}</time>
+        <time class="op-modified" dateTime="{{ post.date_modified|date:"Y-m-d\TH:i:sO" }}">{{ post.date_modified|date:"DATE_FORMAT" }}</time>
+        <address>
+            <a {% if og_author_url %}rel="facebook" href="{{ og_author_url }}"{% endif %}>{{ post.get_author_name }}</a>
+        </address>
+        <figure>
+            <img src="{{ meta.image }}" alt="{{ post.main_image.default_alt_text|default:'' }}" />
+            {% if post.main_image.default_caption %}<figcaption>{{ post.main_image.default_caption }}</figcaption>{% endif %}
+        </figure>
+        <h3 class="op-kicker">{{ post.abstract|striptags|safe }}</h3>
+      </header>
+      {% if post.app_config.use_placeholder %}
+      <div class="blog-content">{% render_placeholder post.content %}</div>
+      {% else %}
+      <div class="blog-content">{% render_model post "post_text" "post_text" "" "safe" %}</div>
+      {% endif %}
+    </article>
+  </body>
+</html>

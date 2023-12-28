@@ -1,0 +1,19 @@
+{% load i18n %}{% spaceless %}
+<div class="plugin plugin-blog">
+    <h3>{% trans "Categories" %}</h3>
+    <ul class="blog-categories">
+        {% for category in categories %}
+            <li><a href="{{ category.get_absolute_url }}" class="blog-categories-{{ category.count }}">
+                {{ category.name }}
+                <span>(
+                    {% if category.count > 0 %}
+                    {% blocktrans count articles=category.count %}1 article{% plural %}{{ articles }} articles{% endblocktrans %}
+                    {% else %}{% trans "0 articles" %}{% endif %}
+                )</span>
+            </a></li>
+        {% empty %}
+            <li class="blog-empty"><p>{% trans "No categories found." %}</p></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endspaceless %}

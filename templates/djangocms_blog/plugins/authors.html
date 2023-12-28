@@ -1,0 +1,19 @@
+{% load i18n easy_thumbnails_tags apphooks_config_tags %}{% spaceless %}
+<div class="plugin plugin-blog">
+    <h3>{% trans "Authors" %}</h3>
+    <ul class="blog-authors">
+        {% for author in authors_list %}
+        <li><a href="{% namespace_url 'posts-author' author.get_username namespace=instance.app_config.namespace %}">
+            {{ author.get_full_name }}
+            <span>(
+                {% if author.count > 0 %}
+                {% blocktrans count articles=author.count %}1 article{% plural %}{{ articles }} articles{% endblocktrans %}
+                {% else %}{% trans "0 articles" %}{% endif %}
+            )</span>
+        </a></li>
+        {% empty %}
+        <li class="blog-empty"><p>{% trans "No author found." %}</p></li>
+        {% endfor %}
+    </ul>
+</div>
+{% endspaceless %}
