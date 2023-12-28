@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "camc_cms_image_gallery"
+    ],
+    "package-name": "camc-cms-image-gallery"
+}
