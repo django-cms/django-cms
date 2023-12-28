@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "camc_cms_breadcrumb"
+    ],
+    "package-name": "camc-cms-breadcrumb"
+}
