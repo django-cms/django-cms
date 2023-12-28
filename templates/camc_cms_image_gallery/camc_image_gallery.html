@@ -1,0 +1,23 @@
+{% load cms_tags %}
+
+<section class="fil-image-gallery{% if instance.grey_background %} bg-grey-50{% endif %}{% if instance.top_title %} has-title{% endif %}">
+    <div class="grid-container">
+        <div class="grid-x">
+            <div class="cell small-12 text-center">
+
+                <!-- render title -->
+                {% if instance.top_title %}
+                <h2 class="title-keyline">{{ instance.top_title }}</h2>
+                {% endif %} {% if instance.intro %}
+                <p>{{ instance.intro }}</p>
+                {% endif %}
+
+                <div class="grid-x grid-margin-x align-center">
+                    <!-- render media-grid items -->
+                    {% for plugin in instance.child_plugin_instances %} {% render_plugin plugin %} {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>

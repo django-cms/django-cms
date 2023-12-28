@@ -1,0 +1,20 @@
+{% load cms_tags global_url_manager_tags %}
+
+<div class="cell small-12 medium-4 camc-image-gallery">
+    <a href="{% render_url instance.link.url_grouper %}" target="{{ instance.link.target }}">
+        <div class="card camc-image-card">
+            <div class="grid-x">
+                <div class="  camc-image-card-icon">
+                    {% if ARTICLE_AMP_ENABLED_FOR_MEDIA %}
+                    <amp-img width="475"   height="268"   src="{{instance.image.file.url}}" layout="responsive"   alt="{% firstof instance.image.file.default_alt_text _('None') %}">
+                    </amp-img>
+                    {% else %}
+                    <img {% if instance.lazy_load_image %}class="lazy" data-src="{{ instance.image.file.url }}" {% else %}src="{{ instance.image.file.url }}" {% endif %} alt="{% firstof instance.image.file.default_alt_text _('None') %}" /> {% endif %}
+                </div>
+                <div class=" meta camc-image-card-content">
+                    <div class="camc-image-card-content-inner">{{ instance.link }}</div>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
