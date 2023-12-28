@@ -1,0 +1,17 @@
+{% load menu_tags %}
+<div class="section-breadcrumb">
+{% for ance in ancestors %}
+    {% if not ance.is_home %}
+        {% if not forloop.last %}
+            <a href="{{ ance.get_absolute_url }}">{{ ance.get_menu_title }}</a>
+            <span class="fil-icon fil-icon-chevron-r-light"></span>
+        {% else %}
+            {% if ance.get_absolute_url == '/' %}
+                <a href="{{ ance.get_absolute_url }}">{{ ance.get_menu_title }}</a>
+            {% else %}
+                {{ ance.get_menu_title }}
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+</div>
