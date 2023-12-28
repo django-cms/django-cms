@@ -1,0 +1,6 @@
+{
+    "installed-apps": [
+        "cmsplugin_socialsharekit"
+    ],
+    "package-name": "cmsplugin-socialsharekit"
+}
