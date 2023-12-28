@@ -126,12 +126,12 @@ class CMSAppConfig():
     CMSAppConfig live in a file called ``cms_config.py``.
 
     Apps subclassing ``CMSAppConfig`` can set ``cms_enabled = True`` for their app config to
-    use django CMS' wizard functionality. Additional wizzwards are listed in the app config's
-    ``cms_wizzards`` property.
+    use django CMS' wizard functionality. Additional wizards are listed in the app config's
+    ``cms_wizards`` property.
 
     The second functionality that django CMS offers is attaching Model objects to the toolbar. To use
     this functionality, set list the Model classes in ``cms_toolbar_enabled_models`` and have
-    `cms_enabled = True```
+    ``cms_enabled = True``
     """
 
     def __init__(self, django_app_config):
