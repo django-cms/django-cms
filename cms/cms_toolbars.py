@@ -301,11 +301,9 @@ class BasicToolbar(CMSToolbar):
                 _('Disable toolbar'), url='?%s' % get_cms_setting('CMS_TOOLBAR_URL__DISABLE')
             )
             self._admin_menu.add_break(TOOLBAR_DISABLE_BREAK)
-            self._admin_menu.add_link_item(
-                _('Shortcuts...'), url='#',
-                extra_classes=('cms-show-shortcuts',)
-            )
-            self._admin_menu.add_break(SHORTCUTS_BREAK)
+
+            # shortcuts
+            self.add_shortcut_button(self._admin_menu)
 
             # logout
             self.add_logout_button(self._admin_menu)
@@ -319,6 +317,14 @@ class BasicToolbar(CMSToolbar):
             if self.request.user.has_perm('%s.%s' % (opts.app_label, get_permission_codename('change', opts))):
                 user_changelist_url = admin_reverse('%s_%s_changelist' % (opts.app_label, opts.model_name))
                 parent.add_sideframe_item(_('Users'), url=user_changelist_url)
+
+    def add_shortcut_button(self, parent):
+        parent.add_link_item(
+            _('Shortcuts...'),
+            url='#',
+            extra_classes=('cms-show-shortcuts',)
+        )
+        parent.add_break(SHORTCUTS_BREAK)
 
     def add_logout_button(self, parent):
         if self.page and not self.page.login_required:
