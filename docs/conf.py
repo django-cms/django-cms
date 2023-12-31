@@ -21,7 +21,7 @@ import sys
 
 sys.path.append(os.path.abspath('./'))
 
-import django, django_settings
+import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_settings')
 django.setup()
@@ -152,7 +152,7 @@ try:
     html_theme_options = {
         "navigation_with_keys": True,
     }
-except:  # NOQA
+except ImportError: 
     html_theme = 'default'
 
 
