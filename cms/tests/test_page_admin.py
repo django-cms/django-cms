@@ -38,6 +38,7 @@ from cms.test_utils.testcases import (
     CMSTestCase,
 )
 from cms.test_utils.util.context_managers import LanguageOverride, UserLoginContext
+from cms.utils.compat import DJANGO_4_2
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
@@ -1373,6 +1374,10 @@ class PageTest(PageTestBase):
         expected = (
             '<input id="id_overwrite_url" maxlength="255" '
             'value="new-url" name="overwrite_url" type="text" />'
+        ) if DJANGO_4_2 else (
+            '<input type="text" name="overwrite_url" value="new-url" '
+            'maxlength="255" aria-describedby="id_overwrite_url_helptext" '
+            'id="id_overwrite_url">'
         )
         changelist = self.get_admin_url(Page, 'changelist')
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
@@ -1425,6 +1430,9 @@ class PageTest(PageTestBase):
         expected = (
             '<input id="id_overwrite_url" maxlength="255" '
             'name="overwrite_url" type="text" />'
+        ) if DJANGO_4_2 else (
+            '<input type="text" name="overwrite_url" maxlength="255" '
+            'aria-describedby="id_overwrite_url_helptext" id="id_overwrite_url">'
         )
         changelist = self.get_admin_url(Page, 'changelist')
         endpoint = self.get_admin_url(Page, 'advanced', cms_page.pk)
