@@ -173,7 +173,7 @@ django CMS also has other requirements, which it lists as dependencies in its
 
     .. code-block:: bash
 
-        python3 -m .venv  # create a virtualenv
+        python3 -m venv .venv  # create a virtualenv
         source .venv/bin/activate  # activate it
         pip install --upgrade pip  # Upgrade pip
 
