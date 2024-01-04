@@ -181,7 +181,7 @@ Then:
 
 .. code-block::
 
-    pip install django-cms\>=4.1.0rc5
+    pip install django-cms
 
 to install the release candidate version of django CMS. It will also install its
 dependencies including Django.
