@@ -187,7 +187,7 @@ status "  Send them manually before creating a version"
 "$SCRIPTS/tx" --token "$TX_TOKEN" status
 "$SCRIPTS/transifex-send-strings"
 
-git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
+git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales" --allow-empty
 
 echo ""
 status "******************************************************************************"
@@ -209,7 +209,7 @@ status "- Fetching strings from transifex"
 
 # Before compiling:
 # ignore changesets that only involves "^POT-Creation-Date:" "^PO-Revision-Date:"
-git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}compilemessages"
+git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}compilemessages" --allow-empty
 cd ..
 
 status "- generating assets/static"

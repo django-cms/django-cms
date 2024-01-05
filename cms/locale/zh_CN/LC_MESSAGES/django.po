@@ -4,19 +4,19 @@
 # 
 # Translators:
 # 华鹏 刘 <lhp.n.reg@gmail.com>, 2023
-# Scott Jiang, 2023
 # Aosp T, 2023
 # Florian Delizy <florian.delizy@gmail.com>, 2023
 # libingchao <popil1987@126.com>, 2023
 # Fabian Braun <fsbraun@gmx.de>, 2023
+# Scott Jiang, 2023
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-22 12:50+0200\n"
+"POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
+"Last-Translator: Scott Jiang, 2023\n"
 "Language-Team: Chinese (China) (https://app.transifex.com/divio/teams/58664/zh_CN/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -196,7 +196,7 @@ msgid "Advanced Settings"
 msgstr "高级设置"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "此页面不能用于主页"
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
@@ -218,12 +218,12 @@ msgid ""
 msgstr "错误！您没有权限移动页面。请刷新页面"
 
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "出错！您没有权限复制此页"
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "出错！您复制的页面尚未翻译成任何一种目标网站设定的语言"
 
 msgid "You do not have permission to edit this page"
 msgstr "您没有权限编辑本页面"
@@ -250,7 +250,7 @@ msgid "You do not have permission to copy these plugins."
 msgstr "您没有复制插件的权限"
 
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "您没有权限删除本页面"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
@@ -1563,3 +1563,6 @@ msgstr "创建一个新的%s实例"
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "一向导程序已经注册在模型%s"
+
+#~ msgid "Slug must not be empty."
+#~ msgstr "缩略名不能为空。"

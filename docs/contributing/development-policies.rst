@@ -13,7 +13,7 @@ Reporting security issues
 .. ATTENTION::
 
     If you think you have discovered a security issue in our code, please report
-    it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
+    it **privately**, by emailing us at `security@django-cms.org <security@django-cms.org>`_.
 
     Please **do not** raise it in any public forum until we have had a
     chance to deal with it.
@@ -47,33 +47,50 @@ the author of the pull request.
 Proposal and discussion of significant changes
 **********************************************
 
-New features and backward-incompatible changes should be proposed using the `Discourse forum <https://discourse.django-cms.org>`_. Discussion should take place there before any pull requests
-are made.
+New features and backward-incompatible changes should follow the best practice of `DEPS <https://github.com/django/deps>`_ and
+should be discussed in the community first. After your proposal has been reviewed by the community,
+it needs to be finally approved by the `Tech Committee <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_.
+This is in the interests of openness and transparency,
+and to give the community a chance to participate in and understand the decisions taken by the project.
 
-This is in the interests of openness and transparency, and to give the community a chance to participate in and
-understand the decisions taken by the project.
+So before submitting pull requests with significant changes, please make sure that the community agrees and the
+Technical Committee approves.
+
+
+To create a proposal...
+
+1. please use this `DEP template <https://github.com/django/deps/blob/main/template.rst>`_
+2. create a discussion in the main `Github repository <https://github.com/django-cms/django-cms/discussions>`_
+3. discuss, discuss, discuss
+4. join the Tech Committee `Slack Channel <https://www.django-cms.org/slack>`_ (#technical-committee) and make the team aware of your proposal after the proposal has been reviewed by the Technical Committee, it is put to a vote at one of the weekly meetings of the technical committee
 
 
 ****************
 Release schedule
 ****************
 
-..  versionchanged:: 3.7
+The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website. The release schedule is
+managed by the release management workgroup. The plan is to release quarterly and according to a retrospectice approach.
 
-    django CMS 3.7 is the new active long term release.
+Example of retrospective approach.
 
-The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website.
+* Q1 2021 -> 3.9 Release
+* End of Q1 2021 -> freeze
+* Check what’s available
+* Merge in anything that’s been approved
+* Q2 2021 Release -> 3.10
+* ...
+* Unscheduled Releases -> e.g. bug fix -> 3.x.x
 
-We are planning releases according to **key principles and aims**. Issues within milestones are
-therefore subject to change.
+The release management workgroup can be found on `Slack <https://www.django-cms.org/slack>`_ in #release-management channel.
+For questions regarding the release process please join the channel and reach out. We're happy to help.
 
-The `django CMS Discourse forum <https://discourse.django-cms.org>`_ serves as gathering
-point for developers. We submit ideas and proposals prior to the roadmap goals.
+Long-Term Support Release
+===========================
 
-django CMS 3.4, surpassed by 3.7, was the first "LTS" ("Long-Term Support")
-release of the application. *Long-term support* means that this version will
-continue to receive security and other critical updates for 24 months after its
-first release.
+For the current Long-Term Support (LTS) release overview see :ref:`here <LTS>`. *Long-term
+support* means that this version will continue to receive security and other
+critical updates in alignment with the corresponding Django LTS release.
 
 Any updates it does receive will be backward-compatible and will not alter functional behaviour. This means that users
 can deploy this version confident that keeping it up-to-date requires only easily-applied security and other critical
@@ -86,35 +103,18 @@ updates, until the next LTS release.
 Branches
 ********
 
-..  versionchanged:: 3.3
-
-    Previously, we maintained a ``master`` branch (now deleted), and a set of ``support`` branches (now pruned, and
-    renamed ``release``).
-
-..  versionchanged:: 3.7
-
-    Simplified the description of the release branches and added additional
-    information for ``releases`` and ``release/4.0.x``. In general open PRs
-    against ``develop``.
-
 We maintain a number of branches on
 `our GitHub repository <https://github.com/django-cms/django-cms>`_:
 
-``develop``
+``develop-4``
     The default target branch for on-going development and new pull requests.
 
 ``release/x.y.z`` are the latest released versions of django CMS. Commits
-    are cherry-picked from ``develop`` and merged into ``release/x.y.z``
+    are cherry-picked from ``develop-4`` and merged into ``release/x.y.z``
     when suitable. We **officially support** the latest, highest released version
-    and the latest LTS (currently 3.7).
+    and the latest LTS.
 
-``release/4.0.x`` is an experimental branch and should not be considered
-    as the highest released version.
-
-``releases`` hosts the `releases.json` file to indicate the availability of new
-    django CMS versions when using `djangocms-admin-style <https://github.com/django-cms/djangocms-admin-style#configuration>`_.
-
-Please always open PR's against develop and indicate that they should be
+Please always open PR's against ``develop-4`` and indicate that they should be
 backported to the latest LTS release when necessary. Older branches are not
 supported any longer.
 
@@ -124,8 +124,6 @@ supported any longer.
 *******
 Commits
 *******
-
-.. versionadded:: 3.3
 
 Commit messages
 ===============
@@ -195,8 +193,6 @@ Ask for help if you run into trouble!
 Changelog
 *********
 
-.. versionadded:: 3.3
-
 **Every new feature, bugfix or other change of substance** must be represented in the `CHANGELOG
 <https://github.com/django-cms/django-cms/blob/develop/CHANGELOG.rst>`_. This includes documentation, but **doesn't** extend
 to things like reformatting code, tidying-up, correcting typos and so on.
@@ -214,4 +210,3 @@ New lines should be added to the top of the list.
 
 
 .. _security@django-cms.org: mailto:security@django-cms.org
-.. _freenode: http://freenode.net/

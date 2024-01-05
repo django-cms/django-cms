@@ -159,62 +159,6 @@ Example::
 
     cms copy site --from-site=1 --to-site=2
 
-*******************
-Moderation commands
-*******************
-
-``cms moderator``
-=================
-
-If you migrate from an earlier version, you should use the ``cms moderator on``
-command to ensure that your published pages are up to date, whether or not you
-used moderation in the past.
-
-.. warning::
-
-    This command **alters data** in your database. You should make a backup of
-    your database before using it! **Never** run this command without first
-    checking for orphaned plugins, using the ``cms list plugins`` command, and
-    if necessary ``delete-orphaned-plugins``. Running  ``cms moderator`` with
-    orphaned plugins will fail and leave bad data in your database.
-
-``cms publisher-publish``
-=========================
-
-If you want to publish many pages at once, this command can help you. By default,
-this command publishes drafts for all public pages.
-
-It accepts the following options
-
-* ``--unpublished``: set to publish all drafts, including unpublished ones;
-  if not set, only already published pages will be republished.
-* ``-l``, ``--language``: specify a language code to publish pages in only one language;
-  if not specified, this command publishes all page languages;
-* ``--site``: specify a site id to publish pages for specified site only;
-  if not specified, this command publishes pages for all sites;
-
-
-Example::
-
-    #publish drafts for public pages in all languages
-    cms publisher-publish
-
-    #publish all drafts in all pages
-    cms publisher-publish --unpublished
-
-    #publish drafts for public pages in deutsch
-    cms publisher-publish --language=de
-
-    #publish all drafts in deutsch
-    cms publisher-publish --unpublished --language=de
-
-    #publish all drafts in deutsch, but only for site with id=2
-    cms publisher-publish --unpublished --language=de --site=2
-
-.. warning::
-
-    This command publishes drafts. You should review drafts before using this
-    command, because they will become public.
 
 **********************
 Maintenance and repair
@@ -225,18 +169,12 @@ Maintenance and repair
 ``fix-tree``
 ============
 
-Occasionally, the pages and plugins tree can become corrupted.
-Typical symptoms include problems when trying to copy or delete plugins or pages.
+Occasionally, the page tree can become corrupted. Typical symptoms include problems 
+when trying to copy or delete pages.
 
 This command will fix small corruptions by rebuilding the tree.
 
-.. _fix-mptt:
+.. versionadded:: 4.0
 
-``fix-mptt``
-============
-
-Occasionally, the MPTT tree can become corrupted (this is one of the reasons for :doc:`our move
-away from MPTT to MP in django CMS 3.1 </upgrade/3.1>`). Typical symptoms include problems when
-trying to copy or delete plugins or pages.
-
-This command has been removed in :doc:`django CMS 3.1 </upgrade/3.1>` and replaced with `fix-tree`_.
+    Since django CMS Version 4 this command does not affect the plugin tree.
+    

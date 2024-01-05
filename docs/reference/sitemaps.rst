@@ -1,5 +1,5 @@
-########
 Sitemaps
-########
+========
 
-..  class:: cms.sitemaps.CMSSitemap
+.. autoclass:: cms.sitemaps.CMSSitemap
+    :members:
