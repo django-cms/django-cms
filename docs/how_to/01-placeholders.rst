@@ -50,7 +50,7 @@ you would like to use:
 
         @cached_property
         def my_placeholder(self):
-            return get_placeholder_from_slot(self.placeholders, "my_placeholder")
+            return get_placeholder_from_slot(self.placeholders, "slot_name")
 
         # your methods
 
@@ -61,7 +61,7 @@ placeholders. The utility function
 based on its slot name.
 
 The ``slot`` is used in templates, to determine where the placeholder's plugins should
-appear in the page, and in the placeholder configuration :ref:`CMS_PLACEHOLDER_CONF`,
+appear in the page, and in the placeholder configuration :setting:`CMS_PLACEHOLDER_CONF`,
 which determines which plugins may be inserted into this placeholder.
 
 .. note::
@@ -97,8 +97,8 @@ amongst the translated fields:
         placeholders = PlaceholderRelationField()
 
         @cached_property
-        def placeholder_1(self):
-            return get_placeholder_from_slot(self.placeholders, "placeholder_1")
+        def my_placeholder(self):
+            return get_placeholder_from_slot(self.placeholders, "slot_name")
 
         def __str__(self):
             return self.title
@@ -106,7 +106,7 @@ amongst the translated fields:
 Templates
 ~~~~~~~~~
 
-To render the placeholder in a template you use the :ref:`render_placeholder` tag from
+To render the placeholder in a template you use the :ttag:`render_placeholder` tag from
 the :mod:`~cms.templatetags.cms_tags` template tag library:
 
 .. code-block:: html+django
@@ -115,7 +115,7 @@ the :mod:`~cms.templatetags.cms_tags` template tag library:
 
     {% render_placeholder mymodel_instance.my_placeholder "640" %}
 
-The :ref:`render_placeholder` tag takes the following parameters:
+The :ttag:`render_placeholder` tag takes the following parameters:
 
 - :class:`~cms.models.fields.PlaceholderField` instance
 - ``width`` parameter for context sensitive plugins (optional)
@@ -173,7 +173,7 @@ a second template, only needed for rendering the structure mode, called, say,
 .. code-block:: html+django
 
     {% load cms_tags %}
-    {% placeholder "placeholder_1" %}
+    {% placeholder "slot_name" %}
 
 The important bit is to include all slot names for the model in the structure template.
 Other parts of the templte are not necessary.
@@ -199,7 +199,8 @@ Registering the model for frontend editing
 .. versionadded:: 4.0
 
 The final step is to register the model for frontend editing. Since django CMS 4 this is
-done by adding a :class:`~cms.app_base.CMSAppConfig` class to the app's `cms_config.py` file:
+done by adding a :class:`~cms.app_base.CMSAppConfig` class to the app's `cms_config.py`
+file:
 
 .. code-block::
 
@@ -215,7 +216,7 @@ Adding content to a placeholder
 -------------------------------
 
 Placeholders can be edited from the frontend by visiting the page displaying your model
-(where you put the :ref:`render_placeholder` tag), then appending ``?toolbar_on`` to the
+(where you put the :ttag:`render_placeholder` tag), then appending ``?toolbar_on`` to the
 page's URL.
 
 This will make the frontend editor top banner appear (and if necessary will require you
