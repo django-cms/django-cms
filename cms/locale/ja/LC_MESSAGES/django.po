@@ -4,16 +4,16 @@
 # 
 # Translators:
 # Paulo Alvarado <paulo.alvarado@divio.ch>, 2023
-# tenomoto <takeshi@enomosphere.net>, 2023
 # Fabian Braun <fsbraun@gmx.de>, 2023
+# tenomoto <takeshi@enomosphere.net>, 2023
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-22 12:50+0200\n"
+"POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
+"Last-Translator: tenomoto <takeshi@enomosphere.net>, 2023\n"
 "Language-Team: Japanese (https://app.transifex.com/divio/teams/58664/ja/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -1567,3 +1567,6 @@ msgstr "新しい%sインスタンスを作成する。"
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "モデル \"%s\" についてウィーザードか゜既に登録されています。"
+
+#~ msgid "Slug must not be empty."
+#~ msgstr "スラグは空ではいけません。"

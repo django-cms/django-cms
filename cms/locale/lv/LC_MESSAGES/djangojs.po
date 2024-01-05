@@ -3,13 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Mikelis Asnins <mikelis.asnins@yahoo.com>, 2013
 msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 16:56+0000\n"
+"POT-Creation-Date: 2022-11-05 20:40+0100\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Mikelis Asnins <mikelis.asnins@yahoo.com>, 2013\n"
 "Language-Team: Latvian (http://app.transifex.com/divio/django-cms/language/lv/)\n"
@@ -19,13 +18,10 @@ msgstr ""
 "Language: lv\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);\n"
 
-msgid "pathname"
+msgid "/"
 msgstr ""
 
-msgid "urnpath"
-msgstr ""
-
-msgid "reserved"
+msgid ":"
 msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"

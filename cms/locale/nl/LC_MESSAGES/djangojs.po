@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Chris Wesseling <chris.wesseling@xs4all.nl>, 2011
 # Jacques de Hooge <>, 2012
 # 9b534940ba88da102a8b2023ae8b0a5c_833de33 <6eff1839cb13e50fd6e97f7bd38c9dda_152118>, 2014
@@ -12,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 16:56+0000\n"
+"POT-Creation-Date: 2022-11-05 20:40+0100\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: kurdyma <transifex.com@kurdyenviolien.nl>, 2016\n"
 "Language-Team: Dutch (http://app.transifex.com/divio/django-cms/language/nl/)\n"
@@ -22,13 +21,10 @@ msgstr ""
 "Language: nl\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "pathname"
+msgid "/"
 msgstr ""
 
-msgid "urnpath"
-msgstr ""
-
-msgid "reserved"
+msgid ":"
 msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
