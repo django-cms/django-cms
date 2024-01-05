@@ -14,7 +14,8 @@ import Class from 'classjs';
 var Messages = new Class({
     options: {
         messageDuration: 300,
-        messageDelay: 3000
+        messageDelay: 3000,
+        messageLength: 160
     },
 
     initialize: function initialize(options) {
@@ -71,6 +72,10 @@ var Messages = new Class({
         var top = this.ui.toolbar.outerHeight(true);
         var close = this.ui.messages.find('.cms-messages-close');
 
+        if (msg.includes('<p') || msg.includes('<br') || msg.length > this.options.messageLength) {
+            // Force long messages to stay on screen
+            delay = 0;
+        }
         // add content to element
         this.ui.messages.find('.cms-messages-inner').html(msg);
 
