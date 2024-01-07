@@ -355,14 +355,14 @@ class CMSPlugin(MP_Node, metaclass=PluginModelBase):
         return new_plugin
 
     @classmethod
-    def fix_tree(cls, destructive=False):
+    def fix_tree(cls, **kwargs):
         """
         Fixes the plugin tree by first calling treebeard fix_tree and the
         recalculating the correct position property for each plugin.
         """
         from cms.utils.plugins import reorder_plugins
 
-        super().fix_tree(destructive)
+        super().fix_tree(**kwargs)
         for placeholder in Placeholder.objects.all():
             for language, __ in settings.LANGUAGES:
                 order = CMSPlugin.objects.filter(
