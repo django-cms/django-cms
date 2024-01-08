@@ -3,15 +3,14 @@ Permissions
 ###########
 
 
-..  module:: cms.models
+..  module:: cms.models.permissionmodels
 
-..  class:: PagePermission
+..  autoclass:: PagePermission
 
+..  autodata:: ACCESS_PAGE
 
-..  data:: ACCESS_PAGE
+..  autodata:: ACCESS_CHILDREN
 
-..  data:: ACCESS_CHILDREN
+..  autodata:: ACCESS_DESCENDANTS
 
-..  data:: ACCESS_DESCENDANTS
-
-..  data:: ACCESS_PAGE_AND_DESCENDANTS
+..  autodata:: ACCESS_PAGE_AND_DESCENDANTS

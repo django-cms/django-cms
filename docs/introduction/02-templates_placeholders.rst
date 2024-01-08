@@ -20,20 +20,23 @@ You can define multiple templates, with different layouts or built-in
 components, and choose them for each page as required. A page's template
 can be switched for another at any time.
 
-You'll find the site's templates in ``mysite/templates``.
+You'll find the site's templates in ``django-cms-quickstart/backend/templates``.
 
 By default, pages in your site will use the ``fullwidth.html`` template, the first one listed in
 the project's ``settings.py`` ``CMS_TEMPLATES`` tuple:
 
 ..  code-block:: python
-    :emphasize-lines: 3
+    :emphasize-lines: 6
 
-    CMS_TEMPLATES = (
-        ## Customize this
-        ('fullwidth.html', 'Fullwidth'),
-        ('sidebar_left.html', 'Sidebar Left'),
-        ('sidebar_right.html', 'Sidebar Right')
-    )
+    CMS_TEMPLATES = [
+        # a minimal template to get started with
+        ('minimal.html', 'Minimal template'),
+
+        # optional templates that extend base.html, to be used with Bootstrap 5
+        ('bootstrap5.html', 'Bootstrap 5 Demo'),
+
+        ('whitenoise-static-files-demo.html', 'Static File Demo'),
+    ]
 
 
 ************
@@ -65,59 +68,53 @@ placeholder "splashbox" %}`` inside the ``{% block content %}`` section. For exa
         {% placeholder "splashbox" %}
     {% endblock content %}
 
-If you switch to *Structure* mode, you'll see the new placeholders available for use.
+If you switch to *Structure* mode (*button in the upper-right corner of the page*), you'll see the new placeholders available for use.
 
-.. image:: /introduction/images/new-placeholder.png
+.. image:: images/new-placeholder.png
    :alt: the new 'splashbox' placeholder
    :align: center
 
 
-*******************
-Static Placeholders
-*******************
+**************
+Static Aliases
+**************
 
-The content of the placeholders we've encountered so far is different for
-every page. Sometimes though you'll want to have a section on your website
-which should be the same on every single page, such as a footer block.
+The content of the placeholders we've encountered so far is different for every page. Sometimes though you'll want to have a section on your website which should be the same on every single page, such as a footer block.
 
-You *could* hard-code your footer into the template, but it would be nicer to be
-able to manage it through the CMS. This is what **static placeholders** are for.
+You *could* hard-code your footer into the template, but it would be nicer to be able to manage it through the CMS. This is what **static aliases** are for. You need to install the django CMS alias package to use static aliases::
 
-Static placeholders are an easy way to display the same content on multiple
-locations on your website. Static placeholders act almost like normal
-placeholders, except for the fact that once a static placeholder is created and
-you added content to it, it will be saved globally. Even when you remove the
-static placeholders from a template, you can reuse them later.
+    pip install git+https://github.com/django-cms/djangocms-alias
 
-So let's add a footer to all our pages. Since we want our footer on every
-single page, we should add it to our **base template**
-(``mysite/templates/base.html``). Place it near the end of the HTML ``<body>`` element:
+Do not forget to add ``djangocms_alias`` to your ``INSTALLED_APPS`` in ``settings.py``.
+
+Static aliases are an easy way to display the same content on multiple locations on your website. Static placeholders act almost like normal placeholders, except for the fact that once a static placeholder is created and you added content to it, it will be saved globally. Even when you remove the static placeholders from a template, you can reuse them later.
+
+So let's add a footer to all our pages. Since we want our footer on every single page, we should add it to our **base template** (``mysite/templates/base.html``). Place it near the end of the HTML ``<body>`` element:
 
 .. code-block:: html+django
-   :emphasize-lines: 1-3
+   :emphasize-lines: 1,3-5
+
+        {% load djangocms_alias_tags %}
 
         <footer>
-          {% static_placeholder 'footer' %}
+          {% static_alias 'footer' %}
         </footer>
 
 
         {% render_block "js" %}
     </body>
 
-Save the template and return to your browser. Refresh any page in Structure mode, and you'll
-see the new static placeholder.
+Save the template and return to your browser. Refresh any page in Structure mode, then go to the "Aliases.." entry in the site menu and you'll see the new static alias listed in its category "Static alias".
 
-.. image:: /introduction/images/static-placeholder.png
+.. image:: images/static-alias.png
    :alt: a static placeholder
    :align: center
 
 ..  note::
 
-    To reduce clutter in the interface, the plugins in static placeholders are hidden by default.
-    Click or tap on the name of the static placeholder to reveal/hide them.
+    Like editing of pages and aliases publishing is independent.
 
-If you add some content to the new static placeholder in the usual way, you'll see that it
-appears on your site's other pages too.
+If you add some content to the new static placeholder in the usual way, you'll see that it appears on your site's other pages too.
 
 
 ***************

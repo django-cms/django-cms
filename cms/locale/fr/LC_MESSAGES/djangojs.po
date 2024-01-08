@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Bertrand Bordage <bordage.bertrand@gmail.com>, 2012-2013
 # Sylvain Chiron <chironsylvain@orange.fr>, 2016
 # chrisglass <tribaal@gmail.com>, 2011
@@ -13,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 16:56+0000\n"
+"POT-Creation-Date: 2022-11-05 20:40+0100\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
 "Language-Team: French (http://app.transifex.com/divio/django-cms/language/fr/)\n"
@@ -23,14 +22,11 @@ msgstr ""
 "Language: fr\n"
 "Plural-Forms: nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
-msgid "pathname"
-msgstr "pathname"
+msgid "/"
+msgstr ""
 
-msgid "urnpath"
-msgstr "urnpath"
-
-msgid "reserved"
-msgstr "réservé"
+msgid ":"
+msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Êtes-vous sûr·e de vouloir changer d′onglet sans enregistrer la page ?"

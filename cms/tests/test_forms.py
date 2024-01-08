@@ -246,6 +246,17 @@ class FormsTestCase(CMSTestCase):
 
         self.assertEqual(normal_result, list(lazy_result))
 
+    def test_lazy_choice_field_behaves_properly(self):
+        """Ensure LazyChoiceField is really lazy"""
+        choices_called = False
+        def get_choices():
+            nonlocal choices_called
+            choices_called = True
+            return ("", "-----"),
+
+        LazyChoiceField(choices=SuperLazyIterator(get_choices))
+        self.assertFalse(choices_called, "Lazy choice function called")
+
 
 class PermissionFormTestCase(CMSTestCase):
 

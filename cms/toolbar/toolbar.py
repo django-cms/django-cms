@@ -403,11 +403,12 @@ class CMSToolbarBase(BaseToolbar):
             return get_object_structure_url(self.obj, language=self.request_language)
         return ''
 
-    def object_is_editable(self):
-        if self.obj:
-            if hasattr(self.obj, "is_editable"):
+    def object_is_editable(self, obj=None):
+        obj = obj or self.obj
+        if obj:
+            if hasattr(obj, "is_editable"):
                 # Object can decide itself
-                return self.obj.is_editable(self.request)
+                return obj.is_editable(self.request)
             return True
         return False
 
