@@ -22,7 +22,7 @@ def get_descendants(root):
 
 
 class FixTreeCommand(SubcommandsCommand):
-    help_string = 'Repairing Materialized Path Tree for Pages'
+    help_string = 'Repairing Materialized Path Tree for Pages and Plugins'
     command_name = 'fix-tree'
 
     def add_arguments(self, parser):
