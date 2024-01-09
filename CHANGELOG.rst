@@ -1,3 +1,11 @@
+4.2 (in progress)
+=================
+
+Features:
+---------
+* Remove menu item "Delete page…" from toolbar.
+
+
 4.1.0 (2023-12-22)
 ==================
 
