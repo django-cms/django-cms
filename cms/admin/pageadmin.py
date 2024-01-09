@@ -371,12 +371,10 @@ class PageAdmin(admin.ModelAdmin):
             **get_deleted_objects_additional_kwargs
         )
 
-        # This is bad and I should feel bad.
-        if _('placeholder') in perms_needed:
-            perms_needed.remove('placeholder')
-
-        if _('page content') in perms_needed:
-            perms_needed.remove('page content')
+        # `django.contrib.admin.utils.get_deleted_objects()` only returns the verbose_name of a model,
+        # we hence have to use that name in order to allow the deletion of objects otherwise prevented.
+        perms_needed.discard(Placeholder._meta.verbose_name)
+        perms_needed.discard(PageContent._meta.verbose_name)
 
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
