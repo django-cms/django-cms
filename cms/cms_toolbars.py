@@ -621,12 +621,6 @@ class PageToolbar(CMSToolbar):
                     disabled=not has_perm,
                 )
 
-            add_page_menu.add_modal_item(
-                _('Duplicate this Page'),
-                url=add_url_parameters(duplicate_page_url, {'language': self.toolbar.request_language}),
-                disabled=not can_add_sibling_page,
-            )
-
             # first break
             current_page_menu.add_break(PAGE_MENU_FIRST_BREAK)
 
