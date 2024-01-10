@@ -14,7 +14,7 @@ or any other plugin to a webpage, using the same frontend editing as the CMS pag
 
     - This allows for models (such as django CMS Alias) which do not have a user-facing
       view to still contain placeholders.
-    - It, however, requires the registration of frontend-editable models with django
+    - However, it requires the registration of frontend-editable models with django
       CMS.
     - Also, views need to tell the toolbar if they contain a frontend-editable model.
 
@@ -127,7 +127,7 @@ The view in which you render your placeholder field must return the :class:`requ
 endpoints require a view to render an object. This method takes the request and the
 object as parameter (see example below: ``render_my_model``).
 
-If the object has an user-facing view it typically is identical to the preview and
+If the object has a user-facing view it typically is identical to the preview and
 editing endpoints, but has to get the object from the URL (e.g., by its primary key).
 **It also needs to set the toolbar object, so that the toolbar will have Edit and
 Preview buttons:**
@@ -166,7 +166,7 @@ Preview buttons:**
 Adding the slots to the model
 -----------------------------
 
-To let django CMS' frontend editor know which placeholders it contains, declare them in
+To let django CMS' frontend editor know which placeholders the model contains, declare them in
 a second template, only needed for rendering the structure mode, called, say,
 ``templtes/my_app/my_model_structure.html``:
 
