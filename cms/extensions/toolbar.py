@@ -5,6 +5,7 @@ from django.urls import NoReverseMatch
 from cms.models import PageContent
 from cms.toolbar_base import CMSToolbar
 from cms.utils import get_language_list
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
 
@@ -39,7 +40,8 @@ class ExtensionToolbar(CMSToolbar):
                 self.page_content = obj
             else:
                 self.page = self.request.current_page  # Otherwise get Page object from the request
-                self.page_content = self.page.get_content_obj(self.current_lang)
+                if self.page:
+                    self.page_content = self.page.get_content_obj(self.current_lang)
         return self.page
 
     def get_page_extension_admin(self):
@@ -84,22 +86,22 @@ class ExtensionToolbar(CMSToolbar):
         """
         warnings.warn(
             "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin",
-            DeprecationWarning,
+            RemovedInDjangoCMS43Warning,
             stacklevel=2,
         )
-        page = self._get_page()
-
-        page_contents = (
-            page.pagecontent_set(manager="admin_manager")
-            .latest_content()
-            .filter(language__in=get_language_list(page.node.site_id))
-        )
         urls = []
+        page = self._get_page()
+        if page:
+            page_contents = (
+                page.pagecontent_set(manager="admin_manager")
+                .latest_content()
+                .filter(language__in=get_language_list(page.node.site_id))
+            )
 
-        for page_content in page_contents:
-            admin_url = self.get_page_content_extension_admin(page_content)
-            if admin_url:
-                urls.append(admin_url)
+            for page_content in page_contents:
+                admin_url = self.get_page_content_extension_admin(page_content)
+                if admin_url:
+                    urls.append(admin_url)
         return urls
 
     def get_page_content_extension_admin(self, page_content_obj=None):

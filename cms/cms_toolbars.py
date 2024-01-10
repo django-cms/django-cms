@@ -24,6 +24,7 @@ from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
 from cms.utils.compat import DJANGO_4_2
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
@@ -443,7 +444,7 @@ class PageToolbar(CMSToolbar):
 
         warnings.warn(
             "Title property of PageToolbar will be removed. Use page_content property instead.",
-            DeprecationWarning, stacklevel=2)
+            RemovedInDjangoCMS43Warning, stacklevel=2)
         return self.page_content
 
     @title.setter
@@ -452,7 +453,7 @@ class PageToolbar(CMSToolbar):
 
         warnings.warn(
             "Title property of PageToolbar will be removed. Use page_content property instead.",
-            DeprecationWarning, stacklevel=2)
+            RemovedInDjangoCMS43Warning, stacklevel=2)
         self.page_content = page_content
 
     # Populate

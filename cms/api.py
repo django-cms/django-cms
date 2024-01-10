@@ -60,6 +60,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
@@ -362,7 +363,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     """
     warnings.warn(
         "cms.api.create_title has been renamed to cms.api.create_page_content().",
-        DeprecationWarning,
+        RemovedInDjangoCMS43Warning,
         stacklevel=2
     )
     return create_page_content(

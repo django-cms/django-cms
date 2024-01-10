@@ -4,6 +4,7 @@ from django import template
 from django.utils.safestring import mark_safe
 
 from cms.toolbar.utils import get_toolbar_from_request
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.plugins import downcast_plugins, get_plugins_as_layered_tree
 
 register = template.Library()
@@ -15,7 +16,7 @@ def render_alias_plugin(context, instance):
         'AliasPlugin is deprecated, '
         'and it will be removed; '
         'please use the package djangocms-alias instead',
-        DeprecationWarning
+        RemovedInDjangoCMS43Warning
     )
 
     request = context['request']

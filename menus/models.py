@@ -2,8 +2,17 @@ from django.db import models
 
 
 class CacheKeyManager(models.Manager):
-
     def get_keys(self, site_id=None, language=None):
+        """
+         Get cache keys based on optional site ID and language.
+
+         Args:
+             site_id: The ID of the site (optional).
+             language: The language (optional).
+
+         Returns:
+             QuerySet: A queryset of CacheKey instances based on the provided site ID and language.
+         """
         if not site_id and not language:
             # Both site and language are None - return everything
             ret = self.all()
@@ -18,13 +27,11 @@ class CacheKeyManager(models.Manager):
 
 
 class CacheKey(models.Model):
-    '''
-    This is to store a "set" of cache keys in a fashion where it's accessible
-    by multiple processes / machines.
-    Multiple Django instances will then share the keys.
-    This allows for selective invalidation of the menu trees (per site, per
-    language), in the cache.
-    '''
+    """
+    This model stores a set of cache keys accessible by multiple processes/machines.
+    Multiple Django instances will then share the keys, allowing selective invalidation
+    of menu trees (per site, per language) in the cache.
+    """
     language = models.CharField(max_length=255)
     site = models.PositiveIntegerField()
     key = models.CharField(max_length=255)
