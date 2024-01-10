@@ -228,7 +228,7 @@ template. It performs the following five steps in one simple go:
 
    .. code-block::
 
-       python -m manage migrate.
+       python -m manage migrate
 
 4. It prompts for crating a superuser by invoking:
 
@@ -530,11 +530,8 @@ We highly recommend installing them both:
 
 .. code-block::
 
-    pip install git+https://github.com/django-cms/djangocms-versioning
-    pip install git+https://github.com/django-cms/djangocms-alias
-
-(We expect to release versions of both in pypi to allow a simpler installation using pip
-by the time django CMS v4.1 is released.)
+    pip install djangocms-versioning
+    pip install djangocms-alias
 
 Also add them to ``INSTALLED_APPS``:
 
@@ -839,7 +836,7 @@ Then run migrations:
 
 .. code-block::
 
-    python manage.py migrate.
+    python manage.py migrate
 
 These and other plugins are described in more detail in :ref:`commonly-used-plugins`.
 

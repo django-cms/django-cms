@@ -131,7 +131,7 @@ class CMSAppConfig():
 
     The second functionality that django CMS offers is attaching Model objects to the toolbar. To use
     this functionality, set list the Model classes in ``cms_toolbar_enabled_models`` and have
-    `cms_enabled = True```
+    ``cms_enabled = True``
     """
 
     def __init__(self, django_app_config):

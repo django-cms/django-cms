@@ -55,11 +55,11 @@ extensions = [
     "sphinxext.opengraph",
     ]
 intersphinx_mapping = {
-    'python': ('http://docs.python.org/3/', None),
-    'django': ('https://docs.djangoproject.com/en/3.2/', 'https://docs.djangoproject.com/en/2.2/_objects/'),
-    'classytags': ('http://readthedocs.org/docs/django-classy-tags/en/latest/', None),
-    'sekizai': ('http://readthedocs.org/docs/django-sekizai/en/latest/', None),
-    'treebeard': ('http://django-treebeard.readthedocs.io/en/latest/', None),
+    'python': ('https://docs.python.org/3/', None),
+    'django': ('https://docs.djangoproject.com/en/4.2/', 'https://docs.djangoproject.com/en/4.2/_objects/'),
+    'classytags': ('https://django-classy-tags.readthedocs.io/en/latest/', None),
+    'sekizai': ('https://django-sekizai.readthedocs.io/en/latest/', None),
+    'treebeard': ('https://django-treebeard.readthedocs.io/en/latest/', None),
 }
 
 autodoc_member_order = "groupwise"
@@ -152,7 +152,7 @@ try:
     html_theme_options = {
         "navigation_with_keys": True,
     }
-except ImportError: 
+except ImportError:
     html_theme = 'default'
 
 
