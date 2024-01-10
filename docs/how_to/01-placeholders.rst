@@ -3,7 +3,7 @@
 How to use placeholders outside the CMS
 =======================================
 
-Placeholders are special model fields that django CMS uses to render user-editable
+Placeholder fields are special model fields that django CMS uses to render user-editable
 content (plugins) in templates. That is, it's the place where a user can add text, video
 or any other plugin to a webpage, using the same frontend editing as the CMS pages.
 
