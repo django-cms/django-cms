@@ -48,6 +48,7 @@ class Placeholder(models.Model):
         permissions = (
             ("use_structure", "Can use Structure mode"),
         )
+        unique_together = [('content_type', 'object_id', 'slot')]
 
     def __str__(self):
         return self.slot
