@@ -228,7 +228,7 @@ template. It performs the following five steps in one simple go:
 
    .. code-block::
 
-       python -m manage migrate.
+       python -m manage migrate
 
 4. It prompts for crating a superuser by invoking:
 
@@ -839,7 +839,7 @@ Then run migrations:
 
 .. code-block::
 
-    python manage.py migrate.
+    python manage.py migrate
 
 These and other plugins are described in more detail in :ref:`commonly-used-plugins`.
 
