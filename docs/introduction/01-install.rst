@@ -530,11 +530,8 @@ We highly recommend installing them both:
 
 .. code-block::
 
-    pip install git+https://github.com/django-cms/djangocms-versioning
-    pip install git+https://github.com/django-cms/djangocms-alias
-
-(We expect to release versions of both in pypi to allow a simpler installation using pip
-by the time django CMS v4.1 is released.)
+    pip install djangocms-versioning
+    pip install djangocms-alias
 
 Also add them to ``INSTALLED_APPS``:
 
