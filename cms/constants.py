@@ -78,3 +78,5 @@ PUBLISH_COMMENT = "Publish"
 SCRIPT_USERNAME = 'script'
 
 CMS_CONFIG_NAME = 'cms_config'
+
+MODAL_HTML_REDIRECT = '<body><a class="cms-view-new-object" target="_top" href="{url}">Redirecting...</a></body>'

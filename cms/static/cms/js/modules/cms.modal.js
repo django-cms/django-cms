@@ -910,6 +910,20 @@ class Modal {
                 return;
             }
 
+            // check if we are redirected - should only happen after successful form submission
+            var redirect = body.find('a.cms-view-new-object');
+            console.log(body.html() + " - " + redirect.attr('href') + " - " + redirect.length);
+            if (redirect.length > 0) {
+                var url = redirect.attr('href');
+                console.log("Url: " + url);
+                if (url) {
+                    Helpers.reloadBrowser(redirect.attr('href'), false);
+                    return true;
+                }
+            }
+
+
+
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');
             iframe.on('focus', function() {
