@@ -381,6 +381,7 @@ class PageAttribute(AsTag):
     options = Options(
         Argument('name', resolve=False),
         Argument('page_lookup', required=False, default=None),
+        Argument('site', required=False, default=None),
         'as',
         Argument('varname', required=False, resolve=False)
     )
@@ -395,13 +396,13 @@ class PageAttribute(AsTag):
         "changed_by",
     ]
 
-    def get_value(self, context, name, page_lookup):
+    def get_value(self, context, name, page_lookup, site):
         if 'request' not in context:
             return ''
         name = name.lower()
         request = context['request']
         lang = get_language_from_request(request)
-        page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(None))
+        page = _get_page_by_untyped_arg(page_lookup, request, get_site_id(site))
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
             ret_val = func(language=lang, fallback=True)

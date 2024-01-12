@@ -334,6 +334,7 @@ Arguments:
 - ``attribute_name``
 - ``page_lookup`` (optional; see `page_lookup`_ for more
   information)
+- ``site`` (optional)
 
 Possible values for ``attribute_name`` are: ``"title"``, ``"menu_title"``,
 ``"page_title"``, ``"slug"``, ``"meta_description"``, ``"changed_date"``, ``"changed_by"``
