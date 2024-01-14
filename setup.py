@@ -9,7 +9,7 @@ REQUIREMENTS = [
     'Django>=3.2',
     'django-classy-tags>=0.7.2',
     'django-formtools>=2.1',
-    'django-treebeard>=4.3',
+    'django-treebeard>=4.3,!=4.5',
     'django-sekizai>=0.7',
     'djangocms-admin-style>=1.2',
     'packaging',
