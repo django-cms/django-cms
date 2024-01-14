@@ -2,6 +2,7 @@ name: Comment on PRs into release/* branches
 
 on:
   pull_request:
+    types: [opened, reopened]
     branches:
       - release/*
 
@@ -16,7 +17,7 @@ jobs:
           github-token: ${{secrets.GITHUB_TOKEN}}
           script: |
             try { github.rest.issues.createComment({
-              pull_request: context.pull_request.number,
+              issue_number: context.issues.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: '👋 Hi there!\n\nPlease remember to **MERGE COMMIT** pull requests from `develop` or `develop-4`!\n\n**Do not SQUASH** commits to preserve history for the changelog.'
