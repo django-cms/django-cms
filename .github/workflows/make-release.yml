@@ -17,9 +17,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v5
       - name: Start building version ${{ inputs.version }}
         env:
           BUILD_BRANCH: release/build
