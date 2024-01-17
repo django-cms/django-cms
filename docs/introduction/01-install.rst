@@ -275,7 +275,7 @@ Spin up your Django development server (Step 3)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now you are ready to spin up Django's development server by first changing directory into 
-the projcet folder and then spinning up the development server:
+the project folder and then spinning up the development server:
 
 .. code-block::
 
