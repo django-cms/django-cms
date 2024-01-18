@@ -1,7 +1,7 @@
 ---
 name: "\U0001F4D8 Documentation report"
-about: 'Something isn''t described correctly in the documentation or needs to be updated?
-  Here is the right place to report. '
+about: "Something isn't described correctly in the documentation or needs to be updated?
+  Here is the right place to report."
 title: "[DOC]"
 labels: 'component: documentation'
 assignees: ''
