@@ -291,7 +291,8 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     request.toolbar = CMSToolbar(request, request_path=absolute_url)
                     # Resolve the apphook's url to get its view function
                     view_func, args, kwargs = resolve(absolute_url)
-                    return view_func(request, *args, **kwargs)
+                    if view_func is not details:
+                        return view_func(request, *args, **kwargs)
                 except Resolver404:
                     # Apphook does not provide a view for its "root", show warning message
                     return _handle_no_apphook(request)

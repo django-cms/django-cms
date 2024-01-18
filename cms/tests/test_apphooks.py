@@ -137,7 +137,7 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         hooks = apphook_pool.get_apphooks()
         app_names = [hook[0] for hook in hooks]
-        self.assertEqual(len(hooks), 8)
+        self.assertEqual(len(hooks), 9)
         self.assertIn(NS_APP_NAME, app_names)
         self.assertIn(APP_NAME, app_names)
         self.apphook_clear()
@@ -160,6 +160,26 @@ class ApphooksTestCase(CMSTestCase):
         self.assertTemplateUsed(response, 'nav_playground.html')
 
         self.apphook_clear()
+
+    def test_apphook_without_landing_page(self):
+        """test rendering the apphook without landing page.
+
+        tests for https://github.com/django-cms/django-cms/issues/7765
+        """
+        from django.contrib.contenttypes.models import ContentType
+
+        from cms import views
+        from cms.utils.urlutils import admin_reverse
+
+        APP_NAME = 'SampleAppWithoutLandingPage'
+        [content] = self.create_base_structure(
+            APP_NAME, ["en"], "apphook-without-landing"
+        )
+        content_type = ContentType.objects.get(app_label='cms', model='pagecontent')
+        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(content_type.pk, content.pk,))
+        # make sure, we do not get views.details as this always uses the
+        # published page content
+        self.assertIsNot(endpoint, views.details)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
     def test_apphook_does_not_crash_django_checks(self):
