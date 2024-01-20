@@ -8,7 +8,10 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 from django.utils.translation import override as force_language
 
-from cms.toolbar.utils import get_object_preview_url
+from cms.toolbar.utils import (
+    get_object_edit_url,
+    get_object_preview_url,
+)
 
 
 class WizardBase:
@@ -18,7 +21,7 @@ class WizardBase:
     template_name = None
 
     def __init__(self, title, weight, form, model=None, template_name=None,
-                 description=None):
+                 description=None, edit_mode_on_success=True):
         """
         :param title: The title of the wizard. It will appear in a large font size on the wizard “menu”
         :param weight: Used for determining the order of the wizards on the
@@ -32,14 +35,16 @@ class WizardBase:
         :param description: This is used on the start form. The description is optional, but if it is
                             not supplied, the CMS will create one from the pattern:
                             "Create a new «model.verbose_name» instance."
+        :param edit_mode_on_success: Whether the user will get redirected to object edit url after a
+                                     successful creation or not. This only works if the object is registered
+                                     for toolbar enabled models.
         """
-        # NOTE: If class attributes or properties are changed, consider updating
-        # cms.templatetags.cms_wizard_tags.WizardProperty too.
         self.title = title
         self.weight = weight
         self.form = form
         self.model = model
         self.description = description
+        self.edit_mode_on_success = edit_mode_on_success
         if template_name is not None:
             self.template_name = template_name
 
@@ -129,9 +134,10 @@ class Wizard(WizardBase):
         """
         Once the wizard has completed, the user will be redirected to the URL of the new
         object that was created. By default, this is done by return the result of
-        calling the ``get_absolute_url`` method on the object. This may then be modified
-        to force the user into edit mode if the wizard property ``edit_mode_on_success``
-        is True.
+        calling the ``get_absolute_url`` method on the object. If the object is registered
+        for toolbar enabled models, the object edit url will be returned. This may be modified
+        to return the preview url instead by setting the wizard property ``edit_mode_on_success``
+        to False.
 
         In some cases, the created content will not implement ``get_absolute_url`` or
         that redirecting the user is undesirable. In these cases, simply override this
@@ -144,6 +150,8 @@ class Wizard(WizardBase):
         extension = apps.get_app_config('cms').cms_extension
 
         if obj.__class__ in extension.toolbar_enabled_models:
+            if self.edit_mode_on_success:
+                return get_object_edit_url(obj, language=kwargs.get("language", None))
             return get_object_preview_url(obj, language=kwargs.get("language", None))
         else:
             if "language" in kwargs:
