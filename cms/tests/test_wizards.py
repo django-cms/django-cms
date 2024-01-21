@@ -19,7 +19,10 @@ from cms.models import Page, UserSettings
 from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
-from cms.toolbar.utils import get_object_edit_url
+from cms.toolbar.utils import (
+    get_object_edit_url,
+    get_object_preview_url,
+)
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.setup import setup_cms_apps
@@ -161,6 +164,34 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
                 page, language="en")
             self.assertEqual(
                 url, get_object_edit_url(page, language="en"))
+
+    def test_get_preview_url(self):
+        wizard_preview_mode = Wizard(
+            title=_(u"Page"),
+            weight=100,
+            form=WizardForm,
+            model=Page,
+            template_name='my_template.html',  # This doesn't exist anywhere
+            edit_mode_on_success=False
+        )
+
+        user = self.get_superuser()
+        page = create_page(
+            title="Sample Page",
+            template=TEMPLATE_INHERITANCE_MAGIC,
+            language="en",
+            created_by=smart_str(user),
+            parent=None,
+            in_navigation=True,
+        )
+
+        extension = apps.get_app_config('cms').cms_extension
+
+        with patch.object(extension, 'toolbar_enabled_models', {Page: page}):
+            url = wizard_preview_mode.get_success_url(
+                page, language="en")
+            self.assertEqual(
+                url, get_object_preview_url(page, language="en"))
 
     def test_get_model(self):
         self.assertEqual(self.page_wizard.get_model(), Page)
