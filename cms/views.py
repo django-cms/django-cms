@@ -116,7 +116,7 @@ def details(request, slug):
 
     if not page:
         # raise 404
-        _handle_no_page(request)
+        return _handle_no_page(request)
 
     request.current_page = page
 
