@@ -167,7 +167,7 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
 
     def test_get_preview_url(self):
         wizard_preview_mode = Wizard(
-            title=_(u"Page"),
+            title=_("Page"),
             weight=100,
             form=WizardForm,
             model=Page,
