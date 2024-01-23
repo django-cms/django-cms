@@ -65,6 +65,15 @@ class ViewTests(CMSTestCase):
         request = self.get_request('/not-existing/')
         self.assertRaises(Http404, _handle_no_page, request)
 
+    def test_handle_no_page_for_root_url(self):
+        """
+        Test if _handle_no_page correctly works for root url
+        """
+        request = self.get_request('/en/')
+        response = _handle_no_page(request)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('admin:cms_pagecontent_changelist'))
+
     def test_apphook_not_hooked(self):
         """
         Test details view when apphook pool has apphooks, but they're not
