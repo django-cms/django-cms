@@ -188,6 +188,11 @@ class GlobalPagePermission(AbstractPagePermission):
         default=True,
         help_text=_("can recover any deleted page"),
     )
+    can_set_as_home = models.BooleanField(
+        verbose_name=_("can set as home"),
+        default=False,
+        help_text=_("can set first tier pages as home page"),
+    )
     sites = models.ManyToManyField(
         to=Site,
         blank=True,
@@ -204,6 +209,12 @@ class GlobalPagePermission(AbstractPagePermission):
 
     def __str__(self):
         return "%s :: GLOBAL" % self.audience
+
+    @classmethod
+    def get_permissions_by_action(cls):
+        permissions_by_action = super().get_permissions_by_action()
+        permissions_by_action['can_set_as_home'] = ['can_change', 'can_set_as_home']
+        return permissions_by_action
 
 
 class PagePermission(AbstractPagePermission):
