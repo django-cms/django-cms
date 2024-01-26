@@ -18,12 +18,11 @@ def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
     """
-    from imp import PY_SOURCE, load_module
+    from importlib.machinery import SourceFileLoader
 
     imported = None
     if module_path:
-        with open(module_path) as openfile:
-            imported = load_module("mod", openfile, module_path, ('imported', 'r', PY_SOURCE))
+        imported = SourceFileLoader("mod", module_path).load_module()
     return imported
 
 
@@ -82,7 +81,7 @@ DEFAULTS = {
     'ENABLE_HELP': True,  # Adds help menu toolbar
     'EXTRA_HELP_MENU_ITEMS': (),
     'HELP_MENU_ITEMS': (
-        (_('Community forum'), 'https://discourse.django-cms.org/'),
+        (_('Community chat'), 'https://www.django-cms.org/slack/'),
         (_('Documentation'), 'https://docs.django-cms.org/en/latest/'),
         (_('Getting started'), 'https://www.django-cms.org/en/get-started-django-cms/'),
         (_('Talk to us'), 'https://www.django-cms.org/en/support/'),
