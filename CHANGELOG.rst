@@ -2,57 +2,47 @@
 Changelog
 =========
 
+3.11.5 (2024-01-26)
+===================
+
+Features:
+---------
+
+* feat: Add Python 3.12 support by @vinitkumar in https://github.com/django-cms/django-cms/pull/7675
+* feat: django 5 support for cms 3.11 by @protoroto in https://github.com/django-cms/django-cms/pull/7724
+* feat: Add bot to remind to not squash merges into release/* branches by @fsbraun in https://github.com/django-cms/django-cms/pull/7719
+
+Bug Fixes
+---------
+
+* fix: preserve `view_class` in decorated views by @Will-Hoey in https://github.com/django-cms/django-cms/pull/7664
+* fix: avoid InvalidCacheKey (memcached) for key-length ~249 by @wfehr in https://github.com/django-cms/django-cms/pull/7657
+* fix: Update transifex pull strings script for v3 in alignment with v4 by @fsbraun in https://github.com/django-cms/django-cms/pull/7681
+* fix: Use correct version of Django in GitHub CI actions by @fsbraun in https://github.com/django-cms/django-cms/pull/7696
+* fix: Remove link to closed discourse channel for feature requests from issue template by @fsbraun in https://github.com/django-cms/django-cms/pull/7701
+* fix: Remove discontinued discourse server from docs by @fsbraun in https://github.com/django-cms/django-cms/pull/7703
+* fix: Add `--fix-paths` option to `./manage.py cms fix-tree` by @fsbraun in https://github.com/django-cms/django-cms/pull/7744
+* fix: readable messages in dark-mode by @fsbraun in https://github.com/django-cms/django-cms/pull/7739
+* fix: "Plural-Forms"  to nplurals=2 for french djangojs locale by @pierreben in https://github.com/django-cms/django-cms/pull/7783
+
 Statistics:
 -----------
 
 This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (4 pull requests)
-
-With the review help of the following contributors:
-
-* Cage Johnson
-* Christian Clauss
-* Conrad
-* Corentin Bettiol
-* Danny Waser
-* Dapo Adedire
+* Benjamin PIERRE
 * Fabian Braun
-* Fabien MICHEL
-* Florian Delizy
-* G3RB3N
-* Github Release Action
-* Halit Çelik
-* Hussein Srour
-* Ivo Branco
-* Jasper
+* fwehr
 * Leonardo Cavallucci
-* Marco Bonetti
-* Mark Walker
-* Micah Denbraver
-* Nihal
-* Nihal Rahman
-* Pankrat
-* Patrick Mazulo
-* Qijia Liu
-* Samuël Weber/GwendalD
-* Shivan Sivakumaran
-* Simon Krull
-* Uladzislau Saldatsenka
 * Vinit Kumar
 * Will Hoey
-* code-review-doctor
-* dependabot[bot]
-* fsbraun
-* jefe
-* jillalberts
-* pajowu
-* realize096
-* ton77v
-* viliammihalik
-* wesleysima
-* wfehr
+
+* @weber-s made their first contribution in https://github.com/django-cms/django-cms/pull/7649
+* @MidnightRoam made their first contribution in https://github.com/django-cms/django-cms/pull/7620
+* @Will-Hoey made their first contribution in https://github.com/django-cms/django-cms/pull/7664
+* @wfehr made their first contribution in https://github.com/django-cms/django-cms/pull/7657
+* @realize096 made their first contribution in https://github.com/django-cms/django-cms/pull/7661
+* @protoroto made their first contribution in https://github.com/django-cms/django-cms/pull/7726
 
 Thanks to all contributors for their efforts!
 
