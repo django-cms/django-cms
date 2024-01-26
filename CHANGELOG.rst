@@ -8,22 +8,22 @@ Changelog
 Features:
 ---------
 
-* feat: Add Python 3.12 support by @vinitkumar in https://github.com/django-cms/django-cms/pull/7675
-* feat: django 5 support for cms 3.11 by @protoroto in https://github.com/django-cms/django-cms/pull/7724
-* feat: Add bot to remind to not squash merges into release/* branches by @fsbraun in https://github.com/django-cms/django-cms/pull/7719
+* feat: Add Python 3.12 support -- Vinit Kumar
+* feat: django 5 support for cms 3.11 -- Leonardo Cavallucci
+* feat: Add bot to remind to not squash merges into release/* branches -- Fabian Braun
 
 Bug Fixes
 ---------
 
-* fix: preserve `view_class` in decorated views by @Will-Hoey in https://github.com/django-cms/django-cms/pull/7664
-* fix: avoid InvalidCacheKey (memcached) for key-length ~249 by @wfehr in https://github.com/django-cms/django-cms/pull/7657
-* fix: Update transifex pull strings script for v3 in alignment with v4 by @fsbraun in https://github.com/django-cms/django-cms/pull/7681
-* fix: Use correct version of Django in GitHub CI actions by @fsbraun in https://github.com/django-cms/django-cms/pull/7696
-* fix: Remove link to closed discourse channel for feature requests from issue template by @fsbraun in https://github.com/django-cms/django-cms/pull/7701
-* fix: Remove discontinued discourse server from docs by @fsbraun in https://github.com/django-cms/django-cms/pull/7703
-* fix: Add `--fix-paths` option to `./manage.py cms fix-tree` by @fsbraun in https://github.com/django-cms/django-cms/pull/7744
-* fix: readable messages in dark-mode by @fsbraun in https://github.com/django-cms/django-cms/pull/7739
-* fix: "Plural-Forms"  to nplurals=2 for french djangojs locale by @pierreben in https://github.com/django-cms/django-cms/pull/7783
+* fix: preserve ``view_class`` in decorated views -- Will Hoey
+* fix: avoid InvalidCacheKey (memcached) for key-length ~249 -- fwehr
+* fix: Update transifex pull strings script for v3 in alignment with v4 -- Fabian Braun
+* fix: Use correct version of Django in GitHub CI actions -- Fabian Braun
+* fix: Remove link to closed discourse channel for feature requests from issue template -- Fabian Braun
+* fix: Remove discontinued discourse server from docs -- Fabian Braun
+* fix: Add ``--fix-paths`` option to ``./manage.py cms fix-tree`` -- Fabian Braun
+* fix: readable messages in dark-mode -- Fabian Braun
+* fix: "Plural-Forms"  to nplurals=2 for french djangojs locale -- Benjamin PIERRE
 
 Statistics:
 -----------
@@ -36,13 +36,6 @@ This release includes 5 pull requests, and was created with the help of the foll
 * Leonardo Cavallucci
 * Vinit Kumar
 * Will Hoey
-
-* @weber-s made their first contribution in https://github.com/django-cms/django-cms/pull/7649
-* @MidnightRoam made their first contribution in https://github.com/django-cms/django-cms/pull/7620
-* @Will-Hoey made their first contribution in https://github.com/django-cms/django-cms/pull/7664
-* @wfehr made their first contribution in https://github.com/django-cms/django-cms/pull/7657
-* @realize096 made their first contribution in https://github.com/django-cms/django-cms/pull/7661
-* @protoroto made their first contribution in https://github.com/django-cms/django-cms/pull/7726
 
 Thanks to all contributors for their efforts!
 
