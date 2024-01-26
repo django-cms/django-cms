@@ -27,7 +27,7 @@ Raising an issue
 
 
 Except in the case of security matters, of course, you're welcome to raise
-issues in any way that suits you - :ref:`using Discourse, or the Slack group
+issues in any way that suits you -  the Slack group
 <development-community>` or in person if you happen to meet another django CMS
 developer.
 

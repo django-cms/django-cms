@@ -1233,8 +1233,10 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         return HttpResponseRedirect(path)
 
     def delete_translation(self, request, object_id, extra_context=None):
-        if 'language' in request.GET:
-            language = request.GET['language']
+        if 'delete_language' in request.GET:
+            language = request.GET['delete_language']
+        elif 'delete_language' in request.POST:
+            language = request.POST['delete_language']
         else:
             language = get_language_from_request(request)
 

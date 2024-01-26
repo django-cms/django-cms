@@ -76,7 +76,6 @@ Community & Association
 You can join us online:
 
 * in our `django CMS Slack channel <https://www.django-cms.org/slack>`_
-* on our `Discourse forum <https://discourse.django-cms.org>`_
 
 You can join a work group and work collaboratively on django CMS
 
