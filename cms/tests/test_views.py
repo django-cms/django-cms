@@ -74,6 +74,14 @@ class ViewTests(CMSTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('admin:cms_pagecontent_changelist'))
 
+    def test_handle_no_page_for_rool_url_no_homepage(self):
+        """
+        Test details view when visiting root and homepage doesn't exist
+        """
+        create_page("one", "nav_playground.html", "en")
+        response = self.client.get("/en/")
+        self.assertEqual(response.status_code, 302)
+
     def test_apphook_not_hooked(self):
         """
         Test details view when apphook pool has apphooks, but they're not
