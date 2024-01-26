@@ -2,6 +2,60 @@
 Changelog
 =========
 
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (4 pull requests)
+
+With the review help of the following contributors:
+
+* Cage Johnson
+* Christian Clauss
+* Conrad
+* Corentin Bettiol
+* Danny Waser
+* Dapo Adedire
+* Fabian Braun
+* Fabien MICHEL
+* Florian Delizy
+* G3RB3N
+* Github Release Action
+* Halit Çelik
+* Hussein Srour
+* Ivo Branco
+* Jasper
+* Leonardo Cavallucci
+* Marco Bonetti
+* Mark Walker
+* Micah Denbraver
+* Nihal
+* Nihal Rahman
+* Pankrat
+* Patrick Mazulo
+* Qijia Liu
+* Samuël Weber/GwendalD
+* Shivan Sivakumaran
+* Simon Krull
+* Uladzislau Saldatsenka
+* Vinit Kumar
+* Will Hoey
+* code-review-doctor
+* dependabot[bot]
+* fsbraun
+* jefe
+* jillalberts
+* pajowu
+* realize096
+* ton77v
+* viliammihalik
+* wesleysima
+* wfehr
+
+Thanks to all contributors for their efforts!
+
 3.11.4 (2023-09-06)
 ===================
 
