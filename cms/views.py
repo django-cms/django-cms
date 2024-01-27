@@ -115,8 +115,10 @@ def details(request, slug):
             return HttpResponseRedirect(redirect_url)
 
     if not page:
-        # raise 404
-        _handle_no_page(request)
+        # raise 404 or redirect to PageContent's
+        # changelist in the admin if this is a
+        # request to the root URL
+        return _handle_no_page(request)
 
     request.current_page = page
 
