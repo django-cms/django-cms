@@ -8,7 +8,8 @@ import Navigation from './cms.navigation';
 import Sideframe from './cms.sideframe';
 import Modal from './cms.modal';
 import Plugin from './cms.plugins';
-åimport { showLoader, hideLoader } from './loader';
+import { filter, throttle, uniq } from 'lodash';
+import { showLoader, hideLoader } from './loader';
 import { Helpers, KEYS } from './cms.base';
 
 var SECOND = 1000;
@@ -717,7 +718,7 @@ var Toolbar = new Class({
     _refreshMarkup: function(newToolbar) {
         const switcher = this.ui.toolbarSwitcher.detach();
 
-        $(this.ui.toolbar[0]).replaceWith(newToolbar[0]);
+        $(this.ui.toolbar).html(newToolbar.children());
 
         $('.cms-toolbar-item-cms-mode-switcher').replaceWith(switcher);
 
