@@ -21,14 +21,52 @@ extend-exclude = [
   "**migrations/**",
 ]
 
-ignore = [
-#  "B006",  # Do not use mutable data structures for argument defaults
-#  "PLR0913",  # Too many arguments to function call,
+extend-ignore = [
+  "C901",     # Too complex
+  "PLR0911",  # Too many return statements
+  "PLR0912",  # Too many branches
+  "PLR0913",  # Too many arguments to function call
+  "PLR0915",  # Too many statements
+
+  # TODO fix separately
+  "B006",
+  "B007",
+  "B027",
+  "B028",
+  "B018",
+  "B020",
+  "B026",
+  "B904",
+  "C400",
+  "C402",
+  "C405",
+  "C408",
+  "C414",
+  "C416",
+  "E701",
+  "F401",
+  "F403",
+  "E501",
+  "PLR2004",
+  "PLR5501",
+  "PLW0120",
+  "PLW0603",
+  "PLW0602",
+  "PLW2901",
+  "UP028",
+  "UP030",
+  "UP031",
 ]
 
 [tool.ruff.per-file-ignores]
 "__init__.py" = [
   "F401"  # unused-import
+]
+"menus/menu_pool.py" = [
+  "PLW2901",  # `for` loop variable `menu_cls` overwritten by assignment target
+]
+"cms/toolbar/utils.py" = [
+  "B020"  # Loop control variable `plugin` overrides iterable it iterates
 ]
 
 [tool.ruff.isort]
