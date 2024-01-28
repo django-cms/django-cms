@@ -21,8 +21,7 @@ from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
-from django.utils.translation import get_language_from_path
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language_from_path, gettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
@@ -79,7 +78,7 @@ def _instance_overrides_method(base, instance, method_name):
     return unbound_method != bound_method
 
 
-class FrontendEditableAdminMixin():
+class FrontendEditableAdminMixin:
     """
     Adding ``FrontendEditableAdminMixin`` to  models admin class allows to open that admin
     in the frontend by double-clicking on fields rendered with the ``render_model`` template
@@ -120,8 +119,7 @@ class FrontendEditableAdminMixin():
                 'message': force_str(_("Field %s not found")) % raw_fields
             }
             return render(request, 'admin/cms/page/plugin/error_form.html', context)
-        if not request.user.has_perm("{0}.change_{1}".format(self.model._meta.app_label,
-                                                             self.model._meta.model_name)):
+        if not request.user.has_perm(f"{self.model._meta.app_label}.change_{self.model._meta.model_name}"):
             context = {
                 'opts': opts,
                 'message': force_str(_("You do not have permission to edit this item"))

@@ -467,10 +467,7 @@ class PageTest(PageTestBase):
             req.GET = {}
 
             actual_result = t.render(template.Context({"request": req}))
-            desired_result = "{0} changed on {1}".format(
-                change_user,
-                actual_result[-19:]
-            )
+            desired_result = f"{change_user} changed on {actual_result[-19:]}"
             save_time = datetime.datetime.strptime(
                 actual_result[-19:],
                 "%Y-%m-%dT%H:%M:%S"
@@ -1610,7 +1607,7 @@ class PermissionsTestCase(PageTestBase):
 
         for attr, value in kwargs.items():
             if attr not in non_inline:
-                attr = 'pagepermission_set-2-0-{}'.format(attr)
+                attr = f'pagepermission_set-2-0-{attr}'
             data[attr] = value
         return data
 
@@ -1643,7 +1640,7 @@ class PermissionsTestCase(PageTestBase):
 
         for attr, value in kwargs.items():
             if attr not in non_inline:
-                attr = 'pagepermission_set-0-{}'.format(attr)
+                attr = f'pagepermission_set-0-{attr}'
             data[attr] = value
         return data
 

@@ -105,8 +105,5 @@ def debug_check_url(url_name):
             reverse('my_test_app_view'),
         )
     except Exception as e:
-        debug_msg = "    ERROR: reverse('{0}'): {1}".format(
-            url_name,
-            e,
-        )
+        debug_msg = f"    ERROR: reverse('{url_name}'): {e}"
     logger.debug(debug_msg)

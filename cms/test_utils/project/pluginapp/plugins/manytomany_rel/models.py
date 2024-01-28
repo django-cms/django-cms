@@ -8,7 +8,7 @@ class Article(models.Model):
     section = models.ForeignKey('Section', on_delete=models.CASCADE)
 
     def __str__(self):
-        return u"%s -- %s" % (self.title, self.section)
+        return "%s -- %s" % (self.title, self.section)
 
 
 class Section(models.Model):

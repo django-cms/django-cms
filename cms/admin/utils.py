@@ -18,8 +18,7 @@ from django.urls import NoReverseMatch
 from django.utils.html import format_html_join
 from django.utils.http import urlencode
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models.managers import ContentAdminManager
 from cms.toolbar.utils import get_object_preview_url

@@ -13,11 +13,7 @@ from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
     get_language,
-)
-from django.utils.translation import (
     gettext_lazy as _,
-)
-from django.utils.translation import (
     override as force_language,
 )
 from treebeard.mp_tree import MP_Node
@@ -101,7 +97,6 @@ class TreeNode(MP_Node):
 
         for field, value in data.items():
             setattr(self, field, value)
-        return
 
     def get_cached_ancestors(self):
         if self._has_cached_hierarchy():
@@ -216,12 +211,7 @@ class Page(models.Model):
         return force_str(title)
 
     def __repr__(self):
-        display = '<{module}.{class_name} id={id} object at {location}>'.format(
-            module=self.__module__,
-            class_name=self.__class__.__name__,
-            id=self.pk,
-            location=hex(id(self)),
-        )
+        display = f'<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>'
         return display
 
     def _clear_node_cache(self):
@@ -753,7 +743,7 @@ class Page(models.Model):
         if self.parent_page:
             base = self.parent_page.get_path(language, fallback=True)
             # base can be empty when the parent is a home-page
-            path = u'%s/%s' % (base, slug) if base else slug
+            path = '%s/%s' % (base, slug) if base else slug
         else:
             path = slug
         return path
