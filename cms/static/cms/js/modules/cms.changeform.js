@@ -2,7 +2,7 @@
 import $ from 'jquery';
 import addSlugHandlers from './slug';
 
-$(function() { 
+$(function() {
     // set local variables
     var title = $('#id_title');
     var slug = $('#id_slug');
