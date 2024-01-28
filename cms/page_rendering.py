@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import Resolver404, get_resolver, resolve, reverse
 
@@ -55,6 +55,12 @@ def render_page(request, page, current_language, slug=None):
 
 def _handle_no_page(request):
     try:
+        # redirect to PageContent's changelist if the root page is detected
+        resolved_path = resolve(request.path)
+        if resolved_path.url_name == 'pages-root':
+            redirect_url = reverse('admin:cms_pagecontent_changelist')
+            return HttpResponseRedirect(redirect_url)
+
         # add a $ to the end of the url (does not match on the cms anymore)
         resolve('%s$' % request.path)
     except Resolver404 as e:

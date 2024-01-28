@@ -2,6 +2,7 @@ import copy
 
 from django.contrib.sites.models import Site
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from cms.api import add_plugin, create_page, create_page_content
 from cms.exceptions import LanguageError
@@ -262,7 +263,15 @@ class MultilingualTestCase(CMSTestCase):
         lang_settings[1][1]['fallbacks'] = []
 
         with self.settings(CMS_LANGUAGES=lang_settings):
+            # No translation for root page
             response = self.client.get("/de/")
+            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.url, reverse('admin:cms_pagecontent_changelist'))
+
+        with self.settings(CMS_LANGUAGES=lang_settings):
+            # No translation for a page other than root
+            create_page("page2", "nav_playground.html", "en", slug="page2")
+            response = self.client.get("/de/page2/")
             self.assertEqual(response.status_code, 404)
 
         # There's no "de" translation.

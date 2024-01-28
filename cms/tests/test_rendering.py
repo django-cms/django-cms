@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.http.response import Http404
 from django.test.utils import override_settings
+from django.urls import reverse
 from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
@@ -65,15 +66,27 @@ class RenderingEmptyTestCase(CMSTestCase):
 
     def test_page_with_empty_pagecontent(self):
         """
-        A page with EmptyPageContent returns 404 when you try to view it.
+        A page with EmptyPageContent except root returns 404 when you try to view it.
         """
         page_content = self.page.get_content_obj('en', force_reload=True)
         self.assertEqual(isinstance(page_content, EmptyPageContent), True)
 
         with self.assertRaises(Http404):
-            details(self.get_request(
-                page=self.page), self.page.get_path('en')
-            )
+            path = self.page.get_path('en')
+            request = self.get_request(path=path, page=self.page)
+            details(request, slug=path)
+
+    def test_page_with_empty_pagecontent_for_root_url(self):
+        """
+        The root page with EmptyPageContent redirects to PageContent's changelist
+        """
+        page_content = self.page.get_content_obj('en', force_reload=True)
+        self.assertEqual(isinstance(page_content, EmptyPageContent), True)
+
+        request = self.get_request(path='/en/', page=self.page)
+        response = details(request, slug=self.page.get_path('en'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('admin:cms_pagecontent_changelist'))
 
 
 @override_settings(
