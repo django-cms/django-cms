@@ -537,7 +537,7 @@ def publish_page(page, user, language):
 
         Publishing pages has been removed from django CMS core in version 4 onward.
 
-        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',
@@ -550,7 +550,7 @@ def publish_pages(include_unpublished=False, language=None, site=None):
 
         Publishing pages has been removed from django CMS core in version 4 onward.
 
-        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',
@@ -563,7 +563,7 @@ def get_page_draft(page):
 
         The concept of draft pages has been removed from django CMS core in version 4 onward.
 
-        For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',
