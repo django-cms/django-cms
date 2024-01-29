@@ -1,7 +1,7 @@
 from django.utils.encoding import smart_str
 
 
-class Menu(object):
+class Menu:
     """The base class for all menu-generating classes."""
     namespace = None
 
@@ -16,7 +16,7 @@ class Menu(object):
         raise NotImplementedError
 
 
-class Modifier(object):
+class Modifier:
     """The base class for all menu-modifying classes. A modifier add, removes or changes
     :class:`menus.base.NavigationNode` in the list."""
     def __init__(self, renderer):
@@ -27,7 +27,7 @@ class Modifier(object):
         pass
 
 
-class NavigationNode(object):
+class NavigationNode:
     """
     Each node in a menu tree is represented by a ``NavigationNode`` instance.
     """

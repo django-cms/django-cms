@@ -76,7 +76,7 @@ def plugin_supports_cte():
     return not (db_vendor == 'mysql' and connection.mysql_version < (8, 0))
 
 
-class BoundRenderMeta():
+class BoundRenderMeta:
     def __init__(self, meta):
         self.index = 0
         self.total = 1
@@ -305,14 +305,14 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         Get src URL for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return plugin.icon_src(instance) if instance else u''
+        return plugin.icon_src(instance) if instance else ''
 
     def get_instance_icon_alt(self):
         """
         Get alt text for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return force_str(plugin.icon_alt(instance)) if instance else u''
+        return force_str(plugin.icon_alt(instance)) if instance else ''
 
     def update(self, refresh=False, **fields):
         CMSPlugin.objects.filter(pk=self.pk).update(**fields)

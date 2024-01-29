@@ -1,19 +1,77 @@
 [tool.ruff]
-exclude = [
-    ".env",
-    ".venv",
-    "**/migrations/**",
-]
-ignore = [
-    "E501",  # line too long
-    "F403",  # 'from module import *' used; unable to detect undefined names
-    "E701",  # multiple statements on one line (colon)
-    "F401",  # module imported but unused
-]
+# https://beta.ruff.rs/docs/configuration/
 line-length = 119
 select = [
-    "I",
-    "E",
-    "F",
-    "W",
+  "E",  # pycodestyle errors
+  "W",  # pycodestyle warnings
+  "F",  # pyflakes
+  "I",  # isort
+  "C",  # flake8-comprehensions
+  "B",  # flake8-bugbear
+  "PLE", # pylint error
+  "PLR", # pylint refactor
+  "PLW", # pylint warning
+  "UP", # pyupgrade
 ]
+
+extend-exclude = [
+  ".ruff_cache",
+  ".env",
+  ".venv",
+  "**migrations/**",
+]
+
+extend-ignore = [
+  "C901",     # Too complex
+  "PLR0911",  # Too many return statements
+  "PLR0912",  # Too many branches
+  "PLR0913",  # Too many arguments to function call
+  "PLR0915",  # Too many statements
+
+  # TODO fix separately
+  "B006",
+  "B007",
+  "B027",
+  "B028",
+  "B018",
+  "B020",
+  "B026",
+  "B904",
+  "C400",
+  "C402",
+  "C405",
+  "C408",
+  "C414",
+  "C416",
+  "E701",
+  "F401",
+  "F403",
+  "E501",
+  "PLR2004",
+  "PLR5501",
+  "PLW0120",
+  "PLW0603",
+  "PLW0602",
+  "PLW2901",
+  "UP028",
+  "UP030",
+  "UP031",
+]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = [
+  "F401"  # unused-import
+]
+"menus/menu_pool.py" = [
+  "PLW2901",  # `for` loop variable `menu_cls` overwritten by assignment target
+]
+"cms/toolbar/utils.py" = [
+  "B020"  # Loop control variable `plugin` overrides iterable it iterates
+]
+
+[tool.ruff.isort]
+combine-as-imports = true
+
+[tool.ruff.pyupgrade]
+# Preserve types, even if a file imports `from __future__ import annotations`.
+keep-runtime-typing = true

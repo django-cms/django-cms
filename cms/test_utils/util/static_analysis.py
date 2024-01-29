@@ -7,7 +7,7 @@ from pyflakes.reporter import Reporter
 
 
 def _pyflakes_report_with_nopyflakes(self, messageClass, node, *args, **kwargs):
-    with open(self.filename, 'r') as code:
+    with open(self.filename) as code:
         if code.readlines()[node.lineno - 1].strip().endswith('# nopyflakes'):
             return
     self.messages.append(messageClass(self.filename, node, *args, **kwargs))

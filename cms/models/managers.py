@@ -63,10 +63,7 @@ class PageManager(models.Manager):
             if related_query_name and not related_query_name.startswith('+'):
                 for field in cmsplugin.search_fields:
                     qp |= Q(**{
-                        'pagecontent_set__placeholders__cmsplugin__{0}__{1}__icontains'.format(
-                            related_query_name,
-                            field,
-                        ): q})
+                        f'pagecontent_set__placeholders__cmsplugin__{related_query_name}__{field}__icontains': q})
         if language:
             qt &= Q(pagecontent_set__language=language)
             qp &= Q(cmsplugin__language=language)

@@ -52,7 +52,7 @@ class Style(CMSPlugin):
         if self.label:
             display.append(self.label)
         if self.tag_type:
-            display.append('<{0}>'.format(self.tag_type))
+            display.append(f'<{self.tag_type}>')
         if self.class_name:
             classes.append(self.class_name)
         if self.additional_classes:

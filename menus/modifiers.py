@@ -96,9 +96,8 @@ class AuthVisibility(Modifier):
             if (node.attr.get('visible_for_authenticated', True) and request.user.is_authenticated) or \
                     (node.attr.get('visible_for_anonymous', True) and not request.user.is_authenticated):
                 final.append(node)
-            else:
-                if node.parent and node in node.parent.children:
-                    node.parent.children.remove(node)
+            elif node.parent and node in node.parent.children:
+                node.parent.children.remove(node)
         return final
 
 

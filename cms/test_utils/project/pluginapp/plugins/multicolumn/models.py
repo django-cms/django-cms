@@ -8,4 +8,4 @@ class MultiColumns(CMSPlugin):
 
     def __str__(self):
         plugins = self.child_plugin_instances or []
-        return "{} columns".format(len(plugins))
+        return f"{len(plugins)} columns"

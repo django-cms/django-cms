@@ -17,14 +17,14 @@ def get_request_ip_resolver():
     try:
         ip_resolver_module = importlib.import_module(module)
         ip_resolver = getattr(ip_resolver_module, attribute)
-    except ImportError:
+    except ImportError as err:
         raise ImproperlyConfigured(
             _('Unable to find the specified CMS_REQUEST_IP_RESOLVER module: '
-              '"{0}".').format(module))
-    except AttributeError:
+              '"{0}".').format(module)) from err
+    except AttributeError as err:
         raise ImproperlyConfigured(
             _('Unable to find the specified CMS_REQUEST_IP_RESOLVER function: '
-              '"{0}" in module "{1}".').format(attribute, module))
+              '"{0}" in module "{1}".').format(attribute, module)) from err
     return ip_resolver
 
 

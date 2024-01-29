@@ -25,4 +25,4 @@ class MigrationTestCase(TestCase):
             status_code = '0'
 
         if status_code == '1':
-            self.fail('There are missing migrations:\n {}'.format(output.getvalue()))
+            self.fail(f'There are missing migrations:\n {output.getvalue()}')

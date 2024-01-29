@@ -35,7 +35,7 @@ class TestSectionOutput(FileSectionWrapper):
         pass
 
 
-class CheckAssertMixin():
+class CheckAssertMixin:
     def assertCheck(self, successful, **assertions):
         """
         asserts that checks are successful or not

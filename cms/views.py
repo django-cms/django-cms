@@ -2,8 +2,7 @@ from urllib.parse import quote
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
@@ -57,10 +56,10 @@ else:
 
 def _clean_redirect_url(redirect_url, language):
     if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
-            '/%s/' % language
+            f"/{language}/"
     )):
         # add language prefix to url
-        redirect_url = "/%s/%s" % (language, redirect_url.lstrip("/"))
+        redirect_url = f"/{language}/{redirect_url.lstrip('/')}"
     return redirect_url
 
 
@@ -239,20 +238,20 @@ def login(request):
     if form.is_valid():
         auth_login(request, form.user_cache)
     else:
-        redirect_to += u'?cms_toolbar_login_error=1'
+        redirect_to += '?cms_toolbar_login_error=1'
     return HttpResponseRedirect(redirect_to)
 
 
 def render_object_structure(request, content_type_id, object_id):
     try:
         content_type = ContentType.objects.get_for_id(content_type_id)
-    except ContentType.DoesNotExist:
-        raise Http404
+    except ContentType.DoesNotExist as err:
+        raise Http404 from err
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+    except ObjectDoesNotExist as err:
+        raise Http404 from err
 
     context = {
         'object': content_type_obj,
@@ -268,8 +267,8 @@ def render_object_structure(request, content_type_id, object_id):
 def render_object_endpoint(request, content_type_id, object_id, require_editable):
     try:
         content_type = ContentType.objects.get_for_id(content_type_id)
-    except ContentType.DoesNotExist:
-        raise Http404
+    except ContentType.DoesNotExist as err:
+        raise Http404 from err
     else:
         model = content_type.model_class()
 
@@ -300,8 +299,8 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     return _handle_no_apphook(request)
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+    except ObjectDoesNotExist as err:
+        raise Http404 from err
 
     extension = apps.get_app_config('cms').cms_extension
 
