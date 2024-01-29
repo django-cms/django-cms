@@ -557,7 +557,7 @@ class PageAdmin(admin.ModelAdmin):
         return page_permissions.user_can_delete_page(request.user, page=obj, site=site)
 
     def can_set_as_home(self, request):
-        site = self.get_site(request)
+        site = get_site(request)
         perms = permissions.get_global_actions_for_user(request.user, site)
         return 'can_set_as_home' in perms
 
