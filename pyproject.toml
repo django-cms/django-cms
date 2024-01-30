@@ -80,3 +80,4 @@ keep-runtime-typing = true
 quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
+docstring-code-line-length = 80
