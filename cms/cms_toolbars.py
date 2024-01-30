@@ -5,9 +5,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.contrib.sites.models import Site
 from django.db.models import Q
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
-from django.utils.translation import override as force_language
+from django.utils.translation import gettext_lazy as _, override as force_language
 
 from cms.api import can_change_page, get_page_draft
 from cms.constants import PUBLISHER_STATE_PENDING, TEMPLATE_INHERITANCE_MAGIC

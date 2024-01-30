@@ -13,8 +13,7 @@ from django.utils.encoding import force_str
 from django.utils.numberformat import format
 from sekizai.context import SekizaiContext
 
-from cms import __file__ as cms_root_path
-from cms import constants
+from cms import __file__ as cms_root_path, constants
 from cms.api import add_plugin, create_page, create_title
 from cms.exceptions import DuplicatePlaceholderWarning, PluginLimitReached
 from cms.models.fields import PlaceholderField

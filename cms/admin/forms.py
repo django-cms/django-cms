@@ -7,10 +7,8 @@ from django.contrib.sites.models import Site
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms.utils import ErrorList
 from django.forms.widgets import HiddenInput
-from django.template.defaultfilters import slugify
 from django.utils.encoding import force_str
-from django.utils.translation import get_language, gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext, gettext_lazy as _
 
 from cms import api
 from cms.apphook_pool import apphook_pool
