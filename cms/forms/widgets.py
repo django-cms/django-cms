@@ -55,11 +55,11 @@ class PageSelectWidget(MultiWidget):
         # the same as an empty string, if the data or initial value we get
         # is None, replace it w/ u''.
         if data is None or (len(data)>=2 and data[1] in [None,'']):
-            data_value = u''
+            data_value = ''
         else:
             data_value = data
         if initial is None:
-            initial_value = u''
+            initial_value = ''
         else:
             initial_value = initial
         if force_str(initial_value) != force_str(data_value):
@@ -94,7 +94,7 @@ class PageSelectWidget(MultiWidget):
         return context
 
     def format_output(self, rendered_widgets):
-        return u' '.join(rendered_widgets)
+        return ' '.join(rendered_widgets)
 
 
 class PageSmartLinkWidget(TextInput):
@@ -166,9 +166,9 @@ class UserSelectAdminWidget(Select):
                 add_url = admin_reverse(f"{auth_model._meta.app_label}_{auth_model._meta.model_name}_add")
             else:
                 add_url = admin_reverse('cms_pageuser_add')
-            output.append(u'<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
+            output.append('<a href="%s" class="add-another" id="add_id_%s" onclick="return showAddAnotherPopup(this);"> ' % \
                     (add_url, name))
-        return mark_safe(u''.join(output))
+        return mark_safe(''.join(output))
 
 class AppHookSelect(Select):
 

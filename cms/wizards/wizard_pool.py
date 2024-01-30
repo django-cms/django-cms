@@ -69,11 +69,11 @@ class WizardPool:
 
         Raises AlreadyRegisteredException if the entry is already registered.
         """
-        assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
+        assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
         if self.is_registered(entry, passive=True):
             model = entry.get_model()
             raise AlreadyRegisteredException(
-                _(u"A wizard has already been registered for model: %s") %
+                _("A wizard has already been registered for model: %s") %
                 model.__name__)
         else:
             self._entries[entry.id] = entry
@@ -86,7 +86,7 @@ class WizardPool:
 
         NOTE: This method triggers pool discovery.
         """
-        assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
+        assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
         if self.is_registered(entry, passive=True):
             del self._entries[entry.id]
             return True

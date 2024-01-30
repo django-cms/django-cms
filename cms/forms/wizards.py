@@ -104,7 +104,7 @@ class CreateCMSPageForm(AddPageForm):
 
         if parent_node:
             base = parent_node.item.get_path(self._language)
-            path = u'%s/%s' % (base, slug) if base else slug
+            path = '%s/%s' % (base, slug) if base else slug
         else:
             base = ''
             path = slug

@@ -72,7 +72,7 @@ class WizardTestMixin:
 
         # This is a basic Wizard
         cls.page_wizard = PageWizard(
-            title=_(u"Page"),
+            title=_("Page"),
             weight=100,
             form=WizardForm,
             model=Page,
@@ -84,7 +84,7 @@ class WizardTestMixin:
 
         # This is a Wizard that uses a ModelForm to define the model
         cls.user_settings_wizard = SettingsWizard(
-            title=_(u"UserSettings"),
+            title=_("UserSettings"),
             weight=200,
             form=ModelWizardForm,
         )
@@ -95,7 +95,7 @@ class WizardTestMixin:
         # This is a bad wizard definition as it neither defines a model, nor
         # uses a ModelForm that has model defined in Meta
         cls.title_wizard = TitleWizard(
-            title=_(u"Page"),
+            title=_("Page"),
             weight=100,
             form=BadModelForm,
             template_name='my_template.html',  # This doesn't exist anywhere
