@@ -62,7 +62,7 @@ class WizardTestMixin:
 
     @classmethod
     def setUpClass(cls):
-        super(WizardTestMixin, cls).setUpClass()
+        super().setUpClass()
         # This prevents auto-discovery, which would otherwise occur as soon as
         # tests start, creating unexpected starting conditions.
         wizard_pool._discovered = True
