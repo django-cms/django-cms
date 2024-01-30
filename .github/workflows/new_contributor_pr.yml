@@ -1,0 +1,25 @@
+name: New contributor message
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  build:
+    name: Hello new contributor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            Hello! Thank you for your contribution! 🎉
+
+            As it's your first contribution be sure to check out the [contribution docs](https://docs.django-cms.org/en/latest/contributing/index.html).
+
+            If you're a Slack user and haven't joined us, please do [here](https://www.django-cms.org/slack)!
+
+            Welcome aboard ⛵️!
