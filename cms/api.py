@@ -567,7 +567,7 @@ def get_page_draft(page):
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',
-                  UserWarning, stacklevel=2)
+                  UserWarning, stacklevel=2) 
 
 
 def copy_plugins_to_language(page, source_language, target_language,
