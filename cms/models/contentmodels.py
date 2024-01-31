@@ -87,7 +87,11 @@ class PageContent(models.Model):
         editable=False)
     changed_date = models.DateTimeField(auto_now=True)
 
-    in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
+    in_navigation = models.BooleanField(
+        _("in navigation"),
+        default=get_cms_setting('DEFAULT_IN_NAVIGATION'),
+        db_index=True,
+    )
     soft_root = models.BooleanField(
         _("soft root"),
         db_index=True,
