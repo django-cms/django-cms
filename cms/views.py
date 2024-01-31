@@ -321,4 +321,5 @@ def render_object_edit(request, content_type_id, object_id):
 
 
 def render_object_preview(request, content_type_id, object_id):
+    request.session['cms_toolbar_disabled'] = False
     return render_object_endpoint(request, content_type_id, object_id, require_editable=False)
