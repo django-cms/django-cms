@@ -1,8 +1,7 @@
 import json
 
 from django.utils.encoding import force_str
-from django.utils.translation import gettext
-from django.utils.translation import override as force_language
+from django.utils.translation import gettext, override as force_language
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 

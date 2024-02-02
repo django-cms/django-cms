@@ -31,8 +31,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import NoReverseMatch, re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
-from django.utils.translation import get_language, gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext, gettext_lazy as _
 from django.views.decorators.http import require_POST
 
 from cms import operations
