@@ -4,11 +4,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.text import slugify
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
-from cms.admin.forms import AddPageForm
-from cms.admin.forms import SlugWidget as AdminSlugWidget
+from cms.admin.forms import AddPageForm, SlugWidget as AdminSlugWidget
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
@@ -100,7 +98,7 @@ class CreateCMSPageForm(AddPageForm):
 
         if parent_node:
             base = parent_node.item.get_path(self._language)
-            path = u'%s/%s' % (base, slug) if base else slug
+            path = '%s/%s' % (base, slug) if base else slug
         else:
             base = ''
             path = slug

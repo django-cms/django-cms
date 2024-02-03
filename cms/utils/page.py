@@ -42,10 +42,7 @@ def get_clean_username(user):
     else:
         # limit changed_by and created_by to avoid problems with Custom User Model
         if len(username) > PAGE_USERNAME_MAX_LENGTH:
-            username = '{0}... (id={1})'.format(
-                username[:PAGE_USERNAME_MAX_LENGTH - 15],
-                user.pk,
-            )
+            username = f'{username[:PAGE_USERNAME_MAX_LENGTH - 15]}... (id={user.pk})'
     return username
 
 
@@ -125,7 +122,7 @@ def get_available_slug(site, path, language, suffix='copy', modified=False):
 
         if match and modified:
             _next = int(match.groups()[-1]) + 1
-            slug = SUFFIX_REGEX.sub('\\g<1>-{}'.format(_next), slug)
+            slug = SUFFIX_REGEX.sub(f'\\g<1>-{_next}', slug)
         elif suffix:
             slug += '-' + suffix + '-2'
         else:

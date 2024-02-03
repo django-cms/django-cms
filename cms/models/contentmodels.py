@@ -134,22 +134,16 @@ class PageContent(models.Model):
         app_label = 'cms'
 
     def __str__(self):
-        return u"%s (%s)" % (self.title, self.language)
+        return "%s (%s)" % (self.title, self.language)
 
     def __repr__(self):
-        display = '<{module}.{class_name} id={id} object at {location}>'.format(
-            module=self.__module__,
-            class_name=self.__class__.__name__,
-            id=self.pk,
-            location=hex(id(self)),
-        )
+        display = f'<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>'
         return display
 
     def update(self, **data):
         for field, value in data.items():
             setattr(self, field, value)
         self.save(update_fields=data.keys())
-        return
 
     def save(self, **kwargs):
         # delete template cache

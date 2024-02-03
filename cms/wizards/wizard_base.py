@@ -5,8 +5,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.translation import gettext as _
-from django.utils.translation import override as force_language
+from django.utils.translation import gettext as _, override as force_language
 
 from cms.toolbar.utils import (
     get_object_edit_url,
@@ -108,12 +107,7 @@ class Wizard(WizardBase):
         return force_str(self.title)
 
     def __repr__(self):
-        display = '<{module}.{class_name} id={id} object at {location}>'.format(
-            module=self.__module__,
-            class_name=self.__class__.__name__,
-            id=self.id,
-            location=hex(id(self)),
-        )
+        display = f'<{self.__module__}.{self.__class__.__name__} id={self.id} object at {hex(id(self))}>'
         return display
 
     def user_has_add_permission(self, user, **kwargs):
@@ -128,7 +122,7 @@ class Wizard(WizardBase):
         model = self.get_model()
         app_label = model._meta.app_label
         model_name = model.__name__.lower()
-        return user.has_perm("%s.%s_%s" % (app_label, "add", model_name))
+        return user.has_perm(f"{app_label}.add_{model_name}")
 
     def get_success_url(self, obj, **kwargs):
         """
@@ -166,8 +160,8 @@ class Wizard(WizardBase):
             model = self.form._meta.model
             if model:
                 return model
-        raise ImproperlyConfigured(u"Please set entry 'model' attribute or use "
-                                   u"ModelForm subclass as a form")
+        raise ImproperlyConfigured("Please set entry 'model' attribute or use "
+                                   "ModelForm subclass as a form")
 
     @cached_property
     def widget_attributes(self):

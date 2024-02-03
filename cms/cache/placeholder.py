@@ -35,12 +35,7 @@ def _get_placeholder_cache_version_key(placeholder, lang, site_id):
     and per VARY header.
     """
     prefix = get_cms_setting('CACHE_PREFIX')
-    key = '{prefix}|placeholder_cache_version|id:{id}|lang:{lang}|site:{site}'.format(
-        prefix=prefix,
-        id=placeholder.pk,
-        lang=str(lang),
-        site=site_id,
-    )
+    key = f'{prefix}|placeholder_cache_version|id:{placeholder.pk}|lang:{str(lang)}|site:{site_id}'
     # django itself adds "version" add the end of cache-keys, e.g. "<key>:1".
     # -> If `cache.set()` is for example called with `version=""`, it still adds
     #    `:` at the end. So if we check the length for `> 250`, a length of 249

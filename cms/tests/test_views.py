@@ -209,7 +209,7 @@ class ViewTests(CMSTestCase):
         page_preview_url = get_object_preview_url(page_content)
         # Anon user
         response = self.client.get(page_preview_url)
-        self.assertRedirects(response, '/en/admin/login/?next={}'.format(page_preview_url))
+        self.assertRedirects(response, f'/en/admin/login/?next={page_preview_url}')
 
         # Superuser
         user = self.get_superuser()

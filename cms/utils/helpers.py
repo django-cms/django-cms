@@ -8,7 +8,7 @@ def find_placeholder_relation(obj):
     return 'page'
 
 
-class classproperty():
+class classproperty:
     """Like @property, but for classes, not just instances.
 
     Example usage:
@@ -63,7 +63,7 @@ def get_header_name(name):
     uc_name = re.sub(r'\W+', '_', force_str(name)).upper()
     if uc_name in ['CONTENT_LENGTH', 'CONTENT_TYPE'] or uc_name.startswith('HTTP_'):
         return uc_name
-    return 'HTTP_{0}'.format(uc_name)
+    return f'HTTP_{uc_name}'
 
 
 def get_timezone_name():

@@ -18,4 +18,3 @@ def get_page(request):
 class CurrentPageMiddleware(MiddlewareMixin):
     def process_request(self, request):
         request.current_page = SimpleLazyObject(lambda: get_page(request))
-        return None

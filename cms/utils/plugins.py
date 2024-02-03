@@ -23,7 +23,7 @@ def get_plugin_class(plugin_type: str) -> CMSPluginBase:
     return plugin_pool.get_plugin(plugin_type)
 
 
-@lru_cache()
+@lru_cache
 def get_plugin_model(plugin_type: str) -> CMSPlugin:
     """Returns the plugin model class for a given plugin_type (str)"""
     return get_plugin_class(plugin_type).model
@@ -34,7 +34,7 @@ def get_plugins(request, placeholder, template, lang=None):
         return []
     if not hasattr(placeholder, '_plugins_cache'):
         assign_plugins(request, [placeholder], template, lang)
-    return getattr(placeholder, '_plugins_cache')
+    return placeholder._plugins_cache
 
 
 def assign_plugins(request, placeholders, template=None, lang=None):
@@ -68,9 +68,9 @@ def assign_plugins(request, placeholders, template=None, lang=None):
         else:
             layered_plugins = []
         # This is all the plugins.
-        setattr(placeholder, '_all_plugins_cache', all_plugins)
+        placeholder._all_plugins_cache = all_plugins
         # This is only the root plugins.
-        setattr(placeholder, '_plugins_cache', layered_plugins)
+        placeholder._plugins_cache = layered_plugins
 
 
 def get_plugins_as_layered_tree(plugins):
