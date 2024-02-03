@@ -1,4 +1,5 @@
 from importlib import import_module
+from unittest.mock import patch
 
 from django.conf import settings
 from django.test.utils import override_settings
@@ -7,6 +8,7 @@ from cms import api
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
 from cms.utils.compat import DJANGO_2_2
+from cms.views import details
 
 if DJANGO_2_2:
     from django.utils.translation import LANGUAGE_SESSION_KEY
@@ -336,11 +338,15 @@ class TestLanguagesNotInCMSLanguages(CMSTestCase):
 class TestLanguageFallbacks(CMSTestCase):
 
     def test_language_code(self):
+        '''
+        No redirect_on_fallback will return 200 with the fallback content
+        '''
         self.create_homepage("home", "nav_playground.html", "fr")
         response = self.client.get('/')
+        # no language code will cause a redirect.
         self.assertEqual(response.status_code, 302)
         response = self.client.get('/en/')
-        self.assertRedirects(response, '/fr/')
+        self.assertEqual(response.status_code, 200)
         response = self.client.get('/fr/')
         self.assertEqual(response.status_code, 200)
 
@@ -386,6 +392,101 @@ class TestLanguageFallbacks(CMSTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/en/')
 
+    @override_settings(
+        CMS_LANGUAGES={
+            'default': {
+                'fallbacks': ['en', 'fr'],
+                'public': True,  # no 404s
+                'redirect_on_fallback': False
+            }
+        },
+    )
+    def test_no_redirect_on_fallback(self):
+        homepage = self.create_homepage(
+            "home",
+            "nav_playground.html",
+            "fr"
+        )
+        page_data = self.get_new_page_data_dbfields(
+            language="fr"
+        )
+        page = api.create_page(**page_data)
+        response = self.client.get(page.get_absolute_url(language="en"))
+        self.assertEqual(response.status_code, 200)
+
+        # homepage should be the same
+        response = self.client.get(homepage.get_absolute_url(language="en"))
+        self.assertEqual(response.status_code, 200)
+
+    @override_settings(
+        CMS_LANGUAGES={
+            'default': {
+                'fallbacks': ['en', 'fr'],
+                'public': True,  # no 404s
+                'redirect_on_fallback': False
+            }
+        },
+    )
+    def test_no_redirect_on_fallback_content(self):
+        """
+        Test that the fallback content will be displayed
+        """
+        homepage = self.create_homepage(
+            "home",
+            "nav_playground.html",
+            "fr"
+        )
+        page_data = self.get_new_page_data_dbfields(
+            language="fr"
+        )
+        page = api.create_page(**page_data)
+        with patch('cms.views.render_pagecontent') as mock_render:
+            # normal page
+            path = page.get_absolute_url(language="en")
+            request = self.get_request(path)
+            details(request, slug=page.get_path("en"))
+            mock_render.assert_called_once_with(
+                request,
+                page.get_content_obj()
+            )
+
+        with patch('cms.views.render_pagecontent') as mock_render:
+            # homepage should be the same
+            path = homepage.get_absolute_url(language="en")
+            request = self.get_request(path)
+            details(request, slug=homepage.get_path("en"))
+            mock_render.assert_called_once_with(
+                request,
+                homepage.get_content_obj()
+            )
+
+    @override_settings(
+        CMS_LANGUAGES={
+            'default': {
+                'fallbacks': ['en', 'fr'],
+                'redirect_on_fallback': True,
+            }
+        }
+    )
+    def test_redirect_on_fallback(self):
+        page_data = self.get_new_page_data_dbfields(
+            language="fr"
+        )
+        page = api.create_page(**page_data)
+        response_fr = self.client.get(page.get_absolute_url(language="fr"))
+        self.assertEqual(response_fr.status_code, 200)
+        response_en = self.client.get(page.get_absolute_url(language="en"))
+        self.assertRedirects(response_en, page.get_absolute_url(language="fr"))
+
+        # homepage should be no different.
+        home_page_data = self.get_new_page_data_dbfields(
+            language="fr",
+        )
+        self.create_homepage(**home_page_data)
+        response_fr = self.client.get(page.get_absolute_url(language="fr"))
+        self.assertEqual(response_fr.status_code, 200)
+        response_en = self.client.get(page.get_absolute_url(language="en"))
+        self.assertRedirects(response_en, page.get_absolute_url(language="fr"))
 
 @override_settings(
     LANGUAGE_CODE='en',

@@ -16,7 +16,7 @@ from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.timezone import now
-from django.utils.translation import get_language_from_request
+from django.utils.translation import activate, get_language_from_request
 from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
@@ -179,9 +179,9 @@ def details(request, slug):
         # There is no page with the requested language
         # and there's no configured fallbacks
         return _handle_no_page(request)
-    elif language_is_unavailable and (redirect_on_fallback or page.is_home):
+    elif language_is_unavailable and redirect_on_fallback:
         # There is no page with the requested language and
-        # the user has explicitly requested to redirect on fallbacks,
+        # redirect_on_fallback is True,
         # so redirect to the first configured / available fallback language
         fallback = fallback_languages[0]
         redirect_url = page.get_absolute_url(fallback, fallback=False)
@@ -212,7 +212,17 @@ def details(request, slug):
     if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(quote(request.get_full_path()), settings.LOGIN_URL)
 
-    content = page.get_content_obj(language=request_language)
+    content_language = request_language
+    if language_is_unavailable:
+        # When redirect_on_fallback is False and
+        # language is unavailable, render the page
+        # in the first fallback language available
+        # by switching to it
+        content_language = fallback_languages[0]
+        activate(content_language)
+        request.LANGUAGE_CODE = content_language
+
+    content = page.get_content_obj(language=content_language)
     # use the page object with populated cache
     content.page = page
     if hasattr(request, 'toolbar'):
