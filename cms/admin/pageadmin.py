@@ -995,6 +995,10 @@ class PageContentAdmin(admin.ModelAdmin):
     def response_add(self, request, obj):
         redirect = request.POST.get("edit", False)
         if redirect == "1":
+            from django.core.cache import cache
+            from cms.cache.permissions import get_cache_key, get_cache_permission_version
+            cache.delete(get_cache_key(request.user, 'change_page'), version=get_cache_permission_version())
+
             # redirect to the edit view if added from the toolbar
             url = get_object_edit_url(obj)  # Redirects to preview if necessary
             return HttpResponse(MODAL_HTML_REDIRECT.format(url=url))
