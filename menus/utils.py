@@ -123,7 +123,7 @@ def language_changer_decorator(language_changer):
     return _decorator
 
 
-class DefaultLanguageChanger(object):
+class DefaultLanguageChanger:
     """
     A class for changing the default language of a web application.
 
