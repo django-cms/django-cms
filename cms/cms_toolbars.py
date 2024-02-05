@@ -6,8 +6,6 @@ from django.contrib.sites.models import Site
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.translation import (
     gettext_lazy as _,
-)
-from django.utils.translation import (
     override as force_language,
 )
 
@@ -494,7 +492,7 @@ class PageToolbar(CMSToolbar):
 
             if add:
                 add_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-add', _('Add Translation')
                 )
 
                 page_add_url = admin_reverse('cms_pagecontent_add')
@@ -505,7 +503,7 @@ class PageToolbar(CMSToolbar):
 
             if remove:
                 remove_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-del', _('Delete Translation')
                 )
                 disabled = len(remove) == 1
                 for code, name in remove:
@@ -517,7 +515,7 @@ class PageToolbar(CMSToolbar):
 
             if copy:
                 copy_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-copy', _('Copy all plugins')
                 )
                 title = _('from %s')
                 question = _('Are you sure you want to copy all plugins from %s?')

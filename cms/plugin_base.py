@@ -11,8 +11,7 @@ from django.core.exceptions import (
 from django.shortcuts import render
 from django.utils.encoding import force_str, smart_str
 from django.utils.html import escapejs
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
@@ -702,7 +701,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return self.name
 
 
-class PluginMenuItem():
+class PluginMenuItem:
     """
     Creates an item in the plugin / placeholder menu
 

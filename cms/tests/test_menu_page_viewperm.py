@@ -150,7 +150,7 @@ class ViewPermissionTests(CMSTestCase):
             user = self._create_user(username, is_staff)
             if groupname:
                 group, _ = Group.objects.get_or_create(name=groupname)
-                user_set = getattr(group, 'user_set')
+                user_set = group.user_set
                 user_set.add(user)
                 group.save()
 
@@ -594,7 +594,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     def _setup_user(self):
         user = self._create_user('user_6', True)
         group = Group.objects.create(name=self.GROUPNAME_6)
-        user_set = getattr(group, 'user_set')
+        user_set = group.user_set
         user_set.add(user)
         group.save()
 

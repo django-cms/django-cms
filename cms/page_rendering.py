@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
-from django.urls import Resolver404, get_resolver, resolve, reverse
+from django.urls import Resolver404, resolve, reverse
 
 from cms import __version__, constants
 from cms.cache.page import set_page_cache

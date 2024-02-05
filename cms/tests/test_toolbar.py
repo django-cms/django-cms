@@ -11,12 +11,11 @@ from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
-from django.urls import resolve, reverse
+from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.functional import lazy
 from django.utils.html import escape
-from django.utils.translation import get_language, override
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _, override
 
 from cms.admin.forms import RequestToolbarForm
 from cms.api import add_plugin, create_page, create_page_content
@@ -608,7 +607,7 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page("toolbar-page", "nav_playground.html", "en")
         page.set_as_homepage()
         login_url = reverse('cms_login')
-        endpoint = '{}?next=https://notyourdomain.com'.format(login_url)
+        endpoint = f'{login_url}?next=https://notyourdomain.com'
         response = self.client.post(endpoint, {'username': username, 'password': username})
         self.assertRedirects(response, page.get_absolute_url(), fetch_redirect_response=False)
 
@@ -865,14 +864,14 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, self.get_staff(), edit_url)
         self.assertMenuItems(
             request, LANGUAGE_MENU_IDENTIFIER, 'Add Translation',
-            [u'German...', u'Brazilian Portuguese...', u'French...', u'Espa\xf1ol...']
+            ['German...', 'Brazilian Portuguese...', 'French...', 'Espa\xf1ol...']
         )
 
         create_page_content(title="de page", language="de", page=page)
         create_page_content(title="fr page", language="fr", page=page)
         self.assertMenuItems(
             request, LANGUAGE_MENU_IDENTIFIER, 'Add Translation',
-            [u'Brazilian Portuguese...', u'Espa\xf1ol...']
+            ['Brazilian Portuguese...', 'Espa\xf1ol...']
         )
 
     def test_copy_plugins(self):
@@ -890,7 +889,7 @@ class ToolbarTests(ToolbarTestBase):
         request = self.get_page_request(page, staff, edit_url_en)
         self.assertMenuItems(
             request, LANGUAGE_MENU_IDENTIFIER, _('Copy all plugins'),
-            [u'from German', u'from French']
+            ['from German', 'from French']
         )
 
         request = self.get_page_request(page, staff, edit_url_de, lang_code='de')
@@ -937,7 +936,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_('Logout %s') % self.get_username(superuser)))
 
         #
         # Test that the logout shows the logged-in user's name, if it was
@@ -954,7 +953,7 @@ class ToolbarTests(ToolbarTestBase):
             response = self.client.get(page_edit_url)
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
-            self.assertTrue(admin_menu.find_first(AjaxItem, name=_(u'Logout %s') % self.get_username(superuser)))
+            self.assertTrue(admin_menu.find_first(AjaxItem, name=_('Logout %s') % self.get_username(superuser)))
 
     @override_settings(CMS_PERMISSION=True)
     def test_toolbar_logout_redirect(self):
@@ -988,7 +987,7 @@ class ToolbarTests(ToolbarTestBase):
             # Published page, no redirect
             response = self.client.get(page1_edit_url)
             toolbar = response.context['request'].toolbar
-            menu_name = _(u'Logout %s') % self.get_username(superuser)
+            menu_name = _('Logout %s') % self.get_username(superuser)
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertTrue(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success)
 
@@ -1127,7 +1126,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         render_placeholder_body = "I'm the render placeholder body"
 
-        plugin = add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+        plugin = add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_placeholder_body)
 
         template_text = '''{% extends "base.html" %}
 {% load cms_tags %}
@@ -1142,15 +1141,13 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<div class="cms-placeholder cms-placeholder-{0}"></div>'.format(ex1.placeholder.pk))
+            f'<div class="cms-placeholder cms-placeholder-{ex1.placeholder.pk}"></div>')
 
         self.assertContains(
             response,
-            '<h1><template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>'
-            '{1}'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'.format(
-                plugin.pk, render_placeholder_body
-            )
+            f'<h1><template class="cms-plugin cms-plugin-start cms-plugin-{plugin.pk}"></template>'
+            f'{render_placeholder_body}'
+            f'<template class="cms-plugin cms-plugin-end cms-plugin-{plugin.pk}"></template>'
         )
 
         self.assertContains(
@@ -1164,17 +1161,17 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         #
         self.assertContains(
             response,
-            '<h3>{0}</h3>'.format(render_placeholder_body)
+            f'<h3>{render_placeholder_body}</h3>'
         )
 
         self.assertContains(
             response,
-            'CMS._plugins.push(["cms-plugin-{0}"'.format(plugin.pk)
+            f'CMS._plugins.push(["cms-plugin-{plugin.pk}"'
         )
 
         self.assertContains(
             response,
-            'CMS._plugins.push(["cms-placeholder-{0}"'.format(ex1.placeholder.pk)
+            f'CMS._plugins.push(["cms-placeholder-{ex1.placeholder.pk}"'
         )
 
     def test_filters(self):
@@ -1679,10 +1676,10 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0} cms-render-model"></template>'.format(ex1.pk))
+            f'<template class="cms-plugin cms-plugin-start cms-plugin-{ex1.pk} cms-render-model"></template>')
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{0} cms-render-model"></template>'.format(ex1.pk))
+            f'<template class="cms-plugin cms-plugin-end cms-plugin-{ex1.pk} cms-render-model"></template>')
 
     def test_callable_item(self):
         user = self.get_staff()
@@ -1975,13 +1972,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         )
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_title-{0} cms-render-model">'
+            f'<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_title-{page.pk} cms-render-model">'
             '</template>'
-            '{1}'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_title-{0} cms-render-model">'
-            '</template>'.format(
-                page.pk, page.get_title(language)
-            )
+            f'{page.get_title(language)}'
+            f'<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_title-{page.pk} cms-render-model">'
+            '</template>'
         )
         self.assertContains(
             response,

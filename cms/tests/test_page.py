@@ -166,7 +166,7 @@ class PagesTestCase(TransactionCMSTestCase):
         page = self.create_homepage(**page_data)
         self.assertEqual(Page.objects.count(), 1)
         self.assertTrue(page.is_home)
-        self.assertEqual(list(page.get_urls().values_list('path', flat=True)), [u''])
+        self.assertEqual(list(page.get_urls().values_list('path', flat=True)), [''])
 
     @skipIf(has_no_custom_user(), 'No custom user')
     def test_create_page_api_with_long_username(self):
@@ -185,12 +185,12 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(Page.objects.count(), 1)
 
         self.assertLessEqual(len(page.created_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegexpMatches(page.created_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.created_by, r'V+\.{3} \(id=\d+\)')
 
         self.assertLessEqual(len(page.changed_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegexpMatches(page.changed_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.changed_by, r'V+\.{3} \(id=\d+\)')
 
-        self.assertEqual(list(page.get_urls().values_list('path', flat=True)), [u'root'])
+        self.assertEqual(list(page.get_urls().values_list('path', flat=True)), ['root'])
 
     def test_get_available_slug_recursion(self):
         """ Checks cms.utils.page.get_available_slug for infinite recursion
@@ -419,7 +419,7 @@ class PagesTestCase(TransactionCMSTestCase):
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
         path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
-        with open(path, 'r') as fobj:
+        with open(path) as fobj:
             old = fobj.read()
         try:
             new = old.replace(
@@ -609,7 +609,7 @@ class PagesTestCase(TransactionCMSTestCase):
 
         saved_page = create_page('test saved page', 'nav_playground.html', 'en')
         self.assertIsNotNone(saved_page.pk)
-        self.assertIn('id={}'.format(saved_page.pk), repr(saved_page))
+        self.assertIn(f'id={saved_page.pk}', repr(saved_page))
 
         non_saved_title = PageContent()
         self.assertIsNone(non_saved_title.pk)
@@ -617,7 +617,7 @@ class PagesTestCase(TransactionCMSTestCase):
 
         saved_content = saved_page.get_content_obj()
         self.assertIsNotNone(saved_content.pk)
-        self.assertIn('id={}'.format(saved_content.pk), repr(saved_content))
+        self.assertIn(f'id={saved_content.pk}', repr(saved_content))
 
     def test_page_overwrite_urls(self):
 

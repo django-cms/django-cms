@@ -291,7 +291,7 @@ class DefaultLanguageChanger(object):
         elif view and view.url_name not in ('pages-details-by-slug', 'pages-root'):
             view_name = view.url_name
             if view.namespace:
-                view_name = "%s:%s" % (view.namespace, view_name)
+                view_name = f"{view.namespace}:{view_name}"
             with force_language(lang):
                 try:
                     url = reverse(view_name, args=view.args, kwargs=view.kwargs, current_app=view.app_name)
@@ -299,4 +299,4 @@ class DefaultLanguageChanger(object):
                     url = None
             if url:
                 return url
-        return '%s%s' % (self.get_page_path(lang), self.app_path)
+        return f"{self.get_page_path(lang)}{self.app_path}"

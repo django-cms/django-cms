@@ -2,7 +2,7 @@ from cms.api import create_page
 from cms.models.pagemodel import Page
 
 
-class NavextendersFixture():
+class NavextendersFixture:
     def create_fixtures(self):
         """
         Tree from fixture:

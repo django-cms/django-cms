@@ -1,4 +1,3 @@
-from collections import defaultdict
 
 from django.contrib.sitemaps import Sitemap
 from django.db.models import OuterRef, Q, Subquery

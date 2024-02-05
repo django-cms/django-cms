@@ -822,5 +822,5 @@ class Placeholder(models.Model):
             cursor.execute(sql, [self.pk, language])
         else:
             raise RuntimeError(
-                '{} is not supported by django-cms'.format(connection.vendor)
+                f'{connection.vendor} is not supported by django-cms'
             )

@@ -4,14 +4,8 @@ from django.utils.encoding import smart_str
 
 
 class Menu:
-    """
-    The base class for all menu-generating classes.
-
-    Attributes:
-        namespace: The namespace for the menu.
-    """
-
-    namespace: Optional[str] = None
+    """The base class for all menu-generating classes."""
+    namespace = None
 
     def __init__(self, renderer):
         """
@@ -39,12 +33,8 @@ class Menu:
 
 
 class Modifier:
-    """
-    The base class for all menu-modifying classes.
-
-    Modifiers add, remove, or change NavigationNodes in the list.
-    """
-
+    """The base class for all menu-modifying classes. A modifier add, removes or changes
+    :class:`menus.base.NavigationNode` in the list."""
     def __init__(self, renderer):
         """
         Initialize the Modifier class.

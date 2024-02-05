@@ -46,7 +46,7 @@ def validate_url_uniqueness(site, path, language, user_language=None, exclude_pa
     else:
         change_url = ""  # Empty page has no slug
     if user_language:
-        change_url += '?language={}'.format(user_language)
+        change_url += f'?language={user_language}'
 
     conflict_url = '<a href="%(change_url)s" target="_blank">%(page_title)s</a>' % {
         'change_url': change_url,
