@@ -866,7 +866,10 @@ class Page(models.Model):
     def get_placeholders(self, language):
         from cms.models import PageContent, Placeholder
 
-        page_content = PageContent.objects.get(language=language, page=self)
+        try:
+            page_content = PageContent.objects.get(language=language, page=self)
+        except PageContent.DoesNotExist:
+            return Placeholder.objects.none()
         return Placeholder.objects.get_for_obj(page_content)
 
     def get_changed_date(self, language=None, fallback=True, force_reload=False):
