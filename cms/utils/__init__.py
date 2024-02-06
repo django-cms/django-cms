@@ -1,6 +1,7 @@
 # TODO: this is just stuff from utils.py - should be split / moved
 
 from cms.utils.i18n import (
+    get_current_language,
     get_default_language,
     get_language_code,
     get_language_list,
@@ -27,8 +28,9 @@ def get_language_from_request(request, current_page=None):
         language = get_language_code(language)
         if language not in get_language_list(site_id):
             language = None
-    if not language:
-        language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
+    if not language and request:
+        # get the active language
+        language = get_current_language()
     if language:
         if language not in get_language_list(site_id):
             language = None

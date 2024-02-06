@@ -1,10 +1,17 @@
+from collections import deque
 from importlib import import_module
 from unittest.mock import patch
 
 from django.conf import settings
+from django.template.context import Context
 from django.test.utils import override_settings
 
 from cms import api
+from cms.plugin_rendering import (
+    ContentRenderer,
+    LegacyRenderer,
+    StructureRenderer,
+)
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
 from cms.utils.compat import DJANGO_2_2
@@ -436,11 +443,27 @@ class TestLanguageFallbacks(CMSTestCase):
             "nav_playground.html",
             "fr"
         )
+        homepage_ph_fr = homepage.get_placeholders(
+            "fr").get(slot="body")
+        api.add_plugin(
+            homepage_ph_fr,
+            plugin_type="TextPlugin",
+            language="fr",
+            body="Hello, world!",
+        )
         page_data = self.get_new_page_data_dbfields(
             language="fr"
         )
         page = api.create_page(**page_data)
-        with patch('cms.views.render_pagecontent') as mock_render:
+        page_ph_fr = page.get_placeholders(
+            "fr").get(slot="body")
+        api.add_plugin(
+            page_ph_fr,
+            plugin_type="TextPlugin",
+            language="fr",
+            body="Hello, world!",
+        )
+        with patch("cms.views.render_pagecontent") as mock_render:
             # normal page
             path = page.get_absolute_url(language="en")
             request = self.get_request(path)
@@ -449,8 +472,12 @@ class TestLanguageFallbacks(CMSTestCase):
                 request,
                 page.get_content_obj()
             )
+            # check that the french plugins will render
+            context = Context({'request': request})
+            rendered_placeholder = self._render_placeholder(page_ph_fr, context)
+            self.assertEqual(rendered_placeholder, "Hello, world!")
 
-        with patch('cms.views.render_pagecontent') as mock_render:
+        with patch("cms.views.render_pagecontent") as mock_render:
             # homepage should be the same
             path = homepage.get_absolute_url(language="en")
             request = self.get_request(path)
@@ -459,6 +486,10 @@ class TestLanguageFallbacks(CMSTestCase):
                 request,
                 homepage.get_content_obj()
             )
+            # check that the french plugins will render
+            context = Context({'request': request})
+            rendered_placeholder = self._render_placeholder(homepage_ph_fr, context)
+            self.assertEqual(rendered_placeholder, "Hello, world!")
 
     @override_settings(
         CMS_LANGUAGES={

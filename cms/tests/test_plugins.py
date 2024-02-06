@@ -70,13 +70,6 @@ def register_plugins(*plugins):
             plugin_pool.unregister_plugin(plugin)
 
 
-def _render_placeholder(placeholder, context, **kwargs):
-    request = context['request']
-    toolbar = get_toolbar_from_request(request)
-    content_renderer = toolbar.content_renderer
-    return content_renderer.render_placeholder(placeholder, context, **kwargs)
-
-
 class DumbFixturePlugin(CMSPluginBase):
     model = CMSPlugin
     name = "Dumb Test Plugin. It does nothing."
@@ -277,7 +270,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertEqual(db_plugin_2.position, 2)
             # Finally we render the placeholder to test the actual content
             context = self.get_context(page_en.get_absolute_url(), page=page_en)
-            rendered_placeholder = _render_placeholder(ph_en, context)
+            rendered_placeholder = self._render_placeholder(ph_en, context)
             self.assertEqual(rendered_placeholder, "I'm the firstI'm the second")
 
     def test_plugin_order_alt(self):
@@ -316,7 +309,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
             # Finally we render the placeholder to test the actual content
             draft_page_context = self.get_context(cms_page.get_absolute_url(), page=cms_page)
-            rendered_placeholder = _render_placeholder(placeholder, draft_page_context)
+            rendered_placeholder = self._render_placeholder(placeholder, draft_page_context)
             self.assertEqual(rendered_placeholder, "I'm the firstI'm the secondI'm the third")
 
     def test_plugin_position(self):
@@ -633,7 +626,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         )
 
         # this should not raise any errors, but just ignore the empty plugin
-        out = _render_placeholder(placeholder, self.get_context(), width=300)
+        out = self._render_placeholder(placeholder, self.get_context(), width=300)
         self.assertFalse(len(out))
         self.assertFalse(len(placeholder._plugins_cache))
 
