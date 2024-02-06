@@ -52,9 +52,6 @@ We assume you are upgrading from django CMS 3.11.4.
 Please make sure that your current database is consistent and in a healthy
 state, and **make a copy of the database before proceeding further.**
 
-Check your settings of `CMS_LANGUAGES` (if used), as it was ignored by default in preceding versions.
-For more information, please see: https://github.com/django-cms/django-cms/pull/6795
-
 Then run::
 
     python manage.py migrate  # to ensure that your database is up-to-date with migrations
