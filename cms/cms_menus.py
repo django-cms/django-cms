@@ -4,7 +4,7 @@ from django.utils.functional import SimpleLazyObject
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyPageContent, PageContent, PageUrl
-from cms.toolbar.utils import get_object_edit_url, get_object_preview_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -235,10 +235,7 @@ class CMSMenu(Menu):
             for trans in page.filtered_translations:
                 page.page_content_cache[trans.language] = trans
 
-            if toolbar.edit_mode_active:
-                url = get_object_edit_url(page.page_content_cache.get(lang))
-
-            elif toolbar.preview_mode_active:
+            if toolbar.preview_mode_active or toolbar.edit_mode_active:
                 url = get_object_preview_url(page.page_content_cache.get(lang))
             else:
                 url = page.get_absolute_url(lang)
