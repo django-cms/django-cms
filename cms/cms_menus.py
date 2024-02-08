@@ -1,6 +1,7 @@
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
+from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.apphook_pool import apphook_pool
@@ -8,7 +9,6 @@ from cms.models import EmptyPageContent, PageContent, PageUrl
 from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
-    force_language,
     get_fallback_languages,
     get_public_languages,
     hide_untranslated,
@@ -66,7 +66,6 @@ def get_visible_nodes(request, pages, site):
             if perm.user_id == user_id or perm.group_id in user_groups:
                 return True
         return False
-
     return [page for page in pages if user_can_see_page(page)]
 
 
@@ -153,6 +152,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, url=""):
 
 
 class CMSNavigationNode(NavigationNode):
+
     def __init__(self, *args, **kwargs):
         self.path = kwargs.pop('path')
         # language is only used when we're dealing with a fallback
@@ -232,12 +232,16 @@ class CMSMenu(Menu):
             to_attr="filtered_urls",
             queryset=PageUrl.objects.filter(language__in=languages),
         )
+        if toolbar.edit_mode_active or toolbar.preview_mode_active:
+            # Get all translations visible in the admin for the current page
+            translations_qs = PageContent.admin_manager.current_content(language__in=languages)
+        else:
+            # Only get public translations
+            translations_qs = PageContent.objects.filter(language__in=languages)
         translations_lookup = Prefetch(
             "pagecontent_set",
             to_attr="filtered_translations",
-            queryset=PageContent.admin_manager.current_content(language__in=languages)
-            if toolbar.edit_mode_active or toolbar.preview_mode_active
-            else PageContent.objects.filter(language__in=languages),
+            queryset=translations_qs,
         )
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
         # Build the blank title instances only once
@@ -258,6 +262,7 @@ class CMSMenu(Menu):
                 page.page_content_cache[trans.language] = trans
 
             if toolbar.preview_mode_active or toolbar.edit_mode_active:
+                # Override URL to link to preview endpoint
                 url = get_object_preview_url(page.page_content_cache.get(lang))
             else:
                 url = ""
