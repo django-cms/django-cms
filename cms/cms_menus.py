@@ -283,7 +283,7 @@ class CMSMenu(Menu):
 
             menu_node = _page_to_node(page)
             if menu_node:
-                # Do not add pages without any page content
+                # Only add pages with at least one page content
                 cut_homepage = homepage and not homepage.get_in_navigation(lang)
 
                 if cut_homepage and parent_id == homepage.pk:
