@@ -26,14 +26,12 @@ Bug Fixes
 * fix: Remove discontinued discourse server from docs -- Fabian Braun
 * fix: Add ``--fix-paths`` option to ``./manage.py cms fix-tree`` -- Fabian Braun
 * fix: readable messages in dark-mode -- Fabian Braun
-* fix: "Plural-Forms"  to nplurals=2 for french djangojs locale -- Benjamin PIERRE
 
 Statistics:
 -----------
 
 This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Benjamin PIERRE
 * Fabian Braun
 * fwehr
 * Leonardo Cavallucci
