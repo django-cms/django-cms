@@ -810,9 +810,6 @@ class Page(models.Model):
         try:
             return self.urls_cache[language].path
         except (AttributeError, KeyError):
-
-            print(f"\n--> {self.urls_cache=} {languages=} {page_languages=}", end="")
-            print("    ", get_languages(self.node.site_id))
             return None
 
     def get_slug(self, language, fallback=True):
