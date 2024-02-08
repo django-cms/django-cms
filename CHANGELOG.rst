@@ -2,6 +2,41 @@
 Changelog
 =========
 
+3.11.5 (2024-01-26)
+===================
+
+Features:
+---------
+
+* feat: Add Python 3.12 support -- Vinit Kumar
+* feat: django 5 support for cms 3.11 -- Leonardo Cavallucci
+* feat: Add bot to remind to not squash merges into release/* branches -- Fabian Braun
+
+Bug Fixes
+---------
+
+* fix: preserve ``view_class`` in decorated views -- Will Hoey
+* fix: avoid InvalidCacheKey (memcached) for key-length ~249 -- fwehr
+* fix: Update transifex pull strings script for v3 in alignment with v4 -- Fabian Braun
+* fix: Use correct version of Django in GitHub CI actions -- Fabian Braun
+* fix: Remove link to closed discourse channel for feature requests from issue template -- Fabian Braun
+* fix: Remove discontinued discourse server from docs -- Fabian Braun
+* fix: Add ``--fix-paths`` option to ``./manage.py cms fix-tree`` -- Fabian Braun
+* fix: readable messages in dark-mode -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun
+* fwehr
+* Leonardo Cavallucci
+* Vinit Kumar
+* Will Hoey
+
+Thanks to all contributors for their efforts!
+
 3.11.4 (2023-09-06)
 ===================
 
