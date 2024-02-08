@@ -260,10 +260,7 @@ class CMSMenu(Menu):
             if toolbar.preview_mode_active or toolbar.edit_mode_active:
                 url = get_object_preview_url(page.page_content_cache.get(lang))
             else:
-                url = page.get_absolute_url(lang)
-
-            if url and "None" in url:
-                print(f"\n--> {page.get_absolute_url()=} {url=}", end="")
+                url = ""
 
             menu_node = get_menu_node_for_page(self.renderer, page, language=lang, fallbacks=fallbacks, url=url)
             return menu_node
