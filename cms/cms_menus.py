@@ -1,4 +1,5 @@
 from django.db.models.query import Prefetch, prefetch_related_objects
+from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
 
 from cms import constants
@@ -7,6 +8,7 @@ from cms.models import EmptyPageContent, PageContent, PageUrl
 from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
+    force_language,
     get_fallback_languages,
     get_public_languages,
     hide_untranslated,
@@ -131,6 +133,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, url=""):
         translation = page.page_content_cache.get(lang)
 
         if translation:
+            page_url = page.urls_cache[lang]
             # Do we have a redirectURL?
             attr["redirect_url"] = translation.redirect  # save redirect URL if any
 
@@ -142,18 +145,37 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, url=""):
                 id=page.pk,
                 attr=attr,
                 visible=page.get_in_navigation(translation.language),
+                path=page_url.path or page_url.slug,
+                language=(translation.language if translation.language != language else None),
             )
             return ret_node
     return None
 
 
 class CMSNavigationNode(NavigationNode):
+    def __init__(self, *args, **kwargs):
+        self.path = kwargs.pop('path')
+        # language is only used when we're dealing with a fallback
+        self.language = kwargs.pop('language', None)
+        super().__init__(*args, **kwargs)
+
     def is_selected(self, request):
         try:
             page_id = request.current_page.pk
         except AttributeError:
             return False
         return page_id == self.id
+
+    def _get_absolute_url(self):
+        if self.attr['is_home']:
+            return reverse('pages-root')
+        return reverse('pages-details-by-slug', kwargs={"slug": self.path})
+
+    def get_absolute_url(self):
+        if self.language:
+            with force_language(self.language):
+                return self._get_absolute_url()
+        return self._get_absolute_url()
 
 
 class CMSMenu(Menu):
