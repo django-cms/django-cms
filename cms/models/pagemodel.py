@@ -23,7 +23,7 @@ from cms.exceptions import LanguageError
 from cms.models.managers import PageManager, PageNodeManager, PageUrlManager
 from cms.utils import i18n
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_current_language, get_languages
+from cms.utils.i18n import get_current_language
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
