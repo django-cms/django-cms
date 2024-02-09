@@ -939,7 +939,7 @@ CMS_CACHE_PREFIX
 ================
 
 default
-    ``cms-``
+    ``f'cms_{__version__}_'``
 
 
 The CMS will prepend the value associated with this key to every cache access

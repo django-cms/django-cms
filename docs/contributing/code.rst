@@ -127,7 +127,7 @@ Frontend
 In order to be able to work with the frontend tooling contributing to the
 django CMS you need to have the following dependencies installed:
 
-    1. `Node <https://nodejs.org/>`_ version 6.10.1 (will install npm 3.10.10 as well).
+    1. `Node <https://nodejs.org/>`_ version 18.19.0 (will install npm 10.2.3 as well).
        We recommend using `NVM <https://github.com/creationix/nvm>`_ to get
        the correct version of Node.
     2. gulp - see `Gulp's Getting Started notes <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md>`_
