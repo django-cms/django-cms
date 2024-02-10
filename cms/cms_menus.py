@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
@@ -22,9 +24,8 @@ from menus.menu_pool import menu_pool
 
 def get_visible_nodes(request, pages, site):
     """
-     This code is basically a many-pages-at-once version of
-     cms.utils.page_permissions.user_can_view_page
-     pages contains all published pages
+    This code is a many-pages-at-once version of cms.utils.page_permissions.user_can_view_page.
+    `pages` contains all published pages.
     """
     user = request.user
     public_for = get_cms_setting('PUBLIC_FOR')
@@ -72,9 +73,14 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     """
     Transform a CMS page into a navigation node.
 
-    :param renderer: MenuRenderer instance bound to the request
-    :param page: the page you wish to transform
-    :param language: The current language used to render the menu
+    Args:
+        renderer: MenuRenderer instance bound to the request.
+        page: The page to transform.
+        language: The current language used to render the menu.
+        fallbacks: List of fallback languages (optional).
+
+    Returns:
+        A CMSNavigationNode instance.
     """
     if fallbacks is None:
         fallbacks = []
@@ -152,11 +158,27 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
 
 
 class CMSNavigationNode(NavigationNode):
+    """
+    Represents a CMS Navigation Node for a Page object in the page tree.
 
-    def __init__(self, *args, **kwargs):
-        self.path = kwargs.pop('path')
+    Attributes:
+        path: The path of the node.
+        language: The language used for the node (optional).
+    """
+
+    def __init__(self, *args, path: str, language: Optional[str] = None, **kwargs):
+        """
+        Initializes a CMSNavigationNode instance.
+
+        Args:
+            *args: Positional arguments.
+            path: The path of the node.
+            language: The language used for the node (optional).
+            **kwargs: Keyword arguments.
+        """
+        self.path = path
         # language is only used when we're dealing with a fallback
-        self.language = kwargs.pop('language', None)
+        self.language = language
         super().__init__(*args, **kwargs)
 
     def is_selected(self, request):
