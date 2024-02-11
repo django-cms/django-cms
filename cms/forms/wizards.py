@@ -9,6 +9,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms.admin.forms import AddPageForm, SlugWidget as AdminSlugWidget
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
+from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_available_slug
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
@@ -26,7 +27,7 @@ class SlugWidget(AdminSlugWidget):
     SlugWidget has moved to cms.admin.forms"""
     def __init__(self, *args, **kwargs):
         warnings.warn("Import SlugWidget from cms.admin.forms. SlugWidget will be removed from cms.forms.wizards",
-                      DeprecationWarning, stacklevel=2)
+                      RemovedInDjangoCMS42Warning, stacklevel=2)
         super().__init__(*args, **kwargs)
 
 

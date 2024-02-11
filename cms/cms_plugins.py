@@ -14,6 +14,7 @@ from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
+from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
 from cms.utils.urlutils import admin_reverse
 
 
@@ -116,7 +117,7 @@ class AliasPlugin(CMSPluginBase):
             'AliasPlugin is deprecated, '
             'and it will be removed; '
             'please use the package djangocms-alias instead',
-            DeprecationWarning
+            RemovedInDjangoCMS42Warning
         )
         if not request.user.is_staff:
             return HttpResponseForbidden("not enough privileges")

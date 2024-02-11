@@ -27,10 +27,10 @@ logger = getLogger('menus')
 
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
-    '''
+    """
     This is an easier to test "inner loop" building the menu tree structure
     for one menu (one language, one site)
-    '''
+    """
     done_nodes = {}  # Dict of node.id:Node
     final_nodes = []
 
