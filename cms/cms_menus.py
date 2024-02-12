@@ -70,7 +70,7 @@ def get_visible_nodes(request, pages, site):
     return [page for page in pages if user_can_see_page(page)]
 
 
-def get_menu_node_for_page(renderer, page, language, fallbacks=None, url=""):
+def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=False):
     """
     Transform a CMS page into a navigation node.
 
@@ -79,7 +79,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, url=""):
         page: The page to transform.
         language: The current language used to render the menu.
         fallbacks: List of fallback languages (optional).
-
+        url: The URL to use for the node (optional) instead of page_content.get_absolute_url().
     Returns:
         A CMSNavigationNode instance.
     """
@@ -127,7 +127,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, url=""):
             # CMSAttachMenus are treated a bit differently to allow them to be
             # able to be attached to multiple points in the navigation.
             exts.append(f"{ext.__name__}:{page.pk}")
-        elif hasattr(ext, '__name__'):
+        elif hasattr(ext, "__name__"):
             exts.append(ext.__name__)
         else:
             exts.append(ext)
@@ -144,9 +144,13 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, url=""):
 
             # Now finally, build the NavigationNode object and return it.
             # The parent_id is manually set by the menu get_nodes method.
+            if endpoint:
+                url = get_object_preview_url(translation)
+            else:
+                url = translation.get_absolute_url()
             ret_node = CMSNavigationNode(
                 title=translation.menu_title or translation.title,
-                url=url or translation.get_absolute_url(),
+                url=url,
                 id=page.pk,
                 attr=attr,
                 visible=page.get_in_navigation(translation.language),
@@ -187,17 +191,6 @@ class CMSNavigationNode(NavigationNode):
         except AttributeError:
             return False
         return page_id == self.id
-
-    def _get_absolute_url(self):
-        if self.attr['is_home']:
-            return reverse('pages-root')
-        return reverse('pages-details-by-slug', kwargs={"slug": self.path})
-
-    def get_absolute_url(self):
-        if self.language:
-            with force_language(self.language):
-                return self._get_absolute_url()
-        return self._get_absolute_url()
 
 
 class CMSMenu(Menu):
@@ -283,13 +276,13 @@ class CMSMenu(Menu):
             for trans in page.filtered_translations:
                 page.page_content_cache[trans.language] = trans
 
-            if toolbar.preview_mode_active or toolbar.edit_mode_active:
-                # Override URL to link to preview endpoint
-                url = get_object_preview_url(page.page_content_cache.get(lang))
-            else:
-                url = ""
-
-            menu_node = get_menu_node_for_page(self.renderer, page, language=lang, fallbacks=fallbacks, url=url)
+            menu_node = get_menu_node_for_page(
+                self.renderer,
+                page,
+                language=lang,
+                fallbacks=fallbacks,
+                endpoint=toolbar.preview_mode_active or toolbar.edit_mode_active,
+            )
             return menu_node
 
         menu_nodes = []
