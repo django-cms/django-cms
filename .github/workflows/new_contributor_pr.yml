@@ -8,7 +8,7 @@ permissions:
   pull-requests: write
 
 jobs:
-  build:
+  new:
     name: Hello new contributor
     runs-on: ubuntu-latest
     steps:
@@ -23,9 +23,13 @@ jobs:
             If you're a Slack user and haven't joined us, please do [here](https://www.django-cms.org/slack)!
 
             Welcome aboard ⛵️!
-
+  discord:
+    name: Discord Notification
+    runs-on: ubuntu-latest
+    needs: new
+    steps:
       - name: Send Discord Webhook
-        uses: Ilshidur/action-discord@v2
+        uses: Ilshidur/action-discord@master
         with:
           webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
           content: |
