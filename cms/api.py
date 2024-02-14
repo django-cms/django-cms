@@ -60,6 +60,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
@@ -362,7 +363,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     """
     warnings.warn(
         "cms.api.create_title has been renamed to cms.api.create_page_content().",
-        DeprecationWarning,
+        RemovedInDjangoCMS43Warning,
         stacklevel=2
     )
     return create_page_content(
@@ -537,7 +538,7 @@ def publish_page(page, user, language):
 
         Publishing pages has been removed from django CMS core in version 4 onward.
 
-        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',
@@ -550,7 +551,7 @@ def publish_pages(include_unpublished=False, language=None, site=None):
 
         Publishing pages has been removed from django CMS core in version 4 onward.
 
-        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',
@@ -563,7 +564,7 @@ def get_page_draft(page):
 
         The concept of draft pages has been removed from django CMS core in version 4 onward.
 
-        For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',

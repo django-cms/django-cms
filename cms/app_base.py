@@ -117,7 +117,7 @@ class CMSApp:
         return self._urls
 
 
-class CMSAppConfig():
+class CMSAppConfig:
     """
     .. versionadded:: 4.0
 

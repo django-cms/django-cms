@@ -51,13 +51,13 @@ def pre_delete_user(instance, **kwargs):
 
 def pre_save_group(instance, raw, **kwargs):
     if instance.pk:
-        user_set = getattr(instance, 'user_set')
+        user_set = instance.user_set
         for user in user_set.all():
             clear_user_permission_cache(user)
 
 
 def pre_delete_group(instance, **kwargs):
-    user_set = getattr(instance, 'user_set')
+    user_set = instance.user_set
     for user in user_set.all():
         clear_user_permission_cache(user)
 
@@ -66,7 +66,7 @@ def _clear_users_permissions(instance):
     if instance.user:
         clear_user_permission_cache(instance.user)
     if instance.group:
-        user_set = getattr(instance.group, 'user_set')
+        user_set = instance.group.user_set
         for user in user_set.all():
             clear_user_permission_cache(user)
 

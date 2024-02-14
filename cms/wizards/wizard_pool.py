@@ -19,7 +19,7 @@ def entry_choices(user, page):
             yield (entry.id, entry.title)
 
 
-class WizardPool():
+class WizardPool:
     """
     .. deprecated:: 4.0
     """
@@ -50,11 +50,11 @@ class WizardPool():
         ``cms.wizards.wizard_pool.AlreadyRegisteredException``.
         """
         # TODO: Add deprecation warning
-        assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
+        assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
         if self.is_registered(entry, passive=True):
             model = entry.get_model()
             raise AlreadyRegisteredException(
-                _(u"A wizard has already been registered for model: %s") %
+                _("A wizard has already been registered for model: %s") %
                 model.__name__)
         else:
             apps.get_app_config('cms').cms_extension.wizards[entry.id] = entry
@@ -68,7 +68,7 @@ class WizardPool():
         Returns True if the entry was successfully registered, else False.
         """
         # TODO: Add deprecation warning
-        assert isinstance(entry, Wizard), u"entry must be an instance of Wizard"
+        assert isinstance(entry, Wizard), "entry must be an instance of Wizard"
         if self.is_registered(entry):
             del apps.get_app_config('cms').cms_extension.wizards[entry.id]
             return True

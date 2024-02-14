@@ -23,7 +23,7 @@ Reporting security issues
 Review
 ******
 
-All patches should be made as pull requests **against develop** to
+All patches should be made as pull requests **against develop-4** to
 `the GitHub repository <https://github.com/django-cms/django-cms>`_. Patches should
 never be pushed directly.
 
@@ -70,7 +70,7 @@ Release schedule
 ****************
 
 The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website. The release schedule is
-managed by the release management workgroup. The plan is to release quarterly and according to a retrospectice approach.
+managed by the release management workgroup. The plan is to release quarterly and according to a retrospective approach.
 
 Example of retrospective approach.
 
@@ -127,6 +127,11 @@ Commits
 
 Commit messages
 ===============
+
+We follow the `Conventional Commits
+<https://www.conventionalcommits.org>`_ specification for commit messages.
+Pull requests are linted against this specification so please make your PR title
+match the specification.
 
 Commit messages and their subject lines should be written in the past tense, not present tense, for example:
 

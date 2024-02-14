@@ -170,7 +170,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             bogus_plugins_report["type"],
-            u'BogusPlugin')
+            'BogusPlugin')
 
         self.assertEqual(
             bogus_plugins_report["instances"][0],
@@ -184,7 +184,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             link_plugins_report["type"],
-            u'LinkPlugin')
+            'LinkPlugin')
 
         self.assertEqual(
             link_plugins_report["instances"][0].get_plugin_instance()[0],
@@ -198,7 +198,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             text_plugins_report["type"],
-            u'TextPlugin')
+            'TextPlugin')
 
         self.assertEqual(
             len(text_plugins_report["instances"]),
@@ -385,7 +385,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -488,7 +488,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
 
         # Original PageContent untouched
         self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))

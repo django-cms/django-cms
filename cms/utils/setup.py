@@ -28,9 +28,11 @@ def validate_settings():
     try:
         django_backend = [x for x in settings.TEMPLATES
                           if x['BACKEND'] == 'django.template.backends.django.DjangoTemplates'][0]
-    except IndexError:
-        raise ImproperlyConfigured("django CMS requires django.template.context_processors.request in "
-                                   "'django.template.backends.django.DjangoTemplates' context processors.")
+    except IndexError as err:
+        raise ImproperlyConfigured(
+            "django CMS requires django.template.context_processors.request in "
+            "'django.template.backends.django.DjangoTemplates' context processors."
+        ) from err
 
     context_processors = django_backend.get('OPTIONS', {}).get('context_processors', [])
     core_request = 'django.core.context_processors.request'

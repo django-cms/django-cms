@@ -129,11 +129,7 @@ class PageAdmin(admin.ModelAdmin):
         return
 
     def get_admin_url(self, action, *args):
-        url_name = "{}_{}_{}".format(
-            self.opts.app_label,
-            self.opts.model_name,
-            action,
-        )
+        url_name = f"{self.opts.app_label}_{self.opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_preserved_filters(self, request):
@@ -838,11 +834,7 @@ class PageContentAdmin(admin.ModelAdmin):
         return obj
 
     def get_admin_url(self, action, *args):
-        url_name = "{}_{}_{}".format(
-            self.opts.app_label,
-            self.opts.model_name,
-            action,
-        )
+        url_name = f"{self.opts.app_label}_{self.opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_preserved_filters(self, request):
@@ -1318,7 +1310,7 @@ class PageContentAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect(admin_reverse('index'))
 
             redirect_to = self.get_admin_url('changelist')
-            redirect_to += '?language={}'.format(request_language)
+            redirect_to += f'?language={request_language}'
             return HttpResponseRedirect(redirect_to)
 
         context = {
@@ -1402,7 +1394,7 @@ class PageContentAdmin(admin.ModelAdmin):
             depth=(page.node.depth + 1 if page else 1),
             follow_descendants=True,
         )
-        return HttpResponse(u''.join(rows))
+        return HttpResponse(''.join(rows))
 
     def get_tree_rows(self, request, pages, language, depth=1,
                       follow_descendants=True):

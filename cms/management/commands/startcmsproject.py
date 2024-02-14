@@ -115,7 +115,7 @@ Enjoy!
                     self.write_command(f'python -m pip install -r "{requirements}"')
                     result = subprocess.run(
                         [sys.executable, "-m", "pip", "install", "-r", requirements],
-                        capture_output=True,
+                        capture_output=True, check=False,
                     )
                     if result.returncode:
                         self.stderr.write(self.style.ERROR(result.stderr.decode()))
@@ -132,7 +132,7 @@ Enjoy!
 
     def run_management_command(self, commands, capture_output=False):
         self.write_command("python -m manage " + " ".join(commands))
-        result = subprocess.run([sys.executable, "-m", "manage"] + commands, capture_output=capture_output)
+        result = subprocess.run([sys.executable, "-m", "manage"] + commands, capture_output=capture_output, check=False)
         if result.returncode:
             if capture_output:
                 self.stderr.write(self.style.ERROR(result.stderr.decode()))
