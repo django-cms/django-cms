@@ -44,10 +44,10 @@ Type 'yes' to continue, or 'no' to cancel: """ % (len(uninstalled_instances), le
             self.stdout.write('... deleting any instances of uninstalled plugins and empty plugin instances\n')
 
             for instance in uninstalled_instances:
-                instance.delete()
+                instance.placeholder.delete_plugin(instance)
 
             for instance in unsaved_instances:
-                instance.delete()
+                instance.placeholder.delete_plugin(instance)
 
             self.stdout.write(
                 'Deleted instances of: \n    %s uninstalled plugins  \n    %s plugins with unsaved instances\n' % (
