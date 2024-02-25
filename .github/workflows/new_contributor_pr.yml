@@ -29,10 +29,11 @@ jobs:
     needs: new
     steps:
       - name: Send Discord Webhook
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
         uses: Ilshidur/action-discord@master
         with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          content: |
+          args: |
             {
               "embeds": [
                 {
