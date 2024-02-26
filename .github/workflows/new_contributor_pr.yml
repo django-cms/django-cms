@@ -31,9 +31,7 @@ jobs:
       - name: Send Discord Webhook
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        uses: Ilshidur/action-discord@master
-        with:
-          args: |
+          DISCORD_EMBEDS: |
             {
               "embeds": [
                 {
@@ -57,3 +55,4 @@ jobs:
                 }
               ]
             }
+        uses: Ilshidur/action-discord@master
