@@ -78,7 +78,7 @@ from cms.utils.i18n import (
     get_site_language_from_request,
 )
 from cms.utils.plugins import copy_plugins_to_placeholder
-from cms.utils.urlutils import admin_reverse
+from cms.utils.urlutils import add_url_parameters, admin_reverse
 
 require_POST = method_decorator(require_POST)
 
@@ -1497,12 +1497,17 @@ class PageContentAdmin(admin.ModelAdmin):
     def get_indicator_menu(cls, request, page_content):
         menu_template = "admin/cms/page/tree/indicator_menu.html"
         if not page_content:
+            url = add_url_parameters(
+                admin_reverse('cms_pagecontent_add'),
+                cms_page=page_content.page.pk,
+                parent_node=page_content.page.node.id,
+                language=page_content.language,
+            )
             return menu_template, [
                 (
                     _("Create Content"),  # Entry
                     "cms-icon-edit-new",  # Optional icon
-                    admin_reverse('cms_pagecontent_add')
-                    + f'?cms_page={page_content.page.pk}&language={page_content.language}',  # url
+                    url,
                     None,  # Optional add classes for <a>
                 ),
             ]
