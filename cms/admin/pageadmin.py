@@ -19,6 +19,7 @@ from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
 from django.forms.fields import IntegerField
+from django.forms.models import ModelForm
 from django.http import (
     Http404,
     HttpResponse,
@@ -177,6 +178,7 @@ class PageAdmin(admin.ModelAdmin):
             pat(r'^([0-9]+)/copy-page/$', self.copy_page),
             pat(r'^([0-9]+)/dialog/copy/$', self.get_copy_dialog),  # copy dialog
             pat(r'^([0-9]+)/permissions/$', self.get_permissions),
+            pat(r'^([0-9]+)/change-permissions/$', self.change_permissions),
             pat(r'^([0-9]+)/set-home/$', self.set_home),
         ]
 
@@ -184,14 +186,14 @@ class PageAdmin(admin.ModelAdmin):
             url_patterns += plugin_pool.get_patterns()
         return url_patterns + super().get_urls()
 
-    def get_inline_instances(self, request, obj=None):
+    def get_inlines(self, request, obj):
         if obj and get_cms_setting('PERMISSION'):
             can_change_perms = self.has_change_permissions_permission(request, obj=obj)
         else:
             can_change_perms = False
 
-        if can_change_perms:
-            return super().get_inline_instances(request, obj)
+        if getattr(request, '_change_page_permissions', False) and can_change_perms:
+            return super().get_inlines(request, obj)
         return []
 
     def get_form(self, request, obj=None, **kwargs):
@@ -199,9 +201,17 @@ class PageAdmin(admin.ModelAdmin):
         Get PageForm for the Page model and modify its fields depending on
         the request.
         """
-        form = super().get_form(request, obj, **kwargs)
-        form._site = get_site(request)
-        form._request = request
+        if getattr(request, '_advanced_settings', False):
+            form = super().get_form(request, obj, **kwargs)
+            form._site = get_site(request)
+            form._request = request
+        else:
+            # In case it's not the advanced view, return an empty form
+            class Meta:
+                model = Page
+                fields = []
+
+            form = type('EmptyPageForm', (ModelForm,), {'Meta': Meta})
         return form
 
     def actions_menu(self, request, object_id, extra_context=None):
@@ -235,19 +245,8 @@ class PageAdmin(admin.ModelAdmin):
         return render(request, self.actions_menu_template, context)
 
     def advanced(self, request, object_id):
-        page = self.get_object(request, object_id=object_id)
-
-        if not self.has_change_advanced_settings_permission(request, obj=page):
-            raise PermissionDenied("No permission for editing advanced settings")
-
-        if page is None:
-            raise self._get_404_exception(object_id)
-
-        if get_cms_setting('PERMISSION'):
-            show_permissions = self.has_change_permissions_permission(request, obj=page)
-        else:
-            show_permissions = False
-        context = {'title': _("Advanced Settings"), 'show_permissions': show_permissions}
+        request._advanced_settings = True
+        context = {'title': _("Advanced Settings")}
         return self.change_view(request, object_id, extra_context=context)
 
     def response_post_save_change(self, request, obj):
@@ -677,6 +676,18 @@ class PageAdmin(admin.ModelAdmin):
             'opts': self.opts,
         }
         return render(request, 'admin/cms/page/permissions.html', context)
+
+    def change_permissions(self, request, page_id):
+        page = self.get_object(request, object_id=page_id)
+        if page is None:
+            raise self._get_404_exception(page_id)
+
+        if not self.has_change_permissions_permission(request, obj=page):
+            raise PermissionDenied("No permission for editing page permissions")
+
+        request._change_page_permissions = True
+        context = {'title': _("Change Page Permissions"), 'show_permissions': get_cms_setting('PERMISSION')}
+        return self.change_view(request, page_id, extra_context=context)
 
     @require_POST
     @transaction.atomic

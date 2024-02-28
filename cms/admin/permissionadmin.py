@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Group
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
@@ -62,37 +61,37 @@ class PagePermissionAdminMixin:
 
 class PagePermissionInlineAdmin(PagePermissionAdminMixin, admin.TabularInline):
     model = PagePermission
-    # use special form, so we can override of user and group field
-    # form = PagePermissionInlineAdminForm
     classes = ['collapse', 'collapsed']
-    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_change_advanced_settings',
-              'can_change_permissions', 'can_move_page', 'grant_on',
-              ]
+    fields = ['user', 'group', 'grant_on']
     extra = 0  # edit page load time boost
     autocomplete_fields = ['user', 'group']
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(can_view=False)
 
-    def get_formset(self, request, obj=None, **kwargs):
+    def get_fields(self, request, obj=None):
         """
-        Some fields may be excluded here. User can change only
-        permissions which are available for him. E.g. if user does not haves
-        can_change flag, he can't change assign can_change permissions.
+        Some fields may be added here. User can change only permissions which are available for them.
+        E.g. if user does not have the can_change permission, he can't change assign can_change permissions.
         """
-        exclude = self.exclude or []
+        fields = list(super().get_fields(request, obj=obj))
         if obj:
             user = request.user
-            if not obj.has_add_permission(user):
-                exclude.append('can_add')
-            if not obj.has_delete_permission(user):
-                exclude.append('can_delete')
-            if not obj.has_advanced_settings_permission(user):
-                exclude.append('can_change_advanced_settings')
-            if not obj.has_move_page_permission(user):
-                exclude.append('can_move_page')
+            if obj.has_add_permission(user):
+                fields.append('can_add')
+            if obj.has_change_permission(user):
+                fields.append('can_change')
+            if obj.has_delete_permission(user):
+                fields.append('can_delete')
+            if obj.has_advanced_settings_permission(user):
+                fields.append('can_change_advanced_settings')
+            if obj.has_move_page_permission(user):
+                fields.append('can_move_page')
+            if obj.has_change_permissions_permission(user):
+                fields.append('can_change_permissions')
+        return fields
 
-        kwargs['exclude'] = exclude
+    def get_formset(self, request, obj=None, **kwargs):
         formset_cls = super().get_formset(request, obj=obj, **kwargs)
         queryset = self.get_queryset(request)
         if obj:

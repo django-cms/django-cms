@@ -578,9 +578,9 @@ class PageToolbar(CMSToolbar):
             new_sub_page_params = {'edit': 1, 'parent_node': self.page.node_id}
 
             add_page_url = admin_reverse('cms_pagecontent_add')
+            page_permissions_url = admin_reverse('cms_page_change_permissions', args=(self.page.pk,))
             advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
             page_settings_url = admin_reverse('cms_pagecontent_change', args=(self.page_content.pk,))
-            duplicate_page_url = admin_reverse('cms_pagecontent_duplicate', args=[self.page_content.pk])
 
             can_add_root_page = page_permissions.user_can_add_page(
                 user=self.request.user,
@@ -636,6 +636,17 @@ class PageToolbar(CMSToolbar):
             settings_disabled = not edit_mode or not can_change
             current_page_menu.add_modal_item(_('Page settings'), url=page_settings_url, disabled=settings_disabled,
                                              on_close=refresh)
+
+            if get_cms_setting('PERMISSION'):
+                # change page permission settings
+                page_permissions_url = add_url_parameters(page_permissions_url, language=self.toolbar.request_language)
+                can_change_permissions = self.page.has_change_permissions_permission(self.request.user)
+                change_permissions_disabled = not edit_mode or not can_change_permissions
+                current_page_menu.add_modal_item(
+                    _('Change page permissions'),
+                    url=page_permissions_url,
+                    disabled=change_permissions_disabled,
+                )
 
             # advanced settings
             advanced_url = add_url_parameters(advanced_url, language=self.toolbar.request_language)
