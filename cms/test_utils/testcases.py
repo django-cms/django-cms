@@ -31,6 +31,7 @@ from cms.models.permissionmodels import (
 )
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.compat import DJANGO_4_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
@@ -661,6 +662,12 @@ class BaseCMSTestCase:
         }
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
         return plugin
+
+    def _render_placeholder(self, placeholder, context, **kwargs):
+        request = context['request']
+        toolbar = get_toolbar_from_request(request)
+        content_renderer = toolbar.content_renderer
+        return content_renderer.render_placeholder(placeholder, context, **kwargs)
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
