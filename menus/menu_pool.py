@@ -310,9 +310,9 @@ class MenuPool:
         return self.modifiers
 
     def clear(self, site_id=None, language=None, all=False):
-        '''
+        """
         This invalidates the cache for a given menu (site_id and language)
-        '''
+        """
         if all:
             cache_keys = CacheKey.objects.get_keys()
         else:
