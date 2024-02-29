@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
+from django.db import models
 from django.test.utils import override_settings
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
@@ -216,7 +217,6 @@ class ManagementTestCase(CMSTestCase):
     def test_delete_orphaned_plugins(self):
         placeholder = Placeholder.objects.create(slot="test")
         add_plugin(placeholder, TextPlugin, "en", body="en body")
-        add_plugin(placeholder, TextPlugin, "en", body="en body")
         add_plugin(placeholder, "LinkPlugin", "en",
                    name="A Link", external_link="https://www.django-cms.org")
 
@@ -226,8 +226,9 @@ class ManagementTestCase(CMSTestCase):
 
         # create a bogus CMSPlugin to simulate one which used to exist but
         # is no longer installed
-        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
-        bogus_plugin.save()
+        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin", placeholder=placeholder)
+        placeholder.add_plugin(bogus_plugin)
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
 
         report = plugin_report()
 
@@ -282,6 +283,11 @@ class ManagementTestCase(CMSTestCase):
         self.assertEqual(
             len(text_plugins_report["unsaved_instances"]),
             0)
+
+        # No gaps in plugin tree
+        max_positon = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
+        self.assertEqual(max_positon, 3)
+
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
