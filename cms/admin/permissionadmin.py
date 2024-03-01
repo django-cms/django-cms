@@ -8,8 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
 from cms.utils import page_permissions, permissions
-from cms.utils.conf import get_cms_setting
-from cms.utils.permissions import get_subordinate_groups, get_subordinate_users
+from cms.utils.conf import get_cms_setting, get_subordinate_groups, get_subordinate_users
 
 PERMISSION_ADMIN_INLINES = []
 

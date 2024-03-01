@@ -46,15 +46,10 @@ from cms.operations.helpers import (
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.compat.forms import UserChangeForm
-from cms.utils.conf import get_cms_setting
+from cms.utils.conf import get_cms_setting, get_subordinate_groups, get_subordinate_users
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
-from cms.utils.permissions import (
-    get_current_user,
-    get_subordinate_groups,
-    get_subordinate_users,
-    get_user_permission_level,
-)
+from cms.utils.permissions import get_current_user, get_user_permission_level
 from cms.utils.urlutils import static_with_version
 from menus.menu_pool import menu_pool
 

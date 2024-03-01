@@ -54,6 +54,8 @@ DEFAULTS = {
     'RAW_ID_USERS': False,
     # if number of users/groups exceeds this, use autocomplete_fields and remove filters in PermissionAdmin
     'USERS_GROUPS_THRESHOLD': 25,
+    'USER_SUBORDINATES': 'cms.utils.permissions.get_subordinate_users',
+    'GROUP_SUBORDINATES': 'cms.utils.permissions.get_subordinate_groups',
     'PUBLIC_FOR': 'all',
     'APPHOOKS': [],
     'TOOLBARS': [],
@@ -116,6 +118,18 @@ def get_media_root():
 @default('CMS_MEDIA_URL')
 def get_media_url():
     return urljoin(settings.MEDIA_URL, get_cms_setting('MEDIA_PATH'))
+
+
+@default('CMS_USER_SUBORDINATES')
+def get_subordinate_users(*args):
+    user_subordinates = get_cms_setting('USER_SUBORDINATES')
+    return import_string(user_subordinates)(*args)
+
+
+@default('CMS_GROUP_SUBORDINATES')
+def get_subordinate_groups(*args):
+    group_subordinates = get_cms_setting('GROUP_SUBORDINATES')
+    return import_string(group_subordinates)(*args)
 
 
 @default('CMS_MENU_RENDERER')
