@@ -1,0 +1,2 @@
+-r requirements_base.txt
+django @ https://github.com/django/django/archive/refs/heads/main.zip
