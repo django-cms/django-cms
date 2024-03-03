@@ -887,7 +887,7 @@
         background-color: $white;
         background-image: url('../../img/pagetree/tree-li-drag.gif');
         background-repeat: no-repeat;
-        background-position: left center;
+        background-position: 2px center;
         image-rendering: pixelated;
         white-space: normal;
 
@@ -897,7 +897,7 @@
 
         [dir=rtl] & {
             // no direct logical property for background-position
-            background-position: right center;
+            background-position: calc(100% - 2px) center;
         }
     }
 
