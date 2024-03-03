@@ -190,7 +190,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip 
+        python -m pip install --upgrade pip
         pip install uv
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system pytest ${{ matrix.django-version }}
@@ -210,7 +210,7 @@ jobs:
         python-version: ['3.12']
         requirements-file: ['requirements_base.txt']
         django-version: [
-          'https://github.com/django/django/archive/main.tar.gz'
+          'django @ https://github.com/django/django/archive/main.tar.gz'
         ]
         os: [
           ubuntu-20.04,
