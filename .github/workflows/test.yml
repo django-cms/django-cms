@@ -54,9 +54,9 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install -r test_requirements/databases.txt
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -112,9 +112,9 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install -r test_requirements/databases.txt
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
 
@@ -157,8 +157,8 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
     - name: Test with django test runner
@@ -190,9 +190,10 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
+        python -m pip install --upgrade pip 
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest ${{ matrix.django-version }}
         python setup.py install
 
     - name: Test with django test runner
@@ -239,9 +240,10 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
-        pip install -r test_requirements/databases.txt
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest ${{ matrix.django-version }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -289,9 +291,10 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
-        pip install -r test_requirements/databases.txt
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest ${{ matrix.django-version }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
