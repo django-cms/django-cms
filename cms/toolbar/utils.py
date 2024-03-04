@@ -5,6 +5,7 @@ from typing import Optional
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
     get_language,
@@ -126,7 +127,7 @@ def get_toolbar_from_request(request):
 
 def add_live_url_querystring_param(obj, url, language=None):
     """
-    Append a live url to a given Page url using a supplied url parameter configured
+    Append a live url to a given object url using a supplied url parameter configured
     by the setting: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
 
     :param obj: Placeholder source object
@@ -135,9 +136,12 @@ def add_live_url_querystring_param(obj, url, language=None):
     :returns: A url string
     """
     url_param = get_cms_setting('ENDPOINT_LIVE_URL_QUERYSTRING_PARAM')
-    if not isinstance(obj, PageContent):
+    if not hasattr(obj, "get_absolute_url"):
         return url
-    live_url = obj.page.get_absolute_url(language=language)
+    try:
+        live_url = obj.get_absolute_url()
+    except NoReverseMatch:
+        return url
     url_fragments = url.split('?')
     if len(url_fragments) > 1:
         url += f'&{url_param}={live_url}'

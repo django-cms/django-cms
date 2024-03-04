@@ -211,7 +211,7 @@ class MultilingualTestCase(CMSTestCase):
             # url uses "en" as the request language
             # but the site is configured to use "de" and "fr"
             response = self.client.get('/en/')
-            self.assertRedirects(response, '/de/')
+            self.assertEqual(response.status_code, 200)
             response = self.client.get('/en/%s/' % page_2.get_path('de'))
             self.assertEqual(response.status_code, 404)
 
@@ -235,8 +235,10 @@ class MultilingualTestCase(CMSTestCase):
             with self.login_user_context(superuser):
                 # url uses "en" as the request language
                 # but the site is configured to use "de" and "fr"
+                # and no redirect on fallback so cms will render
+                # in place
                 response = self.client.get('/en/')
-                self.assertRedirects(response, '/de/')
+                self.assertEqual(response.status_code, 200)
                 response = self.client.get('/en/%s/' % page_2.get_path('de'))
                 self.assertEqual(response.status_code, 404)
 
@@ -284,7 +286,9 @@ class MultilingualTestCase(CMSTestCase):
 
         with self.settings(CMS_LANGUAGES=lang_settings):
             response = self.client.get("/de/")
-            self.assertRedirects(response, '/en/')
+            # as per the comments above, the content should
+            # be rendered in place, no redirect should happen
+            self.assertEqual(response.status_code, 200)
 
     def test_no_english_defined(self):
         with self.settings(

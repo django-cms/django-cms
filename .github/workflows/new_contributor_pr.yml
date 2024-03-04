@@ -29,10 +29,9 @@ jobs:
     needs: new
     steps:
       - name: Send Discord Webhook
-        uses: Ilshidur/action-discord@master
-        with:
-          webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
-          content: |
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_EMBEDS: |
             {
               "embeds": [
                 {
@@ -56,3 +55,4 @@ jobs:
                 }
               ]
             }
+        uses: Ilshidur/action-discord@master
