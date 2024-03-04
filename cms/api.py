@@ -48,7 +48,7 @@ from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import PageContent
-from cms.models.pagemodel import Page
+from cms.models.pagemodel import Page, PageUrl
 from cms.models.permissionmodels import (
     ACCESS_PAGE_AND_DESCENDANTS,
     GlobalPagePermission,
@@ -315,12 +315,14 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
         _thread_locals.user = created_by
         created_by = get_clean_username(created_by)
 
-    page.urls.create(
-        slug=slug,
+    PageUrl.objects.update_or_create(
         path=path,
-        page=page,
-        managed=not bool(overwrite_url),
         language=language,
+        defaults={
+            'slug': slug,
+            'page': page,
+            'managed': not bool(overwrite_url),
+        },
     )
 
     # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object

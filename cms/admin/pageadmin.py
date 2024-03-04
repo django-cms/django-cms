@@ -614,7 +614,13 @@ class PageAdmin(admin.ModelAdmin):
             sender=self.model,
         )
 
-        form.move_page()
+        try:
+            form.move_page()
+        except IntegrityError:
+            message = gettext(
+                "Error! Can not move the page. Please rename the slugs and try again."
+            )
+            return jsonify_request(HttpResponseBadRequest(message))
 
         send_post_page_operation(
             request=request,
