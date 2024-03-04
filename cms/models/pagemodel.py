@@ -287,13 +287,13 @@ class Page(models.Model):
     def _update_url_path(self, language):
         parent_page = self.get_parent_page()
         base_path = parent_page.get_path(language) if parent_page else ''
-        new_path = self._get_path_sql_value(base_path)
 
-        (PageUrl
-         .objects
-         .filter(language=language, page=self)
-         .exclude(managed=False)
-         .update(path=new_path))  # TODO: Update or create?
+        page_url = PageUrl.objects.filter(language=language, page=self).exclude(managed=False)
+        if self.is_home:
+            page_url.update(path='')
+        else:
+            new_path = self._get_path_sql_value(base_path)
+            page_url.update(path=new_path)  # TODO: Update or create?
 
     def _update_url_path_recursive(self, language):
         if self.node.is_leaf() or language not in self.get_languages():
@@ -1079,6 +1079,7 @@ class PageUrl(models.Model):
     class Meta:
         app_label = 'cms'
         default_permissions = []
+        unique_together = [['path', 'language'], ['page', 'language']]
 
     def __str__(self):
         return "%s (%s)" % (self.path or self.slug, self.language)
