@@ -200,6 +200,16 @@ class CMSMenu(Menu):
 
     @staticmethod
     def get_pagecontent_queryset(toolbar):
+        """
+        Returns a queryset of page content objects based on the given toolbar: Includes
+        latest content in edit and preview mode.
+
+        Parameters:
+        - toolbar (Toolbar): The toolbar object passed as an argument.
+
+        Returns:
+        - A queryset of page content objects.
+        """
         if toolbar.edit_mode_active or toolbar.preview_mode_active:
             # Get all page contents visible in the admin
             return PageContent.admin_manager.current_content()
@@ -209,6 +219,21 @@ class CMSMenu(Menu):
 
     @staticmethod
     def preview_endpoint(toolbar):
+        """
+        This method is used to get a callable based on the state of the toolbar which
+        is used to create the preview endpoint URL for each page content in the menu.
+        The callable must accept a page content object as a single parameter.
+
+        If the preview mode or edit mode is active in the toolbar, the callable will be set to the
+        get_object_preview_url function. Otherwise, it will be set to None leading to the fallback
+        of the get_absolute_url method of the page content.
+
+        :param toolbar: The toolbar object that contains the state information.
+        :type toolbar: Toolbar
+
+        :return: Function to be called to create preview endpoint URL for a page content in the menu
+        :rtype: callable or None
+        """
         if toolbar.preview_mode_active or toolbar.edit_mode_active:
             return get_object_preview_url
         return None
