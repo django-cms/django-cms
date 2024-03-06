@@ -70,7 +70,7 @@ def get_visible_nodes(request, pages, site):
     return [page for page in pages if user_can_see_page(page)]
 
 
-def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=False):
+def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint: callable = None):
     """
     Transform a CMS page into a navigation node.
 
@@ -145,7 +145,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
             # Now finally, build the NavigationNode object and return it.
             # The parent_id is manually set by the menu get_nodes method.
             if endpoint:
-                url = get_object_preview_url(translation)
+                url = endpoint(translation)
             else:
                 url = translation.get_absolute_url()
             ret_node = CMSNavigationNode(
@@ -198,6 +198,21 @@ class CMSMenu(Menu):
     based on a site's :class:`cms.models.pagemodel.Page` objects.
     """
 
+    @staticmethod
+    def get_pagecontent_queryset(toolbar):
+        if toolbar.edit_mode_active or toolbar.preview_mode_active:
+            # Get all page contents visible in the admin
+            return PageContent.admin_manager.current_content()
+        else:
+            # Only get public page contents
+            return PageContent.objects.filter()
+
+    @staticmethod
+    def preview_endpoint(toolbar):
+        if toolbar.preview_mode_active or toolbar.edit_mode_active:
+            return get_object_preview_url
+        return None
+
     def get_nodes(self, request):
         site = self.renderer.site
         lang = self.renderer.request_language
@@ -247,12 +262,7 @@ class CMSMenu(Menu):
             to_attr="filtered_urls",
             queryset=PageUrl.objects.filter(language__in=languages),
         )
-        if toolbar.edit_mode_active or toolbar.preview_mode_active:
-            # Get all translations visible in the admin for the current page
-            translations_qs = PageContent.admin_manager.current_content(language__in=languages)
-        else:
-            # Only get public translations
-            translations_qs = PageContent.objects.filter(language__in=languages)
+        translations_qs = self.get_pagecontent_queryset(toolbar).filter(language__in=languages)
         translations_lookup = Prefetch(
             "pagecontent_set",
             to_attr="filtered_translations",
@@ -281,7 +291,7 @@ class CMSMenu(Menu):
                 page,
                 language=lang,
                 fallbacks=fallbacks,
-                endpoint=toolbar.preview_mode_active or toolbar.edit_mode_active,
+                endpoint=self.preview_endpoint(toolbar),
             )
             return menu_node
 
