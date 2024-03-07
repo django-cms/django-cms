@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.urls import NoReverseMatch
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
-from django.utils.translation import get_language_from_request, ugettext_lazy as _
+from django.utils.translation import get_language_from_request, gettext_lazy as _
 
 from cms.utils.conf import get_cms_setting
 from cms.utils.moderator import use_draft

@@ -13,13 +13,13 @@ class PictureInline(admin.StackedInline):
     model = Picture
 
 
+@admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
     inlines = [PictureInline]
 
 
+@admin.register(SomeEditableModel)
 class SomeEditableAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
     pass
 
-admin.site.register(Category, CategoryAdmin)
 admin.site.register(SampleAppConfig)
-admin.site.register(SomeEditableModel, SomeEditableAdmin)

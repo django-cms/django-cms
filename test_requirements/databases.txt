@@ -1,2 +1,2 @@
-psycopg2==2.8.6
-mysqlclient==2.0.3
+psycopg2==2.9.9
+mysqlclient==2.1.1

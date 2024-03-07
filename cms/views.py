@@ -8,7 +8,8 @@ from django.http import Http404, HttpResponse, HttpResponseBadRequest, HttpRespo
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.cache import patch_cache_control
-from django.utils.http import is_safe_url, urlquote
+from urllib.parse import quote
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
 from django.utils.translation import get_language_from_request
 from django.views.decorators.http import require_POST
@@ -165,7 +166,7 @@ def details(request, slug):
 
     # permission checks
     if page.login_required and not request.user.is_authenticated:
-        return redirect_to_login(urlquote(request.get_full_path()), settings.LOGIN_URL)
+        return redirect_to_login(quote(request.get_full_path()), settings.LOGIN_URL)
 
     content = page.get_title_obj(language=request_language)
     # use the page object with populated cache
@@ -180,10 +181,10 @@ def details(request, slug):
 def login(request):
     redirect_to = request.GET.get(REDIRECT_FIELD_NAME)
 
-    if not is_safe_url(url=redirect_to, allowed_hosts=request.get_host()):
+    if not url_has_allowed_host_and_scheme(url=redirect_to, allowed_hosts=request.get_host()):
         redirect_to = reverse("pages-root")
     else:
-        redirect_to = urlquote(redirect_to)
+        redirect_to = quote(redirect_to)
 
     if request.user.is_authenticated:
         return HttpResponseRedirect(redirect_to)
