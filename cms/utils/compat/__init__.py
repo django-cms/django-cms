@@ -1,11 +1,7 @@
 from platform import python_version
+
 from django import get_version
-
-
-try:
-    from packaging.version import Version
-except ModuleNotFoundError:
-    from distutils.version import LooseVersion as Version
+from packaging.version import Version
 
 
 DJANGO_VERSION = get_version()

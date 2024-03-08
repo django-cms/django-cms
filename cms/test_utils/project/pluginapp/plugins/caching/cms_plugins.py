@@ -92,7 +92,7 @@ class VaryCacheOnPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         request = context.get('request')
-        country_code = request.headers.get('country-code') or "any"
+        country_code = request.headers.get('Country-Code') or "any"
         context['now'] = country_code
         return context
 
