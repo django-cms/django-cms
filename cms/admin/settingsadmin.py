@@ -44,7 +44,7 @@ class SettingsAdmin(ModelAdmin):
             path('',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
-            re_path(r'^(.+)/$',
+            path(r'^(.+)/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
         ]
