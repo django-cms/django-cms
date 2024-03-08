@@ -101,7 +101,7 @@ class SekizaiPlugin(CMSPluginBase):
     name = 'WITH SEki'
     module = 'Test'
     render_plugin = True
-    render_template = "plugins/sekizai.html"s
+    render_template = "plugins/sekizai.html"
 
     def render(self, context, instance, placeholder):
         context['now'] = datetime.now().microsecond
