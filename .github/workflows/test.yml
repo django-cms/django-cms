@@ -8,12 +8,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9 ]  # latest release minus two
+        python-version: [ 3.8, 3.9, '3.10' ]  # latest release minus two
         requirements-file: [
-          django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
           django-3.2.txt,
+          django-4.2.txt
         ]
         os: [
           ubuntu-20.04,
@@ -59,12 +57,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9 ]  # latest release minus two
+        python-version: [ 3.8, 3.9, '3.10' ]  # latest release minus two
         requirements-file: [
-          django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
           django-3.2.txt,
+          django-4.2.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -72,7 +68,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -109,12 +105,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.7, 3.8, 3.9 ]  # latest release minus two
+        python-version: [ 3.8, 3.9, '3.10' ]  # latest release minus two
         requirements-file: [
-          django-2.2.txt,
-          django-3.0.txt,
-          django-3.1.txt,
           django-3.2.txt,
+          django-4.2.txt,
         ]
         os: [
           ubuntu-20.04,

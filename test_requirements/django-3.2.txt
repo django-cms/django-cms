@@ -1,3 +1,4 @@
 -r requirements_base.txt
 Django>=3.2,<3.4
-django-formtools==2.2
+django-formtools==2.4.1
+djangocms-text-ckeditor<5.0.0

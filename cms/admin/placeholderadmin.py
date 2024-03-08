@@ -177,6 +177,7 @@ class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
     pass
 
 
+@admin.register(Placeholder)
 class PlaceholderAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
@@ -1093,4 +1094,3 @@ class PlaceholderAdmin(admin.ModelAdmin):
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
 
 
-admin.site.register(Placeholder, PlaceholderAdmin)

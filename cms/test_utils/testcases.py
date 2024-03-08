@@ -11,6 +11,7 @@ from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms.models import model_to_dict
+from django.http import HttpResponse
 from django.template import engines
 from django.template.context import Context
 from django.test import testcases
@@ -23,14 +24,15 @@ from menus.menu_pool import menu_pool
 
 from cms.api import create_page, add_plugin
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.models import Page, PageContent
 from cms.models.permissionmodels import (
     GlobalPagePermission,
     PagePermission,
     PageUser,
 )
+from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.utils.compat import DJANGO_4_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
@@ -450,7 +452,7 @@ class BaseCMSTestCase():
         if persist is not None:
             request.GET[get_cms_setting('CMS_TOOLBAR_URL__PERSIST')] = persist
         request.current_page = page
-        mid = ToolbarMiddleware()
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
         mid.process_request(request)
         if hasattr(request, 'toolbar'):
             request.toolbar.populate()
@@ -663,4 +665,6 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 
 class TransactionCMSTestCase(CMSTestCase, testcases.TransactionTestCase):
-    pass
+    if DJANGO_4_1:
+        def assertQuerySetEqual(self, *args, **kwargs):
+            return self.assertQuerysetEqual(*args, **kwargs)

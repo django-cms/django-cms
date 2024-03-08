@@ -1,3 +1,7 @@
+=== 4.0.1 (unreleased) ===
+* Introduced Django 4.2 support.
+* Dropped Support for Django<3.1
+
 
 === 4.0.0 (unreleased) ===
 * feat: Added live-url querystring parameter option for PageContent edit and preview endpoints

@@ -1,5 +1,4 @@
 from collections import namedtuple
-import copy
 import json
 
 import django
@@ -88,6 +87,7 @@ def get_site(request):
     return site
 
 
+@admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
     change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
@@ -780,6 +780,7 @@ class PageAdmin(admin.ModelAdmin):
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
+@admin.register(PageContent)
 class PageContentAdmin(admin.ModelAdmin):
     ordering = ('page__node__path',)
     search_fields = ('=id', 'page__id', 'page__urls__slug', 'title', 'page__reverse_id')
@@ -904,8 +905,6 @@ class PageContentAdmin(admin.ModelAdmin):
 
         if obj is None:
             raise self._get_404_exception(object_id)
-
-        request = copy.copy(request)
 
         if request.method == 'GET':
             # source is a field in the form
@@ -1477,5 +1476,3 @@ class PageContentAdmin(admin.ModelAdmin):
                 yield render_page_row(page)
 
 
-admin.site.register(Page, PageAdmin)
-admin.site.register(PageContent, PageContentAdmin)

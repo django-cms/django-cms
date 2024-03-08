@@ -5,6 +5,7 @@ from cms.utils.conf import get_cms_setting
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
+from django.urls import path
 from django.urls import include, re_path
 
 
@@ -20,5 +21,5 @@ urlpatterns = [
 ]
 
 urlpatterns += i18n_patterns(
-    re_path(r'^', include('cms.test_utils.project.fourth_cms_urls_for_apphook_tests')),
+    path('', include('cms.test_utils.project.fourth_cms_urls_for_apphook_tests')),
 )
