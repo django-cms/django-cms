@@ -1,5 +1,4 @@
 from collections import namedtuple
-import copy
 import json
 
 import django
