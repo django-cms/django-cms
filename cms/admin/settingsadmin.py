@@ -43,7 +43,7 @@ class SettingsAdmin(ModelAdmin):
             path('',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
-            path(r'^(.+)/$',
+            path('<path:id>/$',
                 wrap(self.change_view),
                 name='%s_%s_change' % info),
         ]
