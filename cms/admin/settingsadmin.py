@@ -11,7 +11,6 @@ from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
 from django.urls import path
-from django.urls import re_path
 from django.utils.html import conditional_escape
 from django.utils.translation import override
 
