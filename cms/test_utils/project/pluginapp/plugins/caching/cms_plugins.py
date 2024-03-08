@@ -92,7 +92,7 @@ class VaryCacheOnPlugin(CMSPluginBase):
 
     def render(self, context, instance, placeholder):
         request = context.get('request')
-        country_code = request.headers.get('country-code') or "any"
+        country_code = request.headers.get('Country-Code') or "any"
         context['now'] = country_code
         return context
 
@@ -101,7 +101,7 @@ class SekizaiPlugin(CMSPluginBase):
     name = 'WITH SEki'
     module = 'Test'
     render_plugin = True
-    render_template = "plugins/sekizai.html"
+    render_template = "plugins/sekizai.html"s
 
     def render(self, context, instance, placeholder):
         context['now'] = datetime.now().microsecond
