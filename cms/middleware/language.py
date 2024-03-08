@@ -2,9 +2,9 @@ from django.conf import settings
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import get_language
 
-from cms.utils.compat import DJANGO_3
+from cms.utils.compat import DJANGO_2_2
 
-if DJANGO_3:
+if DJANGO_2_2:
     from django.utils.translation import LANGUAGE_SESSION_KEY
 
 
@@ -12,7 +12,7 @@ class LanguageCookieMiddleware(MiddlewareMixin):
     def __init__(self, get_response):
         super().__init__(get_response)
 
-    if DJANGO_3:
+    if DJANGO_2_2:
 
         def __call__(self, request):
             response = self.get_response(request)
