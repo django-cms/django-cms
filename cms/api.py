@@ -506,9 +506,6 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
     """
-    if can_publish is not None:
-        warnings.warn('This API function no longer accepts a "can_publish" argument.',
-                      UserWarning, stacklevel=2)
 
     grant_all = grant_all and not global_permission
     data = {
