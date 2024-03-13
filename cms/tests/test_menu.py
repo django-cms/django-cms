@@ -425,7 +425,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
             The queries should be:
                 get all page nodes
                 get all page permissions
-                get all titles
+                get all page contents
                 get all page urls
                 get the menu cache key
                 set the menu cache key

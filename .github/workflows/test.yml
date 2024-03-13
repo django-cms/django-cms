@@ -54,9 +54,9 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install -r test_requirements/databases.txt
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -112,9 +112,9 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install -r test_requirements/databases.txt
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
 
@@ -157,8 +157,8 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
     - name: Test with django test runner
@@ -172,10 +172,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.12']
-        requirements-file: ['requirements_base.txt']
-        django-version: [
-          'https://github.com/django/django/archive/main.tar.gz'
-        ]
+        requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
         ]
@@ -191,8 +188,9 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest
         python setup.py install
 
     - name: Test with django test runner
@@ -207,10 +205,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.12']
-        requirements-file: ['requirements_base.txt']
-        django-version: [
-          'https://github.com/django/django/archive/main.tar.gz'
-        ]
+        requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
         ]
@@ -239,9 +234,10 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
-        pip install -r test_requirements/databases.txt
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -258,10 +254,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.12']
-        requirements-file: ['requirements_base.txt']
-        django-version: [
-          'https://github.com/django/django/archive/main.tar.gz'
-        ]
+        requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
         ]
@@ -289,9 +282,10 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
-        pip install -r test_requirements/databases.txt
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner

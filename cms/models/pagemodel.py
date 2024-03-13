@@ -363,7 +363,7 @@ class Page(models.Model):
             if self.is_home:
                 return reverse('pages-root')
             path = self.get_path(language, fallback) or self.get_slug(language, fallback)  # TODO: Disallow get_slug
-            return reverse('pages-details-by-slug', kwargs={"slug": path})
+            return reverse('pages-details-by-slug', kwargs={"slug": path}) if path else None
 
     def set_tree_node(self, site, target=None, position='first-child'):
         assert position in ('last-child', 'first-child', 'left', 'right')
