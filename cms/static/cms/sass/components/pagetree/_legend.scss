@@ -1,11 +1,11 @@
 .cms-pagetree-legend {
     position: relative;
-    text-align: right;
+    text-align: end;
 
     .cms-icon-info {
         color: $color-primary;
         vertical-align: middle;
-        margin-right: 5px;
+        margin-inline-end: 5px;
     }
 
     .cms-pagetree-dropdown {
@@ -13,22 +13,22 @@
     }
 
     .cms-pagetree-dropdown-menu {
-        top: auto;
-        right: 100%;
-        bottom: 0;
-        left: auto;
-        margin-right: 10px;
-        margin-bottom: -90px;
+        inset-block-start: auto;
+        inset-inline-end: 100%;
+        inset-block-end: 0;
+        inset-inline-start: auto;
+        margin-inline-end: 10px;
+        margin-block-end: -90px;
         &:before {
-            bottom: 96px;
+            inset-block-end: 96px;
         }
     }
     .cms-pagetree-dropdown-item {
         .cms-pagetree-node-state {
-            margin-right: 10px;
+            margin-inline-end: 10px;
         }
         .cms-icon {
-            margin-right: 8px;
+            margin-inline-end: 8px;
         }
         .cms-icon-home,
         .cms-icon-sitemap,
@@ -40,7 +40,7 @@
     .cms-icon {
         text-align: center;
         width: 20px;
-        margin-left: -2px;
+        margin-inline-start: -2px;
     }
     .cms-icon-check-square {
         color: $color-success;
