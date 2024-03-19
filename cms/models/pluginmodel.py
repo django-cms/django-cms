@@ -186,13 +186,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return force_str(self.pk)
 
     def __repr__(self):
-        display = "<{module}.{class_name} id={id} plugin_type='{plugin_type}' object at {location}>".format(
-            module=self.__module__,
-            class_name=self.__class__.__name__,
-            id=self.pk,
-            plugin_type=(self.plugin_type),
-            location=hex(id(self)),
-        )
+        display = f"<{self.__module__}.{self.__class__.__name__} id={self.pk} plugin_type='{self.plugin_type}' object at {hex(id(self))}>"
         return display
 
     def get_plugin_name(self):
