@@ -1,7 +1,6 @@
 import re
 import sys
 
-from cms.utils.urlutils import admin_reverse
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
@@ -27,6 +26,7 @@ from cms.toolbar.utils import (
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
+from cms.utils.urlutils import admin_reverse
 from cms.views import details, login, render_object_structure
 from menus.menu_pool import menu_pool
 

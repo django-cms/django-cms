@@ -96,14 +96,7 @@ def _get_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
     """
     prefix = get_cms_setting('CACHE_PREFIX')
     version, vary_on_list = _get_placeholder_cache_version(placeholder, lang, site_id)
-    main_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}'.format(
-        prefix=prefix,
-        id=placeholder.pk,
-        lang=lang,
-        site=site_id,
-        tz=get_timezone_name(),
-        version=version,
-    )
+    main_key = f'{prefix}|render_placeholder|id:{placeholder.pk}|lang:{lang}|site:{site_id}|tz:{get_timezone_name()}|v:{version}'
 
     if not soft:
         # We are about to write to the cache, so we want to get the latest
