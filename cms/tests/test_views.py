@@ -12,6 +12,7 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches, reverse
 from django.utils.translation import override as force_language
 
+from cms import api
 from cms.api import create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import PageContent, PagePermission, Placeholder, UserSettings
@@ -25,6 +26,7 @@ from cms.toolbar.utils import (
 )
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
+from cms.utils.urlutils import admin_reverse
 from cms.views import details, login, render_object_structure
 from menus.menu_pool import menu_pool
 
@@ -413,8 +415,11 @@ class EndpointTests(CMSTestCase):
     def setUp(self) -> None:
         page_template = "simple.html"
         self.page = self.create_homepage("page", page_template, "en")
-        self.page_content = self.page.get_content_obj()
+
+        self.page_content_en = self.page.get_content_obj()
+        self.page_content_fr = create_page_content("fr", "french home", self.page)
         self.content_type = ContentType.objects.get_for_model(PageContent)
+
         self.client.force_login(self.get_superuser())
 
     def tearDown(self) -> None:
@@ -425,7 +430,28 @@ class EndpointTests(CMSTestCase):
         request.user = self.get_superuser()
         mid = ToolbarMiddleware(lambda req: HttpResponse(""))
         mid(request)
-        response = render_object_structure(request, self.content_type.id, self.page_content.pk)
+        response = render_object_structure(request, self.content_type.id, self.page_content_en.pk)
 
         self.assertEqual(request.current_page, self.page)
         self.assertContains(response, '<div class="cms-toolbar">')
+
+    def test_render_object_structure_i18n(self):
+        """Structure view shows the page content's language not the request's language."""
+        placeholder = self.page.get_placeholders("fr").first()
+        self._add_plugin_to_placeholder(placeholder, "TextPlugin", language="fr")
+        with force_language("fr"):
+            setting, _ = UserSettings.objects.get_or_create(user=self.get_superuser())
+            setting.language="fr"
+            setting.save()
+            structure_endpoint_url = admin_reverse(
+                "cms_placeholder_render_object_structure",
+                args=(self.content_type.id, self.page_content_fr.pk,)
+            )
+            response = self.client.get(structure_endpoint_url)
+            self.assertContains(response, '<strong>Texte</strong>')
+
+            setting.language = "en"
+            setting.save()
+
+            response = self.client.get(structure_endpoint_url)
+            self.assertContains(response, '<strong>Text</strong>')
