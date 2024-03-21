@@ -64,6 +64,10 @@ def get_plugin_toolbar_js(plugin, children=None, parents=None):
 
 
 def get_plugin_tree_as_json(request, plugins):
+    assert False, ("This function is deprecated. Use get_plugin_tree instead.")
+    return json.dumps(get_plugin_tree(request, plugins))
+
+def get_plugin_tree(request, plugins):
     from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
 
     tree_data = []
@@ -116,7 +120,7 @@ def get_plugin_tree_as_json(request, plugins):
             }
             tree_structure.append(template.render(context))
     tree_data.reverse()
-    return json.dumps({'html': '\n'.join(tree_structure), 'plugins': tree_data})
+    return {'html': '\n'.join(tree_structure), 'plugins': tree_data}
 
 
 def get_toolbar_from_request(request):

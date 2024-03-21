@@ -19,11 +19,7 @@ window.CMS || window.parent.CMS || document.write(
     (function(Window) {
         // the dataBridge is used to access plugin information from different resources
         // Do NOT move this!!!
-        Window.CMS.API.Helpers.dataBridge = {{ plugin_data|safe }};
-
-        {% if plugin_structure %}
-            Window.CMS.API.Helpers.dataBridge.structure = {{ plugin_structure|safe }};
-        {% endif %}
+        Window.CMS.API.Helpers.dataBridge = JSON.parse(document.getElementById('data-bridge').textContent);
 
         Window.CMS.$(document).ready(function () {
             // make sure we're doing after the "modal" mechanism kicked in
@@ -34,4 +30,5 @@ window.CMS || window.parent.CMS || document.write(
         });
     })(window.parent || window);
 </script>
+{{ data_bridge|json_script:"data-bridge" }}
 {% endblock %}
