@@ -225,7 +225,7 @@ def details(request, slug):
         # plugins get rendered
         activate(content_language)
 
-    content = page.get_content_obj(language=content_language)
+    content = page.get_content_obj(language=content_language, fallback=False)
     # use the page object with populated cache
     content.page = page
     if hasattr(request, 'toolbar'):
