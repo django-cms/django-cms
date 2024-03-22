@@ -92,7 +92,6 @@ class ExtensionToolbar(CMSToolbar):
         urls = []
         page = self._get_page()
         if page:
-            page._prefetched_objects_cache = {}  # Remove prefetched objects cache to avoid conflicts
             page_contents = (
                 page.pagecontent_set(manager="admin_manager")
                 .latest_content()
