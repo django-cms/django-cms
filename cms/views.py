@@ -143,9 +143,12 @@ def details(request, slug):
     # get_published_languages will return all languages in draft mode
     # and published only in live mode.
     # These languages are then filtered out by the user allowed languages
+    pagecontent_languages = [
+        pagecontent.language for pagecontent in page._prefetched_objects_cache.get('pagecontent_set', [])
+    ]
     available_languages = [
         language for language in user_languages
-        if language in list(page.get_languages())
+        if language in pagecontent_languages
     ]
 
     own_urls = [
