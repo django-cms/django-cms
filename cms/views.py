@@ -140,11 +140,11 @@ def details(request, slug):
         # this means we need to correctly redirect that request.
         return _handle_no_page(request)
 
-    # get_published_languages will return all languages in draft mode
-    # and published only in live mode.
-    # These languages are then filtered out by the user allowed languages
+    # pagecontent_languages will return all languages available to the public
+    # get_page_from_request has prefetched all public pagecontent_set objects
+    # The languages are then filtered out by the user allowed languages
     pagecontent_languages = [
-        pagecontent.language for pagecontent in page._prefetched_objects_cache.get('pagecontent_set', [])
+        pagecontent.language for pagecontent in page.pagecontent_set.all()
     ]
     available_languages = [
         language for language in user_languages
