@@ -95,10 +95,13 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         .get_for_site(site)
         .filter(path=path)
         .select_related('page__node')
-        .prefetch_related('page__pagecontent_set')
     )
-    page = getattr(page_urls.first(), "page", None)
-    if page is not None:
+    page_urls = list(page_urls)  # force queryset evaluation to save 1 query
+    try:
+        page = page_urls[0].page
+    except IndexError:
+        page = None
+    else:
         page.urls_cache = {url.language: url for url in page_urls}
     return page
 
