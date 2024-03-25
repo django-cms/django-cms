@@ -25,7 +25,7 @@ class ToolbarMiddleware:
     def __call__(self, request):
 
         if not self.is_cms_request(request):
-            return
+            return self.get_response(request)
 
         edit_on = get_cms_setting('CMS_TOOLBAR_URL__EDIT_ON')
         edit_off = get_cms_setting('CMS_TOOLBAR_URL__EDIT_OFF')
