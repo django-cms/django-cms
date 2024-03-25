@@ -140,12 +140,10 @@ def details(request, slug):
         # this means we need to correctly redirect that request.
         return _handle_no_page(request)
 
-    # pagecontent_languages will return all languages available to the public
-    # get_page_from_request has prefetched all public pagecontent_set objects
+    # we use the _get_page_content_cache method to populate the cache with all public languages
     # The languages are then filtered out by the user allowed languages
-    pagecontent_languages = [
-        pagecontent.language for pagecontent in page.pagecontent_set.all()
-    ]
+    page._get_page_content_cache(None, fallback=True, force_reload=True)
+    pagecontent_languages = list(page.page_content_cache.keys())
     available_languages = [
         language for language in user_languages
         if language in pagecontent_languages
