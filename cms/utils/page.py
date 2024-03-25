@@ -96,8 +96,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         .filter(path=path)
         .select_related('page__node')
     )
-    page_urls = list(page_urls)
-
+    page_urls = list(page_urls)  # force queryset evaluation to save 1 query
     try:
         page = page_urls[0].page
     except IndexError:
