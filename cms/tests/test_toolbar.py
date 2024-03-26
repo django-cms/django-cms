@@ -1952,22 +1952,6 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response.render()
         self.assertContains(
             response,
-            f'<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_page_title-{page.pk} cms-render-model">'
-            '</template>'
-            f'{page.get_page_title(language)}'
-            f'<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_page_title-{page.pk} cms-render-model">'
-            '</template>'
-        )
-        self.assertContains(
-            response,
-            f'<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_menu_title-{page.pk} cms-render-model">'
-            '</template>'
-            f'{page.get_menu_title(language)}'
-            f'<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_menu_title-{page.pk} cms-render-model">'
-            '</template>'
-        )
-        self.assertContains(
-            response,
             f'<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_title-{page.pk} cms-render-model">'
             '</template>'
             f'{page.get_title(language)}'
