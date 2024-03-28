@@ -16,7 +16,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
-from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree_as_json
+from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree, get_plugin_tree_as_json
 from cms.utils.conf import get_cms_setting
 
 
@@ -429,12 +429,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             parents=parent_classes,
         )
         data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
-
+        data['structure'] = get_plugin_tree(request, plugins)
         context = {
             'plugin': obj,
             'is_popup': True,
-            'plugin_data': json.dumps(data),
-            'plugin_structure': get_plugin_tree_as_json(request, plugins),
+            'data_bridge': data,
         }
 
         if extra_context:
