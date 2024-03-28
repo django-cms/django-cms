@@ -10,4 +10,4 @@ class AboveStaticAnalysisCodeTest(TestCase):
     """
     def test_ruff(self):
         ruff = find_ruff_bin()
-        self.assertEqual(os.spawnv(os.P_WAIT, ruff, ["ruff", "cms", "menus"]), 0)
+        self.assertEqual(os.spawnv(os.P_WAIT, ruff, ["ruff", "check", "cms", "menus"]), 0)

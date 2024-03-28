@@ -607,7 +607,7 @@ class Page(models.Model):
         else:
             languages = [language]
 
-        self.pagecontent_set.filter(language__in=languages).delete()
+        self.pagecontent_set(manager="admin_manager").filter(language__in=languages).delete()
 
     def save(self, **kwargs):
         if self.reverse_id == "":
