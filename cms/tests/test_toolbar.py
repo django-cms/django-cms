@@ -1952,23 +1952,19 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response.render()
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_page_title-{0} cms-render-model">'
+            f'<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_page_title-{page.pk} cms-render-model">'
             '</template>'
-            '{1}'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_page_title-{0} cms-render-model">'
-            '</template>'.format(
-                page.pk, page.get_page_title(language)
-            )
+            f'{page.get_page_title(language)}'
+            f'<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_page_title-{page.pk} cms-render-model">'
+            '</template>'
         )
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_menu_title-{0} cms-render-model">'
+            f'<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_menu_title-{page.pk} cms-render-model">'
             '</template>'
-            '{1}'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_menu_title-{0} cms-render-model">'
-            '</template>'.format(
-                page.pk, page.get_menu_title(language)
-            )
+            f'{page.get_menu_title(language)}'
+            f'<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_menu_title-{page.pk} cms-render-model">'
+            '</template>'
         )
         self.assertContains(
             response,
