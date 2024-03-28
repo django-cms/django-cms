@@ -179,6 +179,16 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
             request = self.get_page_request(None, self.get_staff(), '/en/example/')
             self.assertFalse(hasattr(request, 'toolbar'))
 
+    @override_settings(CMS_TOOLBAR_HIDE=True)
+    def test_correct_response_type_returned_hiding_toolbar(self):
+        response = self.client.post('/')
+        self.assertIsInstance(response, HttpResponse)
+
+    @override_settings(CMS_TOOLBAR_HIDE=False)
+    def test_correct_response_type_returned_showing_toolbar(self):
+        response = self.client.post('/')
+        self.assertIsInstance(response, HttpResponse)
+
 
 @override_settings(CMS_PERMISSION=False)
 class ToolbarTests(ToolbarTestBase):
