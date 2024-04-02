@@ -996,6 +996,7 @@ class PageContentAdmin(admin.ModelAdmin):
         redirect = request.POST.get("edit", False)
         if redirect == "1":
             from django.core.cache import cache
+
             from cms.cache.permissions import get_cache_key, get_cache_permission_version
             cache.delete(get_cache_key(request.user, 'change_page'), version=get_cache_permission_version())
 
