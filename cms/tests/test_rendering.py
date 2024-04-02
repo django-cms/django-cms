@@ -721,7 +721,7 @@ class RenderingTestCase(CMSTestCase):
         placeholder.pk = placeholder.id = 99
 
         with self.login_user_context(self.get_superuser()):
-            page_content = self.get_page_title_obj(self.test_page)
+            page_content = self.get_pagecontent_obj(self.test_page)
             request = self.get_request(get_object_edit_url(page_content))
             request.session = {}
             request.toolbar = CMSToolbar(request)
@@ -758,7 +758,7 @@ class RenderingTestCase(CMSTestCase):
         ]
 
         with self.login_user_context(self.get_superuser()):
-            page_content = self.get_page_title_obj(page)
+            page_content = self.get_pagecontent_obj(page)
             request = self.get_request(get_object_edit_url(page_content))
             request.session = {}
             request.toolbar = CMSToolbar(request)

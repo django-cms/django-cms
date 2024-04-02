@@ -879,7 +879,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         page = create_page('test page en', 'col_two.html', 'en')
 
         # check for en
-        page_content_en = self.get_page_title_obj(page)
+        page_content_en = self.get_pagecontent_obj(page)
         self.assertQuerySetEqual(
             Placeholder.objects.get_for_obj(page_content_en),
             page_content_en.get_placeholders(),
@@ -906,8 +906,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         with self.login_user_context(self.get_superuser()):
             new_page = self.copy_page(page, page, position=1)
 
-        page_content = self.get_page_title_obj(page)
-        new_page_content = self.get_page_title_obj(new_page)
+        page_content = self.get_pagecontent_obj(page)
+        new_page_content = self.get_pagecontent_obj(new_page)
         page_content_plhs = Placeholder.objects.get_for_obj(page_content)
         new_page_content_plhs = Placeholder.objects.get_for_obj(new_page_content)
         self.assertEqual(page_content_plhs.count(), new_page_content_plhs.count())

@@ -1313,7 +1313,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             content_admin = PageContentAdmin(PageContent, admin.site)
             page = self.get_page()
-            content = self.get_page_title_obj(page, 'en')
+            content = self.get_pagecontent_obj(page, 'en')
             form_url = self.get_page_change_uri('en', page)
             # Middleware is needed to correctly setup the environment for the admin
             request = self.get_request()
@@ -1559,6 +1559,25 @@ class PageTest(PageTestBase):
             endpoint = self.get_admin_url(PageContent, 'get_tree')
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
+
+
+class PageActionsTestCase(PageTestBase):
+    def test_add_page(self):
+        with self.login_user_context(self.admin):
+            content = self.get_pagecontent_obj(self.page, 'en')
+            # create page copy
+            page_data = {
+                'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
+                'site': 1, 'language': 'en', 'source': self.page.pk,
+            }
+            self.assertEqual(Page.objects.all().count(), 2)
+            response = self.client.post(
+                self.get_admin_url(PageContent, 'duplicate', content.pk),
+                data=page_data,
+            )
+            # Check that page and its extensions have been copied
+            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
+            self.assertEqual(Page.objects.all().count(), 3)
 
 
 class PermissionsTestCase(PageTestBase):
@@ -2915,7 +2934,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        source_translation = self.get_page_title_obj(page, 'en')
+        source_translation = self.get_pagecontent_obj(page, 'en')
         target_translation = self._add_translation_to_page(page)
         endpoint = self.get_admin_url(PageContent, 'copy_language', source_translation.pk)
         plugins = [
@@ -4323,7 +4342,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        source_translation = self.get_page_title_obj(page, 'en')
+        source_translation = self.get_pagecontent_obj(page, 'en')
         target_translation = self._add_translation_to_page(page)
         endpoint = self.get_admin_url(PageContent, 'copy_language', source_translation.pk)
         plugins = [
