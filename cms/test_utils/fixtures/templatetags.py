@@ -1,7 +1,7 @@
 from cms.api import create_page, create_page_content
 
 
-class TwoPagesFixture():
+class TwoPagesFixture:
     def create_fixtures(self):
         defaults = {
             'template': 'nav_playground.html',

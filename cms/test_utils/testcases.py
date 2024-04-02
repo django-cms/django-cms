@@ -31,6 +31,7 @@ from cms.models.permissionmodels import (
 )
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
+from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.compat import DJANGO_4_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
@@ -420,7 +421,7 @@ class BaseCMSTestCase:
         else:
             request.current_page = None
 
-        class MockStorage():
+        class MockStorage:
 
             def __len__(self):
                 return 0
@@ -498,7 +499,7 @@ class BaseCMSTestCase:
 
     def get_admin_url(self, model, action, *args):
         opts = model._meta
-        url_name = "{}_{}_{}".format(opts.app_label, opts.model_name, action)
+        url_name = f"{opts.app_label}_{opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_permissions_test_page(self):
@@ -558,7 +559,7 @@ class BaseCMSTestCase:
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         if position is None:
             position = placeholder.get_next_plugin_position(language, parent=parent, insert_order='last')
@@ -582,7 +583,7 @@ class BaseCMSTestCase:
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = admin_reverse('cms_placeholder_edit_plugin', args=(plugin.pk,))
         endpoint += '?' + urlencode({'cms_path': path})
@@ -594,7 +595,7 @@ class BaseCMSTestCase:
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = admin_reverse('cms_placeholder_move_plugin')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -606,7 +607,7 @@ class BaseCMSTestCase:
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = admin_reverse('cms_placeholder_copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -618,7 +619,7 @@ class BaseCMSTestCase:
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = admin_reverse('cms_placeholder_copy_plugins')
         endpoint += '?' + urlencode({'cms_path': path})
@@ -630,7 +631,7 @@ class BaseCMSTestCase:
         if plugin.page:
             path = plugin.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = admin_reverse('cms_placeholder_delete_plugin', args=(plugin.pk,))
         endpoint += '?' + urlencode({'cms_path': path})
@@ -642,7 +643,7 @@ class BaseCMSTestCase:
         if placeholder.page:
             path = placeholder.page.get_absolute_url(language)
         else:
-            path = '/{}/'.format(language)
+            path = f'/{language}/'
 
         endpoint = admin_reverse('cms_placeholder_clear_placeholder', args=(placeholder.pk,))
         endpoint += '?' + urlencode({
@@ -661,6 +662,12 @@ class BaseCMSTestCase:
         }
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
         return plugin
+
+    def _render_placeholder(self, placeholder, context, **kwargs):
+        request = context['request']
+        toolbar = get_toolbar_from_request(request)
+        content_renderer = toolbar.content_renderer
+        return content_renderer.render_placeholder(placeholder, context, **kwargs)
 
 
 class CMSTestCase(BaseCMSTestCase, testcases.TestCase):

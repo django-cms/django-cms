@@ -1,6 +1,6 @@
 name: django CMS test.yml
 
-on: [push, pull_request]
+on: pull_request
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -46,7 +46,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -54,9 +54,9 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install -r test_requirements/databases.txt
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -104,7 +104,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -112,9 +112,9 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install -r test_requirements/databases.txt
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
 
@@ -149,7 +149,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -157,8 +157,8 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install pytest
-        pip install -r test_requirements/${{ matrix.requirements-file }}
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
     - name: Test with django test runner
@@ -172,10 +172,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.12']
-        requirements-file: ['requirements_base.txt']
-        django-version: [
-          'https://github.com/django/django/archive/main.tar.gz'
-        ]
+        requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
         ]
@@ -184,15 +181,16 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest
         python setup.py install
 
     - name: Test with django test runner
@@ -207,10 +205,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.12']
-        requirements-file: ['requirements_base.txt']
-        django-version: [
-          'https://github.com/django/django/archive/main.tar.gz'
-        ]
+        requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
         ]
@@ -231,7 +226,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -239,9 +234,10 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
-        pip install -r test_requirements/databases.txt
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -258,10 +254,7 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ['3.12']
-        requirements-file: ['requirements_base.txt']
-        django-version: [
-          'https://github.com/django/django/archive/main.tar.gz'
-        ]
+        requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
         ]
@@ -281,7 +274,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
 
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
@@ -289,9 +282,10 @@ jobs:
       run: |
         sudo apt install gettext gcc -y
         python -m pip install --upgrade pip
-        pip install -r test_requirements/${{ matrix.requirements-file }}
-        pip install pytest ${{ matrix.django-version }}
-        pip install -r test_requirements/databases.txt
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner

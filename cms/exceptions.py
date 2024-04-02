@@ -7,9 +7,8 @@ class PluginNotRegistered(Exception):
 
 
 class PluginLimitReached(Exception):
-    """
-    Gets triggered when a placeholder has reached it's plugin limit.
-    """
+    """Gets triggered when a placeholder has reached its plugin limit."""
+
     pass
 
 
@@ -42,45 +41,48 @@ class NoHomeFound(Exception):
 
 
 class PermissionsException(Exception):
-    """Base permission exception
-    """
+    """Base permission exception"""
 
 
 class NoPermissionsException(PermissionsException):
-    """Can be fired when some violate action is performed on permission system.
-    """
+    """Can be fired when some violate action is performed on permission system."""
 
 
 class PublicIsUnmodifiable(Exception):
     """A method was invoked on the public copy, but is only valid for the
     draft version"""
+
     pass
 
 
 class PublicVersionNeeded(Exception):
     """A Public version of this page is needed"""
+
     pass
 
 
-class Deprecated(Exception): pass
+class Deprecated(Exception):
+    pass
 
 
-class DuplicatePlaceholderWarning(Warning): pass
+class DuplicatePlaceholderWarning(Warning):
+    pass
 
 
-class DontUsePageAttributeWarning(Warning): pass
+class DontUsePageAttributeWarning(Warning):
+    pass
 
 
-class CMSDeprecationWarning(Warning): pass
+class LanguageError(Exception):
+    pass
 
 
-class LanguageError(Exception): pass
+class PluginConsistencyError(Exception):
+    pass
 
 
-class PluginConsistencyError(Exception): pass
-
-
-class PlaceholderNotFound(Exception): pass
+class PlaceholderNotFound(Exception):
+    pass
 
 
 class ConfirmationOfVersion4Required(Exception):

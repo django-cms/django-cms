@@ -689,7 +689,7 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             org_placeholder = org_link_child_plugin.placeholder
             copied_placeholder = copied_link_child_plugin.placeholder
             msg = "placeholder of the original plugin and copied plugin are the same"
-            ok = ((org_placeholder.id != copied_placeholder.id))
+            ok = (org_placeholder.id != copied_placeholder.id)
             self.assertTrue(ok, msg)
 
     def test_copy_page_nested_plugin_moved_parent_plugin(self):
@@ -837,13 +837,13 @@ class NestedPluginsTestCase(PluginsTestBaseCase):
             found_page = page_two_ph_three.page if page_two_ph_three else None
             self.assertEqual(found_page, page_two)
             # check the stored placeholders org vs copy
-            msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_one.pk, page_one_ph_one.pk, page_two.pk)
             self.assertNotEqual(page_two_ph_one.pk, page_one_ph_one.pk, msg)
-            msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_two.pk, page_one_ph_two.pk, page_two.pk)
             self.assertNotEqual(page_two_ph_two.pk, page_one_ph_two.pk, msg)
-            msg = u'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
+            msg = 'placehoder ids copy:%s org:%s copied page %s are identical - tree broken' % (
                 page_two_ph_three.pk, page_one_ph_three.pk, page_two.pk)
             self.assertNotEqual(page_two_ph_three.pk, page_one_ph_three.pk, msg)
             # get the plugins from the original page

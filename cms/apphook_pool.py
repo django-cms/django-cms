@@ -9,7 +9,7 @@ from cms.exceptions import AppAlreadyRegistered
 from cms.utils.conf import get_cms_setting
 
 
-class ApphookPool():
+class ApphookPool:
 
     def __init__(self):
         self.apphooks = []

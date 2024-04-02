@@ -129,11 +129,7 @@ class PageAdmin(admin.ModelAdmin):
         return
 
     def get_admin_url(self, action, *args):
-        url_name = "{}_{}_{}".format(
-            self.opts.app_label,
-            self.opts.model_name,
-            action,
-        )
+        url_name = f"{self.opts.app_label}_{self.opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_preserved_filters(self, request):
@@ -373,12 +369,10 @@ class PageAdmin(admin.ModelAdmin):
             **get_deleted_objects_additional_kwargs
         )
 
-        # This is bad and I should feel bad.
-        if _('placeholder') in perms_needed:
-            perms_needed.remove('placeholder')
-
-        if _('page content') in perms_needed:
-            perms_needed.remove('page content')
+        # `django.contrib.admin.utils.get_deleted_objects()` only returns the verbose_name of a model,
+        # we hence have to use that name in order to allow the deletion of objects otherwise prevented.
+        perms_needed.discard(Placeholder._meta.verbose_name)
+        perms_needed.discard(PageContent._meta.verbose_name)
 
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
@@ -834,11 +828,7 @@ class PageContentAdmin(admin.ModelAdmin):
         return obj
 
     def get_admin_url(self, action, *args):
-        url_name = "{}_{}_{}".format(
-            self.opts.app_label,
-            self.opts.model_name,
-            action,
-        )
+        url_name = f"{self.opts.app_label}_{self.opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_preserved_filters(self, request):
@@ -1315,7 +1305,7 @@ class PageContentAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect(admin_reverse('index'))
 
             redirect_to = self.get_admin_url('changelist')
-            redirect_to += '?language={}'.format(request_language)
+            redirect_to += f'?language={request_language}'
             return HttpResponseRedirect(redirect_to)
 
         context = {
@@ -1399,7 +1389,7 @@ class PageContentAdmin(admin.ModelAdmin):
             depth=(page.node.depth + 1 if page else 1),
             follow_descendants=True,
         )
-        return HttpResponse(u''.join(rows))
+        return HttpResponse(''.join(rows))
 
     def get_tree_rows(self, request, pages, language, depth=1,
                       follow_descendants=True):

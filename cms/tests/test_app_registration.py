@@ -1,9 +1,9 @@
 from importlib import import_module
+from unittest.mock import Mock, patch
 
 from django.apps import AppConfig, apps
 from django.core.exceptions import ImproperlyConfigured
 from django.test import override_settings
-from mock import Mock, patch
 
 from cms import app_registration
 from cms.apps import CMSConfig
