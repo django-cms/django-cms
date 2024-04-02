@@ -155,9 +155,11 @@ class BaseCMSTestCase:
     def get_page_title_obj(self, page, language="en"):
         import warnings
 
+        from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
+
         warnings.warn(
             "get_page_title_obj is deprecated, use get_pagecontent_obj instead",
-            DeprecationWarning,
+            RemovedInDjangoCMS42Warning,
             stacklevel=2,
         )
         return PageContent.objects.get(page=page, language=language)

@@ -32,6 +32,7 @@ from cms.test_utils.util.context_managers import (
     LanguageOverride,
     UserLoginContext,
 )
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils.compat import DJANGO_4_2
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
@@ -1559,23 +1560,49 @@ class PageTest(PageTestBase):
 
 
 class PageActionsTestCase(PageTestBase):
-    def test_add_page(self):
+    def setUp(self):
+        self.admin = self.get_superuser()
+        self.site = Site.objects.get(pk=1)
+        self.page = create_page(
+            'My Page', 'nav_playground.html', 'en',
+            slug="ok",
+            site=self.site, created_by=self.admin)
+
+    def test_add_page_redirect(self):
+        """When adding the edit parameter to the add page form, the user should be redirected to the edit endpoint
+        of the new page."""
         with self.login_user_context(self.admin):
-            content = self.get_pagecontent_obj(self.page, 'en')
-            # create page copy
+            # add page
             page_data = {
-                'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
-                'site': 1, 'language': 'en', 'source': self.page.pk,
+                'title': 'another page', 'slug': 'type1', 'template': 'nav_playground.html',
+                'language': 'en',
+                'edit': 1,
             }
-            self.assertEqual(Page.objects.all().count(), 2)
+            self.assertEqual(Page.objects.all().count(), 1)
             response = self.client.post(
-                self.get_admin_url(PageContent, 'duplicate', content.pk),
+                self.get_admin_url(PageContent, 'add'),
                 data=page_data,
             )
-            # Check that page and its extensions have been copied
-            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
-            self.assertEqual(Page.objects.all().count(), 3)
+            redirect_url = get_object_edit_url(PageContent.objects.get(title='another page'))
+            self.assertContains(response, f'href="{redirect_url}"')
+            self.assertEqual(Page.objects.all().count(), 2)
 
+    def test_add_page_no_redirect(self):
+        with self.login_user_context(self.admin):
+            # add page
+            page_data = {
+                'title': 'another page', 'slug': 'type1', 'template': 'nav_playground.html',
+                'language': 'en',
+                'edit': 0,
+            }
+            self.assertEqual(Page.objects.all().count(), 1)
+            response = self.client.post(
+                self.get_admin_url(PageContent, 'add'),
+                data=page_data,
+            )
+            redirect_url = self.get_admin_url(PageContent, 'changelist') + "?language=en"
+            self.assertRedirects(response, redirect_url)
+            self.assertEqual(Page.objects.all().count(), 2)
 
 class PermissionsTestCase(PageTestBase):
 
