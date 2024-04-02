@@ -542,7 +542,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         ###
         # add the test plugin
         ###
-        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
         endpoint = self.get_change_plugin_uri(test_plugin)
         response = self.client.post(endpoint, {})
@@ -559,7 +559,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         ###
         # add the test plugin
         ###
-        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
 
         endpoint = self.get_change_plugin_uri(test_plugin)
@@ -788,7 +788,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # add the test plugin
         ###
         for lang in avail_langs:
-            add_plugin(ex.placeholder, u"EmptyPlugin", lang)
+            add_plugin(ex.placeholder, "EmptyPlugin", lang)
         # reload instance from database
         ex = Example1.objects.get(pk=ex.pk)
         # get languages
@@ -811,7 +811,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # add the test plugin
         ###
         for lang in avail_langs:
-            add_plugin(placeholder, u"EmptyPlugin", lang)
+            add_plugin(placeholder, "EmptyPlugin", lang)
         # reload placeholder from database
         placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         # get languages
@@ -1163,8 +1163,8 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         self.assertIn("slot=''", repr(unsaved_ph))
 
         saved_ph = Placeholder.objects.create(slot='test')
-        self.assertIn('id={}'.format(saved_ph.pk), repr(saved_ph))
-        self.assertIn("slot='{}'".format(saved_ph.slot), repr(saved_ph))
+        self.assertIn(f'id={saved_ph.pk}', repr(saved_ph))
+        self.assertIn(f"slot='{saved_ph.slot}'", repr(saved_ph))
 
 
 class PlaceholderConfTests(TestCase):

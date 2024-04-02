@@ -7,7 +7,7 @@ from cms.exceptions import ToolbarAlreadyRegistered, ToolbarNotRegistered
 from cms.utils.conf import get_cms_setting
 
 
-class ToolbarPool():
+class ToolbarPool:
     def __init__(self):
         self.toolbars = OrderedDict()
         self._discovered = False

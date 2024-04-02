@@ -83,7 +83,7 @@ The content of the placeholders we've encountered so far is different for every 
 
 You *could* hard-code your footer into the template, but it would be nicer to be able to manage it through the CMS. This is what **static aliases** are for. You need to install the django CMS alias package to use static aliases::
 
-    pip install git+https://github.com/django-cms/djangocms-alias
+    pip install djangocms-alias
 
 Do not forget to add ``djangocms_alias`` to your ``INSTALLED_APPS`` in ``settings.py``.
 

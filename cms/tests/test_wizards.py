@@ -1,3 +1,5 @@
+from unittest.mock import Mock, patch
+
 from django import forms
 from django.apps import apps
 from django.apps.registry import Apps
@@ -8,7 +10,6 @@ from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.encoding import smart_str
 from django.utils.translation import gettext as _
-from mock import Mock, patch
 
 from cms import app_registration
 from cms.api import create_page
@@ -19,6 +20,10 @@ from cms.models import Page, UserSettings
 from cms.test_utils.project.backwards_wizards.wizards import wizard
 from cms.test_utils.project.sampleapp.cms_wizards import sample_wizard
 from cms.test_utils.testcases import CMSTestCase, TransactionCMSTestCase
+from cms.toolbar.utils import (
+    get_object_edit_url,
+    get_object_preview_url,
+)
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.setup import setup_cms_apps
@@ -57,7 +62,7 @@ class BadModelForm(ModelForm):
         pass
 
 
-class WizardTestMixin():
+class WizardTestMixin:
     page_wizard = None
     title_wizard = None
 
@@ -69,7 +74,7 @@ class WizardTestMixin():
             self.fail("Sequence lengths are not the same.")
         for idx, (a, b) in enumerate(zipped):
             if a != b:
-                self.fail("Sequences differ at index {0}".format(idx))
+                self.fail(f"Sequences differ at index {idx}")
 
     @classmethod
     def setUpClass(cls):
@@ -83,7 +88,7 @@ class WizardTestMixin():
 
         # This is a basic Wizard
         cls.page_wizard = PageWizard(
-            title=_(u"Page"),
+            title=_("Page"),
             weight=100,
             form=WizardForm,
             model=Page,
@@ -95,7 +100,7 @@ class WizardTestMixin():
 
         # This is a Wizard that uses a ModelForm to define the model
         cls.user_settings_wizard = SettingsWizard(
-            title=_(u"UserSettings"),
+            title=_("UserSettings"),
             weight=200,
             form=ModelWizardForm,
         )
@@ -106,7 +111,7 @@ class WizardTestMixin():
         # This is a bad wizard definition as it neither defines a model, nor
         # uses a ModelForm that has model defined in Meta
         cls.title_wizard = PageContentWizard(
-            title=_(u"Page"),
+            title=_("Page"),
             weight=100,
             form=BadModelForm,
             template_name='my_template.html',  # This doesn't exist anywhere
@@ -141,6 +146,53 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
         # Now again without a language code
         url = page.get_absolute_url()
         self.assertEqual(self.page_wizard.get_success_url(page), url)
+
+    def test_get_edit_url(self):
+        user = self.get_superuser()
+        page = create_page(
+            title="Sample Page",
+            template=TEMPLATE_INHERITANCE_MAGIC,
+            language="en",
+            created_by=smart_str(user),
+            parent=None,
+            in_navigation=True,
+        )
+
+        extension = apps.get_app_config('cms').cms_extension
+
+        with patch.object(extension, 'toolbar_enabled_models', {Page: page}):
+            url = self.page_wizard.get_success_url(
+                page, language="en")
+            self.assertEqual(
+                url, get_object_edit_url(page, language="en"))
+
+    def test_get_preview_url(self):
+        wizard_preview_mode = Wizard(
+            title=_("Page"),
+            weight=100,
+            form=WizardForm,
+            model=Page,
+            template_name='my_template.html',  # This doesn't exist anywhere
+            edit_mode_on_success=False
+        )
+
+        user = self.get_superuser()
+        page = create_page(
+            title="Sample Page",
+            template=TEMPLATE_INHERITANCE_MAGIC,
+            language="en",
+            created_by=smart_str(user),
+            parent=None,
+            in_navigation=True,
+        )
+
+        extension = apps.get_app_config('cms').cms_extension
+
+        with patch.object(extension, 'toolbar_enabled_models', {Page: page}):
+            url = wizard_preview_mode.get_success_url(
+                page, language="en")
+            self.assertEqual(
+                url, get_object_preview_url(page, language="en"))
 
     def test_get_model(self):
         self.assertEqual(self.page_wizard.get_model(), Page)
@@ -288,7 +340,7 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
     def test_repr(self):
         self.assertIn("cms.cms_wizards.CMSPageWizard", repr(cms_page_wizard))
-        self.assertIn("id={}".format(cms_page_wizard.id), repr(cms_page_wizard))
+        self.assertIn(f"id={cms_page_wizard.id}", repr(cms_page_wizard))
         self.assertIn(hex(id(cms_page_wizard)), repr(cms_page_wizard))
 
     def test_wizard_create_child_page(self):
@@ -398,8 +450,8 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
 
             with self.login_user_context(superuser):
                 url = page.get_absolute_url('en')
-                expected = '<div class="sub-content">{0}</div>'.format(content)
-                unexpected = '<div class="content">{0}</div>'.format(content)
+                expected = f'<div class="sub-content">{content}</div>'
+                unexpected = f'<div class="content">{content}</div>'
                 response = self.client.get(url)
                 self.assertContains(response, expected, status_code=200)
                 self.assertNotContains(response, unexpected, status_code=200)

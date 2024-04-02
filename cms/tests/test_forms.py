@@ -176,7 +176,7 @@ class FormsTestCase(CMSTestCase):
                             'nav_playground.html', 'en',
                             site=site, parent=page1)
         # enforce the choices to be casted to a list
-        site_choices, page_choices = [list(bit) for bit in update_site_and_page_choices('en')]
+        site_choices, page_choices = (list(bit) for bit in update_site_and_page_choices('en'))
         self.assertEqual(page_choices, [
             ('', '----'),
             (site.name, [
@@ -189,7 +189,7 @@ class FormsTestCase(CMSTestCase):
         self.assertEqual(site_choices, [(site.pk, site.name)])
 
     def test_app_config_select_escaping(self):
-        class FakeAppConfig():
+        class FakeAppConfig:
             def __init__(self, pk, config):
                 self.pk = pk
                 self.config = config
@@ -197,7 +197,7 @@ class FormsTestCase(CMSTestCase):
             def __str__(self):
                 return self.config
 
-        class FakeApp():
+        class FakeApp:
             def __init__(self, name, configs=()):
                 self.name = name
                 self.configs = configs

@@ -10,7 +10,7 @@ from cms.constants import LEFT, REFRESH_PAGE, RIGHT, URL_CHANGE
 from cms.utils.compat import DJANGO_4_2
 
 
-class ItemSearchResult():
+class ItemSearchResult:
     """
     Returned by the find APIs in :class:`ToolbarAPIMixin`.
 

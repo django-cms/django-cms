@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -14,7 +15,6 @@ from django.utils.html import escape
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from mock import patch
 from sekizai.context import SekizaiContext
 
 import cms
@@ -116,11 +116,11 @@ class TemplatetagTests(CMSTestCase):
     def test_page_attribute_tag_escapes_content(self):
         script = '<script>alert("XSS");</script>'
 
-        class FakePage():
+        class FakePage:
             def get_page_title(self, *args, **kwargs):
                 return script
 
-        class FakeRequest():
+        class FakeRequest:
             current_page = FakePage()
             GET = {'language': 'en'}
 

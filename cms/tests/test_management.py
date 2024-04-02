@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core import management
 from django.core.management import CommandError
+from django.db import models
 from django.test.utils import override_settings
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 
@@ -170,7 +171,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             bogus_plugins_report["type"],
-            u'BogusPlugin')
+            'BogusPlugin')
 
         self.assertEqual(
             bogus_plugins_report["instances"][0],
@@ -184,7 +185,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             link_plugins_report["type"],
-            u'LinkPlugin')
+            'LinkPlugin')
 
         self.assertEqual(
             link_plugins_report["instances"][0].get_plugin_instance()[0],
@@ -198,7 +199,7 @@ class ManagementTestCase(CMSTestCase):
 
         self.assertEqual(
             text_plugins_report["type"],
-            u'TextPlugin')
+            'TextPlugin')
 
         self.assertEqual(
             len(text_plugins_report["instances"]),
@@ -216,7 +217,6 @@ class ManagementTestCase(CMSTestCase):
     def test_delete_orphaned_plugins(self):
         placeholder = Placeholder.objects.create(slot="test")
         add_plugin(placeholder, TextPlugin, "en", body="en body")
-        add_plugin(placeholder, TextPlugin, "en", body="en body")
         add_plugin(placeholder, "LinkPlugin", "en",
                    name="A Link", external_link="https://www.django-cms.org")
 
@@ -226,8 +226,9 @@ class ManagementTestCase(CMSTestCase):
 
         # create a bogus CMSPlugin to simulate one which used to exist but
         # is no longer installed
-        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin")
-        bogus_plugin.save()
+        bogus_plugin = CMSPlugin(language="en", plugin_type="BogusPlugin", placeholder=placeholder)
+        placeholder.add_plugin(bogus_plugin)
+        add_plugin(placeholder, TextPlugin, "en", body="en body")
 
         report = plugin_report()
 
@@ -282,6 +283,11 @@ class ManagementTestCase(CMSTestCase):
         self.assertEqual(
             len(text_plugins_report["unsaved_instances"]),
             0)
+
+        # No gaps in plugin tree
+        max_positon = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
+        self.assertEqual(max_positon, 3)
+
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
@@ -385,7 +391,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -488,7 +494,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set((u'en', u'de')), set(page.get_languages()))
+            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
 
         # Original PageContent untouched
         self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))

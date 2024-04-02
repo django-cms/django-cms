@@ -128,7 +128,7 @@ def configure_cms_apps(apps_with_features):
     and run code to register them with their config
     """
     for app_with_feature in apps_with_features:
-        enabled_property = "{}_enabled".format(app_with_feature.label)
+        enabled_property = f"{app_with_feature.label}_enabled"
         configure_app = app_with_feature.cms_extension.configure_app
 
         for app_config in get_cms_config_apps():

@@ -2,8 +2,7 @@ from urllib.parse import quote
 
 from django.apps import apps
 from django.conf import settings
-from django.contrib.auth import REDIRECT_FIELD_NAME
-from django.contrib.auth import login as auth_login
+from django.contrib.auth import REDIRECT_FIELD_NAME, login as auth_login
 from django.contrib.auth.views import redirect_to_login
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
@@ -17,7 +16,7 @@ from django.shortcuts import render
 from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.timezone import now
-from django.utils.translation import get_language_from_request
+from django.utils.translation import activate, get_language_from_request
 from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool
@@ -57,10 +56,10 @@ else:
 
 def _clean_redirect_url(redirect_url, language):
     if (redirect_url and is_language_prefix_patterns_used() and redirect_url[0] == "/" and not redirect_url.startswith(
-            '/%s/' % language
+            f"/{language}/"
     )):
         # add language prefix to url
-        redirect_url = "/%s/%s" % (language, redirect_url.lstrip("/"))
+        redirect_url = f"/{language}/{redirect_url.lstrip('/')}"
     return redirect_url
 
 
@@ -115,8 +114,10 @@ def details(request, slug):
             return HttpResponseRedirect(redirect_url)
 
     if not page:
-        # raise 404
-        _handle_no_page(request)
+        # raise 404 or redirect to PageContent's
+        # changelist in the admin if this is a
+        # request to the root URL
+        return _handle_no_page(request)
 
     request.current_page = page
 
@@ -139,12 +140,13 @@ def details(request, slug):
         # this means we need to correctly redirect that request.
         return _handle_no_page(request)
 
-    # get_published_languages will return all languages in draft mode
-    # and published only in live mode.
-    # These languages are then filtered out by the user allowed languages
+    # we use the _get_page_content_cache method to populate the cache with all public languages
+    # The languages are then filtered out by the user allowed languages
+    page._get_page_content_cache(None, fallback=True, force_reload=True)
+    pagecontent_languages = list(page.page_content_cache.keys())
     available_languages = [
         language for language in user_languages
-        if language in list(page.get_languages())
+        if language in pagecontent_languages
     ]
 
     own_urls = [
@@ -173,17 +175,18 @@ def details(request, slug):
         if language != request_language and language in available_languages
     ]
     language_is_unavailable = request_language not in available_languages
+    first_fallback_language = next(iter(fallback_languages or []), None)
 
     if language_is_unavailable and not fallback_languages:
         # There is no page with the requested language
         # and there's no configured fallbacks
         return _handle_no_page(request)
-    elif language_is_unavailable and (redirect_on_fallback or page.is_home):
+    elif language_is_unavailable and redirect_on_fallback:
         # There is no page with the requested language and
-        # the user has explicitly requested to redirect on fallbacks,
+        # redirect_on_fallback is True,
         # so redirect to the first configured / available fallback language
-        fallback = fallback_languages[0]
-        redirect_url = page.get_absolute_url(fallback, fallback=False)
+        redirect_url = page.get_absolute_url(
+            first_fallback_language, fallback=False)
     else:
         page_path = page.get_absolute_url(request_language)
         page_slug = page.get_path(request_language) or page.get_slug(request_language)
@@ -211,7 +214,19 @@ def details(request, slug):
     if page.login_required and not request.user.is_authenticated:
         return redirect_to_login(quote(request.get_full_path()), settings.LOGIN_URL)
 
-    content = page.get_content_obj(language=request_language)
+    content_language = request_language
+    if language_is_unavailable:
+        # When redirect_on_fallback is False and
+        # language is unavailable, render the content
+        # in the first fallback language available
+        # by switching to it
+        content_language = first_fallback_language
+        # translation.activate() is used without context
+        # as the context won't be preserved when the
+        # plugins get rendered
+        activate(content_language)
+
+    content = page.get_content_obj(language=content_language)
     # use the page object with populated cache
     content.page = page
     if hasattr(request, 'toolbar'):
@@ -237,20 +252,20 @@ def login(request):
     if form.is_valid():
         auth_login(request, form.user_cache)
     else:
-        redirect_to += u'?cms_toolbar_login_error=1'
+        redirect_to += '?cms_toolbar_login_error=1'
     return HttpResponseRedirect(redirect_to)
 
 
 def render_object_structure(request, content_type_id, object_id):
     try:
         content_type = ContentType.objects.get_for_id(content_type_id)
-    except ContentType.DoesNotExist:
-        raise Http404
+    except ContentType.DoesNotExist as err:
+        raise Http404 from err
 
     try:
         content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+    except ObjectDoesNotExist as err:
+        raise Http404 from err
 
     context = {
         'object': content_type_obj,
@@ -266,8 +281,8 @@ def render_object_structure(request, content_type_id, object_id):
 def render_object_endpoint(request, content_type_id, object_id, require_editable):
     try:
         content_type = ContentType.objects.get_for_id(content_type_id)
-    except ContentType.DoesNotExist:
-        raise Http404
+    except ContentType.DoesNotExist as err:
+        raise Http404 from err
     else:
         model = content_type.model_class()
 
@@ -291,14 +306,15 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
                     request.toolbar = CMSToolbar(request, request_path=absolute_url)
                     # Resolve the apphook's url to get its view function
                     view_func, args, kwargs = resolve(absolute_url)
-                    return view_func(request, *args, **kwargs)
+                    if view_func is not details:
+                        return view_func(request, *args, **kwargs)
                 except Resolver404:
                     # Apphook does not provide a view for its "root", show warning message
                     return _handle_no_apphook(request)
         else:
             content_type_obj = content_type.get_object_for_this_type(pk=object_id)
-    except ObjectDoesNotExist:
-        raise Http404
+    except ObjectDoesNotExist as err:
+        raise Http404 from err
 
     extension = apps.get_app_config('cms').cms_extension
 
