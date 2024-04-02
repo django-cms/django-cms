@@ -140,12 +140,13 @@ def details(request, slug):
         # this means we need to correctly redirect that request.
         return _handle_no_page(request)
 
-    # get_published_languages will return all languages in draft mode
-    # and published only in live mode.
-    # These languages are then filtered out by the user allowed languages
+    # we use the _get_page_content_cache method to populate the cache with all public languages
+    # The languages are then filtered out by the user allowed languages
+    page._get_page_content_cache(None, fallback=True, force_reload=True)
+    pagecontent_languages = list(page.page_content_cache.keys())
     available_languages = [
         language for language in user_languages
-        if language in list(page.get_languages())
+        if language in pagecontent_languages
     ]
 
     own_urls = [

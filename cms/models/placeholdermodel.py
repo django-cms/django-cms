@@ -53,8 +53,8 @@ class Placeholder(models.Model):
         return self.slot
 
     def __repr__(self):
-        return (f"<{self.__module__}.{self.__class__.__name__} id={self.pk} slot='{self.slot}' object "
-                f"at {hex(id(self))}>")
+        display = f"<{self.__module__}.{self.__class__.__name__} id={self.pk} slot='{self.slot}' object at {hex(id(self))}>"
+        return display
 
     def clear(self, language=None):
         """Deletes all plugins from the placeholder"""

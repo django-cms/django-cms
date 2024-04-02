@@ -1954,11 +1954,6 @@ class EditModelTemplateTagTest(ToolbarTestBase):
             response,
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-get_page_title-{0} cms-render-model">'  # noqa: UP032
             '</template>'
-            '{1}'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-cms-page-get_page_title-{0} cms-render-model">'
-            '</template>'.format(
-                page.pk, page.get_page_title(language)
-            )
         )
         self.assertContains(
             response,

@@ -186,8 +186,8 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return force_str(self.pk)
 
     def __repr__(self):
-        return (f"<{self.__module__}.{self.__class__.__name__} id={self.pk} plugin_type='{self.plugin_type}' object "
-                f"at {hex(id(self))}>")
+        display = f"<{self.__module__}.{self.__class__.__name__} id={self.pk} plugin_type='{self.plugin_type}' object at {hex(id(self))}>"
+        return display
 
     def get_plugin_name(self):
         from cms.plugin_pool import plugin_pool
@@ -213,7 +213,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     def get_plugin_instance(self, admin=None):
         """
         For a plugin instance (usually as a CMSPluginBase), this method
-        returns the downcasted (i.e., correctly typed subclass of CMSPluginBase) instacnce and the plugin class
+        returns the downcasted (i.e., correctly typed subclass of CMSPluginBase) instance and the plugin class
 
         :return: Tuple (instance, plugin)
 
