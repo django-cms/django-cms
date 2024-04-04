@@ -816,7 +816,7 @@ class PluginsTestCase(PluginsTestBaseCase):
 
     def test_plugin_toolbar_struct_permissions(self):
         page = self.get_permissions_test_page()
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         page_edit_url = get_object_edit_url(page_content)
         staff_user = self.get_staff_user_with_no_permissions()
         placeholder = page.get_placeholders('en').get(slot='body')
