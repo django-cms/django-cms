@@ -252,6 +252,11 @@ class AddPageForm(BasePageContentForm):
         required=False,
         widget=forms.HiddenInput(),
     )
+    edit = forms.IntegerField(
+        # Got to edit/preview mode after adding
+        required=False,
+        widget=forms.HiddenInput(),
+    )
     content_defaults = {
         "in_navigation": True,
     }
