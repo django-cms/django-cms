@@ -12,7 +12,7 @@ babel==2.11.0
     # via sphinx
 beautifulsoup4==4.11.1
     # via furo
-black==22.12.0
+black==24.3.0
     # via docstrfmt
 build==0.9.0
     # via pip-tools
@@ -81,8 +81,9 @@ mypy-extensions==1.0.0
     # via
     #   black
     #   typing-inspect
-packaging==21.3
+packaging==24.0
     # via
+    #   black
     #   build
     #   django-cms
     #   sphinx
@@ -105,8 +106,6 @@ pygments==2.13.0
     #   -r requirements.in
     #   furo
     #   sphinx
-pyparsing==3.0.9
-    # via packaging
 pytz==2022.6
     # via
     #   babel
