@@ -289,7 +289,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
     def test_duplicate_extensions(self):
         with self.login_user_context(self.admin):
-            content = self.get_page_title_obj(self.page, 'en')
+            content = self.get_pagecontent_obj(self.page, 'en')
             # create page copy
             page_data = {
                 'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
