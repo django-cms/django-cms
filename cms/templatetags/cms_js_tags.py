@@ -30,17 +30,21 @@ def bool(value):
         return 'false'
 
 
-@register.simple_tag()
-def render_cms_structure_js(renderer, obj):
+@register.simple_tag(takes_context=True)
+def render_cms_structure_js(context, renderer, obj):
     markup_bits = []
     obj_placeholders_by_slot = rescan_placeholders_for_obj(obj)
     declared_placeholders = get_declared_placeholders_for_obj(obj)
+    try:
+        lang = context["request"].toolbar.request_language
+    except AttributeError:
+        lang = None
 
     for placeholder_node in declared_placeholders:
         obj_placeholder = obj_placeholders_by_slot.get(placeholder_node.slot)
 
         if obj_placeholder:
-            placeholder_js = renderer.render_placeholder(obj_placeholder, language=None, page=obj)
+            placeholder_js = renderer.render_placeholder(obj_placeholder, language=lang, page=obj)
             markup_bits.append(placeholder_js)
 
     return mark_safe('\n'.join(markup_bits))

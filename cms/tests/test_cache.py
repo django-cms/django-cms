@@ -457,7 +457,7 @@ class CacheTestCase(CMSTestCase):
             superuser = self.get_superuser()
             # Create a test page
             page = create_page("test page 1", "nav_playground.html", "en")
-            page_content = self.get_page_title_obj(page)
+            page_content = self.get_pagecontent_obj(page)
             page_url = page.get_absolute_url()
             page_edit_url = get_object_edit_url(page_content)
 
