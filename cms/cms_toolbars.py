@@ -429,8 +429,9 @@ class PageToolbar(CMSToolbar):
 
         # if the current page has a parent in the request's current language redirect to it
         if parent_page and language in parent_page.get_languages():
-            with force_language(language):
-                return parent_page.get_absolute_url(language=language)
+            return get_object_preview_url(
+                parent_page.pagecontent_set(manager="admin_manager").latest_content(language=language).first()
+            )
 
         # else redirect to root, do not redirect to Page.objects.get_home() because user could have deleted the last
         # page, if DEBUG == False this could cause a 404
@@ -498,7 +499,9 @@ class PageToolbar(CMSToolbar):
                 page_add_url = admin_reverse('cms_pagecontent_add')
 
                 for code, name in add:
-                    url = add_url_parameters(page_add_url, cms_page=self.page.pk, language=code)
+                    url = add_url_parameters(
+                        page_add_url, cms_page=self.page.pk, parent_node=self.page.node.id, language=code
+                    )
                     add_plugins_menu.add_modal_item(name, url=url)
 
             if remove:

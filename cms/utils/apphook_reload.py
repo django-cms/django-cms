@@ -89,10 +89,7 @@ def reload_urlconf(urlconf=None, new_revision=None):
 
 
 def log_reloading_apphook(global_revision, local_revision):
-    debug_msg = "   New revision!!!! RELOAD!\n      {0} ({1})\n   -> {2} ({3})".format(
-        global_revision, type(global_revision),
-        local_revision, type(local_revision),
-    )
+    debug_msg = f"   New revision!!!! RELOAD!\n      {global_revision} ({type(global_revision)})\n   -> {local_revision} ({type(local_revision)})"
     logger.debug(debug_msg)
 
 
