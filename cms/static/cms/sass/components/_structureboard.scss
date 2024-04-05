@@ -185,7 +185,7 @@
         display: none !important;
     }
     .cms-draggables .cms-draggables {
-        padding-left: $structure-draggable-inner-padding;
+        padding-inline-start: $structure-draggable-inner-padding;
     }
     .cms-dragarea-empty .cms-draggables-root {
         position: relative;
@@ -426,8 +426,8 @@
         }
 
         .cms-draggable {
-            margin-left: $structure-draggable-inner-padding !important;
-            margin-left: 15px;
+            margin-inline-start: $structure-draggable-inner-padding !important;
+            margin-inline-start: 15px;
             .cms-dragitem {
                 background-image: none;
                 &:hover {
@@ -456,7 +456,7 @@
             color: $submenu-icon-color;
             font-size: $submenu-icon-size;
             margin-top: -(math.div($submenu-icon-size, 2));
-            margin-left: -(math.div($submenu-icon-size, 2));        }
+            margin-inline-start: -(math.div($submenu-icon-size, 2));        }
     }
 
     // end of dragarea
@@ -467,7 +467,7 @@
 
     &.cms-structure-condensed {
         width: 416px;
-        right: 0;
+        left: 0;
         box-shadow: 0 0 5px 0 rgba(0,0,0,.2);
         .cms-structure-content {
             padding-inline: 15px;
