@@ -167,7 +167,7 @@ typing-extensions==4.9.0
     #   typing-inspect
 typing-inspect==0.9.0
     # via libcst
-urllib3==1.26.12
+urllib3==1.26.18
     # via requests
 wheel==0.38.3
     # via pip-tools
