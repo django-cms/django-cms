@@ -253,7 +253,7 @@ class AddPageForm(BasePageContentForm):
         widget=forms.HiddenInput(),
     )
     content_defaults = {
-        "in_navigation": True,
+        'in_navigation': get_cms_setting('DEFAULT_IN_NAVIGATION'),
     }
 
     class Meta:
