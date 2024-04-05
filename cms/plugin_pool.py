@@ -15,7 +15,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import normalize_name
 
 
-class PluginPool():
+class PluginPool:
 
     def __init__(self):
         self.plugins = {}

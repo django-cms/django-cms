@@ -1,3 +1,5 @@
+from typing import Optional
+
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
@@ -6,6 +8,7 @@ from django.utils.translation import override as force_language
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyPageContent, PageContent, PageUrl
+from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
     get_fallback_languages,
@@ -22,13 +25,12 @@ from menus.menu_pool import menu_pool
 
 def get_visible_nodes(request, pages, site):
     """
-     This code is basically a many-pages-at-once version of
-     cms.utils.page_permissions.user_can_view_page
-     pages contains all published pages
+    This code is a many-pages-at-once version of cms.utils.page_permissions.user_can_view_page.
+    `pages` contains all published pages.
     """
     user = request.user
-    public_for = get_cms_setting('PUBLIC_FOR')
-    can_see_unrestricted = public_for == 'all' or (public_for == 'staff' and user.is_staff)
+    public_for = get_cms_setting("PUBLIC_FOR")
+    can_see_unrestricted = public_for == "all" or (public_for == "staff" and user.is_staff)
 
     if not user.is_authenticated and not can_see_unrestricted:
         # User is not authenticated and can't see unrestricted pages,
@@ -47,7 +49,7 @@ def get_visible_nodes(request, pages, site):
         return list(pages) if can_see_unrestricted else []
 
     user_id = user.pk
-    user_groups = SimpleLazyObject(lambda: frozenset(user.groups.values_list('pk', flat=True)))
+    user_groups = SimpleLazyObject(lambda: frozenset(user.groups.values_list("pk", flat=True)))
     is_auth_user = user.is_authenticated
 
     def user_can_see_page(page):
@@ -68,13 +70,18 @@ def get_visible_nodes(request, pages, site):
     return [page for page in pages if user_can_see_page(page)]
 
 
-def get_menu_node_for_page(renderer, page, language, fallbacks=None):
+def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=False):
     """
     Transform a CMS page into a navigation node.
 
-    :param renderer: MenuRenderer instance bound to the request
-    :param page: the page you wish to transform
-    :param language: The current language used to render the menu
+    Args:
+        renderer: MenuRenderer instance bound to the request.
+        page: The page to transform.
+        language: The current language used to render the menu.
+        fallbacks: List of fallback languages (optional).
+        url: The URL to use for the node (optional) instead of page_content.get_absolute_url().
+    Returns:
+        A CMSNavigationNode instance.
     """
     if fallbacks is None:
         fallbacks = []
@@ -82,28 +89,28 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
     # These are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
     attr = {
-        'is_page': True,
-        'soft_root': page.get_soft_root(language),
-        'auth_required': page.login_required,
-        'reverse_id': page.reverse_id,
+        "is_page": True,
+        "soft_root": page.get_soft_root(language),
+        "auth_required": page.login_required,
+        "reverse_id": page.reverse_id,
     }
 
     limit_visibility_in_menu = page.get_limit_visibility_in_menu(language)
 
     if limit_visibility_in_menu is constants.VISIBILITY_ALL:
-        attr['visible_for_authenticated'] = True
-        attr['visible_for_anonymous'] = True
+        attr["visible_for_authenticated"] = True
+        attr["visible_for_anonymous"] = True
     else:
-        attr['visible_for_authenticated'] = limit_visibility_in_menu == constants.VISIBILITY_USERS
-        attr['visible_for_anonymous'] = limit_visibility_in_menu == constants.VISIBILITY_ANONYMOUS
-    attr['is_home'] = page.is_home
+        attr["visible_for_authenticated"] = limit_visibility_in_menu == constants.VISIBILITY_USERS
+        attr["visible_for_anonymous"] = limit_visibility_in_menu == constants.VISIBILITY_ANONYMOUS
+    attr["is_home"] = page.is_home
     # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
         if page.navigation_extenders in renderer.menus:
             extenders.append(page.navigation_extenders)
-        elif "{0}:{1}".format(page.navigation_extenders, page.pk) in renderer.menus:
-            extenders.append("{0}:{1}".format(page.navigation_extenders, page.pk))
+        elif f"{page.navigation_extenders}:{page.pk}" in renderer.menus:
+            extenders.append(f"{page.navigation_extenders}:{page.pk}")
     # Is this page an apphook? If so, we need to handle the apphooks's nodes
     # Only run this if we have a translation in the requested language for this
     # object. The title cache should have been prepopulated in CMSMenu.get_nodes
@@ -119,27 +126,31 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
         if hasattr(ext, "get_instances"):
             # CMSAttachMenus are treated a bit differently to allow them to be
             # able to be attached to multiple points in the navigation.
-            exts.append("{0}:{1}".format(ext.__name__, page.pk))
-        elif hasattr(ext, '__name__'):
+            exts.append(f"{ext.__name__}:{page.pk}")
+        elif hasattr(ext, "__name__"):
             exts.append(ext.__name__)
         else:
             exts.append(ext)
     if exts:
-        attr['navigation_extenders'] = exts
+        attr["navigation_extenders"] = exts
 
     for lang in [language] + fallbacks:
-        translation = page.page_content_cache[lang]
+        translation = page.page_content_cache.get(lang)
 
         if translation:
             page_url = page.urls_cache[lang]
             # Do we have a redirectURL?
-            attr['redirect_url'] = translation.redirect  # save redirect URL if any
+            attr["redirect_url"] = translation.redirect  # save redirect URL if any
 
             # Now finally, build the NavigationNode object and return it.
             # The parent_id is manually set by the menu get_nodes method.
+            if endpoint:
+                url = get_object_preview_url(translation)
+            else:
+                url = translation.get_absolute_url()
             ret_node = CMSNavigationNode(
                 title=translation.menu_title or translation.title,
-                url='',
+                url=url,
                 id=page.pk,
                 attr=attr,
                 visible=page.get_in_navigation(translation.language),
@@ -147,16 +158,31 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None):
                 language=(translation.language if translation.language != language else None),
             )
             return ret_node
-    else:
-        raise RuntimeError('Unable to render cms menu. There is a language misconfiguration.')
+    return None
 
 
 class CMSNavigationNode(NavigationNode):
+    """
+    Represents a CMS Navigation Node for a Page object in the page tree.
 
-    def __init__(self, *args, **kwargs):
-        self.path = kwargs.pop('path')
+    Attributes:
+        path: The path of the node.
+        language: The language used for the node (optional).
+    """
+
+    def __init__(self, *args, path: str, language: Optional[str] = None, **kwargs):
+        """
+        Initializes a CMSNavigationNode instance.
+
+        Args:
+            *args: Positional arguments.
+            path: The path of the node.
+            language: The language used for the node (optional).
+            **kwargs: Keyword arguments.
+        """
+        self.path = path
         # language is only used when we're dealing with a fallback
-        self.language = kwargs.pop('language', None)
+        self.language = language
         super().__init__(*args, **kwargs)
 
     def is_selected(self, request):
@@ -166,25 +192,17 @@ class CMSNavigationNode(NavigationNode):
             return False
         return page_id == self.id
 
-    def _get_absolute_url(self):
-        if self.attr['is_home']:
-            return reverse('pages-root')
-        return reverse('pages-details-by-slug', kwargs={"slug": self.path})
-
-    def get_absolute_url(self):
-        if self.language:
-            with force_language(self.language):
-                return self._get_absolute_url()
-        return self._get_absolute_url()
-
 
 class CMSMenu(Menu):
     """Subclass of :class:`menus.base.Menu`. Its :meth:`~menus.base.Menu.get_nodes()` creates a list of NavigationNodes
     based on a site's :class:`cms.models.pagemodel.Page` objects.
     """
+
     def get_nodes(self, request):
         site = self.renderer.site
         lang = self.renderer.request_language
+        toolbar = get_toolbar_from_request(request)
+
         pages = get_page_queryset(site)
 
         if is_valid_site_language(lang, site_id=site.pk):
@@ -209,10 +227,9 @@ class CMSMenu(Menu):
             fallbacks = languages
 
         pages = (
-            pages
-            .filter(pagecontent_set__language__in=languages)
-            .select_related('node')
-            .order_by('node__path')
+            pages.filter(pagecontent_set__language__in=languages)
+            .select_related("node")
+            .order_by("node__path")
             .distinct()
         )
         pages = get_visible_nodes(request, pages, site)
@@ -226,21 +243,24 @@ class CMSMenu(Menu):
             homepage = None
 
         urls_lookup = Prefetch(
-            'urls',
-            to_attr='filtered_urls',
+            "urls",
+            to_attr="filtered_urls",
             queryset=PageUrl.objects.filter(language__in=languages),
         )
+        if toolbar.edit_mode_active or toolbar.preview_mode_active:
+            # Get all translations visible in the admin for the current page
+            translations_qs = PageContent.admin_manager.current_content(language__in=languages)
+        else:
+            # Only get public translations
+            translations_qs = PageContent.objects.filter(language__in=languages)
         translations_lookup = Prefetch(
-            'pagecontent_set',
-            to_attr='filtered_translations',
-            queryset=PageContent.objects.filter(language__in=languages),
+            "pagecontent_set",
+            to_attr="filtered_translations",
+            queryset=translations_qs,
         )
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
         # Build the blank title instances only once
         blank_page_content_cache = {language: EmptyPageContent(language=language) for language in languages}
-
-        if lang not in blank_page_content_cache:
-            blank_page_content_cache[lang] = EmptyPageContent(language=lang)
 
         # Maps a node id to its page id
         node_id_to_page = {}
@@ -261,6 +281,7 @@ class CMSMenu(Menu):
                 page,
                 language=lang,
                 fallbacks=fallbacks,
+                endpoint=toolbar.preview_mode_active or toolbar.edit_mode_active,
             )
             return menu_node
 
@@ -276,16 +297,18 @@ class CMSMenu(Menu):
                 continue
 
             menu_node = _page_to_node(page)
-            cut_homepage = homepage and not homepage.get_in_navigation(lang)
+            if menu_node:
+                # Only add pages with at least one page content
+                cut_homepage = homepage and not homepage.get_in_navigation(lang)
 
-            if cut_homepage and parent_id == homepage.pk:
-                # When the homepage is hidden from navigation,
-                # we need to cut all its direct children from it.
-                menu_node.parent_id = None
-            else:
-                menu_node.parent_id = parent_id
-            node_id_to_page[node.pk] = page.pk
-            menu_nodes.append(menu_node)
+                if cut_homepage and parent_id == homepage.pk:
+                    # When the homepage is hidden from navigation,
+                    # we need to cut all its direct children from it.
+                    menu_node.parent_id = None
+                else:
+                    menu_node.parent_id = parent_id
+                node_id_to_page[node.pk] = page.pk
+                menu_nodes.append(menu_node)
         return menu_nodes
 
 
@@ -293,7 +316,6 @@ menu_pool.register_menu(CMSMenu)
 
 
 class NavExtender(Modifier):
-
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         if post_cut:
             return nodes
@@ -325,8 +347,7 @@ class NavExtender(Modifier):
 
         # find all not assigned nodes
         for menu in self.renderer.menus.items():
-            if (hasattr(menu[1], 'cms_enabled')
-                    and menu[1].cms_enabled and menu[0] not in exts):
+            if hasattr(menu[1], "cms_enabled") and menu[1].cms_enabled and menu[0] not in exts:
                 for node in nodes:
                     if node.namespace == menu[0]:
                         removed.append(node)
@@ -462,8 +483,7 @@ class SoftRootCutter(Modifier):
                 node.parent.parent = None
                 nodes = [node.parent] + nodes
             else:
-                nodes = self.find_ancestors_and_remove_children(
-                    node.parent, nodes)
+                nodes = self.find_ancestors_and_remove_children(node.parent, nodes)
         else:
             for newnode in nodes:
                 if newnode != node and not newnode.parent:

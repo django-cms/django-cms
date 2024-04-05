@@ -1,25 +1,28 @@
 .. _reference:
 
-#########
 Reference
-#########
+=========
 
 Technical reference material.
 
 .. toctree::
     :maxdepth: 1
 
-    api_references
     cli
     configuration
+    api_references
+    app_base
     fields
     navigation
     pages
+    pagecontents
+    extensions
     permissions
     placeholders
     plugins
     sitemaps
     templatetags
-    titles
     toolbar
+    utility-functions
     wizards
+    icons

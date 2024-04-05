@@ -50,6 +50,7 @@ from cms.admin.forms import (
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
+from cms.constants import MODAL_HTML_REDIRECT
 from cms.models import (
     CMSPlugin,
     EmptyPageContent,
@@ -65,6 +66,7 @@ from cms.operations.helpers import (
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
@@ -127,11 +129,7 @@ class PageAdmin(admin.ModelAdmin):
         return
 
     def get_admin_url(self, action, *args):
-        url_name = "{}_{}_{}".format(
-            self.opts.app_label,
-            self.opts.model_name,
-            action,
-        )
+        url_name = f"{self.opts.app_label}_{self.opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_preserved_filters(self, request):
@@ -371,12 +369,10 @@ class PageAdmin(admin.ModelAdmin):
             **get_deleted_objects_additional_kwargs
         )
 
-        # This is bad and I should feel bad.
-        if 'placeholder' in perms_needed:
-            perms_needed.remove('placeholder')
-
-        if 'page content' in perms_needed:
-            perms_needed.remove('page content')
+        # `django.contrib.admin.utils.get_deleted_objects()` only returns the verbose_name of a model,
+        # we hence have to use that name in order to allow the deletion of objects otherwise prevented.
+        perms_needed.discard(Placeholder._meta.verbose_name)
+        perms_needed.discard(PageContent._meta.verbose_name)
 
         if request.POST and not protected:  # The user has confirmed the deletion.
             if perms_needed:
@@ -832,11 +828,7 @@ class PageContentAdmin(admin.ModelAdmin):
         return obj
 
     def get_admin_url(self, action, *args):
-        url_name = "{}_{}_{}".format(
-            self.opts.app_label,
-            self.opts.model_name,
-            action,
-        )
+        url_name = f"{self.opts.app_label}_{self.opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
 
     def get_preserved_filters(self, request):
@@ -989,6 +981,20 @@ class PageContentAdmin(admin.ModelAdmin):
             context['can_change_advanced_settings'] = _has_advanced_settings_perm
 
         return super().change_view(request, object_id, form_url=form_url, extra_context=context)
+
+    def response_add(self, request, obj):
+        redirect = request.POST.get("edit", False)
+        if redirect == "1":
+            from django.core.cache import cache
+
+            from cms.cache.permissions import get_cache_key, get_cache_permission_version
+            cache.delete(get_cache_key(request.user, 'change_page'), version=get_cache_permission_version())
+
+            # redirect to the edit view if added from the toolbar
+            url = get_object_edit_url(obj)  # Redirects to preview if necessary
+            return HttpResponse(MODAL_HTML_REDIRECT.format(url=url))
+        return super().response_add(request, obj)
+
 
     def get_filled_languages(self, request, page):
         site_id = get_site(request).pk
@@ -1299,7 +1305,7 @@ class PageContentAdmin(admin.ModelAdmin):
                 return HttpResponseRedirect(admin_reverse('index'))
 
             redirect_to = self.get_admin_url('changelist')
-            redirect_to += '?language={}'.format(request_language)
+            redirect_to += f'?language={request_language}'
             return HttpResponseRedirect(redirect_to)
 
         context = {
@@ -1383,7 +1389,7 @@ class PageContentAdmin(admin.ModelAdmin):
             depth=(page.node.depth + 1 if page else 1),
             follow_descendants=True,
         )
-        return HttpResponse(u''.join(rows))
+        return HttpResponse(''.join(rows))
 
     def get_tree_rows(self, request, pages, language, depth=1,
                       follow_descendants=True):

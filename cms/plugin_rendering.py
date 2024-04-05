@@ -43,7 +43,7 @@ def _unpack_plugins(parent_plugin):
     return found_plugins
 
 
-class RenderedPlaceholder():
+class RenderedPlaceholder:
     __slots__ = (
         'language',
         'site_id',
@@ -75,14 +75,13 @@ class RenderedPlaceholder():
         return hash(self.placeholder)
 
 
-class BaseRenderer():
+class BaseRenderer:
 
     load_structure = False
     placeholder_edit_template = ''
 
     def __init__(self, request):
         self.request = request
-        self.request_language = get_language_from_request(self.request)
         self._cached_templates = {}
         self._cached_plugin_classes = {}
         self._placeholders_content_cache = {}
@@ -111,6 +110,10 @@ class BaseRenderer():
     def plugin_pool(self):
         import cms.plugin_pool
         return cms.plugin_pool.plugin_pool
+
+    @cached_property
+    def request_language(self):
+        return get_language_from_request(self.request)
 
     def get_placeholder_plugin_menu(self, placeholder, page=None):
         registered_plugins = self.plugin_pool.registered_plugins

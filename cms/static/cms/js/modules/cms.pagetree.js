@@ -328,6 +328,31 @@ var PageTree = new Class({
                 $('.jstree-is-dragging').removeClass('jstree-is-dragging-copy');
                 isCopyClassAdded = false;
             }
+
+            // styling the #jstree-marker dynamically on dnd_move.vakata
+            // because jsTree doesn't support RTL on this specific case
+            // and sets the 'left' property without checking document direction
+            var ins = $.jstree.reference(data.event.target);
+
+            // make sure we're hovering over a tree node
+            if (ins) {
+                var marker = $('#jstree-marker');
+                var root = $('#changelist');
+                var column = $(data.data.origin.element);
+
+                var hover = ins.settings.dnd.large_drop_target ?
+                                $(data.event.target)
+                                    .closest('.jstree-node') :
+                                $(data.event.target)
+                                    .closest('.jstree-anchor').parent();
+
+                var width = root.width() - (column.width() - hover.width());
+
+                marker.css({
+                    left: `${root.offset().left}px`,
+                    width: `${width}px`
+                });
+            }
         });
 
         this.ui.document.on('dnd_stop.vakata', function(e, data) {

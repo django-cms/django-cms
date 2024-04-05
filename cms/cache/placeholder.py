@@ -58,13 +58,14 @@ def _get_placeholder_cache_version_key(placeholder, lang, site_id):
     and per VARY header.
     """
     prefix = get_cms_setting('CACHE_PREFIX')
-    key = '{prefix}|placeholder_cache_version|id:{id}|lang:{lang}|site:{site}'.format(
-        prefix=prefix,
-        id=placeholder.pk,
-        lang=str(lang),
-        site=site_id,
-    )
-    if len(key) > 250:
+    key = f'{prefix}|placeholder_cache_version|id:{placeholder.pk}|lang:{str(lang)}|site:{site_id}'
+    # django itself adds "version" add the end of cache-keys, e.g. "<key>:1".
+    # -> If `cache.set()` is for example called with `version=""`, it still adds
+    #    `:` at the end. So if we check the length for `> 250`, a length of 249
+    #    or even 250 ends up in an InvalidCacheKey-exception.
+    # In order to avoid these errors, we hash the keys at a lower length to also
+    # have a little buffer.
+    if len(key) > 200:
         key = '{prefix}|{hash}'.format(
             prefix=prefix,
             hash=hashlib.sha1(key.encode('utf-8')).hexdigest(),
@@ -118,14 +119,7 @@ def _default_placeholder_cache_key(placeholder, lang, site_id, request, soft=Fal
     """
     prefix = get_cms_setting('CACHE_PREFIX')
     version, vary_on_list = _get_placeholder_cache_version(placeholder, lang, site_id)
-    main_key = '{prefix}|render_placeholder|id:{id}|lang:{lang}|site:{site}|tz:{tz}|v:{version}'.format(
-        prefix=prefix,
-        id=placeholder.pk,
-        lang=lang,
-        site=site_id,
-        tz=get_timezone_name(),
-        version=version,
-    )
+    main_key = f'{prefix}|render_placeholder|id:{placeholder.pk}|lang:{lang}|site:{site_id}|tz:{get_timezone_name()}|v:{version}'
 
     if not soft:
         # We are about to write to the cache, so we want to get the latest

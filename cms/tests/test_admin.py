@@ -1,5 +1,4 @@
 import json
-from unittest import skipIf
 
 from django.contrib import admin
 from django.contrib.admin.sites import site
@@ -372,7 +371,7 @@ class AdminTests(AdminTestsBase):
 
     def test_change_innavigation(self):
         page = self.get_page()
-        content = self.get_page_title_obj(page, 'en')
+        content = self.get_pagecontent_obj(page, 'en')
         permless = self.get_permless()
         admin_user = self.get_admin()
         pagecontent_admin = self.pagecontent_admin_class

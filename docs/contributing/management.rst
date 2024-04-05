@@ -20,14 +20,14 @@ Raising an issue
 .. ATTENTION::
 
     If you think you have discovered a security issue in our code, please report
-    it **privately**, by emailing us at `security@divio.com <security@divio.com>`_.
+    it **privately**, by emailing us at `security@django-cms.org <security@django-cms.org>`_.
 
     Please **do not** raise it in any public forum until we have had a
     chance to deal with it.
 
 
 Except in the case of security matters, of course, you're welcome to raise
-issues in any way that suits you - :ref:`using Discourse, or the Slack group
+issues in any way that suits you -  the Slack group
 <development-community>` or in person if you happen to meet another django CMS
 developer.
 

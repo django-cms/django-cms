@@ -1,0 +1,83 @@
+.. _upgrade-to-3.9.0:
+
+###################
+3.9.0 release notes
+###################
+
+
+This release of django CMS (first community driven release) introduces support for Django 3.2, and bugfix.
+We tried to catch up with as many long waited feature/bugfix requests as possible.
+
+
+*******************
+What's new in 3.9.0
+*******************
+
+Features:
+=========
+* Add support for Django 3.2 LTS version
+* Page changed_date added to the Page tree admin actions dropdown template #6701 (#7046) (73cbbdb00) -- Vladimir Kuvandjiev
+* Allow recursive template extending in placeholders (#6564) (fed6fe54d) -- Stefan Wehrmeyer
+* Added ability to set placeholder global limit on children only (#6847) (18e146495) -- G3RB3N
+* Replaced Travis.CI with Github Actions (#7000) (0f33b5839) -- Vinit Kumar
+* Added support for Github Actions based CI.
+* Added Support for testing frontend, docs, test and linting in different/parallel CI pipelines.
+* Added django-treebeard 4.5.1 support, previously pinned django-treebeard<4.5 to avoid breaking changes introduced
+* Improved performance of ``cms list plugins`` command
+* Page changed date added to the Page tree admin actions dropdown
+
+Bug Fixes:
+==========
+
+* Fixed an issue where the wrong page title was returned (#6466) (3a0c4d26e) -- Alexandre Joly
+* Fixed #6413: migrations 0019 and 0020 on multi db setups (#6708) (826d57f0f) -- Petr Glotov
+* Added fix to migrations to handle multi database routing (#6721) (98658a909) -- Michael Anckaert
+* Fixed issue where default fallbacks is not used when it's an empty list (#6795) (5d21fa5eb) -- Arjan de Pooter
+* Fixed prefix_default_language = False redirect behavior (#6851) (34a26bd1b) -- Radek Stępień
+* Fix not checking slug uniqueness on page move (#6958) (5976d393a) -- Iacopo Spalletti
+* Fixed DontUsePageAttributeWarning message (#6734) (45383888e) -- carmenkow
+* Fixed Cache not invalidated when using a PlaceholderField outside the CMS #6912 (#6956) (3ce63d7d3) -- Benjamin PIERRE
+* Fixed unexpected behavior get_page_from_request (#6974) (#6073) (52f926e0d) -- Yuriy Mamaev
+* Fixed django treebeard 4.5.1 compatibility (#6988) (eeb86fd70) -- Aiky30
+* Fixed Bad Title.path in Multilanguage sites if parent slug is created or modified (#6968) (6e7b0ae48) -- fp4code
+* Fixed redirect issues when i18n_patterns had prefix_default_language = False
+* Fixed not checking slug uniqueness when moving a page
+* Fixed builds on RTD
+* Fixed the cache not being invalidated when updating a PlaceholderField in a custom model
+* Fixed 66622 bad Title.path in multilingual sites when parent slug is created or modified
+* Fixed 6973 bag with unexpected behavior ``get_page_from_request``
+* Fixed migrations with multiple databases
+* Fix styles issues, caused by switching to the ``display: flex`` on the page tree renderer.
+* Fixed missing builtin arguments on main ``cms`` management command causing it to crash
+* Fixed template label nested translation
+* Fixed a bug where the fallback page title would be returned instead of the one from the current language 
+* Fixed an issue when running migrations on a multi database project
+
+
+***********************
+How to upgrade to 3.9.0
+***********************
+
+We assume you are upgrading from django CMS 3.8.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Check your settings of `CMS_LANGUAGES` (if used), as it was ignored by default in preceding versions.
+For more information, please see: https://github.com/django-cms/django-cms/pull/6795
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.

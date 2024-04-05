@@ -1,7 +1,7 @@
 from cms.api import create_page
 
 
-class MenusFixture():
+class MenusFixture:
     def create_fixtures(self):
         """
         Tree from fixture:
@@ -31,7 +31,7 @@ class MenusFixture():
             create_page('P8', in_navigation=True, parent=p6, **defaults)
 
 
-class ExtendedMenusFixture():
+class ExtendedMenusFixture:
     def create_fixtures(self):
         """
         Tree from fixture:
@@ -67,7 +67,7 @@ class ExtendedMenusFixture():
             create_page('P11', in_navigation=True, parent=p10, **defaults)
 
 
-class SubMenusFixture():
+class SubMenusFixture:
     def create_fixtures(self):
         """
         Tree from fixture:
@@ -97,7 +97,7 @@ class SubMenusFixture():
             create_page('P8', in_navigation=True, parent=p6, **defaults)
 
 
-class SoftrootFixture():
+class SoftrootFixture:
     def create_fixtures(self):
         """
         top

@@ -380,7 +380,7 @@ class CMSToolbarBase(BaseToolbar):
 
     def get_object_model(self):
         if self.obj:
-            return "{0}.{1}".format(self.obj._meta.app_label, self.obj._meta.object_name).lower()
+            return f"{self.obj._meta.app_label}.{self.obj._meta.object_name}".lower()
         return ''
 
     def get_object_pk(self):
@@ -402,6 +402,15 @@ class CMSToolbarBase(BaseToolbar):
         if self.obj:
             return get_object_structure_url(self.obj, language=self.request_language)
         return ''
+
+    def object_is_editable(self, obj=None):
+        obj = obj or self.obj
+        if obj:
+            if hasattr(obj, "is_editable"):
+                # Object can decide itself
+                return obj.is_editable(self.request)
+            return True
+        return False
 
     # Internal API
 

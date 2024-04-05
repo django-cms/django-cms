@@ -3,7 +3,7 @@ from django.db import models
 from cms.models import CMSPlugin
 
 
-class SomeParent():
+class SomeParent:
     pass
 
 

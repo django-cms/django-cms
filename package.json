@@ -10,7 +10,7 @@
     "babel-plugin-rewire": "^1.1.0",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.4.0",
-    "browser-sync": "^2.26.12",
+    "browser-sync": "^3.0.2",
     "browserslist-saucelabs": "^0.2.3",
     "chokidar": "^3.5.3",
     "core-js": "^3.31.0",
