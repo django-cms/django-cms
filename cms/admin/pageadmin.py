@@ -50,6 +50,7 @@ from cms.admin.forms import (
 )
 from cms.admin.permissionadmin import PERMISSION_ADMIN_INLINES
 from cms.cache.permissions import clear_permission_cache
+from cms.constants import MODAL_HTML_REDIRECT
 from cms.models import (
     CMSPlugin,
     EmptyPageContent,
@@ -65,6 +66,7 @@ from cms.operations.helpers import (
 )
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils import get_current_site, page_permissions, permissions
 from cms.utils.admin import jsonify_request
 from cms.utils.conf import get_cms_setting
@@ -979,6 +981,20 @@ class PageContentAdmin(admin.ModelAdmin):
             context['can_change_advanced_settings'] = _has_advanced_settings_perm
 
         return super().change_view(request, object_id, form_url=form_url, extra_context=context)
+
+    def response_add(self, request, obj):
+        redirect = request.POST.get("edit", False)
+        if redirect == "1":
+            from django.core.cache import cache
+
+            from cms.cache.permissions import get_cache_key, get_cache_permission_version
+            cache.delete(get_cache_key(request.user, 'change_page'), version=get_cache_permission_version())
+
+            # redirect to the edit view if added from the toolbar
+            url = get_object_edit_url(obj)  # Redirects to preview if necessary
+            return HttpResponse(MODAL_HTML_REDIRECT.format(url=url))
+        return super().response_add(request, obj)
+
 
     def get_filled_languages(self, request, page):
         site_id = get_site(request).pk
