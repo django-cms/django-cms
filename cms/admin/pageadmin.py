@@ -18,7 +18,6 @@ from django.core.exceptions import (
 from django.db import transaction
 from django.db.models import Prefetch, Q
 from django.db.models.query import QuerySet
-from django.db.utils import IntegrityError
 from django.forms.fields import IntegerField
 from django.http import (
     Http404,
