@@ -974,7 +974,7 @@ class PageContentAdmin(admin.ModelAdmin):
             extra_context['cms_page'] = cms_page
             extra_context['language_tabs'] = get_language_tuple(site.pk)
             extra_context['filled_languages'] = self.get_filled_languages(request, cms_page)
-            extra_context['show_language_tabs'] = len(extra_context['language_tabs'])
+            extra_context['show_language_tabs'] = False  # TODO: Language tabs disabled by jrief for better UX
         extra_context['language'] = language
         return super().add_view(request, form_url, extra_context=extra_context)
 
@@ -999,7 +999,7 @@ class PageContentAdmin(admin.ModelAdmin):
             'language_tabs': get_language_tuple(site.pk),
             'filled_languages': self.get_filled_languages(request, obj.page)
         }
-        context['show_language_tabs'] = len(context['language_tabs'])
+        context['show_language_tabs'] = False  #  # TODO: Language tabs disabled by jrief for better UX
         context.update(extra_context or {})
 
         if 'basic_info' in extra_context:
