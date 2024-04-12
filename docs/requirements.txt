@@ -63,7 +63,7 @@ docutils==0.19
     #   sphinx
 furo==2022.12.7
     # via -r requirements.in
-idna==3.4
+idna==3.7
     # via requests
 imagesize==1.4.1
     # via sphinx
