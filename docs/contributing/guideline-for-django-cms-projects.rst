@@ -31,8 +31,8 @@ Approval by Tech Committee of the django CMS Association
 New projects or project transfers under the django CMS patronage must first be approved
 by the `Tech Committee
 <https://github.com/django-cms/django-cms-mgmt/blob/master/tech-committee/about.md>`_.
-For that you should join the #tech-committee channel on `Slack
-<https://www.django-cms.org/slack>`_ and simply submit your proposal. Then, the TC
+For that you should join the #tech-committee channel on `Discord
+<https://discord.gg/H8UgPktb>`_ and simply submit your proposal. Then, the TC
 decides whether or not your project is in line with the product roadmap and overall
 vision for django CMS.
 

@@ -62,7 +62,7 @@ To create a proposal...
 1. please use this `DEP template <https://github.com/django/deps/blob/main/template.rst>`_
 2. create a discussion in the main `Github repository <https://github.com/django-cms/django-cms/discussions>`_
 3. discuss, discuss, discuss
-4. join the Tech Committee `Slack Channel <https://www.django-cms.org/slack>`_ (#technical-committee) and make the team aware of your proposal after the proposal has been reviewed by the Technical Committee, it is put to a vote at one of the weekly meetings of the technical committee
+4. join the Tech Committee (`#technical-committee <https://discord.gg/H8UgPktb>`_) and make the team aware of your proposal after the proposal has been reviewed by the Technical Committee, it is put to a vote at one of the weekly meetings of the technical committee
 
 
 ****************
@@ -82,7 +82,7 @@ Example of retrospective approach.
 * ...
 * Unscheduled Releases -> e.g. bug fix -> 3.x.x
 
-The release management workgroup can be found on `Slack <https://www.django-cms.org/slack>`_ in #release-management channel.
+Release management is managed on `Discord <https://discord.gg/H8UgPktb>`_ in the #technical-committee channel.
 For questions regarding the release process please join the channel and reach out. We're happy to help.
 
 Long-Term Support Release

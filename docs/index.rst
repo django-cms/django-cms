@@ -123,10 +123,10 @@ organisation that exists to support the development of django CMS and its commun
 
 .. rst-class:: column column2
 
-Slack
+Discord
 ~~~~~
 
-Join `our friendly Slack group <https://www.django-cms.org/slack>`_ for **support** and
+Join `our friendly Discord server <https://discord.gg/6cf2FKBR>`_ for **support** and
 to **share ideas** and **discuss technical questions** with other members of the
 community.
 
