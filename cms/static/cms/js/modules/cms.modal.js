@@ -911,13 +911,12 @@ class Modal {
             }
 
             // check if we are redirected - should only happen after successful form submission
-            var redirect = body.find('a.cms-view-new-object').attr("href");
+            var redirect = body.find('a.cms-view-new-object').attr('href');
+
             if (redirect) {
                 Helpers.reloadBrowser(redirect, false);
                 return true;
             }
-
-
 
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');

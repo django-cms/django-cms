@@ -32,6 +32,7 @@ from cms.test_utils.util.context_managers import (
     LanguageOverride,
     UserLoginContext,
 )
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils.compat import DJANGO_4_2
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
@@ -1310,7 +1311,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             content_admin = PageContentAdmin(PageContent, admin.site)
             page = self.get_page()
-            content = self.get_page_title_obj(page, 'en')
+            content = self.get_pagecontent_obj(page, 'en')
             form_url = self.get_page_change_uri('en', page)
             # Middleware is needed to correctly setup the environment for the admin
             request = self.get_request()
@@ -1557,6 +1558,51 @@ class PageTest(PageTestBase):
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
 
+
+class PageActionsTestCase(PageTestBase):
+    def setUp(self):
+        self.admin = self.get_superuser()
+        self.site = Site.objects.get(pk=1)
+        self.page = create_page(
+            'My Page', 'nav_playground.html', 'en',
+            slug="ok",
+            site=self.site, created_by=self.admin)
+
+    def test_add_page_redirect(self):
+        """When adding the edit parameter to the add page form, the user should be redirected to the edit endpoint
+        of the new page."""
+        with self.login_user_context(self.admin):
+            # add page
+            page_data = {
+                'title': 'another page', 'slug': 'type1', 'template': 'nav_playground.html',
+                'language': 'en',
+                'edit': 1,
+            }
+            self.assertEqual(Page.objects.all().count(), 1)
+            response = self.client.post(
+                self.get_admin_url(PageContent, 'add'),
+                data=page_data,
+            )
+            redirect_url = get_object_edit_url(PageContent.objects.get(title='another page'))
+            self.assertContains(response, f'href="{redirect_url}"')
+            self.assertEqual(Page.objects.all().count(), 2)
+
+    def test_add_page_no_redirect(self):
+        with self.login_user_context(self.admin):
+            # add page
+            page_data = {
+                'title': 'another page', 'slug': 'type1', 'template': 'nav_playground.html',
+                'language': 'en',
+                'edit': 0,
+            }
+            self.assertEqual(Page.objects.all().count(), 1)
+            response = self.client.post(
+                self.get_admin_url(PageContent, 'add'),
+                data=page_data,
+            )
+            redirect_url = self.get_admin_url(PageContent, 'changelist') + "?language=en"
+            self.assertRedirects(response, redirect_url)
+            self.assertEqual(Page.objects.all().count(), 2)
 
 class PermissionsTestCase(PageTestBase):
 
@@ -2912,7 +2958,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        source_translation = self.get_page_title_obj(page, 'en')
+        source_translation = self.get_pagecontent_obj(page, 'en')
         target_translation = self._add_translation_to_page(page)
         endpoint = self.get_admin_url(PageContent, 'copy_language', source_translation.pk)
         plugins = [
@@ -4320,7 +4366,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        source_translation = self.get_page_title_obj(page, 'en')
+        source_translation = self.get_pagecontent_obj(page, 'en')
         target_translation = self._add_translation_to_page(page)
         endpoint = self.get_admin_url(PageContent, 'copy_language', source_translation.pk)
         plugins = [
