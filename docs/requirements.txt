@@ -153,7 +153,7 @@ sphinxcontrib-spelling==7.6.2
     # via -r requirements.in
 sphinxext-opengraph==0.7.5
     # via -r requirements.in
-sqlparse==0.4.3
+sqlparse==0.5.0
     # via django
 tabulate==0.9.0
     # via docstrfmt
