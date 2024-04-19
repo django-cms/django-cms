@@ -30,6 +30,28 @@ def get_plugin_model(plugin_type: str) -> CMSPlugin:
 
 
 def get_plugins(request, placeholder, template, lang=None):
+    """
+    Get a list of plugins for a placeholder in a specified template. Respects the placeholder's cache.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        placeholder (Placeholder): The placeholder object for which to retrieve plugins.
+        template (Template): The template object in which the placeholder resides (not used).
+        lang (str, optional): The language code for localization. Defaults to None.
+
+    Returns:
+        list: A list of plugins for the specified placeholder in the template.
+
+    Raises:
+        None.
+
+    Examples:
+        # Get plugins for a placeholder in a template
+        plugins = get_plugins(request, placeholder, template)
+
+        # Get plugins for a placeholder in a template with specific language
+        plugins = get_plugins(request, placeholder, template, lang='en')
+    """
     if not placeholder:
         return []
     if not hasattr(placeholder, '_plugins_cache'):
@@ -42,6 +64,23 @@ def assign_plugins(request, placeholders, template=None, lang=None):
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
     per type.
+
+    :param request: The current request.
+    :param placeholders: An iterable of placeholder objects.
+    :param template: (optional) The template object.
+    :param lang: (optional) The language code.
+
+    This method assigns plugins to the given placeholders. It retrieves the plugins from the database based on the
+    placeholders and the language. The plugins are then downcasted to their specific plugin types.
+
+    The plugins are split up by placeholder and stored in a dictionary where the key is the placeholder ID and the
+    value is a list of plugins.
+
+    For each placeholder, if there are plugins assigned to it, the plugins are organized as a layered tree structure.
+    Otherwise, an empty list is assigned.
+
+    The list of all plugins for each placeholder is stored in the `_all_plugins_cache` attribute of the placeholder,
+    while the list of root plugins is stored in the `_plugins_cache` attribute
     """
     if not placeholders:
         return
