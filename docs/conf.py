@@ -152,7 +152,7 @@ try:
     html_theme_options = {
         "navigation_with_keys": True,
     }
-except ImportError:
+except ImportError: 
     html_theme = 'default'
 
 
