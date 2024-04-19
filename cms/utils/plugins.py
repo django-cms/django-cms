@@ -33,11 +33,10 @@ def get_plugins(request, placeholder, template, lang=None):
     """
     Get a list of plugins for a placeholder in a specified template. Respects the placeholder's cache.
 
-    Args:
-        request (HttpRequest): The HTTP request object.
-        placeholder (Placeholder): The placeholder object for which to retrieve plugins.
-        template (Template): The template object in which the placeholder resides (not used).
-        lang (str, optional): The language code for localization. Defaults to None.
+    :param request: (HttpRequest) The HTTP request object.
+    :param placeholder: (Placeholder) The placeholder object for which to retrieve plugins.
+    :param template: (Template) The template object in which the placeholder resides (not used).
+    :param lang: (str, optional) The language code for localization. Defaults to None.
 
     Returns:
         list: A list of plugins for the specified placeholder in the template.
@@ -45,7 +44,8 @@ def get_plugins(request, placeholder, template, lang=None):
     Raises:
         None.
 
-    Examples:
+    Examples::
+
         # Get plugins for a placeholder in a template
         plugins = get_plugins(request, placeholder, template)
 
@@ -299,13 +299,13 @@ def get_bound_plugins(plugins):
     Finally, iterates over the plugins and yields the downcasted versions if they have a valid parent.
     Does not affect caching.
 
-    Parameters:
-    - plugins (list): List of Plugin instances.
+    :param plugins: (list) List of ``CMSPlugin`` instances.
 
     Yields:
-    - instance (Plugin): Downcasted Plugin instance.
+    - instance (``CMSPlugin`` sub-class): Downcasted Plugin instance.
 
-    Example:
+    Example::
+
         plugins = [plugin_instance1, plugin_instance2]
         for bound_plugin in get_bound_plugins(plugins):
             # Do something with the bound_plugin
