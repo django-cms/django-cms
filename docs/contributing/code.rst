@@ -107,7 +107,7 @@ coverage will only be accepted with a very good reason; bug-fixing patches
 **must** demonstrate the bug with a test to avoid regressions and to check
 that the fix works.
 
-We have a `Discord Server <https://discord.gg/qwS4Fbs7>`_ and of course the code reviews mechanism on GitHub - do use them.
+We have a `Discord Server <https://www.django-cms.org/discord>`_ and of course the code reviews mechanism on GitHub - do use them.
 
 
 .. _contributing_frontend:
