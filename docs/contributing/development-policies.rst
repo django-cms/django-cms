@@ -82,7 +82,7 @@ Example of retrospective approach.
 * ...
 * Unscheduled Releases -> e.g. bug fix -> 3.x.x
 
-Release management is managed on `Discord <https://www.django-cms.org/discord>`_ in the #technical-committee channel.
+Release management is managed on `Discord <https://www.django-cms.org/discord/tech-comm>`_ in the #technical-committee channel.
 For questions regarding the release process please join the channel and reach out. We're happy to help.
 
 Long-Term Support Release
