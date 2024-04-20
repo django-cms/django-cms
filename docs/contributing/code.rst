@@ -28,7 +28,7 @@ Basic requirements and standards
 ********************************
 
 If you're interested in developing a new feature for the CMS, it is recommended
-that you first discuss it on `Discord <https://discord.gg/qwS4Fbs7>`_ so as
+that you first discuss it on `Discord <https://www.django-cms.org/discord>`_ so as
 not to do any work that will not get merged in anyway.
 
 - Code will be reviewed and tested by at least one core developer, preferably
