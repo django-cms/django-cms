@@ -62,7 +62,7 @@ To create a proposal...
 1. please use this `DEP template <https://github.com/django/deps/blob/main/template.rst>`_
 2. create a discussion in the main `Github repository <https://github.com/django-cms/django-cms/discussions>`_
 3. discuss, discuss, discuss
-4. join the Tech Committee (`#technical-committee <https://www.django-cms.org/discord>`_) and make the team aware of your proposal after the proposal has been reviewed by the Technical Committee, it is put to a vote at one of the weekly meetings of the technical committee
+4. join the Tech Committee (`#technical-committee <https://www.django-cms.org/discord/tech-comm>`_) and make the team aware of your proposal after the proposal has been reviewed by the Technical Committee, it is put to a vote at one of the weekly meetings of the technical committee
 
 
 ****************
