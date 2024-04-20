@@ -17,7 +17,7 @@ Here's what the contribution process looks like in brief:
 #. Fork our `GitHub`_ repository, https://github.com/django-cms/django-cms
 #. Work locally and push your changes to your repository.
 #. When you feel your code is good enough for inclusion, send us a pull request.
-#. After that, please join our Discord server (`#contributors <https://discord.gg/mwRxJSBP>`_). This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
+#. After that, please join our Discord server (`#contributors <https://www.django-cms.org/discord>`_). This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
 #. Get acknowledged by the django CMS community for your contribution
 
 See the :ref:`contributing_patch` how-to document for a walk-through of this process.
