@@ -34,7 +34,7 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
-from django.utils.translation import gettext, gettext_lazy as _
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
 from cms import operations
@@ -279,7 +279,7 @@ class PageAdmin(admin.ModelAdmin):
             raise self._get_404_exception(object_id)
 
         if not page.is_potential_home():
-            return HttpResponseBadRequest(gettext("The page is not eligible to be home."))
+            return HttpResponseBadRequest(_("The page is not eligible to be home."))
 
         new_home_tree, old_home_tree = page.set_as_homepage(request.user)
 
@@ -597,7 +597,7 @@ class PageAdmin(admin.ModelAdmin):
 
         # Does the user have permissions to do this...?
         if not can_move_page or (target and not target.has_add_permission(user)):
-            message = gettext(
+            message = _(
                 "Error! You don't have permissions to move this page. Please reload the page"
             )
             return jsonify_request(HttpResponseForbidden(message))
@@ -706,14 +706,14 @@ class PageAdmin(admin.ModelAdmin):
             can_copy_page = page_permissions.user_can_add_page(user, site)
 
         if not can_copy_page:
-            message = gettext("Error! You don't have permissions to copy this page.")
+            message = _("Error! You don't have permissions to copy this page.")
             return jsonify_request(HttpResponseForbidden(message))
 
         page_languages = page.get_languages()
         site_languages = get_language_list(site_id=site.pk)
 
         if not any(lang in page_languages for lang in site_languages):
-            message = gettext(
+            message = _(
                 "Error! "
                 "The page you're pasting is not translated in any of the languages configured by the target site."
             )
@@ -727,7 +727,7 @@ class PageAdmin(admin.ModelAdmin):
         translation = page.get_content_obj(language, fallback=False)
 
         if not self.has_change_permission(request, obj=page):
-            return HttpResponseForbidden(gettext("You do not have permission to edit this page"))
+            return HttpResponseForbidden(_("You do not have permission to edit this page"))
 
         if page is None:
             raise self._get_404_exception(page_id)
@@ -1182,12 +1182,12 @@ class PageContentAdmin(admin.ModelAdmin):
         to_template = request.POST.get("template", None)
 
         if to_template not in dict(get_cms_setting('TEMPLATES')):
-            return HttpResponseBadRequest(gettext("Template not valid"))
+            return HttpResponseBadRequest(_("Template not valid"))
 
         page_content.template = to_template
         page_content.save()
 
-        return HttpResponse(gettext("The template was successfully changed"))
+        return HttpResponse(_("The template was successfully changed"))
 
     @require_POST
     @transaction.atomic
@@ -1204,7 +1204,7 @@ class PageContentAdmin(admin.ModelAdmin):
         page = source_page_content.page
 
         if not target_language or target_language not in get_language_list(site_id=page.node.site_id):
-            return HttpResponseBadRequest(gettext("Language must be set to a supported language!"))
+            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
 
         target_page_content = page.get_content_obj(target_language, fallback=False)
 
@@ -1214,7 +1214,7 @@ class PageContentAdmin(admin.ModelAdmin):
             plugins = placeholder.get_plugins_list(source_page_content.language)
 
             if not target.has_add_plugins_permission(request.user, plugins):
-                return HttpResponseForbidden(gettext("You do not have permission to copy these plugins."))
+                return HttpResponseForbidden(_("You do not have permission to copy these plugins."))
             copy_plugins_to_placeholder(plugins, target, language=target_language)
         return HttpResponse("ok")
 
@@ -1227,7 +1227,7 @@ class PageContentAdmin(admin.ModelAdmin):
         request_language = get_site_language_from_request(request, site_id=page.node.site_id)
 
         if not self.has_delete_translation_permission(request, language, page):
-            return HttpResponseForbidden(gettext("You do not have permission to delete this page"))
+            return HttpResponseForbidden(_("You do not have permission to delete this page"))
 
         if page is None:
             raise self._get_404_exception(object_id)
@@ -1342,7 +1342,7 @@ class PageContentAdmin(admin.ModelAdmin):
             else:
                 # Only this page? Can be permissions or versioning, or ...
                 message = "You cannot change this page's navigation status"
-            return HttpResponseForbidden(gettext(message))
+            return HttpResponseForbidden(_(message))
 
         if page_content is None:
             raise self._get_404_exception(object_id)
