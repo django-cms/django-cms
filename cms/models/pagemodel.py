@@ -198,6 +198,7 @@ class Page(models.Model):
         super().__init__(*args, **kwargs)
         self.urls_cache = {}
         self.page_content_cache = {}
+        self.fallback_languages_cache = {}
 
     def __str__(self):
         try:
@@ -763,7 +764,11 @@ class Page(models.Model):
         return page_urls.update(**data)
 
     def get_fallbacks(self, language):
-        return i18n.get_fallback_languages(language, site_id=self.node.site_id)
+        fallbacks = self.fallback_languages_cache.get(language)
+        if fallbacks is None:
+            fallbacks = i18n.get_fallback_languages(language, site_id=self.node.site_id)
+            self.fallback_languages_cache[language] = fallbacks
+        return fallbacks
 
     # ## PageContent object access
 
@@ -802,7 +807,7 @@ class Page(models.Model):
 
         if language not in self.urls_cache:
             self.urls_cache.update({
-                url.language: url for url in self.urls.filter(language__in=languages)  # TODO: overwrites multiple urls
+                url.language: url for url in self.urls.all() if url.language in languages  # TODO: overwrites multiple urls
             })
 
             for _language in languages:
