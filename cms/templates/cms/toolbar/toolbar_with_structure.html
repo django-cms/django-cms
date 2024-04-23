@@ -34,13 +34,10 @@
         {% include 'cms/toolbar/clipboard.html' with clipboard_plugin=cms_toolbar.clipboard_plugin %}
     {% endif %}
 
-    <!-- TODO: Remove lang and dir once RTL support is added to toolbar -->
     <div 
         class="cms-modal" 
         tabindex="-1" 
         data-touch-action="none"
-        lang="{{ LANGUAGE_CODE|default:"en-us" }}" 
-        dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}"
     >
         <div class="cms-modal-head" data-touch-action="none">
             <span class="cms-modal-title" data-touch-action="none">
