@@ -53,13 +53,13 @@
         .cms-modal-title {
             // set correct cursor when maximized #3111
             cursor: default;
-            padding-right: $modal-header-button-area-size * 3;
+            padding-inline-end: $modal-header-button-area-size * 3;
         }
         .cms-modal-title-suffix {
             display: none;
         }
         .cms-modal-minimize {
-            right: $modal-header-button-area-size + $padding-base;
+            inset-inline-end: $modal-header-button-area-size + $padding-base;
         }
     }
 }
@@ -140,10 +140,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-right: $modal-header-button-area-size * 3 + $padding-normal;
+    margin-inline-end: $modal-header-button-area-size * 3 + $padding-normal;
     .cms-modal-title-suffix {
         font-weight: normal;
-        padding-left: $padding-normal;
+        padding-inline-start: $padding-normal;
     }
 }
 
@@ -154,7 +154,7 @@
     position: absolute;
     top: 50%;
     margin-top: math.div(-$modal-header-button-area-size, 2);
-    right: $padding-normal;
+    inset-inline-end: $padding-normal;
     color: $gray-light;
     text-align: center;
     width: $modal-header-button-area-size;
@@ -169,7 +169,7 @@
     }
 }
 .cms-modal-minimize {
-    right: 2 * $modal-header-button-area-size + $padding-normal;
+    inset-inline-end: 2 * $modal-header-button-area-size + $padding-normal;
     .cms-modal-minimized & {
         @include icon(plus);
         color: $color-primary;
@@ -180,7 +180,7 @@
     }
 }
 .cms-modal-maximize {
-    right: $modal-header-button-area-size + $padding-normal;
+    inset-inline-end: $modal-header-button-area-size + $padding-normal;
     // ensure maximize element is hidden #3111
     .cms-modal-minimized & {
         display: none !important;
@@ -249,13 +249,14 @@
     right: 0;
     left: 0;
     z-index: z(modal, buttons);
-    padding: 0 $modal-resize-size 0 $padding-normal;
+    padding-block: 0;
+    padding-inline: $padding-normal $modal-resize-size;
 }
 .cms-modal-item-buttons {
     $margin: math.div($toolbar-height - $toolbar-button-height, 2);
     @extend .cms-toolbar-item-buttons;
     float: right;
-    margin-left: $margin;
+    margin-inline-start: $margin;
 
     .cancel-link {
         display: none;
