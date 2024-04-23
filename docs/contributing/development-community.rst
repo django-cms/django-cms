@@ -69,19 +69,15 @@ But before you start getting your hands dirty, you should make sure to join us o
 order to stay updated with the latest news and to connect with other users across the
 world.
 
-You can join us online:
+You can join us online through our `support channels <https://www.django-cms.org/support/>`_
 
-- in our `django CMS Slack channel <https://www.django-cms.org/slack>`_
-- on `StackOverflow <https://stackoverflow.com/questions/tagged/django-cms>`_
-
-You should make sure to join our Slack workspace. It is our main communication platform.
-Users from all over the world use Slack to talk about django CMS and to support each
+You should make sure to join our Discord server. It is our main communication platform.
+Users from all over the world use Discord to talk about django CMS and to support each
 other in answering support requests. StackOverflow is a very popular, community-based
 space to find and contribute answers to technical challenges
 
 You can also follow:
 
-- the `@djangocms <https://twitter.com/djangocms>`_ Twitter account for general
-  announcements
+- the `django CMS Youtube account <https://www.youtube.com/c/djangocms>`_
 - the `django CMS Association LinkedIn
   <https://www.linkedin.com/company/django-cms-association>`_ account
