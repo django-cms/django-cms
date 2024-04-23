@@ -58,32 +58,32 @@ class FileOutputWrapper:
         return colorize(msg, opts=opts, **kwargs)
 
     def write_line(self, message=''):
-        self.write(u'%s\n' % message)
+        self.write('%s\n' % message)
 
     def write(self, message):
         self.stdout.write(message)
 
     def write_stderr_line(self, message=''):
-        self.write_stderr(u'%s\n' % message)
+        self.write_stderr('%s\n' % message)
 
     def write_stderr(self, message):
         self.stderr.write(message)
 
     def success(self, message):
         self.successes += 1
-        self.write_line(u'%s %s' % (message, self.colorize('[OK]', fg='green', opts=['bold'])))
+        self.write_line('%s %s' % (message, self.colorize('[OK]', fg='green', opts=['bold'])))
 
     def error(self, message):
         self.errors += 1
-        self.write_stderr_line(u'%s %s' % (message, self.colorize('[ERROR]', fg='red', opts=['bold'])))
+        self.write_stderr_line('%s %s' % (message, self.colorize('[ERROR]', fg='red', opts=['bold'])))
 
     def warn(self, message):
         self.warnings += 1
-        self.write_stderr_line(u'%s %s' % (message, self.colorize('[WARNING]', fg='yellow', opts=['bold'])))
+        self.write_stderr_line('%s %s' % (message, self.colorize('[WARNING]', fg='yellow', opts=['bold'])))
 
     def skip(self, message):
         self.skips += 1
-        self.write_line(u'%s %s' % (message, self.colorize('[SKIP]', fg='blue', opts=['bold'])))
+        self.write_line('%s %s' % (message, self.colorize('[SKIP]', fg='blue', opts=['bold'])))
 
     @method_decorator(contextmanager)
     def section(self, title):
@@ -126,10 +126,10 @@ class FileSectionWrapper(FileOutputWrapper):
         self.wrapper = wrapper
 
     def write_line(self, message=''):
-        self.write(u'  - %s\n' % message)
+        self.write('  - %s\n' % message)
 
     def write_stderr_line(self, message=''):
-        self.write_stderr(u'  - %s\n' % message)
+        self.write_stderr('  - %s\n' % message)
 
     def finish_success(self, message):
         self.wrapper.write_line()
@@ -232,13 +232,11 @@ def check_middlewares(output):
             'cms.middleware.toolbar.ToolbarMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
         )
-        if getattr(settings, 'MIDDLEWARE', None):
-            middlewares = settings.MIDDLEWARE
-        else:
-            middlewares = settings.MIDDLEWARE_CLASSES
+        middlewares = getattr(settings, 'MIDDLEWARE', [])
+
         for middleware in required_middlewares:
             if middleware not in middlewares:
-                section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
+                section.error("%s middleware must be in MIDDLEWARE" % middleware)
 
 
 @define_check

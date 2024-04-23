@@ -107,7 +107,7 @@
         left: 0;
         font-size: $font-size-normal;
         line-height: $line-height-normal;
-        padding-left: $border-radius-normal + 2px;
+        padding-inline-start: $border-radius-normal + 2px;
         border-radius: $border-radius-base;
 
         .cms-dragbar-title {
@@ -121,16 +121,16 @@
             font-weight: bold;
             line-height: $structure-dragbar-height;
             height: $structure-dragbar-height;
-            margin-right: $submenu-icon-area-size * 2 + 25px;
+            margin-inline-end: $submenu-icon-area-size * 2 + 25px;
         }
         .cms-dragbar-toggler {
             position: absolute;
-            right: 0;
+            inset-inline-end: 0;
             background-image: linear-gradient(to right, rgba($structure-bgcolor, 0) 0, $structure-bgcolor 40px);
-            padding-left: 50px;
+            padding-inline-start: 50px;
             font-weight: normal;
             text-transform: uppercase;
-            margin-left: 30px;
+            margin-inline-start: 30px;
             cursor: pointer;
             a {
                 color: $btn-default-color !important;
@@ -185,7 +185,7 @@
         display: none !important;
     }
     .cms-draggables .cms-draggables {
-        padding-left: $structure-draggable-inner-padding;
+        padding-inline-start: $structure-draggable-inner-padding;
     }
     .cms-dragarea-empty .cms-draggables-root {
         position: relative;
@@ -234,11 +234,11 @@
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
-            margin-right: $submenu-icon-area-size * 3 + $submenu-right * 4;
+            margin-inline-end: $submenu-icon-area-size * 3 + $submenu-right * 4;
             padding: $structure-dragarea-padding $structure-dragarea-padding-horizontal;
         }
         .cms-dragitem-collapsable .cms-dragitem-text {
-            padding-left: $structure-dragitem-icon-space;
+            padding-inline-start: $structure-dragitem-icon-space;
         }
     }
 
@@ -288,7 +288,7 @@
             z-index: z(structure, content, empty, empty);
             color: $gray;
             line-height: 44px;
-            padding-left: 20px;
+            padding-inline-start: 20px;
         }
         > .cms-draggables-root > .cms-add-plugin-placeholder {
             position: absolute;
@@ -323,14 +323,14 @@
                 display: none;
             }
             .cms-dragitem-text {
-                padding-left: $structure-dragarea-padding-horizontal;
+                padding-inline-start: $structure-dragarea-padding-horizontal;
             }
         }
         .cms-dragitem-text {
-            margin-right: 0;
+            margin-inline-end: 0;
         }
         &.cms-draggable-from-clipboard .cms-dragitem-text {
-            margin-right: $padding-large;
+            margin-inline-end: $padding-large;
         }
         &.cms-draggable-disabled > .cms-draggable {
             display: none !important;
@@ -364,11 +364,11 @@
             @extend %icon;
             position: absolute;
             top: 50%;
-            left: $structure-dragitem-icon-space - $structure-dragarea-padding-horizontal - 10px;
+            inset-inline-start: $structure-dragitem-icon-space - $structure-dragarea-padding-horizontal - 10px;
             color: $submenu-icon-color;
             font-size: $structure-dragitem-icon-size;
             margin-top: math.div(-$structure-dragitem-icon-size, 2);
-            margin-left: $structure-dragarea-padding-horizontal - 10px;
+            margin-inline-start: $structure-dragarea-padding-horizontal - 10px;
             cursor: pointer;
             transform: rotate(180deg);
         }
@@ -426,8 +426,8 @@
         }
 
         .cms-draggable {
-            margin-left: $structure-draggable-inner-padding !important;
-            margin-left: 15px;
+            margin-inline-start: $structure-draggable-inner-padding !important;
+            margin-inline-start: 15px;
             .cms-dragitem {
                 background-image: none;
                 &:hover {
@@ -456,7 +456,7 @@
             color: $submenu-icon-color;
             font-size: $submenu-icon-size;
             margin-top: -(math.div($submenu-icon-size, 2));
-            margin-left: -(math.div($submenu-icon-size, 2));        }
+            margin-inline-start: -(math.div($submenu-icon-size, 2));        }
     }
 
     // end of dragarea
@@ -467,19 +467,18 @@
 
     &.cms-structure-condensed {
         width: 416px;
-        right: 0;
+        left: 0;
         box-shadow: 0 0 5px 0 rgba(0,0,0,.2);
         .cms-structure-content {
-            padding-left: 15px;
-            padding-right: 15px;
+            padding-inline: 15px;
             overflow-x: hidden;
         }
         .cms-draggables .cms-draggables {
-            padding-left: 15px;
+            padding-inline-start: 15px;
         }
         .cms-draggable-disabled {
             .cms-draggable {
-                margin-left: 15px !important;
+                margin-inline-start: 15px !important;
             }
         }
 
@@ -490,8 +489,8 @@
         .cms-dragitem-text {
             padding-top: 8px;
             padding-bottom: 8px;
-            margin-right: 110px;
-            padding-right: 5px;
+            margin-inline-end: 110px;
+            padding-inline-end: 5px;
         }
         .cms-dragarea-empty .cms-draggables-root {
             min-height: 43px;
@@ -511,10 +510,10 @@
             margin-top: -16px;
         }
         .cms-submenu-add {
-            right: 39px;
+            inset-inline-end: 39px;
         }
         .cms-submenu-edit {
-            right: 39px + 32px + 4px;
+            inset-inline-end: 39px + 32px + 4px;
         }
         .cms-submenu-dropdown-settings .cms-submenu-item a {
             &,
@@ -528,7 +527,7 @@
             padding: 0;
         }
         .cms-dragbar-title {
-            margin-right: $submenu-icon-area-size * 2 + 10px;
+            margin-inline-end: $submenu-icon-area-size * 2 + 10px;
         }
         .cms-draggable-stack {
             height: $structure-dragitem-fullheight - 6px !important;

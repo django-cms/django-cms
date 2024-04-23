@@ -72,7 +72,6 @@ folder (i.e. ``cd ~/Projects``), then
     git clone git@github.com:django-cms/django-cms-quickstart.git
 
     cd django-cms-quickstart
-    git switch -t origin/support/cms-4.1.x
     docker compose build web
     docker compose up -d database_default
     docker compose run web python manage.py migrate
@@ -224,11 +223,12 @@ template. It performs the following five steps in one simple go:
    - `djangocms_admin_style <https://github.com/django-cms/djangocms-admin-style>`_ for
      a consistent user experience with django CMS and Django admin.
 
-3. It runs the ``migrate`` command to create the database:
+3. It changes into the project directory and runs the ``migrate`` command to create the 
+   database:
 
    .. code-block::
 
-       python -m manage migrate.
+       python -m manage migrate
 
 4. It prompts for crating a superuser by invoking:
 
@@ -273,10 +273,12 @@ We suggest to use pip-compile to freeze your requirements as, for example, discu
 Spin up your Django development server (Step 3)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Now you are ready to spin up Django's development server by running:
+Now you are ready to spin up Django's development server by first changing directory into 
+the project folder and then spinning up the development server:
 
 .. code-block::
 
+    cd myproject
     python -m manage runserver
 
 You can visit your project's web site by pointing your browser to ``localhost:8000``.
@@ -530,11 +532,8 @@ We highly recommend installing them both:
 
 .. code-block::
 
-    pip install git+https://github.com/django-cms/djangocms-versioning
-    pip install git+https://github.com/django-cms/djangocms-alias
-
-(We expect to release versions of both in pypi to allow a simpler installation using pip
-by the time django CMS v4.1 is released.)
+    pip install djangocms-versioning
+    pip install djangocms-alias
 
 Also add them to ``INSTALLED_APPS``:
 
@@ -839,7 +838,7 @@ Then run migrations:
 
 .. code-block::
 
-    python manage.py migrate.
+    python manage.py migrate
 
 These and other plugins are described in more detail in :ref:`commonly-used-plugins`.
 

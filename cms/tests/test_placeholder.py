@@ -542,7 +542,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         ###
         # add the test plugin
         ###
-        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
         endpoint = self.get_change_plugin_uri(test_plugin)
         response = self.client.post(endpoint, {})
@@ -559,7 +559,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         ###
         # add the test plugin
         ###
-        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
 
         endpoint = self.get_change_plugin_uri(test_plugin)
@@ -788,7 +788,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # add the test plugin
         ###
         for lang in avail_langs:
-            add_plugin(ex.placeholder, u"EmptyPlugin", lang)
+            add_plugin(ex.placeholder, "EmptyPlugin", lang)
         # reload instance from database
         ex = Example1.objects.get(pk=ex.pk)
         # get languages
@@ -811,7 +811,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # add the test plugin
         ###
         for lang in avail_langs:
-            add_plugin(placeholder, u"EmptyPlugin", lang)
+            add_plugin(placeholder, "EmptyPlugin", lang)
         # reload placeholder from database
         placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         # get languages
@@ -879,7 +879,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         page = create_page('test page en', 'col_two.html', 'en')
 
         # check for en
-        page_content_en = self.get_page_title_obj(page)
+        page_content_en = self.get_pagecontent_obj(page)
         self.assertQuerySetEqual(
             Placeholder.objects.get_for_obj(page_content_en),
             page_content_en.get_placeholders(),
@@ -906,8 +906,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         with self.login_user_context(self.get_superuser()):
             new_page = self.copy_page(page, page, position=1)
 
-        page_content = self.get_page_title_obj(page)
-        new_page_content = self.get_page_title_obj(new_page)
+        page_content = self.get_pagecontent_obj(page)
+        new_page_content = self.get_pagecontent_obj(new_page)
         page_content_plhs = Placeholder.objects.get_for_obj(page_content)
         new_page_content_plhs = Placeholder.objects.get_for_obj(new_page_content)
         self.assertEqual(page_content_plhs.count(), new_page_content_plhs.count())
@@ -1163,8 +1163,8 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         self.assertIn("slot=''", repr(unsaved_ph))
 
         saved_ph = Placeholder.objects.create(slot='test')
-        self.assertIn('id={}'.format(saved_ph.pk), repr(saved_ph))
-        self.assertIn("slot='{}'".format(saved_ph.slot), repr(saved_ph))
+        self.assertIn(f'id={saved_ph.pk}', repr(saved_ph))
+        self.assertIn(f"slot='{saved_ph.slot}'", repr(saved_ph))
 
 
 class PlaceholderConfTests(TestCase):

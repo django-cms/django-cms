@@ -6,7 +6,7 @@
 // handled through theming after the "PAGETREE THEME" section in this file.
 
 .cms-admin-sideframe:not(.djangocms-admin-style) {
-    margin-top: $toolbar-height;
+    margin-block-start: $toolbar-height;
 }
 
 // HELPERS
@@ -15,7 +15,8 @@
     line-height: $toolbar-button-height + 2px;
     height: $toolbar-button-height + 2px;
     font-size: $toolbar-button-font-size;
-    padding: 0 $toolbar-button-padding-horizontal + 10px;
+    padding-block: 0;
+    padding-inline: $toolbar-button-padding-horizontal + 10px;
 }
 
 .cms-hidden,
@@ -82,10 +83,10 @@
         position: relative;
         &:before {
             position: absolute;
-            left: 50%;
-            top: 50%;
-            margin-top: -8px;
-            margin-left: -8px;
+            inset-inline-start: 50%;
+            inset-block-start: 50%;
+            margin-block-start: -8px;
+            margin-inline-start: -8px;
         }
     }
     .cms-btn.cms-btn-no-border {
@@ -106,28 +107,30 @@
     box-sizing: border-box;
     z-index: z(pagetree, header);
     min-height: $pagetree-header-height;
-    padding: $pagetree-header-padding;
+    padding-block: $pagetree-header-padding-block;
+    padding-inline: $pagetree-header-padding-inline;
     box-shadow: none;
-    border-bottom: none;
+    border-block-end: none;
     background: $pagetree-header-background;
     &:before {
         content: "";
         position: absolute;
-        bottom: -6px;
-        left: 0;
-        right: 0;
+        inset-block-end:  -6px;
+        inset-inline-start:0;
+        inset-inline-end: 0;
         height: 5px;
         background-color: $white;
     }
     + .module {
-        padding-top: 0 !important;
+        padding-block-start: 0 !important;
     }
     .djangocms-admin-style & {
-        margin: -40px 0 0 0;
+        margin-block: -40px 0;
+        margin-inline: 0;
     }
 }
 .djangocms-admin-style.cms-admin-sideframe .cms-pagetree-header {
-    margin-top: -25px;
+    margin-block-start: -25px;
 }
 
 .cms-pagetree-header-title {
@@ -176,8 +179,8 @@
 }
 .cms-pagetree-header-body {
     @media (max-width: $pagetree-mobile) {
-        text-align: right;
-        padding-top: 10px;
+        text-align: end;
+        padding-block-start: 10px;
     }
 }
 .cms-pagetree-search-container {
@@ -188,11 +191,11 @@
 // SEARCH
 .cms-pagetree-header-search {
     position: absolute;
-    top: 0;
+    inset-block-start: 0;
     display: table;
     width: 100%;
-    left: 0;
-    right: 0;
+    inset-inline-start:0;
+    inset-inline-end: 0;
     padding: 0;
     box-shadow: none;
     background: none;
@@ -205,7 +208,8 @@
         position: relative;
         outline: none;
         color: $white !important;
-        padding: 8px 10px !important;
+        padding-block: 8px !important;
+        padding-inline: 10px !important;
         border: none !important;
         background: $color-primary !important;
         height: 36px;
@@ -224,7 +228,7 @@
         position: relative;
         display: table-cell;
         width: 100%;
-        padding-right: 5px;
+        padding-inline-end: 5px;
         vertical-align: middle;
         input {
             width: 100%;
@@ -234,25 +238,26 @@
             height: 36px;
             padding: 6px;
             line-height: 24px;
-            padding-right: 35px !important;
+            padding-inline-end: 35px !important;
             transition: width $speed-base;
         }
     }
 
     .cms-pagetree-header-filter-active & {
-        left: 0;
-        right: 0;
-        top: 0;
+        inset-inline-start:0;
+        inset-inline-end: 0;
+        inset-block-start: 0;
     }
 
     .djangocms-admin-style & {
-        margin: 5px 0 10px;
+        margin-block: 5px 10px;
+        margin-inline: 0;
     }
 }
 .cms-pagetree-header-filter-trigger {
     position: absolute;
-    right: 5px;
-    top: 0;
+    inset-inline-end: 5px;
+    inset-block-start: 0;
     cursor: pointer;
     padding: 10px;
     transform: rotate(270deg);
@@ -270,10 +275,11 @@
     display: none;
     overflow: auto;
     position: absolute;
-    left: 0;
-    top: 38px;
+    inset-inline-start:0;
+    inset-block-start: 38px;
     width: 100%;
-    padding: 5px 20px 15px;
+    padding-block: 5px 15px;
+    padding-inline: 20px;
     max-height: $pagetree-header-filter-height;
     box-shadow: $pagetree-box-shadow;
     box-sizing: border-box;
@@ -285,12 +291,14 @@
         font-size: 14px;
         font-weight: normal;
         text-transform: uppercase;
-        padding: 10px 0 0 0;
+        padding-block: 10px 0;
+        padding-inline: 0;
     }
     ul,
     li {
         list-style-type: none;
-        padding: 2px 0;
+        padding-block: 2px;
+        padding-inline: 0;
         margin: 0;
     }
     // color states
@@ -304,8 +312,8 @@
 }
 .cms-pagetree-header-search-close {
     position: absolute;
-    right: 0;
-    top: 0;
+    inset-inline-end: 0;
+    inset-block-start: 0;
     padding: 10px;
     &:hover .cms-icon,
     &:active .cms-icon,
@@ -319,17 +327,18 @@
 }
 .cms-pagetree-header-search-reset {
     font-size: 90%;
-    padding: 0 $pagetree-header-space;
+    padding-block: 0;
+    padding-inline: $pagetree-header-space;
 }
 
 // DROPDOWN
 .cms-pagetree-sites-list {
     display: inline-block;
     vertical-align: top;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin-left: $pagetree-header-space;
-    margin-right: $pagetree-header-space;
+    padding-inline-start: 10px;
+    padding-inline-end: 10px;
+    margin-inline-start: $pagetree-header-space;
+    margin-inline-end: $pagetree-header-space;
 
     .cms-pagetree-dropdown-trigger {
         display: inline-block;
@@ -339,8 +348,8 @@
     }
 
     .cms-pagetree-dropdown-menu {
-        right: 50%;
-        margin-right: math.div(-$pagetree-header-height, 2) - 1px !important;
+        inset-inline-end: 50%;
+        margin-inline-end: math.div(-$pagetree-header-height, 2) - 1px !important;
     }
 }
 
@@ -353,7 +362,7 @@
 
 // BREADCRUMB
 .djangocms-admin-style .cms-pagetree-breadcrumbs {
-    margin-bottom: -30px !important;
+    margin-block-end: -30px !important;
     border: none !important;
 }
 
@@ -364,9 +373,10 @@
     position: relative;
     z-index: z(pagetree, section);
     min-height: $pagetree-section-height;
-    padding: $pagetree-section-padding;
+    padding-block: $pagetree-section-padding-block;
+    padding-inline: $pagetree-section-padding-inline;
     box-shadow: none;
-    border-bottom: none;
+    border-block-end: none;
     background: $white;
     h2,
     p {
@@ -379,9 +389,14 @@
         font-weight: bold;
         color: $gray-darkest;
         background: none;
+
+        [dir=rtl] & {
+            // inline-start & inline-end are not widely supported
+            float: right;
+        }
     }
     .cms-pagetree-container + & {
-        margin-top: -1px;
+        margin-block-start: -1px;
     }
 }
 
@@ -392,28 +407,30 @@
 
     select {
         width: 120px !important;
-        margin-left: 15px;
+        margin-inline-start: 15px;
     }
 }
 .cms-pagetree-section-condensed {
-    padding: $pagetree-section-padding-condensed;
+    padding-block: $pagetree-section-padding-condensed-block;
+    padding-inline: $pagetree-section-padding-condensed-inline;
 }
 .cms-pagetree-section-nav {
     position: absolute;
-    right: 4px;
-    top: 50%;
-    margin-top: math.div(-($pagetree-cell-inner-height + 6px), 2);
+    inset-inline-end: 4px;
+    inset-block-start: 50%;
+    margin-block-start: math.div(-($pagetree-cell-inner-height + 6px), 2);
 
     .cms-pagetree-dropdown-menu {
-        right: 40px;
-        top: -2px;
+        inset-inline-end: 40px;
+        inset-block-start: -2px;
         width: 205px;
     }
 }
 
 .cms-pagetree-dropdown-separator {
     padding: 0;
-    margin: 4px 1px !important;
+    margin-block: 4px !important;
+    margin-inline: 1px !important;
     line-height: 1;
     height: 1px;
     background: $gray-lighter;
@@ -426,18 +443,23 @@
     position: relative;
     z-index: z(pagetree, tree);
     border: 1px solid $gray-lighter;
-    border-bottom: none;
+    border-block-end: none;
 }
 
 .cms-tree-col {
     float: right;
     min-width: $pagetree-cell-inner-height;
     height: $pagetree-cell-inner-height;
+
+    [dir=rtl] & {
+        // inline-start & inline-end are not widely supported
+        float: left;
+    }
 }
 .cms-tree-col-padding-sm {
-    margin-top: -3px;
-    margin-left: -4px;
-    margin-right: -4px;
+    margin-block-start: -3px;
+    margin-inline-start: -4px;
+    margin-inline-start: -4px;
     height: $pagetree-cell-inner-height + 6px;
 }
 
@@ -447,7 +469,7 @@
     text-align: center;
     height: $pagetree-cell-inner-height;
     & + .cms-tree-item {
-        padding-left: 4px;
+        padding-inline-start: 4px;
     }
 
 }
@@ -478,22 +500,27 @@
 
 .cms-tree-reload {
     float: right;
+
+    [dir=rtl] & {
+        // inline-start & inline-end are not widely supported
+        float: left;
+    }
 }
 
 .cms-tree-item-lang .cms-pagetree-dropdown-menu {
-    right: 32px;
-    top: -5px;
+    inset-inline-end: 32px;
+    inset-block-start: -5px;
     min-width: 180px;
 }
 .cms-tree-item-button .cms-pagetree-dropdown-menu {
-    right: 40px;
-    top: -2px;
+    inset-inline-end: 40px;
+    inset-block-start: -2px;
     width: 205px;
 }
 .cms-tree-item-button .cms-hover-tooltip {
     &:before,
     &:after {
-        bottom: math.div($pagetree-cell-inner-height, 2) + 7px;
+        inset-block-end: math.div($pagetree-cell-inner-height, 2) + 7px;
     }
 }
 .cms-pagetree-alt-mode .cms-tree-item-button .cms-icon-settings:not(.cms-btn-disabled)[data-url] {
@@ -623,18 +650,24 @@
 // searchform or filtering
 .cms-tree-search {
     float: left;
-    margin-right: 5px;
+    margin-inline-end: 5px;
+
+    [dir=rtl] & {
+        // inline-start & inline-end are not widely supported
+        float: right;
+    }
+
     label {
         display: none !important;
     }
     select {
         position: relative;
-        top: 2px;
+        inset-block-start: 2px;
         width: $pagetree-search-width !important;
     }
     // need to overwrite djangocms-admin-theme
     #toolbar form#changelist-search input[type="submit"] {
-        margin-left: 0 !important;
+        margin-inline-start: 0 !important;
     }
     #toolbar form#changelist-search #searchbar {
         width: $pagetree-search-width !important;
@@ -642,14 +675,20 @@
 }
 .cms-tree-filters {
     float: right;
+
+    [dir=rtl] & {
+        // inline-start & inline-end are not widely supported
+        float: left;
+    }
+
     .js-cms-tree-filter-trigger {
         position: absolute;
-        top: 0;
-        right: 0;
-        padding-right: 20px;
+        inset-block-start: 0;
+        inset-inline-end: 0;
+        padding-inline-end: 20px;
         line-height: 30px;
         width: 175px;
-        border-bottom: 1px solid $gray-lighter;
+        border-block-end: 1px solid $gray-lighter;
     }
     h2 {
         display: none;
@@ -661,10 +700,11 @@
 
 // searchform or filtering
 .cms-pagetree-empty {
-    padding: $pagetree-header-padding;
-    border-top: none;
+    padding-block: $pagetree-header-padding-block;
+    padding-inline: $pagetree-header-padding-inline;
+    border-block-start: none;
     .addlink {
-        padding-left: 0;
+        padding-inline-start: 0;
     }
 }
 
@@ -691,8 +731,8 @@
         opacity: 0.1 !important;
         + .jstree-grid-cell {
             height: $pagetree-cell-height + 1;
-            border-top: 1px solid $gray-lighter;
-            margin-top: -1px;
+            border-block-start: 1px solid $gray-lighter;
+            margin-block-start: -1px;
         }
     }
     .jstree-is-dragging-copy {
@@ -705,6 +745,8 @@
         padding: 0;
         margin: 0;
         // there are inline styles set to this part
+        // replacing this with margin-inline-start
+        // won't do the job!
         margin-left: 0 !important;
         border: none;
         background: none;
@@ -757,8 +799,9 @@
         font-size: $font-size-small;
         color: $gray;
         text-align: center;
-        padding: $pagetree-jstree-header-padding;
-        border-bottom: 1px solid $gray-lighter;
+        padding-block: $pagetree-jstree-header-padding-block;
+        padding-inline: $pagetree-jstree-header-padding-inline;
+        border-block-end: 1px solid $gray-lighter;
         background: $white;
     }
     .jstree-grid-header-fixed {
@@ -767,24 +810,33 @@
     }
     // ensure first line is not centered
     .jstree-grid-column-0 .jstree-grid-header {
-        text-align: left !important;
+        text-align: start !important;
     }
 
     //###########################################################
     // styles for nesting elements
     .jstree-children {
-        margin-left: $pagetree-nesting-padding;
+        margin-inline-start: $pagetree-nesting-padding;
     }
     .jstree-container-ul {
-        margin-left: -1px;
+        margin-inline-start: -1px;
     }
     .jstree-ocl {
-        float: left;
+        float: left; 
         position: relative;
-        left: $pagetree-nesting-padding;
+        inset-inline-start: $pagetree-nesting-padding;
         font-size: 12px;
         color: $gray-light;
-        padding: 18px 10px 10px 0;
+        padding-block-start: 18px;
+        padding-inline-end: 10px;
+        padding-block-end: 10px;
+        padding-inline-start: 0px;
+
+        [dir=rtl] & {
+            // inline-start & inline-end are not widely supported
+            float: right;
+        }
+
         @extend %icon;
         &:before {
             // can only apply transforms to non-inline elements
@@ -823,19 +875,26 @@
         // we need to add one pixel in to negate the negative margin
         // value to get the borders to work visually
         height: $pagetree-cell-height + 1;
-        padding: $pagetree-anchor-padding;
-        margin-top: -1px;
-        border: 1px solid $gray-lighter;
-        border-right: none;
+        padding-block: $pagetree-anchor-padding-block;
+        padding-inline: $pagetree-anchor-padding-inline;
+        margin-block-start: -1px;
+        border-block: 1px solid $gray-lighter;
+        border-inline: 1px solid $gray-lighter;
+        border-inline-end: none;
         background-color: $white;
         background-image: url('../../img/pagetree/tree-li-drag.gif');
         background-repeat: no-repeat;
-        background-position: -1px center;;
+        background-position: 2px center;
         image-rendering: pixelated;
         white-space: normal;
 
         &:hover {
             color: $gray !important;
+        }
+
+        [dir=rtl] & {
+            // no direct logical property for background-position
+            background-position: calc(100% - 2px) center;
         }
     }
 
@@ -848,7 +907,8 @@
     .jstree-closed,
     .jstree-loading {
         > .jstree-anchor {
-            padding: $pagetree-anchor-padding-with-icon;
+            padding-inline: $pagetree-anchor-padding-inline-with-icon;
+            padding-block: $pagetree-anchor-padding-block-with-icon;
         }
     }
 
@@ -858,7 +918,7 @@
     // style cells afterwards
     .jstree-grid-cell {
         height: $pagetree-cell-height;
-        border-bottom: 1px solid $gray-lighter;
+        border-block-end: 1px solid $gray-lighter;
         background: $white;
         > span {
             display: block;
@@ -872,12 +932,13 @@
     }
     .jstree-grid-cell-regular {
         text-align: center;
-        padding: $pagetree-cell-padding;
-        border-left: 1px solid $gray-lighter;
+        padding-block: $pagetree-cell-padding-block;
+        padding-inline: $pagetree-cell-padding-inline;
+        border-inline-start: 1px solid $gray-lighter;
     }
     .jstree-grid-cell-regular-options {
-        border-left: none;
-        text-align: right;
+        border-inline-start: none;
+        text-align: end;
     }
     // hover states
     .jstree-hovered,
@@ -887,10 +948,10 @@
 
     // special case for paste header
     .jstree-grid-column-1 .jstree-grid-header {
-        text-align: right;
+        text-align: end;
         a {
             font-size: $font-size-small;
-            top: 0;
+            inset-block-start: 0;
         }
         span {
             line-height: 1;
@@ -898,8 +959,8 @@
         // special icon for pasting
         .cms-icon {
             font-size: $font-size-small;
-            padding-right: $pagetree-icon-offset;
-            margin-left: $pagetree-icon-offset;
+            padding-inline-end: $pagetree-icon-offset;
+            margin-inline-start: $pagetree-icon-offset;
         }
     }
 }
@@ -911,8 +972,8 @@
         margin: 0;
     }
     .jstree-anchor {
-        padding-top: 13px;
-        padding-left: 15px;
+        padding-block-start: 13px;
+        padding-inline-start: 15px;
         border: none;
         background: none;
     }
@@ -929,7 +990,7 @@
     > .jstree-anchor .jstree-themeicon {
         content: "";
         position: relative;
-        top: 4px;
+        inset-block-start: 4px;
         color: $color-success;
         @extend %icon;
         @include icon(check);
@@ -943,7 +1004,7 @@
     .cms-tree-node-shared-true {
         > .jstree-anchor {
             border-style: dashed;
-            border-right: none;
+            border-inline-end: none;
             color: #999;
             background-color: $bg-shared !important;
 
@@ -966,9 +1027,9 @@
     .cms-tree-node-shared-false {
         > .jstree-anchor {
             border-style: solid;
-            border-right: none;
+            border-inline-end: none;
             background-color: $white !important;
-            border-bottom: $pagetree-border;
+            border-block-end: $pagetree-border;
 
             &.jstree-hovered,
             &.jstree-clicked {
@@ -978,7 +1039,7 @@
 
         + .cms-tree-node-shared-true {
             > .jstree-anchor {
-                border-top-style: solid;
+                border-block-start-style: solid;
             }
             &.jstree-hovered,
             &.jstree-clicked {
@@ -992,14 +1053,15 @@
         background-color: #f2f2f2;
 
         &.jstree-grid-cell-regular-options {
-            border-left: none;
+            border-inline-start: none;
         }
 
         .cms-btn-no-border {
             background-color: transparent !important;
             &:hover {
                 background-color: #fff !important;
-                border: 1px solid #ddd !important;
+                border-block: 1px solid #ddd !important;
+                border-inline: 1px solid #ddd !important;
             }
         }
 
@@ -1019,9 +1081,9 @@
     }
 
     .cms-page-tree-cell-shared--true + .cms-page-tree-cell-shared--false {
-        border-top: $pagetree-border;
-        margin-top: -1px;
-        padding-top: 8px;
+        border-block-start: $pagetree-border;
+        margin-block-start: -1px;
+        padding-block-start: 8px;
         height: 47px;
     }
 
@@ -1034,15 +1096,17 @@
     display: block;
     min-width: 300px;
     height: $pagetree-cell-height;
-    padding: $pagetree-anchor-padding !important;
-    margin-left: -$pagetree-marker-size + 1;
+    padding-block: $pagetree-anchor-padding-block !important;
+    padding-inline: $pagetree-anchor-padding-inline !important;
+    margin-inline-start: -$pagetree-marker-size + 1;
     background-color: $color-primary !important;
     color: $white;
     // copy icon triggered when pressing `CMD`
     .jstree-copy {
         color: $white;
-        padding: 0 5px 2px;
-        margin-left: 5px;
+        padding-block: 0px 2px;
+        padding-inline: 5px;
+        margin-inline-start: 5px;
         border-radius: $border-radius-base;
         background: $gray-light;
     }
@@ -1050,10 +1114,10 @@
     .jstree-ok,
     .jstree-er {
         position: absolute;
-        top: 0;
-        left: -5px;
-        bottom: 0;
-        right: 0;
+        inset-block-start: 0;
+        inset-inline-start: -5px;
+        inset-block-end:  0;
+        inset-inline-end: 0;
         background-color: rgba(white, 0.6);
     }
     .jstree-ok {
@@ -1072,28 +1136,29 @@
 
 #jstree-marker {
     position: absolute;
-    right: 3%;
     z-index: z("pagetree", "drag-marker");
-    margin: -$pagetree-marker-size 0 0 0;
-    border-right: 0;
-    border-top: $pagetree-marker-size solid transparent;
-    border-bottom: $pagetree-marker-size solid transparent;
-    border-left: $pagetree-marker-size solid $color-primary;
+    margin-inline-start: -($pagetree-marker-size);
+    margin-block-start: -($pagetree-marker-size);
+    border-inline-end: 0;
+    border-block-start: $pagetree-marker-size solid transparent;
+    border-block-end: $pagetree-marker-size solid transparent;
+    border-inline-start: $pagetree-marker-size solid $color-primary;
     height: 0;
     &:after {
         content: '';
         display: block;
         position: absolute;
         height: 3px;
-        top: -1px;
-        left: -2px;
-        right: 0;
+        inset-block-start: -1px;
+        inset-inline-start: -($pagetree-marker-size);
+        inset-inline-end: 0px;
         background-color: $color-primary;
     }
     &.jstree-marker-child {
         border: 2px solid $color-primary;
         height: 46px;
-        margin: -24px 0 0 0;
+        margin-block: -24px 0px;
+        margin-inline: 0;
         background-color: rgba($color-primary, 0.1);
         box-sizing: border-box;
 
@@ -1106,18 +1171,18 @@
 
 .djangocms-admin-style.cms-pagetree-wrapper.cms-admin-sideframe {
     .messagelist + #content {
-        margin-top: 117px !important;
+        margin-block-start: 117px !important;
     }
     #container .breadcrumbs {
-        left: 20px;
+        inset-inline-start: 20px;
     }
     #container .breadcrumbs + .messagelist + #content,
     #container .breadcrumbs + #content {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
+        margin-inline-start: 0 !important;
+        margin-inline-end: 0 !important;
     }
     #jstree-marker {
-        right: 0;
+        inset-inline-end: 0;
     }
 }
 

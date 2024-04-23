@@ -88,7 +88,7 @@ def _is_valid_page_instance(page):
     """
     Check if the supplied object is a valid Page / PageType object
     """
-    return isinstance(page, Page) or isinstance(page, PageType)
+    return isinstance(page, (Page, PageType))
 
 
 def log_page_operations(sender, **kwargs):

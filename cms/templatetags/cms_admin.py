@@ -9,8 +9,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models import Page
 from cms.models.contentmodels import PageContent
@@ -20,7 +19,7 @@ from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
 
-CMS_ADMIN_ICON_BASE = "{}admin/img/".format(settings.STATIC_URL)
+CMS_ADMIN_ICON_BASE = f"{settings.STATIC_URL}admin/img/"
 
 
 class GetAdminUrlForLanguage(AsTag):
@@ -40,7 +39,7 @@ class GetAdminUrlForLanguage(AsTag):
             if page_content:
                 return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
         admin_url = admin_reverse('cms_pagecontent_add')
-        admin_url += '?cms_page={}&language={}'.format(page.pk, language)
+        admin_url += f'?cms_page={page.pk}&language={language}'
         return admin_url
 
 

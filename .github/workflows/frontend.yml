@@ -1,6 +1,6 @@
 name: django CMS frontend.yml
 
-on: [push, pull_request]
+on: pull_request
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,9 +14,9 @@ jobs:
         node-version: ['18']
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm install

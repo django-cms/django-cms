@@ -1,6 +1,4 @@
-import json
-
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.utils.encoding import smart_str
 
 NOT_FOUND_RESPONSE = "NotFound"
@@ -13,4 +11,4 @@ def jsonify_request(response):
          * content: original response content
     """
     content = {'status': response.status_code, 'content': smart_str(response.content, response.charset)}
-    return HttpResponse(json.dumps(content), content_type="application/json")
+    return JsonResponse(content)

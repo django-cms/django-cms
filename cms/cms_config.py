@@ -40,9 +40,7 @@ class CMSCoreExtensions(CMSAppExtension):
                     "from cms.wizards.wizard_base.Wizard"
                 )
             elif wizard.id in self.wizards:
-                msg = "Wizard for model {} has already been registered".format(
-                    wizard.get_model()
-                )
+                msg = f"Wizard for model {wizard.get_model()} has already been registered"
                 logger.warning(msg)
             else:
                 self.wizards[wizard.id] = wizard
@@ -53,7 +51,7 @@ class CMSCoreExtensions(CMSAppExtension):
         for model, render_func, *grouper in cms_config.cms_toolbar_enabled_models:
             if model in self.toolbar_enabled_models:
                 logger.warning(
-                    "Model {} already registered for frontend rendering".format(model),
+                    f"Model {model} already registered for frontend rendering",
                 )
             else:
                 self.toolbar_enabled_models[model] = render_func

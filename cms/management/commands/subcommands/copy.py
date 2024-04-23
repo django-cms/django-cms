@@ -182,7 +182,7 @@ class CopySiteCommand(SubcommandsCommand):
                 if page.is_home:
                     new_page.set_as_homepage()
         self.stdout.write(
-            'Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n'.format(from_site.pk, to_site.pk)
+            f'Copied CMS Tree from SITE_ID {from_site.pk} successfully to SITE_ID {to_site.pk}.\n'
         )
 
     def get_site(self, site_id):

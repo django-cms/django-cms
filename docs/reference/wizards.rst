@@ -38,6 +38,9 @@ When instantiating a Wizard object, use the keywords:
 :description: The description is optional, but if it is not supplied, the
               CMS will create one from the pattern:
               "Create a new «model.verbose_name» instance."
+:edit_mode_on_success: Whether the user will get redirected to object edit url after a
+                       successful creation or not. This only works if the object is registered 
+                       for toolbar enabled models.
 
 
 .. important::

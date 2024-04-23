@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -14,7 +15,6 @@ from django.utils.html import escape
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from mock import patch
 from sekizai.context import SekizaiContext
 
 import cms
@@ -116,11 +116,11 @@ class TemplatetagTests(CMSTestCase):
     def test_page_attribute_tag_escapes_content(self):
         script = '<script>alert("XSS");</script>'
 
-        class FakePage():
+        class FakePage:
             def get_page_title(self, *args, **kwargs):
                 return script
 
-        class FakeRequest():
+        class FakeRequest:
             current_page = FakePage()
             GET = {'language': 'en'}
 
@@ -462,7 +462,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         from django.core.cache import cache
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         placeholder = page.get_placeholders('en')[0]
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         template = "{% load cms_tags %}{% render_plugin plugin %}"
@@ -500,7 +500,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_plugin_no_context(self):
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         placeholder = Placeholder.objects.create(slot='test')
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='Test')
         superuser = self.get_superuser()
@@ -557,7 +557,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         Category.objects.create(name='foo', depth=1)
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         template = "{% load cms_tags %}{% render_model category 'name' %}"
         user = self._create_user("admin", True, True)
         request = RequestFactory().get(get_object_edit_url(page_content))
@@ -589,7 +589,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         template = "{% load cms_tags %}{% render_model_add category %}"
         user = self._create_user("admin", True, True)
         request = RequestFactory().get(get_object_edit_url(page_content))
@@ -627,7 +627,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         template = "{% load cms_tags %}{% render_model_add_block category %}wrapped{% endrender_model_add_block %}"
         user = self._create_user("admin", True, True)
         request = RequestFactory().get(get_object_edit_url(page_content))

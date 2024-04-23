@@ -16,6 +16,7 @@ from cms.test_utils.project.extensionapp.models import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_pool import toolbar_pool
+from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning, RemovedInDjangoCMS43Warning
 from cms.utils.urlutils import admin_reverse
 
 
@@ -288,7 +289,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
     def test_duplicate_extensions(self):
         with self.login_user_context(self.admin):
-            content = self.get_page_title_obj(self.page, 'en')
+            content = self.get_pagecontent_obj(self.page, 'en')
             # create page copy
             page_data = {
                 'title': 'type1', 'slug': 'type1', '_save': 1, 'template': 'nav_playground.html',
@@ -393,7 +394,7 @@ class ExtensionAdminTestCase(CMSTestCase):
                         )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
-            response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
+            response = self.client.get(f'{self.page.get_absolute_url()}?edit')
             self.assertIn("TestItem", response.rendered_content)
         toolbar_pool.toolbars = old_toolbars
 
@@ -416,7 +417,7 @@ class ExtensionAdminTestCase(CMSTestCase):
                     )
         toolbar_pool.register(SampleExtension)
         with self.login_user_context(self.admin):
-            response = self.client.get('{}?edit'.format(self.page.get_absolute_url()))
+            response = self.client.get(f'{self.page.get_absolute_url()}?edit')
             self.assertIn("TestItem", response.rendered_content)
         toolbar_pool.toolbars = old_toolbars
 
@@ -435,7 +436,7 @@ class ExtensionAdminTestCase(CMSTestCase):
         message = "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin"
         with self.login_user_context(self.admin):
             self.assertWarns(
-                DeprecationWarning,
+                RemovedInDjangoCMS43Warning,
                 message,
                 lambda: self.client.get(self.page.get_absolute_url()),
             )

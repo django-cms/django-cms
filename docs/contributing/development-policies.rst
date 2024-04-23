@@ -23,7 +23,7 @@ Reporting security issues
 Review
 ******
 
-All patches should be made as pull requests **against develop** to
+All patches should be made as pull requests **against develop-4** to
 `the GitHub repository <https://github.com/django-cms/django-cms>`_. Patches should
 never be pushed directly.
 
@@ -62,7 +62,7 @@ To create a proposal...
 1. please use this `DEP template <https://github.com/django/deps/blob/main/template.rst>`_
 2. create a discussion in the main `Github repository <https://github.com/django-cms/django-cms/discussions>`_
 3. discuss, discuss, discuss
-4. join the Tech Committee `Slack Channel <https://www.django-cms.org/slack>`_ (#technical-committee) and make the team aware of your proposal after the proposal has been reviewed by the Technical Committee, it is put to a vote at one of the weekly meetings of the technical committee
+4. join the Tech Committee (`#technical-committee <https://www.django-cms.org/discord/tech-comm>`_) and make the team aware of your proposal after the proposal has been reviewed by the Technical Committee, it is put to a vote at one of the weekly meetings of the technical committee
 
 
 ****************
@@ -70,7 +70,7 @@ Release schedule
 ****************
 
 The `roadmap <https://www.django-cms.org/en/roadmap/>`_ can be found on our website. The release schedule is
-managed by the release management workgroup. The plan is to release quarterly and according to a retrospectice approach.
+managed by the release management workgroup. The plan is to release quarterly and according to a retrospective approach.
 
 Example of retrospective approach.
 
@@ -82,7 +82,7 @@ Example of retrospective approach.
 * ...
 * Unscheduled Releases -> e.g. bug fix -> 3.x.x
 
-The release management workgroup can be found on `Slack <https://www.django-cms.org/slack>`_ in #release-management channel.
+Release management is managed on `Discord <https://www.django-cms.org/discord/tech-comm>`_ in the #technical-committee channel.
 For questions regarding the release process please join the channel and reach out. We're happy to help.
 
 Long-Term Support Release
@@ -127,6 +127,11 @@ Commits
 
 Commit messages
 ===============
+
+We follow the `Conventional Commits
+<https://www.conventionalcommits.org>`_ specification for commit messages.
+Pull requests are linted against this specification so please make your PR title
+match the specification.
 
 Commit messages and their subject lines should be written in the past tense, not present tense, for example:
 

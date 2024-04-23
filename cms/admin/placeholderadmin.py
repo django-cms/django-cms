@@ -21,8 +21,7 @@ from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
-from django.utils.translation import get_language_from_path
-from django.utils.translation import gettext as _
+from django.utils.translation import get_language_from_path, gettext as _
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.http import require_POST
 
@@ -37,6 +36,7 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree_as_json
 from cms.utils import get_current_site
+from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import (
@@ -79,7 +79,7 @@ def _instance_overrides_method(base, instance, method_name):
     return unbound_method != bound_method
 
 
-class FrontendEditableAdminMixin():
+class FrontendEditableAdminMixin:
     """
     Adding ``FrontendEditableAdminMixin`` to  models admin class allows to open that admin
     in the frontend by double-clicking on fields rendered with the ``render_model`` template
@@ -117,14 +117,13 @@ class FrontendEditableAdminMixin():
         if not fields:
             context = {
                 'opts': opts,
-                'message': force_str(_("Field %s not found")) % raw_fields
+                'message': _("Field %s not found") % raw_fields
             }
             return render(request, 'admin/cms/page/plugin/error_form.html', context)
-        if not request.user.has_perm("{0}.change_{1}".format(self.model._meta.app_label,
-                                                             self.model._meta.model_name)):
+        if not request.user.has_perm(f"{self.model._meta.app_label}.change_{self.model._meta.model_name}"):
             context = {
                 'opts': opts,
-                'message': force_str(_("You do not have permission to edit this item"))
+                'message': _("You do not have permission to edit this item")
             }
             return render(request, 'admin/cms/page/plugin/error_form.html', context)
             # Dynamically creates the form class with only `field_name` field
@@ -175,7 +174,7 @@ class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
             return super_new(cls, name, bases, attrs)
         warnings.warn(
             "PlaceholderAdminMixin is no longer needed and thus will be removed in django CMS 5.0",
-            DeprecationWarning,
+            RemovedInDjangoCMS50Warning,
             stacklevel=2,
         )
         return super_new(cls, name, bases, attrs)
@@ -362,11 +361,11 @@ class PlaceholderAdmin(admin.ModelAdmin):
         plugin_type = plugin_data['plugin_type']
 
         if not self.has_add_plugin_permission(request, placeholder, plugin_type):
-            message = force_str(_('You do not have permission to add a plugin'))
+            message = _('You do not have permission to add a plugin')
             return HttpResponseForbidden(message)
 
         if not placeholder.check_source(request.user):
-            message = force_str(_('You do not have permission to add a plugin'))
+            message = _('You do not have permission to add a plugin')
             return HttpResponseForbidden(message)
 
         plugin_class = plugin_pool.get_plugin(plugin_type)
@@ -418,7 +417,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         target_placeholder = get_object_or_404(Placeholder, pk=target_placeholder_id)
 
         if not target_language or target_language not in get_language_list():
-            return HttpResponseBadRequest(force_str(_("Language must be set to a supported language!")))
+            return HttpResponseBadRequest(_("Language must be set to a supported language!"))
 
         copy_to_clipboard = target_placeholder.pk == request.toolbar.clipboard.pk
         source_plugin_id = request.POST.get('source_plugin_id', None)
@@ -459,7 +458,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not self.has_copy_plugins_permission(request, old_plugins):
             message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(force_str(message))
+            raise PermissionDenied(message)
 
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy these plugins.')
@@ -484,11 +483,11 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not self.has_copy_plugins_permission(request, old_plugins):
             message = _('You do not have permission to copy this placeholder.')
-            raise PermissionDenied(force_str(message))
+            raise PermissionDenied(message)
 
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy this placeholder.')
-            raise PermissionDenied(force_str(message))
+            raise PermissionDenied(message)
 
         # Empty the clipboard
         target_placeholder.clear()
@@ -530,11 +529,11 @@ class PlaceholderAdmin(admin.ModelAdmin):
 
         if not has_permissions:
             message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(force_str(message))
+            raise PermissionDenied(message)
 
         if not target_placeholder.check_source(request.user):
             message = _('You do not have permission to copy these plugins.')
-            raise PermissionDenied(force_str(message))
+            raise PermissionDenied(message)
 
         target_tree_order = target_placeholder.get_plugin_tree_order(
             language=target_language,
@@ -578,7 +577,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         try:
             plugin_id = int(plugin_id)
         except ValueError:
-            return HttpResponseNotFound(force_str(_("Plugin not found")))
+            return HttpResponseNotFound(_("Plugin not found"))
 
         obj = self._get_plugin_from_id(plugin_id)
 
@@ -586,10 +585,10 @@ class PlaceholderAdmin(admin.ModelAdmin):
         plugin_instance = obj.get_plugin_class_instance(admin=self.admin_site)
 
         if not self.has_change_plugin_permission(request, obj):
-            return HttpResponseForbidden(force_str(_("You do not have permission to edit this plugin")))
+            return HttpResponseForbidden(_("You do not have permission to edit this plugin"))
 
         if not obj.placeholder.check_source(request.user):
-            message = force_str(_("You do not have permission to edit this plugin"))
+            message = _("You do not have permission to edit this plugin")
             return HttpResponseForbidden(message)
 
         response = plugin_instance.change_view(request, str(plugin_id))
@@ -733,11 +732,11 @@ class PlaceholderAdmin(admin.ModelAdmin):
         plugins = [plugin] + list(plugin.get_descendants())
 
         if not self.has_copy_from_clipboard_permission(request, target_placeholder, plugins):
-            message = force_str(_("You have no permission to paste this plugin"))
+            message = _("You have no permission to paste this plugin")
             raise PermissionDenied(message)
 
         if not target_placeholder.check_source(request.user):
-            message = force_str(_("You have no permission to paste this plugin"))
+            message = _("You have no permission to paste this plugin")
             raise PermissionDenied(message)
 
         if target_parent:
@@ -793,11 +792,11 @@ class PlaceholderAdmin(admin.ModelAdmin):
         plugins = plugin.placeholder_ref.get_plugins_list()
 
         if not self.has_copy_from_clipboard_permission(request, target_placeholder, plugins):
-            message = force_str(_("You have no permission to paste this placeholder"))
+            message = _("You have no permission to paste this placeholder")
             raise PermissionDenied(message)
 
         if not target_placeholder.check_source(request.user):
-            message = force_str(_("You have no permission to paste this placeholder"))
+            message = _("You have no permission to paste this placeholder")
             raise PermissionDenied(message)
 
         action_token = self._send_pre_placeholder_operation(
@@ -850,19 +849,19 @@ class PlaceholderAdmin(admin.ModelAdmin):
         source_placeholder = plugin.placeholder
 
         if not self.has_move_plugin_permission(request, plugin, source_placeholder):
-            message = force_str(_("You have no permission to move this plugin"))
+            message = _("You have no permission to move this plugin")
             raise PermissionDenied(message)
 
         if target_placeholder and not self.has_move_plugin_permission(request, plugin, target_placeholder):
-            message = force_str(_("You have no permission to move this plugin"))
+            message = _("You have no permission to move this plugin")
             raise PermissionDenied(message)
 
         if not source_placeholder.check_source(request.user):
-            message = force_str(_("You have no permission to move this plugin"))
+            message = _("You have no permission to move this plugin")
             raise PermissionDenied(message)
 
         if target_placeholder and not target_placeholder.check_source(request.user):
-            message = force_str(_("You have no permission to move this plugin"))
+            message = _("You have no permission to move this plugin")
             raise PermissionDenied(message)
 
         if target_parent:
@@ -914,11 +913,11 @@ class PlaceholderAdmin(admin.ModelAdmin):
         source_placeholder = plugin.placeholder
 
         if not self.has_move_plugin_permission(request, plugin, source_placeholder):
-            message = force_str(_("You have no permission to cut this plugin"))
+            message = _("You have no permission to cut this plugin")
             raise PermissionDenied(message)
 
         if not source_placeholder.check_source(request.user):
-            message = force_str(_("You have no permission to cut this plugin"))
+            message = _("You have no permission to cut this plugin")
             raise PermissionDenied(message)
 
         action_token = self._send_pre_placeholder_operation(
@@ -963,11 +962,11 @@ class PlaceholderAdmin(admin.ModelAdmin):
         plugin = self._get_plugin_from_id(plugin_id)
 
         if not self.has_delete_plugin_permission(request, plugin):
-            return HttpResponseForbidden(force_str(
-                _("You do not have permission to delete this plugin")))
+            message = _("You do not have permission to delete this plugin")
+            return HttpResponseForbidden(message)
 
         if not plugin.placeholder.check_source(request.user):
-            message = force_str(_("You do not have permission to delete this plugin"))
+            message = _("You do not have permission to delete this plugin")
             raise PermissionDenied(message)
 
         opts = plugin._meta
@@ -1045,10 +1044,11 @@ class PlaceholderAdmin(admin.ModelAdmin):
             return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
 
         if not self.has_clear_placeholder_permission(request, placeholder, language):
-            return HttpResponseForbidden(force_str(_("You do not have permission to clear this placeholder")))
+            message = _("You do not have permission to clear this placeholder")
+            return HttpResponseForbidden(message)
 
         if not placeholder.check_source(request.user):
-            message = force_str(_("You do not have permission to clear this placeholder"))
+            message = _("You do not have permission to clear this placeholder")
             raise PermissionDenied(message)
 
         opts = Placeholder._meta
@@ -1065,7 +1065,8 @@ class PlaceholderAdmin(admin.ModelAdmin):
         if request.POST:
             # The user has already confirmed the deletion.
             if perms_needed:
-                return HttpResponseForbidden(force_str(_("You do not have permission to clear this placeholder")))
+                message = _("You do not have permission to clear this placeholder")
+                return HttpResponseForbidden(message)
 
             operation_token = self._send_pre_placeholder_operation(
                 request,
