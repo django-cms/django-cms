@@ -333,7 +333,7 @@ var Toolbar = new Class({
                 var link = $(el);
 
                 // in case the button has a data-rel attribute
-                if (link.attr('data-rel')) {
+                if (link.attr('data-rel') || link.hasClass('cms-form-post-method')) {
                     link.off(that.click).on(that.click, function(e) {
                         e.preventDefault();
                         that._delegate($(this));
@@ -586,21 +586,42 @@ var Toolbar = new Class({
             case 'sideframe':
                 // If the sideframe is enabled, show it
                 if (typeof CMS.settings.sideframe_enabled === 'undefined' || CMS.settings.sideframe_enabled) {
-                    var sideframe = CMS.API.Sideframe || new Sideframe({
-                        onClose: el.data('on-close')
-                    });
-
-                    sideframe.open({
-                        url: el.attr('href'),
-                        animate: true
-                    });
+                    this._openSideFrame(el);
                     break;
                 }
                 // Else fall through to default, the sideframe is disabled
 
             default:
-                Helpers._getWindow().location.href = el.attr('href');
+                if (el.hasClass('cms-form-post-method')) {
+                    this._sendPostRequest(el);
+                } else {
+                    Helpers._getWindow().location.href = el.attr('href');
+                }
         }
+    },
+
+    _openSideFrame: function _openSideFrame(el) {
+        var sideframe = CMS.API.Sideframe || new Sideframe({
+            onClose: el.data('on-close')
+        });
+
+        sideframe.open({
+            url: el.attr('href'),
+            animate: true
+        });
+    },
+
+    _sendPostRequest: function _sendPostRequest(el) {
+        /* Allow post method to be used */
+        var formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
+        var csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
+            ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
+        var fakeForm = $(
+            '<form style="display: none" action="' + el.attr('href') + '" method="POST">' + csrfToken +
+            '</form>'
+        );
+
+        fakeForm.appendTo(Helpers._getWindow().document.body).submit();
     },
 
     /**
