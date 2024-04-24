@@ -1,0 +1,91 @@
+.. _upgrade-to-4.1.1:
+
+*******************
+4.1.1 release notes
+*******************
+
+*December 20, 2022*
+
+.. warning:: Upgrading from previous versions
+
+    django CMS 4.1.0 is the **first community release** of django CMS 4. Django CMS 4 introduces changes that **require** action if you are upgrading from a 3.x version. Please read the step-by-step guide to the
+    process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
+
+
+Welcome to django CMS 4.1!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you’ll want to be aware of when upgrading from
+django CMS 4.0. If you are upgrading from django CMS 3.11 or earlier
+please urgently read the release notes of django CMS 4.0.
+
+
+Django and Python compatibility
+===============================
+
+django CMS supports **Django 3.2 to 5.0**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.8, 3.9, 3.10, and 3.11**. As for Django we highly recommend and only
+support the latest release of each series.
+
+What's new in 4.1
+=================
+
+Status indicators in page tree
+------------------------------
+
+* Status indicators are shown in the page tree. For django CMS core only two
+  states are available: public and empty.
+* Django CMS core provides hooks to allow other packages to patch the status
+  indicators, e.g., djangocms-versioning.
+* Djangocms-versioning will add more functionality to the indicators (e.g.,
+  publish from page tree).
+
+
+Bug Fixes
+---------
+
+* In rare cases moving plugins from one placeholder to another could result in
+  a server error and an inconsistent plugin tree.
+* Empty page contents (e.g., due to a missing translation of a page) will now
+  render correctly in the page tree.
+* Adding a page will trigger the form in the language viewd not in the browser
+  language
+* The "Empty all" menus for placeholders now works.
+
+
+Backward incompatible changes in 4.1
+====================================
+
+TitleExtension
+--------------
+
+``TitleExtension`` in ``cms.extensions.models`` has been renamed to
+``PageContentExtension`` to keep a consistent language in the page models.
+
+Any packages using ``TitleExtension`` will need to adapt the name change in
+their code base.
+
+In ``ExtensionToolbar`` the method ``get_title_extension_admin(language=None)``
+has been deprecated. It is recommended to switch to the new
+``get_page_content_extension_admin(page_content=None)``.
+
+Monkey patching
+---------------
+
+This is a purely internal change: django CMS v4.1 does not support monkey patching as for djangocms-versioning
+before version 2.0. Please only use djangocms-versioning >= 2.0
+
+Miscellaneous
+-------------
+
+* The Django setting ``SEND_BROKEN_LINK_EMAILS`` (removed from Django since
+  version 1.8) was used as a signal to send an email to the site managers
+  if ``page_url`` could not reverse the url name. Since this version the
+  outdated setting is ignored. If managers want to receive mails add
+  ``django.middleware.common.BrokenLinkEmailsMiddleware`` to the project's
+  ``settings.MIDDLEWARE``.
+* ``cms.api.create_title`` has been renamed to :class:`~cms.api.create_page_content`.
+  A compatibility shim remains and issues a deprecation warning.
+* ``cms.models.pluginmodel.CMSPlugin.copy_plugin`` was removed.
