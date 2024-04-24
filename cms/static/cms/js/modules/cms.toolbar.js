@@ -333,7 +333,7 @@ var Toolbar = new Class({
                 var link = $(el);
 
                 // in case the button has a data-rel attribute
-                if (link.attr('data-rel')) {
+                if (link.attr('data-rel') || link.hasClass('cms-form-post-method')) {
                     link.off(that.click).on(that.click, function(e) {
                         e.preventDefault();
                         that._delegate($(this));
@@ -599,7 +599,19 @@ var Toolbar = new Class({
                 // Else fall through to default, the sideframe is disabled
 
             default:
-                Helpers._getWindow().location.href = el.attr('href');
+                if (el.hasClass('cms-form-post-method')) {
+                    /* Allow post method to be used */
+                    var formToken = document.querySelector('form input[name="csrfmiddlewaretoken"]');
+                    var csrfToken = '<input type="hidden" name="csrfmiddlewaretoken" value="' +
+                        ((formToken ? formToken.value : formToken) || window.CMS.config.csrf) + '">';
+                    var fakeForm = $(
+                        '<form style="display: none" action="' + el.attr('href') + '" method="POST">' + csrfToken +
+                        '</form>'
+                    );
+                    fakeForm.appendTo(Helpers._getWindow().document.body).submit();
+                } else {
+                    Helpers._getWindow().location.href = el.attr('href');
+                }
         }
     },
 
