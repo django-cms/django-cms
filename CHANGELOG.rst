@@ -1,10 +1,15 @@
-4.2 (in progress)
-=================
+Statistics:
+-----------
 
-Features:
----------
-* Remove menu item "Delete page…" from toolbar.
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
+* Fabian Braun (1 pull request)
+* Github Release Action (4 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
 
 4.1.0 (2023-12-22)
 ==================
@@ -25,7 +30,6 @@ Features:
 * Python 3.11, 3.10 support
 * Remove patching of PageContent by djangocms-versioning (#7446)
 * Utility function get_placeholder_from_slot for PlaceholderRelationField (#7479)
-* Use autocomplete for entities from model `User` and `Group` instead of the raw primary key.
 
 Bug Fixes:
 ----------
