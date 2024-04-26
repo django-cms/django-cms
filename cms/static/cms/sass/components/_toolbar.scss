@@ -185,6 +185,10 @@
                 display: block;
                 .cms-icon {
                     display: block;
+                    [dir="rtl"] & {
+                        // undo arrow rotation for RTL
+                        transform: rotate(0deg);
+                    }
                 }
 
             }
