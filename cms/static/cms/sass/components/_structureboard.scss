@@ -371,6 +371,9 @@
             margin-inline-start: $structure-dragarea-padding-horizontal - 10px;
             cursor: pointer;
             transform: rotate(180deg);
+            [dir="rtl"] & {
+                transform: rotate(0deg);
+            }
         }
         .cms-dragitem-text {
             cursor: pointer;
@@ -378,6 +381,9 @@
     }
     .cms-dragitem-expanded:before {
         transform: rotate(-90deg);
+        [dir="rtl"] & {
+            transform: rotate(-90deg);
+        }
     }
     // #DRAGGABLES/states#
 
@@ -467,7 +473,7 @@
 
     &.cms-structure-condensed {
         width: 416px;
-        left: 0;
+        inset-inline-end: 0;
         box-shadow: 0 0 5px 0 rgba(0,0,0,.2);
         .cms-structure-content {
             padding-inline: 15px;
