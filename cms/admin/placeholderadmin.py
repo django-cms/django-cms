@@ -192,9 +192,11 @@ class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
 class PlaceholderAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
+        # Placeholders are created by the system
         return False
 
     def has_change_permission(self, request, obj=None):
+        # Placeholders are not editable in the admin
         return False
 
     def has_delete_permission(self, request, obj=None):
