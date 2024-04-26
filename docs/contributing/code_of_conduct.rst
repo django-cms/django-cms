@@ -11,8 +11,7 @@ and polite.
 We will not tolerate abusive behaviour or language or any form of harassment.
 
 Individuals whose behaviour is a cause for concern will be given a warning, and if
-necessary will be excluded from participation in official django CMS channels (Slack
-group, email lists, etc) and events. The `Django Software Foundation
+necessary will be excluded from participation in official django CMS channels and events. The `Django Software Foundation
 <http://djangoproject.com/foundation/>`_ will also be informed of the issue.
 
 Raising a concern

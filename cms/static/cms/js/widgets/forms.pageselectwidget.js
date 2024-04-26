@@ -82,7 +82,7 @@ require.ensure(
 
         // init
         $(function() {
-            if (window.CMS.Widgets !== undefined && window.CMS.Widgets._pageSmartLinkWidgets !== undefined) {
+            if (window.CMS.Widgets !== undefined && window.CMS.Widgets._pageSelectWidgets !== undefined) {
                 window.CMS.Widgets._pageSelectWidgets.forEach(function (widget) {
                     new PageSelectWidget(widget);
                 });
