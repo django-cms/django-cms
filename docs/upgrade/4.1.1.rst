@@ -32,10 +32,16 @@ Improved right-to-left support
 * Both, the CSS assets and the JS assets have been adjusted to better support right-to-left languages (RTL). 
 * Besides imrpvoed ease of use, the page tree can now be fully managed with RTL admin languages
 
+Faster menu rendering
+---------------------
+
+* Improved efficiency building menus for the page tree dramatically reduces database hits
+* Page menus rendered by the core both for versioned and unversioned pages 
+
+
 Bug Fixes
 ---------
 
-* Improved efficiency building menus for the page tree
 * Placeholders do not block deletion of custom model instances with a ``PlaceholderRelationField``.
 * Structure view respects toolbar language
 * Fixed management command to delete orphaned plugins
