@@ -17,12 +17,12 @@ Open source enterprise content management system based on the Django framework a
 Contribute to this project and win rewards
 *******************************************
 
-Because django CMS is a community-driven project, we welcome everyone to `get involved in the project <https://www.django-cms.org/en/contribute/>`_ and `receive a reward <https://www.django-cms.org/en/bounty-program/>`_ for their contribution. Become part of a fantastic community and help us make django CMS the best open source CMS in the world.
+Because django CMS is a community-driven project, we welcome everyone to `get involved in the project <https://www.django-cms.org/en/contribute/>`_. Become part of a fantastic community and help us make django CMS the best open source CMS in the world.
 
 
 .. ATTENTION::
 
-    Please use the ``develop`` branch as the target for pull requests for on-going development.
+    Please use the ``develop-4`` branch as the target for pull requests for on-going development.
 
     Security fixes will be backported to older branches by the core team as appropriate.
 
@@ -55,7 +55,7 @@ See the `Python/Django requirements for the current release version
 <http://docs.django-cms.org/en/latest/#software-version-requirements-and-release-notes>`_ in our documentation.
 
 See the `installation how-to guide for an overview of some other requirements and dependencies of the current release
-<http://docs.django-cms.org/en/latest/how_to/install.html>`_.
+<https://docs.django-cms.org/en/latest/introduction/01-install.html>`_.
 
 
 ***************
@@ -72,8 +72,7 @@ Documentation
 Our documentation working group maintains documentation for several versions of the project. Key versions are:
 
 * `stable <http://docs.django-cms.org>`_ (default), for the **current release** version
-* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **release-3.4.x branch**
-* `develop <http://docs.django-cms.org/en/develop/>`_, representing the latest build of the **develop branch**
+* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **develop-4 branch**
 
 For more information about our branch policy, see `Branches
 <http://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
@@ -97,7 +96,7 @@ The demo platform is kindly provided by Divio, platinum member of the django CMS
 Getting Help
 ************
 
-Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ or our `discourse forum <https://discourse.django-cms.org/>`_ for support.
+Please head over to our `discord forum <https://www.django-cms.org/discord>`_ for support.
 
 ********************
 Professional support
