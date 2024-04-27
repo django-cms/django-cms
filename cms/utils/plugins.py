@@ -299,10 +299,10 @@ def get_bound_plugins(plugins):
     Finally, iterates over the plugins and yields the downcasted versions if they have a valid parent.
     Does not affect caching.
 
-    :param plugins: (list) List of ``CMSPlugin`` instances.
-
-    Yields:
-    - instance (``CMSPlugin`` sub-class): Downcasted Plugin instance.
+    :param plugins:  List of ``CMSPlugin`` instances.
+    :type plugins: List[CMSPlugin]
+    :return: Generator that yields the downcasted plugins.
+    :rtype: Generator[CMSPlugin, None, None]
 
     Example::
 
