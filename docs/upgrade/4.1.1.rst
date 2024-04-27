@@ -31,6 +31,7 @@ Improved right-to-left support
 
 * Both, the CSS assets and the JS assets have been adjusted to better support right-to-left languages (RTL). 
 * Besides imrpvoed ease of use, the page tree can now be fully managed with RTL admin languages
+* Improved translations for Arabic
 
 Faster menu rendering
 ---------------------
