@@ -1,3 +1,6 @@
+4.1.0 (2024-04-30)
+==================
+
 Features:
 ---------
 * send post request if toolbar button has `cms-form-post-method` class (bb31ba990) -- Fabian Braun
