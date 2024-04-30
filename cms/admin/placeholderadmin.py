@@ -192,16 +192,26 @@ class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
 class PlaceholderAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
+        # Placeholders are created by the system
         return False
 
     def has_change_permission(self, request, obj=None):
+        # Placeholders are not editable in the admin
         return False
 
     def has_delete_permission(self, request, obj=None):
-        return False
+        # Placeholders are deleted by cascading the deletion of their source object
+        # so we don't need to check for delete permissions here.
+        return True
 
     def has_module_permission(self, request):
+        # Do not show in admin
         return False
+
+    def delete_view(self, request, object_id, extra_context=None):
+        # Placeholder are deleted by cascading the deletion of their source object
+        # but the admin's delete view is not available for placeholders.
+        raise PermissionDenied
 
     def get_urls(self):
         """
