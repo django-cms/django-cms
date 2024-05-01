@@ -7,6 +7,7 @@
 # Bashar Al-Abdulhadi, 2023
 # Ali Khalel <ali.khalel@gmail.com>, 2023
 # Fabian Braun <fsbraun@gmx.de>, 2023
+# Mohammad Alsakhawy, 2024
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -14,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
+"Last-Translator: Mohammad Alsakhawy, 2024\n"
 "Language-Team: Arabic (https://app.transifex.com/divio/teams/58664/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -74,7 +75,7 @@ msgid "Keep this field empty if standard path should be used."
 msgstr "اترك هذا الحقل فارغ اذا أردت استخدام العنوان الإفتراضي"
 
 msgid "Soft root"
-msgstr ""
+msgstr "سوفتـروت"
 
 msgid "All ancestors will not be displayed in the navigation"
 msgstr "لن يتم عرض الآباء في التصفح"
@@ -98,7 +99,7 @@ msgid "URL options"
 msgstr "خيارات الرابط"
 
 msgid "Menu options"
-msgstr ""
+msgstr "خيارات القائمة"
 
 msgid "Application"
 msgstr "التطبيق"
@@ -202,7 +203,7 @@ msgstr "موضع الملحق الأصل يجب أن يكون نفس الموض�
 
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "مكان الملحق يجب أن يكون أكبر من %(position)d"
 
 msgid "Advanced Settings"
 msgstr "خيارات متقدمة"
@@ -212,7 +213,7 @@ msgstr "هذه الصفحة غير مؤهله لتكون صفحة رئيسية."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "تم حذف %(name)s \"%(obj)s\" بنجاح."
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -264,26 +265,26 @@ msgid "You do not have permission to copy these plugins."
 msgstr "ليس لديك الصلاحية لنسخ هذه الملحقات."
 
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "ليس لديك الصلاحية لحذف هذه الصفحة"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "تم حذف العنوان وملحقات اللغة %(language)s."
 
 msgid "You do not have permission to change a page's navigation status"
-msgstr ""
+msgstr "ليس لديك الصلاحية لتعديل حالة تصفح هذه الصفحة"
 
 msgid "You cannot change this page's navigation status"
-msgstr ""
+msgstr "لا تستطيع تغيير حالة تصفح هذه الصفحة"
 
 msgid "Public content"
-msgstr ""
+msgstr "محتوى منشور"
 
 msgid "Empty"
 msgstr "فارغ"
 
 msgid "Create Content"
-msgstr ""
+msgstr "إنشاء محتوى"
 
 msgid "View restriction"
 msgstr "قيد المشاهدة"
@@ -349,45 +350,48 @@ msgid "Page permissions management"
 msgstr "إدارة حقوق الصفحة"
 
 msgid "Actions"
-msgstr ""
+msgstr "الإجراءات"
 
 msgid "Empty content"
-msgstr ""
+msgstr "محتوى فارغ"
 
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "خصائص %(object_name)s"
 
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "إضافة %(object_name)s جديدة"
 
 msgid "Add content"
-msgstr ""
+msgstr "إضافة محتوى"
 
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"لقد تم تغيير المحتوى الخاص باللغة الحالية. إضغط \"إلغاء\" للرجوع إلى النموذج"
+" وحفظ التغييرات. إضغط \"حسناً\" لتجاهل التغييرات."
 
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "إضافة محتوى بـ%(language)s"
 
 msgid "Preview"
 msgstr "عرض"
 
 msgid "Settings"
-msgstr ""
+msgstr "إعدادات"
 
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
 msgstr ""
+"لغة غير صحيحة %(value)s. لا يمكن معالجة هذا النموذج. حاول تغيير اللغات."
 
 msgid "<unspecified>"
-msgstr ""
+msgstr "<unspecified>"
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
@@ -535,10 +539,12 @@ msgid ""
 "Page %(conflict_page)s has the same url '%(url)s' as current page "
 "\"%(instance)s\"."
 msgstr ""
+"الصفحة %(conflict_page)s تمتلك نفس رابط '%(url)s' صفحة حالية "
+"\"%(instance)s\"."
 
 #, python-format
 msgid "Page %(conflict_page)s has the same url '%(url)s' as current page."
-msgstr ""
+msgstr "الصفحة %(conflict_page)s تمتلك نفس رابط '%(url)s' صفحة حالية."
 
 msgid ""
 "Optional. If supplied, will be automatically added within a new text plugin."
@@ -551,10 +557,10 @@ msgid "Leave empty for automatic slug, or override as required."
 msgstr "لعنوان تفرع تلقائي يُترك فارغاً ، أو تعاد صياغته حسب الطلب."
 
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr ""
+msgstr "لا يمكن إنشاء الصيغة تلقائياً. يرجى تزويدها يدوياً."
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "يرجى تزويد صيغة صحيحة"
 
 msgid "You don't have the permissions required to add a page."
 msgstr "ليس لديك الصلاحية لإضافة صفحة."
@@ -623,7 +629,7 @@ msgid "in navigation"
 msgstr "التصفح"
 
 msgid "soft root"
-msgstr "soft root"
+msgstr "سوفتـروت"
 
 msgid "id"
 msgstr "id"
@@ -653,7 +659,7 @@ msgid "page"
 msgstr "صفحة"
 
 msgid "no limit set"
-msgstr ""
+msgstr "بدون حدود"
 
 msgid "for logged in users only"
 msgstr "للمستخدمين المسجلين فقط"
@@ -695,10 +701,10 @@ msgid "The template used to render the content."
 msgstr "القالب المستعمل لعرض المحتوى."
 
 msgid "page content"
-msgstr ""
+msgstr "محتوى الصفحة"
 
 msgid "page contents"
-msgstr ""
+msgstr "محتويات الصفحة"
 
 msgid "default"
 msgstr "الإفتراضي"
@@ -870,55 +876,55 @@ msgid "There are no further settings for this plugin. Please press save."
 msgstr "لا يوجد إعدادات اخرى لهذا الملحق. الرجاء الضغط على حفظ."
 
 msgid "Moved"
-msgstr ""
+msgstr "حُرِّكَت"
 
 msgid "Changed"
 msgstr "معدل"
 
 msgid "Deleted"
-msgstr ""
+msgstr "حُذِفَت"
 
 msgid "Added Page Translation"
-msgstr ""
+msgstr "أُضِيفت ترجمة الصفحة"
 
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "عُدِلَت ترجمة الصفحة"
 
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "حُذِفَت ترجمة الصفحة"
 
 msgid "Added Plugin"
-msgstr ""
+msgstr "أُضيف الملحق"
 
 msgid "Changed Plugin"
-msgstr ""
+msgstr "عُدِلَ الملحق"
 
 msgid "Moved Plugin"
-msgstr ""
+msgstr "حُرِّكَ الملحق"
 
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "حُذف الملحق"
 
 msgid "Cut Plugin"
-msgstr ""
+msgstr "قص الملحق"
 
 msgid "Paste Plugin"
-msgstr ""
+msgstr "لصق الملحق"
 
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "لصق إلى الموضع"
 
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "تم إضافة الملحقات إلى الموضع من الحافظة"
 
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "فُرِّغَت الحافظة"
 
 msgid "Save"
 msgstr "حفظ"
 
 msgid "Some fields cannot be changed since they are read-only content."
-msgstr ""
+msgstr "لا يمكن تغيير بعض الحقول لأنهم محتوى للقراءة فقط."
 
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
@@ -935,7 +941,7 @@ msgid "Password:"
 msgstr "كلمة المرور:"
 
 msgid "Add a page"
-msgstr ""
+msgstr "إضافة صفحة"
 
 msgid "Change a page"
 msgstr "غير صفحة"
@@ -1031,7 +1037,7 @@ msgid "last change by"
 msgstr "آخر تعديل من قبل"
 
 msgid "last change on"
-msgstr ""
+msgstr "آخر تعديل بتاريخ"
 
 msgid "meta"
 msgstr "تعريفية"
@@ -1105,6 +1111,10 @@ msgid ""
 "                            <a href=\"%(add_url)s\" class=\"addlink\">Add %(object)s</a> now.\n"
 "                        "
 msgstr ""
+"\n"
+"<em>لا يوجد %(object)s بعد.</em>\n"
+"<br>\n"
+"<a href=\"%(add_url)s\" class=\"addlink\">أضف %(object)s</a> الآن."
 
 msgid "Copy options"
 msgstr "خيارات النسخ"
@@ -1151,7 +1161,7 @@ msgstr "لا يوجد معاينة لهذه الصفحة!"
 
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
-msgstr ""
+msgstr "يحتمل أن معلّق التطبيق المرفق لا يقوم بتزويد محتوى لصفحته الأساسية."
 
 msgid "It is being redirected to:"
 msgstr "جاري إعادة توجيهها إلى:"
@@ -1263,10 +1273,10 @@ msgid "Shortcuts"
 msgstr "اختصارات"
 
 msgid "The page was changed in the meantime, reloading..."
-msgstr ""
+msgstr "تم تعديل الصفحة في هذه الأثناء، جاري إعادة التحميل..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "إختصارات نطاق نظام إدارة المحتوى."
 
 msgid "Bring up this help dialog"
 msgstr "أحضر مربع حوار المساعدة هذا إلى الأعلى"
@@ -1385,6 +1395,10 @@ msgid ""
 "                    static files.</p>\n"
 "            "
 msgstr ""
+"\n"
+"<p class=\"cms-welcome-notes\">في حال لم تر شعار ن.إ.م جانغو في الأعلى، تأكد\n"
+" أنك قمت بربط مجلد <code>static/cms</code> مع ملفاتك\n"
+"الثابتة.</p>"
 
 msgid ""
 "\n"
@@ -1394,6 +1408,11 @@ msgid ""
 "                    </p>\n"
 "                "
 msgstr ""
+"\n"
+"<p class=\"cms-welcome-notes\">كونك ترى هذه الرسالة هذا يعني أن لديك\n"
+"<code>DEBUG = True</code> داخل ملف إعدادات جانغو الخاص بك\n"
+"ولم تقم بإضافة أي صفحات بعد.\n"
+"</p>"
 
 msgid "Welcome to django CMS"
 msgstr "أهلاً بك في نظام إدارة محتوى جانقو"
@@ -1411,7 +1430,7 @@ msgid "Next"
 msgstr "التالي"
 
 msgid "Unknown"
-msgstr ""
+msgstr "مجهول"
 
 #, python-format
 msgid "Page not found on %(domain)s"
@@ -1494,7 +1513,7 @@ msgid "Sample App"
 msgstr "عينة تطبيق"
 
 msgid "Sample App with config"
-msgstr ""
+msgstr "عينة تطبيق مع تهيئة"
 
 msgid "Sample App with excluded permissions"
 msgstr "عينة تطبيق بصلاحيات محجوبة"
