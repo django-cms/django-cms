@@ -348,15 +348,9 @@
         clip: rect(0, $toolbar-height, $toolbar-height, 0px);
         .cms-icon {
             position: absolute;
-<<<<<<< HEAD
-            left:  math.div($toolbar-height, 2);
-            top:  math.div($toolbar-height, 2);
-            margin-left: -10px;
-=======
             inset-inline-start: math.div($toolbar-height, 2);
             top: math.div($toolbar-height, 2);
             margin-inline-start:-10px;
->>>>>>> 92a1086de (feat: Add RTL support to toolbar (#7871))
             margin-top: -9px;
             font-size: 20px !important;
         }
