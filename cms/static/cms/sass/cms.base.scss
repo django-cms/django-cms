@@ -54,7 +54,7 @@ div.cms {
     @import "components/pagetree/node-state";
 }
 
- // Can be removed once suffucently many users have browsers the supprt `:dir()`
+ // Can be removed once suffucently many users have browsers the support `:dir()`
 div.cms[dir=rtl] {
     @import "libs/rtl_patch";
 }
