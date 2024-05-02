@@ -28,7 +28,7 @@ Basic requirements and standards
 ********************************
 
 If you're interested in developing a new feature for the CMS, it is recommended
-that you first discuss it on the `Discourse forum <https://discourse.django-cms.org>`_ so as
+that you first discuss it on the `Slack channel <https://www.django-cms.org/slack>`_ so as
 not to do any work that will not get merged in anyway.
 
 - Code will be reviewed and tested by at least one core developer, preferably
@@ -107,8 +107,7 @@ coverage will only be accepted with a very good reason; bug-fixing patches
 **must** demonstrate the bug with a test to avoid regressions and to check
 that the fix works.
 
-We have a `Slack Channel`_, a `Discourse forum
-<https://discourse.django-cms.org>`_, and of course the code reviews mechanism on GitHub - do use them.
+We have a `Slack Channel`_ and of course the code reviews mechanism on GitHub - do use them.
 
 
 .. _contributing_frontend:
@@ -128,7 +127,7 @@ Frontend
 In order to be able to work with the frontend tooling contributing to the
 django CMS you need to have the following dependencies installed:
 
-    1. `Node <https://nodejs.org/>`_ version 6.10.1 (will install npm 3.10.10 as well).
+    1. `Node <https://nodejs.org/>`_ version 18.19.0 (will install npm 10.2.3 as well).
        We recommend using `NVM <https://github.com/creationix/nvm>`_ to get
        the correct version of Node.
     2. gulp - see `Gulp's Getting Started notes <https://github.com/gulpjs/gulp/blob/master/docs/getting-started.md>`_

@@ -16,10 +16,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
-"Language-Team: Norwegian Bokmål (http://www.transifex.com/divio/django-cms/language/nb/)\n"
+"Language-Team: Norwegian Bokmål (http://app.transifex.com/divio/django-cms/language/nb/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -62,9 +62,6 @@ msgstr "Meta-tag beskrivelse"
 
 msgid "A description of the page used by search engines."
 msgstr "En beskrivelse av siden som brukes av søkemotorer."
-
-msgid "Slug must not be empty."
-msgstr "Slug må ha innhold"
 
 msgid "Page type"
 msgstr "Sidetype"
@@ -570,6 +567,12 @@ msgid "Provide a title for the new page."
 msgstr "Oppgi en tittel for den nye siden."
 
 msgid "Leave empty for automatic slug, or override as required."
+msgstr ""
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr ""
+
+msgid "Please provide a valid slug."
 msgstr ""
 
 msgid "You don't have the permissions required to add a page."

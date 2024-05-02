@@ -105,35 +105,39 @@ export const Helpers = {
 
         // if there is an ajax reload, prioritize
         if (ajax) {
-            parent.CMS.API.locked = true;
-            // check if the url has changed, if true redirect to the new path
-            // this requires an ajax request
-            $.ajax({
-                async: false,
-                type: 'GET',
-                url: parent.CMS.config.request.url,
-                data: data || {
-                    model: parent.CMS.config.request.model,
-                    pk: parent.CMS.config.request.pk
-                },
-                success: function(response) {
-                    parent.CMS.API.locked = false;
+            // Check if this is running inside a sideframe and then access
+            // the CMS APIs from the parent window
+            if (parent.CMS && parent.CMS.API) {
+                parent.CMS.API.locked = true;
+                // check if the url has changed, if true redirect to the new path
+                // this requires an ajax request
+                $.ajax({
+                    async: false,
+                    type: 'GET',
+                    url: parent.CMS.config.request.url,
+                    data: data || {
+                        model: parent.CMS.config.request.model,
+                        pk: parent.CMS.config.request.pk
+                    },
+                    success: function(response) {
+                        parent.CMS.API.locked = false;
 
-                    if (response === '' && !url) {
-                        // cancel if response is empty
-                        return false;
-                    } else if (parent.location.pathname !== response && response !== '') {
-                        // api call to the backend to check if the current path is still the same
-                        that.reloadBrowser(response);
-                    } else if (url === 'REFRESH_PAGE') {
-                        // if on_close provides REFRESH_PAGE, only do a reload
-                        that.reloadBrowser();
-                    } else if (url) {
-                        // on_close can also provide a url, reload to the new destination
-                        that.reloadBrowser(url);
+                        if (response === '' && !url) {
+                            // cancel if response is empty
+                            return false;
+                        } else if (parent.location.pathname !== response && response !== '') {
+                            // api call to the backend to check if the current path is still the same
+                            that.reloadBrowser(response);
+                        } else if (url === 'REFRESH_PAGE') {
+                            // if on_close provides REFRESH_PAGE, only do a reload
+                            that.reloadBrowser();
+                        } else if (url) {
+                            // on_close can also provide a url, reload to the new destination
+                            that.reloadBrowser(url);
+                        }
                     }
-                }
-            });
+                });
+            }
 
             // cancel further operations
             return false;
@@ -471,30 +475,18 @@ export const Helpers = {
     },
 
     /**
-     * Get color scheme either from :root[data-color-scheme] or user system setting
+     * Get color scheme either from :root[data-theme] or user system setting
      *
      * @method get_color_scheme
      * @public
      * @returns {String}
      */
     getColorScheme: function () {
-        let state = $('html').attr('data-color-scheme');
+        let state = $('html').attr('data-theme');
 
         if (!state) {
-            if (!CMS.settings) {
-                // Settings loaded? If not, pls. load.
-                this.getSettings();
-            }
-            state = CMS.settings.color_scheme;
-            if (!state && window.matchMedia) {
-                if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                    state = 'dark'; // dark mode
-                } else {
-                    state = 'light';
-                }
-            }
+            state = localStorage.getItem('theme') || CMS.config.color_scheme || 'auto';
         }
-
         return state;
     },
 
@@ -504,34 +496,63 @@ export const Helpers = {
      * @method setColorScheme
      * @public
      * @param scheme {String}
-     * @retiurns {void}
+     * @returns {void}
      */
 
-    setColorScheme: function (scheme) {
+    setColorScheme: function (mode) {
         let body = $('html');
+        let scheme = (mode !== 'light' && mode !== 'dark') ? 'auto' : mode;
 
-        if (!CMS.settings) {
-            // Settings loaded? If not, pls. load.
-            this.getSettings();
+        if (localStorage.getItem('theme') || CMS.config.color_scheme !== scheme) {
+            // Only set local storage if it is either already set or if scheme differs from preset
+            // to avoid fixing the user setting to the preset (which would ignore a change in presets)
+            localStorage.setItem('theme', scheme);
         }
-        CMS.settings.color_scheme = scheme;
-        this.setSettings(CMS.settings);
-        if (scheme === 'auto') {
-            body.removeAttr('data-color-scheme');
-            body.find('div.cms iframe').each(function(i, e) {
-                delete e.contentDocument.documentElement.dataset.colorScheme;
-            });
+
+        body.attr('data-theme', scheme);
+        body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
+            if (e.contentDocument) {
+                e.contentDocument.documentElement.dataset.theme = scheme;
+                // ckeditor (and potentially other apps) have iframes inside their admin forms
+                // also set color scheme there
+                $(e.contentDocument).find('iframe').each(setFrameColorScheme);
+            }
+        });
+    },
+
+    /**
+     * Cycles the color scheme for the current document and all iframes contained.
+     * Follows the logic introduced in Django's 4.2 admin
+     *
+     * @method setColorScheme
+     * @public}
+     * @returns {void}
+     */
+    toggleColorScheme: function () {
+        const currentTheme = this.getColorScheme();
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (prefersDark) {
+            // Auto (dark) -> Light -> Dark
+            if (currentTheme === 'auto') {
+                this.setColorScheme('light');
+            } else if (currentTheme === 'light') {
+                this.setColorScheme('dark');
+            } else {
+                this.setColorScheme('auto');
+            }
         } else {
-            body.attr('data-color-scheme', scheme);
-            body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
-                if (e.contentDocument) {
-                    e.contentDocument.documentElement.dataset.colorScheme = scheme;
-                    // ckeditor (and potentially other apps) have iframes inside their admin forms
-                    // also set color scheme there
-                    $(e.contentDocument).find('iframe').each(setFrameColorScheme);
-                }
-            });
+            // Auto (light) -> Dark -> Light
+            // eslint-disable-next-line no-lonely-if
+            if (currentTheme === 'auto') {
+                this.setColorScheme('dark');
+            } else if (currentTheme === 'dark') {
+                this.setColorScheme('light');
+            } else {
+                this.setColorScheme('auto');
+            }
         }
+
     }
 };
 

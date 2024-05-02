@@ -35,15 +35,19 @@ setting in your project's ``setting.py``:
 .. hint::
 
     If you plan to fix the color scheme to either light or dark, add a corresponding
-    ``data-color-scheme`` attribute to the ``html`` tag in your base template, e.g.
+    ``data-theme`` attribute to the ``html`` tag in your base template, e.g.
 
     .. code-block::
 
-        <html data-color-scheme="light">
+        <html data-theme="light">
 
     This will pin the color scheme early when loading pages and avoid potential
     flickering if the browser preference differs from the ``CMS_COLOR_SCHEME``
     setting.
+
+.. versionchanged:: 3.11.4
+
+    Before version 3.11.4 the color scheme was set by ``data-color-scheme``. Since version 3.11.4 django CMS uses ``data-theme`` just as Django since version 4.2.
 
 
 .. important::

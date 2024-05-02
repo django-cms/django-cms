@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"POT-Creation-Date: 2024-01-26 20:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -52,9 +52,6 @@ msgid "Description meta tag"
 msgstr ""
 
 msgid "A description of the page used by search engines."
-msgstr ""
-
-msgid "Slug must not be empty."
 msgstr ""
 
 msgid "Page type"
@@ -393,9 +390,6 @@ msgstr ""
 msgid "User guide"
 msgstr ""
 
-msgid "Support Forum"
-msgstr ""
-
 msgid "Support Slack"
 msgstr ""
 
@@ -561,6 +555,12 @@ msgid "Provide a title for the new page."
 msgstr ""
 
 msgid "Leave empty for automatic slug, or override as required."
+msgstr ""
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr ""
+
+msgid "Please provide a valid slug."
 msgstr ""
 
 msgid "You don't have the permissions required to add a page."
@@ -1572,7 +1572,7 @@ msgstr ""
 msgid "Add plugin to %(plugin_name)s"
 msgstr ""
 
-msgid "Community forum"
+msgid "Community chat"
 msgstr ""
 
 msgid "Getting started"

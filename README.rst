@@ -4,8 +4,6 @@ django CMS
 .. image:: https://static.pepy.tech/badge/django-cms
     :target: https://pepy.tech/project/django-cms
     :alt: Downloads
-.. image:: https://travis-ci.org/django-cms/django-cms.svg?branch=develop
-    :target: https://travis-ci.org/django-cms/django-cms
 .. image:: https://img.shields.io/pypi/v/django-cms.svg
     :target: https://pypi.python.org/pypi/django-cms/
 .. image:: https://img.shields.io/badge/wheel-yes-green.svg
@@ -102,7 +100,7 @@ The demo platform is kindly provided by Divio, platinum member of the django CMS
 Getting Help
 ************
 
-Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ or our `discourse forum <https://discourse.django-cms.org/>`_ for support.
+Please head over to our `Slack channel <https://www.django-cms.org/slack>`_ for support.
 
 ********************
 Professional support

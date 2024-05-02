@@ -16,6 +16,7 @@ from cms.toolbar.items import REFRESH_PAGE, ButtonList, TemplateItem
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
+from cms.utils.compat import DJANGO_4_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import user_can_change_page, user_can_delete_page, user_can_publish_page
@@ -48,12 +49,11 @@ TOOLBAR_DISABLE_BREAK = 'Toolbar disable Break'
 SHORTCUTS_BREAK = 'Shortcuts Break'
 
 DEFAULT_HELP_MENU_ITEMS = (
-    (gettext("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
-    (gettext("Documentation"), 'https://docs.django-cms.org/en/latest/'),
-    (gettext("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/'),
-    (gettext("Support Forum"), 'https://discourse.django-cms.org/'),
-    (gettext("Support Slack"), 'https://www.django-cms.org/slack'),
-    (gettext("What's new"), 'https://www.django-cms.org/en/blog/'),
+    (_("Getting started developer guide"), 'https://docs.django-cms.org/en/latest/introduction/index.html'),
+    (_("Documentation"), 'https://docs.django-cms.org/en/latest/'),
+    (_("User guide"), 'https://docs.google.com/document/d/1f5eWyD_sxUSok436fSqDI0NHcpQ88CXQoDoQm9ZXb0s/'),
+    (_("Support Slack"), 'https://www.django-cms.org/slack'),
+    (_("What's new"), 'https://www.django-cms.org/en/blog/'),
 )
 
 
@@ -226,7 +226,7 @@ class BasicToolbar(CMSToolbar):
             action=admin_reverse('logout'),
             active=True,
             on_success=on_success,
-            method='GET',
+            method='GET' if DJANGO_4_2 else 'POST',
         )
 
     def add_language_menu(self):
@@ -551,7 +551,7 @@ class PageToolbar(CMSToolbar):
                 )
                 disabled = len(remove) == 1
                 for code, name in remove:
-                    url = add_url_parameters(translation_delete_url, language=code)
+                    url = add_url_parameters(translation_delete_url, delete_language=code)
                     remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:

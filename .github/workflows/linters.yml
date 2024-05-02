@@ -17,10 +17,12 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.11"
+          python-version: "3.12"
           cache: 'pip'
       - run: |
           python -m pip install --upgrade pip
           pip install ruff
       - name: Run Ruff
-        run: ruff cms
+        run: |
+          ruff cms
+          ruff menus

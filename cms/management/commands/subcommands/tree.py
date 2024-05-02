@@ -22,15 +22,24 @@ def get_descendants(root):
 
 
 class FixTreeCommand(SubcommandsCommand):
-    help_string = 'Repairing Materialized Path Tree for Pages'
+    help_string = 'Repairing Materialized Path Tree for Pages and Plugins'
     command_name = 'fix-tree'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--fix-paths',
+            action='store_true',
+            default=False,
+            help='Fix paths for pages and plugins - takes a long time',
+        )
 
     def handle(self, *args, **options):
         """
         Repairs the tree
         """
+        fix_paths = options.get('fix_paths', False)
         self.stdout.write('fixing page tree')
-        TreeNode.fix_tree()
+        TreeNode.fix_tree(fix_paths=fix_paths)
 
         root_nodes = TreeNode.objects.filter(parent__isnull=True)
 
@@ -54,7 +63,7 @@ class FixTreeCommand(SubcommandsCommand):
             self._update_descendants_tree(root)
 
         self.stdout.write('fixing plugin tree')
-        CMSPlugin.fix_tree()
+        CMSPlugin.fix_tree(fix_paths=fix_paths)
         self.stdout.write('all done')
 
     def _update_descendants_tree(self, root):

@@ -11,6 +11,7 @@ from django.http import Http404, HttpResponseBadRequest, HttpResponseNotFound
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.encoding import force_str, smart_str
+from django.utils.http import urlencode
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 
@@ -35,6 +36,7 @@ from cms.test_utils.testcases import (
     URL_CMS_TRANSLATION_DELETE,
     CMSTestCase,
 )
+from cms.utils.compat import DJANGO_2_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -195,13 +197,23 @@ class AdminTestCase(AdminTestsBase):
         create_title("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
         create_title("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
         with self.login_user_context(admin_user):
-            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'de'})
             self.assertEqual(response.status_code, 200)
-            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'de'})
+            self.assertContains(
+                response,
+                'Are you sure you want to delete the title "delete-page-translation-2 (delete-page-translation-2, de)"?'
+            )
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk + "?delete_language=de&cms_path=/en/?edit&language=en")
+            self.assertEqual(response.status_code, 200)
+            self.assertContains(
+                response,
+                'Are you sure you want to delete the title "delete-page-translation-2 (delete-page-translation-2, de)"?'
+            )
+            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'de'})
             self.assertRedirects(response, URL_CMS_PAGE)
-            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
+            response = self.client.get(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'es-mx'})
             self.assertEqual(response.status_code, 200)
-            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'language': 'es-mx'})
+            response = self.client.post(URL_CMS_TRANSLATION_DELETE % page.pk, {'delete_language': 'es-mx'})
             self.assertRedirects(response, URL_CMS_PAGE)
 
     def test_change_dates(self):
@@ -627,7 +639,7 @@ class AdminTests(AdminTestsBase):
                     'placeholder_id': body.pk,
                     'target_language': 'en',
                 }
-                response = self.client.post(url, data)
+                response = self.client.post(f'{url}?{urlencode(data)}')
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
     def test_too_many_plugins_type(self):
@@ -651,11 +663,10 @@ class AdminTests(AdminTestsBase):
                     'target_language': 'en',
                     'plugin_parent': '',
                 }
-                response = self.client.post(url, data)
+                response = self.client.post(f'{url}?{urlencode(data)}')
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
 
     def test_too_many_plugins_global_children(self):
-        from urllib.parse import urlencode
         conf = {
             'body': {
                 'limits': {
@@ -885,7 +896,10 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Invalid slug
             response = self.client.post(self.get_admin_url(Page, 'add'), new_page_data)
-            expected_error = '<ul class="errorlist"><li>Slug must not be empty.</li></ul>'
+            expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
+                             'underscores or hyphens.</li></ul>'
+            if DJANGO_2_2:
+                expected_error = expected_error.replace("“", "&#39").replace("”", "&#39")
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 

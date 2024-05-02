@@ -292,6 +292,7 @@ describe('CMS.Modal', function() {
             });
 
             modal.minimize(); // restore
+            expect(modal.minimized).toEqual(false);
         });
 
         it('stores the css data to be able to restore a modal', function() {

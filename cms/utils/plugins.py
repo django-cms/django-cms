@@ -45,8 +45,7 @@ def assign_plugins(request, placeholders, template=None, lang=None, is_fallback=
         return
     placeholders = tuple(placeholders)
     lang = lang or get_language_from_request(request)
-    qs = get_cmsplugin_queryset(request)
-    qs = qs.filter(placeholder__in=placeholders, language=lang)
+    qs = CMSPlugin.objects.filter(placeholder__in=placeholders, language=lang)
     plugins = list(qs.order_by('placeholder', 'path'))
     fallbacks = defaultdict(list)
     # If no plugin is present in the current placeholder we loop in the fallback languages

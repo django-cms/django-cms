@@ -8,7 +8,7 @@ import Plugin from './cms.plugins';
 import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
 import URI from 'urijs';
-import DiffDOM from 'diff-dom';
+import { DiffDOM } from 'diff-dom';
 import PreventParentScroll from 'prevent-parent-scroll';
 import { find, findIndex, once, remove, compact, isEqual, zip, every } from 'lodash';
 import ls from 'local-storage';

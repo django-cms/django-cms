@@ -3,6 +3,3 @@ contact_links:
   - name: Question
     url: https://www.django-cms.org/en/support/
     about: Please use our community channels to ask for questions.
-  - name: Feature Request
-    url: https://discourse.django-cms.org/c/feature-requests
-    about: Please submit and discuss feature requests via discourse forum.

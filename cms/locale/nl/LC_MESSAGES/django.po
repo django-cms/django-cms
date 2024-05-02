@@ -29,10 +29,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 20:40+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Stefan van den Eertwegh <stefan@corebyte.nl>, 2022\n"
-"Language-Team: Dutch (http://www.transifex.com/divio/django-cms/language/nl/)\n"
+"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
+"Language-Team: Dutch (http://app.transifex.com/divio/django-cms/language/nl/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -75,9 +75,6 @@ msgstr "Meta tag Omschrijving"
 
 msgid "A description of the page used by search engines."
 msgstr "Een omschrijving van de pagina die door zoekmachines wordt gebruikt."
-
-msgid "Slug must not be empty."
-msgstr "Slug mag niet leeg zijn."
 
 msgid "Page type"
 msgstr "Paginatype"
@@ -584,6 +581,12 @@ msgstr "Geef een titel op voor de nieuwe pagina."
 
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "Laat leeg voor een automatische slug, of overschrijf zoals benodigd."
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr "Kan niet automatisch slug aanmaken. Probeer aub eenzelfde handmatig."
+
+msgid "Please provide a valid slug."
+msgstr "Probeer aub een geldige slug."
 
 msgid "You don't have the permissions required to add a page."
 msgstr "Je hebt niet de benodigde rechten om een pagina toe te voegen."

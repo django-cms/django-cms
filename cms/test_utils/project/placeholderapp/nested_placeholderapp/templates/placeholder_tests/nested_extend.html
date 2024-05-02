@@ -1,0 +1,16 @@
+{% extends "placeholder_tests/nested_extend.html" %}
+
+{% load cms_tags %}
+
+{% comment %}
+This file should result in following placeholders:
+
+    - recursed_one   (from cms/test_utils/project/placeholderapp/nested_placeholderapp/templates/placeholder_tests/nested_extend.html)
+    - two            (from cms/test_utils/project/placeholderapp/templates/placeholder_tests/nested_extend.html)
+    - recursed_three (from cms/test_utils/project/placeholderapp/templates/placeholder_tests/nested_extend.html)
+
+{% endcomment %}
+
+{% block one %}
+    {% placeholder "recursed_one" %}
+{% endblock %}

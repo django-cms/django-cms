@@ -91,5 +91,14 @@
     padding-left: 20px;
     border: 2px solid $color-primary;
     border-radius: $border-radius-base;
-    background-color: rgba($color-primary-fallback, 20%);
+    background-color: $white;
+    &:after {
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right:0 ;
+        background-color: rgba($color-primary-fallback, 40%);
+    }
 }

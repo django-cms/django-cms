@@ -9,7 +9,7 @@ from django.utils.encoding import force_str
 from cms.constants import PAGE_USERNAME_MAX_LENGTH
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.moderator import use_draft
+from cms.utils.moderator import _use_draft
 
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
 
@@ -169,7 +169,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     if clean_path is None:
         clean_path = not bool(use_path)
 
-    draft = use_draft(request)
+    draft = _use_draft(request)
     preview = 'preview' in request.GET
     path = request.path_info if use_path is None else use_path
 

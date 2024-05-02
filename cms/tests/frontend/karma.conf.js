@@ -7,7 +7,7 @@
 'use strict';
 
 process.env.NODE_ENV = 'test';
-
+process.env.CHROME_BIN = require('puppeteer').executablePath();
 var baseConf = require('./base.conf');
 var path = require('path');
 var fs = require('fs');
@@ -57,7 +57,7 @@ module.exports = function (config) {
     };
 
     var browsers = {
-        PhantomJS: 'used for local testing'
+        ChromeHeadlessCI: 'used for local testing'
     };
 
     var settings = {
@@ -66,7 +66,7 @@ module.exports = function (config) {
 
         // frameworks to use
         // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
-        frameworks: ['jasmine', 'fixture', 'phantomjs-shim'],
+        frameworks: ['jasmine', 'fixture'],
 
         // list of files / patterns to load in the browser
         files: [
@@ -147,6 +147,14 @@ module.exports = function (config) {
 
         // start these browsers
         browsers: Object.keys(browsers),
+
+        customLaunchers: {
+            ChromeHeadlessCI: {
+                base: 'ChromeHeadless',
+                flags: ['--window-size=1280,1080']
+            }
+        },
+
 
         concurrency: Infinity,
 

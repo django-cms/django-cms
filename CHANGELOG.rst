@@ -2,6 +2,178 @@
 Changelog
 =========
 
+3.11.5 (2024-01-26)
+===================
+
+Features:
+---------
+
+* feat: Add Python 3.12 support -- Vinit Kumar
+* feat: django 5 support for cms 3.11 -- Leonardo Cavallucci
+* feat: Add bot to remind to not squash merges into release/* branches -- Fabian Braun
+
+Bug Fixes
+---------
+
+* fix: preserve ``view_class`` in decorated views -- Will Hoey
+* fix: avoid InvalidCacheKey (memcached) for key-length ~249 -- fwehr
+* fix: Update transifex pull strings script for v3 in alignment with v4 -- Fabian Braun
+* fix: Use correct version of Django in GitHub CI actions -- Fabian Braun
+* fix: Remove link to closed discourse channel for feature requests from issue template -- Fabian Braun
+* fix: Remove discontinued discourse server from docs -- Fabian Braun
+* fix: Add ``--fix-paths`` option to ``./manage.py cms fix-tree`` -- Fabian Braun
+* fix: readable messages in dark-mode -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun
+* fwehr
+* Leonardo Cavallucci
+* Vinit Kumar
+* Will Hoey
+
+Thanks to all contributors for their efforts!
+
+3.11.4 (2023-09-06)
+===================
+
+Features:
+---------
+* Update dark mode switch to be compatible with Django 4.2 admin dark mode (#7549) (1106ae6d7) -- Fabian Braun
+
+Bug Fixes:
+----------
+* Toolbar action button becomes hard to read in dark mode (c626022ba) -- Fabian Braun
+* Backport v4.1.0rc4 fixes - Admin language and styling (#7630) (#7641) (90b72ebea) -- Fabian Braun
+* diff-dom freezing on content refresh: #7460 (#7600) (d8e9c527e) -- Vinit Kumar
+* Fixed RecursionError when extending templates (#7594) (c99f78759) -- mihalikv
+* JS issues with running CMS under cypress (#7591) (ce4c29948) -- Vinit Kumar
+* Mitigate performance hit due to deprecation warnings for v4.1 (#7587) (9908d7e70) -- Fabian Braun
+* create page wizard fails with Asian page titles/unicode slugs (#7565) (0ab640ce3) -- Fabian Braun
+* require Django >= 3.2 (#7562) (a77358b93) -- Fabian Braun
+* respect pre-set (48353c2d6) -- Fabian Braun
+* lint menus app (#7534) (927b60b47) -- Vinit Kumar
+* remove curly bracket left behind on PR 7488 (#7529) (123f7df91) -- Corentin Bettiol
+
+Statistics:
+-----------
+
+This release includes 46 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* ChengDaqi2023 (1 pull request)
+* Corentin Bettiol (1 pull request)
+* Fabian Braun (15 pull requests)
+* Github Release Action (3 pull requests)
+* Vinit Kumar (3 pull requests)
+* caption (1 pull request)
+* mihalikv (1 pull request)
+* suryadev99 (1 pull request)
+
+With the review help of the following contributors:
+
+* Cage Johnson
+* Christian Clauss
+* Conrad
+* Corentin Bettiol
+* Danny Waser
+* Dapo Adedire
+* Fabian Braun
+* Fabien MICHEL
+* Florian Delizy
+* G3RB3N
+* Github Release Action
+* Hussein Srour
+* Ivo Branco
+* Jasper
+* Marco Bonetti
+* Mark Walker
+* Micah Denbraver
+* Nihal
+* Nihal Rahman
+* Pankrat
+* Patrick Mazulo
+* Petr Klus
+* Qijia Liu
+* Shivan Sivakumaran
+* Simon Krull
+* Vinit Kumar
+* code-review-doctor
+* dependabot[bot]
+* fsbraun
+* jefe
+* jillalberts
+* pajowu
+* ton77v
+* viliam mihalik
+* viliammihalik
+* wesleysima
+
+Thanks to all contributors for their efforts!
+
+3.11.3 (2023-04-25)
+===================
+
+Bug Fixes:
+----------
+* Remove superfluous curly bracket left behind on PR 7488 (#7529) -- Corentin Bettiol
+* Fix admin tests (#6848) for some post requests (#7535) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 2 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Corentin Bettiol (1 pull request)
+* Fabian Braun (1 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+3.11.2 (2023-04-18)
+===================
+
+Features:
+---------
+* add django 4.2 support (#7481) (5478faa5c) -- Vinit Kumar
+* add setting to redirect slugs to lowercase (#7509) (01aedee9f) -- pajowu
+* add setting so redirect preserves params (#7489) (dcb9c4b3a) -- Ivo Branco
+* add download statistics to readme (#7474) (25b2303f7) -- Fabian Braun
+
+Bug Fixes:
+----------
+* replace ' by ′ in fr translation − no more "page d\u0027accueil"! (#7488) (b4acc9a6b) -- Corentin Bettiol
+* Link both user and group from global page permissions to change form (#7486) (6cb47629b) -- Fabian Braun
+* Build docs always from the current local version (#7472) (#7475) (7aaddd45a) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 21 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Corentin Bettiol (1 pull request)
+* Danny Waser (1 pull request)
+* Fabian Braun (10 pull requests)
+* Ivo Branco (1 pull request)
+* Jasper (1 pull request)
+* Nihal Rahman (1 pull request)
+* Vinit Kumar (3 pull requests)
+* pajowu (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Nihal
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 3.11.1 (2022-12-12)
 ===================
 

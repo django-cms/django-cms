@@ -12,7 +12,7 @@ from cms.apphook_pool import apphook_pool
 from cms.models.pagemodel import Page
 from cms.utils import get_current_site
 from cms.utils.i18n import get_language_list
-from cms.utils.moderator import use_draft
+from cms.utils.moderator import _use_draft
 
 APP_RESOLVERS = []
 
@@ -35,7 +35,7 @@ def applications_page_check(request, path=None):
         if path.startswith(lang + "/"):
             path = path[len(lang + "/"):]
 
-    use_public = not use_draft(request)
+    use_public = not _use_draft(request)
 
     for resolver in APP_RESOLVERS:
         try:

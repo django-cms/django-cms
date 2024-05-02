@@ -1,0 +1,62 @@
+.. _upgrade-to-3.11.3:
+
+######################
+ release notes 3.11.3
+######################
+
+This release focuses on Django 4.2 support which will be LTS. django CMS version 3.11.x will be supported until the end of life of Django 4.2 estimated for April 2026.
+
+Compared to 3.11.2 it fixes a bug which broke the dropdown menu in the page tree.
+
+********************
+What's new in 3.11.3
+********************
+
+Bug Fixes:
+----------
+* Remove superfluous curly bracket left behind on PR 7488 (#7529) -- Corentin Bettiol
+* Fix admin tests (#6848) for some post requests (#7535) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 2 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Corentin Bettiol (1 pull request)
+* Fabian Braun (1 pull requests)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+
+************************
+How to upgrade to
+************************
+
+We assume you are upgrading from django CMS 3.11.2 or django CMS 3.11.1.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Check your settings of `CMS_LANGUAGES` (if used), as it was ignored by default in preceding versions.
+For more information, please see: https://github.com/django-cms/django-cms/pull/6795
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.

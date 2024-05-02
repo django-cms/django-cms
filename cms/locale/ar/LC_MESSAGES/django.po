@@ -18,10 +18,10 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-05 19:07+0100\n"
+"POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
 "Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
-"Language-Team: Arabic (http://www.transifex.com/divio/django-cms/language/ar/)\n"
+"Language-Team: Arabic (http://app.transifex.com/divio/django-cms/language/ar/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -64,9 +64,6 @@ msgstr "علامة الوصف التعريفية"
 
 msgid "A description of the page used by search engines."
 msgstr "شرح عن الصفحة تستخدمه محركات البحث."
-
-msgid "Slug must not be empty."
-msgstr "حقل الـ Slug يجب ان لا يكون فارغا"
 
 msgid "Page type"
 msgstr "نوع الصفحة"
@@ -573,6 +570,12 @@ msgstr "زوّد الصفحة الجديدة بعنوان."
 
 msgid "Leave empty for automatic slug, or override as required."
 msgstr "لعنوان تفرع تلقائي يُترك فارغاً ، أو تعاد صياغته حسب الطلب."
+
+msgid "Cannot automatically create slug. Please provide one manually."
+msgstr ""
+
+msgid "Please provide a valid slug."
+msgstr ""
 
 msgid "You don't have the permissions required to add a page."
 msgstr "ليس لديك الصلاحية لإضافة صفحة."
