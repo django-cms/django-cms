@@ -5,7 +5,8 @@ from django.contrib.sites.models import Site
 from django.db import models
 from django.db.models import Prefetch
 from django.db.models.base import ModelState
-from django.db.models.functions import Concat
+from django.db.models.constraints import UniqueConstraint
+from django.db.models.functions import Concat, Lower
 from django.forms import model_to_dict
 from django.urls import reverse
 from django.utils.encoding import force_str
@@ -1084,7 +1085,10 @@ class PageUrl(models.Model):
     class Meta:
         app_label = 'cms'
         default_permissions = []
-        unique_together = [['path', 'language'], ['page', 'language']]
+        constraints = [
+            UniqueConstraint(Lower('path'), 'language', name='unique_together_path_language'),
+            UniqueConstraint(fields=['page', 'language'], name='unique_together_page_language'),
+        ]
 
     def __str__(self):
         return "%s (%s)" % (self.path or self.slug, self.language)
