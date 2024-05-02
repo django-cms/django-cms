@@ -256,6 +256,9 @@
     $margin: math.div($toolbar-height - $toolbar-button-height, 2);
     @extend .cms-toolbar-item-buttons;
     float: right;
+    &:dir(rtl) {
+        float: left;
+    }
     margin-inline-start: $margin;
 
     .cancel-link {
@@ -264,6 +267,9 @@
 }
 .cms-modal-item-buttons-left {
     float: left;
+    &:dir(rtl) {
+        float: right;
+    }
 }
 
 // alter footer when html markup is loaded
