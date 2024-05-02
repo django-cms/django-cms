@@ -193,7 +193,7 @@
 
 .cms-modal-resize {
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     z-index: z(modal, resize);
     font-size: 10px;
@@ -206,6 +206,9 @@
         bottom: 5px;
         right: 5px;
         font-size: $font-size-small;
+        &:dir(rtl) {
+            transform: scale(-1,1) translate(2px, 0);  // flip drag triangle
+        }
     }
 }
 
