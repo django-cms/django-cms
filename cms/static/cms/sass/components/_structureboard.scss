@@ -371,7 +371,7 @@
             margin-inline-start: $structure-dragarea-padding-horizontal - 10px;
             cursor: pointer;
             transform: rotate(180deg);
-            [dir="rtl"] & {
+            &:dir(rtl) {
                 transform: rotate(0deg);
             }
         }
@@ -381,7 +381,7 @@
     }
     .cms-dragitem-expanded:before {
         transform: rotate(-90deg);
-        [dir="rtl"] & {
+        &:dir(rtl) {
             transform: rotate(-90deg);
         }
     }
