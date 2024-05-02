@@ -1,6 +1,8 @@
 from collections import OrderedDict
 
-from cms.models import TreeNode
+from django.db.utils import IntegrityError
+
+from cms.models import PageUrl, TreeNode
 
 from .base import SubcommandsCommand
 
@@ -52,6 +54,15 @@ class FixTreeCommand(SubcommandsCommand):
 
         for root in root_nodes.order_by('site__pk', 'path'):
             self._update_descendants_tree(root)
+
+        self.stdout.write('fixing page URLs')
+        for node in root_nodes:
+            page = node.cms_pages.get()
+            for language in page.get_languages():
+                if not page.is_home:
+                    page._update_url_path(language)
+                self._update_url_path_recursive(page, language)
+
         self.stdout.write('all done')
 
     def _update_descendants_tree(self, root):
@@ -79,3 +90,23 @@ class FixTreeCommand(SubcommandsCommand):
                     # draft child for this parent.
                     node.move(target=nodes.get(pk=tree[0].parent_id), pos='first-child')
                 last_node = node
+
+    def _update_url_path_recursive(self, page, language):
+        if page.node.is_leaf() or language not in page.get_languages():
+            return
+
+        pages = page.get_child_pages()
+        base_path = page.get_path(language)
+        new_path = page._get_path_sql_value(base_path)
+
+        try:
+            (PageUrl
+             .objects
+             .filter(language=language, page__in=pages)
+             .exclude(managed=False)
+             .update(path=new_path))
+        except IntegrityError as exc:
+            self.stdout.write(f"{exc} while updating path for page: /{language}/{new_path}")
+
+        for child in pages.filter(urls__language=language).iterator():
+            self._update_url_path_recursive(child, language)

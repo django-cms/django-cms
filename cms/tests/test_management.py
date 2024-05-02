@@ -73,7 +73,7 @@ class ManagementTestCase(CMSTestCase):
         page1.node.save()
         out = StringIO()
         management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
-        self.assertEqual(out.getvalue(), 'fixing page tree\nall done\n')
+        self.assertEqual(out.getvalue(), 'fixing page tree\nfixing page URLs\nall done\n')
         page1 = page1.reload()
         self.assertEqual(page1.node.path, "0002")
         self.assertEqual(page1.node.depth, 1)
