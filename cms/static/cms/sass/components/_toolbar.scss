@@ -241,6 +241,12 @@
 
     .cms-toolbar-item {
         float: none;
+        [dir="rtl"] & {
+            // a bit weird, but if removed, it will best match
+            // with [dir="rtl"] div.cms .cms-toolbar .cms-toolbar-item
+            // and will float to the right
+            float: none;
+        }
         margin: $toolbar-menu-item-padding !important;
         overflow: hidden;
         margin-top: 5px;
