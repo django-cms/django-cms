@@ -576,7 +576,7 @@ class Modal {
         var height = this.ui.modal.height();
         var modalLeft = this.ui.modal.position().left;
         var modalTop = this.ui.modal.position().top;
-        var resizeDir = this.ui.resize.css("direction") === "rtl" ? -1 : +1;
+        var resizeDir = this.ui.resize.css('direction') === 'rtl' ? -1 : +1;
 
         // create event for stopping
         this.ui.body.on(this.pointerUp, function(e) {
