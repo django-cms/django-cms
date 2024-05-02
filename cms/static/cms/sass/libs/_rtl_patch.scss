@@ -1,0 +1,43 @@
+/* This patch file contains all :dir(rtl) selectors for browsers that do not support it yet */
+/* Once, sufficiantly many users have browsers that support `:dir()`, this file can be removed */
+
+/* component: toolbar */
+
+.cms-toolbar {
+    .cms-toolbar-item {
+        float: right;
+    }
+}
+
+.cms-toolbar-item-navigation {
+    li, li a {
+        float: right;
+    }
+    .cms-toolbar-item-navigation-children > a span .cms-icon {
+        transform: rotate(0deg);
+    }
+}
+
+.cms-toolbar-more .cms-toolbar-item-cms-mode-switcher a {
+    float: right !important;
+}
+
+.cms-messages .cms-messages-close {
+    float: left;
+}
+
+.cms-toolbar-item-buttons a {
+    float: right;
+}
+
+
+/* component: modal */
+
+.cms-modal-item-buttons {
+    float: left;
+}
+
+.cms-modal-item-buttons-left {
+    float: right;
+}
+
