@@ -41,3 +41,40 @@
     float: right;
 }
 
+
+/* component: structureboard */
+
+.cms-structure {
+    .cms-dragitem-collapsable:before {
+        transform: rotate(0deg);
+    }
+    .cms-dragitem-expanded:before {
+        transform: rotate(-90deg);
+    }
+}
+
+
+/* component: tree */
+
+.cms-pagetree-section {
+    h2 {
+        float: right;
+    }
+
+}
+
+.cms-tree-col, .cms-tree-reload, .cms-tree-filters {
+    float: left;
+}
+
+.cms-tree-search {
+    float: right;
+}
+
+.jstree-django-cms .jstree-ocl {
+    float: right;
+}
+
+.jstree-anchor {
+    background-position: calc(100% - 2px) center;
+}
