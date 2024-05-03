@@ -8,7 +8,7 @@
     display: none;
     position: fixed;
     top: 0;
-    left: 0;
+    inline-start: 0;
     width: 0;
     bottom: 0;
     z-index: z(sideframe, base);
@@ -60,7 +60,7 @@
 .cms-sideframe-controls {
     position: absolute;
     top: $sideframe-buttons-position-top + $sideframe-buttons-offset;
-    right: $sideframe-buttons-position-right;
+    inset-inline-end: $sideframe-buttons-position-right;
     z-index: z(sideframe, buttons);
     box-shadow: $toolbar-shadow;
     background-color: $white;
