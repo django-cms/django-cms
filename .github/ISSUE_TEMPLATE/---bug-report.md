@@ -61,5 +61,5 @@ CMS/Python/Django versions, logs etc. here.
 The django CMS project is managed and kept alive by its open source community and is backed by the [django CMS Association](https://www.django-cms.org/en/about-us/). We therefore welcome any help and are grateful if people contribute to the project. Please use 'x' to check the items below.
 -->
 
-* [ ] Yes, I want to help fix this issue and I will join #workgroup-pr-review on [Slack](https://www.django-cms.org/slack) to confirm with the community that a PR is welcome. 
+* [ ] Yes, I want to help fix this issue and I will join #workgroup-pr-review on [Discord](https://discord.com/channels/800813886689247262/1201999613272535130) to confirm with the community that a PR is welcome. 
 * [ ] No, I only want to report the issue.
