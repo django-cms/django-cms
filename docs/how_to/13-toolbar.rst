@@ -112,7 +112,7 @@ Action                 Text link variant                                        
 Open link              :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_link_item`      :meth:`~cms.toolbar.toolbar.CMSToolbar.add_button`
 Open link in sideframe :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_sideframe_item` :meth:`~cms.toolbar.toolbar.CMSToolbar.add_sideframe_button`
 Open link in modal     :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_modal_item`     :meth:`~cms.toolbar.toolbar.CMSToolbar.add_modal_button`
-POST action            :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_ajax_item`
+Ajax POST action       :meth:`~cms.toolbar.items.ToolbarAPIMixin.add_ajax_item`
 ====================== ============================================================= ===========================================================
 
 The basic form for using any of these is:

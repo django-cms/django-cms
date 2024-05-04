@@ -63,7 +63,7 @@ docutils==0.19
     #   sphinx
 furo==2022.12.7
     # via -r requirements.in
-idna==3.4
+idna==3.7
     # via requests
 imagesize==1.4.1
     # via sphinx
@@ -106,6 +106,8 @@ pygments==2.13.0
     #   -r requirements.in
     #   furo
     #   sphinx
+pyparsing==3.0.9
+    # via packaging
 pytz==2022.6
     # via
     #   babel
@@ -153,7 +155,7 @@ sphinxcontrib-spelling==7.6.2
     # via -r requirements.in
 sphinxext-opengraph==0.7.5
     # via -r requirements.in
-sqlparse==0.4.3
+sqlparse==0.5.0
     # via django
 tabulate==0.9.0
     # via docstrfmt

@@ -37,7 +37,7 @@ jobs:
                 {
                   "title": "New Contributor Alert",
                   "description": "A new contributor has opened a pull request!",
-                  "color": 3066993,  # You can customize the color here
+                  "color": 3066993,
                   "fields": [
                     {
                       "name": "Repository",
