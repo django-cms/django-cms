@@ -29,7 +29,7 @@ Here’s what the pull request process looks like in brief:
 1. Fork our GitHub repository, https://github.com/django-cms/django-cms
 2. Work locally and push your changes to your repository.
 3. When you feel your code is good enough for inclusion, send us a pull request.
-4. After that, please join our `Discourse Server <https://discord-pr-review-channel.django-cms.org>`_ . This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
+4. After that, please join our `Discord Server <https://discord-pr-review-channel.django-cms.org>`_ . This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
 5. Get acknowledged by the django CMS community for your contribution :-)
 
 To learn more about basic requirements and standards of code contribution, please familiarize yourself with our comprehensive `documentation <https://docs.django-cms.org/en/latest/contributing/code.html#>`_.
