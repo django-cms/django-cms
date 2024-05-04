@@ -37,4 +37,4 @@ django CMS by hand, rather than using the django CMS quistart project, see
 :doc:`/introduction/01-install` and then follow the rest of the tutorials.
 
 Either way, you'll be able to find support and help from the numerous friendly members
-of the django CMS community on `our Discord server <https://discord.gg/6cf2FKBR>`_.
+of the django CMS community on `our Discord server <https://discord-support-channel.django-cms.org>`_.
