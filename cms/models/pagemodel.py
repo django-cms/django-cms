@@ -3,9 +3,9 @@ from os.path import join
 
 from django.contrib.sites.models import Site
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import F, Prefetch, Q
 from django.db.models.base import ModelState
-from django.db.models.constraints import UniqueConstraint
+from django.db.models.constraints import CheckConstraint, UniqueConstraint
 from django.db.models.functions import Concat, Lower
 from django.forms import model_to_dict
 from django.urls import reverse
@@ -1086,6 +1086,7 @@ class PageUrl(models.Model):
         app_label = 'cms'
         default_permissions = []
         constraints = [
+            CheckConstraint(check=Q(slug=Lower(F('slug'))), name='check_slug_lowercase'),
             UniqueConstraint(Lower('path'), 'language', name='unique_together_path_language'),
             UniqueConstraint(fields=['page', 'language'], name='unique_together_page_language'),
         ]
