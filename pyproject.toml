@@ -37,6 +37,7 @@ extend-ignore = [
   "B028",
   "B018",
   "B020",
+  "B024",  # abstract base class, but has no abstract method
   "B026",
   "B904",
   "C400",
