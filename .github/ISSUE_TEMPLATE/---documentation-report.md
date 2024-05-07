@@ -35,9 +35,9 @@ CMS/Python/Django versions, logs etc. here.
 
 ## Do you want to help fix this documentation issue?
 
-<!-- 
+<!--
 The django CMS project is managed and kept alive by its open source community and is backed by the [django CMS Association](https://www.django-cms.org/en/about-us/). We therefore welcome any help and are grateful if people contribute to the project. Please use 'x' to check the items below.
 -->
 
-* [ ] Yes, I want to help fix this issue and I will join #workgroup-documentation on [Slack](https://www.django-cms.org/slack) to confirm with the team that a PR is welcome. 
+* [ ] Yes, I want to help fix this issue and I will join the channel #documentation on our [Discord Server](https://discord-docs-channel.django-cms.org) to confirm with the team that a PR is welcome.
 * [ ] No, I only want to report the issue.
