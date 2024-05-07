@@ -7,7 +7,7 @@ from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
 from django.forms import model_to_dict
-from django.urls import reverse, NoReverseMatch
+from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
