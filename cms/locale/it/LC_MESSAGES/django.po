@@ -9,6 +9,7 @@
 # yakky <i.spalletti@nephila.it>, 2023
 # Leonardo Cavallucci, 2023
 # Fabian Braun <fsbraun@gmx.de>, 2023
+# Raffaella Suardini, 2024
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -16,7 +17,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
+"Last-Translator: Raffaella Suardini, 2024\n"
 "Language-Team: Italian (https://app.transifex.com/divio/teams/58664/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -76,7 +77,7 @@ msgid "Keep this field empty if standard path should be used."
 msgstr "Lascia questo campo vuoto per utilizzare il percorso standard."
 
 msgid "Soft root"
-msgstr ""
+msgstr "Soft root"
 
 msgid "All ancestors will not be displayed in the navigation"
 msgstr ""
@@ -206,7 +207,7 @@ msgstr "Il placeholder del plugin genitore deve essere identico!"
 
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "La posizione del Plugin deve essere maggiore di %(position)d"
 
 msgid "Advanced Settings"
 msgstr "Impostazioni avanzate"
@@ -216,7 +217,7 @@ msgstr "La pagina non può essere impostata come home"
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "Il %(name)s\"%(obj)s\" è stato cancellato con successo."
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -277,9 +278,10 @@ msgstr "Il titolo e i plugin con lingua %(language)s sono stati eliminati"
 
 msgid "You do not have permission to change a page's navigation status"
 msgstr ""
+"Non hai l'autorizzazione per modificare lo stato di navigazione della pagina"
 
 msgid "You cannot change this page's navigation status"
-msgstr ""
+msgstr "Non puoi modificare questo stato di navigazione della pagina"
 
 msgid "Public content"
 msgstr "Contenuto pubblico"
@@ -288,7 +290,7 @@ msgid "Empty"
 msgstr "Vuoto"
 
 msgid "Create Content"
-msgstr ""
+msgstr "Crea contenuto"
 
 msgid "View restriction"
 msgstr "Restrizione di visualizzazione"
@@ -357,15 +359,15 @@ msgid "Actions"
 msgstr "Azioni"
 
 msgid "Empty content"
-msgstr ""
+msgstr "Contenuto vuoto"
 
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "Proprietà %(object_name)s"
 
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "Aggiungi un nuovo%(object_name)s"
 
 msgid "Add content"
 msgstr "Aggiungi contenuto"
@@ -374,10 +376,13 @@ msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"Il contenuto nella lingua corrente è stato modificato. Fai clic su "
+"\"Annulla\" per tornare al form e salvare le modifiche. Fai clic su \"OK\" "
+"per annullare le modifiche."
 
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "Aggiunto contenuto %(language)s"
 
 msgid "Preview"
 msgstr "Anteprima"
@@ -390,6 +395,8 @@ msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
 msgstr ""
+"Lingua %(value)s non valida. Questo modulo non può essere elaborato. Prova a"
+" cambiare lingua."
 
 msgid "<unspecified>"
 msgstr ""
@@ -562,9 +569,10 @@ msgstr ""
 
 msgid "Cannot automatically create slug. Please provide one manually."
 msgstr ""
+"Impossibile creare automaticamente uno slug. Forniscine uno manualmente."
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "Fornisci uno slug valido."
 
 msgid "You don't have the permissions required to add a page."
 msgstr "Non hai i permessi necessari per aggiungere una pagina."
@@ -663,7 +671,7 @@ msgid "page"
 msgstr "pagina"
 
 msgid "no limit set"
-msgstr ""
+msgstr "nessun limite impostato"
 
 msgid "for logged in users only"
 msgstr "solo per utenti che hanno eseguito il login"
@@ -705,10 +713,10 @@ msgid "The template used to render the content."
 msgstr "Il template utilizzato per il rendering del contenuto."
 
 msgid "page content"
-msgstr ""
+msgstr "contenuto della pagina"
 
 msgid "page contents"
-msgstr ""
+msgstr "contenuti della pagina"
 
 msgid "default"
 msgstr "predefinito"
@@ -886,7 +894,7 @@ msgid "There are no further settings for this plugin. Please press save."
 msgstr "Questo plugin non prevede altre impostazioni. Premi salva."
 
 msgid "Moved"
-msgstr ""
+msgstr "Spostato"
 
 msgid "Changed"
 msgstr "Modificata"
@@ -895,25 +903,25 @@ msgid "Deleted"
 msgstr "Cancellato"
 
 msgid "Added Page Translation"
-msgstr ""
+msgstr "Aggiunta Traduzione Pagina"
 
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "Modificata Traduzione Pagina"
 
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "Cancellata Traduzione Pagina"
 
 msgid "Added Plugin"
-msgstr ""
+msgstr "Aggiungi Plugin"
 
 msgid "Changed Plugin"
-msgstr ""
+msgstr "Plugin Modificato"
 
 msgid "Moved Plugin"
-msgstr ""
+msgstr "Plugin Spostato"
 
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "Plugin Cancellato"
 
 msgid "Cut Plugin"
 msgstr "Taglia plugin"
@@ -922,19 +930,19 @@ msgid "Paste Plugin"
 msgstr "Incolla Plugin"
 
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "Incolla da Segnaposto"
 
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "Aggiunto un plugin al segnaposto dagli appunti"
 
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "Svuotato Segnaposto"
 
 msgid "Save"
 msgstr "Salva"
 
 msgid "Some fields cannot be changed since they are read-only content."
-msgstr ""
+msgstr "Alcuni campi non possono essere modificati perché sono read-only"
 
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
@@ -1173,6 +1181,7 @@ msgstr "Questa pagina non ha un'anteprima!"
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
 msgstr ""
+"Probabilmente l'apphook allegato non fornisce contenuto per la sua root."
 
 msgid "It is being redirected to:"
 msgstr "Redirezione a:"
@@ -1444,7 +1453,7 @@ msgid "Next"
 msgstr "Avanti"
 
 msgid "Unknown"
-msgstr ""
+msgstr "Sconosciuto"
 
 #, python-format
 msgid "Page not found on %(domain)s"
