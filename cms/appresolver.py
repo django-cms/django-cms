@@ -3,7 +3,7 @@ from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
-from django.urls import Resolver404, URLResolver, reverse
+from django.urls import NoReverseMatch, Resolver404, URLResolver, reverse
 from django.urls.resolvers import RegexPattern, URLPattern
 from django.utils.translation import get_language, override
 
@@ -26,7 +26,10 @@ def applications_page_check(request):
     """
     # We should get in this branch only if an apphook is active on /
     # This removes the non-CMS part of the URL.
-    path = request.path_info.replace(reverse('pages-root'), '', 1)
+    try:
+        path = request.path_info.replace(reverse('pages-root'), '', 1)
+    except NoReverseMatch:
+        path = request.path_info
 
     # check if application resolver can resolve this
     for lang in get_language_list():
