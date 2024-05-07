@@ -7,7 +7,7 @@ from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
 from django.forms import model_to_dict
-from django.urls import reverse
+from django.urls import reverse, NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
@@ -360,10 +360,13 @@ class Page(models.Model):
             language = get_current_language()
 
         with force_language(language):
-            if self.is_home:
-                return reverse('pages-root')
-            path = self.get_path(language, fallback) or self.get_slug(language, fallback)  # TODO: Disallow get_slug
-            return reverse('pages-details-by-slug', kwargs={"slug": path}) if path else None
+            try:
+                if self.is_home:
+                    return reverse('pages-root')
+                path = self.get_path(language, fallback) or self.get_slug(language, fallback)  # TODO: Disallow get_slug
+                return reverse('pages-details-by-slug', kwargs={"slug": path}) if path else None
+            except NoReverseMatch:
+                return None
 
     def set_tree_node(self, site, target=None, position='first-child'):
         assert position in ('last-child', 'first-child', 'left', 'right')
@@ -1085,9 +1088,12 @@ class PageUrl(models.Model):
             language = get_current_language()
 
         with force_language(language):
-            if self.path == '':
-                return reverse('pages-root')
-            return reverse('pages-details-by-slug', kwargs={"slug": self.path})
+            try:
+                if self.path == '':
+                    return reverse('pages-root')
+                return reverse('pages-details-by-slug', kwargs={"slug": self.path})
+            except NoReverseMatch:
+                return None
 
     def get_path_for_base(self, base_path=''):
         old_base, sep, slug = self.path.rpartition('/')

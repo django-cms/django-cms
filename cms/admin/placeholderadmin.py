@@ -18,7 +18,7 @@ from django.http import (
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
-from django.urls import re_path
+from django.urls import re_path, include
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
@@ -212,6 +212,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name="%s_%s" % (info, fn.__name__))
         url_patterns = [
+            re_path(r'^cms_wizard/', include('cms.wizards.urls')),
             pat(r'^copy-plugins/$', self.copy_plugins),
             pat(r'^add-plugin/$', self.add_plugin),
             pat(r'^edit-plugin/([0-9]+)/$', self.edit_plugin),

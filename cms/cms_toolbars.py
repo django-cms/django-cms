@@ -96,7 +96,7 @@ class PlaceholderToolbar(CMSToolbar):
             disabled = True
 
         url = '{url}?page={page}&language={lang}&edit'.format(
-            url=reverse("cms_wizard_create"),
+            url=admin_reverse("cms_wizard_create"),
             page=page_pk,
             lang=self.toolbar.site_language,
         )
@@ -435,7 +435,10 @@ class PageToolbar(CMSToolbar):
 
         # else redirect to root, do not redirect to Page.objects.get_home() because user could have deleted the last
         # page, if DEBUG == False this could cause a 404
-        return reverse('pages-root')
+        try:
+            return reverse('pages-root')
+        except NoReverseMatch:
+            return admin_reverse("cms_pagecontent_changelist")
 
     @property
     def title(self):
