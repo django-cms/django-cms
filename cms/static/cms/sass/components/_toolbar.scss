@@ -85,7 +85,7 @@
         z-index: 30;
 
         @at-root .cms-structure-mode-structure & {
-            right: $toolbar-height;
+            inset-inline-end: $toolbar-height;
         }
     }
     .cms-toolbar .cms-btn-action {
