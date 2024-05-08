@@ -99,7 +99,7 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
 
     def get_list_display(
         self, request: HttpRequest
-    ) -> tuple[str | typing.Callable[[models.Model], str], ...]:
+    ) -> tuple[typing.Union[str, typing.Callable[[models.Model], str]], ...]:
         list_display = super().get_list_display(request)
         return tuple(
             self.get_admin_list_actions(request)
@@ -166,7 +166,7 @@ class GrouperChangeListBase(ChangeList):
 
     _extra_grouping_fields = []
 
-    def get_filters_params(self, params: dict | None = None):
+    def get_filters_params(self, params: typing.Optional[dict] = None):
         lookup_params = super().get_filters_params(params)
         for field in self._extra_grouping_fields:
             if field in lookup_params:
@@ -207,7 +207,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     #: The name of the ``ForeignKey`` in the content model that points to the grouper instance. If not given
     #: it is assumed to be the snake case name of the grouper model class, e.g. ``"blog_post"`` for the
     #: ``"BlogPost"`` model.
-    grouper_field_name: str | None = None
+    grouper_field_name: typing.Optional[str] = None
     #: Indicates additional grouping fields such as ``"language"`` for example. Additional grouping fields create
     #: tabs in the change form and a dropdown menu in the change list view.
     #:
