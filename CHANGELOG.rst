@@ -1,3 +1,73 @@
+4.1.1 (2024-04-30)
+==================
+
+Features:
+---------
+* send post request if toolbar button has `cms-form-post-method` class (bb31ba990) -- Fabian Braun
+* Add RTL support to modal header and related components (#7863) (bef004550) -- Moe
+* Add RTL support to toolbar (#7871) (92a1086de) -- Moe
+* add versioned deprecation warnings (#7750) (545ea1f6d) -- Fabian Braun
+* Added new contributor message based on django's own version (#7797) (311af6cf3) -- Mark Walker
+
+Bug Fixes:
+----------
+* Placeholders must not block deletion of their source objects (ccb2e8b3b) -- Fabian Braun
+* structure board on the right for ltr (a4c6ccb68) -- Fabian Braun
+* CMS widgets need not load if they are read only (#7880) (fb30434e4) -- Fabian Braun
+* some Django antipatterns (#7867) (c436cf45a) -- Jacob Rief
+* Redirects to newly created object (#7864) (0b43a43c3) -- Fabian Braun
+* `views.details` revealed existence of unpublished language (#7853) (fa7b89cee) -- Fabian Braun
+* Render structure view in toolbar object's language (#7846) (d123d118d) -- Fabian Braun
+* Add RTL support to pagetree (#7817) (21d6a6def) -- Moe
+* 7828, try using uv as pip replacement (#7829) (08463c274) -- Vinit Kumar
+* Efficient build menu for versioned and unversioned pages (#7807) (b0f59bb55) -- Fabian Braun
+* Delete orphaned plugin management command for django CMS 4 (#7814) (3e635d3db) -- Fabian Braun
+* render content in place `redirect_on_fallback` is False (#7781) (e264d0400) -- Moe
+* solved issue #7818 (#7819) (087fa3ec7) -- Raffaella
+* Port forward #7070 - faster DOM update after editing (#7787) (26b081a31) -- Fabian Braun
+* return _handle_no_page when page is None (#7786) (ce8d5d557) -- Moe
+* Redirect user to edit url after a successful page creation (#7772) (f290e3d09) -- Moe
+* editing of apphooked CMS pages without apphook landing page (#7766) (cd6df846b) -- Philipp S. Sommer
+* make messages readable in dark mode, let user close long messages (#7740) (68749cbb3) -- Fabian Braun
+* Replace the VCS pip installs with release name in docs (#7755) (10e9b5327) -- sakhawy
+* Incorrect commands to migrate database in docs (#7754) (082214be6) -- sakhawy
+* Incomplete command to create a virtual env in docs (#7735) (490dffab1) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 89 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Aiden-RC (2 pull requests)
+* Erdenebat Oyungerel (1 pull request)
+* Fabian Braun (37 pull requests)
+* Github Release Action (4 pull requests)
+* Jacob Rief (4 pull requests)
+* Mario Colombo (1 pull request)
+* Mark Walker (9 pull requests)
+* Miloš Nikić (1 pull request)
+* Moe (6 pull requests)
+* Philipp S. Sommer (1 pull request)
+* Raffaella (1 pull request)
+* Vinit Kumar (1 pull request)
+* dependabot[bot] (0 pull request)
+* sakhawy (2 pull requests)
+* sparrow (1 pull request)
+
+With the review help of the following contributors:
+
+* Fabian Braun
+* Github Release Action
+* Jacob Rief
+* Leonardo Cavallucci
+* Mario Colombo
+* Mark Walker
+* Vinit Kumar
+* dependabot[bot]
+* nichoski
+
+Thanks to all contributors for their efforts!
+
 4.1.0 (2023-12-22)
 ==================
 
