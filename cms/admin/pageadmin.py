@@ -95,6 +95,7 @@ def get_site(request):
     return site
 
 
+@admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
     change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
@@ -164,9 +165,9 @@ class PageAdmin(admin.ModelAdmin):
     def get_urls(self):
         """Get the admin urls
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
         url_patterns = [
             pat(r'^list/$', self.get_list),
@@ -383,7 +384,7 @@ class PageAdmin(admin.ModelAdmin):
                     'value': str(obj_id),
                 })
                 return TemplateResponse(request, self.popup_response_template or [
-                    'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                    f'admin/{opts.app_label}/{opts.model_name}/popup_response.html',
                     'admin/%s/popup_response.html' % opts.app_label,
                     'admin/popup_response.html',
                 ], {'popup_response_data': popup_response_data})
@@ -784,6 +785,7 @@ class PageAdmin(admin.ModelAdmin):
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
+@admin.register(PageContent)
 class PageContentAdmin(admin.ModelAdmin):
     ordering = ('page__node__path',)
     search_fields = ('=id', 'page__id', 'page__urls__slug', 'title', 'page__reverse_id')
@@ -852,9 +854,9 @@ class PageContentAdmin(admin.ModelAdmin):
     def get_urls(self):
         """Get the admin urls
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
         url_patterns = [
             pat(r'^get-tree/$', self.get_tree),
@@ -1329,7 +1331,7 @@ class PageContentAdmin(admin.ModelAdmin):
         context.update(extra_context or {})
         request.current_app = self.admin_site.name
         return render(request, self.delete_confirmation_template or [
-            "admin/%s/%s/delete_confirmation.html" % (app_label, titleopts.object_name.lower()),
+            f"admin/{app_label}/{titleopts.object_name.lower()}/delete_confirmation.html",
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context)
@@ -1501,5 +1503,3 @@ class PageContentAdmin(admin.ModelAdmin):
         return "", []
 
 
-admin.site.register(Page, PageAdmin)
-admin.site.register(PageContent, PageContentAdmin)

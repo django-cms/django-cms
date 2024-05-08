@@ -614,7 +614,7 @@ class ToolbarTests(ToolbarTestBase):
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=True)
     def test_show_toolbar_login_anonymous(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
-        page_url = "%s?%s" % (page.get_absolute_url(), get_cms_setting('TOOLBAR_URL__ENABLE'))
+        page_url = "{}?{}".format(page.get_absolute_url(), get_cms_setting('TOOLBAR_URL__ENABLE'))
         response = self.client.get(page_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'cms-toolbar')
@@ -809,10 +809,10 @@ class ToolbarTests(ToolbarTestBase):
     def assertMenuItems(self, request, menu_id, name, items=None):
         toolbar = CMSToolbar(request)
         toolbar.populate()
-        menu = dict(
-            (force_str(getattr(item, 'name', '|')), item)
+        menu = {
+            force_str(getattr(item, 'name', '|')): item
             for item in toolbar.get_menu(menu_id).get_items()
-        )
+        }
         self.assertIn(name, list(menu))
         if items is not None:
             sub_menu = list(
@@ -1424,11 +1424,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            "CMS._plugins.push(['cms-plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
+            "CMS._plugins.push(['cms-plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
 
         self.assertContains(
             response,
-            "CMS._plugins.push(['cms-plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
+            "CMS._plugins.push(['cms-plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
 
     def test_add_tag(self):
         user = self.get_staff()
@@ -1565,12 +1565,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2} cms-render-model '
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-{} cms-render-model '
             'cms-render-model-block">'.format(
                 'placeholderapp', 'example1', ex1.pk
             )
         )
-        self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
+        self.assertContains(response, f'<h1>{ex1.char_1} - {ex1.char_2}</h1>')
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
         self.assertContains(
             response, '<a href="%s">successful if</a>\n    \n<template' % (reverse('detail', args=(ex1.pk,)))
@@ -1596,12 +1596,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2} cms-render-model '
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-{} cms-render-model '
             'cms-render-model-block">'.format(
                 'placeholderapp', 'example1', ex1.pk
             )
         )
-        self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
+        self.assertContains(response, f'<h1>{ex1.char_1} - {ex1.char_2}</h1>')
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
         self.assertContains(
             response, '<a href="%s">successful if</a>\n    \n<template' % (reverse('detail', args=(ex1.pk,)))
@@ -1622,14 +1622,14 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-changelist-{2} cms-render-model '
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-changelist-{} cms-render-model '
             'cms-render-model-block"></template>'.format(
                 'placeholderapp', 'example1', ex1.pk
             )
         )
         self.assertContains(
             response,
-            "edit_plugin: '%s?language=%s&amp;edit_fields=changelist'" % (
+            "edit_plugin: '{}?language={}&amp;edit_fields=changelist'".format(
                 admin_reverse('placeholderapp_example1_changelist'), 'en'
             )
         )
@@ -1651,14 +1651,14 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model">'
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-{}-{} cms-render-model">'
             '</template>'.format(
                 'placeholderapp', 'example1', 'fake_field', ex1.pk
             )
         )
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model">'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{}-{}-{}-{} cms-render-model">'
             '</template>'.format(
                 'placeholderapp', 'example1', 'fake_field', ex1.pk
             )

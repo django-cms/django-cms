@@ -345,7 +345,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins * 2)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -391,7 +391,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -494,7 +494,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
 
         # Original PageContent untouched
         self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))
@@ -617,7 +617,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             self.assertEqual(origina_site1_langs[page.pk], set(page.get_languages()))
 
         for page in Page.objects.on_site(site_active):
-            self.assertEqual(set(('de', 'fr')), set(page.get_languages()))
+            self.assertEqual({'de', 'fr'}, set(page.get_languages()))
 
         # plugins for site 1
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)

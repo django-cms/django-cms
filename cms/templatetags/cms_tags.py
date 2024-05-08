@@ -503,17 +503,17 @@ class CMSEditableObject(InclusionTag):
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = "%s %s list" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {} list".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = "%s %s" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {}".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(
                         edit_fields
                     ) if not isinstance('edit_fields', str) else edit_fields
             else:
-                instance.get_plugin_name = "%s %s" % (smart_str(_('Add')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {}".format(smart_str(_('Add')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
             extra_context['generic'] = opts
@@ -531,28 +531,25 @@ class CMSEditableObject(InclusionTag):
                 # The default view_url is the default admin changeform for the
                 # current instance
                 if not editmode:
-                    view_url = 'admin:%s_%s_add' % (
-                        opts.app_label, opts.model_name)
+                    view_url = f'admin:{opts.app_label}_{opts.model_name}_add'
                     url_base = reverse(view_url)
                 elif not edit_fields:
                     if not view_url:
-                        view_url = 'admin:%s_%s_change' % (
-                            opts.app_label, opts.model_name)
+                        view_url = f'admin:{opts.app_label}_{opts.model_name}_change'
                     if isinstance(instance, Page):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     else:
                         url_base = reverse(view_url, args=(instance.pk,))
                 else:
                     if not view_url:
-                        view_url = 'admin:%s_%s_edit_field' % (
-                            opts.app_label, opts.model_name)
+                        view_url = f'admin:{opts.app_label}_{opts.model_name}_edit_field'
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
                     else:
                         url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             if editmode:
-                extra_context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+                extra_context['edit_url'] = f"{url_base}?{urlencode(querystring)}"
             else:
                 extra_context['edit_url'] = "%s" % url_base
             extra_context['refresh_page'] = True
@@ -650,8 +647,7 @@ class CMSEditableObject(InclusionTag):
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
         if edit_fields == 'changelist':
-            view_url = 'admin:%s_%s_changelist' % (
-                instance._meta.app_label, instance._meta.model_name)
+            view_url = f'admin:{instance._meta.app_label}_{instance._meta.model_name}_changelist'
         querystring = OrderedDict((('language', language),))
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")

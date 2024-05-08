@@ -91,9 +91,9 @@ class FrontendEditableAdminMixin:
         """
         Register the url for the single field edit view
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name="%s_%s" % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f"{info}_{fn.__name__}")
         url_patterns = [
             pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
         ]
@@ -189,6 +189,7 @@ class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
     pass
 
 
+@admin.register(Placeholder)
 class PlaceholderAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
@@ -217,9 +218,9 @@ class PlaceholderAdmin(admin.ModelAdmin):
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name="%s_%s" % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f"{info}_{fn.__name__}")
         url_patterns = [
             pat(r'^copy-plugins/$', self.copy_plugins),
             pat(r'^add-plugin/$', self.add_plugin),
@@ -1119,4 +1120,3 @@ class PlaceholderAdmin(admin.ModelAdmin):
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
 
 
-admin.site.register(Placeholder, PlaceholderAdmin)
