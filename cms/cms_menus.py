@@ -1,3 +1,4 @@
+import typing
 from typing import Optional
 
 from django.db.models.query import Prefetch, prefetch_related_objects
@@ -170,7 +171,7 @@ class CMSNavigationNode(NavigationNode):
         language: The language used for the node (optional).
     """
 
-    def __init__(self, *args, path: str, language: str | None = None, **kwargs):
+    def __init__(self, *args, path: str, language: typing.Optional[str] = None, **kwargs):
         """
         Initializes a CMSNavigationNode instance.
 
