@@ -184,14 +184,15 @@ class PlaceholderToolbar(CMSToolbar):
 
     def add_preview_button(self):
         url = get_object_preview_url(self.toolbar.obj, language=self.toolbar.request_language)
-        item = ButtonList(side=self.toolbar.RIGHT)
-        item.add_button(
-            _('Preview'),
-            url=url,
-            disabled=False,
-            extra_classes=['cms-btn', 'cms-btn-switch-save'],
-        )
-        self.toolbar.add_item(item)
+        if url:
+            item = ButtonList(side=self.toolbar.RIGHT)
+            item.add_button(
+                _('Preview'),
+                url=url,
+                disabled=False,
+                extra_classes=['cms-btn', 'cms-btn-switch-save'],
+            )
+            self.toolbar.add_item(item)
 
     def add_structure_mode(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         structure_active = self.toolbar.structure_mode_active
