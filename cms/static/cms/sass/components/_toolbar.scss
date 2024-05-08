@@ -85,7 +85,7 @@
         z-index: 30;
 
         @at-root .cms-structure-mode-structure & {
-            right: $toolbar-height;
+            inset-inline-end: $toolbar-height;
         }
     }
     .cms-toolbar .cms-btn-action {
@@ -365,6 +365,17 @@
     }
 }
 
+@at-root .cms-structure-mode-endpoint.cms-structure-mode-structure & {
+    .cms-toolbar-item-cms-mode-switcher {
+        display: none;
+    }
+    .cms-toolbar-right {
+        padding-inline-end: 0;
+    }
+    .cms-toolbar::after, .cms-debug-bar {
+        inset-inline-end: 0;
+    }
+}
 //###########################################################
 // #TOOLBAR/dialog#
 .cms-messages {
