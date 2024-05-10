@@ -339,6 +339,7 @@ var Plugin = new Class({
     _dblClickToEditHandler: function _dblClickToEditHandler(e) {
         var that = this;
         var disabled = $(e.currentTarget).closest('.cms-drag-disabled');
+        
         e.preventDefault();
         e.stopPropagation();
 
