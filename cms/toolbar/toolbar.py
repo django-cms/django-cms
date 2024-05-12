@@ -124,6 +124,7 @@ class CMSToolbar(BaseToolbar):
         self.show_toolbar = None
         self.clipboard = None
         self.toolbar_language = None
+        self.toolbar_language_bidi = None
         self.show_toolbar = True
         self.init_toolbar(request, request_path=request_path)
         # Internal attribute to track whether we can cache
@@ -189,6 +190,7 @@ class CMSToolbar(BaseToolbar):
                 user_settings.language = self.request_language
                 user_settings.save()
             self.clipboard = user_settings.clipboard
+        self.toolbar_language_bidi = self.toolbar_language in settings.LANGUAGES_BIDI
 
         if hasattr(self, 'toolbars'):
             for key in self.toolbars:
