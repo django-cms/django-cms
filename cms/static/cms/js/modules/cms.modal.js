@@ -576,6 +576,7 @@ class Modal {
         var height = this.ui.modal.height();
         var modalLeft = this.ui.modal.position().left;
         var modalTop = this.ui.modal.position().top;
+        var resizeDir = this.ui.resize.css('direction') === 'rtl' ? -1 : +1;
 
         // create event for stopping
         this.ui.body.on(this.pointerUp, function(e) {
@@ -588,11 +589,11 @@ class Modal {
             .on(this.pointerMove, function(e) {
                 var mvX = pointerEvent.originalEvent.pageX - e.originalEvent.pageX;
                 var mvY = pointerEvent.originalEvent.pageY - e.originalEvent.pageY;
-                var w = width - mvX * 2;
+                var w = width - resizeDir * mvX * 2;
                 var h = height - mvY * 2;
                 var wMin = that.options.minWidth;
                 var hMin = that.options.minHeight;
-                var left = mvX + modalLeft;
+                var left = resizeDir * mvX + modalLeft;
                 var top = mvY + modalTop;
 
                 // add some limits
