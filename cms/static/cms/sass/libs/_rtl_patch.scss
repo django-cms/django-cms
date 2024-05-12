@@ -41,6 +41,13 @@
     float: right;
 }
 
+.cms-modal-resize {
+    cursor: nw-resize;
+    span {
+        transform: scale(-1,1) translate(2px, 0);  // flip drag triangle
+    }
+}
+
 
 /* component: structureboard */
 

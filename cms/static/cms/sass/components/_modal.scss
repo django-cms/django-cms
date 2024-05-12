@@ -201,6 +201,9 @@
     width: $modal-resize-size;
     height: $modal-resize-size;
     cursor: nw-resize;
+    &:dir(rtl) {
+        cursor: ne-resize;
+    }
     span {
         position: absolute;
         bottom: 5px;
