@@ -56,7 +56,7 @@
     // items
     .cms-toolbar-item {
         float: left;
-        [dir=rtl] & {
+        &:dir(rtl) {
             float: right;
         }
     }
@@ -85,7 +85,7 @@
         z-index: 30;
 
         @at-root .cms-structure-mode-structure & {
-            right: $toolbar-height;
+            inset-inline-end: $toolbar-height;
         }
     }
     .cms-toolbar .cms-btn-action {
@@ -107,13 +107,13 @@
     li {
         position: relative;
         float: left;
-        [dir=rtl] & {
+        &:dir(rtl) {
             float: right;
         }
     }
     li a {
         float: left;
-        [dir=rtl] & {
+        &:dir(rtl) {
             float: right;
         }
         color: $toolbar-menu-item-color;
@@ -184,7 +184,7 @@
                 display: block;
                 .cms-icon {
                     display: block;
-                    [dir="rtl"] & {
+                    &:dir(rtl) {
                         // undo arrow rotation for RTL
                         transform: rotate(0deg);
                     }
@@ -241,7 +241,7 @@
 
     .cms-toolbar-item {
         float: none;
-        [dir=rtl] & {
+        [dir="rtl"] & {
             // a bit weird, but if removed, it will best match
             // with [dir="rtl"] div.cms .cms-toolbar .cms-toolbar-item
             // and will float to the right
@@ -254,7 +254,7 @@
     }
     .cms-toolbar-item-cms-mode-switcher a {
         float: left !important;
-        [dir=rtl] & {
+        &:dir(rtl) {
             float: right !important;
         }
         width: 50%;
@@ -415,7 +415,7 @@
         cursor: pointer;
         display: none;
         float: right;
-        [dir=rtl] & {
+        &:dir(rtl) {
             float: left;
         }
         position: relative;
@@ -570,7 +570,7 @@
 
     a {
         float: left;
-        [dir=rtl] & {
+        &:dir(rtl) {
             float: right;
         }
         line-height: $toolbar-button-height;
