@@ -508,7 +508,7 @@ class BaseCMSTestCase:
 
     def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None):
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -529,7 +529,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -542,7 +542,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -555,7 +555,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -568,7 +568,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -581,7 +581,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -594,7 +594,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
