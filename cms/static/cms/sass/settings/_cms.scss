@@ -137,8 +137,8 @@ $z-layers: (
     "messages":         999999,
     "toolbar": (
         "base":         9999999,
-        "left":         10,
-        "right":        10,
+        "inset-inline-start": 10,
+        "inset-inline-end": 10,
     ),
     "sideframe": (
         "base":         999999,

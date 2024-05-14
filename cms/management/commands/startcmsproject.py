@@ -100,7 +100,7 @@ $ {self.style.SUCCESS("cd " + project)}
 $ {self.style.SUCCESS("python -m manage runserver")}
 
 Learn more at https://docs.django-cms.org/
-Join the django CMS Slack channel http://www.django-cms.org/slack
+Join the django CMS Discord Server at https://discord-main-channel.django-cms.org
 
 Enjoy!
 """
