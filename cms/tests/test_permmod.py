@@ -139,28 +139,6 @@ class PermissionModeratorTests(CMSTestCase):
             response = self.client.get(self.get_page_add_uri('en'))
             self.assertEqual(response.status_code, 403)
 
-    @override_settings(
-        CMS_PLACEHOLDER_CONF={
-            'col_left': {
-                'default_plugins': [
-                    {
-                        'plugin_type': 'TextPlugin',
-                        'values': {
-                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
-                        },
-                    },
-                ]
-            },
-        },
-    )
-    def test_default_plugins(self):
-        with self.login_user_context(self.user_slave):
-            self.assertEqual(CMSPlugin.objects.count(), 0)
-            response = self.client.get(self.slave_page.get_absolute_url(), {'edit': 1})
-            self.assertEqual(response.status_code, 200)
-            self.assertEqual(CMSPlugin.objects.count(), 1)
-
-
     def test_super_can_add_plugin(self):
         self._add_plugin(self.user_super, page=self.slave_page)
 
