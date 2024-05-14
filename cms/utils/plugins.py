@@ -128,7 +128,7 @@ def create_default_plugins(request, placeholders, template, lang):
 
     def _create_default_plugins(placeholder, confs, parent=None):
         """
-        Auxillary function that builds all of a placeholder's default plugins
+        Auxiliary function that builds all of a placeholder's default plugins
         at the current level and drives the recursion down the tree.
         Returns the plugins at the current level along with all descendants.
         """
