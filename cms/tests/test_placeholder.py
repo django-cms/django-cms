@@ -769,7 +769,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             context['request'] = self.get_request(language="en", page=page)
             # Our page should have "en default body 1" AND "en default body 2"
             content = _render_placeholder(placeholder, context)
-            self.assertRegexpMatches(content, "^<p>en default body 1</p>\s*<p>en default body 2</p>$")
+            self.assertRegex(content, r"^<p>en default body 1</p>\s*<p>en default body 2</p>$")
 
     def test_plugins_children_prepopulate(self):
         """
