@@ -1051,6 +1051,24 @@ class PageContentAdmin(admin.ModelAdmin):
         )
         return can_change_page
 
+    def has_view_permission(self, request, obj=None):
+        """
+        Return true if the current user has permission on the page.
+        Return the string 'All' if the user has all rights.
+        """
+        # Identical to has_change_permission, but will remain untouched by any subclassing
+        # as done, e.g., by djangocms-versioning
+        site = get_site(request)
+
+        if obj:
+            return page_permissions.user_can_change_page(request.user, page=obj.page, site=site)
+        can_view_page = page_permissions.user_can_change_at_least_one_page(
+            user=request.user,
+            site=get_site(request),
+            use_cache=False,
+        )
+        return can_view_page
+
     def has_delete_permission(self, request, obj=None):
         """
         Returns True if the current user has permission to delete the page.
