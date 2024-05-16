@@ -119,7 +119,13 @@ def _get_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
     if sub_key_list:
         cache_key += '|' + '|'.join(sub_key_list)
 
-    if len(cache_key) > 250:
+    # django itself adds "version" add the end of cache-keys, e.g. "<key>:1".
+    # -> If `cache.set()` is for example called with `version=""`, it still adds
+    #    `:` at the end. So if we check the length for `> 250`, a length of 249
+    #    or even 250 ends up in an InvalidCacheKey-exception.
+    # In order to avoid these errors, we hash the keys at a lower length to also
+    # have a little buffer.
+    if len(cache_key) > 200:
         cache_key = '{prefix}|{hash}'.format(
             prefix=prefix,
             hash=hashlib.sha1(cache_key.encode('utf-8')).hexdigest(),

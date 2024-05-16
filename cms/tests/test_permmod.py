@@ -591,7 +591,7 @@ class GlobalPermissionTests(CMSTestCase):
                 with self.assertNumQueries(FuzzyInt(3, max_queries)):
                     # internally this calls PageAdmin.has_[add|change|delete|view]_permission()
                     expected_perms = {'add': True, 'change': True, 'delete': False}
-                    expected_perms.update({'view': False})  # Why
+                    expected_perms.update({'view': expected_perms['change']})
                     self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
 
             # can't use the above loop for this test, as we're testing that
@@ -619,7 +619,7 @@ class GlobalPermissionTests(CMSTestCase):
                 request.current_page = None
                 request.session = {}
                 expected_perms = {'add': True, 'change': True, 'delete': False}
-                expected_perms.update({'view': False})
+                expected_perms.update({'view': expected_perms['change']})
                 self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
 
     def test_has_page_add_permission_with_target(self):
