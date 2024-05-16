@@ -290,6 +290,12 @@ class AddPageForm(BasePageContentForm):
         if len(choices) < 2:
             source_field.widget = forms.HiddenInput()
 
+    def clean_slug(self):
+        slug = self.cleaned_data['slug']
+        if slug != slug.lower():
+            raise ValidationError("Slug must have all characters in lowercase")
+        return slug
+
     def clean(self):
         data = self.cleaned_data
 

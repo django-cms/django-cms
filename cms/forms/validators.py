@@ -29,7 +29,7 @@ def validate_url_uniqueness(site, path, language, user_language=None, exclude_pa
         validate_url(path)
 
     path = path.strip('/')
-    page_urls = PageUrl.objects.get_for_site(site, language=language).filter(path=path)
+    page_urls = PageUrl.objects.get_for_site(site, language=language).filter(path=path.lower())
 
     if exclude_page:
         page_urls = page_urls.exclude(page=exclude_page.pk)
