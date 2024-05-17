@@ -19,6 +19,7 @@
 # Marco Barberis <mbarberis@gmail.com>, 2011
 # mbi0 <marco@cruncher.ch>, 2013
 # mbi0 <marco@cruncher.ch>, 2013
+# Raffaella Suardini, 2024
 # Saverio <saverio.brancaccio@gmail.com>, 2014
 # Stefano Brentegani <sbrentegani@gmail.com>, 2013-2014
 # Stefano Brentegani <sbrentegani@gmail.com>, 2011
@@ -31,7 +32,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Leonardo Cavallucci, 2023\n"
+"Last-Translator: Raffaella Suardini, 2024\n"
 "Language-Team: Italian (http://app.transifex.com/divio/django-cms/language/it/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -583,10 +584,10 @@ msgid "Leave empty for automatic slug, or override as required."
 msgstr "Lascia vuoto per slug automatico, o inserisci a seconda delle necessità."
 
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr ""
+msgstr "Impossibile creare automaticamente uno slug. Forniscine uno manualmente."
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "Fornisci uno slug valido."
 
 msgid "You don't have the permissions required to add a page."
 msgstr "Non hai i permessi necessari per aggiungere una pagina."
