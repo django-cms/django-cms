@@ -2,16 +2,25 @@
 Changelog
 =========
 
+3.11.6 (2024-05-17)
+===================
+
+* feat: Toolbar direction set based on toolbar language (back port of #7902) by @skhawy in https://github.com/django-cms/django-cms/pull/7914
+* feat: Add RTL support to pagetree by @sakhawy in https://github.com/django-cms/django-cms/pull/7842
+* fix: Add `--fix-paths` option to `./manage.py cms fix-tree` by @fsbraun in https://github.com/django-cms/django-cms/pull/7744
+* fix: readable messages in dark-mode by @fsbraun in https://github.com/django-cms/django-cms/pull/7739
+* fix: Patch Toolbar Middleware Response by @jimlind in https://github.com/django-cms/django-cms/pull/7856
+* fix: also use key-length of 200 for the actual cache-key of placeholders by @wfehr in https://github.com/django-cms/django-cms/pull/7910
+
 Statistics:
 -----------
 
 This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
-
-With the review help of the following contributors:
-
+* Moe (2 pull requests)
+* Fabian Braun (2 pull requests)
+* Jim Lind (1 pull request)
+* FWehr (1 pull request)
 
 Thanks to all contributors for their efforts!
 
