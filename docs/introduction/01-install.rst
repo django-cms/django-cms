@@ -365,10 +365,12 @@ configured by default in a new Django project's :setting:`django:DATABASES`.
 .. note::
 
     For deployment, you'll need to use a :doc:`production-ready database with Django
-    <django:ref/databases>`. We recommend using PostgreSQL_ or MySQL_.
+    <django:ref/databases>`. We recommend using PostgreSQL_, MySQL_ or MariaDB_.
 
     Installing and maintaining database systems is far beyond the scope of this
     documentation, but is very well documented on the systems' respective websites.
+
+    .. _mariadb: http://www.mariadb.com
 
     .. _mysql: http://www.mysql.com
 
@@ -380,7 +382,7 @@ configured by default in a new Django project's :setting:`django:DATABASES`.
     .. code-block::
 
         pip install psycopg2     # for Postgres
-        pip install mysqlclient  # for MySQL
+        pip install mysqlclient  # for MySQL or MariaDB
 
     Refer to :setting:`Django's DATABASES setting documentation <django:DATABASES>` for the
     appropriate configuration for your chosen database backend.
