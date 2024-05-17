@@ -3,7 +3,8 @@ name: Publish Python 🐍 distributions 📦 to TestPyPI
 on:
   push:
     branches:
-      - master
+      - release/*
+      - deveop-4
 
 jobs:
   build-n-publish:
