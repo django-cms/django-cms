@@ -11,7 +11,7 @@ jobs:
     name: Build and publish Python 🐍 distributions 📦 to TestPyPI
     runs-on: ubuntu-latest
     environment:
-      name: pypi
+      name: test
       url: https://test.pypi.org/p/django-cms
     permissions:
       id-token: write
