@@ -1,0 +1,61 @@
+.. _upgrade-to-3.11.6:
+
+####################
+Release notes 3.11.6
+####################
+
+********************
+What's new in 3.11.6
+********************
+
+Features:
+---------
+
+* feat: Toolbar direction set based on toolbar language (back port of #7902) by @skhawy in https://github.com/django-cms/django-cms/pull/7914
+* feat: Add RTL support to pagetree by @sakhawy in https://github.com/django-cms/django-cms/pull/7842
+
+Bug Fixes
+---------
+
+* fix: Add `--fix-paths` option to `./manage.py cms fix-tree` by @fsbraun in https://github.com/django-cms/django-cms/pull/7744
+* fix: readable messages in dark-mode by @fsbraun in https://github.com/django-cms/django-cms/pull/7739
+* fix: Patch Toolbar Middleware Response by @jimlind in https://github.com/django-cms/django-cms/pull/7856
+* fix: also use key-length of 200 for the actual cache-key of placeholders by @wfehr in https://github.com/django-cms/django-cms/pull/7910
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Moe (2 pull requests)
+* Fabian Braun (2 pull requests)
+* Jim Lind (1 pull request)
+* FWehr (1 pull request)
+
+Thanks to all contributors for their efforts!
+
+
+************************
+How to upgrade to 3.11.6
+************************
+
+We assume you are upgrading from django CMS 3.11.5.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.

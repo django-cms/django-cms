@@ -3,7 +3,7 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Aleks Acimovic, 2022
+# Aleks Acimovic, 2022,2024
 # Damir <damir.arbula@gmail.com>, 2013-2015,2018
 # Dino Ilic <dino.ilic@gmail.com>, 2017
 # Fabian Braun <fsbraun@gmx.de>, 2022
@@ -15,7 +15,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-05 17:55+0200\n"
 "PO-Revision-Date: 2010-11-30 06:47+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2022\n"
+"Last-Translator: Aleks Acimovic, 2022,2024\n"
 "Language-Team: Croatian (http://app.transifex.com/divio/django-cms/language/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -567,10 +567,10 @@ msgid "Leave empty for automatic slug, or override as required."
 msgstr "Ostavite prazno za automatski slug ili upišite slug."
 
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr ""
+msgstr "Nemoguće je automatski kreirati slug. Molimo upišite ga ručno."
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "Molimo upišite ispravan slug."
 
 msgid "You don't have the permissions required to add a page."
 msgstr "Nemate ovlasti dodati stranicu."
@@ -1070,7 +1070,7 @@ msgid "View"
 msgstr "Pogled"
 
 msgid "Menu"
-msgstr "Izborni"
+msgstr "Izbornik"
 
 #, python-format
 msgid ""
@@ -1260,7 +1260,7 @@ msgid "The page was changed in the meantime, reloading..."
 msgstr "Stranica je u međuvremenu promijenjena, ponovno učitavam..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "Prečaci CMS-a"
 
 msgid "Bring up this help dialog"
 msgstr "Prikaži ovaj dijalog za pomoć"
@@ -1281,7 +1281,7 @@ msgid "Focus on Toolbar"
 msgstr "Fokusiraj na toolbar"
 
 msgid "Structureboard"
-msgstr ""
+msgstr "Strukturna ploča"
 
 msgid "Focus on placeholders"
 msgstr "Fokusiraj na placholdere"
@@ -1582,7 +1582,7 @@ msgid "Getting started"
 msgstr "Kako započeti"
 
 msgid "Talk to us"
-msgstr ""
+msgstr "Kontaktirajte nas"
 
 msgid "CMS - your user account was created."
 msgstr "CMS - Vaš korisnički račun je kreiran."
