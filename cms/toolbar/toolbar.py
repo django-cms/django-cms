@@ -578,3 +578,6 @@ class EmptyToolbar(BaseToolbar):
     def __init__(self, request):
         self.request = request
         super().__init__()
+
+    def get_object(self):
+        return None
