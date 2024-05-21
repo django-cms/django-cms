@@ -113,7 +113,7 @@ pytz==2022.6
     #   django
 pyyaml==6.0.1
     # via libcst
-requests==2.28.1
+requests==2.32.0
     # via sphinx
 six==1.16.0
     # via livereload
