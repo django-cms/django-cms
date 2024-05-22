@@ -136,9 +136,9 @@ class TemplatetagTests(CMSTestCase):
         template = '{% load cms_tags %}{% page_attribute page_title %}'
         output_script = self.render_template_obj(template, {}, request_script)
         output_ampersand = self.render_template_obj(template, {}, request_ampersand)
-        
+
         self.assertNotEqual(script, output_script)
-        self.assertEqual(ampersand, output_ampersand) 
+        self.assertEqual(ampersand, output_ampersand)
         self.assertEqual(strip_tags(script), output_script)
         self.assertEqual(strip_tags(ampersand), output_ampersand)
 
