@@ -3,6 +3,8 @@ import sys
 from collections import OrderedDict, defaultdict, deque
 from copy import deepcopy
 from functools import lru_cache
+from itertools import starmap
+from operator import itemgetter
 
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
@@ -12,6 +14,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_language_from_request
+from cms.utils.permissions import has_plugin_permission
 from cms.utils.placeholder import get_placeholder_conf
 
 logger = logging.getLogger(__name__)
@@ -30,6 +33,28 @@ def get_plugin_model(plugin_type: str) -> CMSPlugin:
 
 
 def get_plugins(request, placeholder, template, lang=None):
+    """
+    Get a list of plugins for a placeholder in a specified template. Respects the placeholder's cache.
+
+    :param request: (HttpRequest) The HTTP request object.
+    :param placeholder: (Placeholder) The placeholder object for which to retrieve plugins.
+    :param template: (Template) The template object in which the placeholder resides (not used).
+    :param lang: (str, optional) The language code for localization. Defaults to None.
+
+    Returns:
+        list: A list of plugins for the specified placeholder in the template.
+
+    Raises:
+        None.
+
+    Examples::
+
+        # Get plugins for a placeholder in a template
+        plugins = get_plugins(request, placeholder, template)
+
+        # Get plugins for a placeholder in a template with specific language
+        plugins = get_plugins(request, placeholder, template, lang='en')
+    """
     if not placeholder:
         return []
     if not hasattr(placeholder, '_plugins_cache'):
@@ -42,6 +67,23 @@ def assign_plugins(request, placeholders, template=None, lang=None):
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
     per type.
+
+    :param request: The current request.
+    :param placeholders: An iterable of placeholder objects.
+    :param template: (optional) The template object.
+    :param lang: (optional) The language code.
+
+    This method assigns plugins to the given placeholders. It retrieves the plugins from the database based on the
+    placeholders and the language. The plugins are then downcasted to their specific plugin types.
+
+    The plugins are split up by placeholder and stored in a dictionary where the key is the placeholder ID and the
+    value is a list of plugins.
+
+    For each placeholder, if there are plugins assigned to it, the plugins are organized as a layered tree structure.
+    Otherwise, an empty list is assigned.
+
+    The list of all plugins for each placeholder is stored in the `_all_plugins_cache` attribute of the placeholder,
+    while the list of root plugins is stored in the `_plugins_cache` attribute
     """
     if not placeholders:
         return
@@ -52,6 +94,9 @@ def assign_plugins(request, placeholders, template=None, lang=None):
         .objects
         .filter(placeholder__in=placeholders, language=lang)
     )
+    if not plugins:
+        # Create default plugins if enabled
+        plugins = create_default_plugins(request, placeholders, template, lang)
     plugins = downcast_plugins(plugins, placeholders, request=request)
 
     # split the plugins up by placeholder
@@ -71,6 +116,47 @@ def assign_plugins(request, placeholders, template=None, lang=None):
         placeholder._all_plugins_cache = all_plugins
         # This is only the root plugins.
         placeholder._plugins_cache = layered_plugins
+
+
+def create_default_plugins(request, placeholders, template, lang):
+    """
+    Create all default plugins for the given ``placeholders`` if they have
+    a "default_plugins" configuration value in settings.
+    return all plugins, children, grandchildren (etc.) created
+    """
+    from cms.api import add_plugin
+
+    def _create_default_plugins(placeholder, confs, parent=None):
+        """
+        Auxiliary function that builds all of a placeholder's default plugins
+        at the current level and drives the recursion down the tree.
+        Returns the plugins at the current level along with all descendants.
+        """
+        plugins, descendants = [], []
+        addable_confs = (conf for conf in confs
+                         if has_plugin_permission(request.user,
+                                                  conf['plugin_type'], 'add'))
+        for conf in addable_confs:
+            plugin = add_plugin(placeholder, conf['plugin_type'], lang,
+                                target=parent, **conf['values'])
+            if 'children' in conf:
+                args = placeholder, conf['children'], plugin
+                descendants += _create_default_plugins(*args)
+            plugin.notify_on_autoadd(request, conf)
+            plugins.append(plugin)
+        if parent:
+            parent.notify_on_autoadd_children(request, conf, plugins)
+        return plugins + descendants
+
+    unfiltered_confs = ((ph, get_placeholder_conf('default_plugins',
+                                                  ph.slot, template))
+                        for ph in placeholders)
+    # Empty confs must be filtered before filtering on add permission
+    mutable_confs = ((ph, default_plugin_confs)
+                     for ph, default_plugin_confs
+                     in filter(itemgetter(1), unfiltered_confs)
+                     if ph.has_change_permission(request.user))
+    return sum(starmap(_create_default_plugins, mutable_confs), [])
 
 
 def get_plugins_as_layered_tree(plugins):
@@ -164,7 +250,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
     #. Set the id/pk to None to it the id of the generic plugin instance above;
        this will effectively change the generic plugin created above
        into a concrete one
-    #. find the position in the new plalceholder
+    #. find the position in the new placeholder
     #. save the concrete plugin (which creates a new plugin in the database)
     #. trigger the copy relations
     #. return the plugin ids
@@ -251,6 +337,27 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
 
 
 def get_bound_plugins(plugins):
+    """
+    Get the bound plugins by downcasting the plugins to their respective classes. Raises a KeyError if the plugin type
+    is not available.
+
+    Creates a map of plugin types and their corresponding plugin IDs for later use in downcasting.
+    Then, retrieves the plugin instances from the plugin model using the mapped plugin IDs.
+    Finally, iterates over the plugins and yields the downcasted versions if they have a valid parent.
+    Does not affect caching.
+
+    :param plugins:  List of ``CMSPlugin`` instances.
+    :type plugins: List[CMSPlugin]
+    :return: Generator that yields the downcasted plugins.
+    :rtype: Generator[CMSPlugin, None, None]
+
+    Example::
+
+        plugins = [plugin_instance1, plugin_instance2]
+        for bound_plugin in get_bound_plugins(plugins):
+            # Do something with the bound_plugin
+            pass
+    """
     get_plugin = plugin_pool.get_plugin
     plugin_types_map = defaultdict(list)
     plugin_ids = []
@@ -281,6 +388,21 @@ def get_bound_plugins(plugins):
 
 def downcast_plugins(plugins,
                      placeholders=None, select_placeholder=False, request=None):
+    """
+    Downcasts the given list of plugins to their respective classes. Ignores any plugins
+    that are not available.
+
+    :param plugins: List of plugins to downcast.
+    :type plugins: List[CMSPlugin]
+    :param placeholders: List of placeholders associated with the plugins.
+    :type placeholders: Optional[List[Placeholder]]
+    :param select_placeholder: If True, select_related the plugin queryset with placeholder.
+    :type select_placeholder: bool
+    :param request: The current request.
+    :type request: Optional[HttpRequest]
+    :return: Generator that yields the downcasted plugins.
+    :rtype: Generator[CMSPlugin, None, None]
+    """
     plugin_types_map = defaultdict(list)
     plugin_lookup = {}
     plugin_ids = []
@@ -333,8 +455,21 @@ def downcast_plugins(plugins,
 
 def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):
     """
-    Checks if placeholder has reached its global plugin limit,
-    if not then it checks if it has reached its plugin_type limit.
+    Checks if the global maximum limit for plugins in a placeholder has been reached.
+    If not then it checks if it has reached its maximum plugin_type limit.
+
+    Parameters:
+    - placeholder: The placeholder object to check the limit for.
+    - plugin_type: The type of plugin to check the limit for.
+    - language: The language code for the plugins.
+    - template: The template object for the placeholder. Optional.
+
+    Returns:
+    - False if the limit has not been reached.
+
+    Raises:
+    - PluginLimitReached: If the limit has been reached for the placeholder.
+
     """
     limits = get_placeholder_conf("limits", placeholder.slot, template)
     if limits:

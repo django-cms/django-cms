@@ -153,6 +153,18 @@ class BaseCMSTestCase:
         return pp
 
     def get_page_title_obj(self, page, language="en"):
+        import warnings
+
+        from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
+
+        warnings.warn(
+            "get_page_title_obj is deprecated, use get_pagecontent_obj instead",
+            RemovedInDjangoCMS42Warning,
+            stacklevel=2,
+        )
+        return PageContent.objects.get(page=page, language=language)
+
+    def get_pagecontent_obj(self, page, language="en"):
         return PageContent.objects.get(page=page, language=language)
 
     def _create_user(self, username, is_staff=False, is_superuser=False,
@@ -557,7 +569,7 @@ class BaseCMSTestCase:
 
     def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None, position=None):
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -581,7 +593,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -593,7 +605,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -605,7 +617,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -617,7 +629,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -629,7 +641,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -641,7 +653,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 

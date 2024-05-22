@@ -181,7 +181,7 @@ class StructureBoard {
             const width = this.ui.window[0].innerWidth;
             const BREAKPOINT = 1024;
 
-            if (width > BREAKPOINT && !this.condensed) {
+            if (width > BREAKPOINT && !this.condensed && CMS.settings.mode === 'edit') {
                 this._makeCondensed();
             }
 
@@ -683,7 +683,7 @@ class StructureBoard {
 
         if (CMS.settings.mode === 'structure') {
             history.replaceState({}, '', CMS.config.settings.structure);
-            this.ui.html.addClass('cms-overflow');
+            $('html.cms-structure-mode-structure').addClass('cms-overflow');
         }
 
         this.ui.container.css('right', 0);

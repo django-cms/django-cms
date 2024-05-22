@@ -723,6 +723,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(self.test_page5)
         self.assertEqual(r, '|' + self.test_data5['text_main'] + '|' + self.test_data5['text_sub'])
 
+    @override_settings(CMS_PLACEHOLDER_CONF={None: {'language_fallback': False}})
     def test_inherit_placeholder_queries(self):
         with self.assertNumQueries(FuzzyInt(6, 10)):
             r = self.render(self.test_page2)
@@ -734,7 +735,7 @@ class RenderingTestCase(CMSTestCase):
         placeholder.pk = placeholder.id = 99
 
         with self.login_user_context(self.get_superuser()):
-            page_content = self.get_page_title_obj(self.test_page)
+            page_content = self.get_pagecontent_obj(self.test_page)
             request = self.get_request(get_object_edit_url(page_content))
             request.session = {}
             request.toolbar = CMSToolbar(request)
@@ -771,7 +772,7 @@ class RenderingTestCase(CMSTestCase):
         ]
 
         with self.login_user_context(self.get_superuser()):
-            page_content = self.get_page_title_obj(page)
+            page_content = self.get_pagecontent_obj(page)
             request = self.get_request(get_object_edit_url(page_content))
             request.session = {}
             request.toolbar = CMSToolbar(request)

@@ -213,7 +213,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     def get_plugin_instance(self, admin=None):
         """
         For a plugin instance (usually as a CMSPluginBase), this method
-        returns the downcasted (i.e., correctly typed subclass of CMSPluginBase) instacnce and the plugin class
+        returns the downcasted (i.e., correctly typed subclass of CMSPluginBase) instance and the plugin class
 
         :return: Tuple (instance, plugin)
 

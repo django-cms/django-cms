@@ -40,7 +40,8 @@ describe('CMS.Messages', function() {
         it('has options', function() {
             expect(messages.options).toEqual({
                 messageDuration: 300,
-                messageDelay: 3000
+                messageDelay: 3000,
+                messageLength: 160
             });
             messages = new CMS.Messages({
                 messageDuration: 100,
@@ -48,7 +49,8 @@ describe('CMS.Messages', function() {
             });
             expect(messages.options).toEqual({
                 messageDuration: 100,
-                messageDelay: 0
+                messageDelay: 0,
+                messageLength: 160
             });
         });
     });

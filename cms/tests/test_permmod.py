@@ -9,7 +9,7 @@ from django.test.utils import override_settings
 from cms.admin.forms import save_permissions
 from cms.api import assign_user_to_page, create_page, create_page_user
 from cms.cms_menus import get_visible_nodes
-from cms.models import ACCESS_PAGE, Page, PageContent
+from cms.models import ACCESS_PAGE, CMSPlugin, Page, PageContent
 from cms.models.permissionmodels import (
     ACCESS_PAGE_AND_DESCENDANTS,
     GlobalPagePermission,
@@ -138,6 +138,28 @@ class PermissionModeratorTests(CMSTestCase):
         with self.login_user_context(self.user_slave):
             response = self.client.get(self.get_page_add_uri('en'))
             self.assertEqual(response.status_code, 403)
+
+    @override_settings(
+        CMS_PLACEHOLDER_CONF={
+            'col_left': {
+                'default_plugins': [
+                    {
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
+                        },
+                    },
+                ]
+            },
+        },
+    )
+    def test_default_plugins(self):
+        with self.login_user_context(self.user_slave):
+            self.assertEqual(CMSPlugin.objects.count(), 0)
+            response = self.client.get(self.slave_page.get_absolute_url(), {'edit': 1})
+            self.assertEqual(response.status_code, 200)
+            self.assertEqual(CMSPlugin.objects.count(), 1)
+
 
     def test_super_can_add_plugin(self):
         self._add_plugin(self.user_super, page=self.slave_page)
@@ -591,7 +613,7 @@ class GlobalPermissionTests(CMSTestCase):
                 with self.assertNumQueries(FuzzyInt(3, max_queries)):
                     # internally this calls PageAdmin.has_[add|change|delete|view]_permission()
                     expected_perms = {'add': True, 'change': True, 'delete': False}
-                    expected_perms.update({'view': False})  # Why
+                    expected_perms.update({'view': expected_perms['change']})
                     self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
 
             # can't use the above loop for this test, as we're testing that
@@ -619,7 +641,7 @@ class GlobalPermissionTests(CMSTestCase):
                 request.current_page = None
                 request.session = {}
                 expected_perms = {'add': True, 'change': True, 'delete': False}
-                expected_perms.update({'view': False})
+                expected_perms.update({'view': expected_perms['change']})
                 self.assertEqual(expected_perms, site._registry[PageContent].get_model_perms(request))
 
     def test_has_page_add_permission_with_target(self):

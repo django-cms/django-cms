@@ -82,9 +82,11 @@ require.ensure(
 
         // init
         $(function() {
-            window.CMS.Widgets._pageSelectWidgets.forEach(function(widget) {
-                new PageSelectWidget(widget);
-            });
+            if (window.CMS.Widgets !== undefined && window.CMS.Widgets._pageSelectWidgets !== undefined) {
+                window.CMS.Widgets._pageSelectWidgets.forEach(function (widget) {
+                    new PageSelectWidget(widget);
+                });
+            }
         });
     },
     'admin.widget'
