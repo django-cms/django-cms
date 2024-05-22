@@ -17,12 +17,12 @@
         content: "";
         position: absolute;
         top: -8px;
-        left: -4px;
+        inset-inline-start: -4px;
         width: 0;
         height: 0;
         border-top: 8px solid transparent;
         border-bottom: 8px solid transparent;
-        border-left: 8px solid $color-primary;
+        border-inline-start: 8px solid $color-primary;
     }
 }
 .cms-draggables > .cms-droppable:first-child {
@@ -376,7 +376,7 @@
             margin-inline-start: $structure-dragarea-padding-horizontal - 10px;
             cursor: pointer;
             transform: rotate(180deg);
-            [dir="rtl"] & {
+            &:dir(rtl) {
                 transform: rotate(0deg);
             }
         }
@@ -386,7 +386,7 @@
     }
     .cms-dragitem-expanded:before {
         transform: rotate(-90deg);
-        [dir="rtl"] & {
+        &:dir(rtl) {
             transform: rotate(-90deg);
         }
     }
