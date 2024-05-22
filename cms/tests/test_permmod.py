@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group, Permission
@@ -288,6 +290,20 @@ class PermissionModeratorTests(CMSTestCase):
         with self.settings(CMS_PUBLIC_FOR=None):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
+
+    def test_page_content_reflects_page_publish_permission(self):
+        """
+        Test that the page content object gets its publish permission from the
+        page object.
+        """
+        page = create_page('test', 'nav_playground.html', 'en')
+        page_content = page.get_content_obj("en")
+
+        user = self.get_standard_user()
+        assign_user_to_page(page, user, can_publish=True)
+        with patch.object(page, "has_publish_permission") as page_has_publish_permission:
+            self.assertTrue(page_content.has_publish_permission(user))
+            page_has_publish_permission.assert_called_once_with(user)
 
 
 class ViewPermissionBaseTests(CMSTestCase):
