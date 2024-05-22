@@ -121,18 +121,18 @@ class TemplatetagTests(CMSTestCase):
             def __init__(self, title):
                 self.title = title
                 super().__init__()
-                
+
             def get_page_title(self, *args, **kwargs):
                 return self.title
 
-        class FakeRequest:            
+        class FakeRequest:
             GET = {'language': 'en'}
-    
+
             def __init__(self, page):
                 self.current_page = page
 
         request_script = FakeRequest(FakePage(script))
-        request_ampersand = FakeRequest(FakePage(ampersand)
+        request_ampersand = FakeRequest(FakePage(ampersand))
         template = '{% load cms_tags %}{% page_attribute page_title %}'
         output_script = self.render_template_obj(template, {}, request_script)
         output_ampersand = self.render_template_obj(template, {}, request_ampersand)
