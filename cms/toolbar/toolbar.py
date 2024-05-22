@@ -104,8 +104,7 @@ class BaseToolbar(ToolbarAPIMixin):
 
         if self.structure_mode_active:
             return True
-
-        if self._resolver_match:
+        if self.is_staff and self._resolver_match:
             return self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
         return False
 
@@ -119,9 +118,6 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def content_mode_active(self):
         """``True`` if content mode is active."""
-        if self.structure_mode_active:
-            # Structure mode always takes precedence
-            return False
         return self.is_staff and not self.edit_mode_active
 
     @cached_property
@@ -411,6 +407,15 @@ class CMSToolbarBase(BaseToolbar):
                 return obj.is_editable(self.request)
             return True
         return False
+
+    @property
+    def edit_mode_active(self):
+        """``True`` if editing mode is active。"""
+        # Cannot be cached since it changes depending on the object.
+        if self.structure_mode_active:
+            return self.object_is_editable()
+        return super().edit_mode_active
+
 
     # Internal API
 

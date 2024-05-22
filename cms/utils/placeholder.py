@@ -407,13 +407,21 @@ def rescan_placeholders_for_obj(obj):
 
 
 def get_declared_placeholders_for_obj(obj):
-    """Returns declared placeholders for an object. The object is supposed to have a method ``get_template``
+    """Returns declared placeholders for an object. The object is supposed to either have a method
+    ``get_placeholder_slots`` which returns the list of placeholders or a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
     a list of placeholders used in the template by the ``{% placeholder %}`` template tag.
     """
+    if hasattr(obj, "get_placeholder_slots"):
+        from cms.templatetags.cms_tags import DeclaredPlaceholder
+
+        return [
+            DeclaredPlaceholder(slot=slot, inherit=False) if isinstance(slot, str) else DeclaredPlaceholder(*slot)
+            for slot in obj.get_placeholder_slots()
+        ]
     if not hasattr(obj, "get_template"):
         raise NotImplementedError(
-            "%s should implement get_template" % obj.__class__.__name__
+            "%s should implement either get_placeholders or get_template" % obj.__class__.__name__
         )
     return get_placeholders(obj.get_template())
 

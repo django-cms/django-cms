@@ -18,6 +18,10 @@ def get_page_template_from_request(request):
     templates = get_cms_setting('TEMPLATES')
     template_names = frozenset(pair[0] for pair in templates)
 
+    if not templates:
+        # no templates defined, CMS is running headless
+        return None
+
     if len(templates) == 1:
         # there's only one template
         # avoid any further computation
