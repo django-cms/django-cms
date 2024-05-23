@@ -30,6 +30,11 @@ def render_page(request, page, current_language, slug=None):
         return _handle_no_page(request)
 
     template = page_content.get_template()
+    if not template:
+        # Render placeholder content with minimal markup
+
+        from cms.views import render_placeholder_content
+        return render_placeholder_content(request, page_content, context)
     response = TemplateResponse(request, template, context)
     response.add_post_render_callback(set_page_cache)
 

@@ -115,7 +115,8 @@ class PlaceholderToolbar(CMSToolbar):
         if self.toolbar.content_mode_active and self._can_add_button():
             self.add_edit_button()
         # Preview button
-        if self.toolbar.edit_mode_active and self._can_add_button():
+        if not self.toolbar.preview_mode_active and get_cms_setting('TEMPLATES') and self._can_add_button():
+            # Only add preview button if there are templates available for previewing
             self.add_preview_button()
         # Structure mode
         if self._can_add_structure_mode():

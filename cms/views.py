@@ -13,6 +13,8 @@ from django.http import (
     HttpResponseRedirect,
 )
 from django.shortcuts import render
+from django.template.defaultfilters import title
+from django.template.response import TemplateResponse
 from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.timezone import now
@@ -31,7 +33,7 @@ from cms.page_rendering import (
     _render_welcome_page,
     render_pagecontent,
 )
-from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_preview_url, get_object_structure_url, get_toolbar_from_request
 from cms.utils import get_current_site
 from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 from cms.utils.conf import get_cms_setting
@@ -45,6 +47,7 @@ from cms.utils.i18n import (
     is_language_prefix_patterns_used,
 )
 from cms.utils.page import get_page_from_request
+from cms.utils.placeholder import get_declared_placeholders_for_obj, get_placeholder_conf
 
 if DJANGO_2_2:
     from django.utils.http import (
@@ -276,6 +279,14 @@ def render_object_structure(request, content_type_id, object_id):
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)
+
+
+def render_placeholder_content(request, obj, context):
+    context["cms_placeholder_slots"] = (
+        (placeholder.slot, get_placeholder_conf("name", placeholder.slot, default=title(placeholder.slot)))
+        for placeholder in get_declared_placeholders_for_obj(obj)
+    )
+    return TemplateResponse(request, "cms/headless/placeholder.html", context)
 
 
 def render_object_endpoint(request, content_type_id, object_id, require_editable):

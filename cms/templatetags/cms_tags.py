@@ -14,7 +14,9 @@ from classytags.utils import flatten_context
 from classytags.values import ListValue, StringValue
 from django import template
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.mail import mail_managers
 from django.db.models import Model
 from django.template.loader import render_to_string
@@ -286,6 +288,8 @@ class Placeholder(Tag):
         if not request:
             return ''
 
+        if name in context:
+            name = context[name]
         validate_placeholder_name(name)
 
         toolbar = get_toolbar_from_request(request)
@@ -915,7 +919,18 @@ class RenderPlaceholder(AsTag):
             return ''
 
         if isinstance(placeholder, str):
-            placeholder = PlaceholderModel.objects.get(slot=placeholder)
+            # When only a placeholder name is given, try to get the placeholder
+            # associated with the toolbar object's slot
+            obj = toolbar.get_object()
+            try:
+                placeholder = PlaceholderModel.objects.get(
+                    slot=placeholder,
+                    content_type=ContentType.objects.get_for_model(obj.__class__),
+                    object_id=obj.pk
+                )
+            except (ObjectDoesNotExist, MultipleObjectsReturned, AttributeError):
+                # Catches: Multiple placeholders, no placeholder, no object
+                return ''
 
         content = renderer.render_placeholder(
             placeholder=placeholder,

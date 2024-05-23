@@ -948,7 +948,7 @@ class Page(models.Model):
         content = self.get_content_obj(language, fallback, force_reload)
         if content:
             return content.get_template()
-        return get_cms_setting('TEMPLATES')[0][0]
+        return get_cms_setting('TEMPLATES')[0][0] if get_cms_setting('TEMPLATES') else ""
 
     def get_template_name(self):
         """
@@ -1042,16 +1042,18 @@ class Page(models.Model):
     def rescan_placeholders(self, language):
         return self.get_content_obj(language=language).rescan_placeholders()
 
-    def get_declared_placeholders(self):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_placeholders
+    def get_declared_placeholders(self, language=None, fallback=True, force_reload=False):
+        from cms.utils.placeholder import get_declared_placeholders_for_obj
 
-        return get_placeholders(self.get_template())
+        content = self.get_content_obj(language, fallback, force_reload)
+        if content:
+            return get_declared_placeholders_for_obj(content)
+        return []
 
     def get_xframe_options(self, language=None, fallback=True, force_reload=False):
-        title = self.get_content_obj(language, fallback, force_reload)
-        if title:
-            return title.get_xframe_options()
+        content = self.get_content_obj(language, fallback, force_reload)
+        if content:
+            return content.get_xframe_options()
 
     def get_soft_root(self, language=None, fallback=True, force_reload=False):
         return self.get_page_content_obj_attribute("soft_root", language, fallback, force_reload)

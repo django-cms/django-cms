@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -16,7 +17,7 @@ class PageContent(models.Model):
         (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
     )
     TEMPLATE_DEFAULT = constants.TEMPLATE_INHERITANCE_MAGIC if get_cms_setting(
-        'TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
+        'TEMPLATE_INHERITANCE') else (get_cms_setting('TEMPLATES')[0][0] if get_cms_setting('TEMPLATES') else "")
 
     X_FRAME_OPTIONS_CHOICES = (
         (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
@@ -191,6 +192,38 @@ class PageContent(models.Model):
             language=self.language,
         )
 
+    def get_placeholder_slots(self):
+        """
+        Returns a list of placeholder slots for this page content object.
+        """
+        if get_cms_setting("TEMPLATES"):
+            from cms.utils.placeholder import get_placeholders
+
+            return get_placeholders(self.get_template())
+        if not hasattr(self, "_placeholder_slot_cache"):
+            if self.template == constants.TEMPLATE_INHERITANCE_MAGIC:
+                templates = (
+                    self
+                    .get_ancestor_titles()
+                    .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
+                    .order_by('-page__node__path')
+                    .values_list('template', flat=True)
+                )
+                if templates:
+                    template = templates[0].template
+                else:
+                    template = get_cms_setting('PLACEHOLDERS')[0][0]
+            else:
+                template = self.template or get_cms_setting('PLACEHOLDERS')[0][0]
+
+            for key, value in get_cms_setting("PLACEHOLDERS"):
+                if key == template or key == "":  # NOQA: PLR1714 - Empty string matches always
+                    self._placeholder_slot_cache = value
+                    break
+            else:  # No matching placeholder list found
+                self._placeholder_slot_cache = get_cms_setting('PLACEHOLDERS')[0][1]
+        return self._placeholder_slot_cache
+
     def get_template(self):
         """
         get the template of this page if defined or if closer parent if
@@ -214,7 +247,7 @@ class PageContent(models.Model):
         try:
             self._template_cache = templates[0]
         except IndexError:
-            self._template_cache = get_cms_setting('TEMPLATES')[0][0]
+            self._template_cache = get_cms_setting('TEMPLATES')[0][0] if get_cms_setting('TEMPLATES') else ""
         return self._template_cache
 
     def get_template_name(self):
@@ -282,13 +315,17 @@ class EmptyPageContent:
     menu_title = ""
     page_title = ""
     xframe_options = None
-    template = get_cms_setting('TEMPLATES')[0][0]
+    template = None
     soft_root = False
     in_navigation = False
 
     def __init__(self, language, page=None):
         self.language = language
         self.page = page
+        if get_cms_setting("TEMPLATES"):
+            self.template = get_cms_setting("TEMPLATES")[0][0]
+        else:
+            self.template = ""
 
     def __bool__(self):
         return False
