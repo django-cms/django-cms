@@ -210,14 +210,14 @@ class PageContent(models.Model):
                     .values_list('template', flat=True)
                 )
                 if templates:
-                    template = templates[0].template
+                    placeholder_set = templates[0].template
                 else:
-                    template = get_cms_setting('PLACEHOLDERS')[0][0]
+                    placeholder_set = get_cms_setting('PLACEHOLDERS')[0][0]
             else:
-                template = self.template or get_cms_setting('PLACEHOLDERS')[0][0]
+                placeholder_set = self.template or get_cms_setting('PLACEHOLDERS')[0][0]
 
-            for key, value in get_cms_setting("PLACEHOLDERS"):
-                if key == template or key == "":  # NOQA: PLR1714 - Empty string matches always
+            for key, value, _ in get_cms_setting("PLACEHOLDERS"):
+                if key == placeholder_set or key == "":  # NOQA: PLR1714 - Empty string matches always
                     self._placeholder_slot_cache = value
                     break
             else:  # No matching placeholder list found
@@ -231,6 +231,9 @@ class PageContent(models.Model):
         """
         if hasattr(self, '_template_cache'):
             return self._template_cache
+
+        if not get_cms_setting("TEMPLATES"):
+            return ""
 
         if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
             self._template_cache = self.template or get_cms_setting('TEMPLATES')[0][0]

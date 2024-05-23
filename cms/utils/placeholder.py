@@ -416,7 +416,7 @@ def get_declared_placeholders_for_obj(obj):
         from cms.templatetags.cms_tags import DeclaredPlaceholder
 
         return [
-            DeclaredPlaceholder(slot=slot, inherit=False) if isinstance(slot, str) else DeclaredPlaceholder(*slot)
+            DeclaredPlaceholder(slot=slot, inherit=False) if isinstance(slot, str) else DeclaredPlaceholder(**slot)
             for slot in obj.get_placeholder_slots()
         ]
     if not hasattr(obj, "get_template"):

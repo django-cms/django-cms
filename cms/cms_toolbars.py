@@ -656,18 +656,25 @@ class PageToolbar(CMSToolbar):
                 action = admin_reverse('cms_pagecontent_change_template', args=(self.page_content.pk,))
 
                 if can_change_advanced:
-                    templates_menu = current_page_menu.get_or_create_menu(
-                        'templates',
-                        _('Templates'),
-                        disabled=not can_change,
-                    )
+                    if get_cms_setting('TEMPLATES'):
+                        options = get_cms_setting('TEMPLATES')
+                        template_menu = _('Templates')
+                    else:
+                        options = [(placeholders[0], placeholders[2]) for placeholders in get_cms_setting('PLACEHOLDERS')]
+                        template_menu = _('Placeholders')
+                    if options:
+                        templates_menu = current_page_menu.get_or_create_menu(
+                            'templates',
+                            template_menu,
+                            disabled=not can_change,
+                        )
 
-                    for path, name in get_cms_setting('TEMPLATES'):
-                        active = self.page_content.template == path
-                        if path == TEMPLATE_INHERITANCE_MAGIC:
-                            templates_menu.add_break(TEMPLATE_MENU_BREAK)
-                        templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
-                                                     on_success=refresh)
+                        for path, name in options:
+                            active = self.page_content.template == path
+                            if path == TEMPLATE_INHERITANCE_MAGIC:
+                                templates_menu.add_break(TEMPLATE_MENU_BREAK)
+                            templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
+                                                         on_success=refresh)
 
             # navigation toggle
             in_navigation = self.page_content.in_navigation

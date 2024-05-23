@@ -11,11 +11,7 @@ from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import (
-    get_language,
-    gettext_lazy as _,
-    override as force_language,
-)
+from django.utils.translation import get_language, gettext_lazy as _, override as force_language
 from treebeard.mp_tree import MP_Node
 
 from cms import constants
@@ -999,9 +995,7 @@ class Page(models.Model):
         return user_can_delete_page_translation(user, page=self, language=language)
 
     def has_advanced_settings_permission(self, user):
-        from cms.utils.page_permissions import (
-            user_can_change_page_advanced_settings,
-        )
+        from cms.utils.page_permissions import user_can_change_page_advanced_settings
         return user_can_change_page_advanced_settings(user, page=self)
 
     def has_change_permissions_permission(self, user):

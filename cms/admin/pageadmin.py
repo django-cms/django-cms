@@ -1194,8 +1194,13 @@ class PageContentAdmin(admin.ModelAdmin):
 
         to_template = request.POST.get("template", None)
 
-        if to_template not in dict(get_cms_setting('TEMPLATES')):
-            return HttpResponseBadRequest(_("Template not valid"))
+        if get_cms_setting('TEMPLATES'):
+            if to_template not in dict(get_cms_setting('TEMPLATES')):
+                return HttpResponseBadRequest(_("Template not valid"))
+        else:
+            if to_template not in (placeholder_set[0] for placeholder_set in get_cms_setting('PLACEHOLDERS')):
+                return HttpResponseBadRequest(_("Placeholder selection not valid"))
+
 
         page_content.template = to_template
         page_content.save()

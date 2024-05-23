@@ -6,6 +6,9 @@
             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
             <title>{% block title %}{{ request.current_page.get_page_title|striptags }}{% endblock %}</title>
             <style>
+                html.cms-structure-mode-structure section {
+                    margin-inline-end: 436px;
+                }
                 .cms-placeholder-view section {
                     font: normal 18px/24px Helvetica,Arial,sans-serif;
                     margin: 20px;

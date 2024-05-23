@@ -47,7 +47,7 @@ DEFAULTS = {
     'DEFAULT_X_FRAME_OPTIONS': constants.X_FRAME_OPTIONS_INHERIT,
     'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
-    'PLACEHOLDERS': (('', ('content',)),),
+    'PLACEHOLDERS': (('', ('content',), _("Single placeholder")),),
     'PERMISSION': False,
     # Whether to use raw ID lookups for users when PERMISSION is True
     'RAW_ID_USERS': False,
