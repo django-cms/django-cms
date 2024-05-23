@@ -412,6 +412,10 @@ def get_declared_placeholders_for_obj(obj):
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
     a list of placeholders used in the template by the ``{% placeholder %}`` template tag.
     """
+    template = getattr(obj, "get_template", lambda: None)()
+    if template:
+        return get_placeholders(template)
+
     if hasattr(obj, "get_placeholder_slots"):
         from cms.templatetags.cms_tags import DeclaredPlaceholder
 
@@ -419,11 +423,9 @@ def get_declared_placeholders_for_obj(obj):
             DeclaredPlaceholder(slot=slot, inherit=False) if isinstance(slot, str) else DeclaredPlaceholder(**slot)
             for slot in obj.get_placeholder_slots()
         ]
-    if not hasattr(obj, "get_template"):
-        raise NotImplementedError(
-            "%s should implement either get_placeholders or get_template" % obj.__class__.__name__
-        )
-    return get_placeholders(obj.get_template())
+    raise NotImplementedError(
+        "%s should implement either get_placeholder_slots or get_template" % obj.__class__.__name__
+    )
 
 
 def get_placeholder_from_slot(

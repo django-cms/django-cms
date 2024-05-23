@@ -196,10 +196,8 @@ class PageContent(models.Model):
         """
         Returns a list of placeholder slots for this page content object.
         """
-        if get_cms_setting("TEMPLATES"):
-            from cms.utils.placeholder import get_placeholders
-
-            return get_placeholders(self.get_template())
+        if not get_cms_setting('PLACEHOLDERS'):
+            return []
         if not hasattr(self, "_placeholder_slot_cache"):
             if self.template == constants.TEMPLATE_INHERITANCE_MAGIC:
                 templates = (
