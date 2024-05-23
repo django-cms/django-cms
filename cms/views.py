@@ -283,7 +283,11 @@ def render_object_structure(request, content_type_id, object_id):
 
 def render_placeholder_content(request, obj, context):
     context["cms_placeholder_slots"] = (
-        (placeholder.slot, get_placeholder_conf("name", placeholder.slot, default=title(placeholder.slot)))
+        (
+            placeholder.slot,
+            get_placeholder_conf("name", placeholder.slot, default=title(placeholder.slot)),
+            placeholder.inherit,
+        )
         for placeholder in get_declared_placeholders_for_obj(obj)
     )
     return TemplateResponse(request, "cms/headless/placeholder.html", context)

@@ -21,6 +21,10 @@
                     padding-bottom: 10px;
                     font-size: 1.5em;
                     border-bottom: 1px solid #ccc;
+                    small {
+                        font-size: 0.5em;
+                        color: #999;
+                    }
                 }
                 .cms-placeholder-view section img {
                     max-width: 100%;
@@ -35,10 +39,10 @@
         <body {% block body_attrs %}{% endblock %}>
 {% endspaceless %}{% cms_toolbar %}
         {% block content %}
-            {% for placeholder, label in cms_placeholder_slots %}
+            {% for placeholder, label, inherit in cms_placeholder_slots %}
                 <section>
-                    <h1>{{ label }}</h1>
-                    {% render_placeholder placeholder %}
+                    <h1>{{ label }}{% if inherit %} <small>{% translate "inherited" %}</small>{% endif %}</h1>
+                    {% render_placeholder placeholder 100 "en" inherit=inherit %}
                 </section>
             {% endfor %}
         {% endblock content %}{% spaceless %}

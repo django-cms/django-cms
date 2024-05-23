@@ -4,6 +4,7 @@ from datetime import datetime
 
 from classytags.arguments import (
     Argument,
+    KeywordArgument,
     MultiKeywordArgument,
     MultiValueArgument,
 )
@@ -188,6 +189,37 @@ def render_plugin(context, plugin):
         editable=renderer._placeholders_are_editable,
     )
     return content
+
+
+class EmptyListValue(list, StringValue):
+    """
+    A list of template variables for easy resolving
+    """
+    def __init__(self, value=NULL):
+        list.__init__(self)
+        if value is not NULL:
+            self.append(value)
+
+    def resolve(self, context):
+        resolved = [item.resolve(context) for item in self]
+        return self.clean(resolved)
+
+
+class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
+    sequence_class = EmptyListValue
+
+    def parse(self, parser, token, tagname, kwargs):
+        if '=' in token:
+            if self.name not in kwargs:
+                kwargs[self.name] = self.sequence_class()
+            return False
+        return super().parse(
+            parser,
+            token,
+            tagname,
+            kwargs
+        )
+
 
 
 class PageUrl(AsTag):
@@ -903,19 +935,19 @@ class RenderPlaceholder(AsTag):
     name = 'render_placeholder'
     options = Options(
         Argument('placeholder'),
-        Argument('width', default=None, required=False),
-        'language',
-        Argument('language', default=None, required=False),
+        MultiValueArgumentBeforeKeywordArgument('args', required=False),
+        MultiKeywordArgument('kwargs', required=False),
         'as',
         Argument('varname', required=False, resolve=False)
     )
 
-    def _get_value(self, context, editable=True, **kwargs):
+    def _get_value(self, context, editable=True, placeholder=None, nocache=False, args=None, kwargs=None):
         request = context['request']
         toolbar = get_toolbar_from_request(request)
         renderer = toolbar.get_content_renderer()
-        placeholder = kwargs.get('placeholder')
-        nocache = kwargs.get('nocache', False)
+        width = args.pop() if args else None
+        language = args.pop() if args else None
+        inherit = kwargs.get('inherit', False)
 
         if not placeholder:
             return ''
@@ -923,24 +955,20 @@ class RenderPlaceholder(AsTag):
         if isinstance(placeholder, str):
             # When only a placeholder name is given, try to get the placeholder
             # associated with the toolbar object's slot
-            obj = toolbar.get_object()
-            try:
-                placeholder = PlaceholderModel.objects.get(
-                    slot=placeholder,
-                    content_type=ContentType.objects.get_for_model(obj.__class__),
-                    object_id=obj.pk
-                )
-            except (ObjectDoesNotExist, MultipleObjectsReturned, AttributeError):
-                # Catches: Multiple placeholders, no placeholder, no object
-                return ''
+            return renderer.render_obj_placeholder(
+                placeholder,
+                context,
+                inherit,
+                editable=editable,
+            )
 
         content = renderer.render_placeholder(
             placeholder=placeholder,
             context=context,
-            language=kwargs.get('language'),
+            language=language,
             editable=editable,
             use_cache=not nocache,
-            width=kwargs.get('width'),
+            width=width,
         )
         return content
 
@@ -962,36 +990,6 @@ class RenderUncachedPlaceholder(RenderPlaceholder):
     def _get_value(self, context, editable=True, **kwargs):
         kwargs['nocache'] = True
         return super()._get_value(context, editable, **kwargs)
-
-
-class EmptyListValue(list, StringValue):
-    """
-    A list of template variables for easy resolving
-    """
-    def __init__(self, value=NULL):
-        list.__init__(self)
-        if value is not NULL:
-            self.append(value)
-
-    def resolve(self, context):
-        resolved = [item.resolve(context) for item in self]
-        return self.clean(resolved)
-
-
-class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
-    sequence_class = EmptyListValue
-
-    def parse(self, parser, token, tagname, kwargs):
-        if '=' in token:
-            if self.name not in kwargs:
-                kwargs[self.name] = self.sequence_class()
-            return False
-        return super().parse(
-            parser,
-            token,
-            tagname,
-            kwargs
-        )
 
 
 class CMSAdminURL(AsTag):

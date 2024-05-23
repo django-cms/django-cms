@@ -208,7 +208,7 @@ class PageContent(models.Model):
                     .values_list('template', flat=True)
                 )
                 if templates:
-                    placeholder_set = templates[0].template
+                    placeholder_set = templates[0]
                 else:
                     placeholder_set = get_cms_setting('PLACEHOLDERS')[0][0]
             else:
