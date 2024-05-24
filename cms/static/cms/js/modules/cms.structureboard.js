@@ -176,7 +176,7 @@ class StructureBoard {
 
     _events() {
         this.ui.window.on('resize.cms.structureboard', () => {
-            if (!this._loadedContent || CMS.config.mode !== 'draft') {
+            if (!this._loadedContent) {
                 return;
             }
             const width = this.ui.window[0].innerWidth;
