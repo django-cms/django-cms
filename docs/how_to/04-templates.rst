@@ -2,7 +2,7 @@
 How to work with templates
 ##########################
 
-django CMS uses Django's template system to manage the layout of the pages. While
+django CMS uses Django's template system to manage the layout of the CMS pages.
 
 Django's Template System
 ========================
