@@ -46,7 +46,13 @@ convenience is provided by
 and based on Bootstrap. We encourage you to create your own templates
 as you would do for any Django project.
 
-You are free to decide which CSS framework or JS library to use (if any).
+Generally speaking, django CMS is wholly frontend-agnostic. It doesn’t care
+what your site’s frontend is built on or uses: You are free to decide which
+CSS framework or JS library to use (if any).
+
+When editing, the frontend editor will replace part of the current document's
+DOM. This might require some JS widgets to be reinitialized.
+See :ref:`frontend-integration` for more information.
 
 
 CMS templates
@@ -159,7 +165,7 @@ created in django CMS for an alias.
 
 
 :ttag:`render_model` allows to edit frontend-enabled Django models reusing the
-django CMS frontend editor. See :ref:`_placeholders_outside_cms` for more
+django CMS frontend editor. See :ref:`placeholders_outside_cms` for more
 information.
 
 
