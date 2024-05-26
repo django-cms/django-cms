@@ -39,11 +39,14 @@ in a folder named after the application providing it.
    template and need to use such apps, you can create a ``base.html`` template
    that just consists of the ``{% extends "your_base_template.html" %}`` tag.
 
-A fresh installation of django CMS comes with a default template that for
-reasons of convenience is provided by
+A fresh installation of django CMS using the quickstarter project or the
+``djangocms``command comes with a default template that for reasons of
+convenience is provided by
 `django CMS frontend <https://github.com/django-cms/djangocms-frontend>`_
 and based on Bootstrap. We encourage you to create your own templates
 as you would do for any Django project.
+
+You are free to decide which CSS framework or JS library to use (if any).
 
 
 CMS templates
