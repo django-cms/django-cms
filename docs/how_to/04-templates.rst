@@ -153,21 +153,32 @@ Static aliases
   Using ``static_alias`` requires the installation of
   `djangocms-alias <https://github.com/django-cms/djangocms-alias>`_ to work.
 
-Since some content repeats on multiple pages, it is useful to create a static
-alias for it. This way, you can edit the content in one place and have it
-change on all pages where the alias is used.
+The package `djangocms-alias <https://github.com/django-cms/djangocms-alias>`_
+provides an admin page in Django admin where special types of placeholders
+called "static aliases" can be managed and its contents edited.
 
-Example uses for static aliases are the footer, the sidebar, or the header.
+Frequent Use Cases:
 
-While the :ttag:`placeholder` tag cannot be used in templates outside django CMS,
-any application can use the :ttag:`static_alias` tag to include the content
-created in django CMS for an alias.
+1. Editors wish to manage repeated content centrally (DRY - don't repeat
+   yourself)
 
+2. Developers wish to add CMS functionality to their custom application's
+   templates
 
-:ttag:`render_model` allows to edit frontend-enabled Django models reusing the
-django CMS frontend editor. See :ref:`placeholders_outside_cms` for more
-information.
+**Repeated content**: Often, content areas such as a footer, a header or a
+sidebar have identical content across all pages of a website.
+`djangocms-alias <https://github.com/django-cms/djangocms-alias>`_ provides
+a Django admin page for editors to manage such general site-wide content in
+one place.
 
+**Custom applications**: Templates in custom applications usually follow some
+well-defined business logic which is normally hard-coded in the template.
+However the same templates might include areas of "static" content, i.e.
+content that editors wish to manage. As the django CMS :ttag:`placeholder` tag
+only work in templates attached to the django CMS
+:class:`~cms.models.pagemodel.Page` model,
+`djangocms-alias <https://github.com/django-cms/djangocms-alias>`_
+closes the gap by providing editors central access to such custom content areas.
 
 
 .. _page_template:
