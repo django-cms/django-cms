@@ -175,13 +175,13 @@ class StructureBoard {
 
     _events() {
         this.ui.window.on('resize.cms.structureboard', () => {
-            if (!this._loadedContent) {
+            if (!this._loadedContent || CMS.config.mode !== 'draft') {
                 return;
             }
             const width = this.ui.window[0].innerWidth;
             const BREAKPOINT = 1024;
 
-            if (width > BREAKPOINT && !this.condensed && CMS.settings.mode === 'edit') {
+            if (width > BREAKPOINT && !this.condensed) {
                 this._makeCondensed();
             }
 
