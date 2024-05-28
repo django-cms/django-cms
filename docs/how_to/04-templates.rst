@@ -40,7 +40,7 @@ in a folder named after the application providing it.
    that just consists of the ``{% extends "your_base_template.html" %}`` tag.
 
 A fresh installation of django CMS using the quickstarter project or the
-``djangocms``command comes with a default template that for reasons of
+``djangocms`` command comes with a default template that for reasons of
 convenience is provided by
 `django CMS frontend <https://github.com/django-cms/djangocms-frontend>`_
 and based on Bootstrap. We encourage you to create your own templates
