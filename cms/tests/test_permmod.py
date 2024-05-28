@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.admin.sites import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Group, Permission
@@ -58,15 +60,18 @@ class PermissionModeratorTests(CMSTestCase):
 
     def setUp(self):
         # create super user
-        self.user_super = self._create_user("super", is_staff=True,
-                                            is_superuser=True)
-        self.user_staff = self._create_user("staff", is_staff=True,
-                                            add_default_permissions=True)
-        self.user_master = self._create_user("master", is_staff=True,
-                                             add_default_permissions=True)
-        self.user_slave = self._create_user("slave", is_staff=True,
-                                            add_default_permissions=True)
+        self.user_super = self._create_user("super", is_staff=True, is_superuser=True)
+
+        self.user_staff = self._create_user("staff", is_staff=True, add_default_permissions=True)
+        self.add_permission(self.user_staff, 'publish_page')
+
+        self.user_master = self._create_user("master", is_staff=True, add_default_permissions=True)
+        self.add_permission(self.user_master, 'publish_page')
+
+        self.user_slave = self._create_user("slave", is_staff=True, add_default_permissions=True)
+
         self.user_normal = self._create_user("normal", is_staff=False)
+        self.user_normal.user_permissions.add(Permission.objects.get(codename='publish_page'))
 
         with self.login_user_context(self.user_super):
             self.home_page = create_page("home", "nav_playground.html", "en",
@@ -105,7 +110,7 @@ class PermissionModeratorTests(CMSTestCase):
             page_a = create_page("pageA", "nav_playground.html", "en",
                                  created_by=self.user_super)
             assign_user_to_page(page_a, self.user_master,
-                                can_add=True, can_change=True, can_delete=True,
+                                can_add=True, can_change=True, can_delete=True, can_publish=True,
                                 can_move_page=True)
 
     def _add_plugin(self, user, page):
@@ -236,6 +241,9 @@ class PermissionModeratorTests(CMSTestCase):
             user_global.is_staff = False
             user_global.save()  # Prevent is_staff permission
             global_page = create_page("global", "nav_playground.html", "en")
+            # Removed call since global page user doesn't have publish permission
+            # global_page = publish_page(global_page, user_global)
+            # it's allowed for the normal user to view the page
             assign_user_to_page(global_page, user_global, global_permission=True, can_view=True)
 
         url = global_page.get_absolute_url('en')
@@ -282,6 +290,20 @@ class PermissionModeratorTests(CMSTestCase):
         with self.settings(CMS_PUBLIC_FOR=None):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 404)
+
+    def test_page_content_reflects_page_publish_permission(self):
+        """
+        Test that the page content object gets its publish permission from the
+        page object.
+        """
+        page = create_page('test', 'nav_playground.html', 'en')
+        page_content = page.get_content_obj("en")
+
+        user = self.get_standard_user()
+        assign_user_to_page(page, user, can_publish=True)
+        with patch.object(page, "has_publish_permission") as page_has_publish_permission:
+            self.assertTrue(page_content.has_publish_permission(user))
+            page_has_publish_permission.assert_called_once_with(user)
 
 
 class ViewPermissionBaseTests(CMSTestCase):
