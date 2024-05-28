@@ -437,7 +437,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
 def create_page_user(created_by, user,
                      can_add_page=True, can_view_page=True,
                      can_change_page=True, can_delete_page=True,
-                     can_recover_page=True, can_add_pageuser=True,
+                     can_publish_page=True, can_add_pageuser=True,
                      can_change_pageuser=True, can_delete_pageuser=True,
                      can_add_pagepermission=True,
                      can_change_pagepermission=True,
@@ -466,7 +466,7 @@ def create_page_user(created_by, user,
         'can_view_page': can_view_page,
         'can_change_page': can_change_page,
         'can_delete_page': can_delete_page,
-        'can_recover_page': can_recover_page,
+        'can_publish_page': can_publish_page,
         'can_add_pageuser': can_add_pageuser,
         'can_change_pageuser': can_change_pageuser,
         'can_delete_pageuser': can_delete_pageuser,
@@ -506,15 +506,13 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
     """
-    if can_publish is not None:
-        warnings.warn('This API function no longer accepts a "can_publish" argument.',
-                      UserWarning, stacklevel=2)
 
     grant_all = grant_all and not global_permission
     data = {
         'can_add': can_add or grant_all,
         'can_change': can_change or grant_all,
         'can_delete': can_delete or grant_all,
+        'can_publish': can_publish or grant_all,
         'can_change_advanced_settings': can_change_advanced_settings or grant_all,
         'can_change_permissions': can_change_permissions or grant_all,
         'can_move_page': can_move_page or grant_all,
