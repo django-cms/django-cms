@@ -123,6 +123,7 @@ class BaseCMSTestCase:
             'can_add': False,
             'can_change': False,
             'can_delete': False,
+            'can_publish': False,
             'can_change_advanced_settings': False,
             'can_change_permissions': False,
             'can_move_page': False,
@@ -140,6 +141,7 @@ class BaseCMSTestCase:
             'can_add': False,
             'can_change': False,
             'can_delete': False,
+            'can_publish': False,
             'can_change_advanced_settings': False,
             'can_change_permissions': False,
             'can_move_page': False,
@@ -209,6 +211,7 @@ class BaseCMSTestCase:
         user.user_permissions.add(Permission.objects.get(codename='delete_link'))
         user.user_permissions.add(Permission.objects.get(codename='change_link'))
         # Page permissions
+        user.user_permissions.add(Permission.objects.get(codename='publish_page'))
         user.user_permissions.add(Permission.objects.get(codename='add_page'))
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
         user.user_permissions.add(Permission.objects.get(codename='delete_page'))
