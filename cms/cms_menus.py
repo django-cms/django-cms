@@ -204,11 +204,11 @@ class CMSMenu(Menu):
         Returns a queryset of page content objects based on the given toolbar: Includes
         latest content in edit and preview mode.
 
-        Parameters:
-        - toolbar (Toolbar): The toolbar object passed as an argument.
+        :param: toolbar: The toolbar object passed as an argument.
+        :type toolbar: Toolbar
 
-        Returns:
-        - A queryset of page content objects.
+        :return: queryset of page content objects
+        :rtype: QuerySet
         """
         if toolbar.edit_mode_active or toolbar.preview_mode_active:
             # Get all page contents visible in the admin
