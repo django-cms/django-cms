@@ -182,7 +182,7 @@ class StructureBoard {
             const width = this.ui.window[0].innerWidth;
             const BREAKPOINT = 1024;
 
-            if (width > BREAKPOINT && !this.condensed) {
+            if (width > BREAKPOINT && !this.condensed && CMS.settings.mode === 'edit') {
                 this._makeCondensed();
             }
 
