@@ -1,41 +1,36 @@
-name: Publish Python 🐍 distributions 📦 to TestPyPI
+name: Test PyPI'ye Yayınlama
 
 on:
   push:
     branches:
-      - 'develop'
-      - 'release/**'
+      - main
 
 jobs:
-  build-n-publish:
-    name: Build and publish Python 🐍 distributions 📦 to TestPyPI
+  publish:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.12
-      uses: actions/setup-python@v3
-      with:
-        python-version: '3.12'
+      - name: Kodu Checkout Et
+        uses: actions/checkout@v2
 
-    - name: Install pypa/build
-      run: >-
-        python -m
-        pip install
-        build
-        --user
-    - name: Build a binary wheel and a source tarball
-      run: >-
-        python -m
-        build
-        --sdist
-        --wheel
-        --outdir dist/
-        .
+      - name: Python'u Kur
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
 
-    - name: Publish distribution 📦 to Test PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        repository_url: https://test.pypi.org/legacy/
-        skip_existing: true
+      - name: Bağımlılıkları Yükle
+        run: |
+          python -m pip install --upgrade pip
+          pip install build
+
+      - name: Paketi Derle
+        run: python -m build
+
+      - name: Test PyPI'ye Yayınla
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository-url: https://test.pypi.org/legacy/
