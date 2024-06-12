@@ -18,7 +18,7 @@
     "eslint-plugin-compat": "^4.1.4",
     "exports-loader": "^0.7.0",
     "graceful-fs": "4.2.2",
-    "gulp": "^4.0.2",
+    "gulp": "^5.0.0",
     "gulp-clean-css": "^3.0.4",
     "gulp-eslint": "^3.0.1",
     "gulp-iconfont": "11.0.0",
