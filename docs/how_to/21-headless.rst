@@ -8,11 +8,9 @@ Django CMS is headless-ready. This means that you can use django CMS as a
 backend service to provide content to the frontend technology of your choice.
 
 Traditionally, django CMS serves the content as HTML pages. In headless mode,
-django CMS does not publish the html page tree. To retrieve conten in headless
+django CMS does not publish the html page tree. To retrieve content in headless
 mode you will need an application that serves the content from the CMS via an
-API, such as djangocms-rest. (You can also run a hybrid mode where you serve
-**both** the HTML pages and the content via an API, say, for an app. In this
-case, just add the API to your traditional project.)
+API, such as djangocms-rest.
 
 To run django CMS in headless mode, you simply remove the catch-all URL pattern
 from your projects' ``urls.py`` file and replace it by an API endpoint:
@@ -28,8 +26,15 @@ Now, django CMS will be fully accessible through the admin interface, but the
 frontend will not be served. Once, you add an API endpoint, this will be the
 only way to access the content.
 
-To add an API endpoint, you can use the `djangocms-rest` package. This package
-provides a REST API for django CMS. To install it, run:
+.. note::
+
+    You can also run a hybrid mode where you serve **both** the HTML pages
+    and the content via an API, say, for an app. In this case, keep the django CMS' URLS and just add the
+    API to your traditional project.
+
+
+To add an API endpoint, you can use the ``djangocms-rest`` package, for example.
+This package provides a REST API for django CMS. To install it, run:
 
 .. code-block:: bash
 
@@ -48,7 +53,8 @@ Then, add the following to your ``urls.py`` file:
 .. note::
 
     Django CMS does not force you to use the ``djangocms-rest`` package. You can
-    use any other package that provides an API for django CMS.
+    use any other package that provides an API for django CMS, with
+    a different API such as GraphQL, for example.
 
     If you are using a different API package, you will need to follow the
     instructions provided by that package.
@@ -65,21 +71,22 @@ Django templates.
 
 If you keep the ``CMS_TEMPLATES`` setting in your project, you still will be
 using templates to render the content when editing and previewing in headless
-mode.
+mode. In this case, the templates will be used to identify the placeholders of
+a page.
 
-If ``CMS_TEMPLATES`` is set, the templates will be used to identify the
-placeholders of a page.
+This scenario requires templates to be present in the project for the benefit
+of the editors only.
 
 
 ****************************
- Headless without tempaltes
+ Headless without templates
 ****************************
 
-However, when running Django CMS headlessly, you can fully decouples the
-front-end presentation layer (which includes templates) from the CMS, and the
-configuration of placeholders is handled differently.
+However, when running Django CMS headlessly without templates, you fully
+decouple the front-end presentation layer (which includes templates) from the
+CMS, and the configuration of placeholders must be handled differently.
 
-First, set the ``CMS_TEMPLATES`` setting to an empty list  in your project's
+First, set the ``CMS_TEMPLATES`` setting to an empty list in your project's
 ``settings.py`` file (or removing it entirely):
 
 .. code-block:: python
@@ -100,3 +107,8 @@ placeholder configuration. The first element of the tuple is the name of the
 placeholder configuration. The second element is a tuple of placeholder names.
 The third element is the verbose description of the placeholder configuration
 which will be shown in the user interface.
+
+This scenario is useful when you do not want to design templates and focus on
+the content structure only. Editors will see a generic representation of the
+plugins in a minimally styled template. Note that the ``css`` and ``js``block
+of the plugin templates will be loaded also in this case.
