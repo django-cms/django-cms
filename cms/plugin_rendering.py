@@ -13,7 +13,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import override
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
-from cms.models import PageContent
+from cms.models import PageContent, Placeholder
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
@@ -554,6 +554,28 @@ class ContentRenderer(BaseRenderer):
                 language_cache[placeholder.pk] = cached_value
         return language_cache.get(placeholder.pk)
 
+
+    def _get_content_object(self, page, slots=None):
+        if self.toolbar.get_object() == page:
+            # Current object belongs to the page itself
+            page_content = self.toolbar.get_object()
+            placeholders = Placeholder.objects.get_for_obj(page_content)
+        elif slots:
+            # If looking for inherited placeholders, slots is specified
+            if self.toolbar.preview_mode_active or self.toolbar.edit_mode_active:
+                page_content = (page.pagecontent_set(manager="admin_manager")
+                                .current_content(language=self.request_language).first())
+            else:
+                page_content = page.pagecontent_set.filter(language=self.request_language).first()
+            placeholders = Placeholder.objects.get_for_obj(page_content) if page_content else Placeholder.objects.none()
+        else:
+            page_content = page.get_content_obj(self.request_language, fallback=False)
+
+            PageContent.page.field.set_cached_value(page_content, page)
+            # Creates any placeholders missing on the page
+            placeholders = page_content.rescan_placeholders().values()
+        return placeholders
+
     def _preload_placeholders_for_page(self, page, slots=None, inherit=False):
         """
         Populates the internal plugin cache of each placeholder
@@ -562,14 +584,7 @@ class ContentRenderer(BaseRenderer):
         """
         from cms.utils.plugins import assign_plugins
 
-        if slots:
-            placeholders = page.get_placeholders(self.request_language).filter(slot__in=slots)
-        else:
-            title = page.get_content_obj(self.request_language, fallback=False)
-
-            PageContent.page.field.set_cached_value(title, page)
-            # Creates any placeholders missing on the page
-            placeholders = title.rescan_placeholders().values()
+        placeholders = self._get_content_object(page, slots=slots)
 
         if inherit:
             # When the inherit flag is True,

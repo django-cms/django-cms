@@ -126,7 +126,7 @@ organisation that exists to support the development of django CMS and its commun
 Discord
 ~~~~~
 
-Join `our friendly Discord server <https://www.django-cms.org/discord>`_ for **support** and
+Join `our friendly Discord server <https://discord-support-channel.django-cms.org>`_ for **support** and
 to **share ideas** and **discuss technical questions** with other members of the
 community.
 

@@ -34,7 +34,7 @@ example:
         name = "My Apphook"
 
         def get_urls(self, page=None, language=None, **kwargs):
-            return ["myapp.urls"] # replace this with the path to your application's URLs module
+            return ["myapp.urls"]  # replace this with the path to your application's URLs module
 
 Apphooks for namespaced applications
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,8 +136,8 @@ So, given an application with the ``urls.py`` for the views ``index_view`` and
 .. code-block::
 
     urlpatterns = [
-        path('archive/', archive_view),
-        path('', index_view),
+        path("archive/", archive_view),
+        path("", index_view),
     ]
 
 attached to a page whose URL path is ``/hello/world/``, the views will be exposed as
@@ -149,13 +149,42 @@ follows:
 Sub-pages of an apphooked page
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. important::
+Usually you should not add child pages to a page with an apphook. This is because the
+apphook "swallows" all URLs below that page, handing them over to the attached application.
 
-    Don't add child pages to a page with an apphook.
+In the rare occasion that you nevertheless want to add child pages below an apphooked
+page, then you must add a special URL pattern to route requests back into the CMS.
 
-    The apphook "swallows" all URLs below that of the page, handing them over to the
-    attached application. If you have any child pages of the apphooked page, django CMS
-    will not be able to serve them reliably.
+For example, if you have an apphooked page at ``/hello/`` and you want to add a CMS page,
+and optionally its children below that page using the slug ``world``, then rewrite the
+URL patterns from above as:
+
+.. code-block:: python
+
+    from django.urls import path, re_path
+    from cms.views import details
+
+    def reroute_cms_page(request, path, page=None):
+        language = get_language_from_request(request, check_path=True)
+        return details(request, f'{page.get_path(language)}/{path}')
+
+    class MyApphook(CMSApp):
+        # ...
+        def get_urls(self, page=None, language=None, **kwargs):
+            return [
+                path("archive/", archive_view),
+                re_path(r"^(?P<path>world/.*)$", reroute_cms_page, {"page": page}),
+                path("", index_view),
+            ]
+
+Here we created a short function-based view named ``reroute_cms_page``. It handles
+the requests which otherwise would be swallowed by the apphook.
+
+A requests starting with the URL ``/hello/`` then is handled by ``index_view``,
+``/hello/archive/`` is handled by ``archive_view``, and ``/hello/world/``,
+``/hello/world/foo``, etc. are handled by our special view ``reroute_cms_page``,
+routing the request back to the ``detail()`` view of Django-CMS.
+
 
 Managing apphooks
 -----------------
