@@ -1,8 +1,8 @@
 from collections import OrderedDict
 
-from django.db.utils import IntegrityError
-
 from cms.models import PageUrl, TreeNode
+
+from django.db.utils import IntegrityError
 
 from .base import SubcommandsCommand
 
