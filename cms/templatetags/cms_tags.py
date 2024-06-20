@@ -20,16 +20,12 @@ from django.db.models import Model
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import smart_str
-from django.utils.html import escape
+from django.utils.html import escape, strip_tags
 from django.utils.http import urlencode
 from django.utils.translation import (
     get_language,
-    override,
-)
-from django.utils.translation import (
     gettext_lazy as _,
-)
-from django.utils.translation import (
+    override,
     override as force_language,
 )
 from sekizai.templatetags.sekizai_tags import RenderBlock, SekizaiParser
@@ -39,10 +35,8 @@ from cms.exceptions import PlaceholderNotFound
 from cms.models import (
     CMSPlugin,
     Page,
-    StaticPlaceholder,
-)
-from cms.models import (
     Placeholder as PlaceholderModel,
+    StaticPlaceholder,
 )
 from cms.plugin_pool import plugin_pool
 from cms.toolbar.utils import get_toolbar_from_request
@@ -413,7 +407,9 @@ class PageAttribute(AsTag):
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
             ret_val = func(language=lang, fallback=True)
-            if not isinstance(ret_val, datetime):
+            if name == 'page_title':
+                 ret_val = strip_tags(ret_val)
+            elif not isinstance(ret_val, datetime):
                 ret_val = escape(ret_val)
             return ret_val
         return ''
@@ -507,17 +503,17 @@ class CMSEditableObject(InclusionTag):
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = u"%s %s list" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "%s %s list" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = u"%s %s" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "%s %s" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(
                         edit_fields
                     ) if not isinstance('edit_fields', str) else edit_fields
             else:
-                instance.get_plugin_name = u"%s %s" % (smart_str(_('Add')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "%s %s" % (smart_str(_('Add')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
             extra_context['generic'] = opts

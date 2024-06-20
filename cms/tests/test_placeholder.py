@@ -542,7 +542,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         ###
         # add the test plugin
         ###
-        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
         endpoint = self.get_change_plugin_uri(test_plugin)
         response = self.client.post(endpoint, {})
@@ -559,7 +559,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         ###
         # add the test plugin
         ###
-        test_plugin = add_plugin(ph1, u"EmptyPlugin", u"en")
+        test_plugin = add_plugin(ph1, "EmptyPlugin", "en")
         test_plugin.save()
 
         endpoint = self.get_change_plugin_uri(test_plugin)
@@ -607,7 +607,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             'main': {
                 'name': 'main content',
                 'plugins': ['TextPlugin', 'LinkPlugin'],
-                'require_parent': False,
+                'default_plugins': [
+                    {
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': '<p>Some default text</p>'
+                        },
+                    },
+                ],
             },
             'layout/home.html main': {
                 'name': 'main content with FilerImagePlugin and limit',
@@ -642,8 +649,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             returned = get_placeholder_conf('excluded_plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['layout/other.html main']['excluded_plugins'])
             # test grandparent inherited value
-            returned = get_placeholder_conf('require_parent', 'main', 'layout/other.html')
-            self.assertEqual(returned, TEST_CONF['main']['require_parent'])
+            returned = get_placeholder_conf('default_plugins', 'main', 'layout/other.html')
+            self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
             # test generic configuration
             returned = get_placeholder_conf('plugins', 'something')
             self.assertEqual(returned, TEST_CONF[None]['plugins'])
@@ -738,6 +745,79 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual(old_placeholder_1_plugin_count, current_placeholder_1_plugin_count)
         self.assertEqual(old_placeholder_2_plugin_count, current_placeholder_2_plugin_count)
 
+    def test_plugins_prepopulate(self):
+        """ Tests prepopulate placeholder configuration """
+
+        conf = {
+            'col_left': {
+                'default_plugins' : [
+                    {
+                        'plugin_type':'TextPlugin',
+                        'values':{'body':'<p>en default body 1</p>'},
+                    },
+                    {
+                        'plugin_type':'TextPlugin',
+                        'values':{'body':'<p>en default body 2</p>'},
+                    },
+                ]
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('page_en', 'col_two.html', 'en')
+            placeholder = page.get_placeholders("en").get(slot='col_left')
+            context = SekizaiContext()
+            context['request'] = self.get_request(language="en", page=page)
+            # Our page should have "en default body 1" AND "en default body 2"
+            content = _render_placeholder(placeholder, context)
+            self.assertRegex(content, r"^<p>en default body 1</p>\s*<p>en default body 2</p>$")
+
+    def test_plugins_children_prepopulate(self):
+        """
+        Validate a default textplugin with a nested default link plugin
+        """
+
+        conf = {
+            'col_left': {
+                'default_plugins': [
+                    {
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': '<p>body %(_tag_child_1)s and %(_tag_child_2)s</p>'
+                        },
+                        'children': [
+                            {
+                                'plugin_type': 'LinkPlugin',
+                                'values': {
+                                    'name': 'django',
+                                    'external_link': 'https://www.djangoproject.com/'
+                                },
+                            },
+                            {
+                                'plugin_type': 'LinkPlugin',
+                                'values': {
+                                    'name': 'django-cms',
+                                    'external_link': 'https://www.django-cms.org'
+                                },
+                            },
+                        ]
+                    },
+                ]
+            },
+        }
+
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('page_en', 'col_two.html', 'en')
+            placeholder = page.get_placeholders("en").get(slot='col_left')
+            context = SekizaiContext()
+            context['request'] = self.get_request(language="en", page=page)
+            _render_placeholder(placeholder, context)
+            plugins = placeholder.get_plugins_list()
+            self.assertEqual(len(plugins), 3)
+            self.assertEqual(plugins[0].plugin_type, 'TextPlugin')
+            self.assertEqual(plugins[1].plugin_type, 'LinkPlugin')
+            self.assertEqual(plugins[2].plugin_type, 'LinkPlugin')
+            self.assertTrue(plugins[1].parent == plugins[2].parent and plugins[1].parent == plugins[0])
+
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en")
         title = page.get_content_obj("en")
@@ -788,7 +868,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # add the test plugin
         ###
         for lang in avail_langs:
-            add_plugin(ex.placeholder, u"EmptyPlugin", lang)
+            add_plugin(ex.placeholder, "EmptyPlugin", lang)
         # reload instance from database
         ex = Example1.objects.get(pk=ex.pk)
         # get languages
@@ -811,7 +891,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # add the test plugin
         ###
         for lang in avail_langs:
-            add_plugin(placeholder, u"EmptyPlugin", lang)
+            add_plugin(placeholder, "EmptyPlugin", lang)
         # reload placeholder from database
         placeholder = page.get_placeholders("en").get(slot='col_sidebar')
         # get languages
@@ -879,7 +959,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         page = create_page('test page en', 'col_two.html', 'en')
 
         # check for en
-        page_content_en = self.get_page_title_obj(page)
+        page_content_en = self.get_pagecontent_obj(page)
         self.assertQuerySetEqual(
             Placeholder.objects.get_for_obj(page_content_en),
             page_content_en.get_placeholders(),
@@ -906,8 +986,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         with self.login_user_context(self.get_superuser()):
             new_page = self.copy_page(page, page, position=1)
 
-        page_content = self.get_page_title_obj(page)
-        new_page_content = self.get_page_title_obj(new_page)
+        page_content = self.get_pagecontent_obj(page)
+        new_page_content = self.get_pagecontent_obj(new_page)
         page_content_plhs = Placeholder.objects.get_for_obj(page_content)
         new_page_content_plhs = Placeholder.objects.get_for_obj(new_page_content)
         self.assertEqual(page_content_plhs.count(), new_page_content_plhs.count())
@@ -1163,8 +1243,8 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         self.assertIn("slot=''", repr(unsaved_ph))
 
         saved_ph = Placeholder.objects.create(slot='test')
-        self.assertIn('id={}'.format(saved_ph.pk), repr(saved_ph))
-        self.assertIn("slot='{}'".format(saved_ph.slot), repr(saved_ph))
+        self.assertIn(f'id={saved_ph.pk}', repr(saved_ph))
+        self.assertIn(f"slot='{saved_ph.slot}'", repr(saved_ph))
 
 
 class PlaceholderConfTests(TestCase):

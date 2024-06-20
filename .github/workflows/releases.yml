@@ -1,0 +1,22 @@
+name: Comment on PRs into release/* branches
+
+on:
+  pull_request:
+    branches:
+      - release/*
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '👋 Hi there!\n\nPlease remember to **MERGE COMMIT** pull requests from `develop` or `develop-4`!\n\n**Do not SQUASH** commits to preserve history for the changelog.'
+            })

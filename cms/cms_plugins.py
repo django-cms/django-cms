@@ -7,14 +7,14 @@ from django.http import (
 )
 from django.middleware.csrf import get_token
 from django.urls import re_path
-from django.utils.translation import get_language, gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext, gettext_lazy as _
 
 from cms.models import CMSPlugin, Placeholder
 from cms.models.aliaspluginmodel import AliasPluginModel
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.plugin_base import CMSPluginBase, PluginMenuItem
 from cms.plugin_pool import plugin_pool
+from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
 from cms.utils.urlutils import admin_reverse
 
 
@@ -117,7 +117,7 @@ class AliasPlugin(CMSPluginBase):
             'AliasPlugin is deprecated, '
             'and it will be removed; '
             'please use the package djangocms-alias instead',
-            DeprecationWarning
+            RemovedInDjangoCMS42Warning
         )
         if not request.user.is_staff:
             return HttpResponseForbidden("not enough privileges")

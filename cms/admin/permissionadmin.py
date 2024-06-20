@@ -86,6 +86,8 @@ class PagePermissionInlineAdmin(PagePermissionAdminMixin, admin.TabularInline):
                 exclude.append('can_add')
             if not obj.has_delete_permission(user):
                 exclude.append('can_delete')
+            if not obj.has_publish_permission(user):
+                exclude.append('can_publish')
             if not obj.has_advanced_settings_permission(user):
                 exclude.append('can_change_advanced_settings')
             if not obj.has_move_page_permission(user):
@@ -120,8 +122,8 @@ class ViewRestrictionInlineAdmin(PagePermissionAdminMixin, admin.TabularInline):
 
 
 class GlobalPagePermissionAdmin(admin.ModelAdmin):
-    list_display = ['user', 'group', 'can_change', 'can_delete', 'can_change_permissions']
-    list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_change_permissions']
+    list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+    list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
 
     search_fields = []
     for field in admin_class.search_fields:

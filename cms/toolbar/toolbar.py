@@ -168,6 +168,7 @@ class CMSToolbarBase(BaseToolbar):
         self.is_staff = None
         self.clipboard = None
         self.toolbar_language = None
+        self.toolbar_language_bidi = None
         self.show_toolbar = True
         self.init_toolbar(request, request_path=request_path)
         # Internal attribute to track whether we can cache
@@ -252,6 +253,7 @@ class CMSToolbarBase(BaseToolbar):
                 user_settings.language = self.request_language
                 user_settings.save()
             self.clipboard = user_settings.clipboard
+        self.toolbar_language_bidi = self.toolbar_language in settings.LANGUAGES_BIDI
 
         if hasattr(self, 'toolbars'):
             for key, toolbar in self.toolbars.items():
@@ -380,7 +382,7 @@ class CMSToolbarBase(BaseToolbar):
 
     def get_object_model(self):
         if self.obj:
-            return "{0}.{1}".format(self.obj._meta.app_label, self.obj._meta.object_name).lower()
+            return f"{self.obj._meta.app_label}.{self.obj._meta.object_name}".lower()
         return ''
 
     def get_object_pk(self):
@@ -403,11 +405,12 @@ class CMSToolbarBase(BaseToolbar):
             return get_object_structure_url(self.obj, language=self.request_language)
         return ''
 
-    def object_is_editable(self):
-        if self.obj:
-            if hasattr(self.obj, "is_editable"):
+    def object_is_editable(self, obj=None):
+        obj = obj or self.obj
+        if obj:
+            if hasattr(obj, "is_editable"):
                 # Object can decide itself
-                return self.obj.is_editable(self.request)
+                return obj.is_editable(self.request)
             return True
         return False
 
@@ -575,3 +578,6 @@ class EmptyToolbar(BaseToolbar):
     def __init__(self, request):
         self.request = request
         super().__init__()
+
+    def get_object(self):
+        return None

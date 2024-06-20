@@ -6,8 +6,6 @@ from django.contrib.sites.models import Site
 from django.urls import NoReverseMatch, Resolver404, resolve, reverse
 from django.utils.translation import (
     gettext_lazy as _,
-)
-from django.utils.translation import (
     override as force_language,
 )
 
@@ -23,6 +21,8 @@ from cms.toolbar.utils import (
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
+from cms.utils.compat import DJANGO_4_2
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict, get_language_tuple
 from cms.utils.page_permissions import (
@@ -343,7 +343,7 @@ class BasicToolbar(CMSToolbar):
             action=admin_reverse('logout'),
             active=True,
             on_success=on_success,
-            method='GET',
+            method='POST',
         )
 
     def add_language_menu(self):
@@ -360,7 +360,8 @@ class BasicToolbar(CMSToolbar):
                         url = language_changer(code)
                     except NoReverseMatch:
                         url = DefaultLanguageChanger(self.request)(code)
-                    self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
+                    if url:
+                        self._language_menu.add_link_item(name, url=url, active=self.current_lang == code)
             else:
                 # We do not have to check every time the toolbar is created
                 self._language_menu = True  # Pretend the language menu is already there
@@ -395,7 +396,7 @@ class PageToolbar(CMSToolbar):
 
     def has_page_change_permission(self):
         if not hasattr(self, 'page_change_permission'):
-            self.page_change_permission = can_change_page(self.request)
+            self.page_change_permission = can_change_page(self.request) and self.toolbar.object_is_editable()
         return self.page_change_permission
 
     def in_apphook(self):
@@ -428,8 +429,9 @@ class PageToolbar(CMSToolbar):
 
         # if the current page has a parent in the request's current language redirect to it
         if parent_page and language in parent_page.get_languages():
-            with force_language(language):
-                return parent_page.get_absolute_url(language=language)
+            return get_object_preview_url(
+                parent_page.pagecontent_set(manager="admin_manager").latest_content(language=language).first()
+            )
 
         # else redirect to root, do not redirect to Page.objects.get_home() because user could have deleted the last
         # page, if DEBUG == False this could cause a 404
@@ -441,7 +443,7 @@ class PageToolbar(CMSToolbar):
 
         warnings.warn(
             "Title property of PageToolbar will be removed. Use page_content property instead.",
-            DeprecationWarning, stacklevel=2)
+            RemovedInDjangoCMS43Warning, stacklevel=2)
         return self.page_content
 
     @title.setter
@@ -450,7 +452,7 @@ class PageToolbar(CMSToolbar):
 
         warnings.warn(
             "Title property of PageToolbar will be removed. Use page_content property instead.",
-            DeprecationWarning, stacklevel=2)
+            RemovedInDjangoCMS43Warning, stacklevel=2)
         self.page_content = page_content
 
     # Populate
@@ -472,7 +474,6 @@ class PageToolbar(CMSToolbar):
             )
         else:
             can_change = False
-
         if can_change:
             language_menu = self.toolbar.get_menu(LANGUAGE_MENU_IDENTIFIER)
             if not language_menu:
@@ -492,29 +493,32 @@ class PageToolbar(CMSToolbar):
 
             if add:
                 add_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-add'.format(LANGUAGE_MENU_IDENTIFIER), _('Add Translation')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-add', _('Add Translation')
                 )
 
                 page_add_url = admin_reverse('cms_pagecontent_add')
 
                 for code, name in add:
-                    url = add_url_parameters(page_add_url, cms_page=self.page.pk, language=code)
+                    url = add_url_parameters(
+                        page_add_url, cms_page=self.page.pk, parent_node=self.page.node.id, language=code
+                    )
                     add_plugins_menu.add_modal_item(name, url=url)
 
             if remove:
                 remove_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-del'.format(LANGUAGE_MENU_IDENTIFIER), _('Delete Translation')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-del', _('Delete Translation')
                 )
                 disabled = len(remove) == 1
                 for code, name in remove:
                     pagecontent = self.page.get_content_obj(code)
-                    translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
-                    url = add_url_parameters(translation_delete_url, language=code)
-                    remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
+                    if pagecontent:
+                        translation_delete_url = admin_reverse('cms_pagecontent_delete', args=(pagecontent.pk,))
+                        url = add_url_parameters(translation_delete_url, language=code)
+                        remove_plugins_menu.add_modal_item(name, url=url, disabled=disabled)
 
             if copy:
                 copy_plugins_menu = language_menu.get_or_create_menu(
-                    '{0}-copy'.format(LANGUAGE_MENU_IDENTIFIER), _('Copy all plugins')
+                    f'{LANGUAGE_MENU_IDENTIFIER}-copy', _('Copy all plugins')
                 )
                 title = _('from %s')
                 question = _('Are you sure you want to copy all plugins from %s?')

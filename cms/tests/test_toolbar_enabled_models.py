@@ -1,8 +1,9 @@
+from unittest.mock import Mock, patch
+
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.http import Http404
-from mock import Mock, patch
 
 from cms.api import create_page
 from cms.app_registration import get_cms_config_apps, get_cms_extension_apps
@@ -73,7 +74,7 @@ class ConfigureToolbarEnabledModelsUnitTestCase(CMSTestCase):
         extensions.configure_toolbar_enabled_models(cms_config)
         # Warning message displayed
         mocked_logger.assert_called_once_with(
-            "Model {} already registered for frontend rendering".format(model)
+            f"Model {model} already registered for frontend rendering"
         )
         # Toolbar enabled models dict is still what we expect it to be
         self.assertDictEqual(

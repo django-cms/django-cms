@@ -15,10 +15,10 @@ def dynamic_placeholder_2(instance):
 
 
 class Example1(models.Model):
-    char_1 = models.CharField(u'char_1', max_length=255)
-    char_2 = models.CharField(u'char_2', max_length=255)
-    char_3 = models.CharField(u'char_3', max_length=255)
-    char_4 = models.CharField(u'char_4', max_length=255)
+    char_1 = models.CharField('char_1', max_length=255)
+    char_2 = models.CharField('char_2', max_length=255)
+    char_3 = models.CharField('char_3', max_length=255)
+    char_4 = models.CharField('char_4', max_length=255)
     date_field = models.DateField(null=True)
     placeholder = PlaceholderField('placeholder')
     publish = models.BooleanField(default=True)
@@ -52,24 +52,24 @@ class Example1(models.Model):
 
 
 class TwoPlaceholderExample(models.Model):
-    char_1 = models.CharField(u'char_1', max_length=255)
-    char_2 = models.CharField(u'char_2', max_length=255)
-    char_3 = models.CharField(u'char_3', max_length=255)
-    char_4 = models.CharField(u'char_4', max_length=255)
+    char_1 = models.CharField('char_1', max_length=255)
+    char_2 = models.CharField('char_2', max_length=255)
+    char_3 = models.CharField('char_3', max_length=255)
+    char_4 = models.CharField('char_4', max_length=255)
     placeholder_1 = PlaceholderField('placeholder_1', related_name='p1')
     placeholder_2 = PlaceholderField('placeholder_2', related_name='p2')
 
 
 class DynamicPlaceholderSlotExample(models.Model):
-    char_1 = models.CharField(u'char_1', max_length=255)
-    char_2 = models.CharField(u'char_2', max_length=255)
+    char_1 = models.CharField('char_1', max_length=255)
+    char_2 = models.CharField('char_2', max_length=255)
     placeholder_1 = PlaceholderField(dynamic_placeholder_1, related_name='dynamic_pl_1')
     placeholder_2 = PlaceholderField(dynamic_placeholder_2, related_name='dynamic_pl_2')
 
 
 class CharPksExample(models.Model):
-    char_1 = models.CharField(u'char_1', max_length=255)
-    slug = models.SlugField(u'char_1', max_length=255, primary_key=True)
+    char_1 = models.CharField('char_1', max_length=255)
+    slug = models.SlugField('char_1', max_length=255, primary_key=True)
     placeholder_1 = PlaceholderField('placeholder_1', related_name='charpk_p1')
 
     def __str__(self):

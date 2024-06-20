@@ -9,8 +9,9 @@
 # a270031086f2a0d3514bc0cb507b48f6, 2023
 # Valentin Sandoz <valentin.sandoz@vieux-mazel.ch>, 2023
 # François Palmier <fp@kapt.mobi>, 2023
-# Florian Delizy <florian.delizy@gmail.com>, 2023
 # Sylvain Chiron <chironsylvain@orange.fr>, 2023
+# Florian Delizy <florian.delizy@gmail.com>, 2023
+# Frédéric Roland, 2023
 # Fabian Braun <fsbraun@gmx.de>, 2023
 # Corentin Bettiol, 2023
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
@@ -18,7 +19,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-22 12:50+0200\n"
+"POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
 "Last-Translator: Corentin Bettiol, 2023\n"
 "Language-Team: French (https://app.transifex.com/divio/teams/58664/fr/)\n"
@@ -288,9 +289,10 @@ msgstr "Les titres et les blocs en %(language)s ont été supprimés"
 
 msgid "You do not have permission to change a page's navigation status"
 msgstr ""
+"Vous n'avez pas la permission de changer le statut de navigation d'une page"
 
 msgid "You cannot change this page's navigation status"
-msgstr ""
+msgstr "Vous ne pouvez pas changer le statut de navigation de cette page"
 
 msgid "Public content"
 msgstr "Contenu public"
@@ -391,7 +393,7 @@ msgstr ""
 
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "Ajouter le contenu %(language)s"
 
 msgid "Preview"
 msgstr "Prévisualiser"
@@ -408,7 +410,7 @@ msgstr ""
 "changer de langue."
 
 msgid "<unspecified>"
-msgstr ""
+msgstr "<unspecified>"
 
 #, python-format
 msgid "No registered apphook \"%r\" found"
@@ -725,7 +727,7 @@ msgid "page content"
 msgstr "contenu de la page"
 
 msgid "page contents"
-msgstr ""
+msgstr "contenu de la page"
 
 msgid "default"
 msgstr "par défaut"
@@ -1064,7 +1066,7 @@ msgid "last change by"
 msgstr "dernière modification par"
 
 msgid "last change on"
-msgstr "Dernnière modification le"
+msgstr "dernière modification le"
 
 msgid "meta"
 msgstr "méta"
@@ -1192,6 +1194,8 @@ msgstr "Cette page n'a pas d'aperçu !"
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
 msgstr ""
+"Il est possible que l'apphook attaché ne fournisse pas de contenu pour sa "
+"racine."
 
 msgid "It is being redirected to:"
 msgstr "En cours de redirection vers :"
@@ -1667,3 +1671,6 @@ msgstr "Créer une nouvelle instance de %s."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "Un assistant a déjà été enregistré pour le modèle : %s"
+
+#~ msgid "Slug must not be empty."
+#~ msgstr "Le slug est obligatoire."

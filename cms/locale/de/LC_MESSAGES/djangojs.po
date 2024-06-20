@@ -3,7 +3,6 @@
 # This file is distributed under the same license as the PACKAGE package.
 # 
 # Translators:
-# Translators:
 # Jonas Obrist <me@ojii.ch>, 2011
 # Michael P. Jung <michael.jung@terreon.de>, 2013
 # Peter Wischer <peter.wischer@lwl.org>, 2022
@@ -12,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django CMS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-12-30 16:56+0000\n"
+"POT-Creation-Date: 2022-11-05 20:40+0100\n"
 "PO-Revision-Date: 2010-11-30 06:49+0000\n"
 "Last-Translator: Peter Wischer <peter.wischer@lwl.org>, 2022\n"
 "Language-Team: German (http://app.transifex.com/divio/django-cms/language/de/)\n"
@@ -22,14 +21,11 @@ msgstr ""
 "Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-msgid "pathname"
-msgstr "Pfadname"
+msgid "/"
+msgstr ""
 
-msgid "urnpath"
-msgstr "URN-Pfad"
-
-msgid "reserved"
-msgstr "reserviert"
+msgid ":"
+msgstr ""
 
 msgid "Are you sure you want to change tabs without saving the page first?"
 msgstr "Sind Sie sicher Sie wollen den Reiter wechseln ohne vorher zu speichern?"

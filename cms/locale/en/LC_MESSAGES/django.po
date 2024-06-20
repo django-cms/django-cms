@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-08-25 14:47+0000\n"
+"POT-Creation-Date: 2024-04-26 17:30+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -265,12 +265,6 @@ msgstr "You do not have permission to delete this page"
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Title and plugins with language %(language)s was deleted"
-
-msgid "You do not have permission to change a page's navigation status"
-msgstr "You do not have permission to change a page's navigation status"
-
-msgid "You cannot change this page's navigation status"
-msgstr "You cannot change this page's navigation status"
 
 msgid "Public content"
 msgstr "Public content"
@@ -745,13 +739,6 @@ msgstr "frontend view restriction"
 
 msgid "Please select user or group."
 msgstr "Please select user or group."
-
-msgid ""
-"Users can't publish a page without permissions to change the page. Edit "
-"permissions required."
-msgstr ""
-"Users can't publish a page without permissions to change the page. Edit "
-"permissions required."
 
 msgid ""
 "Users can't change page advanced settings without permissions to change the "
@@ -1544,6 +1531,11 @@ msgstr "Sample App 2"
 msgid "Sample App 3"
 msgstr "Sample App 2"
 
+#, fuzzy
+#| msgid "Sample App with config"
+msgid "Sample App Without Landing Page"
+msgstr "Sample App with config"
+
 msgid "Namespaced App"
 msgstr "Namespaced App"
 
@@ -1598,6 +1590,9 @@ msgstr "Change Category"
 msgid "Thanks for spending some quality time with the Web site today."
 msgstr "Thanks for spending some quality time with the Web site today."
 
+msgid "Lazy"
+msgstr ""
+
 msgid "Inherit the template of the nearest ancestor"
 msgstr "Inherit the template of the nearest ancestor"
 
@@ -1649,6 +1644,19 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#~ msgid "You do not have permission to change a page's navigation status"
+#~ msgstr "You do not have permission to change a page's navigation status"
+
+#~ msgid "You cannot change this page's navigation status"
+#~ msgstr "You cannot change this page's navigation status"
+
+#~ msgid ""
+#~ "Users can't publish a page without permissions to change the page. Edit "
+#~ "permissions required."
+#~ msgstr ""
+#~ "Users can't publish a page without permissions to change the page. Edit "
+#~ "permissions required."
 
 #~ msgid "Slug must not be empty."
 #~ msgstr "Slug must not be empty."

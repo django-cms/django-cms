@@ -2,9 +2,20 @@
 Placeholders
 ############
 
-..  class:: cms.models.placeholdermodel.Placeholder
+.. module:: cms.models.placeholdermodel
 
-    ``Placeholders`` can be filled with plugins, which store or generate content.
+.. autoclass:: Placeholder
+    :members:
+    :show-inheritance:
+    :exclude-members: DoesNotExist, MultipleObjectsReturned
 
 
-..  class:: cms.admin.placeholderadmin.PlaceholderAdminMixin
+.. module:: cms.admin.placeholderadmin
+
+.. autoclass:: FrontendEditableAdminMixin
+    :members:
+    :exclude-members: DoesNotExist, MultipleObjectsReturned
+
+.. autoclass:: PlaceholderAdminMixin
+    :members:
+    :exclude-members: DoesNotExist, MultipleObjectsReturned

@@ -1,5 +1,4 @@
 import json
-from unittest import skipIf
 
 from django.contrib import admin
 from django.contrib.admin.sites import site
@@ -69,6 +68,7 @@ class AdminTestsBase(CMSTestCase):
                 user=normal_guy,
                 can_change=True,
                 can_delete=True,
+                can_publish=True,
                 can_change_advanced_settings=False,
                 can_change_permissions=False,
                 can_move_page=True,
@@ -372,7 +372,7 @@ class AdminTests(AdminTestsBase):
 
     def test_change_innavigation(self):
         page = self.get_page()
-        content = self.get_page_title_obj(page, 'en')
+        content = self.get_pagecontent_obj(page, 'en')
         permless = self.get_permless()
         admin_user = self.get_admin()
         pagecontent_admin = self.pagecontent_admin_class
@@ -517,6 +517,7 @@ class PluginPermissionTests(AdminTestsBase):
             user=user,
             can_change=True,
             can_delete=True,
+            can_publish=True,
             can_change_advanced_settings=False,
             can_change_permissions=False,
             can_move_page=True,
