@@ -607,7 +607,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             'main': {
                 'name': 'main content',
                 'plugins': ['TextPlugin', 'LinkPlugin'],
-                'require_parent': False,
+                'default_plugins': [
+                    {
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': '<p>Some default text</p>'
+                        },
+                    },
+                ],
             },
             'layout/home.html main': {
                 'name': 'main content with FilerImagePlugin and limit',
@@ -642,8 +649,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             returned = get_placeholder_conf('excluded_plugins', 'main', 'layout/other.html')
             self.assertEqual(returned, TEST_CONF['layout/other.html main']['excluded_plugins'])
             # test grandparent inherited value
-            returned = get_placeholder_conf('require_parent', 'main', 'layout/other.html')
-            self.assertEqual(returned, TEST_CONF['main']['require_parent'])
+            returned = get_placeholder_conf('default_plugins', 'main', 'layout/other.html')
+            self.assertEqual(returned, TEST_CONF['main']['default_plugins'])
             # test generic configuration
             returned = get_placeholder_conf('plugins', 'something')
             self.assertEqual(returned, TEST_CONF[None]['plugins'])
@@ -737,6 +744,79 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         # And test the plugin counts remain the same
         self.assertEqual(old_placeholder_1_plugin_count, current_placeholder_1_plugin_count)
         self.assertEqual(old_placeholder_2_plugin_count, current_placeholder_2_plugin_count)
+
+    def test_plugins_prepopulate(self):
+        """ Tests prepopulate placeholder configuration """
+
+        conf = {
+            'col_left': {
+                'default_plugins' : [
+                    {
+                        'plugin_type':'TextPlugin',
+                        'values':{'body':'<p>en default body 1</p>'},
+                    },
+                    {
+                        'plugin_type':'TextPlugin',
+                        'values':{'body':'<p>en default body 2</p>'},
+                    },
+                ]
+            },
+        }
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('page_en', 'col_two.html', 'en')
+            placeholder = page.get_placeholders("en").get(slot='col_left')
+            context = SekizaiContext()
+            context['request'] = self.get_request(language="en", page=page)
+            # Our page should have "en default body 1" AND "en default body 2"
+            content = _render_placeholder(placeholder, context)
+            self.assertRegex(content, r"^<p>en default body 1</p>\s*<p>en default body 2</p>$")
+
+    def test_plugins_children_prepopulate(self):
+        """
+        Validate a default textplugin with a nested default link plugin
+        """
+
+        conf = {
+            'col_left': {
+                'default_plugins': [
+                    {
+                        'plugin_type': 'TextPlugin',
+                        'values': {
+                            'body': '<p>body %(_tag_child_1)s and %(_tag_child_2)s</p>'
+                        },
+                        'children': [
+                            {
+                                'plugin_type': 'LinkPlugin',
+                                'values': {
+                                    'name': 'django',
+                                    'external_link': 'https://www.djangoproject.com/'
+                                },
+                            },
+                            {
+                                'plugin_type': 'LinkPlugin',
+                                'values': {
+                                    'name': 'django-cms',
+                                    'external_link': 'https://www.django-cms.org'
+                                },
+                            },
+                        ]
+                    },
+                ]
+            },
+        }
+
+        with self.settings(CMS_PLACEHOLDER_CONF=conf):
+            page = create_page('page_en', 'col_two.html', 'en')
+            placeholder = page.get_placeholders("en").get(slot='col_left')
+            context = SekizaiContext()
+            context['request'] = self.get_request(language="en", page=page)
+            _render_placeholder(placeholder, context)
+            plugins = placeholder.get_plugins_list()
+            self.assertEqual(len(plugins), 3)
+            self.assertEqual(plugins[0].plugin_type, 'TextPlugin')
+            self.assertEqual(plugins[1].plugin_type, 'LinkPlugin')
+            self.assertEqual(plugins[2].plugin_type, 'LinkPlugin')
+            self.assertTrue(plugins[1].parent == plugins[2].parent and plugins[1].parent == plugins[0])
 
     def test_placeholder_pk_thousands_format(self):
         page = create_page("page", "nav_playground.html", "en")

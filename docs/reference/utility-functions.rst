@@ -45,6 +45,8 @@ Plugins
 
 .. module:: cms.utils.plugins
 
+.. autofunction:: get_plugins
+
 .. autofunction:: assign_plugins
 
 .. autofunction:: has_reached_plugin_limit
@@ -57,3 +59,6 @@ Plugins
 
 .. autofunction:: copy_plugins_to_placeholder
 
+.. autofunction:: downcast_plugins
+
+.. autofunction:: get_bound_plugins

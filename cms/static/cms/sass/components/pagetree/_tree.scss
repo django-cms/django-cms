@@ -390,7 +390,7 @@
         color: $gray-darkest;
         background: none;
 
-        [dir=rtl] & {
+        &:dir(rtl) {
             // inline-start & inline-end are not widely supported
             float: right;
         }
@@ -451,7 +451,7 @@
     min-width: $pagetree-cell-inner-height;
     height: $pagetree-cell-inner-height;
 
-    [dir=rtl] & {
+    &:dir(rtl) {
         // inline-start & inline-end are not widely supported
         float: left;
     }
@@ -501,7 +501,7 @@
 .cms-tree-reload {
     float: right;
 
-    [dir=rtl] & {
+    &:dir(rtl) {
         // inline-start & inline-end are not widely supported
         float: left;
     }
@@ -652,7 +652,7 @@
     float: left;
     margin-inline-end: 5px;
 
-    [dir=rtl] & {
+    &:dir(rtl) {
         // inline-start & inline-end are not widely supported
         float: right;
     }
@@ -676,7 +676,7 @@
 .cms-tree-filters {
     float: right;
 
-    [dir=rtl] & {
+    &:dir(rtl) {
         // inline-start & inline-end are not widely supported
         float: left;
     }
@@ -822,7 +822,7 @@
         margin-inline-start: -1px;
     }
     .jstree-ocl {
-        float: left; 
+        float: left;
         position: relative;
         inset-inline-start: $pagetree-nesting-padding;
         font-size: 12px;
@@ -832,7 +832,7 @@
         padding-block-end: 10px;
         padding-inline-start: 0px;
 
-        [dir=rtl] & {
+        &:dir(rtl) {
             // inline-start & inline-end are not widely supported
             float: right;
         }
@@ -892,7 +892,7 @@
             color: $gray !important;
         }
 
-        [dir=rtl] & {
+        &:dir(rtl) {
             // no direct logical property for background-position
             background-position: calc(100% - 2px) center;
         }

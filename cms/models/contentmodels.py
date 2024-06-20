@@ -172,6 +172,9 @@ class PageContent(models.Model):
     def has_placeholder_change_permission(self, user):
         return self.page.has_change_permission(user)
 
+    def has_publish_permission(self, user):
+        return self.page.has_publish_permission(user)
+
     def rescan_placeholders(self):
         """
         Rescan and if necessary create placeholders in the current template.

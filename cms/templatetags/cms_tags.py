@@ -20,7 +20,7 @@ from django.db.models import Model
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import smart_str
-from django.utils.html import escape
+from django.utils.html import escape, strip_tags
 from django.utils.http import urlencode
 from django.utils.translation import (
     get_language,
@@ -407,7 +407,9 @@ class PageAttribute(AsTag):
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
             ret_val = func(language=lang, fallback=True)
-            if not isinstance(ret_val, datetime):
+            if name == 'page_title':
+                 ret_val = strip_tags(ret_val)
+            elif not isinstance(ret_val, datetime):
                 ret_val = escape(ret_val)
             return ret_val
         return ''

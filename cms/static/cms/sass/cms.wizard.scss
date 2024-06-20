@@ -45,6 +45,9 @@ $wizard-input-size: 16px;
         // tablet and up
         @media (min-width: $screen-tablet) {
             float: left !important;
+            &:dir(rtl) {
+                float: right !important;
+            }
             width: 48% !important;
         }
 

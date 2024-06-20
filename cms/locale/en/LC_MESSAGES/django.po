@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-12-11 19:18+0000\n"
+"POT-Creation-Date: 2024-04-26 17:30+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -205,12 +205,6 @@ msgstr "Advanced Settings"
 msgid "The page is not eligible to be home."
 msgstr "The page is not eligible to be home."
 
-msgid "placeholder"
-msgstr "placeholder"
-
-msgid "page content"
-msgstr "page content"
-
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
 msgstr "The %(name)s \"%(obj)s\" was deleted successfully."
@@ -272,12 +266,6 @@ msgstr "You do not have permission to delete this page"
 msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Title and plugins with language %(language)s was deleted"
 
-msgid "You do not have permission to change a page's navigation status"
-msgstr "You do not have permission to change a page's navigation status"
-
-msgid "You cannot change this page's navigation status"
-msgstr "You cannot change this page's navigation status"
-
 msgid "Public content"
 msgstr "Public content"
 
@@ -337,6 +325,9 @@ msgstr "You do not have permission to clear this placeholder"
 #, python-format
 msgid "The placeholder \"%(obj)s\" was cleared successfully."
 msgstr "The placeholder \"%(obj)s\" was cleared successfully."
+
+msgid "placeholder"
+msgstr "placeholder"
 
 msgid "Page permissions"
 msgstr "Page permissions"
@@ -699,6 +690,9 @@ msgstr "redirect"
 
 msgid "The template used to render the content."
 msgstr "The template used to render the content."
+
+msgid "page content"
+msgstr "page content"
 
 msgid "page contents"
 msgstr "page contents"
@@ -1537,6 +1531,11 @@ msgstr "Sample App 2"
 msgid "Sample App 3"
 msgstr "Sample App 2"
 
+#, fuzzy
+#| msgid "Sample App with config"
+msgid "Sample App Without Landing Page"
+msgstr "Sample App with config"
+
 msgid "Namespaced App"
 msgstr "Namespaced App"
 
@@ -1645,6 +1644,12 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#~ msgid "You do not have permission to change a page's navigation status"
+#~ msgstr "You do not have permission to change a page's navigation status"
+
+#~ msgid "You cannot change this page's navigation status"
+#~ msgstr "You cannot change this page's navigation status"
 
 #~ msgid ""
 #~ "Users can't publish a page without permissions to change the page. Edit "
