@@ -87,7 +87,7 @@ decouple the front-end presentation layer (which includes templates) from the
 CMS, and the configuration of placeholders must be handled differently.
 
 First, set the ``CMS_TEMPLATES`` setting to an empty list in your project's
-``settings.py`` file (or removing it entirely):
+``settings.py`` file (or remove it entirely):
 
 .. code-block:: python
 

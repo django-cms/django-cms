@@ -448,7 +448,7 @@ class PageAdmin(admin.ModelAdmin):
             nodes = obj.node.get_descendants()
             cms_pages.extend(self.model.objects.filter(node__in=nodes))
 
-        # Delete all of the pages titles contents
+        # Delete all the page's page contents
         ct_page_content = ContentType.objects.get_for_model(PageContent)
         page_content_objs = PageContent.objects.filter(page__in=cms_pages)
         placeholders = Placeholder.objects.filter(
