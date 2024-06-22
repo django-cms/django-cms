@@ -174,36 +174,19 @@ def get_global_actions_for_user(user, site):
 @cached_func
 def get_page_actions_for_user(user, site):
     actions = defaultdict(set)
-    pages = (
-        Page
-        .objects
-        .on_site(site)
-        .select_related('node')
-        .order_by('node__path')
-    )
-    nodes = [page.node for page in pages]
-    pages_by_id = {}
-
-    for page in pages:
-        if page.node.is_root():
-            page.node._set_hierarchy(nodes)
-        page.node.__dict__['item'] = page
-        pages_by_id[page.pk] = page
 
     page_permissions = (
         PagePermission
         .objects
         .with_user(user)
-        .filter(page__in=pages_by_id)
+        .select_related('page__node')
+        .filter(page__node__site=site)
     )
 
     for perm in page_permissions.iterator():
-        PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
-
-        page_ids = frozenset(perm.get_page_ids())
-
+        page_paths = frozenset(perm.get_page_paths())
         for action in perm.get_configured_actions():
-            actions[action].update(page_ids)
+            actions[action].update(page_paths)
     return actions
 
 
@@ -216,11 +199,13 @@ def has_global_permission(user, site, action, use_cache=True):
 
 
 def has_page_permission(user, page, action, use_cache=True):
+    # DEPRECATE?
     if use_cache:
         actions = get_page_actions_for_user(user, page.node.site)
     else:
         actions = get_page_actions_for_user.without_cache(user, page.node.site)
-    return page.pk in actions[action]
+    path = page.node.path + "!"
+    return any(path.startswith(allowed_paths) for allowed_paths in actions[action])
 
 
 def get_subordinate_users(user, site):
@@ -253,7 +238,7 @@ def get_subordinate_users(user, site):
         Will return [user, C, X, D, Y, Z]. W was created by user, but is also
         assigned to higher level.
     """
-    from cms.utils.page_permissions import get_change_permissions_id_list
+    from cms.utils.page_permissions import get_change_permissions_paths_list
 
     try:
         user_level = get_user_permission_level(user, site)
@@ -270,12 +255,15 @@ def get_subordinate_users(user, site):
     if user_level == ROOT_USER_LEVEL:
         return get_user_model().objects.all()
 
-    page_id_allow_list = get_change_permissions_id_list(user, site, check_global=False)
+    allow_list = Q()
+    for path in get_change_permissions_paths_list(user, site, check_global=False):
+        allow_list |= Q(pagepermission__page__node__path=path[:-1]) if path.endswith("!") \
+            else Q(pagepermission__page__node__path__startswith=path)
 
     # normal query
     qs = get_user_model().objects.distinct().filter(
         Q(is_staff=True) & (
-            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+            allow_list & Q(pagepermission__page__node__depth__gte=user_level)
         ) | (
             Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
@@ -289,7 +277,7 @@ def get_subordinate_groups(user, site):
     Similar to get_subordinate_users, but returns queryset of Groups instead
     of Users.
     """
-    from cms.utils.page_permissions import get_change_permissions_id_list
+    from cms.utils.page_permissions import get_change_permissions_paths_list
 
     try:
         user_level = get_user_permission_level(user, site)
@@ -312,11 +300,14 @@ def get_subordinate_groups(user, site):
     if user_level == ROOT_USER_LEVEL:
         return Group.objects.all()
 
-    page_id_allow_list = get_change_permissions_id_list(user, site, check_global=False)
+    allow_list = Q()
+    for path in get_change_permissions_paths_list(user, site, check_global=False):
+        allow_list |= Q(pagepermission__page__node__path=path[:-1]) if path.endswith("!") \
+            else Q(pagepermission__page__node__path__startswith=path)
 
     return Group.objects.distinct().filter(
         (
-            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+            allow_list & Q(pagepermission__page__node__depth__gte=user_level)
         ) | (
             Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
         )

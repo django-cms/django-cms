@@ -295,7 +295,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         Result of this is used in admin for page permissions inline.
         """
         # get user level
-        from cms.utils.page_permissions import get_change_permissions_id_list
+        from cms.utils.page_permissions import get_change_permissions_paths_list
         from cms.utils.permissions import get_user_permission_level
 
         try:
@@ -307,12 +307,15 @@ class PagePermissionManager(BasicPagePermissionManager):
             return self.all()
 
         # get all permissions
-        page_id_allow_list = get_change_permissions_id_list(user, site, check_global=False)
+        allow_list = Q()
+        for path in get_change_permissions_paths_list(user, site, check_global=False):
+            allow_list |= Q(page__node__path=path[:-1]) if path.endswith("!") \
+                else Q(page__node__path__startswith=path)
 
         # get permission set, but without objects targeting user, or any group
         # in which he can be
         qs = self.filter(
-            page__id__in=page_id_allow_list,
+            allow_list,
             page__node__depth__gte=user_level,
         )
         qs = qs.exclude(user=user).exclude(group__user=user)

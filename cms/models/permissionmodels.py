@@ -243,6 +243,26 @@ class PagePermission(AbstractPagePermission):
                         "by its creator.")
             raise ValidationError(message)
 
+    def get_page_paths(self):
+        if self.grant_on == ACCESS_PAGE:
+            yield self.page.node.path + "!"
+        elif self.grant_on == ACCESS_CHILDREN:
+            children = self.page.get_child_pages().values_list('node__path', flat=True)
+            for child in children:
+                yield child + "!"
+        elif self.grant_on == ACCESS_DESCENDANTS:
+            children = self.page.get_child_pages().values_list('node__path', flat=True)
+            for child in children:
+                yield child
+        elif self.grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            yield self.page.node.path
+        elif self.grant_on == ACCESS_PAGE_AND_CHILDREN:
+            yield self.page.node.path + "!"
+
+            children = self.page.get_child_pages().values_list('node__path', flat=True)
+            for child in children:
+                yield child + "!"
+
     def get_page_ids(self):
         if self.grant_on & MASK_PAGE:
             yield self.page_id
