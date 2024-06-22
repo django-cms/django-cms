@@ -45,7 +45,7 @@ def _check_delete_translation(user, page, language, site=None):
     return user_can_change_page(user, page, site=site)
 
 
-def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=True):
+def _get_page_paths_for_action(user, site, action, check_global=True, use_cache=True):
     if user.is_superuser or not get_cms_setting('PERMISSION'):
         # got superuser, or permissions aren't enabled?
         # just return grant all mark
@@ -66,9 +66,9 @@ def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=Tr
         return cached
 
     page_actions = get_page_actions(user, site)
-    page_ids = list(page_actions[action])
-    set_permission_cache(user, action, page_ids)
-    return page_ids
+    page_paths = list(page_actions[action])
+    set_permission_cache(user, action, page_paths)
+    return page_paths
 
 
 def auth_permission_required(action):
@@ -335,7 +335,7 @@ def user_can_change_all_pages(user, site):
 
 @auth_permission_required('change_page')
 def user_can_change_at_least_one_page(user, site, use_cache=True):
-    page_ids = get_change_id_list(
+    page_ids = get_change_paths_list(
         user=user,
         site=site,
         check_global=True,
@@ -369,12 +369,12 @@ def user_can_view_all_pages(user, site):
     return has_global_permission(user, site, action='view_page')
 
 
-def get_add_id_list(user, site, check_global=True, use_cache=True):
+def get_add_paths_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has add page rights or the string
     "All" if the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    page_ids = _get_page_paths_for_action(
         user=user,
         site=site,
         action='add_page',
@@ -384,12 +384,12 @@ def get_add_id_list(user, site, check_global=True, use_cache=True):
     return page_ids
 
 
-def get_change_id_list(user, site, check_global=True, use_cache=True):
+def get_change_paths_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has edit rights or the string "All" if
     the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    page_ids = _get_page_paths_for_action(
         user=user,
         site=site,
         action='change_page',
@@ -399,12 +399,12 @@ def get_change_id_list(user, site, check_global=True, use_cache=True):
     return page_ids
 
 
-def get_change_advanced_settings_id_list(user, site, check_global=True, use_cache=True):
+def get_change_advanced_settings_paths_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user can change advanced settings or the
     string "All" if the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    page_ids = _get_page_paths_for_action(
         user=user,
         site=site,
         action='change_page_advanced_settings',
@@ -414,10 +414,10 @@ def get_change_advanced_settings_id_list(user, site, check_global=True, use_cach
     return page_ids
 
 
-def get_change_permissions_id_list(user, site, check_global=True, use_cache=True):
+def get_change_permissions_paths_list(user, site, check_global=True, use_cache=True):
     """Give a list of page where the user can change permissions.
     """
-    page_ids = _get_page_ids_for_action(
+    page_ids = _get_page_paths_for_action(
         user=user,
         site=site,
         action='change_page_permissions',
@@ -427,12 +427,12 @@ def get_change_permissions_id_list(user, site, check_global=True, use_cache=True
     return page_ids
 
 
-def get_delete_id_list(user, site, check_global=True, use_cache=True):
+def get_delete_paths_list(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has delete rights or the string "All" if
     the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    page_ids = _get_page_paths_for_action(
         user=user,
         site=site,
         action='delete_page',
@@ -442,10 +442,10 @@ def get_delete_id_list(user, site, check_global=True, use_cache=True):
     return page_ids
 
 
-def get_move_page_id_list(user, site, check_global=True, use_cache=True):
+def get_move_page_paths_list(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can move.
     """
-    page_ids = _get_page_ids_for_action(
+    page_ids = _get_page_paths_for_action(
         user=user,
         site=site,
         action='move_page',
@@ -455,25 +455,25 @@ def get_move_page_id_list(user, site, check_global=True, use_cache=True):
     return page_ids
 
 
-def get_publish_id_list(user, site, check_global=True, use_cache=True):
-    """
-    Give a list of page where the user has publish rights or the string "All" if
-    the user has all rights.
-    """
-    page_ids = _get_page_ids_for_action(
-        user=user,
-        site=site,
-        action='publish_page',
-        check_global=check_global,
-        use_cache=use_cache,
-    )
-    return page_ids
+def get_publish_paths_list(user, site, check_global=True, use_cache=True):
+     """
+     Give a list of page where the user has publish rights or the string "All" if
+     the user has all rights.
+     """
+     page_ids = _get_page_paths_for_action(
+         user=user,
+         site=site,
+         action='publish_page',
+         check_global=check_global,
+         use_cache=use_cache,
+     )
+     return page_ids
 
 
-def get_view_id_list(user, site, check_global=True, use_cache=True):
+def get_view_paths_list(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can view.
     """
-    page_ids = _get_page_ids_for_action(
+    page_ids = _get_page_paths_for_action(
         user=user,
         site=site,
         action='view_page',
@@ -488,22 +488,25 @@ def has_generic_permission(page, user, action, site=None, check_global=True):
         site = get_current_site()
 
     if page.publisher_is_draft:
-        page_id = page.pk
+        page_path = page.node.path + "!"
     else:
-        page_id = page.publisher_public_id
+        page_path = page.publisher_public.node.path + "!"
 
     actions_map = {
-        'add_page': get_add_id_list,
-        'change_page': get_change_id_list,
-        'change_page_advanced_settings': get_change_advanced_settings_id_list,
-        'change_page_permissions': get_change_permissions_id_list,
-        'delete_page': get_delete_id_list,
-        'delete_page_translation': get_delete_id_list,
-        'move_page': get_move_page_id_list,
-        'publish_page': get_publish_id_list,
-        'view_page': get_view_id_list,
+        'add_page': get_add_paths_list,
+        'change_page': get_change_paths_list,
+        'change_page_advanced_settings': get_change_advanced_settings_paths_list,
+        'change_page_permissions': get_change_permissions_paths_list,
+        'delete_page': get_delete_paths_list,
+        'delete_page_translation': get_delete_paths_list,
+        'publish_page': get_publish_paths_list,
+        'move_page': get_move_page_paths_list,
+        'view_page': get_view_paths_list,
     }
 
     func = actions_map[action]
-    page_ids = func(user, site, check_global=check_global)
-    return page_ids == GRANT_ALL_PERMISSIONS or page_id in page_ids
+
+    page_paths = func(user, site, check_global=check_global)
+    return page_paths == GRANT_ALL_PERMISSIONS or any(
+        page_path.startswith(path) for path in page_paths
+    )

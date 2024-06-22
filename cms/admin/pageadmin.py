@@ -923,13 +923,14 @@ class BasePageAdmin(PlaceholderAdminMixin, admin.ModelAdmin):
         )
 
         if not can_change_global_permissions:
-            allowed_pages = frozenset(page_permissions.get_change_id_list(user, site, check_global=False))
+            allowed_pages = frozenset(page_permissions.get_change_paths_list(user, site, check_global=False))
 
         for permission in _page_permissions.iterator():
             if can_change_global_permissions:
                 can_change = True
             else:
-                can_change = permission.page_id in allowed_pages
+                page_path = permission.page.node.path + "!"
+                can_change = any(page_path.startswith(path) for path in allowed_pages)
 
             row = PermissionRow(
                 is_global=False,
