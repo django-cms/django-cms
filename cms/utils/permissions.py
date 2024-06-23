@@ -191,13 +191,16 @@ def has_global_permission(user, site, action, use_cache=True):
 
 
 def has_page_permission(user, page, action, use_cache=True):
-    # DEPRECATE?
-    if use_cache:
-        actions = get_page_actions_for_user(user, page.node.site)
-    else:
-        actions = get_page_actions_for_user.without_cache(user, page.node.site)
-    path = page.node.path + "!"
-    return any(path.startswith(allowed_paths) for allowed_paths in actions[action])
+    import warnings
+
+    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.page_permissions import has_generic_permission
+
+    warnings.warn("has_page_permission is deprecated and will be removed in django CMS 4.3. "
+                  "Use cms.utils.page_permissions.has_generic_permission instead.",
+                  RemovedInDjangoCMS43Warning, stacklevel=2)
+
+    return has_generic_permission(page, user, action, site=None, check_global=False, use_cache=use_cache)
 
 
 def get_subordinate_users(user, site):
