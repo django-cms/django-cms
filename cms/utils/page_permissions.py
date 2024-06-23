@@ -459,7 +459,7 @@ def get_view_perm_tuples(user, site, check_global=True, use_cache=True):
     return perm_tuples
 
 
-def has_generic_permission(page, user, action, site=None, check_global=True):
+def has_generic_permission(page, user, action, site=None, check_global=True, use_cache=True):
     if site is None:
         site = get_current_site()
 
@@ -478,7 +478,7 @@ def has_generic_permission(page, user, action, site=None, check_global=True):
 
     func = actions_map[action]
 
-    page_perms = func(user, site, check_global=check_global)
+    page_perms = func(user, site, check_global=check_global, use_cache=use_cache)
     return page_perms == GRANT_ALL_PERMISSIONS or any(
         PermissionTuple(perm).contains(page_path) for perm in page_perms
     )

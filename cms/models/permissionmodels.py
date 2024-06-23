@@ -276,7 +276,7 @@ class PagePermission(AbstractPagePermission):
 
     def get_page_permission_tuple(self):
         node = self.page.node
-        return PermissionTuple(self.grant_on, node.path)
+        return PermissionTuple((self.grant_on, node.path))
 
     def get_page_ids(self):
         if self.grant_on & MASK_PAGE:
