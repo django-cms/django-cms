@@ -173,7 +173,7 @@ def get_global_actions_for_user(user, site):
 
 @cached_func
 def get_page_actions_for_user(user, site):
-    actions = defaultdict(set)
+    actions = defaultdict(list)
 
     page_permissions = (
         PagePermission
@@ -184,9 +184,9 @@ def get_page_actions_for_user(user, site):
     )
 
     for perm in page_permissions.iterator():
-        page_paths = frozenset(perm.get_page_paths())
+        permission_tuple = perm.grant_on, perm.page.node.path
         for action in perm.get_configured_actions():
-            actions[action].update(page_paths)
+            actions[action].append(permission_tuple)
     return actions
 
 
@@ -238,7 +238,7 @@ def get_subordinate_users(user, site):
         Will return [user, C, X, D, Y, Z]. W was created by user, but is also
         assigned to higher level.
     """
-    from cms.utils.page_permissions import get_change_permissions_paths_list
+    from cms.utils.page_permissions import get_change_permissions_perm_tuples
 
     try:
         user_level = get_user_permission_level(user, site)
@@ -255,10 +255,10 @@ def get_subordinate_users(user, site):
     if user_level == ROOT_USER_LEVEL:
         return get_user_model().objects.all()
 
+    from cms.models import PermissionTuple
     allow_list = Q()
-    for path in get_change_permissions_paths_list(user, site, check_global=False):
-        allow_list |= Q(pagepermission__page__node__path=path[:-1]) if path.endswith("!") \
-            else Q(pagepermission__page__node__path__startswith=path)
+    for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
+        allow_list |= PermissionTuple(perm_tuple).allow_list("pagepermission__page__node")
 
     # normal query
     qs = get_user_model().objects.distinct().filter(
@@ -277,7 +277,7 @@ def get_subordinate_groups(user, site):
     Similar to get_subordinate_users, but returns queryset of Groups instead
     of Users.
     """
-    from cms.utils.page_permissions import get_change_permissions_paths_list
+    from cms.utils.page_permissions import get_change_permissions_perm_tuples
 
     try:
         user_level = get_user_permission_level(user, site)
@@ -300,10 +300,10 @@ def get_subordinate_groups(user, site):
     if user_level == ROOT_USER_LEVEL:
         return Group.objects.all()
 
+    from cms.models import PermissionTuple
     allow_list = Q()
-    for path in get_change_permissions_paths_list(user, site, check_global=False):
-        allow_list |= Q(pagepermission__page__node__path=path[:-1]) if path.endswith("!") \
-            else Q(pagepermission__page__node__path__startswith=path)
+    for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
+        allow_list |= PermissionTuple(perm_tuple).allow_list("pagepermission__page__node")
 
     return Group.objects.distinct().filter(
         (
