@@ -1,3 +1,4 @@
+import warnings
 from collections import defaultdict
 from contextlib import contextmanager
 from functools import lru_cache, wraps
@@ -321,6 +322,12 @@ def get_view_restrictions(pages):
     """
     Load all view restrictions for the pages
     """
+
+    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+
+    warnings.warn("get_view_restrictions will be removed in django CMS 4.3",
+                  RemovedInDjangoCMS43Warning, stacklevel=2)
+
     restricted_pages = defaultdict(list)
 
     if not get_cms_setting('PERMISSION'):
@@ -348,7 +355,7 @@ def get_view_restrictions(pages):
         # set internal fk cache to our page with loaded ancestors and descendants
         PagePermission.page.field.set_cached_value(perm, pages_by_id[perm.page_id])
 
-        for page_id in perm.get_page_ids():
+        for page_id in perm._get_page_ids():
             restricted_pages[page_id].append(perm)
     return restricted_pages
 
