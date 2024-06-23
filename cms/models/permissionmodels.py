@@ -4,9 +4,11 @@ from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
+from cms.models import Page, TreeNode
 from cms.models import Page
 from cms.models.managers import GlobalPagePermissionManager, PagePermissionManager
 
@@ -26,10 +28,20 @@ if User is None:
 
 # NOTE: those are not just numbers!! we will do binary AND on them,
 # so pay attention when adding/changing them, or MASKs..
+
+#: Access to the page itself
 ACCESS_PAGE = 1
-ACCESS_CHILDREN = 2  # just immediate children (1 level)
-ACCESS_PAGE_AND_CHILDREN = 3  # just immediate children (1 level)
+
+#: Access to immediate children (1 level)
+ACCESS_CHILDREN = 2
+
+#: Access to page itself and immediate children (1 level)
+ACCESS_PAGE_AND_CHILDREN = 3
+
+#: Access to all children (first level and also their children)
 ACCESS_DESCENDANTS = 4
+
+#: Access to page itself and all children (first level and also their children)
 ACCESS_PAGE_AND_DESCENDANTS = 5
 
 # binary masks for ACCESS permissions
@@ -199,8 +211,38 @@ class GlobalPagePermission(AbstractPagePermission):
         return "%s :: GLOBAL" % self.audience
 
 
+class PermissionTuple(tuple):
+    def contains(self, path: str, steplen: int = TreeNode.steplen) -> bool:
+        grant_on, perm_path = self
+        if grant_on == ACCESS_PAGE:
+            return path == perm_path
+        elif grant_on == ACCESS_CHILDREN:
+            return path.startswith(perm_path) and len(path) == len(perm_path) + steplen
+        elif grant_on == ACCESS_DESCENDANTS:
+            return path.startswith(perm_path) and len(path) > len(perm_path)
+        elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            return path.startswith(perm_path)
+        elif grant_on == ACCESS_PAGE_AND_CHILDREN:
+            return path.startswith(perm_path) and len(path) <= len(perm_path) + steplen
+        return False
+
+    def allow_list(self, filter: str, steplen: int = TreeNode.steplen) -> Q:
+        grant_on, path = self
+        if grant_on == ACCESS_PAGE:
+            return Q(**{f"{filter}__path": path})
+        elif grant_on == ACCESS_CHILDREN:
+            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length": len(path) + steplen})
+        elif grant_on == ACCESS_DESCENDANTS:
+            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length__gt": len(path)})
+        elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            return Q(**{f"{filter}__path__startswith": path})
+        elif grant_on == ACCESS_PAGE_AND_CHILDREN:
+            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length__lte": len(path) + steplen})
+        return Q()
+
+
 class PagePermission(AbstractPagePermission):
-    """Page permissions for single page
+    """Page permissions for a single page
     """
     grant_on = models.IntegerField(_("Grant on"), choices=ACCESS_CHOICES, default=ACCESS_PAGE_AND_DESCENDANTS)
     page = models.ForeignKey(Page, on_delete=models.CASCADE, null=True, blank=True, verbose_name=_("page"))
@@ -221,32 +263,16 @@ class PagePermission(AbstractPagePermission):
 
         if self.can_add and self.grant_on == ACCESS_PAGE:
             # this is a misconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to
+            # page, but after he does this, he will not have permissions to
             # access this page anymore, so avoid this.
             message = _("Add page permission requires also access to children, "
                         "or descendants, otherwise added page can't be changed "
                         "by its creator.")
             raise ValidationError(message)
 
-    def get_page_paths(self):
-        if self.grant_on == ACCESS_PAGE:
-            yield self.page.node.path + "!"
-        elif self.grant_on == ACCESS_CHILDREN:
-            children = self.page.get_child_pages().values_list('node__path', flat=True)
-            for child in children:
-                yield child + "!"
-        elif self.grant_on == ACCESS_DESCENDANTS:
-            children = self.page.get_child_pages().values_list('node__path', flat=True)
-            for child in children:
-                yield child
-        elif self.grant_on == ACCESS_PAGE_AND_DESCENDANTS:
-            yield self.page.node.path
-        elif self.grant_on == ACCESS_PAGE_AND_CHILDREN:
-            yield self.page.node.path + "!"
-
-            children = self.page.get_child_pages().values_list('node__path', flat=True)
-            for child in children:
-                yield child + "!"
+    def get_page_permission_tuple(self):
+        node = self.page.node
+        return PermissionTuple(self.grant_on, node.path)
 
     def get_page_ids(self):
         if self.grant_on & MASK_PAGE:

@@ -301,8 +301,8 @@ class PagePermissionManager(BasicPagePermissionManager):
             users C,X,D,Y,I,J but not A, because A user in higher in hierarchy.
 
         If permission object holds group, this permission object can be visible
-        to user only if all of the group members are lover in hierarchy. If any
-        of members is higher then given user, this entry must stay invisible.
+        to user only if all the group members are lover in hierarchy. If any
+        of members is higher than given user, this entry must stay invisible.
 
         If user is superuser, or haves global can_change_permission permissions,
         show him everything.
@@ -310,7 +310,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         Result of this is used in admin for page permissions inline.
         """
         # get user level
-        from cms.utils.page_permissions import get_change_permissions_paths_list
+        from cms.utils.page_permissions import get_change_permissions_perm_tuples
         from cms.utils.permissions import get_user_permission_level
 
         try:
@@ -322,10 +322,10 @@ class PagePermissionManager(BasicPagePermissionManager):
             return self.all()
 
         # get all permissions
+        from cms.models import PermissionTuple
         allow_list = Q()
-        for path in get_change_permissions_paths_list(user, site, check_global=False):
-            allow_list |= Q(page__node__path=path[:-1]) if path.endswith("!") \
-                else Q(page__node__path__startswith=path)
+        for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
+           allow_list |= PermissionTuple(perm_tuple).allow_list("page__node")
 
         # get permission set, but without objects targeting user, or any group
         # in which he can be

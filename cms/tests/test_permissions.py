@@ -3,12 +3,19 @@ from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
 from cms.api import assign_user_to_page, create_page
+from cms.cache.permissions import (
+    clear_user_permission_cache,
+    get_permission_cache,
+    set_permission_cache,
+)
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
+from cms.test_utils.testcases import CMSTestCase
 from cms.cache.permissions import clear_user_permission_cache, get_permission_cache, set_permission_cache
 from cms.models import Page
 from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
 from cms.test_utils.testcases import URL_CMS_PAGE_ADD, CMSTestCase
 from cms.utils.page_permissions import (
-    get_change_paths_list,
+    get_change_perm_tuples,
     user_can_add_subpage,
     user_can_publish_page,
     user_can_view_page,
@@ -59,10 +66,10 @@ class PermissionCacheTests(CMSTestCase):
         cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
-        live_permissions = get_change_paths_list(self.user_normal, Site.objects.get_current())
+        live_permissions = get_change_perm_tuples(self.user_normal, Site.objects.get_current())
         cached_permissions_permissions = get_permission_cache(self.user_normal,
                                                               "change_page")
-        self.assertEqual(live_permissions, [page_b.node.path])
+        self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.node.path)])
         self.assertEqual(cached_permissions_permissions, live_permissions)
 
     def test_cached_permission_precedence(self):
