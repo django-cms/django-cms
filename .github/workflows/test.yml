@@ -14,12 +14,9 @@ jobs:
       matrix:
         python-version: [ '3.10', '3.11', '3.12', '3.13' ]  # latest release minus two
         requirements-file: [
-          django-2.2.txt,
-          django-3.2.txt,
-          django-4.0.txt,
-          django-4.1.txt,
           django-4.2.txt,
-          django-5.0.txt
+          django-5.0.txt,
+          django-5.1.txt
         ]
         os: [
           ubuntu-20.04,
@@ -69,12 +66,9 @@ jobs:
       matrix:
         python-version: [ '3.10', '3.11', '3.12', '3.13' ]
         requirements-file: [
-          django-2.2.txt,
-          django-3.2.txt,
-          django-4.0.txt,
-          django-4.1.txt,
           django-4.2.txt,
-          django-5.0.txt
+          django-5.0.txt,
+          django-5.1.txt
         ]
         os: [
           ubuntu-20.04,
@@ -123,12 +117,9 @@ jobs:
       matrix:
         python-version: [ '3.10', '3.11', '3.12', '3.13' ]
         requirements-file: [
-          django-2.2.txt,
-          django-3.2.txt,
-          django-4.0.txt,
-          django-4.1.txt,
           django-4.2.txt,
-          django-5.0.txt
+          django-5.0.txt,
+          django-5.1.txt
         ]
         os: [
           ubuntu-20.04,
