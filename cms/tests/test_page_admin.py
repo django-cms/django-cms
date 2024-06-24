@@ -1948,7 +1948,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self._add_plugin_to_page(page)
 
         self.add_permission(staff_user, 'change_page')
-        self.add_permission(staff_user, 'delete_page')
+        self.remove_permission(staff_user, 'delete_page')
         gp = self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
@@ -2066,7 +2066,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self._add_plugin_to_page(page, language=translation.language)
 
         self.add_permission(staff_user, 'change_page')
-        self.add_permission(staff_user, 'delete_page')
+        self.remove_permission(staff_user, 'delete_page')
         self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
@@ -3410,8 +3410,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page_perm = self.add_page_permission(
             staff_user,
             page,
-            can_change=True,
-            can_delete=True,
+            can_change=False,
+            can_delete=False,
         )
 
         with self.login_user_context(staff_user):
@@ -3548,7 +3548,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         self.add_page_permission(
             staff_user,
             page,
-            can_change=True,
+            can_change=False,
             can_delete=True,
         )
 

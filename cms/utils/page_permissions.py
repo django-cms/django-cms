@@ -33,11 +33,19 @@ _django_permissions_by_action = {
 }
 
 
-def _get_draft_placeholders(page, language):
+def _get_all_placeholders(page, language=None):
+    from django.contrib.contenttypes.models import ContentType
+
     from cms.models import PageContent, Placeholder
 
-    page_content = PageContent.admin_manager.current_content().get(language=language, page=page)
-    return Placeholder.objects.get_for_obj(page_content)
+    page_contents = PageContent.admin_manager.filter(page=page)
+    if language:
+        page_contents = page_contents.filter(language=language)
+    content_type = ContentType.objects.get_for_model(Placeholder)
+    return Placeholder.objects.filter(
+        content_type=content_type,
+        object_id__in=page_contents.values_list('pk', flat=True)
+    )
 
 
 def _check_delete_translation(user, page, language, site=None):
@@ -165,15 +173,10 @@ def user_can_delete_page(user, page, site=None):
     if not has_perm:
         return False
 
-    for language in page.get_languages():
-        placeholders = (
-            _get_draft_placeholders(page, language)
-            .filter(cmsplugin__language=language)
-            .distinct()
-        )
-        for placeholder in placeholders:
-            if not placeholder.has_delete_plugins_permission(user, [language]):
-                return False
+    placeholders = _get_all_placeholders(page)
+    for placeholder in placeholders:
+        if not placeholder.has_delete_plugins_permission(user, [placeholders.source.language]):
+            return False
     return True
 
 
@@ -191,7 +194,7 @@ def user_can_delete_page_translation(user, page, language, site=None):
         return False
 
     placeholders = (
-        _get_draft_placeholders(page, language)
+        _get_all_placeholders(page, language)
         .filter(cmsplugin__language=language)
         .distinct()
     )
@@ -482,6 +485,6 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
     func = actions_map[action]
 
     page_perms = func(user, site, check_global=check_global, use_cache=use_cache)
-    return page_perms == False or any(
+    return page_perms == GRANT_ALL_PERMISSIONS or any(
         PermissionTuple(perm).contains(page_path) for perm in page_perms
     )
