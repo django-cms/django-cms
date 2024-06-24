@@ -1067,7 +1067,7 @@ class PageContentAdmin(admin.ModelAdmin):
             return page_permissions.user_can_change_page(request.user, page=obj.page, site=site)
         can_change_page = page_permissions.user_can_change_at_least_one_page(
             user=request.user,
-            site=get_site(request),
+            site=site,
             use_cache=False,
         )
         return can_change_page
