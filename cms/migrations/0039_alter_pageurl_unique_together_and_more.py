@@ -7,7 +7,7 @@ import django.db.models.functions.text
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0037_pageurl_unique_together_path_page_language'),
+        ('cms', '0038_pageurl_unique_together_path_page_language'),
     ]
 
     operations = [

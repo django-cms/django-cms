@@ -38,7 +38,7 @@ def forwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0036_alter_placeholder_unique_together'),
+        ('cms', '0037_alter_placeholder_unique_together'),
     ]
 
 

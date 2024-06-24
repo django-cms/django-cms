@@ -15,7 +15,7 @@ def forwards(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0038_alter_pageurl_unique_together_and_more'),
+        ('cms', '0039_alter_pageurl_unique_together_and_more'),
     ]
 
     operations = [
