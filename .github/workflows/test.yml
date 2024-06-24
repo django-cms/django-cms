@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
+        python-version: [ '3.10', '3.11', '3.12', '3.13' ]  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -24,11 +24,6 @@ jobs:
         os: [
           ubuntu-20.04,
         ]
-        exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.8
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
 
     services:
       postgres:
@@ -48,6 +43,7 @@ jobs:
 
       uses: actions/setup-python@v5
       with:
+        allow-prereleases: true
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     - name: Install dependencies
@@ -71,7 +67,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
+        python-version: [ '3.10', '3.11', '3.12', '3.13' ]
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -83,11 +79,6 @@ jobs:
         os: [
           ubuntu-20.04,
         ]
-        exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.8
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
 
     services:
       mysql:
@@ -106,6 +97,7 @@ jobs:
 
       uses: actions/setup-python@v5
       with:
+        allow-prereleases: true
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     - name: Install dependencies
@@ -129,7 +121,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
+        python-version: [ '3.10', '3.11', '3.12', '3.13' ]
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -141,9 +133,6 @@ jobs:
         os: [
           ubuntu-20.04,
         ]
-        exclude:
-          - requirements-file: django-5.0.txt
-            python-version: 3.9
 
     steps:
     - uses: actions/checkout@v4
@@ -151,6 +140,7 @@ jobs:
 
       uses: actions/setup-python@v5
       with:
+        allow-prereleases: true
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     - name: Install dependencies
@@ -171,7 +161,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.13']
         requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
@@ -183,6 +173,7 @@ jobs:
 
       uses: actions/setup-python@v5
       with:
+        allow-prereleases: true
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
@@ -204,7 +195,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.13']
         requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
@@ -228,6 +219,7 @@ jobs:
 
       uses: actions/setup-python@v5
       with:
+        allow-prereleases: true
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     - name: Install dependencies
@@ -253,7 +245,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.13']
         requirements-file: ['requirement_base_django_main.txt']
         os: [
           ubuntu-20.04,
@@ -276,6 +268,7 @@ jobs:
 
       uses: actions/setup-python@v5
       with:
+        allow-prereleases: true
         python-version: ${{ matrix.python-version }}
         cache: 'pip'
     - name: Install dependencies
