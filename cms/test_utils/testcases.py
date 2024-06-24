@@ -123,6 +123,7 @@ class BaseCMSTestCase:
             'can_add': False,
             'can_change': False,
             'can_delete': False,
+            'can_publish': False,
             'can_change_advanced_settings': False,
             'can_change_permissions': False,
             'can_move_page': False,
@@ -140,6 +141,7 @@ class BaseCMSTestCase:
             'can_add': False,
             'can_change': False,
             'can_delete': False,
+            'can_publish': False,
             'can_change_advanced_settings': False,
             'can_change_permissions': False,
             'can_move_page': False,
@@ -209,6 +211,7 @@ class BaseCMSTestCase:
         user.user_permissions.add(Permission.objects.get(codename='delete_link'))
         user.user_permissions.add(Permission.objects.get(codename='change_link'))
         # Page permissions
+        user.user_permissions.add(Permission.objects.get(codename='publish_page'))
         user.user_permissions.add(Permission.objects.get(codename='add_page'))
         user.user_permissions.add(Permission.objects.get(codename='change_page'))
         user.user_permissions.add(Permission.objects.get(codename='delete_page'))
@@ -569,7 +572,7 @@ class BaseCMSTestCase:
 
     def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None, position=None):
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -593,7 +596,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -605,7 +608,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -617,7 +620,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -629,7 +632,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -641,7 +644,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if plugin.page:
-            path = plugin.page.get_absolute_url(language)
+            path = plugin.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -653,7 +656,7 @@ class BaseCMSTestCase:
         language = language or 'en'
 
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language)
+            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 

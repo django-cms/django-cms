@@ -11,7 +11,7 @@ from cms.models.permissionmodels import GlobalPagePermission
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import (
     get_change_id_list,
-    user_can_change_page,
+    user_can_publish_page,
 )
 
 
@@ -76,14 +76,15 @@ class PermissionCacheTests(CMSTestCase):
         )
         page_permission = GlobalPagePermission.objects.create(
             can_change=True,
+            can_publish=True,
             user=self.user_normal,
         )
         page_permission.sites.add(Site.objects.get_current())
-        set_permission_cache(self.user_normal, "change_page", [])
+        set_permission_cache(self.user_normal, "publish_page", [])
 
-        can_change = user_can_change_page(
+        can_publish = user_can_publish_page(
             self.user_normal,
             page,
             Site.objects.get_current(),
         )
-        self.assertTrue(can_change)
+        self.assertTrue(can_publish)
