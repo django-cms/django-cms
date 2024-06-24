@@ -223,7 +223,7 @@ template. It performs the following five steps in one simple go:
    - `djangocms_admin_style <https://github.com/django-cms/djangocms-admin-style>`_ for
      a consistent user experience with django CMS and Django admin.
 
-3. It changes into the project directory and runs the ``migrate`` command to create the 
+3. It changes into the project directory and runs the ``migrate`` command to create the
    database:
 
    .. code-block::
@@ -273,7 +273,7 @@ We suggest to use pip-compile to freeze your requirements as, for example, discu
 Spin up your Django development server (Step 3)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Now you are ready to spin up Django's development server by first changing directory into 
+Now you are ready to spin up Django's development server by first changing directory into
 the project folder and then spinning up the development server:
 
 .. code-block::
@@ -295,7 +295,7 @@ CMS to any Django project. It will require some settings to be modified, however
 Minimally-required applications and settings
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run djanog CMS you will only need to modify the ``settings.py`` and ``urls.py``
+To run django CMS you will only need to modify the ``settings.py`` and ``urls.py``
 files.
 
 Open the new project's ``settings.py`` file in your text editor.

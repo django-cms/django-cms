@@ -4,10 +4,11 @@ from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
-from cms.models import Page
+from cms.models import Page, TreeNode
 from cms.models.managers import (
     GlobalPagePermissionManager,
     PagePermissionManager,
@@ -83,6 +84,7 @@ class AbstractPagePermission(models.Model):
     can_change = models.BooleanField(_("can edit"), default=True)
     can_add = models.BooleanField(_("can add"), default=True)
     can_delete = models.BooleanField(_("can delete"), default=True)
+    can_publish = models.BooleanField(_("can publish"), default=True)
     can_change_advanced_settings = models.BooleanField(_("can change advanced settings"), default=False)
     can_change_permissions = models.BooleanField(
         _("can change permissions"), default=False, help_text=_("on page level")
@@ -110,6 +112,11 @@ class AbstractPagePermission(models.Model):
 
         if self.can_delete:
             message = _("Users can't delete a page without permissions "
+                        "to change the page. Edit permissions required.")
+            raise ValidationError(message)
+
+        if self.can_publish:
+            message = _("Users can't publish a page without permissions "
                         "to change the page. Edit permissions required.")
             raise ValidationError(message)
 
@@ -156,6 +163,7 @@ class AbstractPagePermission(models.Model):
             'can_add',
             'can_change',
             'can_delete',
+            'can_publish',
             'can_change_advanced_settings',
             'can_change_permissions',
             'can_move_page',
@@ -174,6 +182,7 @@ class AbstractPagePermission(models.Model):
             'change_page_permissions': ['can_change', 'can_change_permissions'],
             'delete_page': ['can_change', 'can_delete'],
             'delete_page_translation': ['can_change', 'can_delete'],
+            'publish_page': ['can_change', 'can_publish'],
             'move_page': ['can_change', 'can_move_page'],
             'view_page': ['can_view'],
         }
@@ -217,6 +226,36 @@ class GlobalPagePermission(AbstractPagePermission):
         return permissions_by_action
 
 
+class PermissionTuple(tuple):
+    def contains(self, path: str, steplen: int = TreeNode.steplen) -> bool:
+        grant_on, perm_path = self
+        if grant_on == ACCESS_PAGE:
+            return path == perm_path
+        elif grant_on == ACCESS_CHILDREN:
+            return path.startswith(perm_path) and len(path) == len(perm_path) + steplen
+        elif grant_on == ACCESS_DESCENDANTS:
+            return path.startswith(perm_path) and len(path) > len(perm_path)
+        elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            return path.startswith(perm_path)
+        elif grant_on == ACCESS_PAGE_AND_CHILDREN:
+            return path.startswith(perm_path) and len(path) <= len(perm_path) + steplen
+        return False
+
+    def allow_list(self, filter: str, steplen: int = TreeNode.steplen) -> Q:
+        grant_on, path = self
+        if grant_on == ACCESS_PAGE:
+            return Q(**{f"{filter}__path": path})
+        elif grant_on == ACCESS_CHILDREN:
+            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length": len(path) + steplen})
+        elif grant_on == ACCESS_DESCENDANTS:
+            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length__gt": len(path)})
+        elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            return Q(**{f"{filter}__path__startswith": path})
+        elif grant_on == ACCESS_PAGE_AND_CHILDREN:
+            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length__lte": len(path) + steplen})
+        return Q()
+
+
 class PagePermission(AbstractPagePermission):
     """Page permissions for a single page
     """
@@ -239,14 +278,27 @@ class PagePermission(AbstractPagePermission):
 
         if self.can_add and self.grant_on == ACCESS_PAGE:
             # this is a misconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to
+            # page, but after he does this, he will not have permissions to
             # access this page anymore, so avoid this.
             message = _("Add page permission requires also access to children, "
                         "or descendants, otherwise added page can't be changed "
                         "by its creator.")
             raise ValidationError(message)
 
+    def get_page_permission_tuple(self):
+        node = self.page.node
+        return PermissionTuple((self.grant_on, node.path))
+
     def get_page_ids(self):
+        import warnings
+
+        from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+        warnings.warn("get_page_ids is deprecated and will be removed in django CMS 4.3, "
+                      "use get_page_permission_tuple instead", RemovedInDjangoCMS43Warning, stacklevel=2)
+
+        return self._get_page_ids()
+
+    def _get_page_ids(self):
         if self.grant_on & MASK_PAGE:
             yield self.page_id
 

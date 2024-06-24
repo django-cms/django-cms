@@ -1,25 +1,44 @@
+from copy import deepcopy
+
 from django.contrib import admin
+from django.contrib.admin import site
 from django.contrib.auth import get_user_model
 from django.contrib.auth.admin import UserAdmin
-from django.contrib.auth.models import Group
 from django.contrib.sites.models import Site
+from django.db import OperationalError
 from django.utils.translation import gettext_lazy as _
 
+from cms.admin.forms import (
+    GlobalPagePermissionAdminForm,
+    PagePermissionInlineAdminForm,
+    ViewRestrictionInlineAdminForm,
+)
 from cms.exceptions import NoPermissionsException
 from cms.models import GlobalPagePermission, PagePermission
 from cms.utils import page_permissions, permissions
-from cms.utils.conf import get_cms_setting, get_subordinate_groups, get_subordinate_users
+from cms.utils.conf import get_cms_setting
+from cms.utils.helpers import classproperty
 
 PERMISSION_ADMIN_INLINES = []
 
 user_model = get_user_model()
 admin_class = UserAdmin
-for model, admin_instance in admin.site._registry.items():
+for model, admin_instance in site._registry.items():
     if model == user_model:
         admin_class = admin_instance.__class__
 
 
-class PagePermissionAdminMixin:
+class TabularInline(admin.TabularInline):
+    pass
+
+
+class PagePermissionInlineAdmin(TabularInline):
+    model = PagePermission
+    # use special form, so we can override of user and group field
+    form = PagePermissionInlineAdminForm
+    extra = 0  # edit page load time boost
+    show_with_view_permissions = False
+
     def has_change_permission(self, request, obj=None):
         if not obj:
             return False
@@ -32,10 +51,27 @@ class PagePermissionAdminMixin:
     def has_add_permission(self, request, obj=None):
         return self.has_change_permission(request, obj)
 
+    @classproperty
+    def raw_id_fields(cls):
+        # Dynamically set raw_id_fields based on settings
+        threshold = get_cms_setting('RAW_ID_USERS')
+
+        # Given a fresh django-cms install and a django settings with the
+        # CMS_RAW_ID_USERS = CMS_PERMISSION = True
+        # django throws an OperationalError when running
+        # ./manage migrate
+        # because auth_user doesn't exists yet
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+
+        return ['user'] if threshold else []
+
     def get_queryset(self, request):
         """
         Queryset change, so user with global change permissions can see
-        all permissions. Otherwise, a user can see only permissions for
+        all permissions. Otherwise user can see only permissions for
         peoples which are under him (he can't see his permissions, because
         this will lead to violation, when he can add more power to himself)
         """
@@ -43,99 +79,71 @@ class PagePermissionAdminMixin:
 
         try:
             # can see only permissions for users which are under him in tree
-            queryset = self.model.objects.subordinate_to_user(request.user, site)
+            qs = self.model.objects.subordinate_to_user(request.user, site)
         except NoPermissionsException:
-            queryset = self.model.objects.none()
-        return queryset
-
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        site = Site.objects.get_current(request)
-        formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
-        if db_field.name == 'user':
-            formfield._queryset = get_subordinate_users(request.user, site)
-        if db_field.name == 'group':
-            formfield._queryset = get_subordinate_groups(request.user, site)
-        return formfield
-
-
-class PagePermissionInlineAdmin(PagePermissionAdminMixin, admin.TabularInline):
-    model = PagePermission
-    classes = ['collapse', 'collapsed']
-    fields = ['user', 'group', 'grant_on']
-    extra = 0  # edit page load time boost
-    autocomplete_fields = ['user', 'group']
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(can_view=False)
-
-    def get_fields(self, request, obj=None):
-        """
-        Some fields may be added here. User can change only permissions which are available for them.
-        E.g. if user does not have the can_change permission, he can't change assign can_change permissions.
-        """
-        fields = list(super().get_fields(request, obj=obj))
-        if obj:
-            user = request.user
-            if obj.has_add_permission(user):
-                fields.append('can_add')
-            if obj.has_change_permission(user):
-                fields.append('can_change')
-            if obj.has_delete_permission(user):
-                fields.append('can_delete')
-            if obj.has_advanced_settings_permission(user):
-                fields.append('can_change_advanced_settings')
-            if obj.has_move_page_permission(user):
-                fields.append('can_move_page')
-            if obj.has_change_permissions_permission(user):
-                fields.append('can_change_permissions')
-        return fields
+            return self.model.objects.none()
+        return qs.filter(can_view=self.show_with_view_permissions)
 
     def get_formset(self, request, obj=None, **kwargs):
-        formset_cls = super().get_formset(request, obj=obj, **kwargs)
-        queryset = self.get_queryset(request)
+        """
+        Some fields may be excluded here. User can change only
+        permissions which are available for him. E.g. if user does not haves
+        can_change flag, he can't change assign can_change permissions.
+        """
+        exclude = self.exclude or []
         if obj:
-            queryset = queryset.filter(page=obj)
-        formset_cls._queryset = queryset
+            user = request.user
+            if not obj.has_add_permission(user):
+                exclude.append('can_add')
+            if not obj.has_delete_permission(user):
+                exclude.append('can_delete')
+            if not obj.has_publish_permission(user):
+                exclude.append('can_publish')
+            if not obj.has_advanced_settings_permission(user):
+                exclude.append('can_change_advanced_settings')
+            if not obj.has_move_page_permission(user):
+                exclude.append('can_move_page')
+
+        kwargs['exclude'] = exclude
+        formset_cls = super().get_formset(request, obj=obj, **kwargs)
+        qs = self.get_queryset(request)
+        if obj is not None:
+            qs = qs.filter(page=obj)
+        formset_cls._queryset = qs
         return formset_cls
 
 
-class ViewRestrictionInlineAdmin(PagePermissionAdminMixin, admin.TabularInline):
-    model = PagePermission
+class ViewRestrictionInlineAdmin(PagePermissionInlineAdmin):
     extra = 0  # edit page load time boost
+    form = ViewRestrictionInlineAdminForm
     verbose_name = _("View restriction")
     verbose_name_plural = _("View restrictions")
-    fields = ['user', 'group', 'grant_on', 'can_view']
-    autocomplete_fields = ['user', 'group']
-
-    def formfield_for_dbfield(self, db_field, request, **kwargs):
-        formfield = super().formfield_for_dbfield(db_field, request, **kwargs)
-        if db_field.name == 'can_view':
-            formfield.widget = formfield.hidden_widget()
-            formfield.initial = True
-        return formfield
-
-    def get_queryset(self, request):
-        return super().get_queryset(request).filter(can_view=True)
+    show_with_view_permissions = True
 
 
 class GlobalPagePermissionAdmin(admin.ModelAdmin):
-    list_display = ['user', 'group', 'can_change', 'can_delete', 'can_change_permissions',
-                    'can_change_advanced_settings']
-    list_filter = ['can_change', 'can_delete', 'can_change_permissions', 'can_change_advanced_settings']
-    fields = ['user', 'group', 'can_add', 'can_change', 'can_delete', 'can_change_advanced_settings',
-              'can_change_permissions', 'can_move_page', 'can_view', 'can_set_as_home', 'sites']
-    search_fields = ['user__{}'.format(field) for field in admin_class.search_fields] + ['group__name']
-    autocomplete_fields = ['user', 'group']
-    filter_horizontal = ['sites']
+    list_display = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+    list_filter = ['user', 'group', 'can_change', 'can_delete', 'can_publish', 'can_change_permissions']
+
+    form = GlobalPagePermissionAdminForm
+    search_fields = []
+    for field in admin_class.search_fields:
+        search_fields.append("user__%s" % field)
+    search_fields.append('group__name')
+
+    list_display.append('can_change_advanced_settings')
+    list_filter.append('can_change_advanced_settings')
 
     def get_list_filter(self, request):
-        list_filter = list(super().get_list_filter(request))
-        users_groups_threshold = get_cms_setting('USERS_GROUPS_THRESHOLD')
-        if Group.objects.count() <= users_groups_threshold:
-            list_filter.insert(0, 'group')
-        if get_user_model().objects.count() <= users_groups_threshold:
-            list_filter.insert(0, 'user')
-        return list_filter
+        threshold = get_cms_setting('RAW_ID_USERS')
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+        filter_copy = deepcopy(self.list_filter)
+        if threshold:
+            filter_copy.remove('user')
+        return filter_copy
 
     def has_add_permission(self, request):
         site = Site.objects.get_current(request)
@@ -148,6 +156,23 @@ class GlobalPagePermissionAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         site = Site.objects.get_current(request)
         return permissions.user_can_delete_global_permissions(request.user, site)
+
+    @classproperty
+    def raw_id_fields(cls):
+        # Dynamically set raw_id_fields based on settings
+        threshold = get_cms_setting('RAW_ID_USERS')
+
+        # Given a fresh django-cms install and a django settings with the
+        # CMS_RAW_ID_USERS = CMS_PERMISSION = True
+        # django throws an OperationalError when running
+        # ./manage migrate
+        # because auth_user doesn't exists yet
+        try:
+            threshold = threshold and get_user_model().objects.count() > threshold
+        except OperationalError:
+            threshold = False
+
+        return ['user'] if threshold else []
 
 
 if get_cms_setting('PERMISSION'):
