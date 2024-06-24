@@ -34,7 +34,10 @@ _django_permissions_by_action = {
 
 
 def _get_draft_placeholders(page, language):
-    return page.get_placeholders(language)
+    from cms.models import PageContent, Placeholder
+
+    page_content = PageContent.admin_manager.current_content().get(language=language, page=page)
+    return Placeholder.objects.get_for_obj(page_content)
 
 
 def _check_delete_translation(user, page, language, site=None):
@@ -479,6 +482,6 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
     func = actions_map[action]
 
     page_perms = func(user, site, check_global=check_global, use_cache=use_cache)
-    return page_perms == GRANT_ALL_PERMISSIONS or any(
+    return page_perms == False or any(
         PermissionTuple(perm).contains(page_path) for perm in page_perms
     )
