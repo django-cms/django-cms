@@ -8,9 +8,6 @@ from cms.cache.permissions import (
     get_permission_cache,
     set_permission_cache,
 )
-from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
-from cms.test_utils.testcases import CMSTestCase
-from cms.cache.permissions import clear_user_permission_cache, get_permission_cache, set_permission_cache
 from cms.models import Page
 from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
 from cms.test_utils.testcases import URL_CMS_PAGE_ADD, CMSTestCase

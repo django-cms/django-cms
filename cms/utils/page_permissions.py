@@ -3,8 +3,7 @@ from functools import wraps
 from cms.api import get_page_draft
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import GRANT_ALL_PERMISSIONS
-from cms.models import Page, PermissionTuple
-from cms.models import Page, Placeholder
+from cms.models import Page, PermissionTuple, Placeholder
 from cms.utils import get_current_site
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
