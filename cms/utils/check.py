@@ -369,7 +369,8 @@ def check_template_conf(output):
                     if not isinstance(placeholder, (list, tuple)):
                         section.error("CMS_PLACEHOLDERS setting contains a non-list/tuple entry")
                     elif not isinstance(placeholder[0], str):
-                        section.error("CMS_PLACEHOLDERS contains a non-string entry")
+                        section.error(f"CMS_PLACEHOLDERS contains an entry with a non-string identifier: "
+                                      f"{placeholder[0]}")
                     else:
                         section.success("CMS_PLACEHOLDERS setting entry found - CMS will run in headless mode")
             else:

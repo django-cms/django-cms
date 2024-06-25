@@ -223,6 +223,9 @@ class PageContent(models.Model):
                     break
             else:  # No matching placeholder list found
                 self._placeholder_slot_cache = get_cms_setting('PLACEHOLDERS')[0][1]
+        if isinstance(self._placeholder_slot_cache, str):
+            # Accidentally a strong not a tuple? Make it a 1-element tuple
+            self._placeholder_slot_cache = (self._placeholder_slot_cache,)
         return self._placeholder_slot_cache
 
     def get_template(self):

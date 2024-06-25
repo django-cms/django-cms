@@ -86,29 +86,47 @@ However, when running Django CMS headlessly without templates, you fully
 decouple the front-end presentation layer (which includes templates) from the
 CMS, and the configuration of placeholders must be handled differently.
 
-First, set the ``CMS_TEMPLATES`` setting to an empty list in your project's
-``settings.py`` file (or remove it entirely):
+First, set the :setting:`CMS_TEMPLATES` setting to an empty list in your
+project's ``settings.py`` file (or remove it entirely):
 
 .. code-block:: python
 
     CMS_TEMPLATES = []
 
-Then, you can define the placeholders using the ``CMS_PLACEHOLDERS`` setting:
+Then, you can define the placeholders using the :setting:`CMS_PLACEHOLDERS`
+setting:
 
 .. code-block:: python
 
     CMS_PLACEHOLDERS = (
-        ('single', ('content'), _('Single placeholder')),
+        ('single', ('content',), _('Single placeholder')),
         ('two_column', ('left', 'right'), _('Two columns')),
     )
 
-The ``CMS_PLACEHOLDERS`` setting is a list of tuples. Each tuple represents a
-placeholder configuration. The first element of the tuple is the name of the
-placeholder configuration. The second element is a tuple of placeholder names.
-The third element is the verbose description of the placeholder configuration
-which will be shown in the user interface.
+The :setting:`CMS_PLACEHOLDERS` setting is a list of tuples. Each tuple
+represents a placeholder configuration. Think of each placeholder configuration
+replacing a template and providing the information on which placeholders
+are available on a page: Like a template can have multiple ``{% placeholder %}``
+template tags, a placeholder configuration can contain multiple placeholders.
+
+The first element of the configuration tuple is the name of the placeholder
+configuration. It is stored in a page's ``template`` field. It needs to be
+unique. The second element is a tuple of placeholder slots available for the
+configuration. The third element is the verbose description of the placeholder
+configuration which will be shown in the toolbar. You can select a page's
+placeholder configuration in the Page menu (instead of a template).
+
+.. note::
+
+    :setting:`CMS_PLACEHOLDERS` is only relevant, if no templates are used.
+    If you define templates, placeholders are inferred from the templates.
+
+    Also, do not confuse the :setting:`CMS_PLACEHOLDERS` setting with the
+    :setting:`CMS_PLACEHOLDER_CONF` setting. The latter is used to configure
+    individual placeholders, while the former is used to define available
+    placeholders for a page.
 
 This scenario is useful when you do not want to design templates and focus on
 the content structure only. Editors will see a generic representation of the
-plugins in a minimally styled template. Note that the ``css`` and ``js``block
+plugins in a minimally styled template. Note that the ``css`` and ``js`` block
 of the plugin templates will be loaded also in this case.
