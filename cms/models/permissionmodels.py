@@ -230,18 +230,20 @@ class PermissionTuple(tuple):
             return path.startswith(perm_path) and len(path) <= len(perm_path) + steplen
         return False
 
-    def allow_list(self, filter: str, steplen: int = TreeNode.steplen) -> Q:
+    def allow_list(self, filter: str = "", steplen: int = TreeNode.steplen) -> Q:
+        if filter !="":
+            filter = f"{filter}__"
         grant_on, path = self
         if grant_on == ACCESS_PAGE:
-            return Q(**{f"{filter}__path": path})
+            return Q(**{f"{filter}path": path})
         elif grant_on == ACCESS_CHILDREN:
-            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length": len(path) + steplen})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length": len(path) + steplen})
         elif grant_on == ACCESS_DESCENDANTS:
-            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length__gt": len(path)})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__gt": len(path)})
         elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
-            return Q(**{f"{filter}__path__startswith": path})
+            return Q(**{f"{filter}path__startswith": path})
         elif grant_on == ACCESS_PAGE_AND_CHILDREN:
-            return Q(**{f"{filter}__path__startswith": path, f"{filter}__path__length__lte": len(path) + steplen})
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__lte": len(path) + steplen})
         return Q()
 
 
