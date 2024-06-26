@@ -5,6 +5,7 @@ from cms.constants import GRANT_ALL_PERMISSIONS
 from cms.models import Page, PermissionTuple
 from cms.utils import get_current_site
 from cms.utils.compat.dj import available_attrs
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import (
     cached_func,
@@ -33,11 +34,19 @@ _django_permissions_by_action = {
 }
 
 
-def _get_draft_placeholders(page, language):
+def _get_all_placeholders(page, language=None):
+    from django.contrib.contenttypes.models import ContentType
+
     from cms.models import PageContent, Placeholder
 
-    page_content = PageContent.admin_manager.current_content().get(language=language, page=page)
-    return Placeholder.objects.get_for_obj(page_content)
+    page_contents = PageContent.admin_manager.filter(page=page)
+    if language:
+        page_contents = page_contents.filter(language=language)
+    content_type = ContentType.objects.get_for_model(Placeholder)
+    return Placeholder.objects.filter(
+        content_type=content_type,
+        object_id__in=page_contents.values_list('pk', flat=True)
+    )
 
 
 def _check_delete_translation(user, page, language, site=None):
@@ -165,15 +174,10 @@ def user_can_delete_page(user, page, site=None):
     if not has_perm:
         return False
 
-    for language in page.get_languages():
-        placeholders = (
-            _get_draft_placeholders(page, language)
-            .filter(cmsplugin__language=language)
-            .distinct()
-        )
-        for placeholder in placeholders:
-            if not placeholder.has_delete_plugins_permission(user, [language]):
-                return False
+    placeholders = _get_all_placeholders(page)
+    for placeholder in placeholders:
+        if not placeholder.has_delete_plugins_permission(user, [placeholders.source.language]):
+            return False
     return True
 
 
@@ -191,7 +195,7 @@ def user_can_delete_page_translation(user, page, language, site=None):
         return False
 
     placeholders = (
-        _get_draft_placeholders(page, language)
+        _get_all_placeholders(page, language)
         .filter(cmsplugin__language=language)
         .distinct()
     )
@@ -348,6 +352,23 @@ def user_can_view_all_pages(user, site):
     return has_global_permission(user, site, action='view_page')
 
 
+def _perm_tuples_to_ids(perm_tuples):
+    import inspect
+    import warnings
+
+    from django.db.models import Q
+
+    fn_name = "_".join(inspect.stack()[1][3].split("_")[:-1])  # Calling function's name
+    warnings.warn(f"{fn_name}_ids is deprecated. Use {fn_name}_perm_tuples instead.",
+                  RemovedInDjangoCMS43Warning, stacklevel=3)
+
+    allowed_pages = Q()
+    for perm in perm_tuples:
+        allowed_pages |= PermissionTuple(perm).allow_list("node")
+
+    return list(Page.objects.filter(allowed_pages).values_list('pk', flat=True))
+
+
 def get_add_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has add page rights or the string
@@ -361,6 +382,11 @@ def get_add_perm_tuples(user, site, check_global=True, use_cache=True):
         use_cache=use_cache,
     )
     return perm_tuples
+
+
+def get_add_ids(user, site, check_global=True, use_cache=True):
+    perm_tuples = get_add_perm_tuples(user, site, check_global=check_global, use_cache=use_cache)
+    return _perm_tuples_to_ids(perm_tuples)
 
 
 def get_change_perm_tuples(user, site, check_global=True, use_cache=True):
@@ -378,6 +404,11 @@ def get_change_perm_tuples(user, site, check_global=True, use_cache=True):
     return perm_tuples
 
 
+def get_change_ids(user, site, check_global=True, use_cache=True):
+    perm_tuples = get_change_perm_tuples(user, site, check_global=check_global, use_cache=use_cache)
+    return _perm_tuples_to_ids(perm_tuples)
+
+
 def get_change_advanced_settings_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user can change advanced settings or the
@@ -393,6 +424,16 @@ def get_change_advanced_settings_perm_tuples(user, site, check_global=True, use_
     return perm_tuples
 
 
+def get_change_advanced_settings_ids(user, site, check_global=True, use_cache=True):
+    perm_tuples = get_change_advanced_settings_perm_tuples(
+        user=user,
+        site=site,
+        check_global=check_global,
+        use_cache=use_cache,
+    )
+    return _perm_tuples_to_ids(perm_tuples)
+
+
 def get_change_permissions_perm_tuples(user, site, check_global=True, use_cache=True):
     """Give a list of page where the user can change permissions.
     """
@@ -404,6 +445,16 @@ def get_change_permissions_perm_tuples(user, site, check_global=True, use_cache=
         use_cache=use_cache,
     )
     return perm_tuples
+
+
+def get_change_permissions_ids(user, site, check_global=True, use_cache=True):
+    perm_tuples = get_change_permissions_perm_tuples(
+        user=user,
+        site=site,
+        check_global=check_global,
+        use_cache=use_cache,
+    )
+    return _perm_tuples_to_ids(perm_tuples)
 
 
 def get_delete_perm_tuples(user, site, check_global=True, use_cache=True):
@@ -421,6 +472,11 @@ def get_delete_perm_tuples(user, site, check_global=True, use_cache=True):
     return perm_tuples
 
 
+def get_delete_ids(user, site, check_global=True, use_cache=True):
+    perm_tuples = get_delete_perm_tuples(user, site, check_global=check_global, use_cache=use_cache)
+    return _perm_tuples_to_ids(perm_tuples)
+
+
 def get_move_page_perm_tuples(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can move.
     """
@@ -432,6 +488,11 @@ def get_move_page_perm_tuples(user, site, check_global=True, use_cache=True):
         use_cache=use_cache,
     )
     return perm_tuples
+
+
+def get_move_page_ids(user, site, check_global=True, use_cache=True):
+    perm_tuples = get_move_page_perm_tuples(user, site, check_global=check_global, use_cache=use_cache)
+    return _perm_tuples_to_ids(perm_tuples)
 
 
 def get_publish_perm_tuples(user, site, check_global=True, use_cache=True):
@@ -449,6 +510,11 @@ def get_publish_perm_tuples(user, site, check_global=True, use_cache=True):
     return perm_tuples
 
 
+def get_publish_ids(user, site, check_global=True, use_cache=True):
+    perm_tuples = get_publish_perm_tuples(user, site, check_global=check_global, use_cache=use_cache)
+    return _perm_tuples_to_ids(perm_tuples)
+
+
 def get_view_perm_tuples(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can view.
     """
@@ -460,6 +526,11 @@ def get_view_perm_tuples(user, site, check_global=True, use_cache=True):
         use_cache=use_cache,
     )
     return perm_tuples
+
+
+def get_view_ids(user, site, check_global=True, use_cache=True):
+    perm_tuples = get_view_perm_tuples(user, site, check_global=check_global, use_cache=use_cache)
+    return _perm_tuples_to_ids(perm_tuples)
 
 
 def has_generic_permission(page, user, action, site=None, check_global=True, use_cache=True):
@@ -482,6 +553,6 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
     func = actions_map[action]
 
     page_perms = func(user, site, check_global=check_global, use_cache=use_cache)
-    return page_perms == False or any(
+    return page_perms == GRANT_ALL_PERMISSIONS or any(
         PermissionTuple(perm).contains(page_path) for perm in page_perms
     )
