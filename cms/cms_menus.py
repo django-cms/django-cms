@@ -228,8 +228,7 @@ class CMSMenu(Menu):
 
         pages = (
             pages.filter(pagecontent_set__language__in=languages)
-            .select_related("node")
-            .order_by("node__path")
+            .order_by("path")
             .distinct()
         )
         pages = get_visible_nodes(request, pages, site)

@@ -3,9 +3,9 @@
 {# INFO: columns are defined in base.html options #}
 {% spaceless %}
 <li class="cms-tree-node {{ css_class }}
-    {% if follow_descendants %}{% if descendants %} jstree-open{% elif node.is_branch %} jstree-closed{% endif %}{% endif %}
+    {% if follow_descendants %}{% if descendants %} jstree-open{% elif page.is_branch %} jstree-closed{% endif %}{% endif %}
     {% if page.reverse_id == 'page_types' %} cms-tree-node-pagetype{% endif %}
-    {% if node.depth == 0 %} cms-tree-node-top{% endif %}
+    {% if page.depth == 0 %} cms-tree-node-top{% endif %}
     {% if filtered %} cms-tree-node-filtered{% endif %}
     {% if has_add_permission %} cms-tree-node-root-allow-children{% endif %}
     {% block extra_class %}
@@ -18,7 +18,7 @@
     "
     {% if is_popup %}onclick="opener.dismissRelatedLookupPopup(window, {{ page.pk|unlocalize }}); return false;"{% endif %}
     data-id="{{ page.pk|unlocalize }}"
-    data-node-id="{{ node.pk|unlocalize }}"
+    data-node-id="{{ page.pk|unlocalize }}"
     data-slug="{{ page_content.slug }}"
     data-is-home="{{ page.is_home|yesno:"true,false" }}"
     data-move-permission="{{ has_move_page_permission|yesno:"true,false" }}"
@@ -158,7 +158,7 @@
                     <div{% if has_add_page_permission %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                         data-cms-tooltip="{% autoescape on %}{% trans 'New sub page' %}{% endautoescape %}"{% endif %}>
                         {% if has_add_page_permission %}
-                            <a href="{% url opts|admin_urlname:'add' %}?parent_node={{ node.pk|unlocalize }}&language={{ lang }}"
+                            <a href="{% url opts|admin_urlname:'add' %}?parent_page={{ page.pk|unlocalize }}&language={{ lang }}"
                                 class="js-cms-pagetree-add-page cms-btn cms-btn-default cms-icon cms-icon-plus">
                         {% else %}
                             <span class="cms-btn cms-btn-default cms-btn-disabled cms-icon cms-icon-plus">
@@ -172,7 +172,7 @@
                     </div>
                 </div>
                 <div class="js-cms-pagetree-actions-dropdown cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown" data-lazy-url="{% url 'admin:cms_page_actions_menu' page.pk %}">
-                    <a data-node-id="{{ node.pk|unlocalize }}" data-id="{{ page.pk|unlocalize }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
+                    <a data-node-id="{{ page.pk|unlocalize }}" data-id="{{ page.pk|unlocalize }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
                         <span class="sr-only">{% autoescape on %}{% trans "Options" %}{% endautoescape %}</span>
                     </a>
 
@@ -194,7 +194,7 @@
                                 </a>
                             </li>
                             <li>
-                                <a href="#" data-node-id="{{ node.pk|unlocalize }}" data-id="{{ page.pk|unlocalize }}" class="cms-pagetree-dropdown-item-disabled">
+                                <a href="#" data-node-id="{{ page.pk|unlocalize }}" data-id="{{ page.pk|unlocalize }}" class="cms-pagetree-dropdown-item-disabled">
                                     <span class="cms-icon cms-icon-paste"></span>
                                     <span>{% autoescape on %}{% trans "Paste" %}{% endautoescape %}</span>
                                 </a>
@@ -235,7 +235,7 @@
     {# INFO render children #}
     {% if descendants %}
         <ul>
-            {% show_admin_menu_for_pages descendants depth=node.depth|add:1 %}
+            {% show_admin_menu_for_pages descendants depth=page.depth|add:1 %}
         </ul>
     {% endif %}
 </li>

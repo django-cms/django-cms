@@ -39,10 +39,9 @@ def get_page_choices_for_site(site, language):
         Page
         .objects
         .on_site(site)
-        .select_related('node')
         .prefetch_related(translation_lookup)
-        .order_by('node__path')
-        .only('pk', 'node')
+        .order_by('path')
+        .only('pk')
     )
 
     for page in pages:

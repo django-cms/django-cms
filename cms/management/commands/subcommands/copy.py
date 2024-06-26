@@ -166,9 +166,8 @@ class CopySiteCommand(SubcommandsCommand):
             Page
             .objects
             .on_site(from_site)
-            .filter(node__depth=1)
-            .select_related('node')
-            .order_by('node__path')
+            .filter(depth=1)
+            .order_by('path')
         )
 
         with transaction.atomic():

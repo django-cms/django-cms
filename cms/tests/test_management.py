@@ -441,8 +441,8 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             stdout=out
         )
 
-        pages_1 = list(Page.objects.on_site(site_1).select_related('node').order_by('node__path'))
-        pages_2 = list(Page.objects.on_site(site_2).select_related('node').order_by('node__path'))
+        pages_1 = list(Page.objects.on_site(site_1).order_by('path'))
+        pages_2 = list(Page.objects.on_site(site_2).order_by('path'))
         for index, page in enumerate(pages_1):
             self.assertEqual(page.get_title('en'), pages_2[index].get_title('en'))
             self.assertEqual(page.node.depth, pages_2[index].node.depth)
