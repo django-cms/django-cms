@@ -355,6 +355,7 @@ def user_can_view_all_pages(user, site):
 def _perm_tuples_to_ids(perm_tuples):
     import inspect
     import warnings
+
     from django.db.models import Q
 
     fn_name = "_".join(inspect.stack()[1][3].split("_")[:-1])  # Calling function's name
