@@ -248,7 +248,7 @@ class AddPageForm(BasePageContentForm):
         widget=forms.HiddenInput(),
     )
     parent_node = forms.ModelChoiceField(
-        queryset=TreeNode.objects.all(),
+        queryset=Page.objects.all(),
         required=False,
         widget=forms.HiddenInput(),
     )
@@ -276,7 +276,7 @@ class AddPageForm(BasePageContentForm):
         page_field = self.fields.get("cms_page")
 
         if page_field:
-            page_field.queryset = page_field.queryset.filter(node__site=self._site)
+            page_field.queryset = page_field.queryset.filter(site=self._site)
 
         root_page = PageType.get_root_page(site=self._site)
 
@@ -303,14 +303,12 @@ class AddPageForm(BasePageContentForm):
             # addressed first.
             return data
 
-        parent_node = data.get("parent_node")
-
-        if parent_node:
-            slug = data["slug"]
-            parent_path = parent_node.item.get_path(self._language)
-            path = "%s/%s" % (parent_path, slug) if parent_path else slug
+        if parent_page := data.get('parent_node'):
+            slug = data['slug']
+            parent_path = parent_page.get_path(self._language)
+            path = f"{parent_path}/{slug}" if parent_path else slug
         else:
-            path = data["slug"]
+            path = data['slug']
 
         try:
             # Validate the url
@@ -323,15 +321,14 @@ class AddPageForm(BasePageContentForm):
         except ValidationError as error:
             self.add_error("slug", error)
         else:
-            data["path"] = path
+            data['path'] = path
         return data
 
     def clean_parent_node(self):
-        parent_node = self.cleaned_data.get("parent_node")
-
-        if parent_node and parent_node.site_id != self._site.pk:
+        parent_page = self.cleaned_data.get('parent_node')
+        if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
-        return parent_node
+        return parent_page
 
     def create_translation(self, page):
         data = self.cleaned_data
@@ -359,7 +356,7 @@ class AddPageForm(BasePageContentForm):
     def from_source(self, source, parent=None):
         new_page = source.copy(
             site=self._site,
-            parent_node=parent,
+            parent_page=parent,
             language=self._language,
             translations=False,
             permissions=False,
@@ -391,8 +388,8 @@ class AddPageForm(BasePageContentForm):
         elif source:
             new_page = self.from_source(source, parent=parent)
         else:
-            new_page = Page()
-            new_page.set_tree_node(self._site, target=parent, position="last-child")
+            new_page = Page(site=self._site, parent=parent)
+            new_page.add_to_tree(position='last-child')
             new_page.save()
 
         translation = self.create_translation(new_page)
@@ -416,8 +413,8 @@ class AddPageForm(BasePageContentForm):
                 )
 
         is_first = not (
-            TreeNode.objects.get_for_site(self._site)
-            .exclude(pk=new_page.node_id)
+            Page.objects.on_site(self._site)
+            .exclude(pk=new_page.id)
             .exists()
         )
 
@@ -456,9 +453,7 @@ class AddPageTypeForm(AddPageForm):
         Creates the root node used to store all page types
         for the current site if it doesn't exist.
         """
-        root_page = PageType.get_root_page(site=self._site)
-
-        if not root_page:
+        if not (root_page := PageType.get_root_page(site=self._site)):
             root_page = Page(is_page_type=True)
             root_page.set_tree_node(self._site)
             root_page.save()
@@ -605,15 +600,15 @@ class ChangePageForm(BasePageContentForm):
 
         slug = data["slug"]
         path_override = self.cleaned_data.get("overwrite_url")
-        parent_page = page.parent_page
 
         if path_override:
             path = path_override.strip("/")
-        elif parent_page and parent_page.is_home:
-            path = slug
-        elif parent_page:
-            base_path = parent_page.get_path(self._language)
-            path = "%s/%s" % (base_path, slug) if base_path else None
+        elif page.parent:
+            if page.parent.is_home:
+                path = slug
+            else:
+                base_path = page.parent.get_path(self._language)
+                path = f'{base_path}/{slug}' if base_path else None
         else:
             path = slug
 
@@ -927,7 +922,7 @@ class PageTreeForm(forms.Form):
         self._site = kwargs.pop("site", Site.objects.get_current())
         super().__init__(*args, **kwargs)
         self.fields["target"].queryset = Page.objects.filter(
-            node__site=self._site,
+            site=self._site,
             is_page_type=self.page.is_page_type,
         )
 
@@ -938,38 +933,31 @@ class PageTreeForm(forms.Form):
 
     def get_tree_options(self):
         position = self.cleaned_data["position"]
-        target_page = self.cleaned_data.get("target")
-        parent_node = target_page.node if target_page else None
-
-        if parent_node:
-            return self._get_tree_options_for_parent(parent_node, position)
+        if target_page := self.cleaned_data.get("target"):
+            return self._get_tree_options_for_parent(target_page, position)
         return self._get_tree_options_for_root(position)
 
     def _get_tree_options_for_root(self, position):
-        siblings = self.get_root_nodes().filter(site=self._site)
-
+        siblings = Page.get_root_nodes().filter(site=self._site)
         try:
-            target_node = siblings[position]
+            return siblings[position], 'left'
         except IndexError:
             # The position requested is not occupied.
             # Add the node as the last root node,
             # relative to the current site.
-            return (siblings.reverse()[0], "right")
-        return (target_node, "left")
+            return siblings.reverse()[0], 'right'
 
-    def _get_tree_options_for_parent(self, parent_node, position):
+    def _get_tree_options_for_parent(self, parent_page, position):
         if position == 0:
-            return (parent_node, "first-child")
+            return parent_page, 'first-child'
 
-        siblings = parent_node.get_children().filter(site=self._site)
-
+        siblings = parent_page.get_children().filter(site=self._site)
         try:
-            target_node = siblings[position]
+            return siblings[position], 'left'
         except IndexError:
             # The position requested is not occupied.
             # Add the node to be the parent's first child
-            return (parent_node, "last-child")
-        return (target_node, "left")
+            return parent_page, 'last-child'
 
 
 class MovePageForm(PageTreeForm):
@@ -985,30 +973,23 @@ class MovePageForm(PageTreeForm):
         return cleaned_data
 
     def get_tree_options(self):
-        options = super().get_tree_options()
-        target_node, target_node_position = options
+        target_page, target_page_position = super().get_tree_options()
+        if target_page_position != 'left':
+            return target_page, target_page_position
 
-        if target_node_position != "left":
-            return (target_node, target_node_position)
+        if self.page.path < target_page.path:
+            if self.page.is_sibling_of(target_page):
+                # The page being moved appears before the target page and is a sibling of the target node.
+                # The user is moving from left to right.
+                return target_page, 'right'
 
-        node = self.page.node
-        node_is_first = node.path < target_node.path
-
-        if node_is_first and node.is_sibling_of(target_node):
-            # The node being moved appears before the target node
-            # and is a sibling of the target node.
-            # The user is moving from left to right.
-            target_node_position = "right"
-        elif node_is_first:
-            # The node being moved appears before the target node
-            # but is not a sibling of the target node.
+            # The node being moved appears before the target node but is not a sibling of the target node.
             # The user is moving from right to left.
-            target_node_position = "left"
-        else:
-            # The node being moved appears after the target node.
-            # The user is moving from right to left.
-            target_node_position = "left"
-        return (target_node, target_node_position)
+            return target_page, 'left'
+
+        # The node being moved appears after the target node.
+        # The user is moving from right to left.
+        return target_page, 'left'
 
     def move_page(self):
         self.page.move_page(*self.get_tree_options())
@@ -1019,10 +1000,10 @@ class CopyPageForm(PageTreeForm):
     copy_permissions = forms.BooleanField(initial=False, required=False)
 
     def copy_page(self, user):
-        target, position = self.get_tree_options()
+        target_page, position = self.get_tree_options()
         copy_permissions = self.cleaned_data.get("copy_permissions", False)
         new_page = self.page.copy_with_descendants(
-            target_node=target,
+            target_page=target_page,
             position=position,
             copy_permissions=copy_permissions,
             target_site=self._site,

@@ -36,8 +36,8 @@ class PageSelectWidget(MultiWidget):
         of that page or the current site_id and None if no page_id is given.
         """
         if value:
-            page = Page.objects.select_related('node').get(pk=value)
-            return [page.node.site_id, page.pk, page.pk]
+            page = Page.objects.get(pk=value)
+            return [page.site_id, page.pk, page.pk]
         site = Site.objects.get_current()
         return [site.pk, None, None]
 

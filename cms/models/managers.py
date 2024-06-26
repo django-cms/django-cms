@@ -14,7 +14,7 @@ from cms.models.query import PageNodeQuerySet, PageQuerySet
 from cms.utils.i18n import get_fallback_languages
 
 
-class PageManager(models.Manager):
+class PageManager(MP_NodeManager):
 
     def get_queryset(self):
         """Change standard model queryset to our own.
@@ -91,7 +91,7 @@ class WithUserMixin:
 
 class PageUrlManager(WithUserMixin, models.Manager):
     def get_for_site(self, site, **kwargs):
-        kwargs['page__node__site'] = site
+        kwargs['page__site'] = site
         return self.filter(**kwargs)
 
 
@@ -230,14 +230,14 @@ class PagePermissionManager(BasicPagePermissionManager):
         Provide a single point of entry for deciding whether any given global
         permission exists.
         """
-        query = {perm: True, 'page__node__site': site_id}
+        query = {perm: True, 'page__site': site_id}
         return self.with_user(user).filter(**query)
 
     def get_with_site(self, user, site_id):
-        return self.with_user(user).filter(page__node__site=site_id)
+        return self.with_user(user).filter(page__site=site_id)
 
     def user_has_permissions(self, user, site_id, perms):
-        queryset = self.with_user(user).filter(page__node__site=site_id)
+        queryset = self.with_user(user).filter(page__site=site_id)
         queries = [Q(**{perm: True}) for perm in perms]
         return queryset.filter(functools.reduce(operator.or_, queries)).exists()
 
@@ -313,7 +313,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         # in which he can be
         qs = self.filter(
             page__id__in=page_id_allow_list,
-            page__node__depth__gte=user_level,
+            page__depth__gte=user_level,
         )
         qs = qs.exclude(user=user).exclude(group__user=user)
         return qs
@@ -336,19 +336,19 @@ class PagePermissionManager(BasicPagePermissionManager):
             ACCESS_PAGE_AND_DESCENDANTS,
         )
 
-        paths = page.node.get_ancestor_paths()
+        paths = page.get_ancestor_paths()
 
         # Ancestors
         query = (
-            Q(page__node__path__in=paths) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
+            Q(page__path__in=paths) & (Q(grant_on=ACCESS_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS))
         )
 
-        if page.parent_page:
+        if page.parent:
             # Direct parent
             query |= (
-                Q(page=page.parent_page) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
+                Q(page=page.parent) & (Q(grant_on=ACCESS_CHILDREN) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN))
             )
         query |= Q(page=page) & (
             Q(grant_on=ACCESS_PAGE_AND_DESCENDANTS) | Q(grant_on=ACCESS_PAGE_AND_CHILDREN) | Q(grant_on=ACCESS_PAGE)
         )
-        return self.filter(query).order_by('page__node__depth')
+        return self.filter(query).order_by('page__depth')

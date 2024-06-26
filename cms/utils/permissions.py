@@ -134,7 +134,7 @@ def get_user_permission_level(user, site):
             .objects
             .get_with_change_permissions(user, site)
             .select_related('page')
-            .order_by('page__node__path')
+            .order_by('page__path')
         )[0]
     except IndexError:
         # user isn't assigned to any node
@@ -178,8 +178,7 @@ def get_page_actions_for_user(user, site):
         Page
         .objects
         .on_site(site)
-        .select_related('node')
-        .order_by('node__path')
+        .order_by('path')
     )
     nodes = [page.node for page in pages]
     pages_by_id = {}
@@ -275,7 +274,7 @@ def get_subordinate_users(user, site):
     # normal query
     qs = get_user_model().objects.distinct().filter(
         Q(is_staff=True) & (
-            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__depth__gte=user_level)
         ) | (
             Q(pageuser__created_by=user) & Q(pagepermission__page=None)
         )
@@ -316,7 +315,7 @@ def get_subordinate_groups(user, site):
 
     return Group.objects.distinct().filter(
         (
-            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__node__depth__gte=user_level)
+            Q(pagepermission__page__id__in=page_id_allow_list) & Q(pagepermission__page__depth__gte=user_level)
         ) | (
             Q(pageusergroup__created_by=user) & Q(pagepermission__page__isnull=True)
         )

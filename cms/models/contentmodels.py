@@ -132,6 +132,9 @@ class PageContent(models.Model):
         default_permissions = []
         unique_together = (('language', 'page'),)
         app_label = 'cms'
+        # constraints = [
+        #     models.UniqueConstraint(fields=['language', 'page'], name='language_and_page_uniq')
+        # ]
 
     def __str__(self):
         return "%s (%s)" % (self.title, self.language)
@@ -210,7 +213,7 @@ class PageContent(models.Model):
             self
             .get_ancestor_titles()
             .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
-            .order_by('-page__node__path')
+            .order_by('-page__path')
             .values_list('template', flat=True)
         )
 
@@ -256,7 +259,7 @@ class PageContent(models.Model):
             return xframe_options
 
         # Ignore those pages which just inherit their value
-        ancestors = self.get_ancestor_titles().order_by('-page__node__path')
+        ancestors = self.get_ancestor_titles().order_by('-page__path')
         ancestors = ancestors.exclude(xframe_options=constants.X_FRAME_OPTIONS_INHERIT)
 
         # Now just give me the clickjacking setting (not anything else)

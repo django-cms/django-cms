@@ -370,8 +370,6 @@ class BaseCMSTestCase:
             pk=response_data['id'],
         )
         self.assertObjectExist(copied_page.urls.filter(language=language), slug=new_page_slug)
-        page._clear_node_cache()
-        target_page._clear_node_cache()
         return copied_page
 
     def create_homepage(self, *args, **kwargs):

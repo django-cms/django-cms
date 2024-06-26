@@ -79,10 +79,10 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
     site = Site.objects._get_site_by_id(site_id)
     try:
         if 'pk' in page_lookup:
-            return Page.objects.select_related('node').get(**page_lookup)
+            return Page.objects.get(**page_lookup)
         else:
             pages = get_page_queryset(site)
-            return pages.select_related('node').get(**page_lookup)
+            return pages.get(**page_lookup)
     except Page.DoesNotExist:
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _(
