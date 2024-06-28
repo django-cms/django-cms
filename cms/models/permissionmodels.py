@@ -229,7 +229,7 @@ class PagePermission(AbstractPagePermission):
 
     def __str__(self):
         page = self.page_id and force_str(self.page) or "None"
-        return "%s :: %s has: %s" % (page, self.audience, force_str(self.get_grant_on_display()))
+        return f"{page} :: {self.audience} has: {force_str(self.get_grant_on_display())}"
 
     def clean(self):
         super().clean()
@@ -250,8 +250,7 @@ class PagePermission(AbstractPagePermission):
         if self.grant_on & MASK_CHILDREN:
             children = self.page.get_child_pages().values_list('pk', flat=True)
 
-            for child in children:
-                yield child
+            yield from children
         elif self.grant_on & MASK_DESCENDANTS:
             node = self.page.node
 
@@ -260,8 +259,7 @@ class PagePermission(AbstractPagePermission):
             else:
                 descendants = self.page.get_descendant_pages().values_list('pk', flat=True).iterator()
 
-            for descendant in descendants:
-                yield descendant
+            yield from descendants
 
 
 class PageUserManager(UserManager):

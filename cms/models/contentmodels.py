@@ -134,7 +134,7 @@ class PageContent(models.Model):
         app_label = 'cms'
 
     def __str__(self):
-        return "%s (%s)" % (self.title, self.language)
+        return f"{self.title} ({self.language})"
 
     def __repr__(self):
         display = f'<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>'

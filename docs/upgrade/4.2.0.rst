@@ -1,0 +1,93 @@
+.. _upgrade-to-enter-version-here-template:
+
+###################
+4.2.0 release notes
+###################
+
+*October 31, 2024*
+
+Welcome to django CMS 4.2.0!
+
+These release notes cover the new features, as well as some backwards
+incompatible changes you’ll want to be aware of when upgrading from
+django CMS 4.1 or earlier. We’ve begun the deprecation process for some
+features.
+
+See the How to upgrade to 4.2.0 to a newer version guide if you’re
+updating an existing project.
+
+Django and Python compatibility
+===============================
+
+django CMS supports **Django 4.2, 5.0, and 5.1**. We highly recommend and only
+support the latest release of each series.
+
+It supports **Python 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
+support the latest release of each series.
+
+***********************
+How to upgrade to 4.2.0
+***********************
+
+*******************
+What's new in 4.2.0
+*******************
+
+Feature 1
+=========
+
+Empty sections are to be removed before release.
+
+Feature 2
+=========
+
+Empty sections are to be removed before release.
+
+
+Feature 3
+=========
+
+Minor features
+==============
+
+Empty sections are to be removed before release.
+
+
+Bug Fixes
+=========
+
+**************************************
+Backward incompatible changes in 4.2.0
+**************************************
+
+Topic 1
+=======
+
+Empty sections are to be removed before release.
+
+
+Miscellaneous
+=============
+
+Empty sections are to be removed before release.
+
+
+Features deprecated in 4.2.0
+============================
+
+Empty sections are to be removed before release.
+
+Removal of deprecated functionality
+===================================
+
+* Built-in alias plugin: The alias plugin has been removed. If you need
+  this functionality, you can use the ``djangocms-alias`` package.
+
+* ``SuperLazyIterator``: This class has been removed. If you need this
+  functionality, you can use the ``django.utils.functional.lazy``.
+
+* ``LazyChoiceField``: This class has been removed. If you need this
+  functionality, you can use the default ``django.forms.fields.ChoiceField`` class.
+
+* ``SlugWidget``: This class has been removed from ``cms.wizard.forms``. If you
+  need this functionality, you can use the ``cms.admin.forms.SlugWidget`` class.

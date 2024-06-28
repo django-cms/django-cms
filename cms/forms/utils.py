@@ -55,7 +55,7 @@ def get_page_choices_for_site(site, language):
             if language in titles_by_language:
                 title = titles_by_language[language]
                 indent = "&nbsp;&nbsp;" * (page.node.depth - 1)
-                label = mark_safe("%s%s" % (indent, escape(title)))
+                label = mark_safe(f"{indent}{escape(title)}")
                 yield (page.pk, label)
                 break
 

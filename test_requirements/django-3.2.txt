@@ -1,3 +1,0 @@
--r requirements_base.txt
-Django>=3.2,<3.4
-django-formtools==2.2

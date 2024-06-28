@@ -14,7 +14,6 @@ from django.utils.translation import (
 )
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
-from cms.models import PageContent
 from cms.utils import get_language_list
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse

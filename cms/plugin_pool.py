@@ -198,7 +198,7 @@ class PluginPool:
                 p = plugin()
                 slug = slugify(force_str(normalize_name(p.__class__.__name__)))
                 url_patterns += [
-                    re_path(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                    re_path(rf'^plugin/{slug}/', include(p.plugin_urls)),
                 ]
         finally:
             # Reactivate translation
