@@ -57,7 +57,7 @@ class PluginPool:
         else:
             plugins = self.plugins.values()
         for plugin in plugins:
-            if (plugin.render_plugin and not type(plugin.render_plugin) == property
+            if (plugin.render_plugin and not type(plugin.render_plugin) is property
                     or hasattr(plugin.model, 'render_template')
                     or hasattr(plugin, 'get_render_template')):
                 if (plugin.render_template is None and not hasattr(plugin, 'get_render_template')):
