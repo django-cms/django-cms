@@ -657,8 +657,8 @@ class Page(models.Model):
 
             placeholders = self.get_placeholders(language)
 
-            for placeholder in placeholders:
-                placeholder.clear_cache(language, site_id=self.node.site_id)
+            for placeholder_instance in placeholders:
+                placeholder_instance.clear_cache(language, site_id=self.node.site_id)
 
         if menu:
             # Clears all menu caches for this page's site
