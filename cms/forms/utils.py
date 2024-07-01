@@ -47,13 +47,13 @@ def get_page_choices_for_site(site, language):
 
     for page in pages:
         translations = page.filtered_translations
-        titles_by_language = {trans.language: trans.title for trans in translations}
+        pagecontent_by_language = {trans.language: trans.title for trans in translations}
 
-        for language in languages:
+        for lang in languages:
             # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
-            if language in titles_by_language:
-                title = titles_by_language[language]
+            if lang in pagecontent_by_language:
+                title = pagecontent_by_language[lang]
                 indent = "&nbsp;&nbsp;" * (page.node.depth - 1)
                 label = mark_safe(f"{indent}{escape(title)}")
                 yield (page.pk, label)

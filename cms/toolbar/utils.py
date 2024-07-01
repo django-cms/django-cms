@@ -101,8 +101,8 @@ def get_plugin_tree_as_json(request, plugins):
 
         tree_data.append(plugin_info)
 
-        for plugin in plugin.child_plugin_instances:
-            collect_plugin_data(plugin)
+        for plugin_instance in plugin.child_plugin_instances:
+            collect_plugin_data(plugin_instance)
 
     with force_language(toolbar.toolbar_language):
         for root_plugin in root_plugins:
