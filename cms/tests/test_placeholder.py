@@ -855,7 +855,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set(['en', 'de', 'fr'])
+        avail_langs = {'en', 'de', 'fr'}
         # Setup instance
         ex = Example1(
             char_1='one',
@@ -880,7 +880,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set(['en', 'de', 'fr'])
+        avail_langs = {'en', 'de', 'fr'}
         # Setup instances
         page = create_page('test page', 'col_two.html', 'en')
         for lang in avail_langs:
@@ -1113,9 +1113,9 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         )
         EN = ('en', 'English')
         FR = ('fr', 'French')
-        self.assertEqual(set(fr_copy_languages), set([EN]))
-        self.assertEqual(set(de_copy_languages), set([EN, FR]))
-        self.assertEqual(set(en_copy_languages), set([FR]))
+        self.assertEqual(set(fr_copy_languages), {EN})
+        self.assertEqual(set(de_copy_languages), {EN, FR})
+        self.assertEqual(set(en_copy_languages), {FR})
 
     def test_mlng_placeholder_actions_copy(self):
         actions = MLNGPlaceholderActions()
@@ -1307,8 +1307,7 @@ class PlaceholderPluginTestsBase(CMSTestCase):
         for child in parent.cmsplugin_set.all():
             yield child.pk
 
-            for desc in self._unpack_descendants(child):
-                yield desc
+            yield from self._unpack_descendants(child)
 
     def setUp(self):
         self.placeholder = self._create_placeholder()

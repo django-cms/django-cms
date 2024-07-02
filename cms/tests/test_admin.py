@@ -24,7 +24,6 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_PUBLISHED,
     CMSTestCase,
 )
-from cms.utils.compat import DJANGO_2_2
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
@@ -495,7 +494,7 @@ class PluginPermissionTests(AdminTestsBase):
         return admin.site._registry[Page]
 
     def _give_permission(self, user, model, permission_type, save=True):
-        codename = '%s_%s' % (permission_type, model._meta.object_name.lower())
+        codename = f'{permission_type}_{model._meta.object_name.lower()}'
         user.user_permissions.add(Permission.objects.get(codename=codename))
 
     def _give_page_permission_rights(self, user):
@@ -541,7 +540,7 @@ class PluginPermissionTests(AdminTestsBase):
             self.client.login(username='test', password='test')
 
         self._give_permission(normal_guy, Text, 'change')
-        endpoint = '%sedit-plugin/%s/' % (admin_reverse('cms_placeholder_edit_plugin', args=[plugin.id]), plugin.id)
+        endpoint = '{}edit-plugin/{}/'.format(admin_reverse('cms_placeholder_edit_plugin', args=[plugin.id]), plugin.id)
         endpoint += '?cms_path=/en/'
         response = self.client.post(endpoint, dict())
 
@@ -625,10 +624,8 @@ class AdminFormsTests(AdminTestsBase):
             response = self.client.post(endpoint, new_page_data)
             expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
                              'underscores or hyphens.</li></ul>'
-            expected_error_22 = '<ul class="errorlist"><li>Enter a valid &#39;slug&#39; consisting of letters, ' \
-                               'numbers, underscores or hyphens.</li></ul>'
             self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_error_22 if DJANGO_2_2 else expected_error, html=True)
+            self.assertContains(response, expected_error, html=True)
 
         page2 = api.create_page("test", get_cms_setting('TEMPLATES')[0][0], "en")
         new_page_data = {
@@ -844,8 +841,7 @@ class AdminPageEditContentSizeTests(AdminTestsBase):
                 foundcount = text.count(USER_NAME)
                 # 2 forms contain usernames as options
                 self.assertEqual(foundcount, 2,
-                                 "Username %s appeared %s times in response.content, expected 2 times" % (
-                                     USER_NAME, foundcount))
+                                 f"Username {USER_NAME} appeared {foundcount} times in response.content, expected 2 times")
 
 
 class AdminPageTreeTests(AdminTestsBase):

@@ -6,10 +6,9 @@ from django.db import transaction
 from django.utils.text import slugify
 from django.utils.translation import gettext, gettext_lazy as _
 
-from cms.admin.forms import AddPageForm, SlugWidget as AdminSlugWidget
+from cms.admin.forms import AddPageForm
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
-from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_available_slug
 from cms.utils.page_permissions import user_can_add_page, user_can_add_subpage
@@ -20,15 +19,6 @@ try:
     text_widget = TextEditorWidget
 except ImportError:
     text_widget = forms.Textarea
-
-
-class SlugWidget(AdminSlugWidget):
-    """Compatibility shim with deprecation warning:
-    SlugWidget has moved to cms.admin.forms"""
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Import SlugWidget from cms.admin.forms. SlugWidget will be removed from cms.forms.wizards",
-                      RemovedInDjangoCMS42Warning, stacklevel=2)
-        super().__init__(*args, **kwargs)
 
 
 class CreateCMSPageForm(AddPageForm):
@@ -99,13 +89,13 @@ class CreateCMSPageForm(AddPageForm):
 
         if parent_node:
             base = parent_node.item.get_path(self._language)
-            path = '%s/%s' % (base, slug) if base else slug
+            path = f'{base}/{slug}' if base else slug
         else:
             base = ''
             path = slug
 
         data['slug'] = get_available_slug(self._site, path, self._language, suffix=None)
-        data['path'] = '%s/%s' % (base, data['slug']) if base else data['slug']
+        data['path'] = '{}/{}'.format(base, data['slug']) if base else data['slug']
 
         if not data['slug']:
             raise forms.ValidationError(_("Please provide a valid slug."))

@@ -37,7 +37,7 @@ class AliasPluginModel(CMSPlugin):
 
     def __str__(self):
         if self.plugin_id:
-            return "(%s) %s" % (force_str(self.plugin.get_plugin_name()), self.plugin.get_plugin_instance()[0])
+            return f"({force_str(self.plugin.get_plugin_name())}) {self.plugin.get_plugin_instance()[0]}"
         else:
             return force_str(self.alias_placeholder.get_label())
 

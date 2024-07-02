@@ -26,11 +26,11 @@ class ListApphooksCommand(SubcommandsCommand):
         for apphook, attributes in apphooks.items():
             attributes[0].sort()
             if attributes[1]:
-                self.stdout.write('{0}[instance: {1}] ({2})\n'.format(
+                self.stdout.write('{}[instance: {}] ({})\n'.format(
                     apphook, attributes[1], '/'.join(attributes[0])
                 ))
             else:
-                self.stdout.write('{0} ({1})\n'.format(
+                self.stdout.write('{} ({})\n'.format(
                     apphook, '/'.join(attributes[0])
                 ))
 
@@ -99,7 +99,7 @@ class ListPluginsCommand(SubcommandsCommand):
                 self.stdout.write('    unsaved instance(s) : %s  \n' % unsaved_instances)
 
             else:
-                self.stdout.write('  model      : %s.%s  \n' % (plugin_model.__module__, plugin_model.__name__))
+                self.stdout.write(f'  model      : {plugin_model.__module__}.{plugin_model.__name__}  \n')
                 if unsaved_instances:
                     self.stdout.write(self.style.ERROR('  ERROR      : %s unsaved instance(s) \n' % unsaved_instances))
 

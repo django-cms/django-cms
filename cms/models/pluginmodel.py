@@ -394,20 +394,20 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         for parent in self.get_ancestors():
             try:
                 url = force_str(
-                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                    admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
                                   args=[parent.pk]))
             except NoReverseMatch:
                 url = force_str(
-                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                    admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
                                   args=[parent.pk]))
             breadcrumb.append({'title': force_str(parent.get_plugin_name()), 'url': url})
         try:
             url = force_str(
-                admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
                               args=[self.pk]))
         except NoReverseMatch:
             url = force_str(
-                admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
                               args=[self.pk]))
         breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
         return breadcrumb

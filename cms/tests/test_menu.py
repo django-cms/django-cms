@@ -1147,13 +1147,13 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
 
         This is recursive over the tree
         """
-        msg = '%r != %r with %r, %r' % (len(a), len(b), a, b)
+        msg = f'{len(a)!r} != {len(b)!r} with {a!r}, {b!r}'
         self.assertEqual(len(a), len(b), msg)
         for n1, n2 in zip(a, b):
             for attr in attrs:
                 a1 = getattr(n1, attr)
                 a2 = getattr(n2, attr)
-                msg = '%r != %r with %r, %r (%s)' % (a1, a2, n1, n2, attr)
+                msg = f'{a1!r} != {a2!r} with {n1!r}, {n2!r} ({attr})'
                 self.assertEqual(a1, a2, msg)
             self.assertTreeQuality(n1.children, n2.children)
 
