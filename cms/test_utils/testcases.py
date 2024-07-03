@@ -32,7 +32,6 @@ from cms.models.permissionmodels import (
 from cms.plugin_rendering import ContentRenderer, StructureRenderer
 from cms.test_utils.util.context_managers import UserLoginContext
 from cms.toolbar.utils import get_toolbar_from_request
-from cms.utils.compat import DJANGO_4_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import set_current_user
 from cms.utils.urlutils import admin_reverse
@@ -153,18 +152,6 @@ class BaseCMSTestCase:
         pp = PagePermission.objects.create(**options)
         pp.sites = Site.objects.all()
         return pp
-
-    def get_page_title_obj(self, page, language="en"):
-        import warnings
-
-        from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
-
-        warnings.warn(
-            "get_page_title_obj is deprecated, use get_pagecontent_obj instead",
-            RemovedInDjangoCMS42Warning,
-            stacklevel=2,
-        )
-        return PageContent.objects.get(page=page, language=language)
 
     def get_pagecontent_obj(self, page, language="en"):
         return PageContent.objects.get(page=page, language=language)
@@ -312,9 +299,7 @@ class BaseCMSTestCase:
         for page in qs.order_by('path'):
             ident = "  " * page.level
             print(
-                "%s%s (%s), path: %s, depth: %s, numchild: %s" % (
-                    ident, page, page.pk, page.path, page.depth, page.numchild
-                )
+                f"{ident}{page} ({page.pk}), path: {page.path}, depth: {page.depth}, numchild: {page.numchild}"
             )
 
     def print_node_structure(self, nodes, *extra):
@@ -323,7 +308,7 @@ class BaseCMSTestCase:
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
                 attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
-                print("%s%s: %s" % (ident, node.title, attrs))
+                print(f"{ident}{node.title}: {attrs}")
                 _rec(node.children, level + 1)
 
         _rec(nodes)
@@ -690,6 +675,4 @@ class CMSTestCase(BaseCMSTestCase, testcases.TestCase):
 
 
 class TransactionCMSTestCase(CMSTestCase, testcases.TransactionTestCase):
-    if DJANGO_4_1:
-        def assertQuerySetEqual(self, *args, **kwargs):
-            return self.assertQuerysetEqual(*args, **kwargs)
+    pass

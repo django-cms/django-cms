@@ -555,7 +555,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
 
         """
-        return "%s - %s" % (force_str(self.name), force_str(instance))
+        return f"{force_str(self.name)} - {force_str(instance)}"
 
     def get_fieldsets(self, request, obj=None):
         """

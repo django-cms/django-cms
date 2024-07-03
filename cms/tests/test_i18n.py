@@ -14,11 +14,7 @@ from cms.plugin_rendering import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
-from cms.utils.compat import DJANGO_2_2
 from cms.views import details
-
-if DJANGO_2_2:
-    from django.utils.translation import LANGUAGE_SESSION_KEY
 
 
 @override_settings(
@@ -381,20 +377,12 @@ class TestLanguageFallbacks(CMSTestCase):
         self.client.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 
         #   ugly and long set of session
-        session = self.client.session
-        if not DJANGO_2_2:
-            self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'fr'
-        else:
-            session[LANGUAGE_SESSION_KEY] = 'fr'
-            session.save()
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'fr'
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/fr/')
         self.client.get('/en/')
-        if not DJANGO_2_2:
-            self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'en')
-        else:
-            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'en')
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'en')
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/en/')
