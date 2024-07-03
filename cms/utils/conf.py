@@ -210,7 +210,7 @@ def _ensure_languages_settings(languages):
             for key in language_object:
                 if key not in valid_language_keys:
                     raise ImproperlyConfigured(
-                        "CMS_LANGUAGES has invalid key %r in language %r in site %r" % (key, language_code, site)
+                        f"CMS_LANGUAGES has invalid key {key!r} in language {language_code!r} in site {site!r}"
                     )
 
             if 'fallbacks' not in language_object:

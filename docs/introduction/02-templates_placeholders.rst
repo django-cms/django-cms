@@ -89,16 +89,18 @@ Do not forget to add ``djangocms_alias`` to your ``INSTALLED_APPS`` in ``setting
 
 Static aliases are an easy way to display the same content on multiple locations on your website. Static placeholders act almost like normal placeholders, except for the fact that once a static placeholder is created and you added content to it, it will be saved globally. Even when you remove the static placeholders from a template, you can reuse them later.
 
-So let's add a footer to all our pages. Since we want our footer on every single page, we should add it to our **base template** (``mysite/templates/base.html``). Place it near the end of the HTML ``<body>`` element:
+So let's add a footer to all our pages. Since we want our footer on every single page, we should add it to our **base template** (``mysite/templates/base.html``). Place it near the end of the HTML ``<body>`` element, and inside a content block:
 
 .. code-block:: html+django
    :emphasize-lines: 1,3-5
 
         {% load djangocms_alias_tags %}
 
-        <footer>
-          {% static_alias 'footer' %}
-        </footer>
+        {% block content %}
+            <footer>
+              {% static_alias 'footer' %}
+            </footer>
+        {% endblock content %}
 
 
         {% render_block "js" %}

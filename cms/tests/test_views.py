@@ -92,7 +92,7 @@ class ViewTests(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
         apphooks = (
-            '%s.%s' % (APP_MODULE, APP_NAME),
+            f'{APP_MODULE}.{APP_NAME}',
         )
         page = create_page("page2", "nav_playground.html", "en")
         with self.settings(CMS_APPHOOKS=apphooks):
@@ -207,7 +207,7 @@ class ViewTests(CMSTestCase):
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en")
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         page_preview_url = get_object_preview_url(page_content)
         # Anon user
         response = self.client.get(page_preview_url)
@@ -268,16 +268,12 @@ class ViewTests(CMSTestCase):
             structure_url = get_object_structure_url(page_content, language='fr')
 
             response = self.client.get(edit_url)
-            expected = """
-                <a href="%s" class="cms-btn cms-btn-disabled" title="Toggle structure"
-                data-cms-structure-btn='{ "url": "%s", "name": "Structure" }'
-                data-cms-content-btn='{ "url": "%s", "name": "Content" }'>
+            expected = f"""
+                <a href="{structure_url}" class="cms-btn cms-btn-disabled" title="Toggle structure"
+                data-cms-structure-btn='{{ "url": "{structure_url}", "name": "Structure" }}'
+                data-cms-content-btn='{{ "url": "{edit_url}", "name": "Content" }}'>
                 <span class="cms-icon cms-icon-plugins"></span></a>
-            """ % (
-                structure_url,
-                structure_url,
-                edit_url,
-            )
+            """
             self.assertContains(
                 response,
                 expected,

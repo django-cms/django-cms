@@ -126,6 +126,6 @@ def get_available_slug(site, path, language, suffix='copy', modified=False):
             slug += '-' + suffix + '-2'
         else:
             slug += '-2'
-        path = '%s/%s' % (base, slug) if base else slug
+        path = f'{base}/{slug}' if base else slug
         return get_available_slug(site, path, language, suffix, modified=True)
     return slug

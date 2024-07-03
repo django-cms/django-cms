@@ -588,7 +588,7 @@ class Page(MP_Node):
                 path = page_url.slug
 
             new_url["slug"] = get_available_slug(site, path, page_url.language)
-            new_url["path"] = f'{base}/{new_url["slug"]}' if base else new_url["slug"]
+            new_url["path"] = '{}/{}'.format(base, new_url["slug"]) if base else new_url["slug"]
             PageUrl.objects.with_user(user).create(**new_url)
 
         # copy titles of this page
@@ -739,8 +739,8 @@ class Page(MP_Node):
 
             placeholders = self.get_placeholders(language)
 
-            for placeholder in placeholders:
-                placeholder.clear_cache(language, site_id=self.site_id)
+            for placeholder_instance in placeholders:
+                placeholder_instance.clear_cache(language, site_id=self.site_id)
 
         if menu:
             # Clears all menu caches for this page's site
@@ -827,7 +827,7 @@ class Page(MP_Node):
         if self.parent:
             base = self.parent.get_path(language, fallback=True)
             # base can be empty when the parent is a home-page
-            path = '%s/%s' % (base, slug) if base else slug
+            path = f'{base}/{slug}' if base else slug
         else:
             path = slug
         return path
@@ -1166,7 +1166,7 @@ class PageUrl(models.Model):
         default_permissions = []
 
     def __str__(self):
-        return "%s (%s)" % (self.path or self.slug, self.language)
+        return f"{self.path or self.slug} ({self.language})"
 
     def get_absolute_url(self, language=None, fallback=True):
         if not language:
@@ -1179,7 +1179,7 @@ class PageUrl(models.Model):
 
     def get_path_for_base(self, base_path=''):
         old_base, sep, slug = self.path.rpartition('/')
-        return '%s/%s' % (base_path, slug) if base_path else slug
+        return f'{base_path}/{slug}' if base_path else slug
 
 
 class PageType(Page):

@@ -559,7 +559,7 @@ class CMSToolbarBase(BaseToolbar):
             # render the toolbar content
             toolbar = render_to_string('cms/toolbar/toolbar_with_structure.html', flatten_context(context))
         # return the toolbar content and the content below
-        return '%s\n%s' % (toolbar, rendered_contents)
+        return f'{toolbar}\n{rendered_contents}'
 
 
 # Add toolbar mixins from extensions to toolbar

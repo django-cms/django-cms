@@ -94,8 +94,7 @@ def get_page_changed_by_filter_choices():
 def get_page_template_filter_choices():
     yield ("", _("All"))
 
-    for value, name in get_cms_setting("TEMPLATES"):
-        yield (value, name)
+    yield from get_cms_setting("TEMPLATES")
 
 
 def save_permissions(data, obj):
@@ -120,7 +119,7 @@ def save_permissions(data, obj):
             permission = Permission.objects.get(
                 content_type=content_type, codename=codename
             )
-            field = "can_%s_%s" % (key, name)
+            field = f"can_{key}_{name}"
 
             if data.get(field):
                 permission_accessor.add(permission)
@@ -304,7 +303,7 @@ class AddPageForm(BasePageContentForm):
             return data
 
         if parent_page := data.get('parent_node'):
-            slug = data['slug']
+            slug = data["slug"]
             parent_path = parent_page.get_path(self._language)
             path = f"{parent_path}/{slug}" if parent_path else slug
         else:
@@ -1289,7 +1288,7 @@ class GenericCmsPermissionForm(forms.ModelForm):
             ).values_list("codename", flat=True)
             for key in ("add", "change", "delete"):
                 codename = get_permission_codename(key, model._meta)
-                initials["can_%s_%s" % (key, name)] = codename in permissions
+                initials[f"can_{key}_{name}"] = codename in permissions
         return initials
 
     def save(self, commit=True):

@@ -1343,7 +1343,7 @@ class PageTest(PageTestBase):
         try:
             dom = _parse_html(content)
         except HTMLParseError as e:
-            standardMsg = '%s\n%s' % ("Response's content is not valid HTML", e.msg)
+            standardMsg = '{}\n{}'.format("Response's content is not valid HTML", e.msg)
             self.fail(self._formatMessage(None, standardMsg))
         return dom
 

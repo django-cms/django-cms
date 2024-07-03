@@ -75,15 +75,15 @@ class PageSelectWidget(MultiWidget):
         )
 
     def _build_script(self, name, value, attrs={}):
-        return r"""<script type="text/javascript">
-                var CMS = window.CMS || {};
+        return rf"""<script type="text/javascript">
+                var CMS = window.CMS || {{}};
 
-                CMS.Widgets = CMS.Widgets || {};
+                CMS.Widgets = CMS.Widgets || {{}};
                 CMS.Widgets._pageSelectWidgets = CMS.Widgets._pageSelectWidgets || [];
-                CMS.Widgets._pageSelectWidgets.push({
-                    name: '%(name)s'
-                });
-            </script>""" % {'name': name}
+                CMS.Widgets._pageSelectWidgets.push({{
+                    name: '{name}'
+                }});
+            </script>"""
 
     def get_context(self, name, value, attrs):
         self._build_widgets()
@@ -124,22 +124,22 @@ class PageSmartLinkWidget(TextInput):
 
     def _build_script(self, name, value, attrs={}):
         return r"""<script type="text/javascript">
-            var CMS = window.CMS || {};
+            var CMS = window.CMS || {{}};
 
-            CMS.Widgets = CMS.Widgets || {};
+            CMS.Widgets = CMS.Widgets || {{}};
             CMS.Widgets._pageSmartLinkWidgets = CMS.Widgets._pageSmartLinkWidgets || [];
-            CMS.Widgets._pageSmartLinkWidgets.push({
-                id: '%(element_id)s',
-                text: '%(placeholder_text)s',
-                lang: '%(language_code)s',
-                url: '%(ajax_url)s'
-            });
-        </script>""" % {
-            'element_id': attrs.get('id', ''),
-            'placeholder_text': attrs.get('placeholder_text', ''),
-            'language_code': self.language,
-            'ajax_url': force_str(self.ajax_url)
-        }
+            CMS.Widgets._pageSmartLinkWidgets.push({{
+                id: '{element_id}',
+                text: '{placeholder_text}',
+                lang: '{language_code}',
+                url: '{ajax_url}'
+            }});
+        </script>""".format(
+            element_id=attrs.get('id', ''),
+            placeholder_text=attrs.get('placeholder_text', ''),
+            language_code=self.language,
+            ajax_url=force_str(self.ajax_url)
+        )
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)
@@ -241,23 +241,23 @@ class ApplicationConfigSelect(Select):
         configs = []
         urls = []
         for application, cms_app in self.app_configs.items():
-            configs.append("'%s': [%s]" % (application, ",".join(
-                ["['%s', '%s']" % (config.pk, escapejs(escape(config))) for config in cms_app.get_configs()])))  # noqa
+            configs.append("'{}': [{}]".format(application, ",".join(
+                ["['{}', '{}']".format(config.pk, escapejs(escape(config))) for config in cms_app.get_configs()])))  # noqa
         for application, cms_app in self.app_configs.items():
-            urls.append("'%s': '%s'" % (application, cms_app.get_config_add_url()))
+            urls.append(f"'{application}': '{cms_app.get_config_add_url()}'")
         return r"""<script type="text/javascript">
-            var apphooks_configuration = {
-                %(apphooks_configurations)s
-            };
-            var apphooks_configuration_url = {
-                %(apphooks_url)s
-            };
-            var apphooks_configuration_value = '%(apphooks_value)s';
-        </script>""" % {
-            'apphooks_configurations': ','.join(configs),
-            'apphooks_url': ','.join(urls),
-            'apphooks_value': value,
-        }
+            var apphooks_configuration = {{
+                {apphooks_configurations}
+            }};
+            var apphooks_configuration_url = {{
+                {apphooks_url}
+            }};
+            var apphooks_configuration_value = '{apphooks_value}';
+        </script>""".format(
+            apphooks_configurations=','.join(configs),
+            apphooks_url=','.join(urls),
+            apphooks_value=value,
+        )
 
     def get_context(self, name, value, attrs):
         context = super().get_context(name, value, attrs)

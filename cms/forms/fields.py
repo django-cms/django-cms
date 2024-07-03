@@ -10,39 +10,6 @@ from cms.forms.utils import get_page_choices, get_site_choices
 from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
-from cms.utils.compat import DJANGO_4_2
-from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning
-
-
-class SuperLazyIterator:
-    def __init__(self, func):
-        warnings.warn("SuperLazyIterator is deprecated.",
-                      RemovedInDjangoCMS42Warning, stacklevel=2)
-        self.func = func
-
-    def __iter__(self):
-        return iter(self.func())
-
-
-class LazyChoiceField(forms.ChoiceField):
-
-    def __init__(self, *args, **kwargs):
-        warnings.warn("LazyChoiceField is deprecated. Use Django's ChoiceField instead.",
-                      RemovedInDjangoCMS42Warning, stacklevel=2)
-        super().__init__(*args, **kwargs)
-
-    @property
-    def choices(self):
-        return self._choices
-
-    @choices.setter
-    def choices(self, value):
-        # we overwrite this function so no list(value) or normalize_choices(value) is called
-        # also, do not call the widget's setter as of Django 5
-        if DJANGO_4_2:
-            self._choices = self.widget.choices = value
-        else:
-            self._choices = self.widget._choices = value
 
 
 class PageSelectFormField(forms.MultiValueField):

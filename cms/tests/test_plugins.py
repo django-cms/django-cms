@@ -1016,7 +1016,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         # create 2nd language page
         page_data.update({
-            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
+            'title': f"{page.get_title()} {self.SECOND_LANG}",
             'cms_page': page.pk,
         })
         endpoint = self.get_page_add_uri(self.SECOND_LANG, page)

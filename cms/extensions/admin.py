@@ -48,7 +48,7 @@ class PageExtensionAdmin(ExtensionAdmin):
                 extension = self.model.objects.get(extended_object=page)
                 opts = self.model._meta
                 change_url = reverse(
-                    'admin:%s_%s_change' % (opts.app_label, opts.model_name),
+                    f'admin:{opts.app_label}_{opts.model_name}_change',
                     args=(extension.pk,),
                     current_app=self.admin_site.name
                 )
@@ -95,7 +95,7 @@ class PageContentExtensionAdmin(ExtensionAdmin):
                 extension = self.model.objects.get(extended_object=content)
                 opts = self.model._meta
                 change_url = reverse(
-                    'admin:%s_%s_change' % (opts.app_label, opts.model_name),
+                    f'admin:{opts.app_label}_{opts.model_name}_change',
                     args=(extension.pk,),
                     current_app=self.admin_site.name
                 )
