@@ -303,7 +303,7 @@ class AddPageForm(BasePageContentForm):
             return data
 
         if parent_page := data.get('parent_node'):
-            slug = data["slug"]
+            slug = data['slug']
             parent_path = parent_page.get_path(self._language)
             path = f"{parent_path}/{slug}" if parent_path else slug
         else:
