@@ -331,12 +331,12 @@ class BaseCMSTestCase:
         from cms.utils.page import get_available_slug
 
         if target_site is None:
-            target_site = target_page.node.site
+            target_site = target_page.site
 
         data = {
             'position': position,
             'target': target_page.pk,
-            'source_site': page.node.site_id,
+            'source_site': page.site_id,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -363,7 +363,7 @@ class BaseCMSTestCase:
         return homepage.reload()
 
     def move_page(self, page, target_page, position="first-child"):
-        page.move_page(target_page.node, position)
+        page.move_page(target_page, position)
         return self.reload_page(page)
 
     def reload_page(self, page):

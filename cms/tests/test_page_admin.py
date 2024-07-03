@@ -209,7 +209,7 @@ class PageTest(PageTestBase):
             # but the site is configured to use "de" and "fr"
             response = client.post(endpoint, self.get_new_page_data())
             self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
-            self.assertEqual(Page.objects.filter(node__site=2).count(), 1)
+            self.assertEqual(Page.objects.filter(site=2).count(), 1)
             self.assertEqual(PageContent.objects.filter(language='de').count(), 1)
 
         # The user is on site #1 but switches sites using the site switcher
@@ -221,7 +221,7 @@ class PageTest(PageTestBase):
         endpoint = self.get_page_add_uri('en')
         response = client.post(endpoint, self.get_new_page_data())
         self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
-        self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
+        self.assertEqual(Page.objects.filter(site=2).count(), 2)
         self.assertEqual(PageContent.objects.filter(language='de').count(), 2)
 
         Site.objects.clear_cache()
@@ -241,9 +241,9 @@ class PageTest(PageTestBase):
 
             home_url = PageUrl.objects.get(slug=page_1['slug'])
 
-            page_2 = self.get_new_page_data(parent_id=home_url.page.node.pk)
-            page_3 = self.get_new_page_data(parent_id=home_url.page.node.pk)
-            page_4 = self.get_new_page_data(parent_id=home_url.page.node.pk)
+            page_2 = self.get_new_page_data(parent_id=home_url.page.pk)
+            page_3 = self.get_new_page_data(parent_id=home_url.page.pk)
+            page_4 = self.get_new_page_data(parent_id=home_url.page.pk)
 
             response = self.client.post(self.get_page_add_uri('en'), page_2)
             self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
@@ -296,7 +296,7 @@ class PageTest(PageTestBase):
         add_endpoint = self.get_page_add_uri('en')
         with self.login_user_context(superuser):
             # slug collision between two child pages of the same node
-            page_data = self.get_new_page_data(page.node.pk)
+            page_data = self.get_new_page_data(page.pk)
             page_data['slug'] = 'subpage'
             response = self.client.post(add_endpoint, page_data)
             expected_markup = (
@@ -653,9 +653,9 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            node = self.reload(page.node)
-            self.assertEqual(node.path, path)
-            self.assertEqual(node.site_id, 2)
+            page.refresh_from_db()
+            self.assertEqual(page.path, path)
+            self.assertEqual(page.site_id, 2)
 
     def test_copy_page_to_different_site_fails_with_untranslated_page(self):
         data = {
@@ -677,7 +677,7 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.node.site_id
+                endpoint += '?source_site=%s' % site_1_root.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -686,7 +686,7 @@ class PageTest(PageTestBase):
                 endpoint = self.get_admin_url(Page, 'copy_page', site_1_root.pk)
                 response = self.client.post(endpoint, data)
                 self.assertEqual(response.status_code, 200)
-                self.assertObjectDoesNotExist(Page.objects.all(), node__site=site_2)
+                self.assertObjectDoesNotExist(Page.objects.all(), site=site_2)
                 self.assertEqual(
                     json.loads(response.content.decode('utf8')),
                     expected_response,
@@ -707,7 +707,7 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.node.site_id
+                endpoint += '?source_site=%s' % site_1_root.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -717,7 +717,7 @@ class PageTest(PageTestBase):
                 response = self.client.post(endpoint, data)
                 self.assertEqual(response.status_code, 200)
 
-        site_2_root = self.assertObjectExist(Page.objects.all(), node__site=site_2)
+        site_2_root = self.assertObjectExist(Page.objects.all(), site=site_2)
 
         tree = (
             (site_1_root, '0001'),
@@ -725,7 +725,8 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            self.assertEqual(self.reload(page.node).path, path)
+            page.refresh_from_db()
+            self.assertEqual(page.path, path)
 
     def test_copy_page_to_explicit_position(self):
         """
@@ -757,7 +758,8 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            self.assertEqual(self.reload(page.node).path, path)
+            page.refresh_from_db()
+            self.assertEqual(page.path, path)
 
     def test_copy_page_tree_to_explicit_position(self):
         """
@@ -809,7 +811,8 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            self.assertEqual(self.reload(page.node).path, path)
+            page.refresh_from_db()
+            self.assertEqual(page.path, path)
 
     def test_copy_self_page(self):
         """
@@ -824,12 +827,13 @@ class PageTest(PageTestBase):
         self.assertEqual(page_b.get_child_pages().count(), 2)
         page_d = page_b.get_child_pages()[1]
         page_e = page_d.get_child_pages()[0]
-        self.assertEqual(page_d.node.path, '000100010002')
-        self.assertEqual(page_e.node.path, '0001000100020001')
+        self.assertEqual(page_d.path, '000100010002')
+        self.assertEqual(page_e.path, '0001000100020001')
         page_e.delete()
         page_d.delete()
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_c)
+        page_c.refresh_from_db()
         self.assertEqual(page_c.get_child_pages().count(), 1)
         self.assertEqual(page_b.get_child_pages().count(), 1)
         page_ids = list(page_c.get_descendant_pages().values_list('pk', flat=True))
@@ -853,7 +857,7 @@ class PageTest(PageTestBase):
             self.client.post(add_endpoint, page_data2)
             page_data3 = self.get_new_page_data()
             self.client.post(add_endpoint, page_data3)
-            pages = list(Page.objects.order_by('node__path'))
+            pages = list(Page.objects.order_by('path'))
             home = pages[0]
             page1 = pages[1]
             page2 = pages[2]
@@ -958,9 +962,10 @@ class PageTest(PageTestBase):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
 
-            for page, node_path, url_path in expected_tree:
+            for page, page_path, url_path in expected_tree:
                 page._clear_internal_cache()
-                self.assertEqual(page.node.path, node_path)
+                page.refresh_from_db()
+                self.assertEqual(page.path, page_path)
                 self.assertEqual(page.get_path('en'), url_path)
 
     def test_move_page_integrity(self):
@@ -1020,7 +1025,7 @@ class PageTest(PageTestBase):
             page_child_4 = page_child_4.reload()
 
             # Ensure move worked
-            self.assertEqual(page_root.node.get_descendants().count(), 4)
+            self.assertEqual(page_root.get_descendants().count(), 4)
 
     def test_edit_page_other_site_and_language(self):
         """
@@ -1411,7 +1416,7 @@ class PageTest(PageTestBase):
         )
 
         data = {
-            'openNodes[]': [alpha.node.pk, gamma.node.pk]
+            'openNodes[]': [alpha.pk, gamma.pk]
         }
 
         with self.login_user_context(superuser):
@@ -1502,7 +1507,7 @@ class PageTest(PageTestBase):
     def test_page_tree_render_localized_page_ids(self):
         from django.db import connection
 
-        # Artificially increment the sequence number on cms_page and cms_treenode (below)
+        # Artificially increment the sequence number on cms_page (below)
         # to be > 1000, to trigger a THOUSAND_SEPARATOR localization in the
         # rendered template
 
@@ -1512,7 +1517,6 @@ class PageTest(PageTestBase):
         )
         with connection.cursor() as c:
             c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_page"')
-            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_treenode"')
 
         page = create_page(
             "child-page",
@@ -1534,26 +1538,26 @@ class PageTest(PageTestBase):
         self.assertTrue(page.id > 1000)
         self.assertTrue(sub_page.id > 1000)
 
-        self.assertTrue(page.node.id > 1000)
-        self.assertTrue(sub_page.node.id > 1000)
+        self.assertTrue(page.id > 1000)
+        self.assertTrue(sub_page.id > 1000)
 
         # make sure the rendered page tree doesn't
         # localize page or node ids
         with self.login_user_context(admin_user):
-            data = {'openNodes[]': [root.node.pk, page.node.pk], 'language': 'fr'}
+            data = {'openNodes[]': [root.pk, page.pk], 'language': 'fr'}
 
             endpoint = self.get_admin_url(PageContent, 'get_tree')
             response = self.client.get(endpoint, data=data)
 
             self.assertEqual(response.status_code, 200)
-            self.assertNotContains(response, f'parent_node={page.node.pk:,}')
-            self.assertContains(response, f'parent_node={page.node.pk}')
+            self.assertNotContains(response, f'page={page.pk:,}')
+            self.assertContains(response, f'parent_page={page.pk}')
 
         # if per chance we have localized node ids in our localstorage,
         # make sure DjangoCMS doesn't choke on them when they are passed
         # into the view
         with self.login_user_context(admin_user):
-            data = {'openNodes[]': [root.node.pk, f'{page.node.pk:,}'], 'language': 'fr'}
+            data = {'openNodes[]': [root.pk, f'{page.pk:,}'], 'language': 'fr'}
             endpoint = self.get_admin_url(PageContent, 'get_tree')
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
@@ -2675,7 +2679,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             endpoint = self.get_admin_url(Page, 'get_copy_dialog', page.pk)
-            endpoint += '?source_site=%s' % page.node.site_id
+            endpoint += '?source_site=%s' % page.site_id
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 

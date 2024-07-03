@@ -252,10 +252,8 @@ class PagePermission(AbstractPagePermission):
 
             yield from children
         elif self.grant_on & MASK_DESCENDANTS:
-            node = self.page.node
-
-            if node._has_cached_hierarchy():
-                descendants = (node.item.pk for node in node.get_cached_descendants())
+            if self.page._has_cached_hierarchy():
+                descendants = (page.pk for page in self.page.get_cached_descendants())
             else:
                 descendants = self.page.get_descendant_pages().values_list('pk', flat=True).iterator()
 

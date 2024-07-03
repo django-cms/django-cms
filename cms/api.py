@@ -219,10 +219,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
 
     if reverse_id:
-        if Page.objects.filter(reverse_id=reverse_id, node__site=site).exists():
+        if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(
+        parent=parent,
         created_by=created_by,
         changed_by=created_by,
         reverse_id=reverse_id,

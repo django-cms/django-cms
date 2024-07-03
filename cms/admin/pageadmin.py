@@ -215,7 +215,6 @@ class PageAdmin(admin.ModelAdmin):
         paste_enabled = request.GET.get('has_copy') or request.GET.get('has_cut')
         context = {
             'page': page,
-            'node': page.node,
             'opts': self.opts,
             'site': site,
             'page_is_restricted': page.has_view_restrictions(site),
@@ -1216,7 +1215,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         page = source_page_content.page
 
-        if not target_language or target_language not in get_language_list(site_id=page.node.site_id):
+        if not target_language or target_language not in get_language_list(site_id=page.site_id):
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
 
         target_page_content = page.get_content_obj(target_language, fallback=False)
@@ -1237,7 +1236,7 @@ class PageContentAdmin(admin.ModelAdmin):
         page = page_content.page
         language = page_content.language
         page_url = page.urls.get(language=page_content.language)
-        request_language = get_site_language_from_request(request, site_id=page.node.site_id)
+        request_language = get_site_language_from_request(request, site_id=page.site_id)
 
         if not self.has_delete_translation_permission(request, language, page):
             return HttpResponseForbidden(_("You do not have permission to delete this page"))
@@ -1456,10 +1455,8 @@ class PageContentAdmin(admin.ModelAdmin):
             root_pages = pages
 
         if depth == 1:
-            nodes = list(pages)
-
             for page in root_pages:
-                page._set_hierarchy(nodes)
+                page._set_hierarchy(list(pages))
                 yield render_page_row(page)
         else:
             for page in root_pages:

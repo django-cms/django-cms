@@ -139,7 +139,7 @@ def get_user_permission_level(user, site):
     except IndexError:
         # user isn't assigned to any node
         raise NoPermissionsException
-    return permission.page.node.depth
+    return permission.page.depth
 
 
 def cached_func(func):
@@ -180,13 +180,10 @@ def get_page_actions_for_user(user, site):
         .on_site(site)
         .order_by('path')
     )
-    nodes = [page.node for page in pages]
     pages_by_id = {}
-
     for page in pages:
-        if page.node.is_root():
-            page.node._set_hierarchy(nodes)
-        page.node.__dict__['item'] = page
+        if page.is_root():
+            page._set_hierarchy(pages)
         pages_by_id[page.pk] = page
 
     page_permissions = (
@@ -335,13 +332,10 @@ def get_view_restrictions(pages):
     if not pages:
         return restricted_pages
 
-    nodes = [page.node for page in pages]
     pages_by_id = {}
-
     for page in pages:
-        if page.node.is_root():
-            page.node._set_hierarchy(nodes)
-        page.node.__dict__['item'] = page
+        if page.is_root():
+            page._set_hierarchy(pages)
         pages_by_id[page.pk] = page
 
     page_permissions = PagePermission.objects.filter(

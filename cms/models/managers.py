@@ -10,7 +10,7 @@ from treebeard.mp_tree import MP_NodeManager
 
 from cms.constants import ROOT_USER_LEVEL
 from cms.exceptions import NoPermissionsException
-from cms.models.query import PageNodeQuerySet, PageQuerySet
+from cms.models.query import PageQuerySet
 from cms.utils.i18n import get_fallback_languages
 
 
@@ -71,16 +71,6 @@ class PageManager(MP_NodeManager):
         qs = qs.filter(qt | qp)
 
         return qs.distinct()
-
-
-class PageNodeManager(MP_NodeManager):
-
-    def get_queryset(self):
-        """Sets the custom queryset as the default."""
-        return PageNodeQuerySet(self.model).order_by('path')
-
-    def get_for_site(self, site):
-        return self.filter(site=site)
 
 
 class WithUserMixin:

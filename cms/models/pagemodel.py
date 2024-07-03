@@ -1,3 +1,4 @@
+import warnings
 from logging import getLogger
 from os.path import join
 
@@ -21,122 +22,15 @@ from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.exceptions import LanguageError
-from cms.models.managers import PageManager, PageNodeManager, PageUrlManager
+from cms.models.managers import PageManager, PageUrlManager
 from cms.utils import i18n
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
 logger = getLogger(__name__)
-
-
-class TreeNode(MP_Node):
-
-    parent = models.ForeignKey(
-        'self',
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        related_name='children',
-        db_index=True,
-    )
-    site = models.ForeignKey(
-        Site,
-        on_delete=models.CASCADE,
-        verbose_name=_("site"),
-        related_name='djangocms_nodes',
-        db_index=True,
-    )
-
-    objects = PageNodeManager()
-
-    class Meta:
-        app_label = 'cms'
-        ordering = ['path']
-        default_permissions = []
-
-    def __str__(self):
-        return self.path
-
-    @cached_property
-    def item(self):
-        return self.get_item()
-
-    def get_item(self):
-        # Paving the way...
-        return Page.objects.get(node=self)
-
-    @property
-    def is_branch(self):
-        return bool(self.numchild)
-
-    def get_ancestor_paths(self):
-        paths = frozenset(
-            self.path[0:pos]
-            for pos in range(0, len(self.path), self.steplen)[1:]
-        )
-        return paths
-
-    def add_child(self, **kwargs):
-        if len(kwargs) == 1 and 'instance' in kwargs:
-            kwargs['instance'].parent = self
-        else:
-            kwargs['parent'] = self
-        return super().add_child(**kwargs)
-
-    def add_sibling(self, pos=None, *args, **kwargs):
-        if len(kwargs) == 1 and 'instance' in kwargs:
-            kwargs['instance'].parent_id = self.parent_id
-        else:
-            kwargs['parent_id'] = self.parent_id
-        return super().add_sibling(*args, **kwargs)
-
-    def update(self, **data):
-        cls = self.__class__
-        cls.objects.filter(pk=self.pk).update(**data)
-
-        for field, value in data.items():
-            setattr(self, field, value)
-
-    def get_cached_ancestors(self):
-        if self._has_cached_hierarchy():
-            return self._ancestors
-        return []
-
-    def get_cached_descendants(self):
-        if self._has_cached_hierarchy():
-            return self._descendants
-        return []
-
-    def _reload(self):
-        """
-        Reload a page node from the database
-        """
-        return self.__class__.objects.get(pk=self.pk)
-
-    def _has_cached_hierarchy(self):
-        return hasattr(self, '_descendants') and hasattr(self, '_ancestors')
-
-    def _set_hierarchy(self, nodes, ancestors=None):
-        if self.is_branch:
-            self._descendants = [
-                node for node in nodes
-                if node.path.startswith(self.path) and node.depth > self.depth
-            ]
-        else:
-            self._descendants = []
-
-        if self.is_root():
-            self._ancestors = []
-        else:
-            self._ancestors = ancestors
-
-        children = (node for node in self._descendants
-                    if node.depth == self.depth + 1)
-
-        for child in children:
-            child._set_hierarchy(self._descendants, ancestors=([self] + self._ancestors))
 
 
 class Page(MP_Node):
@@ -230,13 +124,6 @@ class Page(MP_Node):
         help_text=_("Mark this page as a page type"),
     )
 
-    node_deprecated = models.ForeignKey(
-        'TreeNode',
-        related_name='cms_pages',
-        on_delete=models.CASCADE,
-        null=True,
-    )
-
     # Managers
     objects = PageManager()
 
@@ -249,8 +136,8 @@ class Page(MP_Node):
         ]
         verbose_name = _("page")
         verbose_name_plural = _("pages")
-        app_label = 'cms'
-        ordering = ['path']
+        app_label = "cms"
+        ordering = ["path"]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -275,7 +162,12 @@ class Page(MP_Node):
 
     @property
     def node(self):
-        return self.node_deprecated
+        warnings.warn(
+            "The `node` attribute is deprecated. Access the TreeNode instance attributes directly.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
+        return self
 
     @property
     def is_branch(self):
@@ -321,8 +213,12 @@ class Page(MP_Node):
 
     @cached_property
     def parent_page(self):
-        raise NotImplementedError("Use the parent attribute instead of `parent_page`.")
-        return self.get_parent_page()
+        warnings.warn(
+            "Attribute `parent_page` is deprecated. Instead use the attribute `parent`.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
+        return self.parent
 
     def has_valid_url(self, language):
         return self.urls.filter(language=language, path__isnull=False).exists()
@@ -478,7 +374,7 @@ class Page(MP_Node):
             return reverse('pages-details-by-slug', kwargs={"slug": path}) if path else None
 
     def set_tree_node(self, site, target=None, position='first-child'):
-        raise NotImplementedError("Use method add_to_tree instead of set_tree_node.")
+        raise NotImplementedError("Use method `add_to_tree` instead of `set_tree_node`.")
 
     def add_to_tree(self, position='first-child'):
         assert position in ('last-child', 'first-child', 'left', 'right')
@@ -522,6 +418,7 @@ class Page(MP_Node):
             self.parent = target_page.parent
         # Runs the SQL updates on the parent field
         self.update(parent=self.parent)
+        self.refresh_from_db(fields=('path', 'depth'))
 
         # Update the urls for the page being moved
         # and is descendants.
@@ -749,47 +646,22 @@ class Page(MP_Node):
     def get_child_pages(self):
         return self.get_children().order_by('path')
 
-        nodes = self.node.get_children()
-        pages = (
-            self
-            .__class__
-            .objects
-            .filter(node__in=nodes)
-            .order_by('node__path')
-        )
-        return pages
-
     def get_ancestor_pages(self):
         return self.get_ancestors().order_by('path')
 
-        nodes = self.node.get_ancestors()
-        pages = (
-            self
-            .__class__
-            .objects
-            .filter(node__in=nodes)
-            .order_by('node__path')
-        )
-        return pages
-
     def get_descendant_pages(self):
         return self.get_descendants().order_by('path')
-
-        nodes = self.node.get_descendants()
-        pages = (
-            self
-            .__class__
-            .objects
-            .filter(node__in=nodes)
-            .order_by('node__path')
-        )
-        return pages
 
     def get_root(self):
         return self.__class__.objects.get(path=self.path[0:self.steplen])
 
     def get_parent_page(self):
-        raise NotImplementedError("Use the parent attribute instead of get_parent_page.")
+        warnings.warn(
+            "Method `get_parent_page()` is deprecated. Instead use the `parent` attribute.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
+        return self.parent
 
     def get_languages(self):
         if self.languages:

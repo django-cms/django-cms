@@ -27,4 +27,11 @@ class Migration(migrations.Migration):
             name='node_deprecated',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='cms_pages', to='cms.treenode'),
         ),
+        migrations.RemoveField(
+            model_name='page',
+            name='node_deprecated',
+        ),
+        migrations.DeleteModel(
+            name='TreeNode',
+        ),
     ]

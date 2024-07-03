@@ -1,3 +1,5 @@
+import warnings
+
 from django import forms
 from django.apps import apps
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -35,7 +37,6 @@ from cms.models import (
     PageUser,
     PageUserGroup,
     Placeholder,
-    TreeNode,
 )
 from cms.models.permissionmodels import User
 from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION
@@ -46,6 +47,7 @@ from cms.operations.helpers import (
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.compat.forms import UserChangeForm
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
@@ -247,6 +249,7 @@ class AddPageForm(BasePageContentForm):
         widget=forms.HiddenInput(),
     )
     parent_node = forms.ModelChoiceField(
+        # TODO: rename this field to parent_page
         queryset=Page.objects.all(),
         required=False,
         widget=forms.HiddenInput(),
@@ -303,11 +306,11 @@ class AddPageForm(BasePageContentForm):
             return data
 
         if parent_page := data.get('parent_node'):
-            slug = data['slug']
+            slug = data["slug"]
             parent_path = parent_page.get_path(self._language)
             path = f"{parent_path}/{slug}" if parent_path else slug
         else:
-            path = data['slug']
+            path = data["slug"]
 
         try:
             # Validate the url
@@ -320,11 +323,11 @@ class AddPageForm(BasePageContentForm):
         except ValidationError as error:
             self.add_error("slug", error)
         else:
-            data['path'] = path
+            data["path"] = path
         return data
 
     def clean_parent_node(self):
-        parent_page = self.cleaned_data.get('parent_node')
+        parent_page = self.cleaned_data.get("parent_node")
         if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
         return parent_page
@@ -452,7 +455,8 @@ class AddPageTypeForm(AddPageForm):
         Creates the root node used to store all page types
         for the current site if it doesn't exist.
         """
-        if not (root_page := PageType.get_root_page(site=self._site)):
+        root_page = PageType.get_root_page(site=self._site)
+        if not root_page:
             root_page = Page(is_page_type=True)
             root_page.set_tree_node(self._site)
             root_page.save()
@@ -925,10 +929,18 @@ class PageTreeForm(forms.Form):
             is_page_type=self.page.is_page_type,
         )
 
-    def get_root_nodes(self):
+    def get_root_pages(self):
         # TODO: this needs to avoid using the pages accessor directly
-        nodes = TreeNode.get_root_nodes()
-        return nodes.exclude(cms_pages__is_page_type=not self.page.is_page_type)
+        pages = Page.get_root_nodes()
+        return pages.exclude(is_page_type=not self.page.is_page_type)
+
+    def get_root_nodes(self):
+        warnings.warn(
+            "Method `get_root_nodes()` is deprecated. Instead use method `get_root_pages`.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
+        return self.get_root_pages()
 
     def get_tree_options(self):
         position = self.cleaned_data["position"]
@@ -1016,7 +1028,7 @@ class CopyPageForm(PageTreeForm):
         except IndexError:
             # The user is copying a page to a site with no pages
             # Add the node as the last root node.
-            siblings = self.get_root_nodes().reverse()
+            siblings = self.get_root_pages().reverse()
             return (siblings[0], "right")
 
 

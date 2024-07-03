@@ -170,7 +170,7 @@ class CopySiteCommand(SubcommandsCommand):
         with transaction.atomic():
             for page in pages:
                 new_page = page.copy_with_descendants(
-                    target_node=None,
+                    target_page=None,
                     target_site=to_site,
                     user=user,
                 )

@@ -131,10 +131,11 @@ class PageContent(models.Model):
         verbose_name_plural = _("page contents")
         default_permissions = []
         unique_together = (('language', 'page'),)
-        app_label = 'cms'
+        # TODO: unique_together shall be replaced against:
         # constraints = [
         #     models.UniqueConstraint(fields=['language', 'page'], name='language_and_page_uniq')
         # ]
+        app_label = 'cms'
 
     def __str__(self):
         return f"{self.title} ({self.language})"
