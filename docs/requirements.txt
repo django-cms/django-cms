@@ -101,7 +101,7 @@ pyenchant==3.2.2
     # via
     #   -r requirements.in
     #   sphinxcontrib-spelling
-pygments==2.13.0
+pygments==2.15.0
     # via
     #   -r requirements.in
     #   furo
