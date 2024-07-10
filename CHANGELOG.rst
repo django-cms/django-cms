@@ -1,17 +1,31 @@
+4.1.2 (2024-07-12)
+==================
+
 Features:
 ---------
-* Performant permission calculation for pages (#7943) (6b8269e1c) -- Fabian Braun
+* More performant permission calculation for pages (#7943) (6b8269e1c) -- Fabian Braun
+* Reintroduce default_plugins setting -- Fabian Braun
+* Reintroduce page-level publish permission (just as in v4.0) -- Fabian Braun
+
+
+Bug Fixes:
+----------
+* Also use key-length of 200 for the actual cache-key of placeholders -- wfehr
+* Set toolbar direction based on toolbar language -- Fabian Braun
+* Allow viewing page settings even if change page settings is not possible -- Fabian Braun
+* Versioning-safe implementation of placeholder in heritance -- Fabian Braun
+* Only switch to structure endpoint on viewport breakpoint if in edit mode -- Fabian Braun
+* Allow special characters in page title -- Jacob Rief
+
 
 Statistics:
 -----------
 
 This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (4 pull requests)
-
-With the review help of the following contributors:
-
+* Fabian Braun (7 pull requests)
+* Jacob Rief (1 pull request)
+* wfehr (1 pull request)
 
 Thanks to all contributors for their efforts!
 
