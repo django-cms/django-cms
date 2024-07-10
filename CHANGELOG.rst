@@ -1,3 +1,20 @@
+Features:
+---------
+* Performant permission calculation for pages (#7943) (6b8269e1c) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (4 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 4.1.1 (2024-04-30)
 ==================
 
