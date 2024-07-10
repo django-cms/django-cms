@@ -111,7 +111,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
         # make sure we don't get patterns that start with more than one '^'!
         app_pat = app_pat.lstrip('^')
         path = path.lstrip('^')
-        regex = r'^%s%s' % (path, app_pat) if not nested else r'^%s' % (app_pat)
+        regex = rf'^{path}{app_pat}' if not nested else r'^%s' % (app_pat)
         if isinstance(pattern, URLResolver):
             # include default_args
             args = pattern.default_kwargs
@@ -226,12 +226,12 @@ def _get_app_patterns(site):
         page_urls
         .exclude(page__application_urls=None)
         .exclude(page__application_urls='')
-        .order_by('-page__node__path')
+        .order_by('-page__path')
         .select_related('page')
     )
 
     for page_url in page_urls:
-        mix_id = "%s:%s:%s" % (
+        mix_id = "{}:{}:{}".format(
             page_url.path + "/",
             page_url.page.application_urls,
             page_url.language,

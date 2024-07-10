@@ -1,4 +1,3 @@
-
 from django.contrib.admin import site
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string

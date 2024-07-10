@@ -1,0 +1,67 @@
+.. _upgrade-to-3.11.5:
+
+#####################
+ release notes 3.11.5
+#####################
+
+********************
+What's new in 3.11.5
+********************
+
+Features:
+---------
+
+* feat: Add Python 3.12 support -- Vinit Kumar
+* feat: django 5 support for cms 3.11 -- Leonardo Cavallucci
+* feat: Add bot to remind to not squash merges into release/* branches -- Fabian Braun
+
+Bug Fixes
+---------
+
+* fix: preserve ``view_class`` in decorated views -- Will Hoey
+* fix: avoid InvalidCacheKey (memcached) for key-length ~249 -- fwehr
+* fix: Update transifex pull strings script for v3 in alignment with v4 -- Fabian Braun
+* fix: Use correct version of Django in GitHub CI actions -- Fabian Braun
+* fix: Remove link to closed discourse channel for feature requests from issue template -- Fabian Braun
+* fix: Remove discontinued discourse server from docs -- Fabian Braun
+* fix: Add ``--fix-paths`` option to ``./manage.py cms fix-tree`` -- Fabian Braun
+* fix: readable messages in dark-mode -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun
+* fwehr
+* Leonardo Cavallucci
+* Vinit Kumar
+* Will Hoey
+
+Thanks to all contributors for their efforts!
+
+
+************************
+How to upgrade to
+************************
+
+We assume you are upgrading from django CMS 3.11.4.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.

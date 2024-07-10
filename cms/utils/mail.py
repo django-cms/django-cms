@@ -14,7 +14,7 @@ def send_mail(subject, txt_template, to, context=None, html_template=None, fail_
 
     context = context or {}
     context.update({
-        'login_url': "http://%s" % urljoin(site.domain, admin_reverse('index')),
+        'login_url': "https://%s" % urljoin(site.domain, admin_reverse('index')),
         'title': subject,
     })
 

@@ -95,6 +95,7 @@ def get_site(request):
     return site
 
 
+@admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
     change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
@@ -149,8 +150,8 @@ class PageAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         site = get_site(request)
         queryset = super().get_queryset(request)
-        queryset = queryset.filter(node__site=site)
-        return queryset.select_related('node')
+        queryset = queryset.filter(site=site)
+        return queryset
 
     def get_page_from_id(self, page_id):
         page_id = self.model._meta.pk.to_python(page_id)
@@ -164,9 +165,9 @@ class PageAdmin(admin.ModelAdmin):
     def get_urls(self):
         """Get the admin urls
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
         url_patterns = [
             pat(r'^list/$', self.get_list),
@@ -214,7 +215,6 @@ class PageAdmin(admin.ModelAdmin):
         paste_enabled = request.GET.get('has_copy') or request.GET.get('has_cut')
         context = {
             'page': page,
-            'node': page.node,
             'opts': self.opts,
             'site': site,
             'page_is_restricted': page.has_view_restrictions(site),
@@ -383,7 +383,7 @@ class PageAdmin(admin.ModelAdmin):
                     'value': str(obj_id),
                 })
                 return TemplateResponse(request, self.popup_response_template or [
-                    'admin/%s/%s/popup_response.html' % (opts.app_label, opts.model_name),
+                    f'admin/{opts.app_label}/{opts.model_name}/popup_response.html',
                     'admin/%s/popup_response.html' % opts.app_label,
                     'admin/popup_response.html',
                 ], {'popup_response_data': popup_response_data})
@@ -444,11 +444,11 @@ class PageAdmin(admin.ModelAdmin):
 
         cms_pages = [obj]
 
-        if obj.node.is_branch:
-            nodes = obj.node.get_descendants()
-            cms_pages.extend(self.model.objects.filter(node__in=nodes))
+        if obj.is_branch:
+            descendant_ids = obj.get_descendants().values_list('id', flat=True)
+            cms_pages.extend(self.model.objects.filter(id__in=descendant_ids))
 
-        # Delete all of the pages titles contents
+        # Delete all associated pages contents
         ct_page_content = ContentType.objects.get_for_model(PageContent)
         page_content_objs = PageContent.objects.filter(page__in=cms_pages)
         placeholders = Placeholder.objects.filter(
@@ -645,13 +645,14 @@ class PageAdmin(admin.ModelAdmin):
         )
 
         if not can_change_global_permissions:
-            allowed_pages = frozenset(page_permissions.get_change_id_list(user, site, check_global=False))
+            allowed_pages = page_permissions.get_change_perm_tuples(user, site, check_global=False)
 
         for permission in _page_permissions.iterator():
             if can_change_global_permissions:
                 can_change = True
             else:
-                can_change = permission.page_id in allowed_pages
+                page_path = permission.page.node.path
+                can_change = any(perm_tuple.contains(page_path) for perm_tuple in allowed_pages)
 
             row = PermissionRow(
                 is_global=False,
@@ -784,8 +785,9 @@ class PageAdmin(admin.ModelAdmin):
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
+@admin.register(PageContent)
 class PageContentAdmin(admin.ModelAdmin):
-    ordering = ('page__node__path',)
+    ordering = ('page__path',)
     search_fields = ('=id', 'page__id', 'page__urls__slug', 'title', 'page__reverse_id')
     change_form_template = "admin/cms/page/change_form.html"
     change_list_template = "admin/cms/page/tree/base.html"
@@ -846,15 +848,15 @@ class PageContentAdmin(admin.ModelAdmin):
         site = get_site(request)
         languages = get_language_list(site.pk)
         queryset = super().get_queryset(request)
-        queryset = queryset.filter(language__in=languages, page__node__site=site)
-        return queryset.select_related('page__node')
+        queryset = queryset.filter(language__in=languages, page__site=site)
+        return queryset
 
     def get_urls(self):
         """Get the admin urls
         """
-        info = "%s_%s" % (self.model._meta.app_label, self.model._meta.model_name)
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
         def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name='%s_%s' % (info, fn.__name__))
+            return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
         url_patterns = [
             pat(r'^get-tree/$', self.get_tree),
@@ -925,7 +927,7 @@ class PageContentAdmin(admin.ModelAdmin):
             extra_context.update({
                 'title': _("Add Page Copy"),
             })
-        elif 'parent_node' in request.GET:
+        elif 'parent_page' in request.GET:
             extra_context.update({
                 'title': _("New sub page"),
             })
@@ -1008,12 +1010,10 @@ class PageContentAdmin(admin.ModelAdmin):
 
     def _has_add_permission_from_request(self, request):
         site = get_site(request)
-        parent_node_id = request.GET.get('parent_node')
-
-        if parent_node_id:
+        if parent_id := request.GET.get('parent_page'):
             try:
-                parent_node_id = IntegerField().clean(parent_node_id)
-                parent_item = Page.objects.get(node=parent_node_id)
+                parent_id = IntegerField().clean(parent_id)
+                parent_item = Page.objects.get(id=parent_id)
             except (ValidationError, Page.DoesNotExist):
                 return False
         else:
@@ -1046,7 +1046,7 @@ class PageContentAdmin(admin.ModelAdmin):
             return page_permissions.user_can_change_page(request.user, page=obj.page, site=site)
         can_change_page = page_permissions.user_can_change_at_least_one_page(
             user=request.user,
-            site=get_site(request),
+            site=site,
             use_cache=False,
         )
         return can_change_page
@@ -1138,7 +1138,7 @@ class PageContentAdmin(admin.ModelAdmin):
             .on_site(site)
             .filter(pagecontent_set__in=page_contents)
             .distinct()
-            .order_by('node__path')
+            .order_by('path')
         )
         pages = pages.prefetch_related(
             Prefetch(
@@ -1216,7 +1216,7 @@ class PageContentAdmin(admin.ModelAdmin):
 
         page = source_page_content.page
 
-        if not target_language or target_language not in get_language_list(site_id=page.node.site_id):
+        if not target_language or target_language not in get_language_list(site_id=page.site_id):
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
 
         target_page_content = page.get_content_obj(target_language, fallback=False)
@@ -1237,7 +1237,7 @@ class PageContentAdmin(admin.ModelAdmin):
         page = page_content.page
         language = page_content.language
         page_url = page.urls.get(language=page_content.language)
-        request_language = get_site_language_from_request(request, site_id=page.node.site_id)
+        request_language = get_site_language_from_request(request, site_id=page.site_id)
 
         if not self.has_delete_translation_permission(request, language, page):
             return HttpResponseForbidden(_("You do not have permission to delete this page"))
@@ -1329,7 +1329,7 @@ class PageContentAdmin(admin.ModelAdmin):
         context.update(extra_context or {})
         request.current_app = self.admin_site.name
         return render(request, self.delete_confirmation_template or [
-            "admin/%s/%s/delete_confirmation.html" % (app_label, titleopts.object_name.lower()),
+            f"admin/{app_label}/{titleopts.object_name.lower()}/delete_confirmation.html",
             "admin/%s/delete_confirmation.html" % app_label,
             "admin/delete_confirmation.html"
         ], context)
@@ -1365,23 +1365,17 @@ class PageContentAdmin(admin.ModelAdmin):
         Used for lazy loading pages in cms.pagetree.js
         """
         site = get_site(request)
-        pages = Page.objects.on_site(site).order_by('node__path')
+        pages = Page.objects.on_site(site).order_by('path')
         node_id = re.sub(r'[^\d]', '', request.GET.get('nodeId', '')) or None
-        open_nodes = list(map(
-            int,
-            [re.sub(r'[^\d]', '', node) for node in
-             request.GET.getlist('openNodes[]')]
-        ))
+        open_page_ids = [int(id) for id in request.GET.getlist('openNodes[]') if id.isdigit()]
         if node_id:
-            page = get_object_or_404(pages, node_id=int(node_id))
-            pages = page.get_descendant_pages().filter(Q(node__in=open_nodes) | Q(node__parent__in=open_nodes))
+            page = get_object_or_404(pages, id=node_id)
+            pages = page.get_descendant_pages().filter(Q(id__in=open_page_ids) | Q(parent__in=open_page_ids))
         else:
             page = None
             pages = pages.filter(
-                # get all root nodes
-                # or children which were previously open
-                # or children of the open descendants
-                Q(node__depth=1) | Q(node__depth=2, node__in=open_nodes) | Q(node__parent__in=open_nodes)
+                # get all root pages or children which were previously open or children of the open descendants
+                Q(depth=1) | Q(depth=2, id__in=open_page_ids) | Q(parent__in=open_page_ids)
             )
         pages = pages.prefetch_related(
             Prefetch(
@@ -1394,7 +1388,7 @@ class PageContentAdmin(admin.ModelAdmin):
             request,
             pages=pages,
             language=get_site_language_from_request(request, site_id=site.pk),
-            depth=(page.node.depth + 1 if page else 1),
+            depth=(page.depth + 1 if page else 1),
             follow_descendants=True,
         )
         return HttpResponse(''.join(rows))
@@ -1437,9 +1431,8 @@ class PageContentAdmin(admin.ModelAdmin):
                 'site': site,
                 'page': page,
                 'page_content': page.get_content_obj(language, fallback=False),  # Show specific language
-                'node': page.node,
-                'ancestors': [node.item for node in page.node.get_cached_ancestors()],
-                'descendants': [node.item for node in page.node.get_cached_descendants()],
+                'ancestors': [page for page in page.get_cached_ancestors()],
+                'descendants': [page for page in page.get_cached_descendants()],
                 'request': request,
                 'lang': language,
                 'metadata': metadata,
@@ -1457,24 +1450,17 @@ class PageContentAdmin(admin.ModelAdmin):
             return template.render(context)
 
         if follow_descendants:
-            root_pages = (page for page in pages if page.node.depth == depth)
+            root_pages = (page for page in pages if page.depth == depth)
         else:
             # When the tree is filtered, it's displayed as a flat structure
             root_pages = pages
 
         if depth == 1:
-            nodes = []
-
-            for page in pages:
-                page.node.__dict__['item'] = page
-                nodes.append(page.node)
-
             for page in root_pages:
-                page.node._set_hierarchy(nodes)
+                page._set_hierarchy(list(pages))
                 yield render_page_row(page)
         else:
             for page in root_pages:
-                page.node.__dict__['item'] = page
                 yield render_page_row(page)
 
     # Indicators in the page tree
@@ -1501,5 +1487,3 @@ class PageContentAdmin(admin.ModelAdmin):
         return "", []
 
 
-admin.site.register(Page, PageAdmin)
-admin.site.register(PageContent, PageContentAdmin)

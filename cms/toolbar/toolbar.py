@@ -56,7 +56,7 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def site_language(self):
         cms_page = self.request.current_page
-        site_id = cms_page.node.site_id if cms_page else None
+        site_id = cms_page.site_id if cms_page else None
         return get_site_language_from_request(self.request, site_id)
 
     @cached_property
@@ -559,7 +559,7 @@ class CMSToolbarBase(BaseToolbar):
             # render the toolbar content
             toolbar = render_to_string('cms/toolbar/toolbar_with_structure.html', flatten_context(context))
         # return the toolbar content and the content below
-        return '%s\n%s' % (toolbar, rendered_contents)
+        return f'{toolbar}\n{rendered_contents}'
 
 
 # Add toolbar mixins from extensions to toolbar

@@ -94,7 +94,7 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         .objects
         .get_for_site(site)
         .filter(path=path)
-        .select_related('page__node')
+        .select_related('page')
     )
     page_urls = list(page_urls)  # force queryset evaluation to save 1 query
     try:
@@ -126,6 +126,6 @@ def get_available_slug(site, path, language, suffix='copy', modified=False):
             slug += '-' + suffix + '-2'
         else:
             slug += '-2'
-        path = '%s/%s' % (base, slug) if base else slug
+        path = f'{base}/{slug}' if base else slug
         return get_available_slug(site, path, language, suffix, modified=True)
     return slug
