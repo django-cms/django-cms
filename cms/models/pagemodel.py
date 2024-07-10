@@ -136,8 +136,8 @@ class Page(MP_Node):
         ]
         verbose_name = _("page")
         verbose_name_plural = _("pages")
-        app_label = "cms"
-        ordering = ["path"]
+        app_label = 'cms'
+        ordering = ['path']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -452,13 +452,21 @@ class Page(MP_Node):
         models.query.QuerySet.delete(plugins)
         return placeholders
 
-    def copy(self, site, parent_page=None, language=None,
+    def copy(self, site, parent_page=None, parent_node=None, language=None,
              translations=True, permissions=False, extensions=True, user=None):
         from cms.models import PageContent
         from cms.utils.page import get_available_slug
 
         assert parent_page is None or isinstance(parent_page, Page), f"{parent_page} is not an instance of Page."
         assert isinstance(user, get_user_model()), f"{user} is not an instance of User."
+
+        if parent_node is not None:
+            warnings.warn(
+                "Argument `parent_node` is deprecated. Use `parent_page` instead.",
+                RemovedInDjangoCMS43Warning,
+                stacklevel=2,
+            )
+            parent_page = parent_page or parent_node
 
         if parent_page:
             new_page = parent_page.add_child(site=site)

@@ -500,7 +500,7 @@ class PageToolbar(CMSToolbar):
 
                 for code, name in add:
                     url = add_url_parameters(
-                        page_add_url, cms_page=self.page.pk, parent_node=self.page.id, language=code
+                        page_add_url, cms_page=self.page.pk, parent_page=self.page.id, language=code
                     )
                     add_plugins_menu.add_modal_item(name, url=url)
 
@@ -572,7 +572,7 @@ class PageToolbar(CMSToolbar):
                 PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
 
             new_page_params = {'edit': 1}
-            new_sub_page_params = {'edit': 1, 'parent_node': self.page.id}
+            new_sub_page_params = {'edit': 1, 'parent_page': self.page.id}
 
             add_page_url = admin_reverse('cms_pagecontent_add')
             advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
@@ -585,7 +585,7 @@ class PageToolbar(CMSToolbar):
             )
 
             if self.page.parent:
-                new_page_params['parent_node'] = self.page.parent.id
+                new_page_params['parent_page'] = self.page.parent.id
                 can_add_sibling_page = page_permissions.user_can_add_subpage(
                     user=self.request.user,
                     target=self.page.parent,

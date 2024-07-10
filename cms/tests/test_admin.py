@@ -580,7 +580,7 @@ class AdminFormsTests(AdminTestsBase):
         new_page_data = {
             'title': 'Title',
             'slug': 'slug',
-            'parent_node': parent_page.pk,
+            'parent_page': parent_page.pk,
         }
         with self.login_user_context(superuser):
             # Invalid parent
@@ -601,7 +601,7 @@ class AdminFormsTests(AdminTestsBase):
         new_page_data = {
             'title': 'Title',
             'slug': 'home',
-            'parent_node': page1.pk,
+            'parent_page': page1.pk,
         }
         endpoint = self.get_page_add_uri('en')
 

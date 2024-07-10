@@ -248,8 +248,7 @@ class AddPageForm(BasePageContentForm):
         required=False,
         widget=forms.HiddenInput(),
     )
-    parent_node = forms.ModelChoiceField(
-        # TODO: rename this field to parent_page
+    parent_page = forms.ModelChoiceField(
         queryset=Page.objects.all(),
         required=False,
         widget=forms.HiddenInput(),
@@ -305,7 +304,8 @@ class AddPageForm(BasePageContentForm):
             # addressed first.
             return data
 
-        if parent_page := data.get('parent_node'):
+        parent_page = data.get("parent_page")
+        if parent_page:
             slug = data["slug"]
             parent_path = parent_page.get_path(self._language)
             path = f"{parent_path}/{slug}" if parent_path else slug
@@ -326,8 +326,8 @@ class AddPageForm(BasePageContentForm):
             data["path"] = path
         return data
 
-    def clean_parent_node(self):
-        parent_page = self.cleaned_data.get("parent_node")
+    def clean_parent_page(self):
+        parent_page = self.cleaned_data.get("parent_page")
         if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
         return parent_page
@@ -377,7 +377,7 @@ class AddPageForm(BasePageContentForm):
     def save(self, *args, **kwargs):
         page = self.cleaned_data.get("cms_page")
         source = self.cleaned_data.get("source")
-        parent = self.cleaned_data.get("parent_node")
+        parent = self.cleaned_data.get("parent_page")
 
         operation_token = send_pre_page_operation(
             request=self._request,
@@ -472,22 +472,22 @@ class AddPageTypeForm(AddPageForm):
             )
         return root_page
 
-    def clean_parent_node(self):
-        parent_node = super().clean_parent_node()
+    def clean_parent_page(self):
+        parent_page = super().clean_parent_page()
 
-        if parent_node and not parent_node.item.is_page_type:
+        if parent_page and not parent_page.item.is_page_type:
             raise ValidationError("Parent has to be a page type.")
 
-        if not parent_node:
+        if not parent_page:
             # parent was not explicitly selected.
             # fallback to the page types root
-            parent_node = self.get_or_create_root()
-        return parent_node
+            parent_page = self.get_or_create_root()
+        return parent_page
 
     def from_source(self, source, parent=None):
         new_page = source.copy(
             site=self._site,
-            parent_node=parent,
+            parent_page=parent,
             language=self._language,
             translations=False,
             permissions=False,
@@ -930,7 +930,6 @@ class PageTreeForm(forms.Form):
         )
 
     def get_root_pages(self):
-        # TODO: this needs to avoid using the pages accessor directly
         pages = Page.get_root_nodes()
         return pages.exclude(is_page_type=not self.page.is_page_type)
 

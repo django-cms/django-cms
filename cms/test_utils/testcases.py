@@ -258,7 +258,7 @@ class BaseCMSTestCase:
         page_data = {
             'title': 'test page %d' % self.counter,
             'slug': 'test-page-%d' % self.counter,
-            'parent_node': parent_id,
+            'parent_page': parent_id,
         }
         # required only if user haves can_change_permission
         self.counter += 1
