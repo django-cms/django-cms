@@ -258,7 +258,7 @@ class BaseCMSTestCase:
         page_data = {
             'title': 'test page %d' % self.counter,
             'slug': 'test-page-%d' % self.counter,
-            'parent_node': parent_id,
+            'parent_page': parent_id,
         }
         # required only if user haves can_change_permission
         self.counter += 1
@@ -331,12 +331,12 @@ class BaseCMSTestCase:
         from cms.utils.page import get_available_slug
 
         if target_site is None:
-            target_site = target_page.node.site
+            target_site = target_page.site
 
         data = {
             'position': position,
             'target': target_page.pk,
-            'source_site': page.node.site_id,
+            'source_site': page.site_id,
             'copy_permissions': 'on',
             'copy_moderation': 'on',
         }
@@ -355,8 +355,6 @@ class BaseCMSTestCase:
             pk=response_data['id'],
         )
         self.assertObjectExist(copied_page.urls.filter(language=language), slug=new_page_slug)
-        page._clear_node_cache()
-        target_page._clear_node_cache()
         return copied_page
 
     def create_homepage(self, *args, **kwargs):
@@ -365,7 +363,7 @@ class BaseCMSTestCase:
         return homepage.reload()
 
     def move_page(self, page, target_page, position="first-child"):
-        page.move_page(target_page.node, position)
+        page.move_page(target_page, position)
         return self.reload_page(page)
 
     def reload_page(self, page):

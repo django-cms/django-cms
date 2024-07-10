@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
-from cms.models import Page, TreeNode
+from cms.models import Page
 from cms.models.managers import (
     GlobalPagePermissionManager,
     PagePermissionManager,
@@ -216,7 +216,7 @@ class GlobalPagePermission(AbstractPagePermission):
 
 
 class PermissionTuple(tuple):
-    def contains(self, path: str, steplen: int = TreeNode.steplen) -> bool:
+    def contains(self, path: str, steplen: int = Page.steplen) -> bool:
         grant_on, perm_path = self
         if grant_on == ACCESS_PAGE:
             return path == perm_path
@@ -230,7 +230,7 @@ class PermissionTuple(tuple):
             return path.startswith(perm_path) and len(path) <= len(perm_path) + steplen
         return False
 
-    def allow_list(self, filter: str = "", steplen: int = TreeNode.steplen) -> Q:
+    def allow_list(self, filter: str = "", steplen: int = Page.steplen) -> Q:
         if filter !="":
             filter = f"{filter}__"
         grant_on, path = self
@@ -298,10 +298,8 @@ class PagePermission(AbstractPagePermission):
 
             yield from children
         elif self.grant_on & MASK_DESCENDANTS:
-            node = self.page.node
-
-            if node._has_cached_hierarchy():
-                descendants = (node.item.pk for node in node.get_cached_descendants())
+            if self.page._has_cached_hierarchy():
+                descendants = (page.pk for page in self.page.get_cached_descendants())
             else:
                 descendants = self.page.get_descendant_pages().values_list('pk', flat=True).iterator()
 

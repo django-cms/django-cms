@@ -1,3 +1,5 @@
+import warnings
+
 from django import forms
 from django.apps import apps
 from django.contrib.auth import get_permission_codename, get_user_model
@@ -35,7 +37,6 @@ from cms.models import (
     PageUser,
     PageUserGroup,
     Placeholder,
-    TreeNode,
 )
 from cms.models.permissionmodels import User
 from cms.operations import ADD_PAGE_TRANSLATION, CHANGE_PAGE_TRANSLATION
@@ -46,6 +47,7 @@ from cms.operations.helpers import (
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.compat.forms import UserChangeForm
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
@@ -246,8 +248,8 @@ class AddPageForm(BasePageContentForm):
         required=False,
         widget=forms.HiddenInput(),
     )
-    parent_node = forms.ModelChoiceField(
-        queryset=TreeNode.objects.all(),
+    parent_page = forms.ModelChoiceField(
+        queryset=Page.objects.all(),
         required=False,
         widget=forms.HiddenInput(),
     )
@@ -275,7 +277,7 @@ class AddPageForm(BasePageContentForm):
         page_field = self.fields.get("cms_page")
 
         if page_field:
-            page_field.queryset = page_field.queryset.filter(node__site=self._site)
+            page_field.queryset = page_field.queryset.filter(site=self._site)
 
         root_page = PageType.get_root_page(site=self._site)
 
@@ -302,11 +304,10 @@ class AddPageForm(BasePageContentForm):
             # addressed first.
             return data
 
-        parent_node = data.get("parent_node")
-
-        if parent_node:
+        parent_page = data.get("parent_page")
+        if parent_page:
             slug = data["slug"]
-            parent_path = parent_node.item.get_path(self._language)
+            parent_path = parent_page.get_path(self._language)
             path = f"{parent_path}/{slug}" if parent_path else slug
         else:
             path = data["slug"]
@@ -325,12 +326,11 @@ class AddPageForm(BasePageContentForm):
             data["path"] = path
         return data
 
-    def clean_parent_node(self):
-        parent_node = self.cleaned_data.get("parent_node")
-
-        if parent_node and parent_node.site_id != self._site.pk:
+    def clean_parent_page(self):
+        parent_page = self.cleaned_data.get("parent_page")
+        if parent_page and parent_page.site_id != self._site.pk:
             raise ValidationError("Site doesn't match the parent's page site")
-        return parent_node
+        return parent_page
 
     def create_translation(self, page):
         data = self.cleaned_data
@@ -358,7 +358,7 @@ class AddPageForm(BasePageContentForm):
     def from_source(self, source, parent=None):
         new_page = source.copy(
             site=self._site,
-            parent_node=parent,
+            parent_page=parent,
             language=self._language,
             translations=False,
             permissions=False,
@@ -377,7 +377,7 @@ class AddPageForm(BasePageContentForm):
     def save(self, *args, **kwargs):
         page = self.cleaned_data.get("cms_page")
         source = self.cleaned_data.get("source")
-        parent = self.cleaned_data.get("parent_node")
+        parent = self.cleaned_data.get("parent_page")
 
         operation_token = send_pre_page_operation(
             request=self._request,
@@ -390,8 +390,8 @@ class AddPageForm(BasePageContentForm):
         elif source:
             new_page = self.from_source(source, parent=parent)
         else:
-            new_page = Page()
-            new_page.set_tree_node(self._site, target=parent, position="last-child")
+            new_page = Page(site=self._site, parent=parent)
+            new_page.add_to_tree(position='last-child')
             new_page.save()
 
         translation = self.create_translation(new_page)
@@ -415,8 +415,8 @@ class AddPageForm(BasePageContentForm):
                 )
 
         is_first = not (
-            TreeNode.objects.get_for_site(self._site)
-            .exclude(pk=new_page.node_id)
+            Page.objects.on_site(self._site)
+            .exclude(pk=new_page.id)
             .exists()
         )
 
@@ -456,7 +456,6 @@ class AddPageTypeForm(AddPageForm):
         for the current site if it doesn't exist.
         """
         root_page = PageType.get_root_page(site=self._site)
-
         if not root_page:
             root_page = Page(is_page_type=True)
             root_page.set_tree_node(self._site)
@@ -471,24 +470,24 @@ class AddPageTypeForm(AddPageForm):
                 path=PAGE_TYPES_ID,
                 in_navigation=False,
             )
-        return root_page.node
+        return root_page
 
-    def clean_parent_node(self):
-        parent_node = super().clean_parent_node()
+    def clean_parent_page(self):
+        parent_page = super().clean_parent_page()
 
-        if parent_node and not parent_node.item.is_page_type:
+        if parent_page and not parent_page.item.is_page_type:
             raise ValidationError("Parent has to be a page type.")
 
-        if not parent_node:
+        if not parent_page:
             # parent was not explicitly selected.
             # fallback to the page types root
-            parent_node = self.get_or_create_root()
-        return parent_node
+            parent_page = self.get_or_create_root()
+        return parent_page
 
     def from_source(self, source, parent=None):
         new_page = source.copy(
             site=self._site,
-            parent_node=parent,
+            parent_page=parent,
             language=self._language,
             translations=False,
             permissions=False,
@@ -604,15 +603,15 @@ class ChangePageForm(BasePageContentForm):
 
         slug = data["slug"]
         path_override = self.cleaned_data.get("overwrite_url")
-        parent_page = page.parent_page
 
         if path_override:
             path = path_override.strip("/")
-        elif parent_page and parent_page.is_home:
-            path = slug
-        elif parent_page:
-            base_path = parent_page.get_path(self._language)
-            path = f"{base_path}/{slug}" if base_path else None
+        elif page.parent:
+            if page.parent.is_home:
+                path = slug
+            else:
+                base_path = page.parent.get_path(self._language)
+                path = f'{base_path}/{slug}' if base_path else None
         else:
             path = slug
 
@@ -926,49 +925,49 @@ class PageTreeForm(forms.Form):
         self._site = kwargs.pop("site", Site.objects.get_current())
         super().__init__(*args, **kwargs)
         self.fields["target"].queryset = Page.objects.filter(
-            node__site=self._site,
+            site=self._site,
             is_page_type=self.page.is_page_type,
         )
 
+    def get_root_pages(self):
+        pages = Page.get_root_nodes()
+        return pages.exclude(is_page_type=not self.page.is_page_type)
+
     def get_root_nodes(self):
-        # TODO: this needs to avoid using the pages accessor directly
-        nodes = TreeNode.get_root_nodes()
-        return nodes.exclude(cms_pages__is_page_type=not self.page.is_page_type)
+        warnings.warn(
+            "Method `get_root_nodes()` is deprecated. Instead use method `get_root_pages`.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
+        return self.get_root_pages()
 
     def get_tree_options(self):
         position = self.cleaned_data["position"]
-        target_page = self.cleaned_data.get("target")
-        parent_node = target_page.node if target_page else None
-
-        if parent_node:
-            return self._get_tree_options_for_parent(parent_node, position)
+        if target_page := self.cleaned_data.get("target"):
+            return self._get_tree_options_for_parent(target_page, position)
         return self._get_tree_options_for_root(position)
 
     def _get_tree_options_for_root(self, position):
-        siblings = self.get_root_nodes().filter(site=self._site)
-
+        siblings = Page.get_root_nodes().filter(site=self._site)
         try:
-            target_node = siblings[position]
+            return siblings[position], 'left'
         except IndexError:
             # The position requested is not occupied.
             # Add the node as the last root node,
             # relative to the current site.
-            return (siblings.reverse()[0], "right")
-        return (target_node, "left")
+            return siblings.reverse()[0], 'right'
 
-    def _get_tree_options_for_parent(self, parent_node, position):
+    def _get_tree_options_for_parent(self, parent_page, position):
         if position == 0:
-            return (parent_node, "first-child")
+            return parent_page, 'first-child'
 
-        siblings = parent_node.get_children().filter(site=self._site)
-
+        siblings = parent_page.get_children().filter(site=self._site)
         try:
-            target_node = siblings[position]
+            return siblings[position], 'left'
         except IndexError:
             # The position requested is not occupied.
             # Add the node to be the parent's first child
-            return (parent_node, "last-child")
-        return (target_node, "left")
+            return parent_page, 'last-child'
 
 
 class MovePageForm(PageTreeForm):
@@ -984,30 +983,23 @@ class MovePageForm(PageTreeForm):
         return cleaned_data
 
     def get_tree_options(self):
-        options = super().get_tree_options()
-        target_node, target_node_position = options
+        target_page, target_page_position = super().get_tree_options()
+        if target_page_position != 'left':
+            return target_page, target_page_position
 
-        if target_node_position != "left":
-            return (target_node, target_node_position)
+        if self.page.path < target_page.path:
+            if self.page.is_sibling_of(target_page):
+                # The page being moved appears before the target page and is a sibling of the target node.
+                # The user is moving from left to right.
+                return target_page, 'right'
 
-        node = self.page.node
-        node_is_first = node.path < target_node.path
-
-        if node_is_first and node.is_sibling_of(target_node):
-            # The node being moved appears before the target node
-            # and is a sibling of the target node.
-            # The user is moving from left to right.
-            target_node_position = "right"
-        elif node_is_first:
-            # The node being moved appears before the target node
-            # but is not a sibling of the target node.
+            # The node being moved appears before the target node but is not a sibling of the target node.
             # The user is moving from right to left.
-            target_node_position = "left"
-        else:
-            # The node being moved appears after the target node.
-            # The user is moving from right to left.
-            target_node_position = "left"
-        return (target_node, target_node_position)
+            return target_page, 'left'
+
+        # The node being moved appears after the target node.
+        # The user is moving from right to left.
+        return target_page, 'left'
 
     def move_page(self):
         self.page.move_page(*self.get_tree_options())
@@ -1018,10 +1010,10 @@ class CopyPageForm(PageTreeForm):
     copy_permissions = forms.BooleanField(initial=False, required=False)
 
     def copy_page(self, user):
-        target, position = self.get_tree_options()
+        target_page, position = self.get_tree_options()
         copy_permissions = self.cleaned_data.get("copy_permissions", False)
         new_page = self.page.copy_with_descendants(
-            target_node=target,
+            target_page=target_page,
             position=position,
             copy_permissions=copy_permissions,
             target_site=self._site,
@@ -1035,7 +1027,7 @@ class CopyPageForm(PageTreeForm):
         except IndexError:
             # The user is copying a page to a site with no pages
             # Add the node as the last root node.
-            siblings = self.get_root_nodes().reverse()
+            siblings = self.get_root_pages().reverse()
             return (siblings[0], "right")
 
 

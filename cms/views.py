@@ -24,8 +24,7 @@ from cms.apphook_pool import apphook_pool
 from cms.cache.page import get_page_cache
 from cms.exceptions import LanguageError
 from cms.forms.login import CMSToolbarLoginForm
-from cms.models import PageContent
-from cms.models.pagemodel import TreeNode
+from cms.models import Page, PageContent
 from cms.page_rendering import (
     _handle_no_apphook,
     _handle_no_page,
@@ -84,9 +83,8 @@ def details(request, slug):
     site = get_current_site()
     page = get_page_from_request(request, use_path=slug)
     toolbar = get_toolbar_from_request(request)
-    tree_nodes = TreeNode.objects.get_for_site(site)
 
-    if not page and not slug and not tree_nodes.exists():
+    if not page and not slug and not Page.objects.on_site(site).exists():
         # render the welcome page if the requested path is root "/"
         # and there's no pages
         return _render_welcome_page(request)

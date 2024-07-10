@@ -85,10 +85,10 @@ class CreateCMSPageForm(AddPageForm):
                 "slug": [_("Cannot automatically create slug. Please provide one manually.")],
             })
 
-        parent_node = data.get('parent_node')
+        parent_page = data.get('parent_page')
 
-        if parent_node:
-            base = parent_node.item.get_path(self._language)
+        if parent_page:
+            base = parent_page.get_path(self._language)
             path = f'{base}/{slug}' if base else slug
         else:
             base = ''
@@ -101,7 +101,7 @@ class CreateCMSPageForm(AddPageForm):
             raise forms.ValidationError(_("Please provide a valid slug."))
         return data
 
-    def clean_parent_node(self):
+    def clean_parent_page(self):
         # Check to see if this user has permissions to make this page. We've
         # already checked this when producing a list of wizard entries, but this
         # is to prevent people from possible form-hacking.
@@ -109,10 +109,10 @@ class CreateCMSPageForm(AddPageForm):
             # User is adding a page which will be a direct
             # child of the current page.
             parent_page = self._page
-        elif self._page and self._page.parent_page:
+        elif self._page and self._page.parent:
             # User is adding a page which will be a right
             # sibling to the current page.
-            parent_page = self._page.parent_page
+            parent_page = self._page.parent
         else:
             parent_page = None
 
@@ -124,7 +124,7 @@ class CreateCMSPageForm(AddPageForm):
         if not has_perm:
             message = gettext('You don\'t have the permissions required to add a page.')
             raise ValidationError(message)
-        return parent_page.node if parent_page else None
+        return parent_page if parent_page else None
 
     def get_template(self):
         return get_cms_setting('PAGE_WIZARD_DEFAULT_TEMPLATE')

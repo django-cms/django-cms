@@ -95,7 +95,7 @@ class ExtensionToolbar(CMSToolbar):
             page_contents = (
                 page.pagecontent_set(manager="admin_manager")
                 .latest_content()
-                .filter(language__in=get_language_list(page.node.site_id))
+                .filter(language__in=get_language_list(page.site_id))
             )
 
             for page_content in page_contents:
