@@ -296,7 +296,7 @@ class PagePermissionManager(BasicPagePermissionManager):
         from cms.models import PermissionTuple
         allow_list = Q()
         for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
-           allow_list |= PermissionTuple(perm_tuple).allow_list("page__node")
+           allow_list |= PermissionTuple(perm_tuple).allow_list("page")
 
         # get permission set, but without objects targeting user, or any group
         # in which he can be

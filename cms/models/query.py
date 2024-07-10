@@ -7,7 +7,6 @@ from cms.exceptions import NoHomeFound
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 
 
-
 class PageQuerySet(MP_NodeQuerySet):
 
     node_warning = ("As of django CMS 4.2 the Page model does not have a node property anymore. "

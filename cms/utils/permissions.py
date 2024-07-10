@@ -180,12 +180,12 @@ def get_page_actions_for_user(user, site):
         PagePermission
         .objects
         .with_user(user)
-        .select_related('page__node')
+        .select_related('page')
         .filter(page__site=site)
     )
 
     for perm in page_permissions.iterator():
-        permission_tuple = perm.grant_on, perm.page.node.path
+        permission_tuple = perm.grant_on, perm.page.path
         for action in perm.get_configured_actions():
             actions[action].append(permission_tuple)
     return actions
@@ -262,7 +262,7 @@ def get_subordinate_users(user, site):
     from cms.models import PermissionTuple
     allow_list = Q()
     for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
-        allow_list |= PermissionTuple(perm_tuple).allow_list("pagepermission__page__node")
+        allow_list |= PermissionTuple(perm_tuple).allow_list("pagepermission__page")
 
     # normal query
     qs = get_user_model().objects.distinct().filter(
@@ -307,7 +307,7 @@ def get_subordinate_groups(user, site):
     from cms.models import PermissionTuple
     allow_list = Q()
     for perm_tuple in get_change_permissions_perm_tuples(user, site, check_global=False):
-        allow_list |= PermissionTuple(perm_tuple).allow_list("pagepermission__page__node")
+        allow_list |= PermissionTuple(perm_tuple).allow_list("pagepermission__page")
 
     return Group.objects.distinct().filter(
         (
