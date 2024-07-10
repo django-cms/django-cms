@@ -11,7 +11,6 @@ from django.db.models.functions import Concat
 from django.forms import model_to_dict
 from django.urls import reverse
 from django.utils.encoding import force_str
-from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import (
     get_language,
@@ -538,12 +537,20 @@ class Page(MP_Node):
                 new_page.pagepermission_set.bulk_create(permissions_new)
         return new_page
 
-    def copy_with_descendants(self, target_page=None, position=None,
+    def copy_with_descendants(self, target_page=None, target_node=None, position=None,
                               copy_permissions=True, target_site=None, user=None):
         """
         Copy a page [ and all its descendants to a new location ]
         """
         from cms.models import PageContent
+
+        if target_node is not None:
+            warnings.warn(
+                "Argument `parent_node` is deprecated. Use `parent_page` instead.",
+                RemovedInDjangoCMS43Warning,
+                stacklevel=2,
+            )
+            target_page = target_page or target_node
 
         if position in ('first-child', 'last-child'):
             parent_page = target_page
