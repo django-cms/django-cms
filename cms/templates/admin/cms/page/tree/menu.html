@@ -138,7 +138,7 @@
                     {% get_admin_url_for_language page preview_language as content_admin_url %}
                     <div{% if has_change_permission and has_change_advanced_settings_permission and content_admin_url %} class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay"
                         data-cms-tooltip="{% trans "Page settings (SHIFT click for advanced settings)" %}"{% endif %}>
-                        {% if content_admin_url and page_content %}
+                        {% if has_change_permission and page_content and content_admin_url %}
                         <a href="{{ content_admin_url }}"
                             class="cms-btn cms-btn-default js-cms-tree-advanced-settings cms-icon cms-icon-settings"
                             {% if has_change_advanced_settings_permission %}
@@ -149,7 +149,7 @@
                             <span class="cms-btn cms-btn-default cms-btn-disabled js-cms-tree-advanced-settings cms-icon cms-icon-settings">
                         {% endif %}
                             <span class="sr-only">{% trans "Page settings (SHIFT click for advanced settings)" %}</span>
-                        {% if has_change_permission and content_admin_url or has_change_advanced_settings_permission %}
+                        {% if has_change_permission and page_content and content_admin_url %}
                         </a>
                         {% endif %}
                     </div>

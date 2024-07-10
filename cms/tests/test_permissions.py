@@ -7,10 +7,10 @@ from cms.cache.permissions import (
     get_permission_cache,
     set_permission_cache,
 )
-from cms.models.permissionmodels import GlobalPagePermission
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils.page_permissions import (
-    get_change_id_list,
+    get_change_perm_tuples,
     user_can_publish_page,
 )
 
@@ -59,10 +59,10 @@ class PermissionCacheTests(CMSTestCase):
         cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
-        live_permissions = get_change_id_list(self.user_normal, Site.objects.get_current())
+        live_permissions = get_change_perm_tuples(self.user_normal, Site.objects.get_current())
         cached_permissions_permissions = get_permission_cache(self.user_normal,
                                                               "change_page")
-        self.assertEqual(live_permissions, [page_b.id])
+        self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.node.path)])
         self.assertEqual(cached_permissions_permissions, live_permissions)
 
     def test_cached_permission_precedence(self):
