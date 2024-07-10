@@ -646,13 +646,14 @@ class PageAdmin(admin.ModelAdmin):
         )
 
         if not can_change_global_permissions:
-            allowed_pages = frozenset(page_permissions.get_change_id_list(user, site, check_global=False))
+            allowed_pages = page_permissions.get_change_perm_tuples(user, site, check_global=False)
 
         for permission in _page_permissions.iterator():
             if can_change_global_permissions:
                 can_change = True
             else:
-                can_change = permission.page_id in allowed_pages
+                page_path = permission.page.node.path
+                can_change = any(perm_tuple.contains(page_path) for perm_tuple in allowed_pages)
 
             row = PermissionRow(
                 is_global=False,
@@ -1048,7 +1049,7 @@ class PageContentAdmin(admin.ModelAdmin):
             return page_permissions.user_can_change_page(request.user, page=obj.page, site=site)
         can_change_page = page_permissions.user_can_change_at_least_one_page(
             user=request.user,
-            site=get_site(request),
+            site=site,
             use_cache=False,
         )
         return can_change_page
