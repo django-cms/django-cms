@@ -163,7 +163,7 @@ class Page(MP_Node):
     @property
     def node(self):
         warnings.warn(
-            "The `node` attribute is deprecated. Access the TreeNode instance attributes directly.",
+            "The `node` has been removed from Page objects. Access the TreeNode attributes directly.",
             RemovedInDjangoCMS43Warning,
             stacklevel=2
         )
@@ -211,7 +211,7 @@ class Page(MP_Node):
         if hasattr(self, '_prefetched_objects_cache'):
             del self._prefetched_objects_cache
 
-    @cached_property
+    @property
     def parent_page(self):
         warnings.warn(
             "Attribute `parent_page` is deprecated. Instead use the attribute `parent`.",
@@ -374,7 +374,14 @@ class Page(MP_Node):
             return reverse('pages-details-by-slug', kwargs={"slug": path}) if path else None
 
     def set_tree_node(self, site, target=None, position='first-child'):
-        raise NotImplementedError("Use method `add_to_tree` instead of `set_tree_node`.")
+        warnings.warn(
+            "Method `set_tree_node` is deprecated. Use `add_to_tree` instead.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
+        self.site = site
+        self.parent = target
+        return self.add_to_tree(position=position)
 
     def add_to_tree(self, position='first-child'):
         assert position in ('last-child', 'first-child', 'left', 'right')

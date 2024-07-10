@@ -7,7 +7,11 @@ from cms.exceptions import NoHomeFound
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 
 
+
 class PageQuerySet(MP_NodeQuerySet):
+
+    node_warning = ("As of django CMS 4.2 the Page model does not have a node property anymore. "
+                    "Use the related fields directly.")
 
     def get_descendants(self, parent=None):
         if parent is None:
@@ -50,13 +54,12 @@ class PageQuerySet(MP_NodeQuerySet):
         for f in fieldnames:
             if isinstance(f, str) and f.startswith('node'):
                 warnings.warn(
-                    "As of django CMS 4.2 the Page model does not have a node property anymore.",
+                    self.node_warning,
                     RemovedInDjangoCMS43Warning,
                     stacklevel=2,
                 )
-                if f == 'node':
-                    continue
-                modified.append(f.replace('node__', ''))
+                if f != 'node':
+                    modified.append(f.replace('node__', ''))
             else:
                 modified.append(f)
         return super().select_related(*modified)
@@ -66,8 +69,8 @@ class PageQuerySet(MP_NodeQuerySet):
         for key, val in kwargs.items():
             if isinstance(key, str) and key.startswith('node'):
                 warnings.warn(
+                    self.node_warning,
                     RemovedInDjangoCMS43Warning,
-                    "As of django CMS 4.2 the Page model does not have a node property anymore.",
                     stacklevel=2,
                 )
                 if key == 'node':
@@ -82,8 +85,8 @@ class PageQuerySet(MP_NodeQuerySet):
         for f in fieldnames:
             if isinstance(f, str) and f.startswith("node__"):
                 warnings.warn(
+                    self.node_warning,
                     RemovedInDjangoCMS43Warning,
-                    "As of django CMS 4.2 the Page model does not have a node property anymore.",
                     stacklevel=2,
                 )
                 modified.append(f[6:])

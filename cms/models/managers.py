@@ -21,10 +21,6 @@ class PageManager(MP_NodeManager):
         """
         return PageQuerySet(self.model)
 
-    # !IMPORTANT: following methods always return access to draft instances,
-    # take care on what you do one them. use Page.objects.public() for accessing
-    # the published page versions
-
     # Just some of the queryset methods are implemented here, access queryset
     # for more getting more supporting methods.
 

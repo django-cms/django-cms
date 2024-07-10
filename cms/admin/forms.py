@@ -470,7 +470,7 @@ class AddPageTypeForm(AddPageForm):
                 path=PAGE_TYPES_ID,
                 in_navigation=False,
             )
-        return root_page.node
+        return root_page
 
     def clean_parent_node(self):
         parent_node = super().clean_parent_node()

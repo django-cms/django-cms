@@ -213,9 +213,9 @@ def has_global_permission(user, site, action, use_cache=True):
 
 def has_page_permission(user, page, action, use_cache=True):
     if use_cache:
-        actions = get_page_actions_for_user(user, page.node.site)
+        actions = get_page_actions_for_user(user, page.site)
     else:
-        actions = get_page_actions_for_user.without_cache(user, page.node.site)
+        actions = get_page_actions_for_user.without_cache(user, page.site)
     return page.pk in actions[action]
 
 
