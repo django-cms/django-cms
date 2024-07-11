@@ -1,5 +1,4 @@
 import typing
-from typing import Optional
 
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.utils.functional import SimpleLazyObject
@@ -87,19 +86,24 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
     Returns:
         A CMSNavigationNode instance.
     """
-    if fallbacks is None:
-        fallbacks = []
+    for lang in [language] + (fallbacks or []):
+        page_content: PageContent = page.page_content_cache.get(lang)
+        if page_content:
+            break
+    else:
+        # No translation found
+        return None
 
     # These are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
     attr = {
         "is_page": True,
-        "soft_root": page.get_soft_root(language),
+        "soft_root": page_content.soft_root,
         "auth_required": page.login_required,
         "reverse_id": page.reverse_id,
     }
 
-    limit_visibility_in_menu = page.get_limit_visibility_in_menu(language)
+    limit_visibility_in_menu = page_content.limit_visibility_in_menu
 
     if limit_visibility_in_menu is constants.VISIBILITY_ALL:
         attr["visible_for_authenticated"] = True
@@ -138,31 +142,25 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
     if exts:
         attr["navigation_extenders"] = exts
 
-    for lang in [language] + fallbacks:
-        translation = page.page_content_cache.get(lang)
+    page_url = page.urls_cache[lang]
+    # Do we have a redirectURL?
+    attr["redirect_url"] = page_content.redirect  # save redirect URL if any
 
-        if translation:
-            page_url = page.urls_cache[lang]
-            # Do we have a redirectURL?
-            attr["redirect_url"] = translation.redirect  # save redirect URL if any
-
-            # Now finally, build the NavigationNode object and return it.
-            # The parent_id is manually set by the menu get_nodes method.
-            if endpoint:
-                url = get_object_preview_url(translation)
-            else:
-                url = translation.get_absolute_url()
-            ret_node = CMSNavigationNode(
-                title=translation.menu_title or translation.title,
-                url=url,
-                id=page.pk,
-                attr=attr,
-                visible=page.get_in_navigation(translation.language),
-                path=page_url.path or page_url.slug,
-                language=(translation.language if translation.language != language else None),
-            )
-            return ret_node
-    return None
+    # Now finally, build the NavigationNode object and return it.
+    # The parent_id is manually set by the menu get_nodes method.
+    if endpoint:
+        url = get_object_preview_url(page_content)
+    else:
+        url = page.get_absolute_url(language=page_content.language)
+    return CMSNavigationNode(
+        title=page_content.menu_title or page_content.title,
+        url=url,
+        id=page.pk,
+        attr=attr,
+        visible=page.get_in_navigation(page_content.language),
+        path=page_url.path or page_url.slug,
+        language=(page_content.language if page_content.language != language else None),
+    )
 
 
 class CMSNavigationNode(NavigationNode):
