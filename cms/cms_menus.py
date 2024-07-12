@@ -157,7 +157,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
         url=url,
         id=page.pk,
         attr=attr,
-        visible=page.get_in_navigation(page_content.language),
+        visible=page_content.in_navigation,
         path=page_url.path or page_url.slug,
         language=(page_content.language if page_content.language != language else None),
     )
@@ -260,13 +260,11 @@ class CMSMenu(Menu):
             queryset=translations_qs,
         )
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
-        # Build the blank title instances only once
-        blank_page_content_cache = {language: EmptyPageContent(language=language) for language in languages}
-
+  
         def _page_to_node(page):
-            # EmptyPageContent is used to prevent the cms from trying
-            # to find a translation in the database
-            page.page_content_cache = blank_page_content_cache.copy()
+            # We're only filling the existing urls and page contents into the cache
+            # Access the cache directly to not lead to a db hit when accessing
+            # non-existing languages
 
             for page_url in page.filtered_urls:
                 page.urls_cache[page_url.language] = page_url
@@ -285,11 +283,9 @@ class CMSMenu(Menu):
 
         menu_nodes = []
 
+        cut_homepage = homepage and not homepage.get_in_navigation(lang)
         for page in pages:
             if menu_node := _page_to_node(page):
-                # Only add pages with at least one page content
-                cut_homepage = homepage and not homepage.get_in_navigation(lang)
-
                 if cut_homepage and page.parent_id == homepage.pk:
                     # When the homepage is hidden from navigation,
                     # we need to cut all its direct children from it.
