@@ -1,11 +1,11 @@
-import typing
+from typing import Optional
 
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.utils.functional import SimpleLazyObject
 
 from cms import constants
 from cms.apphook_pool import apphook_pool
-from cms.models import EmptyPageContent, PageContent, PagePermission, PageUrl
+from cms.models import EmptyPageContent, Page, PageContent, PagePermission, PageUrl
 from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
@@ -18,6 +18,16 @@ from cms.utils.page import get_page_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
 from menus.base import Menu, Modifier, NavigationNode
 from menus.menu_pool import menu_pool
+
+
+def _get_content_for_page(page, languages):
+    page_content = EmptyPageContent(language=languages[0], page=page)
+    lang_index = len(languages)
+    for trans in page.filtered_translations:
+        if trans.language in languages and languages.index(trans.language) < lang_index:
+            lang_index = languages.index(trans.language)
+            page_content = trans
+    return page_content
 
 
 def get_visible_nodes(request, pages, site):
@@ -73,7 +83,12 @@ def get_visible_nodes(request, pages, site):
     return [page for page in pages if user_can_see_page(page)]
 
 
-def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=False):
+def get_menu_node_for_page(
+    renderer,
+    page: Page,
+    languages: list[str],
+    endpoint: bool = False,
+) -> Optional["CMSNavigationNode"]:
     """
     Transform a CMS page into a navigation node.
 
@@ -86,13 +101,12 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
     Returns:
         A CMSNavigationNode instance.
     """
-    for lang in [language] + (fallbacks or []):
-        page_content: PageContent = page.page_content_cache.get(lang)
-        if page_content:
-            break
-    else:
-        # No translation found
+
+    page_content = _get_content_for_page(page, languages)
+    if page_content is None:
         return None
+
+    lang = page_content.language
 
     # These are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
@@ -121,14 +135,14 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
             extenders.append(f"{page.navigation_extenders}:{page.pk}")
     # Is this page an apphook? If so, we need to handle the apphooks's nodes
     # Only run this if we have a translation in the requested language for this
-    # object. The title cache should have been prepopulated in CMSMenu.get_nodes
+    # object. The page content cache should have been prepopulated in CMSMenu.get_nodes
     # but otherwise, just request the title normally
-    if page.page_content_cache.get(language) and page.application_urls:
+    if page_content.language == languages[0] and page.application_urls:
         # it means it is an apphook
         app = apphook_pool.get_apphook(page.application_urls)
 
         if app:
-            extenders += app.get_menus(page, language)
+            extenders += app.get_menus(page, languages[0])
     exts = []
     for ext in extenders:
         if hasattr(ext, "get_instances"):
@@ -159,7 +173,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
         attr=attr,
         visible=page_content.in_navigation,
         path=page_url.path or page_url.slug,
-        language=(page_content.language if page_content.language != language else None),
+        language=(page_content.language if page_content.language != languages[0] else None),
     )
 
 
@@ -172,7 +186,7 @@ class CMSNavigationNode(NavigationNode):
         language: The language used for the node (optional).
     """
 
-    def __init__(self, *args, path: str, language: typing.Optional[str] = None, **kwargs):
+    def __init__(self, *args, path: str, language: Optional[str] = None, **kwargs):
         """
         Initializes a CMSNavigationNode instance.
 
@@ -238,11 +252,6 @@ class CMSMenu(Menu):
         if not pages:
             return []
 
-        try:
-            homepage = [page for page in pages if page.is_home][0]
-        except IndexError:
-            homepage = None
-
         urls_lookup = Prefetch(
             "urls",
             to_attr="filtered_urls",
@@ -260,7 +269,7 @@ class CMSMenu(Menu):
             queryset=translations_qs,
         )
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
-  
+
         def _page_to_node(page):
             # We're only filling the existing urls and page contents into the cache
             # Access the cache directly to not lead to a db hit when accessing
@@ -269,24 +278,27 @@ class CMSMenu(Menu):
             for page_url in page.filtered_urls:
                 page.urls_cache[page_url.language] = page_url
 
-            for trans in page.filtered_translations:
-                page.page_content_cache[trans.language] = trans
-
             menu_node = get_menu_node_for_page(
                 self.renderer,
                 page,
-                language=lang,
-                fallbacks=fallbacks,
+                languages=languages,
                 endpoint=toolbar.preview_mode_active or toolbar.edit_mode_active,
             )
             return menu_node
 
         menu_nodes = []
+        try:
+            homepage = [page for page in pages if page.is_home][0]
+            homepage_content = _get_content_for_page(homepage, languages)
+            cut_homepage = homepage_content and not homepage_content.in_navigation
+            homepage_pk = homepage.pk
+        except IndexError:
+            homepage_pk = None
+            cut_homepage = False
 
-        cut_homepage = homepage and not homepage.get_in_navigation(lang)
         for page in pages:
             if menu_node := _page_to_node(page):
-                if cut_homepage and page.parent_id == homepage.pk:
+                if page.parent_id == homepage_pk and cut_homepage:
                     # When the homepage is hidden from navigation,
                     # we need to cut all its direct children from it.
                     menu_node.parent_id = None
