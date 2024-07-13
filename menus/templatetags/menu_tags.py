@@ -25,23 +25,20 @@ class NOT_PROVIDED:
     pass
 
 
-def cut_after(node, levels, removed):
+def cut_after(node, levels, removed=None):
     """
     given a tree of nodes cuts after N levels
     """
+    if removed is not None:
+        raise TypeError("menus.template_tags.cut_after() does not accept 'removed' list argument")
     if levels == 0:
-        removed.extend(node.children)
         node.children = []
     else:
-        removed_local = []
         for child in node.children:
             if child.visible:
-                cut_after(child, levels - 1, removed)
+                cut_after(child, levels - 1)
             else:
-                removed_local.append(child)
-        for removed_child in removed_local:
-            node.children.remove(removed_child)
-        removed.extend(removed_local)
+                node.children.remove(child)
 
 
 def remove(node, removed):
@@ -85,7 +82,7 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
         for node in nodes:
             if not node.selected and not node.ancestor:
                 # Cut out inactive nodes after extra_inactive levels
-                cut_after(node, extra_inactive - from_level, [])
+                cut_after(node, extra_inactive - from_level)
             elif not node.selected:
                 # Look for more inactive nodes (children of selected nodes are descendants by definition)
                 recursive_cut(node.children)
@@ -93,7 +90,7 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     if extra_inactive is not None:
         recursive_cut(final)
     if selected and extra_active < 1000:  # 1000 is the default value - no cut
-        cut_after(selected, extra_active, [])
+        cut_after(selected, extra_active)
     return final
 
 
@@ -227,7 +224,7 @@ class ShowSubMenu(InclusionTag):
 
         nodes = menu_renderer.get_nodes()
         children = []
-        # adjust root_level so we cut before the specified level, not after
+        # adjust root_level, so we cut before the specified level, not after
         include_root = False
         if root_level is not None and root_level > 0:
             root_level -= 1
@@ -243,11 +240,11 @@ class ShowSubMenu(InclusionTag):
             # is a node selected on the root_level specified
             root_selected = (node.selected and node.level == root_level)
             if is_root_ancestor or root_selected:
-                cut_after(node, levels, [])
+                cut_after(node, levels)
                 children = node.children
                 for child in children:
                     if child.sibling:
-                        cut_after(child, nephews, [])
+                        cut_after(child, nephews)
                         # if root_level was 0 we need to give the menu the entire tree
                     # not just the children
                 if include_root:
