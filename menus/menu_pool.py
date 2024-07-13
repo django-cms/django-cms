@@ -204,9 +204,35 @@ class MenuRenderer:
         return final_nodes
 
     def _mark_selected(self, nodes):
+        root_nodes = [node for node in nodes if not node.parent]
         for node in nodes:
-            node.selected = node.is_selected(self.request)
+            if node.is_selected(self.request):
+                node.selected = True
+                self._mark_ancestors(node)
+                self._mark_descendants(node)
+                self._mark_siblings(node, root_nodes)
+                return nodes
         return nodes
+
+    def _mark_ancestors(self, node):
+        while node.parent:
+            node = node.parent
+            node.ancestor = True
+
+    def _mark_descendants(self, node):
+        for child in node.children:
+            child.descendant = True
+            self._mark_descendants(child)
+
+    def _mark_siblings(self, node, root_nodes):
+        if node.parent:
+            for sibling in node.parent.children:
+                if sibling != node:
+                    sibling.sibling = True
+        else:
+            for sibling in root_nodes:
+                if sibling != node:
+                    sibling.sibling = True
 
     def apply_modifiers(self, nodes, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
         if not post_cut:

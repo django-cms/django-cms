@@ -1,3 +1,4 @@
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from menus.base import Modifier
 from menus.menu_pool import menu_pool
 
@@ -10,6 +11,19 @@ class Marker(Modifier):
     - descendants (bool): Whether descendants of the current node are marked.
     - ancestors (bool): Whether ancestors of the current node are marked.
     """
+
+    def __init__(self, *args, **kwargs):
+        import warnings
+
+        warnings.warn(
+            "The Marker modifier is deprecated and will be removed. The functionality is now provided "
+            "by the menu_pool itself.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
+
+
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         """
         Modifies a list of nodes based on certain conditions.
@@ -173,8 +187,7 @@ class AuthVisibility(Modifier):
 
 def register():
     """
-    Register the Marker, AuthVisibility, and Level modifiers to the menu pool.
+    Register the AuthVisibility, and Level modifiers to the menu pool.
     """
-    menu_pool.register_modifier(Marker)
     menu_pool.register_modifier(AuthVisibility)
     menu_pool.register_modifier(Level)
