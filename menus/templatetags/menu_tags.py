@@ -56,35 +56,44 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
     cutting nodes away from menus
     """
     final = []
-    removed = []
     selected = None
     for node in nodes:
-        if not hasattr(node, 'level'):
-            # remove and ignore nodes that don't have level information
-            remove(node, removed)
-            continue
-        if node.level == from_level:
-            # turn nodes that are on from_level into root nodes
-            final.append(node)
-            node.parent = None
-        if not node.ancestor and not node.selected and not node.descendant:
-            # cut inactive nodes to extra_inactive, but not of descendants of
-            # the selected node
-            cut_after(node, extra_inactive, removed)
-        if node.level > to_level and node.parent:
-            # remove nodes that are too deep, but not nodes that are on
-            # from_level (local root nodes)
-            remove(node, removed)
+        if getattr(node, "level", None) == from_level and node.visible:
+            if node.level <= extra_inactive or node.selected or node.ancestor or node.descendant:
+                # Add to root nodes if active or clearly within inactive levels
+                final.append(node)
+            else:
+                # Find level of nearest active ancestor
+                parent = node.parent
+                while parent:
+                    if parent.ancestor:
+                        if parent.level + extra_inactive + 1 >= from_level:
+                            final.append(node)
+                        break
+                    parent = parent.parent
+        elif not node.visible and node.parent and node in node.parent.children:
+            # Cut out invisible child nodes
+            node.parent.children.remove(node)
+        if getattr(node, "level", None) == to_level:
+            # Cut at to_level
+            node.children = []
         if node.selected:
+            # Mark selected node
             selected = node
-        if not node.visible:
-            remove(node, removed)
-    if selected:
-        cut_after(selected, extra_active, removed)
-    if removed:
-        for node in removed:
-            if node in final:
-                final.remove(node)
+
+    def recursive_cut(nodes):
+        for node in nodes:
+            if not node.selected and not node.ancestor:
+                # Cut out inactive nodes after extra_inactive levels
+                cut_after(node, extra_inactive - from_level, [])
+            elif not node.selected:
+                # Look for more inactive nodes (children of selected nodes are descendants by definition)
+                recursive_cut(node.children)
+
+    if extra_inactive is not None:
+        recursive_cut(final)
+    if selected and extra_active < 1000:  # 1000 is the default value - no cut
+        cut_after(selected, extra_active, [])
     return final
 
 
@@ -149,22 +158,20 @@ class ShowMenu(InclusionTag):
                         remove_parent.parent = None
                     from_level += node.level + 1
                     to_level += node.level + 1
+                    extra_inactive += node.level + 1
                     nodes = flatten(nodes)
                 else:
                     nodes = []
             children = cut_levels(nodes, from_level, to_level, extra_inactive, extra_active)
             children = menu_renderer.apply_modifiers(children, namespace, root_id, post_cut=True)
 
-        try:
-            context['children'] = children
-            context['template'] = template
-            context['from_level'] = from_level
-            context['to_level'] = to_level
-            context['extra_inactive'] = extra_inactive
-            context['extra_active'] = extra_active
-            context['namespace'] = namespace
-        except:  # NOQA
-            context = {"template": template}
+        context['children'] = children
+        context['template'] = template
+        context['from_level'] = from_level
+        context['to_level'] = to_level
+        context['extra_inactive'] = extra_inactive
+        context['extra_active'] = extra_active
+        context['namespace'] = namespace
         return context
 
 

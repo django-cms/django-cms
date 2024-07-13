@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Union
 
 from django.db.models.query import Prefetch, prefetch_related_objects
 from django.utils.functional import SimpleLazyObject
@@ -20,9 +20,10 @@ from menus.base import Menu, Modifier, NavigationNode
 from menus.menu_pool import menu_pool
 
 
-def _get_content_for_page(page, languages):
+def _get_content_for_page(page: Page, languages: list[str]) -> Union[PageContent, EmptyPageContent]:
     page_content = EmptyPageContent(language=languages[0], page=page)
     lang_index = len(languages)
+    # Expects the page to have been prefetched with filtered_translations
     for trans in page.filtered_translations:
         if trans.language in languages and languages.index(trans.language) < lang_index:
             lang_index = languages.index(trans.language)
@@ -30,7 +31,7 @@ def _get_content_for_page(page, languages):
     return page_content
 
 
-def get_visible_nodes(request, pages, site):
+def get_visible_nodes(request, pages, site) -> list[Page]:
     """
     This code is a many-pages-at-once version of cms.utils.page_permissions.user_can_view_page.
     `pages` contains all published pages.
@@ -62,7 +63,7 @@ def get_visible_nodes(request, pages, site):
     user_groups = SimpleLazyObject(lambda: frozenset(request.user.groups.values_list("pk", flat=True)))
     is_auth_user = request.user.is_authenticated
 
-    def user_can_see_page(page):
+    def user_can_see_page(page: Page) -> bool:
         if page.pk in restriction_map:
             # set internal fk cache to our page with loaded ancestors and descendants
             PagePermission.page.field.set_cached_value(restriction_map[page.pk], page)
@@ -95,9 +96,8 @@ def get_menu_node_for_page(
     Args:
         renderer: MenuRenderer instance bound to the request.
         page: The page to transform.
-        language: The current language used to render the menu.
-        fallbacks: List of fallback languages (optional).
-        url: The URL to use for the node (optional) instead of page_content.get_absolute_url().
+        languages: The list of the current language plus fallbacks used to render the menu.
+        endpoint: Whether to render the node with an url to the preview endpoint.
     Returns:
         A CMSNavigationNode instance.
     """
@@ -201,12 +201,11 @@ class CMSNavigationNode(NavigationNode):
         self.language = language
         super().__init__(*args, **kwargs)
 
-    def is_selected(self, request):
+    def is_selected(self, request) -> bool:
         try:
-            page_id = request.current_page.pk
+            return request.current_page.pk == self.id
         except AttributeError:
             return False
-        return page_id == self.id
 
 
 class CMSMenu(Menu):
@@ -214,7 +213,7 @@ class CMSMenu(Menu):
     based on a site's :class:`cms.models.pagemodel.Page` objects.
     """
 
-    def get_nodes(self, request):
+    def get_nodes(self, request) -> list[NavigationNode]:
         site = self.renderer.site
         lang = self.renderer.request_language
         toolbar = get_toolbar_from_request(request)
