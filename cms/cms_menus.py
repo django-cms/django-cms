@@ -103,7 +103,7 @@ def get_menu_node_for_page(
     """
 
     page_content = _get_content_for_page(page, languages)
-    if page_content is None:
+    if not page_content:
         return None
 
     lang = page_content.language
