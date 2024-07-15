@@ -1,3 +1,4 @@
+import re
 from typing import Optional, Union
 
 from django.db.models.query import Prefetch, prefetch_related_objects
@@ -6,6 +7,7 @@ from django.utils.functional import SimpleLazyObject
 from cms import constants
 from cms.apphook_pool import apphook_pool
 from cms.models import EmptyPageContent, Page, PageContent, PagePermission, PageUrl
+from cms.models.query import PageQuerySet
 from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
@@ -19,19 +21,24 @@ from cms.utils.page_permissions import user_can_view_all_pages
 from menus.base import Menu, Modifier, NavigationNode
 from menus.menu_pool import menu_pool
 
+# Shortcut for visibility markers
+VISIBLE_FOR_AUTHENTICATED = constants.VISIBILITY_ALL, constants.VISIBILITY_USERS
+VISIBLE_FOR_ANONYMOUS = constants.VISIBILITY_ALL, constants.VISIBILITY_ANONYMOUS
 
-def _get_content_for_page(page: Page, languages: list[str]) -> Union[PageContent, EmptyPageContent]:
-    page_content = EmptyPageContent(language=languages[0], page=page)
+
+def _get_content_for_page(page: Page, languages: list[str]) -> Union[PageContent, None]:
+    page_content = None
     lang_index = len(languages)
-    # Expects the page to have been prefetched with filtered_translations
+    # Expects the page contents to have been prefetched with filtered_translations
     for trans in page.filtered_translations:
-        if trans.language in languages and languages.index(trans.language) < lang_index:
+        if languages.index(trans.language) < lang_index:
+            # Earlier in list of fallback languages? Take this.
             lang_index = languages.index(trans.language)
             page_content = trans
     return page_content
 
 
-def get_visible_nodes(request, pages, site) -> list[Page]:
+def get_visible_nodes(request, pages: PageQuerySet, site) -> list[Page]:
     """
     This code is a many-pages-at-once version of cms.utils.page_permissions.user_can_view_page.
     `pages` contains all published pages.
@@ -88,7 +95,7 @@ def get_menu_node_for_page(
     renderer,
     page: Page,
     languages: list[str],
-    endpoint: bool = False,
+    preview_url: Optional[str] = None,
 ) -> Optional["CMSNavigationNode"]:
     """
     Transform a CMS page into a navigation node.
@@ -97,7 +104,8 @@ def get_menu_node_for_page(
         renderer: MenuRenderer instance bound to the request.
         page: The page to transform.
         languages: The list of the current language plus fallbacks used to render the menu.
-        endpoint: Whether to render the node with an url to the preview endpoint.
+        preview_url: If given, serves as a "pattern" for a preview url with the assumoption that "/0/" is replaced
+           by the actual page content pk.
     Returns:
         A CMSNavigationNode instance.
     """
@@ -106,27 +114,19 @@ def get_menu_node_for_page(
     if not page_content:
         return None
 
-    lang = page_content.language
-
     # These are simple to port over, since they are not calculated.
     # Other attributes will be added conditionally later.
+    visibility = page_content.limit_visibility_in_menu
     attr = {
         "is_page": True,
         "soft_root": page_content.soft_root,
         "auth_required": page.login_required,
         "reverse_id": page.reverse_id,
+        "is_home": page.is_home,
+        "visible_for_authenticated": visibility in VISIBLE_FOR_AUTHENTICATED,
+        "visible_for_anonymous": visibility in VISIBLE_FOR_ANONYMOUS,
     }
 
-    limit_visibility_in_menu = page_content.limit_visibility_in_menu
-
-    if limit_visibility_in_menu is constants.VISIBILITY_ALL:
-        attr["visible_for_authenticated"] = True
-        attr["visible_for_anonymous"] = True
-    else:
-        attr["visible_for_authenticated"] = limit_visibility_in_menu == constants.VISIBILITY_USERS
-        attr["visible_for_anonymous"] = limit_visibility_in_menu == constants.VISIBILITY_ANONYMOUS
-    attr["is_home"] = page.is_home
-    # Extenders can be either navigation extenders or from apphooks.
     extenders = []
     if page.navigation_extenders:
         if page.navigation_extenders in renderer.menus:
@@ -137,34 +137,28 @@ def get_menu_node_for_page(
     # Only run this if we have a translation in the requested language for this
     # object. The page content cache should have been prepopulated in CMSMenu.get_nodes
     # but otherwise, just request the title normally
-    if page_content.language == languages[0] and page.application_urls:
+    if page.application_urls and page_content.language == languages[0]:
         # it means it is an apphook
         app = apphook_pool.get_apphook(page.application_urls)
-
         if app:
-            extenders += app.get_menus(page, languages[0])
-    exts = []
-    for ext in extenders:
-        if hasattr(ext, "get_instances"):
-            # CMSAttachMenus are treated a bit differently to allow them to be
-            # able to be attached to multiple points in the navigation.
-            exts.append(f"{ext.__name__}:{page.pk}")
-        elif hasattr(ext, "__name__"):
-            exts.append(ext.__name__)
-        else:
-            exts.append(ext)
-    if exts:
-        attr["navigation_extenders"] = exts
+            extenders.extend(app.get_menus(page, languages[0]))
+    # CMSAattachMenus are treated a bit differently to allow them to be
+    # able to be attached to multiple points in the navigation.
+    attr["navigation_extenders"] = [
+        f"{ext.__name__}:{page.pk}" if hasattr(ext, "get_instances") else getattr(ext, "__name__", ext)
+        for ext in extenders
+    ]
 
-    page_url = page.urls_cache[lang]
-    # Do we have a redirectURL?
-    attr["redirect_url"] = page_content.redirect  # save redirect URL if any
+    page_url = page.urls_cache[page_content.language]
 
     # Now finally, build the NavigationNode object and return it.
     # The parent_id is manually set by the menu get_nodes method.
-    if endpoint:
-        url = get_object_preview_url(page_content)
+    if preview_url:
+        # Build preview url by replacing "/0/" in the url template by the actual pk of the page content object
+        # Hacky, but fast
+        url = re.sub("(/0/)", f"/{page_content.pk}/", preview_url)
     else:
+        # For live pages we need to respect all URL rules, no shortcut
         url = page.get_absolute_url(language=page_content.language)
     return CMSNavigationNode(
         title=page_content.menu_title or page_content.title,
@@ -251,41 +245,40 @@ class CMSMenu(Menu):
         if not pages:
             return []
 
+        # Prefetch URLs in one go
         urls_lookup = Prefetch(
             "urls",
             to_attr="filtered_urls",
             queryset=PageUrl.objects.filter(language__in=languages),
         )
+
+        # Prefetch page contents in one go
         if toolbar.edit_mode_active or toolbar.preview_mode_active:
             # Get all translations visible in the admin for the current page
             translations_qs = PageContent.admin_manager.current_content(language__in=languages)
+            # Preview URL for a "virtual" non-existing page content with id=0. This is used to quickly build many
+            # preview urls by replacing "/0/" by the page content pk in the preview url
+            preview_url = get_object_preview_url(PageContent(id=0))
         else:
             # Only get public translations
             translations_qs = PageContent.objects.filter(language__in=languages)
+            preview_url = None
         translations_lookup = Prefetch(
             "pagecontent_set",
             to_attr="filtered_translations",
             queryset=translations_qs,
         )
+
+        # Execute prefetch
         prefetch_related_objects(pages, urls_lookup, translations_lookup)
-
-        def _page_to_node(page):
-            # We're only filling the existing urls and page contents into the cache
-            # Access the cache directly to not lead to a db hit when accessing
-            # non-existing languages
-
+        for page in pages:
             for page_url in page.filtered_urls:
+                # We're only filling the existing urls and page contents into the cache
+                # Access the cache directly to not lead to a db hit when accessing
+                # non-existing languages
                 page.urls_cache[page_url.language] = page_url
 
-            menu_node = get_menu_node_for_page(
-                self.renderer,
-                page,
-                languages=languages,
-                endpoint=toolbar.preview_mode_active or toolbar.edit_mode_active,
-            )
-            return menu_node
-
-        menu_nodes = []
+        # Find homepage
         try:
             homepage = [page for page in pages if page.is_home][0]
             homepage_content = _get_content_for_page(homepage, languages)
@@ -295,8 +288,15 @@ class CMSMenu(Menu):
             homepage_pk = None
             cut_homepage = False
 
+        menu_nodes = []
         for page in pages:
-            if menu_node := _page_to_node(page):
+            menu_node = get_menu_node_for_page(
+                self.renderer,
+                page,
+                languages=languages,
+                preview_url=preview_url,
+            )
+            if menu_node:
                 if page.parent_id == homepage_pk and cut_homepage:
                     # When the homepage is hidden from navigation,
                     # we need to cut all its direct children from it.
