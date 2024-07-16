@@ -1,14 +1,5 @@
 .. _upgrade-to-3.11.4:
 
-<<<<<<< HEAD
-######################
- release notes 3.11.3
-######################
-
-This release focuses on Django 4.2 support which will be LTS. django CMS version 3.11.x will be supported until the end of life of Django 4.2 estimated for April 2026.
-
-Compared to 3.11.2 it fixes a bug which broke the dropdown menu in the page tree.
-=======
 #####################
  release notes 3.11.4
 #####################
@@ -17,24 +8,6 @@ Compared to 3.11.2 it fixes a bug which broke the dropdown menu in the page tree
 What's new in 3.11.4
 ********************
 
-Bug Fixes:
-----------
-* Remove superfluous curly bracket left behind on PR 7488 (#7529) -- Corentin Bettiol
-* Fix admin tests (#6848) for some post requests (#7535) -- Fabian Braun
-
-Statistics:
------------
-
-This release includes 2 pull requests, and was created with the help of the following contributors (in alphabetical order):
-
-* Corentin Bettiol (1 pull request)
-* Fabian Braun (1 pull requests)
-
-With the review help of the following contributors:
-
-* Fabian Braun
-* Vinit Kumar
-=======
 Features:
  ---------
  * Update dark mode switch to be compatible with Django 4.2 admin dark mode (#7549) (1106ae6d7) -- Fabian Braun
@@ -67,7 +40,6 @@ Features:
  * dependabot[bot] (0 pull request)
  * mihalikv (1 pull request)
  * suryadev99 (1 pull request)
->>>>>>> origin/develop
 
 Thanks to all contributors for their efforts!
 
