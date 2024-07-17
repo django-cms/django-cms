@@ -1,6 +1,7 @@
 import operator
 import warnings
 from collections import OrderedDict
+from typing import Union
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -406,11 +407,13 @@ def rescan_placeholders_for_obj(obj):
     return existing
 
 
-def get_declared_placeholders_for_obj(obj):
+def get_declared_placeholders_for_obj(obj: Union[models.Model, None]) -> list[Placeholder]:
     """Returns declared placeholders for an object. The object is supposed to have a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
     a list of placeholders used in the template by the ``{% placeholder %}`` template tag.
     """
+    if obj is None:
+        return []
     if not hasattr(obj, "get_template"):
         raise NotImplementedError(
             "%s should implement get_template" % obj.__class__.__name__
