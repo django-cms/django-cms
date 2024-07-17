@@ -50,6 +50,7 @@ extend-ignore = [
   "F401",
   "F403",
   "E501",
+  "PLR1704",  # Redefining argument with the local name
   "PLR2004",
   "PLR5501",
   "PLW0120",
