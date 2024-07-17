@@ -29,7 +29,7 @@ What's new in 4.1.2
 Improved right-to-left support
 ------------------------------
 
-* Both, the CSS assets and the JS assets have been adjusted to better support right-to-left languages (RTL). 
+* Both, the CSS assets and the JS assets have been adjusted to better support right-to-left languages (RTL).
 * Besides imrpvoed ease of use, the page tree can now be fully managed with RTL admin languages
 * Improved translations for Arabic
 
@@ -37,7 +37,7 @@ Faster menu rendering
 ---------------------
 
 * Improved efficiency building menus for the page tree dramatically reduces database hits
-* Page menus rendered by the core both for versioned and unversioned pages 
+* Page menus rendered by the core both for versioned and unversioned pages
 
 
 Bug Fixes
@@ -50,3 +50,5 @@ Bug Fixes
 * Directly redirect to edit endpoint after creating a new page
 * Allow editing page content object for apphook without root content
 * Render fallback language in place if ``redirect_on_fallback`` is set to ``False`` in the ``CMS_LANGUAGES`` settings
+* Fail silently when rendering a placeholder on a missing toolbar object -- Fabian Braun
+* Show fallback language titles in pagetree -- Fabian Braun

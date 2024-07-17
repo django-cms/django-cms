@@ -16,7 +16,8 @@ Bug Fixes:
 * Versioning-safe implementation of placeholder in heritance -- Fabian Braun
 * Only switch to structure endpoint on viewport breakpoint if in edit mode -- Fabian Braun
 * Allow special characters in page title -- Jacob Rief
-
+* Fail silently when rendering a placeholder on a missing toolbar object -- Fabian Braun
+* Show fallback language titles in pagetree -- Fabian Braun
 
 Statistics:
 -----------
