@@ -11,7 +11,7 @@ from sekizai.context import SekizaiContext
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_page_content
-from cms.exceptions import DuplicatePlaceholderWarning
+from cms.exceptions import DuplicatePlaceholderWarning, PlaceholderNotFound
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -140,6 +140,17 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
         phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
         self.assertListEqual(phs, sorted(['two', 'new_one', 'base_outside']))
+
+    def test_placeholder_scanning_no_object(self):
+        """Placeholder scanning for a template without a toolbar object raises PlaceholderNotFound"""
+
+        context = SekizaiContext()
+        request = self.get_request(language="en", page=None)
+        toolbar = get_toolbar_from_request(request)
+        renderer = toolbar.get_content_renderer()
+        with self.assertRaises(PlaceholderNotFound):
+            renderer.render_obj_placeholder("someslot", context, False)
+
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))

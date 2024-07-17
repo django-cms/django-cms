@@ -1144,7 +1144,7 @@ class PageContentAdmin(admin.ModelAdmin):
             Prefetch(
                 'pagecontent_set',
                 to_attr='filtered_translations',
-                queryset=self.get_queryset(request),
+                queryset=page_contents,
             ),
         )
 
@@ -1381,7 +1381,7 @@ class PageContentAdmin(admin.ModelAdmin):
             Prefetch(
                 'pagecontent_set',
                 to_attr='filtered_translations',
-                queryset=self.get_queryset(request),
+                queryset=PageContent.admin_manager.get_queryset(),
             ),
         )
         rows = self.get_tree_rows(
