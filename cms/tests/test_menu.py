@@ -1622,13 +1622,13 @@ class ViewPermissionMenuTests(CMSTestCase):
     def test_authed_no_access(self):
         request = self.get_request(self.user)
         all = [page.get_content_obj() for page in self.pages]
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             """
             The queries are:
             User permission
             Group permission
             GlobalpagePermission query for user
-            User permissions
+            PagePermission query for user
             """
             visible = get_visible_page_contents(request, all, self.site)
             self.assertEqual(visible, [])
