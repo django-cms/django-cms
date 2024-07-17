@@ -1,6 +1,5 @@
 import copy
 
-import kolo
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.contrib.sites.models import Site
@@ -1620,7 +1619,6 @@ class ViewPermissionMenuTests(CMSTestCase):
             visible = get_visible_page_contents(request, all, self.site)
             self.assertEqual(visible, all)
 
-    @kolo.enable
     def test_authed_no_access(self):
         request = self.get_request(self.user)
         all = [page.get_content_obj() for page in self.pages]
