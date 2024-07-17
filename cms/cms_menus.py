@@ -25,7 +25,7 @@ VISIBLE_FOR_ANONYMOUS = constants.VISIBILITY_ALL, constants.VISIBILITY_ANONYMOUS
 
 
 def get_visible_nodes(request, pages, site):
-    """Compatibility shim"""
+    """This function is deprecated. Use get_visible_nodes_from_page_contents instead."""
 
     import warnings
 
@@ -36,7 +36,7 @@ def get_visible_nodes(request, pages, site):
         RemovedInDjangoCMS43Warning,
         stacklevel=2,
     )
-    page_contents = get_visible_page_contents(request, (page.get_content_obj() for page in pages), site)
+    page_contents = get_visible_page_contents(request, [page.get_content_obj() for page in pages], site)
     return list({page_content.page for page_content in page_contents})
 
 
