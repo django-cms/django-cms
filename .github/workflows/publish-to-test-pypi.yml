@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - release/*
-      - deveop-4
+      - develop-4
 
 jobs:
   build-n-publish:
