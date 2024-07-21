@@ -27,6 +27,7 @@ from cms.signals.permissions import (
     pre_save_group,
     pre_save_pagepermission,
     pre_save_user,
+    user_m2m_changed,
 )
 from cms.utils.conf import get_cms_setting
 
@@ -89,6 +90,7 @@ if get_cms_setting('PERMISSION'):
     signals.pre_save.connect(pre_save_user, sender=User, dispatch_uid='cms_pre_save_user')
     signals.post_save.connect(post_save_user, sender=User, dispatch_uid='cms_post_save_user')
     signals.pre_delete.connect(pre_delete_user, sender=User, dispatch_uid='cms_pre_delete_user')
+    signals.m2m_changed.connect(user_m2m_changed, sender=User.groups.through, dispatch_uid='cms_user_m2m_changed')
 
     signals.pre_save.connect(pre_save_user, sender=PageUser, dispatch_uid='cms_pre_save_pageuser')
     signals.pre_delete.connect(pre_delete_user, sender=PageUser, dispatch_uid='cms_pre_delete_pageuser')

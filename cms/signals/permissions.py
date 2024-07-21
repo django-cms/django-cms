@@ -1,12 +1,18 @@
+from django.contrib.auth import get_user_model
+
 from cms.cache.permissions import clear_user_permission_cache
 from cms.models import PageUser, PageUserGroup
 from menus.menu_pool import menu_pool
+
+User = get_user_model()
 
 
 def post_save_user(instance, raw, created, **kwargs):
     """Signal called when new user is created, required only when CMS_PERMISSION.
     Assigns creator of the user to PageUserInfo model, so we know who had created
     this user account.
+
+    Flushes permission cache for the user.
 
     requires: CurrentUserMiddleware
     """
@@ -21,6 +27,8 @@ def post_save_user(instance, raw, created, **kwargs):
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
+    clear_user_permission_cache(instance
+                                )
 
 def post_save_user_group(instance, raw, created, **kwargs):
     """The same like post_save_user, but for Group, required only when
@@ -60,6 +68,15 @@ def pre_delete_group(instance, **kwargs):
     user_set = instance.user_set
     for user in user_set.all():
         clear_user_permission_cache(user)
+
+
+def user_m2m_changed(instance, action, reverse, pk_set, **kwargs):
+    if action in ('pre_add', 'pre_remove',):
+        if reverse:
+            for user in User.objects.filter(pk__in=pk_set):
+                clear_user_permission_cache(user)
+        else:
+            clear_user_permission_cache(instance)
 
 
 def _clear_users_permissions(instance):
