@@ -78,17 +78,18 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             # Mark selected node
             selected = node
 
-    def recursive_cut(nodes):
+    def cut_inactive(nodes):
+        """Recursively cut inactive nodes from the tree."""
         for node in nodes:
             if not node.selected and not node.ancestor:
                 # Cut out inactive nodes after extra_inactive levels
                 cut_after(node, extra_inactive - from_level)
             elif not node.selected:
                 # Look for more inactive nodes (children of selected nodes are descendants by definition)
-                recursive_cut(node.children)
+                cut_inactive(node.children)
 
     if extra_inactive is not None:
-        recursive_cut(final)
+        cut_inactive(final)
     if selected and extra_active < 1000:  # 1000 is the default value - no cut
         cut_after(selected, extra_active)
     return final
