@@ -13,6 +13,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import override
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
+from cms.exceptions import PlaceholderNotFound
 from cms.models import PageContent, Placeholder
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
@@ -343,6 +344,8 @@ class ContentRenderer(BaseRenderer):
         # Not page, therefore we will use toolbar object as
         # the current object and render the placeholder
         current_obj = self.toolbar.get_object()
+        if current_obj is None:
+            raise PlaceholderNotFound(f"No object found for placeholder '{slot}'")
         rescan_placeholders_for_obj(current_obj)
         placeholder = Placeholder.objects.get_for_obj(current_obj).get(slot=slot)
         content = self.render_placeholder(
