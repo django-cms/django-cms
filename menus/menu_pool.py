@@ -204,27 +204,30 @@ class MenuRenderer:
         return final_nodes
 
     def _mark_selected(self, nodes):
-        root_nodes = [node for node in nodes if not node.parent]
-        for node in nodes:
-            if node.is_selected(self.request):
-                node.selected = True
-                self._mark_ancestors(node)
-                self._mark_descendants(node)
-                self._mark_siblings(node, root_nodes)
-                return nodes
+        """Mark the selected node and its ancestors, descendants and siblings."""
+        selected = next((node for node in nodes if node.is_selected(self.request)), None)
+        if selected:
+            selected.selected = True
+            self._mark_ancestors(selected)
+            self._mark_descendants(selected)
+            root_nodes = (node for node in nodes if not node.parent)
+            self._mark_siblings(selected, root_nodes)
         return nodes
 
     def _mark_ancestors(self, node):
+        """Marks the ancestors of the selected node."""
         while node.parent:
             node = node.parent
             node.ancestor = True
 
     def _mark_descendants(self, node):
+        """Marks the descendants of the selected node."""
         for child in node.children:
             child.descendant = True
             self._mark_descendants(child)
 
     def _mark_siblings(self, node, root_nodes):
+        """Marks the siblings of the selected node. All root nodes are siblings of a root node."""
         if node.parent:
             for sibling in node.parent.children:
                 if sibling != node:
