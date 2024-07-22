@@ -25,14 +25,14 @@ VISIBLE_FOR_ANONYMOUS = constants.VISIBILITY_ALL, constants.VISIBILITY_ANONYMOUS
 
 
 def get_visible_nodes(request, pages, site):
-    """This function is deprecated. Use get_visible_nodes_from_page_contents instead."""
+    """This function is deprecated. Use get_visible_page_contents instead."""
 
     import warnings
 
     from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 
     warnings.warn(
-        "get_visible_nodes is deprecated, use get_visible_nodes_from_page_contents instead",
+        "get_visible_nodes is deprecated, use get_visible_page_contents instead",
         RemovedInDjangoCMS43Warning,
         stacklevel=2,
     )
