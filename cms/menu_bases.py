@@ -7,7 +7,7 @@ from menus.base import Menu
 
 
 class CMSAttachMenu(Menu):
-    """Base class that can be subclassed to allow your app to attach its oqn menus."""
+    """Base class that can be subclassed to allow your app to attach its own menus."""
     cms_enabled = True
     instance = None
     name = None

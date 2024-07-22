@@ -98,7 +98,7 @@ def debug_check_url(url_name):
     from django.urls import reverse
 
     try:
-        debug_msg = "    reverse('{0}'): {1} ".format(
+        debug_msg = "    reverse('{}'): {} ".format(
             url_name,
             reverse('my_test_app_view'),
         )
