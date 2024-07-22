@@ -148,12 +148,11 @@ class Page(MP_Node):
         try:
             title = self.get_menu_title(fallback=True)
         except LanguageError:
-            try:
-                title = self.pagecontent_set(manager="admin_manager").current()[0]
-            except IndexError:
-                title = None
+            title = self.pagecontent_set(manager="admin_manager").current_content().first()
+            if title:
+                title = title.title
         if title is None:
-            title = ""
+            title = _("Empty")
         return force_str(title)
 
     def __repr__(self):
