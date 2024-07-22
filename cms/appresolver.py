@@ -226,7 +226,7 @@ def _get_app_patterns(site):
         page_urls
         .exclude(page__application_urls=None)
         .exclude(page__application_urls='')
-        .order_by('-page__node__path')
+        .order_by('-page__path')
         .select_related('page')
     )
 

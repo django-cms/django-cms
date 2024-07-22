@@ -27,7 +27,7 @@ class PagePermissionAdminMixin:
         return page_permissions.user_can_change_page_permissions(
             request.user,
             page=obj,
-            site=obj.node.site,
+            site=obj.site,
         )
 
     def has_add_permission(self, request, obj=None):

@@ -228,8 +228,9 @@ class AdminTestCase(AdminTestsBase):
         second_level_page_top = create_page(
             'level21', "nav_playground.html", "en", created_by=admin_user, parent=first_level_page
         )
+        first_level_page.refresh_from_db()
         second_level_page_bottom = create_page(
-            'level22', "nav_playground.html", "en", created_by=admin_user, parent=self.reload(first_level_page)
+            'level22', "nav_playground.html", "en", created_by=admin_user, parent=first_level_page
         )
         third_level_page = create_page(
             'level3', "nav_playground.html", "en", created_by=admin_user, parent=second_level_page_top
@@ -579,7 +580,7 @@ class AdminFormsTests(AdminTestsBase):
         new_page_data = {
             'title': 'Title',
             'slug': 'slug',
-            'parent_node': parent_page.node.pk,
+            'parent_page': parent_page.pk,
         }
         with self.login_user_context(superuser):
             # Invalid parent
@@ -600,7 +601,7 @@ class AdminFormsTests(AdminTestsBase):
         new_page_data = {
             'title': 'Title',
             'slug': 'home',
-            'parent_node': page1.node.pk,
+            'parent_page': page1.pk,
         }
         endpoint = self.get_page_add_uri('en')
 
@@ -876,7 +877,8 @@ class AdminPageTreeTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.node._reload().get_descendants().count(), 1)
+        alpha.refresh_from_db()
+        self.assertEqual(alpha.get_descendants().count(), 1)
 
         # Current structure:
         #   <root>
@@ -899,8 +901,10 @@ class AdminPageTreeTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.node._reload().get_descendants().count(), 2)
-        self.assertEqual(beta.node._reload().get_descendants().count(), 1)
+        alpha.refresh_from_db()
+        self.assertEqual(alpha.get_descendants().count(), 2)
+        beta.refresh_from_db()
+        self.assertEqual(beta.get_descendants().count(), 1)
 
         # Current structure:
         #   <root>
@@ -923,9 +927,12 @@ class AdminPageTreeTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.node._reload().get_descendants().count(), 3)
-        self.assertEqual(beta.node._reload().get_descendants().count(), 2)
-        self.assertEqual(gamma.node._reload().get_descendants().count(), 1)
+        alpha.refresh_from_db()
+        self.assertEqual(alpha.get_descendants().count(), 3)
+        beta.refresh_from_db()
+        self.assertEqual(beta.get_descendants().count(), 2)
+        gamma.refresh_from_db()
+        self.assertEqual(gamma.get_descendants().count(), 1)
 
         # Current structure:
         #   <root>
@@ -947,9 +954,12 @@ class AdminPageTreeTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.node._reload().get_descendants().count(), 0)
-        self.assertEqual(beta.node._reload().get_descendants().count(), 2)
-        self.assertEqual(gamma.node._reload().get_descendants().count(), 1)
+        alpha.refresh_from_db()
+        self.assertEqual(alpha.get_descendants().count(), 0)
+        beta.refresh_from_db()
+        self.assertEqual(beta.get_descendants().count(), 2)
+        gamma.refresh_from_db()
+        self.assertEqual(gamma.get_descendants().count(), 1)
 
         # Current structure:
         #   <root>
@@ -972,9 +982,12 @@ class AdminPageTreeTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.node._reload().get_descendants().count(), 3)
-        self.assertEqual(beta.node._reload().get_descendants().count(), 2)
-        self.assertEqual(gamma.node._reload().get_descendants().count(), 1)
+        alpha.refresh_from_db()
+        self.assertEqual(alpha.get_descendants().count(), 3)
+        beta.refresh_from_db()
+        self.assertEqual(beta.get_descendants().count(), 2)
+        gamma.refresh_from_db()
+        self.assertEqual(gamma.get_descendants().count(), 1)
 
         # Current structure:
         #   <root>
@@ -996,9 +1009,12 @@ class AdminPageTreeTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.node._reload().get_descendants().count(), 1)
-        self.assertEqual(beta.node._reload().get_descendants().count(), 0)
-        self.assertEqual(gamma.node._reload().get_descendants().count(), 1)
+        alpha.refresh_from_db()
+        self.assertEqual(alpha.get_descendants().count(), 1)
+        beta.refresh_from_db()
+        self.assertEqual(beta.get_descendants().count(), 0)
+        gamma.refresh_from_db()
+        self.assertEqual(gamma.get_descendants().count(), 1)
 
         # Current structure:
         #   <root>
@@ -1020,9 +1036,12 @@ class AdminPageTreeTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.node._reload().get_descendants().count(), 1)
-        self.assertEqual(beta.node._reload().get_descendants().count(), 0)
-        self.assertEqual(gamma.node._reload().get_descendants().count(), 0)
+        alpha.refresh_from_db()
+        self.assertEqual(alpha.get_descendants().count(), 1)
+        beta.refresh_from_db()
+        self.assertEqual(beta.get_descendants().count(), 0)
+        gamma.refresh_from_db()
+        self.assertEqual(gamma.get_descendants().count(), 0)
 
         # Current structure:
         #   <root>
@@ -1045,10 +1064,14 @@ class AdminPageTreeTests(AdminTestsBase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 200)
-        self.assertEqual(alpha.node._reload().get_descendants().count(), 1)
-        self.assertEqual(beta.node._reload().get_descendants().count(), 0)
-        self.assertEqual(gamma.node._reload().get_descendants().count(), 0)
-        self.assertEqual(delta.node._reload().get_descendants().count(), 1)
+        alpha.refresh_from_db()
+        self.assertEqual(alpha.get_descendants().count(), 1)
+        beta.refresh_from_db()
+        self.assertEqual(beta.get_descendants().count(), 0)
+        gamma.refresh_from_db()
+        self.assertEqual(gamma.get_descendants().count(), 0)
+        delta.refresh_from_db()
+        self.assertEqual(delta.get_descendants().count(), 1)
 
         # Final structure:
         #   <root>
@@ -1092,7 +1115,7 @@ class AdminPageTreeTests(AdminTestsBase):
                 response = pagecontent_admin.get_tree(request)
                 self.assertContains(
                     response,
-                    f'href="{add_url}?parent_node={page[language].node_id}&language={language}"'
+                    f'href="{add_url}?parent_page={page[language].id}&language={language}"'
                 )
 
 

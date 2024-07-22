@@ -232,8 +232,7 @@ class CMSMenu(Menu):
 
         pages = (
             pages.filter(pagecontent_set__language__in=languages)
-            .select_related("node")
-            .order_by("node__path")
+            .order_by("path")
             .distinct()
         )
         pages = get_visible_nodes(request, pages, site)
@@ -266,9 +265,6 @@ class CMSMenu(Menu):
         # Build the blank title instances only once
         blank_page_content_cache = {language: EmptyPageContent(language=language) for language in languages}
 
-        # Maps a node id to its page id
-        node_id_to_page = {}
-
         def _page_to_node(page):
             # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
@@ -292,26 +288,16 @@ class CMSMenu(Menu):
         menu_nodes = []
 
         for page in pages:
-            node = page.node
-            parent_id = node_id_to_page.get(node.parent_id)
-
-            if node.parent_id and not parent_id:
-                # If the parent page is not available (unpublished, etc..)
-                # don't bother creating menu nodes for its descendants.
-                continue
-
-            menu_node = _page_to_node(page)
-            if menu_node:
+            if menu_node := _page_to_node(page):
                 # Only add pages with at least one page content
                 cut_homepage = homepage and not homepage.get_in_navigation(lang)
 
-                if cut_homepage and parent_id == homepage.pk:
+                if cut_homepage and page.parent_id == homepage.pk:
                     # When the homepage is hidden from navigation,
                     # we need to cut all its direct children from it.
                     menu_node.parent_id = None
                 else:
-                    menu_node.parent_id = parent_id
-                node_id_to_page[node.pk] = page.pk
+                    menu_node.parent_id = page.parent_id
                 menu_nodes.append(menu_node)
         return menu_nodes
 

@@ -258,6 +258,38 @@ class PermissionTuple(tuple):
         return Q()
 
 
+class PermissionTuple(tuple):
+    def contains(self, path: str, steplen: int = Page.steplen) -> bool:
+        grant_on, perm_path = self
+        if grant_on == ACCESS_PAGE:
+            return path == perm_path
+        elif grant_on == ACCESS_CHILDREN:
+            return path.startswith(perm_path) and len(path) == len(perm_path) + steplen
+        elif grant_on == ACCESS_DESCENDANTS:
+            return path.startswith(perm_path) and len(path) > len(perm_path)
+        elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            return path.startswith(perm_path)
+        elif grant_on == ACCESS_PAGE_AND_CHILDREN:
+            return path.startswith(perm_path) and len(path) <= len(perm_path) + steplen
+        return False
+
+    def allow_list(self, filter: str = "", steplen: int = Page.steplen) -> Q:
+        if filter !="":
+            filter = f"{filter}__"
+        grant_on, path = self
+        if grant_on == ACCESS_PAGE:
+            return Q(**{f"{filter}path": path})
+        elif grant_on == ACCESS_CHILDREN:
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length": len(path) + steplen})
+        elif grant_on == ACCESS_DESCENDANTS:
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__gt": len(path)})
+        elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            return Q(**{f"{filter}path__startswith": path})
+        elif grant_on == ACCESS_PAGE_AND_CHILDREN:
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__lte": len(path) + steplen})
+        return Q()
+
+
 class PagePermission(AbstractPagePermission):
     """Page permissions for a single page
     """
@@ -309,10 +341,8 @@ class PagePermission(AbstractPagePermission):
 
             yield from children
         elif self.grant_on & MASK_DESCENDANTS:
-            node = self.page.node
-
-            if node._has_cached_hierarchy():
-                descendants = (node.item.pk for node in node.get_cached_descendants())
+            if self.page._has_cached_hierarchy():
+                descendants = (page.pk for page in self.page.get_cached_descendants())
             else:
                 descendants = self.page.get_descendant_pages().values_list('pk', flat=True).iterator()
 
