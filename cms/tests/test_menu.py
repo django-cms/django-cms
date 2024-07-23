@@ -576,8 +576,8 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # Expectation
         # + P2
         # + P5
-        # + P7 ?
-        # + P8 ?
+        # + P7 (despite the fact that the parent is not visible)
+        # + P8 (despite the fact that the parent is not visible)
 
         self.assertEqual(len(nodes), 4)
         self.assertEqual(nodes[0].descendant, True)
@@ -591,6 +591,13 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 0 1 100 100 %}")
         tpl.render(context)
         nodes = context["children"]
+
+        # Expectation
+        # + P1
+        # | + P2
+        # + P4
+        #   + P5
+
         self.assertEqual(len(nodes), 2)
         for node in nodes:
             self.assertEqual(len(node.children), 1)
@@ -608,7 +615,6 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # + P4
         #   + P5
 
-        input(nodes)
         self.assertEqual(len(nodes), 2)
         for node in nodes:
             self.assertEqual(len(node.children), 1)
