@@ -31,6 +31,7 @@ def cut_after(node, levels, removed=None):
     """
     if removed is not None:
         raise TypeError("menus.template_tags.cut_after() does not accept 'removed' list argument")
+
     if levels == 0:
         node.children = []
     else:
@@ -78,11 +79,11 @@ def cut_levels(nodes, from_level, to_level, extra_inactive, extra_active):
             # Mark selected node
             selected = node
 
-    def cut_inactive(nodes):
+    def cut_inactive(final_nodes):
         """Recursively cut inactive nodes from the tree."""
-        for node in nodes:
+        for node in final_nodes:
             if not node.selected and not node.ancestor:
-                # Cut out inactive nodes after extra_inactive levels
+                # Cut out inactive nodes after extra_inactive levels (starting a 0)
                 cut_after(node, extra_inactive - from_level)
             elif not node.selected:
                 # Look for more inactive nodes (children of selected nodes are descendants by definition)
