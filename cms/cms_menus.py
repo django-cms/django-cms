@@ -51,6 +51,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
         stacklevel=2,
     )
     menu = CMSMenu(renderer)
+    # Overwrite languages according to parameters
     menu.languages = [language] + fallbacks if fallbacks else [language]
     preview_url = get_object_preview_url(PageContent(id=0)) if endpoint else None
     return menu.get_menu_node_for_page_content(page.get_content_obj(language), preview_url=preview_url)
@@ -143,6 +144,36 @@ class CMSMenu(Menu):
     """Subclass of :class:`menus.base.Menu`. Its :meth:`~menus.base.Menu.get_nodes()` creates a list of NavigationNodes
     based on a site's :class:`cms.models.pagemodel.Page` objects.
     """
+
+    def __init__(self, renderer):
+        """
+        Initializes a CMSMenu instance.
+
+        :param renderer: The renderer object.
+        """
+        super().__init__(renderer)
+
+        lang = renderer.request_language
+        site_pk = renderer.site.pk
+        if is_valid_site_language(lang, site_id=site_pk):
+            _valid_language = True
+            _hide_untranslated = hide_untranslated(lang, site_pk)
+        else:
+            _valid_language = False
+            _hide_untranslated = False
+
+        if _valid_language:
+            # The request language has been explicitly configured
+            # for the current site.
+            if _hide_untranslated:
+                fallbacks = []
+            else:
+                fallbacks = get_fallback_languages(lang, site_id=site_pk)
+            self.languages = [lang] + [_lang for _lang in fallbacks if _lang != lang]
+        else:
+            # The request language is not configured for the current site.
+            # Fallback to all configured public languages for the current site.
+            self.languages = get_public_languages(site_pk)
 
     def select_lang(self, page_contents: Iterable[PageContent]) -> Generator[PageContent, None, None]:
         """Generator that returns only those page content objects passed that contain the first language
@@ -240,28 +271,7 @@ class CMSMenu(Menu):
 
     def get_nodes(self, request) -> list[NavigationNode]:
         site = self.renderer.site
-        lang = self.renderer.request_language
         toolbar = get_toolbar_from_request(request)
-
-        if is_valid_site_language(lang, site_id=site.pk):
-            _valid_language = True
-            _hide_untranslated = hide_untranslated(lang, site.pk)
-        else:
-            _valid_language = False
-            _hide_untranslated = False
-
-        if _valid_language:
-            # The request language has been explicitly configured
-            # for the current site.
-            if _hide_untranslated:
-                fallbacks = []
-            else:
-                fallbacks = get_fallback_languages(lang, site_id=site.pk)
-            self.languages = [lang] + [_lang for _lang in fallbacks if _lang != lang]
-        else:
-            # The request language is not configured for the current site.
-            # Fallback to all configured public languages for the current site.
-            self.languages = get_public_languages(site.pk)
 
         if toolbar.edit_mode_active or toolbar.preview_mode_active:
             # Get all translations visible in the admin for the current page
