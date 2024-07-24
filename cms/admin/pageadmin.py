@@ -1499,7 +1499,6 @@ class PageContentAdmin(admin.ModelAdmin):
             url = add_url_parameters(
                 admin_reverse('cms_pagecontent_add'),
                 cms_page=page_content.page.pk,
-                parent_node=page_content.page.node.id,
                 language=page_content.language,
             )
             return menu_template, [
