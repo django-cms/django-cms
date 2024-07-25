@@ -492,8 +492,17 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context)
         nodes = context["children"]
-        self.assertEqual(len(nodes[1].children), 0)
+
+        # Expectation
+        # + P1 (selected)
+        # | + P2
+        # |   + P3
+        # + P4
+
+        self.assertEqual(len(nodes), 2)
+        self.assertTrue(nodes[0].selected)
         self.assertEqual(len(nodes[0].children), 1)
+        self.assertEqual(len(nodes[1].children), 0)
         self.assertEqual(len(nodes[0].children[0].children), 1)
 
         page_4 = self.get_page(4)
@@ -501,8 +510,17 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 0 100 0 100 %}")
         tpl.render(context)
         nodes = context["children"]
-        self.assertEqual(len(nodes[1].children), 1)
+
+        # Expectation
+        # + P1
+        # + P4 (selected)
+        #   + P5
+
+        self.assertEqual(len(nodes), 2)
         self.assertEqual(len(nodes[0].children), 0)
+        self.assertTrue(nodes[1].selected)
+        self.assertEqual(len(nodes[1].children), 1)
+        self.assertEqual(nodes[1].children[0].children, [])
 
     def test_only_one_active_level(self):
         context = self.get_context(page=self.get_page(1))
@@ -541,9 +559,31 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 0 100 %}")
         tpl.render(context)
         nodes = context["children"]
+
+        # Expectation
+        # + P2
         self.assertEqual(len(nodes), 1)
         self.assertEqual(nodes[0].descendant, True)
         self.assertEqual(len(nodes[0].children), 0)
+
+    def test_only_level_one_active_and_inacgtive(self):
+        context = self.get_context(page=self.get_page(1))
+        # test standard show_menu
+        tpl = Template("{% load menu_tags %}{% show_menu 1 1 1 100 %}")
+        tpl.render(context)
+        nodes = context["children"]
+
+        # Expectation
+        # + P2
+        # + P5
+        # + P7 (despite the fact that the parent is not visible)
+        # + P8 (despite the fact that the parent is not visible)
+
+        self.assertEqual(len(nodes), 4)
+        self.assertEqual(nodes[0].descendant, True)
+        self.assertEqual(nodes[1].descendant, False)
+        for node in nodes:
+            self.assertEqual(len(node.children), 0)
 
     def test_level_zero_and_one(self):
         context = self.get_context()
@@ -551,9 +591,34 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 0 1 100 100 %}")
         tpl.render(context)
         nodes = context["children"]
+
+        # Expectation
+        # + P1
+        # | + P2
+        # + P4
+        #   + P5
+
         self.assertEqual(len(nodes), 2)
         for node in nodes:
             self.assertEqual(len(node.children), 1)
+
+    def test_one_inactive(self):
+        context = self.get_context()
+        # test standard show_menu
+        tpl = Template("{% load menu_tags %}{% show_menu 0 100 1 100 %}")
+        tpl.render(context)
+        nodes = context["children"]
+
+        # Expectation
+        # + P1
+        # | + P2
+        # + P4
+        #   + P5
+
+        self.assertEqual(len(nodes), 2)
+        for node in nodes:
+            self.assertEqual(len(node.children), 1)
+            self.assertEqual(len(node.children[0].children), 0)
 
     def test_show_submenu(self):
         context = self.get_context(page=self.get_page(1))
