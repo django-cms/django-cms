@@ -42,7 +42,7 @@
             {% for placeholder, label, inherit in cms_placeholder_slots %}
                 <section>
                     <h1>{{ label }}{% if inherit %} <small>{% translate "inherited" %}</small>{% endif %}</h1>
-                    {% render_placeholder placeholder 100 "en" inherit=inherit %}
+                    {% render_placeholder placeholder 100 LANGUAGE_CODE inherit=inherit %}
                 </section>
             {% endfor %}
         {% endblock content %}{% spaceless %}
