@@ -175,7 +175,7 @@ default
 A list of placeholders that can be added to a page. The first element of the
 tuple is the name of the placeholder configuration. The second element is a
 tuple of placeholder names. The third element is the verbose description of the
-placeholder configuration which will be shown in the user interface.ed
+placeholder configuration which will be shown in the user interface.
 
 The ``CMS_PLACEHOLDERS`` setting is used to define the placeholders in headless
 mode if and only if no CMS templates are defined in :setting:`CMS_TEMPLATES` or
