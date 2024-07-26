@@ -187,10 +187,10 @@ class BasePageContentForm(forms.ModelForm):
     _request = None
 
     title = forms.CharField(
-        label=_("Title"),
+        label=PageContent._meta.get_field("title").verbose_name,
         max_length=255,
         widget=forms.TextInput(),
-        help_text=_("The default title"),
+        help_text=PageContent._meta.get_field("title").help_text,
     )
     slug = forms.SlugField(
         label=_("Slug"),
@@ -198,25 +198,23 @@ class BasePageContentForm(forms.ModelForm):
         help_text=_("The part of the title that is used in the URL"),
     )
     menu_title = forms.CharField(
-        label=_("Menu Title"),
+        label=PageContent._meta.get_field("menu_title").verbose_name,
         widget=forms.TextInput(),
-        help_text=_("Overwrite what is displayed in the menu"),
+        help_text=PageContent._meta.get_field("menu_title").help_text,
         required=False,
     )
     page_title = forms.CharField(
-        label=_("Page Title"),
+        label=PageContent._meta.get_field("page_title").verbose_name,
         widget=forms.TextInput(),
         required=False,
-        help_text=_(
-            "Overwrites what is displayed at the top of your browser or in bookmarks"
-        ),
+        help_text=PageContent._meta.get_field("page_title").help_text,
     )
     meta_description = forms.CharField(
-        label=_("Description meta tag"),
+        label=PageContent._meta.get_field("meta_description").verbose_name,
         max_length=320,
         required=False,
         widget=forms.Textarea(attrs={"maxlength": "320", "rows": "4"}),
-        help_text=_("A description of the page used by search engines."),
+        help_text=PageContent._meta.get_field("meta_description").help_text,
     )
 
     class Meta:
@@ -522,14 +520,14 @@ class ChangePageForm(BasePageContentForm):
         help_text=_("Keep this field empty if standard path should be used."),
     )
     soft_root = forms.BooleanField(
-        label=_("Soft root"),
+        label=PageContent._meta.get_field("soft_root").verbose_name,
         required=False,
-        help_text=_("All ancestors will not be displayed in the navigation"),
+        help_text=PageContent._meta.get_field("soft_root").help_text,
     )
     redirect = PageSmartLinkField(
-        label=_("Redirect"),
+        label=PageContent._meta.get_field("redirect").verbose_name,
         required=False,
-        help_text=_("Redirects to this URL."),
+        help_text=PageContent._meta.get_field("redirect").help_text,
         placeholder_text=_("Start typing..."),
         ajax_view="admin:cms_page_get_list",
     )
