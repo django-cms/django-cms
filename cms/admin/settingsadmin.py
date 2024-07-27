@@ -10,7 +10,7 @@ from django.contrib.auth.admin import csrf_protect_m
 from django.db import transaction
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseBadRequest
 from django.http.request import QueryDict
-from django.urls import path
+from django.urls import path, resolve, Resolver404
 from django.utils.html import conditional_escape
 from django.utils.translation import override
 
@@ -85,6 +85,11 @@ class SettingsAdmin(ModelAdmin):
         origin_url = urlparse(cms_path)
         attached_obj = form_data.get('attached_obj')
         current_page = get_page_from_request(request, use_path=origin_url.path, clean_path=True)
+        
+        try:
+            request.resolver_match = resolve(origin_url.path)
+        except Resolver404:
+            pass
 
         if attached_obj and current_page and not (attached_obj == current_page):
             return HttpResponseBadRequest('Generic object does not match current page')
