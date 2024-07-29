@@ -52,12 +52,11 @@ A very simple index could look something like this:
             ).distinct()
 
         def prepare(self, instance: PageContent) -> dict:
-          request = self.get_request_instance(current_language)
           self.prepared_data = super().prepare(instance)
           self.prepared_data["url"] = instance.page.get_absolute_url()
           self.prepared_data["title"] = instance.title
           self.prepared_data["text"] = (
-            self.prepared_data["title"] + instance.page.meta_description or ""
+            self.prepared_data["title"] + (instance.meta_description or "")
           )
           return self.prepared_data
 
