@@ -410,7 +410,7 @@ class CMSToolbarBase(BaseToolbar):
             return True
         return False
 
-    @property
+    @cached_property
     def edit_mode_active(self):
         """``True`` if editing mode is active。"""
         # Cannot be cached since it changes depending on the object.
