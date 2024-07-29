@@ -46,10 +46,7 @@ A very simple index could look something like this:
             return PageContent
 
         def index_queryset(self, using=None) -> models.QuerySet:
-            return self.get_model().objects.filter(
-              versions__state="published",
-              language=using
-            ).distinct()
+            return self.get_model().objects.filter(language=using)
 
         def prepare(self, instance: PageContent) -> dict:
           self.prepared_data = super().prepare(instance)
