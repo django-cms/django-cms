@@ -336,6 +336,41 @@ def check_copy_relations(output):
                                    'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
 
 
+@define_check
+def check_template_conf(output):
+    with output.section("Template configuration") as section:
+        if get_cms_setting("TEMPLATES"):
+            if isinstance(get_cms_setting("TEMPLATES"), (list, tuple)):
+                for template in get_cms_setting("TEMPLATES"):
+                    if not isinstance(template, (list, tuple)):
+                        section.error("CMS_TEMPLATES setting contains a non-list/tuple entry")
+                    elif len(template) != 2:
+                        section.error("CMS_TEMPLATES setting contains a list/tuple with != 2 entries")
+                    elif not isinstance(template[0], str):
+                        section.error("CMS_TEMPLATES contains a non-string entry")
+                    else:
+                        section.success("CMS_TEMPLATES_DIR or CMS_TEMPLATES setting  found")
+            else:
+                section.error("CMS_TEMPLATES setting is not a list or tuple")
+            if hasattr(settings, "CMS_PLACEHOLDERS"):
+                section.warn("CMS_PLACEHOLDERS setting is also present but will be ignored.")
+        elif get_cms_setting("PLACEHOLDERS"):
+            if isinstance(get_cms_setting("PLACEHOLDERS"), (list, tuple)):
+                for placeholder in get_cms_setting("PLACEHOLDERS"):
+                    if not isinstance(placeholder, (list, tuple)):
+                        section.error("CMS_PLACEHOLDERS setting contains a non-list/tuple entry")
+                    elif not isinstance(placeholder[0], str):
+                        section.error(f"CMS_PLACEHOLDERS contains an entry with a non-string identifier: "
+                                      f"{placeholder[0]}")
+                    else:
+                        section.success("CMS_PLACEHOLDERS setting entry found - CMS will run in headless mode")
+            else:
+                section.error("CMS_PLACEHOLDERS setting is not a list or tuple")
+        else:
+            section.warn("Both CMS_TEMPLATES and CMS_PLACEHOLDERS settings are missing. "
+                         "Will run in headless mode with one placeholder called \"content\"")
+
+
 def check(output):
     """
     Checks the configuration/environment of this django CMS installation.
