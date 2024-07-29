@@ -20,6 +20,7 @@ Using core functionality
     Enable frontend editing for Page and Django models <06-frontend_models>
     Create sitemaps <07-sitemaps>
     Manage Page Types <08-page_types>
+    Headless mode <21-headless>
 
 Creating new functionality
 --------------------------

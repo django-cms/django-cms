@@ -408,17 +408,25 @@ def rescan_placeholders_for_obj(obj):
 
 
 def get_declared_placeholders_for_obj(obj: Union[models.Model, None]) -> list[Placeholder]:
-    """Returns declared placeholders for an object. The object is supposed to have a method ``get_template``
+    """Returns declared placeholders for an object. The object is supposed to either have a method
+    ``get_placeholder_slots`` which returns the list of placeholders or a method ``get_template``
     which returns the template path as a string that renders the object. ``get_declared_placeholders`` returns
     a list of placeholders used in the template by the ``{% placeholder %}`` template tag.
     """
-    if obj is None:
-        return []
-    if not hasattr(obj, "get_template"):
-        raise NotImplementedError(
-            "%s should implement get_template" % obj.__class__.__name__
-        )
-    return get_placeholders(obj.get_template())
+    template = getattr(obj, "get_template", lambda: None)()
+    if template:
+        return get_placeholders(template)
+
+    if hasattr(obj, "get_placeholder_slots"):
+        from cms.templatetags.cms_tags import DeclaredPlaceholder
+
+        return [
+            DeclaredPlaceholder(slot=slot, inherit=False) if isinstance(slot, str) else DeclaredPlaceholder(**slot)
+            for slot in obj.get_placeholder_slots()
+        ]
+    raise NotImplementedError(
+        "%s should implement either get_placeholder_slots or get_template" % obj.__class__.__name__
+    )
 
 
 def get_placeholder_from_slot(

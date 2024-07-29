@@ -96,7 +96,7 @@ class PlaceholderToolbar(CMSToolbar):
             disabled = True
 
         url = '{url}?page={page}&language={lang}&edit'.format(
-            url=reverse("cms_wizard_create"),
+            url=admin_reverse("cms_wizard_create"),
             page=page_pk,
             lang=self.toolbar.site_language,
         )
@@ -115,7 +115,8 @@ class PlaceholderToolbar(CMSToolbar):
         if self.toolbar.content_mode_active and self._can_add_button():
             self.add_edit_button()
         # Preview button
-        if self.toolbar.edit_mode_active and self._can_add_button():
+        if not self.toolbar.preview_mode_active and get_cms_setting('TEMPLATES') and self._can_add_button():
+            # Only add preview button if there are templates available for previewing
             self.add_preview_button()
         # Structure mode
         if self._can_add_structure_mode():
@@ -184,14 +185,15 @@ class PlaceholderToolbar(CMSToolbar):
 
     def add_preview_button(self):
         url = get_object_preview_url(self.toolbar.obj, language=self.toolbar.request_language)
-        item = ButtonList(side=self.toolbar.RIGHT)
-        item.add_button(
-            _('Preview'),
-            url=url,
-            disabled=False,
-            extra_classes=['cms-btn', 'cms-btn-switch-save'],
-        )
-        self.toolbar.add_item(item)
+        if url:
+            item = ButtonList(side=self.toolbar.RIGHT)
+            item.add_button(
+                _('Preview'),
+                url=url,
+                disabled=False,
+                extra_classes=['cms-btn', 'cms-btn-switch-save'],
+            )
+            self.toolbar.add_item(item)
 
     def add_structure_mode(self, extra_classes=('cms-toolbar-item-cms-mode-switcher',)):
         structure_active = self.toolbar.structure_mode_active
@@ -435,7 +437,10 @@ class PageToolbar(CMSToolbar):
 
         # else redirect to root, do not redirect to Page.objects.get_home() because user could have deleted the last
         # page, if DEBUG == False this could cause a 404
-        return reverse('pages-root')
+        try:
+            return reverse('pages-root')
+        except NoReverseMatch:
+            return admin_reverse("cms_pagecontent_changelist")
 
     @property
     def title(self):
@@ -651,18 +656,25 @@ class PageToolbar(CMSToolbar):
                 action = admin_reverse('cms_pagecontent_change_template', args=(self.page_content.pk,))
 
                 if can_change_advanced:
-                    templates_menu = current_page_menu.get_or_create_menu(
-                        'templates',
-                        _('Templates'),
-                        disabled=not can_change,
-                    )
+                    if get_cms_setting('TEMPLATES'):
+                        options = get_cms_setting('TEMPLATES')
+                        template_menu = _('Templates')
+                    else:
+                        options = [(placeholders[0], placeholders[2]) for placeholders in get_cms_setting('PLACEHOLDERS')]
+                        template_menu = _('Placeholders')
+                    if options:
+                        templates_menu = current_page_menu.get_or_create_menu(
+                            'templates',
+                            template_menu,
+                            disabled=not can_change,
+                        )
 
-                    for path, name in get_cms_setting('TEMPLATES'):
-                        active = self.page_content.template == path
-                        if path == TEMPLATE_INHERITANCE_MAGIC:
-                            templates_menu.add_break(TEMPLATE_MENU_BREAK)
-                        templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
-                                                     on_success=refresh)
+                        for path, name in options:
+                            active = self.page_content.template == path
+                            if path == TEMPLATE_INHERITANCE_MAGIC:
+                                templates_menu.add_break(TEMPLATE_MENU_BREAK)
+                            templates_menu.add_ajax_item(name, action=action, data={'template': path}, active=active,
+                                                         on_success=refresh)
 
             # navigation toggle
             in_navigation = self.page_content.in_navigation

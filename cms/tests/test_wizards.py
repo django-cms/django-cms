@@ -201,7 +201,7 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             self.title_wizard.get_model()
 
     def test_endpoint_auth_required(self):
-        endpoint = reverse('cms_wizard_create')
+        endpoint = reverse('admin:cms_wizard_create')
         staff_active = self._create_user("staff-active", is_staff=True, is_superuser=False, is_active=True)
 
         response = self.client.get(endpoint)
