@@ -99,28 +99,32 @@ def get_page_display_name(cms_page):
     if not cms_page.page_content_cache:
         cms_page.set_translations_cache()
 
+    fallback_found = False
     if not cms_page.page_content_cache.get(language):
+        fallback_found = True
         fallback_langs = i18n.get_fallback_languages(language)
-        found = False
         for lang in fallback_langs:
             if cms_page.page_content_cache.get(lang):
-                found = True
                 language = lang
-        if not found:
+                break
+        else:
             language = None
             for lang, item in cms_page.page_content_cache.items():
                 if not isinstance(item, EmptyPageContent):
                     language = lang
-    if not language:
-        return _("Empty")
+                    break
+            else:
+                return _("Empty")
     page_content = cms_page.page_content_cache[language]
     if page_content.title:
-        return page_content.title
-    if page_content.page_title:
-        return page_content.page_title
-    if page_content.menu_title:
-        return page_content.menu_title
-    return cms_page.get_slug(language)
+        title = page_content.title
+    elif page_content.page_title:
+        title = page_content.page_title
+    elif page_content.menu_title:
+        title = page_content.menu_title
+    else:
+        title = cms_page.get_slug(language)
+    return mark_safe(f"<em>{title} ({language})</em>") if fallback_found else title
 
 
 class TreePublishRow(Tag):

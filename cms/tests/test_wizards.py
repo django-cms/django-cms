@@ -201,7 +201,7 @@ class TestWizardBase(WizardTestMixin, TransactionCMSTestCase):
             self.title_wizard.get_model()
 
     def test_endpoint_auth_required(self):
-        endpoint = reverse('cms_wizard_create')
+        endpoint = reverse('admin:cms_wizard_create')
         staff_active = self._create_user("staff-active", is_staff=True, is_superuser=False, is_active=True)
 
         response = self.client.get(endpoint)
@@ -369,8 +369,8 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         self.assertTrue(form.is_valid())
         child_page = form.save()
 
-        self.assertEqual(child_page.node.depth, 2)
-        self.assertEqual(child_page.parent_page, parent_page)
+        self.assertEqual(child_page.depth, 2)
+        self.assertEqual(child_page.parent, parent_page)
         self.assertEqual(child_page.get_title('en'), 'Child')
         self.assertEqual(child_page.get_path('en'), 'parent/child')
 

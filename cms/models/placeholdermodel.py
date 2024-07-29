@@ -431,7 +431,7 @@ class Placeholder(models.Model):
             invalidate_cms_page_cache()
 
         if not site_id and self.page:
-            site_id = self.page.node.site_id
+            site_id = self.page.site_id
         clear_placeholder_cache(self, language, get_site_id(site_id))
 
     def get_plugin_tree_order(self, language, parent_id=None):

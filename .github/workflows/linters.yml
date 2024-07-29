@@ -16,7 +16,7 @@ jobs:
     - run: python -Im pip install --user ruff
 
     - name: Run ruff on cms
-      run: ruff --output-format=github cms
+      run: ruff check --output-format=github cms
 
     - name: Run ruff on menus
-      run: ruff --output-format=github menus
+      run: ruff check --output-format=github menus

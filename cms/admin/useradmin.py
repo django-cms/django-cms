@@ -134,7 +134,7 @@ class PageUserGroupAdmin(GenericCmsPermissionAdmin, admin.ModelAdmin):
             for key in ('add', 'change', 'delete'):
                 perm_code = get_model_permission_codename(model, action=key)
                 if request.user.has_perm(perm_code):
-                    fields.append('can_%s_%s' % (key, name))
+                    fields.append(f'can_{key}_{name}')
             if fields:
                 fieldsets.insert(2 + i, (title, {'fields': (fields,)}))
         return fieldsets

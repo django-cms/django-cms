@@ -26,7 +26,6 @@ from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat import DJANGO_3
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -114,7 +113,7 @@ class ApphooksTestCase(CMSTestCase):
         result = check_url_config(None)
         self.assertEqual(len(result), 0)
 
-    @override_settings(CMS_APPHOOKS=['%s.%s' % (APP_MODULE, APP_NAME)])
+    @override_settings(CMS_APPHOOKS=[f'{APP_MODULE}.{APP_NAME}'])
     def test_explicit_apphooks(self):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.
@@ -308,7 +307,7 @@ class ApphooksTestCase(CMSTestCase):
         view_names = (
             ('sample-settings', 'sample_view'),
             ('sample-class-view', 'ClassView'),
-            ('sample-class-based-view', 'ClassBasedView' if DJANGO_3 else 'view'),
+            ('sample-class-based-view', 'view'),
             # Naming convention changed in Django 4
         )
 
@@ -456,7 +455,7 @@ class ApphooksTestCase(CMSTestCase):
                             "nav_playground.html",
                             language="en",
                             created_by=self.superuser,
-                            parent=de_title.page.get_parent_page(),
+                            parent=de_title.page.parent,
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
         create_page_content("de", "de_title", page2, slug="slug")
@@ -879,7 +878,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page2 = create_page('page2', 'nav_playground.html',
                             'en', created_by=self.superuser,
-                            parent=titles[0].page.get_parent_page(),
+                            parent=titles[0].page.parent,
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_page_content('de', 'de_title', page2, slug='slug')
 
@@ -920,7 +919,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page2 = create_page('page2', 'nav_playground.html',
                             'en', created_by=self.superuser,
-                            parent=titles[0].page.get_parent_page(),
+                            parent=titles[0].page.parent,
                             in_navigation=True,
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_page_content('de', 'de_title', page2, slug='slug')
@@ -1032,13 +1031,13 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
         create_page_content('de', child_page.get_title(), child_page)
+        child_page.refresh_from_db()
 
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook='SampleApp')
-        create_page_content("de", '%s_de' % child_child_page.get_title(), child_child_page)
+        create_page_content("de", f'{child_child_page.get_title()}_de', child_child_page)
+        child_child_page.refresh_from_db()
 
-        # publisher_public is set to draft on publish, issue with one to one reverse
-        child_child_page = self.reload(child_child_page)
         with force_language("en"):
             path = reverse('extra_first')
 

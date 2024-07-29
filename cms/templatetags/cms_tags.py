@@ -4,6 +4,7 @@ from datetime import datetime
 
 from classytags.arguments import (
     Argument,
+    KeywordArgument,
     MultiKeywordArgument,
     MultiValueArgument,
 )
@@ -14,7 +15,9 @@ from classytags.utils import flatten_context
 from classytags.values import ListValue, StringValue
 from django import template
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.mail import mail_managers
 from django.db.models import Model
 from django.template.loader import render_to_string
@@ -79,10 +82,10 @@ def _get_page_by_untyped_arg(page_lookup, request, site_id):
     site = Site.objects._get_site_by_id(site_id)
     try:
         if 'pk' in page_lookup:
-            return Page.objects.select_related('node').get(**page_lookup)
+            return Page.objects.get(**page_lookup)
         else:
             pages = get_page_queryset(site)
-            return pages.select_related('node').get(**page_lookup)
+            return pages.get(**page_lookup)
     except Page.DoesNotExist:
         subject = _('Page not found on %(domain)s') % {'domain': site.domain}
         body = _(
@@ -188,6 +191,37 @@ def render_plugin(context, plugin):
     return content
 
 
+class EmptyListValue(list, StringValue):
+    """
+    A list of template variables for easy resolving
+    """
+    def __init__(self, value=NULL):
+        list.__init__(self)
+        if value is not NULL:
+            self.append(value)
+
+    def resolve(self, context):
+        resolved = [item.resolve(context) for item in self]
+        return self.clean(resolved)
+
+
+class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
+    sequence_class = EmptyListValue
+
+    def parse(self, parser, token, tagname, kwargs):
+        if '=' in token:
+            if self.name not in kwargs:
+                kwargs[self.name] = self.sequence_class()
+            return False
+        return super().parse(
+            parser,
+            token,
+            tagname,
+            kwargs
+        )
+
+
+
 class PageUrl(AsTag):
     name = 'page_url'
 
@@ -286,6 +320,8 @@ class Placeholder(Tag):
         if not request:
             return ''
 
+        if name in context:
+            name = context[name]
         validate_placeholder_name(name)
 
         toolbar = get_toolbar_from_request(request)
@@ -503,17 +539,17 @@ class CMSEditableObject(InclusionTag):
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = "%s %s list" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {} list".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = "%s %s" % (smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {}".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(
                         edit_fields
                     ) if not isinstance('edit_fields', str) else edit_fields
             else:
-                instance.get_plugin_name = "%s %s" % (smart_str(_('Add')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = "{} {}".format(smart_str(_('Add')), smart_str(opts.verbose_name))
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
             extra_context['generic'] = opts
@@ -531,28 +567,25 @@ class CMSEditableObject(InclusionTag):
                 # The default view_url is the default admin changeform for the
                 # current instance
                 if not editmode:
-                    view_url = 'admin:%s_%s_add' % (
-                        opts.app_label, opts.model_name)
+                    view_url = f'admin:{opts.app_label}_{opts.model_name}_add'
                     url_base = reverse(view_url)
                 elif not edit_fields:
                     if not view_url:
-                        view_url = 'admin:%s_%s_change' % (
-                            opts.app_label, opts.model_name)
+                        view_url = f'admin:{opts.app_label}_{opts.model_name}_change'
                     if isinstance(instance, Page):
                         url_base = reverse(view_url, args=(instance.pk, language))
                     else:
                         url_base = reverse(view_url, args=(instance.pk,))
                 else:
                     if not view_url:
-                        view_url = 'admin:%s_%s_edit_field' % (
-                            opts.app_label, opts.model_name)
+                        view_url = f'admin:{opts.app_label}_{opts.model_name}_edit_field'
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
                     else:
                         url_base = reverse(view_url, args=(instance.pk, language))
                     querystring['edit_fields'] = ",".join(context['edit_fields'])
             if editmode:
-                extra_context['edit_url'] = "%s?%s" % (url_base, urlencode(querystring))
+                extra_context['edit_url'] = f"{url_base}?{urlencode(querystring)}"
             else:
                 extra_context['edit_url'] = "%s" % url_base
             extra_context['refresh_page'] = True
@@ -650,8 +683,7 @@ class CMSEditableObject(InclusionTag):
                 edit_fields = 'title,page_title,menu_title'
             view_url = 'admin:cms_page_edit_title_fields'
         if edit_fields == 'changelist':
-            view_url = 'admin:%s_%s_changelist' % (
-                instance._meta.app_label, instance._meta.model_name)
+            view_url = f'admin:{instance._meta.app_label}_{instance._meta.model_name}_changelist'
         querystring = OrderedDict((('language', language),))
         if edit_fields:
             extra_context['edit_fields'] = edit_fields.strip().split(",")
@@ -899,33 +931,40 @@ class RenderPlaceholder(AsTag):
     name = 'render_placeholder'
     options = Options(
         Argument('placeholder'),
-        Argument('width', default=None, required=False),
-        'language',
-        Argument('language', default=None, required=False),
+        MultiValueArgumentBeforeKeywordArgument('args', required=False),
+        MultiKeywordArgument('kwargs', required=False),
         'as',
         Argument('varname', required=False, resolve=False)
     )
 
-    def _get_value(self, context, editable=True, **kwargs):
+    def _get_value(self, context, editable=True, placeholder=None, nocache=False, args=None, kwargs=None):
         request = context['request']
         toolbar = get_toolbar_from_request(request)
         renderer = toolbar.get_content_renderer()
-        placeholder = kwargs.get('placeholder')
-        nocache = kwargs.get('nocache', False)
+        width = args.pop() if args else None
+        language = args.pop() if args else None
+        inherit = kwargs.get('inherit', False)
 
         if not placeholder:
             return ''
 
         if isinstance(placeholder, str):
-            placeholder = PlaceholderModel.objects.get(slot=placeholder)
+            # When only a placeholder name is given, try to get the placeholder
+            # associated with the toolbar object's slot
+            return renderer.render_obj_placeholder(
+                placeholder,
+                context,
+                inherit,
+                editable=editable,
+            )
 
         content = renderer.render_placeholder(
             placeholder=placeholder,
             context=context,
-            language=kwargs.get('language'),
+            language=language,
             editable=editable,
             use_cache=not nocache,
-            width=kwargs.get('width'),
+            width=width,
         )
         return content
 
@@ -947,36 +986,6 @@ class RenderUncachedPlaceholder(RenderPlaceholder):
     def _get_value(self, context, editable=True, **kwargs):
         kwargs['nocache'] = True
         return super()._get_value(context, editable, **kwargs)
-
-
-class EmptyListValue(list, StringValue):
-    """
-    A list of template variables for easy resolving
-    """
-    def __init__(self, value=NULL):
-        list.__init__(self)
-        if value is not NULL:
-            self.append(value)
-
-    def resolve(self, context):
-        resolved = [item.resolve(context) for item in self]
-        return self.clean(resolved)
-
-
-class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
-    sequence_class = EmptyListValue
-
-    def parse(self, parser, token, tagname, kwargs):
-        if '=' in token:
-            if self.name not in kwargs:
-                kwargs[self.name] = self.sequence_class()
-            return False
-        return super().parse(
-            parser,
-            token,
-            tagname,
-            kwargs
-        )
 
 
 class CMSAdminURL(AsTag):
