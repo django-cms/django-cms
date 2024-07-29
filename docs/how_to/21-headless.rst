@@ -2,7 +2,7 @@
  How to run django CMS in headless mode
 ########################################
 
-.. versionadded:: 4.1
+.. versionadded:: 4.2
 
 Django CMS is headless-ready. This means that you can use django CMS as a
 backend service to provide content to the frontend technology of your choice.
@@ -130,3 +130,28 @@ This scenario is useful when you do not want to design templates and focus on
 the content structure only. Editors will see a generic representation of the
 plugins in a minimally styled template. Note that the ``css`` and ``js`` block
 of the plugin templates will be loaded also in this case.
+
+******************************
+ Headless setup and app hooks
+******************************
+
+When running Django CMS in headless mode, you can still use app hooks to
+integrate your Django apps with the CMS. App hooks allow you to attach Django
+apps to a CMS page and render the app's content on that page. Those apps will
+be served via django CMS' url patterns.
+
+If the app provides API endpoints itself, they will need to be included
+explicitly in the REST API. Please check the package you are using to create
+the REST API on how to do this.
+
+**************
+ Hybrid setup
+**************
+
+You can also use django CMS in a hybrid setup, where you serve both the HTML
+pages and the content via an API. In this case, you keep the django CMS' URLS
+and just add the API to your traditional project.
+
+Be careful, however, to have the API endpoints in your project's urls **before**
+django CMS' catch-all HTML urls. Otherwise you run the risk of pages with
+the wrong path shaddowing out the API endpoints.
