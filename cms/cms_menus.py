@@ -2,13 +2,11 @@ import typing
 from typing import Optional
 
 from django.db.models.query import Prefetch, prefetch_related_objects
-from django.urls import reverse
 from django.utils.functional import SimpleLazyObject
-from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.apphook_pool import apphook_pool
-from cms.models import EmptyPageContent, PageContent, PageUrl
+from cms.models import EmptyPageContent, PageContent, PagePermission, PageUrl
 from cms.toolbar.utils import get_object_preview_url, get_toolbar_from_request
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import (
@@ -19,7 +17,6 @@ from cms.utils.i18n import (
 )
 from cms.utils.page import get_page_queryset
 from cms.utils.page_permissions import user_can_view_all_pages
-from cms.utils.permissions import get_view_restrictions
 from menus.base import Menu, Modifier, NavigationNode
 from menus.menu_pool import menu_pool
 
@@ -29,45 +26,51 @@ def get_visible_nodes(request, pages, site):
     This code is a many-pages-at-once version of cms.utils.page_permissions.user_can_view_page.
     `pages` contains all published pages.
     """
-    user = request.user
     public_for = get_cms_setting("PUBLIC_FOR")
-    can_see_unrestricted = public_for == "all" or (public_for == "staff" and user.is_staff)
+    can_see_unrestricted = public_for == "all" or (public_for == "staff" and request.user.is_staff)
 
-    if not user.is_authenticated and not can_see_unrestricted:
+    if not request.user.is_authenticated and not can_see_unrestricted:
         # User is not authenticated and can't see unrestricted pages,
         # no need to check for page restrictions because if there's some,
         # user is anon and if there is not any, user can't see unrestricted.
         return []
 
-    if user_can_view_all_pages(user, site):
+    if user_can_view_all_pages(request.user, site):
         return list(pages)
 
-    restricted_pages = get_view_restrictions(pages)
-
-    if not restricted_pages:
+    if not get_cms_setting('PERMISSION'):
         # If there's no restrictions, let the user see all pages
         # only if he can see unrestricted, otherwise return no pages.
         return list(pages) if can_see_unrestricted else []
 
-    user_id = user.pk
-    user_groups = SimpleLazyObject(lambda: frozenset(user.groups.values_list("pk", flat=True)))
-    is_auth_user = user.is_authenticated
+    restrictions = PagePermission.objects.filter(
+        page__in=pages,
+        can_view=True,
+    )
+    restriction_map = {perm.page_id: perm for perm in restrictions}
+
+    user_id = request.user.pk
+    user_groups = SimpleLazyObject(lambda: frozenset(request.user.groups.values_list("pk", flat=True)))
+    is_auth_user = request.user.is_authenticated
 
     def user_can_see_page(page):
-        page_permissions = restricted_pages.get(page.pk, [])
+        if page.pk in restriction_map:
+            # set internal fk cache to our page with loaded ancestors and descendants
+            PagePermission.page.field.set_cached_value(restriction_map[page.pk], page)
 
-        if not page_permissions:
-            # Page has no view restrictions, fallback to the project's
-            # CMS_PUBLIC_FOR setting.
-            return can_see_unrestricted
+        restricted = False
+        for perm in restrictions:
+            if perm.get_page_permission_tuple().contains(page.node.path):
+                if not is_auth_user:
+                    return False
+                if perm.user_id == user_id or perm.group_id in user_groups:
+                    return True
+                restricted = True
 
-        if not is_auth_user:
-            return False
+        # Page has no view restrictions, fallback to the project's
+        # CMS_PUBLIC_FOR setting.
+        return can_see_unrestricted and not restricted
 
-        for perm in page_permissions:
-            if perm.user_id == user_id or perm.group_id in user_groups:
-                return True
-        return False
     return [page for page in pages if user_can_see_page(page)]
 
 
@@ -229,8 +232,7 @@ class CMSMenu(Menu):
 
         pages = (
             pages.filter(pagecontent_set__language__in=languages)
-            .select_related("node")
-            .order_by("node__path")
+            .order_by("path")
             .distinct()
         )
         pages = get_visible_nodes(request, pages, site)
@@ -263,9 +265,6 @@ class CMSMenu(Menu):
         # Build the blank title instances only once
         blank_page_content_cache = {language: EmptyPageContent(language=language) for language in languages}
 
-        # Maps a node id to its page id
-        node_id_to_page = {}
-
         def _page_to_node(page):
             # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
@@ -289,26 +288,16 @@ class CMSMenu(Menu):
         menu_nodes = []
 
         for page in pages:
-            node = page.node
-            parent_id = node_id_to_page.get(node.parent_id)
-
-            if node.parent_id and not parent_id:
-                # If the parent page is not available (unpublished, etc..)
-                # don't bother creating menu nodes for its descendants.
-                continue
-
-            menu_node = _page_to_node(page)
-            if menu_node:
+            if menu_node := _page_to_node(page):
                 # Only add pages with at least one page content
                 cut_homepage = homepage and not homepage.get_in_navigation(lang)
 
-                if cut_homepage and parent_id == homepage.pk:
+                if cut_homepage and page.parent_id == homepage.pk:
                     # When the homepage is hidden from navigation,
                     # we need to cut all its direct children from it.
                     menu_node.parent_id = None
                 else:
-                    menu_node.parent_id = parent_id
-                node_id_to_page[node.pk] = page.pk
+                    menu_node.parent_id = page.parent_id
                 menu_nodes.append(menu_node)
         return menu_nodes
 

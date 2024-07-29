@@ -29,6 +29,7 @@ jobs:
     needs: new
     steps:
       - name: Send Discord Webhook
+        continue-on-error: true
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
           DISCORD_EMBEDS: |

@@ -204,7 +204,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
-    target_node = parent.node if parent else None
 
     # validate and normalize apphook
     if apphook:
@@ -220,10 +219,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
 
     if reverse_id:
-        if Page.objects.filter(reverse_id=reverse_id, node__site=site).exists():
+        if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(
+        parent=parent,
         created_by=created_by,
         changed_by=created_by,
         reverse_id=reverse_id,
@@ -231,8 +231,9 @@ def create_page(title, template, language, menu_title=None, slug=None,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
         login_required=login_required,
+        site=site,
     )
-    page.set_tree_node(site=site, target=target_node, position=position)
+    page.add_to_tree(position=position)
     page.save()
 
     create_page_content(
@@ -251,9 +252,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-
-    if parent and position in ('last-child', 'first-child'):
-        parent._clear_node_cache()
 
     del _thread_locals.user
     return page
@@ -295,7 +293,7 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
     assert isinstance(page, Page)
 
     # validate language:
-    assert language in get_language_list(page.node.site_id)
+    assert language in get_language_list(page.site_id)
 
     # validate menu visibility
     accepted_limitations = (constants.VISIBILITY_ALL, constants.VISIBILITY_USERS, constants.VISIBILITY_ANONYMOUS)
@@ -304,7 +302,7 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
     # set default slug:
     if not slug:
         base = page.get_path_for_slug(slugify(title), language)
-        slug = get_available_slug(page.node.site, base, language)
+        slug = get_available_slug(page.site, base, language)
 
     if overwrite_url:
         path = overwrite_url.strip('/')

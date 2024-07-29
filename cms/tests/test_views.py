@@ -76,7 +76,7 @@ class ViewTests(CMSTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('admin:cms_pagecontent_changelist'))
 
-    def test_handle_no_page_for_rool_url_no_homepage(self):
+    def test_handle_no_page_for_root_url_no_homepage(self):
         """
         Test details view when visiting root and homepage doesn't exist
         """

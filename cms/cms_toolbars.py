@@ -425,7 +425,7 @@ class PageToolbar(CMSToolbar):
 
     def get_on_delete_redirect_url(self):
         language = self.current_lang
-        parent_page = self.page.parent_page if self.page else None
+        parent_page = self.page.parent if self.page else None
 
         # if the current page has a parent in the request's current language redirect to it
         if parent_page and language in parent_page.get_languages():
@@ -500,7 +500,7 @@ class PageToolbar(CMSToolbar):
 
                 for code, name in add:
                     url = add_url_parameters(
-                        page_add_url, cms_page=self.page.pk, parent_node=self.page.node.id, language=code
+                        page_add_url, cms_page=self.page.pk, parent_page=self.page.id, language=code
                     )
                     add_plugins_menu.add_modal_item(name, url=url)
 
@@ -572,7 +572,7 @@ class PageToolbar(CMSToolbar):
                 PAGE_MENU_IDENTIFIER, _('Page'), position=1, disabled=self.in_apphook() and not self.in_apphook_root())
 
             new_page_params = {'edit': 1}
-            new_sub_page_params = {'edit': 1, 'parent_node': self.page.node_id}
+            new_sub_page_params = {'edit': 1, 'parent_page': self.page.id}
 
             add_page_url = admin_reverse('cms_pagecontent_add')
             advanced_url = admin_reverse('cms_page_advanced', args=(self.page.pk,))
@@ -584,11 +584,11 @@ class PageToolbar(CMSToolbar):
                 site=self.current_site,
             )
 
-            if self.page.parent_page:
-                new_page_params['parent_node'] = self.page.parent_page.node_id
+            if self.page.parent:
+                new_page_params['parent_page'] = self.page.parent.id
                 can_add_sibling_page = page_permissions.user_can_add_subpage(
                     user=self.request.user,
-                    target=self.page.parent_page,
+                    target=self.page.parent,
                 )
             else:
                 can_add_sibling_page = can_add_root_page

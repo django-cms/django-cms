@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group, UserManager
 from django.contrib.sites.models import Site
 from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.db import models
+from django.db.models import Q
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
@@ -214,6 +215,38 @@ class GlobalPagePermission(AbstractPagePermission):
         return "%s :: GLOBAL" % self.audience
 
 
+class PermissionTuple(tuple):
+    def contains(self, path: str, steplen: int = Page.steplen) -> bool:
+        grant_on, perm_path = self
+        if grant_on == ACCESS_PAGE:
+            return path == perm_path
+        elif grant_on == ACCESS_CHILDREN:
+            return path.startswith(perm_path) and len(path) == len(perm_path) + steplen
+        elif grant_on == ACCESS_DESCENDANTS:
+            return path.startswith(perm_path) and len(path) > len(perm_path)
+        elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            return path.startswith(perm_path)
+        elif grant_on == ACCESS_PAGE_AND_CHILDREN:
+            return path.startswith(perm_path) and len(path) <= len(perm_path) + steplen
+        return False
+
+    def allow_list(self, filter: str = "", steplen: int = Page.steplen) -> Q:
+        if filter !="":
+            filter = f"{filter}__"
+        grant_on, path = self
+        if grant_on == ACCESS_PAGE:
+            return Q(**{f"{filter}path": path})
+        elif grant_on == ACCESS_CHILDREN:
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length": len(path) + steplen})
+        elif grant_on == ACCESS_DESCENDANTS:
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__gt": len(path)})
+        elif grant_on == ACCESS_PAGE_AND_DESCENDANTS:
+            return Q(**{f"{filter}path__startswith": path})
+        elif grant_on == ACCESS_PAGE_AND_CHILDREN:
+            return Q(**{f"{filter}path__startswith": path, f"{filter}__path__length__lte": len(path) + steplen})
+        return Q()
+
+
 class PagePermission(AbstractPagePermission):
     """Page permissions for a single page
     """
@@ -236,14 +269,27 @@ class PagePermission(AbstractPagePermission):
 
         if self.can_add and self.grant_on == ACCESS_PAGE:
             # this is a misconfiguration - user can add/move page to current
-            # page but after he does this, he will not have permissions to
+            # page, but after he does this, he will not have permissions to
             # access this page anymore, so avoid this.
             message = _("Add page permission requires also access to children, "
                         "or descendants, otherwise added page can't be changed "
                         "by its creator.")
             raise ValidationError(message)
 
+    def get_page_permission_tuple(self):
+        node = self.page.node
+        return PermissionTuple((self.grant_on, node.path))
+
     def get_page_ids(self):
+        import warnings
+
+        from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+        warnings.warn("get_page_ids is deprecated and will be removed in django CMS 4.3, "
+                      "use get_page_permission_tuple instead", RemovedInDjangoCMS43Warning, stacklevel=2)
+
+        return self._get_page_ids()
+
+    def _get_page_ids(self):
         if self.grant_on & MASK_PAGE:
             yield self.page_id
 
@@ -252,10 +298,8 @@ class PagePermission(AbstractPagePermission):
 
             yield from children
         elif self.grant_on & MASK_DESCENDANTS:
-            node = self.page.node
-
-            if node._has_cached_hierarchy():
-                descendants = (node.item.pk for node in node.get_cached_descendants())
+            if self.page._has_cached_hierarchy():
+                descendants = (page.pk for page in self.page.get_cached_descendants())
             else:
                 descendants = self.page.get_descendant_pages().values_list('pk', flat=True).iterator()
 

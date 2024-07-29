@@ -60,11 +60,32 @@ Bug Fixes
 Backward incompatible changes in 4.2.0
 **************************************
 
-Topic 1
-=======
+Merging of Page.node into Page
+==============================
 
-Empty sections are to be removed before release.
+To improve performance and simplify database accesses, the ``TreeNode`` model
+has been merged into the ``Page`` model. This change is backward incompatible
+and will require a database migration.
 
+Compatibility shims have been added to the ``Page`` model to ensure that custom
+code that accesses the ``Page.node`` attribute will continue to work. However,
+this compatibility shim will be removed in django CMS 4.3 release. For now,
+they raise a ``RemovedInDjangoCMS43Warning`` warning.
+
+Most prominent changes to custom code are:
+
+* Pages have a ``site`` field again: ``page.node.site`` becomes ``page.site``
+* ``page.node.path`` becomes ``page.path``
+* ``page.node.depth`` becomes ``page.depth``
+* ``page.node.numchild`` becomes ``page.numchild``
+* ``page.node.parent`` and ``page.page_parent`` become ``page.parent``
+
+Please also check your ``.filter()``, ``.order()``, ``.select_related()``, and
+``.prefetch_related()`` calls to ensure they are still correct:
+``.filter(node__site=site)`` becomes ``.filter(site=site)`` etc.
+
+If you have custom code that accesses the ``Page.node`` attribute, you should
+update it to use the new attributes on the ``Page`` model.
 
 Miscellaneous
 =============
@@ -75,7 +96,9 @@ Empty sections are to be removed before release.
 Features deprecated in 4.2.0
 ============================
 
-Empty sections are to be removed before release.
+* Use of the `node` property of the :class:`~cms.models.pagemodel.Page` model
+  is deprecated. Use the attributes on the :class:`~cms.models.pagemodel.Page`
+  model instead.
 
 Removal of deprecated functionality
 ===================================
