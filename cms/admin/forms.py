@@ -419,7 +419,7 @@ class AddPageForm(BasePageContentForm):
         )
 
         if is_first and not new_page.is_page_type:
-            # its the first page. Make it the homepage
+            # it's the first page. Make it the homepage
             new_page.set_as_homepage(self._user)
 
         send_post_page_operation(
@@ -540,7 +540,6 @@ class ChangePageForm(BasePageContentForm):
         coerce=int,
         empty_value=None,
     )
-
     fieldsets = (
         (
             None,

@@ -35,7 +35,7 @@ class GetAdminUrlForLanguage(AsTag):
 
     def get_value(self, context, page, language):
         if language in page.get_languages():
-            page_content = page.pagecontent_set(manager="admin_manager").current_content(language=language).first()
+            page_content = page.pagecontent_set(manager="admin_manager").latest_content(language=language).first()
             if page_content:
                 return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
         admin_url = admin_reverse('cms_pagecontent_add')
