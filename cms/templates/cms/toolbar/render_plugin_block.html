@@ -1,2 +1,1 @@
-{% load l10n %}
-<div class="cms-plugin cms-plugin-{{ plugin.id|unlocalize }}">{{ inner }}</div>
+<div class="cms-plugin cms-plugin-{{ plugin.id|safe }}">{{ inner }}</div>
