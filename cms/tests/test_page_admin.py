@@ -2647,7 +2647,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_permissions_cache_invalidation(self):
         """
-        Test permission cache clearing on page save
+        Permission cache clears on page save
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
@@ -2659,6 +2659,42 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             data['_continue'] = '1'
             self.client.post(endpoint, data)
         self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+
+    def test_permission_cache_invalidation_on_group_add(self):
+        """
+        Permissions cache is invalidated if the group relationship of a user is changed
+        """
+        from django.contrib.auth.models import Group
+
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_std_permissions()
+        set_permission_cache(staff_user, "change_page", [page.pk])
+
+        group = Group(name="test_group")
+        group.save()
+        staff_user.groups.add(group)
+
+        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+
+
+    def test_permission_cache_invalidation_on_group_remove(self):
+        """
+        Permissions cache is invalidated if the group relationship of a user is changed
+        """
+        from django.contrib.auth.models import Group
+
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_std_permissions()
+        group = Group(name="test_group")
+        group.save()
+        staff_user.groups.add(group)
+
+        set_permission_cache(staff_user, "change_page", [page.pk])
+
+        group.user_set.remove(staff_user)
+
+        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+
 
     def test_user_can_copy_page(self):
         """
