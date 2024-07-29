@@ -76,7 +76,7 @@ def plugin_supports_cte():
     return not (db_vendor == 'mysql' and connection.mysql_version < (8, 0))
 
 
-class BoundRenderMeta():
+class BoundRenderMeta:
     def __init__(self, meta):
         self.index = 0
         self.total = 1
@@ -186,13 +186,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return force_str(self.pk)
 
     def __repr__(self):
-        display = "<{module}.{class_name} id={id} plugin_type='{plugin_type}' object at {location}>".format(
-            module=self.__module__,
-            class_name=self.__class__.__name__,
-            id=self.pk,
-            plugin_type=(self.plugin_type),
-            location=hex(id(self)),
-        )
+        display = f"<{self.__module__}.{self.__class__.__name__} id={self.pk} plugin_type='{self.plugin_type}' object at {hex(id(self))}>"
         return display
 
     def get_plugin_name(self):
@@ -219,7 +213,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     def get_plugin_instance(self, admin=None):
         """
         For a plugin instance (usually as a CMSPluginBase), this method
-        returns the downcasted (i.e., correctly typed subclass of CMSPluginBase) instacnce and the plugin class
+        returns the downcasted (i.e., correctly typed subclass of CMSPluginBase) instance and the plugin class
 
         :return: Tuple (instance, plugin)
 
@@ -305,14 +299,14 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         Get src URL for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return plugin.icon_src(instance) if instance else u''
+        return plugin.icon_src(instance) if instance else ''
 
     def get_instance_icon_alt(self):
         """
         Get alt text for instance's icon
         """
         instance, plugin = self.get_plugin_instance()
-        return force_str(plugin.icon_alt(instance)) if instance else u''
+        return force_str(plugin.icon_alt(instance)) if instance else ''
 
     def update(self, refresh=False, **fields):
         CMSPlugin.objects.filter(pk=self.pk).update(**fields)
@@ -400,20 +394,20 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         for parent in self.get_ancestors():
             try:
                 url = force_str(
-                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                    admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
                                   args=[parent.pk]))
             except NoReverseMatch:
                 url = force_str(
-                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                    admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
                                   args=[parent.pk]))
             breadcrumb.append({'title': force_str(parent.get_plugin_name()), 'url': url})
         try:
             url = force_str(
-                admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
                               args=[self.pk]))
         except NoReverseMatch:
             url = force_str(
-                admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
                               args=[self.pk]))
         breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
         return breadcrumb

@@ -60,6 +60,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.utils import get_current_site
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.page import get_available_slug, get_clean_username
@@ -203,7 +204,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
 
     # validate position
     assert position in ('last-child', 'first-child', 'left', 'right')
-    target_node = parent.node if parent else None
 
     # validate and normalize apphook
     if apphook:
@@ -219,10 +219,11 @@ def create_page(title, template, language, menu_title=None, slug=None,
         _thread_locals.user = None
 
     if reverse_id:
-        if Page.objects.filter(reverse_id=reverse_id, node__site=site).exists():
+        if Page.objects.filter(reverse_id=reverse_id, site=site).exists():
             raise FieldError('A page with the reverse_id="%s" already exist.' % reverse_id)
 
     page = Page(
+        parent=parent,
         created_by=created_by,
         changed_by=created_by,
         reverse_id=reverse_id,
@@ -230,8 +231,9 @@ def create_page(title, template, language, menu_title=None, slug=None,
         application_urls=application_urls,
         application_namespace=apphook_namespace,
         login_required=login_required,
+        site=site,
     )
-    page.set_tree_node(site=site, target=target_node, position=position)
+    page.add_to_tree(position=position)
     page.save()
 
     create_page_content(
@@ -250,9 +252,6 @@ def create_page(title, template, language, menu_title=None, slug=None,
         limit_visibility_in_menu=limit_visibility_in_menu,
         xframe_options=xframe_options,
     )
-
-    if parent and position in ('last-child', 'first-child'):
-        parent._clear_node_cache()
 
     del _thread_locals.user
     return page
@@ -294,7 +293,7 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
     assert isinstance(page, Page)
 
     # validate language:
-    assert language in get_language_list(page.node.site_id)
+    assert language in get_language_list(page.site_id)
 
     # validate menu visibility
     accepted_limitations = (constants.VISIBILITY_ALL, constants.VISIBILITY_USERS, constants.VISIBILITY_ANONYMOUS)
@@ -303,7 +302,7 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
     # set default slug:
     if not slug:
         base = page.get_path_for_slug(slugify(title), language)
-        slug = get_available_slug(page.node.site, base, language)
+        slug = get_available_slug(page.site, base, language)
 
     if overwrite_url:
         path = overwrite_url.strip('/')
@@ -362,7 +361,7 @@ def create_title(language, title, page, menu_title=None, slug=None,
     """
     warnings.warn(
         "cms.api.create_title has been renamed to cms.api.create_page_content().",
-        DeprecationWarning,
+        RemovedInDjangoCMS43Warning,
         stacklevel=2
     )
     return create_page_content(
@@ -436,7 +435,7 @@ def add_plugin(placeholder, plugin_type, language, position='last-child',
 def create_page_user(created_by, user,
                      can_add_page=True, can_view_page=True,
                      can_change_page=True, can_delete_page=True,
-                     can_recover_page=True, can_add_pageuser=True,
+                     can_publish_page=True, can_add_pageuser=True,
                      can_change_pageuser=True, can_delete_pageuser=True,
                      can_add_pagepermission=True,
                      can_change_pagepermission=True,
@@ -465,7 +464,7 @@ def create_page_user(created_by, user,
         'can_view_page': can_view_page,
         'can_change_page': can_change_page,
         'can_delete_page': can_delete_page,
-        'can_recover_page': can_recover_page,
+        'can_publish_page': can_publish_page,
         'can_add_pageuser': can_add_pageuser,
         'can_change_pageuser': can_change_pageuser,
         'can_delete_pageuser': can_delete_pageuser,
@@ -505,15 +504,13 @@ def assign_user_to_page(page, user, grant_on=ACCESS_PAGE_AND_DESCENDANTS,
     :param can_*: Permissions to grant
     :param bool grant_all: Grant all permissions to the user
     """
-    if can_publish is not None:
-        warnings.warn('This API function no longer accepts a "can_publish" argument.',
-                      UserWarning, stacklevel=2)
 
     grant_all = grant_all and not global_permission
     data = {
         'can_add': can_add or grant_all,
         'can_change': can_change or grant_all,
         'can_delete': can_delete or grant_all,
+        'can_publish': can_publish or grant_all,
         'can_change_advanced_settings': can_change_advanced_settings or grant_all,
         'can_change_permissions': can_change_permissions or grant_all,
         'can_move_page': can_move_page or grant_all,
@@ -537,7 +534,7 @@ def publish_page(page, user, language):
 
         Publishing pages has been removed from django CMS core in version 4 onward.
 
-        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',
@@ -550,7 +547,7 @@ def publish_pages(include_unpublished=False, language=None, site=None):
 
         Publishing pages has been removed from django CMS core in version 4 onward.
 
-        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For publishing functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',
@@ -563,7 +560,7 @@ def get_page_draft(page):
 
         The concept of draft pages has been removed from django CMS core in version 4 onward.
 
-        For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-verisoning>`_
+        For draft functionality see `djangocms-versioning: <https://github.com/django-cms/djangocms-versioning>`_
     """
     warnings.warn('This API function has been removed. For publishing functionality use a package that adds '
                   'publishing, such as: djangocms-versioning.',

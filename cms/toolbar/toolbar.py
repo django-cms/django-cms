@@ -56,7 +56,7 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def site_language(self):
         cms_page = self.request.current_page
-        site_id = cms_page.node.site_id if cms_page else None
+        site_id = cms_page.site_id if cms_page else None
         return get_site_language_from_request(self.request, site_id)
 
     @cached_property
@@ -104,8 +104,7 @@ class BaseToolbar(ToolbarAPIMixin):
 
         if self.structure_mode_active:
             return True
-
-        if self._resolver_match:
+        if self.is_staff and self._resolver_match:
             return self._resolver_match.url_name == 'cms_placeholder_render_object_edit'
         return False
 
@@ -119,9 +118,6 @@ class BaseToolbar(ToolbarAPIMixin):
     @cached_property
     def content_mode_active(self):
         """``True`` if content mode is active."""
-        if self.structure_mode_active:
-            # Structure mode always takes precedence
-            return False
         return self.is_staff and not self.edit_mode_active
 
     @cached_property
@@ -168,6 +164,7 @@ class CMSToolbarBase(BaseToolbar):
         self.is_staff = None
         self.clipboard = None
         self.toolbar_language = None
+        self.toolbar_language_bidi = None
         self.show_toolbar = True
         self.init_toolbar(request, request_path=request_path)
         # Internal attribute to track whether we can cache
@@ -252,6 +249,7 @@ class CMSToolbarBase(BaseToolbar):
                 user_settings.language = self.request_language
                 user_settings.save()
             self.clipboard = user_settings.clipboard
+        self.toolbar_language_bidi = self.toolbar_language in settings.LANGUAGES_BIDI
 
         if hasattr(self, 'toolbars'):
             for key, toolbar in self.toolbars.items():
@@ -380,7 +378,7 @@ class CMSToolbarBase(BaseToolbar):
 
     def get_object_model(self):
         if self.obj:
-            return "{0}.{1}".format(self.obj._meta.app_label, self.obj._meta.object_name).lower()
+            return f"{self.obj._meta.app_label}.{self.obj._meta.object_name}".lower()
         return ''
 
     def get_object_pk(self):
@@ -411,6 +409,15 @@ class CMSToolbarBase(BaseToolbar):
                 return obj.is_editable(self.request)
             return True
         return False
+
+    @property
+    def edit_mode_active(self):
+        """``True`` if editing mode is active。"""
+        # Cannot be cached since it changes depending on the object.
+        if self.structure_mode_active:
+            return self.object_is_editable()
+        return super().edit_mode_active
+
 
     # Internal API
 
@@ -519,6 +526,7 @@ class CMSToolbarBase(BaseToolbar):
 
         context = {
             'cms_toolbar': self,
+            'object_is_immutable': not self.object_is_editable(),
             'cms_renderer': renderer,
             'cms_edit_url': self.get_object_edit_url(),
             'cms_preview_url': self.get_object_preview_url(),
@@ -557,7 +565,7 @@ class CMSToolbarBase(BaseToolbar):
             # render the toolbar content
             toolbar = render_to_string('cms/toolbar/toolbar_with_structure.html', flatten_context(context))
         # return the toolbar content and the content below
-        return '%s\n%s' % (toolbar, rendered_contents)
+        return f'{toolbar}\n{rendered_contents}'
 
 
 # Add toolbar mixins from extensions to toolbar
@@ -576,3 +584,6 @@ class EmptyToolbar(BaseToolbar):
     def __init__(self, request):
         self.request = request
         super().__init__()
+
+    def get_object(self):
+        return None

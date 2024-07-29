@@ -1,5 +1,6 @@
+from unittest.mock import Mock, call, patch
+
 from django.forms.models import model_to_dict
-from mock import Mock, call, patch
 
 from cms.api import create_page
 from cms.models import Placeholder, UserSettings, fields

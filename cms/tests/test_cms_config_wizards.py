@@ -1,6 +1,7 @@
+from unittest.mock import Mock, patch
+
 from django.apps import apps
 from django.core.exceptions import ImproperlyConfigured
-from mock import Mock, patch
 
 from cms.app_registration import get_cms_config_apps, get_cms_extension_apps
 from cms.cms_config import CMSCoreExtensions
@@ -72,8 +73,7 @@ class ConfigureWizardsUnitTestCase(CMSTestCase):
         cms_config = Mock(
             cms_enabled=True, cms_wizards=[wizard, wizard])
         extensions.configure_wizards(cms_config)
-        warning_msg = "Wizard for model {} has already been registered".format(
-            wizard.get_model())
+        warning_msg = f"Wizard for model {wizard.get_model()} has already been registered"
         # Warning message displayed
         mocked_logger.assert_called_once_with(warning_msg)
         # wizards dict is still what we expect it to be

@@ -4,9 +4,9 @@
 # 
 # Translators:
 # Dino Ilic <dino.ilic@gmail.com>, 2022
-# Aleks Acimovic, 2023
 # Damir <damir.arbula@gmail.com>, 2023
 # Fabian Braun <fsbraun@gmx.de>, 2023
+# Aleks Acimovic, 2024
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -14,7 +14,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
+"Last-Translator: Aleks Acimovic, 2024\n"
 "Language-Team: Croatian (https://app.transifex.com/divio/teams/58664/hr/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -95,10 +95,10 @@ msgid "limit when this page is visible in the menu"
 msgstr "ograniči kada je ova stranica vidljiva u izborniku"
 
 msgid "URL options"
-msgstr ""
+msgstr "URL mogućnosti"
 
 msgid "Menu options"
-msgstr ""
+msgstr "Mogućnosti izbornika"
 
 msgid "Application"
 msgstr "Aplikacija"
@@ -203,7 +203,7 @@ msgstr "Roditelj plugina mora biti u istom placeholderu kao i plugin!"
 
 #, python-format
 msgid "Plugin position must be greater than %(position)d"
-msgstr ""
+msgstr "Pozicija plugina mora biti veća od %(position)d"
 
 msgid "Advanced Settings"
 msgstr "Napredne postavke"
@@ -213,7 +213,7 @@ msgstr "Stranica nije raspoloživa za postavljanje u ulogu početne stranice."
 
 #, python-format
 msgid "The %(name)s \"%(obj)s\" was deleted successfully."
-msgstr ""
+msgstr "%(name)s \"%(obj)s\" je/su uspješno obrisan/i."
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -274,19 +274,19 @@ msgid "Title and plugins with language %(language)s was deleted"
 msgstr "Naslov i plugin na jeziku %(language)s je obrisan"
 
 msgid "You do not have permission to change a page's navigation status"
-msgstr ""
+msgstr "Nemate ovlasti da izmjenite status ove stranice \"u navigaciji\""
 
 msgid "You cannot change this page's navigation status"
-msgstr ""
+msgstr "Ne možete izmjeniti status ove stranice \"u navigaciji\""
 
 msgid "Public content"
-msgstr ""
+msgstr "Javni sadržaj"
 
 msgid "Empty"
 msgstr "Prazno"
 
 msgid "Create Content"
-msgstr ""
+msgstr "Izradite sadržaj"
 
 msgid "View restriction"
 msgstr "Ograničenja pregleda"
@@ -352,42 +352,47 @@ msgid "Page permissions management"
 msgstr "Upravljanje ovlastima nad stranicom"
 
 msgid "Actions"
-msgstr ""
+msgstr "Akcije"
 
 msgid "Empty content"
-msgstr ""
+msgstr "Prazan sadržaj"
 
 #, python-format
 msgid "%(object_name)s Properties"
-msgstr ""
+msgstr "Svojstva %(object_name)s"
 
 #, python-format
 msgid "Add new %(object_name)s"
-msgstr ""
+msgstr "Dodaj novi %(object_name)s"
 
 msgid "Add content"
-msgstr ""
+msgstr "Dodaj sadržaj"
 
 msgid ""
 "Content for the current language has been changed. Click \"Cancel\" to "
 "return to the form and save changes. Click \"OK\" to discard changes."
 msgstr ""
+"Sadržaj trenutnog jezika je izmijenjen. Odaberite \"Odustani\" kako bi se "
+"vratili na formular i spremili promjene. Odaberite \"OK\" kako bi odbacili "
+"promjene."
 
 #, python-format
 msgid "Add %(language)s content"
-msgstr ""
+msgstr "Dodaj %(language)s sadržaj"
 
 msgid "Preview"
 msgstr "Pregled"
 
 msgid "Settings"
-msgstr ""
+msgstr "Postavke"
 
 #, python-format
 msgid ""
 "Invalid language %(value)s. This form cannot be processed. Try changing "
 "languages."
 msgstr ""
+"Nevažeći jezik %(value)s. Ovaj formular ne može se provesti. Pokušajte "
+"promijeniti jezike."
 
 msgid "<unspecified>"
 msgstr ""
@@ -557,10 +562,10 @@ msgid "Leave empty for automatic slug, or override as required."
 msgstr "Ostavite prazno za automatski slug ili upišite slug."
 
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr ""
+msgstr "Nemoguće je automatski kreirati slug. Molimo upišite ga ručno."
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "Molimo dodajte ispravan slug."
 
 msgid "You don't have the permissions required to add a page."
 msgstr "Nemate ovlasti dodati stranicu."
@@ -659,7 +664,7 @@ msgid "page"
 msgstr "stranica"
 
 msgid "no limit set"
-msgstr ""
+msgstr "nije postavljen limit"
 
 msgid "for logged in users only"
 msgstr "samo za prijavljene korisnike"
@@ -701,10 +706,10 @@ msgid "The template used to render the content."
 msgstr " predložak korišten za prikaz sadržaja"
 
 msgid "page content"
-msgstr ""
+msgstr "sadržaj stranica"
 
 msgid "page contents"
-msgstr ""
+msgstr "sadržaji stranica"
 
 msgid "default"
 msgstr "uobičajenoa"
@@ -881,55 +886,56 @@ msgid "There are no further settings for this plugin. Please press save."
 msgstr "Nema dodatnih postavki za ovaj plugin. Pritisnite Spremi."
 
 msgid "Moved"
-msgstr ""
+msgstr "Premješten"
 
 msgid "Changed"
 msgstr "Promijenjeno"
 
 msgid "Deleted"
-msgstr ""
+msgstr "Obrisan"
 
 msgid "Added Page Translation"
-msgstr ""
+msgstr "Dodan prijevod strtanice"
 
 msgid "Changed Page Translation"
-msgstr ""
+msgstr "Izmijenjen prijevod strtanice"
 
 msgid "Deleted Page Translation"
-msgstr ""
+msgstr "Obrisan prijevod strtanice"
 
 msgid "Added Plugin"
-msgstr ""
+msgstr "Dodan plugin"
 
 msgid "Changed Plugin"
-msgstr ""
+msgstr "Izmijenjen plugin"
 
 msgid "Moved Plugin"
-msgstr ""
+msgstr "Premješten plugin"
 
 msgid "Deleted Plugin"
-msgstr ""
+msgstr "Obrisan plugin"
 
 msgid "Cut Plugin"
-msgstr ""
+msgstr "Izreži plugin"
 
 msgid "Paste Plugin"
-msgstr ""
+msgstr "Zalijepi plugin"
 
 msgid "Paste to Placeholder"
-msgstr ""
+msgstr "Zalijepi u placeholder"
 
 msgid "Added plugins to placeholder from clipboard"
-msgstr ""
+msgstr "Dodani pluginovi iz međuspremnika u placeholder"
 
 msgid "Cleared Placeholder"
-msgstr ""
+msgstr "Ispražnjen placeholder"
 
 msgid "Save"
 msgstr "Spremi"
 
 msgid "Some fields cannot be changed since they are read-only content."
 msgstr ""
+"Neka polja nije moguće izmijeniti jer su sadržaj koji je samo za čitanje."
 
 #, python-format
 msgid "Log in to administration <a href=\"%(login_url)s\">here</a>."
@@ -946,7 +952,7 @@ msgid "Password:"
 msgstr "Lozinka:"
 
 msgid "Add a page"
-msgstr ""
+msgstr "Dodaj stranicu"
 
 msgid "Change a page"
 msgstr "Promijeni stranicu"
@@ -1166,7 +1172,7 @@ msgstr "Ova stranica nema pregled!"
 
 msgid ""
 "Potentially the attached apphook does not provide content for its root."
-msgstr ""
+msgstr "Moguće je da povezani apphook nema sadržaj za svoj root."
 
 msgid "It is being redirected to:"
 msgstr "Preusmjerena je na:"
@@ -1284,7 +1290,7 @@ msgid "The page was changed in the meantime, reloading..."
 msgstr "Stranica je u međuvremenu promijenjena, ponovno učitavam..."
 
 msgid "CMS-wide Shortcuts"
-msgstr ""
+msgstr "Prečaci CMS-a"
 
 msgid "Bring up this help dialog"
 msgstr "Prikaži ovaj dijalog za pomoć"
@@ -1446,7 +1452,7 @@ msgid "Next"
 msgstr "Sljedeći"
 
 msgid "Unknown"
-msgstr ""
+msgstr "Nepoznato"
 
 #, python-format
 msgid "Page not found on %(domain)s"

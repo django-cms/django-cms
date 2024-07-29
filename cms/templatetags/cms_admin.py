@@ -9,8 +9,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models import Page
 from cms.models.contentmodels import PageContent
@@ -20,7 +19,7 @@ from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
 
-CMS_ADMIN_ICON_BASE = "{}admin/img/".format(settings.STATIC_URL)
+CMS_ADMIN_ICON_BASE = f"{settings.STATIC_URL}admin/img/"
 
 
 class GetAdminUrlForLanguage(AsTag):
@@ -40,7 +39,7 @@ class GetAdminUrlForLanguage(AsTag):
             if page_content:
                 return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
         admin_url = admin_reverse('cms_pagecontent_add')
-        admin_url += '?cms_page={}&language={}'.format(page.pk, language)
+        admin_url += f'?cms_page={page.pk}&language={language}'
         return admin_url
 
 
@@ -100,28 +99,32 @@ def get_page_display_name(cms_page):
     if not cms_page.page_content_cache:
         cms_page.set_translations_cache()
 
+    fallback_found = False
     if not cms_page.page_content_cache.get(language):
+        fallback_found = True
         fallback_langs = i18n.get_fallback_languages(language)
-        found = False
         for lang in fallback_langs:
             if cms_page.page_content_cache.get(lang):
-                found = True
                 language = lang
-        if not found:
+                break
+        else:
             language = None
             for lang, item in cms_page.page_content_cache.items():
                 if not isinstance(item, EmptyPageContent):
                     language = lang
-    if not language:
-        return _("Empty")
+                    break
+            else:
+                return _("Empty")
     page_content = cms_page.page_content_cache[language]
     if page_content.title:
-        return page_content.title
-    if page_content.page_title:
-        return page_content.page_title
-    if page_content.menu_title:
-        return page_content.menu_title
-    return cms_page.get_slug(language)
+        title = page_content.title
+    elif page_content.page_title:
+        title = page_content.page_title
+    elif page_content.menu_title:
+        title = page_content.menu_title
+    else:
+        title = cms_page.get_slug(language)
+    return mark_safe(f"<em>{title} ({language})</em>") if fallback_found else title
 
 
 class TreePublishRow(Tag):

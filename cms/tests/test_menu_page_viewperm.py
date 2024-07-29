@@ -150,7 +150,7 @@ class ViewPermissionTests(CMSTestCase):
             user = self._create_user(username, is_staff)
             if groupname:
                 group, _ = Group.objects.get_or_create(name=groupname)
-                user_set = getattr(group, 'user_set')
+                user_set = group.user_set
                 user_set.add(user)
                 group.save()
 
@@ -231,7 +231,7 @@ class ViewPermissionTests(CMSTestCase):
                 in_public = True
             self.assertTrue(
                 (in_public and not in_restricted) or (not in_public and in_restricted),
-                msg="page_id %s in_public: %s, in_restricted: %s" % (page_id, in_public, in_restricted)
+                msg=f"page_id {page_id} in_public: {in_public}, in_restricted: {in_restricted}"
             )
 
     def assertGrantedVisibility(self, all_pages, expected_granted_pages, username=None):
@@ -279,7 +279,7 @@ class ViewPermissionTests(CMSTestCase):
         return type('Request', (object,), attrs)
 
     def get_url_dict(self, pages, language='en'):
-        return dict((page.get_absolute_url(language=language), page) for page in pages)
+        return {page.get_absolute_url(language=language): page for page in pages}
 
 
 @override_settings(
@@ -594,7 +594,7 @@ class ViewPermissionTreeBugTests(ViewPermissionTests):
     def _setup_user(self):
         user = self._create_user('user_6', True)
         group = Group.objects.create(name=self.GROUPNAME_6)
-        user_set = getattr(group, 'user_set')
+        user_set = group.user_set
         user_set.add(user)
         group.save()
 

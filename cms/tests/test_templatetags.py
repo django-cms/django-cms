@@ -1,5 +1,6 @@
 import os
 from copy import deepcopy
+from unittest.mock import patch
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
@@ -10,11 +11,10 @@ from django.http import HttpResponse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
-from django.utils.html import escape
+from django.utils.html import strip_tags
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from mock import patch
 from sekizai.context import SekizaiContext
 
 import cms
@@ -80,16 +80,16 @@ class TemplatetagTests(CMSTestCase):
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
                 page.page_content_cache = {'en': PageContent(page_title="test2", title="test2")}
-                self.assertEqual('test2', force_str(get_page_display_name(page)))
+                self.assertEqual('<em>test2 (en)</em>', force_str(get_page_display_name(page)))
                 page.page_content_cache = {'en': PageContent(page_title="test2")}
-                self.assertEqual('test2', force_str(get_page_display_name(page)))
-                page.page_content_cache = {'en': PageContent(menu_title="test2")}
-                self.assertEqual('test2', force_str(get_page_display_name(page)))
+                self.assertEqual('<em>test2 (en)</em>', force_str(get_page_display_name(page)))
+                page.page_content_cache = {'en': PageContent(menu_title="menu test2")}
+                self.assertEqual('<em>menu test2 (en)</em>', force_str(get_page_display_name(page)))
                 page.page_content_cache = {'en': PageContent()}
-                page.urls_cache = {'en': PageUrl(slug='test2')}
-                self.assertEqual('test2', force_str(get_page_display_name(page)))
+                page.urls_cache = {'en': PageUrl(slug='slug-test2')}
+                self.assertEqual('<em>slug-test2 (en)</em>', force_str(get_page_display_name(page)))
                 page.page_content_cache = {'en': PageContent(), 'fr': EmptyPageContent('fr')}
-                self.assertEqual('test2', force_str(get_page_display_name(page)))
+                self.assertEqual('<em>slug-test2 (en)</em>', force_str(get_page_display_name(page)))
 
     def test_get_site_id_from_nothing(self):
         with self.settings(SITE_ID=10):
@@ -115,20 +115,32 @@ class TemplatetagTests(CMSTestCase):
 
     def test_page_attribute_tag_escapes_content(self):
         script = '<script>alert("XSS");</script>'
+        ampersand = 'Q&A page'
 
-        class FakePage():
+        class FakePage:
+            def __init__(self, title):
+                self.title = title
+                super().__init__()
+
             def get_page_title(self, *args, **kwargs):
-                return script
+                return self.title
 
-        class FakeRequest():
-            current_page = FakePage()
+        class FakeRequest:
             GET = {'language': 'en'}
 
-        request = FakeRequest()
+            def __init__(self, page):
+                self.current_page = page
+
+        request_script = FakeRequest(FakePage(script))
+        request_ampersand = FakeRequest(FakePage(ampersand))
         template = '{% load cms_tags %}{% page_attribute page_title %}'
-        output = self.render_template_obj(template, {}, request)
-        self.assertNotEqual(script, output)
-        self.assertEqual(escape(script), output)
+        output_script = self.render_template_obj(template, {}, request_script)
+        output_ampersand = self.render_template_obj(template, {}, request_ampersand)
+
+        self.assertNotEqual(script, output_script)
+        self.assertEqual(ampersand, output_ampersand)
+        self.assertEqual(strip_tags(script), output_script)
+        self.assertEqual(strip_tags(ampersand), output_ampersand)
 
     def test_json_encoder(self):
         self.assertEqual(json_filter(True), 'true')
@@ -462,7 +474,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         from django.core.cache import cache
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         placeholder = page.get_placeholders('en')[0]
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='<b>Test</b>')
         template = "{% load cms_tags %}{% render_plugin plugin %}"
@@ -500,7 +512,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
     def test_render_plugin_no_context(self):
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         placeholder = Placeholder.objects.create(slot='test')
         plugin = add_plugin(placeholder, TextPlugin, 'en', body='Test')
         superuser = self.get_superuser()
@@ -557,7 +569,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         Category.objects.create(name='foo', depth=1)
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         template = "{% load cms_tags %}{% render_model category 'name' %}"
         user = self._create_user("admin", True, True)
         request = RequestFactory().get(get_object_edit_url(page_content))
@@ -589,7 +601,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         template = "{% load cms_tags %}{% render_model_add category %}"
         user = self._create_user("admin", True, True)
         request = RequestFactory().get(get_object_edit_url(page_content))
@@ -627,7 +639,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
 
         cache.clear()
         page = create_page('Test', 'col_two.html', 'en')
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         template = "{% load cms_tags %}{% render_model_add_block category %}wrapped{% endrender_model_add_block %}"
         user = self._create_user("admin", True, True)
         request = RequestFactory().get(get_object_edit_url(page_content))

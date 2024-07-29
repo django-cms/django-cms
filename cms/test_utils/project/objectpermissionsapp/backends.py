@@ -3,7 +3,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Model
 
 
-class ObjectPermissionBackend():
+class ObjectPermissionBackend:
     def has_perm(self, user_obj, perm, obj=None):
         if user_obj and user_obj.is_superuser:
             return True

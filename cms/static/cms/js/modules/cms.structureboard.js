@@ -147,7 +147,7 @@ class StructureBoard {
 
         // add drag & drop functionality
         // istanbul ignore next
-        $('.cms-draggable').one(
+        $('.cms-draggable:not(.cms-drag-disabled)').one(
             'pointerover.cms.drag',
             once(() => {
                 $('.cms-draggable').off('pointerover.cms.drag');
@@ -175,7 +175,7 @@ class StructureBoard {
 
     _events() {
         this.ui.window.on('resize.cms.structureboard', () => {
-            if (!this._loadedContent) {
+            if (!this._loadedContent || CMS.config.mode !== 'draft') {
                 return;
             }
             const width = this.ui.window[0].innerWidth;
@@ -683,7 +683,7 @@ class StructureBoard {
 
         if (CMS.settings.mode === 'structure') {
             history.replaceState({}, '', CMS.config.settings.structure);
-            this.ui.html.addClass('cms-overflow');
+            $('html.cms-structure-mode-structure').addClass('cms-overflow');
         }
 
         this.ui.container.css('right', 0);

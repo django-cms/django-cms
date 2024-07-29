@@ -1,6 +1,7 @@
 from django.core.cache import cache
 from django.http.response import Http404
 from django.test.utils import override_settings
+from django.urls import reverse
 from sekizai.context import SekizaiContext
 
 from cms import plugin_rendering
@@ -22,12 +23,7 @@ INHERIT_WITH_OR_TEMPLATE_NAME = 'tests/rendering/inherit_with_or.html'
 
 def sample_plugin_processor(instance, placeholder, rendered_content, original_context):
     original_context_var = original_context['original_context_var']
-    return '%s|test_plugin_processor_ok|%s|%s|%s' % (
-        rendered_content,
-        instance.body,
-        placeholder.slot,
-        original_context_var
-    )
+    return f'{rendered_content}|test_plugin_processor_ok|{instance.body}|{placeholder.slot}|{original_context_var}'
 
 
 def sample_plugin_context_processor(instance, placeholder, original_context):
@@ -65,15 +61,27 @@ class RenderingEmptyTestCase(CMSTestCase):
 
     def test_page_with_empty_pagecontent(self):
         """
-        A page with EmptyPageContent returns 404 when you try to view it.
+        A page with EmptyPageContent except root returns 404 when you try to view it.
         """
         page_content = self.page.get_content_obj('en', force_reload=True)
         self.assertEqual(isinstance(page_content, EmptyPageContent), True)
 
         with self.assertRaises(Http404):
-            details(self.get_request(
-                page=self.page), self.page.get_path('en')
-            )
+            path = self.page.get_path('en')
+            request = self.get_request(path=path, page=self.page)
+            details(request, slug=path)
+
+    def test_page_with_empty_pagecontent_for_root_url(self):
+        """
+        The root page with EmptyPageContent redirects to PageContent's changelist
+        """
+        page_content = self.page.get_content_obj('en', force_reload=True)
+        self.assertEqual(isinstance(page_content, EmptyPageContent), True)
+
+        request = self.get_request(path='/en/', page=self.page)
+        response = details(request, slug=self.page.get_path('en'))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse('admin:cms_pagecontent_changelist'))
 
 
 @override_settings(
@@ -253,7 +261,7 @@ class RenderingTestCase(CMSTestCase):
         self.test_page10 = self.reload(p10)
 
     def strip_rendered(self, content):
-        return content.strip().replace(u"\n", u"")
+        return content.strip().replace("\n", "")
 
     @override_settings(CMS_TEMPLATES=[(TEMPLATE_NAME, '')])
     def render(self, page, template=None, context_vars=None, request=None):
@@ -383,7 +391,7 @@ class RenderingTestCase(CMSTestCase):
             page=self.test_page,
             editable=True,
         )
-        expected = '|{}No content'.format(expected)
+        expected = f'|{expected}No content'
         rendered = self.render(self.test_page, template=t, request=request)
         self.assertEqual(rendered, self.strip_rendered(expected))
 
@@ -396,7 +404,7 @@ class RenderingTestCase(CMSTestCase):
                        char_4="char_4")
         ex1.save()
 
-        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+        add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_placeholder_body)
 
         t = '''{% extends "base.html" %}
 {% load cms_tags %}
@@ -432,7 +440,7 @@ class RenderingTestCase(CMSTestCase):
                        char_4="char_4")
         ex1.save()
 
-        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
+        add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_uncached_placeholder_body)
 
         t = '''{% extends "base.html" %}
 {% load cms_tags %}
@@ -467,7 +475,7 @@ class RenderingTestCase(CMSTestCase):
                        char_4="char_4")
         ex1.save()
         request = self.get_request('/')
-        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_uncached_placeholder_body)
+        add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_uncached_placeholder_body)
 
         template = '{% load cms_tags %}<h1>{% render_uncached_placeholder ex1.placeholder %}</h1>'
 
@@ -487,7 +495,7 @@ class RenderingTestCase(CMSTestCase):
                        char_4="char_4")
         ex1.save()
         request = self.get_request('/')
-        add_plugin(ex1.placeholder, u"TextPlugin", u"en", body=render_placeholder_body)
+        add_plugin(ex1.placeholder, "TextPlugin", "en", body=render_placeholder_body)
 
         template = '{% load cms_tags %}<h1>{% render_placeholder ex1.placeholder %}</h1>'
 
@@ -710,6 +718,7 @@ class RenderingTestCase(CMSTestCase):
         r = self.render(self.test_page5)
         self.assertEqual(r, '|' + self.test_data5['text_main'] + '|' + self.test_data5['text_sub'])
 
+    @override_settings(CMS_PLACEHOLDER_CONF={None: {'language_fallback': False}})
     def test_inherit_placeholder_queries(self):
         with self.assertNumQueries(FuzzyInt(6, 10)):
             r = self.render(self.test_page2)
@@ -721,7 +730,7 @@ class RenderingTestCase(CMSTestCase):
         placeholder.pk = placeholder.id = 99
 
         with self.login_user_context(self.get_superuser()):
-            page_content = self.get_page_title_obj(self.test_page)
+            page_content = self.get_pagecontent_obj(self.test_page)
             request = self.get_request(get_object_edit_url(page_content))
             request.session = {}
             request.toolbar = CMSToolbar(request)
@@ -736,7 +745,7 @@ class RenderingTestCase(CMSTestCase):
         output = renderer.render_placeholder(placeholder, context, 'en', editable=True)
 
         for cls in classes:
-            self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
+            self.assertTrue(cls in output, f'{cls!r} is not in {output!r}')
 
     def test_render_plugin_toolbar_markup(self):
         """
@@ -758,7 +767,7 @@ class RenderingTestCase(CMSTestCase):
         ]
 
         with self.login_user_context(self.get_superuser()):
-            page_content = self.get_page_title_obj(page)
+            page_content = self.get_pagecontent_obj(page)
             request = self.get_request(get_object_edit_url(page_content))
             request.session = {}
             request.toolbar = CMSToolbar(request)

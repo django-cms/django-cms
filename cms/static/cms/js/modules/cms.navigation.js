@@ -129,7 +129,7 @@ class Navigation {
      */
     _calculateAvailableWidth() {
         var fullWidth = this.ui.window.width();
-        var reduce = parseInt(this.ui.toolbarRightPart.css('padding-right'), 10) + this.ui.logo.outerWidth(true);
+        var reduce = parseInt(this.ui.toolbarRightPart.css('padding-inline-end'), 10) + this.ui.logo.outerWidth(true);
 
         return fullWidth - reduce;
     }

@@ -3,7 +3,7 @@ from cms.utils.conf import get_cms_setting
 PERMISSION_KEYS = [
     'add_page', 'change_page', 'change_page_advanced_settings',
     'change_page_permissions', 'delete_page', 'move_page',
-    'view_page',
+    'publish_page', 'view_page',
 ]
 
 
@@ -13,7 +13,7 @@ def get_cache_key(user, key):
 
 
 def get_cache_permission_version_key():
-    return "%s:permission:version" % (get_cms_setting('CACHE_PREFIX'),)
+    return "{}:permission:version".format(get_cms_setting('CACHE_PREFIX'))
 
 
 def get_cache_permission_version():

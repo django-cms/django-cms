@@ -31,7 +31,7 @@ class SiteTestCase(CMSTestCase):
         with self.settings(SITE_ID=self.site2.pk):
             create_page("page_2a", "nav_playground.html", "de", site=self.site2)
             page_list = self.get_pages_admin_list_uri('en')
-            response = self.client.get("%s?site__exact=%s" % (page_list, self.site3.pk))
+            response = self.client.get(f"{page_list}?site__exact={self.site3.pk}")
             self.assertEqual(response.status_code, 200)
             create_page("page_3b", "nav_playground.html", "de", site=self.site3)
 

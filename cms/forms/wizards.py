@@ -4,11 +4,9 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.text import slugify
-from django.utils.translation import gettext
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext, gettext_lazy as _
 
 from cms.admin.forms import AddPageForm
-from cms.admin.forms import SlugWidget as AdminSlugWidget
 from cms.plugin_pool import plugin_pool
 from cms.utils import permissions
 from cms.utils.conf import get_cms_setting
@@ -21,15 +19,6 @@ try:
     text_widget = TextEditorWidget
 except ImportError:
     text_widget = forms.Textarea
-
-
-class SlugWidget(AdminSlugWidget):
-    """Compatibility shim with deprecation warning:
-    SlugWidget has moved to cms.admin.forms"""
-    def __init__(self, *args, **kwargs):
-        warnings.warn("Import SlugWidget from cms.admin.forms. SlugWidget will be removed from cms.forms.wizards",
-                      DeprecationWarning, stacklevel=2)
-        super().__init__(*args, **kwargs)
 
 
 class CreateCMSPageForm(AddPageForm):
@@ -96,23 +85,23 @@ class CreateCMSPageForm(AddPageForm):
                 "slug": [_("Cannot automatically create slug. Please provide one manually.")],
             })
 
-        parent_node = data.get('parent_node')
+        parent_page = data.get('parent_page')
 
-        if parent_node:
-            base = parent_node.item.get_path(self._language)
-            path = u'%s/%s' % (base, slug) if base else slug
+        if parent_page:
+            base = parent_page.get_path(self._language)
+            path = f'{base}/{slug}' if base else slug
         else:
             base = ''
             path = slug
 
         data['slug'] = get_available_slug(self._site, path, self._language, suffix=None)
-        data['path'] = '%s/%s' % (base, data['slug']) if base else data['slug']
+        data['path'] = '{}/{}'.format(base, data['slug']) if base else data['slug']
 
         if not data['slug']:
             raise forms.ValidationError(_("Please provide a valid slug."))
         return data
 
-    def clean_parent_node(self):
+    def clean_parent_page(self):
         # Check to see if this user has permissions to make this page. We've
         # already checked this when producing a list of wizard entries, but this
         # is to prevent people from possible form-hacking.
@@ -120,10 +109,10 @@ class CreateCMSPageForm(AddPageForm):
             # User is adding a page which will be a direct
             # child of the current page.
             parent_page = self._page
-        elif self._page and self._page.parent_page:
+        elif self._page and self._page.parent:
             # User is adding a page which will be a right
             # sibling to the current page.
-            parent_page = self._page.parent_page
+            parent_page = self._page.parent
         else:
             parent_page = None
 
@@ -135,7 +124,7 @@ class CreateCMSPageForm(AddPageForm):
         if not has_perm:
             message = gettext('You don\'t have the permissions required to add a page.')
             raise ValidationError(message)
-        return parent_page.node if parent_page else None
+        return parent_page if parent_page else None
 
     def get_template(self):
         return get_cms_setting('PAGE_WIZARD_DEFAULT_TEMPLATE')

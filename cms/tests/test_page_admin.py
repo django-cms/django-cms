@@ -32,6 +32,7 @@ from cms.test_utils.util.context_managers import (
     LanguageOverride,
     UserLoginContext,
 )
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils.compat import DJANGO_4_2
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
@@ -208,7 +209,7 @@ class PageTest(PageTestBase):
             # but the site is configured to use "de" and "fr"
             response = client.post(endpoint, self.get_new_page_data())
             self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
-            self.assertEqual(Page.objects.filter(node__site=2).count(), 1)
+            self.assertEqual(Page.objects.filter(site=2).count(), 1)
             self.assertEqual(PageContent.objects.filter(language='de').count(), 1)
 
         # The user is on site #1 but switches sites using the site switcher
@@ -220,7 +221,7 @@ class PageTest(PageTestBase):
         endpoint = self.get_page_add_uri('en')
         response = client.post(endpoint, self.get_new_page_data())
         self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
-        self.assertEqual(Page.objects.filter(node__site=2).count(), 2)
+        self.assertEqual(Page.objects.filter(site=2).count(), 2)
         self.assertEqual(PageContent.objects.filter(language='de').count(), 2)
 
         Site.objects.clear_cache()
@@ -240,9 +241,9 @@ class PageTest(PageTestBase):
 
             home_url = PageUrl.objects.get(slug=page_1['slug'])
 
-            page_2 = self.get_new_page_data(parent_id=home_url.page.node.pk)
-            page_3 = self.get_new_page_data(parent_id=home_url.page.node.pk)
-            page_4 = self.get_new_page_data(parent_id=home_url.page.node.pk)
+            page_2 = self.get_new_page_data(parent_id=home_url.page.pk)
+            page_3 = self.get_new_page_data(parent_id=home_url.page.pk)
+            page_4 = self.get_new_page_data(parent_id=home_url.page.pk)
 
             response = self.client.post(self.get_page_add_uri('en'), page_2)
             self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
@@ -295,7 +296,7 @@ class PageTest(PageTestBase):
         add_endpoint = self.get_page_add_uri('en')
         with self.login_user_context(superuser):
             # slug collision between two child pages of the same node
-            page_data = self.get_new_page_data(page.node.pk)
+            page_data = self.get_new_page_data(page.pk)
             page_data['slug'] = 'subpage'
             response = self.client.post(add_endpoint, page_data)
             expected_markup = (
@@ -467,10 +468,7 @@ class PageTest(PageTestBase):
             req.GET = {}
 
             actual_result = t.render(template.Context({"request": req}))
-            desired_result = "{0} changed on {1}".format(
-                change_user,
-                actual_result[-19:]
-            )
+            desired_result = f"{change_user} changed on {actual_result[-19:]}"
             save_time = datetime.datetime.strptime(
                 actual_result[-19:],
                 "%Y-%m-%dT%H:%M:%S"
@@ -655,9 +653,9 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            node = self.reload(page.node)
-            self.assertEqual(node.path, path)
-            self.assertEqual(node.site_id, 2)
+            page.refresh_from_db()
+            self.assertEqual(page.path, path)
+            self.assertEqual(page.site_id, 2)
 
     def test_copy_page_to_different_site_fails_with_untranslated_page(self):
         data = {
@@ -679,7 +677,7 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.node.site_id
+                endpoint += '?source_site=%s' % site_1_root.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -688,7 +686,7 @@ class PageTest(PageTestBase):
                 endpoint = self.get_admin_url(Page, 'copy_page', site_1_root.pk)
                 response = self.client.post(endpoint, data)
                 self.assertEqual(response.status_code, 200)
-                self.assertObjectDoesNotExist(Page.objects.all(), node__site=site_2)
+                self.assertObjectDoesNotExist(Page.objects.all(), site=site_2)
                 self.assertEqual(
                     json.loads(response.content.decode('utf8')),
                     expected_response,
@@ -709,7 +707,7 @@ class PageTest(PageTestBase):
             with self.login_user_context(superuser):
                 # Simulate the copy-dialog
                 endpoint = self.get_admin_url(Page, 'get_copy_dialog', site_1_root.pk)
-                endpoint += '?source_site=%s' % site_1_root.node.site_id
+                endpoint += '?source_site=%s' % site_1_root.site_id
                 response = self.client.get(endpoint)
                 self.assertEqual(response.status_code, 200)
 
@@ -719,7 +717,7 @@ class PageTest(PageTestBase):
                 response = self.client.post(endpoint, data)
                 self.assertEqual(response.status_code, 200)
 
-        site_2_root = self.assertObjectExist(Page.objects.all(), node__site=site_2)
+        site_2_root = self.assertObjectExist(Page.objects.all(), site=site_2)
 
         tree = (
             (site_1_root, '0001'),
@@ -727,7 +725,8 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            self.assertEqual(self.reload(page.node).path, path)
+            page.refresh_from_db()
+            self.assertEqual(page.path, path)
 
     def test_copy_page_to_explicit_position(self):
         """
@@ -759,7 +758,8 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            self.assertEqual(self.reload(page.node).path, path)
+            page.refresh_from_db()
+            self.assertEqual(page.path, path)
 
     def test_copy_page_tree_to_explicit_position(self):
         """
@@ -811,7 +811,8 @@ class PageTest(PageTestBase):
         )
 
         for page, path in tree:
-            self.assertEqual(self.reload(page.node).path, path)
+            page.refresh_from_db()
+            self.assertEqual(page.path, path)
 
     def test_copy_self_page(self):
         """
@@ -826,12 +827,13 @@ class PageTest(PageTestBase):
         self.assertEqual(page_b.get_child_pages().count(), 2)
         page_d = page_b.get_child_pages()[1]
         page_e = page_d.get_child_pages()[0]
-        self.assertEqual(page_d.node.path, '000100010002')
-        self.assertEqual(page_e.node.path, '0001000100020001')
+        self.assertEqual(page_d.path, '000100010002')
+        self.assertEqual(page_e.path, '0001000100020001')
         page_e.delete()
         page_d.delete()
         with self.login_user_context(self.get_superuser()):
             self.copy_page(page_b, page_c)
+        page_c.refresh_from_db()
         self.assertEqual(page_c.get_child_pages().count(), 1)
         self.assertEqual(page_b.get_child_pages().count(), 1)
         page_ids = list(page_c.get_descendant_pages().values_list('pk', flat=True))
@@ -855,7 +857,7 @@ class PageTest(PageTestBase):
             self.client.post(add_endpoint, page_data2)
             page_data3 = self.get_new_page_data()
             self.client.post(add_endpoint, page_data3)
-            pages = list(Page.objects.order_by('node__path'))
+            pages = list(Page.objects.order_by('path'))
             home = pages[0]
             page1 = pages[1]
             page2 = pages[2]
@@ -960,9 +962,10 @@ class PageTest(PageTestBase):
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 200)
 
-            for page, node_path, url_path in expected_tree:
+            for page, page_path, url_path in expected_tree:
                 page._clear_internal_cache()
-                self.assertEqual(page.node.path, node_path)
+                page.refresh_from_db()
+                self.assertEqual(page.path, page_path)
                 self.assertEqual(page.get_path('en'), url_path)
 
     def test_move_page_integrity(self):
@@ -1022,7 +1025,7 @@ class PageTest(PageTestBase):
             page_child_4 = page_child_4.reload()
 
             # Ensure move worked
-            self.assertEqual(page_root.node.get_descendants().count(), 4)
+            self.assertEqual(page_root.get_descendants().count(), 4)
 
     def test_edit_page_other_site_and_language(self):
         """
@@ -1313,7 +1316,7 @@ class PageTest(PageTestBase):
         with self.login_user_context(superuser):
             content_admin = PageContentAdmin(PageContent, admin.site)
             page = self.get_page()
-            content = self.get_page_title_obj(page, 'en')
+            content = self.get_pagecontent_obj(page, 'en')
             form_url = self.get_page_change_uri('en', page)
             # Middleware is needed to correctly setup the environment for the admin
             request = self.get_request()
@@ -1345,7 +1348,7 @@ class PageTest(PageTestBase):
         try:
             dom = _parse_html(content)
         except HTMLParseError as e:
-            standardMsg = '%s\n%s' % ("Response's content is not valid HTML", e.msg)
+            standardMsg = '{}\n{}'.format("Response's content is not valid HTML", e.msg)
             self.fail(self._formatMessage(None, standardMsg))
         return dom
 
@@ -1413,7 +1416,7 @@ class PageTest(PageTestBase):
         )
 
         data = {
-            'openNodes[]': [alpha.node.pk, gamma.node.pk]
+            'openNodes[]': [alpha.pk, gamma.pk]
         }
 
         with self.login_user_context(superuser):
@@ -1504,7 +1507,7 @@ class PageTest(PageTestBase):
     def test_page_tree_render_localized_page_ids(self):
         from django.db import connection
 
-        # Artificially increment the sequence number on cms_page and cms_treenode (below)
+        # Artificially increment the sequence number on cms_page (below)
         # to be > 1000, to trigger a THOUSAND_SEPARATOR localization in the
         # rendered template
 
@@ -1514,7 +1517,6 @@ class PageTest(PageTestBase):
         )
         with connection.cursor() as c:
             c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_page"')
-            c.execute('UPDATE SQLITE_SEQUENCE SET seq = 1001 WHERE name="cms_treenode"')
 
         page = create_page(
             "child-page",
@@ -1536,30 +1538,75 @@ class PageTest(PageTestBase):
         self.assertTrue(page.id > 1000)
         self.assertTrue(sub_page.id > 1000)
 
-        self.assertTrue(page.node.id > 1000)
-        self.assertTrue(sub_page.node.id > 1000)
+        self.assertTrue(page.id > 1000)
+        self.assertTrue(sub_page.id > 1000)
 
         # make sure the rendered page tree doesn't
         # localize page or node ids
         with self.login_user_context(admin_user):
-            data = {'openNodes[]': [root.node.pk, page.node.pk], 'language': 'fr'}
+            data = {'openNodes[]': [root.pk, page.pk], 'language': 'fr'}
 
             endpoint = self.get_admin_url(PageContent, 'get_tree')
             response = self.client.get(endpoint, data=data)
 
             self.assertEqual(response.status_code, 200)
-            self.assertNotContains(response, f'parent_node={page.node.pk:,}')
-            self.assertContains(response, f'parent_node={page.node.pk}')
+            self.assertNotContains(response, f'page={page.pk:,}')
+            self.assertContains(response, f'parent_page={page.pk}')
 
         # if per chance we have localized node ids in our localstorage,
         # make sure DjangoCMS doesn't choke on them when they are passed
         # into the view
         with self.login_user_context(admin_user):
-            data = {'openNodes[]': [root.node.pk, f'{page.node.pk:,}'], 'language': 'fr'}
+            data = {'openNodes[]': [root.pk, f'{page.pk:,}'], 'language': 'fr'}
             endpoint = self.get_admin_url(PageContent, 'get_tree')
             response = self.client.get(endpoint, data=data)
             self.assertEqual(response.status_code, 200)
 
+
+class PageActionsTestCase(PageTestBase):
+    def setUp(self):
+        self.admin = self.get_superuser()
+        self.site = Site.objects.get(pk=1)
+        self.page = create_page(
+            'My Page', 'nav_playground.html', 'en',
+            slug="ok",
+            site=self.site, created_by=self.admin)
+
+    def test_add_page_redirect(self):
+        """When adding the edit parameter to the add page form, the user should be redirected to the edit endpoint
+        of the new page."""
+        with self.login_user_context(self.admin):
+            # add page
+            page_data = {
+                'title': 'another page', 'slug': 'type1', 'template': 'nav_playground.html',
+                'language': 'en',
+                'edit': 1,
+            }
+            self.assertEqual(Page.objects.all().count(), 1)
+            response = self.client.post(
+                self.get_admin_url(PageContent, 'add'),
+                data=page_data,
+            )
+            redirect_url = get_object_edit_url(PageContent.objects.get(title='another page'))
+            self.assertContains(response, f'href="{redirect_url}"')
+            self.assertEqual(Page.objects.all().count(), 2)
+
+    def test_add_page_no_redirect(self):
+        with self.login_user_context(self.admin):
+            # add page
+            page_data = {
+                'title': 'another page', 'slug': 'type1', 'template': 'nav_playground.html',
+                'language': 'en',
+                'edit': 0,
+            }
+            self.assertEqual(Page.objects.all().count(), 1)
+            response = self.client.post(
+                self.get_admin_url(PageContent, 'add'),
+                data=page_data,
+            )
+            redirect_url = self.get_admin_url(PageContent, 'changelist') + "?language=en"
+            self.assertRedirects(response, redirect_url)
+            self.assertEqual(Page.objects.all().count(), 2)
 
 class PermissionsTestCase(PageTestBase):
 
@@ -1610,7 +1657,7 @@ class PermissionsTestCase(PageTestBase):
 
         for attr, value in kwargs.items():
             if attr not in non_inline:
-                attr = 'pagepermission_set-2-0-{}'.format(attr)
+                attr = f'pagepermission_set-2-0-{attr}'
             data[attr] = value
         return data
 
@@ -1643,7 +1690,7 @@ class PermissionsTestCase(PageTestBase):
 
         for attr, value in kwargs.items():
             if attr not in non_inline:
-                attr = 'pagepermission_set-0-{}'.format(attr)
+                attr = f'pagepermission_set-0-{attr}'
             data[attr] = value
         return data
 
@@ -1905,7 +1952,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self._add_plugin_to_page(page)
 
         self.add_permission(staff_user, 'change_page')
-        self.add_permission(staff_user, 'delete_page')
+        self.remove_permission(staff_user, 'delete_page')
         gp = self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
@@ -2023,7 +2070,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self._add_plugin_to_page(page, language=translation.language)
 
         self.add_permission(staff_user, 'change_page')
-        self.add_permission(staff_user, 'delete_page')
+        self.remove_permission(staff_user, 'delete_page')
         self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
@@ -2600,7 +2647,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
     def test_permissions_cache_invalidation(self):
         """
-        Test permission cache clearing on page save
+        Permission cache clears on page save
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_std_permissions()
@@ -2612,6 +2659,42 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
             data['_continue'] = '1'
             self.client.post(endpoint, data)
         self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+
+    def test_permission_cache_invalidation_on_group_add(self):
+        """
+        Permissions cache is invalidated if the group relationship of a user is changed
+        """
+        from django.contrib.auth.models import Group
+
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_std_permissions()
+        set_permission_cache(staff_user, "change_page", [page.pk])
+
+        group = Group(name="test_group")
+        group.save()
+        staff_user.groups.add(group)
+
+        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+
+
+    def test_permission_cache_invalidation_on_group_remove(self):
+        """
+        Permissions cache is invalidated if the group relationship of a user is changed
+        """
+        from django.contrib.auth.models import Group
+
+        page = self.get_permissions_test_page()
+        staff_user = self.get_staff_user_with_std_permissions()
+        group = Group(name="test_group")
+        group.save()
+        staff_user.groups.add(group)
+
+        set_permission_cache(staff_user, "change_page", [page.pk])
+
+        group.user_set.remove(staff_user)
+
+        self.assertIsNone(get_permission_cache(staff_user, "change_page"))
+
 
     def test_user_can_copy_page(self):
         """
@@ -2632,7 +2715,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             endpoint = self.get_admin_url(Page, 'get_copy_dialog', page.pk)
-            endpoint += '?source_site=%s' % page.node.site_id
+            endpoint += '?source_site=%s' % page.site_id
             response = self.client.get(endpoint)
             self.assertEqual(response.status_code, 200)
 
@@ -2915,7 +2998,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         """
         page = self.get_permissions_test_page()
         staff_user = self.get_staff_user_with_no_permissions()
-        source_translation = self.get_page_title_obj(page, 'en')
+        source_translation = self.get_pagecontent_obj(page, 'en')
         target_translation = self._add_translation_to_page(page)
         endpoint = self.get_admin_url(PageContent, 'copy_language', source_translation.pk)
         plugins = [
@@ -3367,8 +3450,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         page_perm = self.add_page_permission(
             staff_user,
             page,
-            can_change=True,
-            can_delete=True,
+            can_change=False,
+            can_delete=False,
         )
 
         with self.login_user_context(staff_user):
@@ -3505,7 +3588,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         self.add_page_permission(
             staff_user,
             page,
-            can_change=True,
+            can_change=False,
             can_delete=True,
         )
 
@@ -4323,7 +4406,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
         """
         page = self._permissions_page
         staff_user = self.get_staff_user_with_no_permissions()
-        source_translation = self.get_page_title_obj(page, 'en')
+        source_translation = self.get_pagecontent_obj(page, 'en')
         target_translation = self._add_translation_to_page(page)
         endpoint = self.get_admin_url(PageContent, 'copy_language', source_translation.pk)
         plugins = [

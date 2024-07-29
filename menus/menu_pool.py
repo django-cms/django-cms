@@ -10,8 +10,6 @@ from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import (
     get_language_from_request,
-)
-from django.utils.translation import (
     gettext_lazy as _,
 )
 
@@ -29,10 +27,10 @@ logger = getLogger('menus')
 
 
 def _build_nodes_inner_for_one_menu(nodes, menu_class_name):
-    '''
+    """
     This is an easier to test "inner loop" building the menu tree structure
     for one menu (one language, one site)
-    '''
+    """
     done_nodes = {}  # Dict of node.id:Node
     final_nodes = []
 
@@ -95,7 +93,7 @@ def _get_menu_class_for_instance(menu_class, instance):
     return meta_class(class_name, (menu_class,), attrs)
 
 
-class MenuRenderer(object):
+class MenuRenderer:
     # The main logic behind this class is to decouple
     # the singleton menu pool from the menu rendering logic.
     # By doing this we can be sure that each request has its
@@ -122,10 +120,10 @@ class MenuRenderer(object):
     def cache_key(self):
         prefix = get_cms_setting('CACHE_PREFIX')
 
-        key = '%smenu_nodes_%s_%s' % (prefix, self.request_language, self.site.pk)
+        key = f"{prefix}menu_nodes_{self.request_language}_{self.site.pk}"
 
         if self.request.user.is_authenticated:
-            key += '_%s_user' % self.request.user.pk
+            key += f"_{self.request.user.pk}_user"
 
         if self.edit_or_preview:
             key += ':edit'
@@ -239,7 +237,7 @@ class MenuRenderer(object):
         return MenuClass(renderer=self)
 
 
-class MenuPool(object):
+class MenuPool:
 
     def __init__(self):
         self.menus = {}
@@ -290,8 +288,7 @@ class MenuPool(object):
                     # of the menu class until it's needed.
                     # Plus we keep the menus consistent by always
                     # pointing to a class instead of an instance.
-                    namespace = "{0}:{1}".format(
-                        menu_class_name, instance.pk)
+                    namespace = f"{menu_class_name}:{instance.pk}"
                     registered_menus[namespace] = _get_menu_class(instance)
 
                 if not instances and not for_rendering:
@@ -313,9 +310,9 @@ class MenuPool(object):
         return self.modifiers
 
     def clear(self, site_id=None, language=None, all=False):
-        '''
+        """
         This invalidates the cache for a given menu (site_id and language)
-        '''
+        """
         if all:
             cache_keys = CacheKey.objects.get_keys()
         else:
@@ -332,8 +329,7 @@ class MenuPool(object):
         assert issubclass(menu_cls, Menu)
         if menu_cls.__name__ in self.menus:
             raise NamespaceAlreadyRegistered(
-                "[{0}] a menu with this name is already registered".format(
-                    menu_cls.__name__))
+                f"[{menu_cls.__name__}] a menu with this name is already registered")
         # Note: menu_cls should still be the menu CLASS at this point.
         self.menus[menu_cls.__name__] = menu_cls
 
@@ -355,9 +351,10 @@ class MenuPool(object):
         # that are registered and have instances
         # (in case of attached menus).
         menus = self.get_registered_menus(for_rendering=False)
-        return sorted(list(set([(menu.__name__, menu.name)
-                                for menu_class_name, menu in menus.items()
-                                if getattr(menu, name, None) == value])))
+        return sorted(
+            {(menu.__name__, menu.name) for menu_class_name, menu in menus.items()
+             if getattr(menu, name, None) == value}
+        )
 
     def get_nodes_by_attribute(self, nodes, name, value):
         return [node for node in nodes if node.attr.get(name, None) == value]

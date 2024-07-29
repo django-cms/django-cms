@@ -20,7 +20,7 @@
         white-space: nowrap;
         font-size: $submenu-item-font-size;
         line-height: $submenu-item-height + 6px;
-        text-align: left;
+        text-align: start;
         min-height: $submenu-item-height + 6px;
         padding: 0 $submenu-item-padding-horizontal;
     }
@@ -88,7 +88,7 @@
     z-index: z(structure, content, empty, addplugin);
     color: $color-primary;
     line-height: 44px;
-    padding-left: 20px;
+    padding-inline-start: 20px;
     border: 2px solid $color-primary;
     border-radius: $border-radius-base;
     background-color: $white;

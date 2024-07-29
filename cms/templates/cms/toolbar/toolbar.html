@@ -4,7 +4,9 @@
      class="cms cms-reset
      {% if not user.is_authenticated %} cms-toolbar-auth{% endif %}
      {% if debug %} cms-toolbar-debug{% endif %}"
-     dir="ltr" data-touch-action="none">
+     lang="{{ request.toolbar.toolbar_language }}"
+     dir="{{ request.toolbar.toolbar_language_bidi|yesno:'rtl,ltr,auto' }}"
+     data-touch-action="none">
 
     {% block toolbar_top %}
     {% endblock toolbar_top %}

@@ -86,7 +86,7 @@ def add_url_parameters(url, *args, **params):
     for arg in args:
         params.update(arg)
     if params:
-        return '%s?%s' % (url, urlencode(params))
+        return f"{url}?{urlencode(params)}"
     return url
 
 
@@ -96,9 +96,9 @@ def admin_reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None,
     if ':' in viewname:
         raise ValueError(
             "viewname in admin_reverse may not already have a namespace "
-            "defined: {0!r}".format(viewname)
+            f"defined: {viewname!r}"
         )
-    viewname = "{0}:{1}".format(admin_namespace, viewname)
+    viewname = f"{admin_namespace}:{viewname}"
     return reverse(
         viewname,
         urlconf=urlconf,

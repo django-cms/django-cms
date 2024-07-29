@@ -35,7 +35,7 @@ class TestSectionOutput(FileSectionWrapper):
         pass
 
 
-class CheckAssertMixin():
+class CheckAssertMixin:
     def assertCheck(self, successful, **assertions):
         """
         asserts that checks are successful or not
@@ -46,7 +46,7 @@ class CheckAssertMixin():
         self.assertEqual(output.successful, successful)
         for key, value in assertions.items():
             self.assertEqual(
-                getattr(output, key), value, "%s %s expected, got %s" % (value, key, getattr(output, key))
+                getattr(output, key), value, f"{value} {key} expected, got {getattr(output, key)}"
             )
 
 

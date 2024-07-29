@@ -18,7 +18,7 @@ def get_sites():
     sites = (
         Site
         .objects
-        .filter(djangocms_nodes__isnull=False)
+        .filter(djangocms_pages__isnull=False)
         .order_by('name')
         .distinct()
     )
@@ -39,23 +39,22 @@ def get_page_choices_for_site(site, language):
         Page
         .objects
         .on_site(site)
-        .select_related('node')
         .prefetch_related(translation_lookup)
-        .order_by('node__path')
-        .only('pk', 'node')
+        .order_by('path')
+        .only('pk')
     )
 
     for page in pages:
         translations = page.filtered_translations
-        titles_by_language = {trans.language: trans.title for trans in translations}
+        pagecontent_by_language = {trans.language: trans.title for trans in translations}
 
-        for language in languages:
+        for lang in languages:
             # EmptyPageContent is used to prevent the cms from trying
             # to find a translation in the database
-            if language in titles_by_language:
-                title = titles_by_language[language]
-                indent = "&nbsp;&nbsp;" * (page.node.depth - 1)
-                label = mark_safe("%s%s" % (indent, escape(title)))
+            if lang in pagecontent_by_language:
+                title = pagecontent_by_language[lang]
+                indent = "&nbsp;&nbsp;" * (page.depth - 1)
+                label = mark_safe(f"{indent}{escape(title)}")
                 yield (page.pk, label)
                 break
 
@@ -87,7 +86,7 @@ def get_site_choices(lang=None):
     lang = lang or i18n.get_current_language()
     site_choices = cache.get(_site_cache_key(lang))
     if site_choices is None:
-        site_choices = update_site_and_page_choices(lang)[0]
+        site_choices, _ = update_site_and_page_choices(lang)
     return site_choices
 
 
@@ -96,7 +95,7 @@ def get_page_choices(lang=None):
     lang = lang or i18n.get_current_language()
     page_choices = cache.get(_page_cache_key(lang))
     if page_choices is None:
-        page_choices = update_site_and_page_choices(lang)[1]
+        _, page_choices = update_site_and_page_choices(lang)
     return page_choices
 
 

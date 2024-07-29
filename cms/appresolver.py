@@ -3,7 +3,7 @@ from importlib import import_module
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import OperationalError, ProgrammingError
-from django.urls import Resolver404, URLResolver, reverse
+from django.urls import NoReverseMatch, Resolver404, URLResolver, reverse
 from django.urls.resolvers import RegexPattern, URLPattern
 from django.utils.translation import get_language, override
 
@@ -26,7 +26,10 @@ def applications_page_check(request):
     """
     # We should get in this branch only if an apphook is active on /
     # This removes the non-CMS part of the URL.
-    path = request.path_info.replace(reverse('pages-root'), '', 1)
+    try:
+        path = request.path_info.replace(reverse('pages-root'), '', 1)
+    except NoReverseMatch:
+        path = request.path_info
 
     # check if application resolver can resolve this
     for lang in get_language_list():
@@ -111,7 +114,7 @@ def recurse_patterns(path, pattern_list, page_id, default_args=None,
         # make sure we don't get patterns that start with more than one '^'!
         app_pat = app_pat.lstrip('^')
         path = path.lstrip('^')
-        regex = r'^%s%s' % (path, app_pat) if not nested else r'^%s' % (app_pat)
+        regex = rf'^{path}{app_pat}' if not nested else r'^%s' % (app_pat)
         if isinstance(pattern, URLResolver):
             # include default_args
             args = pattern.default_kwargs
@@ -157,7 +160,7 @@ def get_app_urls(urls):
             if not hasattr(mod, 'urlpatterns'):
                 raise ImproperlyConfigured(
                     "URLConf `%s` has no urlpatterns attribute" % urlconf)
-            yield getattr(mod, 'urlpatterns')
+            yield mod.urlpatterns
         elif isinstance(urlconf, (list, tuple)):
             yield urlconf
         else:
@@ -226,12 +229,12 @@ def _get_app_patterns(site):
         page_urls
         .exclude(page__application_urls=None)
         .exclude(page__application_urls='')
-        .order_by('-page__node__path')
+        .order_by('-page__path')
         .select_related('page')
     )
 
     for page_url in page_urls:
-        mix_id = "%s:%s:%s" % (
+        mix_id = "{}:{}:{}".format(
             page_url.path + "/",
             page_url.page.application_urls,
             page_url.language,

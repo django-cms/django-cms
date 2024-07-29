@@ -23,7 +23,7 @@ def step2_form_factory(mixin_cls, entry_form_class, attrs=None):
     return FormClass
 
 
-class BaseFormMixin():
+class BaseFormMixin:
     has_separate_optional_fields = False
 
     def __init__(self, *args, **kwargs):

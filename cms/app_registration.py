@@ -72,7 +72,7 @@ def autodiscover_cms_configs():
     for app_config in apps.get_app_configs():
         try:
             cms_module = import_module(
-                '%s.%s' % (app_config.name, CMS_CONFIG_NAME))
+                f'{app_config.name}.{CMS_CONFIG_NAME}')
         except:  # NOQA
             # If something in cms_config.py raises an exception let that
             # exception bubble up. Only catch the exception if
@@ -128,7 +128,7 @@ def configure_cms_apps(apps_with_features):
     and run code to register them with their config
     """
     for app_with_feature in apps_with_features:
-        enabled_property = "{}_enabled".format(app_with_feature.label)
+        enabled_property = f"{app_with_feature.label}_enabled"
         configure_app = app_with_feature.cms_extension.configure_app
 
         for app_config in get_cms_config_apps():
@@ -166,7 +166,7 @@ def backwards_compatibility_config():
     for module in modules_to_autodiscover:
         for app_config in apps.get_app_configs():
             try:
-                import_module('%s.%s' % (app_config.name, module))
+                import_module(f'{app_config.name}.{module}')
             except Exception:  # NOQA
                 # Decide whether to bubble up this error. If the app just
                 # doesn't have the module in question, we can ignore the error
