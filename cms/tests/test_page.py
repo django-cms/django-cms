@@ -113,47 +113,47 @@ class PagesTestCase(TransactionCMSTestCase):
         page2 = create_page('page2', 'nav_playground.html', 'en', parent=page1)
         page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2)
 
-        self.assertEqual(page1.node.depth, 1)
-        self.assertEqual(page1.node.numchild, 1)
-        self.assertFalse(page1.node.is_leaf())
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 1)
+        self.assertFalse(page1.is_leaf())
 
-        self.assertEqual(page2.node.depth, 2)
-        self.assertEqual(page2.node.numchild, 1)
-        self.assertFalse(page2.node.is_leaf())
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
 
-        self.assertEqual(page3.node.depth, 3)
-        self.assertEqual(page3.node.numchild, 0)
-        self.assertTrue(page3.node.is_leaf())
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
 
         page3.delete()
-        page1 = page1.reload()
-        page2 = page2.reload()
+        page1.refresh_from_db()
+        page2.refresh_from_db()
 
-        self.assertEqual(page2.node.depth, 2)
-        self.assertEqual(page2.node.numchild, 0)
-        self.assertTrue(page2.node.is_leaf())
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 0)
+        self.assertTrue(page2.is_leaf())
 
         page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2, reverse_id='page3')
 
-        self.assertEqual(page2.node.depth, 2)
-        self.assertEqual(page2.node.numchild, 1)
-        self.assertFalse(page2.node.is_leaf())
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
 
-        self.assertEqual(page3.node.depth, 3)
-        self.assertEqual(page3.node.numchild, 0)
-        self.assertTrue(page3.node.is_leaf())
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
 
-        self.assertEqual(page1.node.depth, 1)
-        self.assertEqual(page1.node.numchild, 1)
-        self.assertFalse(page1.node.is_leaf())
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 1)
+        self.assertFalse(page1.is_leaf())
 
-        self.assertEqual(page2.node.depth, 2)
-        self.assertEqual(page2.node.numchild, 1)
-        self.assertFalse(page2.node.is_leaf())
+        self.assertEqual(page2.depth, 2)
+        self.assertEqual(page2.numchild, 1)
+        self.assertFalse(page2.is_leaf())
 
-        self.assertEqual(page3.node.depth, 3)
-        self.assertEqual(page3.node.numchild, 0)
-        self.assertTrue(page3.node.is_leaf())
+        self.assertEqual(page3.depth, 3)
+        self.assertEqual(page3.numchild, 0)
+        self.assertTrue(page3.is_leaf())
 
     def test_create_page_api(self):
         page_data = {
@@ -335,12 +335,12 @@ class PagesTestCase(TransactionCMSTestCase):
             "en",
             parent=home,
         )
-        beta.move_page(alpha.node, position='left')
+        beta.move_page(alpha, position='left')
 
         # Draft
-        self.assertEqual(home.node.path, '0001')
-        self.assertEqual(beta.node.path, '00010001')
-        self.assertEqual(alpha.node.path, '00010002')
+        self.assertEqual(home.path, '0001')
+        self.assertEqual(beta.path, '00010001')
+        self.assertEqual(alpha.path, '00010002')
 
     def test_move_page_regression_right_to_left_5752(self):
         # ref: https://github.com/divio/django-cms/issues/5752
@@ -359,23 +359,23 @@ class PagesTestCase(TransactionCMSTestCase):
             "en",
             parent=home,
         )
-        beta.move_page(alpha.node, position='left')
+        beta.move_page(alpha, position='left')
 
         alpha.refresh_from_db()
         beta.refresh_from_db()
 
         # Draft
-        self.assertEqual(home.node.path, '0001')
-        self.assertEqual(beta.node.path, '00010001')
-        self.assertEqual(alpha.node.path, '00010002')
+        self.assertEqual(home.path, '0001')
+        self.assertEqual(beta.path, '00010001')
+        self.assertEqual(alpha.path, '00010002')
 
     def test_move_page_regression_5640(self):
         # ref: https://github.com/divio/django-cms/issues/5640
         alpha = create_page("Alpha", "nav_playground.html", "en")
         beta = create_page("Beta", "nav_playground.html", "en")
-        alpha.move_page(beta.node, position='right')
-        self.assertEqual(beta.node.path, '0002')
-        self.assertEqual(alpha.node.path, '0003')
+        alpha.move_page(beta, position='right')
+        self.assertEqual(beta.path, '0002')
+        self.assertEqual(alpha.path, '0003')
 
     def test_move_page_regression_nested_5640(self):
         # ref: https://github.com/divio/django-cms/issues/5640
@@ -385,10 +385,10 @@ class PagesTestCase(TransactionCMSTestCase):
         delta = create_page("Delta", "nav_playground.html", "en")
         theta = create_page("Theta", "nav_playground.html", "en")
 
-        beta.move_page(alpha.node, position='last-child')
-        gamma.move_page(beta.reload().node, position='last-child')
-        delta.move_page(gamma.reload().node, position='last-child')
-        theta.move_page(delta.reload().node, position='last-child')
+        beta.move_page(alpha, position='last-child')
+        gamma.move_page(beta, position='last-child')
+        delta.move_page(gamma, position='last-child')
+        theta.move_page(delta, position='last-child')
 
         tree = [
             (alpha, '0001'),
@@ -399,14 +399,14 @@ class PagesTestCase(TransactionCMSTestCase):
         ]
 
         for page, path in tree:
-            self.assertEqual(page.reload().node.path, path)
+            self.assertEqual(page.path, path)
 
     def test_move_page_inherit(self):
         parent = create_page("Parent", 'col_three.html', "en")
         child = create_page("Child", constants.TEMPLATE_INHERITANCE_MAGIC,
                             "en", parent=parent)
         self.assertEqual(child.get_template(), parent.get_template())
-        child.move_page(parent.node, 'left')
+        child.move_page(parent, 'left')
         child = Page.objects.get(pk=child.pk)
         self.assertEqual(child.get_template(), parent.get_template())
 
@@ -576,14 +576,14 @@ class PagesTestCase(TransactionCMSTestCase):
         page4 = create_page('test page 4', 'nav_playground.html', 'en')
         page5 = create_page('test page 5', 'nav_playground.html', 'en', parent=page4)
 
-        page1 = page1.reload()
-        page2 = page2.reload()
-        page3 = page3.reload()
-        page4 = page4.reload()
-        page5 = page5.reload()
-        self.assertEqual(page3.node.parent_id, page2.node.pk)
-        self.assertEqual(page2.node.parent_id, page1.node.pk)
-        self.assertEqual(page5.node.parent_id, page4.node.pk)
+        page1.refresh_from_db()
+        page2.refresh_from_db()
+        page3.refresh_from_db()
+        page4.refresh_from_db()
+        page5.refresh_from_db()
+        self.assertEqual(page3.parent_id, page2.pk)
+        self.assertEqual(page2.parent_id, page1.pk)
+        self.assertEqual(page5.parent_id, page4.pk)
 
         self.assertEqual(page1.get_absolute_url(), self.get_pages_root() + '')
         self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + 'test-page-2/')
@@ -592,13 +592,13 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(page5.get_absolute_url(), self.get_pages_root() + 'test-page-4/test-page-5/')
         page3 = self.move_page(page3, page1)
         self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'test-page-3/')
-        page3 = page3.reload()
-        page2 = page2.reload()
-        page5 = page5.reload()
+        page3.refresh_from_db()
+        page2.refresh_from_db()
+        page5.refresh_from_db()
         page5 = self.move_page(page5, page2)
         self.assertEqual(page5.get_absolute_url(), self.get_pages_root() + 'test-page-2/test-page-5/')
-        page3 = page3.reload()
-        page4 = page4.reload()
+        page3.refresh_from_db()
+        page4.refresh_from_db()
         page3 = self.move_page(page3, page4)
         self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'test-page-4/test-page-3/')
 
@@ -900,11 +900,13 @@ class PageTreeTests(CMSTestCase):
         grandchild_1 = create_page(
             'grandchild-1', 'nav_playground.html', 'en', slug='grandchild-1', parent=child
         )
+        child.refresh_from_db()
         grandchild_2 = create_page(
-            'grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2', parent=child.reload()
+            'grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2', parent=child
         )
+        child.refresh_from_db()
         grandchild_3 = create_page(
-            'grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3', parent=child.reload()
+            'grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3', parent=child
         )
         endpoint = self.get_page_change_uri('en', parent)
 
@@ -921,8 +923,8 @@ class PageTreeTests(CMSTestCase):
         home = create_page('grandpa', 'nav_playground.html', 'en', slug='home')
         parent = create_page('parent', 'nav_playground.html', 'en', slug='parent')
         child = create_page('child', 'nav_playground.html', 'en', slug='child', parent=home)
-        child.move_page(parent.node)
-        child = child.reload()
+        child.move_page(parent)
+        child.refresh_from_db()
         self.assertEqual(child.get_absolute_url(language='en'), '/en/parent/child/')
 
 

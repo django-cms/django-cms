@@ -293,7 +293,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         # test the cms menu class
         menu = renderer.get_menu('CMSMenu')
         nodes = menu.get_nodes(request)
-        pages = self.get_all_pages().order_by('node__path')
+        pages = self.get_all_pages().order_by('path')
         self.assertEqual(len(nodes), len(pages))
         self.assertSequenceEqual(
             [node.get_absolute_url() for node in nodes],
@@ -335,7 +335,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         )
 
     def test_cms_menu_public_with_multiple_languages(self):
-        pages = self.get_all_pages().order_by('node__path')
+        pages = self.get_all_pages().order_by('path')
 
         # Fallbacks on
         request = self.get_request(path='/de/', language='de')
@@ -536,7 +536,7 @@ class FixturesMenuTests(MenusFixture, BaseMenuTest):
         tpl = Template("{% load menu_tags %}{% show_menu 1 1 100 100 %}")
         tpl.render(context)
         nodes = context['children']
-        level_2_pages = Page.objects.filter(node__depth=2, node__site=site)
+        level_2_pages = Page.objects.filter(depth=2, site=site)
         self.assertEqual(len(nodes), level_2_pages.count())
         for node in nodes:
             self.assertEqual(len(node.children), 0)
@@ -1011,8 +1011,8 @@ class MenuTests(BaseMenuTest):
 
         # The nl language is not configured for the current site
         # as a result, we have to create the pages manually.
-        nl_page_1 = Page()
-        nl_page_1.set_tree_node(site=site_2, target=None)
+        nl_page_1 = Page(site=site_2)
+        nl_page_1.add_to_tree()
         nl_page_1.save()
         nl_page_1.pagecontent_set.create(
             language='nl',
@@ -1021,8 +1021,8 @@ class MenuTests(BaseMenuTest):
             in_navigation=True,
         )
 
-        nl_page_2 = Page()
-        nl_page_2.set_tree_node(site=site_2, target=None)
+        nl_page_2 = Page(site=site_2)
+        nl_page_2.add_to_tree()
         nl_page_2.save()
         nl_page_2.pagecontent_set.create(
             language='nl',
@@ -1147,13 +1147,13 @@ class AdvancedSoftrootTests(SoftrootFixture, CMSTestCase):
 
         This is recursive over the tree
         """
-        msg = '%r != %r with %r, %r' % (len(a), len(b), a, b)
+        msg = f'{len(a)!r} != {len(b)!r} with {a!r}, {b!r}'
         self.assertEqual(len(a), len(b), msg)
         for n1, n2 in zip(a, b):
             for attr in attrs:
                 a1 = getattr(n1, attr)
                 a2 = getattr(n2, attr)
-                msg = '%r != %r with %r, %r (%s)' % (a1, a2, n1, n2, attr)
+                msg = f'{a1!r} != {a2!r} with {n1!r}, {n2!r} ({attr})'
                 self.assertEqual(a1, a2, msg)
             self.assertTreeQuality(n1.children, n2.children)
 

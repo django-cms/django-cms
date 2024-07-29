@@ -16,7 +16,7 @@ from cms.test_utils.project.extensionapp.models import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning, RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.urlutils import admin_reverse
 
 
@@ -118,7 +118,7 @@ class ExtensionsTestCase(CMSTestCase):
         # asserting original extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
         self.assertEqual(len(extension_pool.get_page_content_extensions()), 2)
-        copied_page = page.copy_with_descendants(target_node=None, position='last-child', user=self.get_superuser())
+        copied_page = page.copy_with_descendants(target_page=None, position='last-child', user=self.get_superuser())
 
         # asserting original + copied extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 4)
@@ -195,7 +195,7 @@ class ExtensionsTestCase(CMSTestCase):
         self.assertEqual(len(extension_pool.get_page_extensions()), 2)
         self.assertEqual(len(extension_pool.get_page_content_extensions()), 2)
 
-        copied_page = page.copy_with_descendants(target_node=None, position='last-child', user=self.get_superuser())
+        copied_page = page.copy_with_descendants(target_page=None, position='last-child', user=self.get_superuser())
 
         # asserting original + copied extensions
         self.assertEqual(len(extension_pool.get_page_extensions()), 4)

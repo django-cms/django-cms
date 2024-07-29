@@ -230,7 +230,7 @@ template. It performs the following five steps in one simple go:
 
        python -m manage migrate
 
-4. It prompts for crating a superuser by invoking:
+4. It prompts for creating a superuser by invoking:
 
    .. code-block::
 

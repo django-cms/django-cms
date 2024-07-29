@@ -11,7 +11,7 @@
 CMS._plugins = CMS._plugins || [];
 // this is a global shared configuration
 CMS.config = {
-    'mode': {% if cms_toolbar.edit_mode_active %}'draft'{% else %}'live'{% endif %},
+    'mode': {% if cms_toolbar.edit_mode_active or cms_toolbar.structure_mode_active %}'draft'{% else %}'live'{% endif %},
     'auth': {% if user.is_authenticated %}true{% else %}false{% endif %},
     'debug': {% if debug %}true{% else %}false{% endif %},
     'csrf': '{{ csrf_token }}',

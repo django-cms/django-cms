@@ -1,4 +1,3 @@
-
 from django.contrib.sitemaps import Sitemap
 from django.db.models import OuterRef, Q, Subquery
 
@@ -12,8 +11,7 @@ def from_iterable(iterables):
     Backport of itertools.chain.from_iterable
     """
     for it in iterables:
-        for element in it:
-            yield element
+        yield from it
 
 
 class CMSSitemap(Sitemap):
@@ -52,7 +50,7 @@ class CMSSitemap(Sitemap):
             .objects
             .get_for_site(site)
             .filter(language__in=languages, path__isnull=False, page__login_required=False)
-            .order_by('page__node__path')
+            .order_by('page__path')
             .select_related("page")
             .annotate(content_pk=Subquery(
                 PageContent.objects

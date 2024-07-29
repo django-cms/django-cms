@@ -61,14 +61,14 @@ class CacheTestCase(CMSTestCase):
         request = self.get_request(page1_url)
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
-        with self.assertNumQueries(FuzzyInt(5, 9)):
+        with self.assertNumQueries(FuzzyInt(4, 8)):
             self.render_template_obj(template, {}, request)
         request = self.get_request(page1_url)
         request.session["cms_edit"] = True
         request.current_page = Page.objects.get(pk=page1.pk)
         request.toolbar = CMSToolbar(request)
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(2):
             self.render_template_obj(template, {}, request)
         # toolbar
         with self.login_user_context(self.get_superuser()):
@@ -78,7 +78,7 @@ class CacheTestCase(CMSTestCase):
             request.toolbar = CMSToolbar(request)
             request.toolbar.show_toolbar = True
         template = "{% load cms_tags %}{% placeholder 'body' %}{% placeholder 'right-column' %}"
-        with self.assertNumQueries(5):
+        with self.assertNumQueries(4):
             self.render_template_obj(template, {}, request)
         exclude = [
             "django.middleware.cache.UpdateCacheMiddleware",
@@ -169,7 +169,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(6):
+            with self.assertNumQueries(5):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
                 with self.assertNumQueries(FuzzyInt(8, 16)):

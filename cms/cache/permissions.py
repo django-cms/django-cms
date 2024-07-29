@@ -13,7 +13,7 @@ def get_cache_key(user, key):
 
 
 def get_cache_permission_version_key():
-    return "%s:permission:version" % (get_cms_setting('CACHE_PREFIX'),)
+    return "{}:permission:version".format(get_cms_setting('CACHE_PREFIX'))
 
 
 def get_cache_permission_version():

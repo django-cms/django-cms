@@ -11,7 +11,7 @@ from sekizai.context import SekizaiContext
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_page_content
-from cms.exceptions import DuplicatePlaceholderWarning
+from cms.exceptions import DuplicatePlaceholderWarning, PlaceholderNotFound
 from cms.models.fields import PlaceholderField
 from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
@@ -140,6 +140,17 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         t = Template('{% include "placeholder_tests/outside_nested_sekizai.html" %}')
         phs = sorted(node.get_declaration().slot for node in _scan_placeholders(t.nodelist))
         self.assertListEqual(phs, sorted(['two', 'new_one', 'base_outside']))
+
+    def test_placeholder_scanning_no_object(self):
+        """Placeholder scanning for a template without a toolbar object raises PlaceholderNotFound"""
+
+        context = SekizaiContext()
+        request = self.get_request(language="en", page=None)
+        toolbar = get_toolbar_from_request(request)
+        renderer = toolbar.get_content_renderer()
+        with self.assertRaises(PlaceholderNotFound):
+            renderer.render_obj_placeholder("someslot", context, False)
+
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
@@ -855,7 +866,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set(['en', 'de', 'fr'])
+        avail_langs = {'en', 'de', 'fr'}
         # Setup instance
         ex = Example1(
             char_1='one',
@@ -880,7 +891,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         Checks the retrieval of filled languages for a placeholder in a django
         model
         """
-        avail_langs = set(['en', 'de', 'fr'])
+        avail_langs = {'en', 'de', 'fr'}
         # Setup instances
         page = create_page('test page', 'col_two.html', 'en')
         for lang in avail_langs:
@@ -1113,9 +1124,9 @@ class PlaceholderActionTests(FakemlngFixtures, CMSTestCase):
         )
         EN = ('en', 'English')
         FR = ('fr', 'French')
-        self.assertEqual(set(fr_copy_languages), set([EN]))
-        self.assertEqual(set(de_copy_languages), set([EN, FR]))
-        self.assertEqual(set(en_copy_languages), set([FR]))
+        self.assertEqual(set(fr_copy_languages), {EN})
+        self.assertEqual(set(de_copy_languages), {EN, FR})
+        self.assertEqual(set(en_copy_languages), {FR})
 
     def test_mlng_placeholder_actions_copy(self):
         actions = MLNGPlaceholderActions()
@@ -1307,8 +1318,7 @@ class PlaceholderPluginTestsBase(CMSTestCase):
         for child in parent.cmsplugin_set.all():
             yield child.pk
 
-            for desc in self._unpack_descendants(child):
-                yield desc
+            yield from self._unpack_descendants(child)
 
     def setUp(self):
         self.placeholder = self._create_placeholder()
