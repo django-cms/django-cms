@@ -778,7 +778,7 @@ class Page(MP_Node):
 
         if language not in self.urls_cache:
             self.urls_cache.update({
-                url.language: url for url in self.urls.filter(language__in=languages)  # TODO: overwrites multiple urls
+                url.language: url for url in self.urls.all() if url.language in languages # TODO: overwrites multiple urls
             })
 
             for _language in languages:
