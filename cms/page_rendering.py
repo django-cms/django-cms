@@ -7,6 +7,7 @@ from cms import __version__, constants
 from cms.cache.page import set_page_cache
 from cms.models import EmptyPageContent
 from cms.utils.page_permissions import user_can_change_page, user_can_view_page
+from cms.utils.urlutils import admin_reverse
 
 
 def render_page(request, page, current_language, slug=None):
@@ -29,6 +30,11 @@ def render_page(request, page, current_language, slug=None):
         return _handle_no_page(request)
 
     template = page_content.get_template()
+    if not template:
+        # Render placeholder content with minimal markup
+
+        from cms.views import render_placeholder_content
+        return render_placeholder_content(request, page_content, context)
     response = TemplateResponse(request, template, context)
     response.add_post_render_callback(set_page_cache)
 
@@ -58,7 +64,7 @@ def _handle_no_page(request):
         # redirect to PageContent's changelist if the root page is detected
         resolved_path = resolve(request.path)
         if resolved_path.url_name == 'pages-root':
-            redirect_url = reverse('admin:cms_pagecontent_changelist')
+            redirect_url = admin_reverse('cms_pagecontent_changelist')
             return HttpResponseRedirect(redirect_url)
 
         # add a $ to the end of the url (does not match on the cms anymore)

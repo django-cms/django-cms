@@ -1,3 +1,4 @@
+import json
 import uuid
 import warnings
 from urllib.parse import parse_qsl, urlparse
@@ -17,7 +18,7 @@ from django.http import (
 )
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
-from django.urls import re_path
+from django.urls import include, re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
@@ -34,7 +35,7 @@ from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
-from cms.toolbar.utils import get_plugin_tree_as_json
+from cms.toolbar.utils import get_plugin_tree
 from cms.utils import get_current_site
 from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
 from cms.utils.conf import get_cms_setting
@@ -222,6 +223,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f"{info}_{fn.__name__}")
         url_patterns = [
+            re_path(r'^cms_wizard/', include('cms.wizards.urls')),
             pat(r'^copy-plugins/$', self.copy_plugins),
             pat(r'^add-plugin/$', self.add_plugin),
             pat(r'^edit-plugin/([0-9]+)/$', self.edit_plugin),
@@ -452,8 +454,8 @@ class PlaceholderAdmin(admin.ModelAdmin):
                 source_placeholder,
                 target_placeholder,
             )
-        data = get_plugin_tree_as_json(request, new_plugins)
-        return HttpResponse(data, content_type='application/json')
+        data = get_plugin_tree(request, new_plugins)
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
     def _copy_plugin_to_clipboard(self, request, target_placeholder):
         source_language = request.POST['source_language']
@@ -735,8 +737,8 @@ class PlaceholderAdmin(admin.ModelAdmin):
         if new_plugin and fetch_tree:
             root = (new_plugin.parent or new_plugin)
             new_plugins = [root] + list(root.get_descendants())
-        data = get_plugin_tree_as_json(request, new_plugins)
-        return HttpResponse(data, content_type='application/json')
+        data = get_plugin_tree(request, new_plugins)
+        return HttpResponse(json.dumps(data), content_type='application/json')
 
     def _paste_plugin(self, request, plugin, target_language,
                       target_placeholder, target_position, target_parent=None):
