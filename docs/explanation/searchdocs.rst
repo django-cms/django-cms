@@ -63,7 +63,7 @@ A very simple index could look something like this:
 
 The above snippet uses the standard ``text`` field that is recommended by 
 ``django-haystack`` to store all the indexable content. There is also a 
-seperate field for the title because you may want to display it as a heading
+separate field for the title because you may want to display it as a heading
 in your search result, and a field for the URL so you can link to the pages.
 
 The indexed content here is *not* using a template (which is one of the options
