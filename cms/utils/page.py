@@ -1,6 +1,6 @@
 import re
 
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 
 from cms.constants import PAGE_USERNAME_MAX_LENGTH
@@ -17,6 +17,10 @@ def get_page_template_from_request(request):
     """
     templates = get_cms_setting('TEMPLATES')
     template_names = frozenset(pair[0] for pair in templates)
+
+    if not templates:
+        # no templates defined, CMS is running headless
+        return None
 
     if len(templates) == 1:
         # there's only one template
@@ -79,14 +83,16 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     path = request.path_info if use_path is None else use_path
 
     if clean_path:
-        pages_root = reverse("pages-root")
+        try:
+            pages_root = reverse("pages-root")
+            if path.startswith(pages_root):
+                path = path[len(pages_root):]
 
-        if path.startswith(pages_root):
-            path = path[len(pages_root):]
-
-        # strip any final slash
-        if path.endswith("/"):
-            path = path[:-1]
+            # strip any final slash
+            if path.endswith("/"):
+                path = path[:-1]
+        except NoReverseMatch:
+            pass
 
     site = get_current_site()
     page_urls = (

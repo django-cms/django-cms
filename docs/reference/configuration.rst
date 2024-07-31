@@ -65,9 +65,9 @@ Additionally, the application in which the model is defined **must** be loaded b
     only at the beginning of a project, before the database is created.
 
 
-*****************
-Required Settings
-*****************
+*******************
+Basic Customisation
+*******************
 
 ..  setting:: CMS_TEMPLATES
 
@@ -75,7 +75,7 @@ CMS_TEMPLATES
 =============
 
 default
-    ``()`` (Not a valid setting!)
+    ``()`` (Valid setting for headless mode only!)
 
 A list of templates you can select for a page.
 
@@ -104,10 +104,6 @@ Example::
     provided within ``cms/templates/cms``. You are strongly advised not to use
     ``cms`` as a directory name for your own project templates.
 
-
-*******************
-Basic Customisation
-*******************
 
 ..  setting:: CMS_TEMPLATE_INHERITANCE
 
@@ -167,6 +163,23 @@ for translation.
     Currently **filesystem** and **app_directory** loader schemas are tested and
     supported.
 
+
+.. setting:: CMS_PLACEHOLDERS
+
+CMS_PLACEHOLDERS
+================
+
+default
+    ``(('', ('content',), _("Single placeholder")),)``
+
+A list of placeholders that can be added to a page. The first element of the
+tuple is the name of the placeholder configuration. The second element is a
+tuple of placeholder names. The third element is the verbose description of the
+placeholder configuration which will be shown in the user interface.
+
+The ``CMS_PLACEHOLDERS`` setting is used to define the placeholders in headless
+mode if and only if no CMS templates are defined in :setting:`CMS_TEMPLATES` or
+:setting:`CMS_TEMPLATES_DIR`.
 
 ..  setting:: CMS_PLACEHOLDER_CONF
 

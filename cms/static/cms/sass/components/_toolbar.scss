@@ -365,6 +365,17 @@
     }
 }
 
+@at-root .cms-structure-mode-endpoint.cms-structure-mode-structure & {
+    .cms-toolbar-item-cms-mode-switcher {
+        display: none;
+    }
+    .cms-toolbar-right {
+        padding-inline-end: 0;
+    }
+    .cms-toolbar::after, .cms-debug-bar {
+        inset-inline-end: 0;
+    }
+}
 //###########################################################
 // #TOOLBAR/dialog#
 .cms-messages {

@@ -9,14 +9,10 @@ from django.db.models import Prefetch
 from django.db.models.base import ModelState
 from django.db.models.functions import Concat
 from django.forms import model_to_dict
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 from django.utils.timezone import now
-from django.utils.translation import (
-    get_language,
-    gettext_lazy as _,
-    override as force_language,
-)
+from django.utils.translation import get_language, gettext_lazy as _, override as force_language
 from treebeard.mp_tree import MP_Node
 
 from cms import constants
@@ -367,10 +363,13 @@ class Page(MP_Node):
             language = get_current_language()
 
         with force_language(language):
-            if self.is_home:
-                return reverse('pages-root')
-            path = self.get_path(language, fallback) or self.get_slug(language, fallback)  # TODO: Disallow get_slug
-            return reverse('pages-details-by-slug', kwargs={"slug": path}) if path else None
+            try:
+                if self.is_home:
+                    return reverse('pages-root')
+                path = self.get_path(language, fallback) or self.get_slug(language, fallback)  # TODO: Disallow get_slug
+                return reverse('pages-details-by-slug', kwargs={"slug": path}) if path else None
+            except NoReverseMatch:
+                return None
 
     def set_tree_node(self, site, target=None, position='first-child'):
         warnings.warn(
@@ -923,7 +922,7 @@ class Page(MP_Node):
         content = self.get_content_obj(language, fallback, force_reload)
         if content:
             return content.get_template()
-        return get_cms_setting('TEMPLATES')[0][0]
+        return get_cms_setting('TEMPLATES')[0][0] if get_cms_setting('TEMPLATES') else ""
 
     def get_template_name(self):
         """
@@ -978,9 +977,7 @@ class Page(MP_Node):
         return user_can_publish_page(user, page=self)
 
     def has_advanced_settings_permission(self, user):
-        from cms.utils.page_permissions import (
-            user_can_change_page_advanced_settings,
-        )
+        from cms.utils.page_permissions import user_can_change_page_advanced_settings
         return user_can_change_page_advanced_settings(user, page=self)
 
     def has_change_permissions_permission(self, user):
@@ -1021,16 +1018,18 @@ class Page(MP_Node):
     def rescan_placeholders(self, language):
         return self.get_content_obj(language=language).rescan_placeholders()
 
-    def get_declared_placeholders(self):
-        # inline import to prevent circular imports
-        from cms.utils.placeholder import get_placeholders
+    def get_declared_placeholders(self, language=None, fallback=True, force_reload=False):
+        from cms.utils.placeholder import get_declared_placeholders_for_obj
 
-        return get_placeholders(self.get_template())
+        content = self.get_content_obj(language, fallback, force_reload)
+        if content:
+            return get_declared_placeholders_for_obj(content)
+        return []
 
     def get_xframe_options(self, language=None, fallback=True, force_reload=False):
-        title = self.get_content_obj(language, fallback, force_reload)
-        if title:
-            return title.get_xframe_options()
+        content = self.get_content_obj(language, fallback, force_reload)
+        if content:
+            return content.get_xframe_options()
 
     def get_soft_root(self, language=None, fallback=True, force_reload=False):
         return self.get_page_content_obj_attribute("soft_root", language, fallback, force_reload)
@@ -1067,9 +1066,12 @@ class PageUrl(models.Model):
             language = get_current_language()
 
         with force_language(language):
-            if self.path == '':
-                return reverse('pages-root')
-            return reverse('pages-details-by-slug', kwargs={"slug": self.path})
+            try:
+                if self.path == '':
+                    return reverse('pages-root')
+                return reverse('pages-details-by-slug', kwargs={"slug": self.path})
+            except NoReverseMatch:
+                return None
 
     def get_path_for_base(self, base_path=''):
         old_base, sep, slug = self.path.rpartition('/')

@@ -899,6 +899,20 @@ class PageContentAdmin(admin.ModelAdmin):
         form._request = request
         return form
 
+    def slug(self, obj):
+        # For read-only views: Get slug from the page
+        if not hasattr(self, "url_obj"):
+            self.url_obj = obj.page.get_url(obj.language)
+        return self.url_obj.slug
+
+    def overwrite_url(self, obj):
+        # For read-only views: Get slug from the page
+        if not hasattr(self, "url_obj"):
+            self.url_obj = obj.page.get_url(obj.language)
+        if self.url_obj.managed:
+            return None
+        return self.url_obj.path
+
     def duplicate(self, request, object_id):
         """
         Leverages the add view logic to duplicate the page.
@@ -1194,8 +1208,13 @@ class PageContentAdmin(admin.ModelAdmin):
 
         to_template = request.POST.get("template", None)
 
-        if to_template not in dict(get_cms_setting('TEMPLATES')):
-            return HttpResponseBadRequest(_("Template not valid"))
+        if get_cms_setting('TEMPLATES'):
+            if to_template not in dict(get_cms_setting('TEMPLATES')):
+                return HttpResponseBadRequest(_("Template not valid"))
+        else:
+            if to_template not in (placeholder_set[0] for placeholder_set in get_cms_setting('PLACEHOLDERS')):
+                return HttpResponseBadRequest(_("Placeholder selection not valid"))
+
 
         page_content.template = to_template
         page_content.save()

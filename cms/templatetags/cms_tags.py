@@ -4,6 +4,7 @@ from datetime import datetime
 
 from classytags.arguments import (
     Argument,
+    KeywordArgument,
     MultiKeywordArgument,
     MultiValueArgument,
 )
@@ -14,7 +15,9 @@ from classytags.utils import flatten_context
 from classytags.values import ListValue, StringValue
 from django import template
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
+from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.mail import mail_managers
 from django.db.models import Model
 from django.template.loader import render_to_string
@@ -188,6 +191,37 @@ def render_plugin(context, plugin):
     return content
 
 
+class EmptyListValue(list, StringValue):
+    """
+    A list of template variables for easy resolving
+    """
+    def __init__(self, value=NULL):
+        list.__init__(self)
+        if value is not NULL:
+            self.append(value)
+
+    def resolve(self, context):
+        resolved = [item.resolve(context) for item in self]
+        return self.clean(resolved)
+
+
+class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
+    sequence_class = EmptyListValue
+
+    def parse(self, parser, token, tagname, kwargs):
+        if '=' in token:
+            if self.name not in kwargs:
+                kwargs[self.name] = self.sequence_class()
+            return False
+        return super().parse(
+            parser,
+            token,
+            tagname,
+            kwargs
+        )
+
+
+
 class PageUrl(AsTag):
     name = 'page_url'
 
@@ -286,6 +320,8 @@ class Placeholder(Tag):
         if not request:
             return ''
 
+        if name in context:
+            name = context[name]
         validate_placeholder_name(name)
 
         toolbar = get_toolbar_from_request(request)
@@ -895,33 +931,40 @@ class RenderPlaceholder(AsTag):
     name = 'render_placeholder'
     options = Options(
         Argument('placeholder'),
-        Argument('width', default=None, required=False),
-        'language',
-        Argument('language', default=None, required=False),
+        MultiValueArgumentBeforeKeywordArgument('args', required=False),
+        MultiKeywordArgument('kwargs', required=False),
         'as',
         Argument('varname', required=False, resolve=False)
     )
 
-    def _get_value(self, context, editable=True, **kwargs):
+    def _get_value(self, context, editable=True, placeholder=None, nocache=False, args=None, kwargs=None):
         request = context['request']
         toolbar = get_toolbar_from_request(request)
         renderer = toolbar.get_content_renderer()
-        placeholder = kwargs.get('placeholder')
-        nocache = kwargs.get('nocache', False)
+        width = args.pop() if args else None
+        language = args.pop() if args else None
+        inherit = kwargs.get('inherit', False)
 
         if not placeholder:
             return ''
 
         if isinstance(placeholder, str):
-            placeholder = PlaceholderModel.objects.get(slot=placeholder)
+            # When only a placeholder name is given, try to get the placeholder
+            # associated with the toolbar object's slot
+            return renderer.render_obj_placeholder(
+                placeholder,
+                context,
+                inherit,
+                editable=editable,
+            )
 
         content = renderer.render_placeholder(
             placeholder=placeholder,
             context=context,
-            language=kwargs.get('language'),
+            language=language,
             editable=editable,
             use_cache=not nocache,
-            width=kwargs.get('width'),
+            width=width,
         )
         return content
 
@@ -943,36 +986,6 @@ class RenderUncachedPlaceholder(RenderPlaceholder):
     def _get_value(self, context, editable=True, **kwargs):
         kwargs['nocache'] = True
         return super()._get_value(context, editable, **kwargs)
-
-
-class EmptyListValue(list, StringValue):
-    """
-    A list of template variables for easy resolving
-    """
-    def __init__(self, value=NULL):
-        list.__init__(self)
-        if value is not NULL:
-            self.append(value)
-
-    def resolve(self, context):
-        resolved = [item.resolve(context) for item in self]
-        return self.clean(resolved)
-
-
-class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
-    sequence_class = EmptyListValue
-
-    def parse(self, parser, token, tagname, kwargs):
-        if '=' in token:
-            if self.name not in kwargs:
-                kwargs[self.name] = self.sequence_class()
-            return False
-        return super().parse(
-            parser,
-            token,
-            tagname,
-            kwargs
-        )
 
 
 class CMSAdminURL(AsTag):

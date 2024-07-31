@@ -338,15 +338,18 @@ var Plugin = new Class({
 
     _dblClickToEditHandler: function _dblClickToEditHandler(e) {
         var that = this;
+        var disabled = $(e.currentTarget).closest('.cms-drag-disabled');
 
         e.preventDefault();
         e.stopPropagation();
 
-        that.editPlugin(
-            Helpers.updateUrlWithPath(that.options.urls.edit_plugin),
-            that.options.plugin_name,
-            that._getPluginBreadcrumbs()
-        );
+        if (!disabled.length) {
+            that.editPlugin(
+                Helpers.updateUrlWithPath(that.options.urls.edit_plugin),
+                that.options.plugin_name,
+                that._getPluginBreadcrumbs()
+            );
+        }
     },
 
     _setPluginContentEvents: function _setPluginContentEvents() {
