@@ -899,6 +899,20 @@ class PageContentAdmin(admin.ModelAdmin):
         form._request = request
         return form
 
+    def slug(self, obj):
+        # For read-only views: Get slug from the page
+        if not hasattr(self, "url_obj"):
+            self.url_obj = obj.page.get_url(obj.language)
+        return self.url_obj.slug
+
+    def overwrite_url(self, obj):
+        # For read-only views: Get slug from the page
+        if not hasattr(self, "url_obj"):
+            self.url_obj = obj.page.get_url(obj.language)
+        if self.url_obj.managed:
+            return None
+        return self.url_obj.path
+
     def duplicate(self, request, object_id):
         """
         Leverages the add view logic to duplicate the page.
