@@ -338,7 +338,6 @@ class CMSMenu(Menu):
                 "page__is_home",
                 "page__login_required",
                 "page__reverse_id",
-                "page__is_home",
                 "page__navigation_extenders",
                 "page__application_urls",
             )
