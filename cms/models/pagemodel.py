@@ -143,12 +143,11 @@ class Page(MP_Node):
         try:
             title = self.get_menu_title(fallback=True)
         except LanguageError:
-            try:
-                title = self.pagecontent_set(manager="admin_manager").current()[0]
-            except IndexError:
-                title = None
+            title = self.pagecontent_set(manager="admin_manager").current_content().first()
+            if title:
+                title = title.title
         if title is None:
-            title = ""
+            title = _("Empty")
         return force_str(title)
 
     def __repr__(self):
@@ -778,7 +777,7 @@ class Page(MP_Node):
 
         if language not in self.urls_cache:
             self.urls_cache.update({
-                url.language: url for url in self.urls.filter(language__in=languages)  # TODO: overwrites multiple urls
+                url.language: url for url in self.urls.all() if url.language in languages # TODO: overwrites multiple urls
             })
 
             for _language in languages:
