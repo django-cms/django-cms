@@ -41,6 +41,7 @@ def get_visible_nodes(request, pages, site):
 
 
 def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=False):
+    """This function is deprecated. Use CMSMenu.get_menu_node_for_page_content instead."""
     import warnings
 
     from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
@@ -123,12 +124,21 @@ class CMSNavigationNode(NavigationNode):
         """
         Initializes a CMSNavigationNode instance.
 
-        Args:
-            *args: Positional arguments.
-            path: The path of the node.
-            language: The language used for the node (optional).
-            **kwargs: Keyword arguments.
+        :param *args: Positional arguments.
+        :param path: The path of the node.
+        :param language: The language used for the node. Optional.
+        :param **kwargs: Keyword arguments.
         """
+        self.path = path
+        if path is not None:
+            import warnings
+
+            from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+
+            warnings.warn(
+                "The 'path' attribute of CMSNavigationNode is deprecated and will be removed in Django CMS 4.3.",
+                RemovedInDjangoCMS43Warning, stacklevel=2,
+            )
         # language is only used when we're dealing with a fallback
         self.language = language
         super().__init__(*args, **kwargs)
@@ -204,14 +214,12 @@ class CMSMenu(Menu):
         """
         Transform a CMS page content object into a navigation node.
 
-        Args:
-            page: The page to transform.
-            languages: The list of the current language plus fallbacks used to render the menu.
-            preview_url: If given, serves as a "pattern" for a preview url with the assumoption that "/0/" is replaced
-               by the actual page content pk.
-            cut: If True the parent_id is set to None
-        Returns:
-            A CMSNavigationNode instance.
+        :param page: The page to transform.
+        :param languages: The list of the current language plus fallbacks used to render the menu.
+        :param preview_url: If given, serves as a "pattern" for a preview url with the assumption that "/0/" is replaced
+            by the actual page content pk. Default is None.
+        :param cut: If True the parent_id is set to None. Default is False.
+        :returns: A CMSNavigationNode instance.
         """
         page = page_content.page
 
@@ -270,6 +278,37 @@ class CMSMenu(Menu):
         )
 
     def get_nodes(self, request) -> list[NavigationNode]:
+        """
+        Returns a list of NavigationNode objects representing the navigation nodes to be displayed in the menu.
+        This method is performance-critical since the number of page content objects can be
+        large.
+
+        :param self: The instance of the class.
+        :param request: The HTTP request object.
+        :return: A list of NavigationNode objects representing the navigation nodes.
+        :rtype: list[NavigationNode]
+
+        ..   note::
+
+            * The method retrieves the necessary data from the database to build the navigation nodes for the menu.
+            * The behavior of the method depends on whether the edit mode or preview mode is active in the toolbar.
+            * If either edit mode or preview mode is active, the method retrieves all current page content objects
+              visible in the admin for the current page.
+            * If neither edit mode nor preview mode is active, the method retrieves only public page content objects.
+            * The retrieved page contents are filtered based on the specified languages, sorted by page path,
+              and filtered by site.
+            * Only specific fields of the page content objects are selected to optimize performance.
+            * If either edit mode or preview mode is active, a preview URL is constructed for a "virtual" non-existing
+              page content with id=0 to avoid too many calls to ``revert`` the admin URL.
+            * The method includes a nested function for prefetching URLs and filling the URL cache.
+            * The visibility of the page contents is further filtered based on authentication and permissions.
+            * The homepage is determined based on the page contents and marked for cutting if necessary.
+            * The menu node for each page content is created using the get_menu_node_for_page_content method of the
+              instance.
+            * The prefetch_urls function is called for each page content to fill the URL cache and provide necessary
+              data for creating the menu node.
+            * The select_lang method is used to filter the page contents based on the specified language preferences.
+        """
         site = self.renderer.site
         toolbar = get_toolbar_from_request(request)
 
@@ -299,7 +338,6 @@ class CMSMenu(Menu):
                 "page__is_home",
                 "page__login_required",
                 "page__reverse_id",
-                "page__is_home",
                 "page__navigation_extenders",
                 "page__application_urls",
             )
