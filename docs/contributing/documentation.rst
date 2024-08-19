@@ -317,7 +317,7 @@ context. Please follow these rules:
   capitalisation or highlighting: "Your placeholder can now be used."
 - at the start of sentences or titles, capitalise in the usual way: "Placeholder
   management guide"
-- when introducing the term for the the first time, or for the first time in a document,
+- when introducing the term for the first time, or for the first time in a document,
   you may highlight it to draw attention to it: "**Placeholders** are special model
   fields".
 - when the word refers specifically to an object in the code, highlight it as a literal:

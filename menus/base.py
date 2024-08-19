@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional
 
 from django.utils.encoding import smart_str
+from django.utils.functional import cached_property
 
 
 class Menu:
@@ -74,9 +75,10 @@ class NavigationNode:
     """
 
     selected: bool = False
-    sibling: bool = False
     ancestor: bool = False
     descendant: bool = False
+    sibling: bool = False
+    level: Optional[int] = None
 
     def __init__(
         self,
@@ -173,3 +175,11 @@ class NavigationNode:
         """
         node_abs_url = self.get_absolute_url()
         return node_abs_url == request.path
+
+
+    @property
+    def is_leaf_node(self) -> bool:
+        """
+        Indicates whether the node is a leaf node.
+        """
+        return not self.children

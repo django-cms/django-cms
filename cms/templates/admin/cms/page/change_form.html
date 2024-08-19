@@ -42,7 +42,7 @@
 
 {% block object-tools %}{% endblock %}
 
-<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{%if request.GET.parent_node %}&amp;parent_node={{ request.GET.parent_node }}{% endif %}{%if request.GET.source %}&amp;source={{ request.GET.source }}{% endif %}" method="post" id="{{ opts.model_name }}_form">
+<form {% if has_file_field %}enctype="multipart/form-data" {% endif %}action="?language={{ language }}{% if request.GET.parent_page %}&amp;parent_page={{ request.GET.parent_page }}{% endif %}{%if request.GET.source %}&amp;source={{ request.GET.source }}{% endif %}" method="post" id="{{ opts.model_name }}_form">
 {% csrf_token %}
 {% block form_top %}{% endblock %}
 

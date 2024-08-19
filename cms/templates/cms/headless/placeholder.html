@@ -1,0 +1,54 @@
+<!DOCTYPE html>{% load cms_tags menu_tags sekizai_tags static i18n %}{% spaceless %}
+    {% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}
+    <html class="cms-placeholder-view" lang="{{ LANGUAGE_CODE|default:"en-us" }}" dir="{{ LANGUAGE_BIDI|yesno:'rtl,ltr,auto' }}">
+        <head>
+            <meta charset="utf-8"/>
+            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+            <title>{% block title %}{{ request.current_page.get_page_title|striptags }}{% endblock %}</title>
+            <style>
+                html.cms-structure-mode-structure section {
+                    margin-inline-end: 436px;
+                }
+                .cms-placeholder-view section {
+                    font: normal 18px/24px Helvetica,Arial,sans-serif;
+                    margin: 20px;
+                    padding: 20px;
+                    border: 1px solid #ccc;
+                }
+                .cms-placeholder-view h1 {
+                    margin: 0 0 20px;
+                    padding: 0;
+                    padding-bottom: 10px;
+                    font-size: 1.5em;
+                    border-bottom: 1px solid #ccc;
+                    small {
+                        font-size: 0.5em;
+                        color: #999;
+                    }
+                }
+                .cms-placeholder-view section img {
+                    max-width: 100%;
+                    padding: 3px;
+                    margin: -5px;
+                    border: 1px solid #ccc;
+                }
+            </style>
+{% endspaceless %}{% render_block 'css' %}{% spaceless %}
+    {% block page_head %}{% endblock %}
+        </head>
+        <body {% block body_attrs %}{% endblock %}>
+{% endspaceless %}{% cms_toolbar %}
+        {% block content %}
+            {% for placeholder, label, inherit in cms_placeholder_slots %}
+                <section>
+                    <h1>{{ label }}{% if inherit %} <small>{% translate "inherited" %}</small>{% endif %}</h1>
+                    {% render_placeholder placeholder 100 LANGUAGE_CODE inherit=inherit %}
+                </section>
+            {% endfor %}
+        {% endblock content %}{% spaceless %}
+        {% block base_js %}{% endblock %}
+{% endspaceless %}{% render_block 'js' %}{% spaceless %}
+    {% block end_js %}{% endblock %}
+    {% block bottom_css %}{% endblock %}
+    </body>
+    </html>{% endspaceless %}

@@ -15,6 +15,7 @@ from django.utils.translation import (
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
 from cms.utils import get_language_list
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
@@ -63,6 +64,14 @@ def get_plugin_toolbar_js(plugin, children=None, parents=None):
 
 
 def get_plugin_tree_as_json(request, plugins):
+    import warnings
+
+    warnings.warn("get_plugin_tree_as_json is deprecated. Use get_plugin_tree instead.",
+                  RemovedInDjangoCMS43Warning, stacklevel=2)
+    return json.dumps(get_plugin_tree(request, plugins))
+
+
+def get_plugin_tree(request, plugins):
     from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
 
     tree_data = []
@@ -115,7 +124,7 @@ def get_plugin_tree_as_json(request, plugins):
             }
             tree_structure.append(template.render(context))
     tree_data.reverse()
-    return json.dumps({'html': '\n'.join(tree_structure), 'plugins': tree_data})
+    return {'html': '\n'.join(tree_structure), 'plugins': tree_data}
 
 
 def get_toolbar_from_request(request):
@@ -159,7 +168,7 @@ def get_object_edit_url(obj: models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
@@ -179,7 +188,7 @@ def get_object_preview_url(obj:models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
@@ -200,7 +209,7 @@ def get_object_structure_url(obj: models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
