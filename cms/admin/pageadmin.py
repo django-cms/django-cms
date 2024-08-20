@@ -847,7 +847,7 @@ class PageContentAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         site = get_site(request)
         languages = get_language_list(site.pk)
-        queryset = super().get_queryset(request)
+        queryset = super().get_queryset(request).select_related('page')
         queryset = queryset.filter(language__in=languages, page__site=site)
         return queryset
 
@@ -1400,7 +1400,7 @@ class PageContentAdmin(admin.ModelAdmin):
             Prefetch(
                 'pagecontent_set',
                 to_attr='filtered_translations',
-                queryset=PageContent.admin_manager.get_queryset(),
+                queryset=self.get_queryset(request),
             ),
         )
         rows = self.get_tree_rows(

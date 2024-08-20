@@ -90,15 +90,17 @@ update it to use the new attributes on the ``Page`` model.
 Miscellaneous
 =============
 
-Empty sections are to be removed before release.
-
+* The function ``cms.cms_menus.get_visible_nodes`` has been deprecated. For
+  performance reasons, the ``cms_menus`` builds the navigation node list based
+  on page content objects. Use ``cms.cms_menus.get_visible_page_contents``
+  instead.
 
 Features deprecated in 4.2.0
 ============================
 
-* Use of the `node` property of the :class:`~cms.models.pagemodel.Page` model
-  is deprecated. Use the attributes on the :class:`~cms.models.pagemodel.Page`
-  model instead.
+* Use of the ``node`` property of the :class:`~cms.models.pagemodel.Page` model
+  is deprecated. Use its attributes on the :class:`~cms.models.pagemodel.Page`
+  model directly instead.
 
 Removal of deprecated functionality
 ===================================

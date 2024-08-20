@@ -168,7 +168,7 @@ def get_object_edit_url(obj: models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
@@ -188,7 +188,7 @@ def get_object_preview_url(obj:models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
@@ -209,7 +209,7 @@ def get_object_structure_url(obj: models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
