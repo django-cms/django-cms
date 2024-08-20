@@ -152,8 +152,7 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
             if result.item.name > new_menu_name:
                 return result.index
 
-            if result.index > last_position:
-                last_position = result.index
+            last_position = max(result.index, last_position)
         else:
             return last_position + 1
 
