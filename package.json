@@ -48,7 +48,7 @@
     "sass": "^1.27.0",
     "uuid": "^8.3.2",
     "watchpack": "^2.4.0",
-    "webpack": "^3.0.0"
+    "webpack": "^5.94.0"
   },
   "dependencies": {
     "babel-runtime": "^6.23.0",
