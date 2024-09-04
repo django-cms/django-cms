@@ -10,6 +10,6 @@ sphinx-autobuild
 datetime
 codespell
 coverage
-django~=3.2
-django-cms
+django~=4.2
+django-cms<4
 pip-tools
