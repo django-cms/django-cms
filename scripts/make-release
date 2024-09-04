@@ -1,5 +1,5 @@
 #!/bin/bash
-
+echo "SCRIPT STARTED"
 #
 # This script is only meant to be used by release managers.
 # It assumes the following:
