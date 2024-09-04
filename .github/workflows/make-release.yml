@@ -27,5 +27,6 @@ jobs:
         shell: bash
         run: |
           pwd
+          ls -la /bin/bash
           cat ./scripts/make-release
           ./scripts/make-release ${{ inputs.version }} ${GITHUB_REF}
