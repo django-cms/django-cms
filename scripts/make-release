@@ -10,6 +10,7 @@ echo "SCRIPT STARTED"
 # License: MIT
 
 set -e
+echo "set -e completed"
 
 base_branch=develop
 upstream_source=git@github.com:django-cms/django-cms.git
@@ -18,12 +19,15 @@ upstream_pattern='github\.com.django-cms/django-cms\.git$'
 SCRIPTS=$(dirname "$(realpath "$0")")
 #shellcheck disable=SC1090
 source "${SCRIPTS}/functions"
+echo "functions sourced"
 
 # Preparations:
 
 # checking we have all necessary tools
 check_command_exists python git awk sed pip npm xargs grep "${EDITOR}"
+echo "commands exist"
 load_nvm
+echo "nvm loaded"
 
 # -- argument checks
 
