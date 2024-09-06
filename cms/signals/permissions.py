@@ -89,13 +89,14 @@ def user_m2m_changed(instance, action, reverse, pk_set, **kwargs):
 
 
 def _clear_users_permissions(instance):
-    menu_pool.clear(all=True)
     if instance.user:
         clear_user_permission_cache(instance.user)
+        menu_pool.clear(all=True)
     if instance.group:
         user_set = instance.group.user_set
         for user in user_set.all():
             clear_user_permission_cache(user)
+        menu_pool.clear(all=True)
 
 
 def pre_save_pagepermission(instance, raw, **kwargs):
