@@ -386,6 +386,7 @@ var Plugin = new Class({
         if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
             // only allow editing by double-click if not disabled
             var selector = `.cms-plugin-${this.options.plugin_id}:not(.cms-edit-disabled)`;
+
             $document
                 .off(pluginDoubleClickEvent, selector)
                 .on(
@@ -424,7 +425,12 @@ var Plugin = new Class({
                 var id = that.options.plugin_id;
                 var disabled = $(e.currentTarget).hasClass('.cms-edit-disabled');  // No tooltip for disabled plugins
 
-                CMS.API.Tooltip.displayToggle((e.type === 'pointerover' || e.type === 'touchstart') && !disabled, e, name, id);
+                CMS.API.Tooltip.displayToggle(
+                    (e.type === 'pointerover' || e.type === 'touchstart') && !disabled,
+                    e,
+                    name,
+                    id
+                );
             });
     },
 
