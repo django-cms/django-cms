@@ -499,11 +499,11 @@ class ContentRenderer(BaseRenderer):
             content = processor(instance, placeholder, content, context)
 
         if editable:
-            edit_edisabled = getattr(instance, "is_immutable", False) or getattr(plugin, "is_immutable", False)
+            edit_disabled = getattr(instance, "edit_disabled", False) or getattr(plugin, "edit_disabled", False)
             content = self.plugin_edit_template.format(
                 pk=instance.pk,
                 content=content,
-                disabled=' cms-edit-disabled' if edit_edisabled else ''
+                disabled=' cms-edit-disabled' if edit_disabled else ''
             )
             placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(placeholder.pk, {})
             placeholder_cache.setdefault('plugins', []).append(instance)

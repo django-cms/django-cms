@@ -200,6 +200,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Disables *dragging* of child plugins in structure mode.
     disable_child_plugins = False
 
+    #: Disables *editing* of this plugin in structure mode. Useful for plugins which, for example, are managed by
+    #: their parent plugins.
+    #:
+    #: If editing is disabled, the plugin will be rendered in structure mode normally, but double-clicking on it will
+    #: not open the plugin edit dialog. The user will not have a direct way to change the plugin instance.
+    #:
+    #: Moving or adding child plugins are not affected.
+    edit_disabled = False
+
     # Warning: setting these to False, may have a serious performance impact,
     # because their child-parent-relation must be recomputed each
     # time the plugin tree is rendered.

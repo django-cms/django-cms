@@ -1,9 +1,9 @@
 {% load i18n l10n cms_tags %}
 
-{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins plugin_is_immutable=plugin.get_plugin_class.is_immutable %}
+{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins edit_disabled=plugin.get_plugin_class.edit_disabled %}
 <div class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
     {% if object_is_immutable %}cms-drag-disabled{% endif %}
-    {% if plugin_is_immutable %}cms-edit-disabled{% endif %}
+    {% if edit_disabled %}cms-edit-disabled{% endif %}
     {{ plugin.add_structureboard_classes|default:"" }}
     {% if not allow_children %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
@@ -11,7 +11,7 @@
     <div class="cms-dragitem cms-dragitem-handler
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% if not disabled_child %}
-            {% if not plugin_is_immutable %}
+            {% if not edit_disabled %}
                 {% if object_is_immutable %}
                     <div class="cms-submenu-btn cms-submenu-edit cms-btn cms-btn-disabled">
                         <span class="cms-hover-tooltip" data-cms-tooltip="{% trans "You do not have permission to edit this item" %}"></span>
