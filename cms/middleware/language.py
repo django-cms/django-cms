@@ -4,6 +4,8 @@ from django.utils.translation import get_language
 
 
 class LanguageCookieMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def __init__(self, get_response):
         super().__init__(get_response)
 
