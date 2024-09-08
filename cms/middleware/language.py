@@ -9,6 +9,8 @@ if DJANGO_2_2:
 
 
 class LanguageCookieMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def __init__(self, get_response):
         super().__init__(get_response)
 
