@@ -1,22 +1,25 @@
 {% load i18n l10n cms_tags %}
 
-{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins %}
+{% with allow_children=plugin.get_plugin_class.allow_children disable_child_plugins=plugin.get_plugin_class.disable_child_plugins plugin_is_immutable=plugin.get_plugin_class.is_immutable %}
 <div  class="cms-draggable cms-draggable-{{ plugin.pk|unlocalize }}
     {% if object_is_immutable %}cms-drag-disabled{% endif %}
+    {% if plugin_is_immutable %}cms-edit-disabled{% endif %}
     {% if not allow_children %} cms-draggable-disabled{% endif %}
     {% if clipboard %} cms-draggable-from-clipboard{% endif %}">
 
     <div class="cms-dragitem cms-dragitem-handler
         {% if plugin.child_plugin_instances %} cms-dragitem-collapsable{% endif %}">
         {% if not disabled_child %}
-            {% if object_is_immutable %}
-                <div class="cms-submenu-btn cms-submenu-edit cms-btn cms-btn-disabled">
-                    <span class="cms-hover-tooltip" data-cms-tooltip="{% trans "You do not have permission to edit this item" %}"></span>
-                </div>
-            {% else %}
-                <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
-                    <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
-                </div>
+            {% if not plugin_is_immutable %}
+                {% if object_is_immutable %}
+                    <div class="cms-submenu-btn cms-submenu-edit cms-btn cms-btn-disabled">
+                        <span class="cms-hover-tooltip" data-cms-tooltip="{% trans "You do not have permission to edit this item" %}"></span>
+                    </div>
+                {% else %}
+                    <div class="cms-submenu-btn cms-submenu-edit cms-btn" data-rel="edit">
+                        <span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay" data-cms-tooltip="{% trans "Edit" %}"></span>
+                    </div>
+                {% endif %}
             {% endif %}
             <div class="cms-submenu-btn cms-submenu-add cms-btn
                 {% if not allow_children or object_is_immutable %} cms-btn-disabled{% endif %}">
