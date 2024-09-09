@@ -1,7 +1,7 @@
 .. _upgrade-to-3.11.7:
 
 ####################
-Release notes 3.11.6
+Release notes 3.11.7
 ####################
 
 ********************
@@ -10,27 +10,26 @@ What's new in 3.11.7
 
 Features:
 ---------
+* Improved permission performance for Django CMS 3 by @fsbraun in https://github.com/django-cms/django-cms/pull/7987
 
-* feat: Toolbar direction set based on toolbar language (back port of #7902) by @skhawy in https://github.com/django-cms/django-cms/pull/7914
-* feat: Add RTL support to pagetree by @sakhawy in https://github.com/django-cms/django-cms/pull/7842
 
-Bug Fixes
----------
-
-* fix: Add `--fix-paths` option to `./manage.py cms fix-tree` by @fsbraun in https://github.com/django-cms/django-cms/pull/7744
-* fix: readable messages in dark-mode by @fsbraun in https://github.com/django-cms/django-cms/pull/7739
-* fix: Patch Toolbar Middleware Response by @jimlind in https://github.com/django-cms/django-cms/pull/7856
-* fix: also use key-length of 200 for the actual cache-key of placeholders by @wfehr in https://github.com/django-cms/django-cms/pull/7910
+Bug Fixes:
+----------
+* Backport of #7868 and #7920 by @fsbraun in https://github.com/django-cms/django-cms/pull/7926
+* Mark language and user middleware synchronous for ASGI (#7985) by @jbazik in https://github.com/django-cms/django-cms/pull/7986
+* Also clear menu cache if page permissions are changed (#7988) (#7990) (7a2632277) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Moe (2 pull requests)
-* Fabian Braun (2 pull requests)
-* Jim Lind (1 pull request)
-* FWehr (1 pull request)
+* Fabian Braun (3 pull request)
+* John Bazik (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
