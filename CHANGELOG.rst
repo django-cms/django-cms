@@ -2,6 +2,34 @@
 Changelog
 =========
 
+3.11.7 (2024-09-09)
+===================
+
+Features:
+---------
+* Improved permission performance for Django CMS 3 by @fsbraun in https://github.com/django-cms/django-cms/pull/7987
+
+
+Bug Fixes:
+----------
+* Backport of #7868 and #7920 by @fsbraun in https://github.com/django-cms/django-cms/pull/7926
+* Mark language and user middleware synchronous for ASGI (#7985) by @jbazik in https://github.com/django-cms/django-cms/pull/7986
+* Also clear menu cache if page permissions are changed (#7988) (#7990) (7a2632277) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (3 pull request)
+* John Bazik (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 3.11.6 (2024-05-17)
 ===================
 

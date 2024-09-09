@@ -24,7 +24,7 @@
 # Massa <massa_@msn.com>, 2015
 # Rafaela Santos <faelaphoenix@gmail.com>, 2019
 # Rafael Duarte Trevisan <rafa.trevisan@gmail.com>, 2013
-# Rodrigo de Almeida Sottomaior Macedo <sottomaiormacedotec@gmail.com>, 2015
+# Rodrigo Sottomaior Macedo <sottomaiormacedotec@sottomaiormacedo.tech>, 2015
 # Rodrigo <rprior@infranology.com.br>, 2014-2015
 # Welligton Miguel <miguelwelligton@gmail.com>, 2020
 msgid ""
