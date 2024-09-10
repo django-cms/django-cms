@@ -14,6 +14,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='title',
             name='meta_description',
-            field=models.TextField(blank=True, help_text='The text displayed in search engines.', null=True, verbose_name='description'),
+            field=models.TextField(blank=True, help_text='A description of the page used by search engines.', null=True, verbose_name='Description meta tag'),
         ),
     ]
