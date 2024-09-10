@@ -362,12 +362,12 @@ class PageAdmin(admin.ModelAdmin):
 
         # Populate deleted_objects, a data structure of all related objects that
         # will also be deleted.
-        objs = [obj] + list(obj.get_descendant_pages())
+        objs = [obj, *list(obj.get_descendant_pages())]
 
-        get_deleted_objects_additional_kwargs = {'request': request}
-        (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            objs, admin_site=self.admin_site,
-            **get_deleted_objects_additional_kwargs
+        deleted_objects, model_count, perms_needed, protected = get_deleted_objects(
+            objs,
+            admin_site=self.admin_site,
+            request=request,
         )
 
         if request.POST and not protected:  # The user has confirmed the deletion.
@@ -1028,7 +1028,6 @@ class PageContentAdmin(admin.ModelAdmin):
             url = get_object_edit_url(obj)  # Redirects to preview if necessary
             return HttpResponse(MODAL_HTML_REDIRECT.format(url=url))
         return super().response_add(request, obj)
-
 
     def get_filled_languages(self, request, page):
         site_id = get_site(request).pk
