@@ -2,24 +2,7 @@
 Changelog
 =========
 
-Bug Fixes:
-----------
-* Import error from backporting v4 deprecation (#7993) (4492f479c) -- Fabian Braun
-
-Statistics:
------------
-
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
-
-* Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
-
-With the review help of the following contributors:
-
-
-Thanks to all contributors for their efforts!
-
-3.11.7 (2024-09-09)
+3.11.8 (2024-09-10)
 ===================
 
 Features:
@@ -32,6 +15,7 @@ Bug Fixes:
 * Backport of #7868 and #7920 by @fsbraun in https://github.com/django-cms/django-cms/pull/7926
 * Mark language and user middleware synchronous for ASGI (#7985) by @jbazik in https://github.com/django-cms/django-cms/pull/7986
 * Also clear menu cache if page permissions are changed (#7988) (#7990) (7a2632277) -- Fabian Braun
+* Import error from backporting v4 deprecation (#7993) (4492f479c) -- Fabian Braun
 
 Statistics:
 -----------
@@ -46,6 +30,11 @@ With the review help of the following contributors:
 * Vinit Kumar
 
 Thanks to all contributors for their efforts!
+
+3.11.7 (2024-09-09)
+===================
+
+**Retracted**
 
 3.11.6 (2024-05-17)
 ===================
