@@ -2,6 +2,23 @@
 Changelog
 =========
 
+Bug Fixes:
+----------
+* Import error from backporting v4 deprecation (#7993) (4492f479c) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 3.11.7 (2024-09-09)
 ===================
 
