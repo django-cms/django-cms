@@ -344,95 +344,62 @@ class PageAdmin(admin.ModelAdmin):
             raise Http404
         return HttpResponseRedirect(admin_reverse('cms_pagecontent_changelist'))
 
-    @transaction.atomic
-    def delete_view(self, request, object_id, extra_context=None):
-        # This is an unfortunate copy/paste from django's delete view.
-        # The reason is to add the descendant pages to the deleted objects list.
-        opts = self.model._meta
-        app_label = opts.app_label
-
-        obj = self.get_object(request, object_id=object_id)
-
-        if not self.has_delete_permission(request, obj):
-            raise PermissionDenied
-
-        if obj is None:
-            raise self._get_404_exception(object_id)
-
-        # Populate deleted_objects, a data structure of all related objects that
-        # will also be deleted.
-        objs = [obj] + list(obj.get_descendant_pages())
-
-        get_deleted_objects_additional_kwargs = {'request': request}
-        (deleted_objects, model_count, perms_needed, protected) = get_deleted_objects(
-            objs, admin_site=self.admin_site,
-            **get_deleted_objects_additional_kwargs
-        )
-
-        if request.POST and not protected:  # The user has confirmed the deletion.
-            if perms_needed:
-                raise PermissionDenied
-            obj_display = force_str(obj)
-            obj_id = obj.serializable_value(opts.pk.attname)
-            self.log_deletion(request, obj, obj_display)
-            self.delete_model(request, obj)
-
-            if IS_POPUP_VAR in request.POST:
-                popup_response_data = json.dumps({
-                    'action': 'delete',
-                    'value': str(obj_id),
-                })
-                return TemplateResponse(request, self.popup_response_template or [
-                    f'admin/{opts.app_label}/{opts.model_name}/popup_response.html',
-                    'admin/%s/popup_response.html' % opts.app_label,
-                    'admin/popup_response.html',
-                ], {'popup_response_data': popup_response_data})
-
-            self.message_user(
+    def response_delete(self, request, obj_display, obj_id):
+        """
+        Determine the HttpResponse for the delete_view stage.
+        """
+        if IS_POPUP_VAR in request.POST:
+            popup_response_data = json.dumps(
+                {
+                    "action": "delete",
+                    "value": str(obj_id),
+                }
+            )
+            return TemplateResponse(
                 request,
-                _('The %(name)s "%(obj)s" was deleted successfully.') % {
-                    'name': force_str(opts.verbose_name),
-                    'obj': force_str(obj_display),
+                self.popup_response_template
+                or [
+                    "admin/%s/%s/popup_response.html"
+                    % (self.opts.app_label, self.opts.model_name),
+                    "admin/%s/popup_response.html" % self.opts.app_label,
+                    "admin/popup_response.html",
+                ],
+                {
+                    "popup_response_data": popup_response_data,
                 },
-                messages.SUCCESS,
             )
 
-            can_change_any_page = page_permissions.user_can_change_at_least_one_page(
-                user=request.user,
-                site=get_site(request),
-                use_cache=False,
-            )
-
-            if can_change_any_page:
-                query = self.get_preserved_filters(request)
-                post_url = admin_reverse('cms_pagecontent_changelist') + '?' + query
-            else:
-                post_url = admin_reverse('index')
-            return HttpResponseRedirect(post_url)
-
-        object_name = force_str(opts.verbose_name)
-
-        if perms_needed or protected:
-            title = _("Cannot delete %(name)s") % {"name": object_name}
-        else:
-            title = _("Are you sure?")
-
-        context = dict(
-            self.admin_site.each_context(request),
-            title=title,
-            object_name=object_name,
-            object=obj,
-            deleted_objects=deleted_objects,
-            model_count=dict(model_count).items(),
-            perms_lacking=perms_needed,
-            protected=protected,
-            opts=opts,
-            app_label=app_label,
-            is_popup=(IS_POPUP_VAR in request.POST or IS_POPUP_VAR in request.GET),
-            to_field=None,
+        self.message_user(
+            request,
+            _("The %(name)s “%(obj)s” was deleted successfully.")
+            % {
+                "name": self.opts.verbose_name,
+                "obj": obj_display,
+            },
+            messages.SUCCESS,
         )
-        context.update(extra_context or {})
-        return self.render_delete_form(request, context)
+
+        if page_permissions.user_can_change_at_least_one_page(
+            user=request.user,
+            site=get_site(request),
+            use_cache=False,
+        ):
+            query = self.get_preserved_filters(request)
+            post_url = f"{admin_reverse('cms_pagecontent_changelist')}?{query}"
+            # Shall this be added? It's part of the original code
+            # preserved_filters = self.get_preserved_filters(request)
+            # post_url = add_preserved_filters(
+            #     {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
+            # )
+        else:
+            post_url = admin_reverse('index', current_app=self.admin_site.name)
+        return HttpResponseRedirect(post_url)
+
+    def get_deleted_objects(self, objs, request):
+        deleted_objs = list(objs)
+        for obj in objs:
+            deleted_objs.extend(obj.get_descendant_pages())
+        return super().get_deleted_objects(deleted_objs, request)
 
     def delete_model(self, request, obj):
         operation_token = send_pre_page_operation(
