@@ -1,0 +1,59 @@
+.. _upgrade-to-3.11.8:
+
+####################
+Release notes 3.11.8
+####################
+
+********************
+What's new in 3.11.8
+********************
+
+Features:
+---------
+* Improved permission performance for Django CMS 3 by @fsbraun in https://github.com/django-cms/django-cms/pull/7987
+
+Bug Fixes:
+----------
+* Backport of #7868 and #7920 by @fsbraun in https://github.com/django-cms/django-cms/pull/7926
+* Mark language and user middleware synchronous for ASGI (#7985) by @jbazik in https://github.com/django-cms/django-cms/pull/7986
+* Also clear menu cache if page permissions are changed (#7988) (#7990) (7a2632277) -- Fabian Braun
+* Import error from backporting v4 deprecation (#7993) (4492f479c) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (3 pull request)
+* John Bazik (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+************************
+How to upgrade to 3.11.8
+************************
+
+We assume you are upgrading from django CMS 3.11.7 (retracted) or 3.11.6.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.
