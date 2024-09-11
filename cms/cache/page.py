@@ -1,5 +1,6 @@
 import hashlib
 from datetime import timedelta
+from importlib import import_module
 
 from django.conf import settings
 from django.utils.cache import (
@@ -17,13 +18,34 @@ from cms.utils.compat.response import get_response_headers
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
 
+# during python load phase, resolve custom cache key extra getter from settings into function
+_page_cache_key_extra = None
+if hasattr(settings, "CMS_PAGE_CACHE_KEY_EXTRA"):
+    try:
+        mod_path, met = settings.CMS_PAGE_CACHE_KEY_EXTRA.rsplit('.', 1)
+
+        mod = import_module(mod_path)
+        _page_cache_key_extra = getattr(mod, met)
+    except ImportError:
+        pass
+
 
 def _page_cache_key(request):
+    """
+    Wrapper function to resolve if custom page cache key extra getter was provided
+    """
+    page_cache_key = _default_page_cache_key(request)
+    if _page_cache_key_extra is not None:
+        page_cache_key += _page_cache_key_extra(request)
+    return page_cache_key
+
+
+def _default_page_cache_key(request):
     # sha1 key of current path
     cache_key = "%s:%d:%s" % (
         get_cms_setting("CACHE_PREFIX"),
         settings.SITE_ID,
-        hashlib.sha1(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
+        hashlib.sha1(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest(),
     )
     if settings.USE_TZ:
         cache_key += '.%s' % get_timezone_name()

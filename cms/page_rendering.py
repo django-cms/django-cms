@@ -68,12 +68,10 @@ def _handle_no_page(request):
             return HttpResponseRedirect(redirect_url)
 
         # add a $ to the end of the url (does not match on the cms anymore)
-        resolve('%s$' % request.path)
+        return resolve('%s$' % request.path).func(request)
     except Resolver404 as e:
         # raise a django http 404 page
-        exc = Http404(dict(path=request.path, tried=e.args[0]['tried']))
-        raise exc
-    raise Http404('CMS Page not found: %s' % request.path)
+        raise Http404(dict(path=request.path, tried=e.args[0]['tried']))
 
 
 def _handle_no_apphook(request):
