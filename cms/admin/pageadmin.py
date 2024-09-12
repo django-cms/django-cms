@@ -76,6 +76,7 @@ from cms.utils.i18n import (
     get_language_tuple,
     get_site_language_from_request,
 )
+from cms.utils.permissions import clear_permission_lru_caches
 from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.urlutils import admin_reverse
 
@@ -97,7 +98,6 @@ def get_site(request):
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
-    change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
 
     form = AdvancedSettingsForm
@@ -337,66 +337,16 @@ class PageAdmin(admin.ModelAdmin):
         return HttpResponseForbidden()
 
     def changelist_view(self, request, extra_context=None):
-        can_change_any_page = page_permissions.user_can_change_at_least_one_page(
-            user=request.user,
-            site=get_site(request),
-            use_cache=False,
-        )
-
-        if not can_change_any_page:
-            raise Http404
-        return HttpResponseRedirect(admin_reverse('cms_pagecontent_changelist'))
+        parameter = "?" + request.GET.urlencode() if request.GET else ""
+        return HttpResponseRedirect(admin_reverse('cms_pagecontent_changelist') + parameter)
 
     def response_delete(self, request, obj_display, obj_id):
         """
-        Determine the HttpResponse for the delete_view stage.
+        Determine the HttpResponse for the delete_view stage. Clear the user's permission
+        lru cache
         """
-        if IS_POPUP_VAR in request.POST:
-            popup_response_data = json.dumps(
-                {
-                    "action": "delete",
-                    "value": str(obj_id),
-                }
-            )
-            return TemplateResponse(
-                request,
-                self.popup_response_template
-                or [
-                    "admin/%s/%s/popup_response.html"
-                    % (self.opts.app_label, self.opts.model_name),
-                    "admin/%s/popup_response.html" % self.opts.app_label,
-                    "admin/popup_response.html",
-                ],
-                {
-                    "popup_response_data": popup_response_data,
-                },
-            )
-
-        self.message_user(
-            request,
-            _("The %(name)s “%(obj)s” was deleted successfully.")
-            % {
-                "name": self.opts.verbose_name,
-                "obj": obj_display,
-            },
-            messages.SUCCESS,
-        )
-
-        if page_permissions.user_can_change_at_least_one_page(
-            user=request.user,
-            site=get_site(request),
-            use_cache=False,
-        ):
-            query = self.get_preserved_filters(request)
-            post_url = f"{admin_reverse('cms_pagecontent_changelist')}?{query}"
-            # Shall this be added? It's part of the original code
-            # preserved_filters = self.get_preserved_filters(request)
-            # post_url = add_preserved_filters(
-            #     {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
-            # )
-        else:
-            post_url = admin_reverse('index', current_app=self.admin_site.name)
-        return HttpResponseRedirect(post_url)
+        clear_permission_lru_caches(request.user)
+        return super().response_delete(request, obj_display, obj_id)
 
     def get_deleted_objects(self, objs, request):
         deleted_objs = list(objs)
@@ -1031,7 +981,6 @@ class PageContentAdmin(admin.ModelAdmin):
         can_change_page = page_permissions.user_can_change_at_least_one_page(
             user=request.user,
             site=site,
-            use_cache=False,
         )
         return can_change_page
 
