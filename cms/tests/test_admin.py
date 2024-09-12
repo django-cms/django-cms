@@ -149,7 +149,7 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
             response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data, follow=True)
-            # follow=True, since page changelist redirects to page ontent changelist
+            # follow=True, since page changelist redirects to page content changelist
             self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
     def test_search_fields(self):

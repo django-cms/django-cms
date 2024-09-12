@@ -164,6 +164,14 @@ def clear_func_cache(user, func):
         delattr(user, func_cache_name)
 
 
+def clear_permission_lru_caches(user):
+    """
+    Clear all python lru caches used by the permission system
+    """
+    clear_func_cache(user, get_global_actions_for_user)
+    clear_func_cache(user, get_page_actions_for_user)
+
+
 @cached_func
 def get_global_actions_for_user(user, site):
     actions = set()
@@ -376,10 +384,3 @@ def has_plugin_permission(user, plugin_type, permission_type):
         action=permission_type,
     )
     return user.has_perm(codename)
-
-def clear_permission_lru_caches(user):
-    """
-    Clear all python lru caches used by the permission system
-    """
-    clear_func_cache(user, get_global_actions_for_user)
-    clear_func_cache(user, get_page_actions_for_user)
