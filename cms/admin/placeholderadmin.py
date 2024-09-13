@@ -5,6 +5,7 @@ from urllib.parse import parse_qsl, urlparse
 
 from django import forms
 from django.contrib import admin
+from django.contrib.admin import utils
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
@@ -104,9 +105,15 @@ class FrontendEditableAdminMixin:
         # Quick and dirty way to retrieve objects for django-hvad
         # Cleaner implementation will extend this method in a child mixin
         try:
-            return self.model.objects.language(language).get(pk=object_id)
+            # First see if the model uses the admin manager pattern from cms.models.manager.ContentAdminManager
+            manager = self.model.admin_manager
         except AttributeError:
-            return self.model.objects.get(pk=object_id)
+            # If not, use the default manager
+            manager = self.model.objects
+        try:
+            return manager.language(language).get(pk=object_id)
+        except AttributeError:
+            return manager.get(pk=object_id)
 
     def edit_field(self, request, object_id, language):
         obj = self._get_object_for_single_field(object_id, language)
