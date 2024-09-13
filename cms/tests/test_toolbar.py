@@ -25,7 +25,7 @@ from cms.cms_toolbars import (
     LANGUAGE_MENU_IDENTIFIER,
     get_user_model,
 )
-from cms.models import PagePermission, UserSettings
+from cms.models import ContentAdminManager, PagePermission, UserSettings
 from cms.test_utils.project.placeholderapp.models import (
     CharPksExample,
     Example1,
@@ -1723,6 +1723,19 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response, "edit_plugin: '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+
+    def test_edit_field_respects_content_admin_mixin(self):
+        user = self.get_staff()
+        ex1 = self._get_example_obj()
+        edit_url = admin_reverse('placeholderapp_example1_edit_field', args=(ex1.pk, "en"))
+
+        with patch('cms.test_utils.project.placeholderapp.models.Example1.admin_manager.get') as get_mock:
+            with self.login_user_context(user):
+                get_mock.return_value = ex1
+                self.client.get(edit_url + "?edit_fields=char_1")
+
+            self.assertEqual(edit_url, "/admin/placeholderapp/example1/edit-field/1/en/")
+            Example1.admin_manager.get.assert_called_once_with(pk=str(ex1.pk))
 
     def test_view_url(self):
         user = self.get_staff()
