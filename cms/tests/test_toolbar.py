@@ -25,7 +25,7 @@ from cms.cms_toolbars import (
     LANGUAGE_MENU_IDENTIFIER,
     get_user_model,
 )
-from cms.models import ContentAdminManager, PagePermission, UserSettings
+from cms.models import PagePermission, UserSettings
 from cms.test_utils.project.placeholderapp.models import (
     CharPksExample,
     Example1,
