@@ -1734,7 +1734,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 get_mock.return_value = ex1
                 self.client.get(edit_url + "?edit_fields=char_1")
 
-            self.assertEqual(edit_url, "/admin/placeholderapp/example1/edit-field/1/en/")
+            self.assertEqual(edit_url, f"/admin/placeholderapp/example1/edit-field/{ex1.pk}/en/")
             Example1.admin_manager.get.assert_called_once_with(pk=str(ex1.pk))
 
     def test_view_url(self):
