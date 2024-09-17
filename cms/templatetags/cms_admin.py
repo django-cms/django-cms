@@ -35,7 +35,7 @@ class GetAdminUrlForLanguage(AsTag):
 
     def get_value(self, context, page, language):
         if language in page.get_languages():
-            page_content = page.pagecontent_set(manager="admin_manager").latest_content(language=language).first()
+            page_content = page.get_admin_content(language)
             if page_content:
                 return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
         admin_url = admin_reverse('cms_pagecontent_add')
@@ -96,26 +96,23 @@ def get_page_display_name(cms_page):
     from cms.models import EmptyPageContent
     language = get_language()
 
-    if not cms_page.page_content_cache:
-        cms_page.set_translations_cache()
-
     fallback_found = False
-    if not cms_page.page_content_cache.get(language):
+    page_content = cms_page.get_admin_content(language)
+    if not page_content:
         fallback_found = True
         fallback_langs = i18n.get_fallback_languages(language)
         for lang in fallback_langs:
-            if cms_page.page_content_cache.get(lang):
+            if cms_page.get_admin_content(lang):
                 language = lang
                 break
         else:
-            language = None
-            for lang, item in cms_page.page_content_cache.items():
+            for lang, item in cms_page.admin_content_cache.items():  # The content wass filled in the previous if
                 if not isinstance(item, EmptyPageContent):
                     language = lang
+                    page_content = item
                     break
             else:
                 return _("Empty")
-    page_content = cms_page.page_content_cache[language]
     if page_content.title:
         title = page_content.title
     elif page_content.page_title:
@@ -156,7 +153,7 @@ class TreePublishRow(Tag):
             )
             return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
 
-        page_content = page.page_content_cache.get(language)
+        page_content = page.get_admin_content(language)
         cls, text = self.get_indicator(page_content)
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
@@ -180,7 +177,7 @@ class TreePublishRowMenu(AsTag):
     )
 
     def get_value(self, context, page, language):
-        page_content = page.page_content_cache.get(language)
+        page_content = page.get_admin_content(language)
         if context.get("has_change_permission", False):
             page_content_admin_class = admin.site._registry[PageContent]
             template, publish_menu_items = page_content_admin_class.get_indicator_menu(

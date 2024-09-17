@@ -138,6 +138,10 @@ class Page(MP_Node):
         super().__init__(*args, **kwargs)
         self.urls_cache = {}
         self.page_content_cache = {}
+        #: Internal cache for page content objects visible publicly
+        self.admin_content_cache = {}
+        #: Internal cache for page content objects visible in the admin (i.e. to staff users.)
+        #: Might be larger than the page_content_cache
 
     def __str__(self):
         try:
@@ -709,8 +713,25 @@ class Page(MP_Node):
         return self.get_languages()
 
     def set_translations_cache(self):
+        warnings.warn(
+            "Method `set_translations_cache` is deprecated. Use `get_content_obj` instead. "
+            "For admin views use `set_admin_content_cache` instead.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2,
+        )
         for translation in self.pagecontent_set.all():
             self.page_content_cache.setdefault(translation.language, translation)
+
+    def set_admin_content_cache(self):
+        for translation in self.pagecontent_set(manager="admin_manager").current_content().all():
+            self.admin_content_cache.setdefault(translation.language, translation)
+
+    def get_admin_content(self, language):
+        from cms.models.contentmodels import EmptyPageContent
+
+        if not self.admin_content_cache:
+            self.set_admin_content_cache()
+        return self.admin_content_cache.get(language, EmptyPageContent(language=language, page=self))
 
     def get_path_for_slug(self, slug, language):
         if self.is_home:
@@ -876,6 +897,10 @@ class Page(MP_Node):
         return self.get_page_content_obj_attribute("redirect", language, fallback, force_reload)
 
     def _get_page_content_cache(self, language, fallback, force_reload):
+        """
+        Sets the internal page object cache for page content objects available to the general user.
+        It optionally respe
+        """
         def get_fallback_language(page, language):
             fallback_langs = i18n.get_fallback_languages(language)
             for lang in fallback_langs:
