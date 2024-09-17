@@ -106,7 +106,7 @@ def get_page_display_name(cms_page):
                 language = lang
                 break
         else:
-            for lang, item in cms_page.admin_content_cache.items():  # The content wass filled in the previous if
+            for lang, item in cms_page.admin_content_cache.items():  # The content was filled in the previous if clause
                 if not isinstance(item, EmptyPageContent):
                     language = lang
                     page_content = item
