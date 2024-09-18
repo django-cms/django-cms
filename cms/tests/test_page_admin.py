@@ -1869,8 +1869,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
-            data = {"post": "yes"}
-            response = self.client.post(endpoint, data)
+            data = {'post': 'yes'}
+            response = self.client.post(endpoint, data, follow=True)
+            # follow=True, since page changelist redirects to page content changelist
 
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._page_exists())
@@ -1925,8 +1926,9 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         self.add_global_permission(staff_user, can_change=True, can_delete=True)
 
         with self.login_user_context(staff_user):
-            data = {"post": "yes"}
-            response = self.client.post(endpoint, data)
+            data = {'post': 'yes'}
+            response = self.client.post(endpoint, data, follow=True)
+            # follow=True, since page changelist redirects to page content changelist
 
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._page_exists())
@@ -3336,8 +3338,8 @@ class PermissionsOnPageTest(PermissionsTestCase):
         )
 
         with self.login_user_context(staff_user):
-            data = {"post": "yes"}
-            response = self.client.post(endpoint, data)
+            data = {'post': 'yes'}
+            response = self.client.post(endpoint, data, follow=True)
 
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._page_exists())
@@ -3401,10 +3403,9 @@ class PermissionsOnPageTest(PermissionsTestCase):
             can_change=True,
             can_delete=True,
         )
-
         with self.login_user_context(staff_user):
-            data = {"post": "yes"}
-            response = self.client.post(endpoint, data)
+            data = {'post': 'yes'}
+            response = self.client.post(endpoint, data, follow=True)
 
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._page_exists())
