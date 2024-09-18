@@ -21,7 +21,7 @@ from cms.models.managers import PageManager, PageUrlManager
 from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_current_language
+from cms.utils.i18n import get_current_language, get_fallback_languages
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
@@ -144,13 +144,11 @@ class Page(MP_Node):
         #: Might be larger than the page_content_cache
 
     def __str__(self):
-        try:
-            title = self.get_menu_title(fallback=True)
-        except LanguageError:
-            title = self.pagecontent_set(manager="admin_manager").current_content().first()
-            if title:
-                title = title.title
-        if title is None:
+        lang = self._get_page_content_cache(get_language(), fallback=True, force_reload=False)
+        page_content = self.page_content_cache.get(lang)
+        if page_content:
+            title = page_content.menu_title or page_content.title
+        else:
             title = _("Empty")
         return force_str(title)
 
@@ -205,6 +203,7 @@ class Page(MP_Node):
     def _clear_internal_cache(self):
         self.urls_cache = {}
         self.page_content_cache = {}
+        self.admin_content_cache = {}
 
         if hasattr(self, '_prefetched_objects_cache'):
             del self._prefetched_objects_cache
@@ -726,12 +725,23 @@ class Page(MP_Node):
         for translation in self.pagecontent_set(manager="admin_manager").current_content().all():
             self.admin_content_cache.setdefault(translation.language, translation)
 
-    def get_admin_content(self, language):
+    def get_admin_content(self, language, fallback=False):
         from cms.models.contentmodels import EmptyPageContent
 
         if not self.admin_content_cache:
             self.set_admin_content_cache()
-        return self.admin_content_cache.get(language, EmptyPageContent(language=language, page=self))
+        page_content = self.admin_content_cache.get(language, EmptyPageContent(language=language, page=self))
+        if not page_content and fallback:
+            for lang in i18n.get_fallback_languages(language):
+                page_content = self.admin_content_cache.get(lang)
+                if page_content:
+                    return page_content
+            if fallback == "force":
+                # Try any page content object
+                for item in self.admin_content_cache.values():
+                    if item:
+                        return item
+        return page_content
 
     def get_path_for_slug(self, slug, language):
         if self.is_home:

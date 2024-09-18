@@ -93,35 +93,13 @@ def show_admin_menu_for_pages(context, descendants, depth=1):
 
 @register.simple_tag(takes_context=False)
 def get_page_display_name(cms_page):
-    from cms.models import EmptyPageContent
     language = get_language()
 
-    fallback_found = False
-    page_content = cms_page.get_admin_content(language)
-    if not page_content:
-        fallback_found = True
-        fallback_langs = i18n.get_fallback_languages(language)
-        for lang in fallback_langs:
-            if cms_page.get_admin_content(lang):
-                language = lang
-                break
-        else:
-            for lang, item in cms_page.admin_content_cache.items():  # The content was filled in the previous if clause
-                if not isinstance(item, EmptyPageContent):
-                    language = lang
-                    page_content = item
-                    break
-            else:
-                return _("Empty")
-    if page_content.title:
-        title = page_content.title
-    elif page_content.page_title:
-        title = page_content.page_title
-    elif page_content.menu_title:
-        title = page_content.menu_title
-    else:
+    page_content = cms_page.get_admin_content(language, fallback="force")
+    title = page_content.title or page_content.page_title or page_content.menu_title
+    if not title:
         title = cms_page.get_slug(language)
-    return mark_safe(f"<em>{title} ({language})</em>") if fallback_found else title
+    return title if page_content.language == language else mark_safe(f"<em>{title} ({page_content.language})</em>")
 
 
 class TreePublishRow(Tag):

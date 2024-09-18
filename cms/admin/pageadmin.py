@@ -450,7 +450,7 @@ class PageAdmin(admin.ModelAdmin):
 
         # Delete all associated pages contents
         ct_page_content = ContentType.objects.get_for_model(PageContent)
-        page_content_objs = PageContent.objects.filter(page__in=cms_pages)
+        page_content_objs = PageContent.admin_manager.filter(page__in=cms_pages).values_list('pk', flat=True)
         placeholders = Placeholder.objects.filter(
             content_type=ct_page_content,
             object_id__in=page_content_objs,
@@ -1238,7 +1238,7 @@ class PageContentAdmin(admin.ModelAdmin):
         if not target_language or target_language not in get_language_list(site_id=page.site_id):
             return HttpResponseBadRequest(_("Language must be set to a supported language!"))
 
-        target_page_content = page.get_admin_content(target_language)
+        target_page_content = page.get_content_obj(target_language, fallback=False)
 
         for placeholder in source_page_content.get_placeholders():
             # TODO: Handle missing placeholder
@@ -1429,13 +1429,7 @@ class PageContentAdmin(admin.ModelAdmin):
         user_can_change_advanced = page_permissions.user_can_change_page_advanced_settings
 
         def render_page_row(page):
-            page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations}
-
-            for _language in languages:
-                # EmptyPageContent is used to prevent the cms from trying
-                # to find a translation in the database
-                page.admin_content_cache.setdefault(_language, EmptyPageContent(language=_language, page=page))
-
+            page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations if trans}
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
             if permissions_on and not has_move_page_permission:
