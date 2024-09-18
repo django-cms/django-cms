@@ -736,6 +736,7 @@ class Page(MP_Node):
                 page_content = self.admin_content_cache.get(lang)
                 if page_content:
                     return page_content
+            page_content = EmptyPageContent(language=language, page=self)
             if fallback == "force":
                 # Try any page content object
                 for item in self.admin_content_cache.values():

@@ -1400,7 +1400,7 @@ class PageContentAdmin(admin.ModelAdmin):
             Prefetch(
                 'pagecontent_set',
                 to_attr='filtered_translations',
-                queryset=self.get_queryset(request),
+                queryset=PageContent.admin_manager.get_queryset()   ,
             ),
         )
         rows = self.get_tree_rows(
@@ -1429,7 +1429,7 @@ class PageContentAdmin(admin.ModelAdmin):
         user_can_change_advanced = page_permissions.user_can_change_page_advanced_settings
 
         def render_page_row(page):
-            page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations if trans}
+            page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations}
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
             if permissions_on and not has_move_page_permission:
