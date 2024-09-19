@@ -79,16 +79,16 @@ class TemplatetagTests(CMSTestCase):
         }
         with self.settings(CMS_LANGUAGES=languages):
             with force_language('fr'):
-                page.page_content_cache = {'en': PageContent(page_title="test2", title="test2")}
+                page.admin_content_cache = {'en': PageContent(page_title="test2", title="test2", language="en")}
                 self.assertEqual('<em>test2 (en)</em>', force_str(get_page_display_name(page)))
-                page.page_content_cache = {'en': PageContent(page_title="test2")}
+                page.admin_content_cache = {'en': PageContent(page_title="test2", language="en")}
                 self.assertEqual('<em>test2 (en)</em>', force_str(get_page_display_name(page)))
-                page.page_content_cache = {'en': PageContent(menu_title="menu test2")}
+                page.admin_content_cache = {'en': PageContent(menu_title="menu test2", language="en")}
                 self.assertEqual('<em>menu test2 (en)</em>', force_str(get_page_display_name(page)))
-                page.page_content_cache = {'en': PageContent()}
+                page.admin_content_cache = {'en': PageContent(language="en")}
                 page.urls_cache = {'en': PageUrl(slug='slug-test2')}
                 self.assertEqual('<em>slug-test2 (en)</em>', force_str(get_page_display_name(page)))
-                page.page_content_cache = {'en': PageContent(), 'fr': EmptyPageContent('fr')}
+                page.admin_content_cache = {'en': PageContent(language="en"), 'fr': EmptyPageContent('fr')}
                 self.assertEqual('<em>slug-test2 (en)</em>', force_str(get_page_display_name(page)))
 
     def test_get_site_id_from_nothing(self):
