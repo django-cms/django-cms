@@ -76,6 +76,7 @@ from cms.utils.i18n import (
     get_language_tuple,
     get_site_language_from_request,
 )
+from cms.utils.permissions import clear_permission_lru_caches
 from cms.utils.plugins import copy_plugins_to_placeholder
 from cms.utils.urlutils import admin_reverse
 
@@ -97,7 +98,6 @@ def get_site(request):
 
 @admin.register(Page)
 class PageAdmin(admin.ModelAdmin):
-    change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
 
     form = AdvancedSettingsForm
@@ -113,10 +113,13 @@ class PageAdmin(admin.ModelAdmin):
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
-        if obj is None:
-            return
-
         site = get_site(request)
+        if obj is None:
+            # Checks if user can change at least one page
+            return page_permissions.user_can_change_at_least_one_page(
+                user=request.user,
+                site=site,
+            )
         return page_permissions.user_can_change_page(request.user, page=obj, site=site)
 
     def has_change_advanced_settings_permission(self, request, obj=None):
@@ -334,66 +337,16 @@ class PageAdmin(admin.ModelAdmin):
         return HttpResponseForbidden()
 
     def changelist_view(self, request, extra_context=None):
-        can_change_any_page = page_permissions.user_can_change_at_least_one_page(
-            user=request.user,
-            site=get_site(request),
-            use_cache=False,
-        )
-
-        if not can_change_any_page:
-            raise Http404
-        return HttpResponseRedirect(admin_reverse('cms_pagecontent_changelist'))
+        parameter = "?" + request.GET.urlencode() if request.GET else ""
+        return HttpResponseRedirect(admin_reverse('cms_pagecontent_changelist') + parameter)
 
     def response_delete(self, request, obj_display, obj_id):
         """
-        Determine the HttpResponse for the delete_view stage.
+        Determine the HttpResponse for the delete_view stage. Clear the user's permission
+        lru cache
         """
-        if IS_POPUP_VAR in request.POST:
-            popup_response_data = json.dumps(
-                {
-                    "action": "delete",
-                    "value": str(obj_id),
-                }
-            )
-            return TemplateResponse(
-                request,
-                self.popup_response_template
-                or [
-                    "admin/%s/%s/popup_response.html"
-                    % (self.opts.app_label, self.opts.model_name),
-                    "admin/%s/popup_response.html" % self.opts.app_label,
-                    "admin/popup_response.html",
-                ],
-                {
-                    "popup_response_data": popup_response_data,
-                },
-            )
-
-        self.message_user(
-            request,
-            _("The %(name)s “%(obj)s” was deleted successfully.")
-            % {
-                "name": self.opts.verbose_name,
-                "obj": obj_display,
-            },
-            messages.SUCCESS,
-        )
-
-        if page_permissions.user_can_change_at_least_one_page(
-            user=request.user,
-            site=get_site(request),
-            use_cache=False,
-        ):
-            query = self.get_preserved_filters(request)
-            post_url = f"{admin_reverse('cms_pagecontent_changelist')}?{query}"
-            # Shall this be added? It's part of the original code
-            # preserved_filters = self.get_preserved_filters(request)
-            # post_url = add_preserved_filters(
-            #     {"preserved_filters": preserved_filters, "opts": self.opts}, post_url
-            # )
-        else:
-            post_url = admin_reverse('index', current_app=self.admin_site.name)
-        return HttpResponseRedirect(post_url)
+        clear_permission_lru_caches(request.user)
+        return super().response_delete(request, obj_display, obj_id)
 
     def get_deleted_objects(self, objs, request):
         deleted_objs = list(objs)
@@ -417,7 +370,7 @@ class PageAdmin(admin.ModelAdmin):
 
         # Delete all associated pages contents
         ct_page_content = ContentType.objects.get_for_model(PageContent)
-        page_content_objs = PageContent.objects.filter(page__in=cms_pages)
+        page_content_objs = PageContent.admin_manager.filter(page__in=cms_pages).values_list('pk', flat=True)
         placeholders = Placeholder.objects.filter(
             content_type=ct_page_content,
             object_id__in=page_content_objs,
@@ -687,7 +640,7 @@ class PageAdmin(admin.ModelAdmin):
 
     def edit_title_fields(self, request, page_id, language):
         page = self.get_object(request, object_id=page_id)
-        translation = page.get_content_obj(language, fallback=False)
+        translation = page.get_admin_content(language)
 
         if not self.has_change_permission(request, obj=page):
             return HttpResponseForbidden(_("You do not have permission to edit this page"))
@@ -790,7 +743,7 @@ class PageContentAdmin(admin.ModelAdmin):
         obj = super().get_object(request, object_id, from_field)
 
         if obj:
-            obj.page.page_content_cache[obj.language] = obj
+            obj.page.admin_content_cache[obj.language] = obj
         return obj
 
     def get_admin_url(self, action, *args):
@@ -1028,7 +981,6 @@ class PageContentAdmin(admin.ModelAdmin):
         can_change_page = page_permissions.user_can_change_at_least_one_page(
             user=request.user,
             site=site,
-            use_cache=False,
         )
         return can_change_page
 
@@ -1367,7 +1319,7 @@ class PageContentAdmin(admin.ModelAdmin):
             Prefetch(
                 'pagecontent_set',
                 to_attr='filtered_translations',
-                queryset=self.get_queryset(request),
+                queryset=PageContent.admin_manager.get_queryset()   ,
             ),
         )
         rows = self.get_tree_rows(
@@ -1396,13 +1348,7 @@ class PageContentAdmin(admin.ModelAdmin):
         user_can_change_advanced = page_permissions.user_can_change_page_advanced_settings
 
         def render_page_row(page):
-            page.page_content_cache = {trans.language: trans for trans in page.filtered_translations}
-
-            for _language in languages:
-                # EmptyPageContent is used to prevent the cms from trying
-                # to find a translation in the database
-                page.page_content_cache.setdefault(_language, EmptyPageContent(language=_language, page=page))
-
+            page.admin_content_cache = {trans.language: trans for trans in page.filtered_translations}
             has_move_page_permission = page_permissions.user_can_move_page(request.user, page, site=site)
 
             if permissions_on and not has_move_page_permission:
@@ -1416,7 +1362,7 @@ class PageContentAdmin(admin.ModelAdmin):
                 'opts': self.opts,
                 'site': site,
                 'page': page,
-                'page_content': page.get_content_obj(language, fallback=False),  # Show specific language
+                'page_content': page.get_admin_content(language),
                 'ancestors': [page for page in page.get_cached_ancestors()],
                 'descendants': [page for page in page.get_cached_descendants()],
                 'request': request,
