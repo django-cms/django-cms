@@ -12,17 +12,16 @@ from django.urls import reverse
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.timezone import now
-from django.utils.translation import (
-    get_language,
-    gettext_lazy as _,
-    override as force_language,
-)
+from django.utils.translation import get_language
+from django.utils.translation import gettext_lazy as _
+from django.utils.translation import override as force_language
 from treebeard.mp_tree import MP_Node
 
 from cms import constants
 from cms.exceptions import LanguageError
 from cms.models.managers import PageManager, PageNodeManager, PageUrlManager
 from cms.utils import i18n
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language, get_fallback_languages
 from cms.utils.page import get_clean_username
@@ -1033,9 +1032,7 @@ class Page(models.Model):
         return user_can_publish_page(user, page=self)
 
     def has_advanced_settings_permission(self, user):
-        from cms.utils.page_permissions import (
-            user_can_change_page_advanced_settings,
-        )
+        from cms.utils.page_permissions import user_can_change_page_advanced_settings
         return user_can_change_page_advanced_settings(user, page=self)
 
     def has_change_permissions_permission(self, user):
