@@ -94,7 +94,7 @@ class StructureBoard {
             window: $(window),
             html: $('html'),
             toolbar: toolbar,
-            sortables: $('.cms-draggables'), // global scope to include clipboard
+            sortables: $('.cms-draggables:not(.cms-drag-disabled)'), // global scope to include clipboard
             plugins: $('.cms-plugin'),
             render_model: $('.cms-render-model'),
             placeholders: $('.cms-placeholder'),
@@ -150,7 +150,7 @@ class StructureBoard {
         $('.cms-draggable:not(.cms-drag-disabled)').one(
             'pointerover.cms.drag',
             once(() => {
-                $('.cms-draggable').off('pointerover.cms.drag');
+                $('.cms-draggable:not(.cms-drag-disabled)').off('pointerover.cms.drag');
                 this._drag();
             })
         );
@@ -428,7 +428,7 @@ class StructureBoard {
                     }
                 });
 
-                this.ui.sortables = $('.cms-draggables');
+                this.ui.sortables = $('.cms-draggables:not(.cms-drag-disabled)');
                 this._drag();
                 StructureBoard._initializeDragItemsStates();
 
@@ -1197,7 +1197,7 @@ class StructureBoard {
         CMS.API.Clipboard.populate(html, pluginData[1]);
         CMS.API.Clipboard._enableTriggers();
 
-        this.ui.sortables = $('.cms-draggables');
+        this.ui.sortables = $('.cms-draggables:not(.cms-drag-disabled)');
         this._dragRefresh();
     }
 
@@ -1292,7 +1292,7 @@ class StructureBoard {
             StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
         });
 
-        this.ui.sortables = $('.cms-draggables');
+        this.ui.sortables = $('.cms-draggables:not(.cms-drag-disabled)');
         this._dragRefresh();
     }
 
@@ -1309,7 +1309,7 @@ class StructureBoard {
             StructureBoard.actualizePluginCollapseStatus(pluginData.plugin_id);
         });
 
-        this.ui.sortables = $('.cms-draggables');
+        this.ui.sortables = $('.cms-draggables:not(.cms-drag-disabled)');
         this._dragRefresh();
     }
 
