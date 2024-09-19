@@ -199,6 +199,7 @@ class Page(models.Model):
         super().__init__(*args, **kwargs)
         self.urls_cache = {}
         self.page_content_cache = {}
+        self.admin_content_cache = {}
 
     def __str__(self):
         try:
