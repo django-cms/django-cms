@@ -112,6 +112,9 @@ class PageAdmin(admin.ModelAdmin):
         Return true if the current user has permission on the page.
         Return the string 'All' if the user has all rights.
         """
+        if obj is None:
+            return
+
         site = get_site(request)
         return page_permissions.user_can_change_page(request.user, page=obj, site=site)
 
