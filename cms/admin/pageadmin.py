@@ -96,6 +96,7 @@ def get_site(request):
 
 
 class PageAdmin(admin.ModelAdmin):
+    change_list_template = "admin/cms/page/tree/base.html"
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
 
     form = AdvancedSettingsForm
