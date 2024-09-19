@@ -211,12 +211,15 @@ class LogPageOperationsTests(CMSTestCase):
         When a pages translation is deleted a log entry is created.
         """
         with self.login_user_context(self._admin_user):
-            page = create_page("page_a", "nav_playground.html", "en")
-            create_page_content(language='de', title="other title %s" % page.get_title('en'), page=page)
+            title_en = "page_a"
+            page = create_page(title_en, "nav_playground.html", "en")
+            create_page_content(language='de', title="other title %s" % title_en, page=page)
             endpoint = self.get_page_delete_translation_uri('en', page)
             post_data = {'post': 'yes', 'language': 'en'}
 
             response = self.client.post(endpoint, post_data)
+            page.page_content_cache = {}  # Reset cache of local object after translation is deleted
+
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)
             # Test that the log count is correct
