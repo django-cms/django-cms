@@ -1,1 +1,2 @@
-import nonexistingmodule  # nopyflakes
+# intentional bad import
+import nonexistingmodule  # noqa

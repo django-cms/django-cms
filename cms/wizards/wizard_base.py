@@ -4,8 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms.models import ModelForm
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
-from django.utils.translation import gettext as _
-from django.utils.translation import override as force_language
+from django.utils.translation import gettext as _, override as force_language
 
 from cms.utils.conf import get_cms_setting
 
@@ -82,7 +81,7 @@ class Wizard(WizardBase):
         model = self.get_model()
         if model:
             model_name = model._meta.verbose_name
-            return _(u"Create a new %s instance.") % model_name
+            return _("Create a new %s instance.") % model_name
 
         return ""
 
@@ -136,8 +135,8 @@ class Wizard(WizardBase):
             model = self.form._meta.model
             if model:
                 return model
-        raise ImproperlyConfigured(u"Please set entry 'model' attribute or use "
-                                   u"ModelForm subclass as a form")
+        raise ImproperlyConfigured("Please set entry 'model' attribute or use "
+                                   "ModelForm subclass as a form")
 
     @cached_property
     def widget_attributes(self):
