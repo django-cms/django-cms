@@ -65,14 +65,14 @@ msgid "Menu Title"
 msgstr "菜单标题"
 
 msgid "Overwrite what is displayed in the menu"
-msgstr "替代菜单上的显示"
+msgstr "取代菜单上的显示"
 
 msgid "Page Title"
 msgstr "页面标题"
 
 msgid ""
 "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr "替代显示在浏览器顶部的标题或书签中的信息"
+msgstr "取代显示在浏览器顶部的标题或书签中的信息"
 
 msgid "Description meta tag"
 msgstr "描述性的原标签"
@@ -90,7 +90,7 @@ msgid "Application"
 msgstr "应用"
 
 msgid "Hook application to this page."
-msgstr "附加第三方应用到本页面。"
+msgstr "链入第三方应用到本页面。"
 
 msgid "Overwrite URL"
 msgstr "重写 URL"
@@ -197,13 +197,13 @@ msgid "Invalid plugin type '%s'"
 msgstr "无效的插件类型 '%s'"
 
 msgid "Language must be set to a supported language!"
-msgstr "语言项目必须被设置为支持的语言！"
+msgstr "语言项目必须设置为所能支持的语言！"
 
 msgid "Parent plugin language must be same as language!"
-msgstr "父层插件语言必须与当前语言一致！"
+msgstr "上级插件语言必须与当前语言一致！"
 
 msgid "Parent plugin placeholder must be same as placeholder!"
-msgstr "父层插件占位符必须与当前占位符一致！"
+msgstr "上级插件占位必须与当前占位一致！"
 
 #, python-format
 msgid ""
@@ -218,7 +218,7 @@ msgid "Publishing dates"
 msgstr "发布日期"
 
 msgid "Change Permissions"
-msgstr "修改权限"
+msgstr "增减权限"
 
 #, python-format
 msgid "Cannot delete %(name)s"
@@ -235,7 +235,7 @@ msgid "Database error"
 msgstr "数据库错误"
 
 msgid "Template not valid"
-msgstr "模板不可用"
+msgstr "模板不合用"
 
 msgid "The template was successfully changed"
 msgstr "模板修改成功"
@@ -245,47 +245,47 @@ msgid ""
 msgstr "错误！您没有权限移动页面。请刷新页面"
 
 msgid "You do not have permission to copy these plugins."
-msgstr "您没有复制插件的权限"
+msgstr "您没有权限复制插件"
 
 msgid "Error! You don't have permissions to copy this page."
-msgstr ""
+msgstr "出错！您没有权限复制此页"
 
 msgid ""
 "Error! The page you're pasting is not translated in any of the languages "
 "configured by the target site."
-msgstr ""
+msgstr "出错！您复制的页面尚未翻译成任何一种目标网站设定的语言"
 
 msgid "You do not have permission to revert this page."
-msgstr "你没有权限回退本页面。"
+msgstr "你没有权限变更回原页面。"
 
 #, python-format
 msgid "\"%s\" was reverted to the live version."
-msgstr "\"%s\" 已回退到最新版本。"
+msgstr "\"%s\" 已回退到在线版本"
 
 msgid "You do not have permission to publish this page"
 msgstr "您没有权限发布此页"
 
 msgid "Page not published! A parent page is not published yet."
-msgstr "页面未发布！一个父页面尚未被发布。"
+msgstr "页面尚未发布！上级页面也尚未发布。"
 
 msgid "The content was successfully published."
 msgstr "当前内容已被成功发布。"
 
 msgid "There was a problem publishing your content"
-msgstr "发布您的内容时遇到了一个问题"
+msgstr "发布您的内容时出错"
 
 msgid "You do not have permission to unpublish this page"
 msgstr "您没有权限撤销发布本页面"
 
 msgid "This page was never published"
-msgstr "这一页从未被发布过。"
+msgstr "这一页从未发布过。"
 
 #, python-format
 msgid "The %(language)s page \"%(page)s\" was successfully unpublished"
 msgstr "%(language)s 语言页面 \"%(page)s\" 已成功撤销发布"
 
 msgid "You do not have permission to delete this page"
-msgstr ""
+msgstr "您没有权限删除本页面"
 
 #, python-format
 msgid "Title and plugins with language %(language)s was deleted"
@@ -296,13 +296,13 @@ msgid "You don't have permissions to see page \"%(title)s\""
 msgstr "你没有查看  %(title)s 页面的权限"
 
 msgid "You do not have permission to change this page's in_navigation status"
-msgstr "您没有权限修改这个页面的浏览中状态"
+msgstr "您没有权限修改这个页面的导航状态"
 
 msgid "You do not have permission to edit this page"
 msgstr "您没有权限编辑本页面"
 
 msgid "Add Page Copy"
-msgstr "添加页面拷贝"
+msgstr "添加页面复制"
 
 msgid "New sub page"
 msgstr "新建子页面"
@@ -311,7 +311,7 @@ msgid "New page"
 msgstr "新建页面"
 
 msgid "The page is not eligible to be home."
-msgstr ""
+msgstr "此页面不能用于主页"
 
 msgid "View restriction"
 msgstr "视图限制"
@@ -321,7 +321,7 @@ msgstr "视图限制"
 
 #, python-format
 msgid "Field %s not found"
-msgstr "未找到字段 %s"
+msgstr "数据列 %s未找到"
 
 msgid "You do not have permission to edit this item"
 msgstr "您没有权限编辑当前项"
@@ -330,7 +330,7 @@ msgid "You do not have permission to add a plugin"
 msgstr "您没有添加插件的权限"
 
 msgid "You do not have permission to copy this placeholder."
-msgstr "没有权限复制该占位符"
+msgstr "没有权限复制该占位"
 
 msgid "Plugin not found"
 msgstr "找不到该插件"

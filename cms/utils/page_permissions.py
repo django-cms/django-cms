@@ -3,7 +3,7 @@ from functools import wraps
 from cms.api import get_page_draft
 from cms.cache.permissions import get_permission_cache, set_permission_cache
 from cms.constants import GRANT_ALL_PERMISSIONS
-from cms.models import Page, Placeholder
+from cms.models import Page, PermissionTuple, Placeholder
 from cms.utils import get_current_site
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
@@ -45,7 +45,7 @@ def _check_delete_translation(user, page, language, site=None):
     return user_can_change_page(user, page, site=site)
 
 
-def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=True):
+def _get_page_permission_tuples_for_action(user, site, action, check_global=True, use_cache=True):
     if user.is_superuser or not get_cms_setting('PERMISSION'):
         # got superuser, or permissions aren't enabled?
         # just return grant all mark
@@ -66,9 +66,10 @@ def _get_page_ids_for_action(user, site, action, check_global=True, use_cache=Tr
         return cached
 
     page_actions = get_page_actions(user, site)
-    page_ids = list(page_actions[action])
-    set_permission_cache(user, action, page_ids)
-    return page_ids
+    # Set cache for all actions calculated
+    for act, page_paths in page_actions.items():
+        set_permission_cache(user, act, list(page_paths))
+    return page_actions[action]
 
 
 def auth_permission_required(action):
@@ -335,13 +336,13 @@ def user_can_change_all_pages(user, site):
 
 @auth_permission_required('change_page')
 def user_can_change_at_least_one_page(user, site, use_cache=True):
-    page_ids = get_change_id_list(
+    perm_tuples = get_change_perm_tuples(
         user=user,
         site=site,
         check_global=True,
         use_cache=use_cache,
     )
-    return page_ids == GRANT_ALL_PERMISSIONS or bool(page_ids)
+    return perm_tuples == GRANT_ALL_PERMISSIONS or bool(perm_tuples)
 
 
 @cached_func
@@ -369,141 +370,144 @@ def user_can_view_all_pages(user, site):
     return has_global_permission(user, site, action='view_page')
 
 
-def get_add_id_list(user, site, check_global=True, use_cache=True):
+def get_add_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has add page rights or the string
     "All" if the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    perm_tuples = _get_page_permission_tuples_for_action(
         user=user,
         site=site,
         action='add_page',
         check_global=check_global,
         use_cache=use_cache,
     )
-    return page_ids
+    return perm_tuples
 
 
-def get_change_id_list(user, site, check_global=True, use_cache=True):
+def get_change_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has edit rights or the string "All" if
     the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    perm_tuples = _get_page_permission_tuples_for_action(
         user=user,
         site=site,
         action='change_page',
         check_global=check_global,
         use_cache=use_cache,
     )
-    return page_ids
+    return perm_tuples
 
 
-def get_change_advanced_settings_id_list(user, site, check_global=True, use_cache=True):
+def get_change_advanced_settings_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user can change advanced settings or the
     string "All" if the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    perm_tuples = _get_page_permission_tuples_for_action(
         user=user,
         site=site,
         action='change_page_advanced_settings',
         check_global=check_global,
         use_cache=use_cache,
     )
-    return page_ids
+    return perm_tuples
 
 
-def get_change_permissions_id_list(user, site, check_global=True, use_cache=True):
+def get_change_permissions_perm_tuples(user, site, check_global=True, use_cache=True):
     """Give a list of page where the user can change permissions.
     """
-    page_ids = _get_page_ids_for_action(
+    perm_tuples = _get_page_permission_tuples_for_action(
         user=user,
         site=site,
         action='change_page_permissions',
         check_global=check_global,
         use_cache=use_cache,
     )
-    return page_ids
+    return perm_tuples
 
 
-def get_delete_id_list(user, site, check_global=True, use_cache=True):
+def get_delete_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has delete rights or the string "All" if
     the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    perm_tuples = _get_page_permission_tuples_for_action(
         user=user,
         site=site,
         action='delete_page',
         check_global=check_global,
         use_cache=use_cache,
     )
-    return page_ids
+    return perm_tuples
 
 
-def get_move_page_id_list(user, site, check_global=True, use_cache=True):
+def get_move_page_perm_tuples(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can move.
     """
-    page_ids = _get_page_ids_for_action(
+    perm_tuples = _get_page_permission_tuples_for_action(
         user=user,
         site=site,
         action='move_page',
         check_global=check_global,
         use_cache=use_cache,
     )
-    return page_ids
+    return perm_tuples
 
 
-def get_publish_id_list(user, site, check_global=True, use_cache=True):
+def get_publish_perm_tuples(user, site, check_global=True, use_cache=True):
     """
     Give a list of page where the user has publish rights or the string "All" if
     the user has all rights.
     """
-    page_ids = _get_page_ids_for_action(
+    perm_tuples = _get_page_permission_tuples_for_action(
         user=user,
         site=site,
         action='publish_page',
         check_global=check_global,
         use_cache=use_cache,
     )
-    return page_ids
+    return perm_tuples
 
 
-def get_view_id_list(user, site, check_global=True, use_cache=True):
+def get_view_perm_tuples(user, site, check_global=True, use_cache=True):
     """Give a list of pages which user can view.
     """
-    page_ids = _get_page_ids_for_action(
+    perm_tuples = _get_page_permission_tuples_for_action(
         user=user,
         site=site,
         action='view_page',
         check_global=check_global,
         use_cache=use_cache,
     )
-    return page_ids
+    return perm_tuples
 
 
-def has_generic_permission(page, user, action, site=None, check_global=True):
+def has_generic_permission(page, user, action, site=None, check_global=True, use_cache=True):
     if site is None:
         site = get_current_site()
 
     if page.publisher_is_draft:
-        page_id = page.pk
+        page_path = page.node.path
     else:
-        page_id = page.publisher_public_id
+        page_path = page.publisher_public.node.path
 
     actions_map = {
-        'add_page': get_add_id_list,
-        'change_page': get_change_id_list,
-        'change_page_advanced_settings': get_change_advanced_settings_id_list,
-        'change_page_permissions': get_change_permissions_id_list,
-        'delete_page': get_delete_id_list,
-        'delete_page_translation': get_delete_id_list,
-        'move_page': get_move_page_id_list,
-        'publish_page': get_publish_id_list,
-        'view_page': get_view_id_list,
+        'add_page': get_add_perm_tuples,
+        'change_page': get_change_perm_tuples,
+        'change_page_advanced_settings': get_change_advanced_settings_perm_tuples,
+        'change_page_permissions': get_change_permissions_perm_tuples,
+        'delete_page': get_delete_perm_tuples,
+        'delete_page_translation': get_delete_perm_tuples,
+        'publish_page': get_publish_perm_tuples,
+        'move_page': get_move_page_perm_tuples,
+        'view_page': get_view_perm_tuples,
     }
 
     func = actions_map[action]
-    page_ids = func(user, site, check_global=check_global)
-    return page_ids == GRANT_ALL_PERMISSIONS or page_id in page_ids
+
+    page_perms = func(user, site, check_global=check_global, use_cache=use_cache)
+    return page_perms == GRANT_ALL_PERMISSIONS or any(
+        PermissionTuple(perm).contains(page_path) for perm in page_perms
+    )

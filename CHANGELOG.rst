@@ -2,6 +2,97 @@
 Changelog
 =========
 
+3.11.8 (2024-09-10)
+===================
+
+Features:
+---------
+* Improved permission performance for Django CMS 3 by @fsbraun in https://github.com/django-cms/django-cms/pull/7987
+
+
+Bug Fixes:
+----------
+* Backport of #7868 and #7920 by @fsbraun in https://github.com/django-cms/django-cms/pull/7926
+* Mark language and user middleware synchronous for ASGI (#7985) by @jbazik in https://github.com/django-cms/django-cms/pull/7986
+* Also clear menu cache if page permissions are changed (#7988) (#7990) (7a2632277) -- Fabian Braun
+* Import error from backporting v4 deprecation (#7993) (4492f479c) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (3 pull request)
+* John Bazik (1 pull request)
+
+With the review help of the following contributors:
+
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+3.11.7 (2024-09-09)
+===================
+
+**Retracted**
+
+3.11.6 (2024-05-17)
+===================
+
+* feat: Toolbar direction set based on toolbar language (back port of #7902) by @skhawy in https://github.com/django-cms/django-cms/pull/7914
+* feat: Add RTL support to pagetree by @sakhawy in https://github.com/django-cms/django-cms/pull/7842
+* fix: Add `--fix-paths` option to `./manage.py cms fix-tree` by @fsbraun in https://github.com/django-cms/django-cms/pull/7744
+* fix: readable messages in dark-mode by @fsbraun in https://github.com/django-cms/django-cms/pull/7739
+* fix: Patch Toolbar Middleware Response by @jimlind in https://github.com/django-cms/django-cms/pull/7856
+* fix: also use key-length of 200 for the actual cache-key of placeholders by @wfehr in https://github.com/django-cms/django-cms/pull/7910
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Moe (2 pull requests)
+* Fabian Braun (2 pull requests)
+* Jim Lind (1 pull request)
+* FWehr (1 pull request)
+
+Thanks to all contributors for their efforts!
+
+3.11.5 (2024-01-26)
+===================
+
+Features:
+---------
+
+* feat: Add Python 3.12 support -- Vinit Kumar
+* feat: django 5 support for cms 3.11 -- Leonardo Cavallucci
+* feat: Add bot to remind to not squash merges into release/* branches -- Fabian Braun
+
+Bug Fixes
+---------
+
+* fix: preserve ``view_class`` in decorated views -- Will Hoey
+* fix: avoid InvalidCacheKey (memcached) for key-length ~249 -- fwehr
+* fix: Update transifex pull strings script for v3 in alignment with v4 -- Fabian Braun
+* fix: Use correct version of Django in GitHub CI actions -- Fabian Braun
+* fix: Remove link to closed discourse channel for feature requests from issue template -- Fabian Braun
+* fix: Remove discontinued discourse server from docs -- Fabian Braun
+* fix: Add ``--fix-paths`` option to ``./manage.py cms fix-tree`` -- Fabian Braun
+* fix: readable messages in dark-mode -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun
+* fwehr
+* Leonardo Cavallucci
+* Vinit Kumar
+* Will Hoey
+
+Thanks to all contributors for their efforts!
+
 3.11.4 (2023-09-06)
 ===================
 

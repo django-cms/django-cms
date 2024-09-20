@@ -24,5 +24,5 @@ jobs:
           pip install ruff
       - name: Run Ruff
         run: |
-          ruff cms
-          ruff menus
+          ruff check cms
+          ruff check menus

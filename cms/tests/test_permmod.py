@@ -837,13 +837,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
         request = self.get_request(user)
         PagePermission.objects.create(can_view=True, user=user, page=self.page, grant_on=ACCESS_PAGE)
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             """
             The queries are:
             PagePermission query (is this page restricted)
             content type lookup (x2)
             GlobalpagePermission query for user
-            TreeNode lookup
             PagePermission query for this user
             """
             self.assertViewAllowed(self.page, user)
@@ -855,13 +854,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
         user.groups.add(self.group)
         request = self.get_request(user)
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             """
                 The queries are:
                 PagePermission query (is this page restricted)
                 content type lookup (x2)
                 GlobalpagePermission query for user
-                TreeNode lookup
                 PagePermission query for user
             """
             self.assertViewAllowed(self.page, user)
@@ -889,13 +887,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
         user = self.get_staff_user_with_no_permissions()
         request = self.get_request(user)
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             """
             The queries are:
             PagePermission query (is this page restricted)
             content type lookup x2
             GlobalpagePermission query for user
-            TreeNode lookup
             PagePermission query for this user
             """
             self.assertViewNotAllowed(self.page, user)

@@ -187,7 +187,7 @@ status "  Send them manually before creating a version"
 "$SCRIPTS/tx" --token "$TX_TOKEN" status
 "$SCRIPTS/transifex-send-strings"
 
-git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales"
+git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}Building locales" --allow-empty
 
 echo ""
 status "******************************************************************************"
@@ -209,7 +209,7 @@ status "- Fetching strings from transifex"
 
 # Before compiling:
 # ignore changesets that only involves "^POT-Creation-Date:" "^PO-Revision-Date:"
-git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}compilemessages"
+git diff-index --quiet HEAD locale || git commit locale -m "${COMMIT_PREFIX}compilemessages" --allow-empty
 cd ..
 
 status "- generating assets/static"
@@ -226,12 +226,7 @@ git commit cms/static -m "${COMMIT_PREFIX}compiling new static files"
 
 
 status "- preparing documentation"
-# Adjust docs/requirements.txt so that it refers to the local version of django CMS
-# (and not to a pypi version)
-sed -i 's/^django-cms=.*$/\./g' docs/requirements.txt
-git add docs/requirements.txt
-
-"${SCRIPTS}/make-changelog" "${FULL_VERSION}"
+"${SCRIPTS}/make-changelog" "${FULL_VERSION}" || echo "Manual update of changelog necessary"
 
 upgrade_doc="docs/upgrade/${VERSION}.rst"
 
@@ -278,7 +273,6 @@ if ! grep -q " *${VERSION}$" docs/upgrade/index.rst; then
     sed -i -e "/:maxdepth: 1/{N;a\ \ \ \ ${VERSION}
 }" docs/upgrade/index.rst
 fi
-
 #
 # commit documentations
 git diff-index --quiet HEAD docs CHANGELOG.rst || git commit -m "${COMMIT_PREFIX}updating latest docs" "${upgrade_doc}" CHANGELOG.rst docs/upgrade/index.rst docs/conf.py
