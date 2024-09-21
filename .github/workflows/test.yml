@@ -24,6 +24,8 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
 
     services:
       postgres:
@@ -78,6 +80,8 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
 
     services:
       mysql:
@@ -130,6 +134,8 @@ jobs:
         ]
         exclude:
           - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
             python-version: 3.9
 
     steps:
