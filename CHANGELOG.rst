@@ -1,3 +1,21 @@
+Bug Fixes:
+----------
+* Respect ContentAdminManager pattern for frontend-editable models (#7998) (e4650ecb7) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (4 pull requests)
+
+With the review help of the following contributors:
+
+* Github Release Action
+
+Thanks to all contributors for their efforts!
+
 4.1.2 (2024-07-12)
 ==================
 
