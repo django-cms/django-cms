@@ -1724,6 +1724,19 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         self.assertContains(
             response, "edit_plugin: '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
 
+    def test_edit_field_respects_content_admin_mixin(self):
+        user = self.get_staff()
+        ex1 = self._get_example_obj()
+        edit_url = admin_reverse('placeholderapp_example1_edit_field', args=(ex1.pk, "en"))
+
+        with patch('cms.test_utils.project.placeholderapp.models.Example1.admin_manager.get') as get_mock:
+            with self.login_user_context(user):
+                get_mock.return_value = ex1
+                self.client.get(edit_url + "?edit_fields=char_1")
+
+            self.assertEqual(edit_url, f"/admin/placeholderapp/example1/edit-field/{ex1.pk}/en/")
+            Example1.admin_manager.get.assert_called_once_with(pk=str(ex1.pk))
+
     def test_view_url(self):
         user = self.get_staff()
         page = create_page('Test', 'col_two.html', 'en')

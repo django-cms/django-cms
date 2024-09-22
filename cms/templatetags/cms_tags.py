@@ -575,7 +575,7 @@ class CMSEditableObject(InclusionTag):
         if not attr_value:
             attr_value = getattr(instance, attribute, '')
         extra_context['content'] = attr_value
-        # This allow the requested item to be a method, a property or an
+        # This allows the requested item to be a method, a property or an
         # attribute
         if callable(extra_context['content']):
             if isinstance(instance, Page):
