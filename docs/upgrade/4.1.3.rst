@@ -4,7 +4,7 @@
 4.1.3 release notes
 *******************
 
-*April 20, 2024*
+*September 22, 2024*
 
 .. warning:: Upgrading from previous versions
 
