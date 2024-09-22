@@ -12,43 +12,40 @@
     process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
 
 
-Welcome to django CMS 4.1.1!
+Welcome to django CMS 4.1.3!
 
 Django and Python compatibility
 ===============================
 
-django CMS supports **Django 3.2 to 5.0**. We highly recommend and only
+django CMS supports **Django 3.2 to 5.1**. We highly recommend and only
 support the latest release of each series.
 
-It supports **Python 3.8, 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
+It supports **Python 3.9, 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
 support the latest release of each series.
 
 What's new in 4.1.3
 ===================
 
-Improved right-to-left support
-------------------------------
-
-* Both, the CSS assets and the JS assets have been adjusted to better support right-to-left languages (RTL).
-* Besides imrpvoed ease of use, the page tree can now be fully managed with RTL admin languages
-* Improved translations for Arabic
-
-Faster menu rendering
----------------------
-
-* Improved efficiency building menus for the page tree dramatically reduces database hits
-* Page menus rendered by the core both for versioned and unversioned pages
+Bug Fixes:
+----------
+* Respect ContentAdminManager pattern for frontend-editable models (#7998) (e4650ecb7) -- Fabian Braun
+* Improve pagecontent caching in page admin (esp. page tree) (#8002) (842f347da) -- Fabian Braun
+* Clear menu cache if page permissions are changed (#7988) (1719b9a1b) -- Fabian Braun
+* Consistent labels and help texts for page content model and page content forms (#7968) (acbc2e70a) -- Fabian Braun
+* Inconsistent color codes for dark mode and `preferes-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
+* Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
 
 
-Bug Fixes
----------
+Statistics:
+-----------
 
-* Placeholders do not block deletion of custom model instances with a ``PlaceholderRelationField``.
-* Structure view respects toolbar language
-* Fixed management command to delete orphaned plugins
-* Faster DOM update after edition plugins
-* Directly redirect to edit endpoint after creating a new page
-* Allow editing page content object for apphook without root content
-* Render fallback language in place if ``redirect_on_fallback`` is set to ``False`` in the ``CMS_LANGUAGES`` settings
-* Fail silently when rendering a placeholder on a missing toolbar object -- Fabian Braun
-* Show fallback language titles in pagetree -- Fabian Braun
+This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull request)
+
+With the review help of the following contributors:
+
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
