@@ -393,7 +393,7 @@ class PageToolbar(CMSToolbar):
             # Toolbar object already set (e.g., in edit or preview mode)
             return self.obj
         # Get from db
-        page_content = self.page.get_content_obj(language=self.current_lang, fallback=False)
+        page_content = self.page.get_admin_content(language=self.current_lang, fallback=False)
         return page_content or None
 
     def has_page_change_permission(self):
