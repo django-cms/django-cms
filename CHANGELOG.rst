@@ -1,18 +1,27 @@
+4.1.2 (2024-09-11)
+==================
+
 Bug Fixes:
 ----------
 * Respect ContentAdminManager pattern for frontend-editable models (#7998) (e4650ecb7) -- Fabian Braun
+* Improve pagecontent caching in page admin (esp. page tree) (#8002) (842f347da) -- Fabian Braun
+* Clear menu cache if page permissions are changed (#7988) (1719b9a1b) -- Fabian Braun
+* Consistent labels and help texts for page content model and page content forms (#7968) (acbc2e70a) -- Fabian Braun
+* Inconsistent color codes for dark mode and `preferes-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
+* Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
+
 
 Statistics:
 -----------
 
-This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (4 pull requests)
+* Fabian Braun (6 pull request)
 
 With the review help of the following contributors:
 
-* Github Release Action
+* Mark Walker
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
