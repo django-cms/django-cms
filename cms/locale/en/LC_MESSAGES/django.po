@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: django-cms\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-07-10 10:40+0000\n"
+"POT-Creation-Date: 2024-09-22 11:36+0000\n"
 "PO-Revision-Date: 2015-11-11 17:31+0000\n"
 "Last-Translator: yakky <i.spalletti@nephila.it>\n"
 "Language-Team: English (http://www.transifex.com/divio/django-cms/language/"
@@ -25,36 +25,11 @@ msgstr "All"
 msgid "Copy permissions"
 msgstr "Copy permissions"
 
-msgid "Title"
-msgstr "Title"
-
-msgid "The default title"
-msgstr "The default title"
-
 msgid "Slug"
 msgstr "Slug"
 
 msgid "The part of the title that is used in the URL"
 msgstr "The part of the title that is used in the URL"
-
-msgid "Menu Title"
-msgstr "Menu Title"
-
-msgid "Overwrite what is displayed in the menu"
-msgstr "Overwrite what is displayed in the menu"
-
-msgid "Page Title"
-msgstr "Page Title"
-
-msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
-msgstr ""
-"Overwrites what is displayed at the top of your browser or in bookmarks"
-
-msgid "Description meta tag"
-msgstr "Description meta tag"
-
-msgid "A description of the page used by search engines."
-msgstr "A description of the page used by search engines."
 
 msgid "Page type"
 msgstr "Page type"
@@ -67,18 +42,6 @@ msgstr "Overwrite URL"
 
 msgid "Keep this field empty if standard path should be used."
 msgstr "Keep this field empty if standard path should be used."
-
-msgid "Soft root"
-msgstr "Soft root"
-
-msgid "All ancestors will not be displayed in the navigation"
-msgstr "All ancestors will not be displayed in the navigation"
-
-msgid "Redirect"
-msgstr "Redirect"
-
-msgid "Redirects to this URL."
-msgstr "Redirects to this URL."
 
 msgid "Start typing..."
 msgstr "Start typing..."
@@ -673,20 +636,36 @@ msgstr "Allow"
 msgid "title"
 msgstr "title"
 
-msgid "overwrite the title (html title tag)"
-msgstr "overwrite the title (html title tag)"
+msgid "The default title"
+msgstr "The default title"
 
-msgid "overwrite the title in the menu"
-msgstr "overwrite the title in the menu"
+msgid "Page Title"
+msgstr "Page Title"
 
-msgid "description"
-msgstr "description"
+msgid "Overwrites what is displayed at the top of your browser or in bookmarks"
+msgstr ""
+"Overwrites what is displayed at the top of your browser or in bookmarks"
 
-msgid "The text displayed in search engines."
-msgstr "The text displayed in search engines."
+msgid "Menu Title"
+msgstr "Menu Title"
+
+msgid "Overwrite what is displayed in the menu"
+msgstr "Overwrite what is displayed in the menu"
+
+msgid "Description meta tag"
+msgstr "Description meta tag"
+
+msgid "A description of the page used by search engines."
+msgstr "A description of the page used by search engines."
 
 msgid "redirect"
 msgstr "redirect"
+
+msgid "Redirects to this URL."
+msgstr "Redirects to this URL."
+
+msgid "All ancestors will not be displayed in the navigation"
+msgstr "All ancestors will not be displayed in the navigation"
 
 msgid "The template used to render the content."
 msgstr "The template used to render the content."
@@ -1651,6 +1630,27 @@ msgstr "Create a new %s instance."
 #, python-format
 msgid "A wizard has already been registered for model: %s"
 msgstr "A wizard has already been registered for model: %s"
+
+#~ msgid "Title"
+#~ msgstr "Title"
+
+#~ msgid "Soft root"
+#~ msgstr "Soft root"
+
+#~ msgid "Redirect"
+#~ msgstr "Redirect"
+
+#~ msgid "overwrite the title (html title tag)"
+#~ msgstr "overwrite the title (html title tag)"
+
+#~ msgid "overwrite the title in the menu"
+#~ msgstr "overwrite the title in the menu"
+
+#~ msgid "description"
+#~ msgstr "description"
+
+#~ msgid "The text displayed in search engines."
+#~ msgstr "The text displayed in search engines."
 
 #~ msgid "You do not have permission to change a page's navigation status"
 #~ msgstr "You do not have permission to change a page's navigation status"
