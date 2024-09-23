@@ -91,8 +91,8 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 class BaseCMSTestCase:
     counter = 1
 
-    def _fixture_setup(self):
-        super()._fixture_setup()
+    def _pre_setup(self):
+        super()._pre_setup()
         self.create_fixtures()
         activate("en")
 
