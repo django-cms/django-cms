@@ -16,6 +16,7 @@ jobs:
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
+          django-5.1.txt,
         ]
         os: [
           ubuntu-20.04,
@@ -23,10 +24,12 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
 
     services:
       postgres:
-        image: postgres:12
+        image: postgres:15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -69,12 +72,15 @@ jobs:
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
+          django-5.1.txt,
         ]
         os: [
           ubuntu-20.04,
         ]
         exclude:
           - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
             python-version: 3.9
 
     services:
@@ -121,12 +127,15 @@ jobs:
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt,
+          django-5.1.txt,
         ]
         os: [
           ubuntu-20.04,
         ]
         exclude:
           - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
             python-version: 3.9
 
     steps:
@@ -196,7 +205,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:13
+        image: postgres:15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
