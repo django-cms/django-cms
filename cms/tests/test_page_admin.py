@@ -1609,6 +1609,29 @@ class PageActionsTestCase(PageTestBase):
             self.assertEqual(Page.objects.all().count(), 2)
 
 class PermissionsTestCase(PageTestBase):
+    def assertContainsPermissions(self, response):
+        try:
+            # Django >= 5.1
+            self.assertContains(
+                response,
+                '<h2 id="pagepermission_set-2-heading" class="inline-heading">Page permissions</h2>',
+                html=True,
+            )
+        except AssertionError:
+            # Django < 5.1
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+
+    def assertNotContainsPermissions(self, response):
+        try:
+            # Django >= 5.1
+            self.assertNotContains(
+                response,
+                '<h2 id="pagepermission_set-1-heading" class="inline-heading">Page permissions</h2>',
+                html=True,
+            )
+        except AssertionError:
+            # Django < 5.1
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
 
     def _add_translation_to_page(self, page):
         translation = create_page_content(
@@ -2186,7 +2209,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2223,7 +2246,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2))
 
@@ -2265,7 +2288,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2315,7 +2338,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
@@ -2357,7 +2380,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2397,7 +2420,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2))
 
@@ -2431,7 +2454,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2468,7 +2491,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2, can_view=True))
 
@@ -2509,7 +2532,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2557,7 +2580,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
@@ -2601,7 +2624,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2643,7 +2666,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
 
@@ -3630,7 +3653,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3667,7 +3690,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2))
 
@@ -3709,7 +3732,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3759,7 +3782,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
@@ -3801,7 +3824,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3841,7 +3864,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2))
 
@@ -3875,7 +3898,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3912,7 +3935,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2, can_view=True))
 
@@ -3953,7 +3976,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -4001,7 +4024,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
@@ -4045,7 +4068,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -4087,7 +4110,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
 
