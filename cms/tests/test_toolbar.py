@@ -584,6 +584,8 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(request.session.get('cms_toolbar_disabled'))
         toolbar = CMSToolbar(request)
         self.assertFalse(toolbar.edit_mode_active)
+        self.assertFalse(toolbar.structure_mode_active)
+        self.assertFalse(toolbar.preview_mode_active)
 
     def test_show_disabled_toolbar_with_edit(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
@@ -1002,6 +1004,50 @@ class ToolbarTests(ToolbarTestBase):
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertEqual(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
+
+
+class ToolbarModeTests(ToolbarTestBase):
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("home", "nav_playground.html", "en")
+        self.page_content = self.get_pagecontent_obj(self.page)
+
+    def tearDown(self):
+        self.page.delete()
+        super().tearDown()
+
+    def test_edit_mode(self):
+        """Only edit mode is active"""
+        page_edit_url = get_object_edit_url(self.page_content)
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page_edit_url)
+            toolbar = response.context['request'].toolbar
+
+        self.assertTrue(toolbar.edit_mode_active)
+        self.assertFalse(toolbar.structure_mode_active)
+        self.assertFalse(toolbar.preview_mode_active)
+
+    def test_preview_mode(self):
+        """Only preview mode is active"""
+        page_preview_url = get_object_preview_url(self.page_content)
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page_preview_url)
+            toolbar = response.context['request'].toolbar
+
+        self.assertFalse(toolbar.edit_mode_active)
+        self.assertFalse(toolbar.structure_mode_active)
+        self.assertTrue(toolbar.preview_mode_active)
+
+    def test_structure_mode(self):
+        """Structure AND edit mode is active"""
+        page_structure_url = get_object_structure_url(self.page_content)
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page_structure_url)
+            toolbar = response.context['request'].toolbar
+
+        self.assertTrue(toolbar.edit_mode_active)
+        self.assertTrue(toolbar.structure_mode_active)
+        self.assertFalse(toolbar.preview_mode_active)
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
