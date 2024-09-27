@@ -23,7 +23,11 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
           - requirements-file: django-4.2.txt
+            python-version: 3.13.0-rc.2
+          - requirements-file: django-5.0.txt
             python-version: 3.13.0-rc.2
 
     services:
@@ -79,10 +83,12 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
           - requirements-file: django-4.2.txt
             python-version: 3.13.0-rc.2
-
-
+          - requirements-file: django-5.0.txt
+            python-version: 3.13.0-rc.2
     services:
       mysql:
         image: mysql:9.0.1
@@ -129,6 +135,7 @@ jobs:
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt
+          django-5.1.txt
         ]
         os: [
           ubuntu-latest,
@@ -136,7 +143,11 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
           - requirements-file: django-4.2.txt
+            python-version: 3.13.0-rc.2
+          - requirements-file: django-5.0.txt
             python-version: 3.13.0-rc.2
 
 
