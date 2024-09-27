@@ -23,6 +23,8 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-4.2.txt
+            python-version: 3.13.0-rc.2
 
     services:
       postgres:
@@ -77,6 +79,9 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-4.2.txt
+            python-version: 3.13.0-rc.2
+
 
     services:
       mysql:
@@ -131,6 +136,9 @@ jobs:
         exclude:
           - requirements-file: django-5.0.txt
             python-version: 3.9
+          - requirements-file: django-4.2.txt
+            python-version: 3.13.0-rc.2
+
 
     steps:
     - uses: actions/checkout@v4
