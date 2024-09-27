@@ -15,8 +15,8 @@ jobs:
         python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
         requirements-file: [
           django-4.2.txt,
-          django-5.0.txt
-          django-5.1.txt
+          django-5.0.txt,
+          django-5.1.txt,
         ]
         os: [
           ubuntu-latest,
@@ -76,7 +76,7 @@ jobs:
         python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
         requirements-file: [
           django-4.2.txt,
-          django-5.0.txt
+          django-5.0.txt,
           django-5.1.txt
         ]
         os: [
@@ -136,7 +136,7 @@ jobs:
         python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
         requirements-file: [
           django-4.2.txt,
-          django-5.0.txt
+          django-5.0.txt,
           django-5.1.txt
         ]
         os: [
