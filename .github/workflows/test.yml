@@ -16,6 +16,7 @@ jobs:
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt
+          django-5.1.txt
         ]
         os: [
           ubuntu-latest,
@@ -76,6 +77,7 @@ jobs:
         requirements-file: [
           django-4.2.txt,
           django-5.0.txt
+          django-5.1.txt
         ]
         os: [
           ubuntu-latest,
