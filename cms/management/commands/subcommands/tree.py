@@ -51,14 +51,6 @@ class FixTreeCommand(SubcommandsCommand):
 
         for root in root_pages.order_by('site__pk', 'path'):
             self._update_descendants_tree(root)
-
-        self.stdout.write('fixing page URLs')
-        for root_page in root_pages:
-            for language in root_page.get_languages():
-                if not root_page.is_home:
-                    root_page._update_url_path(language)
-                self._update_url_path_recursive(root_page, language)
-
         self.stdout.write('all done')
 
     def _update_descendants_tree(self, root):
