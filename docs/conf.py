@@ -191,6 +191,16 @@ show_cloud_banner = True
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+# include the following files in the build output
+html_js_files = [
+    "kapa-ai.js",
+]
+
+# include the following files in the build output
+html_css_files = [
+    "kapa-ai.css",
+]
+
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 #html_last_updated_fmt = '%b %d, %Y'

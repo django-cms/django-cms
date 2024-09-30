@@ -2,7 +2,7 @@
 {% load i18n l10n static %}
 
 {% block title %}{% trans "Edit model" %}{% endblock %}
-
+{% block breadcrumbs %}{% endblock %}
 {% block content %}
 <form action="." method="post" id="cmsplugin_form">
 {% csrf_token %}
