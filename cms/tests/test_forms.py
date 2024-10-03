@@ -241,6 +241,7 @@ class FormsTestCase(CMSTestCase):
     def test_lazy_choice_field_behaves_properly(self):
         """Ensure LazyChoiceField is really lazy"""
         choices_called = False
+
         def get_choices():
             nonlocal choices_called
             choices_called = True

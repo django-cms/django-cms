@@ -13,6 +13,8 @@ makes changes to your database.
 .. toctree::
     :maxdepth: 1
 
+    3.11.8
+    3.11.7
     3.11.6
     3.11.5
     3.11.4
