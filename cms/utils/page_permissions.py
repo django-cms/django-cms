@@ -540,14 +540,19 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
     page_path = page.node.path
     actions_map = {
         'add_page': get_add_perm_tuples,
+        'add': get_add_perm_tuples,
         'change_page': get_change_perm_tuples,
+        'change': get_change_perm_tuples,
         'change_page_advanced_settings': get_change_advanced_settings_perm_tuples,
         'change_page_permissions': get_change_permissions_perm_tuples,
         'delete_page': get_delete_perm_tuples,
+        'delete': get_delete_perm_tuples,
         'delete_page_translation': get_delete_perm_tuples,
         'publish_page': get_publish_perm_tuples,
+        'publish': get_publish_perm_tuples,
         'move_page': get_move_page_perm_tuples,
         'view_page': get_view_perm_tuples,
+        'view': get_view_perm_tuples,
     }
 
     func = actions_map[action]
