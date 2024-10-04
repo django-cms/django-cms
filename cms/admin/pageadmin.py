@@ -571,7 +571,7 @@ class PageAdmin(admin.ModelAdmin):
             if can_change_global_permissions:
                 can_change = True
             else:
-                page_path = permission.page.node.path
+                page_path = permission.page.path
                 can_change = any(perm_tuple.contains(page_path) for perm_tuple in allowed_pages)
 
             row = PermissionRow(

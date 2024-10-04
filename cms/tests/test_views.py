@@ -406,6 +406,7 @@ class ContextTests(CMSTestCase):
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)
 
+
 class EndpointTests(CMSTestCase):
 
     def setUp(self) -> None:
@@ -437,7 +438,7 @@ class EndpointTests(CMSTestCase):
         self._add_plugin_to_placeholder(placeholder, "TextPlugin", language="fr")
         with force_language("fr"):
             setting, _ = UserSettings.objects.get_or_create(user=self.get_superuser())
-            setting.language="fr"
+            setting.language = "fr"
             setting.save()
             structure_endpoint_url = admin_reverse(
                 "cms_placeholder_render_object_structure",

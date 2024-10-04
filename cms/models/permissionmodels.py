@@ -277,8 +277,7 @@ class PagePermission(AbstractPagePermission):
             raise ValidationError(message)
 
     def get_page_permission_tuple(self):
-        node = self.page.node
-        return PermissionTuple((self.grant_on, node.path))
+        return PermissionTuple((self.grant_on, self.page.path))
 
     def get_page_ids(self):
         import warnings
