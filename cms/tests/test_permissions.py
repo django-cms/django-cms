@@ -148,6 +148,8 @@ class PermissionCacheTests(CMSTestCase):
         self.assertTrue(user_can_add_subpage(user1, child))
 
     def test_has_generic_permissions_compatibiltiy(self):
+        from cms.utils.permissions import has_page_permission
+
         page_b = create_page("page_b", "nav_playground.html", "en",
                              created_by=self.user_super)
         assign_user_to_page(page_b, self.user_normal, can_view=True,
@@ -157,5 +159,5 @@ class PermissionCacheTests(CMSTestCase):
         self.assertFalse(has_generic_permission(page_b, self.user_normal, "publish_page"))
 
         # Backwards compatibility: check if the old permission names work
-        self.assertTrue(has_generic_permission(page_b, self.user_normal, "change"))
-        self.assertFalse(has_generic_permission(page_b, self.user_normal, "publish"))
+        self.assertTrue(has_page_permission(self.user_normal, page_b, "change"))
+        self.assertFalse(has_page_permission(self.user_normal, page_b, "publish"))
