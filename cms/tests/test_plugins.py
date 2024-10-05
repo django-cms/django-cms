@@ -693,7 +693,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         def get_page(plugin):
             return plugin.page
 
-        self.assertWarns(
+        self.failUnlessWarns(
             DontUsePageAttributeWarning,
             "Don't use the page attribute on CMSPlugins! "
             "CMSPlugins are not guaranteed to have a page associated with them!",
