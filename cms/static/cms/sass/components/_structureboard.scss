@@ -343,19 +343,19 @@
             4px 4px 0 0 $color-primary;
     }
 
-    .cms-dragable:not(.cms-draggable-disabled) .cms-dragitem {
+    .cms-draggables:not(.cms-drag-disabled) > .cms-draggable:not(.cms-draggable-disabled) .cms-dragitem {
         cursor: move;
-    }
-    .cms-dragitem {
-        position: relative;
-        border-radius: $border-radius-normal;
-        background: $white;
         @if ($structure-dragarea-use-background == 1) {
             background-image: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAABCCAAAAAB73glBAAAAAnRSTlMAAHaTzTgAAAAeSURBVHgBY7gCBgxAAGHRRoAKYOi5dNSloy4ddSkA3VChcDH0cxcAAAAASUVORK5CYII=");
             background-repeat: no-repeat;
             background-position: 10px 50%;
             background-size: 8px 33px;
         }
+    }
+    .cms-dragitem {
+        position: relative;
+        border-radius: $border-radius-normal;
+        background: $white;
         &:hover {
             box-shadow: inset 0 0 0 1px $gray-light;
         }

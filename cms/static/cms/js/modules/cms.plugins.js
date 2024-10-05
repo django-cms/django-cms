@@ -339,11 +339,12 @@ var Plugin = new Class({
     _dblClickToEditHandler: function _dblClickToEditHandler(e) {
         var that = this;
         var disabled = $(e.currentTarget).closest('.cms-drag-disabled');
+        var edit_disabled = $(e.currentTarget).closest('.cms-draggable').hasClass('cms-edit-disabled');
 
         e.preventDefault();
         e.stopPropagation();
 
-        if (!disabled.length) {
+        if (!disabled.length && !edit_disabled) {
             that.editPlugin(
                 Helpers.updateUrlWithPath(that.options.urls.edit_plugin),
                 that.options.plugin_name,
@@ -383,11 +384,14 @@ var Plugin = new Class({
             });
 
         if (!Plugin._isContainingMultiplePlugins(this.ui.container)) {
+            // only allow editing by double-click if not disabled
+            var selector = `.cms-plugin-${this.options.plugin_id}:not(.cms-edit-disabled)`;
+
             $document
-                .off(pluginDoubleClickEvent, `.cms-plugin-${this.options.plugin_id}`)
+                .off(pluginDoubleClickEvent, selector)
                 .on(
                     pluginDoubleClickEvent,
-                    `.cms-plugin-${this.options.plugin_id}`,
+                    selector,
                     this._dblClickToEditHandler.bind(this)
                 );
         }
@@ -419,8 +423,14 @@ var Plugin = new Class({
                 }
                 var name = that.options.plugin_name;
                 var id = that.options.plugin_id;
+                var disabled = $(e.currentTarget).hasClass('.cms-edit-disabled');  // No tooltip for disabled plugins
 
-                CMS.API.Tooltip.displayToggle(e.type === 'pointerover' || e.type === 'touchstart', e, name, id);
+                CMS.API.Tooltip.displayToggle(
+                    (e.type === 'pointerover' || e.type === 'touchstart') && !disabled,
+                    e,
+                    name,
+                    id
+                );
             });
     },
 
@@ -1965,7 +1975,7 @@ Plugin._initializeGlobalHandlers = function _initializeGlobalHandlers() {
         // otherwise propagation won't work to the nested plugin
 
         e.stopPropagation();
-        const pluginContainer = $(e.target).closest('.cms-plugin');
+        const pluginContainer = $(e.target).closest('.cms-plugin:not(.cms-edit-disabled)');
         const allOptions = pluginContainer.data('cms');
 
         if (!allOptions || !allOptions.length) {
