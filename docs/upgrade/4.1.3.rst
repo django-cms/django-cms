@@ -35,6 +35,7 @@ Bug Fixes:
 * Inconsistent color codes for dark mode and `preferes-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
 * Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
 * Accept legacy action names for page permission checks (#8021) (9a1e178) -- Fabian Braun
+* Mark language and user middleware synchronous for ASGI (#7985) -- John Bazik
 
 
 Statistics:
