@@ -1,3 +1,31 @@
+4.1.3 (2024-09-11)
+==================
+
+Bug Fixes:
+----------
+* Respect ContentAdminManager pattern for frontend-editable models (#7998) (e4650ecb7) -- Fabian Braun
+* Improve pagecontent caching in page admin (esp. page tree) (#8002) (842f347da) -- Fabian Braun
+* Clear menu cache if page permissions are changed (#7988) (1719b9a1b) -- Fabian Braun
+* Consistent labels and help texts for page content model and page content forms (#7968) (acbc2e70a) -- Fabian Braun
+* Inconsistent color codes for dark mode and `preferes-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
+* Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
+* Accept legacy action names for page permission checks (#8021) (9a1e178) -- Fabian Braun
+* Mark language and user middleware synchronous for ASGI (#7985) -- John Bazik
+
+Statistics:
+-----------
+
+This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull request)
+
+With the review help of the following contributors:
+
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 4.1.2 (2024-07-12)
 ==================
 

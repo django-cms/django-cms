@@ -7,6 +7,8 @@ from django.utils.deprecation import MiddlewareMixin
 
 
 class CurrentUserMiddleware(MiddlewareMixin):
+    async_capable = False
+
     def process_request(self, request):
         from cms.utils.permissions import set_current_user
 

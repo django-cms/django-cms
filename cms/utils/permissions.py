@@ -209,6 +209,17 @@ def has_page_permission(user, page, action, use_cache=True):
                   "Use cms.utils.page_permissions.has_generic_permission instead.",
                   RemovedInDjangoCMS43Warning, stacklevel=2)
 
+    action_map = {
+        "change": "change_page",
+        "add": "add_page",
+        "move": "move_page",
+        "publish": "publish_page",
+        "delete": "delete_page",
+        "view": "view_page",
+    }
+    if action in action_map:
+        action = action_map[action]
+
     return has_generic_permission(page, user, action, site=None, check_global=False, use_cache=use_cache)
 
 
