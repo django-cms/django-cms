@@ -28,7 +28,7 @@
         <section class="cms-welcome-section">
             <h2>
                 {% if user.is_authenticated %}
-                    {% trans "Add your first page" %}
+                    {% trans "Time to build something great" %}
                 {% else %}
                     {% trans "Please log in" %}
                 {% endif %}
@@ -37,12 +37,16 @@
                 {% blocktrans %}
                     Welcome to django CMS version <strong>{{ cms_version }}</strong>.
                 {% endblocktrans %}
+                {% blocktrans %}
+                    You’ve successfully installed your new CMS – now let’s bring your content to life! Create your
+                    first page and explore the full potential of django CMS!
+                {% endblocktrans %}
             </p>
             <p>
                 {% url "admin:cms_page_add" as admin_add_page %}
                 {% if user.is_authenticated %}
                     {% blocktrans %}
-                        <a href="{{ admin_add_page }}" class="js-welcome-add">Add the first page</a> to the system to continue.
+                        <button class="js-welcome-add cms-btn cms-btn-action">Add the first page</button>
                     {% endblocktrans %}
                 {% else %}
                     {% blocktrans %}
@@ -51,6 +55,14 @@
                     {% endblocktrans %}
                 {% endif %}
             </p>
+            {% blocktrans %}
+                <h2>Django CMS is Free – Help Us Keep It That Way!</h2>
+                <p>
+                    If you value django CMS, your support—through code, feedback, or donations—helps it grow.
+                    Explore, and when you're ready, <a href="//github.com/sponsors/django-cms">donate</a>
+                    (save this link for later) to keep it thriving!
+                </p>
+            {% endblocktrans %}
         </section>
 
         <footer class="cms-welcome-footer">
@@ -59,6 +71,8 @@
                 <a href="//django-cms.org/" target="_blank">{% trans "django CMS" %}</a>
                 <a href="//django-cms.org/en/support" target="_blank">{% trans "Support" %}</a>
                 <a href="//docs.django-cms.org/" target="_blank">{% trans "Documentation" %}</a>
+                <a href="//user-guide.django-cms.org/" target="_blank">{% trans "User guide" %}</a>
+                <a href="//www.django-cms.org/en/donate/" target="_blank">{% trans "Donate" %}</a>
             </p>
             {% blocktrans %}
                 <p class="cms-welcome-notes">If you don't see the django CMS logo at the top, make sure
@@ -91,11 +105,6 @@
                         title: '{% trans "Welcome to django CMS" %}'
                     });
                 });
-
-                // automatically trigger the modal if sideframe isn't open
-                if (!CMS.settings.sideframe.url) {
-                    btn.trigger('click');
-                }
             });
         {% else %}
             window.location.href = '{% url "admin:login" %}?next={{ next_url }}';

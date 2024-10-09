@@ -21,6 +21,10 @@
         }
     }
 
+    a.welcome-button {
+        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border);
+    }
+
     .cms-hidden {
         display: none;
     }
@@ -75,10 +79,19 @@
         h2 {
             font-size: $font-size-large;
             font-weight: bold;
-            margin: 0 0 15px;
+            padding-bottom: 10px;
+        }
+        p + h2 {
+            padding-top: $padding-large;
         }
         p {
-            padding: 5px 0;
+            padding: $padding-base 0;
+        }
+        button.cms-btn-action {
+            @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border);
+            padding: $padding-normal $padding-large;
+            font-size: $font-size-normal;
+            font-weight: bold;
         }
     }
 
