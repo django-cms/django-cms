@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 
+from cms.models import ContentAdminManager
 from cms.models.fields import PlaceholderField
 from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
@@ -25,6 +26,9 @@ class Example1(models.Model):
     decimal_field = models.DecimalField(
         max_digits=5, decimal_places=1,
         blank=True, null=True,)
+
+    admin_manager = ContentAdminManager()
+    objects = models.Manager()
 
     static_admin_url = ''
 
