@@ -85,13 +85,17 @@
             padding-top: $padding-large;
         }
         p {
-            padding: $padding-base 0;
+            padding: 2 * $padding-base 0;
         }
         button.cms-btn-action {
             @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border);
             padding: $padding-normal $padding-large;
             font-size: $font-size-normal;
             font-weight: bold;
+        }
+        li {
+            list-style-type: disc;
+            margin-inline-start: 1.1em;
         }
     }
 
