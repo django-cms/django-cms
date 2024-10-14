@@ -1,5 +1,7 @@
 import copy
 
+from django.db.models import QuerySet
+
 from cms.api import create_page, create_page_content
 from cms.models import PageUrl
 from cms.sitemaps import CMSSitemap
@@ -119,3 +121,11 @@ class SitemapTestCase(CMSTestCase):
                 if item["item"].path:
                     url += item["item"].path + "/"
                 self.assertEqual(item["location"], url)
+
+    def test_sitemap_items_type(self):
+        """
+        Ensure that CMSSitemap.items() returns a QuerySet, not a list.
+        """
+        sitemap = CMSSitemap()
+        items = sitemap.items()
+        self.assertIsInstance(items, QuerySet, "CMSSitemap.items() must return a QuerySet.")
