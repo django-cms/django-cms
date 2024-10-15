@@ -637,6 +637,12 @@ class ChangePageForm(BasePageContentForm):
             data["path"] = path
         return data
 
+    def clean_slug(self):
+        slug = self.cleaned_data['slug']
+        if slug != slug.lower():
+            raise ValidationError("Slug must have all characters in lowercase")
+        return slug
+
     def clean_xframe_options(self):
         if "xframe_options" not in self.fields:
             return  # nothing to do, field isn't present
