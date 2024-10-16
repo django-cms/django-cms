@@ -28,7 +28,7 @@
         <section class="cms-welcome-section">
             <h2>
                 {% if user.is_authenticated %}
-                    {% trans "Time to build something great" %}
+                    {% trans "Time to build something great!" %}
                 {% else %}
                     {% trans "Please log in" %}
                 {% endif %}
@@ -56,7 +56,12 @@
                 {% endif %}
             </p>
             {% blocktrans %}
-                <h2>Django CMS is Free – Help Us Keep It That Way!</h2>
+                <h2>Django CMS is free – help us keep it that way!</h2>
+                <p>
+                    If you value django CMS, your support-through code, feedback, or donations-helps it grow.
+                    Explore, and when you're ready, <a href="//github.com/sponsors/django-cms">sponsor on GitHub</a>
+                    (save this link for later) to keep it thriving!
+                </p>
                 <p>
                     Explore django CMS, enjoy it, and when you're ready,
                 </p>
