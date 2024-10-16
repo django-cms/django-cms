@@ -58,9 +58,9 @@ def _clean_redirect_url(redirect_url, language):
     return redirect_url
 
 
-def details(request, slug):
+def details(request, slug, context={}):
     """
-    The main view of the Django-CMS! Takes a request and a slug, renders the
+    The main view of the Django-CMS! Takes a request, a slug and context, renders the
     page.
     """
     is_authenticated = request.user.is_authenticated
@@ -222,7 +222,7 @@ def details(request, slug):
     if hasattr(request, 'toolbar'):
         request.toolbar.set_object(content)
 
-    return render_pagecontent(request, content)
+    return render_pagecontent(request, content, context)
 
 
 @require_POST

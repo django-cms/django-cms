@@ -10,12 +10,11 @@ from cms.utils.page_permissions import user_can_change_page, user_can_view_page
 from cms.utils.urlutils import admin_reverse
 
 
-def render_page(request, page, current_language, slug=None):
+def render_page(request, page, current_language, slug=None, context={}):
     """
     Renders a page
     """
     page_content = page.page_content_cache.get(current_language, page.get_content_obj(current_language))
-    context = {}
     context['lang'] = current_language
     context['current_page'] = page
     context['current_pagecontent'] = page_content
@@ -92,8 +91,8 @@ def _render_welcome_page(request):
     return TemplateResponse(request, "cms/welcome.html", context)
 
 
-def render_pagecontent(request, pagecontent):
+def render_pagecontent(request, pagecontent, context):
     language = pagecontent.language
     request.current_page = page = pagecontent.page
     page.page_content_cache[language] = pagecontent
-    return render_page(request, page, language)
+    return render_page(request, page, language, context)
