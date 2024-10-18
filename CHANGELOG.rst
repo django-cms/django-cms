@@ -87,6 +87,7 @@ Features:
 * Python 3.11, 3.10 support
 * Remove patching of PageContent by djangocms-versioning (#7446)
 * Utility function get_placeholder_from_slot for PlaceholderRelationField (#7479)
+* Use autocomplete for entities from model `User` and `Group` instead of the raw primary key.
 
 Bug Fixes:
 ----------
