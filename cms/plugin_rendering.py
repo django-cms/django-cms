@@ -425,34 +425,6 @@ class ContentRenderer(BaseRenderer):
             return content + nodelist.render(context)
         return content
 
-    def render_static_placeholder(self, static_placeholder, context, nodelist=None):
-        user = self.request.user
-
-        if self.toolbar.edit_mode_active and user.has_perm('cms.edit_static_placeholder'):
-            placeholder = static_placeholder.draft
-            editable = True
-            use_cache = False
-        else:
-            placeholder = static_placeholder.public
-            editable = False
-            use_cache = True
-
-        # I really don't like these impromptu flags...
-        placeholder.is_static = True
-
-        content = self.render_placeholder(
-            placeholder,
-            context=context,
-            editable=editable,
-            use_cache=use_cache,
-            nodelist=nodelist,
-        )
-
-        if static_placeholder.pk not in self._rendered_static_placeholders:
-            # First time this static placeholder is rendered
-            self._rendered_static_placeholders[static_placeholder.pk] = static_placeholder
-        return content
-
     def render_plugin(self, instance, context, placeholder=None, editable=False):
         if not placeholder:
             placeholder = instance.placeholder
@@ -700,13 +672,20 @@ class StructureRenderer(BaseRenderer):
     def render_static_placeholder(self, static_placeholder, language=None):
         user = self.request.user
 
-        if not user.has_perm('cms.edit_static_placeholder'):
-            return ''
+        # FIXME: Needs to be configured per Static Placeholder enabled package i.e. Alias
+        #       Static Alias would use this
+        #       The mechanism for how the Page would detect which Alias are attached to it,
+        #       It's kind of template driven so this needs to be worked out still!
+        # if not user.has_perm('cms.edit_static_placeholder'):
+        #     return ''
 
         language = language or self.request_language
 
-        placeholder = static_placeholder.draft
-        # I really don't like these impromptu flags...
+        placeholder = static_placeholder
+
+        # It's this flag that shows the content
+        # TODO: This should / could be set by Alias
+        #       for statis Alias
         placeholder.is_static = True
 
         content = self.render_placeholder(placeholder, language=language)
@@ -731,6 +710,7 @@ class StructureRenderer(BaseRenderer):
 
 
 class LegacyRenderer(ContentRenderer):
+    # FIXME: Remove this as it's uses were not known 5+ years ago, they are still not now!
 
     load_structure = True
     placeholder_edit_template = (
