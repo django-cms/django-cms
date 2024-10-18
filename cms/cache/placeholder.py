@@ -19,10 +19,33 @@ check for cache hits without re-computing placeholder.get_vary_cache_on().
 import hashlib
 import time
 
+from importlib import import_module
+
+from django.conf import settings
 from django.utils.timezone import now
 
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_header_name, get_timezone_name
+
+# during python load phase, resolve custom cache key extra getter from settings into function
+_placeholder_cache_key_extra = None
+if hasattr(settings, "CMS_PLACEHOLDER_CACHE_KEY_EXTRA"):
+    try:
+        mod_path, met = settings.CMS_PLACEHOLDER_CACHE_KEY_EXTRA.rsplit('.', 1)
+
+        mod = import_module(mod_path)
+        _placeholder_cache_key_extra = getattr(mod, met)
+    except ImportError:
+        pass
+
+def _get_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
+    """
+    Wrapper function to resolve if custom placeholder cache key extra getter was provided
+    """
+    placeholder_cache_key = _default_placeholder_cache_key(placeholder, lang, site_id, request, soft=False)
+    if _placeholder_cache_key_extra is not None:
+        placeholder_cache_key += _placeholder_cache_key_extra(placeholder, lang, site_id, request, soft=False)
+    return placeholder_cache_key
 
 
 def _get_placeholder_cache_version_key(placeholder, lang, site_id):
@@ -85,7 +108,7 @@ def _set_placeholder_cache_version(placeholder, lang, site_id, version, vary_on_
     cache.set(key, (version, vary_on_list), duration)
 
 
-def _get_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
+def _default_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
     """
     Returns the fully-addressed cache key for the given placeholder and
     the request.
