@@ -14,7 +14,7 @@ from django.utils.translation import get_language, gettext_lazy as _
 from cms.models import Page
 from cms.models.contentmodels import PageContent
 from cms.toolbar.utils import get_object_preview_url
-from cms.utils import get_language_from_request, i18n
+from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
@@ -35,7 +35,7 @@ class GetAdminUrlForLanguage(AsTag):
 
     def get_value(self, context, page, language):
         if language in page.get_languages():
-            page_content = page.pagecontent_set(manager="admin_manager").latest_content(language=language).first()
+            page_content = page.get_admin_content(language)
             if page_content:
                 return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
         admin_url = admin_reverse('cms_pagecontent_add')
