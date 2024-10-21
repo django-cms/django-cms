@@ -27,7 +27,7 @@ ways to install django CMS for free.
    <https://www.django-cms.org/en/blog/2021/01/19/how-you-spin-up-a-django-cms-project-in-less-than-5-minutes/>`_.
    It is a good way for a developer locally without an external vendor and we use this
    option in this django CMS demo.
-3. The last option is to install is creating a django CMS project manually into a local
+3. The last option to install is creating a django CMS project manually into a local
    virtual environment by running the ``djangocms`` command. This will create a new
    Django project set up for running django CMS based on a django CMS-specific project
    template. See :ref:`Installing django CMS by hand <install-django-cms-by-hand>` for
@@ -147,7 +147,7 @@ how django CMS is set up like a typical Django project.
 
     You can also use this guide to help you install django CMS as part of an existing
     project. However, the guide assumes that you are starting with a blank project, so
-    you will need to adapt the steps below appropriately as required. You
+    you will need to adapt the steps below appropriately as required.
 
 This document assumes you have some basic familiarity with Python and Django. After
 you've integrated django CMS into your project, you should be able to follow the
