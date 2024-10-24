@@ -1,3 +1,5 @@
+from django.contrib.admin.utils import flatten_fieldsets
+
 from cms.admin.forms import AdvancedSettingsForm, ChangePageForm
 from cms.models.contentmodels import PageContent
 from cms.models.pagemodel import Page
@@ -6,26 +8,23 @@ from cms.test_utils.testcases import CMSTestCase
 
 class PagePropsMovedToPageContentTests(CMSTestCase):
 
-    def test_moved_constants(self):
-        """test constants moved from Page class"""
-        self.assertFalse(hasattr(Page, "LIMIT_VISIBILITY_IN_MENU_CHOICES"))
-        self.assertFalse(hasattr(Page, "TEMPLATE_DEFAULT"))
-        self.assertFalse(hasattr(Page, "X_FRAME_OPTIONS_INHERIT"))
-        self.assertFalse(hasattr(Page, "X_FRAME_OPTIONS_DENY"))
-        self.assertFalse(hasattr(Page, "X_FRAME_OPTIONS_SAMEORIGIN"))
-        self.assertFalse(hasattr(Page, "X_FRAME_OPTIONS_ALLOW"))
-        self.assertFalse(hasattr(Page, "X_FRAME_OPTIONS_CHOICES"))
+    def test_moved_fields(self):
+        non_editables = [
+            'id',
+            'changed_by',
+            'changed_date',
+            'created_by',
+            'creation_date',
+            'page_id',
+            'in_navigation',
+            'language'
+        ]
 
-        """test Page class constants present in PageContent class"""
-        self.assertTrue(hasattr(PageContent, "LIMIT_VISIBILITY_IN_MENU_CHOICES"))
-        self.assertTrue(hasattr(PageContent, "TEMPLATE_DEFAULT"))
-        self.assertTrue(hasattr(PageContent, "X_FRAME_OPTIONS_CHOICES"))
+        change_page_form_fieldsets = flatten_fieldsets(ChangePageForm.fieldsets)
+        page_content_fields = [field.attname for field in PageContent._meta.fields]
 
-    def test_moved_attributes(self):
-        """test xframe_options attribute moved from Page to PageContent"""
-        self.assertFalse(hasattr(Page, "xframe_options"))
-        self.assertTrue(hasattr(PageContent, "xframe_options"))
+        # filter the non editables from PageContent fields
+        filtered_page_content_fields = list(set(page_content_fields) - set(non_editables))
 
-        """test xframe_options attribute moved from AdvancedSettingsForm to ChangePageForm"""
-        self.assertIsNone(AdvancedSettingsForm.base_fields.get("xframe_options"))
-        self.assertIsNotNone(ChangePageForm.base_fields.get("xframe_options"))
+        for field in filtered_page_content_fields:
+            self.assertIn(field, change_page_form_fieldsets)
