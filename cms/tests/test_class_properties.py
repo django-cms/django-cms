@@ -1,7 +1,8 @@
 from django.contrib.admin.utils import flatten_fieldsets
 
-from cms.admin.forms import ChangePageForm
+from cms.admin.forms import AdvancedSettingsForm, ChangePageForm
 from cms.models.contentmodels import PageContent
+from cms.models.pagemodel import Page
 from cms.test_utils.testcases import CMSTestCase
 
 
