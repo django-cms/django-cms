@@ -540,6 +540,13 @@ class ChangePageForm(BasePageContentForm):
         coerce=int,
         empty_value=None,
     )
+    xframe_options = forms.ChoiceField(
+        choices=PageContent._meta.get_field("xframe_options").choices,
+        label=_("X Frame Options"),
+        help_text=_("Whether this page can be embedded in other pages or websites."),
+        initial=PageContent._meta.get_field("xframe_options").default,
+        required=False,
+    )
     fieldsets = (
         (
             None,
@@ -566,6 +573,13 @@ class ChangePageForm(BasePageContentForm):
                 "fields": ("soft_root", "menu_title", "limit_visibility_in_menu"),
                 "classes": ["collapse"],
             },
+        ),
+        (
+            _("Headers"),
+            {
+                "fields": ("xframe_options",),
+                "classes": ["collapse"],
+            }
         ),
     )
 
