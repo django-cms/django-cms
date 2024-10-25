@@ -40,7 +40,7 @@ def render_page(request, page, current_language, slug=None):
         # This is when we defer to django's own clickjacking handling
         return response
 
-    # We want to prevent django setting this in their middlewear
+    # We want to prevent django setting this in their middleware
     response.xframe_options_exempt = True
 
     if xframe_options == constants.X_FRAME_OPTIONS_ALLOW:

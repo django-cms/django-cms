@@ -130,6 +130,7 @@ class PageContent(models.Model):
     xframe_options = models.IntegerField(
         choices=X_FRAME_OPTIONS_CHOICES,
         default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
+        verbose_name=_("X Frame Options"),
     )
 
     objects = PageContentManager()
