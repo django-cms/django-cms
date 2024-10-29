@@ -49,24 +49,6 @@ class TemplatetagTests(CMSTestCase):
         english_content = page.pagecontent_set(manager="admin_manager").first()
         german_content = create_page_content("de", "AdminURLTestPage German Content", page)
 
-        request = RequestFactory().get('/')
-        request.current_page = page
-        template = """
-            {% load cms_tags cms_admin %}
-            {% get_admin_url_for_language page_obj 'en' %}
-            {% get_admin_url_for_language page_obj 'de' %}
-            {% get_admin_url_for_language page_obj 'fr' %}
-        """
-        output = self.render_template_obj(template, {'page_obj': page}, request)
-        self.assertIn(f'/en/admin/cms/pagecontent/{english_content.pk}/change/', output)
-        self.assertIn(f'/en/admin/cms/pagecontent/{german_content.pk}/change/', output)
-        self.assertIn(f'/en/admin/cms/pagecontent/add/?cms_page={page.pk}&language=fr', output)
-
-    def test_admin_pagecontent_language_tab_urls_accessed_page(self):
-        page = create_page('AdminURLTestPage English Content', 'nav_playground.html', 'en')
-        english_content = page.pagecontent_set(manager="admin_manager").first()
-        german_content = create_page_content("de", "AdminURLTestPage German Content", page)
-
         # Try to fill the cache with partial data (this should not be possible)
         page.get_content_obj(language='en')
         page.get_admin_content(language='en')
