@@ -51,7 +51,7 @@ class TemplatetagTests(CMSTestCase):
 
         # Try to fill the cache with partial data (this should not be possible)
         page.get_content_obj(language='en')  # should not affect admin template tag
-        page.get_admin_content(language='en')
+        page.get_admin_content(language='en')  # Should fill the whole cache
 
         request = RequestFactory().get('/')
         request.current_page = page
