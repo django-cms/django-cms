@@ -66,7 +66,7 @@ class TemplatetagTests(CMSTestCase):
 
         with force_language('fr'):
             url = GetAdminUrlForLanguage.get_value(None, context={'request': request}, page=page, language="fr")
-            # PageContent for the French languag does not exist, we expect a link to create a new PageContent instance
+            # PageContent for the French language does not exist, we expect a link to create a new PageContent instance
             self.assertEqual(url, f'/fr/admin/cms/pagecontent/add/?cms_page={page.pk}&language=fr')
 
     def test_admin_pagecontent_language_tab_urls(self):
