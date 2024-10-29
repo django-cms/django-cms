@@ -740,11 +740,7 @@ class PageContentAdmin(admin.ModelAdmin):
         key is used if no field is provided. Return ``None`` if no match is
         found or the object_id fails validation.
         """
-        obj = super().get_object(request, object_id, from_field)
-
-        if obj:
-            obj.page.admin_content_cache[obj.language] = obj
-        return obj
+        return super().get_object(request, object_id, from_field)
 
     def get_admin_url(self, action, *args):
         url_name = f"{self.opts.app_label}_{self.opts.model_name}_{action}"
