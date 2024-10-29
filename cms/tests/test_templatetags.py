@@ -43,37 +43,33 @@ from cms.utils.placeholder import get_placeholders
 
 
 class TemplatetagTests(CMSTestCase):
-    def test_get_admin_url_for_language(self):
-        # This creates a new page and the corresponding PageContent object for lang 'en'
-        # After that we create a German PageContent object
-        page = create_page("AdminURLTestPage English Content", "nav_playground.html", "en")
-        english_content = page.pagecontent_set(manager="admin_manager").first()
-        german_content = create_page_content("de", "AdminURLTestPage German Content", page)
-
-
-        request = RequestFactory().get('/')
-        request.current_page = page
-
-        with force_language('de'):
-            url = GetAdminUrlForLanguage.get_value(None, context={'request': request}, page=page, language="de")
-            # We expect that getting the German URL will return the German page content (change link, not a create link)
-            self.assertEqual(url, f'/de/admin/cms/pagecontent/{german_content.pk}/change/')
-
-        with force_language('en'):
-            url = GetAdminUrlForLanguage.get_value(None, context={'request': request}, page=page, language="en")
-            # Same goes for the English URL
-            self.assertEqual(url, f'/en/admin/cms/pagecontent/{english_content.pk}/change/')
-
-        with force_language('fr'):
-            url = GetAdminUrlForLanguage.get_value(None, context={'request': request}, page=page, language="fr")
-            # PageContent for the French language does not exist, we expect a link to create a new PageContent instance
-            self.assertEqual(url, f'/fr/admin/cms/pagecontent/add/?cms_page={page.pk}&language=fr')
-
     def test_admin_pagecontent_language_tab_urls(self):
         # Same setup as in the templatetag test above
         page = create_page('AdminURLTestPage English Content', 'nav_playground.html', 'en')
         english_content = page.pagecontent_set(manager="admin_manager").first()
         german_content = create_page_content("de", "AdminURLTestPage German Content", page)
+
+        request = RequestFactory().get('/')
+        request.current_page = page
+        template = """
+            {% load cms_tags cms_admin %}
+            {% get_admin_url_for_language page_obj 'en' %}
+            {% get_admin_url_for_language page_obj 'de' %}
+            {% get_admin_url_for_language page_obj 'fr' %}
+        """
+        output = self.render_template_obj(template, {'page_obj': page}, request)
+        self.assertIn(f'/en/admin/cms/pagecontent/{english_content.pk}/change/', output)
+        self.assertIn(f'/en/admin/cms/pagecontent/{german_content.pk}/change/', output)
+        self.assertIn(f'/en/admin/cms/pagecontent/add/?cms_page={page.pk}&language=fr', output)
+
+    def test_admin_pagecontent_language_tab_urls_accessed_page(self):
+        page = create_page('AdminURLTestPage English Content', 'nav_playground.html', 'en')
+        english_content = page.pagecontent_set(manager="admin_manager").first()
+        german_content = create_page_content("de", "AdminURLTestPage German Content", page)
+
+        # Try to fill the cache with partial data (this should not be possible)
+        page.get_content_obj(language='en')
+        page.get_admin_content(language='en')
 
         request = RequestFactory().get('/')
         request.current_page = page
