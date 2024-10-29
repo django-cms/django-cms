@@ -50,7 +50,7 @@ class TemplatetagTests(CMSTestCase):
         german_content = create_page_content("de", "AdminURLTestPage German Content", page)
 
         # Try to fill the cache with partial data (this should not be possible)
-        page.get_content_obj(language='en')
+        page.get_content_obj(language='en')  # should not affect admin template tag
         page.get_admin_content(language='en')
 
         request = RequestFactory().get('/')
