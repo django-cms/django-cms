@@ -27,7 +27,7 @@ from cms.models import (
     PageUrl,
     Placeholder,
 )
-from cms.templatetags.cms_admin import GetPreviewUrl, get_page_display_name
+from cms.templatetags.cms_admin import GetAdminUrlForLanguage, GetPreviewUrl, get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
@@ -43,6 +43,28 @@ from cms.utils.placeholder import get_placeholders
 
 
 class TemplatetagTests(CMSTestCase):
+    def test_admin_pagecontent_language_tab_urls(self):
+        # Same setup as in the templatetag test above
+        page = create_page('AdminURLTestPage English Content', 'nav_playground.html', 'en')
+        english_content = page.pagecontent_set(manager="admin_manager").first()
+        german_content = create_page_content("de", "AdminURLTestPage German Content", page)
+
+        # Try to fill the cache with partial data (this should not be possible)
+        page.get_content_obj(language='en')  # should not affect admin template tag
+        page.get_admin_content(language='en')  # Should fill the whole cache
+
+        request = RequestFactory().get('/')
+        request.current_page = page
+        template = """
+            {% load cms_tags cms_admin %}
+            {% get_admin_url_for_language page_obj 'en' %}
+            {% get_admin_url_for_language page_obj 'de' %}
+            {% get_admin_url_for_language page_obj 'fr' %}
+        """
+        output = self.render_template_obj(template, {'page_obj': page}, request)
+        self.assertIn(f'/en/admin/cms/pagecontent/{english_content.pk}/change/', output)
+        self.assertIn(f'/en/admin/cms/pagecontent/{german_content.pk}/change/', output)
+        self.assertIn(f'/en/admin/cms/pagecontent/add/?cms_page={page.pk}&language=fr', output)
 
     def test_get_preview_url(self):
         """The get_preview_url template tag returns the content preview url for its language:
