@@ -27,7 +27,7 @@ from cms.models import (
     PageUrl,
     Placeholder,
 )
-from cms.templatetags.cms_admin import GetPreviewUrl, get_page_display_name
+from cms.templatetags.cms_admin import GetAdminUrlForLanguage, GetPreviewUrl, get_page_display_name
 from cms.templatetags.cms_js_tags import json_filter
 from cms.templatetags.cms_tags import (
     _get_page_by_untyped_arg,
@@ -43,6 +43,48 @@ from cms.utils.placeholder import get_placeholders
 
 
 class TemplatetagTests(CMSTestCase):
+    def test_get_admin_url_for_language(self):
+        # This creates a new page and the corresponding PageContent object for lang 'en', both with pk=1
+        page = create_page("AdminURLTestPage English Content", "nav_playground.html", "en")
+
+        # German PageContent will have pk=2
+        german_content = create_page_content("de", "AdminURLTestPage German Content", page)
+
+
+        request = RequestFactory().get('/')
+        request.current_page = page
+        with force_language('de'):
+            url = GetAdminUrlForLanguage.get_value(None, context={'request': request}, page=page, language="de")
+            # We expect that getting the German URL will return the German page content (change link, not a create link)
+            self.assertEqual(url, '/de/admin/cms/pagecontent/2/change/')
+
+        with force_language('en'):
+            url = GetAdminUrlForLanguage.get_value(None, context={'request': request}, page=page, language="en")
+            # Same goes for the English URL
+            self.assertEqual(url, '/en/admin/cms/pagecontent/1/change/')
+
+        with force_language('fr'):
+            url = GetAdminUrlForLanguage.get_value(None, context={'request': request}, page=page, language="fr")
+            # PageContent for the French languag does not exist, we expect a link to create a new PageContent instance
+            self.assertEqual(url, '/fr/admin/cms/pagecontent/add/?cms_page=1&language=fr')
+
+    def test_admin_pagecontent_language_tab_urls(self):
+        # Same setup as in the templatetag test above
+        page = create_page('Test', 'nav_playground.html', 'en')
+        german_content = create_page_content("de", "AdminURLTestPage German Content", page)
+
+        request = RequestFactory().get('/')
+        request.current_page = page
+        template = """
+            {% load cms_tags cms_admin %}
+            {% get_admin_url_for_language page_obj 'en' %}
+            {% get_admin_url_for_language page_obj 'de' %}
+            {% get_admin_url_for_language page_obj 'fr' %}
+        """
+        output = self.render_template_obj(template, {'page_obj': page}, request)
+        self.assertIn('/en/admin/cms/pagecontent/1/change/', output)
+        self.assertIn('/en/admin/cms/pagecontent/2/change/', output)
+        self.assertIn('/en/admin/cms/pagecontent/add/?cms_page=1&language=fr', output)
 
     def test_get_preview_url(self):
         """The get_preview_url template tag returns the content preview url for its language:
