@@ -722,7 +722,7 @@ class Page(MP_Node):
             self.page_content_cache.setdefault(translation.language, translation)
 
     def set_admin_content_cache(self):
-        for translation in self.pagecontent_set(manager="admin_manager").current_content().all():
+        for translation in self.pagecontent_set(manager="admin_manager").latest_content().all():
             self.admin_content_cache.setdefault(translation.language, translation)
 
     def get_admin_content(self, language, fallback=False):
