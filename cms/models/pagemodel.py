@@ -28,6 +28,12 @@ from menus.menu_pool import menu_pool
 logger = getLogger(__name__)
 
 
+class AdminCacheDict(dict):
+    """Dictionary that disallows setting individual items to prevent accidental cache corruption."""
+    def __setitem__(self, key, value):
+        raise ValueError("Do not set individual items in the admin cache dict. Use the clear_cache method instead.")
+
+
 class Page(MP_Node):
     """
     A ``Page`` is the basic unit of site structure in django CMS. The CMS uses a hierarchical page model: each page
@@ -139,7 +145,7 @@ class Page(MP_Node):
         self.urls_cache = {}
         self.page_content_cache = {}
         #: Internal cache for page content objects visible publicly
-        self.admin_content_cache = {}
+        self.admin_content_cache = AdminCacheDict()
         #: Internal cache for page content objects visible in the admin (i.e. to staff users.)
         #: Might be larger than the page_content_cache
 
@@ -203,7 +209,7 @@ class Page(MP_Node):
     def _clear_internal_cache(self):
         self.urls_cache = {}
         self.page_content_cache = {}
-        self.admin_content_cache = {}
+        self.admin_content_cache = AdminCacheDict()
 
         if hasattr(self, '_prefetched_objects_cache'):
             del self._prefetched_objects_cache
@@ -722,6 +728,7 @@ class Page(MP_Node):
             self.page_content_cache.setdefault(translation.language, translation)
 
     def set_admin_content_cache(self):
+        self.admin_conent_cache = AdminCacheDict()
         for translation in self.pagecontent_set(manager="admin_manager").latest_content().all():
             self.admin_content_cache.setdefault(translation.language, translation)
 
