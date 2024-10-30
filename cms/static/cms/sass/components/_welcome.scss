@@ -29,20 +29,16 @@
         display: none;
     }
 
-    .cms-welcome-section,
-    .cms-welcome-footer {
-        box-sizing: border-box;
-        width: $welcome-width;
-        min-width: $welcome-min-width;
-        margin: 0 auto;
-    }
-
     // header area
     .cms-welcome-header {
         text-align: center;
+        h2, p {
+            text-align: center;
+        }
+        padding-bottom: $padding-normal;
     }
 
-    .cms-welcome-heading {
+    h1 {
         color: $gray-light;
         font-size: 22px;
         font-weight: 200;
@@ -52,6 +48,25 @@
         .cms-icon {
             color: $color-success;
         }
+    }
+
+    h2 {
+        font-size: $font-size-large;
+        font-weight: bold;
+        padding-bottom: 10px;
+    }
+
+    p.lead {
+        font-size: $font-size-large;
+        font-weight: 200;
+        margin-bottom: 40px;
+    }
+
+    a.cms-btn-action {
+        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border);
+        padding: $padding-normal $padding-large;
+        font-size: $font-size-normal;
+        font-weight: bold;
     }
 
     .cms-welcome-logo {
@@ -70,28 +85,24 @@
         }
     }
 
+    .cms-welcome-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
+    }
     // section area
     .cms-welcome-section {
+        display: inline-block;
         box-shadow: 0 0 5px $gray-lighter;
         padding: $padding-large;
-        margin-bottom: 5px;
+        margin-top: 30px;
+        margin-bottom: $padding-large;
         background: $white;
-        h2 {
-            font-size: $font-size-large;
-            font-weight: bold;
-            padding-bottom: 10px;
-        }
         p + h2 {
             padding-top: $padding-large;
         }
         p {
             padding: 2 * $padding-base 0;
-        }
-        button.cms-btn-action {
-            @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border);
-            padding: $padding-normal $padding-large;
-            font-size: $font-size-normal;
-            font-weight: bold;
         }
         li {
             list-style-type: disc;
@@ -101,6 +112,7 @@
 
     // footer area
     .cms-welcome-links {
+        text-align: center;
         padding: 10px 5px;
         margin: 0 0 15px;
         border-bottom: 1px solid $gray-lighter;

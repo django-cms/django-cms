@@ -17,64 +17,64 @@
         <header class="cms-welcome-header">
             <h1 class="cms-welcome-heading">
                 <span class="cms-icon cms-icon-check"></span>
-                {% trans "Installation successful!" %}
+                {% trans "Welcome to your new django CMS installation!" %}
             </h1>
             <a href="/" class="cms-welcome-logo">
                 <span class="cms-hidden">{% trans "django CMS" %}</span>
             </a>
-        </header>
-        {{ request.version }}
-
-        <section class="cms-welcome-section">
             <h2>
-                {% if user.is_authenticated %}
-                    {% trans "Time to build something great!" %}
-                {% else %}
-                    {% trans "Please log in" %}
-                {% endif %}
-            </h2>
-            <p>
                 {% blocktrans %}
                     Welcome to django CMS version <strong>{{ cms_version }}</strong>.
                 {% endblocktrans %}
-                {% blocktrans %}
-                    You’ve successfully installed your new CMS – bring your content to life now! Create your
-                    first page and explore the full potential of django CMS!
-                {% endblocktrans %}
-            </p>
-            <p>
-                {% url "admin:cms_page_add" as admin_add_page %}
+            </h2>
+            <p class="lead">
                 {% if user.is_authenticated %}
-                    {% blocktrans %}
-                        <button class="js-welcome-add cms-btn cms-btn-action">Add the first page</button>
-                    {% endblocktrans %}
+                    {% trans "Let’s build something great together!!" %}
                 {% else %}
-                    {% blocktrans %}
-                        JavaScript seems to be disabled so please
-                        <a href="{{ admin_add_page }}" class="js-welcome-add">add a page</a> manually.
-                    {% endblocktrans %}
+                    {% trans "Please log in" %}
                 {% endif %}
             </p>
+            {% url "admin:cms_page_add" as admin_add_page %}
             {% blocktrans %}
-                <h2>Django CMS is free – help us keep it that way!</h2>
-                <p>
-                    If you value django CMS, your support-through code, feedback, or donations-helps it grow.
-                    Explore, and when you're ready, <a href="//github.com/sponsors/django-cms">sponsor on GitHub</a>
-                    (save this link for later) to keep it thriving!
-                </p>
-                <p>
-                    Explore django CMS, enjoy it, and when you're ready,
-                </p>
-                <ul>
-                    <li>
-                        as a private user <a href="//github.com/sponsors/django-cms">sponsor the project on GitHub</a>, or
-                    </li>
-                    <li>
-                        as a professional user <a href="//www.django-cms.org/en/donate/">pick a membership tier</a>.
-                    </li>
-                </ul>
-                <p>Help us grow django CMS.</p>
+                <a class="js-welcome-add cms-btn cms-btn-action">Add your first page</a>
             {% endblocktrans %}
+        </header>
+
+        <section class="cms-welcome-cards">
+            <div class="cms-welcome-section">
+                <h2>Help funding django CMS!</h2>
+                <p>
+                    Your funding directly benefits the product, mainly through the
+                    <a href="https://www.django-cms.org/en/fellowship-program/)!">django CMS Fellowship Program</a>!
+                </p>
+                <p>
+                    A quick way for yourself or your organisation to donate is on
+                    <a href="https://github.com/sponsors/django-cms">Github Sponsors</a>.
+                </p>
+            </div>
+            <div class="cms-welcome-section">
+                <h2>Join the django CMS Association!</h2>
+                <p>
+                    The django CMS Association is a non-profit organisation that funds and steers the development of
+                    django CMS.
+                </p>
+                <p>
+                    You can <a href="https://www.django-cms.org/en/memberships/">join both as an individual or as an
+                    organisation</a>.
+                </p>
+            </div>
+            <div class="cms-welcome-section">
+                {% blocktranslate %}
+                    <h2>Help us make django CMS even better!</h2>
+                    <ul>
+                        <li><a href="https://www.django-cms.org/en/contribute/">Contribute code:</a> fix a bug or
+                            implement a new feature!</li>
+                        <li><a href="https://www.django-cms.org/en/volunteering-opportunities/">Volunteer:</a>
+                            We offer fun and efficient team work!</li>
+                        <li><a>Open-source your work:</a> Make the ecosystem strong.</li>
+                    </ul>
+                {% endblocktranslate %}
+            </div>
         </section>
 
         <footer class="cms-welcome-footer">
