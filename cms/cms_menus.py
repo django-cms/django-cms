@@ -141,7 +141,7 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
         translation = page.page_content_cache.get(lang)
 
         if translation:
-            page_url = page.urls_cache[lang]
+            page_url = page.urls_cache[translation.language]
             # Do we have a redirectURL?
             attr["redirect_url"] = translation.redirect  # save redirect URL if any
 
