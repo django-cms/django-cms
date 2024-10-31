@@ -537,7 +537,7 @@ def has_generic_permission(page, user, action, site=None, check_global=True, use
     if site is None:
         site = get_current_site()
 
-    page_path = page.node.path
+    page_path = page.path
     actions_map = {
         'add_page': get_add_perm_tuples,
         'change_page': get_change_perm_tuples,

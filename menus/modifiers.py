@@ -1,3 +1,4 @@
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from menus.base import Modifier
 from menus.menu_pool import menu_pool
 
@@ -5,11 +6,32 @@ from menus.menu_pool import menu_pool
 class Marker(Modifier):
     """
     Searches the current selected node and marks them.
-    - current_node (bool): Whether the current node is selected.
-    - siblings (bool): Whether siblings of the current node are marked.
-    - descendants (bool): Whether descendants of the current node are marked.
-    - ancestors (bool): Whether ancestors of the current node are marked.
+
+    :param current_node: Whether the current node is selected.
+    :type current_node: bool
+    :param sibling: Whether siblings of the current node are marked.
+    :type sibling: bool
+    :param descendant: Whether descendants of the current node are marked.
+    :type descendant: bool
+    :param ancestor: Whether ancestors of the current node are marked.
+    :type ancestor: bool
+
+    .. note::
+       This modifier is deprecated and will be removed in django CMS 4.3. The menu pool now provides the same functionality out of the box.
     """
+
+    def __init__(self, *args, **kwargs):
+        import warnings
+
+        warnings.warn(
+            "The Marker modifier is deprecated and will be removed. The functionality is now provided "
+            "by the menu_pool itself.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
+
+
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         """
         Modifies a list of nodes based on certain conditions.
@@ -88,21 +110,22 @@ class Level(Modifier):
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         """
-        Modify the given list of nodes based on the specified conditions.
+        Modify the list of nodes based on certain conditions.
 
-        Args:
-            self: The current instance of the class.
-            request: The request object associated with the operation.
-            nodes (list): A list of node objects.
-            namespace: The namespace associated with the nodes.
-            root_id: The ID of the root node.
-            post_cut (bool): Flag indicating whether the modification is being done after the cut operation.
-            breadcrumb (bool): Flag indicating whether the breadcrumb data is being used.
-
-        Returns:
-            list: The modified list of nodes.
+        :param self: The instance of the class containing this method.
+        :param request: The current request object.
+        :param nodes: A list of nodes to be modified.
+        :type nodes: list
+        :param namespace: The namespace.
+        :param root_id: The ID of the root node.
+        :param post_cut: Flag indicating if the modification is happening after cutting.
+        :type post_cut: bool
+        :param breadcrumb: Flag indicating if the modification is happening for the breadcrumb.
+        :type breadcrumb: bool
+        :return: The modified list of nodes.
+        :rtype: list
         """
-        """"""
+
         if breadcrumb:
             return nodes
         for node in nodes:
@@ -120,15 +143,13 @@ class Level(Modifier):
         """
         Mark the levels of menu items.
 
-        Args:
-            node (Node): The root node of the menu hierarchy.
-            post_cut (bool): Flag indicating whether the function is called after a cut is made.
-
-        Returns:
-            None
-
-        Raises:
-            None
+        :param node: The root node of the menu hierarchy.
+        :type node: Node
+        :param post_cut: Flag indicating whether the function is called after a cut is made.
+        :type post_cut: bool
+        :returns: None
+        :rtype: None
+        :raises None: This function does not raise any exceptions.
         """
         for child in node.children:
             if post_cut:
@@ -146,19 +167,19 @@ class AuthVisibility(Modifier):
         """
         Modify the list of nodes based on certain conditions.
 
-        Args:
-            self: The instance of the class containing this method.
-            request: The current request object.
-            nodes (list): A list of nodes to be modified.
-            namespace: The namespace.
-            root_id: The ID of the root node.
-            post_cut (bool): Flag indicating if the modification is happening after cutting.
-            breadcrumb (bool): Flag indicating if the modification is happening for the breadcrumb.
-
-        Returns:
-            list: The modified list of nodes.
+        :param self: The instance of the class containing this method.
+        :param request: The current request object.
+        :param nodes: A list of nodes to be modified.
+        :type nodes: list
+        :param namespace: The namespace.
+        :param root_id: The ID of the root node.
+        :param post_cut: Flag indicating if the modification is happening after cutting.
+        :type post_cut: bool
+        :param breadcrumb: Flag indicating if the modification is happening for the breadcrumb.
+        :type breadcrumb: bool
+        :return: The modified list of nodes.
+        :rtype: list
         """
-        """"""
         if post_cut or breadcrumb:
             return nodes
         final = []
@@ -173,8 +194,7 @@ class AuthVisibility(Modifier):
 
 def register():
     """
-    Register the Marker, AuthVisibility, and Level modifiers to the menu pool.
+    Register the AuthVisibility and Level modifiers to the menu pool.
     """
-    menu_pool.register_modifier(Marker)
     menu_pool.register_modifier(AuthVisibility)
     menu_pool.register_modifier(Level)

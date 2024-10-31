@@ -130,9 +130,6 @@ class PlaceholderRelationField(GenericRelation):
             @cached_property
             def content(self):
                 return get_placeholder_from_slot(self.placeholders, "content")  # A specific placeholder
-
-
-
     """
     default_checks = []
 
