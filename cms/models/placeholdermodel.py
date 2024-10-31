@@ -692,7 +692,7 @@ class Placeholder(models.Model):
             self._shift_plugin_positions(
                 instance.language,
                 start=instance.position,
-                offset=last_plugin.position + 1,
+                offset=last_plugin.position,
             )
             self._recalculate_plugin_positions(instance.language)
 
@@ -740,10 +740,7 @@ class Placeholder(models.Model):
 
     def _shift_plugin_positions(self, language, start, offset=None):
         if offset is None:
-            offset = self.get_last_plugin_position(language)
-            if offset is None:
-                return
-            offset += 1
+            offset = self.get_last_plugin_position(language) or 0
         self.get_plugins(language).filter(
             position__gte=start
         ).update(position=models.F('position') + offset)
