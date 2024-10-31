@@ -21,7 +21,6 @@ from cms.toolbar.utils import (
 from cms.toolbar_base import CMSToolbar
 from cms.toolbar_pool import toolbar_pool
 from cms.utils import get_language_from_request, page_permissions
-from cms.utils.compat import DJANGO_4_2
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_dict, get_language_tuple
@@ -633,14 +632,14 @@ class PageToolbar(CMSToolbar):
 
             # page settings
             page_settings_url = add_url_parameters(page_settings_url, language=self.toolbar.request_language)
-            settings_disabled = not edit_mode or not can_change
+            settings_disabled = not can_change
             current_page_menu.add_modal_item(_('Page settings'), url=page_settings_url, disabled=settings_disabled,
                                              on_close=refresh)
 
             # advanced settings
             advanced_url = add_url_parameters(advanced_url, language=self.toolbar.request_language)
             can_change_advanced = self.page.has_advanced_settings_permission(self.request.user)
-            advanced_disabled = not edit_mode or not can_change_advanced
+            advanced_disabled = not can_change_advanced
             current_page_menu.add_modal_item(_('Advanced settings'), url=advanced_url, disabled=advanced_disabled)
 
             # templates menu
