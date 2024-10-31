@@ -109,7 +109,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual(sorted(placeholders), sorted(['new_one', 'new_two', 'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
-        placeholders = self.assertWarns(
+        placeholders = self.failUnlessWarns(
             DuplicatePlaceholderWarning,
             'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
             _get_placeholder_slots, 'placeholder_tests/test_seven.html'

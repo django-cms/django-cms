@@ -95,6 +95,13 @@ Miscellaneous
   on page content objects. Use ``cms.cms_menus.get_visible_page_contents``
   instead.
 
+* The ``cms.test_utils.testcases.CMSTestCase`` class's ``assertWarns`` has been
+  removed since it was an alias of ``CMSTestCase.failUnlessWarns`` and shadows
+  Python's ``assertWarns``. In your test cases, use
+  Python's ``assertWarns`` instead, or use the ``failUnlessWarns`` method
+  of ``CMSTestCase`` which retains the syntax of the original method.
+
+
 Features deprecated in 4.2.0
 ============================
 

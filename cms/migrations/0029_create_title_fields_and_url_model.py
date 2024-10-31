@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='title',
             name='xframe_options',
-            field=models.IntegerField(choices=PageContent.X_FRAME_OPTIONS_CHOICES, default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS')),
+            field=models.IntegerField(choices=PageContent.X_FRAME_OPTIONS_CHOICES, default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'), verbose_name="X Frame Options"),
         ),
         migrations.AddField(
             model_name='title',
