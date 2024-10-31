@@ -1376,6 +1376,10 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
             .values_list('pk', flat=True)
         )
 
+        new_tree = self.get_plugins().values_list('pk', 'position')
+        expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+        self.assertSequenceEqual(new_tree, expected)
+
         for plugin in self.get_plugins().filter(parent__isnull=True):
             for plugin_id in [plugin.pk] + tree[plugin.pk]:
                 plugin_tree_all.remove(plugin_id)
