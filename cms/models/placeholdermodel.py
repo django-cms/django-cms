@@ -784,13 +784,6 @@ class Placeholder(models.Model):
             cursor.execute(sql)
         elif db_vendor == 'postgresql':
             sql = (
-                'WITH RowNbrs AS ('
-                '    SELECT ID, ROW_NUMBER() OVER (ORDER BY position) AS RowNbr'
-                '    FROM {0} WHERE placeholder_id=%s AND language=%s '
-                ') UPDATE {0} SET position = RowNbrs.RowNbr '
-                'FROM RowNbrs WHERE {0}.id = RowNbrs.id'
-            )
-            (
                 'UPDATE {0} '
                 'SET position = RowNbrs.RowNbr '
                 'FROM ('
