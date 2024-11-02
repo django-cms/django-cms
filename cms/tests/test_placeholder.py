@@ -1378,18 +1378,10 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
         for plugin in self.get_plugins().filter(parent__isnull=True):
             for plugin_id in [plugin.pk] + tree[plugin.pk]:
                 plugin_tree_all.remove(plugin_id)
-            from django.db import DatabaseError
-            try:
-                prev_count = self.placeholder.get_plugins(language='en').count()
-                plugin.refresh_from_db()
-                self.placeholder.delete_plugin(plugin)
-            except DatabaseError as e:
-                print("After")
-                print(f"{plugin_id=} {self.placeholder.cmsplugin_set.get(pk=plugin_id).position=}")
-                print("Previous count", prev_count)
-                print(f"{self.placeholder.get_plugins(language='en').count()=}")
-                print(f"{max(self.placeholder.get_plugins(language='en').values_list('position', flat=True))=}")
-                raise e
+
+            plugin.refresh_from_db()
+            self.placeholder.delete_plugin(plugin)
+
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected)
@@ -1680,8 +1672,10 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
         for plugin in self.get_plugins().filter(parent__isnull=True):
             for plugin_id in [plugin.pk] + tree[plugin.pk]:
                 plugin_tree_all.remove(plugin_id)
+
             plugin.refresh_from_db()
             self.placeholder.delete_plugin(plugin)
+
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected, f"Failed for {plugin.pk}")

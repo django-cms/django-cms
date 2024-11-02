@@ -63,134 +63,134 @@ jobs:
         DATABASE_URL: postgres://postgres:postgres@127.0.0.1/postgres
 
 
-#  mysql:
-#    runs-on: ${{ matrix.os }}
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
-#        requirements-file: [
-#          django-4.2.txt,
-#          django-5.0.txt,
-#          django-5.1.txt,
-#        ]
-#        os: [
-#          ubuntu-latest,
-#        ]
-#        exclude:
-#          - requirements-file: django-5.0.txt
-#            python-version: 3.9
-#          - requirements-file: django-5.1.txt
-#            python-version: 3.9
-#
-#    services:
-#      mysql:
-#        image: mysql:9.0.1
-#        env:
-#          MYSQL_ALLOW_EMPTY_PASSWORD: yes
-#          MYSQL_DATABASE: djangocms_test
-#        ports:
-#          - 3306:3306
-#        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-#
-#
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: Set up Python ${{ matrix.python-version }}
-#
-#      uses: actions/setup-python@v5
-#      with:
-#        python-version: ${{ matrix.python-version }}
-#        cache: 'pip'
-#    - name: Install dependencies
-#      run: |
-#        sudo apt install gettext gcc -y
-#        python -m pip install --upgrade pip
-#        pip install pytest uv
-#        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
-#        uv pip install --system -r test_requirements/databases.txt
-#        python setup.py install
-#
-#
-#    - name: Test with django test runner
-#      run: |
-#        python manage.py test
-#      env:
-#        DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
-#
-#  sqlite:
-#    runs-on: ${{ matrix.os }}
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
-#        requirements-file: [
-#          django-4.2.txt,
-#          django-5.0.txt,
-#          django-5.1.txt,
-#        ]
-#        os: [
-#          ubuntu-latest,
-#        ]
-#        exclude:
-#          - requirements-file: django-5.0.txt
-#            python-version: 3.9
-#          - requirements-file: django-5.1.txt
-#            python-version: 3.9
-#
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: Set up Python ${{ matrix.python-version }}
-#
-#      uses: actions/setup-python@v5
-#      with:
-#        python-version: ${{ matrix.python-version }}
-#        cache: 'pip'
-#    - name: Install dependencies
-#      run: |
-#        sudo apt install gettext gcc -y
-#        python -m pip install --upgrade pip
-#        pip install pytest uv
-#        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
-#        python setup.py install
-#
-#    - name: Test with django test runner
-#      run: python manage.py test
-#      env:
-#        DATABASE_URL: sqlite://localhost/testdb.sqlite
-#
-#  django-main-sqlite:
-#    runs-on: ${{ matrix.os }}
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        python-version: ['3.12']
-#        requirements-file: ['requirement_base_django_main.txt']
-#        os: [
-#          ubuntu-latest,
-#        ]
-#
-#    steps:
-#    - uses: actions/checkout@v4
-#    - name: Set up Python ${{ matrix.python-version }}
-#
-#      uses: actions/setup-python@v5
-#      with:
-#        python-version: ${{ matrix.python-version }}
-#    - name: Install dependencies
-#      run: |
-#        sudo apt install gettext gcc -y
-#        python -m pip install --upgrade pip
-#        pip install uv
-#        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
-#        uv pip install --system pytest
-#        python setup.py install
-#
-#    - name: Test with django test runner
-#      run: python manage.py test
-#      continue-on-error: true
-#      env:
-#        DATABASE_URL: sqlite://localhost/testdb.sqlite
+  mysql:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
+        requirements-file: [
+          django-4.2.txt,
+          django-5.0.txt,
+          django-5.1.txt,
+        ]
+        os: [
+          ubuntu-latest,
+        ]
+        exclude:
+          - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
+
+    services:
+      mysql:
+        image: mysql:9.0.1
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: djangocms_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -r test_requirements/databases.txt
+        python setup.py install
+
+
+    - name: Test with django test runner
+      run: |
+        python manage.py test
+      env:
+        DATABASE_URL: mysql://root@127.0.0.1/djangocms_test
+
+  sqlite:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
+        requirements-file: [
+          django-4.2.txt,
+          django-5.0.txt,
+          django-5.1.txt,
+        ]
+        os: [
+          ubuntu-latest,
+        ]
+        exclude:
+          - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.9
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install pytest uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        python setup.py install
+
+    - name: Test with django test runner
+      run: python manage.py test
+      env:
+        DATABASE_URL: sqlite://localhost/testdb.sqlite
+
+  django-main-sqlite:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.12']
+        requirements-file: ['requirement_base_django_main.txt']
+        os: [
+          ubuntu-latest,
+        ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        sudo apt install gettext gcc -y
+        python -m pip install --upgrade pip
+        pip install uv
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system pytest
+        python setup.py install
+
+    - name: Test with django test runner
+      run: python manage.py test
+      continue-on-error: true
+      env:
+        DATABASE_URL: sqlite://localhost/testdb.sqlite
 
   django-main-postgres:
     runs-on: ${{ matrix.os }}

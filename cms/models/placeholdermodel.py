@@ -684,21 +684,22 @@ class Placeholder(models.Model):
         :param instance: Plugin to add. It's position parameter needs to be set.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
         """
-        with (transaction.atomic()):
+        with transaction.atomic():
+            # We're using raw sql - make the whole operation atomic
             plugins = self.get_plugins(language=instance.language).count()  # 1st hit: Count plugins
             descendants = instance._get_descendants_ids()  # 2nd hit: Get descendant ids
-            last_position = instance.position + len(descendants)  # Last position of deleted plugins
             to_delete = [instance.pk] + descendants  # Instance plus descendants pk
             self.cmsplugin_set.filter(pk__in=to_delete).delete()  # 3rd hit: Delete all plugins in one query
 
+            last_position = instance.position + len(descendants)  # Last position of deleted plugins
             if last_position < plugins:
-                # Close the gap in the plugin tree
+                # Close the gap in the plugin tree (2 hits)
                 self._shift_plugin_positions(
                     instance.language,
                     start=instance.position,
                     offset=plugins,
                 )
-                self._recalculate_plugin_positions(instance.language)  #4th hit: Recalculate positions
+                self._recalculate_plugin_positions(instance.language)
 
     def get_last_plugin(self, language):
         return self.get_plugins(language).last()
