@@ -693,11 +693,11 @@ class Placeholder(models.Model):
 
             if last_position < plugins:
                 # Close the gap in the plugin tree
-                # self._shift_plugin_positions(
-                #     instance.language,
-                #     start=instance.position,
-                #     offset=plugins,
-                # )
+                self._shift_plugin_positions(
+                    instance.language,
+                    start=instance.position,
+                    offset=plugins,
+                )
                 self._recalculate_plugin_positions(instance.language)  #4th hit: Recalculate positions
 
     def get_last_plugin(self, language):
