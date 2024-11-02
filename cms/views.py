@@ -190,9 +190,7 @@ def details(request, slug):
         redirect_url = _clean_redirect_url(redirect_url, request_language)
 
     if redirect_url:
-        if request.user.is_staff and toolbar.edit_mode_active:
-            toolbar.redirect_url = redirect_url
-        elif redirect_url not in own_urls:
+        if redirect_url not in own_urls:
             if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
                 query_string = request.META.get('QUERY_STRING')
                 if query_string:
