@@ -9,9 +9,10 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language, gettext_lazy as _
+from django.utils.text import capfirst
+from django.utils.translation import get_language, gettext, gettext_lazy as _
 
-from cms.models import Page
+from cms.models import Page, CMSPlugin, PageUrl
 from cms.models.contentmodels import PageContent
 from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request, i18n
@@ -276,3 +277,36 @@ def submit_row_plugin(context):
     if context.get('original') is not None:
         ctx['original'] = context['original']
     return ctx
+
+
+@register.inclusion_tag('admin/cms/page/delete_summary.html', takes_context=Tag)
+def delete_summary(context, model_count: dict) -> dict:
+    model_count = dict(model_count)
+    summary_models = (Page, PageContent, CMSPlugin, PageUrl)
+    page_items = {
+        model.__name__ : (
+            model._meta.verbose_name_plural,
+            model_count.pop(model._meta.verbose_name_plural, 0)
+        )
+        for model in summary_models
+    }
+    def recursively_remove(deleted_objects: list | str) -> list:
+        if isinstance(deleted_objects, str):
+            return deleted_objects
+        result = []
+        for obj in deleted_objects:
+            item = recursively_remove(obj)
+            if isinstance(item, str):
+                if not any(f"{capfirst(item._meta.verbose_name)}:" in obj for item in summary_models):
+                    result.append(item)
+            elif len(item) == 1:
+                result.append(item[0])
+            elif item:
+                result.append(item)
+        return result
+    context["deleted_objects"] = recursively_remove(context["deleted_objects"])
+
+    return {
+        'summary': page_items,
+        'model_count': model_count.items(),
+    }

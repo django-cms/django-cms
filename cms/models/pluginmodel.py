@@ -170,6 +170,8 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     child_plugin_instances = None
 
     class Meta:
+        verbose_name = _("plugin")
+        verbose_name_plural = _("plugins")
         app_label = 'cms'
         ordering = ('position',)
         indexes = [
