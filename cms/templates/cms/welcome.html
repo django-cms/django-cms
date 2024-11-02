@@ -29,7 +29,7 @@
             </h2>
             <p class="lead">
                 {% if user.is_authenticated %}
-                    {% trans "Let’s build something great together!!" %}
+                    {% trans "Let’s build something great together!" %}
                 {% else %}
                     {% trans "Please log in" %}
                 {% endif %}
@@ -42,30 +42,34 @@
 
         <section class="cms-welcome-cards">
             <div class="cms-welcome-section">
-                <h2>Help funding django CMS!</h2>
-                <p>
-                    Your funding directly benefits the product, mainly through the
-                    <a href="https://www.django-cms.org/en/fellowship-program/)!">django CMS Fellowship Program</a>!
-                </p>
-                <p>
-                    A quick way for yourself or your organisation to donate is on
-                    <a href="https://github.com/sponsors/django-cms">Github Sponsors</a>.
-                </p>
-            </div>
-            <div class="cms-welcome-section">
-                <h2>Join the django CMS Association!</h2>
-                <p>
-                    The django CMS Association is a non-profit organisation that funds and steers the development of
-                    django CMS.
-                </p>
-                <p>
-                    You can <a href="https://www.django-cms.org/en/memberships/">join both as an individual or as an
-                    organisation</a>.
-                </p>
+                {% blocktranslate %}
+                    <h2>Help Funding!</h2>
+                    <p>
+                        Your funding directly benefits the product, mainly through the
+                        <a href="https://www.django-cms.org/en/fellowship-program/)!">django CMS Fellowship Program</a>!
+                    </p>
+                    <p>
+                        A quick way for yourself or your organisation to donate is on
+                        <a href="https://github.com/sponsors/django-cms">Github Sponsors</a>.
+                    </p>
+                {% endblocktranslate %}
             </div>
             <div class="cms-welcome-section">
                 {% blocktranslate %}
-                    <h2>Help us make django CMS even better!</h2>
+                    <h2>Join Us!</h2>
+                    <p>
+                        The django CMS Association is a non-profit organisation that funds and steers the development of
+                        django CMS.
+                    </p>
+                    <p>
+                        You can <a href="https://www.django-cms.org/en/memberships/">join both as an individual or as an
+                        organisation</a>.
+                    </p>
+                {% endblocktranslate %}
+            </div>
+            <div class="cms-welcome-section">
+                {% blocktranslate %}
+                    <h2>Make django CMS better!</h2>
                     <ul>
                         <li><a href="https://www.django-cms.org/en/contribute/">Contribute code:</a> fix a bug or
                             implement a new feature!</li>
