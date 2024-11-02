@@ -85,7 +85,6 @@ def details(request, slug):
     # Get a Page model object from the request
     site = get_current_site()
     page = get_page_from_request(request, use_path=slug)
-    toolbar = get_toolbar_from_request(request)
 
     if not page and not slug and not Page.objects.on_site(site).exists():
         # render the welcome page if the requested path is root "/"
