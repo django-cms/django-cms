@@ -21,10 +21,6 @@
         }
     }
 
-    a.welcome-button {
-        @include button-variant($btn-action-color, $btn-action-bgcolor, $btn-action-border);
-    }
-
     .cms-hidden {
         display: none;
     }
@@ -67,6 +63,10 @@
         padding: $padding-normal $padding-large;
         font-size: $font-size-normal;
         font-weight: bold;
+        &:hover {
+            text-decoration: none;
+            cursor: pointer;
+        }
     }
 
     .cms-welcome-logo {
