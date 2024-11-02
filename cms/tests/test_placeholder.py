@@ -1380,9 +1380,15 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
                 plugin_tree_all.remove(plugin_id)
             from django.db import DatabaseError
             try:
+                prev_count = self.placeholder.get_plugins(language='en').count()
+                plugin.refresh_from_db()
                 self.placeholder.delete_plugin(plugin)
             except DatabaseError as e:
-                print(f"{self.placeholder.cmsplugin_set.filter(language='en').all()=}")
+                print("After")
+                print(f"{plugin_id=} {self.placeholder.cmsplugin_set.get(pk=plugin_id).position=}")
+                print("Previous count", prev_count)
+                print(f"{self.placeholder.get_plugins(language='en').count()=}")
+                print(f"{max(self.placeholder.get_plugins(language='en').values_list('position', flat=True))=}")
                 raise e
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
@@ -1615,6 +1621,21 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
 
 
 class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
+    """Same tests as before but now with a different plugin tree:
+
+    Parent 1
+      Parent 2
+        Child
+    Parent 1
+      Parent 2
+        Child
+    Parent 1
+      Parent 2
+        Child
+    Parent 1
+      Parent 2
+        Child
+    """
 
     def create_plugins(self, placeholder):
         for i in range(1, 12, 3):
@@ -1659,7 +1680,8 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
         for plugin in self.get_plugins().filter(parent__isnull=True):
             for plugin_id in [plugin.pk] + tree[plugin.pk]:
                 plugin_tree_all.remove(plugin_id)
+            plugin.refresh_from_db()
             self.placeholder.delete_plugin(plugin)
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
-            self.assertSequenceEqual(new_tree, expected)
+            self.assertSequenceEqual(new_tree, expected, f"Failed for {plugin.pk}")

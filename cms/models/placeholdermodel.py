@@ -684,18 +684,21 @@ class Placeholder(models.Model):
         :param instance: Plugin to add. It's position parameter needs to be set.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
         """
-        with transaction.atomic():
-            instance.get_descendants().delete()
-            instance.delete()
-            last_plugin = self.get_last_plugin(instance.language)
+        with (transaction.atomic()):
+            plugins = self.get_plugins(language=instance.language).count()  # 1st hit: Count plugins
+            descendants = instance._get_descendants_ids()  # 2nd hit: Get descendant ids
+            last_position = instance.position + len(descendants)  # Last position of deleted plugins
+            to_delete = [instance.pk] + descendants  # Instance plus descendants pk
+            self.cmsplugin_set.filter(pk__in=to_delete).delete()  # 3rd hit: Delete all plugins in one query
 
-            if last_plugin:
-                self._shift_plugin_positions(
-                    instance.language,
-                    start=instance.position,
-                    offset=last_plugin.position,
-                )
-                self._recalculate_plugin_positions(instance.language)
+            if last_position < plugins:
+                # Close the gap in the plugin tree
+                # self._shift_plugin_positions(
+                #     instance.language,
+                #     start=instance.position,
+                #     offset=plugins,
+                # )
+                self._recalculate_plugin_positions(instance.language)  #4th hit: Recalculate positions
 
     def get_last_plugin(self, language):
         return self.get_plugins(language).last()
@@ -762,7 +765,7 @@ class Placeholder(models.Model):
                 'UPDATE {0} '
                 'SET position = subquery.new_pos '
                 'FROM ('
-                '  SELECT  ID, ROW_NUMBER() OVER (ORDER BY position) AS new_pos '
+                '  SELECT  ID, ROW_NUMBER() OVER (ORDER BY position, id) AS new_pos '
                 '  FROM {0} WHERE placeholder_id=%s AND language=%s '
                 ') subquery '
                 'WHERE {0}.id=subquery.id'
