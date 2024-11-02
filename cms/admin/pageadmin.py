@@ -734,18 +734,6 @@ class PageContentAdmin(admin.ModelAdmin):
         # Block the admin log for change. A signal takes care of this!
         return
 
-    def get_object(self, request, object_id, from_field=None):
-        """
-        Return an instance matching the field and value provided, the primary
-        key is used if no field is provided. Return ``None`` if no match is
-        found or the object_id fails validation.
-        """
-        obj = super().get_object(request, object_id, from_field)
-
-        if obj:
-            obj.page.admin_content_cache[obj.language] = obj
-        return obj
-
     def get_admin_url(self, action, *args):
         url_name = f"{self.opts.app_label}_{self.opts.model_name}_{action}"
         return admin_reverse(url_name, args=args)
@@ -1319,7 +1307,7 @@ class PageContentAdmin(admin.ModelAdmin):
             Prefetch(
                 'pagecontent_set',
                 to_attr='filtered_translations',
-                queryset=PageContent.admin_manager.get_queryset()   ,
+                queryset=PageContent.admin_manager.get_queryset().latest_content(),
             ),
         )
         rows = self.get_tree_rows(
@@ -1417,5 +1405,3 @@ class PageContentAdmin(admin.ModelAdmin):
                 ),
             ]
         return "", []
-
-

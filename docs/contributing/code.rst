@@ -20,7 +20,7 @@ Here's what the contribution process looks like in brief:
 #. After that, please join our Discord server (`#contributors <https://discord-contributors-channel.django-cms.org>`_). This group of friendly community members is dedicated to reviewing pull requests. Report your PR and find a “pr review buddy” who is going to review your pull request.
 #. Get acknowledged by the django CMS community for your contribution
 
-See the :ref:`contributing_patch` how-to document for a walk-through of this process.
+See :ref:`contributing_patch` for a walk-through of this process.
 
 
 ********************************
@@ -202,3 +202,8 @@ the source modules.
 .. _freenode: http://freenode.net/
 .. _pull request: http://help.github.com/send-pull-requests/
 .. _git: http://git-scm.com/
+
+.. toctree::
+    :maxdepth: 1
+
+    contribute-patch
