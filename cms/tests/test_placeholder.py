@@ -1613,20 +1613,23 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
 
 
 class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
-    """Same tests as before but now with a different plugin tree:
+    """
+    Same tests as for PlaceholderFlatPluginTests but now with a different plugin tree:
 
-    Parent 1
-      Parent 2
-        Child
-    Parent 1
-      Parent 2
-        Child
-    Parent 1
-      Parent 2
-        Child
-    Parent 1
-      Parent 2
-        Child
+    ::
+
+        Parent 1
+          Parent 2
+            Child
+        Parent 1
+          Parent 2
+            Child
+        Parent 1
+          Parent 2
+            Child
+        Parent 1
+          Parent 2
+            Child
     """
 
     def create_plugins(self, placeholder):
@@ -1678,4 +1681,4 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
 
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
-            self.assertSequenceEqual(new_tree, expected, f"Failed for {plugin.pk}")
+            self.assertSequenceEqual(new_tree, expected)
