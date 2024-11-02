@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import connection, models
+from django.db import connection, models, transaction
 from django.template.defaultfilters import title
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
@@ -684,17 +684,18 @@ class Placeholder(models.Model):
         :param instance: Plugin to add. It's position parameter needs to be set.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
         """
-        instance.get_descendants().delete()
-        instance.delete()
-        last_plugin = self.get_last_plugin(instance.language)
+        with transaction.atomic():
+            instance.get_descendants().delete()
+            instance.delete()
+            last_plugin = self.get_last_plugin(instance.language)
 
-        if last_plugin:
-            self._shift_plugin_positions(
-                instance.language,
-                start=instance.position,
-                offset=last_plugin.position,
-            )
-            self._recalculate_plugin_positions(instance.language)
+            if last_plugin:
+                self._shift_plugin_positions(
+                    instance.language,
+                    start=instance.position,
+                    offset=last_plugin.position,
+                )
+                self._recalculate_plugin_positions(instance.language)
 
     def get_last_plugin(self, language):
         return self.get_plugins(language).last()
@@ -756,15 +757,15 @@ class Placeholder(models.Model):
         cursor = _get_database_cursor('write')
         db_vendor = _get_database_vendor('write')
 
-        if db_vendor == 'sqlite' or db_vendor == 'postgresql' or db_vendor == 'mysql':
+        if db_vendor in ('sqlite', 'postgresql'):
             sql = (
                 'UPDATE {0} '
-                'SET position = RowNbrs.RowNbr '
+                'SET position = subquery.new_pos '
                 'FROM ('
-                'SELECT  ID, ROW_NUMBER() OVER (ORDER BY position) AS RowNbr '
-                'FROM {0} WHERE placeholder_id=%s AND language=%s '
-                ') AS RowNbrs '
-                'WHERE {0}.id=RowNbrs.id'
+                '  SELECT  ID, ROW_NUMBER() OVER (ORDER BY position) AS new_pos '
+                '  FROM {0} WHERE placeholder_id=%s AND language=%s '
+                ') subquery '
+                'WHERE {0}.id=subquery.id'
             )
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
             cursor.execute(sql, [self.pk, language])
