@@ -23,9 +23,7 @@
                 <span class="cms-hidden">{% trans "django CMS" %}</span>
             </a>
             <h2>
-                {% blocktrans %}
-                    Welcome to django CMS version <strong>{{ cms_version }}</strong>.
-                {% endblocktrans %}
+                {% blocktrans %}Version {{ cms_version }}{% endblocktrans %}
             </h2>
             <p class="lead">
                 {% if user.is_authenticated %}
