@@ -85,7 +85,6 @@ def details(request, slug):
     # Get a Page model object from the request
     site = get_current_site()
     page = get_page_from_request(request, use_path=slug)
-    toolbar = get_toolbar_from_request(request)
 
     if not page and not slug and not Page.objects.on_site(site).exists():
         # render the welcome page if the requested path is root "/"
@@ -190,9 +189,7 @@ def details(request, slug):
         redirect_url = _clean_redirect_url(redirect_url, request_language)
 
     if redirect_url:
-        if request.user.is_staff and toolbar.edit_mode_active:
-            toolbar.redirect_url = redirect_url
-        elif redirect_url not in own_urls:
+        if redirect_url not in own_urls:
             if get_cms_setting('REDIRECT_PRESERVE_QUERY_PARAMS'):
                 query_string = request.META.get('QUERY_STRING')
                 if query_string:
@@ -325,6 +322,11 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
 
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
+
+    if request.user.is_staff and toolbar.edit_mode_active:
+        redirect = getattr(content_type_obj, "redirect", None)
+        if isinstance(redirect, str):
+            toolbar.redirect_url = redirect
 
     if require_editable and not toolbar.object_is_editable():
         # If not editable, switch from edit to preview endpoint
