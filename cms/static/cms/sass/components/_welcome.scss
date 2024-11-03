@@ -30,6 +30,8 @@
         text-align: center;
         h2, p {
             text-align: center;
+        }
+        h2 {
             padding-bottom: 30px;
         }
         padding-bottom: $padding-normal;
@@ -56,7 +58,7 @@
     p.lead {
         font-size: $font-size-large;
         font-weight: 200;
-        margin-bottom: 40px;
+        margin-bottom: $padding-large + 10px;
     }
 
     a.cms-btn-action {
