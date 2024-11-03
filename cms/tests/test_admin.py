@@ -2,6 +2,7 @@ import json
 
 from django.contrib import admin
 from django.contrib.admin.sites import site
+from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
@@ -12,6 +13,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 
 from cms import api
+from cms.admin.forms import ChangePageForm
 from cms.api import add_plugin, create_page, create_page_content
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import PageContent, StaticPlaceholder, UserSettings
@@ -797,6 +799,28 @@ class AdminFormsTests(AdminTestsBase):
                 ))
             )
 
+class PagePropsMovedToPageContentTests(CMSTestCase):
+
+    def test_moved_fields(self):
+        non_editables = [
+            'id',
+            'changed_by',
+            'changed_date',
+            'created_by',
+            'creation_date',
+            'page_id',
+            'in_navigation',
+            'language'
+        ]
+
+        change_page_form_fieldsets = flatten_fieldsets(ChangePageForm.fieldsets)
+        page_content_fields = [field.attname for field in PageContent._meta.fields]
+
+        # filter the non editables from PageContent fields
+        filtered_page_content_fields = list(set(page_content_fields) - set(non_editables))
+
+        for field in filtered_page_content_fields:
+            self.assertIn(field, change_page_form_fieldsets)
 
 class AdminPageEditContentSizeTests(AdminTestsBase):
     """

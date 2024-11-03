@@ -101,6 +101,28 @@ class ViewTests(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.apphook_clear()
 
+    def test_redirect_preview_in_edit_mode(self):
+
+        user = self.get_superuser()
+        page = create_page("page", "nav_playground.html", "fr")
+        page_content = create_page_content("en", "home", page, redirect="https://example.com")
+
+        page.set_as_homepage()
+
+        with self.login_user_context(user), force_language('fr'):
+            edit_url = get_object_edit_url(page_content, language='fr')
+            response = self.client.get(edit_url, follow=True)
+
+            expected = f"""
+                <div class="cms-screenblock">
+                <div class="cms-screenblock-inner">
+                <h1>This page has no preview!</h1>
+                <p>It is being redirected to: <a href="{page_content.redirect}">{page_content.redirect}</a></p>
+                </div>
+                </div>
+            """
+            self.assertContains(response, expected, count=1, html=True)
+
     def test_external_redirect(self):
         # test external redirect
         redirect_one = 'https://www.django-cms.org/'
@@ -406,6 +428,7 @@ class ContextTests(CMSTestCase):
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)
 
+
 class EndpointTests(CMSTestCase):
 
     def setUp(self) -> None:
@@ -437,7 +460,7 @@ class EndpointTests(CMSTestCase):
         self._add_plugin_to_placeholder(placeholder, "TextPlugin", language="fr")
         with force_language("fr"):
             setting, _ = UserSettings.objects.get_or_create(user=self.get_superuser())
-            setting.language="fr"
+            setting.language = "fr"
             setting.save()
             structure_endpoint_url = admin_reverse(
                 "cms_placeholder_render_object_structure",

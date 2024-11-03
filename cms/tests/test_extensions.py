@@ -435,7 +435,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
         message = "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin"
         with self.login_user_context(self.admin):
-            self.assertWarns(
+            self.failUnlessWarns(
                 RemovedInDjangoCMS43Warning,
                 message,
                 lambda: self.client.get(self.page.get_absolute_url()),
