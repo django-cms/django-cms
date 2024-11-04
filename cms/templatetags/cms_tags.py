@@ -573,7 +573,7 @@ class CMSEditableObject(InclusionTag):
                     if not view_url:
                         if isinstance(instance, CMSPlugin):
                             # Plugins do not have a registered admin. They are managed by the placeholder admin.
-                            view_url = f'admin:cms_placeholder_edit_field'
+                            view_url = 'admin:cms_placeholder_edit_field'
                         else:
                             view_url = f'admin:{opts.app_label}_{opts.model_name}_edit_field'
                     if view_url.endswith('_changelist'):
