@@ -1014,7 +1014,6 @@ register.tag('render_model_add_block', CMSEditableObjectAddBlock)
 register.tag('render_model_add', CMSEditableObjectAdd)
 register.tag('render_model_icon', CMSEditableObjectIcon)
 register.tag('render_model', CMSEditableObject)
-register.tag('render_inline_field', CMSInlineField)
 register.simple_tag(
     _show_placeholder_by_id,
     takes_context=True,
