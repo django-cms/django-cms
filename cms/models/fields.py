@@ -10,7 +10,7 @@ from cms.models.placeholdermodel import Placeholder
 class PlaceholderField(models.ForeignKey):
     """
     .. warning::
-        This field is for django CMS versions below 4 only. It may only used for migrations.
+        This field is for django CMS versions below 4 only. It may only be used for migrations.
 
     The ``PlaceholderField`` has been replaced by the :class:`~cms.models.fields.PlaceholderRelationField`,
     the built-in migrations will automatically take care of the replacement.
