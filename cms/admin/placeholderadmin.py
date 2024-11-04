@@ -33,6 +33,7 @@ from cms.exceptions import PluginLimitReached
 from cms.models.placeholdermodel import Placeholder
 from cms.models.placeholderpluginmodel import PlaceholderReference
 from cms.models.pluginmodel import CMSPlugin
+from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree
@@ -93,6 +94,7 @@ class FrontendEditableAdminMixin:
         Register the url for the single field edit view
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f"{info}_{fn.__name__}")
         url_patterns = [
@@ -139,7 +141,8 @@ class FrontendEditableAdminMixin:
         if not cancel_clicked and request.method == 'POST':
             form = form_class(instance=obj, data=request.POST)
             if form.is_valid():
-                form.save()
+                new_object = form.save(commit=False)
+                self.save_model(request, new_object, form, change=True)  # Call save model like the admin does
                 saved_successfully = True
         else:
             form = form_class(instance=obj)
@@ -168,6 +171,9 @@ class FrontendEditableAdminMixin:
             })
             return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
+            if isinstance(self, CMSPluginBase):
+                # Update the structure board by populating the data bridge
+                return self.render_close_frame(request, obj)
             return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
@@ -226,6 +232,7 @@ class PlaceholderAdmin(admin.ModelAdmin):
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f"{info}_{fn.__name__}")
         url_patterns = [
@@ -1126,5 +1133,3 @@ class PlaceholderAdmin(admin.ModelAdmin):
         }
         request.current_app = self.admin_site.name
         return TemplateResponse(request, "admin/cms/page/plugin/delete_confirmation.html", context)
-
-

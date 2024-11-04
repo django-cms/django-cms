@@ -53,7 +53,6 @@ from cms.cache.permissions import clear_permission_cache
 from cms.constants import MODAL_HTML_REDIRECT
 from cms.models import (
     CMSPlugin,
-    EmptyPageContent,
     GlobalPagePermission,
     Page,
     PageContent,
@@ -169,6 +168,7 @@ class PageAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
@@ -763,6 +763,7 @@ class PageContentAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
@@ -915,7 +916,6 @@ class PageContentAdmin(admin.ModelAdmin):
             url = get_object_edit_url(obj)  # Redirects to preview if necessary
             return HttpResponse(MODAL_HTML_REDIRECT.format(url=url))
         return super().response_add(request, obj)
-
 
     def get_filled_languages(self, request, page):
         site_id = get_site(request).pk
@@ -1121,7 +1121,6 @@ class PageContentAdmin(admin.ModelAdmin):
         else:
             if to_template not in (placeholder_set[0] for placeholder_set in get_cms_setting('PLACEHOLDERS')):
                 return HttpResponseBadRequest(_("Placeholder selection not valid"))
-
 
         page_content.template = to_template
         page_content.save()
