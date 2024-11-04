@@ -761,14 +761,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         conf = {
             'col_left': {
-                'default_plugins' : [
+                'default_plugins': [
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{'body':'<p>en default body 1</p>'},
+                        'plugin_type': 'TextPlugin',
+                        'values': {'body': '<p>en default body 1</p>'},
                     },
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{'body':'<p>en default body 2</p>'},
+                        'plugin_type': 'TextPlugin',
+                        'values': {'body': '<p>en default body 2</p>'},
                     },
                 ]
             },
@@ -1375,6 +1375,10 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
             .get_plugins()
             .values_list('pk', flat=True)
         )
+
+        new_tree = self.get_plugins().values_list('pk', 'position')
+        expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
+        self.assertSequenceEqual(new_tree, expected)
 
         for plugin in self.get_plugins().filter(parent__isnull=True):
             for plugin_id in [plugin.pk] + tree[plugin.pk]:

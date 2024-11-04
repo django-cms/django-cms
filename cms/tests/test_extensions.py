@@ -16,7 +16,7 @@ from cms.test_utils.project.extensionapp.models import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar_pool import toolbar_pool
-from cms.utils.compat.warnings import RemovedInDjangoCMS42Warning, RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.urlutils import admin_reverse
 
 
@@ -427,6 +427,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
         class SampleExtensionToolbar2(ExtensionToolbar):
             model = MyPageContentExtension
+
             def populate(self):
                 nonlocal urls
                 urls = self.get_title_extension_admin()

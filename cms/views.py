@@ -94,7 +94,6 @@ def details(request, slug):
     # Get a Page model object from the request
     site = get_current_site()
     page = get_page_from_request(request, use_path=slug)
-    toolbar = get_toolbar_from_request(request)
     tree_nodes = TreeNode.objects.get_for_site(site)
 
     if not page and not slug and not tree_nodes.exists():

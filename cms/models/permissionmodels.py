@@ -231,7 +231,7 @@ class PermissionTuple(tuple):
         return False
 
     def allow_list(self, filter: str = "", steplen: int = TreeNode.steplen) -> Q:
-        if filter !="":
+        if filter != "":
             filter = f"{filter}__"
         grant_on, path = self
         if grant_on == ACCESS_PAGE:

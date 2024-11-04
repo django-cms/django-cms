@@ -12,7 +12,6 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches, reverse
 from django.utils.translation import override as force_language
 
-from cms import api
 from cms.api import create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import PageContent, PagePermission, Placeholder, UserSettings
@@ -432,6 +431,7 @@ class ContextTests(CMSTestCase):
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)
 
+
 class EndpointTests(CMSTestCase):
 
     def setUp(self) -> None:
@@ -463,7 +463,7 @@ class EndpointTests(CMSTestCase):
         self._add_plugin_to_placeholder(placeholder, "TextPlugin", language="fr")
         with force_language("fr"):
             setting, _ = UserSettings.objects.get_or_create(user=self.get_superuser())
-            setting.language="fr"
+            setting.language = "fr"
             setting.save()
             structure_endpoint_url = admin_reverse(
                 "cms_placeholder_render_object_structure",

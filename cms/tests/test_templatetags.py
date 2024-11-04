@@ -57,7 +57,6 @@ class TemplatetagTests(CMSTestCase):
         self.assertIn("/en", page_preview_url)
         self.assertIn("/de/", german_content_preview_url)
 
-
     def test_get_admin_tree_title(self):
         page = create_page("page_a", "nav_playground.html", "en")
         self.assertEqual(get_page_display_name(page), 'page_a')
