@@ -107,6 +107,7 @@ if __name__ == "__main__":
     }
 
     dynamic_configs = {
+        "INSTALLED_APPS": INSTALLED_APPS,
         "TEMPLATES": [
             {
                 "NAME": "django",
@@ -172,10 +173,9 @@ if __name__ == "__main__":
     if "--db-url" in argv:
         pos = argv.index("--db-url")
         if len(argv) > pos + 1:
-            dynamic_configs["DATABASES"] = {"default": dj_database_url.config(default=argv[pos + 1])}
+            dynamic_configs["DATABASES"] = {"default": dj_database_url.parse(argv[pos + 1])}
             argv.pop(pos)
             argv.pop(pos)
-            install_auth_user_model(dynamic_configs, argv[pos + 1])
         else:
             raise ValueError("No value provided for db-url")
 
@@ -211,7 +211,6 @@ if __name__ == "__main__":
             ADMIN_MEDIA_PREFIX="/static/admin/",
             EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend",
             PLUGIN_APPS=PLUGIN_APPS,
-            INSTALLED_APPS=INSTALLED_APPS,
             DEBUG_TOOLBAR_PATCH_SETTINGS=False,
             INTERNAL_IPS=["127.0.0.1"],
             AUTHENTICATION_BACKENDS=(
