@@ -49,6 +49,11 @@ def main(argv, **full_settings):
     from django.core.management import execute_from_command_line
     from django.conf import settings
 
+    local_commands = ["test", "migrate", "makemigrations",]
+
+    if len(argv) >= 2 and argv[1] in local_commands and all(not arg.startswith("-") for arg in argv[2:]):
+        argv.append("cms")
+        argv.append("menus")
     settings.configure(**full_settings)
     execute_from_command_line(argv)
 
@@ -181,13 +186,14 @@ if __name__ == "__main__":
 
     if "--use-tz" in argv:
         dynamic_configs["USE_TZ"] = True
-        argv.pop(argv.index("--db-url"))
+        argv.pop(argv.index("--use-tz"))
     else:
-        dynamic_configs["USE_TZ"] = False
+        pass
+        # dynamic_configs["USE_TZ"] = False
 
     with TempDirs(3) as (media_dir, static_dir, cms_media_dir):
         main(
-            argv + ["cms", "menus"],
+            argv,
             PROJECT_PATH=PROJECT_PATH,
             SECRET_KEY="Welcome to django CMS",
             CACHES={
