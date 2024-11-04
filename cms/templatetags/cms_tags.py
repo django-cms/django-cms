@@ -866,29 +866,6 @@ class CMSEditableObjectBlock(CMSEditableObject):
         return extra_context
 
 
-class CMSInlineField(CMSEditableObject):
-    name = 'render_inline_field'
-    options = Options(
-        Argument('instance'),
-        Argument('attribute'),
-        Argument('language', default=None, required=False),
-        Argument('filters', default=None, required=False),
-        Argument('view_url', default=None, required=False),
-        Argument('view_method', default=None, required=False),
-        'as',
-        Argument('varname', required=False, resolve=False),
-    )
-
-    def render_tag(self, context, **kwargs):
-        if context["request"].session.get("inline_editing", True) and isinstance(kwargs["instance"], CMSPlugin):
-            # Only allow inline field to be rendered if inline editing is active and the instance is a CMSPlugin
-            # DummyPlugins of the ``plugin`` tag are cannot be edited
-            kwargs["edit_fields"] = kwargs["attribute"]
-            return super().render_tag(context, **kwargs)
-        else:
-            return getattr(kwargs["instance"], kwargs["attribute"], "")
-
-
 class StaticPlaceholderNode(Tag):
     name = 'static_placeholder'
     options = PlaceholderOptions(
