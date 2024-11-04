@@ -39,15 +39,7 @@ class TempDirs:
             os.rmdir(temp_dir)
 
 
-class DisableMigrations(object):
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return "notmigrations"
-
-
-def main(argv, **full_settings):
+def main(argv: list[str], **full_settings):
     from django.core.management import execute_from_command_line
     from django.conf import settings
 
@@ -206,8 +198,7 @@ if __name__ == "__main__":
         dynamic_configs["USE_TZ"] = True
         argv.pop(argv.index("--use-tz"))
     else:
-        pass
-        # dynamic_configs["USE_TZ"] = False
+        dynamic_configs["USE_TZ"] = False
 
     with TempDirs(3) as (media_dir, static_dir, cms_media_dir):
         main(
