@@ -18,7 +18,9 @@ def install_auth_user_model(settings, value):
     if value is None:
         return
     custom_user_app = "cms.test_utils.project." + value.split(".")[0]
-    settings["INSTALLED_APPS"].insert(settings["INSTALLED_APPS"].index("cms"), custom_user_app)
+    settings["INSTALLED_APPS"].insert(
+        settings["INSTALLED_APPS"].index("cms"), custom_user_app
+    )
     settings["AUTH_USER_MODEL"] = value
 
 
@@ -49,9 +51,17 @@ def main(argv, **full_settings):
     from django.core.management import execute_from_command_line
     from django.conf import settings
 
-    local_commands = ["test", "migrate", "makemigrations",]
+    local_commands = [
+        "test",
+        "migrate",
+        "makemigrations",
+    ]
 
-    if len(argv) >= 2 and argv[1] in local_commands and all(not arg.startswith("-") for arg in argv[2:]):
+    if (
+        len(argv) >= 2
+        and argv[1] in local_commands
+        and all(not arg.startswith("-") for arg in argv[2:])
+    ):
         argv.append("cms")
         argv.append("menus")
     settings.configure(**full_settings)
@@ -60,7 +70,9 @@ def main(argv, **full_settings):
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_LIVE_TEST_SERVER_ADDRESS", "localhost:8000-9000")
-    PROJECT_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), "cms", "test_utils"))
+    PROJECT_PATH = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "cms", "test_utils")
+    )
 
     PLUGIN_APPS = [
         "djangocms_text_ckeditor",
@@ -117,7 +129,9 @@ if __name__ == "__main__":
             {
                 "NAME": "django",
                 "BACKEND": "django.template.backends.django.DjangoTemplates",
-                "DIRS": [os.path.abspath(os.path.join(PROJECT_PATH, "project", "templates"))],
+                "DIRS": [
+                    os.path.abspath(os.path.join(PROJECT_PATH, "project", "templates"))
+                ],
                 "OPTIONS": {
                     "debug": True,
                     "context_processors": [
@@ -139,7 +153,9 @@ if __name__ == "__main__":
                 },
             }
         ],
-        "DATABASES": {"default": dj_database_url.config(default="sqlite://localhost/local.sqlite")},
+        "DATABASES": {
+            "default": dj_database_url.config(default="sqlite://localhost/local.sqlite")
+        },
     }
 
     if "test" in sys.argv:
@@ -178,7 +194,9 @@ if __name__ == "__main__":
     if "--db-url" in argv:
         pos = argv.index("--db-url")
         if len(argv) > pos + 1:
-            dynamic_configs["DATABASES"] = {"default": dj_database_url.parse(argv[pos + 1])}
+            dynamic_configs["DATABASES"] = {
+                "default": dj_database_url.parse(argv[pos + 1])
+            }
             argv.pop(pos)
             argv.pop(pos)
         else:
@@ -302,7 +320,13 @@ if __name__ == "__main__":
             ),
             CMS_PLACEHOLDER_CONF={
                 "col_sidebar": {
-                    "plugins": ("FilePlugin", "LinkPlugin", "PicturePlugin", "TextPlugin", "SnippetPlugin"),
+                    "plugins": (
+                        "FilePlugin",
+                        "LinkPlugin",
+                        "PicturePlugin",
+                        "TextPlugin",
+                        "SnippetPlugin",
+                    ),
                     "name": gettext("sidebar column"),
                 },
                 "col_left": {
@@ -352,7 +376,10 @@ if __name__ == "__main__":
             CMS_SITE_CHOICES_CACHE_KEY="CMS:site_choices",
             CMS_PAGE_CHOICES_CACHE_KEY="CMS:page_choices",
             CMS_NAVIGATION_EXTENDERS=[
-                ("cms.test_utils.project.sampleapp.menu_extender.get_nodes", "SampleApp Menu"),
+                (
+                    "cms.test_utils.project.sampleapp.menu_extender.get_nodes",
+                    "SampleApp Menu",
+                ),
             ],
             ROOT_URLCONF="cms.test_utils.project.urls",
             PASSWORD_HASHERS=("django.contrib.auth.hashers.MD5PasswordHasher",),
