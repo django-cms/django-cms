@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -37,7 +37,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -76,7 +76,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -87,7 +87,7 @@ jobs:
           django-5.1.txt,
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
@@ -101,7 +101,7 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0
+        image: mysql:9.0.1
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: djangocms_test
@@ -139,7 +139,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [ 3.9, '3.10', '3.11', '3.12' ]  # latest release minus two
+        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -147,11 +147,10 @@ jobs:
           django-4.1.txt,
           django-4.2.txt,
           django-5.0.txt,
-          django-5.0.txt,
           django-5.1.txt,
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
@@ -188,7 +187,7 @@ jobs:
         python-version: ['3.12']
         requirements-file: ['requirement_base_django_main.txt']
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
 
     steps:
@@ -221,7 +220,7 @@ jobs:
         python-version: ['3.12']
         requirements-file: ['requirement_base_django_main.txt']
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
 
     services:
@@ -270,7 +269,7 @@ jobs:
         python-version: ['3.12']
         requirements-file: ['requirement_base_django_main.txt']
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
 
     services:
