@@ -23,7 +23,7 @@ jobs:
           django-5.1.txt,
         ]
         os: [
-          ubuntu-20.04,
+          ubuntu-latest,
         ]
         exclude:
           - requirements-file: django-5.0.txt
@@ -225,7 +225,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
