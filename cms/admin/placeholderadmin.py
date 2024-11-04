@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
-from django.db import transaction, models
+from django.db import models, transaction
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -86,19 +86,6 @@ class BaseEditableAdminMixin:
     Base class for FrontendEditableAdminMixin to be re-used by
     PlaceholderAdmin
     """
-    def get_urls(self) -> list[str]:
-        """
-        Register the url for the edit field view
-        """
-        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
-
-        def pat(regex, fn):
-            return re_path(regex, self.admin_site.admin_view(fn), name=f"{info}_{fn.__name__}")
-        url_patterns = [
-            pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
-        ]
-        return url_patterns + super().get_urls()
-
     @xframe_options_sameorigin
     def edit_field(self, request, object_id, language):
         """Endpoint which manages frontend-editable fields"""
@@ -171,6 +158,19 @@ class FrontendEditableAdminMixin(BaseEditableAdminMixin):
     in the frontend by double-clicking on fields rendered with the ``render_model`` template
     tag.
     """
+    def get_urls(self) -> list[str]:
+        """
+        Register the url for the edit field view
+        """
+        info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
+        def pat(regex, fn):
+            return re_path(regex, self.admin_site.admin_view(fn), name=f"{info}_{fn.__name__}")
+        url_patterns = [
+            pat(r'edit-field/(%s)/([a-z\-]+)/$' % SLUG_REGEXP, self.edit_field),
+        ]
+        return url_patterns + super().get_urls()
+
     def _get_model_admin(self, obj: models.Model) -> admin.ModelAdmin:
         # FrontendEditableAdminMixin needs to be added to the model's model admin class.
         # Hence, the relevant admin is the model admin itself.
@@ -255,6 +255,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             pat(r'^copy-plugins/$', self.copy_plugins),
             pat(r'^add-plugin/$', self.add_plugin),
             pat(r'^edit-plugin/([0-9]+)/$', self.edit_plugin),
+            pat(r'^edit-plugin/([0-9]+)/([a-z\-]+)/$', self.edit_field),
             pat(r'^delete-plugin/([0-9]+)/$', self.delete_plugin),
             pat(r'^clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'^move-plugin/$', self.move_plugin),
@@ -264,7 +265,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             pat(r'^object/([0-9]+)/structure/([0-9]+)/$', render_object_structure),
             pat(r'^object/([0-9]+)/preview/([0-9]+)/$', render_object_preview),
         ]
-        return url_patterns + super().get_urls()
+        return url_patterns
 
     def _get_object_for_single_field(self, object_id: int, language: str) -> CMSPlugin:
         # For BaseEditableAdminMixin: This (private) method retrieves the corresponding CMSPlugin and
