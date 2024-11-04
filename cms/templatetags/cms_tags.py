@@ -572,7 +572,8 @@ class CMSEditableObject(InclusionTag):
                 else:
                     if not view_url:
                         if isinstance(instance, CMSPlugin):
-                            view_url = f'admin:{opts.app_label}_{opts.model_name}_edit_field'  # TODO: Correct endpoint
+                            # Plugins do not have a registered admin. They are managed by the placeholder admin.
+                            view_url = f'admin:cms_placeholder_edit_field'
                         else:
                             view_url = f'admin:{opts.app_label}_{opts.model_name}_edit_field'
                     if view_url.endswith('_changelist'):
@@ -865,6 +866,29 @@ class CMSEditableObjectBlock(CMSEditableObject):
         return extra_context
 
 
+class CMSInlineField(CMSEditableObject):
+    name = 'render_inline_field'
+    options = Options(
+        Argument('instance'),
+        Argument('attribute'),
+        Argument('language', default=None, required=False),
+        Argument('filters', default=None, required=False),
+        Argument('view_url', default=None, required=False),
+        Argument('view_method', default=None, required=False),
+        'as',
+        Argument('varname', required=False, resolve=False),
+    )
+
+    def render_tag(self, context, **kwargs):
+        if context["request"].session.get("inline_editing", True) and isinstance(kwargs["instance"], CMSPlugin):
+            # Only allow inline field to be rendered if inline editing is active and the instance is a CMSPlugin
+            # DummyPlugins of the ``plugin`` tag are cannot be edited
+            kwargs["edit_fields"] = kwargs["attribute"]
+            return super().render_tag(context, **kwargs)
+        else:
+            return getattr(kwargs["instance"], kwargs["attribute"], "")
+
+
 class StaticPlaceholderNode(Tag):
     name = 'static_placeholder'
     options = PlaceholderOptions(
@@ -1013,6 +1037,7 @@ register.tag('render_model_add_block', CMSEditableObjectAddBlock)
 register.tag('render_model_add', CMSEditableObjectAdd)
 register.tag('render_model_icon', CMSEditableObjectIcon)
 register.tag('render_model', CMSEditableObject)
+register.tag('render_inline_field', CMSInlineField)
 register.simple_tag(
     _show_placeholder_by_id,
     takes_context=True,
