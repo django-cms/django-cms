@@ -122,14 +122,15 @@ class FrontendEditableAdminMixin:
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
         raw_fields = request.GET.get("edit_fields")
-        fields = [field for field in raw_fields.split(",") if field in self.frontend_editable_fields]
+        admin_obj = obj.get_plugin_class_instance(admin=self.admin_site) if isinstance(obj, CMSPlugin) else self
+        fields = [field for field in raw_fields.split(",") if field in admin_obj.frontend_editable_fields]
         if not fields:
             context = {
                 'opts': opts,
                 'message': _("Field %s not found") % raw_fields
             }
             return render(request, 'admin/cms/page/plugin/error_form.html', context)
-        if not request.user.has_perm(f"{self.model._meta.app_label}.change_{self.model._meta.model_name}"):
+        if not request.user.has_perm(f"{admin_obj.model._meta.app_label}.change_{admin_obj.model._meta.model_name}"):
             context = {
                 'opts': opts,
                 'message': _("You do not have permission to edit this item")
@@ -137,18 +138,18 @@ class FrontendEditableAdminMixin:
             return render(request, 'admin/cms/page/plugin/error_form.html', context)
             # Dynamically creates the form class with only `field_name` field
         # enabled
-        form_class = self.get_form(request, obj, fields=fields)
+        form_class = admin_obj.get_form(request, obj, fields=fields)
         if not cancel_clicked and request.method == 'POST':
             form = form_class(instance=obj, data=request.POST)
             if form.is_valid():
                 new_object = form.save(commit=False)
-                self.save_model(request, new_object, form, change=True)  # Call save model like the admin does
+                admin_obj.save_model(request, new_object, form, change=True)  # Call save model like the admin does
                 saved_successfully = True
         else:
             form = form_class(instance=obj)
         admin_form = AdminForm(form, fieldsets=[(None, {'fields': fields})], prepopulated_fields={},
                                model_admin=self)
-        media = self.media + admin_form.media
+        media = admin_obj.media + admin_form.media
         context = {
             'CMS_MEDIA_URL': get_cms_setting('MEDIA_URL'),
             'title': opts.verbose_name,
@@ -171,9 +172,9 @@ class FrontendEditableAdminMixin:
             })
             return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
-            if isinstance(self, CMSPluginBase):
+            if isinstance(admin_obj, CMSPluginBase):
                 # Update the structure board by populating the data bridge
-                return self.render_close_frame(request, obj)
+                return admin_obj.render_close_frame(request, obj)
             return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
@@ -203,7 +204,7 @@ class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
 
 
 @admin.register(Placeholder)
-class PlaceholderAdmin(admin.ModelAdmin):
+class PlaceholderAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
 
     def has_add_permission(self, request):
         # Placeholders are created by the system
@@ -249,7 +250,13 @@ class PlaceholderAdmin(admin.ModelAdmin):
             pat(r'^object/([0-9]+)/structure/([0-9]+)/$', render_object_structure),
             pat(r'^object/([0-9]+)/preview/([0-9]+)/$', render_object_preview),
         ]
-        return url_patterns
+        return url_patterns + super().get_urls()
+
+    def _get_object_for_single_field(self, object_id, language):
+        """For FrontendEditableAdminMixin: This (private) method retrieves the corresponding CMSPlugin and
+        downcasts it to the appropriate plugin model. language is ignored."""
+        plugin = get_object_or_404(CMSPlugin, pk=object_id)  # Returns a CMSPlugin instance
+        return plugin.get_bound_plugin()  # Returns the plugin model instance of the appropriate type
 
     def _get_operation_language(self, request):
         # Unfortunately the ?language GET query
