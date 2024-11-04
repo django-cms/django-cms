@@ -51,7 +51,7 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_edit_url
 from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
 
 

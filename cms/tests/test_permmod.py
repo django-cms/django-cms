@@ -165,7 +165,6 @@ class PermissionModeratorTests(CMSTestCase):
             self.assertEqual(response.status_code, 200)
             self.assertEqual(CMSPlugin.objects.count(), 1)
 
-
     def test_super_can_add_plugin(self):
         self._add_plugin(self.user_super, page=self.slave_page)
 

@@ -202,6 +202,7 @@ def boolean_icon(value):
         mapped_icon,
     )
 
+
 @register.tag(name="page_submit_row")
 class PageSubmitRow(InclusionTag):
     name = 'page_submit_row'

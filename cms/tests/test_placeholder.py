@@ -761,14 +761,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         conf = {
             'col_left': {
-                'default_plugins' : [
+                'default_plugins': [
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{'body':'<p>en default body 1</p>'},
+                        'plugin_type': 'TextPlugin',
+                        'values': {'body': '<p>en default body 1</p>'},
                     },
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{'body':'<p>en default body 2</p>'},
+                        'plugin_type': 'TextPlugin',
+                        'values': {'body': '<p>en default body 2</p>'},
                     },
                 ]
             },
