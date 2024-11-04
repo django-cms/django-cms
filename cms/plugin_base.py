@@ -414,21 +414,23 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             # This is a nasty edge-case.
             # If the parent plugin is a ghost plugin, fetching the plugin tree
             # will fail because the downcasting function filters out all ghost plugins.
-            # Currently this case is only present in the djangocms-text-ckeditor app
+            # Currently, this case is only present in the djangocms-text-ckeditor app
             # which uses ghost plugins to create inline plugins on the text.
             root = obj
 
         plugins = [root] + list(root.get_descendants())
+        # simulate the call to the unauthorized CMSPlugin.page property
+        cms_page = obj.placeholder.page if obj.placeholder_id else None
 
         child_classes = self.get_child_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
         parent_classes = self.get_parent_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
