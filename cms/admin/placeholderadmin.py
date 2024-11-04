@@ -8,7 +8,7 @@ from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.utils import get_deleted_objects
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.db import transaction, models
 from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
@@ -81,15 +81,14 @@ def _instance_overrides_method(base, instance, method_name):
     return unbound_method != bound_method
 
 
-class FrontendEditableAdminMixin:
+class BaseEditableAdminMixin:
     """
-    Adding ``FrontendEditableAdminMixin`` to  models admin class allows to open that admin
-    in the frontend by double-clicking on fields rendered with the ``render_model`` template
-    tag.
+    Base class for FrontendEditableAdminMixin to be re-used by
+    PlaceholderAdmin
     """
     frontend_editable_fields = []
 
-    def get_urls(self):
+    def get_urls(self) -> list[str]:
         """
         Register the url for the single field edit view
         """
@@ -102,27 +101,13 @@ class FrontendEditableAdminMixin:
         ]
         return url_patterns + super().get_urls()
 
-    def _get_object_for_single_field(self, object_id, language):
-        # Quick and dirty way to retrieve objects for django-hvad
-        # Cleaner implementation will extend this method in a child mixin
-        try:
-            # First see if the model uses the admin manager pattern from cms.models.manager.ContentAdminManager
-            manager = self.model.admin_manager
-        except AttributeError:
-            # If not, use the default manager
-            manager = self.model.objects
-        try:
-            return manager.language(language).get(pk=object_id)
-        except AttributeError:
-            return manager.get(pk=object_id)
-
     def edit_field(self, request, object_id, language):
         obj = self._get_object_for_single_field(object_id, language)
         opts = obj.__class__._meta
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
         raw_fields = request.GET.get("edit_fields")
-        admin_obj = obj.get_plugin_class_instance(admin=self.admin_site) if isinstance(obj, CMSPlugin) else self
+        admin_obj = self._get_model_admin(obj)
         fields = [field for field in raw_fields.split(",") if field in admin_obj.frontend_editable_fields]
         if not fields:
             context = {
@@ -179,6 +164,30 @@ class FrontendEditableAdminMixin:
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
+class FrontendEditableAdminMixin(BaseEditableAdminMixin):
+    """
+    Adding ``FrontendEditableAdminMixin`` to  models admin class allows to open that admin
+    in the frontend by double-clicking on fields rendered with the ``render_model`` template
+    tag.
+    """
+    def _get_model_admin(self, obj: models.Model) -> admin.ModelAdmin:
+        return self
+
+    def _get_object_for_single_field(self, object_id: int, language: str) -> models.Model:
+        # Quick and dirty way to retrieve objects for django-hvad
+        # Cleaner implementation will extend this method in a child mixin
+        try:
+            # First see if the model uses the admin manager pattern from cms.models.manager.ContentAdminManager
+            manager = self.model.admin_manager
+        except AttributeError:
+            # If not, use the default manager
+            manager = self.model.objects
+        try:
+            return manager.language(language).get(pk=object_id)
+        except AttributeError:
+            return manager.get(pk=object_id)
+
+
 class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
     def __new__(cls, name, bases, attrs):
         super_new = super().__new__
@@ -204,7 +213,7 @@ class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
 
 
 @admin.register(Placeholder)
-class PlaceholderAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
+class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
 
     def has_add_permission(self, request):
         # Placeholders are created by the system
@@ -228,7 +237,7 @@ class PlaceholderAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
         # but the admin's delete view is not available for placeholders.
         raise PermissionDenied
 
-    def get_urls(self):
+    def get_urls(self) -> list[str]:
         """
         Register the plugin specific urls (add/edit/copy/remove/move)
         """
@@ -252,11 +261,14 @@ class PlaceholderAdmin(FrontendEditableAdminMixin, admin.ModelAdmin):
         ]
         return url_patterns + super().get_urls()
 
-    def _get_object_for_single_field(self, object_id, language):
+    def _get_object_for_single_field(self, object_id: int, language: str) -> CMSPlugin:
         """For FrontendEditableAdminMixin: This (private) method retrieves the corresponding CMSPlugin and
         downcasts it to the appropriate plugin model. language is ignored."""
         plugin = get_object_or_404(CMSPlugin, pk=object_id)  # Returns a CMSPlugin instance
         return plugin.get_bound_plugin()  # Returns the plugin model instance of the appropriate type
+
+    def _get_model_admin(self, obj: CMSPlugin) -> admin.ModelAdmin:
+        return obj.get_plugin_class_instance(admin=self.admin_site)
 
     def _get_operation_language(self, request):
         # Unfortunately the ?language GET query
