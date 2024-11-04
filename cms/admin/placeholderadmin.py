@@ -86,11 +86,9 @@ class BaseEditableAdminMixin:
     Base class for FrontendEditableAdminMixin to be re-used by
     PlaceholderAdmin
     """
-    frontend_editable_fields = []
-
     def get_urls(self) -> list[str]:
         """
-        Register the url for the single field edit view
+        Register the url for the edit field view
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
 
@@ -101,14 +99,17 @@ class BaseEditableAdminMixin:
         ]
         return url_patterns + super().get_urls()
 
+    @xframe_options_sameorigin
     def edit_field(self, request, object_id, language):
+        """Endpoint which manages frontend-editable fields"""
         obj = self._get_object_for_single_field(object_id, language)
         opts = obj.__class__._meta
         saved_successfully = False
         cancel_clicked = request.POST.get("_cancel", False)
         raw_fields = request.GET.get("edit_fields")
         admin_obj = self._get_model_admin(obj)
-        fields = [field for field in raw_fields.split(",") if field in admin_obj.frontend_editable_fields]
+        allowed_fields = getattr(admin_obj, "frontend_editable_fields", [])
+        fields = [field for field in raw_fields.split(",") if field in allowed_fields]
         if not fields:
             context = {
                 'opts': opts,
@@ -171,6 +172,8 @@ class FrontendEditableAdminMixin(BaseEditableAdminMixin):
     tag.
     """
     def _get_model_admin(self, obj: models.Model) -> admin.ModelAdmin:
+        # FrontendEditableAdminMixin needs to be added to the model's model admin class.
+        # Hence, the relevant admin is the model admin itself.
         return self
 
     def _get_object_for_single_field(self, object_id: int, language: str) -> models.Model:
@@ -214,6 +217,8 @@ class PlaceholderAdminMixin(metaclass=PlaceholderAdminMixinBase):
 
 @admin.register(Placeholder)
 class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
+    """Placeholder admin manages placeholders and their plugins, as well as the preview, edit, and
+    structure endpoints."""
 
     def has_add_permission(self, request):
         # Placeholders are created by the system
@@ -262,12 +267,15 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         return url_patterns + super().get_urls()
 
     def _get_object_for_single_field(self, object_id: int, language: str) -> CMSPlugin:
-        """For FrontendEditableAdminMixin: This (private) method retrieves the corresponding CMSPlugin and
-        downcasts it to the appropriate plugin model. language is ignored."""
+        # For BaseEditableAdminMixin: This (private) method retrieves the corresponding CMSPlugin and
+        # downcasts it to the appropriate plugin model. language is ignored. This provides the plugin for
+        # edit_field"""
         plugin = get_object_or_404(CMSPlugin, pk=object_id)  # Returns a CMSPlugin instance
         return plugin.get_bound_plugin()  # Returns the plugin model instance of the appropriate type
 
     def _get_model_admin(self, obj: CMSPlugin) -> admin.ModelAdmin:
+        # For BaseEditableAdminMixin: This (private) method retrieves the model admin for the plugin model
+        # which is the plugin instance itself.
         return obj.get_plugin_class_instance(admin=self.admin_site)
 
     def _get_operation_language(self, request):
