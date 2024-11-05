@@ -25,8 +25,4 @@ jobs:
           BUILD_BRANCH: release/build
           TX_TOKEN: ${{ secrets.TX_TOKEN }}
         shell: bash
-        run: |
-          pwd
-          ls -la /bin/bash
-          cat ./scripts/make-release
-          ./scripts/make-release ${{ inputs.version }} ${GITHUB_REF}
+        run: ./scripts/make-release ${{ inputs.version }} ${GITHUB_REF}
