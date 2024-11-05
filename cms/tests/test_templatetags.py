@@ -699,6 +699,7 @@ class EditablePluginsTemplateTags(CMSTestCase):
         self.plugin = add_plugin(self.placeholder, TextPlugin, 'en', body='<b>Test</b>')
 
     def test_render_model_plugin(self):
+        """The render_model template tags also works with a plugin."""
         template = """{% load cms_tags %}{% render_model plugin "body" "body" %}"""
         # The template html tags will render the object editable in the frontend
         expectation = (
