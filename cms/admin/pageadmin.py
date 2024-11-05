@@ -105,6 +105,9 @@ class PageAdmin(admin.ModelAdmin):
     move_form = MovePageForm
     inlines = PERMISSION_ADMIN_INLINES
 
+    def has_module_permission(self, request):
+        return False  # Hides page model from the admin index
+    
     def has_add_permission(self, request):
         return False
 
