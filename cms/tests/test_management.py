@@ -304,6 +304,10 @@ class ManagementTestCase(CMSTestCase):
         self.assertEqual(out.getvalue(), "1 'TextPlugin' plugins uninstalled\n")
         self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 0)
 
+    def test_for_running_only_cms_command(self):
+        with self.assertRaises(CommandError) as e:
+            management.call_command('cms')
+        self.assertEqual(str(e.exception), 'Error: one of the available sub commands must be provided')
 
 class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 
