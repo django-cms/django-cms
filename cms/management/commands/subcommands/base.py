@@ -60,6 +60,8 @@ class SubcommandsCommand(BaseCommand):
         parser = CommandParser(
             prog=f"{os.path.basename(prog_name)} {subcommand}",
             description=self.help or None,
+            missing_args_message=getattr(self, "missing_args_message", None),
+            called_from_command_line=getattr(self, "_called_from_command_line", None),
             **kwargs
         )
         self.add_arguments(parser)

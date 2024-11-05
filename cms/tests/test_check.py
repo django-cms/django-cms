@@ -135,6 +135,17 @@ class CheckTests(CheckAssertMixin, TestCase):
         with self.settings(SITE_ID='broken'):
             self.assertCheck(False, warnings=0, errors=1)
 
+    def test_cmsapps_check(self):
+        from cms.app_base import CMSApp
+        from cms.apphook_pool import apphook_pool
+        class AppWithoutName(CMSApp):
+            def get_urls(self, page=None, language=None, **kwargs):
+                return ["sampleapp.urls"]
+
+        app = apphook_pool.register(AppWithoutName)
+
+        self.assertCheck(True, warnings=1, errors=0)
+        apphook_pool.apps.pop(app.__name__)
 
 class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
 

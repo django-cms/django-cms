@@ -179,6 +179,8 @@ everybody's future work much easier by doing so). We'll always accept contributi
 test without code, but not code without a test - which should give you an idea of how
 important tests are.
 
+:ref:`See how to write a test patch <test-writing>`.
+
 What we need
 ~~~~~~~~~~~~
 
