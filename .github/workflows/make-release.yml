@@ -24,5 +24,4 @@ jobs:
         env:
           BUILD_BRANCH: release/build
           TX_TOKEN: ${{ secrets.TX_TOKEN }}
-        shell: bash
         run: ./scripts/make-release ${{ inputs.version }} ${GITHUB_REF}
