@@ -15,6 +15,7 @@ from django.utils.html import strip_tags
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
+from djangocms_text_ckeditor.models import Text
 from sekizai.context import SekizaiContext
 
 import cms
@@ -689,3 +690,29 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
             output = self.render_template_obj(template, {'category': Category()}, request)
         expected = 'wrapped'
         self.assertEqual(expected, output)
+
+
+class EditablePluginsTemplateTags(CMSTestCase):
+    def setUp(self):
+        self.page = create_page('Test', 'simple.html', 'en')
+        self.placeholder = self.page.get_placeholders('en')[0]
+        self.plugin = add_plugin(self.placeholder, TextPlugin, 'en', body='<b>Test</b>')
+
+    def test_render_model_plugin(self):
+        template = """{% load cms_tags %}{% render_model plugin "body" "body" %}"""
+        # The template html tags will render the object editable in the frontend
+        expectation = (
+            '<template class="cms-plugin cms-plugin-start cms-plugin-djangocms_text_ckeditor-text-body-1 cms-render-model"></template>'
+            '&lt;b&gt;Test&lt;/b&gt;'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-djangocms_text_ckeditor-text-body-1 cms-render-model"></template>'
+        )
+
+        endpoint = get_object_edit_url(self.page.get_content_obj("en"))  # view in edit mode
+        request = RequestFactory().get(endpoint)
+        request.user = self.get_superuser()
+        request.current_page = self.page
+        request.toolbar = CMSToolbar(request)  # add toolbar
+
+        output = self.render_template_obj(template, {'plugin': self.plugin}, request)
+
+        self.assertEqual(output, expectation)
