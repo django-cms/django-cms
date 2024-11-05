@@ -9,7 +9,6 @@ from django.core.management.commands.compilemessages import has_bom
 from django.test.testcases import TestCase
 
 from cms.test_utils.util.context_managers import TemporaryDirectory
-from cms.utils.compat import DJANGO_2_2, DJANGO_3_0, DJANGO_3_1
 
 THIS_DIR = os.path.dirname(__file__)
 SOURCE_DIR = os.path.abspath(os.path.join(THIS_DIR, '..', 'locale'))
@@ -42,11 +41,7 @@ def compile_messages():
         for dirpath, dirnames, filenames in os.walk(basedir):
             for f in filenames:
                 if f.endswith('.po'):
-                    if DJANGO_2_2 or DJANGO_3_0 or DJANGO_3_1:
-                        pfn = os.path.join(dirpath, f)
-                    else:
-                        # for django3.2 and above. The change happened in djang3.2 to pathlib.
-                        pfn = Path(dirpath) / f
+                    pfn = Path(dirpath) / f
                     if has_bom(pfn):
                         raise CommandError(
                             "The %s file has a BOM (Byte Order Mark). "

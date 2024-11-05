@@ -32,7 +32,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        margin-right: 40px;
+        margin-inline-end: 40px;
     }
 
     .cms-plugins {
@@ -45,13 +45,13 @@
         bottom: 0;
         left: 0;
         z-index: z(structure, content, empty, droppable);
-        color: darken($gray-lighter, 15%);
+        color: $gray-light;
         line-height: $structure-dragitem-height;
         height: auto;
         margin: 0;
         border: 2px solid $color-primary;
         border-radius: $border-radius-base;
-        background-color: mix(white, $color-primary, 90%);
+        background-color: rgba($color-primary-fallback, 20%);
         box-shadow: none;
         transform: translateY(0) !important;
         &:before {

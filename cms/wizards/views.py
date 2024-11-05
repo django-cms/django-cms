@@ -65,7 +65,7 @@ class WizardCreateView(SessionWizardView):
         # We need to grab the page from pre-validated data so that the wizard
         # has it to prepare the list of valid entries.
         if data:
-            page_key = "{0}-page".format(step)
+            page_key = f"{step}-page"
             self.page_pk = data.get(page_key, None)
         else:
             self.page_pk = None

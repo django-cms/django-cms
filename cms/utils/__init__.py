@@ -1,9 +1,7 @@
-# TODO: this is just stuff from utils.py - should be splitted / moved
-from django.conf import settings
-from django.core.files.storage import get_storage_class
-from django.utils.functional import LazyObject
+# TODO: this is just stuff from utils.py - should be split / moved
 
 from cms.utils.i18n import (
+    get_current_language,
     get_default_language,
     get_language_code,
     get_language_list,
@@ -25,13 +23,14 @@ def get_language_from_request(request, current_page=None):
         language = request.POST.get('language', None)
     if hasattr(request, 'GET') and not language:
         language = request.GET.get('language', None)
-    site_id = current_page.node.site_id if current_page else None
+    site_id = current_page.site_id if current_page else None
     if language:
         language = get_language_code(language)
         if language not in get_language_list(site_id):
             language = None
-    if not language:
-        language = get_language_code(getattr(request, 'LANGUAGE_CODE', None))
+    if not language and request:
+        # get the active language
+        language = get_current_language()
     if language:
         if language not in get_language_list(site_id):
             language = None
@@ -50,14 +49,3 @@ def get_language_from_request(request, current_page=None):
         language = get_default_language(site_id=site_id)
 
     return language
-
-
-default_storage = 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-
-class ConfiguredStorage(LazyObject):
-    def _setup(self):
-        self._wrapped = get_storage_class(getattr(settings, 'STATICFILES_STORAGE', default_storage))()
-
-
-configured_storage = ConfiguredStorage()

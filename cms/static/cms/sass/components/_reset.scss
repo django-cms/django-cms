@@ -19,9 +19,9 @@
     h1,
     h2,
     h3 {
-        color: #222;
+        color: var(--dca-black);
         font: normal #{$font-size-normal}/#{$line-height-normal} Helvetica,Arial,sans-serif;
-        text-align: left;
+        text-align: start;
         text-decoration: none;
         box-sizing: border-box;
         height: auto;

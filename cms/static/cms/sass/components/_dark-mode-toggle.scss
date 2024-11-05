@@ -1,0 +1,23 @@
+@use "sass:math";
+
+div.cms .cms-toolbar-item-dark-mode-toggle span.cms-icon.cms-toggle {
+    font-size: 120%;
+    padding-top: 55%;
+    color: var(--dca-gray-darkest);
+}
+
+html[data-theme="light"] div.cms .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+    @extend .cms-icon-theme-light;
+    font-size: 170%;  // sun appears smaller (due to its rays)
+    padding-top: 25%;  // therefore apply larger size
+}
+
+html[data-theme="dark"]  div.cms .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+    @extend .cms-icon-theme-dark;
+}
+
+html:not([data-theme]), html[data-theme="auto"] {
+    div.cms .cms-toolbar-item-dark-mode-toggle .cms-toggle {
+        @extend .cms-icon-theme-auto;
+    }
+}

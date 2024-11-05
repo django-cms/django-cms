@@ -1,3 +1,4 @@
+import contextlib
 import logging
 import sys
 from collections import OrderedDict
@@ -9,9 +10,11 @@ from django.template import Context
 from django.utils.functional import cached_property
 from django.utils.module_loading import import_string
 from django.utils.safestring import mark_safe
+from django.utils.translation import override
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
-from cms.models import PageContent
+from cms.exceptions import PlaceholderNotFound
+from cms.models import PageContent, Placeholder
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
@@ -41,7 +44,7 @@ def _unpack_plugins(parent_plugin):
     return found_plugins
 
 
-class RenderedPlaceholder():
+class RenderedPlaceholder:
     __slots__ = (
         'language',
         'site_id',
@@ -73,14 +76,13 @@ class RenderedPlaceholder():
         return hash(self.placeholder)
 
 
-class BaseRenderer():
+class BaseRenderer:
 
     load_structure = False
     placeholder_edit_template = ''
 
     def __init__(self, request):
         self.request = request
-        self.request_language = get_language_from_request(self.request)
         self._cached_templates = {}
         self._cached_plugin_classes = {}
         self._placeholders_content_cache = {}
@@ -109,6 +111,10 @@ class BaseRenderer():
     def plugin_pool(self):
         import cms.plugin_pool
         return cms.plugin_pool.plugin_pool
+
+    @cached_property
+    def request_language(self):
+        return get_language_from_request(self.request)
 
     def get_placeholder_plugin_menu(self, placeholder, page=None):
         registered_plugins = self.plugin_pool.registered_plugins
@@ -300,7 +306,9 @@ class ContentRenderer(BaseRenderer):
             self._rendered_placeholders[placeholder.pk] = rendered_placeholder
 
         if editable:
-            data = self.get_editable_placeholder_context(placeholder, page=page)
+            request = context.get("request", None)
+            with override(request.toolbar.toolbar_language) if request else contextlib.nullcontext():
+                data = self.get_editable_placeholder_context(placeholder, page=page)
             data['content'] = placeholder_content
             placeholder_content = self.placeholder_edit_template.format(**data)
 
@@ -336,6 +344,8 @@ class ContentRenderer(BaseRenderer):
         # Not page, therefore we will use toolbar object as
         # the current object and render the placeholder
         current_obj = self.toolbar.get_object()
+        if current_obj is None:
+            raise PlaceholderNotFound(f"No object found for placeholder '{slot}'")
         rescan_placeholders_for_obj(current_obj)
         placeholder = Placeholder.objects.get_for_obj(current_obj).get(slot=slot)
         content = self.render_placeholder(
@@ -376,14 +386,13 @@ class ContentRenderer(BaseRenderer):
                 use_cache=True,
                 nodelist=None,
             )
-        parent_page = current_page.parent_page
         should_inherit = (
             inherit
-            and not content and parent_page
+            and not content and current_page.parent
             # The placeholder cache is primed when the first placeholder
             # is loaded. If the current page's parent is not in there,
             # it means its cache was never primed as it wasn't necessary.
-            and parent_page.pk in placeholder_cache
+            and current_page.parent.pk in placeholder_cache
             # don't display inherited plugins in edit mode, so that the user doesn't
             # mistakenly edit/delete them. This is a fix for issue #1303. See the discussion
             # there for possible enhancements
@@ -397,7 +406,7 @@ class ContentRenderer(BaseRenderer):
                 slot,
                 context,
                 inherit=True,
-                page=parent_page,
+                page=current_page.parent,
                 nodelist=None,
                 editable=False,
             )
@@ -547,6 +556,28 @@ class ContentRenderer(BaseRenderer):
                 language_cache[placeholder.pk] = cached_value
         return language_cache.get(placeholder.pk)
 
+
+    def _get_content_object(self, page, slots=None):
+        if self.toolbar.get_object() == page:
+            # Current object belongs to the page itself
+            page_content = self.toolbar.get_object()
+            placeholders = Placeholder.objects.get_for_obj(page_content)
+        elif slots:
+            # If looking for inherited placeholders, slots is specified
+            if self.toolbar.preview_mode_active or self.toolbar.edit_mode_active:
+                page_content = (page.pagecontent_set(manager="admin_manager")
+                                .current_content(language=self.request_language).first())
+            else:
+                page_content = page.pagecontent_set.filter(language=self.request_language).first()
+            placeholders = Placeholder.objects.get_for_obj(page_content) if page_content else Placeholder.objects.none()
+        else:
+            page_content = page.get_content_obj(self.request_language, fallback=False)
+
+            PageContent.page.field.set_cached_value(page_content, page)
+            # Creates any placeholders missing on the page
+            placeholders = page_content.rescan_placeholders().values()
+        return placeholders
+
     def _preload_placeholders_for_page(self, page, slots=None, inherit=False):
         """
         Populates the internal plugin cache of each placeholder
@@ -555,14 +586,7 @@ class ContentRenderer(BaseRenderer):
         """
         from cms.utils.plugins import assign_plugins
 
-        if slots:
-            placeholders = page.get_placeholders(self.request_language).filter(slot__in=slots)
-        else:
-            title = page.get_content_obj(self.request_language, fallback=False)
-
-            PageContent.page.field.set_cached_value(title, page)
-            # Creates any placeholders missing on the page
-            placeholders = title.rescan_placeholders().values()
+        placeholders = self._get_content_object(page, slots=slots)
 
         if inherit:
             # When the inherit flag is True,
@@ -596,7 +620,6 @@ class ContentRenderer(BaseRenderer):
                 lang=self.request_language,
             )
 
-        parent_page = page.parent_page
         # Inherit only placeholders that have no plugins
         # or are not cached.
         placeholders_to_inherit = [
@@ -604,9 +627,9 @@ class ContentRenderer(BaseRenderer):
             if not getattr(pl, '_plugins_cache', None) and pl.slot in slots_w_inheritance
         ]
 
-        if parent_page and placeholders_to_inherit:
+        if page.parent and placeholders_to_inherit:
             self._preload_placeholders_for_page(
-                page=parent_page,
+                page=page.parent,
                 slots=placeholders_to_inherit,
                 inherit=True,
             )

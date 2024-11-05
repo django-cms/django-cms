@@ -427,8 +427,89 @@ export const Helpers = {
         var path = win.location.pathname + win.location.search;
 
         return this.makeURL(url, [['cms_path', path]]);
+    },
+
+    /**
+     * Get color scheme either from :root[data-theme] or user system setting
+     *
+     * @method get_color_scheme
+     * @public
+     * @returns {String}
+     */
+    getColorScheme: function () {
+        let state = $('html').attr('data-theme');
+
+        if (!state) {
+            state = localStorage.getItem('theme') || CMS.config.color_scheme || 'auto';
+        }
+        return state;
+    },
+
+    /**
+     * Sets the color scheme for the current document and all iframes contained.
+     *
+     * @method setColorScheme
+     * @public
+     * @param scheme {String}
+     * @returns {void}
+     */
+
+    setColorScheme: function (mode) {
+        let body = $('html');
+        let scheme = (mode !== 'light' && mode !== 'dark') ? 'auto' : mode;
+
+        if (localStorage.getItem('theme') || CMS.config.color_scheme !== scheme) {
+            // Only set local storage if it is either already set or if scheme differs from preset
+            // to avoid fixing the user setting to the preset (which would ignore a change in presets)
+            localStorage.setItem('theme', scheme);
+        }
+
+        body.attr('data-theme', scheme);
+        body.find('div.cms iframe').each(function setFrameColorScheme(i, e) {
+            if (e.contentDocument) {
+                e.contentDocument.documentElement.dataset.theme = scheme;
+                // ckeditor (and potentially other apps) have iframes inside their admin forms
+                // also set color scheme there
+                $(e.contentDocument).find('iframe').each(setFrameColorScheme);
+            }
+        });
+    },
+
+    /**
+     * Cycles the color scheme for the current document and all iframes contained.
+     * Follows the logic introduced in Django's 4.2 admin
+     *
+     * @method setColorScheme
+     * @public}
+     * @returns {void}
+     */
+    toggleColorScheme: function () {
+        const currentTheme = this.getColorScheme();
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (prefersDark) {
+            // Auto (dark) -> Light -> Dark
+            if (currentTheme === 'auto') {
+                this.setColorScheme('light');
+            } else if (currentTheme === 'light') {
+                this.setColorScheme('dark');
+            } else {
+                this.setColorScheme('auto');
+            }
+        } else {
+            // Auto (light) -> Dark -> Light
+            // eslint-disable-next-line no-lonely-if
+            if (currentTheme === 'auto') {
+                this.setColorScheme('dark');
+            } else if (currentTheme === 'dark') {
+                this.setColorScheme('light');
+            } else {
+                this.setColorScheme('auto');
+            }
+        }
     }
 };
+
 
 /**
  * Provides key codes for common keys.

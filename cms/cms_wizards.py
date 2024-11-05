@@ -10,12 +10,8 @@ from .wizards.wizard_base import Wizard
 class CMSPageWizard(Wizard):
 
     def user_has_add_permission(self, user, page=None, **kwargs):
-        if page:
-            parent_page = page.get_parent_page()
-        else:
-            parent_page = None
-
-        if page and page.get_parent_page():
+        parent_page = page.parent if page else None
+        if page and parent_page:
             # User is adding a page which will be a right
             # sibling to the current page.
             has_perm = user_can_add_subpage(user, target=parent_page)

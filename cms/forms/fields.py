@@ -1,28 +1,15 @@
+import warnings
+
 from django import forms
 from django.contrib.admin.widgets import RelatedFieldWidgetWrapper
 from django.core.validators import EMPTY_VALUES
+from django.forms import ChoiceField
 from django.utils.translation import gettext_lazy as _
 
 from cms.forms.utils import get_page_choices, get_site_choices
 from cms.forms.validators import validate_url
 from cms.forms.widgets import PageSelectWidget, PageSmartLinkWidget
 from cms.models.pagemodel import Page
-
-
-class SuperLazyIterator():
-    def __init__(self, func):
-        self.func = func
-
-    def __iter__(self):
-        return iter(self.func())
-
-
-class LazyChoiceField(forms.ChoiceField):
-    def _set_choices(self, value):
-        # we overwrite this function so no list(value) is called
-        self._choices = self.widget.choices = value
-
-    choices = property(forms.ChoiceField._get_choices, _set_choices)
 
 
 class PageSelectFormField(forms.MultiValueField):
@@ -45,13 +32,11 @@ class PageSelectFormField(forms.MultiValueField):
         errors = self.default_error_messages.copy()
         if 'error_messages' in kwargs:
             errors.update(kwargs['error_messages'])
-        site_choices = SuperLazyIterator(get_site_choices)
-        page_choices = SuperLazyIterator(get_page_choices)
         self.limit_choices_to = limit_choices_to
         kwargs['required'] = required
         fields = (
-            LazyChoiceField(choices=site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
-            LazyChoiceField(choices=page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
+            ChoiceField(choices=get_site_choices, required=False, error_messages={'invalid': errors['invalid_site']}),
+            ChoiceField(choices=get_page_choices, required=False, error_messages={'invalid': errors['invalid_page']}),
         )
 
         # Remove the unexpected blank kwarg if it's supplied,

@@ -170,7 +170,7 @@ casper.test.begin('Pages can be added through the page tree', function(test) {
                         'Page is published by default'
                     );
                     // add nested page
-                    this.click('a[href*="/admin/cms/pagecontent/add/?parent_node=' + pageNodeId + '"]');
+                    this.click('a[href*="/admin/cms/pagecontent/add/?parent_page=' + pageNodeId + '"]');
                 })
                 .waitForSelector('#page_form', function() {
                     this.sendKeys('#id_title', 'Nested page');

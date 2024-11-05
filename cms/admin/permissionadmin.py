@@ -45,7 +45,7 @@ class PagePermissionInlineAdmin(TabularInline):
         return page_permissions.user_can_change_page_permissions(
             request.user,
             page=obj,
-            site=obj.node.site,
+            site=obj.site,
         )
 
     def has_add_permission(self, request, obj=None):
@@ -88,7 +88,7 @@ class PagePermissionInlineAdmin(TabularInline):
         """
         Some fields may be excluded here. User can change only
         permissions which are available for him. E.g. if user does not haves
-        can_publish flag, he can't change assign can_publish permissions.
+        can_change flag, he can't change assign can_change permissions.
         """
         exclude = self.exclude or []
         if obj:

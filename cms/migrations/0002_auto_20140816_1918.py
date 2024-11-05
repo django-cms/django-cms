@@ -115,10 +115,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(primary_key=True, verbose_name='ID', auto_created=True, serialize=False)),
                 ('language', models.CharField(db_index=True, max_length=15, verbose_name='language')),
-                ('title', models.CharField(max_length=255, verbose_name='title')),
-                ('page_title', models.CharField(max_length=255, null=True, help_text='overwrite the title (html title tag)', blank=True, verbose_name='title')),
-                ('menu_title', models.CharField(max_length=255, null=True, help_text='overwrite the title in the menu', blank=True, verbose_name='title')),
                 ('meta_description', models.TextField(max_length=155, null=True, help_text='The text displayed in search engines.', blank=True, verbose_name='description')),
+                ('title', models.CharField(max_length=255, help_text='The default title', verbose_name='title')),
+                ('page_title', models.CharField(max_length=255, null=True, help_text='Overwrites what is displayed at the top of your browser or in bookmarks', blank=True, verbose_name='Page Title')),
+                ('menu_title', models.CharField(max_length=255, null=True, help_text='Overwrite what is displayed in the menu', blank=True, verbose_name='Menu Title')),
                 ('slug', models.SlugField(max_length=255, verbose_name='slug')),
                 ('path', models.CharField(db_index=True, max_length=255, verbose_name='Path')),
                 ('has_url_overwrite', models.BooleanField(db_index=True, default=False, editable=False, verbose_name='has url overwrite')),

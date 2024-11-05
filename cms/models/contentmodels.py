@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -16,7 +17,7 @@ class PageContent(models.Model):
         (constants.VISIBILITY_ANONYMOUS, _('for anonymous users only')),
     )
     TEMPLATE_DEFAULT = constants.TEMPLATE_INHERITANCE_MAGIC if get_cms_setting(
-        'TEMPLATE_INHERITANCE') else get_cms_setting('TEMPLATES')[0][0]
+        'TEMPLATE_INHERITANCE') else (get_cms_setting('TEMPLATES')[0][0] if get_cms_setting('TEMPLATES') else "")
 
     X_FRAME_OPTIONS_CHOICES = (
         (constants.X_FRAME_OPTIONS_INHERIT, _('Inherit from parent page')),
@@ -38,32 +39,39 @@ class PageContent(models.Model):
     ]
 
     language = models.CharField(_("language"), max_length=15, db_index=True)
-    title = models.CharField(_("title"), max_length=255)
+    title = models.CharField(
+        verbose_name=_("title"),
+        max_length=255,
+        help_text=_("The default title"),
+    )
     page_title = models.CharField(
-        _("title"),
+        verbose_name=_("Page Title"),
         max_length=255,
         blank=True,
         null=True,
-        help_text=_("overwrite the title (html title tag)")
+        help_text=_(
+            "Overwrites what is displayed at the top of your browser or in bookmarks"
+        ),
     )
     menu_title = models.CharField(
-        _("title"),
+        verbose_name=_("Menu Title"),
         max_length=255,
         blank=True,
         null=True,
-        help_text=_("overwrite the title in the menu")
+        help_text=_("Overwrite what is displayed in the menu"),
     )
     meta_description = models.TextField(
-        _("description"),
+        verbose_name=_("Description meta tag"),
         blank=True,
         null=True,
-        help_text=_("The text displayed in search engines.")
+        help_text=_("A description of the page used by search engines."),
     )
     redirect = models.CharField(
-        _("redirect"),
+        verbose_name=_("redirect"),
         max_length=2048,
         blank=True,
-        null=True
+        null=True,
+        help_text=_("Redirects to this URL."),
     )
     page = models.ForeignKey(
         Page,
@@ -72,7 +80,7 @@ class PageContent(models.Model):
         related_name="pagecontent_set"
     )
     creation_date = models.DateTimeField(
-        _("creation date"),
+        verbose_name=_("creation date"),
         editable=False,
         default=timezone.now
     )
@@ -80,41 +88,50 @@ class PageContent(models.Model):
     placeholders = PlaceholderRelationField()
 
     created_by = models.CharField(
-        _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
-        editable=False)
+        verbose_name=_("created by"),
+        max_length=constants.PAGE_USERNAME_MAX_LENGTH,
+        editable=False,
+    )
     changed_by = models.CharField(
-        _("changed by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
-        editable=False)
+        verbose_name=_("changed by"),
+        max_length=constants.PAGE_USERNAME_MAX_LENGTH,
+        editable=False,
+    )
     changed_date = models.DateTimeField(auto_now=True)
 
-    in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
+    in_navigation = models.BooleanField(
+        verbose_name=_("in navigation"),
+        default=True,
+        db_index=True,
+    )
     soft_root = models.BooleanField(
-        _("soft root"),
+        verbose_name=_("soft root"),
         db_index=True,
         default=False,
-        help_text=_("All ancestors will not be displayed in the navigation")
+        help_text=_("All ancestors will not be displayed in the navigation"),
     )
     template = models.CharField(
-        _("template"),
+        verbose_name=_("template"),
         max_length=100,
         choices=template_choices,
         help_text=_('The template used to render the content.'),
-        default=TEMPLATE_DEFAULT
+        default=TEMPLATE_DEFAULT,
     )
     limit_visibility_in_menu = models.SmallIntegerField(
-        _("menu visibility"),
+        verbose_name=_("menu visibility"),
         default=constants.VISIBILITY_ALL,
         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES,
         db_index=True,
         blank=True,
         null=True,
-        help_text=_("limit when this page is visible in the menu")
+        help_text=_("limit when this page is visible in the menu"),
     )
 
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
         choices=X_FRAME_OPTIONS_CHOICES,
         default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
+        verbose_name=_("X Frame Options"),
     )
 
     objects = PageContentManager()
@@ -127,27 +144,27 @@ class PageContent(models.Model):
     """
 
     class Meta:
+        verbose_name = _("page content")
+        verbose_name_plural = _("page contents")
         default_permissions = []
         unique_together = (('language', 'page'),)
+        # TODO: unique_together shall be replaced against:
+        # constraints = [
+        #     models.UniqueConstraint(fields=['language', 'page'], name='language_and_page_uniq')
+        # ]
         app_label = 'cms'
 
     def __str__(self):
-        return u"%s (%s)" % (self.title, self.language)
+        return f"{self.title} ({self.language})"
 
     def __repr__(self):
-        display = '<{module}.{class_name} id={id} object at {location}>'.format(
-            module=self.__module__,
-            class_name=self.__class__.__name__,
-            id=self.pk,
-            location=hex(id(self)),
-        )
+        display = f'<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>'
         return display
 
     def update(self, **data):
         for field, value in data.items():
             setattr(self, field, value)
         self.save(update_fields=data.keys())
-        return
 
     def save(self, **kwargs):
         # delete template cache
@@ -176,6 +193,9 @@ class PageContent(models.Model):
     def has_placeholder_change_permission(self, user):
         return self.page.has_change_permission(user)
 
+    def has_publish_permission(self, user):
+        return self.page.has_publish_permission(user)
+
     def rescan_placeholders(self):
         """
         Rescan and if necessary create placeholders in the current template.
@@ -195,6 +215,39 @@ class PageContent(models.Model):
             language=self.language,
         )
 
+    def get_placeholder_slots(self):
+        """
+        Returns a list of placeholder slots for this page content object.
+        """
+        if not get_cms_setting('PLACEHOLDERS'):
+            return []
+        if not hasattr(self, "_placeholder_slot_cache"):
+            if self.template == constants.TEMPLATE_INHERITANCE_MAGIC:
+                templates = (
+                    self
+                    .get_ancestor_titles()
+                    .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
+                    .order_by('-page__node__path')
+                    .values_list('template', flat=True)
+                )
+                if templates:
+                    placeholder_set = templates[0]
+                else:
+                    placeholder_set = get_cms_setting('PLACEHOLDERS')[0][0]
+            else:
+                placeholder_set = self.template or get_cms_setting('PLACEHOLDERS')[0][0]
+
+            for key, value, _ in get_cms_setting("PLACEHOLDERS"):
+                if key == placeholder_set or key == "":  # NOQA: PLR1714 - Empty string matches always
+                    self._placeholder_slot_cache = value
+                    break
+            else:  # No matching placeholder list found
+                self._placeholder_slot_cache = get_cms_setting('PLACEHOLDERS')[0][1]
+        if isinstance(self._placeholder_slot_cache, str):
+            # Accidentally a strong not a tuple? Make it a 1-element tuple
+            self._placeholder_slot_cache = (self._placeholder_slot_cache,)
+        return self._placeholder_slot_cache
+
     def get_template(self):
         """
         get the template of this page if defined or if closer parent if
@@ -202,6 +255,9 @@ class PageContent(models.Model):
         """
         if hasattr(self, '_template_cache'):
             return self._template_cache
+
+        if not get_cms_setting("TEMPLATES"):
+            return ""
 
         if self.template != constants.TEMPLATE_INHERITANCE_MAGIC:
             self._template_cache = self.template or get_cms_setting('TEMPLATES')[0][0]
@@ -211,14 +267,14 @@ class PageContent(models.Model):
             self
             .get_ancestor_titles()
             .exclude(template=constants.TEMPLATE_INHERITANCE_MAGIC)
-            .order_by('-page__node__path')
+            .order_by('-page__path')
             .values_list('template', flat=True)
         )
 
         try:
             self._template_cache = templates[0]
         except IndexError:
-            self._template_cache = get_cms_setting('TEMPLATES')[0][0]
+            self._template_cache = get_cms_setting('TEMPLATES')[0][0] if get_cms_setting('TEMPLATES') else ""
         return self._template_cache
 
     def get_template_name(self):
@@ -257,7 +313,7 @@ class PageContent(models.Model):
             return xframe_options
 
         # Ignore those pages which just inherit their value
-        ancestors = self.get_ancestor_titles().order_by('-page__node__path')
+        ancestors = self.get_ancestor_titles().order_by('-page__path')
         ancestors = ancestors.exclude(xframe_options=constants.X_FRAME_OPTIONS_INHERIT)
 
         # Now just give me the clickjacking setting (not anything else)
@@ -286,13 +342,17 @@ class EmptyPageContent:
     menu_title = ""
     page_title = ""
     xframe_options = None
-    template = get_cms_setting('TEMPLATES')[0][0]
+    template = None
     soft_root = False
     in_navigation = False
 
     def __init__(self, language, page=None):
         self.language = language
         self.page = page
+        if get_cms_setting("TEMPLATES"):
+            self.template = get_cms_setting("TEMPLATES")[0][0]
+        else:
+            self.template = ""
 
     def __bool__(self):
         return False

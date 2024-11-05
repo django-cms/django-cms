@@ -43,7 +43,7 @@ casper.test.begin('Change Settings', function(test) {
             });
         })
         .waitForResource(/admin/)
-        // have to wait for the sideframe again, cause the page reloads itself after saving the the language
+        // have to wait for the sideframe again, cause the page reloads itself after saving the language
         .waitUntilVisible('.cms-sideframe-frame')
         .withFrame(0, function() {
             casper
@@ -69,7 +69,7 @@ casper.test.begin('Change Settings', function(test) {
                 });
         })
         .waitForResource(/admin/)
-        // have to wait for the sideframe again, cause the page reloads itself after saving the the language
+        // have to wait for the sideframe again, cause the page reloads itself after saving the language
         .waitUntilVisible('.cms-sideframe-frame')
         .withFrame(0, function() {
             casper

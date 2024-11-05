@@ -35,7 +35,7 @@ class TestSectionOutput(FileSectionWrapper):
         pass
 
 
-class CheckAssertMixin():
+class CheckAssertMixin:
     def assertCheck(self, successful, **assertions):
         """
         asserts that checks are successful or not
@@ -46,7 +46,7 @@ class CheckAssertMixin():
         self.assertEqual(output.successful, successful)
         for key, value in assertions.items():
             self.assertEqual(
-                getattr(output, key), value, "%s %s expected, got %s" % (value, key, getattr(output, key))
+                getattr(output, key), value, f"{value} {key} expected, got {getattr(output, key)}"
             )
 
 
@@ -61,15 +61,30 @@ class CheckTests(CheckAssertMixin, TestCase):
         with self.settings(INSTALLED_APPS=apps):
             self.assertCheck(False, errors=1)
 
+    def test_no_django_i18n_context_processor(self):
+        override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
+        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
+            'sekizai.context_processors.sekizai',
+            'cms.context_processors.cms_settings'
+        ]
+        with self.settings(**override):
+            self.assertCheck(False, errors=1)
+
     def test_no_cms_settings_context_processor(self):
         override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = ['sekizai.context_processors.sekizai']
+        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
+            'sekizai.context_processors.sekizai',
+            'django.template.context_processors.i18n',
+        ]
         with self.settings(**override):
             self.assertCheck(False, errors=1)
 
     def test_no_sekizai_template_context_processor(self):
         override = {'TEMPLATES': deepcopy(settings.TEMPLATES)}
-        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = ['cms.context_processors.cms_settings']
+        override['TEMPLATES'][0]['OPTIONS']['context_processors'] = [
+            'cms.context_processors.cms_settings',
+            'django.template.context_processors.i18n',
+        ]
         with self.settings(**override):
             self.assertCheck(False, errors=2)
 
@@ -120,6 +135,17 @@ class CheckTests(CheckAssertMixin, TestCase):
         with self.settings(SITE_ID='broken'):
             self.assertCheck(False, warnings=0, errors=1)
 
+    def test_cmsapps_check(self):
+        from cms.app_base import CMSApp
+        from cms.apphook_pool import apphook_pool
+        class AppWithoutName(CMSApp):
+            def get_urls(self, page=None, language=None, **kwargs):
+                return ["sampleapp.urls"]
+
+        app = apphook_pool.register(AppWithoutName)
+
+        self.assertCheck(True, warnings=1, errors=0)
+        apphook_pool.apps.pop(app.__name__)
 
 class CheckWithDatabaseTests(CheckAssertMixin, TestCase):
 

@@ -1,0 +1,59 @@
+name: New contributor message
+
+on:
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  pull-requests: write
+
+jobs:
+  new:
+    name: Hello new contributor
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/first-interaction@v1
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          pr-message: |
+            Hello! Thank you for your contribution! 🎉
+
+            As it's your first contribution, be sure to check out the [contribution docs](https://docs.django-cms.org/en/latest/contributing/index.html).
+
+            We invite you to join us on our [Discord Server](https://discord-main-channel.django-cms.org)!
+
+            Welcome aboard ⛵️!
+  discord:
+    name: Discord Notification
+    runs-on: ubuntu-latest
+    needs: new
+    steps:
+      - name: Send Discord Webhook
+        continue-on-error: true
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_EMBEDS: |
+            {
+              "embeds": [
+                {
+                  "title": "New Contributor Alert",
+                  "description": "A new contributor has opened a pull request!",
+                  "color": 3066993,
+                  "fields": [
+                    {
+                      "name": "Repository",
+                      "value": "${{ github.repository }}"
+                    },
+                    {
+                      "name": "Pull Request",
+                      "value": "${{ github.event.pull_request.html_url }}"
+                    },
+                    {
+                      "name": "Contributor",
+                      "value": "${{ github.event.pull_request.user.login }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        uses: Ilshidur/action-discord@master

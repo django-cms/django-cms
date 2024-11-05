@@ -1,0 +1,20 @@
+# Read the Docs configuration file
+# See https://docs.readthedocs.io/en/stable/config-file/v2.html for details
+version: 2
+
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.11"
+
+sphinx:
+  configuration: docs/conf.py
+  fail_on_warning: false
+
+formats:
+  - epub
+  - pdf
+
+python:
+  install:
+    - requirements: docs/requirements.txt

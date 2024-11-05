@@ -3,7 +3,7 @@ import sys
 import uuid
 
 # Py2 and Py3 compatible reload
-from imp import reload
+from importlib import reload
 from threading import local
 
 from django.conf import settings
@@ -89,24 +89,19 @@ def reload_urlconf(urlconf=None, new_revision=None):
 
 
 def log_reloading_apphook(global_revision, local_revision):
-    debug_msg = "   New revision!!!! RELOAD!\n      {0} ({1})\n   -> {2} ({3})".format(
-        global_revision, type(global_revision),
-        local_revision, type(local_revision),
-    )
-    logger.debug(debug_msg)
+    logger.debug(f"   New revision!!!! RELOAD!\n"
+                 f"      {global_revision} ({type(global_revision)})\n"
+                 f"   -> {local_revision} ({type(local_revision)})")
 
 
 def debug_check_url(url_name):
     from django.urls import reverse
 
     try:
-        debug_msg = "    reverse('{0}'): {1} ".format(
+        debug_msg = "    reverse('{}'): {} ".format(
             url_name,
             reverse('my_test_app_view'),
         )
     except Exception as e:
-        debug_msg = "    ERROR: reverse('{0}'): {1}".format(
-            url_name,
-            e,
-        )
+        debug_msg = f"    ERROR: reverse('{url_name}'): {e}"
     logger.debug(debug_msg)

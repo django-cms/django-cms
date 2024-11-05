@@ -1,33 +1,40 @@
 from django.conf import settings
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.template.response import TemplateResponse
 from django.urls import Resolver404, resolve, reverse
 
 from cms import __version__, constants
 from cms.cache.page import set_page_cache
 from cms.models import EmptyPageContent
-from cms.utils.page import get_page_template_from_request
 from cms.utils.page_permissions import user_can_change_page, user_can_view_page
+from cms.utils.urlutils import admin_reverse
 
 
-def render_page(request, page, current_language, slug):
+def render_page(request, page, current_language, slug=None):
     """
     Renders a page
     """
+    page_content = page.page_content_cache.get(current_language, page.get_content_obj(current_language))
     context = {}
     context['lang'] = current_language
     context['current_page'] = page
+    context['current_pagecontent'] = page_content
     context['has_change_permissions'] = user_can_change_page(request.user, page)
     context['has_view_permissions'] = user_can_view_page(request.user, page)
 
     cant_view_page = any([
         not context['has_view_permissions'],
-        isinstance(page.get_content_obj(current_language), EmptyPageContent)
+        isinstance(page_content, EmptyPageContent)
     ])
     if cant_view_page:
         return _handle_no_page(request)
 
-    template = get_page_template_from_request(request)
+    template = page_content.get_template()
+    if not template:
+        # Render placeholder content with minimal markup
+
+        from cms.views import render_placeholder_content
+        return render_placeholder_content(request, page_content, context)
     response = TemplateResponse(request, template, context)
     response.add_post_render_callback(set_page_cache)
 
@@ -39,7 +46,7 @@ def render_page(request, page, current_language, slug):
         # This is when we defer to django's own clickjacking handling
         return response
 
-    # We want to prevent django setting this in their middlewear
+    # We want to prevent django setting this in their middleware
     response.xframe_options_exempt = True
 
     if xframe_options == constants.X_FRAME_OPTIONS_ALLOW:
@@ -54,6 +61,12 @@ def render_page(request, page, current_language, slug):
 
 def _handle_no_page(request):
     try:
+        # redirect to PageContent's changelist if the root page is detected
+        resolved_path = resolve(request.path)
+        if resolved_path.url_name == 'pages-root':
+            redirect_url = admin_reverse('cms_pagecontent_changelist')
+            return HttpResponseRedirect(redirect_url)
+
         # add a $ to the end of the url (does not match on the cms anymore)
         resolve('%s$' % request.path)
     except Resolver404 as e:
@@ -83,4 +96,4 @@ def render_pagecontent(request, pagecontent):
     language = pagecontent.language
     request.current_page = page = pagecontent.page
     page.page_content_cache[language] = pagecontent
-    return render_page(request, page, language, page.get_slug(language))
+    return render_page(request, page, language)

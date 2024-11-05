@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import connection, models
+from django.db import connection, models, transaction
 from django.template.defaultfilters import title
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
@@ -53,13 +53,7 @@ class Placeholder(models.Model):
         return self.slot
 
     def __repr__(self):
-        display = "<{module}.{class_name} id={id} slot='{slot}' object at {location}>".format(
-            module=self.__module__,
-            class_name=self.__class__.__name__,
-            id=self.pk,
-            slot=self.slot,
-            location=hex(id(self)),
-        )
+        display = f"<{self.__module__}.{self.__class__.__name__} id={self.pk} slot='{self.slot}' object at {hex(id(self))}>"
         return display
 
     def clear(self, language=None):
@@ -437,7 +431,7 @@ class Placeholder(models.Model):
             invalidate_cms_page_cache()
 
         if not site_id and self.page:
-            site_id = self.page.node.site_id
+            site_id = self.page.site_id
         clear_placeholder_cache(self, language, get_site_id(site_id))
 
     def get_plugin_tree_order(self, language, parent_id=None):
@@ -690,17 +684,22 @@ class Placeholder(models.Model):
         :param instance: Plugin to add. It's position parameter needs to be set.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
         """
-        instance.get_descendants().delete()
-        instance.delete()
-        last_plugin = self.get_last_plugin(instance.language)
+        with transaction.atomic():
+            # We're using raw sql - make the whole operation atomic
+            plugins = self.get_plugins(language=instance.language).count()  # 1st hit: Count plugins
+            descendants = instance._get_descendants_ids()  # 2nd hit: Get descendant ids
+            to_delete = [instance.pk] + descendants  # Instance plus descendants pk
+            self.cmsplugin_set.filter(pk__in=to_delete).delete()  # 3rd hit: Delete all plugins in one query
 
-        if last_plugin:
-            self._shift_plugin_positions(
-                instance.language,
-                start=instance.position,
-                offset=last_plugin.position,
-            )
-            self._recalculate_plugin_positions(instance.language)
+            last_position = instance.position + len(descendants)  # Last position of deleted plugins
+            if last_position < plugins:
+                # Close the gap in the plugin tree (2 hits)
+                self._shift_plugin_positions(
+                    instance.language,
+                    start=instance.position,
+                    offset=plugins,
+                )
+                self._recalculate_plugin_positions(instance.language)
 
     def get_last_plugin(self, language):
         return self.get_plugins(language).last()
@@ -762,39 +761,15 @@ class Placeholder(models.Model):
         cursor = _get_database_cursor('write')
         db_vendor = _get_database_vendor('write')
 
-        if db_vendor == 'sqlite':
-            sql = (
-                'CREATE TEMPORARY TABLE temp AS '
-                'SELECT ID, ('
-                'SELECT COUNT(*)+1 FROM {0} t WHERE '
-                'placeholder_id={0}.placeholder_id AND language={0}.language '
-                'AND {0}.position > t.position'
-                ') AS new_position '
-                'FROM {0} WHERE placeholder_id=%s AND language=%s'
-            )
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk, language])
-
+        if db_vendor in ('sqlite', 'postgresql'):
             sql = (
                 'UPDATE {0} '
-                'SET position = (SELECT new_position FROM temp WHERE id={0}.id) '
-                'WHERE placeholder_id=%s AND language=%s'
-            )
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk, language])
-
-            sql = 'DROP TABLE temp'
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql)
-        elif db_vendor == 'postgresql':
-            sql = (
-                'UPDATE {0} '
-                'SET position = RowNbrs.RowNbr '
+                'SET position = subquery.new_pos '
                 'FROM ('
-                'SELECT  ID, ROW_NUMBER() OVER (ORDER BY position) AS RowNbr '
-                'FROM {0} WHERE placeholder_id=%s AND language=%s '
-                ') RowNbrs '
-                'WHERE {0}.id=RowNbrs.id'
+                '  SELECT  ID, ROW_NUMBER() OVER (ORDER BY position, id) AS new_pos '
+                '  FROM {0} WHERE placeholder_id=%s AND language=%s '
+                ') subquery '
+                'WHERE {0}.id=subquery.id'
             )
             sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
             cursor.execute(sql, [self.pk, language])
@@ -822,5 +797,5 @@ class Placeholder(models.Model):
             cursor.execute(sql, [self.pk, language])
         else:
             raise RuntimeError(
-                '{} is not supported by django-cms'.format(connection.vendor)
+                f'{connection.vendor} is not supported by django-cms'
             )

@@ -16,6 +16,9 @@ $pagetree: true;
 
 
 a.btn.cms-action-btn {
+    color: var(--dca-gray-darkest, var(--body-fg));
+    border: 1px solid var(--dca-gray-lighter, #ddd);
+    border-radius: $border-radius-base;
     position: relative;
     display: inline-flex;
     padding: 0 !important;

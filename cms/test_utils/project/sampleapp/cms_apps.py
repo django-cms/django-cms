@@ -72,7 +72,7 @@ class SampleApp2(CMSApp):
 
 
 class SampleApp3(CMSApp):
-    # CMSApp which returns the url directly rather than trough another Python module
+    # CMSApp which returns the url directly rather than through another Python module
     name = _("Sample App 3")
 
     def get_urls(self, page=None, language=None, **kwargs):
@@ -82,6 +82,15 @@ class SampleApp3(CMSApp):
         return [
             re_path(r'^$', my_view, name='sample3-root'),
         ]
+
+
+class SampleAppWithoutLandingPage(CMSApp):
+    # CMSApp that does not define a view at ''
+
+    name = _("Sample App Without Landing Page")
+
+    def get_urls(self, page=None, language=None, **kwargs):
+        return ["cms.test_utils.project.sampleapp.urls_extra"]
 
 
 class NamespacedApp(CMSApp):
@@ -136,6 +145,7 @@ apphook_pool.register(SampleApp)
 apphook_pool.register(SampleAppWithExcludedPermissions)
 apphook_pool.register(SampleApp2)
 apphook_pool.register(SampleApp3)
+apphook_pool.register(SampleAppWithoutLandingPage)
 apphook_pool.register(NamespacedApp)
 apphook_pool.register(ParentApp)
 apphook_pool.register(VariableUrlsApp)

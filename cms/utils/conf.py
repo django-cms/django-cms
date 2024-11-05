@@ -21,12 +21,11 @@ def _load_from_file(module_path):
     """
     Load a python module from its absolute filesystem path
     """
-    from imp import PY_SOURCE, load_module
+    from importlib.machinery import SourceFileLoader
 
     imported = None
     if module_path:
-        with open(module_path, 'r') as openfile:
-            imported = load_module("mod", openfile, module_path, ('imported', 'r', PY_SOURCE))
+        imported = SourceFileLoader("mod", module_path).load_module()
     return imported
 
 
@@ -48,6 +47,7 @@ DEFAULTS = {
     'DEFAULT_X_FRAME_OPTIONS': constants.X_FRAME_OPTIONS_INHERIT,
     'TOOLBAR_SIMPLE_STRUCTURE_MODE': True,
     'PLACEHOLDER_CONF': {},
+    'PLACEHOLDERS': (('', ('content',), _("Single placeholder")),),
     'PERMISSION': False,
     # Whether to use raw ID lookups for users when PERMISSION is True
     'RAW_ID_USERS': False,
@@ -62,7 +62,7 @@ DEFAULTS = {
     'PAGE_CACHE': True,
     'PLACEHOLDER_CACHE': True,
     'PLUGIN_CACHE': True,
-    'CACHE_PREFIX': 'cms_{}_'.format(__version__),
+    'CACHE_PREFIX': f'cms_{__version__}_',
     'PLUGIN_PROCESSORS': [],
     'PLUGIN_CONTEXT_PROCESSORS': [],
     'UNIHANDECODE_VERSION': None,
@@ -88,6 +88,8 @@ DEFAULTS = {
     'REDIRECT_PRESERVE_QUERY_PARAMS': False,
     'REDIRECT_TO_LOWERCASE_SLUG': False,
     'HIDE_LEGACY_FEATURES': True,
+    'COLOR_SCHEME': 'auto',
+    'COLOR_SCHEME_TOGGLE': True,
 }
 
 
@@ -130,12 +132,12 @@ def get_toolbar_url__enable():
 def get_templates():
     if getattr(settings, 'CMS_TEMPLATES_DIR', False):
         tpldir = getattr(settings, 'CMS_TEMPLATES_DIR', False)
-        # CMS_TEMPLATES_DIR can either be a string poiting to the templates directory
+        # CMS_TEMPLATES_DIR can either be a string pointing to the templates directory
         # or a dictionary holding 'site: template dir' entries
         if isinstance(tpldir, dict):
             tpldir = tpldir[settings.SITE_ID]
-        # We must extract the relative path of CMS_TEMPLATES_DIR to the neares
-        # valid templates directory. Here we mimick what the filesystem and
+        # We must extract the relative path of CMS_TEMPLATES_DIR to the nearest
+        # valid templates' directory. Here we mimic what the filesystem and
         # app_directories template loaders do
         prefix = ''
         # Relative to TEMPLATE['DIRS'] for filesystem loader
@@ -167,9 +169,17 @@ def get_templates():
             templates = list((os.path.join(prefix, tpl), tpl) for tpl in os.listdir(tpldir))
     else:
         templates = list(getattr(settings, 'CMS_TEMPLATES', []))
-    if get_cms_setting('TEMPLATE_INHERITANCE'):
+    if get_cms_setting('TEMPLATE_INHERITANCE') and templates:
         templates.append((constants.TEMPLATE_INHERITANCE_MAGIC, _('Inherit the template of the nearest ancestor')))
     return templates
+
+
+def get_placeholders():
+    if getattr(settings, 'CMS_PLACEHOLDERS', False):
+        return settings.CMS_PLACEHOLDERS
+    if getattr(settings, 'CMS_TEMPLATES', False) or getattr(settings, 'CMS_TEMPLATES_DIR', False):
+        return ()
+    return DEFAULTS['PLACEHOLDERS']
 
 
 def _ensure_languages_settings(languages):
@@ -209,7 +219,7 @@ def _ensure_languages_settings(languages):
             for key in language_object:
                 if key not in valid_language_keys:
                     raise ImproperlyConfigured(
-                        "CMS_LANGUAGES has invalid key %r in language %r in site %r" % (key, language_code, site)
+                        f"CMS_LANGUAGES has invalid key {key!r} in language {language_code!r} in site {site!r}"
                     )
 
             if 'fallbacks' not in language_object:
@@ -271,6 +281,7 @@ COMPLEX = {
     'MEDIA_URL': get_media_url,
     # complex because not prefixed by CMS_
     'TEMPLATES': get_templates,
+    'PLACEHOLDERS': get_placeholders,
     'LANGUAGES': get_languages,
     'UNIHANDECODE_HOST': get_unihandecode_host,
     'CMS_TOOLBAR_URL__PERSIST': get_toolbar_url__persist,

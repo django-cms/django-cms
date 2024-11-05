@@ -7,10 +7,12 @@ from cms.cache.permissions import (
     get_permission_cache,
     set_permission_cache,
 )
-from cms.models.permissionmodels import GlobalPagePermission
+from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
 from cms.test_utils.testcases import CMSTestCase
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.page_permissions import (
-    get_change_id_list,
+    get_change_perm_tuples,
+    has_generic_permission,
     user_can_publish_page,
 )
 
@@ -59,10 +61,10 @@ class PermissionCacheTests(CMSTestCase):
         cached_permissions = get_permission_cache(self.user_normal, "change_page")
         self.assertIsNone(cached_permissions)
 
-        live_permissions = get_change_id_list(self.user_normal, Site.objects.get_current())
+        live_permissions = get_change_perm_tuples(self.user_normal, Site.objects.get_current())
         cached_permissions_permissions = get_permission_cache(self.user_normal,
                                                               "change_page")
-        self.assertEqual(live_permissions, [page_b.id])
+        self.assertEqual(live_permissions, [(ACCESS_PAGE_AND_DESCENDANTS, page_b.node.path)])
         self.assertEqual(cached_permissions_permissions, live_permissions)
 
     def test_cached_permission_precedence(self):
@@ -88,3 +90,24 @@ class PermissionCacheTests(CMSTestCase):
             Site.objects.get_current(),
         )
         self.assertTrue(can_publish)
+
+    def test_has_generic_permissions_compatibiltiy(self):
+        from cms.utils.permissions import has_page_permission
+
+        page_b = create_page("page_b", "nav_playground.html", "en",
+                             created_by=self.user_super)
+        assign_user_to_page(page_b, self.user_normal, can_view=True,
+                            can_change=True)
+
+        self.assertTrue(has_generic_permission(page_b, self.user_normal, "change_page"))
+        self.assertFalse(has_generic_permission(page_b, self.user_normal, "publish_page"))
+
+        message = ("has_page_permission is deprecated and will be removed in django CMS 4.3. "
+                   "Use cms.utils.page_permissions.has_generic_permission instead.")
+        # Backwards compatibility: check if the old permission names work
+        with self.assertWarns(RemovedInDjangoCMS43Warning) as w:
+            self.assertTrue(has_page_permission(self.user_normal, page_b, "change"))
+        self.assertEqual(str(w.warning), message)
+        with self.assertWarns(RemovedInDjangoCMS43Warning) as w:
+            self.assertFalse(has_page_permission(self.user_normal, page_b, "publish"))
+        self.assertEqual(str(w.warning), message)

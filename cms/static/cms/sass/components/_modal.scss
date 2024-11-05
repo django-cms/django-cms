@@ -1,6 +1,8 @@
 //##############################################################################
 // MODAL
 
+@use "sass:math";
+
 // Editing plugins in frontend
 .cms-modal {
     display: none;
@@ -51,13 +53,13 @@
         .cms-modal-title {
             // set correct cursor when maximized #3111
             cursor: default;
-            padding-right: $modal-header-button-area-size * 3;
+            padding-inline-end: $modal-header-button-area-size * 3;
         }
         .cms-modal-title-suffix {
             display: none;
         }
         .cms-modal-minimize {
-            right: $modal-header-button-area-size + $padding-base;
+            inset-inline-end: $modal-header-button-area-size + $padding-base;
         }
     }
 }
@@ -138,10 +140,10 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    margin-right: $modal-header-button-area-size * 3 + $padding-normal;
+    margin-inline-end: $modal-header-button-area-size * 3 + $padding-normal;
     .cms-modal-title-suffix {
         font-weight: normal;
-        padding-left: $padding-normal;
+        padding-inline-start: $padding-normal;
     }
 }
 
@@ -151,8 +153,8 @@
     display: block;
     position: absolute;
     top: 50%;
-    margin-top: -$modal-header-button-area-size / 2;
-    right: $padding-normal;
+    margin-top: math.div(-$modal-header-button-area-size, 2);
+    inset-inline-end: $padding-normal;
     color: $gray-light;
     text-align: center;
     width: $modal-header-button-area-size;
@@ -160,14 +162,14 @@
     cursor: pointer;
     &:before {
         position: relative;
-        top: ($modal-header-button-area-size - $icon-size) / 2;
+        top: math.div($modal-header-button-area-size - $icon-size, 2);
     }
     &:hover {
         color: $color-primary;
     }
 }
 .cms-modal-minimize {
-    right: 2 * $modal-header-button-area-size + $padding-normal;
+    inset-inline-end: 2 * $modal-header-button-area-size + $padding-normal;
     .cms-modal-minimized & {
         @include icon(plus);
         color: $color-primary;
@@ -178,7 +180,7 @@
     }
 }
 .cms-modal-maximize {
-    right: $modal-header-button-area-size + $padding-normal;
+    inset-inline-end: $modal-header-button-area-size + $padding-normal;
     // ensure maximize element is hidden #3111
     .cms-modal-minimized & {
         display: none !important;
@@ -191,7 +193,7 @@
 
 .cms-modal-resize {
     position: absolute;
-    right: 0;
+    inset-inline-end: 0;
     bottom: 0;
     z-index: z(modal, resize);
     font-size: 10px;
@@ -199,11 +201,17 @@
     width: $modal-resize-size;
     height: $modal-resize-size;
     cursor: nw-resize;
+    &:dir(rtl) {
+        cursor: ne-resize;
+    }
     span {
         position: absolute;
         bottom: 5px;
         right: 5px;
         font-size: $font-size-small;
+        &:dir(rtl) {
+            transform: scale(-1,1) translate(2px, 0);  // flip drag triangle
+        }
     }
 }
 
@@ -223,7 +231,7 @@
     a {
         color: $color-primary;
         &:hover {
-            color: darken($color-primary, 20%);
+            filter: brightness(0.8);
         }
         &:after {
             content: "/";
@@ -247,25 +255,36 @@
     right: 0;
     left: 0;
     z-index: z(modal, buttons);
-    padding: 0 $modal-resize-size 0 $padding-normal;
+    padding-block: 0;
+    padding-inline: $padding-normal $modal-resize-size;
 }
 .cms-modal-item-buttons {
-    $margin: ($toolbar-height - $toolbar-button-height) / 2;
+    $margin: math.div($toolbar-height - $toolbar-button-height, 2);
     @extend .cms-toolbar-item-buttons;
     float: right;
-    margin-left: $margin;
+    &:dir(rtl) {
+        float: left;
+    }
+    margin-inline-start: $margin;
+
+    .cancel-link {
+        display: none;
+    }
 }
 .cms-modal-item-buttons-left {
     float: left;
+    &:dir(rtl) {
+        float: right;
+    }
 }
 
 // alter footer when html markup is loaded
 .cms-modal-markup {
     .cms-modal-foot {
-        height: $modal-footer-height / 2;
+        height: math.div($modal-footer-height, 2);
     }
     .cms-modal-body {
-        bottom: $modal-footer-height / 2;
+        bottom: math.div($modal-footer-height, 2);
     }
 }
 

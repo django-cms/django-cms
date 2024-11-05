@@ -58,7 +58,7 @@ def notfound(request):
     raise Http404
 
 
-class ClassView():
+class ClassView:
     def __call__(self, request, *args, **kwargs):
         context = {'content': 'plain text'}
         return render(request, "sampleapp/plain.html", context)

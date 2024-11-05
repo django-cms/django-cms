@@ -1,13 +1,16 @@
 MarkupSafe
 Pygments
-sphinx
+furo
+Sphinx>=4.2.0
+sphinx-copybutton
+sphinxext-opengraph
 sphinxcontrib-spelling
 pyenchant>3
 sphinx-autobuild
-divio-docs-theme
 datetime
 coverage
-django~=3.2
-django-sekizai<4  # for python 3.7
-django-cms
+django~=4.2
+git+https://github.com/django-cms/django-cms@release/4.1.x
+codespell
 pip-tools
+docstrfmt

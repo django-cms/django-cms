@@ -2,23 +2,31 @@
 // SETTINGS
 
 $pagetree-mobile: $screen-mobile + 200px;
-$pagetree-box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+$pagetree-box-shadow: 0 0 5px 0 rgba(var(--dca-shadow), 0.2);
 $pagetree-border: 1px solid $gray-lighter;
 
 // top header area
 $pagetree-header-background: $gray-super-lightest;
 $pagetree-header-height: 36px;
 $pagetree-header-padding: 15px 20px;
+$pagetree-header-padding-block: 15px;
+$pagetree-header-padding-inline: 20px;
 $pagetree-header-space: 10px;
 $pagetree-header-search-width: 220px;
 $pagetree-header-filter-height: 400px;
 
 // dropdown
 $pagetree-dropdown-padding-horizontal: 15px;
+$pagetree-dropdown-padding-horizontal: 15px;
+$pagetree-dropdown-padding-horizontal: 15px;
 
 // menu sections
 $pagetree-section-padding: 15px 20px;
+$pagetree-section-padding-block: 15px;
+$pagetree-section-padding-inline: 20px;
 $pagetree-section-padding-condensed: 10px 20px;
+$pagetree-section-padding-condensed-block: 10px;
+$pagetree-section-padding-condensed-inline: 20px;
 $pagetree-section-height: 15px;
 $pagetree-section-border: 1px solid $gray-lighter;
 
@@ -29,10 +37,18 @@ $pagetree-cell-height: 46px;
 
 // general paddings for elements
 $pagetree-jstree-header-padding: 3px 6px;
+$pagetree-jstree-header-padding-block: 3px;
+$pagetree-jstree-header-padding-inline: 6px;
 $pagetree-anchor-padding: 12px 25px;
+$pagetree-anchor-padding-block: 12px 12px;
+$pagetree-anchor-padding-inline: 25px 25px;
 $pagetree-anchor-padding-with-icon: 12px 25px 12px 45px;
+$pagetree-anchor-padding-block-with-icon: 12px 12px; 
+$pagetree-anchor-padding-inline-with-icon: 45px 25px; 
 $pagetree-nesting-padding: 20px;
 $pagetree-cell-padding: 7px 8px;
+$pagetree-cell-padding-block: 7px 7px;
+$pagetree-cell-padding-inline: 8px 8px;
 
 // marker used for positioning when moving nodes
 $pagetree-marker-size: 6px;

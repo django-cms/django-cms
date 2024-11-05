@@ -45,6 +45,9 @@ $wizard-input-size: 16px;
         // tablet and up
         @media (min-width: $screen-tablet) {
             float: left !important;
+            &:dir(rtl) {
+                float: right !important;
+            }
             width: 48% !important;
         }
 
@@ -71,7 +74,7 @@ $wizard-input-size: 16px;
 
         &.active {
             border-color: $btn-action-border;
-            background: lighten($btn-action-bgcolor, 45%);
+            background: rgba($color-primary-fallback, 45%);
         }
     }
 }

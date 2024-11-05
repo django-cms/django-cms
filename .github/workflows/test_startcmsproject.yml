@@ -1,0 +1,39 @@
+name: djangocms mysite test
+
+on: pull_request
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  create-project:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        django-version: [
+          '4.2', '5.0', '5.1'
+        ]
+        python-version: ['3.11']
+        requirements-file: ['requirements_base.txt']
+        os: [
+          ubuntu-20.04,
+        ]
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }}
+
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Create project from template
+      run: |
+        sudo apt install gettext gcc -y
+        python -m venv .venv
+        source ./.venv/bin/activate
+        python -m pip install --upgrade pip
+        pip install Django~=${{ matrix.django-version }}
+        pip install -e .
+        djangocms mysite --noinput

@@ -58,32 +58,32 @@ class FileOutputWrapper:
         return colorize(msg, opts=opts, **kwargs)
 
     def write_line(self, message=''):
-        self.write(u'%s\n' % message)
+        self.write('%s\n' % message)
 
     def write(self, message):
         self.stdout.write(message)
 
     def write_stderr_line(self, message=''):
-        self.write_stderr(u'%s\n' % message)
+        self.write_stderr('%s\n' % message)
 
     def write_stderr(self, message):
         self.stderr.write(message)
 
     def success(self, message):
         self.successes += 1
-        self.write_line(u'%s %s' % (message, self.colorize('[OK]', fg='green', opts=['bold'])))
+        self.write_line('{} {}'.format(message, self.colorize('[OK]', fg='green', opts=['bold'])))
 
     def error(self, message):
         self.errors += 1
-        self.write_stderr_line(u'%s %s' % (message, self.colorize('[ERROR]', fg='red', opts=['bold'])))
+        self.write_stderr_line('{} {}'.format(message, self.colorize('[ERROR]', fg='red', opts=['bold'])))
 
     def warn(self, message):
         self.warnings += 1
-        self.write_stderr_line(u'%s %s' % (message, self.colorize('[WARNING]', fg='yellow', opts=['bold'])))
+        self.write_stderr_line('{} {}'.format(message, self.colorize('[WARNING]', fg='yellow', opts=['bold'])))
 
     def skip(self, message):
         self.skips += 1
-        self.write_line(u'%s %s' % (message, self.colorize('[SKIP]', fg='blue', opts=['bold'])))
+        self.write_line('{} {}'.format(message, self.colorize('[SKIP]', fg='blue', opts=['bold'])))
 
     @method_decorator(contextmanager)
     def section(self, title):
@@ -126,10 +126,10 @@ class FileSectionWrapper(FileOutputWrapper):
         self.wrapper = wrapper
 
     def write_line(self, message=''):
-        self.write(u'  - %s\n' % message)
+        self.write('  - %s\n' % message)
 
     def write_stderr_line(self, message=''):
-        self.write_stderr(u'  - %s\n' % message)
+        self.write_stderr('  - %s\n' % message)
 
     def finish_success(self, message):
         self.wrapper.write_line()
@@ -208,7 +208,7 @@ def check_i18n(output):
                              "'en_US'): '%s' provided" % lang[0])
         if settings.SITE_ID == hash(settings.SITE_ID):
             for site, items in get_cms_setting('LANGUAGES').items():
-                if type(site) == int:
+                if isinstance(site, int):
                     for lang in items:
                         if lang['code'].find('_') > -1:
                             section.warn("CMS_LANGUAGES entries must contain valid language codes, not locales (e.g.: "
@@ -232,13 +232,11 @@ def check_middlewares(output):
             'cms.middleware.toolbar.ToolbarMiddleware',
             'cms.middleware.language.LanguageCookieMiddleware',
         )
-        if getattr(settings, 'MIDDLEWARE', None):
-            middlewares = settings.MIDDLEWARE
-        else:
-            middlewares = settings.MIDDLEWARE_CLASSES
+        middlewares = getattr(settings, 'MIDDLEWARE', [])
+
         for middleware in required_middlewares:
             if middleware not in middlewares:
-                section.error("%s middleware must be in MIDDLEWARE_CLASSES" % middleware)
+                section.error("%s middleware must be in MIDDLEWARE" % middleware)
 
 
 @define_check
@@ -248,6 +246,7 @@ def check_context_processors(output):
             chain(*[template['OPTIONS'].get('context_processors', []) for template in settings.TEMPLATES]))
         required_processors = (
             'cms.context_processors.cms_settings',
+            'django.template.context_processors.i18n'
         )
         for processor in required_processors:
             if processor not in processors:
@@ -269,7 +268,7 @@ def check_plugin_instances(output):
             # warn about those that have unsaved instances
             if plugin_type["unsaved_instances"]:
                 section.error(
-                    "%s has %s unsaved instances" % (plugin_type["type"], len(plugin_type["unsaved_instances"])))
+                    "{} has {} unsaved instances".format(plugin_type["type"], len(plugin_type["unsaved_instances"])))
 
         if section.successful:
             section.finish_success("The plugins in your database are in good order")
@@ -288,7 +287,7 @@ def check_copy_relations(output):
     from cms.plugin_pool import plugin_pool
 
     def c_to_s(klass):
-        return '%s.%s' % (klass.__module__, klass.__name__)
+        return f'{klass.__module__}.{klass.__name__}'
 
     def get_class(method_name, model):
         for cls in inspect.getmro(model):
@@ -305,17 +304,11 @@ def check_copy_relations(output):
                 # to do
                 continue
             for rel in plugin_class._meta.many_to_many:
-                section.warn('%s has a many-to-many relation to %s,\n    but no "copy_relations" method defined.' % (
-                    c_to_s(plugin_class),
-                    c_to_s(rel.model),
-                ))
+                section.warn(f'{c_to_s(plugin_class)} has a many-to-many relation to {c_to_s(rel.model)},\n    but no "copy_relations" method defined.')
             for rel in plugin_class._get_related_objects():
                 if rel.model != CMSPlugin and not issubclass(
                         rel.model, plugin.model) and rel.model != AliasPluginModel:
-                    section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(plugin_class),
-                        c_to_s(rel.model),
-                    ))
+                    section.warn(f'{c_to_s(plugin_class)} has a foreign key from {c_to_s(rel.model)},\n    but no "copy_relations" method defined.')
 
         for extension in chain(extension_pool.page_extensions, extension_pool.page_content_extensions):
             if get_class('copy_relations', extension) is not BaseExtension:
@@ -332,18 +325,62 @@ def check_copy_relations(output):
                 )
             for rel in extension._get_related_objects():
                 if rel.model != extension:
-                    section.warn('%s has a foreign key from %s,\n    but no "copy_relations" method defined.' % (
-                        c_to_s(extension),
-                        c_to_s(rel.model),
-                    ))
+                    section.warn(f'{c_to_s(extension)} has a foreign key from {c_to_s(rel.model)},\n    but no "copy_relations" method defined.')
 
         if not section.warnings:
-            section.finish_success('All plugins and page/title extensions have "copy_relations" method if needed.')
+            section.finish_success('All plugins and page/page content extensions have "copy_relations" method if needed.')
         else:
-            section.finish_success('Some plugins or page/title extensions do not define a "copy_relations" method.\n'
+            section.finish_success('Some plugins or page/page content extensions do not define a "copy_relations" method.\n'
                                    'This might lead to data loss when publishing or copying plugins/extensions.\n'
                                    'See https://django-cms.readthedocs.io/en/latest/extending_cms/custom_plugins.html#handling-relations or '  # noqa
                                    'https://django-cms.readthedocs.io/en/latest/extending_cms/extending_page_title.html#handling-relations.')  # noqa
+
+
+@define_check
+def check_template_conf(output):
+    with output.section("Template configuration") as section:
+        if get_cms_setting("TEMPLATES"):
+            if isinstance(get_cms_setting("TEMPLATES"), (list, tuple)):
+                for template in get_cms_setting("TEMPLATES"):
+                    if not isinstance(template, (list, tuple)):
+                        section.error("CMS_TEMPLATES setting contains a non-list/tuple entry")
+                    elif len(template) != 2:
+                        section.error("CMS_TEMPLATES setting contains a list/tuple with != 2 entries")
+                    elif not isinstance(template[0], str):
+                        section.error("CMS_TEMPLATES contains a non-string entry")
+                    else:
+                        section.success("CMS_TEMPLATES_DIR or CMS_TEMPLATES setting  found")
+            else:
+                section.error("CMS_TEMPLATES setting is not a list or tuple")
+            if hasattr(settings, "CMS_PLACEHOLDERS"):
+                section.warn("CMS_PLACEHOLDERS setting is also present but will be ignored.")
+        elif get_cms_setting("PLACEHOLDERS"):
+            if isinstance(get_cms_setting("PLACEHOLDERS"), (list, tuple)):
+                for placeholder in get_cms_setting("PLACEHOLDERS"):
+                    if not isinstance(placeholder, (list, tuple)):
+                        section.error("CMS_PLACEHOLDERS setting contains a non-list/tuple entry")
+                    elif not isinstance(placeholder[0], str):
+                        section.error(f"CMS_PLACEHOLDERS contains an entry with a non-string identifier: "
+                                      f"{placeholder[0]}")
+                    else:
+                        section.success("CMS_PLACEHOLDERS setting entry found - CMS will run in headless mode")
+            else:
+                section.error("CMS_PLACEHOLDERS setting is not a list or tuple")
+        else:
+            section.warn("Both CMS_TEMPLATES and CMS_PLACEHOLDERS settings are missing. "
+                         "Will run in headless mode with one placeholder called \"content\"")
+
+
+@define_check
+def check_cmsapps_names(output):
+    from cms.apphook_pool import apphook_pool
+    with output.section("Apphooks") as section:
+        for hook, name in apphook_pool.get_apphooks():
+            if apphook_pool.get_apphook(hook).name is None:
+                section.warn("CMSApps should define a name. %s doesn't have a name" % name)
+        if section.successful:
+            section.finish_success("CMSApps configuration is okay")
+
 
 
 def check(output):
@@ -354,7 +391,8 @@ def check(output):
 
     Returns whether the configuration/environment are okay (has no errors)
     """
-    title = "Checking django CMS installation"
+    import cms
+    title = f"Checking django CMS {cms.__version__} installation"
     border = '*' * len(title)
     output.write_line(output.colorize(border, opts=['bold']))
     output.write_line(output.colorize(title, opts=['bold']))

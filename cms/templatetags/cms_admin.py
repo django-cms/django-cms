@@ -7,9 +7,9 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
+from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.translation import get_language
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
 from cms.models import Page
 from cms.models.contentmodels import PageContent
@@ -19,7 +19,7 @@ from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
 
-CMS_ADMIN_ICON_BASE = "%sadmin/img/" % settings.STATIC_URL
+CMS_ADMIN_ICON_BASE = f"{settings.STATIC_URL}admin/img/"
 
 
 class GetAdminUrlForLanguage(AsTag):
@@ -35,11 +35,11 @@ class GetAdminUrlForLanguage(AsTag):
 
     def get_value(self, context, page, language):
         if language in page.get_languages():
-            page_content = page.pagecontent_set(manager="admin_manager").current_content(language=language).first()
+            page_content = page.get_admin_content(language)
             if page_content:
                 return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
         admin_url = admin_reverse('cms_pagecontent_add')
-        admin_url += '?cms_page={}&language={}'.format(page.pk, language)
+        admin_url += f'?cms_page={page.pk}&language={language}'
         return admin_url
 
 
@@ -93,38 +93,17 @@ def show_admin_menu_for_pages(context, descendants, depth=1):
 
 @register.simple_tag(takes_context=False)
 def get_page_display_name(cms_page):
-    from cms.models import EmptyPageContent
     language = get_language()
 
-    if not cms_page.page_content_cache:
-        cms_page.set_translations_cache()
-
-    if not cms_page.page_content_cache.get(language):
-        fallback_langs = i18n.get_fallback_languages(language)
-        found = False
-        for lang in fallback_langs:
-            if cms_page.page_content_cache.get(lang):
-                found = True
-                language = lang
-        if not found:
-            language = None
-            for lang, item in cms_page.page_content_cache.items():
-                if not isinstance(item, EmptyPageContent):
-                    language = lang
-    if not language:
-        return _("Empty")
-    page_content = cms_page.page_content_cache[language]
-    if page_content.title:
-        return page_content.title
-    if page_content.page_title:
-        return page_content.page_title
-    if page_content.menu_title:
-        return page_content.menu_title
-    return cms_page.get_slug(language)
+    page_content = cms_page.get_admin_content(language, fallback="force")
+    title = page_content.title or page_content.page_title or page_content.menu_title
+    if not title:
+        title = cms_page.get_slug(language)
+    return title if page_content.language == language else mark_safe(f"<em>{title} ({page_content.language})</em>")
 
 
 class TreePublishRow(Tag):
-    """New template tag that renders a pontential menu to be offered with the
+    """New template tag that renders a potential menu to be offered with the
     dirty indicators. The core will not display a menu."""
     name = "tree_publish_row"
     options = Options(
@@ -152,7 +131,7 @@ class TreePublishRow(Tag):
             )
             return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
 
-        page_content = page.page_content_cache.get(language)
+        page_content = page.get_admin_content(language)
         cls, text = self.get_indicator(page_content)
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
@@ -176,7 +155,7 @@ class TreePublishRowMenu(AsTag):
     )
 
     def get_value(self, context, page, language):
-        page_content = page.page_content_cache.get(language)
+        page_content = page.get_admin_content(language)
         if context.get("has_change_permission", False):
             page_content_admin_class = admin.site._registry[PageContent]
             template, publish_menu_items = page_content_admin_class.get_indicator_menu(
@@ -216,10 +195,12 @@ def render_filter_field(request, field):
 
 @register.filter
 def boolean_icon(value):
-    BOOLEAN_MAPPING = {True: 'yes', False: 'no', None: 'unknown'}
-    return mark_safe(
-        '<img src="%sicon-%s.gif" alt="%s" />' % (CMS_ADMIN_ICON_BASE, BOOLEAN_MAPPING.get(value, 'unknown'), value))
-
+    mapped_icon = {True: 'yes', False: 'no'}.get(value, 'unknown')
+    return format_html(
+        '<img src="{0}icon-{1}.svg" alt="{1}" />',
+        CMS_ADMIN_ICON_BASE,
+        mapped_icon,
+    )
 
 @register.tag(name="page_submit_row")
 class PageSubmitRow(InclusionTag):

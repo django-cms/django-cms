@@ -18,6 +18,7 @@
 @import "components/dialog";
 @import "components/content";
 @import "components/loader";
+@import "components/dark-mode-toggle";
 
 // div.cms needs to beat .cms-reset a selectors
 div.cms {
@@ -53,9 +54,7 @@ div.cms {
     @import "components/pagetree/node-state";
 }
 
-//##############################################################################
-// DJANGO DEBUG TOOLBAR FIX
-// removed as of: //github.com/divio/django-cms/issues/2476
-// #djDebug #djDebugToolbarHandle {
-//     top:35px !important; border-right:none !important;
-// }
+ // Can be removed once suffucently many users have browsers the support `:dir()`
+div.cms[dir=rtl] {
+    @import "libs/rtl_patch";
+}

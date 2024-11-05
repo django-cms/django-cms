@@ -1,7 +1,7 @@
 (function($) {
     $(function() {
         // INFO: it is not possible to put a form inside a form, so
-        // the versioning actions have to create their own form on click.
+        // the actions have to create their own form on click.
         // Note for any apps inheriting the burger menu, this will also capture those events.
 
         function closeSideFrame() {

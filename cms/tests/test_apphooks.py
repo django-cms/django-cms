@@ -15,18 +15,13 @@ from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_page_content
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import (
-    applications_page_check,
-    clear_app_resolvers,
-    get_app_patterns,
-)
+from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.middleware.page import get_page
 from cms.models import PageContent
 from cms.test_utils.project.placeholderapp.models import Example1
 from cms.test_utils.testcases import CMSTestCase
 from cms.tests.test_menu_utils import DumbPageLanguageUrl
 from cms.toolbar.toolbar import CMSToolbar
-from cms.utils.compat import DJANGO_3
 from menus.menu_pool import menu_pool
 from menus.utils import DefaultLanguageChanger
 
@@ -114,7 +109,7 @@ class ApphooksTestCase(CMSTestCase):
         result = check_url_config(None)
         self.assertEqual(len(result), 0)
 
-    @override_settings(CMS_APPHOOKS=['%s.%s' % (APP_MODULE, APP_NAME)])
+    @override_settings(CMS_APPHOOKS=[f'{APP_MODULE}.{APP_NAME}'])
     def test_explicit_apphooks(self):
         """
         Test explicit apphook loading with the CMS_APPHOOKS setting.
@@ -137,7 +132,7 @@ class ApphooksTestCase(CMSTestCase):
         self.apphook_clear()
         hooks = apphook_pool.get_apphooks()
         app_names = [hook[0] for hook in hooks]
-        self.assertEqual(len(hooks), 8)
+        self.assertEqual(len(hooks), 9)
         self.assertIn(NS_APP_NAME, app_names)
         self.assertIn(APP_NAME, app_names)
         self.apphook_clear()
@@ -160,6 +155,26 @@ class ApphooksTestCase(CMSTestCase):
         self.assertTemplateUsed(response, 'nav_playground.html')
 
         self.apphook_clear()
+
+    def test_apphook_without_landing_page(self):
+        """test rendering the apphook without landing page.
+
+        tests for https://github.com/django-cms/django-cms/issues/7765
+        """
+        from django.contrib.contenttypes.models import ContentType
+
+        from cms import views
+        from cms.utils.urlutils import admin_reverse
+
+        APP_NAME = 'SampleAppWithoutLandingPage'
+        [content] = self.create_base_structure(
+            APP_NAME, ["en"], "apphook-without-landing"
+        )
+        content_type = ContentType.objects.get(app_label='cms', model='pagecontent')
+        endpoint = admin_reverse('cms_placeholder_render_object_edit', args=(content_type.pk, content.pk,))
+        # make sure, we do not get views.details as this always uses the
+        # published page content
+        self.assertIsNot(endpoint, views.details)
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_for_apphook_tests')
     def test_apphook_does_not_crash_django_checks(self):
@@ -288,7 +303,7 @@ class ApphooksTestCase(CMSTestCase):
         view_names = (
             ('sample-settings', 'sample_view'),
             ('sample-class-view', 'ClassView'),
-            ('sample-class-based-view', 'ClassBasedView' if DJANGO_3 else 'view'),
+            ('sample-class-based-view', 'view'),
             # Naming convention changed in Django 4
         )
 
@@ -312,6 +327,27 @@ class ApphooksTestCase(CMSTestCase):
         self.assertEqual(excluded_response.status_code, 200)
         self.assertEqual(not_excluded_response.status_code, 302)
         self.apphook_clear()
+
+    @override_settings(CMS_APPHOOKS=[f'{APP_MODULE}.{APP_NAME}'])
+    def test_apphook_without_name_defaults_to_class_name(self):
+        """
+        Test that an apphook without a name defaults to the class name.
+        """
+        @apphook_pool.register
+        class AppWithoutName(CMSApp):
+            def get_urls(self, page=None, language=None, **kwargs):
+                return ["sampleapp.urls"]
+
+        @apphook_pool.register
+        class AppWithName(CMSApp):
+            name = "Custom name"
+            def get_urls(self, page=None, language=None, **kwargs):
+                return ["sampleapp.urls"]
+
+        hooks = apphook_pool.get_apphooks()
+        hook_names = dict(hooks)
+        self.assertEqual(hook_names.get('AppWithoutName'), 'AppWithoutName')
+        self.assertEqual(hook_names.get('AppWithName'), 'Custom name')
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_3')
     def test_get_page_for_apphook_on_preview_or_edit(self):
@@ -436,7 +472,7 @@ class ApphooksTestCase(CMSTestCase):
                             "nav_playground.html",
                             language="en",
                             created_by=self.superuser,
-                            parent=de_title.page.get_parent_page(),
+                            parent=de_title.page.parent,
                             apphook=NS_APP_NAME,
                             apphook_namespace="instance_2")
         create_page_content("de", "de_title", page2, slug="slug")
@@ -859,7 +895,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page2 = create_page('page2', 'nav_playground.html',
                             'en', created_by=self.superuser,
-                            parent=titles[0].page.get_parent_page(),
+                            parent=titles[0].page.parent,
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_page_content('de', 'de_title', page2, slug='slug')
 
@@ -900,7 +936,7 @@ class ApphooksTestCase(CMSTestCase):
 
         page2 = create_page('page2', 'nav_playground.html',
                             'en', created_by=self.superuser,
-                            parent=titles[0].page.get_parent_page(),
+                            parent=titles[0].page.parent,
                             in_navigation=True,
                             apphook='VariableUrlsApp', reverse_id='page2')
         create_page_content('de', 'de_title', page2, slug='slug')
@@ -1012,13 +1048,13 @@ class ApphooksPageLanguageUrlTestCase(CMSTestCase):
         child_page = create_page("child_page", "nav_playground.html", "en",
                                  created_by=superuser, parent=page)
         create_page_content('de', child_page.get_title(), child_page)
+        child_page.refresh_from_db()
 
         child_child_page = create_page("child_child_page", "nav_playground.html",
                                        "en", created_by=superuser, parent=child_page, apphook='SampleApp')
-        create_page_content("de", '%s_de' % child_child_page.get_title(), child_child_page)
+        create_page_content("de", f'{child_child_page.get_title()}_de', child_child_page)
+        child_child_page.refresh_from_db()
 
-        # publisher_public is set to draft on publish, issue with one to one reverse
-        child_child_page = self.reload(child_child_page)
         with force_language("en"):
             path = reverse('extra_first')
 

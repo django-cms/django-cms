@@ -39,9 +39,6 @@ module.exports = function addSlugHandlers(title, slug) {
     // autocall
     title.trigger('keyup');
 
-    // set focus to title
-    title.focus();
-
     // add changed data bindings to elements
     slug.add(title).bind('change', function() {
         $(this).data('changed', true);

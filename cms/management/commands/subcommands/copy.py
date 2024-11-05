@@ -81,7 +81,7 @@ class CopyLangCommand(SubcommandsCommand):
                 if isinstance(title, EmptyPageContent):
                     title = page.get_content_obj(from_lang)
                     if verbose:
-                        self.stdout.write('copying page content %s from language %s\n' % (title.title, from_lang))
+                        self.stdout.write(f'copying page content {title.title} from language {from_lang}\n')
                     if not user:
                         raise CommandError('Specify either --userid or --username')
                     from django.forms import model_to_dict
@@ -118,15 +118,13 @@ class CopyLangCommand(SubcommandsCommand):
                     # copy plugins using API
                     if verbose:
                         self.stdout.write(
-                            'copying plugins for %s from %s\n' % (page.get_page_title(from_lang), from_lang)
+                            f'copying plugins for {page.get_page_title(from_lang)} from {from_lang}\n'
                         )
                     copy_plugins_to_language(page, from_lang, to_lang, only_empty)
             else:
                 if verbose:
                     self.stdout.write(
-                        'Skipping page %s, language %s not defined\n' % (
-                            page.get_page_title(page.get_languages()[0]), from_lang
-                        )
+                        f'Skipping page {page.get_page_title(page.get_languages()[0])}, language {from_lang} not defined\n'
                     )
 
         if copy_content:
@@ -139,8 +137,7 @@ class CopyLangCommand(SubcommandsCommand):
                 if plugin_list:
                     if verbose:
                         self.stdout.write(
-                            'copying plugins from static_placeholder "%s" in "%s" to "%s"\n' % (
-                                static_placeholder.name, from_lang, to_lang)
+                            f'copying plugins from static_placeholder "{static_placeholder.name}" in "{from_lang}" to "{to_lang}"\n'
                         )
                     copy_plugins_to_placeholder(
                         plugins=plugin_list,
@@ -188,15 +185,14 @@ class CopySiteCommand(SubcommandsCommand):
             Page
             .objects
             .on_site(from_site)
-            .filter(node__depth=1)
-            .select_related('node')
-            .order_by('node__path')
+            .filter(depth=1)
+            .order_by('path')
         )
 
         with transaction.atomic():
             for page in pages:
                 new_page = page.copy_with_descendants(
-                    target_node=None,
+                    target_page=None,
                     target_site=to_site,
                     user=user,
                 )
@@ -204,7 +200,7 @@ class CopySiteCommand(SubcommandsCommand):
                 if page.is_home:
                     new_page.set_as_homepage()
         self.stdout.write(
-            'Copied CMS Tree from SITE_ID {0} successfully to SITE_ID {1}.\n'.format(from_site.pk, to_site.pk)
+            f'Copied CMS Tree from SITE_ID {from_site.pk} successfully to SITE_ID {to_site.pk}.\n'
         )
 
     def get_site(self, site_id):

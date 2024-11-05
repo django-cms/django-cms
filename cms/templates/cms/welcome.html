@@ -17,40 +17,67 @@
         <header class="cms-welcome-header">
             <h1 class="cms-welcome-heading">
                 <span class="cms-icon cms-icon-check"></span>
-                {% trans "Installation successful!" %}
+                {% trans "Welcome to your new django CMS installation!" %}
             </h1>
             <a href="/" class="cms-welcome-logo">
                 <span class="cms-hidden">{% trans "django CMS" %}</span>
             </a>
-        </header>
-        {{ request.version }}
-
-        <section class="cms-welcome-section">
             <h2>
+                {% blocktrans %}Version {{ cms_version }}{% endblocktrans %}
+            </h2>
+            <p class="lead">
                 {% if user.is_authenticated %}
-                    {% trans "Add your first page" %}
+                    {% trans "Let’s build something great together!" %}
                 {% else %}
                     {% trans "Please log in" %}
                 {% endif %}
-            </h2>
-            <p>
-                {% blocktrans %}
-                    Welcome to django CMS version <strong>{{ cms_version }}</strong>.
-                {% endblocktrans %}
             </p>
-            <p>
-                {% url "admin:cms_page_add" as admin_add_page %}
-                {% if user.is_authenticated %}
-                    {% blocktrans %}
-                        <a href="{{ admin_add_page }}" class="js-welcome-add">Add the first page</a> to the system to continue.
-                    {% endblocktrans %}
-                {% else %}
-                    {% blocktrans %}
-                        JavaScript seems to be disabled so please
-                        <a href="{{ admin_add_page }}" class="js-welcome-add">add a page</a> manually.
-                    {% endblocktrans %}
-                {% endif %}
-            </p>
+            {% url "admin:cms_page_add" as admin_add_page %}
+            {% blocktrans %}
+                <a class="js-welcome-add cms-btn cms-btn-action">Add your first page</a>
+            {% endblocktrans %}
+        </header>
+
+        <section class="cms-welcome-cards">
+            <div class="cms-welcome-section">
+                {% blocktranslate %}
+                    <h2>Help Funding</h2>
+                    <p>
+                        Your funding directly benefits the product, mainly through the
+                        <a href="https://www.django-cms.org/en/fellowship-program/)!">django CMS Fellowship Program</a>!
+                    </p>
+                    <p>
+                        A quick way for yourself or your organisation to donate is on
+                        <a href="https://github.com/sponsors/django-cms">Github Sponsors</a>.
+                    </p>
+                {% endblocktranslate %}
+            </div>
+            <div class="cms-welcome-section">
+                {% blocktranslate %}
+                    <h2>Join Us</h2>
+                    <p>
+                        The django CMS Association is a non-profit organisation that funds and steers the development of
+                        django CMS.
+                    </p>
+                    <p>
+                        You can <a href="https://www.django-cms.org/en/memberships/">join both as an individual or as an
+                        organisation</a>.
+                    </p>
+                {% endblocktranslate %}
+            </div>
+            <div class="cms-welcome-section">
+                {% blocktranslate %}
+                    <h2>Contribute</h2>
+                    <ul>
+                        <li><a href="https://www.django-cms.org/en/contribute/">Contribute code:</a> fix a bug or
+                            implement a new feature!</li>
+                        <li><a href="https://www.django-cms.org/en/volunteering-opportunities/">Volunteer:</a>
+                            We offer fun and efficient team work!</li>
+                        <li><a href="https://www.django-cms.org/en/repositories-plugins/">Open-source your work:</a>
+                            Make the ecosystem strong.</li>
+                    </ul>
+                {% endblocktranslate %}
+            </div>
         </section>
 
         <footer class="cms-welcome-footer">
@@ -59,6 +86,8 @@
                 <a href="//django-cms.org/" target="_blank">{% trans "django CMS" %}</a>
                 <a href="//django-cms.org/en/support" target="_blank">{% trans "Support" %}</a>
                 <a href="//docs.django-cms.org/" target="_blank">{% trans "Documentation" %}</a>
+                <a href="//user-guide.django-cms.org/" target="_blank">{% trans "User guide" %}</a>
+                <a href="//www.django-cms.org/en/donate/" target="_blank">{% trans "Give back" %}</a>
             </p>
             {% blocktrans %}
                 <p class="cms-welcome-notes">If you don't see the django CMS logo at the top, make sure
@@ -87,15 +116,10 @@
                     e.preventDefault();
                     var modal = new CMS.Modal();
                     modal.open({
-                        url: '{% url "cms_wizard_create" %}?language={{ LANGUAGE_CODE }}',
+                        url: '{% url "admin:cms_wizard_create" %}?language={{ LANGUAGE_CODE }}',
                         title: '{% trans "Welcome to django CMS" %}'
                     });
                 });
-
-                // automatically trigger the modal if sideframe isn't open
-                if (!CMS.settings.sideframe.url) {
-                    btn.trigger('click');
-                }
             });
         {% else %}
             window.location.href = '{% url "admin:login" %}?next={{ next_url }}';

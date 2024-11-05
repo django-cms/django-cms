@@ -5,11 +5,11 @@ class TestPlugin1(CMSPlugin):
     pass
 
 
-class LeftMixin():
+class LeftMixin:
     pass
 
 
-class RightMixin():
+class RightMixin:
     pass
 
 

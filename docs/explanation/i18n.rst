@@ -1,0 +1,39 @@
+####################
+Internationalisation
+####################
+
+django CMS excels in its multilingual support, and can be configured to handle a vast range of different requirements. Its
+behaviour is flexible and can be controlled at a granular level in :setting:`CMS_LANGUAGES`. Other :ref:`i18n_l10n_reference` settings offer further control.
+
+See :ref:`multilingual_support_how_to` on how to set up a multilingual django CMS project.
+
+****
+URLs
+****
+
+Multilingual URLs require the use of :func:`~django.conf.urls.i18n.i18n_patterns`. For more information about this see
+the official `Django documentation
+<https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns>`_
+on the subject. :ref:`multilingual_urls` describes what you need to do in a django CMS project.
+
+
+.. _documentation: https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
+
+
+.. _determining_language_preference:
+
+*************************************************
+How django CMS determines which language to serve
+*************************************************
+
+django CMS uses a number of standard Django mechanisms to choose the language for the user, in the following order of
+preference:
+
+* language code in the URL - for example, ``http://example.com/de`` (when multilingual URLs are enabled)
+* language stored in the browsing session
+* language stored in a cookie from a previous session
+* language requested by the browser in the ``Accept-Language`` header
+* the default ``LANGUAGE_CODE`` in the site's settings
+
+More in-depth documentation about this is available at
+https://docs.djangoproject.com/en/dev/topics/i18n/translation/#how-django-discovers-language-preference
