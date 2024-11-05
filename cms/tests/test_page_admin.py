@@ -472,7 +472,7 @@ class PageTest(PageTestBase):
             save_time = datetime.datetime.strptime(
                 actual_result[-19:],
                 "%Y-%m-%dT%H:%M:%S"
-            )
+            ).replace(tzinfo=datetime.timezone.utc if settings.USE_TZ else None)
 
             self.assertEqual(actual_result, desired_result)
             # direct time comparisons are flaky, so we just check if the
