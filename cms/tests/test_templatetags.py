@@ -703,9 +703,9 @@ class EditablePluginsTemplateTags(CMSTestCase):
         template = """{% load cms_tags %}{% render_model plugin "body" "body" %}"""
         # The template html tags will render the object editable in the frontend
         expectation = (
-            '<template class="cms-plugin cms-plugin-start cms-plugin-djangocms_text_ckeditor-text-body-1 cms-render-model"></template>'
+            f'<template class="cms-plugin cms-plugin-start cms-plugin-djangocms_text_ckeditor-text-body-{{ self.plugin_pk }} cms-render-model"></template>'
             '&lt;b&gt;Test&lt;/b&gt;'
-            '<template class="cms-plugin cms-plugin-end cms-plugin-djangocms_text_ckeditor-text-body-1 cms-render-model"></template>'
+            f'<template class="cms-plugin cms-plugin-end cms-plugin-djangocms_text_ckeditor-text-body-{{ self.plugin_pk }} cms-render-model"></template>'
         )
 
         endpoint = get_object_edit_url(self.page.get_content_obj("en"))  # view in edit mode
