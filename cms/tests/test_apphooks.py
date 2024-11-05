@@ -15,11 +15,7 @@ from cms.admin.forms import AdvancedSettingsForm
 from cms.api import create_page, create_page_content
 from cms.app_base import CMSApp
 from cms.apphook_pool import apphook_pool
-from cms.appresolver import (
-    applications_page_check,
-    clear_app_resolvers,
-    get_app_patterns,
-)
+from cms.appresolver import applications_page_check, clear_app_resolvers, get_app_patterns
 from cms.middleware.page import get_page
 from cms.models import PageContent
 from cms.test_utils.project.placeholderapp.models import Example1
@@ -331,6 +327,27 @@ class ApphooksTestCase(CMSTestCase):
         self.assertEqual(excluded_response.status_code, 200)
         self.assertEqual(not_excluded_response.status_code, 302)
         self.apphook_clear()
+
+    @override_settings(CMS_APPHOOKS=[f'{APP_MODULE}.{APP_NAME}'])
+    def test_apphook_without_name_defaults_to_class_name(self):
+        """
+        Test that an apphook without a name defaults to the class name.
+        """
+        @apphook_pool.register
+        class AppWithoutName(CMSApp):
+            def get_urls(self, page=None, language=None, **kwargs):
+                return ["sampleapp.urls"]
+
+        @apphook_pool.register
+        class AppWithName(CMSApp):
+            name = "Custom name"
+            def get_urls(self, page=None, language=None, **kwargs):
+                return ["sampleapp.urls"]
+
+        hooks = apphook_pool.get_apphooks()
+        hook_names = dict(hooks)
+        self.assertEqual(hook_names.get('AppWithoutName'), 'AppWithoutName')
+        self.assertEqual(hook_names.get('AppWithName'), 'Custom name')
 
     @override_settings(ROOT_URLCONF='cms.test_utils.project.urls_3')
     def test_get_page_for_apphook_on_preview_or_edit(self):

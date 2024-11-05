@@ -371,6 +371,18 @@ def check_template_conf(output):
                          "Will run in headless mode with one placeholder called \"content\"")
 
 
+@define_check
+def check_cmsapps_names(output):
+    from cms.apphook_pool import apphook_pool
+    with output.section("Apphooks") as section:
+        for hook, name in apphook_pool.get_apphooks():
+            if apphook_pool.get_apphook(hook).name is None:
+                section.warn("CMSApps should define a name. %s doesn't have a name" % name)
+        if section.successful:
+            section.finish_success("CMSApps configuration is okay")
+
+
+
 def check(output):
     """
     Checks the configuration/environment of this django CMS installation.
