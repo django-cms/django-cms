@@ -156,8 +156,7 @@ class Page(MP_Node):
         else:
             title = _("No available title")
         path = self.get_path(get_language(), fallback=True)
-        path = f" (/{path}/)" if path else ""
-        return force_str(title) + path
+        return force_str(title) + ("" if path is None else f" (/{path})")
 
     def __repr__(self):
         display = f'<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>'
