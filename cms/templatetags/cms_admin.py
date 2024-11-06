@@ -1,24 +1,20 @@
-import re
-
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import AsTag, InclusionTag
 from django import template
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.utils import model_ngettext
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
 from django.utils.html import format_html
 from django.utils.safestring import mark_safe
-from django.utils.text import capfirst
-from django.utils.translation import get_language, gettext, gettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 
-from cms.models import CMSPlugin, Page, PageUrl
+from cms.models import Page
 from cms.models.contentmodels import PageContent
 from cms.toolbar.utils import get_object_preview_url
-from cms.utils import get_language_from_request, i18n
+from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
@@ -205,6 +201,7 @@ def boolean_icon(value):
         CMS_ADMIN_ICON_BASE,
         mapped_icon,
     )
+
 
 @register.tag(name="page_submit_row")
 class PageSubmitRow(InclusionTag):
