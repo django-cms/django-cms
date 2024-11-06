@@ -1019,6 +1019,14 @@ class PageContentAdmin(admin.ModelAdmin):
         )
         return has_perm
 
+    def get_sites_for_user(self, user):
+        sites = Site.objects.order_by('name')
+
+        if not get_cms_setting('PERMISSION') or user.is_superuser:
+            return sites
+        _has_perm = page_permissions.user_can_change_at_least_one_page
+        return [site for site in sites if _has_perm(user, site)]
+
     def changelist_view(self, request, extra_context=None):
         from django.contrib.admin.views.main import ERROR_FLAG
 
@@ -1091,6 +1099,7 @@ class PageContentAdmin(admin.ModelAdmin):
             'admin': self,
             'tree': {
                 'site': site,
+                'sites': self.get_sites_for_user(request.user),
                 'query': query,
                 'is_filtered': changelist_form.is_filtered(),
                 'items': pages,
