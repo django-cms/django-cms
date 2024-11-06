@@ -150,12 +150,14 @@ class Page(MP_Node):
         #: Might be larger than the page_content_cache
 
     def __str__(self):
-        page_content = self.get_admin_content(get_language(), fallback=True)
+        page_content = self.get_content_obj(get_language(), fallback=True)
         if page_content:
             title = page_content.menu_title or page_content.title
         else:
-            title = _("Empty")
-        return force_str(title)
+            title = _("No available title")
+        path = self.get_path(get_language(), fallback=True)
+        path = f" (/{path}/)" if path else ""
+        return force_str(title) + path
 
     def __repr__(self):
         display = f'<{self.__module__}.{self.__class__.__name__} id={self.pk} object at {hex(id(self))}>'
