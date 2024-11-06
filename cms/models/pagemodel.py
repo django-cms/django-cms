@@ -150,8 +150,7 @@ class Page(MP_Node):
         #: Might be larger than the page_content_cache
 
     def __str__(self):
-        lang = self._get_page_content_cache(get_language(), fallback=True, force_reload=False)
-        page_content = self.page_content_cache.get(lang)
+        page_content = self.get_admin_content(get_language(), fallback=True)
         if page_content:
             title = page_content.menu_title or page_content.title
         else:
@@ -728,7 +727,7 @@ class Page(MP_Node):
             self.page_content_cache.setdefault(translation.language, translation)
 
     def set_admin_content_cache(self):
-        self.admin_conent_cache = AdminCacheDict()
+        self.admin_content_cache = AdminCacheDict()
         for translation in self.pagecontent_set(manager="admin_manager").latest_content().all():
             self.admin_content_cache.setdefault(translation.language, translation)
 
