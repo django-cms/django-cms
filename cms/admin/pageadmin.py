@@ -348,12 +348,6 @@ class PageAdmin(admin.ModelAdmin):
         clear_permission_lru_caches(request.user)
         return super().response_delete(request, obj_display, obj_id)
 
-    def get_deleted_objects(self, objs, request):
-        deleted_objs = list(objs)
-        for obj in objs:
-            deleted_objs.extend(obj.get_descendant_pages())
-        return super().get_deleted_objects(deleted_objs, request)
-
     def delete_model(self, request, obj):
         operation_token = send_pre_page_operation(
             request=request,

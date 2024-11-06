@@ -1,3 +1,5 @@
+import re
+
 from classytags.arguments import Argument
 from classytags.core import Options, Tag
 from classytags.helpers import AsTag, InclusionTag
@@ -297,12 +299,17 @@ def delete_summary(context, model_count: dict) -> dict:
         for obj in deleted_objects:
             item = recursively_remove(obj)
             if isinstance(item, str):
-                if not any(f"{capfirst(item._meta.verbose_name)}:" in obj for item in summary_models):
-                    result.append(item)
-            elif len(item) == 1:
-                result.append(item[0])
+                if obj.startswith(f"{capfirst(Page._meta.verbose_name)}: "):
+                    text = re.findall(r'>(.*)<', obj)
+                    if text:
+                        result.append(text[0])
+                    else:
+                        result.append(mark_safe(item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: ")))
+                elif obj.startswith(f"{capfirst(PageContent._meta.verbose_name)}: "):
+                    result.insert(0, mark_safe(item.removeprefix(f"{capfirst(PageContent._meta.verbose_name)}: ")))
+
             elif item:
-                result.append(item)
+                result.append(sorted(item, key=lambda x: isinstance(x, list)))
         return result
     context["deleted_objects"] = recursively_remove(context["deleted_objects"])
 

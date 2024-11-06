@@ -1,10 +1,72 @@
 {% extends "admin/delete_confirmation.html" %}
 {% load i18n admin_urls static cms_admin %}
+{% block extrahead %}{{ block.super }}
+    <style>
+        .flexbox {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2em;
+            margin-top: 5em;
+            + hr {
+                margin: 3em 0;
+            }
+        }
+        .summary {
+            font-size: 150%;
+            line-height: 150%;
+            svg {
+                margin-inline-end: 1em;
+                zoom: 200%;
+            }
+            .count {
+                margin-inline-start: 0.5em;
+                font-size: 300%;
+            }
+        }
+        ul.other {
+            li {
+                display: block;
+                padding: 0;
+                .number {
+                    margin-inline-start: 1em;
+                    text-align: inline-end;
+                    padding-inline-end: 1.5em;
+                    display: inline-block;
+                }
+                width: 100%;
+            }
+            padding: 0;
+            box-sizing: border-box;
+            display: none;
+            margin-bottom: 2em;
+        }
+        ul#deleted-objects {
+            padding: 0;
+            li {
+                list-style-type: none;
+                background(var(--body-bg));
+                &:has( > :not(a)) {
+                    border-top: 1px solid var(--border-color);
+                }
+            }
+            ul {
+                margin-inline-start: 0;
+                padding-inline-start: 1em;
+            }
+        }
+        form {
+            padding: 1em 0;
+        }
+    </style>
+{% endblock %}
 {% block delete_confirm %}
     <h3>
      {% blocktranslate with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktranslate %}
     </h3>
     {% delete_summary model_count %}
+    <h2>{{ _("Pages") }}</h2>
+    <ul id="deleted-objects">{{ deleted_objects|unordered_list }}</ul>
+    <hr>
     <form method="post">{% csrf_token %}
         <div>
         <input type="hidden" name="post" value="yes">
