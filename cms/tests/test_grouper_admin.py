@@ -1,6 +1,7 @@
 from django.contrib.admin import site
 from django.templatetags.static import static
 from django.utils.crypto import get_random_string
+from django.utils.translation import get_language, override as force_language
 
 from cms.admin.utils import CONTENT_PREFIX
 from cms.test_utils.project.sampleapp.models import (
@@ -125,6 +126,29 @@ class GrouperModelAdminTestCase(SetupMixin, CMSTestCase):
         # Assert
         admin = site._registry[GrouperModel]
         self.assertEqual(admin.content_model, GrouperModelContent)
+
+    def test_extra_grouping_field_fixed(self):
+        """Extra grouping fields are retrieved correctly"""
+        with force_language("en"):
+            expected_language = "zh"
+            self.admin.language = expected_language
+
+            admin_language = self.admin.get_language()
+            current_content_filters = self.admin.current_content_filters
+
+            self.assertEqual(admin_language, expected_language)
+            self.assertEqual(current_content_filters["language"],  expected_language)
+
+    def test_extra_grouping_field_current(self):
+        """Extra grouping fields (language) when not set return current default correctly"""
+        del self.admin.language  # No pre-set language
+        expected_language = get_language()
+
+        admin_language = self.admin.get_language()
+        current_content_filters = self.admin.current_content_filters
+
+        self.assertEqual(admin_language, expected_language)
+        self.assertEqual(current_content_filters["language"], expected_language)
 
 
 class GrouperChangeListTestCase(SetupMixin, CMSTestCase):
