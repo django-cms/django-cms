@@ -271,12 +271,12 @@ PageContent extensions
 ++++++++++++++++++++++
 
 In order to retrieve a page content extension within a template, get the ``PageContent``
-object using ``request.current_page.get_pagecontent_obj``. Using the example above, we
+object using ``request.current_page.get_content_obj``. Using the example above, we
 could use:
 
 .. code-block::
 
-    {{ request.current_page.get_pagecontent_obj.ratingextension.rating }}
+    {{ request.current_page.get_content_obj.ratingextension.rating }}
 
 With menus
 ~~~~~~~~~~
