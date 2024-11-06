@@ -165,7 +165,7 @@ class AdminTestCase(AdminTestsBase):
                 if not admin_instance.search_fields:
                     continue
                 url = admin_reverse('cms_%s_changelist' % model._meta.model_name)
-                response = self.client.get('%s?q=1' % url)
+                response = self.client.get('%s?q=1' % url, follow=True)  # Page redirects to PageContent
                 errmsg = response.content
                 self.assertEqual(response.status_code, 200, errmsg)
 
