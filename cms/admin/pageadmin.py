@@ -107,7 +107,6 @@ class PageAdmin(admin.ModelAdmin):
 
     def has_module_permission(self, request):
         return False  # Hides page model from the admin index
-    
     def has_add_permission(self, request):
         return False
 
