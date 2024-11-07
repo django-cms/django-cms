@@ -158,7 +158,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         See https://github.com/django-cms/django-cms/issues/7948
         """
         with self.assertRaises(TypeError):
-            x: TestPlugin[list] = TestPlugin()  # noqa: F841
+            TestPlugin[int]  # noqa: F841
 
     def test_add_edit_plugin(self):
         """
