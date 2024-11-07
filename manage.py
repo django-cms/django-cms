@@ -8,6 +8,7 @@ import warnings
 import dj_database_url
 
 from cms.exceptions import DontUsePageAttributeWarning
+from cms.utils.conf import default
 from docs.django_settings import SECRET_KEY
 
 gettext = lambda s: s
@@ -50,9 +51,8 @@ def main(argv: list[str], **full_settings):
     ]
 
     if (
-        len(argv) >= 2
+        len(argv) - sum((arg.startswith("-") for arg in argv[2:]), start=0) < 3
         and argv[1] in local_commands
-        and all(not arg.startswith("-") for arg in argv[2:])
     ):
         argv.append("cms")
         argv.append("menus")
