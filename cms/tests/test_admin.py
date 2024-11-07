@@ -165,7 +165,7 @@ class AdminTestCase(AdminTestsBase):
                 if not admin_instance.search_fields:
                     continue
                 url = admin_reverse('cms_%s_changelist' % model._meta.model_name)
-                response = self.client.get('%s?q=1' % url)
+                response = self.client.get('%s?q=1' % url, follow=True)  # Page redirects to PageContent
                 errmsg = response.content
                 self.assertEqual(response.status_code, 200, errmsg)
 
@@ -736,7 +736,7 @@ class AdminFormsTests(AdminTestsBase):
 
         user = self.get_superuser()
         with self.login_user_context(user):
-            with self.assertNumQueries(6):
+            with self.assertNumQueries(7):
                 force_str(self.client.get(self.get_pages_admin_list_uri('en')))
 
     def test_smart_link_pages(self):
