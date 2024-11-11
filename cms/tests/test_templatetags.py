@@ -11,11 +11,10 @@ from django.http import HttpResponse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
-from django.utils.html import strip_tags, escape
+from django.utils.html import escape
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
-from djangocms_text_ckeditor.models import Text
 from sekizai.context import SekizaiContext
 
 import cms
