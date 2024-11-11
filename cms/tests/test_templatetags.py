@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.test import RequestFactory
 from django.test.utils import override_settings
 from django.utils.encoding import force_str
-from django.utils.html import strip_tags
+from django.utils.html import strip_tags, escape
 from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
@@ -139,6 +139,7 @@ class TemplatetagTests(CMSTestCase):
     def test_page_attribute_tag_escapes_content(self):
         script = '<script>alert("XSS");</script>'
         ampersand = 'Q&A page'
+        partial = '"><img src=x onerror=alert(1) "'
 
         class FakePage:
             def __init__(self, title):
@@ -159,11 +160,14 @@ class TemplatetagTests(CMSTestCase):
         template = '{% load cms_tags %}{% page_attribute page_title %}'
         output_script = self.render_template_obj(template, {}, request_script)
         output_ampersand = self.render_template_obj(template, {}, request_ampersand)
+        output_partial = self.render_template_obj(template, {}, FakeRequest(FakePage(partial)))
 
         self.assertNotEqual(script, output_script)
-        self.assertEqual(ampersand, output_ampersand)
-        self.assertEqual(strip_tags(script), output_script)
-        self.assertEqual(strip_tags(ampersand), output_ampersand)
+        self.assertNotEqual(ampersand, output_ampersand)
+        self.assertNotEqual(partial, output_partial)
+        self.assertEqual(escape(script), output_script)
+        self.assertEqual(escape(ampersand), output_ampersand)
+        self.assertEqual(escape(partial), output_partial)
 
     def test_json_encoder(self):
         self.assertEqual(json_filter(True), 'true')
