@@ -22,7 +22,7 @@ to inject malicious code into the page title allowing to load arbitrary
 javascript code when viewing the page. We recommend that you upgrade to
 this version as soon as possible.
 
-The security issue is of low severity, since an attacker needs to have access to
+The security issue is of low severity, since an attacker needs to have access
 to the django CMS admin interface to exploit it.
 
 Thanks to `Ali İltizar (@alii76tt) <https://twitter.com/alii76tt>`_ for
