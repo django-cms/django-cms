@@ -26,27 +26,35 @@ support the latest release of each series.
 What's new in 4.1.4
 ===================
 
+
 Bug Fixes:
 ----------
-* Respect ContentAdminManager pattern for frontend-editable models (#7998) (e4650ecb7) -- Fabian Braun
-* Improve pagecontent caching in page admin (esp. page tree) (#8002) (842f347da) -- Fabian Braun
-* Clear menu cache if page permissions are changed (#7988) (1719b9a1b) -- Fabian Braun
-* Consistent labels and help texts for page content model and page content forms (#7968) (acbc2e70a) -- Fabian Braun
-* Inconsistent color codes for dark mode and `preferes-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
-* Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
-* Accept legacy action names for page permission checks (#8021) (9a1e178) -- Fabian Braun
-* Mark language and user middleware synchronous for ASGI (#7985) -- John Bazik
+* XSS vulnerability for page title (#8075) (c045a990e) -- Fabian Braun
+* Menus crashed when unexpected page content was present (#8052) -- Fabian Braun
+* Sites menu was empty in the page tree (#8064) -- Fabian Braun
+* Added redirect message when in editing a redirect toolbar object (#8056) -- Sal
+* X frame options added to page settings form (#8041) -- Sal
+* template tag ``get_admin_url_for_language`` did not return the latest page content (#7967) -- Fabian Braun
+* Sitemap return a QuerySet in CMSSitemap.items() (#8031) -- Jens-Erik Weber
+* Improved UX when page content is missing in selected language (#8033) -- Jacob Rief
 
+Other:
+------
+* Updated welcome page (#8057) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (6 pull request)
+* Fabian Braun (5 pull request)
+* Jacob Rief (1 pull request)
+* Jens-Erik Weber (1 pull request)
+* Sal (2 pull request)
 
 With the review help of the following contributors:
 
+* Jacob Rief
 * Mark Walker
 * Vinit Kumar
 
