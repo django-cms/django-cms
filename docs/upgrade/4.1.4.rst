@@ -12,7 +12,28 @@
     process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
 
 
-Welcome to django CMS 4.1.3!
+Welcome to django CMS 4.1.4!
+
+Security fix
+============
+
+django CMS 4.1.4 closes a security vulnerability that could allow an attacker
+to inject malicious code into the page title allowing to load arbitrary
+javascript code when viewing the page. We recommend that you upgrade to
+this version as soon as possible.
+
+The security issue is of low severity, since an attacker needs to have access to
+to the django CMS admin interface to exploit it.
+
+Thanks to `Ali İltizar (@alii76tt) <https://twitter.com/alii76tt>`_ for
+reporting the issue.
+
+.. note::
+
+   As ever, we remind our users and contributors that all security reports,
+   patches and concerns be addressed only to our security team by email, at
+   `security@django-cms.org <mailto:security@django-cms.org>`_.
+
 
 Django and Python compatibility
 ===============================
