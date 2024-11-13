@@ -2,6 +2,28 @@
 Changelog
 =========
 
+3.11.9 (2024-11-13)
+===================
+
+Bug Fixes:
+----------
+* XSS vulnerability for page title (#8075) (699f04e9b) -- Fabian Braun
+* fix: Accept legacy action names for page permission check (#8022) (fc4838f99) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (2 pull requests)
+
+With the review help of the following contributors:
+
+* Mark Walker
+
+Thanks to all contributors for their efforts!
+
 3.11.8 (2024-09-10)
 ===================
 
