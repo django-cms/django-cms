@@ -2,6 +2,23 @@
 Changelog
 =========
 
+Bug Fixes:
+----------
+* XSS vulnerability for page title (#8075) (699f04e9b) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (1 pull request)
+* Github Release Action (3 pull requests)
+
+With the review help of the following contributors:
+
+
+Thanks to all contributors for their efforts!
+
 3.11.8 (2024-09-10)
 ===================
 
