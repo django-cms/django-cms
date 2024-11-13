@@ -1,3 +1,39 @@
+4.1.4 (2024-11-12)
+==================
+
+Bug Fixes:
+----------
+* XSS vulnerability for page title (#8075) (c045a990e) -- Fabian Braun
+* Menus crashed when unexpected page content was present (#8052) -- Fabian Braun
+* Sites menu was empty in the page tree (#8064) -- Fabian Braun
+* Added redirect message when in editing a redirect toolbar object (#8056) -- Sal
+* X frame options added to page settings form (#8041) -- Sal
+* template tag ``get_admin_url_for_language`` did not return the latest page content (#7967) -- Fabian Braun
+* Sitemap return a QuerySet in CMSSitemap.items() (#8031) -- Jens-Erik Weber
+* Improved UX when page content is missing in selected language (#8033) -- Jacob Rief
+
+Other:
+------
+* Updated welcome page (#8057) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull request)
+* Jacob Rief (1 pull request)
+* Jens-Erik Weber (1 pull request)
+* Sal (2 pull request)
+
+With the review help of the following contributors:
+
+* Jacob Rief
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
 4.1.3 (2024-09-11)
 ==================
 

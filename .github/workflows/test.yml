@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
+        python-version: ['3.9', '3.10', '3.11', '3.12']
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -76,7 +76,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
+        python-version: ['3.9', '3.10', '3.11', '3.12']
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
@@ -139,7 +139,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.9, '3.10', '3.11', '3.12', '3.13.0-rc.2']  # latest release minus two
+        python-version: ['3.9', '3.10', '3.11', '3.12']
         requirements-file: [
           django-2.2.txt,
           django-3.2.txt,
