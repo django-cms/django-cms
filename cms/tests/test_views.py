@@ -366,6 +366,18 @@ class ViewTests(CMSTestCase):
 
         self.assertNotIn(response.url, "<script>alert('Attack')</script>")
 
+    def test_queries(self):
+        create_page("home", "simple.html", "en")
+        cms_page = create_page("dreinhardt", "simple.html", "en")
+        url = cms_page.get_absolute_url()
+        with self.assertNumQueries(5):
+            # 1. get_page_from_request: checks PageUrl
+            # 2. get page contents: PageContent
+            # 3. Check permissions
+            # 4. Get placeholders
+            # 5. Get plugins
+            self.client.get(url)
+
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
 class ContextTests(CMSTestCase):
