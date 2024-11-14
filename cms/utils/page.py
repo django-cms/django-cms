@@ -2,7 +2,6 @@ import re
 
 from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
-from django.utils.translation.trans_null import get_language
 
 from cms.constants import PAGE_USERNAME_MAX_LENGTH
 from cms.utils import get_current_site, get_language_from_request
