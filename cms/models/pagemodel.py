@@ -814,7 +814,7 @@ class Page(MP_Node):
         if fallback:
             languages.extend(self.get_fallbacks(language))
 
-        if not language in self.urls_cache:
+        if language not in self.urls_cache:
             # `get_page_from_request` will fill the cache only for the current language
             # Here, we fully fill it and try again
             self.urls_cache = {
