@@ -8,7 +8,7 @@ def remove_pageurl_duplicates(apps, schema_editor):
     PageUrl = apps.get_model("cms", "PageUrl")
     non_unique = PageUrl.objects.values("page_id", "language").annotate(total=Count("language")).filter(total__gt=1)
     for item in non_unique:
-        for url in PageUrl.objects.filter(page_id=item["page_id"], language=item["language"])[1:]:
+        for url in PageUrl.objects.filter(page_id=item["page_id"], language=item["language"]).order_by("-pk")[1:]:
             url.delete()
 
 

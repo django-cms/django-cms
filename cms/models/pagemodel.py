@@ -811,26 +811,20 @@ class Page(MP_Node):
     def get_url_obj(self, language, fallback=True):
         """Get the path of the page depending on the given language"""
         languages = [language]
-
         if fallback:
             languages.extend(self.get_fallbacks(language))
 
-        for _language in languages:
-            if _language in self.urls_cache:
-                language = _language
-                break
-        else:
+        if not language in self.urls_cache:
             # `get_page_from_request` will fill the cache only for the current language
             # Here, we fully fill it and try again
-            self.urls_cache ={
+            self.urls_cache = {
                 url.language: url for url in self.urls.all() if url.language in languages
             }
-            for _language in languages:
-                if _language in self.urls_cache:
-                    language = _language
-                    break
 
-        return self.urls_cache.get(language)
+        return next(
+            (self.urls_cache[lang] for lang in languages if lang in self.urls_cache),
+            None
+        )
 
     def get_path(self, language, fallback=True):
         url = self.get_url_obj(language, fallback)
