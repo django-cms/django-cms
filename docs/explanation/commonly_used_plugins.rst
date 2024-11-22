@@ -30,8 +30,11 @@ Recommended with Version 4 of django CMS
 ========================== ================================== ==========================
 Package                    Description                        Status
 ========================== ================================== ==========================
+djangocms-text             Next gen. text Plugin for          supports V4.1
+                           django CMS using Tiptap
 djangocms-text-ckeditor    Text Plugin for django CMS using   supports v4.1 as of v5.1.2
                            CKEditor 4
+djangocms-link             Add links on your site             supports V4.1
 djangocms-versioning       Adds versioning and publication    v4.x only
                            management features to v4
 djangocms-moderation       Implements moderation process to   v4.x only
@@ -39,14 +42,13 @@ djangocms-moderation       Implements moderation process to   v4.x only
 djangocms-alias            Central management of recurring    v4.x only
                            plugin sequences - replaces static
                            placeholders
-djangocms-url-manager      Central place to manage all link   v4.x only
-                           urls for your project
 djangocms-frontend         Plugin bundle for django CMS       supports v4.1
                            providing several components from
                            the popular Bootstrap 5 framework.
                            Themable and extensible
+djangocms-form-builder     Build forms for your site          supports v4.1
 django-filer               Manager for assets like images     supports v4.1
-djangocms-attributes-field An opinionated implementation to   no issues known
+djangocms-attributes-field An opinionated implementation to   supports v4.1
                            add attributes to any HTML element
 djangocms-icons            Adds support for Fontawesome icons supports v4.1
                            attributes to any HTML element
@@ -64,9 +66,6 @@ Thrid-party opinionated packages
 ========================= ========================== ===================================
 Package                   Description                Status
 ========================= ========================== ===================================
-djangocms-version-locking Allows locking draft       v4.x only
-                          versions to avoid
-                          conflicts
 djangocms-page-admin      New PageContent admin      supports v4.0, v4.1 support unclear
                           which doesn't include tree
                           functionality
@@ -80,12 +79,11 @@ djangocms-references      Retrieve objects that are  supports v4.0, v4.1 support
 Packages not (yet) supporting version 4
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-====================== =========================================== =================
+====================== =========================================== =====================
 Package                Description                                 Status
-====================== =========================================== =================
-djangocms-link         Add links on your site                      not yet supported
+====================== =========================================== =====================
 djangocms-blog         django CMS blog application - Support for   not yet supported
-                       multilingual posts, placeholders, social
+                       multilingual posts, placeholders, social    (working fork exists)
                        network meta tags and configurable apphooks
 djangocms-history      Undo/redo functionality for django CMS      not yet supported
                        operations
@@ -93,7 +91,7 @@ djangocms-page-sitemap django CMS page extension to handle sitemap not yet suppo
                        customization
 djangocms-page-meta    Add SEO meta data to django CMS pages       not yet supported
 djangocms-transfer     Export and import plugins as JSON           not yet supported
-====================== =========================================== =================
+====================== =========================================== =====================
 
 Contributors are needed to add django CMS v4 support to the following packages:
 

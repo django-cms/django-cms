@@ -136,5 +136,3 @@ class SettingsAdmin(ModelAdmin):
         Return empty perms dict thus hiding the model from admin index.
         """
         return {}
-
-

@@ -53,7 +53,6 @@ from cms.cache.permissions import clear_permission_cache
 from cms.constants import MODAL_HTML_REDIRECT
 from cms.models import (
     CMSPlugin,
-    EmptyPageContent,
     GlobalPagePermission,
     Page,
     PageContent,
@@ -104,6 +103,7 @@ class PageAdmin(admin.ModelAdmin):
     copy_form = CopyPageForm
     move_form = MovePageForm
     inlines = PERMISSION_ADMIN_INLINES
+    search_fields = ('=id', 'urls__slug', 'pagecontent_set__title', 'reverse_id')
 
     def has_add_permission(self, request):
         return False
@@ -169,6 +169,7 @@ class PageAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
@@ -763,6 +764,7 @@ class PageContentAdmin(admin.ModelAdmin):
         """Get the admin urls
         """
         info = f"{self.model._meta.app_label}_{self.model._meta.model_name}"
+
         def pat(regex, fn):
             return re_path(regex, self.admin_site.admin_view(fn), name=f'{info}_{fn.__name__}')
 
@@ -916,7 +918,6 @@ class PageContentAdmin(admin.ModelAdmin):
             return HttpResponse(MODAL_HTML_REDIRECT.format(url=url))
         return super().response_add(request, obj)
 
-
     def get_filled_languages(self, request, page):
         site_id = get_site(request).pk
         filled_languages = page.get_languages()
@@ -1018,6 +1019,14 @@ class PageContentAdmin(admin.ModelAdmin):
         )
         return has_perm
 
+    def get_sites_for_user(self, user):
+        sites = Site.objects.order_by('name')
+
+        if not get_cms_setting('PERMISSION') or user.is_superuser:
+            return sites
+        _has_perm = page_permissions.user_can_change_at_least_one_page
+        return [site for site in sites if _has_perm(user, site)]
+
     def changelist_view(self, request, extra_context=None):
         from django.contrib.admin.views.main import ERROR_FLAG
 
@@ -1090,6 +1099,7 @@ class PageContentAdmin(admin.ModelAdmin):
             'admin': self,
             'tree': {
                 'site': site,
+                'sites': self.get_sites_for_user(request.user),
                 'query': query,
                 'is_filtered': changelist_form.is_filtered(),
                 'items': pages,
@@ -1121,7 +1131,6 @@ class PageContentAdmin(admin.ModelAdmin):
         else:
             if to_template not in (placeholder_set[0] for placeholder_set in get_cms_setting('PLACEHOLDERS')):
                 return HttpResponseBadRequest(_("Placeholder selection not valid"))
-
 
         page_content.template = to_template
         page_content.save()

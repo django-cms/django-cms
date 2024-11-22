@@ -136,7 +136,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
     Creates a :class:`cms.models.Page` instance and returns it. Also
-    creates a :class:`cms.models.Title` instance for the specified
+    creates a :class:`cms.models.PageContent` instance for the specified
     language.
 
     .. warning::

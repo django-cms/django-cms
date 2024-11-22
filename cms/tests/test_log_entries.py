@@ -7,6 +7,7 @@ from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, Placeholder, UserSettings
 from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
 from cms.utils import get_current_site
+from cms.utils.i18n import force_language
 from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
 
 # Snippet to create wizard page taken from: test_wizards.py
@@ -214,6 +215,8 @@ class LogPageOperationsTests(CMSTestCase):
             title_en = "page_a"
             page = create_page(title_en, "nav_playground.html", "en")
             create_page_content(language='de', title="other title %s" % title_en, page=page)
+            with force_language("de"):  # The remaining language
+                expected_entry = str(page)
             endpoint = self.get_page_delete_translation_uri('en', page)
             post_data = {'post': 'yes', 'language': 'en'}
 
@@ -233,7 +236,7 @@ class LogPageOperationsTests(CMSTestCase):
             # Check the object id is set correctly
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
-            self.assertEqual(str(page), log_entry.object_repr)
+            self.assertEqual(expected_entry, log_entry.object_repr)
             # Check that the correct user created the log
             self.assertEqual(self._admin_user.pk, log_entry.user_id)
 
