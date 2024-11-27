@@ -81,7 +81,7 @@ class TemplatetagTests(CMSTestCase):
 
 
     def test_get_admin_tree_title(self):
-        page = create_page("page_a", "nav_playground.html", "en")
+        page = create_page("page_a", "nav_playground.html", "en", slug="slug-test2")
         self.assertEqual(get_page_display_name(page), 'page_a')
         languages = {
             1: [
@@ -108,7 +108,6 @@ class TemplatetagTests(CMSTestCase):
                 page.admin_content_cache = {'en': PageContent(menu_title="menu test2", language="en")}
                 self.assertEqual('<em>menu test2 (en)</em>', force_str(get_page_display_name(page)))
                 page.admin_content_cache = {'en': PageContent(language="en")}
-                page.urls_cache = {'en': PageUrl(slug='slug-test2')}
                 self.assertEqual('<em>slug-test2 (en)</em>', force_str(get_page_display_name(page)))
                 page.admin_content_cache = {'en': PageContent(language="en"), 'fr': EmptyPageContent('fr')}
                 self.assertEqual('<em>slug-test2 (en)</em>', force_str(get_page_display_name(page)))
