@@ -288,7 +288,6 @@ class ManagementTestCase(CMSTestCase):
         max_positon = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
         self.assertEqual(max_positon, 3)
 
-
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
         management.call_command('cms', 'uninstall', 'plugins', PLUGIN, interactive=False, stdout=out)
@@ -308,6 +307,7 @@ class ManagementTestCase(CMSTestCase):
         with self.assertRaises(CommandError) as e:
             management.call_command('cms')
         self.assertEqual(str(e.exception), 'Error: one of the available sub commands must be provided')
+
 
 class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
 

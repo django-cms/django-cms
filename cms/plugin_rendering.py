@@ -556,7 +556,6 @@ class ContentRenderer(BaseRenderer):
                 language_cache[placeholder.pk] = cached_value
         return language_cache.get(placeholder.pk)
 
-
     def _get_content_object(self, page, slots=None):
         if self.toolbar.get_object() == page:
             # Current object belongs to the page itself

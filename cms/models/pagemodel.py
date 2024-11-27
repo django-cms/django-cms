@@ -838,7 +838,6 @@ class Page(MP_Node):
             return url.slug
         return None
 
-
     def get_title(self, language=None, fallback=True, force_reload=False):
         """
         get the title of the page depending on the given language

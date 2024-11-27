@@ -1,3 +1,11 @@
+[tool.flake8]
+max-line-length = 119
+exclude = [
+  ".env",
+  ".venv",
+  "**/migrations/**",
+]
+
 [tool.ruff]
 # https://beta.ruff.rs/docs/configuration/
 line-length = 119

@@ -382,7 +382,6 @@ def check_cmsapps_names(output):
             section.finish_success("CMSApps configuration is okay")
 
 
-
 def check(output):
     """
     Checks the configuration/environment of this django CMS installation.
