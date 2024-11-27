@@ -1266,13 +1266,15 @@ class PageContentAdmin(admin.ModelAdmin):
                 'language': force_str(get_language_object(language)['name'])
             }
             messages.success(request, message)
+            if language in page.admin_content_cache:
+                del page.admin_content_cache[language]
+            if language in page.page_content_cache:
+                del page.page_content_cache[language]
 
             page_url.delete()
             page_content.delete()
             for p in saved_plugins:
                 p.delete()
-
-            page.remove_language(language)
 
             send_post_page_operation(
                 request=request,

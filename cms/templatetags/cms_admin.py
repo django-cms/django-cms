@@ -98,7 +98,7 @@ def get_page_display_name(cms_page):
     page_content = cms_page.get_admin_content(language, fallback="force")
     title = page_content.title or page_content.page_title or page_content.menu_title
     if not title:
-        title = cms_page.get_slug(language)
+        title = cms_page.get_slug(language) or _("Empty")
     return title if page_content.language == language else mark_safe(f"<em>{title} ({page_content.language})</em>")
 
 
