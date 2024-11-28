@@ -1,7 +1,6 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from django.utils.encoding import smart_str
-from django.utils.functional import cached_property
 
 
 class Menu:
@@ -20,7 +19,7 @@ class Menu:
         if not self.namespace:
             self.namespace = self.__class__.__name__
 
-    def get_nodes(self, request) -> List['NavigationNode']:
+    def get_nodes(self, request) -> list['NavigationNode']:
         """
         Get a list of NavigationNode instances for the menu.
 
@@ -87,7 +86,7 @@ class NavigationNode:
         id: Any,
         parent_id: Optional[Any] = None,
         parent_namespace: Optional[str] = None,
-        attr: Optional[Dict[str, Any]] = None,
+        attr: Optional[dict[str, Any]] = None,
         visible: bool = True,
     ):
         """
@@ -102,7 +101,7 @@ class NavigationNode:
             attr: Additional information to store on this node (optional).
             visible: Indicates whether this item is visible (default is True).
         """
-        self.children: List[NavigationNode] = []  # Do not modify
+        self.children: list[NavigationNode] = []  # Do not modify
         self.parent: Optional[NavigationNode] = None  # Do not modify, code depends on this
         self.namespace: Optional[str] = None  # TODO: Clarify the necessity of this and the line above
         self.title = title
@@ -148,13 +147,13 @@ class NavigationNode:
         """
         return self.attr.get(name, None)
 
-    def get_descendants(self) -> List['NavigationNode']:
+    def get_descendants(self) -> list['NavigationNode']:
         """
         Returns a list of all children beneath the current menu item.
         """
         return sum(([node] + node.get_descendants() for node in self.children), [])
 
-    def get_ancestors(self) -> List['NavigationNode']:
+    def get_ancestors(self) -> list['NavigationNode']:
         """
         Returns a list of all parent items, excluding the current menu item.
         """
@@ -175,7 +174,6 @@ class NavigationNode:
         """
         node_abs_url = self.get_absolute_url()
         return node_abs_url == request.path
-
 
     @property
     def is_leaf_node(self) -> bool:

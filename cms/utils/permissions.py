@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import GlobalPagePermission, Page, PagePermission
+from cms.models import GlobalPagePermission, PagePermission
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username

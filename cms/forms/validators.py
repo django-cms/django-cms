@@ -1,6 +1,5 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator, URLValidator
-from django.utils.encoding import force_str
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext
 
