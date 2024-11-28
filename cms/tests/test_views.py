@@ -12,7 +12,6 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches, reverse
 from django.utils.translation import override as force_language
 
-from cms import api
 from cms.api import create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import PageContent, PagePermission, Placeholder, UserSettings

@@ -17,7 +17,9 @@ class Marker(Modifier):
     :type ancestor: bool
 
     .. note::
-       This modifier is deprecated and will be removed in django CMS 4.3. The menu pool now provides the same functionality out of the box.
+
+       This modifier is deprecated and will be removed in django CMS 4.3. The menu pool now provides the same
+       functionality out of the box.
     """
 
     def __init__(self, *args, **kwargs):
@@ -30,7 +32,6 @@ class Marker(Modifier):
             stacklevel=2,
         )
         super().__init__(*args, **kwargs)
-
 
     def modify(self, request, nodes, namespace, root_id, post_cut, breadcrumb):
         """

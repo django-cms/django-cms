@@ -4,7 +4,7 @@ from django.contrib.sites.models import Site
 from django.test.utils import override_settings
 
 from cms.api import create_page
-from cms.cms_menus import get_visible_nodes, get_visible_page_contents
+from cms.cms_menus import get_visible_page_contents
 from cms.models import (
     ACCESS_CHILDREN,
     ACCESS_DESCENDANTS,

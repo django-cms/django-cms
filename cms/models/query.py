@@ -1,6 +1,5 @@
 import warnings
 
-from django.db.models.query import QuerySet
 from treebeard.mp_tree import MP_NodeQuerySet
 
 from cms.exceptions import NoHomeFound

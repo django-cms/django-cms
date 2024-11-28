@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -237,7 +236,7 @@ class PageContent(models.Model):
             else:
                 placeholder_set = self.template or get_cms_setting('PLACEHOLDERS')[0][0]
 
-            for key, value, _ in get_cms_setting("PLACEHOLDERS"):
+            for key, value, __ in get_cms_setting("PLACEHOLDERS"):
                 if key == placeholder_set or key == "":  # NOQA: PLR1714 - Empty string matches always
                     self._placeholder_slot_cache = value
                     break

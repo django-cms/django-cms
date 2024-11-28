@@ -10,7 +10,7 @@ from django.utils.translation import activate, override as force_language
 
 from cms.api import create_page, create_page_content
 from cms.apphook_pool import apphook_pool
-from cms.cms_menus import get_visible_nodes, get_visible_page_contents
+from cms.cms_menus import get_visible_page_contents
 from cms.models import ACCESS_PAGE_AND_DESCENDANTS, Page, PageContent
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.test_utils.fixtures.menus import (
@@ -34,7 +34,6 @@ from cms.test_utils.util.context_managers import LanguageOverride, apphooks
 from cms.test_utils.util.mock import AttributeObject
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_languages
 from menus.base import NavigationNode
 from menus.menu_pool import _build_nodes_inner_for_one_menu, menu_pool
 from menus.models import CacheKey

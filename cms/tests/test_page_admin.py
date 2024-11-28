@@ -1608,6 +1608,7 @@ class PageActionsTestCase(PageTestBase):
             self.assertRedirects(response, redirect_url)
             self.assertEqual(Page.objects.all().count(), 2)
 
+
 class PermissionsTestCase(PageTestBase):
     def assertContainsPermissions(self, response):
         try:
@@ -2701,7 +2702,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         self.assertIsNone(get_permission_cache(staff_user, "change_page"))
 
-
     def test_permission_cache_invalidation_on_group_remove(self):
         """
         Permissions cache is invalidated if the group relationship of a user is changed
@@ -2719,7 +2719,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         group.user_set.remove(staff_user)
 
         self.assertIsNone(get_permission_cache(staff_user, "change_page"))
-
 
     def test_user_can_copy_page(self):
         """
