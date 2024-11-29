@@ -1,4 +1,4 @@
-from functools import lru_cache
+from functools import cache, lru_cache
 
 from django.utils.functional import lazy
 
@@ -12,7 +12,7 @@ def cms_settings(request):
     """
     from menus.menu_pool import MenuRenderer
 
-    @lru_cache(maxsize=None)
+    @cache
     def _get_menu_renderer():
         # We use lru_cache to avoid getting the manager
         # every time this function is called.

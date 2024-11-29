@@ -1,5 +1,5 @@
 import inspect
-from functools import lru_cache
+from functools import cache, lru_cache
 from importlib import import_module
 
 from django.apps import apps
@@ -98,7 +98,7 @@ def autodiscover_cms_configs():
                     "CMSAppExtension")
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_cms_extension_apps():
     """
     Returns django app configs of apps with a cms extension
@@ -110,7 +110,7 @@ def get_cms_extension_apps():
     return cms_apps
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_cms_config_apps():
     """
     Returns django app configs of apps with a cms config

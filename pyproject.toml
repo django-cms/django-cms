@@ -57,9 +57,11 @@ extend-ignore = [
   "PLW0603",
   "PLW0602",
   "PLW2901",
+  "UP006",  # Use `list` instead of `typing.List` for type annotation
   "UP028",
   "UP030",
   "UP031",
+  "UP035",  # UP035 `typing.List` is deprecated, use `list` instead
 ]
 
 [tool.ruff.lint.per-file-ignores]
