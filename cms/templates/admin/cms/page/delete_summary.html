@@ -1,0 +1,21 @@
+{% load i18n %}
+<h2>{% translate "Summary" %}</h2>
+<div class="flexbox">
+    {% for model, count in model_count %}
+        <div class="summary">
+            {{ model|capfirst }}: <span class="count">{{ count }}</span>
+        </div>
+    {% endfor %}
+    <div class="summary page-contents">
+        {{ summary.PageContent.0|capfirst }}: <span class="count">{{ summary.PageContent.1 }}</span>
+    </div>
+    <div class="summary plugins">
+        {{ summary.CMSPlugin.0|capfirst }}: <span class="count">{{ summary.CMSPlugin.1 }}</span>
+    </div>
+</div>
+<ul class="other">
+    {% for name, number in model_count %}
+        <li><span class="name">{{ name|capfirst }}:</span><span class="number">{{ number }}</span></li>
+    {% endfor %}
+</ul>
+
