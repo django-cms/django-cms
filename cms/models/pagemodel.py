@@ -16,12 +16,11 @@ from django.utils.translation import get_language, gettext_lazy as _, override a
 from treebeard.mp_tree import MP_Node
 
 from cms import constants
-from cms.exceptions import LanguageError
 from cms.models.managers import PageManager, PageUrlManager
 from cms.utils import i18n
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
-from cms.utils.i18n import get_current_language, get_fallback_languages
+from cms.utils.i18n import get_current_language
 from cms.utils.page import get_clean_username
 from menus.menu_pool import menu_pool
 
@@ -114,12 +113,6 @@ class Page(MP_Node):
         blank=True,
         null=True,
     )
-    languages = models.CharField(
-        max_length=255,
-        editable=False,
-        blank=True,
-        null=True,
-    )
     is_page_type = models.BooleanField(
         default=False,
         help_text=_("Mark this page as a page type"),
@@ -143,6 +136,7 @@ class Page(MP_Node):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.urls_cache = {}
+        #: Internal cache for page urls
         self.page_content_cache = {}
         #: Internal cache for page content objects visible publicly
         self.admin_content_cache = AdminCacheDict()
@@ -438,7 +432,6 @@ class Page(MP_Node):
         languages = (
             self
             .urls
-            .filter(language__in=self.get_languages())
             .values_list('language', flat=True)
         )
 
@@ -524,7 +517,6 @@ class Page(MP_Node):
                 )
                 placeholder.copy_plugins(new_placeholder, language=new_title.language)
             new_page.page_content_cache[new_title.language] = new_title
-        new_page.update_languages([trans.language for trans in translations])
 
         if extensions:
             from cms.extensions import extension_pool
@@ -692,30 +684,46 @@ class Page(MP_Node):
         )
         return self.parent
 
-    def get_languages(self):
-        if self.languages:
-            return sorted(self.languages.split(','))
-        else:
-            return []
+    @property
+    def languages(self):
+        warnings.warn(
+            "Attribute `languages` is deprecated. Use `get_languages` instead.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
+        return ",".join(self.get_languages())
+
+    def get_languages(self, admin_manager=True):
+        """Returns available languages for the page. This is potentially costly."""
+        if admin_manager:
+            if not self.admin_content_cache:
+                self.set_admin_content_cache()
+            return list(self.admin_content_cache.keys())
+        if not self.page_content_cache:
+            self._get_page_content_cache(get_language(), fallback=False, force_reload=False)
+        return list(self.page_content_cache.keys())
 
     def remove_language(self, language):
-        page_languages = self.get_languages()
-
-        if language in page_languages:
-            page_languages.remove(language)
-            self.update_languages(page_languages)
+        warnings.warn(
+            "Method `remove_language` is deprecated and has no effect any more.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
 
     def update_languages(self, languages):
-        languages = ",".join(set(languages))
-        # Update current instance
-        self.languages = languages
-        # Commit. It's important to not call save()
-        # we'd like to commit only the languages field and without
-        # any kind of signals.
-        self.update(languages=languages)
+        warnings.warn(
+            "Method `update_languages` is deprecated and has no effect any more.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2
+        )
 
     def get_published_languages(self):
-        return self.get_languages()
+        warnings.warn(
+            "Method `get_published_languages` is deprecated. Use `get_languages(admin_manager=False)` instead.",
+            RemovedInDjangoCMS43Warning,
+            stacklevel=2,
+        )
+        return self.get_languages(admin_manager=False)
 
     def set_translations_cache(self):
         warnings.warn(
@@ -800,58 +808,35 @@ class Page(MP_Node):
         except AttributeError:
             return None
 
-    def get_path(self, language, fallback=True):
+    def get_url_obj(self, language, fallback=True):
         """Get the path of the page depending on the given language"""
         languages = [language]
-
         if fallback:
             languages.extend(self.get_fallbacks(language))
 
-        page_languages = self.get_languages()
-
-        for _language in languages:
-            if _language in page_languages:
-                language = _language
-                break
-
         if language not in self.urls_cache:
-            self.urls_cache.update({
-                url.language: url for url in self.urls.all() if url.language in languages # TODO: overwrites multiple urls
-            })
+            # `get_page_from_request` will fill the cache only for the current language
+            # Here, we fully fill it and try again
+            self.urls_cache = {
+                url.language: url for url in self.urls.all() if url.language in languages
+            }
 
-            for _language in languages:
-                self.urls_cache.setdefault(_language, None)
+        return next(
+            (self.urls_cache[lang] for lang in languages if lang in self.urls_cache),
+            None
+        )
 
-        try:
-            return self.urls_cache[language].path
-        except (AttributeError, KeyError):
-            return None
+    def get_path(self, language, fallback=True):
+        url = self.get_url_obj(language, fallback)
+        if url:
+            return url.path
+        return None
 
     def get_slug(self, language, fallback=True):
-        languages = [language]
-
-        if fallback:
-            languages.extend(self.get_fallbacks(language))
-
-        page_languages = self.get_languages()
-
-        for _language in languages:
-            if _language in page_languages:
-                language = _language
-                break
-
-        if language not in self.urls_cache:
-            self.urls_cache.update({
-                url.language: url for url in self.urls.filter(language__in=languages)
-            })
-
-            for _language in languages:
-                self.urls_cache.setdefault(_language, None)
-
-        try:
-            return self.urls_cache[language].slug
-        except (AttributeError, KeyError):
-            return None
+        url = self.get_url_obj(language, fallback)
+        if url:
+            return url.slug
+        return None
 
     def get_title(self, language=None, fallback=True, force_reload=False):
         """
@@ -1099,6 +1084,7 @@ class PageUrl(models.Model):
     class Meta:
         app_label = 'cms'
         default_permissions = []
+        unique_together = ('language', 'page')
 
     def __str__(self):
         return f"{self.path or self.slug} ({self.language})"

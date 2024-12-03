@@ -533,6 +533,7 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page("english-page", "nav_playground.html", "en")
         german_content = create_page_content("de", "german content", page)
         english_content = page.get_content_obj('en')
+        page_languages = page.get_languages()
         edit_url = get_object_edit_url(english_content)
         staff = self.get_staff()
         self.client.force_login(staff)
@@ -541,8 +542,8 @@ class ToolbarTests(ToolbarTestBase):
         menus = response.context['cms_toolbar'].menus
         language_menu = menus['language-menu']
         delete = language_menu.items[-2]
-        german_delete = delete.items[0]
-        english_delete = delete.items[1]
+        german_delete = delete.items[page_languages.index("de")]
+        english_delete = delete.items[page_languages.index("en")]
 
         copy = language_menu.items[-1]
         copy_german = copy.items[0]

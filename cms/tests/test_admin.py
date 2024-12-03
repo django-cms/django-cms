@@ -799,6 +799,7 @@ class AdminFormsTests(AdminTestsBase):
                 ))
             )
 
+
 class PagePropsMovedToPageContentTests(CMSTestCase):
 
     def test_moved_fields(self):
@@ -821,6 +822,7 @@ class PagePropsMovedToPageContentTests(CMSTestCase):
 
         for field in filtered_page_content_fields:
             self.assertIn(field, change_page_form_fieldsets)
+
 
 class AdminPageEditContentSizeTests(AdminTestsBase):
     """

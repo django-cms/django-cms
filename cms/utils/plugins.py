@@ -2,7 +2,7 @@ import logging
 import sys
 from collections import OrderedDict, defaultdict, deque
 from copy import deepcopy
-from functools import lru_cache
+from functools import cache, lru_cache
 from itertools import starmap
 from operator import itemgetter
 
@@ -20,7 +20,7 @@ from cms.utils.placeholder import get_placeholder_conf
 logger = logging.getLogger(__name__)
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_plugin_class(plugin_type: str) -> CMSPluginBase:
     """Returns the plugin class for a given plugin_type (str)"""
     return plugin_pool.get_plugin(plugin_type)

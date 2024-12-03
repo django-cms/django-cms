@@ -4,7 +4,6 @@ from datetime import datetime
 
 from classytags.arguments import (
     Argument,
-    KeywordArgument,
     MultiKeywordArgument,
     MultiValueArgument,
 )
@@ -21,7 +20,7 @@ from django.db.models import Model
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import smart_str
-from django.utils.html import escape, strip_tags
+from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.translation import (
     get_language,
@@ -217,7 +216,6 @@ class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
             tagname,
             kwargs
         )
-
 
 
 class PageUrl(AsTag):
