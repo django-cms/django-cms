@@ -4,7 +4,6 @@ from datetime import datetime
 
 from classytags.arguments import (
     Argument,
-    KeywordArgument,
     MultiKeywordArgument,
     MultiValueArgument,
 )
@@ -15,15 +14,13 @@ from classytags.utils import flatten_context
 from classytags.values import ListValue, StringValue
 from django import template
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
-from django.core.exceptions import MultipleObjectsReturned, ObjectDoesNotExist
 from django.core.mail import mail_managers
 from django.db.models import Model
 from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.encoding import smart_str
-from django.utils.html import escape, strip_tags
+from django.utils.html import escape
 from django.utils.http import urlencode
 from django.utils.translation import (
     get_language,
@@ -219,7 +216,6 @@ class MultiValueArgumentBeforeKeywordArgument(MultiValueArgument):
             tagname,
             kwargs
         )
-
 
 
 class PageUrl(AsTag):
@@ -443,9 +439,7 @@ class PageAttribute(AsTag):
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
             ret_val = func(language=lang, fallback=True)
-            if name == 'page_title':
-                 ret_val = strip_tags(ret_val)
-            elif not isinstance(ret_val, datetime):
+            if not isinstance(ret_val, datetime):
                 ret_val = escape(ret_val)
             return ret_val
         return ''
@@ -531,25 +525,20 @@ class CMSEditableObject(InclusionTag):
         else:
             lang = get_language()
         opts = instance._meta
-        # Django < 1.10 creates dynamic proxy model subclasses when fields are
-        # deferred using .only()/.exclude(). Make sure to use the underlying
-        # model options when it's the case.
-        if getattr(instance, '_deferred', False):
-            opts = opts.proxy_for_model._meta
         with force_language(lang):
             extra_context = {}
             if edit_fields == 'changelist':
-                instance.get_plugin_name = "{} {} list".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = lambda: f"{smart_str(_('Edit'))} {smart_str(opts.verbose_name)} list"
                 extra_context['attribute_name'] = 'changelist'
             elif editmode:
-                instance.get_plugin_name = "{} {}".format(smart_str(_('Edit')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = lambda: f"{smart_str(_('Edit'))} {smart_str(opts.verbose_name)}"
                 if not context.get('attribute_name', None):
                     # Make sure CMS.Plugin object will not clash in the frontend.
                     extra_context['attribute_name'] = '-'.join(
                         edit_fields
                     ) if not isinstance('edit_fields', str) else edit_fields
             else:
-                instance.get_plugin_name = "{} {}".format(smart_str(_('Add')), smart_str(opts.verbose_name))
+                instance.get_plugin_name = lambda: f"{smart_str(_('Add'))} {smart_str(opts.verbose_name)}"
                 extra_context['attribute_name'] = 'add'
             extra_context['instance'] = instance
             extra_context['generic'] = opts
@@ -578,7 +567,11 @@ class CMSEditableObject(InclusionTag):
                         url_base = reverse(view_url, args=(instance.pk,))
                 else:
                     if not view_url:
-                        view_url = f'admin:{opts.app_label}_{opts.model_name}_edit_field'
+                        if isinstance(instance, CMSPlugin):
+                            # Plugins do not have a registered admin. They are managed by the placeholder admin.
+                            view_url = 'admin:cms_placeholder_edit_field'
+                        else:
+                            view_url = f'admin:{opts.app_label}_{opts.model_name}_edit_field'
                     if view_url.endswith('_changelist'):
                         url_base = reverse(view_url)
                     else:

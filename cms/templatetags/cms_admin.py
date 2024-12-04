@@ -14,7 +14,7 @@ from django.utils.translation import get_language, gettext_lazy as _
 from cms.models import Page
 from cms.models.contentmodels import PageContent
 from cms.toolbar.utils import get_object_preview_url
-from cms.utils import get_language_from_request, i18n
+from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
@@ -98,7 +98,7 @@ def get_page_display_name(cms_page):
     page_content = cms_page.get_admin_content(language, fallback="force")
     title = page_content.title or page_content.page_title or page_content.menu_title
     if not title:
-        title = cms_page.get_slug(language)
+        title = cms_page.get_slug(language) or _("Empty")
     return title if page_content.language == language else mark_safe(f"<em>{title} ({page_content.language})</em>")
 
 
@@ -201,6 +201,7 @@ def boolean_icon(value):
         CMS_ADMIN_ICON_BASE,
         mapped_icon,
     )
+
 
 @register.tag(name="page_submit_row")
 class PageSubmitRow(InclusionTag):
