@@ -14,7 +14,8 @@ __all__ = [
 ]
 
 
-class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
+class VERIFIED:
+    pass  # need a unique identifier for CMS_LANGUAGES
 
 
 def _load_from_file(module_path):

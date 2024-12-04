@@ -235,7 +235,6 @@ class FormsTestCase(CMSTestCase):
                         '\\u003B' in output)
 
 
-
 class PermissionFormTestCase(CMSTestCase):
 
     def test_permission_forms(self):
