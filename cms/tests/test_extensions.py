@@ -427,6 +427,7 @@ class ExtensionAdminTestCase(CMSTestCase):
 
         class SampleExtensionToolbar2(ExtensionToolbar):
             model = MyPageContentExtension
+
             def populate(self):
                 nonlocal urls
                 urls = self.get_title_extension_admin()

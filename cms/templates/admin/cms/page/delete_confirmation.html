@@ -1,0 +1,61 @@
+{% extends "admin/delete_confirmation.html" %}
+{% load i18n admin_urls static cms_admin %}
+{% block extrahead %}{{ block.super }}
+    <style>
+        .flexbox {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2em;
+            margin-top: 2em;
+            + hr {
+                margin: 3em 0;
+            }
+        }
+        .summary .count {
+                margin-inline-start: 0.5em;
+                font-size: 300%;
+        }
+        ul#deleted-objects {
+            padding: 0;
+            li {
+                list-style-type: none;
+                background(var(--body-bg));
+                &:has( > :not(a)) {
+                    border-top: 1px solid var(--border-color);
+                }
+            }
+            ul {
+                margin-inline-start: 0;
+                padding-inline-start: 1em;
+            }
+        }
+        form {
+            padding: 1em 0;
+        }
+    </style>
+{% endblock %}
+{% block delete_confirm %}
+    <p>
+     {% blocktranslate with escaped_object=object %}Are you sure you want to delete the {{ object_name }} "{{ escaped_object }}"? All of the following related items will be deleted:{% endblocktranslate %}
+    </p>
+
+    <div class="flexbox">
+        {% for model, count in model_count %}
+            <h2 class="summary">
+                {{ model|capfirst }}<span class="count">{{ count }}</span>
+            </h2>
+        {% endfor %}
+    </div>
+    <h2>{% translate "Structure" %}</h2>
+    <ul id="deleted-objects">{{ deleted_objects|unordered_list }}</ul>
+    <hr>
+    <form method="post">{% csrf_token %}
+        <div>
+        <input type="hidden" name="post" value="yes">
+        {% if is_popup %}<input type="hidden" name="{{ is_popup_var }}" value="1">{% endif %}
+        {% if to_field %}<input type="hidden" name="{{ to_field_var }}" value="{{ to_field }}">{% endif %}
+        <input type="submit" value="{% translate 'Yes, I’m sure' %}">
+        <a href="#" class="button cancel-link">{% translate "No, take me back" %}</a>
+        </div>
+    </form>
+{% endblock %}

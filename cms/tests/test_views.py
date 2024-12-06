@@ -12,7 +12,6 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches, reverse
 from django.utils.translation import override as force_language
 
-from cms import api
 from cms.api import create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import PageContent, PagePermission, Placeholder, UserSettings
@@ -365,6 +364,18 @@ class ViewTests(CMSTestCase):
         response = login(request)
 
         self.assertNotIn(response.url, "<script>alert('Attack')</script>")
+
+    def test_queries(self):
+        create_page("home", "simple.html", "en")
+        cms_page = create_page("dreinhardt", "simple.html", "en")
+        url = cms_page.get_absolute_url()
+        with self.assertNumQueries(5):
+            # 1. get_page_from_request: checks PageUrl
+            # 2. get page contents: PageContent
+            # 3. Check permissions
+            # 4. Get placeholders
+            # 5. Get plugins
+            self.client.get(url)
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')

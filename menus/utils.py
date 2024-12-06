@@ -207,10 +207,9 @@ class DefaultLanguageChanger:
         if not page:
             return '/%s/' % lang if settings.USE_I18N else '/'
 
-        page_languages = page.get_languages()
-
-        if lang in page_languages:
-            return page.get_absolute_url(lang, fallback=False)
+        url = page.get_absolute_url(lang, fallback=False)
+        if url:
+            return url
 
         site = get_current_site()
 
@@ -226,14 +225,16 @@ class DefaultLanguageChanger:
 
         default_language = get_default_language_for_site(site.pk)
 
-        if not _valid_language and default_language in page_languages:
+        if not _valid_language:
             # The request language is not configured for the current site.
             # Fallback to the default language configured for the current site.
-            return page.get_absolute_url(default_language, fallback=False)
+            url = page.get_absolute_url(default_language, fallback=False)
+            if url:
+                return url
 
         if _valid_language:
             fallbacks = get_fallback_languages(lang, site_id=site.pk) or []
-            fallbacks = [_lang for _lang in fallbacks if _lang in page_languages]
+            fallbacks = [_lang for _lang in fallbacks if _lang in page.get_languages()]
         else:
             fallbacks = []
 

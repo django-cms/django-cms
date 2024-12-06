@@ -151,7 +151,6 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         with self.assertRaises(PlaceholderNotFound):
             renderer.render_obj_placeholder("someslot", context, False)
 
-
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
         self.assertEqual(response.status_code, 200)
@@ -761,14 +760,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         conf = {
             'col_left': {
-                'default_plugins' : [
+                'default_plugins': [
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{'body':'<p>en default body 1</p>'},
+                        'plugin_type': 'TextPlugin',
+                        'values': {'body': '<p>en default body 1</p>'},
                     },
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{'body':'<p>en default body 2</p>'},
+                        'plugin_type': 'TextPlugin',
+                        'values': {'body': '<p>en default body 2</p>'},
                     },
                 ]
             },

@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
-from typing import Generator, Iterable, Optional, Union
+from collections.abc import Generator, Iterable
+from typing import Optional
 
 from django.utils.functional import SimpleLazyObject
 
@@ -333,7 +334,6 @@ class CMSMenu(Menu):
                 "soft_root",
                 "in_navigation",
                 "page__site_id",
-                "page__languages",
                 "page__parent_id",
                 "page__is_home",
                 "page__login_required",
@@ -352,7 +352,7 @@ class CMSMenu(Menu):
         else:
             preview_url = None  # No short-cut here
             prefetched_urls = PageUrl.objects.filter(
-                language__in=self.languages,
+                language__in=(page_content.language for page_content in page_contents),
                 page_id__in=(page_content.page.pk for page_content in page_contents),
             )  # Fetch the PageUrl objects
             # Prepare for filling urls_cache
