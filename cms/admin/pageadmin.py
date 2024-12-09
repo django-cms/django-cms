@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import json
 import re
 from collections import namedtuple
@@ -34,6 +36,8 @@ from django.template.response import SimpleTemplateResponse, TemplateResponse
 from django.urls import re_path
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
+from django.utils.safestring import mark_safe
+from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
@@ -104,6 +108,9 @@ class PageAdmin(admin.ModelAdmin):
     move_form = MovePageForm
     inlines = PERMISSION_ADMIN_INLINES
     search_fields = ('=id', 'urls__slug', 'pagecontent_set__title', 'reverse_id')
+
+    def has_module_permission(self, request):
+        return False  # Hides page model from the admin index
 
     def has_add_permission(self, request):
         return False
@@ -350,10 +357,45 @@ class PageAdmin(admin.ModelAdmin):
         return super().response_delete(request, obj_display, obj_id)
 
     def get_deleted_objects(self, objs, request):
-        deleted_objs = list(objs)
-        for obj in objs:
-            deleted_objs.extend(obj.get_descendant_pages())
-        return super().get_deleted_objects(deleted_objs, request)
+        """Minimize complexity of delete selected confirmation: Only show pages, page contents and plugins numbers,
+        only show Page and PageContent objects in the details.
+        """
+        def recursively_remove(deleted_objects: list | str) -> list:
+            """Remove all objects that are not Page or PageContent from the nested list of deleted objects.
+            Reformat the messages."""
+            if isinstance(deleted_objects, str):
+                return deleted_objects
+            result = []
+            for obj in deleted_objects:
+                item = recursively_remove(obj)
+                if isinstance(item, str):
+                    if obj.startswith(f"{capfirst(Page._meta.verbose_name)}: "):
+                        text = re.findall(r'>(.*)<', obj)
+                        if text:
+                            result.append(mark_safe("<b>" + text[0] + "</b>"))
+                        else:
+                            result.append(mark_safe(
+                                "<b>" + item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: ") + "</b>"
+                            ))
+                    elif obj.startswith(f"{capfirst(PageContent._meta.verbose_name)}: "):
+                        result.insert(0, mark_safe(
+                            item.removeprefix(f"{capfirst(PageContent._meta.verbose_name)}: ")
+                        ))
+                elif item:
+                    result.append(item)
+            return result
+
+        to_delete, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+        to_delete = recursively_remove(to_delete)
+        model_count = {
+            key: value for key, value in model_count.items() if key in (
+                Page._meta.verbose_name_plural,
+                PageContent._meta.verbose_name_plural,
+                CMSPlugin._meta.verbose_name_plural
+            )
+        }
+
+        return to_delete, model_count, perms_needed, protected
 
     def delete_model(self, request, obj):
         operation_token = send_pre_page_operation(
