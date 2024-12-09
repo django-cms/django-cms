@@ -295,6 +295,19 @@ class RenderingTestCase(CMSTestCase):
         r = self.strip_rendered(response.content.decode('utf8'))
         self.assertEqual(r, '|' + self.test_data['text_main'] + '|' + self.test_data['text_sub'] + '|')
 
+    def test_getting_placeholders(self):
+        """ContentRenderer._get_content_object uses toolbar to return placeholders of a page"""
+        request = self.get_request(page=self.test_page)
+        request.toolbar = CMSToolbar(request)
+        wrong_content_obj = self.test_page2.get_content_obj("en")
+        wrong_content_obj.page = self.test_page
+        request.toolbar.set_object(wrong_content_obj)
+        content_renderer = self.get_content_renderer(request)
+        placeholders = content_renderer._get_content_object(self.test_page)
+        wrong_content_obj.page = self.test_page2
+
+        self.assertEqual(len(placeholders), 2)
+
     @override_settings(
         CMS_PLUGIN_PROCESSORS=('cms.tests.test_rendering.sample_plugin_processor',),
         CMS_PLUGIN_CONTEXT_PROCESSORS=('cms.tests.test_rendering.sample_plugin_context_processor',),
