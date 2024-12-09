@@ -373,6 +373,19 @@ class AdminTests(AdminTestsBase):
     def get_page(self):
         return self.page
 
+    def test_admin_index(self):
+        endpoint = admin_reverse("index")
+        endpoint_page = admin_reverse("cms_page_changelist")
+        endpoint_page_content = admin_reverse("cms_pagecontent_changelist")
+
+        admin_user = self.get_admin()
+        with self.login_user_context(admin_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+
+        self.assertNotContains(response, endpoint_page)
+        self.assertContains(response, endpoint_page_content)
+
     def test_change_innavigation(self):
         page = self.get_page()
         content = self.get_pagecontent_obj(page, 'en')

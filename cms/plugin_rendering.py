@@ -562,10 +562,10 @@ class ContentRenderer(BaseRenderer):
         return language_cache.get(placeholder.pk)
 
     def _get_content_object(self, page, slots=None):
-        if self.toolbar.get_object() == page:
+        toolbar_obj = self.toolbar.get_object()
+        if isinstance(toolbar_obj, PageContent) and toolbar_obj.page == page:
             # Current object belongs to the page itself
-            page_content = self.toolbar.get_object()
-            placeholders = Placeholder.objects.get_for_obj(page_content)
+            return Placeholder.objects.get_for_obj(toolbar_obj)
         elif slots:
             # If looking for inherited placeholders, slots is specified
             if self.toolbar.preview_mode_active or self.toolbar.edit_mode_active:
@@ -573,14 +573,13 @@ class ContentRenderer(BaseRenderer):
                                 .current_content(language=self.request_language).first())
             else:
                 page_content = page.pagecontent_set.filter(language=self.request_language).first()
-            placeholders = Placeholder.objects.get_for_obj(page_content) if page_content else Placeholder.objects.none()
-        else:
-            page_content = page.get_content_obj(self.request_language, fallback=False)
-
+            return Placeholder.objects.get_for_obj(page_content) if page_content else Placeholder.objects.none()
+        elif page_content := page.get_content_obj(self.request_language, fallback=False):
             PageContent.page.field.set_cached_value(page_content, page)
             # Creates any placeholders missing on the page
-            placeholders = page_content.rescan_placeholders().values()
-        return placeholders
+            return page_content.rescan_placeholders().values()
+        else:
+            return Placeholder.objects.none()
 
     def _preload_placeholders_for_page(self, page, slots=None, inherit=False):
         """

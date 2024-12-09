@@ -109,6 +109,9 @@ class PageAdmin(admin.ModelAdmin):
     inlines = PERMISSION_ADMIN_INLINES
     search_fields = ('=id', 'urls__slug', 'pagecontent_set__title', 'reverse_id')
 
+    def has_module_permission(self, request):
+        return False  # Hides page model from the admin index
+
     def has_add_permission(self, request):
         return False
 
