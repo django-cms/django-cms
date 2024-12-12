@@ -30,7 +30,7 @@ end of the ``<head>`` to load required style sheets and the
 ``{% render_block "js" %}`` tag at the bottom of the ``<body>`` to load the
 necessary JavaScript.
 
-If you are using the django-cms-quickstart project for this turorial, you will
+If you are using the django-cms-quickstart project for this tutorial, you will
 find the site's templates in ``django-cms-quickstart/backend/templates``.
 
 By default, pages in your site will use the ``bootstrap5.html`` template, the
