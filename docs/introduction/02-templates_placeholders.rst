@@ -26,7 +26,7 @@ can be switched for another at any time.
 We recommend creating a ``base.html`` template, shared by all the
 applications in the project, that your django CMS templates can extend.
 See Django's :ref:`template language documentation <django:template-inheritance>`
-or more on how template inheritance works.
+for more on how template inheritance works.
 
 A template used by django CMS needs to include the
 :ttag:`{% cms_toolbar %} <cms_toolbar>` template tag in its ``<body>`` to show
