@@ -23,6 +23,11 @@ You can define multiple templates, with different layouts or built-in
 components, and choose them for each page as required. A page's template
 can be switched for another at any time.
 
+We recommend creating a ``base.html`` template, shared by all the
+applications in the project, that your django CMS templates can extend.
+See Django's :ref:`template language documentation <django:template-inheritance>`
+or more on how template inheritance works.
+
 A template used by django CMS needs to include the ``{% cms_toolbar %}``
 :ttag`template tag <cms_toolbar>` in its ``<body>`` to show the toolbar. In
 addition, the template should include the ``{% render_block "css" %}`` at the
@@ -50,10 +55,10 @@ first one listed in the project's ``settings.py`` ``CMS_TEMPLATES`` tuple:
     ]
 
 If you've installed django CMS by hand or used the ``djangocms`` command you
-will not have templates preinstalled. The ``djangocms`` command installs an
+will not have templates pre-installed. The ``djangocms`` command installs an
 empty template that re-uses a minimal template from the djangocms-frontend
-package using Bootstrap 5. For this tutorial, you can check out the
-`templates on github <https://github.com/django-cms/django-cms-quickstart/tree/main/backend/templates>`_.
+package using Bootstrap 5. For this tutorial, you can check out and copy the
+`quickstart templates on github <https://github.com/django-cms/django-cms-quickstart/tree/main/backend/templates>`_.
 
 
 ************
