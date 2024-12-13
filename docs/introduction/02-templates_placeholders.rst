@@ -28,12 +28,12 @@ applications in the project, that your django CMS templates can extend.
 See Django's :ref:`template language documentation <django:template-inheritance>`
 or more on how template inheritance works.
 
-A template used by django CMS needs to include the ``{% cms_toolbar %}``
-:ttag:`template tag <cms_toolbar>` in its ``<body>`` to show the toolbar. In
-addition, the template should include the ``{% render_block "css" %}`` at the
-end of the ``<head>`` to load required style sheets and the
-``{% render_block "js" %}`` tag at the bottom of the ``<body>`` to load the
-necessary JavaScript.
+A template used by django CMS needs to include the
+:ttag:`{% cms_toolbar %} <cms_toolbar>` template tag in its ``<body>`` to show
+the toolbar. In addition, the template should include the
+``{% render_block "css" %}`` at the end of the ``<head>`` to load required
+style sheets and the ``{% render_block "js" %}`` tag at the bottom of the
+``<body>`` to load the necessary JavaScript.
 
 If you are using the django-cms-quickstart project for this tutorial, you will
 find the site's templates in ``django-cms-quickstart/backend/templates``.
