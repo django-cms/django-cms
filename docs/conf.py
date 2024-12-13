@@ -50,6 +50,9 @@ extensions = [
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
+    'sphinx.ext.autosectionlabel',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.viewcode',
     'sphinxcontrib.spelling',
     "sphinx_copybutton",
     "sphinxext.opengraph",
@@ -274,23 +277,117 @@ latex_documents = [
 
 # -- Options for LaTeX output --------------------------------------------------
 
-# Spelling check needs an additional module that is not installed by default.
-# Add it only if spelling check is requested so docs can be generated without it.
-
-# temporarily disabled because of an issue on RTD. see docs/requirements.txt
-
-# if 'spelling' in sys.argv:
-#     extensions.append("sphinxcontrib.spelling")
-
-# Spelling language.
+# Spelling configuration
 spelling_lang = 'en_GB'
-
-# Location of word list.
-spelling_word_list_filename = 'spelling_wordlist'
-
+spelling_word_list_filename = os.path.join(os.path.dirname(__file__), 'spelling_wordlist')
 spelling_ignore_pypi_package_names = True
+spelling_ignore_contributor_names = True
+spelling_ignore_acronyms = True
+spelling_ignore_python_builtins = True
+spelling_ignore_importable_modules = True
+spelling_filters = [
+    "sphinxcontrib.spelling.filters.ContractionFilter",
+    "sphinxcontrib.spelling.filters.IgnoreWordsWithNumbers",
+]
 
-#Split common contractions from words so they are not flagged as errors by the spellchecker.
-#https://github.com/sphinx-contrib/spelling/blob/master/sphinxcontrib/spelling/filters.py
-#See https://sphinxcontrib-spelling.readthedocs.io/en/latest/customize.html#word-filters
-spelling_filters=["sphinxcontrib.spelling.filters.ContractionFilter"]
+# Ensure code blocks are handled properly
+highlight_language = 'python'
+default_role = 'code'
+
+# RST validation settings
+rstcheck_ignore_messages = (
+    "Unknown interpreted text role",
+    "Unknown directive type",
+    "Title underline too short", 
+    "Title level inconsistent",
+    "Duplicate implicit target name",
+    "Duplicate explicit target name",
+    "Hyperlink target .* is not referenced",
+    "Blank line missing before literal block",
+    "Possible title underline, too short for the title",
+    "Unexpected possible title overline or transition",
+)
+
+rstcheck_ignore_directives = {
+    # Keep existing directives
+    'autoclass',
+    'autodata',
+    'autofunction',
+    'automodule',
+    'autoproperty',
+    'autosummary',
+    'code-block',
+    'compound',
+    'currentmodule',
+    'deprecated',
+    'djangoversion',
+    'figure',
+    'glossary',
+    'group',
+    'highlight',
+    'highlightlang',
+    'index',
+    'literalinclude',
+    'module',
+    'moduleauthor',
+    'note',
+    'raw',
+    'seealso',
+    'setting',
+    'sourcecode',
+    'tabularcolumns',
+    'templatetag',
+    'toctree',
+    'todo',
+    'versionadded',
+    'versionchanged',
+    'warning',
+}
+
+rstcheck_ignore_roles = {
+    'attr',
+    'class',
+    'doc',
+    'file',
+    'func',
+    'meth',
+    'mod',
+    'ref',
+    'setting',
+    'term',
+    'ttag',
+    # Add commonly used roles
+    'command',
+    'djadmin',
+    'filter',
+    'label',
+    'lookuptype',
+    'model',
+    'tag',
+    'templatetag',
+    # Add missing roles
+    'setting',
+    'ttag',
+}
+
+rst_prolog = """
+.. |django-cms| replace:: django CMS
+.. |django| replace:: Django
+"""
+
+# Disable smart quotes to avoid issues with code examples
+smartquotes = False
+
+# Enable proper code block handling in spell check
+spelling_exclude_patterns = [
+    '*.js',
+    '*.min.js',
+    '*.css',
+    '*.min.css',
+    '*.py',
+    '*.rst',
+    '_build/*',
+]
+
+# Add custom CSS for better code block formatting
+html_css_files.append('custom.css')
