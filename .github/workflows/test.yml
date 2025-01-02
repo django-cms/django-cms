@@ -18,7 +18,8 @@ jobs:
           django-4.0.txt,
           django-4.1.txt,
           django-4.2.txt,
-          django-5.0.txt
+          django-5.0.txt,
+          django-5.1.txt
         ]
         os: [
           ubuntu-20.04,
@@ -27,6 +28,10 @@ jobs:
           - requirements-file: django-5.0.txt
             python-version: 3.8
           - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.8
+          - requirements-file: django-5.1.txt
             python-version: 3.9
 
     services:
@@ -76,7 +81,8 @@ jobs:
           django-4.0.txt,
           django-4.1.txt,
           django-4.2.txt,
-          django-5.0.txt
+          django-5.0.txt,
+          django-5.1.txt
         ]
         os: [
           ubuntu-20.04,
@@ -85,6 +91,10 @@ jobs:
           - requirements-file: django-5.0.txt
             python-version: 3.8
           - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.8
+          - requirements-file: django-5.1.txt
             python-version: 3.9
 
     services:
@@ -134,7 +144,8 @@ jobs:
           django-4.0.txt,
           django-4.1.txt,
           django-4.2.txt,
-          django-5.0.txt
+          django-5.0.txt,
+          django-5.1.txt
         ]
         os: [
           ubuntu-20.04,
@@ -143,6 +154,10 @@ jobs:
           - requirements-file: django-5.0.txt
             python-version: 3.8
           - requirements-file: django-5.0.txt
+            python-version: 3.9
+          - requirements-file: django-5.1.txt
+            python-version: 3.8
+          - requirements-file: django-5.1.txt
             python-version: 3.9
 
     steps:
