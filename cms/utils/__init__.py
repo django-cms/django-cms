@@ -53,9 +53,9 @@ default_storage = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 class ConfiguredStorage(LazyObject):
     def _setup(self):
-        from django.core.files.storage import get_storage_class
+        from django.utils.module_loading import import_string
 
-        self._wrapped = get_storage_class(getattr(settings, 'STATICFILES_STORAGE', default_storage))()
+        self._wrapped = import_string(getattr(settings, 'STATICFILES_STORAGE', default_storage))()
 
 
 configured_storage = ConfiguredStorage()
