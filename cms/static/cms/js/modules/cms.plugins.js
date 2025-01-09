@@ -491,13 +491,13 @@ var Plugin = new Class({
      * @param {String} name name of the plugin, e.g. "Column"
      * @param {String} parent id of a parent plugin
      */
-    addPlugin: function(type, name, parent) {
+    addPlugin: function(type, name, parent, position) {
         var params = {
             placeholder_id: this.options.placeholder_id,
             plugin_type: type,
             cms_path: path,
             plugin_language: CMS.config.request.language,
-            plugin_position: this._getPluginAddPosition()
+            plugin_position: position || this._getPluginAddPosition()
         };
 
         if (parent) {
@@ -1035,6 +1035,9 @@ var Plugin = new Class({
         var isTouching;
         var plugins;
 
+        var possibleChildClasses = this._getPossibleChildClasses();
+        var selectionNeeded = possibleChildClasses.filter(':not(.cms-submenu-item-title)').length !== 1;
+
         var initModal = once(function initModal() {
             var placeholder = $(
                 '<div class="cms-add-plugin-placeholder">' + CMS.config.lang.addPluginPlaceholder + '</div>'
@@ -1108,23 +1111,32 @@ var Plugin = new Class({
 
                 Plugin._hideSettingsMenu();
 
-                initModal();
+                if (selectionNeeded) {
+                    initModal();
 
-                // since we don't know exact plugin parent (because dragndrop)
-                // we need to know the parent id by the time we open "add plugin" dialog
-                var pluginsCopy = that._updateWithMostUsedPlugins(
-                    plugins
-                        .clone(true, true)
-                        .data('parentId', that._getId(nav.closest('.cms-draggable')))
-                        .append(that._getPossibleChildClasses())
-                );
+                    // since we don't know exact plugin parent (because dragndrop)
+                    // we need to know the parent id by the time we open "add plugin" dialog
+                    var pluginsCopy = that._updateWithMostUsedPlugins(
+                        plugins
+                            .clone(true, true)
+                            .data('parentId', that._getId(nav.closest('.cms-draggable')))
+                            .append(possibleChildClasses)
+                    );
 
-                modal.open({
-                    title: that.options.addPluginHelpTitle,
-                    html: pluginsCopy,
-                    width: 530,
-                    height: 400
-                });
+                    modal.open({
+                        title: that.options.addPluginHelpTitle,
+                        html: pluginsCopy,
+                        width: 530,
+                        height: 400
+                    });
+                } else {
+                    // only one plugin available, no need to show the modal
+                    // instead directly add the single plugin
+                    const el = possibleChildClasses.find('a');  // only one result
+                    const pluginType = el.attr('href').replace('#', '');
+                    const parentId = that._getId(nav.closest('.cms-draggable'));
+                    that.addPlugin(pluginType, el.text(), parentId);
+                }
             });
 
         // prevent propagation
