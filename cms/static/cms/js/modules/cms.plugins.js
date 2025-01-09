@@ -1032,11 +1032,9 @@ var Plugin = new Class({
         }
         var that = this;
         var modal;
+        var possibleChildClasses;
         var isTouching;
         var plugins;
-
-        var possibleChildClasses = this._getPossibleChildClasses();
-        var selectionNeeded = possibleChildClasses.filter(':not(.cms-submenu-item-title)').length !== 1;
 
         var initModal = once(function initModal() {
             var placeholder = $(
@@ -1110,6 +1108,9 @@ var Plugin = new Class({
                 e.stopPropagation();
 
                 Plugin._hideSettingsMenu();
+
+                possibleChildClasses = that._getPossibleChildClasses();
+                var selectionNeeded = possibleChildClasses.filter(':not(.cms-submenu-item-title)').length !== 1;
 
                 if (selectionNeeded) {
                     initModal();
