@@ -490,7 +490,9 @@ var Plugin = new Class({
      * @param {String} type type of the plugin, e.g "Bootstrap3ColumnCMSPlugin"
      * @param {String} name name of the plugin, e.g. "Column"
      * @param {String} parent id of a parent plugin
+     * @param {Number} position (optional) position of the plugin
      */
+    // eslint-disable-next-line max-params
     addPlugin: function(type, name, parent, position) {
         var params = {
             placeholder_id: this.options.placeholder_id,
@@ -1136,6 +1138,7 @@ var Plugin = new Class({
                     const el = possibleChildClasses.find('a');  // only one result
                     const pluginType = el.attr('href').replace('#', '');
                     const parentId = that._getId(nav.closest('.cms-draggable'));
+
                     that.addPlugin(pluginType, el.text(), parentId);
                 }
             });
