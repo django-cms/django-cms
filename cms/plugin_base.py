@@ -79,15 +79,6 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                         }
                     )
                 ]
-            if not basic_fields and not advanced_fields:
-                # No need for editing of plugin without fields
-                # Plugins with a get_fieldsets method are assumed to provide non-empty fieldsets
-                new_plugin.edit_disabled = new_plugin.edit_disabled or not hasattr(new_plugin, "get_fieldsets")
-        else:
-            if not flatten_fieldsets(new_plugin.fieldsets):
-                # No need for editing of plugin without fields
-                new_plugin.edit_disabled = new_plugin.edit_disabled or not hasattr(new_plugin, "get_fieldsets")
-
         # Set default name
         if not new_plugin.name:
             new_plugin.name = re.sub("([a-z])([A-Z])", "\\g<1> \\g<2>", name)
