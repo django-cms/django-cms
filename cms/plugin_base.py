@@ -207,15 +207,6 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Moving or adding child plugins are not affected.
     edit_disabled = False
 
-    #: Disables *moving* of children of this plugin in structure mode. Useful for plugins which, for example, manage
-    #: their child plugins.
-    #:
-    #: If moving is disabled, the plugin will not be draggable in structure mode. The user will not have a direct way
-    #: to change the order of the child plugins.
-    #:
-    #: Editing or adding child plugins are not affected.
-    moving_children_disabled = False
-
     #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have now
     #: fields to fill, or which have valid default values for all fields.
     #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
@@ -540,15 +531,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         pass
 
     def icon_src(self, instance):
-        """By default, this returns an empty string, which, if left un-overridden would result in no icon
+        """Deprecated: Since djangocms-text-ckeditor introduced inline previews of plugins, the icon will not be
+        rendered in TextPlugins anymore.
+
+        By default, this returns an empty string, which, if left un-overridden would result in no icon
         rendered at all, which, in turn, would render the plugin un-editable by the operator inside a parent
         text plugin.
 
         Therefore, this should be overridden when the plugin has text_enabled set to True to return the path
         to an icon to display in the text of the text plugin.
-
-        Since djangocms-text-ckeditor introduced inline previews of plugins, the icon will not be
-        rendered in TextPlugins anymore.
 
         :param instance: The instance of the plugin model.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
@@ -556,7 +547,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Example::
 
             def icon_src(self, instance):
-                return settings.STATIC_URL + "cms/img/icons/plugins/link.png"
+                return static("cms/img/icons/plugins/link.png")
 
         See also: :attr:`text_enabled`, :meth:`icon_alt`
         """
@@ -572,7 +563,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             for the 'alt' text.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
 
-        By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
+        By default, :meth:`icon_alt` will return a string of the form: "[plugin type] -
         [instance]", but can be modified to return anything you like.
 
         This function accepts the ``instance`` as a parameter and returns a string to be

@@ -324,7 +324,7 @@ describe('CMS.Plugin', function() {
             jasmine.clock().uninstall();
         });
 
-        it('removes the temlpate tags around the plugin markup', function() {
+        it('removes the template tags around the plugin markup', function() {
             expect($('template')).not.toBeInDOM();
         });
 
@@ -496,6 +496,10 @@ describe('CMS.Plugin', function() {
         class FakeModal {
             constructor(...args) {
                 modalConstructor(...args);
+                this.ui = {
+                    frame: $('.cms-modal-frame'),
+                    modal: $('.cms-modal')
+                };
             }
         }
 
@@ -543,8 +547,8 @@ describe('CMS.Plugin', function() {
             fixture.cleanup();
         });
 
-        it('opens the modal with correct url', function() {
-            plugin.addPlugin('TextPlugin', 'Text plugin', 12);
+        it('opens the edit modal with correct url', function() {
+            plugin.addPlugin('TextPlugin', 'Text plugin', 12, true);
 
             expect(modalConstructor).toHaveBeenCalledWith({
                 onClose: false,
@@ -563,6 +567,19 @@ describe('CMS.Plugin', function() {
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_parent=12');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('plugin_position=42');
             expect(FakeModal.prototype.open.calls.mostRecent().args[0].url).toMatch('cms_path=');
+        });
+
+        it('skips the edit modal when configured', function() {
+            plugin.addPlugin('TextPlugin', 'Text plugin', 12, false);
+            expect(modalConstructor).toHaveBeenCalledWith({
+                onClose: false,
+                redirectOnClose: false
+            });
+
+            expect(FakeModal.prototype.open).toHaveBeenCalledWith({
+                url: '#',
+                title: 'Text plugin'
+            });
         });
 
         it('opens the modal with correct url', function() {
