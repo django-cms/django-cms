@@ -494,7 +494,7 @@ var Plugin = new Class({
      * @param {Number} position (optional) position of the plugin
      */
     // eslint-disable-next-line max-params
-    addPlugin: function(type, name, parent, showAddForm=true, position) {
+    addPlugin: function(type, name, parent, showAddForm = true, position) {
         var params = {
             placeholder_id: this.options.placeholder_id,
             plugin_type: type,
@@ -530,6 +530,7 @@ var Plugin = new Class({
             }
             const contents = modal.ui.frame.find('iframe').contents();
             const body = contents.find('body');
+
             body.append(`<form method="post" action="${url}" style="display: none;">
                 <input type="hidden" name="csrfmiddlewaretoken" value="${CMS.config.csrf}"></form>`);
             body.find('form').submit();
@@ -537,7 +538,7 @@ var Plugin = new Class({
         this.modal = modal;
 
         Helpers.removeEventListener('modal-closed.add-plugin');
-        Helpers.addEventListener('modal-closed.add-plugin', (e, {instance}) => {
+        Helpers.addEventListener('modal-closed.add-plugin', (e, { instance }) => {
             if (instance !== modal) {
                 return;
             }
@@ -1157,6 +1158,7 @@ var Plugin = new Class({
                     const pluginType = el.attr('href').replace('#', '');
                     const showAddForm = el.data('addForm');
                     const parentId = that._getId(nav.closest('.cms-draggable'));
+
                     that.addPlugin(pluginType, el.text(), parentId, showAddForm);
                 }
             });
