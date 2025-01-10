@@ -447,7 +447,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             fields = flatten_fieldsets(fieldsets)
             # Instantiate the add form for all fields
             initial_form = plugin_instance.get_form(request, None, change=False, fields=fields)()
-            # Turn the inital values in a multi-value dict. In a multi-value dict each value is a list.
+            # Turn the initial values in a multi-value dict. In a multi-value dict each value is a list.
             # Hence, if the initial value is not a list, it is turned into a list.
             query_dict = MultiValueDict({
                 name: field.initial if isinstance(field.initial, (tuple, list)) else [field.initial]
