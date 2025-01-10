@@ -494,7 +494,7 @@ var Plugin = new Class({
      * @param {Number} position (optional) position of the plugin
      */
     // eslint-disable-next-line max-params
-    addPlugin: function(type, name, parent, showAddForm, position) {
+    addPlugin: function(type, name, parent, showAddForm=true, position) {
         var params = {
             placeholder_id: this.options.placeholder_id,
             plugin_type: type,
@@ -524,7 +524,10 @@ var Plugin = new Class({
                 url: '#',
                 title: name
             });
-            modal.ui.modal.hide();
+            if (modal.ui) {
+                // Hide the plugin type selector modal if it's open
+                modal.ui.modal.hide();
+            }
             const contents = modal.ui.frame.find('iframe').contents();
             const body = contents.find('body');
             body.append(`<form method="post" action="${url}" style="display: none;">
@@ -540,40 +543,6 @@ var Plugin = new Class({
             }
             Plugin._removeAddPluginPlaceholder();
         });
-    },
-
-    _postAddRequest: function (url) {
-        showLoader();
-        Plugin._removeAddPluginPlaceholder();
-        new Modal().close();  // Don't have access to a potentially open modal, just create a new one and close it
-
-        const iframe = $(document.body)
-            .append(`<iframe name="cms-add-plugin" style="display: none;"></iframe>`)
-            .find('iframe[target="cms-add-plugin"]').last();
-        const form = $(document.body)
-            .append(`<form method="post" target="cms-add-plugin" action="${url}" style="display: none;">
-<input type="hidden" name="csrfmiddlewaretoken" value="${CMS.config.csrf}"></form>`)
-            .find('form[target="cms-add-plugin"]').last();
-
-        iframe.on('load', () => {
-            console.log("iframe onLoad");
-            const contents = iframe.contents();
-
-            // show messages in toolbar if provided
-            const messages = contents.find('.messagelist li.error');
-            if (messages.length) {
-                CMS.API.Messages.open({
-                    message: messages.eq(0).html()
-                });
-            }
-
-            iframe.remove();
-            hideLoader();
-        });
-
-        form.submit();
-        form.remove();
-        console.log("submitted", form);
     },
 
     _getPluginAddPosition: function() {

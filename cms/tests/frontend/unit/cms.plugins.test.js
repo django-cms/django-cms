@@ -1687,7 +1687,7 @@ describe('CMS.Plugin', function() {
         var plugin;
         var tmpl =
             '<div class="cms-plugin-picker" data-parent-id="mock"><div class="cms-submenu-item {1}">' +
-            '<a href="{2}">Submenu item</a>' +
+            '<a href="{2}" data-add-form="{3}">Submenu item</a>' +
             '</div></div>';
 
         beforeEach(function(done) {
@@ -1771,13 +1771,15 @@ describe('CMS.Plugin', function() {
 
         it('delegates to add plugin', function() {
             spyOn(plugin, 'addPlugin');
-            var nav = $(tmpl.replace('{1}', '').replace('{2}', '#shmock')).find('> div');
+            var nav = $(tmpl.replace('{1}', '')
+                .replace('{2}', '#shmock')
+                .replace('{3}', 'perhaps')).find('> div');
             var link = nav.find('a');
             link.attr('data-rel', 'add');
             plugin._setupActions(nav);
             link.trigger(Plugin.click);
             expect(plugin.addPlugin).toHaveBeenCalledTimes(1);
-            expect(plugin.addPlugin).toHaveBeenCalledWith('shmock', 'Submenu item', 'mock');
+            expect(plugin.addPlugin).toHaveBeenCalledWith('shmock', 'Submenu item', 'mock', 'perhaps');
         });
 
         it('delegates to add ajax plugin', function() {

@@ -6,7 +6,7 @@ from urllib.parse import parse_qsl, urlparse
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
-from django.contrib.admin.utils import get_deleted_objects, flatten_fieldsets
+from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import models, transaction
 from django.http import (
