@@ -169,7 +169,7 @@ class Modal {
         this.ui.minimizeButton.toggle(this.options.minimizable);
         this.ui.maximizeButton.toggle(this.options.maximizable);
 
-        var position = this._calculateNewPosition(opts);
+        const position = this._calculateNewPosition(opts);
 
         this.ui.maximizeButton.removeClass('cms-modal-maximize-active');
         this.maximized = false;
@@ -912,12 +912,15 @@ class Modal {
             }
 
             // check if we are redirected - should only happen after successful form submission
-            var redirect = body.find('a.cms-view-new-object').attr('href');
+            const redirect = body.find('a.cms-view-new-object').attr('href');
 
             if (redirect) {
                 Helpers.reloadBrowser(redirect, false);
                 return true;
             }
+
+            // If the resopnse contains the data bridge, the form was saved successfully
+            that.saved = that.saved || body.find('script#data-bridge').length;
 
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');
@@ -1034,6 +1037,10 @@ class Modal {
                     }, 150); // eslint-disable-line
                 }
             } else {
+                if (that.ui.modal.hasClass('cms-modal-open')) {
+                    // show modal if hidden
+                    that.ui.modal.show();
+                }
                 iframe.show();
                 // set title of not provided
                 innerTitle = contents.find('#content h1:eq(0)');

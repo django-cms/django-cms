@@ -3,6 +3,7 @@ import re
 
 from django import forms
 from django.contrib import admin, messages
+from django.contrib.admin.utils import flatten_fieldsets
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.shortcuts import render
 from django.utils.encoding import force_str, smart_str
@@ -78,6 +79,15 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
                         }
                     )
                 ]
+            if not basic_fields and not advanced_fields:
+                # No need for editing of plugin without fields
+                # Plugins with a get_fieldsets method are assumed to provide non-empty fieldsets
+                new_plugin.edit_disabled = new_plugin.edit_disabled or not hasattr(new_plugin, "get_fieldsets")
+        else:
+            if not flatten_fieldsets(new_plugin.fieldsets):
+                # No need for editing of plugin without fields
+                new_plugin.edit_disabled = new_plugin.edit_disabled or not hasattr(new_plugin, "get_fieldsets")
+
         # Set default name
         if not new_plugin.name:
             new_plugin.name = re.sub("([a-z])([A-Z])", "\\g<1> \\g<2>", name)
@@ -156,7 +166,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     See also: :meth:`icon_alt`, :meth:`icon_src`."""
 
     #: Set to ``True`` if this plugin should only be used in a placeholder that is attached to a django CMS page,
-    #: and not other models with ``PlaceholderFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
+    #: and not other models with ``PlaceholderRelationFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
     #: :attr:`require_parent`.
     page_only = False
 
@@ -196,6 +206,30 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     #: Disables *dragging* of child plugins in structure mode.
     disable_child_plugins = False
+
+    #: Disables *editing* of this plugin in structure mode. Useful for plugins which, for example, are managed by
+    #: their parent plugins.
+    #:
+    #: If editing is disabled, the plugin will be rendered in structure mode normally, but double-clicking on it will
+    #: not open the plugin edit dialog. The user will not have a direct way to change the plugin instance.
+    #:
+    #: Moving or adding child plugins are not affected.
+    edit_disabled = False
+
+    #: Disables *moving* of children of this plugin in structure mode. Useful for plugins which, for example, manage
+    #: their child plugins.
+    #:
+    #: If moving is disabled, the plugin will not be draggable in structure mode. The user will not have a direct way
+    #: to change the order of the child plugins.
+    #:
+    #: Editing or adding child plugins are not affected.
+    moving_children_disabled = False
+
+    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have now
+    #: fields to fill, or which have valid default values for all fields.
+    #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
+    #: errors
+    show_plugin_add_form = True
 
     # Warning: setting these to False, may have a serious performance impact,
     # because their child-parent-relation must be recomputed each
