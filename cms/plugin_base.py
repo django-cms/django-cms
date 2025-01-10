@@ -205,10 +205,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: not open the plugin edit dialog. The user will not have a direct way to change the plugin instance.
     #:
     #: Moving or adding child plugins are not affected.
-    edit_disabled = False
+    disable_edit = False
 
-    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have now
-    #: fields to fill, or which have valid default values for all fields.
+    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have no
+    #: fields to fill, or which have valid default values for *all* fields.
     #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
     #: errors
     show_plugin_add_form = True
