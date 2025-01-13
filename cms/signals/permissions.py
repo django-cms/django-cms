@@ -27,8 +27,9 @@ def post_save_user(instance, raw, created, **kwargs):
     page_user.__dict__.update(instance.__dict__)
     page_user.save()
 
-    clear_user_permission_cache(instance
-                                )
+    clear_user_permission_cache(instance)
+    menu_pool.clear(all=True)
+
 
 def post_save_user_group(instance, raw, created, **kwargs):
     """The same like post_save_user, but for Group, required only when
@@ -51,14 +52,17 @@ def post_save_user_group(instance, raw, created, **kwargs):
 
 def pre_save_user(instance, raw, **kwargs):
     clear_user_permission_cache(instance)
+    menu_pool.clear(all=True)
 
 
 def pre_delete_user(instance, **kwargs):
     clear_user_permission_cache(instance)
+    menu_pool.clear(all=True)
 
 
 def pre_save_group(instance, raw, **kwargs):
     if instance.pk:
+        menu_pool.clear(all=True)
         user_set = instance.user_set
         for user in user_set.all():
             clear_user_permission_cache(user)
@@ -66,12 +70,17 @@ def pre_save_group(instance, raw, **kwargs):
 
 def pre_delete_group(instance, **kwargs):
     user_set = instance.user_set
+    menu_pool.clear(all=True)
     for user in user_set.all():
         clear_user_permission_cache(user)
 
 
 def user_m2m_changed(instance, action, reverse, pk_set, **kwargs):
-    if action in ('pre_add', 'pre_remove',):
+    if action in (
+        "pre_add",
+        "pre_remove",
+    ):
+        menu_pool.clear(all=True)
         if reverse:
             for user in User.objects.filter(pk__in=pk_set):
                 clear_user_permission_cache(user)
@@ -82,10 +91,12 @@ def user_m2m_changed(instance, action, reverse, pk_set, **kwargs):
 def _clear_users_permissions(instance):
     if instance.user:
         clear_user_permission_cache(instance.user)
+        menu_pool.clear(all=True)
     if instance.group:
         user_set = instance.group.user_set
         for user in user_set.all():
             clear_user_permission_cache(user)
+        menu_pool.clear(all=True)
 
 
 def pre_save_pagepermission(instance, raw, **kwargs):
@@ -98,7 +109,6 @@ def pre_delete_pagepermission(instance, **kwargs):
 
 def pre_save_globalpagepermission(instance, raw, **kwargs):
     _clear_users_permissions(instance)
-    menu_pool.clear(all=True)
 
 
 def pre_delete_globalpagepermission(instance, **kwargs):

@@ -33,7 +33,7 @@ from cms.test_utils.util.context_managers import (
     UserLoginContext,
 )
 from cms.toolbar.utils import get_object_edit_url
-from cms.utils.compat import DJANGO_4_2
+from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.compat.dj import installed_apps
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_page_from_request
@@ -274,12 +274,18 @@ class PageTest(PageTestBase):
 
             response = self.client.post(add_endpoint, page_data)
             new_page = Page.objects.only('id').latest('id')
-            expected_error = (
-                '<ul class="errorlist"><li>Page '
-                '<a href="{}" target="_blank">test page 1</a> '
-                'has the same url \'test-page-1\' as current page.</li></ul>'
-            ).format(self.get_page_change_uri('en', new_page))
-
+            if DJANGO_5_1:
+                expected_error = (
+                    '<ul class="errorlist"><li>Page '
+                    '<a href="{}" target="_blank">test page 1</a> '
+                    'has the same url \'test-page-1\' as current page.</li></ul>'
+                ).format(self.get_page_change_uri('en', new_page))
+            else:
+                expected_error = (
+                    '<ul class="errorlist" id="id_slug_error"><li>Page '
+                    '<a href="{}" target="_blank">test page 1</a> '
+                    'has the same url \'test-page-1\' as current page.</li></ul>'
+                ).format(self.get_page_change_uri('en', new_page))
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error)
 
@@ -295,44 +301,65 @@ class PageTest(PageTestBase):
         superuser = self.get_superuser()
         add_endpoint = self.get_page_add_uri('en')
         with self.login_user_context(superuser):
-            # slug collision between two child pages of the same node
-            page_data = self.get_new_page_data(page.pk)
-            page_data['slug'] = 'subpage'
-            response = self.client.post(add_endpoint, page_data)
-            expected_markup = (
-                '<ul class="errorlist">'
-                '<li>Page <a href="{}" target="_blank">subpage</a> '
-                'has the same url \'page/subpage\' as current page.</li></ul>'
-            ).format(self.get_page_change_uri('en', sub_page))
+            with self.subTest("Slug collision between two child pages of the same node"):
+                page_data = self.get_new_page_data(page.pk)
+                page_data['slug'] = 'subpage'
+                response = self.client.post(add_endpoint, page_data)
+                if DJANGO_5_1:
+                    expected_markup = (
+                        '<ul class="errorlist">'
+                        '<li>Page <a href="{}" target="_blank">subpage</a> '
+                        'has the same url \'page/subpage\' as current page.</li></ul>'
+                    ).format(self.get_page_change_uri('en', sub_page))
+                else:
+                    expected_markup = (
+                        '<ul class="errorlist" id="id_slug_error">'
+                        '<li>Page <a href="{}" target="_blank">subpage</a> '
+                        'has the same url \'page/subpage\' as current page.</li></ul>'
+                    ).format(self.get_page_change_uri('en', sub_page))
 
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_markup)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, expected_markup)
 
-            # slug collision between page with no parent and a child page of home-page
-            page_data = self.get_new_page_data()
-            page_data['slug'] = 'child-page'
-            response = self.client.post(add_endpoint, page_data)
-            expected_markup = (
-                '<ul class="errorlist">'
-                '<li>Page <a href="{}" target="_blank">child-page</a> '
-                'has the same url \'child-page\' as current page.</li></ul>'
-            ).format(self.get_page_change_uri('en', child_page))
+            with self.subTest("Slug collision between page with no parent and a child page of home-page"):
+                page_data = self.get_new_page_data()
+                page_data['slug'] = 'child-page'
+                response = self.client.post(add_endpoint, page_data)
+                if DJANGO_5_1:
+                    expected_markup = (
+                        '<ul class="errorlist">'
+                        '<li>Page <a href="{}" target="_blank">child-page</a> '
+                        'has the same url \'child-page\' as current page.</li></ul>'
+                    ).format(self.get_page_change_uri('en', child_page))
+                else:
+                    expected_markup = (
+                        '<ul class="errorlist" id="id_slug_error">'
+                        '<li>Page <a href="{}" target="_blank">child-page</a> '
+                        'has the same url \'child-page\' as current page.</li></ul>'
+                    ).format(self.get_page_change_uri('en', child_page))
 
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_markup)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, expected_markup)
 
-            # slug collision between two top-level pages
-            page_data = self.get_new_page_data()
-            page_data['slug'] = 'page'
-            response = self.client.post(add_endpoint, page_data)
-            expected_markup = (
-                '<ul class="errorlist">'
-                '<li>Page <a href="{}" target="_blank">page</a> '
-                'has the same url \'page\' as current page.</li></ul>'
-            ).format(self.get_page_change_uri('en', page))
+            with self.subTest("Slug collision between two top-level pages"):
+                page_data = self.get_new_page_data()
+                page_data['slug'] = 'page'
+                response = self.client.post(add_endpoint, page_data)
+                if DJANGO_5_1:
+                    expected_markup = (
+                        '<ul class="errorlist">'
+                        '<li>Page <a href="{}" target="_blank">page</a> '
+                        'has the same url \'page\' as current page.</li></ul>'
+                    ).format(self.get_page_change_uri('en', page))
+                else:
+                    expected_markup = (
+                        '<ul class="errorlist" id="id_slug_error">'
+                        '<li>Page <a href="{}" target="_blank">page</a> '
+                        'has the same url \'page\' as current page.</li></ul>'
+                    ).format(self.get_page_change_uri('en', page))
 
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_markup)
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, expected_markup)
 
     def test_edit_page(self):
         """
@@ -365,45 +392,54 @@ class PageTest(PageTestBase):
         data['template'] = page.template
         endpoint = self.get_page_change_uri('en', page)
         redirect_to = self.get_pages_admin_list_uri('en')
-
-        with self.login_user_context(superuser):
-            data['redirect'] = '/'
-            response = self.client.post(endpoint, data)
-            self.assertRedirects(response, redirect_to)
-
-        with self.login_user_context(superuser):
-            data['redirect'] = '/hello'
-            response = self.client.post(endpoint, data)
-            self.assertRedirects(response, redirect_to)
-
-        with self.login_user_context(superuser):
-            data['redirect'] = '/hello/'
-            response = self.client.post(endpoint, data)
-            self.assertRedirects(response, redirect_to)
-
-        with self.login_user_context(superuser):
-            data['redirect'] = '../hello'
-            response = self.client.post(endpoint, data)
-            self.assertRedirects(response, redirect_to)
-
-        with self.login_user_context(superuser):
-            data['redirect'] = '../hello/'
-            response = self.client.post(endpoint, data)
-            self.assertRedirects(response, redirect_to)
-
-        with self.login_user_context(superuser):
-            data['redirect'] = 'javascript:alert(1)'
-            # Asserts users can't insert javascript call
-            response = self.client.post(endpoint, data)
+        if DJANGO_5_1:
             validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
-            self.assertContains(response, validation_error, html=True)
+        else:
+            validation_error = '<ul class="errorlist" id="id_redirect_error"><li>Enter a valid URL.</li></ul>'
 
-        with self.login_user_context(superuser):
-            data['redirect'] = '<script>alert("test")</script>'
-            # Asserts users can't insert javascript call
-            response = self.client.post(endpoint, data)
-            validation_error = '<ul class="errorlist"><li>Enter a valid URL.</li></ul>'
-            self.assertContains(response, validation_error, html=True)
+        with self.subTest('Test that a redirect to the root page (valid)'):
+            with self.login_user_context(superuser):
+                data['redirect'] = '/'
+                response = self.client.post(endpoint, data)
+                self.assertRedirects(response, redirect_to)
+
+        with self.subTest('Test that a redirect to a page with an absolute URL (valid)'):
+            with self.login_user_context(superuser):
+                data['redirect'] = '/hello'
+                response = self.client.post(endpoint, data)
+                self.assertRedirects(response, redirect_to)
+
+        with self.subTest('Test that a redirect to a page with an absolute URL ending with a slash (valid)'):
+            with self.login_user_context(superuser):
+                data['redirect'] = '/hello/'
+                response = self.client.post(endpoint, data)
+                self.assertRedirects(response, redirect_to)
+
+        with self.subTest('Test that a redirect to a page with a relative URL (valid)'):
+            with self.login_user_context(superuser):
+                data['redirect'] = '../hello'
+                response = self.client.post(endpoint, data)
+                self.assertRedirects(response, redirect_to)
+
+        with self.subTest('Test that a redirect to a page with a relative URL ending with a slash (valid)'):
+            with self.login_user_context(superuser):
+                data['redirect'] = '../hello/'
+                response = self.client.post(endpoint, data)
+                self.assertRedirects(response, redirect_to)
+
+        with self.subTest('Test that a redirect to a page with a javascript: URL (invalid)'):
+            with self.login_user_context(superuser):
+                data['redirect'] = 'javascript:alert(1)'
+                # Asserts users can't insert javascript call
+                response = self.client.post(endpoint, data)
+                self.assertContains(response, validation_error, html=True)
+
+        with self.subTest('Test that a redirect to a page with script tag as URL (invalid)'):
+            with self.login_user_context(superuser):
+                data['redirect'] = '<script>alert("test")</script>'
+                # Asserts users can't insert javascript call
+                response = self.client.post(endpoint, data)
+                self.assertContains(response, validation_error, html=True)
 
     def test_meta_description_fields_from_admin(self):
         """
@@ -472,7 +508,7 @@ class PageTest(PageTestBase):
             save_time = datetime.datetime.strptime(
                 actual_result[-19:],
                 "%Y-%m-%dT%H:%M:%S"
-            )
+            ).replace(tzinfo=datetime.timezone.utc if settings.USE_TZ else None)
 
             self.assertEqual(actual_result, desired_result)
             # direct time comparisons are flaky, so we just check if the
@@ -1097,11 +1133,18 @@ class PageTest(PageTestBase):
         boo = create_page('boo', 'nav_playground.html', 'en')
         hoo = create_page('hoo', 'nav_playground.html', 'en')
         translation = hoo.get_content_obj('en', fallback=False)
-        expected_error = (
-            '<ul class="errorlist"><li>Page '
-            '<a href="{}" target="_blank">boo</a> '
-            'has the same url \'boo\' as current page "hoo".</li></ul>'
-        ).format(self.get_page_change_uri('en', boo))
+        if DJANGO_5_1:
+            expected_error = (
+                '<ul class="errorlist"><li>Page '
+                '<a href="{}" target="_blank">boo</a> '
+                'has the same url \'boo\' as current page "hoo".</li></ul>'
+            ).format(self.get_page_change_uri('en', boo))
+        else:
+            expected_error = (
+                '<ul class="errorlist" id="id_overwrite_url_error"><li>Page '
+                '<a href="{}" target="_blank">boo</a> '
+                'has the same url \'boo\' as current page "hoo".</li></ul>'
+            ).format(self.get_page_change_uri('en', boo))
 
         with self.login_user_context(superuser):
             endpoint = self.get_page_change_uri('en', hoo)
@@ -1608,7 +1651,31 @@ class PageActionsTestCase(PageTestBase):
             self.assertRedirects(response, redirect_url)
             self.assertEqual(Page.objects.all().count(), 2)
 
+
 class PermissionsTestCase(PageTestBase):
+    def assertContainsPermissions(self, response):
+        try:
+            # Django >= 5.1
+            self.assertContains(
+                response,
+                '<h2 id="pagepermission_set-2-heading" class="inline-heading">Page permissions</h2>',
+                html=True,
+            )
+        except AssertionError:
+            # Django < 5.1
+            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+
+    def assertNotContainsPermissions(self, response):
+        try:
+            # Django >= 5.1
+            self.assertNotContains(
+                response,
+                '<h2 id="pagepermission_set-1-heading" class="inline-heading">Page permissions</h2>',
+                html=True,
+            )
+        except AssertionError:
+            # Django < 5.1
+            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
 
     def _add_translation_to_page(self, page):
         translation = create_page_content(
@@ -1876,7 +1943,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             data = {'post': 'yes'}
-            response = self.client.post(endpoint, data)
+            response = self.client.post(endpoint, data, follow=True)
+            # follow=True, since page changelist redirects to page content changelist
 
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._page_exists())
@@ -1932,7 +2000,8 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             data = {'post': 'yes'}
-            response = self.client.post(endpoint, data)
+            response = self.client.post(endpoint, data, follow=True)
+            # follow=True, since page changelist redirects to page content changelist
 
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._page_exists())
@@ -2184,7 +2253,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2221,7 +2290,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2))
 
@@ -2263,7 +2332,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2313,7 +2382,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
@@ -2355,7 +2424,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2395,7 +2464,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2))
 
@@ -2429,7 +2498,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2466,7 +2535,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2, can_view=True))
 
@@ -2507,7 +2576,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2555,7 +2624,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
@@ -2599,7 +2668,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -2641,7 +2710,7 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
 
@@ -2676,7 +2745,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
 
         self.assertIsNone(get_permission_cache(staff_user, "change_page"))
 
-
     def test_permission_cache_invalidation_on_group_remove(self):
         """
         Permissions cache is invalidated if the group relationship of a user is changed
@@ -2694,7 +2762,6 @@ class PermissionsOnGlobalTest(PermissionsTestCase):
         group.user_set.remove(staff_user)
 
         self.assertIsNone(get_permission_cache(staff_user, "change_page"))
-
 
     def test_user_can_copy_page(self):
         """
@@ -3359,7 +3426,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             data = {'post': 'yes'}
-            response = self.client.post(endpoint, data)
+            response = self.client.post(endpoint, data, follow=True)
 
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._page_exists())
@@ -3423,10 +3490,9 @@ class PermissionsOnPageTest(PermissionsTestCase):
             can_change=True,
             can_delete=True,
         )
-
         with self.login_user_context(staff_user):
             data = {'post': 'yes'}
-            response = self.client.post(endpoint, data)
+            response = self.client.post(endpoint, data, follow=True)
 
             self.assertRedirects(response, redirect_to)
             self.assertFalse(self._page_exists())
@@ -3629,7 +3695,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3666,7 +3732,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2))
 
@@ -3708,7 +3774,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3758,7 +3824,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
@@ -3800,7 +3866,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3840,7 +3906,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2))
 
@@ -3874,7 +3940,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -3911,7 +3977,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(self._page_permission_exists(user=staff_user_2, can_view=True))
 
@@ -3952,7 +4018,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -4000,7 +4066,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertFalse(
                 self._page_permission_exists(
@@ -4044,7 +4110,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertContainsPermissions(response)
             response = self.client.post(endpoint, data)
             self.assertEqual(response.status_code, 302)
             self.assertRedirects(response, endpoint)
@@ -4086,7 +4152,7 @@ class PermissionsOnPageTest(PermissionsTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.get(endpoint)
-            self.assertNotContains(response, '<h2>Page permissions</h2>', html=True)
+            self.assertNotContainsPermissions(response)
             self.client.post(endpoint, data)
             self.assertTrue(self._page_permission_exists(user=staff_user_2, can_view=True))
 

@@ -410,15 +410,6 @@ class CMSToolbarBase(BaseToolbar):
             return True
         return False
 
-    @property
-    def edit_mode_active(self):
-        """``True`` if editing mode is active。"""
-        # Cannot be cached since it changes depending on the object.
-        if self.structure_mode_active:
-            return self.object_is_editable()
-        return super().edit_mode_active
-
-
     # Internal API
 
     def _add_item(self, item, position=None):

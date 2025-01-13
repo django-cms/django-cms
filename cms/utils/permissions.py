@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import GlobalPagePermission, Page, PagePermission
+from cms.models import GlobalPagePermission, PagePermission
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
@@ -158,6 +158,20 @@ def cached_func(func):
     return cached_func
 
 
+def clear_func_cache(user, func):
+    func_cache_name = '_djangocms_cached_func_%s' % func.__name__
+    if hasattr(user, func_cache_name):
+        delattr(user, func_cache_name)
+
+
+def clear_permission_lru_caches(user):
+    """
+    Clear all python lru caches used by the permission system
+    """
+    clear_func_cache(user, get_global_actions_for_user)
+    clear_func_cache(user, get_page_actions_for_user)
+
+
 @cached_func
 def get_global_actions_for_user(user, site):
     actions = set()
@@ -208,6 +222,17 @@ def has_page_permission(user, page, action, use_cache=True):
     warnings.warn("has_page_permission is deprecated and will be removed in django CMS 4.3. "
                   "Use cms.utils.page_permissions.has_generic_permission instead.",
                   RemovedInDjangoCMS43Warning, stacklevel=2)
+
+    action_map = {
+        "change": "change_page",
+        "add": "add_page",
+        "move": "move_page",
+        "publish": "publish_page",
+        "delete": "delete_page",
+        "view": "view_page",
+    }
+    if action in action_map:
+        action = action_map[action]
 
     return has_generic_permission(page, user, action, site=page.site, check_global=False, use_cache=use_cache)
 

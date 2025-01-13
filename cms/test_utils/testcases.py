@@ -91,8 +91,8 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 class BaseCMSTestCase:
     counter = 1
 
-    def _fixture_setup(self):
-        super()._fixture_setup()
+    def _pre_setup(self):
+        super()._pre_setup()
         self.create_fixtures()
         activate("en")
 
@@ -475,8 +475,6 @@ class BaseCMSTestCase:
         else:
             self.fail(f"Warning {message} not given.")
         return result
-
-    assertWarns = failUnlessWarns
 
     def load_template_from_string(self, template):
         return engines['django'].from_string(template)

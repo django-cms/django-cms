@@ -2,7 +2,7 @@ import json
 import os
 import warnings
 from datetime import date
-from functools import lru_cache
+from functools import cache
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
@@ -19,7 +19,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
-@lru_cache(maxsize=None)
+@cache
 def _get_descendants_cte():
     db_vendor = _get_database_vendor('read')
     if db_vendor == 'oracle':
@@ -60,7 +60,7 @@ def _get_database_cursor(action):
     return _get_database_connection(action).cursor()
 
 
-@lru_cache(maxsize=None)
+@cache
 def plugin_supports_cte():
     # This has to be as function because when it's a var it evaluates before
     # db is connected and we get OperationalError. MySQL version is retrieved
@@ -170,6 +170,8 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     child_plugin_instances = None
 
     class Meta:
+        verbose_name = _("plugin")
+        verbose_name_plural = _("plugins")
         app_label = 'cms'
         ordering = ('position',)
         indexes = [

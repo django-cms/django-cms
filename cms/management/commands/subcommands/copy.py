@@ -89,9 +89,6 @@ class CopyLangCommand(SubcommandsCommand):
                     new_title["page"] = page
                     PageContent.objects.with_user(user).create(**new_title)
 
-                    if to_lang not in page.get_languages():
-                        page.update_languages(page.get_languages() + [to_lang])
-
                 if copy_content:
                     # copy plugins using API
                     if verbose:

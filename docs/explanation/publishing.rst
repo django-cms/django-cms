@@ -20,6 +20,8 @@ details please consult the `djangocms-versioning documentation
 Also, while this section focuses on pages, djangocms-versioning can lend its versioning
 capabilities to other objects, too, e.g., aliases as defined in djangocms-alias.
 
+.. _version_states:
+
 Version states
 --------------
 

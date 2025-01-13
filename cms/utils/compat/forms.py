@@ -38,8 +38,5 @@ if settings.AUTH_USER_MODEL != "auth.User":  # pragma: no cover
             UserCreationForm,  # nopyflakes
         )
 else:
-    from django.contrib.auth.admin import UserAdmin  # nopyflakes
-    from django.contrib.auth.forms import (
-        UserChangeForm,  # nopyflakes
-        UserCreationForm,  # nopyflakes
-    )
+    from django.contrib.auth.admin import UserAdmin  # noqa: F401
+    from django.contrib.auth.forms import UserChangeForm, UserCreationForm  # noqa: F401

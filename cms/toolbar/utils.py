@@ -14,7 +14,6 @@ from django.utils.translation import (
 )
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
-from cms.utils import get_language_list
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -168,7 +167,7 @@ def get_object_edit_url(obj: models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
@@ -178,7 +177,7 @@ def get_object_edit_url(obj: models.Model, language: str = None) -> str:
     return url
 
 
-def get_object_preview_url(obj:models.Model, language: str = None) -> str:
+def get_object_preview_url(obj: models.Model, language: str = None) -> str:
     """
     Returns the url of the preview endpoint for the given object. The object must be frontend-editable
     and registered as such with cms.
@@ -188,7 +187,7 @@ def get_object_preview_url(obj:models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
@@ -209,11 +208,12 @@ def get_object_structure_url(obj: models.Model, language: str = None) -> str:
     content_type = ContentType.objects.get_for_model(obj)
 
     language = getattr(obj, "language", language)  # Object trumps parameter
-    if language not in get_language_list():
+    if language is None:
         language = get_language()
 
     with force_language(language):
         return admin_reverse('cms_placeholder_render_object_structure', args=[content_type.pk, obj.pk])
+
 
 def get_object_for_language(obj: models.Model, language: str, latest: bool = False) -> Optional[models.Model]:
     """

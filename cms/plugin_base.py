@@ -3,11 +3,7 @@ import re
 
 from django import forms
 from django.contrib import admin, messages
-from django.core.exceptions import (
-    ImproperlyConfigured,
-    ObjectDoesNotExist,
-    ValidationError,
-)
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.shortcuts import render
 from django.utils.encoding import force_str, smart_str
 from django.utils.html import escapejs
@@ -16,7 +12,8 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin
-from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree, get_plugin_tree_as_json
+from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree
+from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 
 
@@ -257,6 +254,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             raise ValidationError("plugin has no render_template: %s" % self.__class__)
         return template
 
+    if DJANGO_5_1:
+        # Avoid a bug in Django's template engine that is incompatible with Python 3.9+
+        # type hinting. By default, the parent class has no __class_getitem__ method.
+        # There exist third-party packages, however, that inject type hinting into Django.
+        # This ensures, that any type hinting is ignore for CMSPlugin (below Django 5.2)
+        # See https://github.com/django-cms/django-cms/issues/7948
+        def __class_getitem__(cls, item):
+            raise TypeError
+
     @classmethod
     def get_render_queryset(cls):
         return cls.model._default_manager.all()
@@ -405,21 +411,23 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             # This is a nasty edge-case.
             # If the parent plugin is a ghost plugin, fetching the plugin tree
             # will fail because the downcasting function filters out all ghost plugins.
-            # Currently this case is only present in the djangocms-text-ckeditor app
+            # Currently, this case is only present in the djangocms-text-ckeditor app
             # which uses ghost plugins to create inline plugins on the text.
             root = obj
 
         plugins = [root] + list(root.get_descendants())
+        # simulate the call to the unauthorized CMSPlugin.page property
+        cms_page = obj.placeholder.page if obj.placeholder_id else None
 
         child_classes = self.get_child_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 
         parent_classes = self.get_parent_classes(
             slot=obj.placeholder.slot,
-            page=obj.page,
+            page=cms_page,
             instance=obj,
         )
 

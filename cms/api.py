@@ -136,7 +136,7 @@ def create_page(title, template, language, menu_title=None, slug=None,
                 xframe_options=constants.X_FRAME_OPTIONS_INHERIT):
     """
     Creates a :class:`cms.models.Page` instance and returns it. Also
-    creates a :class:`cms.models.Title` instance for the specified
+    creates a :class:`cms.models.PageContent` instance for the specified
     language.
 
     .. warning::
@@ -313,12 +313,10 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
         _thread_locals.user = created_by
         created_by = get_clean_username(created_by)
 
-    page.urls.create(
-        slug=slug,
-        path=path,
+    page.urls.update_or_create(
         page=page,
-        managed=not bool(overwrite_url),
         language=language,
+        defaults=dict(slug=slug, path=path,  managed=not bool(overwrite_url)),
     )
 
     # E.g., djangocms-versioning needs an User object to be passed when creating a versioned Object
@@ -340,11 +338,8 @@ def create_page_content(language, title, page, menu_title=None, slug=None,
         xframe_options=xframe_options,
     )
     page_content.rescan_placeholders()
+    page._clear_internal_cache()
 
-    page_languages = page.get_languages()
-
-    if language not in page_languages:
-        page.update_languages(page_languages + [language])
     return page_content
 
 

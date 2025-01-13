@@ -2,6 +2,7 @@ import json
 
 from django.contrib import admin
 from django.contrib.admin.sites import site
+from django.contrib.admin.utils import flatten_fieldsets
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
@@ -12,6 +13,7 @@ from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from djangocms_text_ckeditor.models import Text
 
 from cms import api
+from cms.admin.forms import ChangePageForm
 from cms.api import add_plugin, create_page, create_page_content
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
 from cms.models import PageContent, StaticPlaceholder, UserSettings
@@ -24,6 +26,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_PUBLISHED,
     CMSTestCase,
 )
+from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
@@ -136,7 +139,7 @@ class AdminTestCase(AdminTestsBase):
         add_plugin(body, 'TextPlugin', 'en', body='text')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data, follow=True)
             self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
     def test_delete_diff_language(self):
@@ -148,7 +151,8 @@ class AdminTestCase(AdminTestsBase):
         add_plugin(body, 'TextPlugin', 'en', body='text')
         with self.login_user_context(admin_user):
             data = {'post': 'yes'}
-            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data)
+            response = self.client.post(URL_CMS_PAGE_DELETE % page.pk, data, follow=True)
+            # follow=True, since page changelist redirects to page content changelist
             self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
 
     def test_search_fields(self):
@@ -162,7 +166,7 @@ class AdminTestCase(AdminTestsBase):
                 if not admin_instance.search_fields:
                     continue
                 url = admin_reverse('cms_%s_changelist' % model._meta.model_name)
-                response = self.client.get('%s?q=1' % url)
+                response = self.client.get('%s?q=1' % url, follow=True)  # Page redirects to PageContent
                 errmsg = response.content
                 self.assertEqual(response.status_code, 200, errmsg)
 
@@ -369,6 +373,19 @@ class AdminTests(AdminTestsBase):
 
     def get_page(self):
         return self.page
+
+    def test_admin_index(self):
+        endpoint = admin_reverse("index")
+        endpoint_page = admin_reverse("cms_page_changelist")
+        endpoint_page_content = admin_reverse("cms_pagecontent_changelist")
+
+        admin_user = self.get_admin()
+        with self.login_user_context(admin_user):
+            response = self.client.get(endpoint)
+            self.assertEqual(response.status_code, 200)
+
+        self.assertNotContains(response, endpoint_page)
+        self.assertContains(response, endpoint_page_content)
 
     def test_change_innavigation(self):
         page = self.get_page()
@@ -586,10 +603,16 @@ class AdminFormsTests(AdminTestsBase):
             # Invalid parent
             endpoint = self.get_page_add_uri('en')
             response = self.client.post(endpoint, new_page_data)
-            expected_error = (
-                '<ul class="errorlist">'
-                '<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>'
-            )
+            if DJANGO_5_1:
+                expected_error = (
+                    '<ul class="errorlist">'
+                    '<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>'
+                )
+            else:
+                expected_error = (
+                    '<ul class="errorlist" id="id_parent_page_error">'
+                    '<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>'
+                )
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
@@ -608,10 +631,17 @@ class AdminFormsTests(AdminTestsBase):
         with self.login_user_context(superuser):
             # Invalid parent
             response = self.client.post(endpoint, new_page_data)
-            expected_error = (
-                '<ul class="errorlist">'
-                '<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>'
-            )
+            if DJANGO_5_1:
+                expected_error = (
+                    '<ul class="errorlist">'
+                    '<li>Site doesn&#39;t match the parent&#39;s page site</li></ul>'
+                )
+            else:
+                expected_error = (
+                    '<ul class="errorlist" id="id_parent_page_error">'
+                    '<li>Site doesn&#x27;t match the parent&#x27;s page site</li></ul>'
+                )
+
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, expected_error, html=True)
 
@@ -620,13 +650,19 @@ class AdminFormsTests(AdminTestsBase):
             'slug': '#',
         }
 
-        with self.login_user_context(superuser):
-            # Invalid slug
-            response = self.client.post(endpoint, new_page_data)
-            expected_error = '<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, ' \
-                             'underscores or hyphens.</li></ul>'
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_error, html=True)
+        with self.subTest("Invalid slug"):
+            with self.login_user_context(superuser):
+                # Invalid slug
+                response = self.client.post(endpoint, new_page_data)
+                if DJANGO_5_1:
+                    expected_error = ('<ul class="errorlist"><li>Enter a valid “slug” consisting of letters, numbers, '
+                                      'underscores or hyphens.</li></ul>')
+                else:
+                    expected_error = ('<ul class="errorlist" id="id_slug_error"><li>Enter a valid “slug” consisting of '
+                                      'letters, numbers, underscores or hyphens.</li></ul>')
+
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, expected_error, html=True)
 
         page2 = api.create_page("test", get_cms_setting('TEMPLATES')[0][0], "en")
         new_page_data = {
@@ -635,15 +671,23 @@ class AdminFormsTests(AdminTestsBase):
         }
 
         with self.login_user_context(superuser):
-            # Duplicate slug / path
-            response = self.client.post(endpoint, new_page_data)
-            expected_error = (
-                '<ul class="errorlist"><li>Page '
-                '<a href="{}" target="_blank">test</a> '
-                'has the same url \'test\' as current page.</li></ul>'
-            ).format(self.get_page_change_uri('en', page2))
-            self.assertEqual(response.status_code, 200)
-            self.assertContains(response, expected_error, html=True)
+            with self.subTest("Duplicate slug / path"):
+                response = self.client.post(endpoint, new_page_data)
+                if DJANGO_5_1:
+                    expected_error = (
+                        '<ul class="errorlist"><li>Page '
+                        '<a href="{}" target="_blank">test</a> '
+                        'has the same url \'test\' as current page.</li></ul>'
+                    ).format(self.get_page_change_uri('en', page2))
+                else:
+                    expected_error = (
+                        '<ul class="errorlist" id="id_slug_error"><li>Page '
+                        '<a href="{}" target="_blank">test</a> '
+                        'has the same url \'test\' as current page.</li></ul>'
+                    ).format(self.get_page_change_uri('en', page2))
+
+                self.assertEqual(response.status_code, 200)
+                self.assertContains(response, expected_error, html=True)
 
     @override_settings(CMS_PERMISSION=False)
     def test_reverse_id_error_location(self):
@@ -733,7 +777,7 @@ class AdminFormsTests(AdminTestsBase):
 
         user = self.get_superuser()
         with self.login_user_context(user):
-            with self.assertNumQueries(6):
+            with self.assertNumQueries(7):
                 force_str(self.client.get(self.get_pages_admin_list_uri('en')))
 
     def test_smart_link_pages(self):
@@ -795,6 +839,30 @@ class AdminFormsTests(AdminTestsBase):
                     ).content.decode("utf-8")
                 ))
             )
+
+
+class PagePropsMovedToPageContentTests(CMSTestCase):
+
+    def test_moved_fields(self):
+        non_editables = [
+            'id',
+            'changed_by',
+            'changed_date',
+            'created_by',
+            'creation_date',
+            'page_id',
+            'in_navigation',
+            'language'
+        ]
+
+        change_page_form_fieldsets = flatten_fieldsets(ChangePageForm.fieldsets)
+        page_content_fields = [field.attname for field in PageContent._meta.fields]
+
+        # filter the non editables from PageContent fields
+        filtered_page_content_fields = list(set(page_content_fields) - set(non_editables))
+
+        for field in filtered_page_content_fields:
+            self.assertIn(field, change_page_form_fieldsets)
 
 
 class AdminPageEditContentSizeTests(AdminTestsBase):

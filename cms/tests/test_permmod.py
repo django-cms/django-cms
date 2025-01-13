@@ -151,7 +151,9 @@ class PermissionModeratorTests(CMSTestCase):
                     {
                         'plugin_type': 'TextPlugin',
                         'values': {
-                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
+                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, '
+                                    'delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus '
+                                    'harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
                         },
                     },
                 ]
@@ -164,7 +166,6 @@ class PermissionModeratorTests(CMSTestCase):
             response = self.client.get(self.slave_page.get_absolute_url(), {'edit': 1})
             self.assertEqual(response.status_code, 200)
             self.assertEqual(CMSPlugin.objects.count(), 1)
-
 
     def test_super_can_add_plugin(self):
         self._add_plugin(self.user_super, page=self.slave_page)

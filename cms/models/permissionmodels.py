@@ -231,7 +231,7 @@ class PermissionTuple(tuple):
         return False
 
     def allow_list(self, filter: str = "", steplen: int = Page.steplen) -> Q:
-        if filter !="":
+        if filter != "":
             filter = f"{filter}__"
         grant_on, path = self
         if grant_on == ACCESS_PAGE:
@@ -277,8 +277,7 @@ class PagePermission(AbstractPagePermission):
             raise ValidationError(message)
 
     def get_page_permission_tuple(self):
-        node = self.page.node
-        return PermissionTuple((self.grant_on, node.path))
+        return PermissionTuple((self.grant_on, self.page.path))
 
     def get_page_ids(self):
         import warnings

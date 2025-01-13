@@ -2,6 +2,7 @@ import datetime
 import pickle
 import warnings
 from contextlib import contextmanager
+from unittest import skipIf
 
 from django import http
 from django.conf import settings
@@ -51,7 +52,8 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_edit_url
+from cms.utils.compat import DJANGO_5_1
 from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
 
 
@@ -147,6 +149,16 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
         return CMSPlugin.objects.get(pk=plugin.pk).get_bound_plugin()
+
+    @skipIf(not DJANGO_5_1, "Django 5.2+ fixed the template engine")
+    def test_no_plugin_class_get_item(self):
+        """
+        Avoid a bug in Django's template engine that is incompatible with Python 3.9+
+        type hinting. It has been fixed in Django 5.2
+        See https://github.com/django-cms/django-cms/issues/7948
+        """
+        with self.assertRaises(TypeError):
+            TestPlugin[int]  # noqa: F841
 
     def test_add_edit_plugin(self):
         """
@@ -693,7 +705,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         def get_page(plugin):
             return plugin.page
 
-        self.assertWarns(
+        self.failUnlessWarns(
             DontUsePageAttributeWarning,
             "Don't use the page attribute on CMSPlugins! "
             "CMSPlugins are not guaranteed to have a page associated with them!",

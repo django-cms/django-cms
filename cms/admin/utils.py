@@ -387,15 +387,23 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     @property
     def current_content_filters(self) -> dict[str, typing.Any]:
         """Filters needed to get the correct content model instance"""
-        return {field: getattr(self, field) for field in self.extra_grouping_fields}
+        return {field: getattr(self, field, self.get_extra_grouping_field(field)) for field in self.extra_grouping_fields}
 
     def get_language(self) -> str:
-        """Hook on how to get the current language. By default, Django provides it."""
-        return get_language()
+        """Hook on how to get the current language. By default, if it is set as a
+        property, use the property, otherwise let Django provide it."""
+        return getattr(self, "language", get_language())
 
     def get_language_tuple(self) -> tuple[tuple[str, str], ...]:
         """Hook on how to get all available languages for the language selector."""
         return get_language_tuple()
+
+    def get_extra_grouping_field(self, field):
+        """Retrieves the current value for grouping fields - by default by calling self.get_<field>, e.g.,
+        self.get_language(). If those are not implemented, this method will fail."""
+        if callable(getattr(self, f"get_{field}", None)):
+            return getattr(self, f"get_{field}")()
+        raise ValueError("Cannot get extra grouping field")
 
     def get_changelist(self, request: HttpRequest, **kwargs) -> type:
         """Allow for extra grouping fields as a non-filter parameter"""

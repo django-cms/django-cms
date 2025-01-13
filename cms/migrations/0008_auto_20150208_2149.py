@@ -13,7 +13,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='title',
             name='redirect',
-            field=models.CharField(max_length=2048, null=True, verbose_name='redirect', blank=True),
+            field=models.CharField(max_length=2048, null=True, help_text='Redirects to this URL.', verbose_name='redirect', blank=True),
             preserve_default=True,
         ),
     ]

@@ -14,7 +14,7 @@ from django.utils.translation import get_language, gettext_lazy as _
 from cms.models import Page
 from cms.models.contentmodels import PageContent
 from cms.toolbar.utils import get_object_preview_url
-from cms.utils import get_language_from_request, i18n
+from cms.utils import get_language_from_request
 from cms.utils.urlutils import admin_reverse
 
 register = template.Library()
@@ -35,7 +35,7 @@ class GetAdminUrlForLanguage(AsTag):
 
     def get_value(self, context, page, language):
         if language in page.get_languages():
-            page_content = page.pagecontent_set(manager="admin_manager").current_content(language=language).first()
+            page_content = page.get_admin_content(language)
             if page_content:
                 return admin_reverse('cms_pagecontent_change', args=[page_content.pk])
         admin_url = admin_reverse('cms_pagecontent_add')
@@ -93,38 +93,13 @@ def show_admin_menu_for_pages(context, descendants, depth=1):
 
 @register.simple_tag(takes_context=False)
 def get_page_display_name(cms_page):
-    from cms.models import EmptyPageContent
     language = get_language()
 
-    if not cms_page.page_content_cache:
-        cms_page.set_translations_cache()
-
-    fallback_found = False
-    if not cms_page.page_content_cache.get(language):
-        fallback_found = True
-        fallback_langs = i18n.get_fallback_languages(language)
-        for lang in fallback_langs:
-            if cms_page.page_content_cache.get(lang):
-                language = lang
-                break
-        else:
-            language = None
-            for lang, item in cms_page.page_content_cache.items():
-                if not isinstance(item, EmptyPageContent):
-                    language = lang
-                    break
-            else:
-                return _("Empty")
-    page_content = cms_page.page_content_cache[language]
-    if page_content.title:
-        title = page_content.title
-    elif page_content.page_title:
-        title = page_content.page_title
-    elif page_content.menu_title:
-        title = page_content.menu_title
-    else:
-        title = cms_page.get_slug(language)
-    return mark_safe(f"<em>{title} ({language})</em>") if fallback_found else title
+    page_content = cms_page.get_admin_content(language, fallback="force")
+    title = page_content.title or page_content.page_title or page_content.menu_title
+    if not title:
+        title = cms_page.get_slug(language) or _("Empty")
+    return title if page_content.language == language else mark_safe(f"<em>{title} ({page_content.language})</em>")
 
 
 class TreePublishRow(Tag):
@@ -156,7 +131,7 @@ class TreePublishRow(Tag):
             )
             return render_to_string("admin/cms/page/tree/indicator_legend.html", context.flatten())
 
-        page_content = page.page_content_cache.get(language)
+        page_content = page.get_admin_content(language)
         cls, text = self.get_indicator(page_content)
         return mark_safe(
             '<span class="cms-hover-tooltip cms-hover-tooltip-left cms-hover-tooltip-delay %s" '
@@ -180,7 +155,7 @@ class TreePublishRowMenu(AsTag):
     )
 
     def get_value(self, context, page, language):
-        page_content = page.page_content_cache.get(language)
+        page_content = page.get_admin_content(language)
         if context.get("has_change_permission", False):
             page_content_admin_class = admin.site._registry[PageContent]
             template, publish_menu_items = page_content_admin_class.get_indicator_menu(
@@ -226,6 +201,7 @@ def boolean_icon(value):
         CMS_ADMIN_ICON_BASE,
         mapped_icon,
     )
+
 
 @register.tag(name="page_submit_row")
 class PageSubmitRow(InclusionTag):

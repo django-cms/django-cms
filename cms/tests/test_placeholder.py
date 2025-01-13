@@ -109,7 +109,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual(sorted(placeholders), sorted(['new_one', 'new_two', 'new_three']))
 
     def test_placeholder_scanning_duplicate(self):
-        placeholders = self.assertWarns(
+        placeholders = self.failUnlessWarns(
             DuplicatePlaceholderWarning,
             'Duplicate {% placeholder "one" %} in template placeholder_tests/test_seven.html.',
             _get_placeholder_slots, 'placeholder_tests/test_seven.html'
@@ -150,7 +150,6 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         renderer = toolbar.get_content_renderer()
         with self.assertRaises(PlaceholderNotFound):
             renderer.render_obj_placeholder("someslot", context, False)
-
 
     def test_fieldsets_requests(self):
         response = self.client.get(admin_reverse('placeholderapp_example1_add'))
@@ -761,14 +760,14 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         conf = {
             'col_left': {
-                'default_plugins' : [
+                'default_plugins': [
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{'body':'<p>en default body 1</p>'},
+                        'plugin_type': 'TextPlugin',
+                        'values': {'body': '<p>en default body 1</p>'},
                     },
                     {
-                        'plugin_type':'TextPlugin',
-                        'values':{'body':'<p>en default body 2</p>'},
+                        'plugin_type': 'TextPlugin',
+                        'values': {'body': '<p>en default body 2</p>'},
                     },
                 ]
             },
@@ -1378,7 +1377,10 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
         for plugin in self.get_plugins().filter(parent__isnull=True):
             for plugin_id in [plugin.pk] + tree[plugin.pk]:
                 plugin_tree_all.remove(plugin_id)
+
+            plugin.refresh_from_db()
             self.placeholder.delete_plugin(plugin)
+
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected)
@@ -1610,6 +1612,24 @@ class PlaceholderFlatPluginTests(PlaceholderPluginTestsBase):
 
 
 class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
+    """
+    Same tests as for PlaceholderFlatPluginTests but now with a different plugin tree:
+
+    ::
+
+        Parent 1
+          Parent 2
+            Child
+        Parent 1
+          Parent 2
+            Child
+        Parent 1
+          Parent 2
+            Child
+        Parent 1
+          Parent 2
+            Child
+    """
 
     def create_plugins(self, placeholder):
         for i in range(1, 12, 3):
@@ -1654,7 +1674,10 @@ class PlaceholderNestedPluginTests(PlaceholderFlatPluginTests):
         for plugin in self.get_plugins().filter(parent__isnull=True):
             for plugin_id in [plugin.pk] + tree[plugin.pk]:
                 plugin_tree_all.remove(plugin_id)
+
+            plugin.refresh_from_db()
             self.placeholder.delete_plugin(plugin)
+
             new_tree = self.get_plugins().values_list('pk', 'position')
             expected = [(pk, pos) for pos, pk in enumerate(plugin_tree_all, 1)]
             self.assertSequenceEqual(new_tree, expected)
