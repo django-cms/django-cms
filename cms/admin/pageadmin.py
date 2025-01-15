@@ -132,7 +132,7 @@ class PageDeleteMessageMixin:
             return result
 
         if len(objs) == 1 and isinstance(objs[0], PageContent):
-            # Allways look for all page/language combinations
+            # Always look for all page/language combinations
             objs = list(PageContent.admin_manager.filter(page=objs[0].page, language=objs[0].language))
 
         to_delete, trad_model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
