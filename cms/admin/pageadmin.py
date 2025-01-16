@@ -1248,6 +1248,7 @@ class PageContentAdmin(admin.ModelAdmin):
         page_content = self.get_object(request, object_id=object_id)
         page = page_content.page
         language = page_content.language
+        page_contents = PageContent.objects.filter(page=page, langauge=language)
         page_url = page.urls.get(language=page_content.language)
         request_language = get_site_language_from_request(request, site_id=page.node.site_id)
 
@@ -1273,7 +1274,7 @@ class PageContentAdmin(admin.ModelAdmin):
             admin_site=self.admin_site,
         )[:3]
         to_delete_translations, __, perms_needed_translation = get_deleted_objects(
-            [page_content],
+            page_contents,
             request=request,
             admin_site=self.admin_site,
         )[:3]
@@ -1306,7 +1307,7 @@ class PageContentAdmin(admin.ModelAdmin):
             messages.success(request, message)
 
             page_url.delete()
-            page_content.delete()
+            page_contents.delete()
             for p in saved_plugins:
                 p.delete()
 
