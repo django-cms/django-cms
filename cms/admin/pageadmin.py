@@ -1248,7 +1248,7 @@ class PageContentAdmin(admin.ModelAdmin):
         page_content = self.get_object(request, object_id=object_id)
         page = page_content.page
         language = page_content.language
-        page_contents = PageContent.objects.filter(page=page, langauge=language)
+        page_contents = PageContent.objects.filter(page=page, language=language)
         page_url = page.urls.get(language=page_content.language)
         request_language = get_site_language_from_request(request, site_id=page.node.site_id)
 
