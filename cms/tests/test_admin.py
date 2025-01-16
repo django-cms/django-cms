@@ -16,7 +16,7 @@ from cms import api
 from cms.admin.forms import ChangePageForm
 from cms.api import add_plugin, create_page, create_page_content
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import PageContent, StaticPlaceholder, UserSettings
+from cms.models import PageContent, PageUrl, StaticPlaceholder, UserSettings
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
@@ -185,16 +185,26 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user)
         create_page_content("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
         create_page_content("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
+        data = {"post": "yes"}
         with self.login_user_context(admin_user):
             response = self.client.get(self.get_page_delete_translation_uri('de', page))
             self.assertEqual(response.status_code, 200)
-            response = self.client.post(self.get_page_delete_translation_uri('de', page))
-            # input(response.content)
-            # self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
+            response = self.client.post(self.get_page_delete_translation_uri('de', page), data=data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
             response = self.client.get(self.get_page_delete_translation_uri('es-mx', page))
             self.assertEqual(response.status_code, 200)
-            response = self.client.post(self.get_page_delete_translation_uri('es-mx', page))
-            # self.assertRedirects(response, self.get_pages_admin_list_uri('es-mx'))
+            self.assertContains(
+                response,
+                '<p>Are you sure you want to delete the page content "delete-page-translation-es (es-mx)"?'
+            )
+            response = self.client.post(self.get_page_delete_translation_uri('es-mx', page), data=data)
+            self.assertRedirects(response, self.get_pages_admin_list_uri('es-mx'))
+
+        self.assertTrue(PageContent.objects.filter(page=page, language='en').exists())
+        self.assertFalse(PageContent.objects.filter(page=page, language='de').exists())
+        self.assertFalse(PageContent.objects.filter(page=page, language='es-mx').exists())
+        self.assertFalse(PageUrl.objects.filter(page=page, language='de').exists())
+        self.assertFalse(PageUrl.objects.filter(page=page, language='es-mx').exists())
 
     def test_change_template(self):
         template = get_cms_setting('TEMPLATES')[0][0]

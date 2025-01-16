@@ -1224,9 +1224,8 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     def delete_view(self, request, object_id, extra_context=None):
         page_content = self.get_object(request, object_id=object_id)
         page = page_content.page
-        language = page_content.language
 
-        if not self.has_delete_translation_permission(request, language, page):
+        if not self.has_delete_translation_permission(request, page_content.language, page):
             return HttpResponseForbidden(_("You do not have permission to delete this page"))
 
         if page is None:
@@ -1238,20 +1237,19 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
         return super().delete_view(request, object_id, extra_context)
 
     def delete_model(self, request, obj):
-        page = obj.page
         ct_page_content = ContentType.objects.get_for_model(PageContent)
-        page_contents = PageContent.admin_manager.filter(page=page, language=obj.language)
+        page_contents = PageContent.admin_manager.filter(page=obj.page, language=obj.language)
         placeholders = Placeholder.objects.filter(
             content_type=ct_page_content,
             object_id__in=page_contents.values("pk"),
         )
         saved_plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
-        page_url = page.urls.get(language=obj.language)
+        page_url = obj.page.urls.get(language=obj.language)
 
         operation_token = send_pre_page_operation(
             request=request,
             operation=operations.DELETE_PAGE_TRANSLATION,
-            obj=page,
+            obj=obj.page,
             translation=obj,
             sender=self.model
         )
@@ -1260,22 +1258,20 @@ class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
             'language': force_str(get_language_object(obj.language)['name'])
         }
         messages.success(request, message)
-        if obj.language in page.admin_content_cache:
-            del page.admin_content_cache[obj.language]
-        if obj.language in page.page_content_cache:
-            del page.page_content_cache[obj.language]
+        if obj.language in obj.page.admin_content_cache:
+            del obj.page.admin_content_cache[obj.language]
+        if obj.language in obj.page.page_content_cache:
+            del obj.page.page_content_cache[obj.language]
 
         page_url.delete()
-        for page_content in page_contents:
-            page_content.delete()
-        for p in saved_plugins:
-            p.delete()
+        page_contents.delete()
+        saved_plugins.delete()
 
         send_post_page_operation(
             request=request,
             operation=operations.DELETE_PAGE_TRANSLATION,
             token=operation_token,
-            obj=page,
+            obj=obj.page,
             translation=obj,
             sender=self.model,
         )
