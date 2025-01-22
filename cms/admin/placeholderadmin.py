@@ -83,7 +83,7 @@ def _instance_overrides_method(base, instance, method_name):
 
 class BaseEditableAdminMixin:
     """
-    Base class for FrontendEditableAdminMixin to be re-used by
+    Base class for FrontendEditableAdminMixin to be reused by
     PlaceholderAdmin
     """
     @xframe_options_sameorigin
