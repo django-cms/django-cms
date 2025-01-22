@@ -841,8 +841,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             request.toolbar = CMSToolbar(request)
             renderer = self.get_structure_renderer(request=request)
             output = renderer.render_placeholder(placeholder, language='en', page=page)
-            self.assertIn('<a data-rel="add" href="TextPlugin">Text</a>', output)
-            self.assertNotIn('<a data-rel="add" href="LinkPlugin">Link</a>', output)
+            self.assertIn('<a data-rel="add" data-add-form="true" href="TextPlugin">Text</a>', output)
+            self.assertNotIn('<a data-rel="add" data-add-form="true" href="LinkPlugin">Link</a>', output)
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")
