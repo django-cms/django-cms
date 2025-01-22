@@ -62,9 +62,13 @@ EXPIRE_NOW = 0
 #: max caching should only be up to one year.
 MAX_EXPIRATION_TTL = 365 * 24 * 3600
 
-PLUGIN_TOOLBAR_JS = "CMS._plugins.push([\"cms-plugin-%(pk)s\", %(config)s]);\n"
 
-PLACEHOLDER_TOOLBAR_JS = "CMS._plugins.push([\"cms-placeholder-%(pk)s\", %(config)s]);"
+def _get_toolbar_js(type: str) -> str:
+    return f'<script data-cms-{type} id="cms-{type}-%(pk)s" type="application/json">%(config)s</script>'
+
+
+PLUGIN_TOOLBAR_JS = _get_toolbar_js("plugin")
+PLACEHOLDER_TOOLBAR_JS = _get_toolbar_js("placeholder")
 
 # In the permissions system we use user levels to determine
 # the depth in which the user has permissions.
