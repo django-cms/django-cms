@@ -50,7 +50,12 @@ window.CMS = CMS;
 
 CMS.$(function () {
     // this is a globally shared configuration
-    CMS.config = CMS.config || JSON.parse(document.getElementById('cms-config-json').textContent || '{}');
+    try {
+        CMS.config = CMS.config || JSON.parse(document.getElementById('cms-config-json').textContent || '{}');
+    } catch (e) {
+        console.error('CMS: Failed to parse configuration JSON:', e);
+        CMS.config = CMS.config || {};
+    }
     CMS.settings = CMS.API.Helpers.getSettings();
 
     initHelpShortcuts();
