@@ -56,7 +56,7 @@ first one listed in the project's ``settings.py`` ``CMS_TEMPLATES`` tuple:
 
 If you've installed django CMS by hand or used the ``djangocms`` command you
 will not have templates pre-installed. The ``djangocms`` command installs an
-empty template that re-uses a minimal template from the djangocms-frontend
+empty template that reuses a minimal template from the djangocms-frontend
 package using Bootstrap 5. For this tutorial, you can check out and copy the
 `quickstart templates on github <https://github.com/django-cms/django-cms-quickstart/tree/main/backend/templates>`_.
 
