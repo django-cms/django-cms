@@ -487,14 +487,14 @@ class NoDBAdminTests(CMSTestCase):
         if DJANGO_5_1:
             self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1'))
         else:
-            self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1', request))
+            self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1', request=request))
 
     def test_lookup_allowed_published(self):
         request = self.get_request()
         if DJANGO_5_1:
             self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1'))
         else:
-            self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1', request))
+            self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1', request=request))
 
 
 class PluginPermissionTests(AdminTestsBase):
