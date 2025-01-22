@@ -484,11 +484,11 @@ class NoDBAdminTests(CMSTestCase):
 
     def test_lookup_allowed_site__exact(self):
         request = self.get_request()
-        self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1', request))
+        self.assertTrue(self.admin_class.lookup_allowed('site__exact', '1', request=request))
 
     def test_lookup_allowed_published(self):
         request = self.get_request()
-        self.assertTrue(self.admin_class.lookup_allowed('published', '1', request))
+        self.assertTrue(self.admin_class.lookup_allowed('published', '1', request=request))
 
 
 class PluginPermissionTests(AdminTestsBase):
