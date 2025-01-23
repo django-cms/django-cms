@@ -39,12 +39,22 @@
         </li>
         <li>
             {% if has_delete_permission %}
-                <a href="{% url opts|admin_urlname:'delete' page.id %}" title="{% filter escapejs %}{% trans "Delete" %}{% endfilter %}">
+                <a href="{% url opts|admin_urlname:'delete' page.id %}" title="{% filter escapejs %}{% trans "Delete all translations" %}{% endfilter %}">
             {% else %}
                 <a href="#" class="cms-pagetree-dropdown-item-disabled">
             {% endif %}
                     <span class="cms-icon cms-icon-bin"></span>
-                    <span>{% trans "Delete" %}...</span>
+                    <span>{% trans "Delete all translations" %}...</span>
+                </a>
+        </li>
+        <li>
+            {% if has_delete_permission and page_content %}
+                <a href="{% url 'admin:cms_pagecontent_delete' object_id=page_content.id %}" title="{% filter escapejs %}{% trans "Delete this translation" %}{% endfilter %}">
+            {% else %}
+                <a href="#" class="cms-pagetree-dropdown-item-disabled">
+            {% endif %}
+                    <span class="cms-icon cms-icon-bin"></span>
+                    <span>{% trans "Delete this translation" %}...</span>
                 </a>
         </li>
         {% if has_change_permission and page.is_potential_home %}

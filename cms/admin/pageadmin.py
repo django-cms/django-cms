@@ -228,9 +228,14 @@ class PageAdmin(admin.ModelAdmin):
             raise self._get_404_exception(object_id)
 
         site = get_site(request)
+        preview_language = request.GET.get('language')
+        page_content = page.get_content_obj(request.GET.get('language'))
+        if not page_content or page_content.language != preview_language:
+            page_content = None
         paste_enabled = request.GET.get('has_copy') or request.GET.get('has_cut')
         context = {
             'page': page,
+            'page_content': page_content,
             'opts': self.opts,
             'site': site,
             'page_is_restricted': page.has_view_restrictions(site),
