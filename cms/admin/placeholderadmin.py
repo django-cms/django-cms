@@ -6,7 +6,7 @@ from urllib.parse import parse_qsl, urlparse
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
-from django.contrib.admin.utils import get_deleted_objects
+from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import models, transaction
 from django.http import (
@@ -19,6 +19,7 @@ from django.http import (
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import include, re_path
+from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
@@ -436,8 +437,29 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             'position': plugin_data['plugin_position'],
         }
 
-        response = plugin_instance.add_view(request)
+        if request.method == 'POST':
+            # If the plugin has show_add_plugin_form set to False,
+            # the post data is missing the initial values of the plugin form
+            # Get the fields, the form and the initial values from the plugin instance
+            # Replace the POST parameters by those initial values plus any concrete changes
+            # the form.
+            fieldsets = plugin_instance.get_fieldsets(request, obj=None)
+            fields = flatten_fieldsets(fieldsets)
+            # Instantiate the add form for all fields
+            initial_form = plugin_instance.get_form(request, None, change=False, fields=fields)()
+            # Turn the initial values in a multi-value dict. In a multi-value dict each value is a list.
+            # Hence, if the initial value is not a list, it is turned into a list.
+            query_dict = MultiValueDict({
+                name: field.initial if isinstance(field.initial, (tuple, list)) else [field.initial]
+                for name, field in initial_form.fields.items()
+                if getattr(field, "initial", None) is not None and name not in request.POST
+            })
+            # Add the actual post parameters
+            query_dict.update(request.POST)
+            # Use the QueryDict as the POST data
+            request.POST = query_dict
 
+        response = plugin_instance.add_view(request)
         plugin = getattr(plugin_instance, 'saved_object', None)
 
         if plugin_instance._operation_token:
