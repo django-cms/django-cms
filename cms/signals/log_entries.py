@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.admin.models import ADDITION, CHANGE, DELETION, LogEntry
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import gettext_lazy as _
