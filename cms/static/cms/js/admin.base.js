@@ -2,7 +2,7 @@
 import './polyfills/function.prototype.bind.js';
 import './libs/pep';
 
-import {Helpers, KEYS} from './modules/cms.base';
+import { Helpers, KEYS } from './modules/cms.base';
 import $ from 'jquery';
 import Class from 'classjs';
 
@@ -31,7 +31,7 @@ if (document.querySelector('body.cms-close-frame script#data-bridge')) {
         setTimeout(function () {
             // save current plugin
             Window.CMS.API.Helpers.onPluginSave();
-        }, 100);
+        }, 100); // eslint-disable-line no-magic-numbers
     })(window.parent || window);
-};
+}
 
