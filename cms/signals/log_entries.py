@@ -82,6 +82,9 @@ _placeholder_operations_map = {
 
 
 def create_log_entry(user_id, content_type_id, object_id, object_repr, action_flag, change_message):
+    if isinstance(change_message, list):
+        change_message = json.dumps(change_message)
+
     LogEntry.objects.create(
             user_id=user_id,
             content_type_id=content_type_id,
