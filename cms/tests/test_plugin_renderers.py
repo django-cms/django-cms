@@ -12,8 +12,8 @@ from cms.plugin_rendering import (
     StructureRenderer,
 )
 from cms.test_utils.testcases import CMSTestCase
-from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
 from cms.toolbar.toolbar import CMSToolbar
+from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
 
 
 class TestStructureRenderer(CMSTestCase):
