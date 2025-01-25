@@ -186,7 +186,9 @@ class BaseRenderer:
             )
         return self._cached_plugin_classes[plugin_type]
 
-    def get_plugins_to_render(self, placeholder: Placeholder, language: str, template: str):
+    def get_plugins_to_render(
+        self, placeholder: Placeholder, language: str, template: str
+    ):
         from cms.utils.plugins import get_plugins
 
         plugins = get_plugins(
@@ -247,7 +249,7 @@ class ContentRenderer(BaseRenderer):
         language: Optional[str] = None,
         page: Optional[Page] = None,
         editable: bool = False,
-        use_cache: bool =False,
+        use_cache: bool = False,
         nodelist: Optional = None,
         width: Optional = None,
     ):
@@ -309,7 +311,10 @@ class ContentRenderer(BaseRenderer):
                 "rendering placeholder", context, placeholder, editable
             )
             if not get_cms_setting("CATCH_PLUGIN_500_EXCEPTION"):
-                if not self.toolbar.edit_mode_active and not self.toolbar.preview_mode_active:
+                if (
+                    not self.toolbar.edit_mode_active
+                    and not self.toolbar.preview_mode_active
+                ):
                     raise e from None
 
         if not placeholder_content and nodelist:
@@ -360,7 +365,9 @@ class ContentRenderer(BaseRenderer):
         context.pop()
         return mark_safe(placeholder_content)
 
-    def get_editable_placeholder_context(self, placeholder: Placeholder, page: Optional[Page] = None) -> dict:
+    def get_editable_placeholder_context(
+        self, placeholder: Placeholder, page: Optional[Page] = None
+    ) -> dict:
         placeholder_cache = self.get_rendered_plugins_cache(placeholder)
         placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
         plugin_toolbar_js_bits = (
@@ -380,7 +387,7 @@ class ContentRenderer(BaseRenderer):
         context: Context,
         inherit: bool,
         nodelist=None,
-        editable: bool = True
+        editable: bool = True,
     ):
         from cms.models import Placeholder
 
@@ -418,7 +425,7 @@ class ContentRenderer(BaseRenderer):
         inherit: bool,
         page: Optional[Page] = None,
         nodelist=None,
-        editable: bool = True
+        editable: bool = True,
     ):
         if not self.current_page:
             # This method should only be used when rendering a cms page.
@@ -486,7 +493,9 @@ class ContentRenderer(BaseRenderer):
             return content + nodelist.render(context)
         return content
 
-    def render_static_placeholder(self, static_placeholder: StaticPlaceholder, context: Context, nodelist=None):
+    def render_static_placeholder(
+        self, static_placeholder: StaticPlaceholder, context: Context, nodelist=None
+    ):
         user = self.request.user
 
         if self.toolbar.edit_mode_active and user.has_perm(
@@ -525,6 +534,7 @@ class ContentRenderer(BaseRenderer):
         placeholder: Optional[Placeholder] = None,
         editable: bool = False,
     ):
+        context["_last_plugin"] = instance  # Used if an exception is rendered
         if not placeholder:
             placeholder = instance.placeholder
 
@@ -567,6 +577,15 @@ class ContentRenderer(BaseRenderer):
             f'{exc.__name__}: {value} when {action} "{placeholder}" on '
             f'{placeholder_source_obj} object "{placeholder.source}"'
         )
+        if "_last_plugin" in context:
+            instance = context["_last_plugin"]
+            try:
+                description = (
+                    f"{instance._meta.verbose_name} {instance.get_short_description()}"
+                )
+            except Exception:
+                description = f"{instance._meta.verbose_name}"
+            message += f', plugin #{instance.pk} "{description}"'
         logger.error(message, exc_info=(exc, value, traceback))
 
         if editable:
@@ -575,11 +594,18 @@ class ContentRenderer(BaseRenderer):
                 html = reporter.get_traceback_html()
             else:
                 html = ""
-            return f"""
-                <div class="cms-rendering-exception">
-                    <h2 class="cms-rendering-exception-title">{message}</h2>
-                    {html}
-                </div>"""
+            heading = f'<h2 class="cms-rendering-exception-title">{message}</h2>'
+            if "_last_plugin" in context:
+                # Make error message editable by double-click to open the editor for the plugin causing the exception
+                heading = self.plugin_edit_template.format(
+                    pk=context["_last_plugin"].pk, content=heading
+                )
+                placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
+                    placeholder.pk, {}
+                )
+                placeholder_cache.setdefault("plugins", []).append(instance)
+
+            return f'<div class="cms-rendering-exception">{heading}{html}</div>'
         return ""
 
     def render_plugins(
