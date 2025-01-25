@@ -1,6 +1,5 @@
 from collections import deque
 
-import kolo
 from django.template import Context
 from django.test.utils import override_settings
 
