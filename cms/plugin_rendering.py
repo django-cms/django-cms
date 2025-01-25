@@ -19,6 +19,8 @@ from django.views.debug import ExceptionReporter
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import PageContent, Placeholder, Page, CMSPlugin, StaticPlaceholder
+from cms.plugin_pool import PluginPool
+from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
@@ -37,7 +39,7 @@ from cms.utils.plugins import get_plugin_restrictions
 logger = logging.getLogger(__name__)
 
 
-def _unpack_plugins(parent_plugin):
+def _unpack_plugins(parent_plugin: CMSPlugin) -> list[CMSPlugin]:
     found_plugins = []
 
     for plugin in parent_plugin.child_plugin_instances or []:
@@ -88,8 +90,8 @@ class RenderedPlaceholder:
 
 
 class BaseRenderer:
-    load_structure = False
-    placeholder_edit_template = ""
+    load_structure: bool = False
+    placeholder_edit_template: str = ""
 
     def __init__(self, request: HttpRequest):
         self.request = request
@@ -102,15 +104,15 @@ class BaseRenderer:
         self._rendered_plugins_by_placeholder = {}
 
     @cached_property
-    def current_page(self):
+    def current_page(self) -> Page:
         return self.request.current_page
 
     @cached_property
-    def current_site(self):
+    def current_site(self) -> Site:
         return Site.objects.get_current(self.request)
 
     @cached_property
-    def toolbar(self):
+    def toolbar(self) -> CMSToolbar:
         return get_toolbar_from_request(self.request)
 
     @cached_property
@@ -118,7 +120,7 @@ class BaseRenderer:
         return self.toolbar.templates
 
     @cached_property
-    def plugin_pool(self):
+    def plugin_pool(self) -> PluginPool:
         import cms.plugin_pool
 
         return cms.plugin_pool.plugin_pool
@@ -158,7 +160,7 @@ class BaseRenderer:
         )
         return placeholder_toolbar_js
 
-    def get_plugin_toolbar_js(self, plugin, page=None):
+    def get_plugin_toolbar_js(self, plugin: CMSPlugin, page: Optional[Page] = None):
         placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
             plugin.placeholder_id, {}
         )
@@ -174,7 +176,7 @@ class BaseRenderer:
         )
         return content
 
-    def get_plugin_class(self, plugin):
+    def get_plugin_class(self, plugin: CMSPlugin) -> type:
         plugin_type = plugin.plugin_type
 
         if plugin_type not in self._cached_plugin_classes:
@@ -183,7 +185,7 @@ class BaseRenderer:
             )
         return self._cached_plugin_classes[plugin_type]
 
-    def get_plugins_to_render(self, placeholder, language, template):
+    def get_plugins_to_render(self, placeholder: Placeholder, language: str, template: str):
         from cms.utils.plugins import get_plugins
 
         plugins = get_plugins(
@@ -194,7 +196,7 @@ class BaseRenderer:
         )
         return plugins
 
-    def get_rendered_plugins_cache(self, placeholder):
+    def get_rendered_plugins_cache(self, placeholder: Placeholder):
         blank = {
             "plugins": [],
             "plugin_parents": {},
@@ -202,15 +204,15 @@ class BaseRenderer:
         }
         return self._rendered_plugins_by_placeholder.get(placeholder.pk, blank)
 
-    def get_rendered_placeholders(self):
+    def get_rendered_placeholders(self) -> list[Placeholder]:
         rendered = list(self._rendered_placeholders.values())
         return [r.placeholder for r in rendered]
 
-    def get_rendered_editable_placeholders(self):
+    def get_rendered_editable_placeholders(self) -> list[Placeholder]:
         rendered = list(self._rendered_placeholders.values())
         return [r.placeholder for r in rendered if r.editable]
 
-    def get_rendered_static_placeholders(self):
+    def get_rendered_static_placeholders(self) -> list[StaticPlaceholder]:
         return list(self._rendered_static_placeholders.values())
 
 
@@ -226,7 +228,7 @@ class ContentRenderer(BaseRenderer):
         "<script data-cms>{plugin_js}\n{placeholder_js}</script>"
     )
 
-    def __init__(self, request):
+    def __init__(self, request: HttpRequest):
         super().__init__(request)
         self._placeholders_are_editable = bool(self.toolbar.edit_mode_active)
 
@@ -357,7 +359,7 @@ class ContentRenderer(BaseRenderer):
         context.pop()
         return mark_safe(placeholder_content)
 
-    def get_editable_placeholder_context(self, placeholder, page=None):
+    def get_editable_placeholder_context(self, placeholder: Placeholder, page: Optional[Page] = None) -> dict:
         placeholder_cache = self.get_rendered_plugins_cache(placeholder)
         placeholder_toolbar_js = self.get_placeholder_toolbar_js(placeholder, page)
         plugin_toolbar_js_bits = (
@@ -372,7 +374,12 @@ class ContentRenderer(BaseRenderer):
         return context
 
     def render_obj_placeholder(
-        self, slot, context, inherit, nodelist=None, editable=True
+        self,
+        slot: str,
+        context: Context,
+        inherit: bool,
+        nodelist=None,
+        editable: bool = True
     ):
         from cms.models import Placeholder
 
@@ -404,7 +411,13 @@ class ContentRenderer(BaseRenderer):
         return content
 
     def render_page_placeholder(
-        self, slot, context, inherit, page=None, nodelist=None, editable=True
+        self,
+        slot: str,
+        context: Context,
+        inherit: bool,
+        page: Optional[Page] = None,
+        nodelist=None,
+        editable: bool = True
     ):
         if not self.current_page:
             # This method should only be used when rendering a cms page.
