@@ -1,5 +1,6 @@
 from collections import deque
 
+import kolo
 from django.template import Context
 from django.test.utils import override_settings
 
@@ -11,6 +12,8 @@ from cms.plugin_rendering import (
     StructureRenderer,
 )
 from cms.test_utils.testcases import CMSTestCase
+from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+from cms.toolbar.toolbar import CMSToolbar
 
 
 class TestStructureRenderer(CMSTestCase):
@@ -141,46 +144,63 @@ class TestContentRenderer(TestStructureRenderer):
         self.assertEqual(cache[placeholder_2.slot], placeholder_2)
         self.assertEqual(cache[placeholder_2.slot]._plugins_cache, deque([placeholder_2_plugin_1]))
 
-    def test_plugin_exception_catchers(self):
-        """Tests if failing plugins do not break template rendering and report errors to the logger"""
-        cms_page = create_page("page", 'nav_playground.html', "en")
-        placeholder_1 = cms_page.get_placeholders("en").get(slot='body')
+
+class TestExceptionCatchers(CMSTestCase):
+    renderer_class = ContentRenderer
+
+    def setUp(self):
+        self.user = self.get_superuser()
+
+        self.cms_page = create_page("page", 'nav_playground.html', "en")
+        self.placeholder_1 = self.cms_page.get_placeholders("en").get(slot='body')
         add_plugin(
-            placeholder_1,
+            self.placeholder_1,
             plugin_type='LinkPlugin',
             language='en',
             name='Link #1',
             external_link='https://www.django-cms.org',
         )
         add_plugin(
-            placeholder_1,
+            self.placeholder_1,
             plugin_type='BuggyPlugin',
             language='en',
         )
-        placeholder_2 = cms_page.get_placeholders("en").get(slot='right-column')
-        placeholder_2_plugin_1 = add_plugin(
-            placeholder_2,
+        self.placeholder_2 = self.cms_page.get_placeholders("en").get(slot='right-column')
+        self.placeholder_2_plugin_1 = add_plugin(
+            self.placeholder_2,
             plugin_type='LinkPlugin',
             language='en',
             name='Link #3',
             external_link='https://www.django-cms.org',
         )
-        renderer = self.get_renderer(page=cms_page)
 
-        # Test if non-existent plugins creates error log and does not fail
-        placeholder_2_plugin_1.plugin_type = 'NonExistingPlugin'
-        placeholder_2_plugin_1.save()
+        self.request = self.get_request(
+            get_object_edit_url(self.cms_page.get_admin_content('en')),
+            'en',
+            page=self.cms_page,
+        )
+        self.request.toolbar = CMSToolbar(self.request)
+        self.renderer = self.renderer_class(self.request)
+
+    def test_non_existent_plugins_creates_error_log_and_does_not_fail(self):
+        self.placeholder_2_plugin_1.plugin_type = 'NonExistingPlugin'
+        self.placeholder_2_plugin_1.save()
         with self.assertLogs("cms.utils.plugins", level="ERROR") as logs:
             plugin_context = Context()
-            renderer.render_placeholder(placeholder_2, plugin_context, "en")
+            self.renderer.render_placeholder(self.placeholder_2, plugin_context, "en")
             self.assertEqual(len(logs.output), 1)
             self.assertIn("Plugin not installed: NonExistingPlugin", logs.output[0])
-        placeholder_2_plugin_1.plugin_type = 'LinkPlugin'
-        placeholder_2_plugin_1.save()
+        self.placeholder_2_plugin_1.plugin_type = 'LinkPlugin'
+        self.placeholder_2_plugin_1.save()
 
-        # Test if exception in template rendering creates error log and does not fail (plugin 1)
-        # Test if exception in plugin.render creates error log and does not fail (plugin 2)
-        # patch link plugin
+    def test_exception_in_plugin_render_creates_error_log_and_does_not_fail(self):
+        with self.assertLogs("cms.plugin_rendering", level="ERROR") as logs:
+            plugin_context = Context()
+            self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en")
+            self.assertEqual(len(logs.output), 1)
+            self.assertIn("ZeroDivisionError: division by zero", logs.output[0])
+
+    def test_exception_in_template_rendering_creates_error_log_and_does_not_fail(self):
         from cms.test_utils.project.pluginapp.plugins.link.cms_plugins import (
             LinkPlugin,
         )
@@ -188,12 +208,61 @@ class TestContentRenderer(TestStructureRenderer):
         LinkPlugin.render_template = "pluginapp/link/bugs.html"
         with self.assertLogs("cms.plugin_rendering", level="ERROR") as logs:
             plugin_context = Context()
-            renderer.render_placeholder(placeholder_1, plugin_context, "en")
-            self.assertEqual(len(logs.output), 2)
-            self.assertIn("pluginapp/link/bugs.html", logs.output[0])
-            self.assertIn("ZeroDivisionError:", logs.output[1])
+            self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en")
+            self.assertEqual(len(logs.output), 1)
+            self.assertIn("TemplateSyntaxError: Invalid block tag on line 1", logs.output[0])
         LinkPlugin.render_template = link_template
+
+    def test_exception_in_plugin_render_shows_error_in_edit_mode(self):
+        plugin_context = Context()
+        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+            markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=True)
+        self.assertTrue(self.renderer.toolbar.edit_mode_active)
+        self.assertIn('<div class="cms-rendering-exception">', markup)
+        self.assertIn("ZeroDivisionError: division by zero", markup)
+
+    def test_exception_in_plugin_render_is_silent_in_preview_mode(self):
+        plugin_context = Context()
+        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+            markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
+        self.assertEqual('', markup)
+
+    def test_exception_in_plugin_render_is_silent_in_live_mode(self):
+        plugin_context = Context()
+        self.request = self.get_request(
+            self.cms_page.get_absolute_url('en'),
+            'en',
+            page=self.cms_page,
+        )
+        self.request.toolbar = CMSToolbar(self.request)
+        self.renderer = self.renderer_class(self.request)
+
+        with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+            markup = self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
+        self.assertFalse(self.renderer.toolbar.edit_mode_active)
+        self.assertEqual('', markup)
+
+    @override_settings(CMS_CATCH_PLUGIN_500_EXCEPTION=False)
+    def test_exception_in_plugin_render_is_raised__in_live_mode(self):
+        plugin_context = Context()
+        self.request = self.get_request(
+            self.cms_page.get_absolute_url('en'),
+            'en',
+            page=self.cms_page,
+        )
+        self.request.toolbar = CMSToolbar(self.request)
+        self.renderer = self.renderer_class(self.request)
+
+        with self.assertRaises(ZeroDivisionError):
+            with self.assertLogs("cms.plugin_rendering", level="ERROR"):
+                self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
+
+
 
 
 class TestLegacyRenderer(TestContentRenderer):
+    renderer_class = LegacyRenderer
+
+
+class TestLegacyRendererExceptionCatcher(TestExceptionCatchers):
     renderer_class = LegacyRenderer

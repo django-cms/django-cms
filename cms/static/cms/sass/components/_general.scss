@@ -17,3 +17,29 @@
         overflow: hidden !important;
     }
 }
+
+// Render exceptions in edit mode
+.cms-rendering-exception {
+    display: inline-block;
+    border: none;
+    background: #ffc;
+    padding: 0.6em 1.3em;
+    cursor: not-allowed;
+    min-height: 2em;
+    width:100%;
+    vertical-align:middle;
+
+    .cms-rendering-exception-title {
+        font-weight: bold;
+        color: darkred;
+    }
+    header#summary {
+        h1, pre {
+            display: none;
+        }
+    }
+
+    main#info {
+        font-size: 0.8rem;
+    }
+}
