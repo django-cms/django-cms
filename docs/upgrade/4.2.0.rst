@@ -42,16 +42,16 @@ Exception handling
 ==================
 
 Since django CMS 4, exceptions that happen during plugin rendering have been
-caught and displayed a message at the plugin's position.
-
-After feedback from the community, django CMS 4.2 refactored exception handling.
+caught and displayed a message at the plugin's position. After feedback from
+the community, django CMS 4.2 refactored exception handling.
 
 * Exceptions are now caught on placeholder level.
 
 * In edit mode, a message about the exception is shown for the placeholder. If
   ``settings.DEBUG == True`` this message includes the full Django trace.
 
-* Editors still can edit plugins causing the exception.
+* Editors still can edit plugins causing the exception. It can be edited by
+  double-clicking the error message or through the structure board.
 
 * In preview mode and on site, the placeholder containing the plugin will
   render empty.
@@ -59,7 +59,6 @@ After feedback from the community, django CMS 4.2 refactored exception handling.
 * If ``settings.CMS_CATCH_PLUGIN_500_EXCEPTION`` is set to ``False``, trying
   to view content that raises an exception will trigger a server error
   (http 500). Preview and edit modes will still work.
-
 
 
 Minor features

@@ -24,14 +24,16 @@
     border: none;
     background: #ffc;
     padding: 0.6em 1.3em;
-    cursor: not-allowed;
     min-height: 2em;
-    width:100%;
-    vertical-align:middle;
+    width: 100%;
+    vertical-align: middle;
 
     .cms-rendering-exception-title {
         font-weight: bold;
         color: darkred;
+        &:not(.cms-plugin) {
+            cursor: not-allowed;
+        }
     }
     header#summary {
         h1, pre {
@@ -41,5 +43,11 @@
 
     main#info {
         font-size: 0.8rem;
+        h2 {
+            font-size: 1.6rem;
+        }
+        h3 {
+            font-size: 1.2rem;
+        }
     }
 }
