@@ -2,8 +2,9 @@ import contextlib
 import logging
 import sys
 from collections import OrderedDict
+from collections.abc import Generator
 from functools import partial
-from typing import Generator, Optional, Union
+from typing import Optional, Union
 
 from classytags.utils import flatten_context
 from django.conf import settings
@@ -18,7 +19,7 @@ from django.views.debug import ExceptionReporter
 
 from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
-from cms.models import PageContent, Placeholder, Page, CMSPlugin, StaticPlaceholder
+from cms.models import CMSPlugin, Page, PageContent, Placeholder, StaticPlaceholder
 from cms.plugin_pool import PluginPool
 from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
