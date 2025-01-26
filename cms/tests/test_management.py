@@ -458,7 +458,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         for page in Page.objects.on_site(site_2_pk):
             phs_2.extend(page.get_placeholders('en').values_list('pk', flat=True))
 
-        # These asserts that no orphaned plugin exists
+        # These assert that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_2).count(), number_start_plugins)
 

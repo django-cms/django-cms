@@ -1,11 +1,14 @@
 import logging
 import sys
 from collections import OrderedDict, defaultdict, deque
+from collections.abc import Iterable
 from copy import deepcopy
 from functools import cache, lru_cache
 from itertools import starmap
 from operator import itemgetter
+from typing import Optional
 
+from django.http import HttpRequest
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
@@ -97,7 +100,8 @@ def assign_plugins(request, placeholders, template=None, lang=None):
     if not plugins:
         # Create default plugins if enabled
         plugins = create_default_plugins(request, placeholders, template, lang)
-    plugins = downcast_plugins(plugins, placeholders, request=request)
+    else:
+        plugins = downcast_plugins(plugins, placeholders, request=request)
 
     # split the plugins up by placeholder
     plugins_by_placeholder = defaultdict(list)
@@ -336,6 +340,13 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
     return list(plugins_by_id.values())
 
 
+def _get_base_model(model):
+    # Find non-proxy model for plugin
+    if model._meta.proxy_for_model is None:
+        return model
+    return _get_base_model(model._meta.proxy_for_model)
+
+
 def get_bound_plugins(plugins):
     """
     Get the bound plugins by downcasting the plugins to their respective classes. Raises a KeyError if the plugin type
@@ -366,15 +377,17 @@ def get_bound_plugins(plugins):
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
         plugin_ids.append(plugin.pk)
-        plugin_types_map[plugin.plugin_type].append(plugin.pk)
+        plugin_model = _get_base_model(get_plugin(plugin.plugin_type).model)  # Collect all base models
+        plugin_types_map[plugin_model].append(plugin.pk)
 
-    for plugin_type, pks in plugin_types_map.items():
-        plugin_model = get_plugin(plugin_type).model
+    for plugin_model, pks in plugin_types_map.items():
         plugin_queryset = plugin_model.objects.filter(pk__in=pks)
 
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
         for instance in plugin_queryset.iterator():
+            cls = get_plugin(plugin.plugin_type).model  # Get original class
+            instance.__class__ = cls  # Cast to correct model (including proxies)
             plugin_lookup[instance.pk] = instance
 
     for plugin in plugins:
@@ -386,8 +399,12 @@ def get_bound_plugins(plugins):
             yield plugin_lookup[plugin.pk]
 
 
-def downcast_plugins(plugins,
-                     placeholders=None, select_placeholder=False, request=None):
+def downcast_plugins(
+    plugins: Iterable[CMSPlugin],
+    placeholders: Optional[list] = None,
+    select_placeholder: bool = False,
+    request: Optional[HttpRequest] = None
+) -> Iterable[CMSPlugin]:
     """
     Downcasts the given list of plugins to their respective classes. Ignores any plugins
     that are not available.
@@ -407,26 +424,28 @@ def downcast_plugins(plugins,
     plugin_lookup = {}
     plugin_ids = []
 
+    get_plugin = plugin_pool.get_plugin
+
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
         # Keep track of the plugin ids we've received
+        try:
+            plugin_model = _get_base_model(get_plugin(plugin.plugin_type).model)  # Collect all base models
+        except KeyError:
+            # Plugin not available
+            logger.error(
+                f"Plugin not installed: {plugin.plugin_type} (pk={plugin.pk})", exc_info=sys.exc_info()
+            )
+            continue
         plugin_ids.append(plugin.pk)
-        plugin_types_map[plugin.plugin_type].append(plugin.pk)
+        plugin_types_map[plugin_model].append(plugin.pk)
 
     placeholders = placeholders or []
     placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
 
-    for plugin_type, pks in plugin_types_map.items():
-        try:
-            cls = plugin_pool.get_plugin(plugin_type)
-        except KeyError:
-            # Plugin not available
-            logger.error(
-                f"Plugin not installed: {plugin_type} (pk={', '.join(str(pk) for pk in pks)})", exc_info=sys.exc_info()
-            )
-            continue
+    for plugin_model, pks in plugin_types_map.items():
         # get all the plugins of type cls.model
-        plugin_qs = cls.get_render_queryset().filter(pk__in=pks)
+        plugin_qs = plugin_model.objects.filter(pk__in=pks)
 
         if select_placeholder:
             plugin_qs = plugin_qs.select_related('placeholder')
@@ -435,14 +454,14 @@ def downcast_plugins(plugins,
         # downcasted versions
         for instance in plugin_qs.iterator():
             placeholder = placeholders_by_id.get(instance.placeholder_id)
+            cls = get_plugin(instance.plugin_type)  # Plugin class
+            instance.__class__ = cls.model  # Cast to original model (including proxies)
+            plugin_lookup[instance.pk] = instance
 
             if placeholder:
                 instance.placeholder = placeholder
-
                 if not cls.cache and not cls().get_cache_expiration(request, instance, placeholder):
                     placeholder.cache_placeholder = False
-
-            plugin_lookup[instance.pk] = instance
 
     for plugin in plugins:
         parent_not_available = (not plugin.parent_id or plugin.parent_id not in plugin_ids)

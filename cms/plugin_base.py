@@ -421,6 +421,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return super().render_change_form(request, context, add, change, form_url, obj)
 
     def render_close_frame(self, request, obj, extra_context=None):
+        from cms.utils.plugins import get_plugin_restrictions
+
         try:
             root = obj.parent.get_bound_plugin() if obj.parent else obj
         except ObjectDoesNotExist:
@@ -435,25 +437,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # simulate the call to the unauthorized CMSPlugin.page property
         cms_page = obj.placeholder.page if obj.placeholder_id else None
 
-        child_classes = self.get_child_classes(
-            slot=obj.placeholder.slot,
-            page=cms_page,
-            instance=obj,
-        )
-
-        parent_classes = self.get_parent_classes(
-            slot=obj.placeholder.slot,
-            page=cms_page,
-            instance=obj,
-        )
-
+        restrictions = {}  # Restrictions cache
+        child_classes, parent_classes = get_plugin_restrictions(obj, cms_page, restrictions)
         data = get_plugin_toolbar_info(
             obj,
             children=child_classes,
             parents=parent_classes,
         )
         data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
-        data['structure'] = get_plugin_tree(request, plugins)
+        data['structure'] = get_plugin_tree(request, plugins, restrictions)
         context = {
             'plugin': obj,
             'is_popup': True,
@@ -631,8 +623,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Adding this as a separate method,
         # we allow other plugins to affect
         # the list of child plugin candidates.
-        # Useful in cases like djangocms-text-ckeditor
-        # where only text only plugins are allowed.
+        # Useful in cases like djangocms-text
+        # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
         return plugin_pool.registered_plugins
 
