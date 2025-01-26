@@ -185,7 +185,7 @@ Current LTS table
 ========== ============== ====== ========================
 django CMS Feature freeze Django End of long-term support
 ========== ============== ====== ========================
-4.2.x      tbd            5.2    April 2028
+4.2.x      February 2025  5.2    April 2028
 4.1 x      September 2023 4.2    April 2026
 3.11.x     September 2023 4.2    April 2026
 ========== ============== ====== ========================
