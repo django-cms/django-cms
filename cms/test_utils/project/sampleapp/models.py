@@ -4,7 +4,7 @@ from django.db import models
 from django.urls import reverse
 from treebeard.mp_tree import MP_Node
 
-from cms.models.fields import PlaceholderField, PlaceholderRelationField
+from cms.models.fields import PlaceholderRelationField
 from cms.utils.placeholder import get_placeholder_from_slot
 
 

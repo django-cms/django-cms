@@ -20,12 +20,12 @@ class PlaceholderField(models.ForeignKey):
     See documentation of :class:`~cms.models.fields.PlaceholderRelationField` for how to replace the code.
     """
     def __init__(self, slotname, default_width=None, actions=None, **kwargs):
+        import warnings
+
         from cms.utils.placeholder import (
             PlaceholderNoAction,
             validate_placeholder_name,
         )
-
-        import warnings
         warnings.warn(
             "PlaceholderField is deprecated. It will be removed in django CMS 4.3. "
             "Replace by PlaceholderRelationField.",

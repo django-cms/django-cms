@@ -39,7 +39,6 @@ class Example1(models.Model):
     def placeholder(self):
         return get_placeholder_from_slot(self.placeholders, "placeholder")
 
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

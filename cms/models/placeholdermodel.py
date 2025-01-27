@@ -62,9 +62,12 @@ class Placeholder(models.Model):
         self.get_plugins(language).delete()
 
     def get_label(self):
+        from cms.models import PageContent
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = self.page.get_template() if self.page else None
+        template = None
+        if self.content_type == ContentType.objects.get_for_model(PageContent):
+             template = self.source.get_template()
         name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
         name = _(name)
         return name
@@ -258,8 +261,9 @@ class Placeholder(models.Model):
 
     @property
     def actions(self):
-        from cms.utils.placeholder import PlaceholderNoAction
         import warnings
+
+        from cms.utils.placeholder import PlaceholderNoAction
 
         warnings.warn("The actions property is deprecated. Use placeholder admin instead.",
                       RemovedInDjangoCMS43Warning, stacklevel=2)
