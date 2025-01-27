@@ -231,7 +231,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         except ObjectDoesNotExist:
             instance = None
             self._inst = None
-        return (instance, plugin)
+        return instance, plugin
 
     def get_bound_plugin(self):
         """

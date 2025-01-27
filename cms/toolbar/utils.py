@@ -70,12 +70,12 @@ def get_plugin_tree_as_json(request, plugins):
     return json.dumps(get_plugin_tree(request, plugins))
 
 
-def get_plugin_tree(request, plugins):
+def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
     from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
 
     tree_data = []
     tree_structure = []
-    restrictions = {}
+    restrictions = restrictions or {}
     root_plugins = deque()
     plugin_children = defaultdict(deque)
     toolbar = get_toolbar_from_request(request)
