@@ -67,7 +67,7 @@ class Placeholder(models.Model):
 
         template = None
         if self.content_type == ContentType.objects.get_for_model(PageContent):
-             template = self.source.get_template()
+            template = self.source.get_template()
         name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
         name = _(name)
         return name
