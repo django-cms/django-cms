@@ -165,7 +165,8 @@ class PlaceholderManager(models.Manager):
         """
         content_type = ContentType.objects.get_for_model(obj)
         self.get_queryset()
-        return PlaceholderForObjQS(source_object=obj, model=self.model, using=self._db, hints=self._hints).filter(content_type=content_type, object_id=obj.pk)
+        return (PlaceholderForObjQS(source_object=obj, model=self.model, using=self._db, hints=self._hints)
+                .filter(content_type=content_type, object_id=obj.pk))
 
 
 ################################################################################
