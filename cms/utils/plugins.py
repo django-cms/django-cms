@@ -3,7 +3,7 @@ import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
-from functools import cache, lru_cache
+from functools import cache
 from itertools import starmap
 from operator import itemgetter
 from typing import Optional
@@ -429,7 +429,10 @@ def downcast_plugins(
             )
             continue
         plugin_ids.append(plugin.pk)
-        plugin_types_map[base_model].append(plugin.pk)
+        if base_model is CMSPlugin:
+            plugin_lookup[plugin.pk] = plugin  # No downcast needed
+        else:
+            plugin_types_map[base_model].append(plugin.pk)
 
     placeholders = placeholders or []
     placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
@@ -444,15 +447,9 @@ def downcast_plugins(
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
         for instance in plugin_qs.iterator():
-            placeholder = placeholders_by_id.get(instance.placeholder_id)
             cls = get_plugin_class(instance.plugin_type)  # Plugin class
             instance.__class__ = cls.model  # Cast to original model (including proxies)
             plugin_lookup[instance.pk] = instance
-
-            if placeholder:
-                instance.placeholder = placeholder
-                if not cls.cache and not cls().get_cache_expiration(request, instance, placeholder):
-                    placeholder.cache_placeholder = False
 
     for plugin in plugins:
         parent_not_available = (not plugin.parent_id or plugin.parent_id not in plugin_ids)
@@ -460,8 +457,16 @@ def downcast_plugins(
         valid_parent = (parent_not_available or plugin.parent_id in plugin_lookup)
 
         if valid_parent and plugin.pk in plugin_lookup:
-            plugin._inst = plugin_lookup[plugin.pk]  # Populate bound plugin cache for plugin
-            yield plugin_lookup[plugin.pk]
+            instance = plugin_lookup[plugin.pk]
+            placeholder = placeholders_by_id.get(instance.placeholder_id)
+            if placeholder:
+                instance.placeholder = placeholder
+                cls = get_plugin_class(instance.plugin_type)
+                if not cls.cache and not cls().get_cache_expiration(request, instance, placeholder):
+                    placeholder.cache_placeholder = False
+
+            plugin._inst = instance  # Populate bound plugin cache for plugin
+            yield instance
 
 
 def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):

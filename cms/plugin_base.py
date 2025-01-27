@@ -4,7 +4,6 @@ from functools import lru_cache
 
 from django import forms
 from django.contrib import admin, messages
-from django.contrib.admin.utils import flatten_fieldsets
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.shortcuts import render
 from django.utils.encoding import force_str, smart_str
