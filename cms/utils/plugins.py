@@ -429,10 +429,7 @@ def downcast_plugins(
             )
             continue
         plugin_ids.append(plugin.pk)
-        if base_model is CMSPlugin:
-            plugin_lookup[plugin.pk] = plugin  # No downcast needed
-        else:
-            plugin_types_map[base_model].append(plugin.pk)
+        plugin_types_map[base_model].append(plugin.pk)
 
     placeholders = placeholders or []
     placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
