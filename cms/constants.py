@@ -63,8 +63,8 @@ EXPIRE_NOW = 0
 MAX_EXPIRATION_TTL = 365 * 24 * 3600
 
 
-def _get_toolbar_js(type: str) -> str:
-    return f'<script data-cms-{type} id="cms-{type}-%(pk)s" type="application/json">%(config)s</script>'
+def _get_toolbar_js(plugin_type: str) -> str:
+    return f'<script data-cms-{plugin_type} id="cms-{plugin_type}-%(pk)s" type="application/json">%(config)s</script>'
 
 
 PLUGIN_TOOLBAR_JS = _get_toolbar_js("plugin")
