@@ -169,7 +169,7 @@ class CacheTestCase(CMSTestCase):
             request = self.get_request(page1_url)
             request.current_page = Page.objects.get(pk=page1.pk)
             request.toolbar = CMSToolbar(request)
-            with self.assertNumQueries(5):
+            with self.assertNumQueries(4):
                 output2 = self.render_template_obj(template, {}, request)
             with self.settings(CMS_PAGE_CACHE=False):
                 with self.assertNumQueries(FuzzyInt(8, 16)):
