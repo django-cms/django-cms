@@ -1,5 +1,6 @@
 import json
 import re
+from functools import lru_cache
 
 from django import forms
 from django.contrib import admin, messages
@@ -323,10 +324,19 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return bool(allowed_parents)
 
     @classmethod
+    @lru_cache
+    def _get_template_for_page(cls, page):
+        """Cache page template because page.get_template() might have to fetch the page content object from the db
+         since django CMS 4"""
+        if page:
+            return page.get_template()
+        return None
+
+    @classmethod
     def get_require_parent(cls, slot, page):
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page.get_template() if page else None
+        template = cls._get_template_for_page(page)
 
         # config overrides..
         require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
@@ -607,7 +617,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page.get_template() if page else None
+        template = cls._get_template_for_page(page)
 
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
@@ -667,7 +677,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def get_parent_classes(cls, slot, page, instance=None):
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page.get_template() if page else None
+        template = cls._get_template_for_page(page)
 
         # config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
