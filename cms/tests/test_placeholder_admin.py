@@ -192,7 +192,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
             with CaptureQueriesContext(connection) as queries:
                 response = self.client.get(endpoint)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(queries), 17, "\n".join([f"{i}. {q['sql']}" for i, q in enumerate(queries, start=1)]))
+        self.assertEqual(len(queries), 16, "\n".join([f"{i}. {q['sql']}" for i, q in enumerate(queries, start=1)]))
         # Queries
         # 1. SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21
         # 2. SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."id" = 18 LIMIT 21
@@ -210,7 +210,6 @@ class PlaceholderAdminTestCase(CMSTestCase):
         # 14. SELECT "cms_cmsplugin"."id", "cms_cmsplugin"."placeholder_id", "cms_cmsplugin"."parent_id", "cms_cmsplugin"."position", "cms_cmsplugin"."language", "cms_cmsplugin"."plugin_type", "cms_cmsplugin"."creation_date", "cms_cmsplugin"."changed_date", "multicolumn_multicolumns"."cmsplugin_ptr_id" FROM "multicolumn_multicolumns" INNER JOIN "cms_cmsplugin" ON ("multicolumn_multicolumns"."cmsplugin_ptr_id" = "cms_cmsplugin"."id") WHERE "multicolumn_multicolumns"."cmsplugin_ptr_id" IN (1, 4) ORDER BY "cms_cmsplugin"."position" ASC
         # 15. SELECT "cms_cmsplugin"."id", "cms_cmsplugin"."placeholder_id", "cms_cmsplugin"."parent_id", "cms_cmsplugin"."position", "cms_cmsplugin"."language", "cms_cmsplugin"."plugin_type", "cms_cmsplugin"."creation_date", "cms_cmsplugin"."changed_date", "link_link"."cmsplugin_ptr_id", "link_link"."name", "link_link"."external_link" FROM "link_link" INNER JOIN "cms_cmsplugin" ON ("link_link"."cmsplugin_ptr_id" = "cms_cmsplugin"."id") WHERE "link_link"."cmsplugin_ptr_id" IN (7) ORDER BY "cms_cmsplugin"."position" ASC
         # 16. SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."id" = 18 LIMIT 21
-        # 17. SELECT "cms_pagecontent"."id", "cms_pagecontent"."language", "cms_pagecontent"."title", "cms_pagecontent"."page_title", "cms_pagecontent"."menu_title", "cms_pagecontent"."meta_description", "cms_pagecontent"."redirect", "cms_pagecontent"."page_id", "cms_pagecontent"."creation_date", "cms_pagecontent"."created_by", "cms_pagecontent"."changed_by", "cms_pagecontent"."changed_date", "cms_pagecontent"."in_navigation", "cms_pagecontent"."soft_root", "cms_pagecontent"."template", "cms_pagecontent"."limit_visibility_in_menu", "cms_pagecontent"."xframe_options" FROM "cms_pagecontent" WHERE "cms_pagecontent"."id" = 1 LIMIT 21
 
     def test_object_structure_endpoint(self):
         page = create_page('Page 1', 'simple.html', 'en')
@@ -224,7 +223,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
             with CaptureQueriesContext(connection) as queries:
                 response = self.client.get(endpoint)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(queries), 19, "\n".join([f"{i}. {q['sql']}" for i, q in enumerate(queries, start=1)]))
+        self.assertEqual(len(queries), 18, "\n".join([f"{i}. {q['sql']}" for i, q in enumerate(queries, start=1)]))
         # Queries
         # 1. SELECT "auth_user"."id", "auth_user"."password", "auth_user"."last_login", "auth_user"."is_superuser", "auth_user"."username", "auth_user"."first_name", "auth_user"."last_name", "auth_user"."email", "auth_user"."is_staff", "auth_user"."is_active", "auth_user"."date_joined" FROM "auth_user" WHERE "auth_user"."id" = 1 LIMIT 21
         # 2. SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."id" = 18 LIMIT 21
@@ -243,5 +242,4 @@ class PlaceholderAdminTestCase(CMSTestCase):
         # 15. SELECT "cms_cmsplugin"."id", "cms_cmsplugin"."placeholder_id", "cms_cmsplugin"."parent_id", "cms_cmsplugin"."position", "cms_cmsplugin"."language", "cms_cmsplugin"."plugin_type", "cms_cmsplugin"."creation_date", "cms_cmsplugin"."changed_date", "multicolumn_multicolumns"."cmsplugin_ptr_id" FROM "multicolumn_multicolumns" INNER JOIN "cms_cmsplugin" ON ("multicolumn_multicolumns"."cmsplugin_ptr_id" = "cms_cmsplugin"."id") WHERE "multicolumn_multicolumns"."cmsplugin_ptr_id" IN (1, 4) ORDER BY "cms_cmsplugin"."position" ASC
         # 16. SELECT "cms_cmsplugin"."id", "cms_cmsplugin"."placeholder_id", "cms_cmsplugin"."parent_id", "cms_cmsplugin"."position", "cms_cmsplugin"."language", "cms_cmsplugin"."plugin_type", "cms_cmsplugin"."creation_date", "cms_cmsplugin"."changed_date", "link_link"."cmsplugin_ptr_id", "link_link"."name", "link_link"."external_link" FROM "link_link" INNER JOIN "cms_cmsplugin" ON ("link_link"."cmsplugin_ptr_id" = "cms_cmsplugin"."id") WHERE "link_link"."cmsplugin_ptr_id" IN (7) ORDER BY "cms_cmsplugin"."position" ASC
         # 17. SELECT "django_content_type"."id", "django_content_type"."app_label", "django_content_type"."model" FROM "django_content_type" WHERE "django_content_type"."id" = 18 LIMIT 21
-        # 18. SELECT "cms_pagecontent"."id", "cms_pagecontent"."language", "cms_pagecontent"."title", "cms_pagecontent"."page_title", "cms_pagecontent"."menu_title", "cms_pagecontent"."meta_description", "cms_pagecontent"."redirect", "cms_pagecontent"."page_id", "cms_pagecontent"."creation_date", "cms_pagecontent"."created_by", "cms_pagecontent"."changed_by", "cms_pagecontent"."changed_date", "cms_pagecontent"."in_navigation", "cms_pagecontent"."soft_root", "cms_pagecontent"."template", "cms_pagecontent"."limit_visibility_in_menu", "cms_pagecontent"."xframe_options" FROM "cms_pagecontent" WHERE "cms_pagecontent"."id" = 1 LIMIT 21
-        # 19. SELECT "cms_cmsplugin"."language" AS "language" FROM "cms_cmsplugin" WHERE "cms_cmsplugin"."placeholder_id" = 1 ORDER BY "cms_cmsplugin"."position" ASC
+        # 18. SELECT "cms_cmsplugin"."language" AS "language" FROM "cms_cmsplugin" WHERE "cms_cmsplugin"."placeholder_id" = 1 ORDER BY "cms_cmsplugin"."position" ASC

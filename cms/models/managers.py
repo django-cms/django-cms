@@ -137,14 +137,19 @@ class ContentAdminManager(WithUserMixin, models.Manager):
 class PlaceholderForObjQS(models.QuerySet):
     _source_object = None
 
-    def __init__(self, source_object, *args, **kwargs):
-        self.source_object = source_object
+    def __init__(self, *args, **kwargs):
+        self._source_object = kwargs.pop('source_object', self._source_object)
         super().__init__(*args, **kwargs)
 
     def __iter__(self):
-        for obj in super().__iter__():
-            obj._state.fields_cache["source"] = self._source_object
-            yield obj
+        if self._fields:
+            # values_list etc
+            yield from super().__iter__()
+        else:
+            # Placeholder objects
+            for obj in super().__iter__():
+                obj._state.fields_cache["source"] = self._source_object
+                yield obj
 
     def _chain(self):
         # Also clone source_object when chaining querysets!
@@ -159,7 +164,8 @@ class PlaceholderManager(models.Manager):
         Get all placeholders for given object
         """
         content_type = ContentType.objects.get_for_model(obj)
-        return self.filter(content_type=content_type, object_id=obj.pk)
+        self.get_queryset()
+        return PlaceholderForObjQS(source_object=obj, model=self.model, using=self._db, hints=self._hints).filter(content_type=content_type, object_id=obj.pk)
 
 
 ################################################################################
