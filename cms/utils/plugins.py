@@ -29,7 +29,6 @@ def get_plugin_class(plugin_type: str) -> CMSPluginBase:
     return plugin_pool.get_plugin(plugin_type)
 
 
-@lru_cache
 def get_plugin_model(plugin_type: str) -> CMSPlugin:
     """Returns the plugin model class for a given plugin_type (str)"""
     return get_plugin_class(plugin_type).model
@@ -273,9 +272,9 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
 
     for source_plugin in get_bound_plugins(plugins):
         parent = plugins_by_id.get(source_plugin.parent_id, root_plugin)
-        plugin_model = get_plugin_model(source_plugin.plugin_type)
+        plugin_model = source_plugin.__class__  # get_plugin_model(source_plugin.plugin_type)
 
-        if plugin_model != CMSPlugin:
+        if plugin_model is not CMSPlugin:
             new_plugin = deepcopy(source_plugin)
             new_plugin.pk = None
             new_plugin.id = None
@@ -283,7 +282,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
             new_plugin.placeholder = placeholder
             new_plugin.parent = parent
         else:
-            new_plugin = plugin_model(
+            new_plugin = CMSPlugin(
                 language=(language or source_plugin.language),
                 parent=parent,
                 plugin_type=source_plugin.plugin_type,
@@ -330,7 +329,7 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
     # Backwards compatibility
     # This magic is needed for advanced plugins like Text Plugins that can have
     # nested plugins and need to update their content based on the new plugins.
-    # FIXME: The only reason this exists is djangocms-text-ckeditor
+    # FIXME: The only reason this exists is djangocms-text/djangocms-text-ckeditor
     for new_plugin, old_plugin in plugin_pairs:
         new_plugin.post_copy(old_plugin, plugin_pairs)
 
@@ -338,13 +337,6 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
         placeholder._recalculate_plugin_positions(language)
 
     return list(plugins_by_id.values())
-
-
-def _get_base_model(model):
-    # Find non-proxy model for plugin
-    if model._meta.proxy_for_model is None:
-        return model
-    return _get_base_model(model._meta.proxy_for_model)
 
 
 def get_bound_plugins(plugins):
@@ -369,7 +361,6 @@ def get_bound_plugins(plugins):
             # Do something with the bound_plugin
             pass
     """
-    get_plugin = plugin_pool.get_plugin
     plugin_types_map = defaultdict(list)
     plugin_ids = []
     plugin_lookup = {}
@@ -377,17 +368,16 @@ def get_bound_plugins(plugins):
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
         plugin_ids.append(plugin.pk)
-        plugin_model = _get_base_model(get_plugin(plugin.plugin_type).model)  # Collect all base models
-        plugin_types_map[plugin_model].append(plugin.pk)
+        base_model = get_plugin_model(plugin.plugin_type)._meta.concrete_model  # Collect all base models
+        plugin_types_map[base_model].append(plugin.pk)
 
-    for plugin_model, pks in plugin_types_map.items():
-        plugin_queryset = plugin_model.objects.filter(pk__in=pks)
-
+    for base_model, pks in plugin_types_map.items():
+        plugin_queryset = base_model.objects.filter(pk__in=pks)
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
         for instance in plugin_queryset.iterator():
-            cls = get_plugin(plugin.plugin_type).model  # Get original class
-            instance.__class__ = cls  # Cast to correct model (including proxies)
+            model = get_plugin_model(instance.plugin_type)  # Get original class
+            instance.__class__ = model  # Cast to correct model (including proxies)
             plugin_lookup[instance.pk] = instance
 
     for plugin in plugins:
@@ -396,6 +386,7 @@ def get_bound_plugins(plugins):
         valid_parent = (parent_not_available or plugin.parent_id in plugin_lookup)
 
         if valid_parent and plugin.pk in plugin_lookup:
+            plugin._inst = plugin_lookup[plugin.pk]  # Populate bound plugin cache for plugin
             yield plugin_lookup[plugin.pk]
 
 
@@ -424,13 +415,11 @@ def downcast_plugins(
     plugin_lookup = {}
     plugin_ids = []
 
-    get_plugin = plugin_pool.get_plugin
-
     # make a map of plugin types, needed later for downcasting
     for plugin in plugins:
         # Keep track of the plugin ids we've received
         try:
-            plugin_model = _get_base_model(get_plugin(plugin.plugin_type).model)  # Collect all base models
+            plugin_model = get_plugin_model(plugin.plugin_type)._meta.concrete_model  # Collect all base models
         except KeyError:
             # Plugin not available
             logger.error(
@@ -454,7 +443,7 @@ def downcast_plugins(
         # downcasted versions
         for instance in plugin_qs.iterator():
             placeholder = placeholders_by_id.get(instance.placeholder_id)
-            cls = get_plugin(instance.plugin_type)  # Plugin class
+            cls = get_plugin_class(instance.plugin_type)  # Plugin class
             instance.__class__ = cls.model  # Cast to original model (including proxies)
             plugin_lookup[instance.pk] = instance
 
@@ -469,6 +458,7 @@ def downcast_plugins(
         valid_parent = (parent_not_available or plugin.parent_id in plugin_lookup)
 
         if valid_parent and plugin.pk in plugin_lookup:
+            plugin._inst = plugin_lookup[plugin.pk]  # Populate bound plugin cache for plugin
             yield plugin_lookup[plugin.pk]
 
 
