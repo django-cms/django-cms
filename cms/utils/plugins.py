@@ -89,7 +89,7 @@ def assign_plugins(request, placeholders, template=None, lang=None):
     """
     if not placeholders:
         return
-    placeholders = tuple(placeholders)
+    placeholders = tuple(placeholders)  # Trigger db hit
     lang = lang or get_language_from_request(request)
     plugins = list(
         CMSPlugin
@@ -458,6 +458,8 @@ def downcast_plugins(
 
         if valid_parent and plugin.pk in plugin_lookup:
             instance = plugin_lookup[plugin.pk]
+            if instance.parent_id in plugin_lookup:
+                instance._state.fields_cache["parent"] = plugin_lookup[instance.parent_id]
             placeholder = placeholders_by_id.get(instance.placeholder_id)
             if placeholder:
                 instance.placeholder = placeholder
