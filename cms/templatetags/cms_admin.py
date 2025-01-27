@@ -7,7 +7,7 @@ from django.contrib import admin
 from django.contrib.admin.views.main import ERROR_FLAG
 from django.template.loader import render_to_string
 from django.utils.encoding import force_str
-from django.utils.html import format_html
+from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.translation import get_language, gettext_lazy as _
 
@@ -99,7 +99,7 @@ def get_page_display_name(cms_page):
     title = page_content.title or page_content.page_title or page_content.menu_title
     if not title:
         title = cms_page.get_slug(language) or _("Empty")
-    return title if page_content.language == language else mark_safe(f"<em>{title} ({page_content.language})</em>")
+    return title if page_content.language == language else mark_safe(f"<em>{escape(title)} ({page_content.language})</em>")
 
 
 class TreePublishRow(Tag):
