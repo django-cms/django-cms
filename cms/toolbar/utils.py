@@ -14,6 +14,7 @@ from django.utils.translation import (
 )
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
+from cms.models import PageContent
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -231,6 +232,8 @@ def get_object_for_language(obj: models.Model, language: str, latest: bool = Fal
         # Object does not have language field or language is requested language
         # Return object itself
         return obj
+    if isinstance(obj, PageContent):
+        return obj.page.get_admin_content(language, fallback=False) or None
     # Does the object have a cache with sister objects
     cached_object = getattr(obj, "_sibling_objects_for_language_cache", {})
     if cached_object:

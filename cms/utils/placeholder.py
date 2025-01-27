@@ -1,7 +1,7 @@
 import operator
 import warnings
 from collections import OrderedDict
-from typing import Union
+from typing import Optional, Union
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -431,7 +431,7 @@ def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent,
 
 
 def get_placeholder_from_slot(
-    placeholder_relation: models.Manager, slot: str, template_obj=None
+    placeholder_relation: models.Manager, slot: str, template_obj=None, default_width: Optional[int] = None
 ) -> Placeholder:
     """Retrieves the placeholder instance for a PlaceholderRelationField either by scanning the template
     of the template_obj (if given) or by creating or getting a Placeholder in the database
@@ -448,4 +448,4 @@ def get_placeholder_from_slot(
     else:
         # Gets or creates the placeholder in any model. Placeholder is
         # rendered by {% render_placeholder %}
-        return placeholder_relation.get_or_create(slot=slot)[0]
+        return placeholder_relation.get_or_create(slot=slot, default_width=default_width)[0]

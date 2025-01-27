@@ -346,8 +346,7 @@ class ContentRenderer(BaseRenderer):
         current_obj = self.toolbar.get_object()
         if current_obj is None:
             raise PlaceholderNotFound(f"No object found for placeholder '{slot}'")
-        rescan_placeholders_for_obj(current_obj)
-        placeholder = Placeholder.objects.get_for_obj(current_obj).get(slot=slot)
+        placeholder = rescan_placeholders_for_obj(current_obj).get(slot)
         content = self.render_placeholder(
             placeholder,
             context=context,

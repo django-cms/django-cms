@@ -134,6 +134,25 @@ class ContentAdminManager(WithUserMixin, models.Manager):
         return self.get_queryset().latest_content(**kwargs)
 
 
+class PlaceholderForObjQS(models.QuerySet):
+    _source_object = None
+
+    def __init__(self, source_object, *args, **kwargs):
+        self.source_object = source_object
+        super().__init__(*args, **kwargs)
+
+    def __iter__(self):
+        for obj in super().__iter__():
+            obj._state.fields_cache["source"] = self._source_object
+            yield obj
+
+    def _chain(self):
+        # Also clone source_object when chaining querysets!
+        clone = super()._chain()
+        clone._source_object = self._source_object
+        return clone
+
+
 class PlaceholderManager(models.Manager):
     def get_for_obj(self, obj):
         """
