@@ -60,6 +60,7 @@ from cms.models import (
     Page,
     PageContent,
     PagePermission,
+    PageUrl,
     Placeholder,
 )
 from cms.operations.helpers import (
@@ -123,9 +124,9 @@ class PageDeleteMessageMixin:
                             result.append(mark_safe(
                                 "<b>" + item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: ") + "</b>"
                             ))
-                    elif obj.startswith(f"{capfirst(PageContent._meta.verbose_name)}: "):
+                    elif obj.startswith(f"{capfirst(PageUrl._meta.verbose_name)}: "):
                         result.insert(0, mark_safe(
-                            item.removeprefix(f"{capfirst(PageContent._meta.verbose_name)}: ")
+                            item.removeprefix(f"{capfirst(PageUrl._meta.verbose_name)}: ")
                         ))
                 elif item:
                     result.append(item)
@@ -139,17 +140,10 @@ class PageDeleteMessageMixin:
         to_delete = recursively_remove(to_delete)
 
         model_count = {
-            Page._meta.verbose_name_plural: 0,
-            PageContent._meta.verbose_name_plural: 0,
-            CMSPlugin._meta.verbose_name_plural: 0
+            Page._meta.verbose_name_plural: trad_model_count.get(Page._meta.verbose_name_plural, 0),
+            _("Translations"): trad_model_count.get(PageUrl._meta.verbose_name_plural, 0),
+            CMSPlugin._meta.verbose_name_plural: trad_model_count.get(CMSPlugin._meta.verbose_name_plural, 0),
         }
-        model_count.update({
-            key: value for key, value in trad_model_count.items() if key in (
-                Page._meta.verbose_name_plural,
-                PageContent._meta.verbose_name_plural,
-                CMSPlugin._meta.verbose_name_plural
-            )
-        })
         return to_delete, model_count, perms_needed, protected
 
 
