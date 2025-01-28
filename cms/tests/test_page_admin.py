@@ -525,14 +525,13 @@ class PageTest(PageTestBase):
         endpoint = self.get_admin_url(Page, 'delete', page_a.pk)
 
         page_tree = [page_a] + list(page_a.get_descendant_pages())
-        row_markup = '<a href="%s">%s</a>'
+        row_markup = '<li>%s</li>'
 
         with self.login_user_context(superuser):
             response = self.client.get(endpoint)
             for page in page_tree:
-                content = page.get_content_obj('en')
-                edit_url = self.get_admin_url(PageContent, 'change', content.pk)
-                page_markup = row_markup % (edit_url, str(content))
+                page_url = page.urls.filter(language='en').first()
+                page_markup = row_markup % str(page_url)
                 self.assertContains(response, page_markup, html=True)
 
     def test_homepage_with_children(self):
