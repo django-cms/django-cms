@@ -151,6 +151,7 @@ class DefaultLanguageChanger:
             None.
         """
         self.request = request
+        self.request_language = get_language_from_request(request)
         self._app_path = None
 
     @property
@@ -176,7 +177,7 @@ class DefaultLanguageChanger:
         """
         if self._app_path is None:
             if settings.USE_I18N:
-                page_path = self.get_page_path(get_language_from_request(self.request))
+                page_path = self.get_page_path(self.request_language)
             else:
                 page_path = self.get_page_path(settings.LANGUAGE_CODE)
             if page_path:
@@ -259,8 +260,7 @@ class DefaultLanguageChanger:
             NoReverseMatch: If there is no matching URL for the given language.
             TypeError: If there is a type error when trying to get the absolute URL.
         """
-        page_language = get_language_from_request(self.request)
-        with force_language(page_language):
+        with force_language(self.request_language):
             try:
                 view = resolve(self.request.path_info)
             except (NoReverseMatch, Resolver404):  # NOQA
