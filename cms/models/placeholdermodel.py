@@ -67,7 +67,7 @@ class Placeholder(models.Model):
         from cms.utils.placeholder import get_placeholder_conf
 
         template = None
-        if self.content_type == ContentType.objects.get_for_model(PageContent):
+        if isinstance(self.source, PageContent):
             # Make the database access lazy, so that it only happens if needed.
             template = lazy(self.source.get_template, str)()
         name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
