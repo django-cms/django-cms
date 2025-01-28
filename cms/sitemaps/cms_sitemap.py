@@ -54,6 +54,7 @@ class CMSSitemap(Sitemap):
             .filter(language__in=languages, path__isnull=False, page__login_required=False)
             .order_by("page__path")
             .select_related("page")
+            .prefetch_related("page__pagecontent_set")
             .annotate(
                 content_pk=Subquery(
                     PageContent.objects.filter(page=OuterRef("page"), language=OuterRef("language"))
@@ -65,7 +66,7 @@ class CMSSitemap(Sitemap):
         )
 
     def lastmod(self, page_url):
-        return page_url.page.changed_date
+        return page_url.page.get_content_obj(page_url.language).changed_date
 
     def location(self, page_url):
         return page_url.get_absolute_url(page_url.language)
