@@ -254,6 +254,13 @@ Configuration is retrieved in the following order:
 #. CMS_PLACEHOLDER_CONF['template']
 #. CMS_PLACEHOLDER_CONF[None]
 
+where ``template`` denotes a page's template setting, e.g. ``pages/with_sidebar.html``.
+The template name must end in ``.htm`` or ``.html``. ``placeholder`` is a placeholder
+slot name.
+
+The template selector is only available on django CMS pages. Placeholder for other
+models, such as aliases from djangocms-alias, can only be configured by their slot name.
+
 The first ``CMS_PLACEHOLDER_CONF`` key that matches for the required configuration attribute
 is used.
 
