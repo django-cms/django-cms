@@ -7,6 +7,7 @@ from django.contrib import admin, messages
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.shortcuts import render
 from django.utils.encoding import force_str, smart_str
+from django.utils.functional import lazy
 from django.utils.html import escapejs
 from django.utils.translation import gettext, gettext_lazy as _
 
@@ -328,7 +329,8 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """Cache page template because page.get_template() might have to fetch the page content object from the db
          since django CMS 4"""
         if page:
-            return page.get_template()
+            # Make the database access lazy, so that it only happens if needed.
+            return lazy(page.get_template, str)()
         return None
 
     @classmethod

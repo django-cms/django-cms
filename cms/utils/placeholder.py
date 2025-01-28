@@ -43,7 +43,7 @@ def get_context():
         return {}
 
 
-def get_placeholder_conf(setting, placeholder, template=None, default=None):
+def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str] = None, default=None):
     """
     Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins' or 'name'.
@@ -52,21 +52,24 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
 
     CMS_PLACEHOLDER_CONF[None] (global)
     CMS_PLACEHOLDER_CONF['template'] (if template is given)
-    CMS_PLACEHOLDER_CONF['placeholder']
+    CMS_PLACEHOLDER_CONF['placeholder'] (where placeholder denotes a slot)
     CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
+
+    Template is only evaluated if the placeholder configuration contains key with ".html" or ".htm"
     """
 
     if placeholder:
         keys = []
         placeholder_conf = get_cms_setting("PLACEHOLDER_CONF")
+        template_in_conf = any(key is not None and ".htm" in key for key in placeholder_conf)
         # 1st level
-        if template:
+        if template_in_conf and template:
             keys.append(f"{template} {placeholder}")
         # 2nd level
         keys.append(placeholder)
         # 3rd level
-        if template:
-            keys.append(template)
+        if template_in_conf and template:
+            keys.append(str(template))
         # 4th level
         keys.append(None)
         for key in keys:

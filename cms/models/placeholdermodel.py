@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models, transaction
 from django.template.defaultfilters import title
 from django.utils.encoding import force_str
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from cms.cache import invalidate_cms_page_cache
@@ -67,7 +68,8 @@ class Placeholder(models.Model):
 
         template = None
         if self.content_type == ContentType.objects.get_for_model(PageContent):
-            template = self.source.get_template()
+            # Make the database access lazy, so that it only happens if needed.
+            template = lazy(self.source.get_template, str)()
         name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
         name = _(name)
         return name
