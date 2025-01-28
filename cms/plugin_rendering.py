@@ -21,7 +21,6 @@ from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import CMSPlugin, Page, PageContent, Placeholder, StaticPlaceholder
 from cms.plugin_pool import PluginPool
-from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
@@ -113,7 +112,7 @@ class BaseRenderer:
         return Site.objects.get_current(self.request)
 
     @cached_property
-    def toolbar(self) -> CMSToolbar:
+    def toolbar(self):  # Type hinting disrupts import order
         return get_toolbar_from_request(self.request)
 
     @cached_property
