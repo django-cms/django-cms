@@ -65,8 +65,8 @@ Minor features
 ==============
 
 * Deleting pages or deleting translations now gives a much clear delete
-  confirmation message. It does not list all objects deleted but sumarizes
-  how many pages, tranlations (counted by ``PageUrl`` objects) and plugins
+  confirmation message. It does not list all objects deleted but summarizes
+  how many pages, translations (counted by ``PageUrl`` objects) and plugins
   are about to be deleted.
 
 
