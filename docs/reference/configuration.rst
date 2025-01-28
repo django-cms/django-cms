@@ -1197,6 +1197,20 @@ This indicates to the CMS that it should redirect requests with an non-lowercase
 slug to its lowercase version if no page with that slug is found.
 
 
+CMS_CATCH_PLUGIN_500_EXCEPTION
+==============================
+
+default
+    ``True``
+
+Should rendering plugins cause an exception, they are caught by default.
+In edit mode the exception is shown in the placeholder, in preview mode and
+on public content the placeholder remains empty.
+
+If ``CMS_CATCH_PLUGIN_500_EXCEPTION`` is set to ``False``, viewing public
+content will cause a server error (http error code 500). This can, for example,
+be used for regular health checking.
+
 CMS_CONFIRM_VERSION4
 ====================
 
