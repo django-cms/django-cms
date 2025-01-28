@@ -64,7 +64,10 @@ the community, django CMS 4.2 refactored exception handling.
 Minor features
 ==============
 
-Empty sections are to be removed before release.
+* Deleting pages or deleting translations now gives a much clear delete
+  confirmation message. It does not list all objects deleted but sumarizes
+  how many pages, tranlations (counted by ``PageUrl`` objects) and plugins
+  are about to be deleted.
 
 
 Bug Fixes
