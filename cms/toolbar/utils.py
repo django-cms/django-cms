@@ -83,7 +83,6 @@ def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
     template = toolbar.templates.drag_item_template
     get_plugin_info = get_plugin_toolbar_info
     placeholder = plugins[0].placeholder
-    host_page = placeholder.page
     copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
     plugins = list(downcast_plugins(plugins, select_placeholder=True))
     plugin_ids = frozenset(plugin.pk for plugin in plugins)
@@ -99,7 +98,6 @@ def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
     def collect_plugin_data(plugin):
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
-            page=host_page,
             restrictions_cache=restrictions,
         )
         plugin_info = get_plugin_info(

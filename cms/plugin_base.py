@@ -338,7 +338,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return None
 
     @classmethod
-    def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin]=None):
+    def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
 
         template = cls._get_template_for_conf(page, instance)
@@ -449,11 +449,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             root = obj
 
         plugins = [root] + list(root.get_descendants())
-        # simulate the call to the unauthorized CMSPlugin.page property
-        cms_page = obj.placeholder.page if obj.placeholder_id else None
 
         restrictions = {}  # Restrictions cache
-        child_classes, parent_classes = get_plugin_restrictions(obj, cms_page, restrictions)
+        child_classes, parent_classes = get_plugin_restrictions(obj, restrictions_cache=restrictions)
         data = get_plugin_toolbar_info(
             obj,
             children=child_classes,
@@ -615,7 +613,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
-    def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin]=None):
+    def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
         Returns a list of plugin types that are allowed
         as children of this plugin.
@@ -644,7 +642,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return plugin_pool.registered_plugins
 
     @classmethod
-    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin]=None):
+    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
@@ -679,7 +677,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return child_classes
 
     @classmethod
-    def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin]=None):
+    def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         from cms.utils.placeholder import get_placeholder_conf
 
         template = cls._get_template_for_conf(page, instance)

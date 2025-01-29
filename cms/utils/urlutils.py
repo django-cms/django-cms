@@ -99,9 +99,9 @@ def admin_reverse(
     viewname: str,
     urlconf: Optional[str] = None,
     args: Optional[Sequence] = None,
-    kwargs: Optional[dict[str, Any]]=None,
+    kwargs: Optional[dict[str, Any]] = None,
     prefix=None,
-    current_app: Optional[str]=None
+    current_app: Optional[str] = None
 ):
     return reverse(
         f"{admin_namespace}:{viewname}",
