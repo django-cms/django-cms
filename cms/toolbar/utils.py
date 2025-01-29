@@ -45,12 +45,12 @@ def get_plugin_toolbar_info(plugin, children=None, parents=None):
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': data['plugin_name']}
-
-    data['onClose'] = False
-    data['addPluginHelpTitle'] = force_str(help_text)
-    data['plugin_order'] = ''
-    data['plugin_restriction'] = children or []
-    data['plugin_parent_restriction'] = parents or []
+    data.update({
+        "onClose": False,
+        "addPluginHelpTitle": force_str(help_text),
+        "plugin_order": '',
+        "plugin_restriction": children or [],
+    })
     return data
 
 

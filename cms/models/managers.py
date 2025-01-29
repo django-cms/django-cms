@@ -135,6 +135,9 @@ class ContentAdminManager(WithUserMixin, models.Manager):
 
 
 class PlaceholderForObjQS(models.QuerySet):
+    # This Queryset prepopulates the source field cache when the get_for_obj manager is used
+    # __iter__ is called when the queryset has been evaluated and is iterated
+    # get prepopulates the cache for any get requests
     _source_object = None
 
     def __init__(self, *args, **kwargs):
@@ -150,6 +153,11 @@ class PlaceholderForObjQS(models.QuerySet):
             for obj in super().__iter__():
                 obj._state.fields_cache["source"] = self._source_object
                 yield obj
+
+    def get(self, *args, **kwargs):
+        obj = super().get(*args, **kwargs)
+        obj._state.fields_cache["source"] = self._source_object
+        return obj
 
     def _chain(self):
         # Also clone source_object when chaining querysets!

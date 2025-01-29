@@ -61,14 +61,14 @@ def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str]
     if placeholder:
         keys = []
         placeholder_conf = get_cms_setting("PLACEHOLDER_CONF")
-        template_in_conf = any(key is not None and ".htm" in key for key in placeholder_conf)
+        template_in_conf = any(".htm" in (key or "") for key in placeholder_conf) and template
         # 1st level
-        if template_in_conf and template:
+        if template_in_conf:
             keys.append(f"{template} {placeholder}")
         # 2nd level
         keys.append(placeholder)
         # 3rd level
-        if template_in_conf and template:
+        if template_in_conf:
             keys.append(str(template))
         # 4th level
         keys.append(None)
