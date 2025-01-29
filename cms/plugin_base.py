@@ -1,6 +1,7 @@
 import json
 import re
 from functools import lru_cache
+from typing import Optional
 
 from django import forms
 from django.contrib import admin, messages
@@ -13,7 +14,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
-from cms.models import CMSPlugin
+from cms.models import CMSPlugin, Page
 from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree
 from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
@@ -325,19 +326,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @lru_cache
-    def _get_template_for_page(cls, page):
+    def _get_template_for_conf(cls, page: Optional[Page], instance: Optional[CMSPlugin]):
         """Cache page template because page.get_template() might have to fetch the page content object from the db
          since django CMS 4"""
         if page:
             # Make the database access lazy, so that it only happens if needed.
             return lazy(page.get_template, str)()
+        if instance is not None and instance.placeholder.source and hasattr(instance.placeholder.source, 'get_template'):
+            # If source object has get_template method, use it (lazily)
+            return lazy(instance.placeholder.source.get_template, str)()
         return None
 
     @classmethod
-    def get_require_parent(cls, slot, page):
+    def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin]=None):
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_page(page)
+        template = cls._get_template_for_conf(page, instance)
 
         # config overrides..
         require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
@@ -611,21 +615,21 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
-    def get_child_class_overrides(cls, slot, page):
+    def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin]=None):
         """
         Returns a list of plugin types that are allowed
         as children of this plugin.
         """
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_page(page)
+        template = cls._get_template_for_conf(page, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
         return ph_conf.get(cls.__name__, cls.child_classes)
 
     @classmethod
-    def get_child_plugin_candidates(cls, slot, page):
+    def get_child_plugin_candidates(cls, slot: str, page: Optional[Page] = None):
         """
         Returns a list of all plugin classes
         that will be considered when fetching
@@ -640,13 +644,13 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return plugin_pool.registered_plugins
 
     @classmethod
-    def get_child_classes(cls, slot, page, instance=None):
+    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin]=None):
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
         """
         # Placeholder overrides are highest in priority
-        child_classes = cls.get_child_class_overrides(slot, page)
+        child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
 
         if child_classes:
             return child_classes
@@ -675,10 +679,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return child_classes
 
     @classmethod
-    def get_parent_classes(cls, slot, page, instance=None):
+    def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin]=None):
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_page(page)
+        template = cls._get_template_for_conf(page, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})

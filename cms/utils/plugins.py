@@ -213,7 +213,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
 
     if plugin_class.cache_child_classes:
         children_cache[plugin_type] = child_classes or []
-    return (child_classes, parent_classes)
+    return child_classes, parent_classes
 
 
 def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_list, plugins_by_id):
