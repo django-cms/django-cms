@@ -446,8 +446,7 @@ def get_placeholder_from_slot(
         try:
             return placeholder_relation.get(slot=slot)
         except Placeholder.DoesNotExist:
-            rescan_placeholders_for_obj(template_obj)
-            return placeholder_relation.placeholders.get(slot=slot)
+            return rescan_placeholders_for_obj(template_obj).get(slot)
     else:
         # Gets or creates the placeholder in any model. Placeholder is
         # rendered by {% render_placeholder %}
