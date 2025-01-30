@@ -183,7 +183,7 @@ class PluginPool:
         Retrieve a plugin from the cache.
         """
         self.discover_plugins()
-        return self.plugins[name]
+        return self.plugins.get(name)
 
     def get_patterns(self):
         self.discover_plugins()
