@@ -395,7 +395,7 @@ def has_plugin_permission(user, plugin_type, permission_type):
             plugin_class.model,
             action=permission_type,
         )
-        return user.has_perm(codename)    
+        return user.has_perm(codename)
     except KeyError:
         # Grant all permissions for uninstalled plugins, so they do not block
         # emptying placeholders.
