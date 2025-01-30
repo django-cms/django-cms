@@ -457,12 +457,12 @@ class PagesTestCase(TransactionCMSTestCase):
         now -= datetime.timedelta(microseconds=now.microsecond)
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en")
-        content = page.get_content_obj('en')
+        page.get_content_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         page.save()
         sitemap = CMSSitemap()
-        actual_last_modification_time = sitemap.lastmod(content)
+        actual_last_modification_time = sitemap.lastmod(sitemap.items().first())
         self.assertEqual(actual_last_modification_time.date(), now.date())
 
     def test_templates(self):
