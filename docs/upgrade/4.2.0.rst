@@ -64,6 +64,11 @@ the community, django CMS 4.2 refactored exception handling.
 Minor features
 ==============
 
+* Deleting pages or deleting translations now gives a much clear delete
+  confirmation message. It does not list all objects deleted but summarizes
+  how many pages, translations (counted by ``PageUrl`` objects) and plugins
+  are about to be deleted.
+
 * ``CMS_PLACEHOLDER_CONF`` now allows to add configuration by template name for
   placeholders that not necessarily are part of a page, but could be part of
   any model (e.g., an alias). Instead for looking at pages, the placeholder tries
