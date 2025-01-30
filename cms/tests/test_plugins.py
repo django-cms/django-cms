@@ -722,7 +722,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = api.create_page("page", "nav_playground.html", "en")
-        content = page.get_content_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         page.save()
