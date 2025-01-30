@@ -389,13 +389,14 @@ def has_plugin_permission(user, plugin_type, permission_type):
     permission_type should be 'add', 'change' or 'delete'.
     """
     from cms.plugin_pool import plugin_pool
-    plugin_class = plugin_pool.get_plugin(plugin_type)
-    if not plugin_class:
+    try:
+        plugin_class = plugin_pool.get_plugin(plugin_type)
+        codename = get_model_permission_codename(
+            plugin_class.model,
+            action=permission_type,
+        )
+        return user.has_perm(codename)    
+    except KeyError:
         # Grant all permissions for uninstalled plugins, so they do not block
         # emptying placeholders.
         return True
-    codename = get_model_permission_codename(
-        plugin_class.model,
-        action=permission_type,
-    )
-    return user.has_perm(codename)
