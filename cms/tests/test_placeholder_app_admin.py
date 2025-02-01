@@ -131,7 +131,7 @@ class AppAdminTest(AppAdminTestCase):
     def test_no_global_limit_check_same_placeholder_move(self):
         """
         Ensures no global limit exception is raised
-        when moving plugins inside of a placeholder.
+        when moving plugins inside a placeholder.
         """
         superuser = self.get_superuser()
         source_placeholder = self._obj.placeholder

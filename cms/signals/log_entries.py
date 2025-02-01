@@ -96,6 +96,7 @@ def create_log_entry(user_id, content_type_id, object_id, object_repr, action_fl
             change_message=change_message,
         )
 
+
 def _is_valid_page_instance(page):
     """
     Check if the supplied object is a valid Page / PageType object
