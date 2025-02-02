@@ -1,7 +1,7 @@
 import operator
 import warnings
 from collections import OrderedDict
-from typing import Union
+from typing import Optional, Union
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -43,7 +43,7 @@ def get_context():
         return {}
 
 
-def get_placeholder_conf(setting, placeholder, template=None, default=None):
+def get_placeholder_conf(setting: str, placeholder: str, template: Optional[str] = None, default=None):
     """
     Returns the placeholder configuration for a given setting. The key would for
     example be 'plugins' or 'name'.
@@ -52,21 +52,24 @@ def get_placeholder_conf(setting, placeholder, template=None, default=None):
 
     CMS_PLACEHOLDER_CONF[None] (global)
     CMS_PLACEHOLDER_CONF['template'] (if template is given)
-    CMS_PLACEHOLDER_CONF['placeholder']
+    CMS_PLACEHOLDER_CONF['placeholder'] (where placeholder denotes a slot)
     CMS_PLACEHOLDER_CONF['template placeholder'] (if template is given)
+
+    Template is only evaluated if the placeholder configuration contains key with ".html" or ".htm"
     """
 
     if placeholder:
         keys = []
         placeholder_conf = get_cms_setting("PLACEHOLDER_CONF")
+        template_in_conf = any(".htm" in (key or "") for key in placeholder_conf) and template
         # 1st level
-        if template:
+        if template_in_conf:
             keys.append(f"{template} {placeholder}")
         # 2nd level
         keys.append(placeholder)
         # 3rd level
-        if template:
-            keys.append(template)
+        if template_in_conf:
+            keys.append(str(template))
         # 4th level
         keys.append(None)
         for key in keys:
@@ -431,7 +434,7 @@ def get_declared_placeholders_for_obj(obj: Union[models.Model, EmptyPageContent,
 
 
 def get_placeholder_from_slot(
-    placeholder_relation: models.Manager, slot: str, template_obj=None
+    placeholder_relation: models.Manager, slot: str, template_obj=None, default_width: Optional[int] = None
 ) -> Placeholder:
     """Retrieves the placeholder instance for a PlaceholderRelationField either by scanning the template
     of the template_obj (if given) or by creating or getting a Placeholder in the database
@@ -443,9 +446,8 @@ def get_placeholder_from_slot(
         try:
             return placeholder_relation.get(slot=slot)
         except Placeholder.DoesNotExist:
-            rescan_placeholders_for_obj(template_obj)
-            return placeholder_relation.placeholders.get(slot=slot)
+            return rescan_placeholders_for_obj(template_obj).get(slot)
     else:
         # Gets or creates the placeholder in any model. Placeholder is
         # rendered by {% render_placeholder %}
-        return placeholder_relation.get_or_create(slot=slot)[0]
+        return placeholder_relation.get_or_create(slot=slot, default_width=default_width)[0]

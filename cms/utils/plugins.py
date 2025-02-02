@@ -3,7 +3,7 @@ import sys
 from collections import OrderedDict, defaultdict, deque
 from collections.abc import Iterable
 from copy import deepcopy
-from functools import cache, lru_cache
+from functools import cache
 from itertools import starmap
 from operator import itemgetter
 from typing import Optional
@@ -89,7 +89,7 @@ def assign_plugins(request, placeholders, template=None, lang=None):
     """
     if not placeholders:
         return
-    placeholders = tuple(placeholders)
+    placeholders = tuple(placeholders)  # Trigger db hit
     lang = lang or get_language_from_request(request)
     plugins = list(
         CMSPlugin
@@ -213,7 +213,7 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
 
     if plugin_class.cache_child_classes:
         children_cache[plugin_type] = child_classes or []
-    return (child_classes, parent_classes)
+    return child_classes, parent_classes
 
 
 def _reunite_orphaned_placeholder_plugin_children(root_plugin, orphaned_plugin_list, plugins_by_id):
@@ -329,7 +329,6 @@ def copy_plugins_to_placeholder(plugins, placeholder, language=None,
     # Backwards compatibility
     # This magic is needed for advanced plugins like Text Plugins that can have
     # nested plugins and need to update their content based on the new plugins.
-    # FIXME: The only reason this exists is djangocms-text/djangocms-text-ckeditor
     for new_plugin, old_plugin in plugin_pairs:
         new_plugin.post_copy(old_plugin, plugin_pairs)
 
@@ -369,7 +368,10 @@ def get_bound_plugins(plugins):
     for plugin in plugins:
         plugin_ids.append(plugin.pk)
         base_model = get_plugin_model(plugin.plugin_type)._meta.concrete_model  # Collect all base models
-        plugin_types_map[base_model].append(plugin.pk)
+        if base_model is CMSPlugin:
+            plugin_lookup[plugin.pk] = plugin  # No downcast needed
+        else:
+            plugin_types_map[base_model].append(plugin.pk)
 
     for base_model, pks in plugin_types_map.items():
         plugin_queryset = base_model.objects.filter(pk__in=pks)
@@ -419,7 +421,7 @@ def downcast_plugins(
     for plugin in plugins:
         # Keep track of the plugin ids we've received
         try:
-            plugin_model = get_plugin_model(plugin.plugin_type)._meta.concrete_model  # Collect all base models
+            base_model = get_plugin_model(plugin.plugin_type)._meta.concrete_model  # Collect all base models
         except KeyError:
             # Plugin not available
             logger.error(
@@ -427,7 +429,10 @@ def downcast_plugins(
             )
             continue
         plugin_ids.append(plugin.pk)
-        plugin_types_map[plugin_model].append(plugin.pk)
+        if base_model is CMSPlugin:
+            plugin_lookup[plugin.pk] = plugin  # No downcast needed
+        else:
+            plugin_types_map[base_model].append(plugin.pk)
 
     placeholders = placeholders or []
     placeholders_by_id = {placeholder.pk: placeholder for placeholder in placeholders}
@@ -442,15 +447,9 @@ def downcast_plugins(
         # put them in a map, so we can replace the base CMSPlugins with their
         # downcasted versions
         for instance in plugin_qs.iterator():
-            placeholder = placeholders_by_id.get(instance.placeholder_id)
             cls = get_plugin_class(instance.plugin_type)  # Plugin class
             instance.__class__ = cls.model  # Cast to original model (including proxies)
             plugin_lookup[instance.pk] = instance
-
-            if placeholder:
-                instance.placeholder = placeholder
-                if not cls.cache and not cls().get_cache_expiration(request, instance, placeholder):
-                    placeholder.cache_placeholder = False
 
     for plugin in plugins:
         parent_not_available = (not plugin.parent_id or plugin.parent_id not in plugin_ids)
@@ -458,8 +457,18 @@ def downcast_plugins(
         valid_parent = (parent_not_available or plugin.parent_id in plugin_lookup)
 
         if valid_parent and plugin.pk in plugin_lookup:
-            plugin._inst = plugin_lookup[plugin.pk]  # Populate bound plugin cache for plugin
-            yield plugin_lookup[plugin.pk]
+            instance = plugin_lookup[plugin.pk]
+            if instance.parent_id in plugin_lookup:
+                instance._state.fields_cache["parent"] = plugin_lookup[instance.parent_id]
+            placeholder = placeholders_by_id.get(instance.placeholder_id)
+            if placeholder:
+                instance.placeholder = placeholder
+                cls = get_plugin_class(instance.plugin_type)
+                if not cls.cache and not cls().get_cache_expiration(request, instance, placeholder):
+                    placeholder.cache_placeholder = False
+
+            plugin._inst = instance  # Populate bound plugin cache for plugin
+            yield instance
 
 
 def has_reached_plugin_limit(placeholder, plugin_type, language, template=None):

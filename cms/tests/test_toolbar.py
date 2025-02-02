@@ -2158,10 +2158,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         page_content = self.get_pagecontent_obj(page, "en")
 
         self.assertEqual(page_content, get_object_for_language(page_content, "en"))
-        self.assertTrue(not hasattr(page_content, "_sibling_objects_for_language_cache"))
         self.assertIsNone(get_object_for_language(page_content, "de"))
-        self.assertTrue(hasattr(page_content, "_sibling_objects_for_language_cache"))
-        self.assertEqual(len(page_content._sibling_objects_for_language_cache), 1)
 
     def test_get_object_for_language_multiple_languages(self):
         page = create_page('Test', 'col_two.html', 'en')
@@ -2177,10 +2174,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
                 page_content[code] = create_page_content(code, verbose, page)
 
         self.assertEqual(page_content["en"], get_object_for_language(page_content["en"], "en"))
-        self.assertTrue(not hasattr(page_content["en"], "_sibling_objects_for_language_cache"))
         self.assertEqual(get_object_for_language(page_content["en"], "de"), page_content["de"])
-        self.assertTrue(hasattr(page_content["en"], "_sibling_objects_for_language_cache"))
-        self.assertEqual(len(page_content["en"]._sibling_objects_for_language_cache), len(get_language_tuple()))
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):

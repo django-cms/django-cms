@@ -6,6 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import connection, models, transaction
 from django.template.defaultfilters import title
 from django.utils.encoding import force_str
+from django.utils.functional import lazy
 from django.utils.translation import gettext_lazy as _
 
 from cms.cache import invalidate_cms_page_cache
@@ -14,6 +15,7 @@ from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
 from cms.exceptions import LanguageError
 from cms.models.managers import PlaceholderManager
 from cms.utils import get_language_from_request, permissions
+from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting, get_site_id
 from cms.utils.i18n import get_language_object
 
@@ -61,9 +63,13 @@ class Placeholder(models.Model):
         self.get_plugins(language).delete()
 
     def get_label(self):
+        from cms.models import PageContent
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = self.page.get_template() if self.page else None
+        template = None
+        if isinstance(self.source, PageContent):
+            # Make the database access lazy, so that it only happens if needed.
+            template = lazy(self.source.get_template, str)()
         name = get_placeholder_conf("name", self.slot, template=template, default=title(self.slot))
         name = _(name)
         return name
@@ -82,27 +88,18 @@ class Placeholder(models.Model):
         """
         from cms.utils.permissions import get_model_permission_codename
 
-        attached_models = self._get_attached_models()
-
-        if not attached_models:
+        if not self.source:
             # technically if placeholder is not attached to anything,
             # user should not be able to change it but if is superuser
             # then we "should" allow it.
             return user.is_superuser
 
-        attached_objects = self._get_attached_objects()
-
-        for obj in attached_objects:
-            try:
-                perm = obj.has_placeholder_change_permission(user)
-            except AttributeError:
-                model = type(obj)
-                change_perm = get_model_permission_codename(model, 'change')
-                perm = user.has_perm(change_perm)
-
-            if not perm:
-                return False
-        return True
+        try:
+            return self.source.has_placeholder_change_permission(user)
+        except AttributeError:
+            model = type(self.source)
+            change_perm = get_model_permission_codename(model, 'change')
+            return user.has_perm(change_perm)
 
     def has_add_plugin_permission(self, user, plugin_type):
         """
@@ -208,70 +205,10 @@ class Placeholder(models.Model):
             return True
         return remote_field.run_checks(self, user)
 
-    def _get_related_objects(self):
-        fields = self._meta._get_fields(
-            forward=False, reverse=True,
-            include_parents=True,
-            include_hidden=False,
-        )
-        return list(obj for obj in fields)
-
-    def _get_attached_fields(self):
-        """
-        Returns a list of all non-cmsplugin reverse related fields.
-        """
-        from cms.models import CMSPlugin
-
-        if not hasattr(self, '_attached_fields_cache'):
-            self._attached_fields_cache = []
-            relations = self._get_related_objects()
-            for rel in relations:
-                if issubclass(rel.field.model, CMSPlugin):
-                    continue
-
-                field = getattr(self, rel.get_accessor_name())
-
-                try:
-                    if field.exists():
-                        self._attached_fields_cache.append(rel.field)
-                except:  # NOQA
-                    pass
-        return self._attached_fields_cache
-
-    def _get_attached_field(self):
-        try:
-            return self._get_attached_fields()[0]
-        except IndexError:
-            return None
-
     def _get_attached_model(self):
         if self.source:
             return self.source._meta.model
         return None
-
-    def _get_attached_models(self):
-        """
-        Returns a list of models of attached to this placeholder.
-        """
-        if hasattr(self, '_attached_models_cache'):
-            return self._attached_models_cache
-
-        self._attached_models_cache = [field.model for field in self._get_attached_fields()]
-
-        if self.source:
-            self._attached_models_cache += [self.source._meta.model]
-        return self._attached_models_cache
-
-    def _get_attached_objects(self):
-        """
-        Returns a list of objects attached to this placeholder.
-        """
-        objs = [obj for field in self._get_attached_fields()
-                for obj in getattr(self, field.remote_field.get_accessor_name()).all()]
-
-        if not objs and self.source:
-            return [self.source]
-        return objs
 
     def page_getter(self):
         if not hasattr(self, '_page'):
@@ -326,12 +263,13 @@ class Placeholder(models.Model):
 
     @property
     def actions(self):
+        import warnings
+
         from cms.utils.placeholder import PlaceholderNoAction
 
-        if not hasattr(self, '_actions_cache'):
-            field = self._get_attached_field()
-            self._actions_cache = getattr(field, 'actions', PlaceholderNoAction())
-        return self._actions_cache
+        warnings.warn("The actions property is deprecated. Use placeholder admin instead.",
+                      RemovedInDjangoCMS43Warning, stacklevel=2)
+        return PlaceholderNoAction()
 
     def get_cache_expiration(self, request, response_timestamp):
         """

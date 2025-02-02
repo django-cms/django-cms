@@ -277,6 +277,10 @@ class CMSToolbarBase(BaseToolbar):
         if self.is_staff:
             try:
                 user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
+                if user_settings.clipboard and not user_settings.clipboard.object_id:
+                    # Add source field to existing clipboard objects
+                    user_settings.clipboard.source = user_settings
+                    user_settings.clipboard.save()
             except UserSettings.DoesNotExist:
                 placeholder = Placeholder.objects.create(slot="clipboard")
                 user_settings = UserSettings.objects.create(
@@ -284,6 +288,8 @@ class CMSToolbarBase(BaseToolbar):
                     language=self.request_language,
                     user=self.request.user,
                 )
+                placeholder.source = user_settings  # Populate source
+                placeholder.save()
         return user_settings
 
     def _reorder_toolbars(self):

@@ -78,7 +78,7 @@ To make your extension editable, you must first create an admin class that sub-c
 ``cms.extensions.PageExtensionAdmin``. This admin handles page permissions.
 
 Continuing with the example model above, here's a simple corresponding
-``PageExtensionAdmin`` class:
+``PageExtensionAdmin`` class that should live in the ``admin.py`` file:
 
 .. code-block::
 
