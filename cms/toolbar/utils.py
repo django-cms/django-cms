@@ -14,6 +14,7 @@ from django.utils.translation import (
 )
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
+from cms.models import PageContent
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -44,12 +45,12 @@ def get_plugin_toolbar_info(plugin, children=None, parents=None):
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': data['plugin_name']}
-
-    data['onClose'] = False
-    data['addPluginHelpTitle'] = force_str(help_text)
-    data['plugin_order'] = ''
-    data['plugin_restriction'] = children or []
-    data['plugin_parent_restriction'] = parents or []
+    data.update({
+        "onClose": False,
+        "addPluginHelpTitle": force_str(help_text),
+        "plugin_order": '',
+        "plugin_restriction": children or [],
+    })
     return data
 
 
@@ -70,19 +71,18 @@ def get_plugin_tree_as_json(request, plugins):
     return json.dumps(get_plugin_tree(request, plugins))
 
 
-def get_plugin_tree(request, plugins):
+def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
     from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
 
     tree_data = []
     tree_structure = []
-    restrictions = {}
+    restrictions = restrictions or {}
     root_plugins = deque()
     plugin_children = defaultdict(deque)
     toolbar = get_toolbar_from_request(request)
     template = toolbar.templates.drag_item_template
     get_plugin_info = get_plugin_toolbar_info
     placeholder = plugins[0].placeholder
-    host_page = placeholder.page
     copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
     plugins = list(downcast_plugins(plugins, select_placeholder=True))
     plugin_ids = frozenset(plugin.pk for plugin in plugins)
@@ -98,7 +98,6 @@ def get_plugin_tree(request, plugins):
     def collect_plugin_data(plugin):
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
-            page=host_page,
             restrictions_cache=restrictions,
         )
         plugin_info = get_plugin_info(
@@ -231,6 +230,8 @@ def get_object_for_language(obj: models.Model, language: str, latest: bool = Fal
         # Object does not have language field or language is requested language
         # Return object itself
         return obj
+    if isinstance(obj, PageContent):
+        return obj.page.get_admin_content(language, fallback=False) or None
     # Does the object have a cache with sister objects
     cached_object = getattr(obj, "_sibling_objects_for_language_cache", {})
     if cached_object:

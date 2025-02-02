@@ -1,4 +1,5 @@
 # TODO: this is just stuff from utils.py - should be split / moved
+from django.http import HttpRequest
 
 from cms.utils.i18n import (
     get_current_language,
@@ -14,10 +15,13 @@ def get_current_site():
     return Site.objects.get_current()
 
 
-def get_language_from_request(request, current_page=None):
+def get_language_from_request(request: HttpRequest, current_page=None):
     """
     Return the most obvious language according the request
     """
+    if getattr(request, '_cms_language', None):
+        return request._cms_language
+
     language = None
     if hasattr(request, 'POST'):
         language = request.POST.get('language', None)
@@ -31,6 +35,7 @@ def get_language_from_request(request, current_page=None):
     if not language and request:
         # get the active language
         language = get_current_language()
+        request._cms_language = language
     if language:
         if language not in get_language_list(site_id):
             language = None

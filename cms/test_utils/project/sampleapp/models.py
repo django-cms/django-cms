@@ -1,14 +1,21 @@
+from functools import cached_property
+
 from django.db import models
 from django.urls import reverse
 from treebeard.mp_tree import MP_Node
 
-from cms.models.fields import PlaceholderField
+from cms.models.fields import PlaceholderRelationField
+from cms.utils.placeholder import get_placeholder_from_slot
 
 
 class Category(MP_Node):
     parent = models.ForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
-    description = PlaceholderField('category_description', 600)
+    placeholders = PlaceholderRelationField()
+
+    @cached_property
+    def description(self):
+        return get_placeholder_from_slot(self.placeholders, "description", default_width=600)
 
     def __str__(self):
         return self.name

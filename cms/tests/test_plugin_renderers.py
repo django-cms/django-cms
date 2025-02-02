@@ -12,7 +12,7 @@ from cms.plugin_rendering import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_edit_url
 
 
 class TestStructureRenderer(CMSTestCase):
@@ -255,8 +255,6 @@ class TestExceptionCatchers(CMSTestCase):
         with self.assertRaises(ZeroDivisionError):
             with self.assertLogs("cms.plugin_rendering", level="ERROR"):
                 self.renderer.render_placeholder(self.placeholder_1, plugin_context, "en", editable=False)
-
-
 
 
 class TestLegacyRenderer(TestContentRenderer):

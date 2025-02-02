@@ -21,7 +21,6 @@ from cms.cache.placeholder import get_placeholder_cache, set_placeholder_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import CMSPlugin, Page, PageContent, Placeholder, StaticPlaceholder
 from cms.plugin_pool import PluginPool
-from cms.toolbar.toolbar import CMSToolbar
 from cms.toolbar.utils import (
     get_placeholder_toolbar_js,
     get_plugin_toolbar_js,
@@ -113,7 +112,7 @@ class BaseRenderer:
         return Site.objects.get_current(self.request)
 
     @cached_property
-    def toolbar(self) -> CMSToolbar:
+    def toolbar(self):
         return get_toolbar_from_request(self.request)
 
     @cached_property
@@ -167,7 +166,6 @@ class BaseRenderer:
         )
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
-            page=page,
             restrictions_cache=placeholder_cache,
         )
         content = get_plugin_toolbar_js(
@@ -389,8 +387,6 @@ class ContentRenderer(BaseRenderer):
         nodelist=None,
         editable: bool = True,
     ):
-        from cms.models import Placeholder
-
         # Check if page, if so delegate to render_page_placeholder
         if self.current_page:
             return self.render_page_placeholder(
@@ -406,8 +402,7 @@ class ContentRenderer(BaseRenderer):
         current_obj = self.toolbar.get_object()
         if current_obj is None:
             raise PlaceholderNotFound(f"No object found for placeholder '{slot}'")
-        rescan_placeholders_for_obj(current_obj)
-        placeholder = Placeholder.objects.get_for_obj(current_obj).get(slot=slot)
+        placeholder = rescan_placeholders_for_obj(current_obj).get(slot)
         content = self.render_placeholder(
             placeholder,
             context=context,
