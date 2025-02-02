@@ -448,14 +448,13 @@ class TestLanguageFallbacks(CMSTestCase):
         with patch("cms.views.render_pagecontent") as mock_render:
             # normal page
             path = page.get_absolute_url(language="en")
-            request = self.get_request(path)
+            request = self.get_request(path, "en")
             details(request, slug=page.get_path("en"))
             mock_render.assert_called_once_with(
                 request,
                 page.get_content_obj()
             )
-            # check that the french plugins will render
-            context = Context({'request': request})
+            context = Context({'request': self.get_request(path, "fr")})
             rendered_placeholder = self._render_placeholder(page_ph_fr, context)
             self.assertEqual(rendered_placeholder, "Hello, world!")
 
