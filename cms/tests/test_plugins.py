@@ -722,14 +722,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = api.create_page("page", "nav_playground.html", "en")
-        content = page.get_content_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         page.save()
         plugin = self._create_link_plugin_on_page(page, slot='body')
         plugin = self.__edit_link_plugin(plugin, "fnord")
 
-        actual_last_modification_time = CMSSitemap().lastmod(content)
+        sitemap = CMSSitemap()
+        actual_last_modification_time = sitemap.lastmod(sitemap.items().first())
         actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)
         self.assertEqual(plugin.changed_date.date(), actual_last_modification_time.date())
         self.assertEqual(page.changed_date.date(), one_day_ago.date() + datetime.timedelta(days=1))
@@ -841,8 +841,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             request.toolbar = CMSToolbar(request)
             renderer = self.get_structure_renderer(request=request)
             output = renderer.render_placeholder(placeholder, language='en', page=page)
-            self.assertIn('<a data-rel="add" href="TextPlugin">Text</a>', output)
-            self.assertNotIn('<a data-rel="add" href="LinkPlugin">Link</a>', output)
+            self.assertIn('<a data-rel="add" data-add-form="true" href="TextPlugin">Text</a>', output)
+            self.assertNotIn('<a data-rel="add" data-add-form="true" href="LinkPlugin">Link</a>', output)
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")

@@ -139,7 +139,7 @@ class PluginPool:
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
-        plugins = sorted(self.plugins.values(), key=attrgetter('name'))
+        plugins = self.plugins.values()
         template = page.get_template() if page else None
 
         allowed_plugins = get_placeholder_conf(
@@ -170,7 +170,7 @@ class PluginPool:
             # Filters out any plugin that requires a parent or has set parent classes
             plugins = (plugin for plugin in plugins
                        if not plugin.requires_parent_plugin(placeholder, page))
-        return sorted(plugins, key=attrgetter('module'))
+        return plugins
 
     def get_text_enabled_plugins(self, placeholder, page):
         plugins = set(self.get_all_plugins(placeholder, page))
@@ -212,7 +212,7 @@ class PluginPool:
 
     @cached_property
     def registered_plugins(self):
-        return self.get_all_plugins()
+        return sorted(self.get_all_plugins(), key=attrgetter("module", "name"))
 
     @cached_property
     def plugins_with_extra_menu(self):

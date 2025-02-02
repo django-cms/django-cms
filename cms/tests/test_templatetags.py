@@ -72,7 +72,7 @@ class TemplatetagTests(CMSTestCase):
         page = create_page("page_a", "nav_playground.html", "en")
         german_content = create_page_content("de", "Seite_a", page)
 
-        page_preview_url = GetPreviewUrl.get_value(None, context={"request": None}, page_content=page)
+        page_preview_url = GetPreviewUrl.get_value(None, context={"request": self.get_request()}, page_content=page)
         german_content_preview_url = GetPreviewUrl.get_value(None, context={}, page_content=german_content)
 
         self.assertIn("/en", page_preview_url)

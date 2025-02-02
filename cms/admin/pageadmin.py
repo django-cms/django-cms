@@ -9,7 +9,6 @@ from django.conf import settings
 from django.contrib import admin, messages
 from django.contrib.admin.helpers import AdminForm
 from django.contrib.admin.options import IS_POPUP_VAR
-from django.contrib.admin.utils import get_deleted_objects
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.sites.models import Site
 from django.core.exceptions import (
@@ -61,6 +60,7 @@ from cms.models import (
     Page,
     PageContent,
     PagePermission,
+    PageUrl,
     Placeholder,
 )
 from cms.operations.helpers import (
@@ -99,8 +99,56 @@ def get_site(request):
     return site
 
 
+class PageDeleteMessageMixin:
+    """Expressive and simplified delete confirmation message for pages and translations."""
+    delete_confirmation_template = "admin/cms/page/delete_confirmation.html"
+
+    def get_deleted_objects(self, objs, request):
+        """Minimize complexity of delete selected confirmation: Only show pages, page contents and plugins numbers,
+        only show Page and PageContent objects in the details.
+        """
+        def recursively_remove(deleted_objects: list | str) -> list:
+            """Remove all objects that are not Page or PageContent from the nested list of deleted objects.
+            Reformat the messages."""
+            if isinstance(deleted_objects, str):
+                return deleted_objects
+            result = []
+            for obj in deleted_objects:
+                item = recursively_remove(obj)
+                if isinstance(item, str):
+                    if obj.startswith(f"{capfirst(Page._meta.verbose_name)}: "):
+                        text = re.findall(r'>(.*)<', obj)
+                        if text:
+                            result.append(mark_safe("<b>" + text[0] + "</b>"))
+                        else:
+                            result.append(mark_safe(
+                                "<b>" + item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: ") + "</b>"
+                            ))
+                    elif obj.startswith(f"{capfirst(PageUrl._meta.verbose_name)}: "):
+                        result.insert(0, mark_safe(
+                            item.removeprefix(f"{capfirst(PageUrl._meta.verbose_name)}: ")
+                        ))
+                elif item:
+                    result.append(item)
+            return result
+
+        if len(objs) == 1 and isinstance(objs[0], PageContent):
+            # Always look for all page/language combinations
+            objs = list(PageContent.admin_manager.filter(page=objs[0].page, language=objs[0].language))
+
+        to_delete, trad_model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
+        to_delete = recursively_remove(to_delete)
+
+        model_count = {
+            Page._meta.verbose_name_plural: trad_model_count.get(Page._meta.verbose_name_plural, 0),
+            _("Translations"): trad_model_count.get(PageUrl._meta.verbose_name_plural, 0),
+            CMSPlugin._meta.verbose_name_plural: trad_model_count.get(CMSPlugin._meta.verbose_name_plural, 0),
+        }
+        return to_delete, model_count, perms_needed, protected
+
+
 @admin.register(Page)
-class PageAdmin(admin.ModelAdmin):
+class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     actions_menu_template = 'admin/cms/page/tree/actions_dropdown.html'
 
     form = AdvancedSettingsForm
@@ -136,6 +184,11 @@ class PageAdmin(admin.ModelAdmin):
         return page_permissions.user_can_change_page_advanced_settings(request.user, page=obj, site=site)
 
     def log_deletion(self, request, object, object_repr):
+        # DJANGO_42
+        # Block the admin log for deletion. A signal takes care of this!
+        return
+
+    def log_deletions(self, request, queryset):
         # Block the admin log for deletion. A signal takes care of this!
         return
 
@@ -355,47 +408,6 @@ class PageAdmin(admin.ModelAdmin):
         """
         clear_permission_lru_caches(request.user)
         return super().response_delete(request, obj_display, obj_id)
-
-    def get_deleted_objects(self, objs, request):
-        """Minimize complexity of delete selected confirmation: Only show pages, page contents and plugins numbers,
-        only show Page and PageContent objects in the details.
-        """
-        def recursively_remove(deleted_objects: list | str) -> list:
-            """Remove all objects that are not Page or PageContent from the nested list of deleted objects.
-            Reformat the messages."""
-            if isinstance(deleted_objects, str):
-                return deleted_objects
-            result = []
-            for obj in deleted_objects:
-                item = recursively_remove(obj)
-                if isinstance(item, str):
-                    if obj.startswith(f"{capfirst(Page._meta.verbose_name)}: "):
-                        text = re.findall(r'>(.*)<', obj)
-                        if text:
-                            result.append(mark_safe("<b>" + text[0] + "</b>"))
-                        else:
-                            result.append(mark_safe(
-                                "<b>" + item.removeprefix(f"{capfirst(Page._meta.verbose_name)}: ") + "</b>"
-                            ))
-                    elif obj.startswith(f"{capfirst(PageContent._meta.verbose_name)}: "):
-                        result.insert(0, mark_safe(
-                            item.removeprefix(f"{capfirst(PageContent._meta.verbose_name)}: ")
-                        ))
-                elif item:
-                    result.append(item)
-            return result
-
-        to_delete, model_count, perms_needed, protected = super().get_deleted_objects(objs, request)
-        to_delete = recursively_remove(to_delete)
-        model_count = {
-            key: value for key, value in model_count.items() if key in (
-                Page._meta.verbose_name_plural,
-                PageContent._meta.verbose_name_plural,
-                CMSPlugin._meta.verbose_name_plural
-            )
-        }
-
-        return to_delete, model_count, perms_needed, protected
 
     def delete_model(self, request, obj):
         operation_token = send_pre_page_operation(
@@ -749,7 +761,7 @@ class PageAdmin(admin.ModelAdmin):
 
 
 @admin.register(PageContent)
-class PageContentAdmin(admin.ModelAdmin):
+class PageContentAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     ordering = ('page__path',)
     search_fields = ('=id', 'page__id', 'page__urls__slug', 'title', 'page__reverse_id')
     change_form_template = "admin/cms/page/change_form.html"
@@ -770,6 +782,11 @@ class PageContentAdmin(admin.ModelAdmin):
         return
 
     def log_deletion(self, request, object, object_repr):
+        # DJANGO_42
+        # Block the admin log for deletion. A signal takes care of this!
+        return
+
+    def log_deletions(self, request, queryset):
         # Block the admin log for deletion. A signal takes care of this!
         return
 
@@ -1208,15 +1225,11 @@ class PageContentAdmin(admin.ModelAdmin):
             copy_plugins_to_placeholder(plugins, target, language=target_language)
         return HttpResponse("ok")
 
-    @transaction.atomic
     def delete_view(self, request, object_id, extra_context=None):
         page_content = self.get_object(request, object_id=object_id)
         page = page_content.page
-        language = page_content.language
-        page_url = page.urls.get(language=page_content.language)
-        request_language = get_site_language_from_request(request, site_id=page.site_id)
 
-        if not self.has_delete_translation_permission(request, language, page):
+        if not self.has_delete_translation_permission(request, page_content.language, page):
             return HttpResponseForbidden(_("You do not have permission to delete this page"))
 
         if page is None:
@@ -1225,93 +1238,47 @@ class PageContentAdmin(admin.ModelAdmin):
         if not len(list(page.get_languages())) > 1:
             return HttpResponseBadRequest('There only exists one translation for this page')
 
-        titleopts = PageContent._meta
-        app_label = titleopts.app_label
-        placeholders = Placeholder.objects.get_for_obj(page_content)
-        saved_plugins = CMSPlugin.objects.filter(
-            placeholder__in=placeholders,
-            language=language,
-        )
-        to_delete_urls, __, perms_needed_url = get_deleted_objects(
-            [page_url],
-            request=request,
-            admin_site=self.admin_site,
-        )[:3]
-        to_delete_translations, __, perms_needed_translation = get_deleted_objects(
-            [page_content],
-            request=request,
-            admin_site=self.admin_site,
-        )[:3]
-        to_delete_plugins, __, perms_needed_plugins = get_deleted_objects(
-            saved_plugins,
-            request=request,
-            admin_site=self.admin_site,
-        )[:3]
+        return super().delete_view(request, object_id, extra_context)
 
-        to_delete_objects = [to_delete_urls, to_delete_plugins, to_delete_translations]
-        perms_needed = set(
-            list(perms_needed_url) + list(perms_needed_translation) + list(perms_needed_plugins)
+    def delete_model(self, request, obj):
+        ct_page_content = ContentType.objects.get_for_model(PageContent)
+        page_contents = PageContent.admin_manager.filter(page=obj.page, language=obj.language)
+        placeholders = Placeholder.objects.filter(
+            content_type=ct_page_content,
+            object_id__in=page_contents.values("pk"),
+        )
+        saved_plugins = CMSPlugin.objects.filter(placeholder__in=placeholders)
+        page_url = obj.page.urls.get(language=obj.language)
+
+        operation_token = send_pre_page_operation(
+            request=request,
+            operation=operations.DELETE_PAGE_TRANSLATION,
+            obj=obj.page,
+            translation=obj,
+            sender=self.model
         )
 
-        if request.method == 'POST':
-            if perms_needed:
-                raise PermissionDenied
-
-            operation_token = send_pre_page_operation(
-                request=request,
-                operation=operations.DELETE_PAGE_TRANSLATION,
-                obj=page,
-                translation=page_content,
-                sender=self.model
-            )
-
-            message = _('Title and plugins with language %(language)s was deleted') % {
-                'language': force_str(get_language_object(language)['name'])
-            }
-            messages.success(request, message)
-            if language in page.admin_content_cache:
-                del page.admin_content_cache[language]
-            if language in page.page_content_cache:
-                del page.page_content_cache[language]
-
-            page_url.delete()
-            page_content.delete()
-            for p in saved_plugins:
-                p.delete()
-
-            send_post_page_operation(
-                request=request,
-                operation=operations.DELETE_PAGE_TRANSLATION,
-                token=operation_token,
-                obj=page,
-                translation=page_content,
-                sender=self.model,
-            )
-
-            if not self.has_change_permission(request, None):
-                return HttpResponseRedirect(admin_reverse('index'))
-
-            redirect_to = self.get_admin_url('changelist')
-            redirect_to += f'?language={request_language}'
-            return HttpResponseRedirect(redirect_to)
-
-        context = {
-            "title": _("Are you sure?"),
-            "object_name": force_str(titleopts.verbose_name),
-            "object": page_content,
-            "deleted_objects": to_delete_objects,
-            "perms_lacking": perms_needed,
-            "opts": self.opts,
-            "root_path": admin_reverse('index'),
-            "app_label": app_label,
+        message = _('Title and plugins with language %(language)s was deleted') % {
+            'language': force_str(get_language_object(obj.language)['name'])
         }
-        context.update(extra_context or {})
-        request.current_app = self.admin_site.name
-        return render(request, self.delete_confirmation_template or [
-            f"admin/{app_label}/{titleopts.object_name.lower()}/delete_confirmation.html",
-            "admin/%s/delete_confirmation.html" % app_label,
-            "admin/delete_confirmation.html"
-        ], context)
+        messages.success(request, message)
+        if obj.language in obj.page.admin_content_cache:
+            del obj.page.admin_content_cache[obj.language]
+        if obj.language in obj.page.page_content_cache:
+            del obj.page.page_content_cache[obj.language]
+
+        page_url.delete()
+        page_contents.delete()
+        saved_plugins.delete()
+
+        send_post_page_operation(
+            request=request,
+            operation=operations.DELETE_PAGE_TRANSLATION,
+            token=operation_token,
+            obj=obj.page,
+            translation=obj,
+            sender=self.model,
+        )
 
     @require_POST
     def change_innavigation(self, request, object_id):
