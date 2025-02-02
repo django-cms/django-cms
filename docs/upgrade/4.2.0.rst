@@ -64,7 +64,16 @@ the community, django CMS 4.2 refactored exception handling.
 Minor features
 ==============
 
-Empty sections are to be removed before release.
+* Deleting pages or deleting translations now gives a much clear delete
+  confirmation message. It does not list all objects deleted but summarizes
+  how many pages, translations (counted by ``PageUrl`` objects) and plugins
+  are about to be deleted.
+
+* ``CMS_PLACEHOLDER_CONF`` now allows to add configuration by template name for
+  placeholders that not necessarily are part of a page, but could be part of
+  any model (e.g., an alias). Instead for looking at pages, the placeholder tries
+  to access a ``get_template()`` method on its source model instance to identify
+  the template name its rendered on.
 
 
 Bug Fixes
@@ -115,6 +124,10 @@ Miscellaneous
   Python's ``assertWarns`` instead, or use the ``failUnlessWarns`` method
   of ``CMSTestCase`` which retains the syntax of the original method.
 
+* ``CMSPluginBase.get_require_parent()``, ``CMSPluginBase.get_child_class_overrides()``,
+  ``CMSPluginBase.get_child_plugin_candidates()``, ``CMSPluginBase.get_child_classes()``,
+  ``CMSPluginBase.get_parent_classes()`` by default do receive ``None`` for their
+  ``page`` argument.
 
 Features deprecated in 4.2.0
 ============================

@@ -231,7 +231,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         except ObjectDoesNotExist:
             instance = None
             self._inst = None
-        return (instance, plugin)
+        return instance, plugin
 
     def get_bound_plugin(self):
         """
@@ -245,18 +245,20 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
 
         if plugin.model != self.__class__:
             self._inst = plugin.model.objects.get(cmsplugin_ptr=self)
+            # Preserve prefetched placeholder
+            self._inst._state.fields_cache["placeholder"] = self.placeholder
+            # Preserve render_meta
             self._inst._render_meta = self._render_meta
         else:
             self._inst = self
         return self._inst
 
     def get_plugin_info(self, children=None, parents=None):
-        plugin_name = self.get_plugin_name()
-        data = {
+        return {
             'type': 'plugin',
             'position': self.position,
             'placeholder_id': str(self.placeholder_id),
-            'plugin_name': force_str(plugin_name) or '',
+            'plugin_name': force_str(self.get_plugin_name()) or '',
             'plugin_type': self.plugin_type,
             'plugin_id': str(self.pk),
             'plugin_language': self.language or '',
@@ -265,7 +267,6 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             'plugin_parent_restriction': parents or [],
             'urls': self.get_action_urls(),
         }
-        return data
 
     def refresh_from_db(self, *args, **kwargs):
         super().refresh_from_db(*args, **kwargs)
