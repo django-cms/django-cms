@@ -595,8 +595,11 @@ class ContentRenderer(BaseRenderer):
             heading = f'<h2 class="cms-rendering-exception-title">{message}</h2>'
             if "_last_plugin" in context:
                 # Make error message editable by double-click to open the editor for the plugin causing the exception
+                plugin = context["_last_plugin"]
+                disable_edit = getattr(instance, "disable_edit", False) or getattr(plugin, "disable_edit", False)
                 heading = self.plugin_edit_template.format(
-                    pk=context["_last_plugin"].pk, content=heading
+                    pk=plugin.pk, content=heading,
+                    disabled=' cms-edit-disabled' if disable_edit else '',
                 )
                 placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
                     placeholder.pk, {}
