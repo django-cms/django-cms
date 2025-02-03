@@ -55,17 +55,17 @@ class CMSSitemap(Sitemap):
             .order_by('page__node__path')
             .select_related("page")
             .annotate(
-                content_pk=Subquery(
+                content_changed_date=Subquery(
                     PageContent.objects.filter(page=OuterRef("page"), language=OuterRef("language"))
                     .filter(Q(redirect="") | Q(redirect=None))
-                    .values_list("pk")[:1]
+                    .values_list("changed_date")[:1]
                 )
             )
-            .filter(content_pk__isnull=False)  # Remove page content with redirects
+            .filter(content_changed_date__isnull=False)  # Remove page content with redirects
         )
 
     def lastmod(self, page_url):
-        return page_url.page.changed_date
+        return page_url.content_changed_date
 
     def location(self, page_url):
         return page_url.get_absolute_url(page_url.language)
