@@ -26,7 +26,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_PUBLISHED,
     CMSTestCase,
 )
-from cms.utils.compat import DJANGO_5_1
+from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
@@ -491,8 +491,10 @@ class AdminTests(AdminTestsBase):
         endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?language=en&edit_fields=page_title"
         with self.login_user_context(self.get_superuser()):
             response = self.client.get(endpoint)
-        self.assertContains(response, '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">')
-
+        if DJANGO_4_2:
+            self.assertContains(response, '<input type="text" name="page_title" maxlength="255" id="id_page_title">')
+        else:
+            self.assertContains(response, '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">')
 
 
 class NoDBAdminTests(CMSTestCase):
