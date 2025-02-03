@@ -12,7 +12,6 @@ from django.test.utils import override_settings
 from django.urls import clear_url_caches, reverse
 from django.utils.translation import override as force_language
 
-from cms import api
 from cms.api import create_page, create_page_content
 from cms.middleware.toolbar import ToolbarMiddleware
 from cms.models import PageContent, PagePermission, Placeholder, UserSettings
@@ -76,7 +75,7 @@ class ViewTests(CMSTestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.url, reverse('admin:cms_pagecontent_changelist'))
 
-    def test_handle_no_page_for_rool_url_no_homepage(self):
+    def test_handle_no_page_for_root_url_no_homepage(self):
         """
         Test details view when visiting root and homepage doesn't exist
         """
@@ -92,7 +91,7 @@ class ViewTests(CMSTestCase):
         if APP_MODULE in sys.modules:
             del sys.modules[APP_MODULE]
         apphooks = (
-            '%s.%s' % (APP_MODULE, APP_NAME),
+            f'{APP_MODULE}.{APP_NAME}',
         )
         page = create_page("page2", "nav_playground.html", "en")
         with self.settings(CMS_APPHOOKS=apphooks):
@@ -100,6 +99,28 @@ class ViewTests(CMSTestCase):
             response = self.client.get(page.get_absolute_url())
             self.assertEqual(response.status_code, 200)
             self.apphook_clear()
+
+    def test_redirect_preview_in_edit_mode(self):
+
+        user = self.get_superuser()
+        page = create_page("page", "nav_playground.html", "fr")
+        page_content = create_page_content("en", "home", page, redirect="https://example.com")
+
+        page.set_as_homepage()
+
+        with self.login_user_context(user), force_language('fr'):
+            edit_url = get_object_edit_url(page_content, language='fr')
+            response = self.client.get(edit_url, follow=True)
+
+            expected = f"""
+                <div class="cms-screenblock">
+                <div class="cms-screenblock-inner">
+                <h1>This page has no preview!</h1>
+                <p>It is being redirected to: <a href="{page_content.redirect}">{page_content.redirect}</a></p>
+                </div>
+                </div>
+            """
+            self.assertContains(response, expected, count=1, html=True)
 
     def test_external_redirect(self):
         # test external redirect
@@ -207,7 +228,7 @@ class ViewTests(CMSTestCase):
 
     def test_edit_permission(self):
         page = create_page("page", "nav_playground.html", "en")
-        page_content = self.get_page_title_obj(page)
+        page_content = self.get_pagecontent_obj(page)
         page_preview_url = get_object_preview_url(page_content)
         # Anon user
         response = self.client.get(page_preview_url)
@@ -268,16 +289,12 @@ class ViewTests(CMSTestCase):
             structure_url = get_object_structure_url(page_content, language='fr')
 
             response = self.client.get(edit_url)
-            expected = """
-                <a href="%s" class="cms-btn cms-btn-disabled" title="Toggle structure"
-                data-cms-structure-btn='{ "url": "%s", "name": "Structure" }'
-                data-cms-content-btn='{ "url": "%s", "name": "Content" }'>
+            expected = f"""
+                <a href="{structure_url}" class="cms-btn cms-btn-disabled" title="Toggle structure"
+                data-cms-structure-btn='{{ "url": "{structure_url}", "name": "Structure" }}'
+                data-cms-content-btn='{{ "url": "{edit_url}", "name": "Content" }}'>
                 <span class="cms-icon cms-icon-plugins"></span></a>
-            """ % (
-                structure_url,
-                structure_url,
-                edit_url,
-            )
+            """
             self.assertContains(
                 response,
                 expected,
@@ -348,6 +365,18 @@ class ViewTests(CMSTestCase):
 
         self.assertNotIn(response.url, "<script>alert('Attack')</script>")
 
+    def test_queries(self):
+        create_page("home", "simple.html", "en")
+        cms_page = create_page("dreinhardt", "simple.html", "en")
+        url = cms_page.get_absolute_url()
+        with self.assertNumQueries(5):
+            # 1. get_page_from_request: checks PageUrl
+            # 2. get page contents: PageContent
+            # 3. Check permissions
+            # 4. Get placeholders
+            # 5. Get plugins
+            self.client.get(url)
+
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.urls')
 class ContextTests(CMSTestCase):
@@ -410,6 +439,7 @@ class ContextTests(CMSTestCase):
                 template = Variable('CMS_TEMPLATE').resolve(response.context)
                 self.assertEqual(template, page_template)
 
+
 class EndpointTests(CMSTestCase):
 
     def setUp(self) -> None:
@@ -441,7 +471,7 @@ class EndpointTests(CMSTestCase):
         self._add_plugin_to_placeholder(placeholder, "TextPlugin", language="fr")
         with force_language("fr"):
             setting, _ = UserSettings.objects.get_or_create(user=self.get_superuser())
-            setting.language="fr"
+            setting.language = "fr"
             setting.save()
             structure_endpoint_url = admin_reverse(
                 "cms_placeholder_render_object_structure",

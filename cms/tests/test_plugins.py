@@ -2,6 +2,7 @@ import datetime
 import pickle
 import warnings
 from contextlib import contextmanager
+from unittest import skipIf
 
 from django import http
 from django.conf import settings
@@ -51,7 +52,8 @@ from cms.test_utils.project.pluginapp.plugins.validation.cms_plugins import (
 )
 from cms.test_utils.testcases import CMSTestCase
 from cms.toolbar.toolbar import CMSToolbar
-from cms.toolbar.utils import get_object_edit_url, get_toolbar_from_request
+from cms.toolbar.utils import get_object_edit_url
+from cms.utils.compat import DJANGO_5_1
 from cms.utils.plugins import copy_plugins_to_placeholder, get_plugins
 
 
@@ -147,6 +149,16 @@ class PluginsTestCase(PluginsTestBaseCase):
         response = self.client.post(endpoint, data)
         self.assertEqual(response.status_code, 200)
         return CMSPlugin.objects.get(pk=plugin.pk).get_bound_plugin()
+
+    @skipIf(not DJANGO_5_1, "Django 5.2+ fixed the template engine")
+    def test_no_plugin_class_get_item(self):
+        """
+        Avoid a bug in Django's template engine that is incompatible with Python 3.9+
+        type hinting. It has been fixed in Django 5.2
+        See https://github.com/django-cms/django-cms/issues/7948
+        """
+        with self.assertRaises(TypeError):
+            TestPlugin[int]  # noqa: F841
 
     def test_add_edit_plugin(self):
         """
@@ -693,7 +705,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         def get_page(plugin):
             return plugin.page
 
-        self.assertWarns(
+        self.failUnlessWarns(
             DontUsePageAttributeWarning,
             "Don't use the page attribute on CMSPlugins! "
             "CMSPlugins are not guaranteed to have a page associated with them!",
@@ -710,14 +722,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = api.create_page("page", "nav_playground.html", "en")
-        content = page.get_content_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         page.save()
         plugin = self._create_link_plugin_on_page(page, slot='body')
         plugin = self.__edit_link_plugin(plugin, "fnord")
 
-        actual_last_modification_time = CMSSitemap().lastmod(content)
+        sitemap = CMSSitemap()
+        actual_last_modification_time = sitemap.lastmod(sitemap.items().first())
         actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)
         self.assertEqual(plugin.changed_date.date(), actual_last_modification_time.date())
         self.assertEqual(page.changed_date.date(), one_day_ago.date() + datetime.timedelta(days=1))
@@ -829,8 +841,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             request.toolbar = CMSToolbar(request)
             renderer = self.get_structure_renderer(request=request)
             output = renderer.render_placeholder(placeholder, language='en', page=page)
-            self.assertIn('<a data-rel="add" href="TextPlugin">Text</a>', output)
-            self.assertNotIn('<a data-rel="add" href="LinkPlugin">Link</a>', output)
+            self.assertIn('<a data-rel="add" data-add-form="true" href="TextPlugin">Text</a>', output)
+            self.assertNotIn('<a data-rel="add" data-add-form="true" href="LinkPlugin">Link</a>', output)
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -1016,7 +1028,7 @@ class PluginManyToManyTestCase(PluginsTestBaseCase):
         page_data = self.get_new_page_data()
         # create 2nd language page
         page_data.update({
-            'title': "%s %s" % (page.get_title(), self.SECOND_LANG),
+            'title': f"{page.get_title()} {self.SECOND_LANG}",
             'cms_page': page.pk,
         })
         endpoint = self.get_page_add_uri(self.SECOND_LANG, page)

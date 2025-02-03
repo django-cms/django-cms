@@ -14,3 +14,4 @@ DJANGO_3_2 = Version(DJANGO_VERSION) < Version('3.3')
 DJANGO_3 = Version(DJANGO_VERSION) < Version('4.0')
 DJANGO_4_1 = Version(DJANGO_VERSION) < Version('4.2')
 DJANGO_4_2 = Version(DJANGO_VERSION) < Version('4.3')
+DJANGO_5_1 = Version(DJANGO_VERSION) < Version('5.2.dev')  # To allow testing against django's main branch

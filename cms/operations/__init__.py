@@ -1,4 +1,3 @@
-
 # Placeholder operations
 ADD_PLUGIN = 'add_plugin'
 CHANGE_PLUGIN = 'change_plugin'

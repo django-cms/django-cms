@@ -533,6 +533,7 @@ class ToolbarTests(ToolbarTestBase):
         page = create_page("english-page", "nav_playground.html", "en")
         german_content = create_page_content("de", "german content", page)
         english_content = page.get_content_obj('en')
+        page_languages = page.get_languages()
         edit_url = get_object_edit_url(english_content)
         staff = self.get_staff()
         self.client.force_login(staff)
@@ -541,8 +542,8 @@ class ToolbarTests(ToolbarTestBase):
         menus = response.context['cms_toolbar'].menus
         language_menu = menus['language-menu']
         delete = language_menu.items[-2]
-        german_delete = delete.items[0]
-        english_delete = delete.items[1]
+        german_delete = delete.items[page_languages.index("de")]
+        english_delete = delete.items[page_languages.index("en")]
 
         copy = language_menu.items[-1]
         copy_german = copy.items[0]
@@ -584,6 +585,8 @@ class ToolbarTests(ToolbarTestBase):
         self.assertTrue(request.session.get('cms_toolbar_disabled'))
         toolbar = CMSToolbar(request)
         self.assertFalse(toolbar.edit_mode_active)
+        self.assertFalse(toolbar.structure_mode_active)
+        self.assertFalse(toolbar.preview_mode_active)
 
     def test_show_disabled_toolbar_with_edit(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
@@ -614,7 +617,7 @@ class ToolbarTests(ToolbarTestBase):
     @override_settings(CMS_TOOLBAR_ANONYMOUS_ON=True)
     def test_show_toolbar_login_anonymous(self):
         page = create_page("toolbar-page", "nav_playground.html", "en")
-        page_url = "%s?%s" % (page.get_absolute_url(), get_cms_setting('TOOLBAR_URL__ENABLE'))
+        page_url = "{}?{}".format(page.get_absolute_url(), get_cms_setting('TOOLBAR_URL__ENABLE'))
         response = self.client.get(page_url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'cms-toolbar')
@@ -809,10 +812,10 @@ class ToolbarTests(ToolbarTestBase):
     def assertMenuItems(self, request, menu_id, name, items=None):
         toolbar = CMSToolbar(request)
         toolbar.populate()
-        menu = dict(
-            (force_str(getattr(item, 'name', '|')), item)
+        menu = {
+            force_str(getattr(item, 'name', '|')): item
             for item in toolbar.get_menu(menu_id).get_items()
-        )
+        }
         self.assertIn(name, list(menu))
         if items is not None:
             sub_menu = list(
@@ -1002,6 +1005,50 @@ class ToolbarTests(ToolbarTestBase):
             toolbar = response.context['request'].toolbar
             admin_menu = toolbar.get_or_create_menu(ADMIN_MENU_IDENTIFIER)
             self.assertEqual(admin_menu.find_first(AjaxItem, name=menu_name).item.on_success, '/')
+
+
+class ToolbarModeTests(ToolbarTestBase):
+    def setUp(self):
+        super().setUp()
+        self.page = create_page("home", "nav_playground.html", "en")
+        self.page_content = self.get_pagecontent_obj(self.page)
+
+    def tearDown(self):
+        self.page.delete()
+        super().tearDown()
+
+    def test_edit_mode(self):
+        """Only edit mode is active"""
+        page_edit_url = get_object_edit_url(self.page_content)
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page_edit_url)
+            toolbar = response.context['request'].toolbar
+
+        self.assertTrue(toolbar.edit_mode_active)
+        self.assertFalse(toolbar.structure_mode_active)
+        self.assertFalse(toolbar.preview_mode_active)
+
+    def test_preview_mode(self):
+        """Only preview mode is active"""
+        page_preview_url = get_object_preview_url(self.page_content)
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page_preview_url)
+            toolbar = response.context['request'].toolbar
+
+        self.assertFalse(toolbar.edit_mode_active)
+        self.assertFalse(toolbar.structure_mode_active)
+        self.assertTrue(toolbar.preview_mode_active)
+
+    def test_structure_mode(self):
+        """Structure AND edit mode is active"""
+        page_structure_url = get_object_structure_url(self.page_content)
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(page_structure_url)
+            toolbar = response.context['request'].toolbar
+
+        self.assertTrue(toolbar.edit_mode_active)
+        self.assertTrue(toolbar.structure_mode_active)
+        self.assertFalse(toolbar.preview_mode_active)
 
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
@@ -1424,11 +1471,11 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            "CMS._plugins.push(['cms-plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
+            "CMS._plugins.push(['cms-plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
 
         self.assertContains(
             response,
-            "CMS._plugins.push(['cms-plugin-{0}-{1}-{2}-{3}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
+            "CMS._plugins.push(['cms-plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
 
     def test_add_tag(self):
         user = self.get_staff()
@@ -1565,12 +1612,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2} cms-render-model '
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-{} cms-render-model '
             'cms-render-model-block">'.format(
                 'placeholderapp', 'example1', ex1.pk
             )
         )
-        self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
+        self.assertContains(response, f'<h1>{ex1.char_1} - {ex1.char_2}</h1>')
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
         self.assertContains(
             response, '<a href="%s">successful if</a>\n    \n<template' % (reverse('detail', args=(ex1.pk,)))
@@ -1596,12 +1643,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2} cms-render-model '
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-{} cms-render-model '
             'cms-render-model-block">'.format(
                 'placeholderapp', 'example1', ex1.pk
             )
         )
-        self.assertContains(response, '<h1>%s - %s</h1>' % (ex1.char_1, ex1.char_2))
+        self.assertContains(response, f'<h1>{ex1.char_1} - {ex1.char_2}</h1>')
         self.assertContains(response, '<span class="date">%s</span>' % (ex1.date_field.strftime("%Y")))
         self.assertContains(
             response, '<a href="%s">successful if</a>\n    \n<template' % (reverse('detail', args=(ex1.pk,)))
@@ -1622,14 +1669,14 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         # Assertions on the content of the block tag
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-changelist-{2} cms-render-model '
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-changelist-{} cms-render-model '
             'cms-render-model-block"></template>'.format(
                 'placeholderapp', 'example1', ex1.pk
             )
         )
         self.assertContains(
             response,
-            "edit_plugin: '%s?language=%s&amp;edit_fields=changelist'" % (
+            "edit_plugin: '{}?language={}&amp;edit_fields=changelist'".format(
                 admin_reverse('placeholderapp_example1_changelist'), 'en'
             )
         )
@@ -1651,14 +1698,14 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}-{1}-{2}-{3} cms-render-model">'
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{}-{}-{}-{} cms-render-model">'
             '</template>'.format(
                 'placeholderapp', 'example1', 'fake_field', ex1.pk
             )
         )
         self.assertContains(
             response,
-            '<template class="cms-plugin cms-plugin-end cms-plugin-{0}-{1}-{2}-{3} cms-render-model">'
+            '<template class="cms-plugin cms-plugin-end cms-plugin-{}-{}-{}-{} cms-render-model">'
             '</template>'.format(
                 'placeholderapp', 'example1', 'fake_field', ex1.pk
             )
@@ -1723,6 +1770,19 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response, "edit_plugin: '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+
+    def test_edit_field_respects_content_admin_mixin(self):
+        user = self.get_staff()
+        ex1 = self._get_example_obj()
+        edit_url = admin_reverse('placeholderapp_example1_edit_field', args=(ex1.pk, "en"))
+
+        with patch('cms.test_utils.project.placeholderapp.models.Example1.admin_manager.get') as get_mock:
+            with self.login_user_context(user):
+                get_mock.return_value = ex1
+                self.client.get(edit_url + "?edit_fields=char_1")
+
+            self.assertEqual(edit_url, f"/admin/placeholderapp/example1/edit-field/{ex1.pk}/en/")
+            Example1.admin_manager.get.assert_called_once_with(pk=str(ex1.pk))
 
     def test_view_url(self):
         user = self.get_staff()
@@ -2096,10 +2156,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         page_content = self.get_pagecontent_obj(page, "en")
 
         self.assertEqual(page_content, get_object_for_language(page_content, "en"))
-        self.assertTrue(not hasattr(page_content, "_sibling_objects_for_language_cache"))
         self.assertIsNone(get_object_for_language(page_content, "de"))
-        self.assertTrue(hasattr(page_content, "_sibling_objects_for_language_cache"))
-        self.assertEqual(len(page_content._sibling_objects_for_language_cache), 1)
 
     def test_get_object_for_language_multiple_languages(self):
         page = create_page('Test', 'col_two.html', 'en')
@@ -2115,10 +2172,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
                 page_content[code] = create_page_content(code, verbose, page)
 
         self.assertEqual(page_content["en"], get_object_for_language(page_content["en"], "en"))
-        self.assertTrue(not hasattr(page_content["en"], "_sibling_objects_for_language_cache"))
         self.assertEqual(get_object_for_language(page_content["en"], "de"), page_content["de"])
-        self.assertTrue(hasattr(page_content["en"], "_sibling_objects_for_language_cache"))
-        self.assertEqual(len(page_content["en"]._sibling_objects_for_language_cache), len(get_language_tuple()))
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):

@@ -56,24 +56,24 @@ class PluginPool:
             plugins = [plugin]
         else:
             plugins = self.plugins.values()
-        for plugin in plugins:
-            if (plugin.render_plugin and not type(plugin.render_plugin) == property
-                    or hasattr(plugin.model, 'render_template')
-                    or hasattr(plugin, 'get_render_template')):
-                if (plugin.render_template is None and not hasattr(plugin, 'get_render_template')):
+        for plugin_class in plugins:
+            if (plugin_class.render_plugin and type(plugin_class.render_plugin) is not property
+                    or hasattr(plugin_class.model, 'render_template')
+                    or hasattr(plugin_class, 'get_render_template')):
+                if (plugin_class.render_template is None and not hasattr(plugin_class, 'get_render_template')):
                     raise ImproperlyConfigured(
                         "CMS Plugins must define a render template, "
                         "a get_render_template method or "
-                        "set render_plugin=False: %s" % plugin
+                        "set render_plugin=False: %s" % plugin_class
                     )
                 # If plugin class defines get_render_template we cannot
                 # statically check for valid template file as it depends
                 # on plugin configuration and context.
                 # We cannot prevent developer to shoot in the users' feet
-                elif not hasattr(plugin, 'get_render_template'):
+                elif not hasattr(plugin_class, 'get_render_template'):
                     from django.template import loader
 
-                    template = plugin.render_template
+                    template = plugin_class.render_template
                     if isinstance(template, str) and template:
                         try:
                             loader.get_template(template)
@@ -85,17 +85,17 @@ class PluginPool:
                             if str(e) == template:
                                 raise ImproperlyConfigured(
                                     "CMS Plugins must define a render template (%s) that exists: %s"
-                                    % (plugin, template)
+                                    % (plugin_class, template)
                                 )
                             else:
                                 pass
                         except TemplateSyntaxError:
                             pass
             else:
-                if plugin.allow_children:
+                if plugin_class.allow_children:
                     raise ImproperlyConfigured(
                         "CMS Plugins can not define render_plugin=False and allow_children=True: %s"
-                        % plugin
+                        % plugin_class
                     )
 
     def register_plugin(self, plugin):
@@ -139,7 +139,7 @@ class PluginPool:
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
-        plugins = sorted(self.plugins.values(), key=attrgetter('name'))
+        plugins = self.plugins.values()
         template = page.get_template() if page else None
 
         allowed_plugins = get_placeholder_conf(
@@ -170,7 +170,7 @@ class PluginPool:
             # Filters out any plugin that requires a parent or has set parent classes
             plugins = (plugin for plugin in plugins
                        if not plugin.requires_parent_plugin(placeholder, page))
-        return sorted(plugins, key=attrgetter('module'))
+        return plugins
 
     def get_text_enabled_plugins(self, placeholder, page):
         plugins = set(self.get_all_plugins(placeholder, page))
@@ -198,7 +198,7 @@ class PluginPool:
                 p = plugin()
                 slug = slugify(force_str(normalize_name(p.__class__.__name__)))
                 url_patterns += [
-                    re_path(r'^plugin/%s/' % (slug,), include(p.plugin_urls)),
+                    re_path(rf'^plugin/{slug}/', include(p.plugin_urls)),
                 ]
         finally:
             # Reactivate translation
@@ -212,7 +212,7 @@ class PluginPool:
 
     @cached_property
     def registered_plugins(self):
-        return self.get_all_plugins()
+        return sorted(self.get_all_plugins(), key=attrgetter("module", "name"))
 
     @cached_property
     def plugins_with_extra_menu(self):

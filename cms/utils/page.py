@@ -1,10 +1,10 @@
 import re
 
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import force_str
 
 from cms.constants import PAGE_USERNAME_MAX_LENGTH
-from cms.utils import get_current_site
+from cms.utils import get_current_site, get_language_from_request
 from cms.utils.conf import get_cms_setting
 
 SUFFIX_REGEX = re.compile(r'^(.*)-(\d+)$')
@@ -17,6 +17,10 @@ def get_page_template_from_request(request):
     """
     templates = get_cms_setting('TEMPLATES')
     template_names = frozenset(pair[0] for pair in templates)
+
+    if not templates:
+        # no templates defined, CMS is running headless
+        return None
 
     if len(templates) == 1:
         # there's only one template
@@ -79,14 +83,16 @@ def get_page_from_request(request, use_path=None, clean_path=None):
     path = request.path_info if use_path is None else use_path
 
     if clean_path:
-        pages_root = reverse("pages-root")
+        try:
+            pages_root = reverse("pages-root")
+            if path.startswith(pages_root):
+                path = path[len(pages_root):]
 
-        if path.startswith(pages_root):
-            path = path[len(pages_root):]
-
-        # strip any final slash
-        if path.endswith("/"):
-            path = path[:-1]
+            # strip any final slash
+            if path.endswith("/"):
+                path = path[:-1]
+        except NoReverseMatch:
+            pass
 
     site = get_current_site()
     page_urls = (
@@ -94,15 +100,15 @@ def get_page_from_request(request, use_path=None, clean_path=None):
         .objects
         .get_for_site(site)
         .filter(path=path)
-        .select_related('page__node')
+        .select_related('page')
     )
     page_urls = list(page_urls)  # force queryset evaluation to save 1 query
     try:
         page = page_urls[0].page
+        if page_urls[0].language == get_language_from_request(request):
+            page.urls_cache = {url.language: url for url in page_urls}
     except IndexError:
         page = None
-    else:
-        page.urls_cache = {url.language: url for url in page_urls}
     return page
 
 
@@ -126,6 +132,6 @@ def get_available_slug(site, path, language, suffix='copy', modified=False):
             slug += '-' + suffix + '-2'
         else:
             slug += '-2'
-        path = '%s/%s' % (base, slug) if base else slug
+        path = f'{base}/{slug}' if base else slug
         return get_available_slug(site, path, language, suffix, modified=True)
     return slug

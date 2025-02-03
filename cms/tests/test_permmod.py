@@ -151,7 +151,9 @@ class PermissionModeratorTests(CMSTestCase):
                     {
                         'plugin_type': 'TextPlugin',
                         'values': {
-                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
+                            'body': 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Culpa, repellendus, '
+                                    'delectus, quo quasi ullam inventore quod quam aut voluptatum aliquam voluptatibus '
+                                    'harum officiis officia nihil minus unde accusamus dolorem repudiandae.'
                         },
                     },
                 ]
@@ -164,7 +166,6 @@ class PermissionModeratorTests(CMSTestCase):
             response = self.client.get(self.slave_page.get_absolute_url(), {'edit': 1})
             self.assertEqual(response.status_code, 200)
             self.assertEqual(CMSPlugin.objects.count(), 1)
-
 
     def test_super_can_add_plugin(self):
         self._add_plugin(self.user_super, page=self.slave_page)
@@ -488,13 +489,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
         request = self.get_request(user)
         PagePermission.objects.create(can_view=True, user=user, page=self.page, grant_on=ACCESS_PAGE)
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             """
             The queries are:
             PagePermission query (is this page restricted)
             content type lookup (x2)
             GlobalpagePermission query for user
-            TreeNode lookup
             PagePermission query for this user
             """
             self.assertViewAllowed(self.page, user)
@@ -506,13 +506,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
         user.groups.add(self.group)
         request = self.get_request(user)
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             """
                 The queries are:
                 PagePermission query (is this page restricted)
                 content type lookup (x2)
                 GlobalpagePermission query for user
-                TreeNode lookup
                 PagePermission query for user
             """
             self.assertViewAllowed(self.page, user)
@@ -540,13 +539,12 @@ class RestrictedViewPermissionTests(ViewPermissionBaseTests):
         user = self.get_staff_user_with_no_permissions()
         request = self.get_request(user)
 
-        with self.assertNumQueries(6):
+        with self.assertNumQueries(5):
             """
             The queries are:
             PagePermission query (is this page restricted)
             content type lookup x2
             GlobalpagePermission query for user
-            TreeNode lookup
             PagePermission query for this user
             """
             self.assertViewNotAllowed(self.page, user)

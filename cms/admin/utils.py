@@ -51,7 +51,7 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
 
     def get_actions_list(
         self,
-    ) -> typing.List[typing.Callable[[models.Model, HttpRequest], str]]:
+    ) -> list[typing.Callable[[models.Model, HttpRequest], str]]:
         """Collect list actions from implemented methods and return as list. Make sure to call
         it's ``super()`` instance when overwriting::
 
@@ -99,7 +99,7 @@ class ChangeListActionsMixin(metaclass=forms.MediaDefiningClass):
 
     def get_list_display(
         self, request: HttpRequest
-    ) -> typing.Tuple[typing.Union[str, typing.Callable[[models.Model], str]], ...]:
+    ) -> tuple[typing.Union[str, typing.Callable[[models.Model], str]], ...]:
         list_display = super().get_list_display(request)
         return tuple(
             self.get_admin_list_actions(request)
@@ -216,7 +216,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
     #:      All fields serving as extra grouping fields must be part of the admin's
     #:      :attr:`~django.contrib.admin.ModelAdmin.fieldsets` setting for ``GrouperModelAdmin`` to work properly.
     #:      In the change form the fields will be invisible.
-    extra_grouping_fields: typing.Tuple[str, ...] = ()
+    extra_grouping_fields: tuple[str, ...] = ()
     #: The content model class to be used. Defaults to the model class named like the grouper model class
     #: plus ``"Content"`` at the end from the same app as the grouper model class, e.g., ``BlogPostContent`` if
     #: the grouper is ``BlogPost``.
@@ -385,17 +385,25 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
                 setattr(self, field, value)
 
     @property
-    def current_content_filters(self) -> typing.Dict[str, typing.Any]:
+    def current_content_filters(self) -> dict[str, typing.Any]:
         """Filters needed to get the correct content model instance"""
-        return {field: getattr(self, field) for field in self.extra_grouping_fields}
+        return {field: getattr(self, field, self.get_extra_grouping_field(field)) for field in self.extra_grouping_fields}
 
     def get_language(self) -> str:
-        """Hook on how to get the current language. By default, Django provides it."""
-        return get_language()
+        """Hook on how to get the current language. By default, if it is set as a
+        property, use the property, otherwise let Django provide it."""
+        return getattr(self, "language", get_language())
 
-    def get_language_tuple(self) -> typing.Tuple[typing.Tuple[str, str], ...]:
+    def get_language_tuple(self) -> tuple[tuple[str, str], ...]:
         """Hook on how to get all available languages for the language selector."""
         return get_language_tuple()
+
+    def get_extra_grouping_field(self, field):
+        """Retrieves the current value for grouping fields - by default by calling self.get_<field>, e.g.,
+        self.get_language(). If those are not implemented, this method will fail."""
+        if callable(getattr(self, f"get_{field}", None)):
+            return getattr(self, f"get_{field}")()
+        raise ValueError("Cannot get extra grouping field")
 
     def get_changelist(self, request: HttpRequest, **kwargs) -> type:
         """Allow for extra grouping fields as a non-filter parameter"""
@@ -468,7 +476,7 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
 
     def get_extra_context(
         self, request: HttpRequest, object_id: typing.Optional[str] = None
-    ) -> typing.Dict[str, typing.Any]:
+    ) -> dict[str, typing.Any]:
         """Provide the grouping fields to the change view."""
         if object_id:
             # Instance provided? Get corresponding postconent
@@ -750,7 +758,7 @@ class _GrouperAdminFormMixin:
                 for field in self._additional_content_fields:
                     self.fields[field].disabled = True
 
-    def update_labels(self, fields: typing.List[str]) -> None:
+    def update_labels(self, fields: list[str]) -> None:
         """Adds a language indicator to field labels"""
         if "language" in self._admin.extra_grouping_fields:
             language_dict = get_language_dict()

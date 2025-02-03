@@ -65,9 +65,9 @@ Additionally, the application in which the model is defined **must** be loaded b
     only at the beginning of a project, before the database is created.
 
 
-*****************
-Required Settings
-*****************
+*******************
+Basic Customisation
+*******************
 
 ..  setting:: CMS_TEMPLATES
 
@@ -75,7 +75,7 @@ CMS_TEMPLATES
 =============
 
 default
-    ``()`` (Not a valid setting!)
+    ``()`` (Valid setting for headless mode only!)
 
 A list of templates you can select for a page.
 
@@ -104,10 +104,6 @@ Example::
     provided within ``cms/templates/cms``. You are strongly advised not to use
     ``cms`` as a directory name for your own project templates.
 
-
-*******************
-Basic Customisation
-*******************
 
 ..  setting:: CMS_TEMPLATE_INHERITANCE
 
@@ -167,6 +163,23 @@ for translation.
     Currently **filesystem** and **app_directory** loader schemas are tested and
     supported.
 
+
+.. setting:: CMS_PLACEHOLDERS
+
+CMS_PLACEHOLDERS
+================
+
+default
+    ``(('', ('content',), _("Single placeholder")),)``
+
+A list of placeholders that can be added to a page. The first element of the
+tuple is the name of the placeholder configuration. The second element is a
+tuple of placeholder names. The third element is the verbose description of the
+placeholder configuration which will be shown in the user interface.
+
+The ``CMS_PLACEHOLDERS`` setting is used to define the placeholders in headless
+mode if and only if no CMS templates are defined in :setting:`CMS_TEMPLATES` or
+:setting:`CMS_TEMPLATES_DIR`.
 
 ..  setting:: CMS_PLACEHOLDER_CONF
 
@@ -243,6 +256,15 @@ Configuration is retrieved in the following order:
 
 The first ``CMS_PLACEHOLDER_CONF`` key that matches for the required configuration attribute
 is used.
+
+``template`` denotes a page's template setting, e.g. ``pages/with_sidebar.html``.
+The template name must end in ``.htm`` or ``.html``. ``placeholder`` is a placeholder
+slot name.
+
+.. versionchanged:: 4.2
+
+    The template selector is available on django CMS pages. Since django CMS 4.2 it also
+    is available for other models, provided they provide a ``get_template()`` method.
 
 E.g: given the example above if the ``plugins`` configuration is retrieved for the ``content``
 placeholder in a page using the ``base.html`` template, the value
@@ -693,6 +715,17 @@ Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://githu
                 unihandecode-1.0.0.zh.min.js
 
 More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.io/>`_.
+
+
+.. setting:: CMS_DEFAULT_IN_NAVIGATION
+
+CMS_DEFAULT_IN_NAVIGATION
+=========================
+
+default
+    ``True``
+
+Decides if a newly added page content is automatically added to the navigation. 
 
 
 **************
@@ -1172,6 +1205,20 @@ default
 This indicates to the CMS that it should redirect requests with an non-lowercase
 slug to its lowercase version if no page with that slug is found.
 
+
+CMS_CATCH_PLUGIN_500_EXCEPTION
+==============================
+
+default
+    ``True``
+
+Should rendering plugins cause an exception, they are caught by default.
+In edit mode the exception is shown in the placeholder, in preview mode and
+on public content the placeholder remains empty.
+
+If ``CMS_CATCH_PLUGIN_500_EXCEPTION`` is set to ``False``, viewing public
+content will cause a server error (http error code 500). This can, for example,
+be used for regular health checking.
 
 CMS_CONFIRM_VERSION4
 ====================

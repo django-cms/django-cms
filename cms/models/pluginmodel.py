@@ -2,7 +2,7 @@ import json
 import os
 import warnings
 from datetime import date
-from functools import lru_cache
+from functools import cache
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
@@ -19,7 +19,7 @@ from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
-@lru_cache(maxsize=None)
+@cache
 def _get_descendants_cte():
     db_vendor = _get_database_vendor('read')
     if db_vendor == 'oracle':
@@ -60,7 +60,7 @@ def _get_database_cursor(action):
     return _get_database_connection(action).cursor()
 
 
-@lru_cache(maxsize=None)
+@cache
 def plugin_supports_cte():
     # This has to be as function because when it's a var it evaluates before
     # db is connected and we get OperationalError. MySQL version is retrieved
@@ -170,6 +170,8 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     child_plugin_instances = None
 
     class Meta:
+        verbose_name = _("plugin")
+        verbose_name_plural = _("plugins")
         app_label = 'cms'
         ordering = ('position',)
         indexes = [
@@ -229,7 +231,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         except ObjectDoesNotExist:
             instance = None
             self._inst = None
-        return (instance, plugin)
+        return instance, plugin
 
     def get_bound_plugin(self):
         """
@@ -243,18 +245,20 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
 
         if plugin.model != self.__class__:
             self._inst = plugin.model.objects.get(cmsplugin_ptr=self)
+            # Preserve prefetched placeholder
+            self._inst._state.fields_cache["placeholder"] = self.placeholder
+            # Preserve render_meta
             self._inst._render_meta = self._render_meta
         else:
             self._inst = self
         return self._inst
 
     def get_plugin_info(self, children=None, parents=None):
-        plugin_name = self.get_plugin_name()
-        data = {
+        return {
             'type': 'plugin',
             'position': self.position,
             'placeholder_id': str(self.placeholder_id),
-            'plugin_name': force_str(plugin_name) or '',
+            'plugin_name': force_str(self.get_plugin_name()) or '',
             'plugin_type': self.plugin_type,
             'plugin_id': str(self.pk),
             'plugin_language': self.language or '',
@@ -263,7 +267,6 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             'plugin_parent_restriction': parents or [],
             'urls': self.get_action_urls(),
         }
-        return data
 
     def refresh_from_db(self, *args, **kwargs):
         super().refresh_from_db(*args, **kwargs)
@@ -394,20 +397,20 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         for parent in self.get_ancestors():
             try:
                 url = force_str(
-                    admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                    admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
                                   args=[parent.pk]))
             except NoReverseMatch:
                 url = force_str(
-                    admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                    admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
                                   args=[parent.pk]))
             breadcrumb.append({'title': force_str(parent.get_plugin_name()), 'url': url})
         try:
             url = force_str(
-                admin_reverse("%s_%s_edit_plugin" % (model._meta.app_label, model._meta.model_name),
+                admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
                               args=[self.pk]))
         except NoReverseMatch:
             url = force_str(
-                admin_reverse("%s_%s_edit_plugin" % (Page._meta.app_label, Page._meta.model_name),
+                admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
                               args=[self.pk]))
         breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
         return breadcrumb

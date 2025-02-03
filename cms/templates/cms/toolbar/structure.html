@@ -1,6 +1,6 @@
 {% load cms_tags cms_js_tags i18n sekizai_tags %}
 <!DOCTYPE html>
-<html class="cms-overflow">
+<html class="cms-overflow{% if not CMS_TEMPLATE %} cms-structure-mode-endpoint{% endif %}">
 <head>
     <meta charset="UTF-8">
     <title>{{ object.title }}</title>

@@ -67,17 +67,17 @@ class ManagementTestCase(CMSTestCase):
     def test_fix_tree(self):
         create_page("home", "nav_playground.html", "en")
         page1 = create_page("page", "nav_playground.html", "en")
-        page1.node.depth = 3
-        page1.node.numchild = 4
-        page1.node.path = "00100010"
-        page1.node.save()
+        page1.depth = 3
+        page1.numchild = 4
+        page1.path = "00100010"
+        page1.save()
         out = StringIO()
         management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
         self.assertEqual(out.getvalue(), 'fixing page tree\nfixing page URLs\nall done\n')
         page1 = page1.reload()
-        self.assertEqual(page1.node.path, "0002")
-        self.assertEqual(page1.node.depth, 1)
-        self.assertEqual(page1.node.numchild, 0)
+        self.assertEqual(page1.path, "0002")
+        self.assertEqual(page1.depth, 1)
+        self.assertEqual(page1.numchild, 0)
 
     def test_fix_tree_regression_5641(self):
         # ref: https://github.com/divio/django-cms/issues/5641
@@ -87,10 +87,10 @@ class ManagementTestCase(CMSTestCase):
         delta = create_page("Delta", "nav_playground.html", "en")
         theta = create_page("Theta", "nav_playground.html", "en")
 
-        beta.move_page(alpha.node, position='last-child')
-        gamma.move_page(beta.node, position='last-child')
-        delta.move_page(gamma.node, position='last-child')
-        theta.move_page(delta.node, position='last-child')
+        beta.move_page(alpha, position='last-child')
+        gamma.move_page(beta, position='last-child')
+        delta.move_page(gamma, position='last-child')
+        theta.move_page(delta, position='last-child')
 
         out = StringIO()
         management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
@@ -104,7 +104,7 @@ class ManagementTestCase(CMSTestCase):
         ]
 
         for page, path in tree:
-            self.assertEqual(page.node.path, path)
+            self.assertEqual(page.path, path)
 
     @override_settings(INSTALLED_APPS=TEST_INSTALLED_APPS)
     def test_uninstall_apphooks_with_apphook(self):
@@ -288,7 +288,6 @@ class ManagementTestCase(CMSTestCase):
         max_positon = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
         self.assertEqual(max_positon, 3)
 
-
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
         management.call_command('cms', 'uninstall', 'plugins', PLUGIN, interactive=False, stdout=out)
@@ -303,6 +302,11 @@ class ManagementTestCase(CMSTestCase):
         management.call_command('cms', 'uninstall', 'plugins', PLUGIN, interactive=False, stdout=out)
         self.assertEqual(out.getvalue(), "1 'TextPlugin' plugins uninstalled\n")
         self.assertEqual(CMSPlugin.objects.filter(plugin_type=PLUGIN).count(), 0)
+
+    def test_for_running_only_cms_command(self):
+        with self.assertRaises(CommandError) as e:
+            management.call_command('cms')
+        self.assertEqual(str(e.exception), 'Error: one of the available sub commands must be provided')
 
 
 class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
@@ -345,7 +349,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins * 2)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -391,7 +395,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
         # These asserts that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.all().count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)
@@ -441,11 +445,11 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             stdout=out
         )
 
-        pages_1 = list(Page.objects.on_site(site_1).select_related('node').order_by('node__path'))
-        pages_2 = list(Page.objects.on_site(site_2).select_related('node').order_by('node__path'))
+        pages_1 = list(Page.objects.on_site(site_1).order_by('path'))
+        pages_2 = list(Page.objects.on_site(site_2).order_by('path'))
         for index, page in enumerate(pages_1):
             self.assertEqual(page.get_title('en'), pages_2[index].get_title('en'))
-            self.assertEqual(page.node.depth, pages_2[index].node.depth)
+            self.assertEqual(page.depth, pages_2[index].depth)
 
         phs_1 = []
         phs_2 = []
@@ -454,7 +458,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         for page in Page.objects.on_site(site_2_pk):
             phs_2.extend(page.get_placeholders('en').values_list('pk', flat=True))
 
-        # These asserts that no orphaned plugin exists
+        # These assert that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_2).count(), number_start_plugins)
 
@@ -494,7 +498,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         )
         pages = Page.objects.on_site(site)
         for page in pages:
-            self.assertEqual(set(('en', 'de')), set(page.get_languages()))
+            self.assertEqual({'en', 'de'}, set(page.get_languages()))
 
         # Original PageContent untouched
         self.assertEqual("root page de", Page.objects.get_home(site).get_title("de"))
@@ -617,7 +621,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
             self.assertEqual(origina_site1_langs[page.pk], set(page.get_languages()))
 
         for page in Page.objects.on_site(site_active):
-            self.assertEqual(set(('de', 'fr')), set(page.get_languages()))
+            self.assertEqual({'de', 'fr'}, set(page.get_languages()))
 
         # plugins for site 1
         self.assertEqual(CMSPlugin.objects.filter(language='en').count(), number_start_plugins)

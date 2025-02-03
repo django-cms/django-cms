@@ -1,4 +1,3 @@
-from collections import deque
 from importlib import import_module
 from unittest.mock import patch
 
@@ -7,18 +6,9 @@ from django.template.context import Context
 from django.test.utils import override_settings
 
 from cms import api
-from cms.plugin_rendering import (
-    ContentRenderer,
-    LegacyRenderer,
-    StructureRenderer,
-)
 from cms.test_utils.testcases import CMSTestCase
 from cms.utils import get_language_from_request, i18n
-from cms.utils.compat import DJANGO_2_2
 from cms.views import details
-
-if DJANGO_2_2:
-    from django.utils.translation import LANGUAGE_SESSION_KEY
 
 
 @override_settings(
@@ -381,20 +371,12 @@ class TestLanguageFallbacks(CMSTestCase):
         self.client.cookies[settings.SESSION_COOKIE_NAME] = store.session_key
 
         #   ugly and long set of session
-        session = self.client.session
-        if not DJANGO_2_2:
-            self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'fr'
-        else:
-            session[LANGUAGE_SESSION_KEY] = 'fr'
-            session.save()
+        self.client.cookies[settings.LANGUAGE_COOKIE_NAME] = 'fr'
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/fr/')
         self.client.get('/en/')
-        if not DJANGO_2_2:
-            self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'en')
-        else:
-            self.assertEqual(self.client.session[LANGUAGE_SESSION_KEY], 'en')
+        self.assertEqual(self.client.cookies[settings.LANGUAGE_COOKIE_NAME].value, 'en')
         response = self.client.get('/')
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, '/en/')
@@ -466,14 +448,13 @@ class TestLanguageFallbacks(CMSTestCase):
         with patch("cms.views.render_pagecontent") as mock_render:
             # normal page
             path = page.get_absolute_url(language="en")
-            request = self.get_request(path)
+            request = self.get_request(path, "en")
             details(request, slug=page.get_path("en"))
             mock_render.assert_called_once_with(
                 request,
                 page.get_content_obj()
             )
-            # check that the french plugins will render
-            context = Context({'request': request})
+            context = Context({'request': self.get_request(path, "fr")})
             rendered_placeholder = self._render_placeholder(page_ph_fr, context)
             self.assertEqual(rendered_placeholder, "Hello, world!")
 
@@ -518,6 +499,7 @@ class TestLanguageFallbacks(CMSTestCase):
         self.assertEqual(response_fr.status_code, 200)
         response_en = self.client.get(page.get_absolute_url(language="en"))
         self.assertRedirects(response_en, page.get_absolute_url(language="fr"))
+
 
 @override_settings(
     LANGUAGE_CODE='en',

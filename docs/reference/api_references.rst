@@ -74,8 +74,9 @@ add a text plugin with the content ``'hello world'``. This is done in English::
 
     from cms.api import create_page, add_plugin
 
-    page = create_page('My Page', 'my_template.html', 'en')
-    placeholder = page.placeholders.get(slot='body')
+    page = create_page('My Page', 'my_template.html', 'en', created_by=user)  # Since django CMS 4, we need a user object
+    page_content = page.get_admin_content('en')
+    placeholder = page_content.get_placeholders().get(slot='body')
     add_plugin(placeholder, 'TextPlugin', 'en', body='hello world')
 
 

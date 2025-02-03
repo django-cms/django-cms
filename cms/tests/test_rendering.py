@@ -23,12 +23,7 @@ INHERIT_WITH_OR_TEMPLATE_NAME = 'tests/rendering/inherit_with_or.html'
 
 def sample_plugin_processor(instance, placeholder, rendered_content, original_context):
     original_context_var = original_context['original_context_var']
-    return '%s|test_plugin_processor_ok|%s|%s|%s' % (
-        rendered_content,
-        instance.body,
-        placeholder.slot,
-        original_context_var
-    )
+    return f'{rendered_content}|test_plugin_processor_ok|{instance.body}|{placeholder.slot}|{original_context_var}'
 
 
 def sample_plugin_context_processor(instance, placeholder, original_context):
@@ -294,6 +289,19 @@ class RenderingTestCase(CMSTestCase):
         response.render()
         r = self.strip_rendered(response.content.decode('utf8'))
         self.assertEqual(r, '|' + self.test_data['text_main'] + '|' + self.test_data['text_sub'] + '|')
+
+    def test_getting_placeholders(self):
+        """ContentRenderer._get_content_object uses toolbar to return placeholders of a page"""
+        request = self.get_request(page=self.test_page)
+        request.toolbar = CMSToolbar(request)
+        wrong_content_obj = self.test_page2.get_content_obj("en")
+        wrong_content_obj.page = self.test_page
+        request.toolbar.set_object(wrong_content_obj)
+        content_renderer = self.get_content_renderer(request)
+        placeholders = content_renderer._get_content_object(self.test_page)
+        wrong_content_obj.page = self.test_page2
+
+        self.assertEqual(len(placeholders), 2)
 
     @override_settings(
         CMS_PLUGIN_PROCESSORS=('cms.tests.test_rendering.sample_plugin_processor',),
@@ -750,7 +758,7 @@ class RenderingTestCase(CMSTestCase):
         output = renderer.render_placeholder(placeholder, context, 'en', editable=True)
 
         for cls in classes:
-            self.assertTrue(cls in output, '%r is not in %r' % (cls, output))
+            self.assertTrue(cls in output, f'{cls!r} is not in {output!r}')
 
     def test_render_plugin_toolbar_markup(self):
         """

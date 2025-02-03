@@ -1,5 +1,5 @@
 import inspect
-from functools import lru_cache
+from functools import cache
 from importlib import import_module
 
 from django.apps import apps
@@ -72,7 +72,7 @@ def autodiscover_cms_configs():
     for app_config in apps.get_app_configs():
         try:
             cms_module = import_module(
-                '%s.%s' % (app_config.name, CMS_CONFIG_NAME))
+                f'{app_config.name}.{CMS_CONFIG_NAME}')
         except:  # NOQA
             # If something in cms_config.py raises an exception let that
             # exception bubble up. Only catch the exception if
@@ -98,7 +98,7 @@ def autodiscover_cms_configs():
                     "CMSAppExtension")
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_cms_extension_apps():
     """
     Returns django app configs of apps with a cms extension
@@ -110,7 +110,7 @@ def get_cms_extension_apps():
     return cms_apps
 
 
-@lru_cache(maxsize=None)
+@cache
 def get_cms_config_apps():
     """
     Returns django app configs of apps with a cms config
@@ -166,7 +166,7 @@ def backwards_compatibility_config():
     for module in modules_to_autodiscover:
         for app_config in apps.get_app_configs():
             try:
-                import_module('%s.%s' % (app_config.name, module))
+                import_module(f'{app_config.name}.{module}')
             except Exception:  # NOQA
                 # Decide whether to bubble up this error. If the app just
                 # doesn't have the module in question, we can ignore the error

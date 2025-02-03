@@ -62,7 +62,7 @@ All three titles::
 
 
 You can always customise the editable fields by providing the
-`edit_field` parameter::
+``edit_field`` parameter::
 
     {% render_model request.current_page "title" "page_title,menu_title" %}
 
@@ -281,4 +281,44 @@ the standard ``as`` syntax:
     <h1>{{ variable }}</h1>
 
     {% endblock content %}
+
+
+*******
+Plugins
+*******
+
+.. versionadded:: 4.2
+
+    Exposing plugins for frontend editing is a new feature in django CMS 4.2.
+
+
+The frontend editing feature is also available for plugins. While by definition
+plugins are frontend-editable, you can still use the template tags to expose
+only selected fields for editing.
+
+Say, you have a header plugin that contains a section header and a summary
+of the section content. You can expose only the header for editing::
+
+    {% load cms_tags %}
+
+    {% block content %}
+    <h1>{% render_model instance "header" "header" %}</h1>
+    {% endblock content %}
+
+This will render ``{{ instance.header }}`` and double-clicking on it will open
+a pop-up window with the change form for the plugin instance with the header field
+only.
+
+An alternative is to use the ``render_model_block`` template tag::
+
+    {% load cms_tags %}
+
+    {% block content %}
+    <h1>{% render_model_block instance "header" %}
+      {{ instance.header }}
+    {% endrender_model_block %}</h1>
+    {% endblock content %}
+
+Third party packages such as djangocms-text use this feature to allow inline
+editing of single fields in the frontend.
 
