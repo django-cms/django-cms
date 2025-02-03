@@ -284,7 +284,8 @@ prevent the disappearance of existing plugin instances, as discussed in `Issue #
 1. **Define the Model**:
    
    In your application's `models.py`, define a model that inherits from `CMSPlugin`. This model 
-   will store the plugin's data.
+   will store the plugin's data. To allow for automatic migration later, make sure that all model 
+   fields have meaningful defaults. 
 
    .. code-block:: python
 
@@ -292,7 +293,7 @@ prevent the disappearance of existing plugin instances, as discussed in `Issue #
        from cms.models.pluginmodel import CMSPlugin
 
        class MyPluginModel(CMSPlugin):
-           title = models.CharField(max_length=100, default='Default Title')
+           title = models.CharField(max_length=100, default='Default Title')  # Add defaults
            # Add other fields as needed
 
            def __str__(self):
