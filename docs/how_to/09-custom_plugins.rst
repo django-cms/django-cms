@@ -318,7 +318,7 @@ prevent the disappearance of existing plugin instances, as discussed in `Issue #
 
 3. **Create Migrations**:
    
-   Generate the necessary database migrations to reflect the new model. Do not apply yet, since 
+   Generate the necessary database migrations to reflect the new model. Do not apply them yet, since 
    the migrations will need an additional script to run.
 
    .. code-block:: bash
