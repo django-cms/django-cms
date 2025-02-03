@@ -1,6 +1,8 @@
 from collections import OrderedDict
 
-from cms.models.pagemodel import Page
+from django.db import IntegrityError
+
+from cms.models.pagemodel import Page, PageUrl
 
 from .base import SubcommandsCommand
 
@@ -53,7 +55,7 @@ class FixTreeCommand(SubcommandsCommand):
             self._update_descendants_tree(root)
 
         self.stdout.write('fixing page URLs')
-        for node in root_nodes:
+        for node in root_pages:
             page = node.cms_pages.get()
             for language in page.get_languages():
                 if not page.is_home:
