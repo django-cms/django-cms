@@ -55,8 +55,7 @@ class FixTreeCommand(SubcommandsCommand):
             self._update_descendants_tree(root)
 
         self.stdout.write('fixing page URLs')
-        for node in root_pages:
-            page = node.cms_pages.get()
+        for page in root_pages:
             for language in page.get_languages():
                 if not page.is_home:
                     page._update_url_path(language)
