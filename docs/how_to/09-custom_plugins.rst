@@ -335,23 +335,36 @@ prevent the disappearance of existing plugin instances, as discussed in `Issue #
 
     .. code-block:: python
 
-       from django.db import migrations, models
-       from cms.models.pluginmodel import CMSPlugin
+       def add_model_to_plugin(apps, schema_editor):
+           """ Adds instances for the new model.
+           ATTENTION: All fields of the model must have a valid default value!"""
 
-       def forwards_func(apps, schema_editor):
-           MyPluginModel = apps.get_model('my_app', 'MyPluginModel')
-           for old_plugin in CMSPlugin.objects.filter(plugin_type="MyPlugin"):
-               MyPluginModel.objects.create(
-                   cmsplugin_ptr=old_plugin,
-                   title="Default Title"  # Assign a default or migrate relevant data
-               )
+           # Adjust the following two lines
+           model = app.get_model("my_app", "MyGreatPluginModel")  # Name of the plugin's new model class
+           plugin_type = "MyGreatPlugin"  # Name of the plugin class
+
+           CMSPlugin = apps.get_model("cms", "CMSPlugin")
+
+           plugin_instances = CMSPlugin.objects.filter(plugin_type=plugin_type)
+           for plugin_instance in plugin_instances:
+               logger.info('Creating new model instance for plugin instance %s', plugin_instance.pk)
+               obj = model()
+               obj.pk = plugin_instance.pk
+               obj.cmsplugin_ptr = plugin_instance
+               obj.plugin_type = plugin_type
+               obj.placeholder = plugin_instance.placeholder
+               obj.parent = plugin_instance.parent
+               obj.language = plugin_instance.language
+               obj.position = plugin_instance.position
+               obj.creation_date = plugin_instance.creation_date
+               obj.save()
 
        class Migration(migrations.Migration):
            ... 
 
            operations = [
                ..., 
-               migrations.RunPython(forwards_func),  # Add at the end
+               migrations.RunPython(add_model_to_plugin),  # Add at the end of migration operations
            ]
 
    This script migrates existing plugin instances to the new model structure, preserving data integrity.
