@@ -92,6 +92,7 @@ DEFAULTS = {
     'COLOR_SCHEME': 'auto',
     'COLOR_SCHEME_TOGGLE': True,
     'CATCH_PLUGIN_500_EXCEPTION': True,
+    'DEFAULT_IN_NAVIGATION': True,
 }
 
 
