@@ -717,6 +717,17 @@ Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://githu
 More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.io/>`_.
 
 
+.. setting:: CMS_DEFAULT_IN_NAVIGATION
+
+CMS_DEFAULT_IN_NAVIGATION
+=========================
+
+default
+    ``True``
+
+Decides if a newly added page content is automatically added to the navigation. 
+
+
 **************
 Media Settings
 **************
