@@ -156,7 +156,7 @@ class PageAdmin(PageDeleteMessageMixin, admin.ModelAdmin):
     move_form = MovePageForm
     inlines = PERMISSION_ADMIN_INLINES
     search_fields = ('=id', 'urls__slug', 'pagecontent_set__title', 'reverse_id')
-    title_frontend_editable_fields =  ['title', 'menu_title', 'page_title'] 
+    title_frontend_editable_fields =  ['title', 'menu_title', 'page_title']
 
     def has_module_permission(self, request):
         return False  # Hides page model from the admin index
