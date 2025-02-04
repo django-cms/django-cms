@@ -534,11 +534,11 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual(content_en.strip(), '<a href="http://example.com/">valid</a>')
 
     @override_settings(CMS_PERMISSION=False)
-    def test_nested_plugin_escapejs(self):
+    def test_databridge_contains_changes(self):
         """
         Checks #1366 error condition.
         When adding/editing a plugin whose icon_src() method returns a URL
-        containing an hyphen, the hyphen is escaped by django escapejs resulting
+        containing a hyphen, the hyphen is escaped by django escapejs resulting
         in a incorrect URL
         """
         ex = Example1(
@@ -556,7 +556,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         test_plugin.save()
         endpoint = self.get_change_plugin_uri(test_plugin)
         response = self.client.post(endpoint, {})
-        self.assertContains(response, "CMS.API.Helpers.onPluginSave")
+        self.assertContains(response, '<script id="data-bridge" type="application/json">')
+        self.assertContains(response, f'title=\\"EmptyPlugin ID: {test_plugin.pk}\\"')
 
     @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs_page(self):
@@ -574,7 +575,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         endpoint = self.get_change_plugin_uri(test_plugin)
         response = self.client.post(endpoint, {})
-        self.assertContains(response, "CMS.API.Helpers.onPluginSave")
+        self.assertContains(response, '<script id="data-bridge" type="application/json">')
+        self.assertContains(response, f'title=\\"EmptyPlugin ID: {test_plugin.pk}\\"')
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, _get_placeholder_slots, 'placeholder_tests/test_eleven.html')

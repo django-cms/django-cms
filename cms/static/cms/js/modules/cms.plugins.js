@@ -2226,7 +2226,17 @@ Plugin.staticPlaceholderDuplicatesMap = {};
 
 // istanbul ignore next
 Plugin._initializeTree = function _initializeTree() {
-    CMS._plugins = uniqWith(CMS._plugins, ([x], [y]) => x === y);
+    const plugins = {};
+
+    document.body.querySelectorAll(
+        'script[data-cms-plugin], ' +
+        'script[data-cms-placeholder], ' +
+        'script[data-cms-general]'
+    ).forEach(script => {
+        plugins[script.id] = JSON.parse(script.textContent || '{}');
+    });
+
+    CMS._plugins = Object.entries(plugins);
     CMS._instances = CMS._plugins.map(function(args) {
         return new CMS.Plugin(args[0], args[1]);
     });
@@ -2257,6 +2267,12 @@ Plugin._removeAddPluginPlaceholder = function removeAddPluginPlaceholder() {
 Plugin._refreshPlugins = function refreshPlugins() {
     Plugin.aliasPluginDuplicatesMap = {};
     Plugin.staticPlaceholderDuplicatesMap = {};
+
+    // Re-read front-end editable fields ("general" plugins) from DOM
+    document.body.querySelectorAll('script[data-cms-general]').forEach(script => {
+        CMS._plugins.push([script.id, JSON.parse(script.textContent)]);
+    });
+    // Remove duplicates
     CMS._plugins = uniqWith(CMS._plugins, isEqual);
 
     CMS._instances.forEach(instance => {

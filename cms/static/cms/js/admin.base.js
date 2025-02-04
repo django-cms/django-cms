@@ -15,6 +15,23 @@ const CMS = {
     KEYS
 };
 
-// in case some data is already attached to the CMS global
-// we shoud not override it
+// in case some data is already attached to the global CMS
+// we must not override it
 window.CMS = CMS.$.extend(window.CMS || {}, CMS);
+
+// Serve the data bridge:
+// We have a special case here cause the CMS namespace
+// can be either inside the current window or the parent
+if (document.querySelector('body.cms-close-frame script#data-bridge')) {
+    (function (Window) {
+        // the dataBridge is used to access plugin information from different resources
+        // Do NOT move this!!!
+        Window.CMS.API.Helpers.dataBridge = JSON.parse(document.getElementById('data-bridge').textContent);
+        // make sure we're doing after the "modal" mechanism kicked in
+        setTimeout(function () {
+            // save current plugin
+            Window.CMS.API.Helpers.onPluginSave();
+        }, 100); // eslint-disable-line no-magic-numbers
+    })(window.parent || window);
+}
+
