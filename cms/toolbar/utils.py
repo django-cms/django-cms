@@ -1,10 +1,11 @@
 import json
 from collections import defaultdict, deque
-from typing import Optional
+from typing import Any, Optional
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.http import HttpRequest
 from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
@@ -12,9 +13,11 @@ from django.utils.translation import (
     gettext,
     override as force_language,
 )
+from sekizai.context import SekizaiContext
+from sekizai.helpers import get_varname
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
-from cms.models import PageContent
+from cms.models import CMSPlugin, PageContent
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
@@ -68,10 +71,29 @@ def get_plugin_tree_as_json(request, plugins):
 
     warnings.warn("get_plugin_tree_as_json is deprecated. Use get_plugin_tree instead.",
                   RemovedInDjangoCMS43Warning, stacklevel=2)
-    return json.dumps(get_plugin_tree(request, plugins))
+    return json.dumps(get_plugin_tree(request, plugins)[0])
 
 
-def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
+def get_plugin_tree(
+    request: HttpRequest,
+    plugins: list[CMSPlugin],
+    restrictions: Optional[dict] = None
+) -> tuple[dict[str, Any], list[CMSPlugin]]:
+    """
+    Constructs a tree structure of CMS plugins for the toolbar.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        plugins (list[CMSPlugin]): A list of CMSPlugin instances to be organized into a tree.
+        restrictions (Optional[dict], optional): A dictionary of plugin restrictions. Defaults to None.
+
+    Returns:
+        tuple[dict[str, Any], list[CMSPlugin]]: A tuple containing:
+            - A dictionary with 'html' and 'plugins' keys:
+                - 'html': A string of rendered HTML for the plugin tree.
+                - 'plugins': A list of plugin information dictionaries.
+            - A list of downcasted CMSPlugin instances in the order they appear in the tree.
+    """
     from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
 
     tree_data = []
@@ -122,16 +144,39 @@ def get_plugin_tree(request, plugins, restrictions: Optional[dict] = None):
             }
             tree_structure.append(template.render(context))
     tree_data.reverse()
-    return {'html': '\n'.join(tree_structure), 'plugins': tree_data}
+    return {'html': '\n'.join(tree_structure), 'plugins': tree_data}, plugins
 
 
-def get_toolbar_from_request(request):
+def get_plugin_content(request: HttpRequest, plugin: CMSPlugin, context: dict = {}) -> dict[str, Any]:
+    toolbar = get_toolbar_from_request(request)
+    renderer = toolbar.content_renderer
+    # Switch to edit mode despite the request originally coming from the admin
+    toolbar.edit_mode_active = True
+    renderer._placeholders_are_editable = True
+    context = SekizaiContext({'request': request, **context})
+    content = renderer.render_plugin(plugin, context, placeholder=plugin.placeholder, editable=True)
+    return {
+        "html": content,
+        "js": '\n'.join(context[get_varname()].get("js", [])),
+        "css": '\n'.join(context[get_varname()].get("css", [])),
+        "pluginIds": get_plugin_tree_ids(plugin) ,
+    }
+
+
+def get_plugin_tree_ids(plugin: CMSPlugin) -> list[int]:
+    plugin_ids = [plugin.pk]
+    for child in plugin.child_plugin_instances:
+        plugin_ids += get_plugin_tree_ids(child)
+    return plugin_ids
+
+
+def get_toolbar_from_request(request: HttpRequest):
     from .toolbar import EmptyToolbar
 
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
-def add_live_url_querystring_param(obj, url, language=None):
+def add_live_url_querystring_param(obj: models.Model, url: str, language: Optional[str] = None) -> str:
     """
     Append a live url to a given object url using a supplied url parameter configured
     by the setting: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM

@@ -148,7 +148,7 @@ class BaseEditableAdminMixin:
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
             if isinstance(admin_obj, CMSPluginBase):
                 # Update the structure board by populating the data bridge
-                return admin_obj.render_close_frame(request, obj)
+                return admin_obj.render_close_frame(request, obj, add=False)
             return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
@@ -517,7 +517,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 source_placeholder,
                 target_placeholder,
             )
-        data = get_plugin_tree(request, new_plugins)
+        data, __ = get_plugin_tree(request, new_plugins)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
     def _copy_plugin_to_clipboard(self, request, target_placeholder):
@@ -800,7 +800,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         if new_plugin and fetch_tree:
             root = (new_plugin.parent or new_plugin)
             new_plugins = [root] + list(root.get_descendants())
-        data = get_plugin_tree(request, new_plugins)
+        data, __ = get_plugin_tree(request, new_plugins)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
     def _paste_plugin(self, request, plugin, target_language,

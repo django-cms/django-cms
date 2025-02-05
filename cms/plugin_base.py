@@ -6,7 +6,9 @@ from typing import Optional
 from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.template import Context
 from django.utils.encoding import force_str, smart_str
 from django.utils.functional import lazy
 from django.utils.html import escapejs
@@ -15,7 +17,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin, Page
-from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree
+from cms.toolbar.utils import get_plugin_content, get_plugin_toolbar_info, get_plugin_tree
 from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 
@@ -128,7 +130,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     See also: :attr:`frontend_edit_template`.
     """
-    #: If True, displays a preview in the admin.
+    # If True, displays a preview in the admin. Not used any more.
     admin_preview = False
 
     #:  The path to the template used to render the template. If ``render_plugin`` is ``True`` either this or
@@ -214,6 +216,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
     #: errors
     show_plugin_add_form = True
+
+    #: The plugin does not modify the context or request and its rendering is not influenced by its parent
+    #: plugins.
+    is_local = True
 
     # Warning: setting these to False, may have a serious performance impact,
     # because their child-parent-relation must be recomputed each
@@ -435,7 +441,13 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         return super().render_change_form(request, context, add, change, form_url, obj)
 
-    def render_close_frame(self, request, obj, extra_context=None):
+    def render_close_frame(
+        self,
+        request: HttpRequest,
+        obj: CMSPlugin,
+        add: bool = False,
+        extra_context: Optional[Context] = None
+    ) -> HttpResponse:
         from cms.utils.plugins import get_plugin_restrictions
 
         try:
@@ -458,7 +470,28 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             parents=parent_classes,
         )
         data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
-        data['structure'] = get_plugin_tree(request, plugins, restrictions)
+        data['structure'], downcasted_plugins = get_plugin_tree(request, plugins, restrictions)
+        if all(plugin.get_plugin_class().is_local for plugin in downcasted_plugins):
+            # Render the changes
+            # Adds the rendered plugin tree to the context
+            # If the plugin has been created, always also rerender the parent plugin
+            content_plugin = downcasted_plugins[0] if add else next(
+                (plugin for plugin in downcasted_plugins if plugin.pk == obj.pk), None
+            )
+            # Also provide the parent
+            parent = next(
+                (plugin for plugin in downcasted_plugins if plugin.pk == content_plugin.parent_id), None
+            ) if content_plugin.parent_id else None
+            try:
+                data['content'] = get_plugin_content(request, content_plugin, {"parent": parent})
+                data['messages'] = [
+                    {'level': message.level,
+                    'message': message.message,
+                    'tags': message.tags}
+                    for message in messages.get_messages(request)]
+            except Exception:
+                pass  # do not deliver content if rendering fails
+
         context = {
             'plugin': obj,
             'is_popup': True,
@@ -516,7 +549,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # was added successfully but looks like the CMS has not
         # supported this and can lead to issues with plugins
         # like ckeditor.
-        return self.render_close_frame(request, obj)
+        return self.render_close_frame(request, obj, add=True)
 
     def response_change(self, request, obj):
         self.object_successfully_changed = True
@@ -524,7 +557,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         msg_dict = {'name': force_str(opts.verbose_name), 'obj': force_str(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
-        return self.render_close_frame(request, obj)
+        return self.render_close_frame(request, obj, add=False)
 
     def log_addition(self, request, obj, bypass=None):
         pass
