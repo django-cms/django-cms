@@ -220,8 +220,8 @@ class BaseRenderer:
 class ContentRenderer(BaseRenderer):
     plugin_edit_template = (
         '<template class="cms-plugin '
-        'cms-plugin-start cms-plugin-{pk}"></template>{content}'
-        '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}"></template>'
+        'cms-plugin-start cms-plugin-{pk}" data-position="{position}"></template>{content}'
+        '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}" data-position="{position}"></template>'
     )
     placeholder_edit_template = (
         '{content} '
@@ -555,7 +555,7 @@ class ContentRenderer(BaseRenderer):
             content = processor(instance, placeholder, content, context)
 
         if editable:
-            content = self.plugin_edit_template.format(pk=instance.pk, content=content)
+            content = self.plugin_edit_template.format(pk=instance.pk, content=content, position=instance.position)
             placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
                 placeholder.pk, {}
             )
@@ -591,8 +591,9 @@ class ContentRenderer(BaseRenderer):
             heading = f'<h2 class="cms-rendering-exception-title">{message}</h2>'
             if "_last_plugin" in context:
                 # Make error message editable by double-click to open the editor for the plugin causing the exception
+                instance = context["_last_plugin"]
                 heading = self.plugin_edit_template.format(
-                    pk=context["_last_plugin"].pk, content=heading
+                    pk=instance.pk, content=heading, position=instance.position,
                 )
                 placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
                     placeholder.pk, {}

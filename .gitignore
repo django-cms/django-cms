@@ -48,3 +48,4 @@ node_modules
 screenshots
 .idea
 .better_test.db
+.vscode/settings.json
