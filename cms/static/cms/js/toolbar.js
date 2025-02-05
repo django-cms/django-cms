@@ -46,6 +46,27 @@ CMS.KEYS = KEYS;
 CMS.$ = $;
 CMS.Class = Class;
 
-initHelpShortcuts();
-
 window.CMS = CMS;
+
+CMS.$(function () {
+    // this is a globally shared configuration
+    try {
+        CMS.config = CMS.config || JSON.parse(document.getElementById('cms-config-json').textContent || '{}');
+    } catch (e) {
+        CMS.config = CMS.config || {};
+    }
+    CMS.settings = CMS.API.Helpers.getSettings();
+
+    initHelpShortcuts();
+
+    // extends API
+    CMS.API.Clipboard = new CMS.Clipboard();
+    CMS.API.StructureBoard = new CMS.StructureBoard();
+    CMS.API.Messages = new CMS.Messages();
+    CMS.API.Tooltip = new CMS.Tooltip();
+    CMS.API.Toolbar = new CMS.Toolbar();
+    CMS.API.Sideframe = new CMS.Sideframe();
+
+    CMS.Plugin._initializeTree();
+});
+
