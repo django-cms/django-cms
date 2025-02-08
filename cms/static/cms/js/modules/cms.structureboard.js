@@ -944,50 +944,56 @@ class StructureBoard {
     // eslint-disable-next-line complexity
     invalidateState(action, data, { propagate = true } = {}) {
         // eslint-disable-next-line default-case
+
+        let updateNeeded = true;  // By default, any edit action will result in changed content and therefore a need for an update
+
         switch (action) {
             case 'COPY': {
                 this.handleCopyPlugin(data);
+                updateNeeded = false;  // Copying, however, only changes the clipboard - no update needed
                 break;
             }
 
+             // For other actions, only refresh, if the new state cannot be determined from the data bridge
             case 'ADD': {
-                this.handleAddPlugin(data);
+                updateNeeded = this.handleAddPlugin(data); 
                 break;
             }
 
             case 'EDIT': {
-                this.handleEditPlugin(data);
+                updateNeeded = this.handleEditPlugin(data); 
                 break;
             }
 
             case 'DELETE': {
-                this.handleDeletePlugin(data);
+                updateNeeded = this.handleDeletePlugin(data);  
                 break;
             }
 
             case 'CLEAR_PLACEHOLDER': {
-                this.handleClearPlaceholder(data);
+                updateNeeded = this.handleClearPlaceholder(data);
                 break;
             }
 
             case 'PASTE':
             case 'MOVE': {
-                this.handleMovePlugin(data);
+                updateNeeded = this.handleMovePlugin(data);
                 break;
             }
 
             case 'CUT': {
-                this.handleCutPlugin(data);
+                updateNeeded = this.handleCutPlugin(data);
                 break;
             }
+            
+            case undefined:
+            case false:
+            case '': {
+                CMS.API.Helpers.reloadBrowser();
+                return;    
+            }
         }
-
         Plugin._recalculatePluginPositions(action, data);
-
-        if (!action) {
-            CMS.API.Helpers.reloadBrowser();
-            return;
-        }
 
         if (propagate) {
             this._propagateInvalidatedState(action, data);
@@ -1000,11 +1006,11 @@ class StructureBoard {
         if (currentMode === 'structure') {
             this._requestcontent = null;
 
-            if (this._loadedContent && action !== 'COPY') {
+            if (this._loadedContent && updateNeeded) {
                 this.updateContent();
                 return;  // Toolbar loaded
             }
-        } else if (action !== 'COPY') {
+        } else if (updateNeeded === true) {
             this._requestcontent = null;
             this.updateContent();
             return;  // Toolbar loaded
@@ -1166,6 +1172,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
+        return true;  // update needed
     }
 
     handleCopyPlugin(data) {
@@ -1188,22 +1195,21 @@ class StructureBoard {
 
         Plugin._updateClipboard();
 
-        let html = '';
-
         const clipboardDraggable = $('.cms-clipboard .cms-draggable:first');
-
-        html = clipboardDraggable.parent().html();
+        const html = clipboardDraggable.parent().html();
 
         CMS.API.Clipboard.populate(html, pluginData[1]);
         CMS.API.Clipboard._enableTriggers();
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
+        return true;  // update needed
     }
 
     handleCutPlugin(data) {
-        this.handleDeletePlugin(data);
-        this.handleCopyPlugin(data);
+        let updateNeeded = this.handleDeletePlugin(data);
+        updateNeeded |= this.handleCopyPlugin(data);
+        return updateNeeded;  // update needed
     }
 
     _extractMessages(doc) {
@@ -1241,13 +1247,12 @@ class StructureBoard {
         if (!this._loadedStructure) {
             this._requeststructure = null;
         }
-        var fixedContentMarkup = contentMarkup;
-        var newDoc = new DOMParser().parseFromString(fixedContentMarkup, 'text/html');
+        const newDoc = new DOMParser().parseFromString(contentMarkup, 'text/html');
 
         const structureScrollTop = $('.cms-structure-content').scrollTop();
 
-        var toolbar = $('#cms-top, [data-cms]').detach();
-        var newToolbar = $(newDoc).find('.cms-toolbar').clone();
+        const toolbar = $('#cms-top, [data-cms]').detach();
+        const newToolbar = $(newDoc).find('.cms-toolbar').clone();
 
         $(newDoc).find('#cms-top, [data-cms]').remove();
 
@@ -1261,21 +1266,32 @@ class StructureBoard {
             );
         }
 
-        var headDiff = dd.diff(document.head, newDoc.head);
+        const headDiff = dd.diff(document.head, newDoc.head);
 
-        StructureBoard._replaceBodyWithHTML(newDoc.body.innerHTML);
+        StructureBoard._replaceBodyWithHTML(newDoc.body);
         dd.apply(document.head, headDiff);
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
 
         $('.cms-structure-content').scrollTop(structureScrollTop);
+        this._loadedContent = true;
+        this._contentChanged();
+    }
 
+    _contentChanged(messages) {
         Plugin._refreshPlugins();
 
         Helpers._getWindow().dispatchEvent(new Event('load'));
         $(Helpers._getWindow()).trigger('cms-content-refresh');
-
-        this._loadedContent = true;
+        if (messages) {
+            CMS.API.Messages.close();
+            if (messages.length) {
+                CMS.API.Messages.open({
+                    message: messages.map(message => `<p>${message.message}</p>`).join(''),
+                    error: messages.some(message => message.level === 'error')
+                });
+            }
+        }
     }
 
     handleAddPlugin(data) {
@@ -1294,6 +1310,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
+        return true;  // update needed
     }
 
     handleEditPlugin(data) {
@@ -1311,6 +1328,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
+        return true;  // update needed
     }
 
     handleDeletePlugin(data) {
@@ -1338,6 +1356,7 @@ class StructureBoard {
                 instance => instance.options.plugin_id && Number(instance.options.plugin_id) === Number(pluginId)
             );
         });
+        return true;
     }
 
     handleClearPlaceholder(data) {
@@ -1363,6 +1382,7 @@ class StructureBoard {
         });
 
         StructureBoard.actualizePlaceholders();
+        return true;
     }
 
     /**
@@ -1449,8 +1469,8 @@ class StructureBoard {
         });
     }
 
-    static _replaceBodyWithHTML(html) {
-        document.body.innerHTML = html;
+    static _replaceBodyWithHTML(body) {
+        document.body.innerHTML = body.innerHTML;
     }
 
     highlightPluginFromUrl() {

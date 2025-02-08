@@ -4,7 +4,7 @@ import sys
 from collections import OrderedDict
 from collections.abc import Generator
 from functools import partial
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from classytags.utils import flatten_context
 from django.conf import settings
@@ -185,7 +185,7 @@ class BaseRenderer:
         return self._cached_plugin_classes[plugin_type]
 
     def get_plugins_to_render(
-        self, placeholder: Placeholder, language: str, template: str
+        self, placeholder: Placeholder, language: str, template: Optional[str]
     ):
         from cms.utils.plugins import get_plugins
 
@@ -198,7 +198,7 @@ class BaseRenderer:
         return plugins
 
     def get_rendered_plugins_cache(self, placeholder: Placeholder):
-        blank = {
+        blank: dict[str, Any] = {
             "plugins": [],
             "plugin_parents": {},
             "plugin_children": {},
@@ -220,8 +220,8 @@ class BaseRenderer:
 class ContentRenderer(BaseRenderer):
     plugin_edit_template = (
         '<template class="cms-plugin '
-        'cms-plugin-start cms-plugin-{pk}" data-position="{position}"></template>{content}'
-        '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}" data-position="{position}"></template>'
+        'cms-plugin-start cms-plugin-{pk}" data-cms-position="{position}"></template>{content}'
+        '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}"></template>'
     )
     placeholder_edit_template = (
         '{content} '
@@ -247,8 +247,8 @@ class ContentRenderer(BaseRenderer):
         page: Optional[Page] = None,
         editable: bool = False,
         use_cache: bool = False,
-        nodelist: Optional = None,
-        width: Optional = None,
+        nodelist: Optional[Any] = None,
+        width: Optional[int] = None,
     ):
         from sekizai.helpers import Watcher
 
@@ -529,7 +529,7 @@ class ContentRenderer(BaseRenderer):
         editable: bool = False,
     ):
         context["_last_plugin"] = instance  # Used if an exception is rendered
-        if not placeholder:
+        if placeholder is None:
             placeholder = instance.placeholder
 
         instance, plugin = instance.get_plugin_instance()

@@ -215,7 +215,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: fields to fill, or which have valid default values for *all* fields.
     #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
     #: errors
-    show_plugin_add_form = True
+    show_add_form = True
 
     #: The plugin does not modify the context or request and its rendering is not influenced by its parent
     #: plugins.

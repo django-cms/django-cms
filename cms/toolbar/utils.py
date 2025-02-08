@@ -17,13 +17,13 @@ from sekizai.context import SekizaiContext
 from sekizai.helpers import get_varname
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
-from cms.models import CMSPlugin, PageContent
+from cms.models import CMSPlugin, PageContent, Placeholder
 from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
-def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
+def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: Optional[list[str]] = None) -> str:
     label = placeholder.get_label() or ''
     help_text = gettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
@@ -43,7 +43,7 @@ def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin, children=None, parents=None):
+def get_plugin_toolbar_info(plugin: CMSPlugin, children: Optional[list[str]] = None, parents: Optional[list[str]] = None) -> dict[str, Any]:
     data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
@@ -57,7 +57,7 @@ def get_plugin_toolbar_info(plugin, children=None, parents=None):
     return data
 
 
-def get_plugin_toolbar_js(plugin, children=None, parents=None):
+def get_plugin_toolbar_js(plugin: CMSPlugin, children: Optional[list[str]] = None, parents: Optional[list[str]] = None) -> str:
     data = get_plugin_toolbar_info(
         plugin,
         children=children,
@@ -66,7 +66,7 @@ def get_plugin_toolbar_js(plugin, children=None, parents=None):
     return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_tree_as_json(request, plugins):
+def get_plugin_tree_as_json(request: HttpRequest, plugins: list[CMSPlugin]) -> str:
     import warnings
 
     warnings.warn("get_plugin_tree_as_json is deprecated. Use get_plugin_tree instead.",
@@ -157,8 +157,9 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin, context: dict = 
     content = renderer.render_plugin(plugin, context, placeholder=plugin.placeholder, editable=True)
     return {
         "html": content,
-        "js": '\n'.join(context[get_varname()].get("js", [])),
-        "css": '\n'.join(context[get_varname()].get("css", [])),
+        "js": "".join(context[get_varname()].get("js", [])),
+        "css": "".join(context[get_varname()].get("css", [])),
+        "position": plugin.position,
         "pluginIds": get_plugin_tree_ids(plugin) ,
     }
 

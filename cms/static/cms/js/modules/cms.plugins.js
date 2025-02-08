@@ -152,10 +152,10 @@ var Plugin = new Class({
             // from which we filter out empty ones
             contents = contentWrappers
                 .map(items => {
-                    var templateStart = $(items[0]);
-                    var className = templateStart.attr('class').replace('cms-plugin-start', '');
-
-                    var itemContents = $(nextUntil(templateStart[0], container));
+                    const templateStart = $(items[0]);
+                    const className = templateStart.attr('class').replace('cms-plugin-start', '');
+                    const position = templateStart.attr('data-cms-position');
+                    let itemContents = $(nextUntil(templateStart[0], container));
 
                     $(items).filter('template').remove();
 
@@ -175,7 +175,8 @@ var Plugin = new Class({
                     });
 
                     itemContents.addClass(`cms-plugin ${className}`);
-
+                    itemContents.first().addClass(`cms-plugin-first`).attr('data-cms-position', position);
+                    itemContents.last().addClass(`cms-plugin-last`).attr('data-cms-position', position);
                     return itemContents;
                 })
                 .filter(v => v.length);
