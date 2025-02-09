@@ -3,6 +3,8 @@
 from django.db import migrations, models
 import django.db.models.deletion
 
+import cms.models.settingmodels
+
 
 class Migration(migrations.Migration):
 
@@ -33,5 +35,16 @@ class Migration(migrations.Migration):
         ),
         migrations.DeleteModel(
             name='TreeNode',
+        ),
+        migrations.AlterField(
+            model_name="usersettings",
+            name="clipboard",
+            field=cms.models.settingmodels.PlaceholderForeignKey(
+                blank=True,
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="cms.placeholder",
+            ),
         ),
     ]
