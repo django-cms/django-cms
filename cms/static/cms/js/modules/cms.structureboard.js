@@ -22,10 +22,10 @@ import preloadImagesFromMarkup from './preload-images';
 import { Helpers, KEYS } from './cms.base';
 import { showLoader, hideLoader } from './loader';
 
-let dd;
 const DOMParser = window.DOMParser; // needed only for testing
 const storageKey = 'cms-structure';
 
+let dd;
 let placeholders;
 let originalPluginContainer;
 
@@ -60,7 +60,7 @@ class StructureBoard {
         this.latestAction = [];
         ls.remove(storageKey);
 
-        dd = new DiffDOM();
+        dd = new DiffDOM({debug: true});
 
         // setup initial stuff
         const setup = this._setup();
@@ -1070,6 +1070,40 @@ class StructureBoard {
             .fail(() => loader.remove() && Helpers.reloadBrowser());
     }
 
+    _updateContentFromDataBridge(data) {
+        console.log("update content from data bridge", data);
+        if (!data || !data.content || !data.content.pluginIds || data.content.pluginIds.length < 1 || !data.content.html) {
+            // Non content data available in data bridge? Full content upudate needed.
+            console.log("no data");
+            return true;  // Update needed
+        }
+
+        const existingPlugins = $(`:not(template).cms-plugin.cms-plugin-${data.content.pluginIds[0]}.cms-plugin-last`);
+    
+        if (existingPlugins.length < 1) {
+                // Plugin not found, but placeholder is known - plugin was added
+                console.log("plugin not found");
+                return true;  // Update needed
+        }
+        console.log(existingPlugins)
+        // Add new content after existing content
+        existingPlugins.after(data.content.html);
+        // Delete previous content
+        // Go through all plugins and child plugins (they might not be nested)
+        data.content.pluginIds.forEach(id => {
+                $(`:not(template).cms-plugin.cms-plugin-${id}`).remove();
+            });
+        this._updateSekizai(data, 'css');
+        this._updateSekizai(data, 'js');
+
+        this._contentChanged(data.messages);
+        return true;
+    }
+
+    _updateSekizai(data, block) {
+
+    }
+
     _loadToolbar() {
         const placeholderIds = getPlaceholderIds(CMS._plugins).map(id => `placeholders[]=${id}`).join('&');
 
@@ -1247,6 +1281,7 @@ class StructureBoard {
         if (!this._loadedStructure) {
             this._requeststructure = null;
         }
+        let fixedContentMarkup = contentMarkup;
         const newDoc = new DOMParser().parseFromString(contentMarkup, 'text/html');
 
         const structureScrollTop = $('.cms-structure-content').scrollTop();
@@ -1265,11 +1300,9 @@ class StructureBoard {
                 })
             );
         }
-
-        const headDiff = dd.diff(document.head, newDoc.head);
-
+        StructureBoard._replaceHeadWithHTML(newDoc.head);
         StructureBoard._replaceBodyWithHTML(newDoc.body);
-        dd.apply(document.head, headDiff);
+
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
 
@@ -1310,7 +1343,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return true;  // update needed
+        return this._updateContentFromDataBridge(data);
     }
 
     handleEditPlugin(data) {
@@ -1328,7 +1361,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return true;  // update needed
+        return this._updateContentFromDataBridge(data);
     }
 
     handleDeletePlugin(data) {
@@ -1469,9 +1502,25 @@ class StructureBoard {
         });
     }
 
-    static _replaceBodyWithHTML(body) {
-        document.body.innerHTML = body.innerHTML;
+    static _replaceBodyWithHTML(body, forceFullReplace = true) {
+        if (forceFullReplace) {
+            // Resets all events etc.
+            document.body.innerHTML = body.innerHTML;
+        } else {
+            // Mostly small changes to the body, so we can just diff and apply
+            const bodyDiff = dd.diff(document.body, body);
+            dd.apply(document.body, bodyDiff);
+        }
     }
+
+    static _replaceHeadWithHTML(head) {
+        console.log(document.head, typeof(document.head));
+        console.log(head, typeof(head));
+
+        const headDiff = dd.diff(document.head, head);
+        dd.apply(document.head, headDiff);
+    }
+
 
     highlightPluginFromUrl() {
         const hash = window.location.hash;
