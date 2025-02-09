@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 class ForeignPlaceholderKey(models.ForeignKey):
     def run_checks(self, *args, **kwargs):
         return True
-    
+
 
 class UserSettings(models.Model):
     user = models.OneToOneField(
