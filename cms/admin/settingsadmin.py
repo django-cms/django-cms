@@ -19,6 +19,7 @@ from django.utils.translation import override
 
 from cms.admin.forms import RequestToolbarForm
 from cms.models import UserSettings
+from cms.models.contentmodels import PageContent
 from cms.utils.page import get_page_from_request
 from cms.utils.urlutils import admin_reverse
 
@@ -79,10 +80,10 @@ class SettingsAdmin(ModelAdmin):
         cms_path = form_data.get('cms_path') or request.path_info
         origin_url = urlparse(cms_path)
         attached_obj = form_data.get('attached_obj')
-        current_page = get_page_from_request(request, use_path=origin_url.path, clean_path=True)
-
-        if attached_obj and current_page and not (attached_obj == current_page):
-            return HttpResponseBadRequest('Generic object does not match current page')
+        if isinstance(attached_obj, PageContent):
+            current_page = attached_obj.page
+        else:
+            current_page = get_page_from_request(request, use_path=origin_url.path, clean_path=True)
 
         data = QueryDict(query_string=origin_url.query, mutable=True)
         placeholders = request.GET.getlist("placeholders[]")
