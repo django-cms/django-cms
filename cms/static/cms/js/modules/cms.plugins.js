@@ -175,8 +175,8 @@ var Plugin = new Class({
                     });
 
                     itemContents.addClass(`cms-plugin ${className}`);
-                    itemContents.first().addClass(`cms-plugin-first`).attr('data-cms-position', position);
-                    itemContents.last().addClass(`cms-plugin-last`).attr('data-cms-position', position);
+                    itemContents.first().addClass('cms-plugin-first').attr('data-cms-position', position);
+                    itemContents.last().addClass('cms-plugin-last').attr('data-cms-position', position);
                     return itemContents;
                 })
                 .filter(v => v.length);

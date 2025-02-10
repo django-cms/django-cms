@@ -7,7 +7,7 @@ import keyboard from './keyboard';
 import Plugin from './cms.plugins';
 import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
-import {DiffDOM, nodeToObj} from 'diff-dom';
+import { DiffDOM, nodeToObj } from 'diff-dom';
 import PreventParentScroll from 'prevent-parent-scroll';
 import { find, findIndex, once, remove, compact, isEqual, zip, every } from 'lodash';
 import ls from 'local-storage';
@@ -60,7 +60,7 @@ class StructureBoard {
         this.latestAction = [];
         ls.remove(storageKey);
 
-        dd = new DiffDOM({debug: true});
+        dd = new DiffDOM();
 
         // setup initial stuff
         const setup = this._setup();
@@ -945,7 +945,8 @@ class StructureBoard {
     invalidateState(action, data, { propagate = true } = {}) {
         // eslint-disable-next-line default-case
 
-        let updateNeeded = true;  // By default, any edit action will result in changed content and therefore a need for an update
+        // By default, any edit action will result in changed content and therefore a need for an update
+        let updateNeeded = true;
 
         switch (action) {
             case 'COPY': {
@@ -992,11 +993,13 @@ class StructureBoard {
                 CMS.API.Helpers.reloadBrowser();
                 return;
             }
+
+            default:
+                break;
         }
         Plugin._recalculatePluginPositions(action, data);
 
         if (propagate) {
-            console.log("propagate", action, data);
             this._propagateInvalidatedState(action, data);
         }
 
@@ -1061,7 +1064,6 @@ class StructureBoard {
         const loader = $('<div class="cms-content-reloading"></div>');
 
         $('.cms-structure').before(loader);
-
         return this._requestMode('content')
             .done(markup => {
                 // eslint-disable-next-line no-magic-numbers
@@ -1072,10 +1074,9 @@ class StructureBoard {
     }
 
     _updateContentFromDataBridge(data) {
-        console.log("update content from data bridge", data);
-        if (!data || !data.content || !data.content.pluginIds || data.content.pluginIds.length < 1 || !data.content.html) {
+        if (!data || !data.content || !data.content.pluginIds ||
+            data.content.pluginIds.length < 1 || !data.content.html) {
             // Non content data available in data bridge? Full content upudate needed.
-            console.log("no data");
             return true;  // Update needed
         }
 
@@ -1084,6 +1085,7 @@ class StructureBoard {
         if (existingPlugins.length < 1) {
             // Plugin not found, but placeholder is known - plugin was added
             const placeholder = $(`div.cms-placeholder.cms-placeholder-${data.placeholder_id}`);
+
             if (placeholder.length === 0) {
                 // Placeholder not found - update needed
                 return true;
@@ -1096,8 +1098,8 @@ class StructureBoard {
         // Delete previous content
         // Go through all plugins and child plugins (they might not be nested)
         data.content.pluginIds.forEach(id => {
-                $(`:not(template).cms-plugin.cms-plugin-${id}`).remove();
-            });
+            $(`:not(template).cms-plugin.cms-plugin-${id}`).remove();
+        });
         this._updateSekizai(data, 'css');
         this._updateSekizai(data, 'js');
 
@@ -1111,7 +1113,9 @@ class StructureBoard {
         }
 
         // Find existing candiates, selector and cursor to write to
-        let current, selector, location;
+        let current;
+        let selector;
+        let location;
 
         if (block === 'css') {
             selector = 'link, style, meta';
@@ -1129,6 +1133,7 @@ class StructureBoard {
         // Cannot use innerHTML since this would prevent scripts to be executed.
         const newElements = document.createElement('div');
         const diff = dd.diff(newElements, `<div>${data.content[block]}</div>`);
+
         dd.apply(newElements, diff);
 
         // Collect deferred scripts to ensure firing
@@ -1136,10 +1141,12 @@ class StructureBoard {
         const loaded = [];
 
         for (const element of newElements.querySelectorAll(selector)) {
-            if (!this._elementPresent(current, element)) {
+            if (this._elementPresent(current, element)) {
+                element.remove();
+            } else {
                 if (element.hasAttribute('src')) {
                     deferred.push(element);
-                    element.onerror = element.onload = (el) => {
+                    element.onerror = element.onload = el => {
                         loaded.push(el);
                         if (loaded.length === deferred.length) {
                             Helpers._getWindow().dispatchEvent(new Event('load'));
@@ -1148,8 +1155,6 @@ class StructureBoard {
                     };
                 }
                 location.appendChild(element);
-            } else {
-                element.remove();
             }
         }
         return deferred.length > 0;
@@ -1158,7 +1163,7 @@ class StructureBoard {
     _elementPresent(current, element) {
         const markup = element.outerHTML;
 
-        return [...current].some((el) => el.outerHTML === markup);
+        return [...current].some(el => el.outerHTML === markup);
     }
 
     _loadToolbar() {
@@ -1298,9 +1303,10 @@ class StructureBoard {
     }
 
     handleCutPlugin(data) {
-        let updateNeeded = this.handleDeletePlugin(data);
-        updateNeeded |= this.handleCopyPlugin(data);
-        return updateNeeded;  // update needed
+        const updateNeededFromDelete = this.handleDeletePlugin(data);
+        const updateNeededFromCopy = this.handleCopyPlugin(data);
+
+        return updateNeededFromDelete || updateNeededFromCopy;
     }
 
     _extractMessages(doc) {
@@ -1357,6 +1363,7 @@ class StructureBoard {
             );
         }
         const headDiff = dd.diff(document.head, nodeToObj(newDoc.head));
+
         StructureBoard._replaceBodyWithHTML(newDoc.body);
         dd.apply(document.head, headDiff);
 
@@ -1566,6 +1573,7 @@ class StructureBoard {
         } else {
             // Mostly small changes to the body, so we can just diff and apply
             const bodyDiff = dd.diff(document.body, body);
+
             dd.apply(document.body, bodyDiff);
         }
     }
