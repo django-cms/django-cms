@@ -92,7 +92,10 @@ class PlaceholderAdminTestCase(CMSTestCase):
             user=superuser,
             clipboard=Placeholder.objects.create(),
         )
-        source_placeholder = Placeholder.objects.create(slot="source")
+        user_settings.clipboard.source = user_settings
+        user_settings.clipboard.save()
+
+        source_placeholder = Placeholder.objects.create(slot='source')
         source_plugin = self._add_plugin_to_placeholder(source_placeholder)
         endpoint = self.get_copy_plugin_uri(source_plugin)
         with self.login_user_context(superuser):
