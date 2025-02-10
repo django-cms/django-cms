@@ -1084,13 +1084,15 @@ class StructureBoard {
         if (existingPlugins.length < 1) {
             // Plugin not found, but placeholder is known - plugin was added
             const placeholder = $(`div.cms-placeholder.cms-placeholder-${data.placeholder_id}`);
-            console.log(placeholder);
+            if (placeholder.length === 0) {
+                // Placeholder not found - update needed
+                return true;
+            }
             placeholder.before(data.content.html);
-            return placeholder.length === 0;  // Only update of placeholder div not found
+        } else {
+            // Add new content after existing content
+            existingPlugins.after(data.content.html);
         }
-        console.log(existingPlugins);
-        // Add new content after existing content
-        existingPlugins.after(data.content.html);
         // Delete previous content
         // Go through all plugins and child plugins (they might not be nested)
         data.content.pluginIds.forEach(id => {
@@ -1104,7 +1106,44 @@ class StructureBoard {
     }
 
     _updateSekizai(data, block) {
+        if ((data.content[block] || '').length === 0) {
+            return;
+        }
 
+        // Find existing candiates, selector and cursor to write to
+        let current, selector, cursor;
+
+        if (block === 'css') {
+            selector = 'link, style, meta';
+            current = document.head.querySelectorAll(selector);
+            cursor = document.head.lastElementChild;
+        } else if (block === 'js') {
+            selector = 'script';
+            current = document.body.querySelectorAll(selector);
+            cursor = document.body.querySelector('script[data-cms-config]') || document.body.lastElementChild;
+        } else {
+            return;
+        }
+
+        // Parse new block
+        const newElements = document.createElement('div');
+        newElements.innerHTML = data.content[block];
+
+        for (const element of newElements.querySelectorAll(selector)) {
+            if (!this._elementPresent(current, element)) {
+                console.log("insert", element);
+                cursor.after(element);
+                cursor = element;
+            } else {
+                element.remove();
+            }
+        }
+    }
+
+    _elementPresent(current, element) {
+        const markup = element.outerHTML;
+
+        return [...current].some((el) => el.outerHTML === markup);
     }
 
     _loadToolbar() {
