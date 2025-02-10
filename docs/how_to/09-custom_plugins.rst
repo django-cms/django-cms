@@ -272,6 +272,117 @@ another.
 See the GitHub issue `copy_relations() does not work for relations between cmsplugins
 #4143 <https://github.com/django-cms/django-cms/issues/4143>`_ for more details.
 
+
+Adding a model to an existing custom plugin
+-------------------------------------------
+
+When enhancing an existing django CMS plugin with additional functionality, you might need to 
+associate a database model with the plugin. This allows the plugin to store and manage data 
+persistently. However, introducing a model to an existing plugin requires careful handling to 
+prevent the disappearance of existing plugin instances, as discussed in `Issue #7476`_.
+
+1. **Define the Model**:
+   
+   In your application's `models.py`, define a model that inherits from `CMSPlugin`. This model 
+   will store the plugin's data. To allow for automatic migration later, make sure that all model 
+   fields have meaningful defaults. 
+
+   .. code-block:: python
+
+       from django.db import models
+       from cms.models.pluginmodel import CMSPlugin
+
+       class MyPluginModel(CMSPlugin):
+           title = models.CharField(max_length=100, default='Default Title')  # Add defaults
+           # Add other fields as needed
+
+           def __str__(self):
+               return self.title
+
+2. **Update the Plugin Class**:
+   
+   In your `cms_plugins.py`, associate the plugin with the newly created model by setting the `model` attribute.
+
+   .. code-block:: python
+
+       from cms.plugin_base import CMSPluginBase
+       from cms.plugin_pool import plugin_pool
+       from django.utils.translation import gettext_lazy as _
+       from .models import MyPluginModel
+
+       @plugin_pool.register_plugin
+       class MyPlugin(CMSPluginBase):
+           model = MyPluginModel
+           name = _("My Plugin")
+           render_template = "my_app/my_plugin_template.html"
+           # Configure other attributes as needed
+
+3. **Create Migrations**:
+   
+   Generate the necessary database migrations to reflect the new model. Do not apply them yet, since 
+   the migrations will need an additional script to run.
+
+   .. code-block:: bash
+
+       python manage.py makemigrations
+
+4. **Handle Existing Plugin Instances**:
+   
+   After adding a model to an existing plugin, existing instances will not automatically 
+   associate with the new model, leading to their disappearance in the CMS interface. To address 
+   this, use a migration script to convert existing plugin instances to the new model.
+
+   This script can be added to the migration just created in step 3.
+
+    .. code-block:: python
+
+       def add_model_to_plugin(apps, schema_editor):
+           """ Adds instances for the new model.
+           ATTENTION: All fields of the model must have a valid default value!"""
+
+           # Adjust the following two lines
+           model = app.get_model("my_app", "MyGreatPluginModel")  # Name of the plugin's new model class
+           plugin_type = "MyGreatPlugin"  # Name of the plugin class
+
+           CMSPlugin = apps.get_model("cms", "CMSPlugin")
+
+           plugin_instances = CMSPlugin.objects.filter(plugin_type=plugin_type)
+           for plugin_instance in plugin_instances:
+               logger.info('Creating new model instance for plugin instance %s', plugin_instance.pk)
+               obj = model()
+               obj.pk = plugin_instance.pk
+               obj.cmsplugin_ptr = plugin_instance
+               obj.plugin_type = plugin_type
+               obj.placeholder = plugin_instance.placeholder
+               obj.parent = plugin_instance.parent
+               obj.language = plugin_instance.language
+               obj.position = plugin_instance.position
+               obj.creation_date = plugin_instance.creation_date
+               obj.save()
+
+       class Migration(migrations.Migration):
+           ... 
+
+           operations = [
+               ..., 
+               migrations.RunPython(add_model_to_plugin),  # Add at the end of migration operations
+           ]
+
+   This script migrates existing plugin instances to the new model structure, preserving data integrity.
+
+5. **Run the migrations**:
+   
+   Apply the modified migration. 
+
+   .. code-block:: bash
+
+       python manage.py makemigrations
+   
+   After applying migrations, thoroughly test the plugin to ensure that existing instances appear correctly 
+   and that the new model functionalities work as intended.
+
+.. _Issue #7476: https://github.com/django-cms/django-cms/issues/7476
+
 Advanced
 --------
 
