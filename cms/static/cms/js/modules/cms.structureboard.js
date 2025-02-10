@@ -1111,33 +1111,48 @@ class StructureBoard {
         }
 
         // Find existing candiates, selector and cursor to write to
-        let current, selector, cursor;
+        let current, selector, location;
 
         if (block === 'css') {
             selector = 'link, style, meta';
             current = document.head.querySelectorAll(selector);
-            cursor = document.head.lastElementChild;
+            location = document.head;
         } else if (block === 'js') {
             selector = 'script';
             current = document.body.querySelectorAll(selector);
-            cursor = document.body.querySelector('script[data-cms-config]') || document.body.lastElementChild;
+            location = document.body;
         } else {
             return;
         }
 
-        // Parse new block
+        // Parse new block, by creating the diff
+        // Cannot use innerHTML since this would prevent scripts to be executed.
         const newElements = document.createElement('div');
-        newElements.innerHTML = data.content[block];
+        const diff = dd.diff(newElements, `<div>${data.content[block]}</div>`);
+        dd.apply(newElements, diff);
+
+        // Collect deferred scripts to ensure firing
+        const deferred = [];
+        const loaded = [];
 
         for (const element of newElements.querySelectorAll(selector)) {
             if (!this._elementPresent(current, element)) {
-                console.log("insert", element);
-                cursor.after(element);
-                cursor = element;
+                if (element.hasAttribute('src')) {
+                    deferred.push(element);
+                    element.onerror = element.onload = (el) => {
+                        loaded.push(el);
+                        if (loaded.length === deferred.length) {
+                            Helpers._getWindow().dispatchEvent(new Event('load'));
+                            $(Helpers._getWindow()).trigger('cms-content-refresh');
+                        }
+                    };
+                }
+                location.appendChild(element);
             } else {
                 element.remove();
             }
         }
+        return deferred.length > 0;
     }
 
     _elementPresent(current, element) {

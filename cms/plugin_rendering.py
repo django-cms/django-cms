@@ -220,7 +220,7 @@ class BaseRenderer:
 class ContentRenderer(BaseRenderer):
     plugin_edit_template = (
         '<template class="cms-plugin '
-        'cms-plugin-start cms-plugin-{pk}" data-cms-position="{position}"></template>{content}'
+        'cms-plugin-start cms-plugin-{pk}" data-cms-placeholder="{placeholder}" data-cms-position="{position}"></template>{content}'
         '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}"></template>'
     )
     placeholder_edit_template = (
@@ -555,7 +555,12 @@ class ContentRenderer(BaseRenderer):
             content = processor(instance, placeholder, content, context)
 
         if editable:
-            content = self.plugin_edit_template.format(pk=instance.pk, content=content, position=instance.position)
+            content = self.plugin_edit_template.format(
+                pk=instance.pk,
+                placeholder=instance.placeholder_id,
+                content=content,
+                position=instance.position
+            )
             placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
                 placeholder.pk, {}
             )
@@ -593,7 +598,10 @@ class ContentRenderer(BaseRenderer):
                 # Make error message editable by double-click to open the editor for the plugin causing the exception
                 instance = context["_last_plugin"]
                 heading = self.plugin_edit_template.format(
-                    pk=instance.pk, content=heading, position=instance.position,
+                    pk=instance.pk,
+                    placeholder=instance.placeholder_id,
+                    content=heading,
+                    position=instance.position,
                 )
                 placeholder_cache = self._rendered_plugins_by_placeholder.setdefault(
                     placeholder.pk, {}
