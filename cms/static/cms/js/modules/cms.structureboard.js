@@ -7,7 +7,7 @@ import keyboard from './keyboard';
 import Plugin from './cms.plugins';
 import { getPlaceholderIds } from './cms.toolbar';
 import Clipboard from './cms.clipboard';
-import { DiffDOM } from 'diff-dom';
+import {DiffDOM, nodeToObj} from 'diff-dom';
 import PreventParentScroll from 'prevent-parent-scroll';
 import { find, findIndex, once, remove, compact, isEqual, zip, every } from 'lodash';
 import ls from 'local-storage';
@@ -956,17 +956,17 @@ class StructureBoard {
 
              // For other actions, only refresh, if the new state cannot be determined from the data bridge
             case 'ADD': {
-                updateNeeded = this.handleAddPlugin(data); 
+                updateNeeded = this.handleAddPlugin(data);
                 break;
             }
 
             case 'EDIT': {
-                updateNeeded = this.handleEditPlugin(data); 
+                updateNeeded = this.handleEditPlugin(data);
                 break;
             }
 
             case 'DELETE': {
-                updateNeeded = this.handleDeletePlugin(data);  
+                updateNeeded = this.handleDeletePlugin(data);
                 break;
             }
 
@@ -985,17 +985,18 @@ class StructureBoard {
                 updateNeeded = this.handleCutPlugin(data);
                 break;
             }
-            
+
             case undefined:
             case false:
             case '': {
                 CMS.API.Helpers.reloadBrowser();
-                return;    
+                return;
             }
         }
         Plugin._recalculatePluginPositions(action, data);
 
         if (propagate) {
+            console.log("propagate", action, data);
             this._propagateInvalidatedState(action, data);
         }
 
@@ -1079,13 +1080,15 @@ class StructureBoard {
         }
 
         const existingPlugins = $(`:not(template).cms-plugin.cms-plugin-${data.content.pluginIds[0]}.cms-plugin-last`);
-    
+
         if (existingPlugins.length < 1) {
-                // Plugin not found, but placeholder is known - plugin was added
-                console.log("plugin not found");
-                return true;  // Update needed
+            // Plugin not found, but placeholder is known - plugin was added
+            const placeholder = $(`div.cms-placeholder.cms-placeholder-${data.placeholder_id}`);
+            console.log(placeholder);
+            placeholder.before(data.content.html);
+            return placeholder.length === 0;  // Only update of placeholder div not found
         }
-        console.log(existingPlugins)
+        console.log(existingPlugins);
         // Add new content after existing content
         existingPlugins.after(data.content.html);
         // Delete previous content
@@ -1097,7 +1100,7 @@ class StructureBoard {
         this._updateSekizai(data, 'js');
 
         this._contentChanged(data.messages);
-        return true;
+        return false;
     }
 
     _updateSekizai(data, block) {
@@ -1281,7 +1284,6 @@ class StructureBoard {
         if (!this._loadedStructure) {
             this._requeststructure = null;
         }
-        let fixedContentMarkup = contentMarkup;
         const newDoc = new DOMParser().parseFromString(contentMarkup, 'text/html');
 
         const structureScrollTop = $('.cms-structure-content').scrollTop();
@@ -1300,8 +1302,9 @@ class StructureBoard {
                 })
             );
         }
-        StructureBoard._replaceHeadWithHTML(newDoc.head);
+        const headDiff = dd.diff(document.head, nodeToObj(newDoc.head));
         StructureBoard._replaceBodyWithHTML(newDoc.body);
+        dd.apply(document.head, headDiff);
 
         toolbar.prependTo(document.body);
         CMS.API.Toolbar._refreshMarkup(newToolbar);
@@ -1512,15 +1515,6 @@ class StructureBoard {
             dd.apply(document.body, bodyDiff);
         }
     }
-
-    static _replaceHeadWithHTML(head) {
-        console.log(document.head, typeof(document.head));
-        console.log(head, typeof(head));
-
-        const headDiff = dd.diff(document.head, head);
-        dd.apply(document.head, headDiff);
-    }
-
 
     highlightPluginFromUrl() {
         const hash = window.location.hash;
