@@ -1426,7 +1426,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return this._updateContentFromDataBridge(data);;
+        return this._updateContentFromDataBridge(data);
     }
 
     handleDeletePlugin(data) {

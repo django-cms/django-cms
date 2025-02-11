@@ -117,8 +117,8 @@ var Plugin = new Class({
      * @param {String} container `cms-plugin-${id}`
      */
     _setupUI: function setupUI(container) {
-        var wrapper = $(`.${container}`);
-        var contents;
+        const wrapper = $(`.${container}`);
+        let contents;
 
         // have to check for cms-plugin, there can be a case when there are multiple
         // static placeholders or plugins rendered twice, there could be multiple wrappers on same page
@@ -130,11 +130,7 @@ var Plugin = new Class({
             //
             // in case of plugins it means that it's aliased plugin or a plugin in a duplicated
             // static placeholder (for whatever reason)
-            console.log(wrapper.toArray());
-            if (container === 'cms-plugin-1') {
-                debugger;
-            }
-            const contentWrappers = wrapper.toArray().reduce((wrappers, elem, index) => {
+            const contentWrappers = wrapper.toArray().reduce((wrappers, elem) => {
                 if (elem.classList.contains('cms-plugin-start')) {
                     // start new wrapper
                     wrappers.push([elem]);
@@ -146,12 +142,9 @@ var Plugin = new Class({
                 return wrappers;
             }, []);
 
-            console.log(container);
-            console.log(contentWrappers);
-
             if (contentWrappers[0][0].tagName === 'TEMPLATE') {
-                // then we map that structure into an array of jquery collections
-                // from which we filter out empty ones
+                // then - if the content is bracketed by two template tages - we map that structure into an array of
+                // jquery collections from which we filter out empty ones
                 contents = contentWrappers
                     .map(items => {
                         const templateStart = $(items[0]);
