@@ -2,6 +2,10 @@
  * Copyright https://github.com/divio/django-cms
  */
 
+/* eslint-env es6 */
+/* jshint esversion: 6 */
+/* global CMS */
+
 import $ from 'jquery';
 import keyboard from './keyboard';
 import Plugin from './cms.plugins';
@@ -30,8 +34,9 @@ let placeholders;
 let originalPluginContainer;
 
 const triggerWindowResize = () => {
+    'use strict';
     try {
-        var evt = document.createEvent('UIEvents');
+        const evt = document.createEvent('UIEvents');
 
         evt.initUIEvent('resize', true, false, window, 0);
         window.dispatchEvent(evt);
@@ -58,6 +63,7 @@ class StructureBoard {
         this.state = false;
         this.dragging = false;
         this.latestAction = [];
+        this.scriptReferenceCount = 0;
         ls.remove(storageKey);
 
         dd = new DiffDOM();
@@ -84,8 +90,8 @@ class StructureBoard {
      * @private
      */
     _setupUI() {
-        var container = $('.cms-structure');
-        var toolbar = $('.cms-toolbar');
+        const container = $('.cms-structure');
+        const toolbar = $('.cms-toolbar');
 
         this.ui = {
             container: container,
@@ -116,7 +122,7 @@ class StructureBoard {
      * @returns {Boolean|void}
      */
     _setup() {
-        var that = this;
+        const that = this;
 
         // cancel if there is no structure / content switcher
         if (!this.ui.toolbarModeSwitcher.length) {
@@ -268,7 +274,7 @@ class StructureBoard {
      * @param {Boolean} [options.useHoveredPlugin] should the plugin be taken into account
      */
     _toggleStructureBoard(options = {}) {
-        var that = this;
+        const that = this;
 
         if (options.useHoveredPlugin && CMS.settings.mode !== 'structure') {
             that._showAndHighlightPlugin(options.successTimeout).then($.noop, $.noop);
@@ -302,20 +308,20 @@ class StructureBoard {
             return Promise.resolve(false);
         }
 
-        var tooltip = CMS.API.Tooltip.domElem;
-        var HIGHLIGHT_TIMEOUT = 10;
-        var DRAGGABLE_HEIGHT = 50; // it's not precisely 50, but it fits
+        const tooltip = CMS.API.Tooltip.domElem;
+        const HIGHLIGHT_TIMEOUT = 10;
+        const DRAGGABLE_HEIGHT = 50; // it's not precisely 50, but it fits
 
         if (!tooltip.is(':visible')) {
             return Promise.resolve(false);
         }
 
-        var pluginId = tooltip.data('plugin_id');
+        const pluginId = tooltip.data('plugin_id');
 
         return this.show().then(function() {
-            var draggable = $('.cms-draggable-' + pluginId);
-            var doc = $(document);
-            var currentExpandmode = doc.data('expandmode');
+            const draggable = $('.cms-draggable-' + pluginId);
+            const doc = $(document);
+            const currentExpandmode = doc.data('expandmode');
 
             // expand necessary parents
             doc.data('expandmode', false);
@@ -326,8 +332,8 @@ class StructureBoard {
 
             setTimeout(() => doc.data('expandmode', currentExpandmode));
             setTimeout(function() {
-                var offsetParent = draggable.offsetParent();
-                var position = draggable.position().top + offsetParent.scrollTop();
+                const offsetParent = draggable.offsetParent();
+                const position = draggable.position().top + offsetParent.scrollTop();
 
                 draggable.offsetParent().scrollTop(position - window.innerHeight / 2 + DRAGGABLE_HEIGHT);
 
@@ -355,8 +361,8 @@ class StructureBoard {
         // had the scrollbar and if it had - we adjust
         // the toolbar positioning
         if (init) {
-            var width = this.ui.toolbar.width();
-            var scrollBarWidth = this.ui.window[0].innerWidth - width;
+            const width = this.ui.toolbar.width();
+            let scrollBarWidth = this.ui.window[0].innerWidth - width;
 
             if (!scrollBarWidth && init) {
                 scrollBarWidth = measureScrollbar();
@@ -388,15 +394,13 @@ class StructureBoard {
 
                 CMS.settings.states = Helpers.getSettings().states;
 
-                var bodyRegex = /<body[\S\s]*?>([\S\s]*)<\/body>/gi;
-                var body = $(bodyRegex.exec(contentMarkup)[1]);
+                const bodyRegex = /<body[\S\s]*?>([\S\s]*)<\/body>/gi;
+                const body = $(bodyRegex.exec(contentMarkup)[1]);
 
-                var structure = body.find('.cms-structure-content');
-                var toolbar = body.find('.cms-toolbar');
-                var scripts = body.filter(function() {
-                    var elem = $(this);
-
-                    return elem.is('[type="text/cms-template"]'); // cms scripts
+                const structure = body.find('.cms-structure-content');
+                const toolbar = body.find('.cms-toolbar');
+                const scripts = body.filter(function() {
+                    return $(this).is('[type="text/cms-template"]'); // cms scripts
                 });
                 const pluginIds = this.getIds(body.find('.cms-draggable'));
                 const pluginDataSource = body.filter('script[data-cms]').toArray()
@@ -463,7 +467,7 @@ class StructureBoard {
     }
 
     _loadContent() {
-        var that = this;
+        const that = this;
 
         // case when content mode is already loaded
         if (CMS.config.settings.mode === 'edit' || this._loadedContent) {
@@ -476,22 +480,22 @@ class StructureBoard {
             .done(function(contentMarkup) {
                 that._requestcontent = null;
                 hideLoader();
-                var htmlRegex = /<html([\S\s]*?)>[\S\s]*<\/html>/gi;
-                var bodyRegex = /<body([\S\s]*?)>([\S\s]*)<\/body>/gi;
-                var headRegex = /<head[\S\s]*?>([\S\s]*)<\/head>/gi;
-                var matches = bodyRegex.exec(contentMarkup);
+                const htmlRegex = /<html([\S\s]*?)>[\S\s]*<\/html>/gi;
+                const bodyRegex = /<body([\S\s]*?)>([\S\s]*)<\/body>/gi;
+                const headRegex = /<head[\S\s]*?>([\S\s]*)<\/head>/gi;
+                const matches = bodyRegex.exec(contentMarkup);
                 // we don't handle cases where body or html doesn't exist, cause it's highly unlikely
                 // and will result in way more troubles for cms than this
-                var bodyAttrs = matches[1];
-                var body = $(matches[2]);
-                var head = $(headRegex.exec(contentMarkup)[1]);
-                var htmlAttrs = htmlRegex.exec(contentMarkup)[1];
-                var bodyAttributes = $('<div ' + bodyAttrs + '></div>')[0].attributes;
-                var htmlAttributes = $('<div ' + htmlAttrs + '></div>')[0].attributes;
-                var newToolbar = body.find('.cms-toolbar');
-                var toolbar = $('.cms').add('[data-cms]').detach();
-                var title = head.filter('title');
-                var bodyElement = $('body');
+                const bodyAttrs = matches[1];
+                let body = $(matches[2]);
+                const head = $(headRegex.exec(contentMarkup)[1]);
+                const htmlAttrs = htmlRegex.exec(contentMarkup)[1];
+                const bodyAttributes = $('<div ' + bodyAttrs + '></div>')[0].attributes;
+                const htmlAttributes = $('<div ' + htmlAttrs + '></div>')[0].attributes;
+                const newToolbar = body.find('.cms-toolbar');
+                const toolbar = $('.cms').add('[data-cms]').detach();
+                const title = head.filter('title');
+                const bodyElement = $('body');
 
                 // istanbul ignore else
                 if (title) {
@@ -499,7 +503,7 @@ class StructureBoard {
                 }
 
                 body = body.filter(function() {
-                    var elem = $(this);
+                    const elem = $(this);
 
                     return (
                         !elem.is('.cms#cms-top') && !elem.is('[data-cms]:not([data-cms-generic])') // toolbar
@@ -532,13 +536,13 @@ class StructureBoard {
                     window.dispatchEvent(new Event('DOMContentLoaded'));
                 });
 
-                const unhandledPlugins = $('body').find('template.cms-plugin');
+                const unhandledPlugins = bodyElement.find('template.cms-plugin');
 
                 if (unhandledPlugins.length) {
                     CMS.API.Messages.open({
                         message: CMS.config.lang.unhandledPageChange
                     });
-                    Helpers.reloadBrowser();
+                    Helpers.reloadBrowser('REFRESH_PAGE');
                 }
 
                 that._loadedContent = true;
@@ -565,7 +569,7 @@ class StructureBoard {
         $('html').removeClass('cms-overflow');
 
         // set active item
-        var modes = this.ui.toolbarModeLinks;
+        const modes = this.ui.toolbarModeLinks;
 
         modes.removeClass('cms-btn-active').eq(1).addClass('cms-btn-active');
         this.ui.html.removeClass('cms-structure-mode-structure').addClass('cms-structure-mode-content');
@@ -590,8 +594,8 @@ class StructureBoard {
             return false;
         }
 
-        var id = null;
-        var cls = el.attr('class').split(' ')[1];
+        let id = null;
+        const cls = el.attr('class').split(' ')[1];
 
         if (el.hasClass('cms-plugin')) {
             id = cls.replace('cms-plugin-', '').trim();
@@ -616,8 +620,8 @@ class StructureBoard {
      * @returns {String[]}
      */
     getIds(els) {
-        var that = this;
-        var array = [];
+        const that = this;
+        const array = [];
 
         els.each(function() {
             array.push(that.getId($(this)));
@@ -634,7 +638,7 @@ class StructureBoard {
      */
     _showBoard(init) {
         // set active item
-        var modes = this.ui.toolbarModeLinks;
+        const modes = this.ui.toolbarModeLinks;
 
         modes.removeClass('cms-btn-active').eq(0).addClass('cms-btn-active');
         this.ui.html.removeClass('cms-structure-mode-content').addClass('cms-structure-mode-structure');
@@ -662,8 +666,8 @@ class StructureBoard {
             history.replaceState({}, '', CMS.config.settings.edit);
         }
 
-        var width = this.ui.toolbar.width();
-        var scrollBarWidth = this.ui.window[0].innerWidth - width;
+        const width = this.ui.toolbar.width();
+        let scrollBarWidth = this.ui.window[0].innerWidth - width;
 
         if (!scrollBarWidth) {
             scrollBarWidth = measureScrollbar();
@@ -720,7 +724,7 @@ class StructureBoard {
      * @private
      */
     _drag(elem = this.ui.sortables) {
-        var that = this;
+        const that = this;
 
         elem
             .nestedSortable({
@@ -732,7 +736,7 @@ class StructureBoard {
                 dropOnEmpty: true,
                 // cloning huge structure is a performance loss compared to cloning just a dragitem
                 helper: function createHelper(e, item) {
-                    var clone = item.find('> .cms-dragitem').clone();
+                    const clone = item.find('> .cms-dragitem').clone();
 
                     clone.wrap('<div class="' + item[0].className + '"></div>');
                     return clone.parent();
@@ -766,7 +770,7 @@ class StructureBoard {
                     // keep in mind that caching cms-draggables query only works
                     // as long as we don't create them on the fly
                     that.ui.sortables.each(function() {
-                        var element = $(this);
+                        const element = $(this);
 
                         if (element.children().length === 0) {
                             element.removeClass('cms-hidden');
@@ -803,7 +807,7 @@ class StructureBoard {
                         return false;
                     }
 
-                    var newPluginContainer = ui.item.closest('.cms-draggables');
+                    const newPluginContainer = ui.item.closest('.cms-draggables');
 
                     if (originalPluginContainer.is(newPluginContainer)) {
                         // if we moved inside same container,
@@ -818,17 +822,15 @@ class StructureBoard {
                     }
 
                     // we pass the id to the updater which checks within the backend the correct place
-                    var id = that.getId(ui.item);
-                    var plugin = $(`.cms-draggable-${id}`);
-                    var eventData = {
+                    const id = that.getId(ui.item);
+                    const plugin = $(`.cms-draggable-${id}`);
+                    const eventData = {
                         id: id
                     };
-                    var previousParentPlugin = originalPluginContainer.closest('.cms-draggable');
+                    const previousParentPlugin = originalPluginContainer.closest('.cms-draggable');
 
                     if (previousParentPlugin.length) {
-                        var previousParentPluginId = that.getId(previousParentPlugin);
-
-                        eventData.previousParentPluginId = previousParentPluginId;
+                        eventData.previousParentPluginId = that.getId(previousParentPlugin);
                     }
 
                     // check if we copy/paste a plugin or not
@@ -842,7 +844,7 @@ class StructureBoard {
 
                     // reset placeholder without entries
                     that.ui.sortables.each(function() {
-                        var element = $(this);
+                        const element = $(this);
 
                         if (element.children().length === 0) {
                             element.addClass('cms-hidden');
@@ -858,8 +860,8 @@ class StructureBoard {
                         return false;
                     }
                     // getting restriction array
-                    var bounds = [];
-                    var immediateParentType;
+                    let bounds = [];
+                    let immediateParentType;
 
                     if (placeholder && placeholder.closest('.cms-clipboard-containers').length) {
                         return false;
@@ -870,24 +872,24 @@ class StructureBoard {
                         return false;
                     }
 
-                    var originalItemId = that.getId(originalItem);
+                    const originalItemId = that.getId(originalItem);
                     // save original state events
-                    var original = $('.cms-draggable-' + originalItemId);
+                    const original = $('.cms-draggable-' + originalItemId);
 
                     // cancel if item has no settings
                     if (original.length === 0 || !original.data('cms')) {
                         return false;
                     }
-                    var originalItemData = original.data('cms');
-                    var parent_bounds = $.grep(originalItemData.plugin_parent_restriction, function(r) {
+                    const originalItemData = original.data('cms');
+                    const parent_bounds = $.grep(originalItemData.plugin_parent_restriction, function(r) {
                         // special case when PlaceholderPlugin has a parent restriction named "0"
                         return r !== '0';
                     });
-                    var type = originalItemData.plugin_type;
+                    const type = originalItemData.plugin_type;
                     // prepare variables for bound
-                    var holderId = that.getId(placeholder.closest('.cms-dragarea'));
-                    var holder = $('.cms-placeholder-' + holderId);
-                    var plugin;
+                    const holderId = that.getId(placeholder.closest('.cms-dragarea'));
+                    const holder = $('.cms-placeholder-' + holderId);
+                    let plugin;
 
                     if (placeholderParent && placeholderParent.length) {
                         // placeholderParent is always latest, it maybe that
@@ -1005,7 +1007,7 @@ class StructureBoard {
 
         // refresh content mode if needed
         // refresh toolbar
-        var currentMode = CMS.settings.mode;
+        const currentMode = CMS.settings.mode;
 
         if (currentMode === 'structure') {
             this._requestcontent = null;
@@ -1137,27 +1139,26 @@ class StructureBoard {
         dd.apply(newElements, diff);
 
         // Collect deferred scripts to ensure firing
-        const deferred = [];
-        const loaded = [];
+        this.scriptReferenceCount = 0;
+        const scriptLoaded = () => {
+            if (--this.scriptReferenceCount < 1) {
+                Helpers._getWindow().dispatchEvent(new Event('load'));
+                $(Helpers._getWindow()).trigger('cms-content-refresh');
+            }
+        };
 
         for (const element of newElements.querySelectorAll(selector)) {
             if (this._elementPresent(current, element)) {
                 element.remove();
             } else {
                 if (element.hasAttribute('src')) {
-                    deferred.push(element);
-                    element.onerror = element.onload = el => {
-                        loaded.push(el);
-                        if (loaded.length === deferred.length) {
-                            Helpers._getWindow().dispatchEvent(new Event('load'));
-                            $(Helpers._getWindow()).trigger('cms-content-refresh');
-                        }
-                    };
+                    this.scriptReferenceCount++;
+                    element.onerror = element.onload = scriptLoaded;
                 }
                 location.appendChild(element);
             }
         }
-        return deferred.length > 0;
+        return this.scriptReferenceCount > 0;
     }
 
     _elementPresent(current, element) {
@@ -1429,9 +1430,9 @@ class StructureBoard {
     }
 
     handleDeletePlugin(data) {
-        var deletedPluginIds = [data.plugin_id];
-        var draggable = $('.cms-draggable-' + data.plugin_id);
-        var children = draggable.find('.cms-draggable');
+        let deletedPluginIds = [data.plugin_id];
+        const draggable = $('.cms-draggable-' + data.plugin_id);
+        const children = draggable.find('.cms-draggable');
         let parent = draggable.parent().closest('.cms-draggable');
 
         if (!parent.length) {
@@ -1457,7 +1458,7 @@ class StructureBoard {
     }
 
     handleClearPlaceholder(data) {
-        var deletedIds = CMS._instances
+        const deletedIds = CMS._instances
             .filter(instance => {
                 if (
                     instance.options.plugin_id &&
@@ -1503,8 +1504,8 @@ class StructureBoard {
      */
     static actualizePlaceholders() {
         placeholders.each(function() {
-            var placeholder = $(this);
-            var copyAll = placeholder.find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
+            const placeholder = $(this);
+            const copyAll = placeholder.find('.cms-dragbar .cms-submenu-item:has(a[data-rel="copy"]):first');
 
             if (
                 placeholder.find('> .cms-draggables').children('.cms-draggable').not('.cms-draggable-is-dragging')
@@ -1552,8 +1553,8 @@ class StructureBoard {
      */
     static actualizePluginsCollapsibleStatus(els) {
         els.each(function() {
-            var childList = $(this);
-            var pluginDragItem = childList.closest('.cms-draggable').find('> .cms-dragitem');
+            const childList = $(this);
+            const pluginDragItem = childList.closest('.cms-draggable').find('> .cms-dragitem');
 
             if (childList.children().length) {
                 pluginDragItem.addClass('cms-dragitem-collapsable');
@@ -1641,11 +1642,13 @@ class StructureBoard {
 // istanbul ignore next
 StructureBoard._initializeDragItemsStates = function _initializeDragItemsStates() {
     // removing duplicate entries
-    var states = CMS.settings.states || [];
-    var sortedArr = states.sort();
-    var filteredArray = [];
+    'use strict';
 
-    for (var i = 0; i < sortedArr.length; i++) {
+    const states = CMS.settings.states || [];
+    const sortedArr = states.sort();
+    const filteredArray = [];
+
+    for (let i = 0; i < sortedArr.length; i++) {
         if (sortedArr[i] !== sortedArr[i + 1]) {
             filteredArray.push(sortedArr[i]);
         }
@@ -1654,7 +1657,7 @@ StructureBoard._initializeDragItemsStates = function _initializeDragItemsStates(
 
     // loop through the items
     $.each(CMS.settings.states, function(index, id) {
-        var el = $('.cms-draggable-' + id);
+        const el = $('.cms-draggable-' + id);
 
         // only add this class to elements which have immediate children
         if (el.find('> .cms-collapsable-container > .cms-draggable').length) {
