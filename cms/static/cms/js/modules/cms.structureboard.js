@@ -1082,7 +1082,7 @@ class StructureBoard {
             return true;  // Update needed
         }
 
-        const existingPlugins = $(`:not(template).cms-plugin.cms-plugin-${data.content.pluginIds[0]}.cms-plugin-last`);
+        const existingPlugins = $(`:not(template).cms-plugin.cms-plugin-${data.content.pluginIds[0]}.cms-plugin-end`);
 
         if (existingPlugins.length < 1) {
             // Plugin not found, but placeholder is known - plugin was added
@@ -1426,7 +1426,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return this._updateContentFromDataBridge(data);
+        return this._updateContentFromDataBridge(data);;
     }
 
     handleDeletePlugin(data) {

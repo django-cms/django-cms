@@ -130,60 +130,64 @@ var Plugin = new Class({
             //
             // in case of plugins it means that it's aliased plugin or a plugin in a duplicated
             // static placeholder (for whatever reason)
-            var contentWrappers = wrapper.toArray().reduce((wrappers, elem, index) => {
-                if (index === 0) {
-                    wrappers[0].push(elem);
-                    return wrappers;
-                }
-
-                var lastWrapper = wrappers[wrappers.length - 1];
-                var lastItemInWrapper = lastWrapper[lastWrapper.length - 1];
-
-                if ($(lastItemInWrapper).is('.cms-plugin-end')) {
+            console.log(wrapper.toArray());
+            if (container === 'cms-plugin-1') {
+                debugger;
+            }
+            const contentWrappers = wrapper.toArray().reduce((wrappers, elem, index) => {
+                if (elem.classList.contains('cms-plugin-start')) {
+                    // start new wrapper
                     wrappers.push([elem]);
                 } else {
-                    lastWrapper.push(elem);
+                    // belongs to previous wrapper
+                    wrappers.at(-1).push(elem);
                 }
 
                 return wrappers;
-            }, [[]]);
+            }, []);
 
-            // then we map that structure into an array of jquery collections
-            // from which we filter out empty ones
-            contents = contentWrappers
-                .map(items => {
-                    const templateStart = $(items[0]);
-                    const className = templateStart.attr('class').replace('cms-plugin-start', '');
-                    const position = templateStart.attr('data-cms-position');
-                    let itemContents = $(nextUntil(templateStart[0], container));
+            console.log(container);
+            console.log(contentWrappers);
 
-                    $(items).filter('template').remove();
+            if (contentWrappers[0][0].tagName === 'TEMPLATE') {
+                // then we map that structure into an array of jquery collections
+                // from which we filter out empty ones
+                contents = contentWrappers
+                    .map(items => {
+                        const templateStart = $(items[0]);
+                        const className = templateStart.attr('class').replace('cms-plugin-start', '');
+                        const position = templateStart.attr('data-cms-position');
+                        let itemContents = $(nextUntil(templateStart[0], container));
 
-                    itemContents.each((index, el) => {
-                        // if it's a non-space top-level text node - wrap it in `cms-plugin`
-                        if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
-                            var element = $(el);
+                        itemContents.each((index, el) => {
+                            // if it's a non-space top-level text node - wrap it in `cms-plugin`
+                            if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
+                                var element = $(el);
 
-                            element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
-                            itemContents[index] = element.parent()[0];
-                        }
-                    });
+                                element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
+                                itemContents[index] = element.parent()[0];
+                            }
+                        });
 
-                    // otherwise we don't really need text nodes or comment nodes or empty text nodes
-                    itemContents = itemContents.filter(function() {
-                        return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
-                    });
+                        // otherwise we don't really need text nodes or comment nodes or empty text nodes
+                        itemContents = itemContents.filter(function() {
+                            return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
+                        });
 
-                    itemContents.addClass(`cms-plugin ${className}`);
-                    itemContents.first().addClass('cms-plugin-first').attr('data-cms-position', position);
-                    itemContents.last().addClass('cms-plugin-last').attr('data-cms-position', position);
-                    return itemContents;
-                })
-                .filter(v => v.length);
+                        itemContents.addClass(`cms-plugin ${className}`);
+                        itemContents.first().addClass('cms-plugin-start').attr('data-cms-position', position);
+                        itemContents.last().addClass('cms-plugin-end').attr('data-cms-position', position);
+                        return itemContents;
+                    })
+                    .filter(v => v.length);
 
-            if (contents.length) {
-                // and then reduce it to one big collection
-                contents = contents.reduce((collection, items) => collection.add(items), $());
+                wrapper.filter('template').remove();
+                if (contents.length) {
+                    // and then reduce it to one big collection
+                    contents = contents.reduce((collection, items) => collection.add(items), $());
+                }
+            } else {
+                contents = wrapper;
             }
         } else {
             contents = wrapper;

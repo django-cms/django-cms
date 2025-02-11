@@ -7,10 +7,11 @@
  * @param {String} until class name of the element
  * @returns {Array<Element>} resulting array of elements
  */
-var nextUntil = function nextUntil(element, until) {
-    var next = [];
-    var el = element;
-    var regex = new RegExp(until);
+
+export default function nextUntil(element, until) {
+    const regex = new RegExp(until);
+    const next = [];
+    let el = element;
 
     while (
         el.nextSibling &&
@@ -26,6 +27,4 @@ var nextUntil = function nextUntil(element, until) {
     }
 
     return next;
-};
-
-export default nextUntil;
+}
