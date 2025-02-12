@@ -1,13 +1,11 @@
 /**
+ * Collects all sibling elements after the given element until an element matching the specified condition is found.
  * Essentially same as jQuery's `.nextUntil` but also includes non-element nodes.
  *
- * @function nextUntil
- * @public
- * @param {Element} element to start from
- * @param {String} until class name of the element
- * @returns {Array<Element>} resulting array of elements
+ * @param {Element} element - The starting element.
+ * @param {string} until - A string representing the class name pattern to stop at.
+ * @returns {Element[]} An array of sibling elements after the given element until the condition is met.
  */
-
 export default function nextUntil(element, until) {
     const regex = new RegExp(until);
     const next = [];
