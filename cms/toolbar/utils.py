@@ -77,8 +77,9 @@ def get_plugin_tree_as_json(request: HttpRequest, plugins: list[CMSPlugin]) -> s
 def get_plugin_tree(
     request: HttpRequest,
     plugins: list[CMSPlugin],
-    restrictions: Optional[dict] = None
-) -> tuple[dict[str, Any], list[CMSPlugin]]:
+    restrictions: Optional[dict] = None,
+    target_plugin: Optional[CMSPlugin] = None,
+) -> dict[str, Any]:
     """
     Constructs a tree structure of CMS plugins for the toolbar.
 
@@ -86,13 +87,16 @@ def get_plugin_tree(
         request (HttpRequest): The HTTP request object.
         plugins (list[CMSPlugin]): A list of CMSPlugin instances to be organized into a tree.
         restrictions (Optional[dict], optional): A dictionary of plugin restrictions. Defaults to None.
+        target_plugin (Optional[CMSPlugin], optional): The target plugin to render.
+            Content will only be rendered if given. Defaults to None.
 
     Returns:
-        tuple[dict[str, Any], list[CMSPlugin]]: A tuple containing:
-            - A dictionary with 'html' and 'plugins' keys:
-                - 'html': A string of rendered HTML for the plugin tree.
-                - 'plugins': A list of plugin information dictionaries.
-            - A list of downcasted CMSPlugin instances in the order they appear in the tree.
+        tuple[dict[str, Any]]: A dictionary with up to five keys:
+            - 'html': A string of rendered HTML for the plugin tree.
+            - 'plugins': A list of plugin information dictionaries.
+            - 'content': The rendered content of target_plugin (if given) including its children
+            - 'target_position': The position of the target_plugin (if given)
+            - 'target_placeholder_id': The placeholder id of the target_plugin (if given)
     """
     from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
 
@@ -144,7 +148,23 @@ def get_plugin_tree(
             }
             tree_structure.append(template.render(context))
     tree_data.reverse()
-    return {'html': '\n'.join(tree_structure), 'plugins': tree_data}, plugins
+
+    content = {}
+    # Render the target plugin if given and all plugins are local
+    if target_plugin and all(plugin.get_plugin_class().is_local for plugin in plugins):
+        # Also provide the parent plugin to the context (if available)
+        downcasted = next(
+            (plugin for plugin in plugins if plugin.pk == target_plugin.pk), None
+        )
+        parent = next(
+            (plugin for plugin in plugins if plugin.pk == target_plugin.parent_id), None
+        ) if target_plugin.parent_id else None
+        try:
+            content["content"] = get_plugin_content(request, downcasted, {"parent": parent})
+        except Exception:
+            pass  # do not deliver content if rendering fails
+
+    return {'html': '\n'.join(tree_structure), 'plugins': tree_data, **content}
 
 
 def get_plugin_content(request: HttpRequest, plugin: CMSPlugin, context: dict = {}) -> dict[str, Any]:
@@ -160,6 +180,7 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin, context: dict = 
         "js": "".join(context[get_varname()].get("js", [])),
         "css": "".join(context[get_varname()].get("css", [])),
         "position": plugin.position,
+        "placeholder_id": plugin.placeholder_id,
         "pluginIds": get_plugin_tree_ids(plugin) ,
     }
 

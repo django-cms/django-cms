@@ -517,7 +517,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 source_placeholder,
                 target_placeholder,
             )
-        data, __ = get_plugin_tree(request, new_plugins)
+        data = get_plugin_tree(request, new_plugins)
         return HttpResponse(json.dumps(data), content_type='application/json')
 
     def _copy_plugin_to_clipboard(self, request, target_placeholder):
@@ -695,6 +695,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         POST request with following parameters:
         - plugin_id
         - placeholder_id
+        - target_position (optional)
         - plugin_language (optional)
         - plugin_parent (optional)
         - plugin_order (array, optional)
@@ -720,6 +721,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             placeholder = None
 
         # The rest are optional
+        target_position = int(request.POST.get('target_position', "0"))
         parent_id = get_int(request.POST.get('plugin_parent', ""), None)
         target_language = request.POST['target_language']
         move_a_copy = request.POST.get('move_a_copy')
@@ -767,7 +769,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 plugin=plugin,
                 target_language=target_language,
                 target_placeholder=placeholder,
-                target_position=int(request.POST['target_position']),
+                target_position=target_position,
             )
         elif move_a_copy:
             fetch_tree = True
@@ -777,7 +779,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 target_parent=target_parent,
                 target_language=target_language,
                 target_placeholder=placeholder,
-                target_position=int(request.POST['target_position']),
+                target_position=target_position,
             )
         elif move_to_clipboard:
             new_plugin = self._cut_plugin(
@@ -793,14 +795,17 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 request,
                 plugin=plugin,
                 target_parent=target_parent,
-                target_position=int(request.POST['target_position']),
+                target_position=target_position,
                 target_placeholder=placeholder,
             )
 
         if new_plugin and fetch_tree:
             root = (new_plugin.parent or new_plugin)
             new_plugins = [root] + list(root.get_descendants())
-        data, __ = get_plugin_tree(request, new_plugins)
+        data = get_plugin_tree(request, new_plugins, target_plugin=new_plugins[0])
+        # Pass the target_position
+        data["insert"] = new_plugins[0].pk == plugin.pk
+        data["source_placeholder_id"] = source_placeholder.pk
         return HttpResponse(json.dumps(data), content_type='application/json')
 
     def _paste_plugin(self, request, plugin, target_language,
@@ -966,7 +971,6 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
 
         # Refresh plugin to get new position values
         updated_plugin = plugin.reload()
-
         if target_placeholder:
             target_placeholder.clear_cache(language)
         source_placeholder.clear_cache(language)

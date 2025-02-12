@@ -470,27 +470,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             parents=parent_classes,
         )
         data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
-        data['structure'], downcasted_plugins = get_plugin_tree(request, plugins, restrictions)
-        if all(plugin.get_plugin_class().is_local for plugin in downcasted_plugins):
-            # Render the changes
-            # Adds the rendered plugin tree to the context
-            # If the plugin has been created, always also rerender the parent plugin
-            content_plugin = downcasted_plugins[0] if add else next(
-                (plugin for plugin in downcasted_plugins if plugin.pk == obj.pk), None
-            )
-            # Also provide the parent
-            parent = next(
-                (plugin for plugin in downcasted_plugins if plugin.pk == content_plugin.parent_id), None
-            ) if content_plugin.parent_id else None
-            try:
-                data['content'] = get_plugin_content(request, content_plugin, {"parent": parent})
-                data['messages'] = [
-                    {'level': message.level,
-                    'message': message.message,
-                    'tags': message.tags}
-                    for message in messages.get_messages(request)]
-            except Exception:
-                pass  # do not deliver content if rendering fails
+        target_plugin = plugins[0] if add else next(
+            (plugin for plugin in plugins if plugin.pk == obj.pk), None
+        )
+        data['structure'] = get_plugin_tree(request, plugins, restrictions=restrictions, target_plugin=target_plugin)
+        data['messages'] = [{
+            'level': message.level,
+            'message': message.message,
+            'tags': message.tags,
+            } for message in messages.get_messages(request)]
 
         context = {
             'plugin': obj,
