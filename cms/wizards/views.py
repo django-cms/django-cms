@@ -7,6 +7,7 @@ from django.forms import Form
 from django.http import HttpResponse
 from django.template.response import SimpleTemplateResponse
 from django.urls import NoReverseMatch
+from django.utils.html import escape
 from formtools.wizard.views import SessionWizardView
 
 from cms.constants import MODAL_HTML_REDIRECT
@@ -146,7 +147,7 @@ class WizardCreateView(SessionWizardView):
                     url = '/'
             else:
                 url = '/'
-        return HttpResponse(MODAL_HTML_REDIRECT.format(url=url))
+        return HttpResponse(MODAL_HTML_REDIRECT.format(url=escape(url)))
 
     def get_selected_entry(self):
         data = self.get_cleaned_data_for_step('0')
