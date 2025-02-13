@@ -42,16 +42,16 @@ Empty sections are to be removed before release.
 Security: Improved content security policy support
 ==================================================
 
-Earlier versions of django CMS added inline JavaScript to the page in edit mode to 
+Earlier versions of django CMS added inline JavaScript to the page in edit mode to
 communicate with the frontend editor. This effectively barred projects from enforcing
-meaningful content security policies. In django CMS 4.2.0, we have removed all inline 
-JavaScript from the edit mode (or other places in django CMS), replacing it with 
-text/json objects to communicate with the frontend editor. This allows projects to 
-enforce strict Content Security Policies (CSP) without any issues. 
+meaningful content security policies. In django CMS 4.2.0, we have removed all inline
+JavaScript from the edit mode (or other places in django CMS), replacing it with
+text/json objects to communicate with the frontend editor. This allows projects to
+enforce strict Content Security Policies (CSP) without any issues.
 
-For a fully working project, it is also important that other packages used, especially 
-plugins, do not rely on inline JavaScript. This change enhances the security 
-posture of your django CMS projects by enabling the use of CSP headers to mitigate 
+For a fully working project, it is also important that other packages used, especially
+plugins, do not rely on inline JavaScript. This change enhances the security
+posture of your django CMS projects by enabling the use of CSP headers to mitigate
 cross-site scripting (XSS) and other code injection attacks.
 
 Development: Exception handling
@@ -125,6 +125,45 @@ Please also check your ``.filter()``, ``.order()``, ``.select_related()``, and
 
 If you have custom code that accesses the ``Page.node`` attribute, you should
 update it to use the new attributes on the ``Page`` model.
+
+Change of signature of ``CMSPluginBase.get_parent_classes()`` and related methods
+=================================================================================
+
+The selection of allowed plugins for allowed plugins is based on a set of plugin
+methods:
+* ``get_child_classes()``: Returns a list of plugin classes that can be children
+  of the current plugin.
+* ``get_parent_classes()``: Returns a list of plugin classes that can be parents
+  of the current plugin.
+* ``get_child_classes()``: Returns a list of plugin classes that can be children
+  of the current plugin.
+* ``get_child_plugin_candidates()``: Returns a list of plugin classes that can be
+  children of the current plugin, but are not necessarily allowed.
+* ``get_child_class_overrides()``: Returns a dictionary of plugin classes that
+  can be children of the current plugin, but are not necessarily allowed.
+
+For historical reasons, all these methods accept an optional ``page`` argument.
+Plugins are not page-specific, so this argument and in the default implementation
+of the methods only the page template is used to query ``CMS_PLACEHOLDER_CONF``.
+
+As of django CMS 4.2.0, the ``page`` argument is deprecated and will be removed in
+django CMS 4.3.0. Already in django CMS 4.2, the page argument cannot be used
+positional.
+
+If you have custom plugins that override these methods, you should update them to
+use the ``template`` argument instead of the ``page`` argument. While the page
+argument is still available, you will need to convert calls to use named arguments,
+e.g.::
+
+    MyPlugin.get_parent_classes(slot, page, instance)  # Raises error, convert to
+    MyPlugin.get_parent_classes(slot, page=page, instance=instance)  # works since django CMS 3 but is deprecated
+    MyPlugin.get_parent_classes(slot, template=template, instance=instance) # recommended for django CMS 4.2+
+
+The new signatures better reflect the much broader use of plugins also outside of
+pages, such as aliases, blog posts or any other custom model. Additionally,
+avoiding the need of resolving the page object saves database hits and adds
+significant performance.
+
 
 Miscellaneous
 =============

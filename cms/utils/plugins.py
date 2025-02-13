@@ -203,23 +203,26 @@ def get_plugin_restrictions(
             slot=plugin.placeholder.slot,
             page=page,
             instance=plugin,
+            template=template,
         )
         if plugin_class.cache_parent_classes:
             parents_cache[plugin_type] = parent_classes or []
 
-    if plugin_class.cache_child_classes and not plugin_type in children_cache:
+    if plugin_class.cache_child_classes and plugin_type not in children_cache:
         children_cache[plugin_type] = plugin_class.get_child_classes(
             slot=plugin.placeholder.slot,
             page=page,
             instance=plugin,
-            filter=plugin_pool.get_globally_cachable_filter(True),  # Only cachable plugins
+            template=template,
+            candidates=plugin_pool.plugins_with_cached_parent_classes,
         )
     child_classes = children_cache.get(plugin_type, [])
     child_classes += plugin_class.get_child_classes(
         slot=plugin.placeholder.slot,
         page=page,
         instance=plugin,
-        filter=plugin_pool.get_globally_cachable_filter(False),  # Rerun uncachable plugins
+        template=template,
+        candidates=plugin_pool.plugins_with_uncached_parent_classes,
     )
     return child_classes, parent_classes
 

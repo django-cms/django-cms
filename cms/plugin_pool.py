@@ -233,13 +233,14 @@ class PluginPool:
     @cached_property
     def plugins_with_uncached_parent_classes(self):
         plugin_classes = [cls for cls in self.registered_plugins
-                          if not cls.cache_parent_classes]
+                          if not cls.cache_parent_classes or not cls.has_standard_child_rules()]
         return plugin_classes
 
-    def get_globally_cachable_filter(self, cachable):
-        if cachable:
-            return lambda plugin_class: plugin_class.cache_parent_classes and plugin_class.has_standard_child_rules()
-        return lambda plugin_class: not (plugin_class.cache_parent_classes and plugin_class.has_standard_child_rules())
+    @cached_property
+    def plugins_with_cached_parent_classes(self):
+        plugin_classes = [cls for cls in self.registered_plugins
+                          if cls.cache_parent_classes and cls.has_standard_child_rules()]
+        return plugin_classes
 
 
 plugin_pool = PluginPool()

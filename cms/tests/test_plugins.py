@@ -856,7 +856,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ChildClassesPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
             # assert baseline
-            self.assertEqual(['TextPlugin'], plugin.get_child_classes(placeholder.slot, page))
+            self.assertEqual(['TextPlugin'], plugin.get_child_classes(placeholder.slot, page=page))
 
             CMS_PLACEHOLDER_CONF = {
                 'body': {
@@ -868,7 +868,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
                 self.assertEqual(
                     ['LinkPlugin', 'PicturePlugin'],
-                    plugin.get_child_classes(placeholder.slot, page)
+                    plugin.get_child_classes(placeholder.slot, page=page)
                 )
 
     def test_plugin_parent_classes_from_settings(self):
@@ -882,7 +882,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ParentClassesPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
             # assert baseline
-            self.assertEqual(['TextPlugin'], plugin.get_parent_classes(placeholder.slot, page))
+            self.assertEqual(['TextPlugin'], plugin.get_parent_classes(placeholder.slot, page=page))
 
             CMS_PLACEHOLDER_CONF = {
                 'body': {
@@ -892,7 +892,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                 }
             }
             with self.settings(CMS_PLACEHOLDER_CONF=CMS_PLACEHOLDER_CONF):
-                self.assertEqual(['TestPlugin'], plugin.get_parent_classes(placeholder.slot, page))
+                self.assertEqual(['TestPlugin'], plugin.get_parent_classes(placeholder.slot, page=page))
 
     def test_plugin_parent_classes_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -904,7 +904,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
             # assert baseline
-            child_classes = plugin.get_child_classes(placeholder.slot, page)
+            child_classes = plugin.get_child_classes(placeholder.slot, page=page)
             self.assertIn('ChildPlugin', child_classes)
             self.assertIn('ParentPlugin', child_classes)
 
@@ -918,7 +918,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             plugin = plugin.get_plugin_class_instance()
             # assert baseline
-            child_classes = plugin.get_child_classes(placeholder.slot, page)
+            child_classes = plugin.get_child_classes(placeholder.slot, page=page)
             self.assertIn('ChildPlugin', child_classes)
             self.assertIn('ParentPlugin', child_classes)
 

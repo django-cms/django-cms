@@ -338,7 +338,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return None
 
     @classmethod
-    def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, template: Optional[str] = None) -> bool:
+    def get_require_parent(cls, slot: str, *, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, template: Optional[str] = None) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
 
         template = template or cls._get_template_for_conf(page, instance)
@@ -616,18 +616,21 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def has_standard_child_rules(cls):
         """Standard methods for child plugin rules are defined in the CMSPlugin class.
         They do not depend on instance or page parameters (except template)"""
-        return True
         if not hasattr(cls, "_class_rule_opt_on"):
-            cls._class_rule_opt_on = all(getattr(CMSPluginBase, method) == getattr(cls, method) for method in (
+            cls._class_rule_opt_on = all(not cls._is_overloaded(method) for method in (
                 'get_child_plugin_candidates',
                 'get_child_class_overrides',
                 'get_parent_classes',
                 ))
         return cls._class_rule_opt_on
 
+    @classmethod
+    def _is_overloaded(cls, method):
+        # A classmethod is overloaded if it appears more than once in the mro
+        return sum(bool(res.__dict__.get(method, False)) for res in cls.__mro__) > 1
 
     @classmethod
-    def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, template: Optional[str] = None):
+    def get_child_class_overrides(cls, slot: str, *, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, template: Optional[str] = None):
         """
         Returns a list of plugin types that are allowed
         as children of this plugin.
@@ -641,11 +644,21 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return ph_conf.get(cls.__name__, cls.child_classes)
 
     @classmethod
-    def get_child_plugin_candidates(cls, slot: str, page: Optional[Page] = None):
+    def get_child_plugin_candidates(cls, slot: str, *, page: Optional[Page] = None, template: Optional[str] = None):
         """
-        Returns a list of all plugin classes
-        that will be considered when fetching
+        Returns a list of all plugin classes that will be considered when fetching
         all available child classes for this plugin.
+
+        Args:
+            slot (str): The slot name where the plugin is located.
+            page (Optional[Page], optional): The page instance where the plugin is used. Defaults to None. (Deprecated)
+            template (Optional[str], optional): The template used for the plugin. Defaults to None.
+
+        Returns:
+            list: A list of all registered plugin classes that can be used as child plugins.
+
+        .. warning::
+            The ``page`` parameter is deprecated and will be removed in django CMS 4.3.
         """
         # Adding this as a separate method,
         # we allow other plugins to affect
@@ -656,24 +669,35 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return plugin_pool.registered_plugins
 
     @classmethod
-    def get_child_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, filter: Optional[callable] = None):
+    def get_child_classes(cls, slot: str, *, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, template: Optional[str] = None, candidates: Optional[list] = None):
         """
-        Returns a list of plugin types that can be added
-        as children to this plugin.
+        Returns a list of plugin types that can be added as children to this plugin.
+
+        Args:
+            slot (str): The slot where the plugin is located.
+            page (Optional[Page], optional): The page where the plugin is located. Defaults to None. (Deprecated)
+            instance (Optional[CMSPlugin], optional): The instance of the plugin. Defaults to None.
+            template (Optional[str], optional): The template used for the plugin. Defaults to None.
+            filter (Optional[callable], optional): A callable to filter the child plugin candidates. Defaults to None.
+
+        Returns:
+            list: A list of plugin types that can be added as children to this plugin.
+
+        .. warning::
+            The ``page`` parameter is deprecated and will be removed in django CMS 4.3.
         """
 
         # Placeholder overrides are highest in priority
-        child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
+        child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance, template=template)
 
         if child_classes:
             return child_classes
 
         # Get all child plugin candidates
-        if filter is None:
-            installed_plugins =  cls.get_child_plugin_candidates(slot, page)
+        if candidates is None:
+            installed_plugins =  cls.get_child_plugin_candidates(slot, page=page, template=template)
         else:
-            installed_plugins = (plugin_class for plugin_class in cls.get_child_plugin_candidates(slot, page)
-                                if filter(plugin_class))
+            installed_plugins = candidates
 
         child_classes = []
         plugin_type = cls.__name__
@@ -687,7 +711,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # If there are no restrictions then the plugin
         # is a valid child class.
         for plugin_class in installed_plugins:
-            allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
+            allowed_parents = plugin_class.get_parent_classes(slot, page=page, instance=instance, template=template)
             if not allowed_parents or plugin_type in allowed_parents:
                 # Plugin has no parent restrictions or
                 # Current plugin (self) is a configured parent
@@ -696,7 +720,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return child_classes
 
     @classmethod
-    def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None,  template: Optional[str] = None):
+    def get_parent_classes(cls, slot: str, *, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None,  template: Optional[str] = None):
+        """
+        Retrieve the parent classes for a given plugin class based on the slot and optional parameters.
+
+        Args:
+            slot (str): The slot name where the plugin is placed.
+            page (Optional[Page], optional): The page instance. Defaults to None. (Deprecated)
+            instance (Optional[CMSPlugin], optional): The plugin instance. Defaults to None.
+            template (Optional[str], optional): The template name. Defaults to None.
+
+        Returns:
+            list: A list of parent classes for the plugin.
+
+        .. warning::
+            The ``page`` parameter is deprecated and will be removed in django CMS 4.3.
+        """
         from cms.utils.placeholder import get_placeholder_conf
 
         template = template or cls._get_template_for_conf(page, instance)
