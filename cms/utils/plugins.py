@@ -6,13 +6,14 @@ from copy import deepcopy
 from functools import cache
 from itertools import starmap
 from operator import itemgetter
-from typing import Optional
+from typing import Any, Optional
 
 from django.http import HttpRequest
 from django.utils.encoding import force_str
 from django.utils.translation import gettext as _
 
 from cms.exceptions import PluginLimitReached
+from cms.models.placeholdermodel import Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
@@ -34,13 +35,13 @@ def get_plugin_model(plugin_type: str) -> CMSPlugin:
     return get_plugin_class(plugin_type).model
 
 
-def get_plugins(request, placeholder, template, lang=None):
+def get_plugins(request: HttpRequest, placeholder: Placeholder, template: Optional[str], lang=None):
     """
     Get a list of plugins for a placeholder in a specified template. Respects the placeholder's cache.
 
     :param request: (HttpRequest) The HTTP request object.
     :param placeholder: (Placeholder) The placeholder object for which to retrieve plugins.
-    :param template: (Template) The template object in which the placeholder resides (not used).
+    :param template: (str) The template name in which the placeholder resides.
     :param lang: (str, optional) The language code for localization. Defaults to None.
 
     Returns:
@@ -64,7 +65,7 @@ def get_plugins(request, placeholder, template, lang=None):
     return placeholder._plugins_cache
 
 
-def assign_plugins(request, placeholders, template=None, lang=None):
+def assign_plugins(request: HttpRequest, placeholders: Iterable[Placeholder], template: Optional[str] = None, lang: str=None):
     """
     Fetch all plugins for the given ``placeholders`` and
     cast them down to the concrete instances in one query
@@ -72,7 +73,7 @@ def assign_plugins(request, placeholders, template=None, lang=None):
 
     :param request: The current request.
     :param placeholders: An iterable of placeholder objects.
-    :param template: (optional) The template object.
+    :param template: (optional) The template name where the plugin's placeholder is rendered.
     :param lang: (optional) The language code.
 
     This method assigns plugins to the given placeholders. It retrieves the plugins from the database based on the
@@ -121,7 +122,7 @@ def assign_plugins(request, placeholders, template=None, lang=None):
         placeholder._plugins_cache = layered_plugins
 
 
-def create_default_plugins(request, placeholders, template, lang):
+def create_default_plugins(request: HttpRequest, placeholders: Iterable[Placeholder], template: Optional[str], lang: str):
     """
     Create all default plugins for the given ``placeholders`` if they have
     a "default_plugins" configuration value in settings.
@@ -162,7 +163,7 @@ def create_default_plugins(request, placeholders, template, lang):
     return sum(starmap(_create_default_plugins, mutable_confs), [])
 
 
-def get_plugins_as_layered_tree(plugins):
+def get_plugins_as_layered_tree(plugins: Iterable[CMSPlugin]) -> deque[CMSPlugin]:
     """
     Given an iterable of plugins ordered by position,
     returns a deque of root plugins with their respective
@@ -181,14 +182,19 @@ def get_plugins_as_layered_tree(plugins):
     return root_plugins
 
 
-def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
+def get_plugin_restrictions(
+        plugin: CMSPlugin,
+        page=None,
+        template: Optional[str] = None,
+        restrictions_cache: Optional[dict[str, Any]] = None
+        ):
     if restrictions_cache is None:
         restrictions_cache = {}
 
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
-    parents_cache = restrictions_cache.setdefault('plugin_parents', {})
-    children_cache = restrictions_cache.setdefault('plugin_children', {})
+    parents_cache = restrictions_cache.setdefault('plugin_parents', plugin_pool.parents_cache)
+    children_cache = restrictions_cache.setdefault('plugin_children', plugin_pool.children_cache)
 
     try:
         parent_classes = parents_cache[plugin_type]
@@ -198,21 +204,23 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
             page=page,
             instance=plugin,
         )
+        if plugin_class.cache_parent_classes:
+            parents_cache[plugin_type] = parent_classes or []
 
-    if plugin_class.cache_parent_classes:
-        parents_cache[plugin_type] = parent_classes or []
-
-    try:
-        child_classes = children_cache[plugin_type]
-    except KeyError:
-        child_classes = plugin_class.get_child_classes(
+    if plugin_class.cache_child_classes and not plugin_type in children_cache:
+        children_cache[plugin_type] = plugin_class.get_child_classes(
             slot=plugin.placeholder.slot,
             page=page,
             instance=plugin,
+            filter=plugin_pool.get_globally_cachable_filter(True),  # Only cachable plugins
         )
-
-    if plugin_class.cache_child_classes:
-        children_cache[plugin_type] = child_classes or []
+    child_classes = children_cache.get(plugin_type, [])
+    child_classes += plugin_class.get_child_classes(
+        slot=plugin.placeholder.slot,
+        page=page,
+        instance=plugin,
+        filter=plugin_pool.get_globally_cachable_filter(False),  # Rerun uncachable plugins
+    )
     return child_classes, parent_classes
 
 

@@ -317,11 +317,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return context
 
     @classmethod
-    def requires_parent_plugin(cls, slot, page):
-        if cls.get_require_parent(slot, page):
+    def requires_parent_plugin(cls, slot: str, page, template: Optional[str] = None):
+        if cls.get_require_parent(slot, page=page, template=template):
             return True
 
-        allowed_parents = cls.get_parent_classes(slot, page)
+        allowed_parents = cls.get_parent_classes(slot, page=page, template=template)
         return bool(allowed_parents)
 
     @classmethod
@@ -338,10 +338,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return None
 
     @classmethod
-    def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None) -> bool:
+    def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, template: Optional[str] = None) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_conf(page, instance)
+        template = template or cls._get_template_for_conf(page, instance)
 
         # config overrides..
         require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
@@ -613,14 +613,28 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
-    def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+    def has_standard_child_rules(cls):
+        """Standard methods for child plugin rules are defined in the CMSPlugin class.
+        They do not depend on instance or page parameters (except template)"""
+        return True
+        if not hasattr(cls, "_class_rule_opt_on"):
+            cls._class_rule_opt_on = all(getattr(CMSPluginBase, method) == getattr(cls, method) for method in (
+                'get_child_plugin_candidates',
+                'get_child_class_overrides',
+                'get_parent_classes',
+                ))
+        return cls._class_rule_opt_on
+
+
+    @classmethod
+    def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, template: Optional[str] = None):
         """
         Returns a list of plugin types that are allowed
         as children of this plugin.
         """
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_conf(page, instance)
+        template = template or cls._get_template_for_conf(page, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
@@ -642,11 +656,12 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return plugin_pool.registered_plugins
 
     @classmethod
-    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+    def get_child_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, filter: Optional[callable] = None):
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
         """
+
         # Placeholder overrides are highest in priority
         child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
 
@@ -654,7 +669,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             return child_classes
 
         # Get all child plugin candidates
-        installed_plugins = cls.get_child_plugin_candidates(slot, page)
+        if filter is None:
+            installed_plugins =  cls.get_child_plugin_candidates(slot, page)
+        else:
+            installed_plugins = (plugin_class for plugin_class in cls.get_child_plugin_candidates(slot, page)
+                                if filter(plugin_class))
 
         child_classes = []
         plugin_type = cls.__name__
@@ -677,10 +696,10 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return child_classes
 
     @classmethod
-    def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+    def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None,  template: Optional[str] = None):
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = cls._get_template_for_conf(page, instance)
+        template = template or cls._get_template_for_conf(page, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})
@@ -689,10 +708,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     def get_plugin_urls(self):
         """
-        Returns the URL patterns the plugin wants to register views for.
+        Returns the URL patterns the plugin wants to register admin views for.
         They are included under django CMS's page admin URLS in the plugin path
         (e.g.: ``/admin/cms/page/plugin/<plugin-name>/`` in the default case).
-
 
         ``get_plugin_urls()`` is useful if your plugin needs to talk asynchronously to the admin.
         """

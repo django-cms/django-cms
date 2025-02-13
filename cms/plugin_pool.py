@@ -19,17 +19,21 @@ class PluginPool:
 
     def __init__(self):
         self.plugins = {}
+        self.parents_cache = {}
+        self.children_cache = {}
         self.discovered = False
 
     def _clear_cached(self):
         if 'registered_plugins' in self.__dict__:
             del self.__dict__['registered_plugins']
-
         if 'plugins_with_extra_menu' in self.__dict__:
             del self.__dict__['plugins_with_extra_menu']
-
         if 'plugins_with_extra_placeholder_menu' in self.__dict__:
             del self.__dict__['plugins_with_extra_placeholder_menu']
+        if 'plugins_with_uncached_parent_classes' in self.__dict__:
+            del self.__dict__['plugins_with_uncached_parent_classes']
+        self.parents_cache = {}
+        self.children_cache = {}
 
     def discover_plugins(self):
         if self.discovered:
@@ -225,6 +229,17 @@ class PluginPool:
         plugin_classes = [cls for cls in self.registered_plugins
                           if cls._has_extra_placeholder_menu_items]
         return plugin_classes
+
+    @cached_property
+    def plugins_with_uncached_parent_classes(self):
+        plugin_classes = [cls for cls in self.registered_plugins
+                          if not cls.cache_parent_classes]
+        return plugin_classes
+
+    def get_globally_cachable_filter(self, cachable):
+        if cachable:
+            return lambda plugin_class: plugin_class.cache_parent_classes and plugin_class.has_standard_child_rules()
+        return lambda plugin_class: not (plugin_class.cache_parent_classes and plugin_class.has_standard_child_rules())
 
 
 plugin_pool = PluginPool()
