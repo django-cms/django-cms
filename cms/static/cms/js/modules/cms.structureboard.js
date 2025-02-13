@@ -1081,33 +1081,29 @@ class StructureBoard {
             // Non content data available in data bridge? Full content upudate needed.
             return true;  // Update needed
         }
-        if (data.source_placeholder_id) {
-            // If last plugin was moved from a placeholder, the placeholder needs to be updated
-            if (!CMS._instances.some(
+        if (data.source_placeholder_id && !CMS._instances.some(
                 instance => instance.options.type === 'plugin' &&
                 instance.options.placeholder_id == data.source_placeholder_id  // eslint-disable-line eqeqeq
-            )) {
-                return true;  // Update needed
-            }
+        )) {
+            // If last plugin was moved from a placeholder, the placeholder needs to be updated
+            return true;  // Update needed
         }
 
-        const existingPlugins = $(`:not(template).cms-plugin.cms-plugin-${data.content.pluginIds[0]}.cms-plugin-end`);
+        let nextEl = $(`:not(template).cms-plugin.cms-plugin-${data.content.pluginIds[0]}.cms-plugin-start`);
 
-        if (existingPlugins.length < 1 || data.insert) {
+        if (nextEl.length < 1 || data.insert) {
             // Plugin not found, but placeholder is known - plugin was added
             const placeholder_id = data.content.placeholder_id;
             const position = data.content.position;
-            const nextEl = this._findNextElement(position, placeholder_id, data.content.pluginIds);
 
-            if (nextEl.length === 0) {
-                // Placeholder not found - update needed
-                return true;
-            }
-            nextEl.before(data.content.html);
-        } else {
-            // Add new content after existing content
-            existingPlugins.after(data.content.html);
+            nextEl = this._findNextElement(position, placeholder_id, data.content.pluginIds);
         }
+        if (nextEl.length === 0) {
+            // Placeholder not found - update needed
+            return true;
+        }
+        nextEl.before(data.content.html);
+
         // Delete previous content
         // Go through all plugins and child plugins (they might not be nested)
         data.content.pluginIds.forEach(id => {
