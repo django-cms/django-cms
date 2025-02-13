@@ -14,7 +14,7 @@ from django.utils.translation import gettext as _
 from cms import app_registration
 from cms.api import create_page
 from cms.cms_wizards import cms_page_wizard, cms_subpage_wizard
-from cms.constants import TEMPLATE_INHERITANCE_MAGIC
+from cms.constants import MODAL_HTML_REDIRECT, TEMPLATE_INHERITANCE_MAGIC
 from cms.forms.wizards import CreateCMSPageForm, CreateCMSSubPageForm
 from cms.models import Page, UserSettings
 from cms.test_utils.project.backwards_wizards.wizards import wizard
@@ -27,6 +27,7 @@ from cms.toolbar.utils import (
 from cms.utils import get_current_site
 from cms.utils.conf import get_cms_setting
 from cms.utils.setup import setup_cms_apps
+from cms.utils.urlutils import admin_reverse
 from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
 from cms.wizards.helpers import get_entries, get_entry
 from cms.wizards.wizard_base import Wizard
@@ -588,6 +589,38 @@ class TestPageWizard(WizardTestMixin, CMSTestCase):
         )
         self.assertTrue(form.is_valid())
         self.assertTrue(form.save().get_urls().filter(slug='page-2-3'))
+
+
+class TestPageWizardSubmission(CMSTestCase):
+    def test_page_wizard_submission(self):
+        from cms.wizards.helpers import get_entries
+
+        page = create_page('home', 'nav_playground.html', 'en')
+        entry_id = get_entries()[0].id
+        endpoint = admin_reverse("cms_wizard_create")
+        data_step1 = {
+            'wizard_create_view-current_step': '0',
+            '0-entry': entry_id,
+            '0-language': 'en',
+            '0-page': page.pk,
+        }
+        data_step2 = {
+            'wizard_create_view-current_step': '1',
+            '1-title': 'my test page',
+            '1-slug': 'my-test-page',
+            '1-content': '',
+        }
+
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.post(endpoint, data_step1, follow=True)
+            self.assertEqual(response.status_code, 200)
+            response = self.client.post(endpoint, data_step2)
+
+        edit_endpoint = get_object_edit_url(
+            Page.objects.exclude(pk=page.pk).last().get_content_obj("en"),
+            "en"
+        )
+        self.assertContains(response, MODAL_HTML_REDIRECT.format(url=edit_endpoint))
 
 
 class TestWizardHelpers(CMSTestCase):

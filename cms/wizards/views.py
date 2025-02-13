@@ -4,10 +4,13 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
 from django.forms import Form
+from django.http import HttpResponse
 from django.template.response import SimpleTemplateResponse
 from django.urls import NoReverseMatch
+from django.utils.html import escape
 from formtools.wizard.views import SessionWizardView
 
+from cms.constants import MODAL_HTML_REDIRECT
 from cms.models import Page
 from cms.utils import get_current_site
 from cms.utils.i18n import get_site_language_from_request
@@ -144,8 +147,7 @@ class WizardCreateView(SessionWizardView):
                     url = '/'
             else:
                 url = '/'
-
-        return SimpleTemplateResponse("cms/wizards/done.html", {"url": url})
+        return HttpResponse(MODAL_HTML_REDIRECT.format(url=escape(url)))
 
     def get_selected_entry(self):
         data = self.get_cleaned_data_for_step('0')
