@@ -585,7 +585,7 @@ class Placeholder(models.Model):
                 # far enough to shift behind current last target position
                 target_length - target_position + 1,
                 # far enough to leave enough space to move back
-                plugin.position + source_offset - target_position + plugins_to_move_count
+                plugin.position + source_offset - target_position + plugins_to_move_count + 1
             )
             target_placeholder._shift_plugin_positions(
                 plugin.language,

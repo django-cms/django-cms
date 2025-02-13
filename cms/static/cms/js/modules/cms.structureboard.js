@@ -1077,22 +1077,33 @@ class StructureBoard {
 
     _updateContentFromDataBridge(data) {
         if (!data || !data.content || !data.content.pluginIds ||
-            data.content.pluginIds.length < 1 || !data.content.html) {
+            data.content.pluginIds.length < 1 || data.content.html === undefined) {
             // Non content data available in data bridge? Full content upudate needed.
             return true;  // Update needed
+        }
+        if (data.source_placeholder_id) {
+            // If last plugin was moved from a placeholder, the placeholder needs to be updated
+            if (!CMS._instances.some(
+                instance => instance.options.type === 'plugin' &&
+                instance.options.placeholder_id == data.source_placeholder_id  // eslint-disable-line eqeqeq
+            )) {
+                return true;  // Update needed
+            }
         }
 
         const existingPlugins = $(`:not(template).cms-plugin.cms-plugin-${data.content.pluginIds[0]}.cms-plugin-end`);
 
-        if (existingPlugins.length < 1) {
+        if (existingPlugins.length < 1 || data.insert) {
             // Plugin not found, but placeholder is known - plugin was added
-            const placeholder = $(`div.cms-placeholder.cms-placeholder-${data.placeholder_id}`);
+            const placeholder_id = data.content.placeholder_id;
+            const position = data.content.position;
+            const nextEl = this._findNextElement(position, placeholder_id, data.content.pluginIds);
 
-            if (placeholder.length === 0) {
+            if (nextEl.length === 0) {
                 // Placeholder not found - update needed
                 return true;
             }
-            placeholder.before(data.content.html);
+            nextEl.before(data.content.html);
         } else {
             // Add new content after existing content
             existingPlugins.after(data.content.html);
@@ -1101,12 +1112,33 @@ class StructureBoard {
         // Go through all plugins and child plugins (they might not be nested)
         data.content.pluginIds.forEach(id => {
             $(`:not(template).cms-plugin.cms-plugin-${id}`).remove();
+            // Plugin data is updated through the data bridge - script elements can be removed
+            $(`script[data-cms-plugin]#cms-plugin-${id}`).remove();
         });
         this._updateSekizai(data, 'css');
         this._updateSekizai(data, 'js');
 
         this._contentChanged(data.messages);
         return false;
+    }
+
+    _findNextElement(position, placeholder_id, excludedPlugins) {
+        let nextEl = $(`div.cms-placeholder.cms-placeholder-${placeholder_id}`);
+        const nextPlugins = CMS._instances.filter(instance =>
+            instance.options.type === 'plugin' &&
+            instance.options.placeholder_id == placeholder_id &&  // eslint-disable-line eqeqeq
+            instance.options.position >= position &&
+            !excludedPlugins.includes(1 * instance.options.plugin_id));
+
+        if (nextPlugins.length > 0) {
+            // Plugins found with higher position, get the one with lowest position
+            const nextPluginId = nextPlugins.reduce((acc, instance) => {
+                return instance.options.position < acc.options.position ? instance : acc;
+            }, nextPlugins[0]).options.plugin_id;
+
+            nextEl = $(`.cms-plugin.cms-plugin-${nextPluginId}.cms-plugin-start`);
+        }
+        return nextEl;
     }
 
     _updateSekizai(data, block) {
@@ -1269,7 +1301,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return true;  // update needed
+        return this._updateContentFromDataBridge(data);
     }
 
     handleCopyPlugin(data) {
@@ -1305,9 +1337,9 @@ class StructureBoard {
 
     handleCutPlugin(data) {
         const updateNeededFromDelete = this.handleDeletePlugin(data);
-        const updateNeededFromCopy = this.handleCopyPlugin(data);
 
-        return updateNeededFromDelete || updateNeededFromCopy;
+        this.handleCopyPlugin(data);
+        return updateNeededFromDelete;
     }
 
     _extractMessages(doc) {
@@ -1408,7 +1440,7 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return this._updateContentFromDataBridge(data);
+        return this._updateContentFromDataBridge(data.structure);
     }
 
     handleEditPlugin(data) {
@@ -1426,13 +1458,16 @@ class StructureBoard {
 
         this.ui.sortables = $('.cms-draggables');
         this._dragRefresh();
-        return this._updateContentFromDataBridge(data);
+        return this._updateContentFromDataBridge(data.structure);
     }
 
     handleDeletePlugin(data) {
-        let deletedPluginIds = [data.plugin_id];
+        const placeholder_id = CMS._instances.find(
+            plugin => plugin.options.plugin_id === data.plugin_id
+        ).options.placeholder_id;
         const draggable = $('.cms-draggable-' + data.plugin_id);
         const children = draggable.find('.cms-draggable');
+        let deletedPluginIds = [data.plugin_id];
         let parent = draggable.parent().closest('.cms-draggable');
 
         if (!parent.length) {
@@ -1448,13 +1483,19 @@ class StructureBoard {
         StructureBoard.actualizePluginsCollapsibleStatus(parent.find('> .cms-draggables'));
         StructureBoard.actualizePlaceholders();
         deletedPluginIds.forEach(function(pluginId) {
+            $(`.cms-plugin.cms-plugin-${pluginId}`).remove();  // Remove from content
+            $(`script[data-cms-plugin]#cms-plugin-${pluginId}`).remove();  // Remove script elements
             remove(CMS._plugins, settings => settings[0] === `cms-plugin-${pluginId}`);
             remove(
                 CMS._instances,
                 instance => instance.options.plugin_id && Number(instance.options.plugin_id) === Number(pluginId)
             );
         });
-        return true;
+        const lastPluginDeleted = CMS._instances.find(
+            plugin => plugin.options.placeholder_id == placeholder_id  // eslint-disable-line eqeqeq
+        ) === undefined;
+
+        return lastPluginDeleted;
     }
 
     handleClearPlaceholder(data) {
