@@ -1,29 +1,7 @@
 from django.core.exceptions import ImproperlyConfigured
-from django.template.backends.django import DjangoTemplates
 from django.test import override_settings
 
 from cms.test_utils.testcases import CMSTestCase
-
-
-class CustomDjangoTemplates(DjangoTemplates):
-    """
-    A custom template engine that inherits from DjangoTemplates
-    """
-
-    pass
-
-
-class NonDjangoTemplates:
-    """
-    A mock template backend that doesn't inherit from DjangoTemplates
-    """
-
-    def __init__(self, params):
-        self.params = params
-        self.engine = None
-
-    def get_template(self, template_name):
-        pass
 
 
 class TemplateEngineTests(CMSTestCase):
@@ -33,7 +11,7 @@ class TemplateEngineTests(CMSTestCase):
         """
         custom_templates_settings = [
             {
-                "BACKEND": "cms.tests.test_template_engines.CustomDjangoTemplates",
+                "BACKEND": "cms.test_utils.project.template_backends.CustomDjangoTemplates",
                 "DIRS": [],
                 "OPTIONS": {
                     "context_processors": ["django.template.context_processors.request"],
@@ -52,7 +30,7 @@ class TemplateEngineTests(CMSTestCase):
         """
         non_django_templates_settings = [
             {
-                "BACKEND": "cms.tests.test_template_engines.NonDjangoTemplates",
+                "BACKEND": "cms.test_utils.project.template_backends.NonDjangoTemplates",
                 "DIRS": [],
                 "OPTIONS": {
                     "context_processors": ["django.template.context_processors.request"],
