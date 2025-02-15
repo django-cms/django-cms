@@ -31,8 +31,8 @@ def validate_settings():
 
     if not django_engines:
         raise ImproperlyConfigured(
-            "django CMS requires django.template.context_processors.request in "
-            "'django.template.backends.django.DjangoTemplates' context processors."
+            "django CMS requires a template engine that inherits from "
+            "'django.template.backends.django.DjangoTemplates'."
         )
 
     engine = django_engines[0]
