@@ -718,6 +718,7 @@ var Plugin = new Class({
                     error: true
                 });
                 hideLoader();
+                that._refreshStructureBoard();
             }
         });
     },
@@ -764,22 +765,22 @@ var Plugin = new Class({
         CMS.API.locked = true;
 
         // set correct options
-        var options = opts || this.options;
+        const options = opts || this.options;
 
-        var dragitem = $(`.cms-draggable-${options.plugin_id}:last`);
+        const dragitem = $(`.cms-draggable-${options.plugin_id}:last`);
 
         // SAVING POSITION
-        var placeholder_id = this._getId(dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first());
+        const placeholder_id = this._getId(dragitem.parents('.cms-draggables').last().prevAll('.cms-dragbar').first());
 
         // cancel here if we have no placeholder id
         if (placeholder_id === false) {
             return false;
         }
-        var pluginParentElement = dragitem.parent().closest('.cms-draggable');
-        var plugin_parent = this._getId(pluginParentElement);
+        const pluginParentElement = dragitem.parent().closest('.cms-draggable');
+        const plugin_parent = this._getId(pluginParentElement);
 
         // gather the data for ajax request
-        var data = {
+        const data = {
             plugin_id: options.plugin_id,
             plugin_parent: plugin_parent || '',
             target_language: CMS.config.request.language,
@@ -796,7 +797,7 @@ var Plugin = new Class({
             Plugin._updatePluginPositions(options.placeholder_id);
         }
 
-        var position = this.options.position;
+        const position = this.options.position;
 
         data.target_position = position;
 
@@ -806,7 +807,7 @@ var Plugin = new Class({
             type: 'POST',
             url: Helpers.updateUrlWithPath(options.urls.move_plugin),
             data: data,
-            success: function(response) {
+            success: response => {
                 CMS.API.StructureBoard.invalidateState(
                     data.move_a_copy ? 'PASTE' : 'MOVE',
                     $.extend({}, data, { placeholder_id: placeholder_id }, response)
@@ -816,9 +817,9 @@ var Plugin = new Class({
                 CMS.API.locked = false;
                 hideLoader();
             },
-            error: function(jqXHR) {
+            error: jqXHR => {
                 CMS.API.locked = false;
-                var msg = CMS.config.lang.error;
+                const msg = CMS.config.lang.error;
 
                 // trigger error
                 CMS.API.Messages.open({
@@ -826,8 +827,21 @@ var Plugin = new Class({
                     error: true
                 });
                 hideLoader();
+                this._refreshStructureBoard();
             }
         });
+    },
+
+    /**
+     * Updates the structure board after failed change
+     *
+     * @method _refreshStructureBoard
+     * @private
+     */
+
+    _refreshStructureBoard: function _refreshToolbar() {
+        CMS.API.StructureBoard._loadedStructure = false;
+        CMS.API.StructureBoard._loadStructure();
     },
 
     /**
