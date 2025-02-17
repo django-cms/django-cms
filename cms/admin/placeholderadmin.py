@@ -735,7 +735,10 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 has_reached_plugin_limit(placeholder, plugin.plugin_type,
                                          target_language, template=template)
             except PluginLimitReached as er:
-                return HttpResponseBadRequest(er)
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error("Plugin limit reached: %s", er)
+                return HttpResponseBadRequest("A plugin limit has been reached. Please contact the administrator.")
 
         # True if the plugin is not being moved from the clipboard
         # to a placeholder or from a placeholder to the clipboard.
