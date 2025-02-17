@@ -223,6 +223,29 @@ class AdminTestCase(AdminTestsBase):
             self.assertRedirects(response, self.get_pages_admin_list_uri("de"))
             self.assertEqual(page.get_content_obj("de").template, TEMPLATE_INHERITANCE_MAGIC)
 
+    def test_create_translation_always_copies_template_from_default_language_regardless_of_amount_of_languages(self):
+        admin_user = self.get_superuser()
+        # Create a page in default language ("fr")
+        page = create_page("create-translation", "nav_playground.html", "fr", created_by=admin_user)
+        with self.login_user_context(admin_user):
+            data = {
+                "title": "create-translation-de",
+                "slug": "create-translation-de",
+                "cms_page": page.pk,
+                "template": "col_two.html",
+            }
+            response = self.client.post(
+                self.get_page_add_uri("de", page),
+                data=data,
+            )
+            data = {"title": "create-translation-en", "slug": "create-translation-en", "cms_page": page.pk}
+            response = self.client.post(
+                self.get_page_add_uri("en", page),
+                data=data,
+            )
+            self.assertRedirects(response, self.get_pages_admin_list_uri("en"))
+            self.assertEqual(page.get_content_obj("en").template, "nav_playground.html")
+
     def test_delete_translation(self):
         admin_user = self.get_superuser()
         page = create_page("delete-page-translation", "nav_playground.html", "en", created_by=admin_user)

@@ -235,16 +235,29 @@ Template Inheritance in Page Content Translations
 Default Behavior (without versioning)
 -------------------------------------
 
-In django CMS (version 4 and above), when creating page content translations, all content is immediately published. When creating a translation of an existing page, the template from the original page content is copied to the new translation.
-This behavior can be seen in the `create_translation` method. The template is explicitly copied from the original page content to ensure consistent layout across languages.
+In django CMS (version 4 and above), when creating page content translations, all content is immediately 
+published. When creating a translation of an existing page, the template from the original page content is 
+copied to the new translation. This behavior can be seen in the `create_translation` method. The template 
+is explicitly copied from the original page content to ensure consistent layout across languages.
+
+Note for django CMS versions prior to 4.2:
+
+In older versions of django CMS (prior to 4.2), when creating page content translations, the template is not 
+automatically copied from the original page content. Instead, the default site template (or the template 
+from the last published version) is applied, and manual adjustments may be necessary to ensure consistency.
 
 Behavior with djangocms-versioning
 ------------------------------------
 
-When using djangocms-versioning, pages and their content can exist in different states (draft, published, etc.). This introduces some nuances in template inheritance:
+When using djangocms-versioning, pages and their content can exist in different states (draft, published,
+etc.). This introduces some nuances in template inheritance:
 
 1. When you create a page and publish it, the template is set and published
-2. If you create a new page content in another language and modify its template but don't publish it, that template change remains in draft state
-3. When creating a translation of that page content, the new translation will inherit the template from the last published version, not from any unpublished drafts
+2. When creating a translation of a page content, the new translation will inherit the template from the
+   draft version of the main language page content if one exists
+3. If no draft version exists in the main language, the template will be inherited from the published
+   version instead
 
-This is because djangocms-versioning maintains strict separation between published and draft content to prevent unpublished changes from becoming visible. This behavior ensures that new translations are based on stable, published content rather than draft changes that may still be in progress.
+This behavior ensures that new translations automatically pick up any template changes that are in progress
+(draft state) in the main language, maintaining consistency across translations even before changes are
+published.

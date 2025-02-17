@@ -95,6 +95,21 @@ def get_page_template_filter_choices():
     yield from get_cms_setting("TEMPLATES")
 
 
+def get_main_language_page_content_template(new_page):
+    # If you have djangocms-versioning installed, this will get the latest version of the page content, and ignore drafts.
+    # Get the main language page content template if available
+    if new_page:
+        try:
+            main_language = new_page.get_languages()[0]
+            main_language_page_content = new_page.get_admin_content(language=main_language)
+            return main_language_page_content.template if main_language_page_content else None
+        except (IndexError, AttributeError):
+            # Handle cases where get_languages() returns empty list
+            # or if there's any attribute access error
+            pass
+    return None
+
+
 def save_permissions(data, obj):
     models = (
         (Page, "page"),
@@ -322,7 +337,7 @@ class AddPageForm(BasePageContentForm):
             raise ValidationError("Site doesn't match the parent's page site")
         return parent_page
 
-    def create_translation(self, page, og_page_content_template=None):
+    def create_translation(self, page, main_language_page_content_template=None):
         data = self.cleaned_data
         title_kwargs = {
             "page": page,
@@ -344,8 +359,8 @@ class AddPageForm(BasePageContentForm):
         if "meta_description" in data:
             title_kwargs["meta_description"] = data["meta_description"]
 
-        if og_page_content_template:
-            title_kwargs["template"] = og_page_content_template
+        if main_language_page_content_template:
+            title_kwargs["template"] = main_language_page_content_template
 
         return api.create_page_content(**title_kwargs)
 
@@ -388,23 +403,9 @@ class AddPageForm(BasePageContentForm):
             new_page.add_to_tree(position="last-child")
             new_page.save()
 
-        # If you have djangocms-versioning installed, this will get the latest version of the page content, and ignore drafts.
-        # Get the original page content template if available
-        og_page_content_template = None
-        if new_page:
-            try:
-                main_language = new_page.get_languages()[0]
-                og_page_content = (
-                    PageContent.objects.filter(page_id=new_page.pk, language=main_language).only("template").first()
-                )
-                if og_page_content:
-                    og_page_content_template = og_page_content.template
-            except (IndexError, AttributeError):
-                # Handle cases where get_languages() returns empty list
-                # or if there's any attribute access error
-                pass
-
-        translation = self.create_translation(new_page, og_page_content_template=og_page_content_template)
+        translation = self.create_translation(
+            new_page, main_language_page_content_template=get_main_language_page_content_template(new_page)
+        )
         new_page.page_content_cache[translation.language] = translation
 
         if source:
