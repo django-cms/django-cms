@@ -437,12 +437,14 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             'position': plugin_data['plugin_position'],
         }
 
-        if request.method == 'POST':
-            # If the plugin has show_add_plugin_form set to False,
+        if request.method == 'POST' and not plugin_class.show_plugin_add_form:
+            # If the plugin has show_plugin_add_form set to False,
             # the post data is missing the initial values of the plugin form
             # Get the fields, the form and the initial values from the plugin instance
             # Replace the POST parameters by those initial values plus any concrete changes
             # the form.
+            # TODO: Make this work with Text plugins which use ghost plugins and have to
+            # have show_plugin_add_form=True
             fieldsets = plugin_instance.get_fieldsets(request, obj=None)
             fields = flatten_fieldsets(fieldsets)
             # Instantiate the add form for all fields

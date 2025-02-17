@@ -29,6 +29,23 @@ class PlaceholderAdminTestCase(CMSTestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(plugins.count(), 1)
 
+    def test_add_plugin_with_ghost(self):
+        """Adding a text plugin works. Text plugins create a ghost plugin."""
+        superuser = self.get_superuser()
+        placeholder = Placeholder.objects.create(slot="test")
+        plugins = placeholder.get_plugins("en").filter(plugin_type="TextPlugin")
+        uri = self.get_add_plugin_uri(
+            placeholder=placeholder,
+            plugin_type="TextPlugin",
+            language="en",
+        )
+        with self.login_user_context(superuser):
+            data = {"body": "<p>Some markup</p>"}
+            response = self.client.post(uri, data, follow=True)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(plugins.count(), 1)
+
     def test_add_plugins_from_placeholder(self):
         """
         User can copy plugins from one placeholder to another
