@@ -126,12 +126,12 @@ var Plugin = new Class({
             // so it's possible that multiple plugins (more often generics) are rendered
             // in different places. e.g. page menu in the header and in the footer
             // so first, we find all the template tags, then put them in a structure like this:
-            // [[start, end], [start, end]...]
+            // [[start, end], [start, end], ...]
             //
             // in case of plugins it means that it's aliased plugin or a plugin in a duplicated
             // static placeholder (for whatever reason)
             const contentWrappers = wrapper.toArray().reduce((wrappers, elem) => {
-                if (elem.classList.contains('cms-plugin-start')) {
+                if (elem.classList.contains('cms-plugin-start') || wrappers.length === 0) {
                     // start new wrapper
                     wrappers.push([elem]);
                 } else {
