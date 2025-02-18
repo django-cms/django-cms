@@ -2628,7 +2628,7 @@ describe('CMS.StructureBoard', function() {
         beforeEach(() => {
             structureBoard = new StructureBoard();
         });
-    
+
         it('should return true if data is missing or incomplete', () => {
             const incompleteData = {};
             expect(structureBoard._updateContentFromDataBridge(incompleteData)).toBe(true);
