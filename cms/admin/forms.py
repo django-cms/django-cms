@@ -257,7 +257,7 @@ class AddPageForm(BasePageContentForm):
         widget=forms.HiddenInput(),
     )
     content_defaults = {
-        "in_navigation": True,
+        "in_navigation": get_cms_setting("DEFAULT_IN_NAVIGATION"),
     }
 
     class Meta:
@@ -1497,7 +1497,9 @@ class RequestToolbarForm(forms.Form):
 
         try:
             # Use admin manager if available for the toolbar form
-            if hasattr(model_class, "admin_manager"):
+            if issubclass(model_class, PageContent):
+                generic_obj = model_class.admin_manager.select_related("page").get(pk=obj_id)
+            elif hasattr(model_class, "admin_manager"):
                 generic_obj = model_class.admin_manager.get(pk=obj_id)
             else:
                 generic_obj = model_class.objects.get(pk=obj_id)

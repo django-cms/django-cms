@@ -257,6 +257,15 @@ Configuration is retrieved in the following order:
 The first ``CMS_PLACEHOLDER_CONF`` key that matches for the required configuration attribute
 is used.
 
+``template`` denotes a page's template setting, e.g. ``pages/with_sidebar.html``.
+The template name must end in ``.htm`` or ``.html``. ``placeholder`` is a placeholder
+slot name.
+
+.. versionchanged:: 4.2
+
+    The template selector is available on django CMS pages. Since django CMS 4.2 it also
+    is available for other models, provided they provide a ``get_template()`` method.
+
 E.g: given the example above if the ``plugins`` configuration is retrieved for the ``content``
 placeholder in a page using the ``base.html`` template, the value
 ``['TextPlugin', 'PicturePlugin', 'TeaserPlugin']`` will be returned as ``'base.html content'``
@@ -706,6 +715,17 @@ Add the library files from `GitHub ojii/unihandecode.js tree/dist <https://githu
                 unihandecode-1.0.0.zh.min.js
 
 More documentation is available on `unihandecode.js' Read the Docs <https://unihandecodejs.readthedocs.io/>`_.
+
+
+.. setting:: CMS_DEFAULT_IN_NAVIGATION
+
+CMS_DEFAULT_IN_NAVIGATION
+=========================
+
+default
+    ``True``
+
+Decides if a newly added page content is automatically added to the navigation. 
 
 
 **************

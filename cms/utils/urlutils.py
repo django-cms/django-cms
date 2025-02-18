@@ -1,4 +1,6 @@
 import re
+from collections.abc import Sequence
+from typing import Any, Optional
 from urllib.parse import urlparse
 
 from django.conf import settings
@@ -90,17 +92,19 @@ def add_url_parameters(url, *args, **params):
     return url
 
 
-def admin_reverse(viewname, urlconf=None, args=None, kwargs=None, prefix=None,
-                  current_app=None):
-    admin_namespace = get_cms_setting('ADMIN_NAMESPACE')
-    if ':' in viewname:
-        raise ValueError(
-            "viewname in admin_reverse may not already have a namespace "
-            f"defined: {viewname!r}"
-        )
-    viewname = f"{admin_namespace}:{viewname}"
+admin_namespace = get_cms_setting('ADMIN_NAMESPACE')
+
+
+def admin_reverse(
+    viewname: str,
+    urlconf: Optional[str] = None,
+    args: Optional[Sequence] = None,
+    kwargs: Optional[dict[str, Any]] = None,
+    prefix=None,
+    current_app: Optional[str] = None
+):
     return reverse(
-        viewname,
+        f"{admin_namespace}:{viewname}",
         urlconf=urlconf,
         args=args,
         kwargs=kwargs,

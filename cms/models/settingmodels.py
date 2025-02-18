@@ -4,6 +4,12 @@ from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
 
 
+class PlaceholderForeignKey(models.ForeignKey):
+    def run_checks(self, *args, **kwargs):
+        # User always has permission to change their own clipboard
+        return True
+
+
 class UserSettings(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -13,7 +19,7 @@ class UserSettings(models.Model):
     )
     language = models.CharField(_("Language"), max_length=10, choices=settings.LANGUAGES,
                                 help_text=_("The language for the admin interface and toolbar"))
-    clipboard = models.ForeignKey(
+    clipboard = PlaceholderForeignKey(
         'cms.Placeholder',
         on_delete=models.CASCADE,
         blank=True,
@@ -30,4 +36,5 @@ class UserSettings(models.Model):
         return force_str(self.user)
 
     def has_placeholder_change_permission(self, user):
-        return True
+        # User always has permission to change their own clipboard
+       return True

@@ -534,11 +534,11 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         self.assertEqual(content_en.strip(), '<a href="http://example.com/">valid</a>')
 
     @override_settings(CMS_PERMISSION=False)
-    def test_nested_plugin_escapejs(self):
+    def test_databridge_contains_changes(self):
         """
         Checks #1366 error condition.
         When adding/editing a plugin whose icon_src() method returns a URL
-        containing an hyphen, the hyphen is escaped by django escapejs resulting
+        containing a hyphen, the hyphen is escaped by django escapejs resulting
         in a incorrect URL
         """
         ex = Example1(
@@ -556,7 +556,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         test_plugin.save()
         endpoint = self.get_change_plugin_uri(test_plugin)
         response = self.client.post(endpoint, {})
-        self.assertContains(response, "CMS.API.Helpers.onPluginSave")
+        self.assertContains(response, '<script id="data-bridge" type="application/json">')
+        self.assertContains(response, f'title=\\"EmptyPlugin ID: {test_plugin.pk}\\"')
 
     @override_settings(CMS_PERMISSION=False)
     def test_nested_plugin_escapejs_page(self):
@@ -574,7 +575,8 @@ class PlaceholderTestCase(TransactionCMSTestCase):
 
         endpoint = self.get_change_plugin_uri(test_plugin)
         response = self.client.post(endpoint, {})
-        self.assertContains(response, "CMS.API.Helpers.onPluginSave")
+        self.assertContains(response, '<script id="data-bridge" type="application/json">')
+        self.assertContains(response, f'title=\\"EmptyPlugin ID: {test_plugin.pk}\\"')
 
     def test_placeholder_scanning_fail(self):
         self.assertRaises(TemplateSyntaxError, _get_placeholder_slots, 'placeholder_tests/test_eleven.html')
@@ -714,8 +716,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
             name='category',
             parent=None, depth=1,
         )
-        self.assertEqual(example.description._get_attached_fields()[0].model, Category)
-        self.assertEqual(len(example.description._get_attached_fields()), 1)
+        self.assertEqual(example.description._get_attached_model(), Category)
 
     def test_placeholder_field_valid_slotname(self):
         self.assertRaises(ImproperlyConfigured, PlaceholderField, 10)
@@ -1215,7 +1216,7 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
 
     def test_excercise_get_attached_field(self):
         ph = Placeholder.objects.create(slot='test', default_width=300)
-        self.assertEqual(ph._get_attached_field(), None)  # Simple PH - no field name
+        self.assertEqual(ph.source, None)  # Simple PH - no source
 
     def test_excercise_get_attached_models_notplugins(self):
         ex = Example1(
@@ -1226,13 +1227,13 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         )
         ex.save()
         ph = ex.placeholder
-        result = list(ph._get_attached_models())
-        self.assertEqual(result, [Example1])  # Simple PH - Example1 model
+        result = ph._get_attached_model()
+        self.assertEqual(result, Example1)  # Simple PH - Example1 model
         add_plugin(ph, 'TextPlugin', 'en', body='en body')
-        result = list(ph._get_attached_models())
-        self.assertEqual(result, [Example1])  # Simple PH still one Example1 model
+        result = ph._get_attached_model()
+        self.assertEqual(result, Example1)  # Simple PH still one Example1 model
 
-    def test_excercise_get_attached_fields_notplugins(self):
+    def test_excercise_get_placeholder_source(self):
         ex = Example1(
             char_1='one',
             char_2='two',
@@ -1241,11 +1242,7 @@ class PlaceholderModelTests(ToolbarTestBase, CMSTestCase):
         )
         ex.save()
         ph = ex.placeholder
-        result = [f.name for f in list(ph._get_attached_fields())]
-        self.assertEqual(result, ['placeholder'])  # Simple PH - placeholder field name
-        add_plugin(ph, 'TextPlugin', 'en', body='en body')
-        result = [f.name for f in list(ph._get_attached_fields())]
-        self.assertEqual(result, ['placeholder'])  # Simple PH - still one placeholder field name
+        self.assertEqual(ph.source, ex)  # Simple PH - with source reference
 
     def test_repr(self):
         unsaved_ph = Placeholder()
@@ -1271,7 +1268,7 @@ class PlaceholderConfTests(TestCase):
         }
         LinkPlugin = plugin_pool.get_plugin('LinkPlugin')
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            plugins = plugin_pool.get_all_plugins(placeholder, page)
+            plugins = list(plugin_pool.get_all_plugins(placeholder, page))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
 
@@ -1289,7 +1286,7 @@ class PlaceholderConfTests(TestCase):
         }
         LinkPlugin = plugin_pool.get_plugin('LinkPlugin')
         with self.settings(CMS_PLACEHOLDER_CONF=conf):
-            plugins = plugin_pool.get_all_plugins(placeholder, page)
+            plugins = list(plugin_pool.get_all_plugins(placeholder, page))
             self.assertEqual(len(plugins), 1, plugins)
             self.assertEqual(plugins[0], LinkPlugin)
 
@@ -1326,7 +1323,6 @@ class PlaceholderPluginTestsBase(CMSTestCase):
     def create_plugins(self, placeholder):
         for i in range(1, 9):
             parent = add_plugin(placeholder or self.placeholder, 'StylePlugin', 'en')
-            # self._create_plugin(placeholder, position=i)
             for j in range(3):
                 add_plugin(placeholder or self.placeholder, 'StylePlugin', 'en', 'last-child', parent)
 

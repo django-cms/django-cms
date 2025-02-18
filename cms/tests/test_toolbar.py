@@ -1053,7 +1053,7 @@ class ToolbarModeTests(ToolbarTestBase):
 
 @override_settings(ROOT_URLCONF='cms.test_utils.project.placeholderapp_urls')
 class EditModelTemplateTagTest(ToolbarTestBase):
-    edit_fields_rx = "(\\?|&amp;)edit_fields=%s"
+    edit_fields_rx = "(\\?|&amp;|\\\\u0026)edit_fields=%s"
 
     def tearDown(self):
         Example1.objects.all().delete()
@@ -1094,7 +1094,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user)
         response = detail_view(request, ex1.pk)
         self.assertContains(response, "<h1>one</h1>")
-        self.assertContains(response, "CMS.API")
+        self.assertContains(response, '<script data-cms-config id="cms-config-json" type="application/json">')
 
     def test_edit(self):
         user = self.get_staff()
@@ -1213,12 +1213,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         self.assertContains(
             response,
-            f'CMS._plugins.push(["cms-plugin-{plugin.pk}"'
+            f'<script data-cms-plugin id="cms-plugin-{plugin.pk}" type="application/json">'
         )
 
         self.assertContains(
             response,
-            f'CMS._plugins.push(["cms-placeholder-{ex1.placeholder.pk}"'
+            f'<script data-cms-placeholder id="cms-placeholder-{ex1.placeholder.pk}" type="application/json">'
         )
 
     def test_filters(self):
@@ -1418,7 +1418,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
                 'placeholderapp', 'example1', ex1.pk
             )
         )
-        self.assertContains(response, "onClose: 'REFRESH_PAGE',")
+        self.assertContains(response, '"onClose": "REFRESH_PAGE",')
 
     def test_icon_tag(self):
         user = self.get_staff()
@@ -1471,11 +1471,12 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
             response,
-            "CMS._plugins.push(['cms-plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_1', ex1.pk))
-
+            f'<script id="cms-plugin-placeholderapp-example1-char_1-{ex1.pk}" type="application/json" data-cms-general>'
+        )
         self.assertContains(
             response,
-            "CMS._plugins.push(['cms-plugin-{}-{}-{}-{}'".format('placeholderapp', 'example1', 'char_2', ex1.pk))
+            f'<script id="cms-plugin-placeholderapp-example1-char_2-{ex1.pk}" type="application/json" data-cms-general>'
+        )
 
     def test_add_tag(self):
         user = self.get_staff()
@@ -1676,7 +1677,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         )
         self.assertContains(
             response,
-            "edit_plugin: '{}?language={}&amp;edit_fields=changelist'".format(
+            '"edit_plugin": "{}?language={}&amp;edit_fields=changelist"'.format(
                 admin_reverse('placeholderapp_example1_changelist'), 'en'
             )
         )
@@ -1769,7 +1770,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit_url)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
-            response, "edit_plugin: '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk)
+            response, '"edit_plugin": "/admin/placeholderapp/example1/edit-field/%s/en/' % ex1.pk)
 
     def test_edit_field_respects_content_admin_mixin(self):
         user = self.get_staff()
@@ -1800,7 +1801,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         request = self.get_page_request(page, user, edit_url)
         response = detail_view(request, ex1.pk, template_string=template_text)
         self.assertContains(
-            response, "edit_plugin: '/admin/placeholderapp/example1/edit-field/%s/en/" % ex1.pk
+            response, '"edit_plugin": "/admin/placeholderapp/example1/edit-field/%s/en/' % ex1.pk
         )
 
     def test_method_attribute(self):
@@ -2036,6 +2037,7 @@ class EditModelTemplateTagTest(ToolbarTestBase):
         )
         self.assertContains(
             response,
+            ''
             '<template class="cms-plugin cms-plugin-start cms-plugin-cms-page-changelist-%s cms-render-model '
             'cms-render-model-block"></template>\n        <h3>Menu</h3>' % page.pk
         )
@@ -2156,10 +2158,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
         page_content = self.get_pagecontent_obj(page, "en")
 
         self.assertEqual(page_content, get_object_for_language(page_content, "en"))
-        self.assertTrue(not hasattr(page_content, "_sibling_objects_for_language_cache"))
         self.assertIsNone(get_object_for_language(page_content, "de"))
-        self.assertTrue(hasattr(page_content, "_sibling_objects_for_language_cache"))
-        self.assertEqual(len(page_content._sibling_objects_for_language_cache), 1)
 
     def test_get_object_for_language_multiple_languages(self):
         page = create_page('Test', 'col_two.html', 'en')
@@ -2175,10 +2174,7 @@ class ToolbarUtilsTestCase(ToolbarTestBase):
                 page_content[code] = create_page_content(code, verbose, page)
 
         self.assertEqual(page_content["en"], get_object_for_language(page_content["en"], "en"))
-        self.assertTrue(not hasattr(page_content["en"], "_sibling_objects_for_language_cache"))
         self.assertEqual(get_object_for_language(page_content["en"], "de"), page_content["de"])
-        self.assertTrue(hasattr(page_content["en"], "_sibling_objects_for_language_cache"))
-        self.assertEqual(len(page_content["en"]._sibling_objects_for_language_cache), len(get_language_tuple()))
 
 
 class CharPkFrontendPlaceholderAdminTest(ToolbarTestBase):

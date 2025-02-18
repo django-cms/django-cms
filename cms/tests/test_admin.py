@@ -16,7 +16,7 @@ from cms import api
 from cms.admin.forms import ChangePageForm
 from cms.api import add_plugin, create_page, create_page_content
 from cms.constants import TEMPLATE_INHERITANCE_MAGIC
-from cms.models import PageContent, StaticPlaceholder, UserSettings
+from cms.models import PageContent, PageUrl, StaticPlaceholder, UserSettings
 from cms.models.pagemodel import Page
 from cms.models.permissionmodels import GlobalPagePermission, PagePermission
 from cms.models.placeholdermodel import Placeholder
@@ -26,7 +26,7 @@ from cms.test_utils.testcases import (
     URL_CMS_PAGE_PUBLISHED,
     CMSTestCase,
 )
-from cms.utils.compat import DJANGO_5_1
+from cms.utils.compat import DJANGO_4_2, DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list
 from cms.utils.urlutils import admin_reverse
@@ -185,15 +185,26 @@ class AdminTestCase(AdminTestsBase):
                            created_by=admin_user)
         create_page_content("de", "delete-page-translation-2", page, slug="delete-page-translation-2")
         create_page_content("es-mx", "delete-page-translation-es", page, slug="delete-page-translation-es")
+        data = {"post": "yes"}
         with self.login_user_context(admin_user):
             response = self.client.get(self.get_page_delete_translation_uri('de', page))
             self.assertEqual(response.status_code, 200)
-            response = self.client.post(self.get_page_delete_translation_uri('de', page))
+            response = self.client.post(self.get_page_delete_translation_uri('de', page), data=data)
             self.assertRedirects(response, self.get_pages_admin_list_uri('de'))
             response = self.client.get(self.get_page_delete_translation_uri('es-mx', page))
             self.assertEqual(response.status_code, 200)
-            response = self.client.post(self.get_page_delete_translation_uri('es-mx', page))
+            self.assertContains(
+                response,
+                '<p>Are you sure you want to delete the page content "delete-page-translation-es (es-mx)"?'
+            )
+            response = self.client.post(self.get_page_delete_translation_uri('es-mx', page), data=data)
             self.assertRedirects(response, self.get_pages_admin_list_uri('es-mx'))
+
+        self.assertTrue(PageContent.objects.filter(page=page, language='en').exists())
+        self.assertFalse(PageContent.objects.filter(page=page, language='de').exists())
+        self.assertFalse(PageContent.objects.filter(page=page, language='es-mx').exists())
+        self.assertFalse(PageUrl.objects.filter(page=page, language='de').exists())
+        self.assertFalse(PageUrl.objects.filter(page=page, language='es-mx').exists())
 
     def test_change_template(self):
         template = get_cms_setting('TEMPLATES')[0][0]
@@ -475,6 +486,15 @@ class AdminTests(AdminTestsBase):
                 }
                 response = self.client.post(url, data)
                 self.assertEqual(response.status_code, HttpResponseBadRequest.status_code)
+
+    def test_page_edit_field_endpoint(self):
+        endpoint = admin_reverse("cms_page_edit_title_fields", args=(self.page.pk, "en")) + "?language=en&edit_fields=page_title"
+        with self.login_user_context(self.get_superuser()):
+            response = self.client.get(endpoint)
+        if DJANGO_4_2:
+            self.assertContains(response, '<input type="text" name="page_title" maxlength="255" id="id_page_title">')
+        else:
+            self.assertContains(response, '<input type="text" name="page_title" maxlength="255" aria-describedby="id_page_title_helptext" id="id_page_title">')
 
 
 class NoDBAdminTests(CMSTestCase):
@@ -785,7 +805,7 @@ class AdminFormsTests(AdminTestsBase):
 
         user = self.get_superuser()
         with self.login_user_context(user):
-            with self.assertNumQueries(7):
+            with self.assertNumQueries(8):
                 force_str(self.client.get(self.get_pages_admin_list_uri('en')))
 
     def test_smart_link_pages(self):
