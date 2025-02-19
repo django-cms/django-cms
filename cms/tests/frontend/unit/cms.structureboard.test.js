@@ -2623,21 +2623,19 @@ describe('CMS.StructureBoard', function() {
     });
 
     describe('_updateContentFromDataBridge', () => {
-        let structureBoard;
-
         beforeEach(() => {
-            structureBoard = new StructureBoard();
+            CMS.API.StructureBoard = new StructureBoard();
         });
 
         it('should return true if data is missing or incomplete', () => {
             const incompleteData = {};
-            expect(structureBoard._updateContentFromDataBridge(incompleteData)).toBe(true);
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(incompleteData)).toBe(true);
 
             const missingContent = { content: {} };
-            expect(structureBoard._updateContentFromDataBridge(missingContent)).toBe(true);
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(missingContent)).toBe(true);
 
             const missingPluginIds = { content: { html: '<div></div>' } };
-            expect(structureBoard._updateContentFromDataBridge(missingPluginIds)).toBe(true);
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(missingPluginIds)).toBe(true);
         });
 
         it('should return true if source placeholder is not found', () => {
@@ -2649,7 +2647,7 @@ describe('CMS.StructureBoard', function() {
                 }
             };
             spyOn(CMS._instances, 'some').and.returnValue(false);
-            expect(structureBoard._updateContentFromDataBridge(data)).toBe(true);
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(true);
         });
 
         it('should update content and return false if data is valid', () => {
@@ -2663,14 +2661,14 @@ describe('CMS.StructureBoard', function() {
                     position: 0
                 }
             };
-            spyOn(structureBoard, '_findNextElement').and.returnValue($('<div></div>'));
-            spyOn(structureBoard, '_updateSekizai');
-            spyOn(structureBoard, '_contentChanged');
+            spyOn(CMS.API.StructureBoard, '_findNextElement').and.returnValue($('<div></div>'));
+            spyOn(CMS.API.StructureBoard, '_updateSekizai');
+            spyOn(CMS.API.StructureBoard, '_contentChanged');
 
-            expect(structureBoard._updateContentFromDataBridge(data)).toBe(false);
-            expect(structureBoard._updateSekizai).toHaveBeenCalledWith(data, 'css');
-            expect(structureBoard._updateSekizai).toHaveBeenCalledWith(data, 'js');
-            expect(structureBoard._contentChanged).toHaveBeenCalledWith(undefined);
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(false);
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data, 'css');
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data, 'js');
+            expect(CMS.API.StructureBoard._contentChanged).toHaveBeenCalledWith(undefined);
         });
 
         it('should remove previous content and update Sekizai blocks', () => {
@@ -2684,23 +2682,23 @@ describe('CMS.StructureBoard', function() {
                     js: '<script src="script.js"></script>'
                 }
             };
-            spyOn(structureBoard, '_findNextElement').and.returnValue($('<div></div>'));
-            spyOn(structureBoard, '_updateSekizai');
-            spyOn(structureBoard, '_contentChanged');
+            spyOn(CMS.API.StructureBoard, '_findNextElement').and.returnValue($('<div></div>'));
+            spyOn(CMS.API.StructureBoard, '_updateSekizai');
+            spyOn(CMS.API.StructureBoard, '_contentChanged');
 
             $('body').append('<div class="cms-plugin cms-plugin-1"></div>');
             $('body').append('<div class="cms-plugin cms-plugin-2"></div>');
             $('body').append('<script data-cms-plugin id="cms-plugin-1"></script>');
             $('body').append('<script data-cms-plugin id="cms-plugin-2"></script>');
 
-            expect(structureBoard._updateContentFromDataBridge(data)).toBe(false);
+            expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(false);
             expect($('.cms-plugin.cms-plugin-1').length).toBe(0);
             expect($('.cms-plugin.cms-plugin-2').length).toBe(0);
             expect($('script[data-cms-plugin]#cms-plugin-1').length).toBe(0);
             expect($('script[data-cms-plugin]#cms-plugin-2').length).toBe(0);
-            expect(structureBoard._updateSekizai).toHaveBeenCalledWith(data, 'css');
-            expect(structureBoard._updateSekizai).toHaveBeenCalledWith(data, 'js');
-            expect(structureBoard._contentChanged).toHaveBeenCalledWith(undefined);
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data, 'css');
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data, 'js');
+            expect(CMS.API.StructureBoard._contentChanged).toHaveBeenCalledWith(undefined);
         });
     });
 

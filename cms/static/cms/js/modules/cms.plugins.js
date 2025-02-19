@@ -841,7 +841,7 @@ var Plugin = new Class({
 
     _refreshStructureBoard: function _refreshToolbar() {
         CMS.API.StructureBoard._loadedStructure = false;
-        CMS.API.StructureBoard._loadStructure();
+        CMS.API.StructureBoard.show();
     },
 
     /**
