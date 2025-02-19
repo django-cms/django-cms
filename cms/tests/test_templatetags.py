@@ -510,11 +510,12 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar.show_toolbar = True
         output = self.render_template_obj(template, {'plugin': plugin}, request)
         expected = (
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}"></template>'
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}" data-cms-placeholder="{2}" '
+            'data-cms-position="{1}"></template>'
             '<b>Test</b>'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'
         )
-        self.assertEqual(output, expected.format(plugin.pk))
+        self.assertEqual(output, expected.format(plugin.pk, plugin.position, plugin.placeholder_id))
 
     def test_render_plugin_not_editable(self):
         from django.core.cache import cache
@@ -550,7 +551,8 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         output = render_plugin(context, plugin)
         self.assertEqual(
             output,
-            f'<template class="cms-plugin cms-plugin-start cms-plugin-{plugin.pk}"></template>'
+            f'<template class="cms-plugin cms-plugin-start cms-plugin-{plugin.pk}" '
+            f'data-cms-placeholder="{plugin.placeholder_id}" data-cms-position="{plugin.position}"></template>'
             f'Test<template class="cms-plugin cms-plugin-end cms-plugin-{plugin.pk}"></template>'
         )
 

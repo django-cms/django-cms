@@ -107,7 +107,7 @@ class PageDeleteMessageMixin:
         """Minimize complexity of delete selected confirmation: Only show pages, page contents and plugins numbers,
         only show Page and PageContent objects in the details.
         """
-        def recursively_remove(deleted_objects: list | str) -> list:
+        def recursively_remove(deleted_objects: list | str) -> list | str:
             """Remove all objects that are not Page or PageContent from the nested list of deleted objects.
             Reformat the messages."""
             if isinstance(deleted_objects, str):

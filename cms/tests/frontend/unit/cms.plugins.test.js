@@ -351,78 +351,94 @@ describe('CMS.Plugin', function() {
                     pluginId: 99,
                     name: 'element + element',
                     expected: [
-                        '<div class="plugin99-1 cms-plugin cms-plugin-99">element</div>',
-                        '<div class="plugin99-2 cms-plugin cms-plugin-99">and another element</div>'
+                        '<div class="plugin99-1 cms-plugin cms-plugin-99 cms-plugin-start" data-cms-position="42">' +
+                        'element</div>',
+                        '<div class="plugin99-2 cms-plugin cms-plugin-99 cms-plugin-end" data-cms-position="42">' +
+                        'and another element</div>'
                     ]
                 },
                 {
                     pluginId: 100,
                     name: 'textnode + element',
                     expected: [
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-100">\n' +
-                            '        text </cms-plugin>',
-                        '<div class="plugin100 cms-plugin cms-plugin-100">and element</div>'
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-100 cms-plugin-start" ' +
+                        'data-cms-position="42">\n' +
+                        '        text </cms-plugin>',
+                        '<div class="plugin100 cms-plugin cms-plugin-100 cms-plugin-end"' +
+                        ' data-cms-position="42"> and element</div>'
                     ]
                 },
                 {
                     pluginId: 101,
                     name: 'textnode + element + textnode',
                     expected: [
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101">text </cms-plugin>',
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101 cms-plugin-start" ' +
+                        'data-cms-position="42">\n' +
+                        '        text </cms-plugin>',
                         '<div class="plugin101 cms-plugin cms-plugin-101">element</div>',
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101"> another text</cms-plugin>'
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101 cms-plugin-end" ' +
+                        'data-cms-position="42"> another text\n' +
+                        '    </cms-plugin>'
                     ]
                 },
                 {
                     pluginId: 102,
                     name: 'element + textnode',
                     expected: [
-                        '<div class="plugin102 cms-plugin cms-plugin-102">element</div>',
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-102"> and text\n' +
-                            '        </cms-plugin>'
+                        '<div class="plugin102 cms-plugin cms-plugin-102 cms-plugin-start" ' +
+                        'data-cms-position="42">element</div>',
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-102 cms-plugin-end" ' +
+                        'data-cms-position="42"> and text\n' +
+                        '    </cms-plugin>'
                     ]
                 },
                 {
                     pluginId: 103,
                     name: 'textnode',
                     expected: [
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-103">\n' +
-                            '        only text node\n    </cms-plugin>'
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-103 ' +
+                        'cms-plugin-start cms-plugin-end" data-cms-position="42">\n' +
+                         '        only text node\n    </cms-plugin>'
                     ]
                 },
                 {
                     pluginId: 104,
                     name: 'textnode + comment',
                     expected: [
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-104">\n' +
-                            '        text node </cms-plugin>'
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-104 ' +
+                        'cms-plugin-start cms-plugin-end" data-cms-position="42">\n' +
+                         '        text node </cms-plugin>'
                     ]
                 },
                 {
                     pluginId: 105,
                     name: 'comment + textnode',
                     expected: [
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-105">' +
-                            ' and a text node\n' +
-                            '    </cms-plugin>'
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-105 ' +
+                        'cms-plugin-start cms-plugin-end" data-cms-position="42">' +
+                         ' and a text node\n' +
+                         '    </cms-plugin>'
                     ]
                 },
                 {
                     pluginId: 106,
                     name: 'textnode + comment + textnode',
                     expected: [
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-106">' +
-                            'text node </cms-plugin>',
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-106">' +
-                            ' and a text node\n' +
-                            '    </cms-plugin>'
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-106 cms-plugin-start" ' +
+                        'data-cms-position="42">\n' +
+                        '        text node </cms-plugin>',
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-106 cms-plugin-end" ' +
+                        'data-cms-position="42">' +
+                        ' and a text node\n' +
+                        '    </cms-plugin>'
                     ]
                 },
                 {
                     pluginId: 107,
                     name: 'whitespace textnode + comment + textnode',
                     expected: [
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-107">' +
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-107 ' +
+                            'cms-plugin-start cms-plugin-end" data-cms-position="42">' +
                             ' and a text node\n' +
                             '    </cms-plugin>'
                     ]
@@ -436,11 +452,7 @@ describe('CMS.Plugin', function() {
                         plugin_id: test.pluginId
                     });
 
-                    expect(
-                        plugin.ui.container.map(function(i, el) {
-                            return el.outerHTML;
-                        })
-                    ).toEqual(test.expected);
+                    expect($.map(plugin.ui.container, el => el.outerHTML)).toEqual(test.expected);
                 });
             });
         });

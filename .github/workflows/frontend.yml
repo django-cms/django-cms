@@ -8,7 +8,7 @@ concurrency:
 
 jobs:
   frontend:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: ['18']
@@ -21,8 +21,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm install
     - run: npm install -g gulp@4.0.2
-    - run: |
-          gulp unitTest
-          gulp lint
+    - run: gulp unitTest
+    - run: gulp lint
     - run: gulp icons
     - run: gulp sass

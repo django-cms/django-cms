@@ -1192,7 +1192,8 @@ class EditModelTemplateTagTest(ToolbarTestBase):
 
         self.assertContains(
             response,
-            f'<h1><template class="cms-plugin cms-plugin-start cms-plugin-{plugin.pk}"></template>'
+            f'<h1><template class="cms-plugin cms-plugin-start cms-plugin-{plugin.pk}" '
+            f'data-cms-placeholder="{plugin.placeholder_id}" data-cms-position="{plugin.position}"></template>'
             f'{render_placeholder_body}'
             f'<template class="cms-plugin cms-plugin-end cms-plugin-{plugin.pk}"></template>'
         )

@@ -50,7 +50,7 @@ describe('CMS.Messages', function() {
             expect(messages.options).toEqual({
                 messageDuration: 100,
                 messageDelay: 0,
-                messageLength: 160
+                messageLength: 250
             });
         });
     });
