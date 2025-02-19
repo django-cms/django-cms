@@ -123,7 +123,8 @@ var Plugin = new Class({
         // have to check for cms-plugin, there can be a case when there are multiple
         // static placeholders or plugins rendered twice, there could be multiple wrappers on same page
         if (wrapper.length > 1 && container.match(/cms-plugin/)) {
-            const contentWrappers = this._extractContentWrappers(wrapper);  // Get array [[start, end], [start, end], ...]
+            // Get array [[start, end], [start, end], ...]
+            const contentWrappers = this._extractContentWrappers(wrapper);
 
             if (contentWrappers[0][0].tagName === 'TEMPLATE') {
                 // then - if the content is bracketed by two template tages - we map that structure into an array of
@@ -204,6 +205,7 @@ var Plugin = new Class({
         itemContents.each((index, el) => {
             if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
                 const element = $(el);
+
                 element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
                 itemContents[index] = element.parent()[0];
             }
