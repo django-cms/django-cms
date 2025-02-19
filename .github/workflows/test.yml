@@ -17,6 +17,7 @@ jobs:
           django-4.2.txt,
           django-5.0.txt,
           django-5.1.txt,
+          django-5.2.txt,
         ]
         os: [
           ubuntu-latest,
@@ -25,6 +26,8 @@ jobs:
           - requirements-file: django-5.0.txt
             python-version: 3.9
           - requirements-file: django-5.1.txt
+            python-version: 3.9
+          - requirements-file: django-5.2.txt
             python-version: 3.9
 
     services:
@@ -73,6 +76,7 @@ jobs:
           django-4.2.txt,
           django-5.0.txt,
           django-5.1.txt,
+          django-5.2.txt,
         ]
         os: [
           ubuntu-latest,
@@ -81,6 +85,8 @@ jobs:
           - requirements-file: django-5.0.txt
             python-version: 3.9
           - requirements-file: django-5.1.txt
+            python-version: 3.9
+          - requirements-file: django-5.2.txt
             python-version: 3.9
 
     services:
@@ -128,6 +134,7 @@ jobs:
           django-4.2.txt,
           django-5.0.txt,
           django-5.1.txt,
+          django-5.2.txt,
         ]
         os: [
           ubuntu-latest,
@@ -136,6 +143,8 @@ jobs:
           - requirements-file: django-5.0.txt
             python-version: 3.9
           - requirements-file: django-5.1.txt
+            python-version: 3.9
+          - requirements-file: django-5.2.txt
             python-version: 3.9
 
     steps:
