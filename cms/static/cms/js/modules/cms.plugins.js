@@ -718,7 +718,6 @@ var Plugin = new Class({
                     error: true
                 });
                 hideLoader();
-                that._refreshStructureBoard();
             }
         });
     },
@@ -827,24 +826,11 @@ var Plugin = new Class({
                     error: true
                 });
                 hideLoader();
-                this._refreshStructureBoard();
             }
         });
     },
 
-    /**
-     * Updates the structure board after failed change
-     *
-     * @method _refreshStructureBoard
-     * @private
-     */
-
-    _refreshStructureBoard: function _refreshToolbar() {
-        CMS.API.StructureBoard._loadedStructure = false;
-        CMS.API.StructureBoard.show();
-    },
-
-    /**
+     /**
      * Changes the settings attributes on an initialised plugin.
      *
      * @method _setSettings
