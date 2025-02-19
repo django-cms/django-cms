@@ -123,55 +123,13 @@ var Plugin = new Class({
         // have to check for cms-plugin, there can be a case when there are multiple
         // static placeholders or plugins rendered twice, there could be multiple wrappers on same page
         if (wrapper.length > 1 && container.match(/cms-plugin/)) {
-            // so it's possible that multiple plugins (more often generics) are rendered
-            // in different places. e.g. page menu in the header and in the footer
-            // so first, we find all the template tags, then put them in a structure like this:
-            // [[start, end], [start, end], ...]
-            //
-            // in case of plugins it means that it's aliased plugin or a plugin in a duplicated
-            // static placeholder (for whatever reason)
-            const contentWrappers = wrapper.toArray().reduce((wrappers, elem) => {
-                if (elem.classList.contains('cms-plugin-start') || wrappers.length === 0) {
-                    // start new wrapper
-                    wrappers.push([elem]);
-                } else {
-                    // belongs to previous wrapper
-                    wrappers.at(-1).push(elem);
-                }
-
-                return wrappers;
-            }, []);
+            const contentWrappers = this._extractContentWrappers(wrapper);  // Get array [[start, end], [start, end], ...]
 
             if (contentWrappers[0][0].tagName === 'TEMPLATE') {
                 // then - if the content is bracketed by two template tages - we map that structure into an array of
                 // jquery collections from which we filter out empty ones
                 contents = contentWrappers
-                    .map(items => {
-                        const templateStart = $(items[0]);
-                        const className = templateStart.attr('class').replace('cms-plugin-start', '');
-                        const position = templateStart.attr('data-cms-position');
-                        let itemContents = $(nextUntil(templateStart[0], container));
-
-                        itemContents.each((index, el) => {
-                            // if it's a non-space top-level text node - wrap it in `cms-plugin`
-                            if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
-                                var element = $(el);
-
-                                element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
-                                itemContents[index] = element.parent()[0];
-                            }
-                        });
-
-                        // otherwise we don't really need text nodes or comment nodes or empty text nodes
-                        itemContents = itemContents.filter(function() {
-                            return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
-                        });
-
-                        itemContents.addClass(`cms-plugin ${className}`);
-                        itemContents.first().addClass('cms-plugin-start').attr('data-cms-position', position);
-                        itemContents.last().addClass('cms-plugin-end').attr('data-cms-position', position);
-                        return itemContents;
-                    })
+                    .map(items => this._processTemplateGroup(items, container))
                     .filter(v => v.length);
 
                 wrapper.filter('template').remove();
@@ -193,6 +151,73 @@ var Plugin = new Class({
 
         this.ui = this.ui || {};
         this.ui.container = contents;
+    },
+
+    /**
+     * Extracts the content wrappers from the given wrapper:
+     * It is possible that multiple plugins (more often generics) are rendered
+     * in different places. e.g. page menu in the header and in the footer
+     * so first, we find all the template tags, then put them in a structure like this:
+     * [[start, end], [start, end], ...]
+     *
+     * @method _extractContentWrappers
+     * @private
+     * @param {jQuery} wrapper
+     * @returns {Array<Array<HTMLElement>>}
+     */
+    _extractContentWrappers: function (wrapper) {
+        return wrapper.toArray().reduce((wrappers, elem) => {
+            if (elem.classList.contains('cms-plugin-start') || wrappers.length === 0) {
+                wrappers.push([elem]);
+            } else {
+                wrappers.at(-1).push(elem);
+            }
+            return wrappers;
+        }, []);
+    },
+
+    /**
+     * Processes the template group and returns a jQuery collection
+     * of the content bracketed by ``cms-plugin-start`` and ``cms-plugin-end``.
+     * It also wraps any top-level text nodes in ``cms-plugin`` elements.
+     *
+     * @method _processTemplateGroup
+     * @private
+     * @param {Array<HTMLElement>} items
+     * @param {HTMLElement} container
+     * @returns {jQuery}
+     * @example
+     * // Given the following HTML:
+     * <template class="cms-plugin cms-plugin-4711 cms-plugin-start" data-cms-position="1"></template>
+     * <p>Some text</p>
+     * <template class="cms-plugin cms-plugin-4711 cms-plugin-end" data-cms-position="1"></template>
+     *
+     * // The following jQuery collection will be returned:
+     * $('<p class="cms-plugin cms-plugin-4711 cms-plugin-start cms-plugin-end" data-cms-position="1">Some text</p>')
+     */
+    _processTemplateGroup: function (items, container) {
+        const templateStart = $(items[0]);
+        const className = templateStart.attr('class').replace('cms-plugin-start', '');
+        const position = templateStart.attr('data-cms-position');
+        let itemContents = $(nextUntil(templateStart[0], container));
+
+        itemContents.each((index, el) => {
+            if (el.nodeType === Node.TEXT_NODE && !el.textContent.match(/^\s*$/)) {
+                const element = $(el);
+                element.wrap('<cms-plugin class="cms-plugin-text-node"></cms-plugin>');
+                itemContents[index] = element.parent()[0];
+            }
+        });
+
+        itemContents = itemContents.filter(function() {
+            return this.nodeType !== Node.TEXT_NODE && this.nodeType !== Node.COMMENT_NODE;
+        });
+
+        itemContents.addClass(`cms-plugin ${className}`);
+        itemContents.first().addClass('cms-plugin-start').attr('data-cms-position', position);
+        itemContents.last().addClass('cms-plugin-end').attr('data-cms-position', position);
+
+        return itemContents;
     },
 
     /**
