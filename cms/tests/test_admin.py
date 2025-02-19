@@ -408,6 +408,34 @@ class AdminTestCase(AdminTestsBase):
         self.assertEqual(ph.get_plugins("en").count(), 2)
         self.assertEqual(ph.get_plugins("de").count(), 0)
 
+    def test_template_inheritance_magic_with_three_levels_of_inheritance_inherits_from_parent(self):
+        admin_user = self.get_superuser()
+        grandparent_page = create_page("grandparent-page", "nav_playground.html", "en", created_by=admin_user)
+        parent_page = create_page("parent-page", "col_two.html", "en", created_by=admin_user, parent=grandparent_page)
+        child_page = create_page("child-page", "nav_playground.html", "en", created_by=admin_user, parent=parent_page)
+
+        with self.login_user_context(admin_user):
+            self.client.post(
+                self.get_page_change_template_uri("en", child_page), {"template": TEMPLATE_INHERITANCE_MAGIC}
+            )
+            child_page_content = PageContent.objects.get(page=child_page, language="en")
+            self.assertEqual(child_page_content.get_template(), "col_two.html")
+
+    def test_template_inheritance_magic_with_three_levels_of_inheritance_inherits_from_grandparent(self):
+        admin_user = self.get_superuser()
+        grandparent_page = create_page("grandparent-page", "nav_playground.html", "en", created_by=admin_user)
+        parent_page = create_page(
+            "parent-page", TEMPLATE_INHERITANCE_MAGIC, "en", created_by=admin_user, parent=grandparent_page
+        )
+        child_page = create_page("child-page", "col_two.html", "en", created_by=admin_user, parent=parent_page)
+
+        with self.login_user_context(admin_user):
+            self.client.post(
+                self.get_page_change_template_uri("en", child_page), {"template": TEMPLATE_INHERITANCE_MAGIC}
+            )
+            child_page_content = PageContent.objects.get(page=child_page, language="en")
+            self.assertEqual(child_page_content.get_template(), "nav_playground.html")
+
 
 class AdminTests(AdminTestsBase):
     # TODO: needs tests for actual permissions, not only superuser/normaluser
