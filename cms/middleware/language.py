@@ -1,14 +1,21 @@
 from django.conf import settings
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import get_language
 
 
-class LanguageCookieMiddleware(MiddlewareMixin):
+class LanguageCookieMiddleware:
     def __init__(self, get_response):
-        super().__init__(get_response)
+        self.get_response = get_response
+        super().__init__()
 
     def __call__(self, request):
         response = self.get_response(request)
+        return self.process_response(request, response)
+
+    async def __acall__(self, request):
+        response = await self.get_response(request)
+        return self.process_response(request, response)
+
+    def process_response(self, request, response):
         language = get_language()
         if (
             settings.LANGUAGE_COOKIE_NAME in request.COOKIES  # noqa: W503
