@@ -219,7 +219,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     #: The plugin does not modify the context or request and its rendering is not influenced by its parent
     #: plugins.
-    is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT", False)
+    is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
 
     # Warning: setting these to False, may have a serious performance impact,
     # because their child-parent-relation must be recomputed each
