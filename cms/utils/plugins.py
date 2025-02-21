@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 @cache
-def get_plugin_class(plugin_type: str) -> CMSPluginBase:
+def get_plugin_class(plugin_type: str) -> type[CMSPluginBase]:
     """Returns the plugin class for a given plugin_type (str)"""
     return plugin_pool.get_plugin(plugin_type)
 

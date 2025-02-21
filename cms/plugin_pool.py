@@ -3,7 +3,7 @@ from operator import attrgetter
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import slugify
-from django.urls import include, re_path
+from django.urls import URLResolver, include, re_path
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.module_loading import autodiscover_modules
@@ -176,20 +176,20 @@ class PluginPool:
                        if not plugin.requires_parent_plugin(placeholder, page))
         return plugins
 
-    def get_text_enabled_plugins(self, placeholder, page):
+    def get_text_enabled_plugins(self, placeholder, page) -> list[type[CMSPluginBase]]:
         plugins = set(self.get_all_plugins(placeholder, page))
         plugins.update(self.get_all_plugins(placeholder, page, 'text_only_plugins'))
         return sorted((p for p in plugins if p.text_enabled),
                       key=attrgetter('module', 'name'))
 
-    def get_plugin(self, name):
+    def get_plugin(self, name) -> type[CMSPluginBase]:
         """
         Retrieve a plugin from the cache.
         """
         self.discover_plugins()
         return self.plugins[name]
 
-    def get_patterns(self):
+    def get_patterns(self) -> list[URLResolver]:
         self.discover_plugins()
 
         # We want untranslated name of the plugin for its slug so we deactivate translation
@@ -210,22 +210,22 @@ class PluginPool:
 
         return url_patterns
 
-    def get_system_plugins(self):
+    def get_system_plugins(self) -> list[str]:
         self.discover_plugins()
         return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
 
     @cached_property
-    def registered_plugins(self):
+    def registered_plugins(self) -> list[type[CMSPluginBase]]:
         return sorted(self.get_all_plugins(), key=attrgetter("module", "name"))
 
     @cached_property
-    def plugins_with_extra_menu(self):
+    def plugins_with_extra_menu(self) -> list[type[CMSPluginBase]]:
         plugin_classes = [cls for cls in self.registered_plugins
                           if cls._has_extra_plugin_menu_items]
         return plugin_classes
 
     @cached_property
-    def plugins_with_extra_placeholder_menu(self):
+    def plugins_with_extra_placeholder_menu(self) -> list[type[CMSPluginBase]]:
         plugin_classes = [cls for cls in self.registered_plugins
                           if cls._has_extra_placeholder_menu_items]
         return plugin_classes

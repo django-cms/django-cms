@@ -88,7 +88,7 @@ class Placeholder(models.Model):
         """
         from cms.utils.permissions import get_model_permission_codename
 
-        if not self.source:
+        if not self.object_id:
             # technically if placeholder is not attached to anything,
             # user should not be able to change it but if is superuser
             # then we "should" allow it.
@@ -192,7 +192,7 @@ class Placeholder(models.Model):
         return True
 
     def _get_source_remote_field(self):
-        if self.source is None:
+        if self.object_id is None:
             return
         return next(
             f for f in self.source._meta.get_fields()
@@ -585,7 +585,7 @@ class Placeholder(models.Model):
                 # far enough to shift behind current last target position
                 target_length - target_position + 1,
                 # far enough to leave enough space to move back
-                plugin.position + source_offset - target_position + plugins_to_move_count
+                plugin.position + source_offset - target_position + plugins_to_move_count + 1
             )
             target_placeholder._shift_plugin_positions(
                 plugin.language,

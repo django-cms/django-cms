@@ -17,7 +17,7 @@ const minifyCss = require('gulp-clean-css');
 const eslint = require('gulp-eslint');
 const webpack = require('webpack');
 const KarmaServer = require('karma').Server;
-const integrationTests = require('djangocms-casper-helpers/gulp');
+// const integrationTests = require('djangocms-casper-helpers/gulp');
 const GulpPostCss = require('gulp-postcss');
 
 const argv = require('minimist')(process.argv.slice(2)); // eslint-disable-line
@@ -178,7 +178,14 @@ const unitTest = (done) => {
         new KarmaServer({
             configFile: PROJECT_PATH.tests + '/karma.conf.js',
             singleRun: true
-        }, done).start()
+        }, (exitCode) => {
+        if (exitCode !== 0) {
+            done(new Error(`Karma tests failed with exit code ${exitCode}`));
+            process.exit(exitCode);
+        } else {
+            done();
+        }
+    }).start()
     );
 };
 

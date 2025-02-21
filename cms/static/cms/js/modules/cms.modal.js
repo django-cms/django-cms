@@ -919,7 +919,7 @@ class Modal {
                 return true;
             }
 
-            // If the resopnse contains the data bridge, the form was saved successfully
+            // If the response contains the data bridge, the form was saved successfully
             that.saved = that.saved || body.find('script#data-bridge').length;
 
             // tabindex is required for keyboard navigation
