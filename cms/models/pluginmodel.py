@@ -321,7 +321,7 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return
 
     def reload(self):
-        return CMSPlugin.objects.get(pk=self.pk)
+        return CMSPlugin.objects.select_related("parent", "placeholder", "placeholder").get(pk=self.pk)
 
     def _get_descendants_count(self):
         if plugin_supports_cte():
