@@ -286,7 +286,7 @@ class PluginPool:
             bool: True if the restrictions can be cached globally, False otherwise.
         """
         if not hasattr(plugin_class, '_cache_restrictions_globally'):
-            plugin_class._cache_restrictions_globally = not any(
+            plugin_class._cache_restrictions_globally = all(
                 hasattr(getattr(plugin_class, method_name), "_template_slot_caching") for method_name in self.restriction_methods
             )
         return plugin_class._cache_restrictions_globally
