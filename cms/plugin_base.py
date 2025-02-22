@@ -218,7 +218,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     show_add_form = True
 
     #: The plugin does not modify the context or request and its rendering is not influenced by its parent
-    #: plugins.
+    #: plugins. Defaults to ``False`` unless ``CMS_ALWAYS_REFRESH_CONTENT`` is set to ``True``.
     is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
 
     # Warning: setting these to False, may have a serious performance impact,
