@@ -1,7 +1,7 @@
 import json
 import re
-from functools import lru_cache
-from typing import Optional
+from functools import lru_cache, wraps
+from typing import Callable, Optional, TypeVar, cast
 
 from django import forms
 from django.contrib import admin, messages
@@ -98,21 +98,34 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
-def template_slot_caching(method: callable) -> callable:
-    """
-    Decorator that adds a ``_template_slot_caching`` attribute to the given method.
+T = TypeVar('T', bound=Callable)
 
-    This attribute is used to indicate that the method supports global caching based
-    on placeholder slots and templates (see `CMS_PLACEHOLDER_CONF`).
+def template_slot_caching(method: T) -> T:
+    """
+    Decorator that enables global caching for methods based on placeholder slots and templates.
+
+    This decorator marks methods that should participate in the CMS's template and slot-based
+    caching system. Decorated methods will have their results cached according to the
+    configuration specified in CMS_PLACEHOLDER_CONF.
 
     Args:
-        method (function): The method to be decorated.
+        method: The method to be decorated.
 
     Returns:
-        function: The decorated method with the ``_template_slot_caching`` attribute set to True.
+        The decorated method with template slot caching enabled.
+
+    Example:
+        @template_slot_caching
+        def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+            # Method implementation...
+            pass
     """
-    method._template_slot_caching = True
-    return method
+    @wraps(method)
+    def wrapper(*args, **kwargs):
+        return method(*args, **kwargs)
+
+    wrapper._template_slot_caching = True
+    return cast(T, wrapper)
 
 
 class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):

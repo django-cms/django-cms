@@ -231,7 +231,7 @@ class PluginPool:
                           if cls._has_extra_placeholder_menu_items]
         return plugin_classes
 
-    def get_restricions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Optional[Page] = None):
+    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Optional[Page] = None):
         """
         Retrieve the restrictions cache for a given plugin instance.
 
