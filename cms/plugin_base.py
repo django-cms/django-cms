@@ -98,6 +98,23 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
+def template_slot_caching(method: callable) -> callable:
+    """
+    Decorator that adds a `_template_slot_caching` attribute to the given method.
+
+    This attribute is used to indicate that the method supports global caching based
+    on placeholder slots and templates (see `CMS_PLACEHOLDER_CONF`).
+
+    Args:
+        method (function): The method to be decorated.
+
+    Returns:
+        function: The decorated method with the `_template_slot_caching` attribute set to True.
+    """
+    method._template_slot_caching = True
+    return method
+
+
 class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     """
     Inherits :class:`django:django.contrib.admin.ModelAdmin` and in most respects behaves like a
@@ -343,6 +360,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             return lazy(instance.placeholder.source.get_template, str)()
         return None
 
+    @template_slot_caching
     @classmethod
     def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
@@ -633,6 +651,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         """
         return gettext('There are no further settings for this plugin. Please press save.')
 
+    @template_slot_caching
     @classmethod
     def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
@@ -662,6 +681,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         from cms.plugin_pool import plugin_pool
         return plugin_pool.registered_plugins
 
+    @template_slot_caching
     @classmethod
     def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
@@ -697,6 +717,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         return child_classes
 
+    @template_slot_caching
     @classmethod
     def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         from cms.utils.placeholder import get_placeholder_conf
