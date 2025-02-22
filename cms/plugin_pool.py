@@ -26,7 +26,9 @@ class PluginPool:
             None: {},
             **{key: {} for key in get_cms_setting('PLACEHOLDER_CONF').keys()},
         }
-        self.global_template_restrictions = any(".htm" in (key or "") for key in self.global_restrictions_cache.keys())
+        self.global_template_restrictions = any(
+            ".htm" in (key or "") for key in self.global_restrictions_cache
+        )
 
     def _clear_cached(self):
         if 'registered_plugins' in self.__dict__:
