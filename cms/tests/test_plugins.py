@@ -960,6 +960,16 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
 
+    def test_get_ancestors_no_parent(self):
+        placeholder = self.get_placeholder()
+        with register_plugins(CMSPluginBase):
+            # Create a single plugin with no parent
+            plugin = api.add_plugin(placeholder, CMSPluginBase, 'en')
+            plugin.save()
+        with self.assertNumQueries(1):
+            ancestors = plugin.get_ancestors()
+        self.assertEqual(ancestors, [])
+
     def test_get_ancestors_with_downcasted_plugins(self):
         placeholder = self.get_placeholder()
         plugins = self._create_plugin_tree(placeholder, 10, downcast=True)
