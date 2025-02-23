@@ -404,7 +404,6 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
     def _get_ancestors_from_db(self):
         cursor = _get_database_cursor("write")
         sql = f"{_get_ancestors_cte()} SELECT id FROM ancestors;"
-        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
         cursor.execute(sql, [self.parent_id])
         ancestor_ids = [item[0] for item in cursor.fetchall()]
         return CMSPlugin.objects.filter(pk__in=ancestor_ids).order_by('position')
