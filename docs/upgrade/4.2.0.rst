@@ -42,16 +42,16 @@ Empty sections are to be removed before release.
 Security: Improved content security policy support
 ==================================================
 
-Earlier versions of django CMS added inline JavaScript to the page in edit mode to 
+Earlier versions of django CMS added inline JavaScript to the page in edit mode to
 communicate with the frontend editor. This effectively barred projects from enforcing
-meaningful content security policies. In django CMS 4.2.0, we have removed all inline 
-JavaScript from the edit mode (or other places in django CMS), replacing it with 
-text/json objects to communicate with the frontend editor. This allows projects to 
-enforce strict Content Security Policies (CSP) without any issues. 
+meaningful content security policies. In django CMS 4.2.0, we have removed all inline
+JavaScript from the edit mode (or other places in django CMS), replacing it with
+text/json objects to communicate with the frontend editor. This allows projects to
+enforce strict Content Security Policies (CSP) without any issues.
 
-For a fully working project, it is also important that other packages used, especially 
-plugins, do not rely on inline JavaScript. This change enhances the security 
-posture of your django CMS projects by enabling the use of CSP headers to mitigate 
+For a fully working project, it is also important that other packages used, especially
+plugins, do not rely on inline JavaScript. This change enhances the security
+posture of your django CMS projects by enabling the use of CSP headers to mitigate
 cross-site scripting (XSS) and other code injection attacks.
 
 Development: Exception handling
@@ -166,3 +166,7 @@ Removal of deprecated functionality
 
 * ``SlugWidget``: This class has been removed from ``cms.wizard.forms``. If you
   need this functionality, you can use the ``cms.admin.forms.SlugWidget`` class.
+
+* ``CMSPlugin.get_breadcrumb`` and ``CMSPlugin.get_breadcrumb_json``: These
+  methods have been removed. They are unused, undocumented, and were broken since
+  django CMS 4.0.

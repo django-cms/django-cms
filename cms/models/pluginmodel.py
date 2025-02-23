@@ -444,37 +444,6 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         )
         return list(obj for obj in fields if not isinstance(obj.field, models.ManyToManyField))
 
-    def get_breadcrumb(self):
-        from cms.models import Page
-
-        model = self.placeholder._get_attached_model() or Page
-        breadcrumb = []
-        for parent in self.get_ancestors():
-            try:
-                url = force_str(
-                    admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
-                                  args=[parent.pk]))
-            except NoReverseMatch:
-                url = force_str(
-                    admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
-                                  args=[parent.pk]))
-            breadcrumb.append({'title': force_str(parent.get_plugin_name()), 'url': url})
-        try:
-            url = force_str(
-                admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
-                              args=[self.pk]))
-        except NoReverseMatch:
-            url = force_str(
-                admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
-                              args=[self.pk]))
-        breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
-        return breadcrumb
-
-    def get_breadcrumb_json(self):
-        result = json.dumps(self.get_breadcrumb())
-        result = mark_safe(result)
-        return result
-
     def notify_on_autoadd(self, request, conf):
         """
         Method called when we auto add this plugin via default_plugins in

@@ -952,8 +952,6 @@ class PluginsTestCase(PluginsTestBaseCase):
 
 
     def test_get_ancestors(self):
-        import random
-
         placeholder = self.get_placeholder()
         plugins = self._create_plugin_tree(placeholder, 10, downcast=False)
 
@@ -963,7 +961,6 @@ class PluginsTestCase(PluginsTestBaseCase):
         self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
 
     def test_get_ancestors_with_downcasted_plugins(self):
-
         placeholder = self.get_placeholder()
         plugins = self._create_plugin_tree(placeholder, 10, downcast=True)
 
