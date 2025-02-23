@@ -943,7 +943,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                     plugin.parent_id = plugins[i - 1].pk
                 plugin.save()
             for i, plugin in enumerate(plugins, start=1):
-                plugin.positon = i  # recalculate positions
+                plugin.position = i  # recalculate positions
                 plugin.save()
 
         with self.assertNumQueries(2):
@@ -967,7 +967,7 @@ class PluginsTestCase(PluginsTestBaseCase):
                     plugin.parent_id = plugins[i - 1].pk
                 plugin.save()
             for i, plugin in enumerate(plugins, start=1):
-                plugin.positon = i  # recalculate positions
+                plugin.position = i  # recalculate positions
                 plugin.save()
 
             plugins = list(downcast_plugins(plugins))
