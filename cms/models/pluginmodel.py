@@ -45,6 +45,32 @@ def _get_descendants_cte():
     return sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
 
 
+@cache
+def _get_ancestors_cte():
+    db_vendor = _get_database_vendor('read')
+    if db_vendor == 'oracle':
+        sql = (
+            "WITH ancestors AS ("
+            "SELECT {0}.id, {0}.parent_id "
+            "FROM {0} WHERE id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.parent_id FROM {0} "
+            "INNER JOIN ancestors ON {0}.id=ancestors.parent_id"
+            ")"
+        )
+    else:
+        sql = (
+            "WITH RECURSIVE ancestors AS ("
+            "SELECT {0}.id, {0}.parent_id "
+            "FROM {0} WHERE id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.parent_id FROM {0} "
+            "INNER JOIN ancestors ON {0}.id=ancestors.parent_id"
+            ")"
+        )
+    return sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+
+
 def _get_database_connection(action):
     return {
         'read': connections[router.db_for_read(CMSPlugin)],
@@ -356,6 +382,22 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
 
     def get_descendants(self):
         return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
+
+    def get_ancestors(self):
+        if self.parent_id:
+            if self._state.fields_cache.get('parent') or not plugin_supports_cte():
+                return self.parent.get_ancestors() + [self.parent]
+            else:
+                return list(self._get_ancestors_from_db())
+        return []
+
+    def _get_ancestors_from_db(self):
+        cursor = _get_database_cursor("write")
+        sql = f"{_get_ancestors_cte()} SELECT id FROM ancestors;"
+        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+        cursor.execute(sql, [self.parent_id])
+        return CMSPlugin.objects.filter(pk__in=[item[0] for item in cursor.fetchall()]).order_by('position')
+
 
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'pk', 'position']:
