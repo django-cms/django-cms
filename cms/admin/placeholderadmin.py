@@ -1089,7 +1089,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 placeholder=placeholder,
                 tree_order=plugin_tree_order,
             )
-            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
+            return render(request, "admin/cms/page/close_frame.html", {})
 
         plugin_name = force_str(plugin.get_plugin_class().name)
 

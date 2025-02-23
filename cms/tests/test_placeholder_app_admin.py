@@ -347,7 +347,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
             data = {'post': True}
 
             response = self.client.post(endpoint, data)
-            self.assertEqual(response.status_code, 302)
+            self.assertContains(response, '<div class="success"></div>')
             self.assertFalse(CMSPlugin.objects.filter(pk=plugin.pk).exists())
 
     def test_user_cant_delete_plugin(self):
