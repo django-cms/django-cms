@@ -1,7 +1,7 @@
 import json
 import re
-from functools import lru_cache
-from typing import Optional
+from functools import lru_cache, wraps
+from typing import Callable, Optional, TypeVar, cast
 
 from django import forms
 from django.contrib import admin, messages
@@ -96,6 +96,36 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         if 'get_extra_plugin_menu_items' in attrs:
             new_plugin._has_extra_plugin_menu_items = True
         return new_plugin
+
+
+T = TypeVar('T', bound=Callable)
+
+def template_slot_caching(method: T) -> T:
+    """
+    Decorator that enables global caching for methods based on placeholder slots and templates.
+
+    This decorator marks methods that should participate in the CMS's template and slot-based
+    caching system. Decorated methods will have their results cached according to the
+    configuration specified in CMS_PLACEHOLDER_CONF.
+
+    Args:
+        method: The method to be decorated.
+
+    Returns:
+        The decorated method with template slot caching enabled.
+
+    Example:
+        @template_slot_caching
+        def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+            # Method implementation...
+            pass
+    """
+    @wraps(method)
+    def wrapper(*args, **kwargs):
+        return method(*args, **kwargs)
+
+    wrapper._template_slot_caching = True
+    return cast(T, wrapper)
 
 
 class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
@@ -344,6 +374,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return None
 
     @classmethod
+    @template_slot_caching
     def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
 
@@ -634,6 +665,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
+    @template_slot_caching
     def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
         Returns a list of plugin types that are allowed
@@ -663,6 +695,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return plugin_pool.registered_plugins
 
     @classmethod
+    @template_slot_caching
     def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
         Returns a list of plugin types that can be added
@@ -698,6 +731,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return child_classes
 
     @classmethod
+    @template_slot_caching
     def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         from cms.utils.placeholder import get_placeholder_conf
 
