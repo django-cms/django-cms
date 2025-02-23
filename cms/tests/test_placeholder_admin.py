@@ -157,7 +157,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
             data = {"post": True}
             response = self.client.post(endpoint, data)
 
-        self.assertEqual(response.status_code, 302)
+        self.assertContains(response, '<div class="success"></div>')
         self.assertFalse(CMSPlugin.objects.filter(pk=plugin.pk).exists())
 
     def test_clear_placeholder_endpoint(self):
