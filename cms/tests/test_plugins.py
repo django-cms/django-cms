@@ -541,7 +541,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         endpoint = self.get_delete_plugin_uri(plugin)
         response = self.client.post(endpoint, plugin_data)
-        self.assertEqual(response.status_code, 302)
+        self.assertContains(response, '<div class="success"></div>')
         # there should be no plugins
         self.assertEqual(0, CMSPlugin.objects.all().count())
 
