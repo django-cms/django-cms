@@ -185,10 +185,11 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     if restrictions_cache is None:
         restrictions_cache = {}
 
+    cache = plugin_pool.get_restrictions_cache(restrictions_cache, plugin, page=page)
     plugin_type = plugin.plugin_type
     plugin_class = get_plugin_class(plugin.plugin_type)
-    parents_cache = restrictions_cache.setdefault('plugin_parents', {})
-    children_cache = restrictions_cache.setdefault('plugin_children', {})
+    parents_cache = cache.setdefault('plugin_parents', {})
+    children_cache = cache.setdefault('plugin_children', {})
 
     try:
         parent_classes = parents_cache[plugin_type]
