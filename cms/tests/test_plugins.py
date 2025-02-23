@@ -966,7 +966,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             # Create a single plugin with no parent
             plugin = api.add_plugin(placeholder, CMSPluginBase, 'en')
             plugin.save()
-        with self.assertNumQueries(1):
+        with self.assertNumQueries(0):
             ancestors = plugin.get_ancestors()
         self.assertEqual(ancestors, [])
 
