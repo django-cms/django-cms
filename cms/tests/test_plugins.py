@@ -929,35 +929,11 @@ class PluginsTestCase(PluginsTestBaseCase):
             name = "Test Plugin"
         self.assertIsNotNone(DecoratorTestPlugin)
 
-    def test_get_ancestors(self):
-        import random
-
-        placeholder = self.get_placeholder()
-        n = 10
-        with register_plugins(CMSPluginBase):
-            # Creat n plugins, shuffle them and then create a linear tree of them
-            plugins = random.sample([api.add_plugin(placeholder, CMSPluginBase, 'en') for _ in range(n)], k=n)
-            for i, plugin in enumerate(plugins):
-                plugin.position = n + i + 1  # order positions, too
-                if i > 0:
-                    plugin.parent_id = plugins[i - 1].pk
-                plugin.save()
-            for i, plugin in enumerate(plugins, start=1):
-                plugin.position = i  # recalculate positions
-                plugin.save()
-
-        with self.assertNumQueries(2):
-            ancestors = plugin.get_ancestors()
-
-        self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
-
-    def test_get_ancestors_with_downcasted_plugins(self):
+    def _create_plugin_tree(self, placeholder, n, downcast=False):
         import random
 
         from cms.utils.plugins import downcast_plugins
 
-        placeholder = self.get_placeholder()
-        n = 10
         with register_plugins(CMSPluginBase):
             # Creat n plugins, shuffle them and then create a linear tree of them
             plugins = random.sample([api.add_plugin(placeholder, CMSPluginBase, 'en') for _ in range(n)], k=n)
@@ -970,7 +946,26 @@ class PluginsTestCase(PluginsTestBaseCase):
                 plugin.position = i  # recalculate positions
                 plugin.save()
 
-            plugins = list(downcast_plugins(plugins))
+            if downcast:
+                plugins = list(downcast_plugins(plugins))
+        return plugins
+
+
+    def test_get_ancestors(self):
+        import random
+
+        placeholder = self.get_placeholder()
+        plugins = self._create_plugin_tree(placeholder, 10, downcast=False)
+
+        with self.assertNumQueries(2):
+            ancestors = plugins[-1].get_ancestors()
+
+        self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
+
+    def test_get_ancestors_with_downcasted_plugins(self):
+
+        placeholder = self.get_placeholder()
+        plugins = self._create_plugin_tree(placeholder, 10, downcast=True)
 
         with self.assertNumQueries(0):
             ancestors = plugins[-1].get_ancestors()

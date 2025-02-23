@@ -384,20 +384,30 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
 
     def get_ancestors(self):
-        if self.parent_id:
-            if self._state.fields_cache.get('parent') or not plugin_supports_cte():
-                return self.parent.get_ancestors() + [self.parent]
-            else:
-                return list(self._get_ancestors_from_db())
-        return []
+        """
+        Retrieve the list of ancestor plugins for the current plugin.
+
+        This method returns a list of ancestor plugins, starting from the root
+        ancestor down to the immediate parent of the current plugin. If the
+        current plugin has no parent, an empty list is returned.
+
+        Returns:
+            list: A list of ancestor plugins, ordered from the root ancestor
+                  to the immediate parent of the current plugin.
+        """
+        if not self.parent_id:
+            return []
+        if self._state.fields_cache.get('parent') or not plugin_supports_cte():
+            return self.parent.get_ancestors() + [self.parent]
+        return list(self._get_ancestors_from_db())
 
     def _get_ancestors_from_db(self):
         cursor = _get_database_cursor("write")
         sql = f"{_get_ancestors_cte()} SELECT id FROM ancestors;"
         sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
         cursor.execute(sql, [self.parent_id])
-        return CMSPlugin.objects.filter(pk__in=[item[0] for item in cursor.fetchall()]).order_by('position')
-
+        ancestor_ids = [item[0] for item in cursor.fetchall()]
+        return CMSPlugin.objects.filter(pk__in=ancestor_ids).order_by('position')
 
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'pk', 'position']:
