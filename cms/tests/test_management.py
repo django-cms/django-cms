@@ -285,8 +285,8 @@ class ManagementTestCase(CMSTestCase):
             0)
 
         # No gaps in plugin tree
-        max_positon = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
-        self.assertEqual(max_positon, 3)
+        max_position = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
+        self.assertEqual(max_position, 3)
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
