@@ -7,8 +7,8 @@ from functools import cache
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
-from django.db.models.base import ModelBase
 from django.db.models import QuerySet
+from django.db.models.base import ModelBase
 from django.utils import timezone
 from django.utils.encoding import force_str
 from django.utils.translation import gettext_lazy as _
