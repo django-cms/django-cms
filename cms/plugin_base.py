@@ -232,13 +232,13 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Disables *dragging* of child plugins in structure mode.
     disable_child_plugins = False
 
-    #: Disables *editing* of this plugin in structure mode. Useful for plugins which, for example, are managed by
-    #: their parent plugins.
-    #:
-    #: If editing is disabled, the plugin will be rendered in structure mode normally, but double-clicking on it will
-    #: not open the plugin edit dialog. The user will not have a direct way to change the plugin instance.
-    #:
-    #: Moving or adding child plugins are not affected.
+    """Disables *editing* of this plugin in structure mode. Useful for plugins which, for example, are managed by
+    their parent plugins.
+    
+    If editing is disabled, the plugin will be rendered in structure mode normally, but double-clicking on it will
+    not open the plugin edit dialog. The user will not have a direct way to change the plugin instance.
+    
+    Moving or adding child plugins are not affected."""
     disable_edit = False
 
     #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have no
@@ -392,7 +392,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         :param request: Relevant ``HTTPRequest`` instance.
         :param instance: The ``CMSPlugin`` instance that is being rendered.
-        :rtype: ``None`` or ``datetime`` or ```time_delta`` or ``int``
+        :rtype: ``None`` or ``datetime`` or ``time_delta`` or ``int``
 
         Must return one of:
 
@@ -420,15 +420,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         useful: :const:`~cms.constants.EXPIRE_NOW` and :data:`~cms.constants.MAX_EXPIRATION_TTL`.
 
         An integer value of 0 (zero) or :const:`~cms.constants.EXPIRE_NOW` effectively means "do not
-        cache". Negative values will be treated as `EXPIRE_NOW`. Values exceeding the value
-        `~cms.constants.MAX_EXPIRATION_TTL` will be set to that value.
+        cache". Negative values will be treated as :const:`~cms.constants.EXPIRE_NOW`. Values exceeding the value
+        :const:`~cms.constants.MAX_EXPIRATION_TTL` will be set to that value.
 
-        Negative `timedelta` values or those greater than `MAX_EXPIRATION_TTL`
+        Negative `timedelta` values or those greater than ``MAX_EXPIRATION_TTL``
         will also be ranged in the same manner.
 
-        Similarly, `datetime` values earlier than now will be treated as
-        `EXPIRE_NOW`. Values greater than `MAX_EXPIRATION_TTL` seconds in the
-        future will be treated as `MAX_EXPIRATION_TTL` seconds in the future.
+        Similarly, ``datetime`` values earlier than now will be treated as
+        ``EXPIRE_NOW``. Values greater than ``MAX_EXPIRATION_TTL`` seconds in the
+        future will be treated as ``MAX_EXPIRATION_TTL`` seconds in the future.
         """
         return None
 

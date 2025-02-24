@@ -33,11 +33,41 @@ How to upgrade to 4.2.0
 What's new in 4.2.0
 *******************
 
-Feature 1
-=========
+Use cases: Headless readiness
+=============================
 
-Empty sections are to be removed before release.
+Django CMS 4.2.0 is headless-ready, allowing you to use django CMS as a backend 
+service to provide content to the frontend technology of your choice. Traditionally, 
+django CMS serves the content as HTML pages. In headless mode, django CMS does not 
+publish the HTML page tree. Instead, you can retrieve content via an API, such as 
+``djangocms-rest``.
 
+To run django CMS in headless mode, remove the catch-all URL pattern from your 
+project's `urls.py` file and replace it with an API endpoint. This allows django 
+CMS to be fully accessible through the admin interface while serving content 
+exclusively through the API.
+
+Additionally, you can continue running a hybrid mode where both HTML pages and API 
+content are served. 
+
+
+Editor experience: Improved turn-around times
+=============================================
+
+In django CMS 4.2.0, significant improvements have been made to enhance the editor 
+experience by reducing turn-around times. One of the key changes is the introduction 
+of a new mechanism for handling plugin data updates. This mechanism reduces the 
+number of database queries and optimizes the rendering process, resulting in faster 
+load times and more responsive interactions when managing content. Editors will 
+benefit from a more efficient and enjoyable editing workflow, with quicker updates 
+and smoother transitions between editing tasks.
+
+Full content updates are only necessary for so-called "non-local" changes. Plugins that
+change content at other places that its position on the page or its children, can be
+marked by setting the ``is_local`` attribute to ``False``. This will trigger a full
+content update if the plugin is changed. An example of a non-local change is a plugin
+that adds a title to a table of contents. If changed, both the title itself and the
+table of contents need to be updated.
 
 Security: Improved content security policy support
 ==================================================
@@ -80,7 +110,7 @@ the community, django CMS 4.2 refactored exception handling.
 Minor features
 ==============
 
-* Deleting pages or deleting translations now gives a much clear delete
+* Deleting pages or deleting translations now gives a much clearer delete
   confirmation message. It does not list all objects deleted but summarizes
   how many pages, translations (counted by ``PageUrl`` objects) and plugins
   are about to be deleted.
@@ -142,7 +172,7 @@ Miscellaneous
 
 * ``CMSPluginBase.get_require_parent()``, ``CMSPluginBase.get_child_class_overrides()``,
   ``CMSPluginBase.get_child_plugin_candidates()``, ``CMSPluginBase.get_child_classes()``,
-  ``CMSPluginBase.get_parent_classes()`` by default do receive ``None`` for their
+  ``CMSPluginBase.get_parent_classes()`` by default receive ``None`` for their
   ``page`` argument.
 
 Features deprecated in 4.2.0
