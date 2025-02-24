@@ -181,7 +181,7 @@ def get_plugin_content(request: HttpRequest, plugin: CMSPlugin, context: dict = 
         "css": "".join(context[get_varname()].get("css", [])),
         "position": plugin.position,
         "placeholder_id": plugin.placeholder_id,
-        "pluginIds": get_plugin_tree_ids(plugin) ,
+        "pluginIds": get_plugin_tree_ids(plugin),
     }
 
 

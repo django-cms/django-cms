@@ -1,4 +1,5 @@
-import json
+from __future__ import annotations
+
 import os
 import warnings
 from datetime import date
@@ -7,10 +8,9 @@ from functools import cache
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
 from django.db.models.base import ModelBase
-from django.urls import NoReverseMatch
+from django.db.models import QuerySet
 from django.utils import timezone
 from django.utils.encoding import force_str
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
@@ -84,22 +84,6 @@ def _get_database_vendor(action):
 
 def _get_database_cursor(action):
     return _get_database_connection(action).cursor()
-
-
-@cache
-def plugin_supports_cte():
-    # This has to be as function because when it's a var it evaluates before
-    # db is connected and we get OperationalError. MySQL version is retrieved
-    # from db, and it's cached_property.
-    connection = _get_database_connection('write')
-    db_vendor = _get_database_vendor('write')
-    sqlite_no_cte = (
-        db_vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 8, 3)
-    )
-
-    if sqlite_no_cte:
-        return False
-    return not (db_vendor == 'mysql' and connection.mysql_version < (8, 0))
 
 
 class BoundRenderMeta:
@@ -350,40 +334,28 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return CMSPlugin.objects.select_related("parent", "placeholder").get(pk=self.pk)
 
     def _get_descendants_count(self):
-        if plugin_supports_cte():
-            cursor = _get_database_cursor('write')
-            sql = _get_descendants_cte() + '\n'
-            sql += 'SELECT COUNT(*) FROM descendants;'
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk])
-            return cursor.fetchall()[0][0]
-        return self.get_descendants().count()
+        cursor = _get_database_cursor('write')
+        sql = _get_descendants_cte() + '\n'
+        sql += 'SELECT COUNT(*) FROM descendants;'
+        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+        cursor.execute(sql, [self.pk])
+        return cursor.fetchall()[0][0]
 
     def _get_descendants_ids(self):
-        if plugin_supports_cte():
-            cursor = _get_database_cursor('write')
-            sql = _get_descendants_cte() + '\n'
-            sql += 'SELECT id FROM descendants;'
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk])
-            descendants = [item[0] for item in cursor.fetchall()]
-        else:
-            children = self.get_children().values_list('pk', flat=True)
-            descendants = list(children)
-            while children:
-                children = CMSPlugin.objects.filter(
-                    parent__in=children,
-                ).values_list('pk', flat=True)
-                descendants.extend(children)
-        return descendants
+        cursor = _get_database_cursor('write')
+        sql = _get_descendants_cte() + '\n'
+        sql += 'SELECT id FROM descendants;'
+        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+        cursor.execute(sql, [self.pk])
+        return [item[0] for item in cursor.fetchall()]
 
-    def get_children(self):
+    def get_children(self) -> QuerySet:
         return self.cmsplugin_set.all()
 
-    def get_descendants(self):
+    def get_descendants(self) -> QuerySet:
         return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
 
-    def get_ancestors(self):
+    def get_ancestors(self) -> list[CMSPlugin]:
         """
         Retrieve the list of ancestor plugins for the current plugin.
 
@@ -397,11 +369,11 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         """
         if not self.parent_id:
             return []
-        if self._state.fields_cache.get('parent') or not plugin_supports_cte():
+        if self._state.fields_cache.get('parent'):
             return self.parent.get_ancestors() + [self.parent]
-        return list(self._get_ancestors_from_db())
+        return list(self.get_ancestors_qs())
 
-    def _get_ancestors_from_db(self):
+    def get_ancestors_qs(self) -> QuerySet:
         cursor = _get_database_cursor("write")
         sql = f"{_get_ancestors_cte()} SELECT id FROM ancestors;"
         cursor.execute(sql, [self.parent_id])

@@ -950,7 +950,6 @@ class PluginsTestCase(PluginsTestBaseCase):
                 plugins = list(downcast_plugins(plugins))
         return plugins
 
-
     def test_get_ancestors(self):
         placeholder = self.get_placeholder()
         plugins = self._create_plugin_tree(placeholder, 10, downcast=False)
