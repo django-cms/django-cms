@@ -54,9 +54,9 @@ content are served.
 Editor experience: Improved turn-around times
 =============================================
 
-In django CMS 4.2.0, significant improvements have been made to enhance the editor 
-experience by reducing turn-around times. One of the key changes is the introduction 
-of a new mechanism for handling plugin data updates. This mechanism reduces the 
+significant improvements have been made to enhance the editor experience by 
+reducing turn-around times. One of the key changes is the introduction of a 
+new mechanism for handling plugin data updates. This mechanism reduces the 
 number of database queries and optimizes the rendering process, resulting in faster 
 load times and more responsive interactions when managing content. Editors will 
 benefit from a more efficient and enjoyable editing workflow, with quicker updates 
@@ -68,6 +68,39 @@ marked by setting the ``is_local`` attribute to ``False``. This will trigger a f
 content update if the plugin is changed. An example of a non-local change is a plugin
 that adds a title to a table of contents. If changed, both the title itself and the
 table of contents need to be updated.
+
+Plugin restrictions need to be recalculated on every request in edit and structure 
+mode, which is of n² complexity (n: number of plugins). While the plugin restrictions 
+can be widely customized, the standard implementation respects the 
+:setting:`CMS_PLACEHOLDER_CONF` setting, allowing restrictions to depend on template 
+and slot names. This release caches these restrictions globally in the plugin pool 
+for all plugins that follow the standard implementation.
+
+Database performance
+====================
+
+To enhance database performance, one of the key changes is the merging of the 
+``TreeNode`` model into the ``Page`` model. This change simplifies database accesses and 
+improves performance by reducing the number of joins required for common queries. As a result, 
+page-related operations are faster and more efficient. Compatibility shims have been 
+added to ensure that custom code accessing the `Page.node` attribute continues to work 
+and will reference back to the page itself. These shims will be removed in django CMS 4.3. 
+
+Additionally, this release optimizes the number of queries needed for the edit and structure 
+endpoints to improve responsiveness and the editor experience. Downcasting plugins are now 
+queried by their concrete model, benefiting plugins that use proxy models, such as 
+``djangocms-frontend`` or ``djangocms-cascade``. Downcasting is fully avoided for plugins 
+without a model. During downcasting, the cache for parent references is prepopulated with 
+downcasted parent plugins, avoiding database hits when plugin templates access ``plugin.parent``. 
+Note that after downcasting ``plugin.parent`` now returns a downcasted plugin, not a 
+``CMSPlugin`` instance.
+
+Plugin renderers now cache their page's template name, necessary to respect the 
+:setting:`CMS_PLACEHOLDER_CONF` setting, solving an n+1 issue that led to a page object being 
+fetched for each plugin type used. The ``Placeholder`` model's internal code has been simplified
+to reduce the number of database hits. Its manager's `get_for_obj()` method now automatically 
+prepopulates the cache for the source field of fetched placeholders, solving another n+1 issue 
+when accessing ``placeholder.source``. 
 
 Security: Improved content security policy support
 ==================================================
@@ -102,7 +135,7 @@ the community, django CMS 4.2 refactored exception handling.
 * In preview mode and on site, the placeholder containing the plugin will
   render empty.
 
-* If ``settings.CMS_CATCH_PLUGIN_500_EXCEPTION`` is set to ``False``, trying
+* If :setting:`CMS_CATCH_PLUGIN_500_EXCEPTION` is set to ``False``, trying
   to view content that raises an exception will trigger a server error
   (http 500). Preview and edit modes will still work.
 
