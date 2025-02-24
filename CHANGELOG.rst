@@ -43,7 +43,7 @@ Bug Fixes:
 * Improve pagecontent caching in page admin (esp. page tree) (#8002) (842f347da) -- Fabian Braun
 * Clear menu cache if page permissions are changed (#7988) (1719b9a1b) -- Fabian Braun
 * Consistent labels and help texts for page content model and page content forms (#7968) (acbc2e70a) -- Fabian Braun
-* Inconsistent color codes for dark mode and `preferes-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
+* Inconsistent color codes for dark mode and `prefers-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
 * Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
 * Accept legacy action names for page permission checks (#8021) (9a1e178) -- Fabian Braun
 * Mark language and user middleware synchronous for ASGI (#7985) -- John Bazik
