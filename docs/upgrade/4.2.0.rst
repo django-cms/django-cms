@@ -201,9 +201,6 @@ Minor features
   edit, say, a subset of fields. 
 
 
-Bug Fixes
-=========
-
 **************************************
 Backward incompatible changes in 4.2.0
 **************************************
