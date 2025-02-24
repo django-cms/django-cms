@@ -16,8 +16,9 @@ features.
 See the How to upgrade to 4.2.0 to a newer version guide if you’re
 updating an existing project.
 
+*******************************
 Django and Python compatibility
-===============================
+*******************************
 
 django CMS supports **Django 4.2, 5.0, and 5.1**. We highly recommend and only
 support the latest release of each series.
@@ -29,45 +30,69 @@ support the latest release of each series.
 How to upgrade to 4.2.0
 ***********************
 
+Update your project’s ``requirements.txt`` file to require django CMS 4.2.0 and
+run ``pip install -r requirements.txt``.
+
+If you are upgrading from an earlier version of django CMS, read the release
+notes for all the versions between your current version and this one. Check
+the :ref:`release notes <release-notes>` for each version to see if there are
+any special instructions.
+
+Run migrations::
+
+    python -m manage migrate
+
+.. warning::
+
+    Since the migrations merge the ``TreeNode`` and ``Page`` models, you should run the
+    migration in a test environment first to ensure that the migration runs
+    successfully.
+
+    There is no backwards migration to the previous state.
+  
+
 *******************
 What's new in 4.2.0
 *******************
 
-Use cases: Headless readiness
-=============================
-
-Django CMS 4.2.0 is headless-ready, allowing you to use django CMS as a backend 
-service to provide content to the frontend technology of your choice. Traditionally, 
-django CMS serves the content as HTML pages. In headless mode, django CMS does not 
-publish the HTML page tree. Instead, you can retrieve content via an API, such as 
-``djangocms-rest``.
-
-To run django CMS in headless mode, remove the catch-all URL pattern from your 
-project's `urls.py` file and replace it with an API endpoint. This allows django 
-CMS to be fully accessible through the admin interface while serving content 
-exclusively through the API.
-
-Additionally, you can continue running a hybrid mode where both HTML pages and API 
-content are served. 
-
-
 Editor experience: Improved turn-around times
 =============================================
 
-significant improvements have been made to enhance the editor experience by 
-reducing turn-around times. One of the key changes is the introduction of a 
-new mechanism for handling plugin data updates. This mechanism reduces the 
-number of database queries and optimizes the rendering process, resulting in faster 
-load times and more responsive interactions when managing content. Editors will 
+Significant improvements have been made to enhance the editor experience by 
+reducing turn-around times. 
+
+Faster plugin addition
+----------------------
+
+In django CMS 4.2.0, adding child plugins has been made easier when only one plugin 
+type is allowed. When adding a plugin to a placeholder, there is no need for a 
+plugin selector modal if only one plugin is available. Now in this situation the 
+plugin selector modal is skipped, streamlining the process. Typical use cases include 
+"nested" plugins such as accordions, rows with columns, and similar structures.
+
+Additionally, if the plugin form contains no fields to edit or has default values for
+all fields, a plugin can be created without add plugin form. To enable this quick creation
+of content, set the plugin's property :attr:`~cms.plugin_base.CMSPluginBase.show_add_form` to
+``False``.
+
+Improved plugin updates
+-----------------------
+
+One of the key changes is the introduction of a new mechanism for handling plugin data updates. 
+This mechanism reduces the number request-response cycles and optimizes the rendering process, 
+resulting in faster load times and more responsive interactions when managing content. Editors will 
 benefit from a more efficient and enjoyable editing workflow, with quicker updates 
 and smoother transitions between editing tasks.
 
 Full content updates are only necessary for so-called "non-local" changes. Plugins that
 change content at other places that its position on the page or its children, can be
-marked by setting the ``is_local`` attribute to ``False``. This will trigger a full
-content update if the plugin is changed. An example of a non-local change is a plugin
-that adds a title to a table of contents. If changed, both the title itself and the
-table of contents need to be updated.
+marked by setting the new :attr:`~cms.plugin_base.CMSPluginBase.is_local` attribute to 
+``False``. This will trigger a full content update if the plugin is changed. An example 
+of a non-local change is a plugin that adds a title to a table of contents. If changed,
+both the title itself and the table of contents need to be updated.
+
+Less server load
+----------------
 
 Plugin restrictions need to be recalculated on every request in edit and structure 
 mode, which is of n² complexity (n: number of plugins). While the plugin restrictions 
@@ -79,15 +104,15 @@ for all plugins that follow the standard implementation.
 Database performance
 ====================
 
-To enhance database performance, one of the key changes is the merging of the 
-``TreeNode`` model into the ``Page`` model. This change simplifies database accesses and 
+To enhance database performance, one of the key changes is the **merging of the 
+``TreeNode`` model into the ``Page`` model**. This change simplifies database accesses and 
 improves performance by reducing the number of joins required for common queries. As a result, 
 page-related operations are faster and more efficient. Compatibility shims have been 
 added to ensure that custom code accessing the `Page.node` attribute continues to work 
 and will reference back to the page itself. These shims will be removed in django CMS 4.3. 
 
-Additionally, this release optimizes the number of queries needed for the edit and structure 
-endpoints to improve responsiveness and the editor experience. Downcasting plugins are now 
+Additionally, this release optimizes the number of queries needed for the **edit and structure 
+endpoints** to improve responsiveness and the editor experience. Downcasting plugins are now 
 queried by their concrete model, benefiting plugins that use proxy models, such as 
 ``djangocms-frontend`` or ``djangocms-cascade``. Downcasting is fully avoided for plugins 
 without a model. During downcasting, the cache for parent references is prepopulated with 
@@ -108,7 +133,7 @@ Security: Improved content security policy support
 Earlier versions of django CMS added inline JavaScript to the page in edit mode to 
 communicate with the frontend editor. This effectively barred projects from enforcing
 meaningful content security policies. In django CMS 4.2.0, we have removed all inline 
-JavaScript from the edit mode (or other places in django CMS), replacing it with 
+JavaScript from the edit mode (or other places in django CMS core), replacing it with 
 text/json objects to communicate with the frontend editor. This allows projects to 
 enforce strict Content Security Policies (CSP) without any issues. 
 
@@ -116,6 +141,23 @@ For a fully working project, it is also important that other packages used, espe
 plugins, do not rely on inline JavaScript. This change enhances the security 
 posture of your django CMS projects by enabling the use of CSP headers to mitigate 
 cross-site scripting (XSS) and other code injection attacks.
+
+Use cases: Full Headless support
+================================
+
+Django CMS 4.2.0 is headless-ready, allowing you to use django CMS as a backend 
+service to provide content to the frontend technology of your choice. Traditionally, 
+django CMS serves the content as HTML pages. In headless mode, django CMS does not 
+publish the HTML page tree. Instead, you can retrieve content via an API, such as 
+`djangocms-rest <https://github.com/django-cms/djangocms-rest>`_.
+
+To run django CMS in headless mode, remove the catch-all URL pattern from your 
+project's `urls.py` file and replace it with an API endpoint. This allows django 
+CMS to be fully accessible through the admin interface while serving content 
+exclusively through the API.
+
+Additionally, you can continue running a hybrid mode where both HTML pages and API 
+content are served. 
 
 Development: Exception handling
 ===============================
@@ -153,6 +195,10 @@ Minor features
   any model (e.g., an alias). Instead for looking at pages, the placeholder tries
   to access a ``get_template()`` method on its source model instance to identify
   the template name its rendered on.
+
+* Plugins now inherit the ``FrontendEditableMixin``. While plugins always have been
+  frontend editable, this allows for defining parts of the rendered plugin to just
+  edit, say, a subset of fields. 
 
 
 Bug Fixes

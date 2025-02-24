@@ -241,14 +241,14 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Moving or adding child plugins are not affected.
     disable_edit = False
 
-    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have no
+    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which have no
     #: fields to fill, or which have valid default values for *all* fields.
     #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
-    #: errors
+    #: errors.
     show_add_form = True
 
     #: The plugin does not modify the context or request and its rendering is not influenced by its parent
-    #: plugins. Defaults to ``False`` unless :setting:`CMS_ALWAYS_REFRESH_CONTENT` is set to ``True``.
+    #: plugins. Defaults to ``True`` unless :setting:`CMS_ALWAYS_REFRESH_CONTENT` is set to ``True``.
     is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
 
     # Warning: setting these to False, may have a serious performance impact,
