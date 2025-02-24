@@ -232,8 +232,9 @@ Please also check your ``.filter()``, ``.order()``, ``.select_related()``, and
 If you have custom code that accesses the ``Page.node`` attribute, you should
 update it to use the new attributes on the ``Page`` model.
 
+*************
 Miscellaneous
-=============
+*************
 
 * The function ``cms.cms_menus.get_visible_nodes`` has been deprecated. For
   performance reasons, the ``cms_menus`` builds the navigation node list based
@@ -251,15 +252,17 @@ Miscellaneous
   ``CMSPluginBase.get_parent_classes()`` by default receive ``None`` for their
   ``page`` argument.
 
+****************************
 Features deprecated in 4.2.0
-============================
+****************************
 
 * Use of the ``node`` property of the :class:`~cms.models.pagemodel.Page` model
   is deprecated. Use its attributes on the :class:`~cms.models.pagemodel.Page`
   model directly instead.
 
+***********************************
 Removal of deprecated functionality
-===================================
+***********************************
 
 * Built-in alias plugin: The alias plugin has been removed. If you need
   this functionality, you can use the ``djangocms-alias`` package.
