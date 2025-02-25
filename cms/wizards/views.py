@@ -5,7 +5,6 @@ from django.core.exceptions import PermissionDenied
 from django.core.files.storage import FileSystemStorage
 from django.forms import Form
 from django.http import HttpResponse
-from django.template.response import SimpleTemplateResponse
 from django.urls import NoReverseMatch
 from django.utils.html import escape
 from formtools.wizard.views import SessionWizardView

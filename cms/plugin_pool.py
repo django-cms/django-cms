@@ -270,9 +270,7 @@ class PluginPool:
             return self.global_restrictions_cache[slot]
         return self.global_restrictions_cache[None]
 
-
     restriction_methods = ("get_require_parent", "get_child_class_overrides", "get_parent_classes")
-
 
     def can_cache_globally(self, plugin_class: CMSPluginBase) -> bool:
         """

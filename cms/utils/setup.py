@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.template import engines
 from django.template.backends.django import DjangoTemplates
