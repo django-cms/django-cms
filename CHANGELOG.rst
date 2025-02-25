@@ -21,10 +21,10 @@ Statistics:
 
 This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (5 pull request)
+* Fabian Braun (5 pull requests)
 * Jacob Rief (1 pull request)
 * Jens-Erik Weber (1 pull request)
-* Sal (2 pull request)
+* Sal (2 pull requests)
 
 With the review help of the following contributors:
 
