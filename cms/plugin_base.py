@@ -241,14 +241,14 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: Moving or adding child plugins are not affected.
     disable_edit = False
 
-    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have no
+    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which have no
     #: fields to fill, or which have valid default values for *all* fields.
     #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
-    #: errors
+    #: errors.
     show_add_form = True
 
     #: The plugin does not modify the context or request and its rendering is not influenced by its parent
-    #: plugins. Defaults to ``False`` unless ``CMS_ALWAYS_REFRESH_CONTENT`` is set to ``True``.
+    #: plugins. Defaults to ``True`` unless :setting:`CMS_ALWAYS_REFRESH_CONTENT` is set to ``True``.
     is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
 
     # Warning: setting these to False, may have a serious performance impact,
@@ -392,7 +392,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         :param request: Relevant ``HTTPRequest`` instance.
         :param instance: The ``CMSPlugin`` instance that is being rendered.
-        :rtype: ``None`` or ``datetime`` or ```time_delta`` or ``int``
+        :rtype: ``None`` or ``datetime`` or ``time_delta`` or ``int``
 
         Must return one of:
 
@@ -417,18 +417,18 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             An integer number of seconds that this plugin's content can be cached.
 
         There are constants are defined in ``cms.constants`` that may be
-        useful: :const:`~cms.constants.EXPIRE_NOW` and :data:`~cms.constants.MAX_EXPIRATION_TTL`.
+        useful: :const:`~cms.constants.EXPIRE_NOW` and :const:`~cms.constants.MAX_EXPIRATION_TTL`.
 
         An integer value of 0 (zero) or :const:`~cms.constants.EXPIRE_NOW` effectively means "do not
-        cache". Negative values will be treated as `EXPIRE_NOW`. Values exceeding the value
-        `~cms.constants.MAX_EXPIRATION_TTL` will be set to that value.
+        cache". Negative values will be treated as :const:`~cms.constants.EXPIRE_NOW`. Values exceeding the value
+        :const:`~cms.constants.MAX_EXPIRATION_TTL` will be set to that value.
 
-        Negative `timedelta` values or those greater than `MAX_EXPIRATION_TTL`
+        Negative `timedelta` values or those greater than ``MAX_EXPIRATION_TTL``
         will also be ranged in the same manner.
 
-        Similarly, `datetime` values earlier than now will be treated as
-        `EXPIRE_NOW`. Values greater than `MAX_EXPIRATION_TTL` seconds in the
-        future will be treated as `MAX_EXPIRATION_TTL` seconds in the future.
+        Similarly, ``datetime`` values earlier than now will be treated as
+        ``EXPIRE_NOW``. Values greater than ``MAX_EXPIRATION_TTL`` seconds in the
+        future will be treated as ``MAX_EXPIRATION_TTL`` seconds in the future.
         """
         return None
 

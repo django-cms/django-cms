@@ -453,6 +453,17 @@ django-sekizai, please refer to the `django-sekizai documentation`_.
 Note that sekizai **can't** help you with the **admin-side** plugin templates - what
 follows is for your plugins' **output templates**.
 
+Inline JavaScrip code
++++++++++++++++++++++
+
+django CMS does not enforce a specific way to include JavaScript code in your plugins. 
+Inline JavaScript code is a potential security risk, so it is recommended to avoid it
+where possible. Since version 4.2 django CMS itself has removed any inline JavaScript
+from its code base to allow for meaningful Content Security Policy (CSP) headers to be
+set. **It is good practice to avoid inline JavaScript in your plugins as well.**
+If your project's CSP policy does not allow inline JavaScript, inline JavaScript
+provided through Sekizai also will not be executed.
+
 Sekizai style
 +++++++++++++
 
@@ -530,16 +541,12 @@ A **bad** example:
     In such a case, you can use the ``cms-content-refresh`` event to take care of that,
     by adding something like:
 
-    .. code-block:: html+django
+    .. code-block:: javascript
 
-        {% if request.toolbar and request.toolbar.edit_mode_active %}
-            <script>
-            CMS.$(window).on('cms-content-refresh', function () {
-                // Here comes your code of the plugin's javascript which
-                // needs to be run after a content refresh
-            });
-            </script>
-        {% endif %}
+        CMS.$(window).on('cms-content-refresh', function () {
+            // Here comes your code of the plugin's javascript which
+            // needs to be run after a content refresh
+        });
 
 .. _plugin-context-processors:
 
