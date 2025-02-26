@@ -512,41 +512,21 @@ A **bad** example:
         });
     </script>{% endaddtoblock %}
 
-.. note::
-
-    If the Plugin requires javascript code to be rendered properly, the class
-    ``'cms-execute-js-to-render'`` can be added to the script tag. This will download
-    and execute all scripts with this class, which weren't present before, when the
-    plugin is first added to the page. If the javascript code is protected from
-    prematurely executing by the EventListener for the event ``'load'`` and/or
-    ``'DOMContentLoaded'``, the following classes can be added to the script tag:
-
-    =========================================== =============================
-    Classname                                   Corresponding javascript code
-    =========================================== =============================
-    cms-trigger-event-document-DOMContentLoaded ``document.dispatchEvent(new
-                                                Event('DOMContentLoaded')``
-    cms-trigger-event-window-DOMContentLoaded   ``window.dispatchEvent(new
-                                                Event('DOMContentLoaded')``
-    cms-trigger-event-window-load               ``window.dispatchEvent(new
-                                                Event('load')``
-    =========================================== =============================
-
-    The events will be triggered once after all scripts are successfully injected into
-    the DOM.
 
 .. note::
 
     Some plugins might need to run a certain bit of javascript after a content refresh.
-    In such a case, you can use the ``cms-content-refresh`` event to take care of that,
-    by adding something like:
+    This is why after a content refresh in edit mode, the ``document.DOMContentLoaded``,
+    ``window.load`` events and -- for backward compatibility -- the ``cms-content-refresh`` 
+    jQuery event are triggered.
 
     .. code-block:: javascript
 
-        CMS.$(window).on('cms-content-refresh', function () {
+        window.on('load', function () {
             // Here comes your code of the plugin's javascript which
             // needs to be run after a content refresh
         });
+
 
 .. _plugin-context-processors:
 

@@ -509,7 +509,7 @@ class StructureBoard {
                         !elem.is('.cms#cms-top') && !elem.is('[data-cms]:not([data-cms-generic])') // toolbar
                     ); // cms scripts
                 });
-                body.find('[data-cms]:not([data-cms-generic])').remove(); // cms scripts
+                body.find('[data-cms]:not([data-cms-generic])').remove();  // cms scripts
 
                 [].slice.call(bodyAttributes).forEach(function(attr) {
                     bodyElement.attr(attr.name, attr.value);
@@ -532,8 +532,8 @@ class StructureBoard {
 
                 // istanbul ignore next
                 scripts.on('load', function() {
+                    window.document.dispatchEvent(new Event('DOMContentLoaded'));
                     window.dispatchEvent(new Event('load'));
-                    window.dispatchEvent(new Event('DOMContentLoaded'));
                 });
 
                 const unhandledPlugins = bodyElement.find('template.cms-plugin');
@@ -1075,10 +1075,10 @@ class StructureBoard {
             .fail(() => loader.remove() && Helpers.reloadBrowser());
     }
 
-    _updateContentFromDataBridge(data) {
+    _updateContentFromDataBridge(data) {  // eslint-disable-line complexity
         if (!data || !data.content || !data.content.pluginIds ||
             data.content.pluginIds.length < 1 || data.content.html === undefined) {
-            // Non content data available in data bridge? Full content upudate needed.
+            // No content data available in data bridge? Full content upudate needed.
             return true;  // Update needed
         }
         if (data.source_placeholder_id && !CMS._instances.some(
@@ -1114,10 +1114,8 @@ class StructureBoard {
         this._updateSekizai(data, 'css');
         if (this._updateSekizai(data, 'js') === 0) {
             // No scripts need to be loaded - content update is done
-            Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
-            Helpers._getWindow().dispatchEvent(new Event('load'));
-            $(Helpers._getWindow()).trigger('cms-content-refresh');    
-        };
+            StructureBoard._triggerRefreshEvents();
+        }
 
         this._contentChanged(data.messages);
         return false;
@@ -1596,26 +1594,26 @@ class StructureBoard {
 
     /**
      * Replaces the current document body with the provided HTML content.
-     * 
+     *
      * This method removes all existing script elements from the document body,
      * replaces the body content with the new HTML, and then re-inserts new script
      * elements to ensure they are executed.
-     * 
+     *
      * @param {HTMLElement} body - The new HTML content to replace the current body.
-     * 
+     *
      * @private
      */
     _replaceBodyWithHTML(body) {
         const oldScripts = document.body.querySelectorAll('script:not([type="application/json"])');  // get old scripts
+
         for (const script of oldScripts) {
             script.remove();  // detach them
         }
-        console.log(oldScripts);
-        // Resets all events etc.
+
+        // Insert content, resets all events etc.
         document.body.innerHTML = body.innerHTML;
 
         const newScripts = document.body.querySelectorAll('script:not([type="application/json"])');
-        console.log(newScripts);
 
         // Collect deferred scripts to ensure firing
         this.scriptReferenceCount = 0;
@@ -1623,8 +1621,8 @@ class StructureBoard {
         for (const script of newScripts) {
             if (!StructureBoard._elementPresent(oldScripts, script)) {
                 // Rewrite script to DOM to force execution
-                console.log("new script", script.outerHTML);
                 const newScript = document.createElement('script');
+
                 // Copy all attributes
                 for (const attr of script.attributes) {
                     newScript.setAttribute(attr.name, attr.value);
@@ -1643,11 +1641,8 @@ class StructureBoard {
         }
 
         if (this.scriptReferenceCount === 0) {
-            console.log("no scripts to load - refresh");
             // No scripts need to be loaded - content update is done
-            Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
-            Helpers._getWindow().dispatchEvent(new Event('load'));
-            $(Helpers._getWindow()).trigger('cms-content-refresh');    
+            StructureBoard._triggerRefreshEvents();
         }
     }
 
@@ -1674,11 +1669,24 @@ class StructureBoard {
      */
     _scriptLoaded() {
         if (--this.scriptReferenceCount < 1) {
-            console.log("All scripts loaded - refresh");
-            Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
-            Helpers._getWindow().dispatchEvent(new Event('load'));
-            $(Helpers._getWindow()).trigger('cms-content-refresh');    
+            StructureBoard._triggerRefreshEvents();
         }
+    }
+
+    /**
+     * Triggers refresh events on the window and document.
+     *
+     * This method dispatches the 'DOMContentLoaded' event on the document,
+     * the 'load' event on the window, and triggers the 'cms-content-refresh'
+     * event using jQuery on the window.
+     *
+     * @private
+     * @static
+     */
+    static _triggerRefreshEvents() {
+        Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
+        Helpers._getWindow().dispatchEvent(new Event('load'));
+        $(Helpers._getWindow()).trigger('cms-content-refresh');
     }
 
     highlightPluginFromUrl() {
