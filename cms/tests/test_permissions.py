@@ -102,7 +102,7 @@ class PermissionCacheTests(CMSTestCase):
         self.assertTrue(has_generic_permission(page_b, self.user_normal, "change_page"))
         self.assertFalse(has_generic_permission(page_b, self.user_normal, "publish_page"))
 
-        message = ("has_page_permission is deprecated and will be removed in django CMS 4.3. "
+        message = ("has_page_permission is deprecated. "
                    "Use cms.utils.page_permissions.has_generic_permission instead.")
         # Backwards compatibility: check if the old permission names work
         with self.assertWarns(RemovedInDjangoCMS51Warning) as w:
