@@ -39,7 +39,7 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree
 from cms.utils import get_current_site
-from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import (
@@ -201,7 +201,7 @@ class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
             return super_new(cls, name, bases, attrs)
         warnings.warn(
             "PlaceholderAdminMixin is no longer needed and thus will be removed in django CMS 5.0",
-            RemovedInDjangoCMS50Warning,
+            RemovedInDjangoCMS51Warning,
             stacklevel=2,
         )
         return super_new(cls, name, bases, attrs)

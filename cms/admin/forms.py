@@ -47,7 +47,7 @@ from cms.operations.helpers import (
 from cms.plugin_pool import plugin_pool
 from cms.signals.apphook import set_restart_trigger
 from cms.utils.compat.forms import UserChangeForm
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_list, get_site_language_from_request
 from cms.utils.page import get_clean_username
@@ -920,7 +920,7 @@ class PageTreeForm(forms.Form):
     def get_root_nodes(self):
         warnings.warn(
             "Method `get_root_nodes()` is deprecated. Instead use method `get_root_pages`.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS51Warning,
             stacklevel=2,
         )
         return self.get_root_pages()
