@@ -5,7 +5,7 @@ import django.db.models.deletion
 
 
 def merge_page_treenode(apps, schema_editor):
-    Page = apps.get_model('cms', 'page')
+    Page = apps.get_model('cms', 'Page')
     db_alias = schema_editor.connection.alias
 
     for page in Page.objects.using(db_alias).all():
