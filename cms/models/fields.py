@@ -27,7 +27,7 @@ class PlaceholderField(models.ForeignKey):
             validate_placeholder_name,
         )
         warnings.warn(
-            "PlaceholderField is deprecated. It will be removed in django CMS 4.3. "
+            "PlaceholderField is deprecated. "
             "Replace by PlaceholderRelationField.",
             RemovedInDjangoCMS51Warning, stacklevel=2
         )
