@@ -18,7 +18,7 @@ from treebeard.mp_tree import MP_Node
 from cms import constants
 from cms.models.managers import PageManager, PageUrlManager
 from cms.utils import i18n
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_current_language
 from cms.utils.page import get_clean_username
@@ -160,7 +160,7 @@ class Page(MP_Node):
     def node(self):
         warnings.warn(
             "The `node` has been removed from Page objects. Access the TreeNode attributes directly.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2
         )
         return self
@@ -212,7 +212,7 @@ class Page(MP_Node):
     def parent_page(self):
         warnings.warn(
             "Attribute `parent_page` is deprecated. Instead use the attribute `parent`.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2
         )
         return self.parent
@@ -376,7 +376,7 @@ class Page(MP_Node):
     def set_tree_node(self, site, target=None, position='first-child'):
         warnings.warn(
             "Method `set_tree_node` is deprecated. Use `add_to_tree` instead.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2
         )
         self.site = site
@@ -462,7 +462,7 @@ class Page(MP_Node):
         if parent_node is not None:
             warnings.warn(
                 "Argument `parent_node` is deprecated. Use `parent_page` instead.",
-                RemovedInDjangoCMS43Warning,
+                RemovedInDjangoCMS60Warning,
                 stacklevel=2,
             )
             parent_page = parent_page or parent_node
@@ -546,7 +546,7 @@ class Page(MP_Node):
         if target_node is not None:
             warnings.warn(
                 "Argument `parent_node` is deprecated. Use `parent_page` instead.",
-                RemovedInDjangoCMS43Warning,
+                RemovedInDjangoCMS60Warning,
                 stacklevel=2,
             )
             target_page = target_page or target_node
@@ -679,7 +679,7 @@ class Page(MP_Node):
     def get_parent_page(self):
         warnings.warn(
             "Method `get_parent_page()` is deprecated. Instead use the `parent` attribute.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2
         )
         return self.parent
@@ -688,7 +688,7 @@ class Page(MP_Node):
     def languages(self):
         warnings.warn(
             "Attribute `languages` is deprecated. Use `get_languages` instead.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2
         )
         return ",".join(self.get_languages())
@@ -706,21 +706,21 @@ class Page(MP_Node):
     def remove_language(self, language):
         warnings.warn(
             "Method `remove_language` is deprecated and has no effect any more.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2
         )
 
     def update_languages(self, languages):
         warnings.warn(
             "Method `update_languages` is deprecated and has no effect any more.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2
         )
 
     def get_published_languages(self):
         warnings.warn(
             "Method `get_published_languages` is deprecated. Use `get_languages(admin_manager=False)` instead.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2,
         )
         return self.get_languages(admin_manager=False)
@@ -729,7 +729,7 @@ class Page(MP_Node):
         warnings.warn(
             "Method `set_translations_cache` is deprecated. Use `get_content_obj` instead. "
             "For admin views use `set_admin_content_cache` instead.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS60Warning,
             stacklevel=2,
         )
         for translation in self.pagecontent_set.all():

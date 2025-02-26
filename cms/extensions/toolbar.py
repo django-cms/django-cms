@@ -5,7 +5,7 @@ from django.urls import NoReverseMatch
 from cms.models import PageContent
 from cms.toolbar_base import CMSToolbar
 from cms.utils import get_language_list
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.page_permissions import user_can_change_page
 from cms.utils.urlutils import admin_reverse
 
@@ -86,7 +86,7 @@ class ExtensionToolbar(CMSToolbar):
         """
         warnings.warn(
             "get_title_extension_admin has been deprecated and replaced by get_page_content_extension_admin",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS51Warning,
             stacklevel=2,
         )
         urls = []

@@ -30,11 +30,11 @@ def get_visible_nodes(request, pages, site):
 
     import warnings
 
-    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 
     warnings.warn(
         "get_visible_nodes is deprecated, use get_visible_page_contents instead",
-        RemovedInDjangoCMS43Warning,
+        RemovedInDjangoCMS51Warning,
         stacklevel=2,
     )
     page_contents = get_visible_page_contents(request, [page.get_content_obj() for page in pages], site)
@@ -45,11 +45,11 @@ def get_menu_node_for_page(renderer, page, language, fallbacks=None, endpoint=Fa
     """This function is deprecated. Use CMSMenu.get_menu_node_for_page_content instead."""
     import warnings
 
-    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 
     warnings.warn(
         "get_menu_node_for_page is deprecated, use CMSMenu's get_menu_node_for_page_content method instead",
-        RemovedInDjangoCMS43Warning,
+        RemovedInDjangoCMS51Warning,
         stacklevel=2,
     )
     menu = CMSMenu(renderer)
@@ -134,11 +134,11 @@ class CMSNavigationNode(NavigationNode):
         if path is not None:
             import warnings
 
-            from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+            from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 
             warnings.warn(
                 "The 'path' attribute of CMSNavigationNode is deprecated and will be removed in Django CMS 4.3.",
-                RemovedInDjangoCMS43Warning, stacklevel=2,
+                RemovedInDjangoCMS51Warning, stacklevel=2,
             )
         # language is only used when we're dealing with a fallback
         self.language = language

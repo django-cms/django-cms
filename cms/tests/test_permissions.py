@@ -9,7 +9,7 @@ from cms.cache.permissions import (
 )
 from cms.models.permissionmodels import ACCESS_PAGE_AND_DESCENDANTS, GlobalPagePermission
 from cms.test_utils.testcases import CMSTestCase
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.page_permissions import (
     get_change_perm_tuples,
     has_generic_permission,
@@ -105,9 +105,9 @@ class PermissionCacheTests(CMSTestCase):
         message = ("has_page_permission is deprecated and will be removed in django CMS 4.3. "
                    "Use cms.utils.page_permissions.has_generic_permission instead.")
         # Backwards compatibility: check if the old permission names work
-        with self.assertWarns(RemovedInDjangoCMS43Warning) as w:
+        with self.assertWarns(RemovedInDjangoCMS51Warning) as w:
             self.assertTrue(has_page_permission(self.user_normal, page_b, "change"))
         self.assertEqual(str(w.warning), message)
-        with self.assertWarns(RemovedInDjangoCMS43Warning) as w:
+        with self.assertWarns(RemovedInDjangoCMS51Warning) as w:
             self.assertFalse(has_page_permission(self.user_normal, page_b, "publish"))
         self.assertEqual(str(w.warning), message)
