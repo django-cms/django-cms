@@ -1,4 +1,5 @@
-import json
+from __future__ import annotations
+
 import os
 import warnings
 from datetime import date
@@ -6,11 +7,10 @@ from functools import cache
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import connection, connections, models, router
+from django.db.models import QuerySet
 from django.db.models.base import ModelBase
-from django.urls import NoReverseMatch
 from django.utils import timezone
 from django.utils.encoding import force_str
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from cms.exceptions import DontUsePageAttributeWarning
@@ -45,6 +45,32 @@ def _get_descendants_cte():
     return sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
 
 
+@cache
+def _get_ancestors_cte():
+    db_vendor = _get_database_vendor('read')
+    if db_vendor == 'oracle':
+        sql = (
+            "WITH ancestors AS ("
+            "SELECT {0}.id, {0}.parent_id "
+            "FROM {0} WHERE id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.parent_id FROM {0} "
+            "INNER JOIN ancestors ON {0}.id=ancestors.parent_id"
+            ")"
+        )
+    else:
+        sql = (
+            "WITH RECURSIVE ancestors AS ("
+            "SELECT {0}.id, {0}.parent_id "
+            "FROM {0} WHERE id = %s "
+            "UNION ALL "
+            "SELECT {0}.id, {0}.parent_id FROM {0} "
+            "INNER JOIN ancestors ON {0}.id=ancestors.parent_id"
+            ")"
+        )
+    return sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+
+
 def _get_database_connection(action):
     return {
         'read': connections[router.db_for_read(CMSPlugin)],
@@ -58,22 +84,6 @@ def _get_database_vendor(action):
 
 def _get_database_cursor(action):
     return _get_database_connection(action).cursor()
-
-
-@cache
-def plugin_supports_cte():
-    # This has to be as function because when it's a var it evaluates before
-    # db is connected and we get OperationalError. MySQL version is retrieved
-    # from db, and it's cached_property.
-    connection = _get_database_connection('write')
-    db_vendor = _get_database_vendor('write')
-    sqlite_no_cte = (
-        db_vendor == 'sqlite' and connection.Database.sqlite_version_info < (3, 8, 3)
-    )
-
-    if sqlite_no_cte:
-        return False
-    return not (db_vendor == 'mysql' and connection.mysql_version < (8, 0))
 
 
 class BoundRenderMeta:
@@ -324,38 +334,51 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
         return CMSPlugin.objects.select_related("parent", "placeholder").get(pk=self.pk)
 
     def _get_descendants_count(self):
-        if plugin_supports_cte():
-            cursor = _get_database_cursor('write')
-            sql = _get_descendants_cte() + '\n'
-            sql += 'SELECT COUNT(*) FROM descendants;'
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk])
-            return cursor.fetchall()[0][0]
-        return self.get_descendants().count()
+        cursor = _get_database_cursor('write')
+        sql = _get_descendants_cte() + '\n'
+        sql += 'SELECT COUNT(*) FROM descendants;'
+        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+        cursor.execute(sql, [self.pk])
+        return cursor.fetchall()[0][0]
 
     def _get_descendants_ids(self):
-        if plugin_supports_cte():
-            cursor = _get_database_cursor('write')
-            sql = _get_descendants_cte() + '\n'
-            sql += 'SELECT id FROM descendants;'
-            sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
-            cursor.execute(sql, [self.pk])
-            descendants = [item[0] for item in cursor.fetchall()]
-        else:
-            children = self.get_children().values_list('pk', flat=True)
-            descendants = list(children)
-            while children:
-                children = CMSPlugin.objects.filter(
-                    parent__in=children,
-                ).values_list('pk', flat=True)
-                descendants.extend(children)
-        return descendants
+        cursor = _get_database_cursor('write')
+        sql = _get_descendants_cte() + '\n'
+        sql += 'SELECT id FROM descendants;'
+        sql = sql.format(connection.ops.quote_name(CMSPlugin._meta.db_table))
+        cursor.execute(sql, [self.pk])
+        return [item[0] for item in cursor.fetchall()]
 
-    def get_children(self):
+    def get_children(self) -> QuerySet:
         return self.cmsplugin_set.all()
 
-    def get_descendants(self):
+    def get_descendants(self) -> QuerySet:
         return CMSPlugin.objects.filter(pk__in=self._get_descendants_ids())
+
+    def get_ancestors(self) -> list[CMSPlugin]:
+        """
+        Retrieve the list of ancestor plugins for the current plugin.
+
+        This method returns a list of ancestor plugins, starting from the root
+        ancestor down to the immediate parent of the current plugin. If the
+        current plugin has no parent, an empty list is returned.
+
+        Returns:
+            list: A list of ancestor plugins, ordered from the root ancestor
+                  to the immediate parent of the current plugin.
+        """
+        if not self.parent_id:
+            return []
+        if self._state.fields_cache.get('parent'):
+            return self.parent.get_ancestors() + [self.parent]
+        return list(self.get_ancestors_qs())
+
+    def get_ancestors_qs(self) -> QuerySet:
+        cursor = _get_database_cursor("write")
+        sql = f"{_get_ancestors_cte()} SELECT id FROM ancestors;"
+        cursor.execute(sql, [self.parent_id])
+        ancestor_ids = [item[0] for item in cursor.fetchall()]
+        return CMSPlugin.objects.filter(pk__in=ancestor_ids).order_by('position')
 
     def set_base_attr(self, plugin):
         for attr in ['parent_id', 'placeholder', 'language', 'plugin_type', 'creation_date', 'pk', 'position']:
@@ -391,37 +414,6 @@ class CMSPlugin(models.Model, metaclass=PluginModelBase):
             include_hidden=False,
         )
         return list(obj for obj in fields if not isinstance(obj.field, models.ManyToManyField))
-
-    def get_breadcrumb(self):
-        from cms.models import Page
-
-        model = self.placeholder._get_attached_model() or Page
-        breadcrumb = []
-        for parent in self.get_ancestors():
-            try:
-                url = force_str(
-                    admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
-                                  args=[parent.pk]))
-            except NoReverseMatch:
-                url = force_str(
-                    admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
-                                  args=[parent.pk]))
-            breadcrumb.append({'title': force_str(parent.get_plugin_name()), 'url': url})
-        try:
-            url = force_str(
-                admin_reverse(f"{model._meta.app_label}_{model._meta.model_name}_edit_plugin",
-                              args=[self.pk]))
-        except NoReverseMatch:
-            url = force_str(
-                admin_reverse(f"{Page._meta.app_label}_{Page._meta.model_name}_edit_plugin",
-                              args=[self.pk]))
-        breadcrumb.append({'title': force_str(self.get_plugin_name()), 'url': url})
-        return breadcrumb
-
-    def get_breadcrumb_json(self):
-        result = json.dumps(self.get_breadcrumb())
-        result = mark_safe(result)
-        return result
 
     def notify_on_autoadd(self, request, conf):
         """

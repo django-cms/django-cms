@@ -17,7 +17,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin, Page
-from cms.toolbar.utils import get_plugin_content, get_plugin_toolbar_info, get_plugin_tree
+from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree
 from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 
@@ -241,14 +241,14 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     Moving or adding child plugins are not affected."""
     disable_edit = False
 
-    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which,have no
+    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which have no
     #: fields to fill, or which have valid default values for *all* fields.
     #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
-    #: errors
+    #: errors.
     show_add_form = True
 
     #: The plugin does not modify the context or request and its rendering is not influenced by its parent
-    #: plugins. Defaults to ``False`` unless ``CMS_ALWAYS_REFRESH_CONTENT`` is set to ``True``.
+    #: plugins. Defaults to ``True`` unless :setting:`CMS_ALWAYS_REFRESH_CONTENT` is set to ``True``.
     is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
 
     # Warning: setting these to False, may have a serious performance impact,
@@ -417,7 +417,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             An integer number of seconds that this plugin's content can be cached.
 
         There are constants are defined in ``cms.constants`` that may be
-        useful: :const:`~cms.constants.EXPIRE_NOW` and :data:`~cms.constants.MAX_EXPIRATION_TTL`.
+        useful: :const:`~cms.constants.EXPIRE_NOW` and :const:`~cms.constants.MAX_EXPIRATION_TTL`.
 
         An integer value of 0 (zero) or :const:`~cms.constants.EXPIRE_NOW` effectively means "do not
         cache". Negative values will be treated as :const:`~cms.constants.EXPIRE_NOW`. Values exceeding the value

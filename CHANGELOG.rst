@@ -1,3 +1,99 @@
+4.1.4 (2024-11-12)
+==================
+
+Bug Fixes:
+----------
+* XSS vulnerability for page title (#8075) (c045a990e) -- Fabian Braun
+* Menus crashed when unexpected page content was present (#8052) -- Fabian Braun
+* Sites menu was empty in the page tree (#8064) -- Fabian Braun
+* Added redirect message when in editing a redirect toolbar object (#8056) -- Sal
+* X frame options added to page settings form (#8041) -- Sal
+* template tag ``get_admin_url_for_language`` did not return the latest page content (#7967) -- Fabian Braun
+* Sitemap return a QuerySet in CMSSitemap.items() (#8031) -- Jens-Erik Weber
+* Improved UX when page content is missing in selected language (#8033) -- Jacob Rief
+
+Other:
+------
+* Updated welcome page (#8057) -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (5 pull requests)
+* Jacob Rief (1 pull request)
+* Jens-Erik Weber (1 pull request)
+* Sal (2 pull requests)
+
+With the review help of the following contributors:
+
+* Jacob Rief
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.3 (2024-09-11)
+==================
+
+Bug Fixes:
+----------
+* Respect ContentAdminManager pattern for frontend-editable models (#7998) (e4650ecb7) -- Fabian Braun
+* Improve pagecontent caching in page admin (esp. page tree) (#8002) (842f347da) -- Fabian Braun
+* Clear menu cache if page permissions are changed (#7988) (1719b9a1b) -- Fabian Braun
+* Consistent labels and help texts for page content model and page content forms (#7968) (acbc2e70a) -- Fabian Braun
+* Inconsistent color codes for dark mode and `prefers-color-scheme: auto` (#7979) (46ff58321) -- Fabian Braun
+* Invalidate permissions cache if group assignment of user changes (ec05b6f2f) -- Fabian Braun
+* Accept legacy action names for page permission checks (#8021) (9a1e178) -- Fabian Braun
+* Mark language and user middleware synchronous for ASGI (#7985) -- John Bazik
+
+Statistics:
+-----------
+
+This release includes 6 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (6 pull request)
+
+With the review help of the following contributors:
+
+* Mark Walker
+* Vinit Kumar
+
+Thanks to all contributors for their efforts!
+
+4.1.2 (2024-07-12)
+==================
+
+Features:
+---------
+* More performant permission calculation for pages (#7943) (6b8269e1c) -- Fabian Braun
+* Reintroduce default_plugins setting -- Fabian Braun
+* Reintroduce page-level publish permission (just as in v4.0) -- Fabian Braun
+
+
+Bug Fixes:
+----------
+* Also use key-length of 200 for the actual cache-key of placeholders -- wfehr
+* Set toolbar direction based on toolbar language -- Fabian Braun
+* Allow viewing page settings even if change page settings is not possible -- Fabian Braun
+* Versioning-safe implementation of placeholder in heritance -- Fabian Braun
+* Only switch to structure endpoint on viewport breakpoint if in edit mode -- Fabian Braun
+* Allow special characters in page title -- Jacob Rief
+* Fail silently when rendering a placeholder on a missing toolbar object -- Fabian Braun
+* Show fallback language titles in pagetree -- Fabian Braun
+
+Statistics:
+-----------
+
+This release includes 5 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (7 pull requests)
+* Jacob Rief (1 pull request)
+* wfehr (1 pull request)
+
+Thanks to all contributors for their efforts!
+
 4.1.1 (2024-04-30)
 ==================
 
