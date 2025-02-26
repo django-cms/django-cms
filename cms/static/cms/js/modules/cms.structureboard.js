@@ -1112,7 +1112,7 @@ class StructureBoard {
             $(`script[data-cms-plugin]#cms-plugin-${id}`).remove();
         });
         this._updateSekizai(data, 'css');
-        if (this._updateSekizai(data, 'js') === 0) {
+        if (!this._updateSekizai(data, 'js')) {
             // No scripts need to be loaded - content update is done
             StructureBoard._triggerRefreshEvents();
         }
