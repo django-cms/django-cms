@@ -32,23 +32,15 @@ Here's a brief overview of the current status of the core addons:
 We welcome feedback, documentation, patches and any other help to maintain and improve
 these valuable components.
 
-Thrid-party opinionated packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Third-party Addons
+------------------
 
-========================= ========================== ===================================
-Package                   Description                Status
-========================= ========================== ===================================
-djangocms-page-admin      New PageContent admin      supports v4.0, v4.1 support unclear
-                          which doesn't include tree
-                          functionality
-djangocms-navigation      (undocumented)             supports v4.0, v4.1 support unclear
-djangocms-references      Retrieve objects that are  supports v4.0, v4.1 support unclear
-                          related to a selected
-                          object and view to present
-                          that data to the end user
-========================= ========================== ===================================
+These are popular addons maintained by a third party.
 
-Deprecated addons
+.. include :: ../autogenerate/third-party.include
+
+
+Deprecated Addons
 -----------------
 
 Some older plugins that you may have encountered are now deprecated and we advise

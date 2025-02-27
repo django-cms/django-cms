@@ -225,8 +225,8 @@ def split_description(description, max_length=60):
     return lines
 
 
-def write_plugin_table(f, deprecated=False):
-    chapter = get_chapter("CMS packages")
+def write_plugin_table(f, chapter="CMS packages", deprecated=False):
+    chapter = get_chapter(chapter)
 
     if chapter:
         print("========================== ============================================================ =========== ==================", file=f)

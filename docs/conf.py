@@ -313,3 +313,6 @@ with open("autogenerate/plugins.include", "w") as f:
 
 with open("autogenerate/deprecated_plugins.include", "w") as f:
     write_plugin_table(f, deprecated=True)
+
+with open("autogenerate/third-party.include", "w") as f:
+    write_plugin_table(f, chapter="Third-party packages", deprecated=False)
