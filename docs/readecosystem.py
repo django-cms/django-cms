@@ -168,7 +168,7 @@ def write_LTS_table(f):
             python = [f"{check if py in python_support else cross} " for py in python_versions]
             django = [('LTS' if dj in lts_support else check) if dj in django_support else cross
                     for dj in django_versions]
-            print(f"{cms + '.x':10} " + " ".join(python) + " " + "  ".join(django), file=f)
+            print(f"{f'{cms}.x':10} " + " ".join(python) + " " + "  ".join(django), file=f)
     print(separator, file=f)
 
 
