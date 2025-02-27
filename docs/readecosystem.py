@@ -234,7 +234,7 @@ def write_plugin_table(f, deprecated=False):
         print("Package                    Description                                                  Status      Supported Versions", file=f)
         print("========================== ============================================================ =========== ==================", file=f)
         for plugin in chapter["content"]:
-            if plugin["properties"].get("deprecated", False) is deprecated:
+            if bool(plugin["properties"].get("deprecated", False)) is deprecated:
                 status = plugin["properties"].get("grade", "unknown")
                 versions = plugin["properties"].get("django CMS", [])
                 if not isinstance(versions, list):

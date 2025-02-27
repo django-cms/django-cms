@@ -78,35 +78,12 @@ djangocms-references      Retrieve objects that are  supports v4.0, v4.1 support
                           that data to the end user
 ========================= ========================== ===================================
 
-Packages not (yet) supporting version 4 or 5
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-====================== =========================================== =====================
-Package                Description                                 Status
-====================== =========================================== =====================
-djangocms-blog         django CMS blog application - Support for   not yet supported
-                       multilingual posts, placeholders, social    (working fork exists)
-                       network meta tags and configurable apphooks
-djangocms-history      Undo/redo functionality for django CMS      not yet supported
-                       operations
-djangocms-page-sitemap django CMS page extension to handle sitemap not yet supported
-                       customization
-djangocms-page-meta    Add SEO meta data to django CMS pages       not yet supported
-====================== =========================================== =====================
-
-Contributors are needed to add django CMS v4 support to the following packages:
-
 Deprecated addons
 -----------------
 
 Some older plugins that you may have encountered are now deprecated and we advise
 against incorporating them into new projects.
 
-These are:
+.. include :: ../autogenerate/deprecated_plugins.include
 
-- `cmsplugin-filer <https://github.com/divio/cmsplugin-filer>`_
-- `Aldryn Style <https://github.com/aldryn/aldryn-style>`_
-- `Aldryn Locations <https://github.com/aldryn/aldryn-locations>`_
-- `Aldryn Snippet <https://github.com/aldryn/aldryn-snippet>`_
-- `Django CMS Bootstrap4 <https://github.com/django-cms/djangocms-bootstrap4>`_
-  (djangocms-frontend offers an automated migration)
+Also, all `Aldryn plugins <https://github.com/aldryn/>`_ are deprecated and archived.

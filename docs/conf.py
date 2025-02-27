@@ -297,6 +297,8 @@ spelling_filters=["sphinxcontrib.spelling.filters.ContractionFilter"]
 
 from readecosystem import write_LTS_table, write_current_LTS, write_plugin_table
 
+os.makedirs("autogenerate", exist_ok=True)
+
 with open("autogenerate/compatibility.include", "w") as f:
     write_LTS_table(f)
 
