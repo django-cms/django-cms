@@ -52,10 +52,9 @@ def _read_ecosystem():
 
 def get_chapter(name: str) -> dict:
     ecosystem = read_ecosystem()
-    for chapter in ecosystem:
-        if chapter["title"] == name:
-            return chapter
-    return None
+    return next(
+        (chapter for chapter in ecosystem if chapter["title"] == name), None
+    )
 
 
 def sorted_versions(versions: list) -> list:
