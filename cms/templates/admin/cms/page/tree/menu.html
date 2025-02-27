@@ -171,7 +171,7 @@
                         {% endif %}
                     </div>
                 </div>
-                <div class="js-cms-pagetree-actions-dropdown cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown" data-lazy-url="{% url 'admin:cms_page_actions_menu' page.pk %}">
+                <div class="js-cms-pagetree-actions-dropdown cms-tree-item cms-tree-item-button cms-pagetree-dropdown js-cms-pagetree-dropdown" data-lazy-url="{% url 'admin:cms_page_actions_menu' page.pk %}" data-lazy-url-data="language={{ preview_language }}">
                     <a data-node-id="{{ page.pk|unlocalize }}" data-id="{{ page.pk|unlocalize }}" href="#" class="js-cms-pagetree-dropdown-trigger js-cms-pagetree-options cms-pagetree-dropdown-trigger cms-btn cms-btn-default cms-btn-no-border cms-icon cms-icon-menu">
                         <span class="sr-only">{% autoescape on %}{% trans "Options" %}{% endautoescape %}</span>
                     </a>
