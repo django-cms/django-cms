@@ -282,9 +282,9 @@ class PagePermission(AbstractPagePermission):
     def get_page_ids(self):
         import warnings
 
-        from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
-        warnings.warn("get_page_ids is deprecated and will be removed in django CMS 4.3, "
-                      "use get_page_permission_tuple instead", RemovedInDjangoCMS43Warning, stacklevel=2)
+        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+        warnings.warn("get_page_ids is deprecated, "
+                      "use get_page_permission_tuple instead", RemovedInDjangoCMS60Warning, stacklevel=2)
 
         return self._get_page_ids()
 

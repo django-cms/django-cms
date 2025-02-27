@@ -1,33 +1,30 @@
 .. _upgrade-to-enter-version-here-template:
 
 ###################
-4.2.0 release notes
+5.0.0 release notes
 ###################
 
 *March 31, 2025*
 
-Welcome to django CMS 4.2.0!
+Welcome to django CMS 5.0.0!
 
 These release notes cover the new features, as well as some backwards
 incompatible changes you’ll want to be aware of when upgrading from
 django CMS 4.1 or earlier. We’ve begun the deprecation process for some
 features.
 
-See the How to upgrade to 4.2.0 to a newer version guide if you’re
-updating an existing project.
-
 *******************************
 Django and Python compatibility
 *******************************
 
-django CMS supports **Django 4.2, 5.0, and 5.1**. We highly recommend and only
+django CMS supports **Django 4.2, 5.0, 5.1, and 5.2**. We highly recommend and only
 support the latest release of each series.
 
-It supports **Python 3.10, 3.11, and 3.12**. As for Django we highly recommend and only
+It supports **Python 3.10, 3.11, 3.12, and 3.13**. As for Django we highly recommend and only
 support the latest release of each series.
 
 ***********************
-How to upgrade to 4.2.0
+How to upgrade to 5.0.0
 ***********************
 
 Update your project’s ``requirements.txt`` file to require django CMS 4.2.0 and
@@ -47,12 +44,10 @@ Run migrations::
     Since the migrations merge the ``TreeNode`` and ``Page`` models, you should run the
     migration in a test environment first to ensure that the migration runs
     successfully.
-
-    There is no backwards migration to the previous state.
   
 
 *******************
-What's new in 4.2.0
+What's new in 5.0.0
 *******************
 
 Editor experience: Improved turn-around times
@@ -64,7 +59,7 @@ reducing turn-around times.
 Faster plugin addition
 ----------------------
 
-In django CMS 4.2.0, adding child plugins has been made easier when only one plugin 
+In django CMS 5.0.0, adding child plugins has been made easier when only one plugin 
 type is allowed. When adding a plugin to a placeholder, there is no need for a 
 plugin selector modal if only one plugin is available. Now in this situation the 
 plugin selector modal is skipped, streamlining the process. Typical use cases include 
@@ -139,7 +134,7 @@ Security: Improved content security policy support
 
 Earlier versions of django CMS added inline JavaScript to the page in edit mode to
 communicate with the frontend editor. This effectively barred projects from enforcing
-meaningful content security policies. In django CMS 4.2.0, we have removed all inline 
+meaningful content security policies. In django CMS 5.0.0, we have removed all inline 
 JavaScript from the edit mode (or other places in django CMS core), replacing it with 
 text/json objects to communicate with the frontend editor. This allows projects to 
 enforce strict Content Security Policies (CSP) without any issues. 
@@ -152,7 +147,7 @@ cross-site scripting (XSS) and other code injection attacks.
 Use cases: Full Headless support
 ================================
 
-Django CMS 4.2.0 is headless-ready, allowing you to use django CMS as a backend 
+Django CMS 5.0.0 is headless-ready, allowing you to use django CMS as a backend 
 service to provide content to the frontend technology of your choice. Traditionally, 
 django CMS serves the content as HTML pages. In headless mode, django CMS does not 
 publish the HTML page tree. Instead, you can retrieve content via an API, such as 
@@ -173,7 +168,7 @@ Development: Exception handling
 
 Since django CMS 4, exceptions that happen during plugin rendering have been
 caught and displayed a message at the plugin's position. After feedback from
-the community, django CMS 4.2 refactored exception handling.
+the community, django CMS 5.0 refactored exception handling.
 
 * Exceptions are now caught on placeholder level.
 
@@ -211,9 +206,9 @@ Minor features
   to provide inline editing for selected fields of their plugins.
 
 
-**************************************
-Backward incompatible changes in 4.2.0
-**************************************
+************************************
+Backward incompatible changes in 5.0
+************************************
 
 Merging of Page.node into Page
 ==============================
@@ -224,8 +219,8 @@ and will require a database migration.
 
 Compatibility shims have been added to the ``Page`` model to ensure that custom
 code that accesses the ``Page.node`` attribute will continue to work. However,
-this compatibility shim will be removed in django CMS 4.3 release. For now,
-they raise a ``RemovedInDjangoCMS43Warning`` warning.
+this compatibility shim will be removed in django CMS 6.0 release. For now,
+they raise a ``RemovedInDjangoCMS60Warning`` warning.
 
 Most prominent changes to custom code are:
 
@@ -262,9 +257,9 @@ Miscellaneous
   ``CMSPluginBase.get_parent_classes()`` by default receive ``None`` for their
   ``page`` argument.
 
-****************************
-Features deprecated in 4.2.0
-****************************
+**************************
+Features deprecated in 5.0
+**************************
 
 * Use of the ``node`` property of the :class:`~cms.models.pagemodel.Page` model
   is deprecated. Use its attributes on the :class:`~cms.models.pagemodel.Page`
