@@ -509,7 +509,7 @@ class StructureBoard {
                         !elem.is('.cms#cms-top') && !elem.is('[data-cms]:not([data-cms-generic])') // toolbar
                     ); // cms scripts
                 });
-                body.find('[data-cms]:not([data-cms-generic])').remove(); // cms scripts
+                body.find('[data-cms]:not([data-cms-generic])').remove();  // cms scripts
 
                 [].slice.call(bodyAttributes).forEach(function(attr) {
                     bodyElement.attr(attr.name, attr.value);
@@ -532,8 +532,8 @@ class StructureBoard {
 
                 // istanbul ignore next
                 scripts.on('load', function() {
+                    window.document.dispatchEvent(new Event('DOMContentLoaded'));
                     window.dispatchEvent(new Event('load'));
-                    window.dispatchEvent(new Event('DOMContentLoaded'));
                 });
 
                 const unhandledPlugins = bodyElement.find('template.cms-plugin');
@@ -1075,10 +1075,10 @@ class StructureBoard {
             .fail(() => loader.remove() && Helpers.reloadBrowser());
     }
 
-    _updateContentFromDataBridge(data) {
+    _updateContentFromDataBridge(data) {  // eslint-disable-line complexity
         if (!data || !data.content || !data.content.pluginIds ||
             data.content.pluginIds.length < 1 || data.content.html === undefined) {
-            // Non content data available in data bridge? Full content upudate needed.
+            // No content data available in data bridge? Full content upudate needed.
             return true;  // Update needed
         }
         if (data.source_placeholder_id && !CMS._instances.some(
@@ -1112,7 +1112,10 @@ class StructureBoard {
             $(`script[data-cms-plugin]#cms-plugin-${id}`).remove();
         });
         this._updateSekizai(data, 'css');
-        this._updateSekizai(data, 'js');
+        if (!this._updateSekizai(data, 'js')) {
+            // No scripts need to be loaded - content update is done
+            StructureBoard._triggerRefreshEvents();
+        }
 
         this._contentChanged(data.messages);
         return false;
@@ -1168,31 +1171,19 @@ class StructureBoard {
 
         // Collect deferred scripts to ensure firing
         this.scriptReferenceCount = 0;
-        const scriptLoaded = () => {
-            if (--this.scriptReferenceCount < 1) {
-                Helpers._getWindow().dispatchEvent(new Event('load'));
-                $(Helpers._getWindow()).trigger('cms-content-refresh');
-            }
-        };
 
         for (const element of newElements.querySelectorAll(selector)) {
-            if (this._elementPresent(current, element)) {
+            if (StructureBoard._elementPresent(current, element)) {
                 element.remove();
             } else {
                 if (element.hasAttribute('src')) {
                     this.scriptReferenceCount++;
-                    element.onerror = element.onload = scriptLoaded;
+                    element.onload = element.onerror = this._scriptLoaded.bind(this);
                 }
                 location.appendChild(element);
             }
         }
         return this.scriptReferenceCount > 0;
-    }
-
-    _elementPresent(current, element) {
-        const markup = element.outerHTML;
-
-        return [...current].some(el => el.outerHTML === markup);
     }
 
     _loadToolbar() {
@@ -1393,7 +1384,7 @@ class StructureBoard {
         }
         const headDiff = dd.diff(document.head, nodeToObj(newDoc.head));
 
-        StructureBoard._replaceBodyWithHTML(newDoc.body);
+        this._replaceBodyWithHTML(newDoc.body);
         dd.apply(document.head, headDiff);
 
         toolbar.prependTo(document.body);
@@ -1406,9 +1397,6 @@ class StructureBoard {
 
     _contentChanged(messages) {
         Plugin._refreshPlugins();
-
-        Helpers._getWindow().dispatchEvent(new Event('load'));
-        $(Helpers._getWindow()).trigger('cms-content-refresh');
         if (messages) {
             CMS.API.Messages.close();
             if (messages.length) {
@@ -1604,16 +1592,109 @@ class StructureBoard {
         });
     }
 
-    static _replaceBodyWithHTML(body, forceFullReplace = true) {
-        if (forceFullReplace) {
-            // Resets all events etc.
-            document.body.innerHTML = body.innerHTML;
-        } else {
-            // Mostly small changes to the body, so we can just diff and apply
-            const bodyDiff = dd.diff(document.body, body);
+    /**
+     * Replaces the current document body with the provided HTML content.
+     *
+     * This method removes all existing script elements from the document body,
+     * replaces the body content with the new HTML, and then re-inserts new script
+     * elements to ensure they are executed.
+     *
+     * @param {HTMLElement} body - The new HTML content to replace the current body.
+     *
+     * @private
+     */
+    _replaceBodyWithHTML(body) {
+        // Remove (i.e. detach) old scripts
+        const oldScripts = document.body.querySelectorAll('script:not([type="application/json"])');
 
-            dd.apply(document.body, bodyDiff);
+        oldScripts.forEach(script => script.remove());
+
+        // Replace the body content
+        document.body.innerHTML = body.innerHTML;
+
+        // Process new scripts in a dedicated helper
+        const newScripts = document.body.querySelectorAll('script:not([type="application/json"])');
+
+        this._processNewScripts(newScripts, oldScripts);
+
+        if (this.scriptReferenceCount === 0) {
+            StructureBoard._triggerRefreshEvents();
         }
+    }
+
+    /**
+     * Processes new script elements by comparing them with old script elements.
+     * If a new script is not present in the old scripts, it rewrites the script to the DOM to force execution.
+     *
+     * @param {NodeList} newScripts - A list of new script elements to be processed.
+     * @param {NodeList} oldScripts - A list of old script elements to compare against.
+     * @private
+     */
+    _processNewScripts(newScripts, oldScripts) {
+        newScripts.forEach(script => {
+            if (!StructureBoard._elementPresent(oldScripts, script)) {
+                // Rewrite script to DOM to force execution
+                const newScript = document.createElement('script');
+
+                // Copy attributes
+                Array.from(script.attributes).forEach(attr => {
+                    newScript.setAttribute(attr.name, attr.value);
+                });
+                if (script.src) {
+                    // Needs to be loaded from a server
+                    this.scriptReferenceCount++;
+                    newScript.onload = newScript.onerror = this._scriptLoaded.bind(this);
+                } else {
+                    // Inline script
+                    newScript.textContent = script.textContent;
+                }
+                script.parentNode.insertBefore(newScript, script.nextSibling);
+                script.remove();
+            }
+        });
+    }
+
+    /**
+     * Checks if a given element is present in the current set of elements.
+     *
+     * @param {NodeList} current - The current set of elements to check against.
+     * @param {Element} element - The element to check for presence.
+     * @returns {boolean} - Returns true if the element is present in the current set, otherwise false.
+     * @private
+     */
+    static _elementPresent(current, element) {
+        const markup = element.outerHTML;
+
+        return [...current].some(el => el.outerHTML === markup);
+    }
+
+    /**
+     * Handles the event when a script is loaded.
+     * Decrements the script reference count and, if it reaches zero,
+     * dispatches a 'load' event on the window and triggers a 'cms-content-refresh' event.
+     *
+     * @private
+     */
+    _scriptLoaded() {
+        if (--this.scriptReferenceCount < 1) {
+            StructureBoard._triggerRefreshEvents();
+        }
+    }
+
+    /**
+     * Triggers refresh events on the window and document.
+     *
+     * This method dispatches the 'DOMContentLoaded' event on the document,
+     * the 'load' event on the window, and triggers the 'cms-content-refresh'
+     * event using jQuery on the window.
+     *
+     * @private
+     * @static
+     */
+    static _triggerRefreshEvents() {
+        Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
+        Helpers._getWindow().dispatchEvent(new Event('load'));
+        $(Helpers._getWindow()).trigger('cms-content-refresh');
     }
 
     highlightPluginFromUrl() {

@@ -2572,7 +2572,7 @@ describe('CMS.StructureBoard', function() {
 
             board = new StructureBoard();
 
-            spyOn(StructureBoard, '_replaceBodyWithHTML');
+            spyOn(board, '_replaceBodyWithHTML');
 
             CMS.API.Messages = {
                 open: jasmine.createSpy()
