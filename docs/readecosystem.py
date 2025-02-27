@@ -242,8 +242,8 @@ def write_plugin_table(f, deprecated=False):
                 if not isinstance(versions, list):
                     versions = [versions]
                 versions = ", ".join(versions)
-                descrption = plugin['description']
-                lines = split_description(descrption)
+                description = plugin['description']
+                lines = split_description(description)
                 print(f"{plugin['title']:<26} {lines[0]:<60} {status:<13} {versions}", file=f)
                 for line in lines[1:]:
                     print(f"{'':26} {line:<60}", file=f)
