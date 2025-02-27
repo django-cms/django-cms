@@ -25,7 +25,7 @@ You will always find a complete list of the officially endorsed core addons in t
 `django CMS ecosystem <https://github.com/django-cms/djangocms-ecosystem>`_ github
 repository.
 
-Here's a breif overview of the current status of the core addons:
+Here's a brief overview of the current status of the core addons:
 
 .. include :: ../autogenerate/plugins.include
 
