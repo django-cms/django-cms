@@ -21,11 +21,13 @@ You don't need to use them, and for many of them alternatives exist, but they re
 a good way to get started with a reliable project set-up. We recommend them for new
 users of django CMS in particular.
 
-At this point in time not all are compatible with versions 4 of django CMS or above.
-Please see those two lists:
+You will always find a complete list of the officially endorsed core addons in the
+`django CMS ecosystem <https://github.com/django-cms/djangocms-ecosystem>`_ github
+repository.
 
-Recommended with Version 4 of django CMS
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Here's a breif overview of the current status of the core addons:
+
+.. include :: ../autogenerate/plugins.include
 
 ========================== ================================== ==========================
 Package                    Description                        Status
@@ -76,8 +78,8 @@ djangocms-references      Retrieve objects that are  supports v4.0, v4.1 support
                           that data to the end user
 ========================= ========================== ===================================
 
-Packages not (yet) supporting version 4
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Packages not (yet) supporting version 4 or 5
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ====================== =========================================== =====================
 Package                Description                                 Status
@@ -90,7 +92,6 @@ djangocms-history      Undo/redo functionality for django CMS      not yet suppo
 djangocms-page-sitemap django CMS page extension to handle sitemap not yet supported
                        customization
 djangocms-page-meta    Add SEO meta data to django CMS pages       not yet supported
-djangocms-transfer     Export and import plugins as JSON           not yet supported
 ====================== =========================================== =====================
 
 Contributors are needed to add django CMS v4 support to the following packages:

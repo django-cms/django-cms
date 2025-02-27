@@ -294,3 +294,20 @@ spelling_ignore_pypi_package_names = True
 #https://github.com/sphinx-contrib/spelling/blob/master/sphinxcontrib/spelling/filters.py
 #See https://sphinxcontrib-spelling.readthedocs.io/en/latest/customize.html#word-filters
 spelling_filters=["sphinxcontrib.spelling.filters.ContractionFilter"]
+
+from readecosystem import write_LTS_table, write_current_LTS, write_plugin_table
+
+with open("autogenerate/compatibility.include", "w") as f:
+    write_LTS_table(f)
+
+with open("autogenerate/lts.include", "w") as f:
+    write_current_LTS(f, current=True)
+
+with open("autogenerate/past_lts.include", "w") as f:
+    write_current_LTS(f, current=False)
+
+with open("autogenerate/plugins.include", "w") as f:
+    write_plugin_table(f, deprecated=False)
+
+with open("autogenerate/deprecated_plugins.include", "w") as f:
+    write_plugin_table(f, deprecated=True)
