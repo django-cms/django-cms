@@ -64,6 +64,8 @@ def sorted_versions(versions: list) -> list:
 
 def get_django_versions():
     djangocms = get_chapter("django CMS")
+    if djangocms is None:
+        return []
     versions = set()
     for content in djangocms["content"]:
         if "django" in content["properties"]:
