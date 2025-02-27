@@ -402,9 +402,7 @@ class PageAttribute(AsTag):
         if page and name in self.valid_attributes:
             func = getattr(page, "get_%s" % name)
             ret_val = func(language=lang, fallback=True)
-            if name == 'page_title':
-                ret_val = strip_tags(ret_val)
-            elif not isinstance(ret_val, datetime):
+            if not isinstance(ret_val, datetime):
                 ret_val = escape(ret_val)
             return ret_val
         return ''

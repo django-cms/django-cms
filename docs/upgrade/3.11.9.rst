@@ -1,0 +1,76 @@
+.. _upgrade-to-3.11.9:
+
+####################
+Release notes 3.11.9
+####################
+
+************
+Security fix
+************
+
+django CMS 3.11.9 closes a security vulnerability that could allow an attacker
+to inject malicious code into the page title allowing to load arbitrary
+javascript code when viewing the page. We recommend that you upgrade to
+this version as soon as possible.
+
+The security issue is of low severity, since an attacker needs to have access
+to the django CMS admin interface to exploit it.
+
+Thanks to `Ali İltizar (@alii76tt) <https://twitter.com/alii76tt>`_ for
+reporting the issue.
+
+.. note::
+
+   As ever, we remind our users and contributors that all security reports,
+   patches and concerns be addressed only to our security team by email, at
+   `security@django-cms.org <mailto:security@django-cms.org>`_.
+
+
+
+********************
+What's new in 3.11.9
+********************
+
+Bug Fixes:
+----------
+* XSS vulnerability for page title (#8075) (699f04e9b) -- Fabian Braun
+* fix: Accept legacy action names for page permission check (#8022) (fc4838f99) -- Fabian Braun
+
+
+Statistics:
+-----------
+
+This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+
+* Fabian Braun (2 pull requests)
+
+With the review help of the following contributors:
+
+* Mark Walker
+
+Thanks to all contributors for their efforts!
+
+************************
+How to upgrade to 3.11.9
+************************
+
+We assume you are upgrading from django CMS 3.11.8.
+
+Please make sure that your current database is consistent and in a healthy
+state, and **make a copy of the database before proceeding further.**
+
+Then run::
+
+    python manage.py migrate  # to ensure that your database is up-to-date with migrations
+    python manage.py cms fix-tree
+
+Check custom code and third-party applications for use of deprecated or removed functionality or
+APIs (see above). Some third-party components may need to be updated.
+
+Install the new version of django CMS from GitHub or via pip.
+
+Run::
+
+    python manage.py migrate
+
+to apply the new migrations.

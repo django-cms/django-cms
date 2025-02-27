@@ -191,7 +191,19 @@ def has_global_permission(user, site, action, use_cache=True):
 
 
 def has_page_permission(user, page, action, use_cache=True):
+    # Compatibility shim to be removed in django CMS 4.3
     from cms.utils.page_permissions import has_generic_permission
+
+    action_map = {
+        "change": "change_page",
+        "add": "add_page",
+        "move": "move_page",
+        "publish": "publish_page",
+        "delete": "delete_page",
+        "view": "view_page",
+    }
+    if action in action_map:
+        action = action_map[action]
 
     return has_generic_permission(page, user, action, site=None, check_global=False, use_cache=use_cache)
 

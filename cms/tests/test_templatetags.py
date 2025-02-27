@@ -10,7 +10,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 from django.test import RequestFactory
 from django.test.utils import override_settings
-from django.utils.html import strip_tags
+from django.utils.html import escape
 from django.utils.timezone import now
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from sekizai.context import SekizaiContext
@@ -78,9 +78,9 @@ class TemplatetagTests(CMSTestCase):
         output_ampersand = self.render_template_obj(template, {}, request_ampersand)
 
         self.assertNotEqual(script, output_script)
-        self.assertEqual(ampersand, output_ampersand)
-        self.assertEqual(strip_tags(script), output_script)
-        self.assertEqual(strip_tags(ampersand), output_ampersand)
+        self.assertNotEqual(ampersand, output_ampersand)
+        self.assertEqual(escape(script), output_script)
+        self.assertEqual(escape(ampersand), output_ampersand)
 
     def test_json_encoder(self):
         self.assertEqual(json_filter(True), 'true')
