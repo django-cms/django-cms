@@ -29,36 +29,6 @@ Here's a brief overview of the current status of the core addons:
 
 .. include :: ../autogenerate/plugins.include
 
-========================== ================================== ==========================
-Package                    Description                        Status
-========================== ================================== ==========================
-djangocms-text             Next gen. text Plugin for          supports V4.1
-                           django CMS using Tiptap
-djangocms-text-ckeditor    Text Plugin for django CMS using   supports v4.1 as of v5.1.2
-                           CKEditor 4
-djangocms-link             Add links on your site             supports V4.1
-djangocms-versioning       Adds versioning and publication    v4.x only
-                           management features to v4
-djangocms-moderation       Implements moderation process to   v4.x only
-                           channel publications
-djangocms-alias            Central management of recurring    v4.x only
-                           plugin sequences - replaces static
-                           placeholders
-djangocms-frontend         Plugin bundle for django CMS       supports v4.1
-                           providing several components from
-                           the popular Bootstrap 5 framework.
-                           Themable and extensible
-djangocms-form-builder     Build forms for your site          supports v4.1
-django-filer               Manager for assets like images     supports v4.1
-djangocms-attributes-field An opinionated implementation to   supports v4.1
-                           add attributes to any HTML element
-djangocms-icons            Adds support for Fontawesome icons supports v4.1
-                           attributes to any HTML element
-djangocms-picture          Add images to your site            no issues known
-djangocms-admin-style      django CMS design for Django's     supports v4.1 as of v3.2.1
-                           admin backend
-========================== ================================== ==========================
-
 We welcome feedback, documentation, patches and any other help to maintain and improve
 these valuable components.
 
