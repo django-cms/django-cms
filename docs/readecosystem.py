@@ -96,8 +96,7 @@ def get_djangocms_versions():
 
 
 def get_python_support(version: str) -> list:
-    djangocms = get_chapter("django CMS")
-    if djangocms:
+    if djangocms := get_chapter("django CMS"):
         for content in djangocms["content"]:
             if content["title"] == f"django CMS {version}":
                 return content["properties"].get("python", [])
