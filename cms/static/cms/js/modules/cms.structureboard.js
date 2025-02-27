@@ -1604,46 +1604,54 @@ class StructureBoard {
      * @private
      */
     _replaceBodyWithHTML(body) {
-        const oldScripts = document.body.querySelectorAll('script:not([type="application/json"])');  // get old scripts
+        // Remove (i.e. detach) old scripts
+        const oldScripts = document.body.querySelectorAll('script:not([type="application/json"])');
 
-        for (const script of oldScripts) {
-            script.remove();  // detach them
-        }
+        oldScripts.forEach(script => script.remove());
 
-        // Insert content, resets all events etc.
+        // Replace the body content
         document.body.innerHTML = body.innerHTML;
 
+        // Process new scripts in a dedicated helper
         const newScripts = document.body.querySelectorAll('script:not([type="application/json"])');
 
-        // Collect deferred scripts to ensure firing
-        this.scriptReferenceCount = 0;
+        this._processNewScripts(newScripts, oldScripts);
 
-        for (const script of newScripts) {
+        if (this.scriptReferenceCount === 0) {
+            StructureBoard._triggerRefreshEvents();
+        }
+    }
+
+    /**
+     * Processes new script elements by comparing them with old script elements.
+     * If a new script is not present in the old scripts, it rewrites the script to the DOM to force execution.
+     *
+     * @param {NodeList} newScripts - A list of new script elements to be processed.
+     * @param {NodeList} oldScripts - A list of old script elements to compare against.
+     * @private
+     */
+    _processNewScripts(newScripts, oldScripts) {
+        newScripts.forEach(script => {
             if (!StructureBoard._elementPresent(oldScripts, script)) {
                 // Rewrite script to DOM to force execution
                 const newScript = document.createElement('script');
 
-                // Copy all attributes
-                for (const attr of script.attributes) {
+                // Copy attributes
+                Array.from(script.attributes).forEach(attr => {
                     newScript.setAttribute(attr.name, attr.value);
-                }
+                });
                 if (script.src) {
-                    newScript.src = script.src;
+                    // Needs to be loaded from a server
                     this.scriptReferenceCount++;
                     newScript.onload = newScript.onerror = this._scriptLoaded.bind(this);
                 } else {
+                    // Inline script
                     newScript.textContent = script.textContent;
                 }
-                // Insert the new script at the same position
                 script.parentNode.insertBefore(newScript, script.nextSibling);
                 script.remove();
             }
-        }
-
-        if (this.scriptReferenceCount === 0) {
-            // No scripts need to be loaded - content update is done
-            StructureBoard._triggerRefreshEvents();
-        }
+        });
     }
 
     /**
