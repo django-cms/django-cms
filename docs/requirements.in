@@ -14,3 +14,4 @@ git+https://github.com/django-cms/django-cms@release/4.1.x
 codespell
 pip-tools
 docstrfmt
+git+https://github.com/django-cms/djangocms-ecosystem

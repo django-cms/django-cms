@@ -23,6 +23,9 @@ sys.path.append(os.path.abspath('./'))
 
 import django
 
+from djangocms_ecosystem import write_LTS_table, write_current_LTS, write_plugin_table
+
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_settings')
 django.setup()
 
@@ -294,8 +297,6 @@ spelling_ignore_pypi_package_names = True
 #https://github.com/sphinx-contrib/spelling/blob/master/sphinxcontrib/spelling/filters.py
 #See https://sphinxcontrib-spelling.readthedocs.io/en/latest/customize.html#word-filters
 spelling_filters=["sphinxcontrib.spelling.filters.ContractionFilter"]
-
-from readecosystem import write_LTS_table, write_current_LTS, write_plugin_table
 
 os.makedirs("autogenerate", exist_ok=True)
 
