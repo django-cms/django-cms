@@ -7,7 +7,11 @@ Please note that dozens if not hundreds of different django CMS plugins have bee
 available under open-source licences. Some, like the ones on this page, are likely to be
 of general interest, while others are highly specialised.
 
-This page only lists those that fall under the responsibility of the django CMS project.
+All packages officially endorsed by the `django CMS Association <https://django-cms.org/>`_
+are listed in the
+`django-cms/djangocms-ecosystem <https://github.com/django-cms/djangocms-ecosystem/blob/main/README.md>`_
+repository.
+
 Please see the `Django Packages <https://djangopackages.org/search/?q=django+cms>`_ site
 for some more, or just do a web search for the functionality you seek - you'll be
 surprised at the range of plugins that has been created.
