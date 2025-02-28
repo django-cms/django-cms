@@ -5,7 +5,7 @@ from cms.constants import GRANT_ALL_PERMISSIONS
 from cms.models import Page, PermissionTuple
 from cms.utils import get_current_site
 from cms.utils.compat.dj import available_attrs
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.permissions import (
     cached_func,
@@ -360,7 +360,7 @@ def _perm_tuples_to_ids(perm_tuples):
 
     fn_name = "_".join(inspect.stack()[1][3].split("_")[:-1])  # Calling function's name
     warnings.warn(f"{fn_name}_ids is deprecated. Use {fn_name}_perm_tuples instead.",
-                  RemovedInDjangoCMS43Warning, stacklevel=3)
+                  RemovedInDjangoCMS51Warning, stacklevel=3)
 
     allowed_pages = Q()
     for perm in perm_tuples:

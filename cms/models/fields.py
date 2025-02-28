@@ -5,7 +5,7 @@ from django.db import models
 
 from cms.forms.fields import PageSelectFormField
 from cms.models.placeholdermodel import Placeholder
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 
 
 class PlaceholderField(models.ForeignKey):
@@ -27,9 +27,9 @@ class PlaceholderField(models.ForeignKey):
             validate_placeholder_name,
         )
         warnings.warn(
-            "PlaceholderField is deprecated. It will be removed in django CMS 4.3. "
+            "PlaceholderField is deprecated. "
             "Replace by PlaceholderRelationField.",
-            RemovedInDjangoCMS43Warning, stacklevel=2
+            RemovedInDjangoCMS51Warning, stacklevel=2
         )
 
         if not actions:
