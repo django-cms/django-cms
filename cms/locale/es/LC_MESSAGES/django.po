@@ -10,6 +10,7 @@
 # jorlugaqui <jorlugaqui@gmail.com>, 2023
 # Luis Zárate <luisza@visualcon.net>, 2023
 # Fabian Braun <fsbraun@gmx.de>, 2023
+# Diego Alejandro Romero Mercado, 2024
 # Jonas Obrist <ojiidotch@gmail.com>, 2011
 msgid ""
 msgstr ""
@@ -17,7 +18,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-08-23 12:21+0000\n"
 "PO-Revision-Date: 2022-12-12 10:32+0000\n"
-"Last-Translator: Fabian Braun <fsbraun@gmx.de>, 2023\n"
+"Last-Translator: Diego Alejandro Romero Mercado, 2024\n"
 "Language-Team: Spanish (https://app.transifex.com/divio/teams/58664/es/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -566,10 +567,10 @@ msgstr ""
 "Dejar en blanco para un slug automático, o configurar como sea necesario."
 
 msgid "Cannot automatically create slug. Please provide one manually."
-msgstr ""
+msgstr "No se puede crear slug automáticamente. Proporcione uno manualmente."
 
 msgid "Please provide a valid slug."
-msgstr ""
+msgstr "Por favor proporcione un slug válido"
 
 msgid "You don't have the permissions required to add a page."
 msgstr "No tiene los permisos necesarios para agregar una página."
@@ -1051,7 +1052,7 @@ msgid "last change by"
 msgstr "ultimo cambio por"
 
 msgid "last change on"
-msgstr ""
+msgstr "Último cambio por"
 
 msgid "meta"
 msgstr "meta"
