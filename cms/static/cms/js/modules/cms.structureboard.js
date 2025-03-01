@@ -1686,15 +1686,19 @@ class StructureBoard {
      *
      * This method dispatches the 'DOMContentLoaded' event on the document,
      * the 'load' event on the window, and triggers the 'cms-content-refresh'
-     * event using jQuery on the window.
+     * event using jQuery on the window. The events are dispatched asynchronously
+     * to ensure that the current execution context is completed before the events
+     * are triggered.
      *
      * @private
      * @static
      */
     static _triggerRefreshEvents() {
-        Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
-        Helpers._getWindow().dispatchEvent(new Event('load'));
-        $(Helpers._getWindow()).trigger('cms-content-refresh');
+        setTimeout(() => {
+            Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
+            Helpers._getWindow().dispatchEvent(new Event('load'));
+            $(Helpers._getWindow()).trigger('cms-content-refresh');
+        }, 0);
     }
 
     highlightPluginFromUrl() {
