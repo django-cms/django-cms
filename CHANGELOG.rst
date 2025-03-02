@@ -36,7 +36,7 @@ Bug Fixes:
 * Django 6 tried to adding object tools to the page tree throwing an error (#8133) (01fd09bca) -- Fabian Braun
 * Allow frontend editing of page title fields (#8131) (5f36e1c40) -- Fabian Braun
 * #7904 - `manage.py cms fixtree` did not fix PageUrl model (#7905) (63a38367b) -- Jacob Rief
-* Respect setting CMS_ DEFAULT_IN_NAVIGATION (#8094) (ded96db00) -- Fabian Braun
+* Respect setting CMS_DEFAULT_IN_NAVIGATION (#8094) (ded96db00) -- Fabian Braun
 * Added the new delete confirmation for pages also to delete translation (#8111) (df4066639) -- Fabian Braun
 * Use correct `changed_date` of page content in sitemap (#8122) (d98757609) -- Jacob Rief
 * Placeholder page getter failed for unpublished pages (#8115) (4bcb4b43e) -- Fabian Braun
@@ -64,7 +64,7 @@ Bug Fixes:
 * Respect ContentAdminManager pattern for frontend-editable models (#7998) (a56decf11) -- Fabian Braun
 * Also clear menu cache if page permissions are changed (#7988) (4f1cbc5c9) -- Fabian Braun
 * Consistent labels and help texts for page content model and page content forms (#7968) (5f2f9e465) -- Fabian Braun
-* Inconsistent color codes for dark mode and `preferes-color-scheme: auto` (#7979) (f82bcaca4) -- Fabian Braun
+* Inconsistent color codes for dark mode and `prefers-color-scheme: auto` (#7979) (f82bcaca4) -- Fabian Braun
 * Refactor menus app: significant time saving (queries and cpu) (#7956) (59d50f249) -- Fabian Braun
 * template tag `get_admin_url_for_language` did not return the latest page content (#7967) (b4f54a517) -- Fabian Braun
 * Regression: Turning a cached property into a property in a subclass leads to side-effects (#7971) (93f6fc508) -- Fabian Braun
