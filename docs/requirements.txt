@@ -6,7 +6,7 @@
 #
 --extra-index-url https://www.piwheels.org/simple
 
--e ..
+django-cms @ git+https://github.com/django-cms/django-cms@release/build
     # via -r requirements.in
 alabaster==1.0.0
     # via sphinx
