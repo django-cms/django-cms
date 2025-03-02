@@ -565,7 +565,7 @@ class CMSToolbarBase(BaseToolbar):
         return f'{toolbar}\n{rendered_contents}'
 
 
-# Add toolbar mixins from extensions to toolbar
+#: :class:`CMSToolbarBase` including toolbar mixins from extensions to toolbar
 CMSToolbar = type("CMSToolbar", tuple(cms_toolbar_extensions + [CMSToolbarBase]), dict())
 
 
