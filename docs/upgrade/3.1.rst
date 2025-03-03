@@ -61,7 +61,7 @@ Other than this, end users should not notice any changes.
 Action required
 ---------------
 
-Run :ref:`manage.py cms fix-mptt <fix-mptt>` before you upgrade.
+Run ``manage.py cms fix-mptt`` before you upgrade.
 
 Developers who use django CMS will need to run the schema and data migrations that are part of this
 release. Developers of third-party applications that relied on the Django MPTT that shipped with
@@ -198,7 +198,7 @@ Check the readme file of each plugin when upgrading to know the actions required
 Structure mode permission
 =========================
 
-A new :doc:`Can use Structure mode* permission </topics/permissions>` has been added.
+A new :doc:`Can use Structure mode* permission </explanation/permissions>` has been added.
 
 Without this permission, a non-superuser will no longer have access to structure mode. This makes
 possible a more strict workflow, in which certain users are able to edit content but not structure.
@@ -236,7 +236,7 @@ including the use of "clipboard-like" items.
 Per-namespace apphook configuration
 ===================================
 
-django CMS provides a new API to define namespaced :doc:`Apphook </how_to/apphooks>` configurations.
+django CMS provides a new API to define namespaced :doc:`Apphook </how_to/11-apphooks>` configurations.
 
 `Aldryn Apphooks Config <https://github.com/aldryn/aldryn-apphooks-config>`_ has
 been created and released as a standard implementation to take advantage

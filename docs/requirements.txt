@@ -6,6 +6,8 @@
 #
 --extra-index-url https://www.piwheels.org/simple
 
+django-cms @ git+https://github.com/django-cms/django-cms@release/build
+    # via -r requirements.in
 alabaster==1.0.0
     # via sphinx
 anyio==4.6.0
@@ -53,8 +55,6 @@ django-classy-tags==4.1.0
     # via
     #   django-cms
     #   django-sekizai
-django-cms @ git+https://github.com/django-cms/django-cms@release/4.1.x
-    # via -r requirements.in
 django-formtools==2.5.1
     # via django-cms
 django-sekizai==4.1.0
