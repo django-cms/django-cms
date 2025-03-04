@@ -119,7 +119,6 @@ Example:
 
     {% page_language_url "de" %}
 
-
 ***************************************
 Configuring language-handling behaviour
 ***************************************
@@ -129,3 +128,29 @@ languages.
 
 
 .. _documentation: https://docs.djangoproject.com/en/dev/topics/i18n/translation/#internationalization-in-url-patterns
+
+Custom Language Resolution
+---------------------------
+
+You can override django-cms's language resolution by setting ``request.LANGUAGE_CODE`` in your own middleware. Common use cases include:
+
+* Serving different languages based on domains (e.g., ``example.com`` → English, ``example.de`` → German)::
+
+    class DomainLanguageMiddleware:
+        def __init__(self, get_response):
+            self.get_response = get_response
+
+        def __call__(self, request):
+            host = request.get_host().split(':')[0]
+            if host.endswith('.de'):
+                request.LANGUAGE_CODE = 'de'
+            elif host.endswith('.fr'):
+                request.LANGUAGE_CODE = 'fr'
+            return self.get_response(request)
+
+* Setting language based on user preferences or geolocation
+* Implementing custom language negotiation logic
+
+Make sure to place your custom middleware after ``LocaleMiddleware`` if you want to override its behavior, or before if you want ``LocaleMiddleware`` to be able to override your custom logic.
+
+You can customize the default language for each site using the :setting:`CMS_LANGUAGES` setting.

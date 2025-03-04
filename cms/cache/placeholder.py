@@ -19,33 +19,10 @@ check for cache hits without re-computing placeholder.get_vary_cache_on().
 import hashlib
 import time
 
-from importlib import import_module
-
-from django.conf import settings
 from django.utils.timezone import now
 
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_header_name, get_timezone_name
-
-# during python load phase, resolve custom cache key extra getter from settings into function
-_placeholder_cache_key_extra = None
-if hasattr(settings, "CMS_PLACEHOLDER_CACHE_KEY_EXTRA"):
-    try:
-        mod_path, met = settings.CMS_PLACEHOLDER_CACHE_KEY_EXTRA.rsplit('.', 1)
-
-        mod = import_module(mod_path)
-        _placeholder_cache_key_extra = getattr(mod, met)
-    except ImportError:
-        pass
-
-def _get_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
-    """
-    Wrapper function to resolve if custom placeholder cache key extra getter was provided
-    """
-    placeholder_cache_key = _default_placeholder_cache_key(placeholder, lang, site_id, request, soft=False)
-    if _placeholder_cache_key_extra is not None:
-        placeholder_cache_key += _placeholder_cache_key_extra(placeholder, lang, site_id, request, soft=False)
-    return placeholder_cache_key
 
 
 def _get_placeholder_cache_version_key(placeholder, lang, site_id):
@@ -57,8 +34,8 @@ def _get_placeholder_cache_version_key(placeholder, lang, site_id):
     this (placeholder x lang) inaccessible. Sub-caches include caches per TZ
     and per VARY header.
     """
-    prefix = get_cms_setting('CACHE_PREFIX')
-    key = f'{prefix}|placeholder_cache_version|id:{placeholder.pk}|lang:{str(lang)}|site:{site_id}'
+    prefix = get_cms_setting("CACHE_PREFIX")
+    key = f"{prefix}|placeholder_cache_version|id:{placeholder.pk}|lang:{str(lang)}|site:{site_id}"
     # django itself adds "version" add the end of cache-keys, e.g. "<key>:1".
     # -> If `cache.set()` is for example called with `version=""`, it still adds
     #    `:` at the end. So if we check the length for `> 250`, a length of 249
@@ -66,9 +43,9 @@ def _get_placeholder_cache_version_key(placeholder, lang, site_id):
     # In order to avoid these errors, we hash the keys at a lower length to also
     # have a little buffer.
     if len(key) > 200:
-        key = '{prefix}|{hash}'.format(
+        key = "{prefix}|{hash}".format(
             prefix=prefix,
-            hash=hashlib.sha1(key.encode('utf-8')).hexdigest(),
+            hash=hashlib.sha1(key.encode("utf-8")).hexdigest(),
         )
     return key
 
@@ -108,7 +85,7 @@ def _set_placeholder_cache_version(placeholder, lang, site_id, version, vary_on_
     cache.set(key, (version, vary_on_list), duration)
 
 
-def _default_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
+def _get_placeholder_cache_key(placeholder, lang, site_id, request, soft=False):
     """
     Returns the fully-addressed cache key for the given placeholder and
     the request.
@@ -117,7 +94,7 @@ def _default_placeholder_cache_key(placeholder, lang, site_id, request, soft=Fal
     read from the cache. If instead the key retrieval is to support a cache
     write, let «soft» be False.
     """
-    prefix = get_cms_setting('CACHE_PREFIX')
+    prefix = get_cms_setting("CACHE_PREFIX")
     version, vary_on_list = _get_placeholder_cache_version(placeholder, lang, site_id)
     tz = get_timezone_name()
     main_key = f"{prefix}|render_placeholder|id:{placeholder.pk}|lang:{lang}|site:{site_id}|tz:{tz}|v:{version}"
@@ -131,17 +108,16 @@ def _default_placeholder_cache_key(placeholder, lang, site_id, request, soft=Fal
         vary_on_list = placeholder.get_vary_cache_on(request)
         duration = placeholder.get_cache_expiration(request, now())
         # Update the main placeholder cache version
-        _set_placeholder_cache_version(
-            placeholder, lang, site_id, version, vary_on_list, duration)
+        _set_placeholder_cache_version(placeholder, lang, site_id, version, vary_on_list, duration)
 
     sub_key_list = []
     for key in vary_on_list:
-        value = request.META.get(get_header_name(key)) or '_'
-        sub_key_list.append(key + ':' + value)
+        value = request.META.get(get_header_name(key)) or "_"
+        sub_key_list.append(key + ":" + value)
 
     cache_key = main_key
     if sub_key_list:
-        cache_key += '|' + '|'.join(sub_key_list)
+        cache_key += "|" + "|".join(sub_key_list)
 
     # django itself adds "version" add the end of cache-keys, e.g. "<key>:1".
     # -> If `cache.set()` is for example called with `version=""`, it still adds
@@ -150,9 +126,9 @@ def _default_placeholder_cache_key(placeholder, lang, site_id, request, soft=Fal
     # In order to avoid these errors, we hash the keys at a lower length to also
     # have a little buffer.
     if len(cache_key) > 200:
-        cache_key = '{prefix}|{hash}'.format(
+        cache_key = "{prefix}|{hash}".format(
             prefix=prefix,
-            hash=hashlib.sha1(cache_key.encode('utf-8')).hexdigest(),
+            hash=hashlib.sha1(cache_key.encode("utf-8")).hexdigest(),
         )
 
     return cache_key
@@ -166,16 +142,11 @@ def set_placeholder_cache(placeholder, lang, site_id, content, request):
 
     key = _get_placeholder_cache_key(placeholder, lang, site_id, request)
 
-    duration = min(
-        get_cms_setting('CACHE_DURATIONS')['content'],
-        placeholder.get_cache_expiration(request, now())
-    )
+    duration = min(get_cms_setting("CACHE_DURATIONS")["content"], placeholder.get_cache_expiration(request, now()))
     cache.set(key, content, duration)
     # "touch" the cache-version, so that it stays as fresh as this content.
     version, vary_on_list = _get_placeholder_cache_version(placeholder, lang, site_id)
-    _set_placeholder_cache_version(
-        placeholder, lang, site_id, version, vary_on_list, duration=duration
-    )
+    _set_placeholder_cache_version(placeholder, lang, site_id, version, vary_on_list, duration=duration)
 
 
 def get_placeholder_cache(placeholder, lang, site_id, request):

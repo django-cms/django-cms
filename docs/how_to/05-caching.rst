@@ -55,7 +55,17 @@ Have a look at the following settings to enable/disable various caching behaviou
 - :setting:`CMS_PLACEHOLDER_CACHE`
 - :setting:`CMS_PLUGIN_CACHE`
 
+Language Cache
+=============
 
+django-cms caches pages on a per-language basis. Each page version in a different language has its own cache entry, built from:
 
+* Site ID and language
+* Page path hash
+* Timezone (if USE_TZ is enabled)
 
+The system handles language fallbacks automatically - if a page doesn't exist in the requested language, the fallback language version is cached and served instead.
 
+To manually clear the cache for a specific language::
+
+    page.clear_cache(language='en')

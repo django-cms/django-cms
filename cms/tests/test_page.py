@@ -16,6 +16,7 @@ from django.utils.translation import override as force_language
 
 from cms import constants
 from cms.api import add_plugin, create_page, create_page_content
+from cms.cache.page import get_page_cache
 from cms.forms.validators import validate_url_uniqueness
 from cms.models import Page, PageContent
 from cms.models.placeholdermodel import Placeholder
@@ -31,38 +32,40 @@ from cms.utils.page import (
 
 
 class PageMigrationTestCase(CMSTestCase):
-
     def test_content_type(self):
         """
         Test correct content type is set for Page object
         """
         from django.contrib.contenttypes.models import ContentType
-        self.assertEqual(ContentType.objects.filter(model='page', app_label='cms').count(), 1)
+
+        self.assertEqual(ContentType.objects.filter(model="page", app_label="cms").count(), 1)
 
 
 def has_no_custom_user():
-    return get_user_model().USERNAME_FIELD != 'email'
+    return get_user_model().USERNAME_FIELD != "email"
 
 
 class PagesTestCase(TransactionCMSTestCase):
-
     def tearDown(self):
         cache.clear()
 
     def test_absolute_url(self):
+        """
+        Test correct content type is set for Page object
+        """
         page = self.create_homepage("page", "nav_playground.html", "en")
         create_page_content("fr", "french home", page)
         page_2 = create_page("inner", "nav_playground.html", "en", parent=page)
         create_page_content("fr", "french inner", page_2)
 
-        self.assertEqual(page_2.get_absolute_url(), '/en/inner/')
-        self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
-        self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+        self.assertEqual(page_2.get_absolute_url(), "/en/inner/")
+        self.assertEqual(page_2.get_absolute_url(language="en"), "/en/inner/")
+        self.assertEqual(page_2.get_absolute_url(language="fr"), "/fr/french-inner/")
 
-        with force_language('fr'):
-            self.assertEqual(page_2.get_absolute_url(), '/fr/french-inner/')
-            self.assertEqual(page_2.get_absolute_url(language='en'), '/en/inner/')
-            self.assertEqual(page_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+        with force_language("fr"):
+            self.assertEqual(page_2.get_absolute_url(), "/fr/french-inner/")
+            self.assertEqual(page_2.get_absolute_url(language="en"), "/en/inner/")
+            self.assertEqual(page_2.get_absolute_url(language="fr"), "/fr/french-inner/")
 
     def test_absolute_url_page_content(self):
         page = self.create_homepage("page", "nav_playground.html", "en")
@@ -71,27 +74,27 @@ class PagesTestCase(TransactionCMSTestCase):
         content_2 = create_page_content("fr", "french inner", page_2)
 
         # content_2 is French
-        self.assertEqual(content_2.get_absolute_url(), '/fr/french-inner/')
+        self.assertEqual(content_2.get_absolute_url(), "/fr/french-inner/")
         # if language specified, get the language version's url
-        self.assertEqual(content_2.get_absolute_url(language='en'), '/en/inner/')
+        self.assertEqual(content_2.get_absolute_url(language="en"), "/en/inner/")
         # for completeness: specify own language
-        self.assertEqual(content_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+        self.assertEqual(content_2.get_absolute_url(language="fr"), "/fr/french-inner/")
 
         # The above result does not change if language is changed
-        with force_language('en'):
-            self.assertEqual(content_2.get_absolute_url(), '/fr/french-inner/')
-            self.assertEqual(content_2.get_absolute_url(language='en'), '/en/inner/')
-            self.assertEqual(content_2.get_absolute_url(language='fr'), '/fr/french-inner/')
+        with force_language("en"):
+            self.assertEqual(content_2.get_absolute_url(), "/fr/french-inner/")
+            self.assertEqual(content_2.get_absolute_url(language="en"), "/en/inner/")
+            self.assertEqual(content_2.get_absolute_url(language="fr"), "/fr/french-inner/")
 
     def test_get_root_page(self):
         _create = functools.partial(
             create_page,
-            template='nav_playground.html',
-            language='en',
+            template="nav_playground.html",
+            language="en",
         )
-        page_a = _create('page_a')
-        page_a_a = _create('page_a_a_a', parent=page_a)
-        page_a_a_a = _create('page_a_a_a', parent=page_a_a)
+        page_a = _create("page_a")
+        page_a_a = _create("page_a_a_a", parent=page_a)
+        page_a_a_a = _create("page_a_a_a", parent=page_a_a)
         page_tree_with_root = [
             (page_a, page_a),
             (page_a_a, page_a),
@@ -109,9 +112,9 @@ class PagesTestCase(TransactionCMSTestCase):
         This is handled by MP_NodeQuerySet (which was not used before the fix)
 
         """
-        page1 = create_page('home', 'nav_playground.html', 'en')
-        page2 = create_page('page2', 'nav_playground.html', 'en', parent=page1)
-        page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2)
+        page1 = create_page("home", "nav_playground.html", "en")
+        page2 = create_page("page2", "nav_playground.html", "en", parent=page1)
+        page3 = create_page("page3", "nav_playground.html", "en", parent=page2)
 
         self.assertEqual(page1.depth, 1)
         self.assertEqual(page1.numchild, 1)
@@ -133,7 +136,7 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(page2.numchild, 0)
         self.assertTrue(page2.is_leaf())
 
-        page3 = create_page('page3', 'nav_playground.html', 'en', parent=page2, reverse_id='page3')
+        page3 = create_page("page3", "nav_playground.html", "en", parent=page2, reverse_id="page3")
 
         self.assertEqual(page2.depth, 2)
         self.assertEqual(page2.numchild, 1)
@@ -157,26 +160,25 @@ class PagesTestCase(TransactionCMSTestCase):
 
     def test_create_page_api(self):
         page_data = {
-            'title': 'root',
-            'slug': 'root',
-            'language': settings.LANGUAGES[0][0],
-            'template': 'nav_playground.html',
-
+            "title": "root",
+            "slug": "root",
+            "language": settings.LANGUAGES[0][0],
+            "template": "nav_playground.html",
         }
         page = self.create_homepage(**page_data)
         self.assertEqual(Page.objects.count(), 1)
         self.assertTrue(page.is_home)
-        self.assertEqual(list(page.get_urls().values_list('path', flat=True)), [''])
+        self.assertEqual(list(page.get_urls().values_list("path", flat=True)), [""])
 
-    @skipIf(has_no_custom_user(), 'No custom user')
+    @skipIf(has_no_custom_user(), "No custom user")
     def test_create_page_api_with_long_username(self):
         page_data = {
-            'title': 'root',
-            'slug': 'root',
-            'language': settings.LANGUAGES[0][0],
-            'template': 'nav_playground.html',
-            'created_by': self._create_user(
-                'V' * constants.PAGE_USERNAME_MAX_LENGTH + 'ERY-LONG-USERNAME',
+            "title": "root",
+            "slug": "root",
+            "language": settings.LANGUAGES[0][0],
+            "template": "nav_playground.html",
+            "created_by": self._create_user(
+                "V" * constants.PAGE_USERNAME_MAX_LENGTH + "ERY-LONG-USERNAME",
                 is_staff=True,
                 is_superuser=True,
             ),
@@ -185,117 +187,109 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(Page.objects.count(), 1)
 
         self.assertLessEqual(len(page.created_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegex(page.created_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.created_by, r"V+\.{3} \(id=\d+\)")
 
         self.assertLessEqual(len(page.changed_by), constants.PAGE_USERNAME_MAX_LENGTH)
-        self.assertRegex(page.changed_by, r'V+\.{3} \(id=\d+\)')
+        self.assertRegex(page.changed_by, r"V+\.{3} \(id=\d+\)")
 
-        self.assertEqual(list(page.get_urls().values_list('path', flat=True)), ['root'])
+        self.assertEqual(list(page.get_urls().values_list("path", flat=True)), ["root"])
 
     def test_get_available_slug_recursion(self):
-        """ Checks cms.utils.page.get_available_slug for infinite recursion
-        """
+        """Checks cms.utils.page.get_available_slug for infinite recursion"""
         site = get_current_site()
         for x in range(0, 12):
-            create_page('test-page', 'nav_playground.html', 'en')
-        new_slug = get_available_slug(site, 'test-page', 'en')
-        self.assertEqual(new_slug, 'test-page-copy-13')  # get_available_slug's suffix default is 'copy'
+            create_page("test-page", "nav_playground.html", "en")
+        new_slug = get_available_slug(site, "test-page", "en")
+        self.assertEqual(new_slug, "test-page-copy-13")  # get_available_slug's suffix default is 'copy'
 
     def test_path_collisions_api_1(self):
-        """ Checks for slug collisions on sibling pages - uses API to create pages
-        """
+        """Checks for slug collisions on sibling pages - uses API to create pages"""
         site = get_current_site()
-        page1 = create_page('test page 1', 'nav_playground.html', 'en')
-        page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
-                              parent=page1, slug="foo")
-        page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
-                              parent=page1, slug="foo")
+        page1 = create_page("test page 1", "nav_playground.html", "en")
+        page1_1 = create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
+        page1_2 = create_page("test page 1_2", "nav_playground.html", "en", parent=page1, slug="foo")
         # both sibling pages has same slug, so both pages have an invalid slug
         self.assertRaises(
             ValidationError,
             validate_url_uniqueness,
             site=site,
-            path=page1_1.get_path('en'),
-            language='en',
+            path=page1_1.get_path("en"),
+            language="en",
             exclude_page=page1_1,
         )
         self.assertRaises(
             ValidationError,
             validate_url_uniqueness,
             site=site,
-            path=page1_2.get_path('en'),
-            language='en',
+            path=page1_2.get_path("en"),
+            language="en",
             exclude_page=page1_2,
         )
 
     def test_path_collisions_api_2(self):
-        """ Checks for slug collisions on root (not home) page and a home page child - uses API to create pages
-        """
+        """Checks for slug collisions on root (not home) page and a home page child - uses API to create pages"""
         site = get_current_site()
-        page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en')
-        page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
-                              parent=page1, slug="foo")
-        page2 = create_page('test page 1_1', 'nav_playground.html', 'en',
-                            slug="foo")
+        page1 = self.create_homepage("test page 1", "nav_playground.html", "en")
+        page1_1 = create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
+        page2 = create_page("test page 1_1", "nav_playground.html", "en", slug="foo")
         # Root (non home) page and child page has the same slug, both are invalid
         self.assertRaises(
             ValidationError,
             validate_url_uniqueness,
             site=site,
-            path=page1_1.get_path('en'),
-            language='en',
+            path=page1_1.get_path("en"),
+            language="en",
             exclude_page=page1_1,
         )
         self.assertRaises(
             ValidationError,
             validate_url_uniqueness,
             site=site,
-            path=page2.get_path('en'),
-            language='en',
+            path=page2.get_path("en"),
+            language="en",
             exclude_page=page2,
         )
 
     def test_path_collisions_api_3(self):
-        """ Checks for slug collisions on children of a non root page - uses API to create pages
-        """
+        """Checks for slug collisions on children of a non root page - uses API to create pages"""
         site = get_current_site()
-        page1 = create_page('test page 1', 'nav_playground.html', 'en')
-        page1_1 = create_page('test page 1_1', 'nav_playground.html', 'en',
-                              parent=page1, slug="foo")
-        page1_1_1 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
-                                parent=page1_1, slug="bar")
-        page1_1_2 = create_page('test page 1_1_1', 'nav_playground.html', 'en',
-                                parent=page1_1, slug="bar")
-        page1_2 = create_page('test page 1_2', 'nav_playground.html', 'en',
-                              parent=page1, slug="bar")
+        page1 = create_page("test page 1", "nav_playground.html", "en")
+        page1_1 = create_page("test page 1_1", "nav_playground.html", "en", parent=page1, slug="foo")
+        page1_1_1 = create_page("test page 1_1_1", "nav_playground.html", "en", parent=page1_1, slug="bar")
+        page1_1_2 = create_page("test page 1_1_1", "nav_playground.html", "en", parent=page1_1, slug="bar")
+        page1_2 = create_page("test page 1_2", "nav_playground.html", "en", parent=page1, slug="bar")
         # Direct children of home has different slug so it's ok.
-        self.assertTrue(validate_url_uniqueness(
-            site,
-            path=page1_1.get_path('en'),
-            language='en',
-            exclude_page=page1_1,
-        ))
-        self.assertTrue(validate_url_uniqueness(
-            site,
-            path=page1_2.get_path('en'),
-            language='en',
-            exclude_page=page1_2,
-        ))
+        self.assertTrue(
+            validate_url_uniqueness(
+                site,
+                path=page1_1.get_path("en"),
+                language="en",
+                exclude_page=page1_1,
+            )
+        )
+        self.assertTrue(
+            validate_url_uniqueness(
+                site,
+                path=page1_2.get_path("en"),
+                language="en",
+                exclude_page=page1_2,
+            )
+        )
         # children of page1_1 has the same slug -> you lose!
         self.assertRaises(
             ValidationError,
             validate_url_uniqueness,
             site=site,
-            path=page1_1_1.get_path('en'),
-            language='en',
+            path=page1_1_1.get_path("en"),
+            language="en",
             exclude_page=page1_1_1,
         )
         self.assertRaises(
             ValidationError,
             validate_url_uniqueness,
             site=site,
-            path=page1_1_2.get_path('en'),
-            language='en',
+            path=page1_1_2.get_path("en"),
+            language="en",
             exclude_page=page1_1_2,
         )
 
@@ -306,15 +300,14 @@ class PagesTestCase(TransactionCMSTestCase):
         superuser = self.get_superuser()
         self.assertEqual(Page.objects.all().count(), 0)
         with self.login_user_context(superuser):
-            page = self.create_homepage('test page 1', "nav_playground.html", "en")
+            page = self.create_homepage("test page 1", "nav_playground.html", "en")
             response = self.client.get(self.get_pages_root())
             self.assertEqual(response.status_code, 200)
-            page2 = create_page("test page 2", "nav_playground.html", "en",
-                                parent=page)
+            page2 = create_page("test page 2", "nav_playground.html", "en", parent=page)
             homepage = Page.objects.get_home()
-            self.assertEqual(homepage.get_slug('en'), 'test-page-1')
+            self.assertEqual(homepage.get_slug("en"), "test-page-1")
 
-            self.assertEqual(page2.get_absolute_url(), '/en/test-page-2/')
+            self.assertEqual(page2.get_absolute_url(), "/en/test-page-2/")
             response = self.client.get(page2.get_absolute_url())
             self.assertEqual(response.status_code, 200)
 
@@ -335,12 +328,12 @@ class PagesTestCase(TransactionCMSTestCase):
             "en",
             parent=home,
         )
-        beta.move_page(alpha, position='left')
+        beta.move_page(alpha, position="left")
 
         # Draft
-        self.assertEqual(home.path, '0001')
-        self.assertEqual(beta.path, '00010001')
-        self.assertEqual(alpha.path, '00010002')
+        self.assertEqual(home.path, "0001")
+        self.assertEqual(beta.path, "00010001")
+        self.assertEqual(alpha.path, "00010002")
 
     def test_move_page_regression_right_to_left_5752(self):
         # ref: https://github.com/divio/django-cms/issues/5752
@@ -359,23 +352,23 @@ class PagesTestCase(TransactionCMSTestCase):
             "en",
             parent=home,
         )
-        beta.move_page(alpha, position='left')
+        beta.move_page(alpha, position="left")
 
         alpha.refresh_from_db()
         beta.refresh_from_db()
 
         # Draft
-        self.assertEqual(home.path, '0001')
-        self.assertEqual(beta.path, '00010001')
-        self.assertEqual(alpha.path, '00010002')
+        self.assertEqual(home.path, "0001")
+        self.assertEqual(beta.path, "00010001")
+        self.assertEqual(alpha.path, "00010002")
 
     def test_move_page_regression_5640(self):
         # ref: https://github.com/divio/django-cms/issues/5640
         alpha = create_page("Alpha", "nav_playground.html", "en")
         beta = create_page("Beta", "nav_playground.html", "en")
-        alpha.move_page(beta, position='right')
-        self.assertEqual(beta.path, '0002')
-        self.assertEqual(alpha.path, '0003')
+        alpha.move_page(beta, position="right")
+        self.assertEqual(beta.path, "0002")
+        self.assertEqual(alpha.path, "0003")
 
     def test_move_page_regression_nested_5640(self):
         # ref: https://github.com/divio/django-cms/issues/5640
@@ -385,61 +378,55 @@ class PagesTestCase(TransactionCMSTestCase):
         delta = create_page("Delta", "nav_playground.html", "en")
         theta = create_page("Theta", "nav_playground.html", "en")
 
-        beta.move_page(alpha, position='last-child')
-        gamma.move_page(beta, position='last-child')
-        delta.move_page(gamma, position='last-child')
-        theta.move_page(delta, position='last-child')
+        beta.move_page(alpha, position="last-child")
+        gamma.move_page(beta, position="last-child")
+        delta.move_page(gamma, position="last-child")
+        theta.move_page(delta, position="last-child")
 
         tree = [
-            (alpha, '0001'),
-            (beta, '00010001'),
-            (gamma, '000100010001'),
-            (delta, '0001000100010001'),
-            (theta, '00010001000100010001'),
+            (alpha, "0001"),
+            (beta, "00010001"),
+            (gamma, "000100010001"),
+            (delta, "0001000100010001"),
+            (theta, "00010001000100010001"),
         ]
 
         for page, path in tree:
             self.assertEqual(page.path, path)
 
     def test_move_page_inherit(self):
-        parent = create_page("Parent", 'col_three.html', "en")
-        child = create_page("Child", constants.TEMPLATE_INHERITANCE_MAGIC,
-                            "en", parent=parent)
+        parent = create_page("Parent", "col_three.html", "en")
+        child = create_page("Child", constants.TEMPLATE_INHERITANCE_MAGIC, "en", parent=parent)
         self.assertEqual(child.get_template(), parent.get_template())
-        child.move_page(parent, 'left')
+        child.move_page(parent, "left")
         child = Page.objects.get(pk=child.pk)
         self.assertEqual(child.get_template(), parent.get_template())
 
     def test_add_placeholder(self):
         # create page
-        page = create_page("Add Placeholder", "nav_playground.html", "en",
-                           position="last-child", in_navigation=True)
-        page.update_translations(template='add_placeholder.html')
+        page = create_page("Add Placeholder", "nav_playground.html", "en", position="last-child", in_navigation=True)
+        page.update_translations(template="add_placeholder.html")
         url = page.get_absolute_url()
         response = self.client.get(url)
         self.assertEqual(200, response.status_code)
-        path = os.path.join(settings.TEMPLATES[0]['DIRS'][0], 'add_placeholder.html')
+        path = os.path.join(settings.TEMPLATES[0]["DIRS"][0], "add_placeholder.html")
         with open(path) as fobj:
             old = fobj.read()
         try:
-            new = old.replace(
-                '<!-- SECOND_PLACEHOLDER -->',
-                '{% placeholder second_placeholder %}'
-            )
-            with open(path, 'w') as fobj:
+            new = old.replace("<!-- SECOND_PLACEHOLDER -->", "{% placeholder second_placeholder %}")
+            with open(path, "w") as fobj:
                 fobj.write(new)
             response = self.client.get(url)
             self.assertEqual(200, response.status_code)
         finally:
-            with open(path, 'w') as fobj:
+            with open(path, "w") as fobj:
                 fobj.write(old)
 
     def test_sitemap_login_required_pages(self):
         """
         Test that CMSSitemap object contains only published,public (login_required=False) pages
         """
-        create_page("page", "nav_playground.html", "en", login_required=True,
-                    in_navigation=True)
+        create_page("page", "nav_playground.html", "en", login_required=True, in_navigation=True)
         self.assertEqual(len(CMSSitemap().items()), 0)
 
     def test_sitemap_includes_last_modification_date(self):
@@ -457,7 +444,7 @@ class PagesTestCase(TransactionCMSTestCase):
         now -= datetime.timedelta(microseconds=now.microsecond)
         one_day_ago = now - datetime.timedelta(days=1)
         page = create_page("page", "nav_playground.html", "en")
-        page.get_content_obj('en')
+        page.get_content_obj("en")
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         page.save()
@@ -485,7 +472,7 @@ class PagesTestCase(TransactionCMSTestCase):
         grand_child2_content.template = constants.TEMPLATE_INHERITANCE_MAGIC
         grand_child2_content.save()
 
-        self.assertFalse(hasattr(grand_child_content, '_template_cache'))
+        self.assertFalse(hasattr(grand_child_content, "_template_cache"))
         with self.assertNumQueries(0):
             self.assertEqual(child_content.template, constants.TEMPLATE_INHERITANCE_MAGIC)
         with self.assertNumQueries(2):
@@ -495,9 +482,9 @@ class PagesTestCase(TransactionCMSTestCase):
         with self.assertNumQueries(0):
             grand_child.get_template()
 
-        self.assertFalse(hasattr(grand_child2_content, '_template_cache'))
+        self.assertFalse(hasattr(grand_child2_content, "_template_cache"))
         with self.assertNumQueries(1):
-            self.assertEqual(child2_content.template, 'col_two.html')
+            self.assertEqual(child2_content.template, "col_two.html")
             self.assertEqual(child2.get_template_name(), grand_child2.get_template_name())
 
         # test template cache
@@ -508,26 +495,23 @@ class PagesTestCase(TransactionCMSTestCase):
         parent_content.template = constants.TEMPLATE_INHERITANCE_MAGIC
         parent_content.save()
         self.assertEqual(parent_content.template, constants.TEMPLATE_INHERITANCE_MAGIC)
-        self.assertEqual(parent.get_template(), get_cms_setting('TEMPLATES')[0][0])
-        self.assertEqual(parent.get_template_name(), get_cms_setting('TEMPLATES')[0][1])
+        self.assertEqual(parent.get_template(), get_cms_setting("TEMPLATES")[0][0])
+        self.assertEqual(parent.get_template_name(), get_cms_setting("TEMPLATES")[0][1])
 
     def test_delete_with_plugins(self):
         """
         Check that plugins and placeholders get correctly deleted when we delete
         a page!
         """
-        Text = self.get_plugin_model('TextPlugin')
+        Text = self.get_plugin_model("TextPlugin")
         home = create_page("home", "nav_playground.html", "en")
         page = create_page("page", "nav_playground.html", "en")
-        placeholder = page.get_placeholders('en')[0]
+        placeholder = page.get_placeholders("en")[0]
         plugin_base = CMSPlugin.objects.create(
-            plugin_type='TextPlugin',
-            placeholder=placeholder,
-            position=1,
-            language=settings.LANGUAGES[0][0]
+            plugin_type="TextPlugin", placeholder=placeholder, position=1, language=settings.LANGUAGES[0][0]
         )
 
-        plugin = Text(body='')
+        plugin = Text(body="")
         plugin_base.set_base_attr(plugin)
         plugin.save()
         self.assertEqual(CMSPlugin.objects.count(), 1)
@@ -535,46 +519,46 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertTrue(Placeholder.objects.count() > 2)
 
         superuser = self.get_superuser()
-        home_pl_count = home.get_placeholders('en').count()
-        page_pl_count = page.get_placeholders('en').count()
+        home_pl_count = home.get_placeholders("en").count()
+        page_pl_count = page.get_placeholders("en").count()
         expected_pl_count = Placeholder.objects.count() - (home_pl_count + page_pl_count)
 
         with self.login_user_context(superuser):
             # Delete page
-            self.client.post(self.get_admin_url(Page, 'delete', page.pk), {'post': 'yes'})
+            self.client.post(self.get_admin_url(Page, "delete", page.pk), {"post": "yes"})
 
         with self.login_user_context(superuser):
             # Delete home page
-            self.client.post(self.get_admin_url(Page, 'delete', home.pk), {'post': 'yes'})
+            self.client.post(self.get_admin_url(Page, "delete", home.pk), {"post": "yes"})
         self.assertEqual(CMSPlugin.objects.count(), 0)
         self.assertEqual(Text.objects.count(), 0)
-        self.assertEqual(Placeholder.objects.exclude(slot='clipboard').count(), expected_pl_count)
+        self.assertEqual(Placeholder.objects.exclude(slot="clipboard").count(), expected_pl_count)
         self.assertEqual(Page.objects.count(), 0)
 
     def test_get_page_from_request_nopage(self):
-        request = self.get_request('/')
+        request = self.get_request("/")
         page = get_page_from_request(request)
         self.assertEqual(page, None)
 
     def test_get_page_from_request_with_page_404(self):
         create_page("page", "nav_playground.html", "en")
-        request = self.get_request('/does-not-exist/')
+        request = self.get_request("/does-not-exist/")
         found_page = get_page_from_request(request)
         self.assertEqual(found_page, None)
 
     def test_get_page_without_final_slash(self):
         root = create_page("root", "nav_playground.html", "en", slug="root")
         create_page("page", "nav_playground.html", "en", slug="page", parent=root)
-        request = self.get_request('/en/root/page')
+        request = self.get_request("/en/root/page")
         found_page = get_page_from_request(request)
         self.assertIsNotNone(found_page)
 
     def test_page_urls(self):
-        page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en')
-        page2 = create_page('test page 2', 'nav_playground.html', 'en', parent=page1)
-        page3 = create_page('test page 3', 'nav_playground.html', 'en', parent=page2)
-        page4 = create_page('test page 4', 'nav_playground.html', 'en')
-        page5 = create_page('test page 5', 'nav_playground.html', 'en', parent=page4)
+        page1 = self.create_homepage("test page 1", "nav_playground.html", "en")
+        page2 = create_page("test page 2", "nav_playground.html", "en", parent=page1)
+        page3 = create_page("test page 3", "nav_playground.html", "en", parent=page2)
+        page4 = create_page("test page 4", "nav_playground.html", "en")
+        page5 = create_page("test page 5", "nav_playground.html", "en", parent=page4)
 
         page1.refresh_from_db()
         page2.refresh_from_db()
@@ -585,155 +569,161 @@ class PagesTestCase(TransactionCMSTestCase):
         self.assertEqual(page2.parent_id, page1.pk)
         self.assertEqual(page5.parent_id, page4.pk)
 
-        self.assertEqual(page1.get_absolute_url(), self.get_pages_root() + '')
-        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + 'test-page-2/')
-        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'test-page-2/test-page-3/')
-        self.assertEqual(page4.get_absolute_url(), self.get_pages_root() + 'test-page-4/')
-        self.assertEqual(page5.get_absolute_url(), self.get_pages_root() + 'test-page-4/test-page-5/')
+        self.assertEqual(page1.get_absolute_url(), self.get_pages_root() + "")
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + "test-page-2/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + "test-page-2/test-page-3/")
+        self.assertEqual(page4.get_absolute_url(), self.get_pages_root() + "test-page-4/")
+        self.assertEqual(page5.get_absolute_url(), self.get_pages_root() + "test-page-4/test-page-5/")
         page3 = self.move_page(page3, page1)
-        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'test-page-3/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + "test-page-3/")
         page3.refresh_from_db()
         page2.refresh_from_db()
         page5.refresh_from_db()
         page5 = self.move_page(page5, page2)
-        self.assertEqual(page5.get_absolute_url(), self.get_pages_root() + 'test-page-2/test-page-5/')
+        self.assertEqual(page5.get_absolute_url(), self.get_pages_root() + "test-page-2/test-page-5/")
         page3.refresh_from_db()
         page4.refresh_from_db()
         page3 = self.move_page(page3, page4)
-        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'test-page-4/test-page-3/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + "test-page-4/test-page-3/")
 
     def test_page_and_title_repr(self):
         non_saved_page = Page()
         self.assertIsNone(non_saved_page.pk)
-        self.assertIn('id=None', repr(non_saved_page))
+        self.assertIn("id=None", repr(non_saved_page))
 
-        saved_page = create_page('test saved page', 'nav_playground.html', 'en')
+        saved_page = create_page("test saved page", "nav_playground.html", "en")
         self.assertIsNotNone(saved_page.pk)
-        self.assertIn(f'id={saved_page.pk}', repr(saved_page))
+        self.assertIn(f"id={saved_page.pk}", repr(saved_page))
 
         non_saved_title = PageContent()
         self.assertIsNone(non_saved_title.pk)
-        self.assertIn('id=None', repr(non_saved_title))
+        self.assertIn("id=None", repr(non_saved_title))
 
         saved_content = saved_page.get_content_obj()
         self.assertIsNotNone(saved_content.pk)
-        self.assertIn(f'id={saved_content.pk}', repr(saved_content))
+        self.assertIn(f"id={saved_content.pk}", repr(saved_content))
 
     def test_page_overwrite_urls(self):
+        page1 = self.create_homepage("test page 1", "nav_playground.html", "en")
 
-        page1 = self.create_homepage('test page 1', 'nav_playground.html', 'en')
-
-        page2 = create_page('test page 2', 'nav_playground.html', 'en', parent=page1)
+        page2 = create_page("test page 2", "nav_playground.html", "en", parent=page1)
 
         page3 = create_page(
-            'test page 3', 'nav_playground.html', 'en', parent=page2, overwrite_url='i-want-another-url'
+            "test page 3", "nav_playground.html", "en", parent=page2, overwrite_url="i-want-another-url"
         )
         superuser = self.get_superuser()
 
-        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + 'test-page-2/')
-        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'i-want-another-url/')
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + "test-page-2/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + "i-want-another-url/")
 
-        endpoint = self.get_page_change_uri('en', page2)
+        endpoint = self.get_page_change_uri("en", page2)
 
         with self.login_user_context(superuser):
-            data = {'title': 'test page 2', 'slug': 'page-test-2', 'template': 'nav_playground.html'}
+            data = {"title": "test page 2", "slug": "page-test-2", "template": "nav_playground.html"}
             response = self.client.post(endpoint, data)
-            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
+            self.assertRedirects(response, self.get_pages_admin_list_uri("en"))
 
         page2 = Page.objects.get(pk=page2.pk)
         page3 = Page.objects.get(pk=page3.pk)
 
-        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + 'page-test-2/')
-        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'i-want-another-url/')
+        self.assertEqual(page2.get_absolute_url(), self.get_pages_root() + "page-test-2/")
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + "i-want-another-url/")
 
         # tests a bug found in 2.2 where saving an ancestor page
         # wiped out the overwrite_url for child pages
         page2.save()
-        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + 'i-want-another-url/')
+        self.assertEqual(page3.get_absolute_url(), self.get_pages_root() + "i-want-another-url/")
 
     def test_slug_url_overwrite_clash(self):
-        """ Tests if a URL-Override clashes with a normal page url
-        """
+        """Tests if a URL-Override clashes with a normal page url"""
         site = get_current_site()
         with self.settings(CMS_PERMISSION=False):
-            create_page('home', 'nav_playground.html', 'en')
-            bar = create_page('bar', 'nav_playground.html', 'en')
-            foo = create_page('foo', 'nav_playground.html', 'en')
+            create_page("home", "nav_playground.html", "en")
+            bar = create_page("bar", "nav_playground.html", "en")
+            foo = create_page("foo", "nav_playground.html", "en")
             # Tests to assure is_valid_url is ok on plain pages
-            self.assertTrue(validate_url_uniqueness(
-                site,
-                path=bar.get_path('en'),
-                language='en',
-                exclude_page=bar,
-            ))
-            self.assertTrue(validate_url_uniqueness(
-                site,
-                path=foo.get_path('en'),
-                language='en',
-                exclude_page=foo,
-            ))
+            self.assertTrue(
+                validate_url_uniqueness(
+                    site,
+                    path=bar.get_path("en"),
+                    language="en",
+                    exclude_page=bar,
+                )
+            )
+            self.assertTrue(
+                validate_url_uniqueness(
+                    site,
+                    path=foo.get_path("en"),
+                    language="en",
+                    exclude_page=foo,
+                )
+            )
 
-            foo.update_urls('en', managed=False, path='bar')
+            foo.update_urls("en", managed=False, path="bar")
 
             self.assertRaises(
                 ValidationError,
                 validate_url_uniqueness,
                 site,
-                path=bar.get_path('en'),
-                language='en',
+                path=bar.get_path("en"),
+                language="en",
                 exclude_page=bar,
             )
 
     def test_valid_url_multisite(self):
         site1 = Site.objects.get_current()
         site3 = Site.objects.create(domain="sample3.com", name="sample3.com")
-        home = create_page('home', 'nav_playground.html', 'de', site=site1)
-        bar = create_page('bar', 'nav_playground.html', 'de', slug="bar", parent=home, site=site1)
-        home_s3 = create_page('home', 'nav_playground.html', 'de', site=site3)
-        bar_s3 = create_page('bar', 'nav_playground.html', 'de', slug="bar", parent=home_s3, site=site3)
+        home = create_page("home", "nav_playground.html", "de", site=site1)
+        bar = create_page("bar", "nav_playground.html", "de", slug="bar", parent=home, site=site1)
+        home_s3 = create_page("home", "nav_playground.html", "de", site=site3)
+        bar_s3 = create_page("bar", "nav_playground.html", "de", slug="bar", parent=home_s3, site=site3)
 
-        self.assertTrue(validate_url_uniqueness(
-            site1,
-            path=bar.get_path('de'),
-            language='de',
-            exclude_page=bar,
-        ))
+        self.assertTrue(
+            validate_url_uniqueness(
+                site1,
+                path=bar.get_path("de"),
+                language="de",
+                exclude_page=bar,
+            )
+        )
 
-        self.assertTrue(validate_url_uniqueness(
-            site3,
-            path=bar_s3.get_path('de'),
-            language='de',
-            exclude_page=bar_s3,
-        ))
+        self.assertTrue(
+            validate_url_uniqueness(
+                site3,
+                path=bar_s3.get_path("de"),
+                language="de",
+                exclude_page=bar_s3,
+            )
+        )
 
     def test_home_slug_not_accessible(self):
         with self.settings(CMS_PERMISSION=False):
-            page = self.create_homepage('page', 'nav_playground.html', 'en')
-            self.assertEqual(page.get_absolute_url('en'), '/en/')
-            resp = self.client.get('/en/')
+            page = self.create_homepage("page", "nav_playground.html", "en")
+            self.assertEqual(page.get_absolute_url("en"), "/en/")
+            resp = self.client.get("/en/")
             self.assertEqual(resp.status_code, HttpResponse.status_code)
-            resp = self.client.get('/en/page/')
+            resp = self.client.get("/en/page/")
             self.assertEqual(resp.status_code, HttpResponseNotFound.status_code)
 
     def test_plugin_loading_queries(self):
         with self.settings(
-                CMS_TEMPLATES=(('placeholder_tests/base.html', 'tpl'), ),
+            CMS_TEMPLATES=(("placeholder_tests/base.html", "tpl"),),
         ):
-            page = create_page('home', 'placeholder_tests/base.html', 'en', slug='home')
-            page.page_content_cache['en'] = page.pagecontent_set.get(language='en')
-            placeholders = list(page.get_placeholders('en'))
+            page = create_page("home", "placeholder_tests/base.html", "en", slug="home")
+            page.page_content_cache["en"] = page.pagecontent_set.get(language="en")
+            placeholders = list(page.get_placeholders("en"))
             for i, placeholder in enumerate(placeholders):
                 for j in range(5):
-                    add_plugin(placeholder, 'TextPlugin', 'en', body='text-%d-%d' % (i, j))
-                    add_plugin(placeholder, 'LinkPlugin', 'en', name='link-%d-%d' % (i, j))
+                    add_plugin(placeholder, "TextPlugin", "en", body="text-%d-%d" % (i, j))
+                    add_plugin(placeholder, "LinkPlugin", "en", name="link-%d-%d" % (i, j))
 
             # trigger the apphook query so that it doesn't get in our way
-            reverse('pages-root')
+            reverse("pages-root")
             # trigger the get_languages query so it doesn't get in our way
             context = self.get_context(page=page)
-            context['request'].current_page.get_languages()
+            context["request"].current_page.get_languages()
 
-            renderer = self.get_content_renderer(context['request'])
+            renderer = self.get_content_renderer(context["request"])
 
             with self.assertNumQueries(4):
                 for i, placeholder in enumerate(placeholders):
@@ -743,204 +733,275 @@ class PagesTestCase(TransactionCMSTestCase):
                         inherit=False,
                     )
                     for j in range(5):
-                        self.assertIn('text-%d-%d' % (i, j), content)
-                        self.assertIn('link-%d-%d' % (i, j), content)
+                        self.assertIn("text-%d-%d" % (i, j), content)
+                        self.assertIn("link-%d-%d" % (i, j), content)
 
     def test_xframe_options_allow(self):
         """Test that no X-Frame-Options is set when page's xframe_options is set to allow"""
         page = create_page(
-            title='home',
-            template='nav_playground.html',
-            language='en',
-            slug='home',
-            xframe_options=constants.X_FRAME_OPTIONS_ALLOW
+            title="home",
+            template="nav_playground.html",
+            language="en",
+            slug="home",
+            xframe_options=constants.X_FRAME_OPTIONS_ALLOW,
         )
 
-        resp = self.client.get(page.get_absolute_url('en'))
-        self.assertEqual(resp.get('X-Frame-Options'), None)
+        resp = self.client.get(page.get_absolute_url("en"))
+        self.assertEqual(resp.get("X-Frame-Options"), None)
 
     def test_xframe_options_sameorigin(self):
         """Test that X-Frame-Options is 'SAMEORIGIN' when xframe_options is set to origin"""
         page = create_page(
-            title='home',
-            template='nav_playground.html',
-            language='en',
-            slug='home',
-            xframe_options=constants.X_FRAME_OPTIONS_SAMEORIGIN
+            title="home",
+            template="nav_playground.html",
+            language="en",
+            slug="home",
+            xframe_options=constants.X_FRAME_OPTIONS_SAMEORIGIN,
         )
 
-        resp = self.client.get(page.get_absolute_url('en'))
-        self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
+        resp = self.client.get(page.get_absolute_url("en"))
+        self.assertEqual(resp.get("X-Frame-Options"), "SAMEORIGIN")
 
     def test_xframe_options_deny(self):
         """Test that X-Frame-Options is 'DENY' when xframe_options is set to deny"""
         page = create_page(
-            title='home',
-            template='nav_playground.html',
-            language='en',
-            slug='home',
-            xframe_options=constants.X_FRAME_OPTIONS_DENY
+            title="home",
+            template="nav_playground.html",
+            language="en",
+            slug="home",
+            xframe_options=constants.X_FRAME_OPTIONS_DENY,
         )
 
-        resp = self.client.get(page.get_absolute_url('en'))
-        self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
+        resp = self.client.get(page.get_absolute_url("en"))
+        self.assertEqual(resp.get("X-Frame-Options"), "DENY")
 
     def test_xframe_options_inherit_with_parent(self):
         """Test that X-Frame-Options is set to parent page's setting when inherit is set"""
         parent = create_page(
-            title='home',
-            template='nav_playground.html',
-            language='en',
-            slug='home',
-            xframe_options=constants.X_FRAME_OPTIONS_DENY
+            title="home",
+            template="nav_playground.html",
+            language="en",
+            slug="home",
+            xframe_options=constants.X_FRAME_OPTIONS_DENY,
         )
 
         child1 = create_page(
-            title='subpage',
-            template='nav_playground.html',
-            language='en',
-            slug='subpage',
+            title="subpage",
+            template="nav_playground.html",
+            language="en",
+            slug="subpage",
             parent=parent,
-            xframe_options=constants.X_FRAME_OPTIONS_INHERIT
+            xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
         )
 
         child2 = create_page(
-            title='subpage',
-            template='nav_playground.html',
-            language='en',
-            slug='subpage',
+            title="subpage",
+            template="nav_playground.html",
+            language="en",
+            slug="subpage",
             parent=child1,
-            xframe_options=constants.X_FRAME_OPTIONS_ALLOW
+            xframe_options=constants.X_FRAME_OPTIONS_ALLOW,
         )
         child3 = create_page(
-            title='subpage',
-            template='nav_playground.html',
-            language='en',
-            slug='subpage',
+            title="subpage",
+            template="nav_playground.html",
+            language="en",
+            slug="subpage",
             parent=child2,
-            xframe_options=constants.X_FRAME_OPTIONS_INHERIT
+            xframe_options=constants.X_FRAME_OPTIONS_INHERIT,
         )
 
-        resp = self.client.get(parent.get_absolute_url('en'))
-        self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
+        resp = self.client.get(parent.get_absolute_url("en"))
+        self.assertEqual(resp.get("X-Frame-Options"), "DENY")
 
-        resp = self.client.get(child1.get_absolute_url('en'))
-        self.assertEqual(resp.get('X-Frame-Options'), 'DENY')
+        resp = self.client.get(child1.get_absolute_url("en"))
+        self.assertEqual(resp.get("X-Frame-Options"), "DENY")
 
-        resp = self.client.get(child2.get_absolute_url('en'))
-        self.assertEqual(resp.get('X-Frame-Options'), None)
+        resp = self.client.get(child2.get_absolute_url("en"))
+        self.assertEqual(resp.get("X-Frame-Options"), None)
 
-        resp = self.client.get(child3.get_absolute_url('en'))
-        self.assertEqual(resp.get('X-Frame-Options'), None)
+        resp = self.client.get(child3.get_absolute_url("en"))
+        self.assertEqual(resp.get("X-Frame-Options"), None)
 
     def test_top_level_page_inherited_xframe_options_are_applied(self):
-        MIDDLEWARE = settings.MIDDLEWARE + ['django.middleware.clickjacking.XFrameOptionsMiddleware']
+        MIDDLEWARE = settings.MIDDLEWARE + ["django.middleware.clickjacking.XFrameOptionsMiddleware"]
         with self.settings(MIDDLEWARE=MIDDLEWARE):
-            page = create_page('test page 1', 'nav_playground.html', 'en')
-            resp = self.client.get(page.get_absolute_url('en'))
-            self.assertEqual(resp.get('X-Frame-Options'), 'SAMEORIGIN')
+            page = create_page("test page 1", "nav_playground.html", "en")
+            resp = self.client.get(page.get_absolute_url("en"))
+            self.assertEqual(resp.get("X-Frame-Options"), "SAMEORIGIN")
 
     def test_xframe_options_with_cms_page_cache_and_clickjacking_middleware(self):
         # Refs: 6346
-        if getattr(settings, 'MIDDLEWARE', None):
+        if getattr(settings, "MIDDLEWARE", None):
             override = {
-                'MIDDLEWARE': settings.MIDDLEWARE + [
-                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+                "MIDDLEWARE": settings.MIDDLEWARE
+                + [
+                    "django.middleware.clickjacking.XFrameOptionsMiddleware",
                 ]
             }
         else:
             override = {
-                'MIDDLEWARE_CLASSES': settings.MIDDLEWARE_CLASSES + [
-                    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+                "MIDDLEWARE_CLASSES": settings.MIDDLEWARE_CLASSES
+                + [
+                    "django.middleware.clickjacking.XFrameOptionsMiddleware",
                 ]
             }
 
-        override['CMS_PAGE_CACHE'] = True
+        override["CMS_PAGE_CACHE"] = True
 
         with self.settings(**override):
             page = create_page(
-                'test page 1',
-                'nav_playground.html',
-                'en',
+                "test page 1",
+                "nav_playground.html",
+                "en",
                 xframe_options=constants.X_FRAME_OPTIONS_ALLOW,
             )
 
             # Normal response from render_page
-            resp = self.client.get(page.get_absolute_url('en'))
-            self.assertEqual(resp.get('X-Frame-Options'), None)
+            resp = self.client.get(page.get_absolute_url("en"))
+            self.assertEqual(resp.get("X-Frame-Options"), None)
 
             # Response from page cache
-            resp = self.client.get(page.get_absolute_url('en'))
-            self.assertEqual(resp.get('X-Frame-Options'), None)
+            resp = self.client.get(page.get_absolute_url("en"))
+            self.assertEqual(resp.get("X-Frame-Options"), None)
+
+    def test_page_cache_basic(self):
+        """
+        Test that the page cache works in its basic form
+        """
+        page = self.create_homepage("page", "nav_playground.html", "en")
+        page_url = page.get_absolute_url()
+        request = self.get_request(page_url)
+
+        # First request - should set cache
+        response = self.client.get(page_url)
+        self.assertEqual(response.status_code, 200)
+        cached_data = get_page_cache(request)
+        self.assertIsNotNone(cached_data)
+
+        # Verify cache contents
+        cached_content, cached_headers, expires = cached_data
+        self.assertEqual(cached_content, response.content)
+
+    def test_page_cache_language_handling(self):
+        """
+        Test that the page cache properly handles different languages
+        """
+        page = self.create_homepage("page", "nav_playground.html", "en")
+        create_page_content("fr", "french home", page)
+
+        # Get the page in English
+        en_url = page.get_absolute_url(language="en")
+        en_request = self.get_request(en_url)
+        en_request.LANGUAGE_CODE = "en"
+        en_response = self.client.get(en_url)
+        self.assertEqual(en_response.status_code, 200)
+
+        # Get the page in French
+        fr_url = page.get_absolute_url(language="fr")
+        fr_request = self.get_request(fr_url)
+        fr_request.LANGUAGE_CODE = "fr"
+        fr_response = self.client.get(fr_url)
+        self.assertEqual(fr_response.status_code, 200)
+
+        # Verify we have different cache entries for each language
+        en_cached = get_page_cache(en_request)
+        fr_cached = get_page_cache(fr_request)
+
+        self.assertIsNotNone(en_cached)
+        self.assertIsNotNone(fr_cached)
+        self.assertNotEqual(en_cached[0], fr_cached[0])  # Different content for different languages
+
+    def test_page_cache_language_fallback(self):
+        """
+        Test that the page cache works correctly with language fallbacks:
+        - No cache entry should exist for non-existent language versions
+        - The fallback language version should be cached
+        """
+        page = self.create_homepage("page", "nav_playground.html", "en")
+
+        # Request in German (which doesn't exist)
+        de_url = page.get_absolute_url(language="de")
+        de_request = self.get_request(de_url)
+        de_request.LANGUAGE_CODE = "de"
+
+        response = self.client.get(de_url)
+        self.assertEqual(response.status_code, 302)  # Should redirect to English
+        self.assertTrue(response["Location"].startswith("/en/"))  # Redirects to English version
+
+        # German version should NOT be cached since it doesn't exist
+        cached_data = get_page_cache(de_request)
+        self.assertIsNone(cached_data, "Non-existent German version should not be cached")
+
+        # English version should be cached after we follow the redirect
+        en_request = self.get_request(response["Location"])
+        en_request.LANGUAGE_CODE = "en"
+        en_response = self.client.get(response["Location"])
+        self.assertEqual(en_response.status_code, 200)
+
+        en_cached = get_page_cache(en_request)
+        self.assertIsNotNone(en_cached, "Fallback English version should be cached")
 
 
 class PageTreeTests(CMSTestCase):
-
     def test_rename_node(self):
         superuser = self.get_superuser()
-        create_page('grandpa', 'nav_playground.html', 'en', slug='home')
-        parent = create_page('parent', 'nav_playground.html', 'en', slug='parent')
-        child = create_page('child', 'nav_playground.html', 'en', slug='child', parent=parent)
-        endpoint = self.get_page_change_uri('en', parent)
+        create_page("grandpa", "nav_playground.html", "en", slug="home")
+        parent = create_page("parent", "nav_playground.html", "en", slug="parent")
+        child = create_page("child", "nav_playground.html", "en", slug="child", parent=parent)
+        endpoint = self.get_page_change_uri("en", parent)
 
         with self.login_user_context(superuser):
-            data = {'title': 'parent', 'slug': 'father', 'template': 'nav_playground.html'}
+            data = {"title": "parent", "slug": "father", "template": "nav_playground.html"}
             response = self.client.post(endpoint, data)
-            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
+            self.assertRedirects(response, self.get_pages_admin_list_uri("en"))
 
         child = Page.objects.get(pk=child.pk)
 
-        self.assertEqual(child.get_absolute_url(language='en'), '/en/father/child/')
+        self.assertEqual(child.get_absolute_url(language="en"), "/en/father/child/")
 
     def test_rename_node_alters_descendants(self):
         superuser = self.get_superuser()
-        create_page('grandpa', 'nav_playground.html', 'en', slug='home')
-        parent = create_page('parent', 'nav_playground.html', 'en', slug='parent')
-        child = create_page('child', 'nav_playground.html', 'en', slug='child', parent=parent)
-        grandchild_1 = create_page(
-            'grandchild-1', 'nav_playground.html', 'en', slug='grandchild-1', parent=child
-        )
+        create_page("grandpa", "nav_playground.html", "en", slug="home")
+        parent = create_page("parent", "nav_playground.html", "en", slug="parent")
+        child = create_page("child", "nav_playground.html", "en", slug="child", parent=parent)
+        grandchild_1 = create_page("grandchild-1", "nav_playground.html", "en", slug="grandchild-1", parent=child)
         child.refresh_from_db()
-        grandchild_2 = create_page(
-            'grandchild-2', 'nav_playground.html', 'en', slug='grandchild-2', parent=child
-        )
+        grandchild_2 = create_page("grandchild-2", "nav_playground.html", "en", slug="grandchild-2", parent=child)
         child.refresh_from_db()
-        grandchild_3 = create_page(
-            'grandchild-3', 'nav_playground.html', 'en', slug='grandchild-3', parent=child
-        )
-        endpoint = self.get_page_change_uri('en', parent)
+        grandchild_3 = create_page("grandchild-3", "nav_playground.html", "en", slug="grandchild-3", parent=child)
+        endpoint = self.get_page_change_uri("en", parent)
 
         with self.login_user_context(superuser):
-            data = {'title': 'parent', 'slug': 'father', 'template': 'nav_playground.html'}
+            data = {"title": "parent", "slug": "father", "template": "nav_playground.html"}
             response = self.client.post(endpoint, data)
-            self.assertRedirects(response, self.get_pages_admin_list_uri('en'))
+            self.assertRedirects(response, self.get_pages_admin_list_uri("en"))
 
-        self.assertEqual(grandchild_1.get_absolute_url(language='en'), '/en/father/child/grandchild-1/')
-        self.assertEqual(grandchild_2.get_absolute_url(language='en'), '/en/father/child/grandchild-2/')
-        self.assertEqual(grandchild_3.get_absolute_url(language='en'), '/en/father/child/grandchild-3/')
+        self.assertEqual(grandchild_1.get_absolute_url(language="en"), "/en/father/child/grandchild-1/")
+        self.assertEqual(grandchild_2.get_absolute_url(language="en"), "/en/father/child/grandchild-2/")
+        self.assertEqual(grandchild_3.get_absolute_url(language="en"), "/en/father/child/grandchild-3/")
 
     def test_move_node(self):
-        home = create_page('grandpa', 'nav_playground.html', 'en', slug='home')
-        parent = create_page('parent', 'nav_playground.html', 'en', slug='parent')
-        child = create_page('child', 'nav_playground.html', 'en', slug='child', parent=home)
+        home = create_page("grandpa", "nav_playground.html", "en", slug="home")
+        parent = create_page("parent", "nav_playground.html", "en", slug="parent")
+        child = create_page("child", "nav_playground.html", "en", slug="child", parent=home)
         child.move_page(parent)
         child.refresh_from_db()
-        self.assertEqual(child.get_absolute_url(language='en'), '/en/parent/child/')
+        self.assertEqual(child.get_absolute_url(language="en"), "/en/parent/child/")
 
 
 class PageContentTests(CMSTestCase):
-
     def setUp(self):
         self.page = create_page("english-page", "nav_playground.html", "en")
         self.german_content = create_page_content("de", "german content", self.page)
-        self.english_content = self.page.get_content_obj('en')
+        self.english_content = self.page.get_content_obj("en")
 
     def test_get_content_obj(self):
         """
         Cache partially populated, if no hit it should try to populate it
         """
-        del self.page.page_content_cache['de']
-        german_content = self.page.get_content_obj('de')
+        del self.page.page_content_cache["de"]
+        german_content = self.page.get_content_obj("de")
         self.assertEqual(german_content.pk, self.german_content.pk)
 
     def test_page_content_manager(self):
