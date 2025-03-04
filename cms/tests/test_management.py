@@ -73,7 +73,7 @@ class ManagementTestCase(CMSTestCase):
         page1.save()
         out = StringIO()
         management.call_command('cms', 'fix-tree', interactive=False, stdout=out)
-        self.assertEqual(out.getvalue(), 'fixing page tree\nall done\n')
+        self.assertEqual(out.getvalue(), 'fixing page tree\nfixing page URLs\nall done\n')
         page1 = page1.reload()
         self.assertEqual(page1.path, "0002")
         self.assertEqual(page1.depth, 1)
@@ -285,8 +285,8 @@ class ManagementTestCase(CMSTestCase):
             0)
 
         # No gaps in plugin tree
-        max_positon = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
-        self.assertEqual(max_positon, 3)
+        max_position = placeholder.cmsplugin_set.aggregate(models.Max('position'))['position__max']
+        self.assertEqual(max_position, 3)
 
     def test_uninstall_plugins_without_plugin(self):
         out = StringIO()
@@ -458,7 +458,7 @@ class PageFixtureManagementTestCase(NavextendersFixture, CMSTestCase):
         for page in Page.objects.on_site(site_2_pk):
             phs_2.extend(page.get_placeholders('en').values_list('pk', flat=True))
 
-        # These asserts that no orphaned plugin exists
+        # These assert that no orphaned plugin exists
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_1).count(), number_start_plugins)
         self.assertEqual(CMSPlugin.objects.filter(placeholder__in=phs_2).count(), number_start_plugins)
 

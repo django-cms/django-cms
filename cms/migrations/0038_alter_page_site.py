@@ -3,6 +3,23 @@
 from django.db import migrations, models
 import django.db.models.deletion
 
+import cms.models.settingmodels
+
+
+def separate_page_treenode(apps, schema_editor):
+    Page = apps.get_model('cms', 'Page')
+    TreeNode = apps.get_model('cms', 'TreeNode')
+    db_alias = schema_editor.connection.alias
+
+    for page in Page.objects.using(db_alias).order_by("path"):
+        page.node_deprecated = TreeNode.objects.create(
+            depth=page.depth,
+            path=page.path,
+            site=page.site,
+            numchild=page.numchild
+        )
+        page.save()
+
 
 class Migration(migrations.Migration):
 
@@ -25,13 +42,25 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='page',
             name='node_deprecated',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='cms_pages', to='cms.treenode'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='cms_pages', to='cms.treenode'),
         ),
+        migrations.RunPython(migrations.RunPython.noop, reverse_code=separate_page_treenode),
         migrations.RemoveField(
             model_name='page',
             name='node_deprecated',
         ),
         migrations.DeleteModel(
             name='TreeNode',
+        ),
+        migrations.AlterField(
+            model_name="usersettings",
+            name="clipboard",
+            field=cms.models.settingmodels.PlaceholderForeignKey(
+                blank=True,
+                editable=False,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="cms.placeholder",
+            ),
         ),
     ]

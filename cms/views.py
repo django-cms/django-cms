@@ -251,7 +251,11 @@ def render_object_structure(request, content_type_id, object_id):
         raise Http404 from err
 
     try:
-        content_type_obj = content_type.get_object_for_this_type(pk=object_id)
+        if issubclass(content_type.model_class(), PageContent):
+            content_type_obj = PageContent._base_manager.select_related("page").get(pk=object_id)
+            request.current_page = content_type_obj.page
+        else:
+            content_type_obj = content_type.get_object_for_this_type(pk=object_id)
     except ObjectDoesNotExist as err:
         raise Http404 from err
 
@@ -259,8 +263,6 @@ def render_object_structure(request, content_type_id, object_id):
         'object': content_type_obj,
         'cms_toolbar': request.toolbar,
     }
-    if isinstance(content_type_obj, PageContent):
-        request.current_page = content_type_obj.page
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
     return render(request, 'cms/toolbar/structure.html', context)

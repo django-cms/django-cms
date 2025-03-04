@@ -10,7 +10,8 @@ sphinx-autobuild
 datetime
 coverage
 django~=4.2
-git+https://github.com/django-cms/django-cms@release/4.1.x
+git+https://github.com/django-cms/django-cms@release/build
 codespell
 pip-tools
 docstrfmt
+git+https://github.com/django-cms/djangocms-ecosystem  # important to install directly from github

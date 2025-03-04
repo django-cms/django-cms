@@ -1,10 +1,11 @@
 import json
 from collections import defaultdict, deque
-from typing import Optional
+from typing import Any, Optional
 
 from django.apps import apps
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.http import HttpRequest
 from django.urls import NoReverseMatch
 from django.utils.encoding import force_str
 from django.utils.translation import (
@@ -12,14 +13,17 @@ from django.utils.translation import (
     gettext,
     override as force_language,
 )
+from sekizai.context import SekizaiContext
+from sekizai.helpers import get_varname
 
 from cms.constants import PLACEHOLDER_TOOLBAR_JS, PLUGIN_TOOLBAR_JS
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.models import CMSPlugin, PageContent, Placeholder
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.urlutils import admin_reverse
 
 
-def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
+def get_placeholder_toolbar_js(placeholder: Placeholder, allowed_plugins: Optional[list[str]] = None) -> str:
     label = placeholder.get_label() or ''
     help_text = gettext(
         'Add plugin to placeholder "%(placeholder_label)s"'
@@ -39,21 +43,21 @@ def get_placeholder_toolbar_js(placeholder, allowed_plugins=None):
     return PLACEHOLDER_TOOLBAR_JS % {'pk': placeholder.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_toolbar_info(plugin, children=None, parents=None):
+def get_plugin_toolbar_info(plugin: CMSPlugin, children: Optional[list[str]] = None, parents: Optional[list[str]] = None) -> dict[str, Any]:
     data = plugin.get_plugin_info(children=children, parents=parents)
     help_text = gettext(
         'Add plugin to %(plugin_name)s'
     ) % {'plugin_name': data['plugin_name']}
-
-    data['onClose'] = False
-    data['addPluginHelpTitle'] = force_str(help_text)
-    data['plugin_order'] = ''
-    data['plugin_restriction'] = children or []
-    data['plugin_parent_restriction'] = parents or []
+    data.update({
+        "onClose": False,
+        "addPluginHelpTitle": force_str(help_text),
+        "plugin_order": '',
+        "plugin_restriction": children or [],
+    })
     return data
 
 
-def get_plugin_toolbar_js(plugin, children=None, parents=None):
+def get_plugin_toolbar_js(plugin: CMSPlugin, children: Optional[list[str]] = None, parents: Optional[list[str]] = None) -> str:
     data = get_plugin_toolbar_info(
         plugin,
         children=children,
@@ -62,27 +66,49 @@ def get_plugin_toolbar_js(plugin, children=None, parents=None):
     return PLUGIN_TOOLBAR_JS % {'pk': plugin.pk, 'config': json.dumps(data)}
 
 
-def get_plugin_tree_as_json(request, plugins):
+def get_plugin_tree_as_json(request: HttpRequest, plugins: list[CMSPlugin]) -> str:
     import warnings
 
     warnings.warn("get_plugin_tree_as_json is deprecated. Use get_plugin_tree instead.",
-                  RemovedInDjangoCMS43Warning, stacklevel=2)
-    return json.dumps(get_plugin_tree(request, plugins))
+                  RemovedInDjangoCMS51Warning, stacklevel=2)
+    return json.dumps(get_plugin_tree(request, plugins)[0])
 
 
-def get_plugin_tree(request, plugins):
+def get_plugin_tree(
+    request: HttpRequest,
+    plugins: list[CMSPlugin],
+    restrictions: Optional[dict] = None,
+    target_plugin: Optional[CMSPlugin] = None,
+) -> dict[str, Any]:
+    """
+    Constructs a tree structure of CMS plugins for the toolbar.
+
+    Args:
+        request (HttpRequest): The HTTP request object.
+        plugins (list[CMSPlugin]): A list of CMSPlugin instances to be organized into a tree.
+        restrictions (Optional[dict], optional): A dictionary of plugin restrictions. Defaults to None.
+        target_plugin (Optional[CMSPlugin], optional): The target plugin to render.
+            Content will only be rendered if given. Defaults to None.
+
+    Returns:
+        tuple[dict[str, Any]]: A dictionary with up to five keys:
+            - 'html': A string of rendered HTML for the plugin tree.
+            - 'plugins': A list of plugin information dictionaries.
+            - 'content': The rendered content of target_plugin (if given) including its children
+            - 'target_position': The position of the target_plugin (if given)
+            - 'target_placeholder_id': The placeholder id of the target_plugin (if given)
+    """
     from cms.utils.plugins import downcast_plugins, get_plugin_restrictions
 
     tree_data = []
     tree_structure = []
-    restrictions = {}
+    restrictions = restrictions or {}
     root_plugins = deque()
     plugin_children = defaultdict(deque)
     toolbar = get_toolbar_from_request(request)
     template = toolbar.templates.drag_item_template
     get_plugin_info = get_plugin_toolbar_info
     placeholder = plugins[0].placeholder
-    host_page = placeholder.page
     copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
     plugins = list(downcast_plugins(plugins, select_placeholder=True))
     plugin_ids = frozenset(plugin.pk for plugin in plugins)
@@ -98,7 +124,6 @@ def get_plugin_tree(request, plugins):
     def collect_plugin_data(plugin):
         child_classes, parent_classes = get_plugin_restrictions(
             plugin=plugin,
-            page=host_page,
             restrictions_cache=restrictions,
         )
         plugin_info = get_plugin_info(
@@ -123,16 +148,57 @@ def get_plugin_tree(request, plugins):
             }
             tree_structure.append(template.render(context))
     tree_data.reverse()
-    return {'html': '\n'.join(tree_structure), 'plugins': tree_data}
+
+    content = {}
+    # Render the target plugin if given and all plugins are local
+    if target_plugin and all(plugin.get_plugin_class().is_local for plugin in plugins):
+        # Also provide the parent plugin to the context (if available)
+        downcasted = next(
+            (plugin for plugin in plugins if plugin.pk == target_plugin.pk), None
+        )
+        parent = next(
+            (plugin for plugin in plugins if plugin.pk == target_plugin.parent_id), None
+        ) if target_plugin.parent_id else None
+        try:
+            content["content"] = get_plugin_content(request, downcasted, {"parent": parent})
+        except Exception:
+            pass  # do not deliver content if rendering fails
+
+    return {'html': '\n'.join(tree_structure), 'plugins': tree_data, **content}
 
 
-def get_toolbar_from_request(request):
+def get_plugin_content(request: HttpRequest, plugin: CMSPlugin, context: dict = {}) -> dict[str, Any]:
+    toolbar = get_toolbar_from_request(request)
+    renderer = toolbar.content_renderer
+    # Switch to edit mode despite the request originally coming from the admin
+    toolbar.edit_mode_active = True
+    renderer._placeholders_are_editable = True
+    context = SekizaiContext({'request': request, **context})
+    content = renderer.render_plugin(plugin, context, placeholder=plugin.placeholder, editable=True)
+    return {
+        "html": content,
+        "js": "".join(context[get_varname()].get("js", [])),
+        "css": "".join(context[get_varname()].get("css", [])),
+        "position": plugin.position,
+        "placeholder_id": plugin.placeholder_id,
+        "pluginIds": get_plugin_tree_ids(plugin),
+    }
+
+
+def get_plugin_tree_ids(plugin: CMSPlugin) -> list[int]:
+    plugin_ids = [plugin.pk]
+    for child in plugin.child_plugin_instances:
+        plugin_ids += get_plugin_tree_ids(child)
+    return plugin_ids
+
+
+def get_toolbar_from_request(request: HttpRequest):
     from .toolbar import EmptyToolbar
 
     return getattr(request, 'toolbar', EmptyToolbar(request))
 
 
-def add_live_url_querystring_param(obj, url, language=None):
+def add_live_url_querystring_param(obj: models.Model, url: str, language: Optional[str] = None) -> str:
     """
     Append a live url to a given object url using a supplied url parameter configured
     by the setting: CMS_ENDPOINT_LIVE_URL_QUERYSTRING_PARAM
@@ -231,6 +297,8 @@ def get_object_for_language(obj: models.Model, language: str, latest: bool = Fal
         # Object does not have language field or language is requested language
         # Return object itself
         return obj
+    if isinstance(obj, PageContent):
+        return obj.page.get_admin_content(language, fallback=False) or None
     # Does the object have a cache with sister objects
     cached_object = getattr(obj, "_sibling_objects_for_language_cache", {})
     if cached_object:

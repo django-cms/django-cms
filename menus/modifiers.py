@@ -1,4 +1,4 @@
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from menus.base import Modifier
 from menus.menu_pool import menu_pool
 
@@ -28,7 +28,7 @@ class Marker(Modifier):
         warnings.warn(
             "The Marker modifier is deprecated and will be removed. The functionality is now provided "
             "by the menu_pool itself.",
-            RemovedInDjangoCMS43Warning,
+            RemovedInDjangoCMS51Warning,
             stacklevel=2,
         )
         super().__init__(*args, **kwargs)

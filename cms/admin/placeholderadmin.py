@@ -6,7 +6,7 @@ from urllib.parse import parse_qsl, urlparse
 from django import forms
 from django.contrib import admin
 from django.contrib.admin.helpers import AdminForm
-from django.contrib.admin.utils import get_deleted_objects
+from django.contrib.admin.utils import flatten_fieldsets, get_deleted_objects
 from django.core.exceptions import PermissionDenied
 from django.db import models, transaction
 from django.http import (
@@ -19,6 +19,7 @@ from django.http import (
 from django.shortcuts import get_list_or_404, get_object_or_404, render
 from django.template.response import TemplateResponse
 from django.urls import include, re_path
+from django.utils.datastructures import MultiValueDict
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.html import conditional_escape
@@ -38,7 +39,7 @@ from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
 from cms.toolbar.utils import get_plugin_tree
 from cms.utils import get_current_site
-from cms.utils.compat.warnings import RemovedInDjangoCMS50Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import (
@@ -83,7 +84,7 @@ def _instance_overrides_method(base, instance, method_name):
 
 class BaseEditableAdminMixin:
     """
-    Base class for FrontendEditableAdminMixin to be re-used by
+    Base class for FrontendEditableAdminMixin to be reused by
     PlaceholderAdmin
     """
     @xframe_options_sameorigin
@@ -147,7 +148,7 @@ class BaseEditableAdminMixin:
         if not cancel_clicked and request.method == 'POST' and saved_successfully:
             if isinstance(admin_obj, CMSPluginBase):
                 # Update the structure board by populating the data bridge
-                return admin_obj.render_close_frame(request, obj)
+                return admin_obj.render_close_frame(request, obj, add=False)
             return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
         return render(request, 'admin/cms/page/plugin/change_form.html', context)
 
@@ -200,7 +201,7 @@ class PlaceholderAdminMixinBase(forms.MediaDefiningClass):
             return super_new(cls, name, bases, attrs)
         warnings.warn(
             "PlaceholderAdminMixin is no longer needed and thus will be removed in django CMS 5.0",
-            RemovedInDjangoCMS50Warning,
+            RemovedInDjangoCMS51Warning,
             stacklevel=2,
         )
         return super_new(cls, name, bases, attrs)
@@ -436,8 +437,31 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             'position': plugin_data['plugin_position'],
         }
 
-        response = plugin_instance.add_view(request)
+        if request.method == 'POST' and not plugin_class.show_add_form:
+            # If the plugin has show_add_form set to False,
+            # the post data is missing the initial values of the plugin form
+            # Get the fields, the form and the initial values from the plugin instance
+            # Replace the POST parameters by those initial values plus any concrete changes
+            # the form.
+            # TODO: Make this work with Text plugins which use ghost plugins and have to
+            # have show_add_form=True
+            fieldsets = plugin_instance.get_fieldsets(request, obj=None)
+            fields = flatten_fieldsets(fieldsets)
+            # Instantiate the add form for all fields
+            initial_form = plugin_instance.get_form(request, None, change=False, fields=fields)()
+            # Turn the initial values in a multi-value dict. In a multi-value dict each value is a list.
+            # Hence, if the initial value is not a list, it is turned into a list.
+            query_dict = MultiValueDict({
+                name: field.initial if isinstance(field.initial, (tuple, list)) else [field.initial]
+                for name, field in initial_form.fields.items()
+                if getattr(field, "initial", None) is not None and name not in request.POST
+            })
+            # Add the actual post parameters
+            query_dict.update(request.POST)
+            # Use the QueryDict as the POST data
+            request.POST = query_dict
 
+        response = plugin_instance.add_view(request)
         plugin = getattr(plugin_instance, 'saved_object', None)
 
         if plugin_instance._operation_token:
@@ -673,6 +697,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         POST request with following parameters:
         - plugin_id
         - placeholder_id
+        - target_position (optional)
         - plugin_language (optional)
         - plugin_parent (optional)
         - plugin_order (array, optional)
@@ -698,6 +723,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             placeholder = None
 
         # The rest are optional
+        target_position = int(request.POST.get('target_position', "0"))
         parent_id = get_int(request.POST.get('plugin_parent', ""), None)
         target_language = request.POST['target_language']
         move_a_copy = request.POST.get('move_a_copy')
@@ -745,7 +771,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 plugin=plugin,
                 target_language=target_language,
                 target_placeholder=placeholder,
-                target_position=int(request.POST['target_position']),
+                target_position=target_position,
             )
         elif move_a_copy:
             fetch_tree = True
@@ -755,7 +781,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 target_parent=target_parent,
                 target_language=target_language,
                 target_placeholder=placeholder,
-                target_position=int(request.POST['target_position']),
+                target_position=target_position,
             )
         elif move_to_clipboard:
             new_plugin = self._cut_plugin(
@@ -771,14 +797,17 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 request,
                 plugin=plugin,
                 target_parent=target_parent,
-                target_position=int(request.POST['target_position']),
+                target_position=target_position,
                 target_placeholder=placeholder,
             )
 
         if new_plugin and fetch_tree:
             root = (new_plugin.parent or new_plugin)
             new_plugins = [root] + list(root.get_descendants())
-        data = get_plugin_tree(request, new_plugins)
+        data = get_plugin_tree(request, new_plugins, target_plugin=new_plugins[0])
+        # Pass the target_position
+        data["insert"] = new_plugins[0].pk == plugin.pk
+        data["source_placeholder_id"] = source_placeholder.pk
         return HttpResponse(json.dumps(data), content_type='application/json')
 
     def _paste_plugin(self, request, plugin, target_language,
@@ -944,7 +973,6 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
 
         # Refresh plugin to get new position values
         updated_plugin = plugin.reload()
-
         if target_placeholder:
             target_placeholder.clear_cache(language)
         source_placeholder.clear_cache(language)
@@ -1061,7 +1089,7 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 placeholder=placeholder,
                 tree_order=plugin_tree_order,
             )
-            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
+            return render(request, "admin/cms/page/close_frame.html", {})
 
         plugin_name = force_str(plugin.get_plugin_class().name)
 

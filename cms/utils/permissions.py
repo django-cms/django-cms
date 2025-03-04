@@ -216,12 +216,12 @@ def has_global_permission(user, site, action, use_cache=True):
 def has_page_permission(user, page, action, use_cache=True):
     import warnings
 
-    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
     from cms.utils.page_permissions import has_generic_permission
 
-    warnings.warn("has_page_permission is deprecated and will be removed in django CMS 4.3. "
+    warnings.warn("has_page_permission is deprecated. "
                   "Use cms.utils.page_permissions.has_generic_permission instead.",
-                  RemovedInDjangoCMS43Warning, stacklevel=2)
+                  RemovedInDjangoCMS51Warning, stacklevel=2)
 
     action_map = {
         "change": "change_page",
@@ -348,10 +348,10 @@ def get_view_restrictions(pages):
     Load all view restrictions for the pages
     """
 
-    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 
-    warnings.warn("get_view_restrictions will be removed in django CMS 4.3",
-                  RemovedInDjangoCMS43Warning, stacklevel=2)
+    warnings.warn("get_view_restrictions will be removed",
+                  RemovedInDjangoCMS51Warning, stacklevel=2)
 
     restricted_pages = defaultdict(list)
 
@@ -389,9 +389,14 @@ def has_plugin_permission(user, plugin_type, permission_type):
     permission_type should be 'add', 'change' or 'delete'.
     """
     from cms.plugin_pool import plugin_pool
-    plugin_class = plugin_pool.get_plugin(plugin_type)
-    codename = get_model_permission_codename(
-        plugin_class.model,
-        action=permission_type,
-    )
-    return user.has_perm(codename)
+    try:
+        plugin_class = plugin_pool.get_plugin(plugin_type)
+        codename = get_model_permission_codename(
+            plugin_class.model,
+            action=permission_type,
+        )
+        return user.has_perm(codename)
+    except KeyError:
+        # Grant all permissions for uninstalled plugins, so they do not block
+        # emptying placeholders.
+        return True

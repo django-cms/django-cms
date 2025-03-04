@@ -18,5 +18,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '👋 Hi there!\n\nPlease remember to **MERGE COMMIT** pull requests from `develop` or `develop-4`!\n\n**Do not SQUASH** commits to preserve history for the changelog.'
+              body: '👋 Hi there!\n\nPlease remember to **MERGE COMMIT** pull requests from `main`!\n\n**Do not SQUASH** commits to preserve history for the changelog.'
             })

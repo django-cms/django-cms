@@ -153,7 +153,7 @@ module.exports = function (config) {
         customLaunchers: {
             ChromeHeadlessCI: {
                 base: 'ChromeHeadless',
-                flags: ['--window-size=1280,1080']
+                flags: ['--window-size=1280,1080', '--no-sandbox']
             }
         },
 

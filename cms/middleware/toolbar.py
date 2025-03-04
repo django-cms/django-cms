@@ -5,7 +5,6 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.urls import resolve
 from django.urls.exceptions import Resolver404
-from django.utils.deprecation import MiddlewareMixin
 from django.utils.functional import SimpleLazyObject
 
 from cms.toolbar.toolbar import CMSToolbar
@@ -16,10 +15,13 @@ from cms.utils.request_ip_resolvers import get_request_ip_resolver
 get_request_ip = get_request_ip_resolver()
 
 
-class ToolbarMiddleware(MiddlewareMixin):
+class ToolbarMiddleware:
     """
     Middleware to set up CMS Toolbar.
     """
+    def __init__(self, get_response):
+        self.get_response = get_response
+        super().__init__()
 
     def is_edit_mode(self, request):
         try:
@@ -87,3 +89,13 @@ class ToolbarMiddleware(MiddlewareMixin):
         if toolbar._cache_disabled:
             add_never_cache_headers(response)
         return response
+
+    def __call__(self, request):
+        self.process_request(request)
+        response = self.get_response(request)
+        return self.process_response(request, response)
+
+    async def __acall__(self, request):
+        self.process_request(request)
+        response = await self.get_response(request)
+        return self.process_response(request, response)

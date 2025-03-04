@@ -1,15 +1,17 @@
 from operator import attrgetter
+from typing import Optional
 
 from django.core.exceptions import ImproperlyConfigured
 from django.template import TemplateDoesNotExist, TemplateSyntaxError
 from django.template.defaultfilters import slugify
-from django.urls import include, re_path
+from django.urls import URLResolver, include, re_path
 from django.utils.encoding import force_str
-from django.utils.functional import cached_property
+from django.utils.functional import cached_property, lazy
 from django.utils.module_loading import autodiscover_modules
 from django.utils.translation import activate, deactivate_all, get_language
 
 from cms.exceptions import PluginAlreadyRegistered, PluginNotRegistered
+from cms.models.pagemodel import Page
 from cms.plugin_base import CMSPluginBase
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import normalize_name
@@ -20,14 +22,19 @@ class PluginPool:
     def __init__(self):
         self.plugins = {}
         self.discovered = False
+        self.global_restrictions_cache = {
+            None: {},
+            **{key: {} for key in get_cms_setting('PLACEHOLDER_CONF').keys()},
+        }
+        self.global_template_restrictions = any(
+            ".htm" in (key or "") for key in self.global_restrictions_cache
+        )
 
     def _clear_cached(self):
         if 'registered_plugins' in self.__dict__:
             del self.__dict__['registered_plugins']
-
         if 'plugins_with_extra_menu' in self.__dict__:
             del self.__dict__['plugins_with_extra_menu']
-
         if 'plugins_with_extra_placeholder_menu' in self.__dict__:
             del self.__dict__['plugins_with_extra_placeholder_menu']
 
@@ -139,8 +146,8 @@ class PluginPool:
         from cms.utils.placeholder import get_placeholder_conf
 
         self.discover_plugins()
-        plugins = sorted(self.plugins.values(), key=attrgetter('name'))
-        template = page.get_template() if page else None
+        plugins = self.plugins.values()
+        template = lazy(page.get_template, str)() if page else None  # Make template lazy to avoid unnecessary db access
 
         allowed_plugins = get_placeholder_conf(
             setting_key,
@@ -170,22 +177,22 @@ class PluginPool:
             # Filters out any plugin that requires a parent or has set parent classes
             plugins = (plugin for plugin in plugins
                        if not plugin.requires_parent_plugin(placeholder, page))
-        return sorted(plugins, key=attrgetter('module'))
+        return plugins
 
-    def get_text_enabled_plugins(self, placeholder, page):
+    def get_text_enabled_plugins(self, placeholder, page) -> list[type[CMSPluginBase]]:
         plugins = set(self.get_all_plugins(placeholder, page))
         plugins.update(self.get_all_plugins(placeholder, page, 'text_only_plugins'))
         return sorted((p for p in plugins if p.text_enabled),
                       key=attrgetter('module', 'name'))
 
-    def get_plugin(self, name):
+    def get_plugin(self, name) -> type[CMSPluginBase]:
         """
         Retrieve a plugin from the cache.
         """
         self.discover_plugins()
         return self.plugins[name]
 
-    def get_patterns(self):
+    def get_patterns(self) -> list[URLResolver]:
         self.discover_plugins()
 
         # We want untranslated name of the plugin for its slug so we deactivate translation
@@ -206,25 +213,83 @@ class PluginPool:
 
         return url_patterns
 
-    def get_system_plugins(self):
+    def get_system_plugins(self) -> list[str]:
         self.discover_plugins()
         return [plugin.__name__ for plugin in self.plugins.values() if plugin.system]
 
     @cached_property
-    def registered_plugins(self):
-        return self.get_all_plugins()
+    def registered_plugins(self) -> list[type[CMSPluginBase]]:
+        return sorted(self.get_all_plugins(), key=attrgetter("module", "name"))
 
     @cached_property
-    def plugins_with_extra_menu(self):
+    def plugins_with_extra_menu(self) -> list[type[CMSPluginBase]]:
         plugin_classes = [cls for cls in self.registered_plugins
                           if cls._has_extra_plugin_menu_items]
         return plugin_classes
 
     @cached_property
-    def plugins_with_extra_placeholder_menu(self):
+    def plugins_with_extra_placeholder_menu(self) -> list[type[CMSPluginBase]]:
         plugin_classes = [cls for cls in self.registered_plugins
                           if cls._has_extra_placeholder_menu_items]
         return plugin_classes
+
+    def get_restrictions_cache(self, request_cache: dict, instance: CMSPluginBase, page: Optional[Page] = None):
+        """
+        Retrieve the restrictions cache for a given plugin instance.
+
+        This method checks if the plugin class can be cached globally. This is the case if the
+        plugin restrictions only depend on template and placeholder slot as described by the
+        CMS_PLACEHOLDER_CONF setting.
+
+        If it can, it retrieves the appropriate restrictions cache based on the template and slot
+        of the plugin instance's placeholder. If not, it returns the (local) request cache which will
+        be recalculated for each request.
+
+        Args:
+            request_cache (dict): The current request cache.
+            instance (CMSPluginBase): The plugin instance for which to retrieve the restrictions cache.
+            page (Optional[Page]): The page associated with the plugin instance, if any.
+
+        Returns:
+            dict: The restrictions cache for the given plugin instance - or the cache valid for the request.
+        """
+        plugin_class = self.get_plugin(instance.plugin_type)
+        if not self.can_cache_globally(plugin_class):
+            return request_cache
+        slot = instance.placeholder.slot
+        if self.global_template_restrictions:
+            template = plugin_class._get_template_for_conf(page)
+        else:
+            template = ""
+
+        if f"{template} {slot}" in self.global_restrictions_cache:
+            return self.global_restrictions_cache[f"{template} {slot}"]
+        if template and template in self.global_restrictions_cache:
+            return self.global_restrictions_cache[template]
+        if slot in self.global_restrictions_cache:
+            return self.global_restrictions_cache[slot]
+        return self.global_restrictions_cache[None]
+
+    restriction_methods = ("get_require_parent", "get_child_class_overrides", "get_parent_classes")
+
+    def can_cache_globally(self, plugin_class: CMSPluginBase) -> bool:
+        """
+        Check if the restrictions for a given plugin class can be cached globally.
+
+        This is the case if the plugin restrictions only depend on template and placeholder slot as
+        described by the CMS_PLACEHOLDER_CONF setting.
+
+        Args:
+            plugin_class (CMSPluginBase): The plugin class for which to check if restrictions can be cached globally.
+
+        Returns:
+            bool: True if the restrictions can be cached globally, False otherwise.
+        """
+        if not hasattr(plugin_class, '_cache_restrictions_globally'):
+            plugin_class._cache_restrictions_globally = all(
+                hasattr(getattr(plugin_class, method_name), "_template_slot_caching") for method_name in self.restriction_methods
+            )
+        return plugin_class._cache_restrictions_globally
 
 
 plugin_pool = PluginPool()

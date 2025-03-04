@@ -4,6 +4,7 @@ Plugins
 
 .. autoclass:: cms.plugin_base.CMSPluginBase
   :members:
+  
 
   ..  method:: get_render_template(self, context, instance, placeholder)
 
@@ -33,9 +34,9 @@ Plugins
   :members:
 
 
-******************************************
+************************
 Plugin utility functions
-******************************************
+************************
 
 .. autofunction:: cms.utils.plugins.assign_plugins
 

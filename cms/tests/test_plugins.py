@@ -541,7 +541,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         }
         endpoint = self.get_delete_plugin_uri(plugin)
         response = self.client.post(endpoint, plugin_data)
-        self.assertEqual(response.status_code, 302)
+        self.assertContains(response, '<div class="success"></div>')
         # there should be no plugins
         self.assertEqual(0, CMSPlugin.objects.all().count())
 
@@ -722,14 +722,14 @@ class PluginsTestCase(PluginsTestBaseCase):
         now = timezone.now()
         one_day_ago = now - datetime.timedelta(days=1)
         page = api.create_page("page", "nav_playground.html", "en")
-        content = page.get_content_obj('en')
         page.creation_date = one_day_ago
         page.changed_date = one_day_ago
         page.save()
         plugin = self._create_link_plugin_on_page(page, slot='body')
         plugin = self.__edit_link_plugin(plugin, "fnord")
 
-        actual_last_modification_time = CMSSitemap().lastmod(content)
+        sitemap = CMSSitemap()
+        actual_last_modification_time = sitemap.lastmod(sitemap.items().first())
         actual_last_modification_time -= datetime.timedelta(microseconds=actual_last_modification_time.microsecond)
         self.assertEqual(plugin.changed_date.date(), actual_last_modification_time.date())
         self.assertEqual(page.changed_date.date(), one_day_ago.date() + datetime.timedelta(days=1))
@@ -841,8 +841,8 @@ class PluginsTestCase(PluginsTestBaseCase):
             request.toolbar = CMSToolbar(request)
             renderer = self.get_structure_renderer(request=request)
             output = renderer.render_placeholder(placeholder, language='en', page=page)
-            self.assertIn('<a data-rel="add" href="TextPlugin">Text</a>', output)
-            self.assertNotIn('<a data-rel="add" href="LinkPlugin">Link</a>', output)
+            self.assertIn('<a data-rel="add" data-add-form="true" href="TextPlugin">Text</a>', output)
+            self.assertNotIn('<a data-rel="add" data-add-form="true" href="LinkPlugin">Link</a>', output)
 
     def test_plugin_child_classes_from_settings(self):
         page = api.create_page("page", "nav_playground.html", "en")
@@ -928,6 +928,55 @@ class PluginsTestCase(PluginsTestBaseCase):
             render_plugin = False
             name = "Test Plugin"
         self.assertIsNotNone(DecoratorTestPlugin)
+
+    def _create_plugin_tree(self, placeholder, n, downcast=False):
+        import random
+
+        from cms.utils.plugins import downcast_plugins
+
+        with register_plugins(CMSPluginBase):
+            # Creat n plugins, shuffle them and then create a linear tree of them
+            plugins = random.sample([api.add_plugin(placeholder, CMSPluginBase, 'en') for _ in range(n)], k=n)
+            for i, plugin in enumerate(plugins):
+                plugin.position = n + i + 1  # order positions, too
+                if i > 0:
+                    plugin.parent_id = plugins[i - 1].pk
+                plugin.save()
+            for i, plugin in enumerate(plugins, start=1):
+                plugin.position = i  # recalculate positions
+                plugin.save()
+
+            if downcast:
+                plugins = list(downcast_plugins(plugins))
+        return plugins
+
+    def test_get_ancestors(self):
+        placeholder = self.get_placeholder()
+        plugins = self._create_plugin_tree(placeholder, 10, downcast=False)
+
+        with self.assertNumQueries(2):
+            ancestors = plugins[-1].get_ancestors()
+
+        self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
+
+    def test_get_ancestors_no_parent(self):
+        placeholder = self.get_placeholder()
+        with register_plugins(CMSPluginBase):
+            # Create a single plugin with no parent
+            plugin = api.add_plugin(placeholder, CMSPluginBase, 'en')
+            plugin.save()
+        with self.assertNumQueries(0):
+            ancestors = plugin.get_ancestors()
+        self.assertEqual(ancestors, [])
+
+    def test_get_ancestors_with_downcasted_plugins(self):
+        placeholder = self.get_placeholder()
+        plugins = self._create_plugin_tree(placeholder, 10, downcast=True)
+
+        with self.assertNumQueries(0):
+            ancestors = plugins[-1].get_ancestors()
+
+        self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
 
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):

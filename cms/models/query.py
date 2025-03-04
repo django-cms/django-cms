@@ -3,12 +3,12 @@ import warnings
 from treebeard.mp_tree import MP_NodeQuerySet
 
 from cms.exceptions import NoHomeFound
-from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
 
 
 class PageQuerySet(MP_NodeQuerySet):
 
-    node_warning = ("As of django CMS 4.2 the Page model does not have a node property anymore. "
+    node_warning = ("As of django CMS 5.0 the Page model does not have a node property anymore. "
                     "Use the related fields directly.")
 
     def get_descendants(self, parent=None):
@@ -53,7 +53,7 @@ class PageQuerySet(MP_NodeQuerySet):
             if isinstance(f, str) and f.startswith('node'):
                 warnings.warn(
                     self.node_warning,
-                    RemovedInDjangoCMS43Warning,
+                    RemovedInDjangoCMS60Warning,
                     stacklevel=2,
                 )
                 if f != 'node':
@@ -68,7 +68,7 @@ class PageQuerySet(MP_NodeQuerySet):
             if isinstance(key, str) and key.startswith('node'):
                 warnings.warn(
                     self.node_warning,
-                    RemovedInDjangoCMS43Warning,
+                    RemovedInDjangoCMS60Warning,
                     stacklevel=2,
                 )
                 if key == 'node':
@@ -84,7 +84,7 @@ class PageQuerySet(MP_NodeQuerySet):
             if isinstance(f, str) and f.startswith("node__"):
                 warnings.warn(
                     self.node_warning,
-                    RemovedInDjangoCMS43Warning,
+                    RemovedInDjangoCMS60Warning,
                     stacklevel=2,
                 )
                 modified.append(f[6:])

@@ -15,7 +15,7 @@ var Messages = new Class({
     options: {
         messageDuration: 300,
         messageDelay: 3000,
-        messageLength: 160
+        messageLength: 250
     },
 
     initialize: function initialize(options) {

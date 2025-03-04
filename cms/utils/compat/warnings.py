@@ -1,6 +1,5 @@
-class RemovedInDjangoCMS43Warning(DeprecationWarning):
+class RemovedInDjangoCMS51Warning(DeprecationWarning):
     pass
 
-
-class RemovedInDjangoCMS50Warning(DeprecationWarning):
+class RemovedInDjangoCMS60Warning(DeprecationWarning):
     pass
