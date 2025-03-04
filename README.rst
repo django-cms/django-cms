@@ -22,7 +22,7 @@ Because django CMS is a community-driven project, we welcome everyone to `get in
 
 .. ATTENTION::
 
-    Please use the ``develop-4`` branch as the target for pull requests for on-going development.
+    Please use the ``main`` branch as the target for pull requests for on-going development.
 
     Security fixes will be backported to older branches by the core team as appropriate.
 
@@ -72,7 +72,7 @@ Documentation
 Our documentation working group maintains documentation for several versions of the project. Key versions are:
 
 * `stable <http://docs.django-cms.org>`_ (default), for the **current release** version
-* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **develop-4 branch**
+* `latest <http://docs.django-cms.org/en/latest/>`_, representing the latest build of the **main branch**
 
 For more information about our branch policy, see `Branches
 <http://docs.django-cms.org/en/latest/contributing/development-policies.html>`_.
