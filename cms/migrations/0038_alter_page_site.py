@@ -17,6 +17,7 @@ def separate_page_treenode(apps, schema_editor):
             path=page.path,
             site=page.site,
             numchild=page.numchild
+            parent=page.parent.node_deprecated if page.parent else None,
         )
         page.save()
 
