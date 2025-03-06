@@ -56,7 +56,7 @@ Have a look at the following settings to enable/disable various caching behaviou
 - :setting:`CMS_PLUGIN_CACHE`
 
 Language Cache
-=============
+==============
 
 django-cms caches pages on a per-language basis. Each page version in a different language has its own cache entry, built from:
 
