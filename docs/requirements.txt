@@ -38,7 +38,7 @@ coverage==7.6.1
     # via -r requirements.in
 datetime==5.5
     # via -r requirements.in
-django==4.2.18
+django==4.2.20
     # via
     #   -r requirements.in
     #   django-classy-tags
