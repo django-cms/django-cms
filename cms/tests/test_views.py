@@ -107,20 +107,20 @@ class ViewTests(CMSTestCase):
         page_content = create_page_content("en", "home", page, redirect="https://example.com")
 
         page.set_as_homepage()
-
+        urls = (get_object_edit_url(page_content, language='fr'), get_object_preview_url(page_content, language='fr'))
+        expected = f"""
+            <div class="cms-screenblock">
+            <div class="cms-screenblock-inner">
+            <h1>This page has no preview!</h1>
+            <p>It is being redirected to: <a href="{page_content.redirect}">{page_content.redirect}</a></p>
+            </div>
+            </div>
+        """
         with self.login_user_context(user), force_language('fr'):
-            edit_url = get_object_edit_url(page_content, language='fr')
-            response = self.client.get(edit_url, follow=True)
-
-            expected = f"""
-                <div class="cms-screenblock">
-                <div class="cms-screenblock-inner">
-                <h1>This page has no preview!</h1>
-                <p>It is being redirected to: <a href="{page_content.redirect}">{page_content.redirect}</a></p>
-                </div>
-                </div>
-            """
-            self.assertContains(response, expected, count=1, html=True)
+            for url in urls:
+                with self.subTest(url=url):
+                    response = self.client.get(url)
+                    self.assertContains(response, expected, count=1, html=True)
 
     def test_external_redirect(self):
         # test external redirect
