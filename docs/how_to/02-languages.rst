@@ -151,6 +151,4 @@ You can override django-cms's language resolution by setting ``request.LANGUAGE_
 * Setting language based on user preferences or geolocation
 * Implementing custom language negotiation logic
 
-Make sure to place your custom middleware after ``LocaleMiddleware`` if you want to override its behavior, or before if you want ``LocaleMiddleware`` to be able to override your custom logic.
-
 You can customize the default language for each site using the :setting:`CMS_LANGUAGES` setting.
