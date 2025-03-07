@@ -107,7 +107,6 @@ class ViewTests(CMSTestCase):
         page_content = create_page_content("en", "home", page, redirect="https://example.com")
 
         page.set_as_homepage()
-        urls = (get_object_edit_url(page_content, language='fr'), get_object_preview_url(page_content, language='fr'))
         expected = f"""
             <div class="cms-screenblock">
             <div class="cms-screenblock-inner">
@@ -117,10 +116,14 @@ class ViewTests(CMSTestCase):
             </div>
         """
         with self.login_user_context(user), force_language('fr'):
-            for url in urls:
-                with self.subTest(url=url):
-                    response = self.client.get(url)
-                    self.assertContains(response, expected, count=1, html=True)
+            with self.subTest("Edit endpoint shows redirect message"):
+                url = get_object_edit_url(page_content, language='fr')
+                response = self.client.get(url)
+                self.assertContains(response, expected, count=1, html=True)
+            with self.subTest("Preview endpoint shows redirect message"):
+                url = get_object_preview_url(page_content, language='fr')
+                response = self.client.get(url)
+                self.assertContains(response, expected, count=1, html=True)
 
     def test_external_redirect(self):
         # test external redirect
