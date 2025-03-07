@@ -321,10 +321,9 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
 
-    if request.user.is_staff and toolbar.edit_mode_active:
-        redirect = getattr(content_type_obj, "redirect", None)
-        if isinstance(redirect, str):
-            toolbar.redirect_url = redirect
+    redirect = getattr(content_type_obj, "redirect", None)
+    if isinstance(redirect, str):
+        toolbar.redirect_url = redirect
 
     if require_editable and not toolbar.object_is_editable():
         # If not editable, switch from edit to preview endpoint
