@@ -7,10 +7,7 @@ from unittest import skipIf
 from django import http
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin.widgets import (
-    FilteredSelectMultiple,
-    RelatedFieldWidgetWrapper,
-)
+from django.contrib.admin.widgets import FilteredSelectMultiple, RelatedFieldWidgetWrapper
 from django.core.exceptions import ImproperlyConfigured
 from django.forms.widgets import Media
 from django.test.testcases import TestCase
@@ -22,21 +19,13 @@ from djangocms_text_ckeditor.models import Text
 
 from cms import api
 from cms.api import create_page
-from cms.exceptions import (
-    DontUsePageAttributeWarning,
-    PluginAlreadyRegistered,
-    PluginNotRegistered,
-)
+from cms.exceptions import DontUsePageAttributeWarning, PluginAlreadyRegistered, PluginNotRegistered
 from cms.models import Page, Placeholder
 from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.sitemaps.cms_sitemap import CMSSitemap
-from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import (
-    Article,
-    ArticlePluginModel,
-    Section,
-)
+from cms.test_utils.project.pluginapp.plugins.manytomany_rel.models import Article, ArticlePluginModel, Section
 from cms.test_utils.project.pluginapp.plugins.meta.cms_plugins import (
     TestPlugin,
     TestPlugin2,
@@ -941,56 +930,6 @@ class PluginsTestCase(PluginsTestBaseCase):
 
         self.assertEqual([ancestor.pk for ancestor in ancestors], [plugin.pk for plugin in plugins[:-1]])
 
-    def test_validate_template_invalid_parent_class(self):
-        class ParentPlugin(CMSPluginBase):
-            render_template = "base.html"
-            allow_children = True
-
-        class ChildPlugin(CMSPluginBase):
-            render_template = "base.html"
-            parent_classes = ("NonExistentPlugin",)
-
-        with register_plugins(ParentPlugin, ChildPlugin):
-            from cms.utils.setup import setup
-
-            with self.assertRaises(ImproperlyConfigured) as context:
-                setup()
-
-            self.assertIn("Parent plugin class 'NonExistentPlugin' not found", str(context.exception))
-
-    def test_validate_template_invalid_child_class(self):
-        class ParentPlugin(CMSPluginBase):
-            render_template = "base.html"
-            allow_children = True
-            child_classes = ("NonExistentPlugin",)
-
-        class ChildPlugin(CMSPluginBase):
-            render_template = "base.html"
-            parent_classes = ("ParentPlugin",)
-
-        with register_plugins(ParentPlugin, ChildPlugin):
-            from cms.utils.setup import setup
-
-            with self.assertRaises(ImproperlyConfigured) as context:
-                setup()
-
-            self.assertIn("Child plugin class 'NonExistentPlugin' not found", str(context.exception))
-
-    def test_validate_template_valid_parent_child_classes(self):
-        class ParentPlugin(CMSPluginBase):
-            render_template = "base.html"
-            allow_children = True
-            child_classes = ("ChildPlugin",)
-
-        class ChildPlugin(CMSPluginBase):
-            render_template = "base.html"
-            parent_classes = ("ParentPlugin",)
-
-        with register_plugins(ParentPlugin, ChildPlugin):
-            from cms.utils.setup import setup
-
-            setup()
-
 
 class PluginManyToManyTestCase(PluginsTestBaseCase):
     def setUp(self):
@@ -1255,9 +1194,7 @@ class BrokenPluginTests(TestCase):
 
 class MTIPluginsTestCase(PluginsTestBaseCase):
     def test_add_edit_plugin(self):
-        from cms.test_utils.project.mti_pluginapp.models import (
-            TestPluginBetaModel,
-        )
+        from cms.test_utils.project.mti_pluginapp.models import TestPluginBetaModel
 
         """
         Test that we can instantiate and use a MTI plugin

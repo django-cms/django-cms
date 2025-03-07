@@ -53,7 +53,7 @@ class PluginPool:
 
     def validate_templates(self, plugin=None):
         """
-        Plugins templates and parent/child classes are validated at this stage
+        Plugins templates are validated at this stage
         """
         if plugin:
             plugins = [plugin]
@@ -97,24 +97,6 @@ class PluginPool:
                                 pass
                         except TemplateSyntaxError:
                             pass
-
-                # Validate parent_classes exist
-                if hasattr(plugin_class, "parent_classes") and plugin_class.parent_classes:
-                    for parent_class in plugin_class.parent_classes:
-                        if parent_class != "0" and parent_class not in self.plugins:
-                            raise ImproperlyConfigured(
-                                f"Parent plugin class '{parent_class}' not found. "
-                                f"Please check the parent_classes attribute on plugin '{plugin_class.__name__}'"
-                            )
-
-                # Validate child_classes exist
-                if hasattr(plugin_class, "child_classes") and plugin_class.child_classes:
-                    for child_class in plugin_class.child_classes:
-                        if child_class not in self.plugins:
-                            raise ImproperlyConfigured(
-                                f"Child plugin class '{child_class}' not found. "
-                                f"Please check the child_classes attribute on plugin '{plugin_class.__name__}'"
-                            )
             else:
                 if plugin_class.allow_children:
                     raise ImproperlyConfigured(
@@ -134,7 +116,7 @@ class PluginPool:
         plugin_name = plugin.__name__
         if plugin_name in self.plugins:
             raise PluginAlreadyRegistered(
-                "Cannot register %r, a plugin with this name (%r) is already " "registered." % (plugin, plugin_name)
+                f"Cannot register {plugin!r}, a plugin with this name ({plugin_name!r}) is already registered."
             )
 
         plugin.value = plugin_name
