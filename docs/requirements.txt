@@ -4,10 +4,6 @@
 #
 #    pip-compile --output-file=requirements.txt requirements.in
 #
---extra-index-url https://www.piwheels.org/simple
-
-django-cms @ git+https://github.com/django-cms/django-cms@release/build
-    # via -r requirements.in
 alabaster==1.0.0
     # via sphinx
 anyio==4.6.0
@@ -42,7 +38,7 @@ coverage==7.6.1
     # via -r requirements.in
 datetime==5.5
     # via -r requirements.in
-django==4.2.18
+django==4.2.20
     # via
     #   -r requirements.in
     #   django-classy-tags
@@ -55,6 +51,8 @@ django-classy-tags==4.1.0
     # via
     #   django-cms
     #   django-sekizai
+django-cms @ git+https://github.com/django-cms/django-cms@release/build
+    # via -r requirements.in
 django-formtools==2.5.1
     # via django-cms
 django-sekizai==4.1.0
@@ -81,7 +79,7 @@ idna==3.10
     #   requests
 imagesize==1.4.1
     # via sphinx
-jinja2==3.1.5
+jinja2==3.1.6
     # via sphinx
 libcst==1.4.0
     # via docstrfmt

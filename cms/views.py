@@ -116,10 +116,11 @@ def details(request, slug):
         user_languages = get_public_languages(site_id=site.pk)
 
     request_language = None
-    if is_language_prefix_patterns_used():
-        request_language = get_language_from_request(request, check_path=True)
+    if hasattr(request, "LANGUAGE_CODE"):
+        # use language from middleware - usually django.middleware.locale.LocaleMiddleware
+        request_language = request.LANGUAGE_CODE
     if not request_language:
-        request_language = get_default_language_for_site(get_current_site().pk)
+        request_language = get_default_language_for_site(site.pk)
 
     if not page.is_home and request_language not in user_languages:
         # The homepage is treated differently because
@@ -325,10 +326,9 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
     toolbar = get_toolbar_from_request(request)
     toolbar.set_object(content_type_obj)
 
-    if request.user.is_staff and toolbar.edit_mode_active:
-        redirect = getattr(content_type_obj, "redirect", None)
-        if isinstance(redirect, str):
-            toolbar.redirect_url = redirect
+    redirect = getattr(content_type_obj, "redirect", None)
+    if isinstance(redirect, str):
+        toolbar.redirect_url = redirect
 
     if require_editable and not toolbar.object_is_editable():
         # If not editable, switch from edit to preview endpoint
