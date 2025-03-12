@@ -1,12 +1,13 @@
 import datetime
+import iptools
 import re
 from unittest.mock import patch
 
-import iptools
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.http import HttpResponse
 from django.template.defaultfilters import truncatewords
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -127,6 +128,53 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
         page = create_page('foo', 'col_two.html', 'en')
         page = create_page('foo', 'col_two.html', 'en', parent=page)
         request = self.get_page_request(page, self.get_anon())
+        self.assertTrue(hasattr(request, 'toolbar'))
+
+    @override_settings(CMS_TOOLBAR_HIDE=True)
+    def test_app_setted_show_toolbar_in_admin_endpoints(self):
+        from cms.middleware.toolbar import ToolbarMiddleware
+
+        page = create_page('foo', 'col_two.html', 'en')
+        content = page.pagecontent_set.first()
+
+        # edit endpoint
+        request = self.get_request(get_object_edit_url(content))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        self.assertTrue(hasattr(request, 'toolbar'))
+
+        # structure endpoint
+        request = self.get_request(get_object_structure_url(content))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        self.assertTrue(hasattr(request, 'toolbar'))
+
+        # preview endpoint
+        request = self.get_request(get_object_preview_url(content))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        self.assertTrue(hasattr(request, 'toolbar'))
+
+    @override_settings(CMS_TOOLBAR_HIDE=True)
+    def test_app_setted_provide_toolbar_obj_to_edit_actions(self):
+        from cms.middleware.toolbar import ToolbarMiddleware
+
+        # clear placeholder
+        request = self.get_request(admin_reverse("cms_placeholder_clear_placeholder", args=(1,)))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        self.assertTrue(hasattr(request, 'toolbar'))
+
+        # move plugin
+        request = self.get_request(admin_reverse("cms_placeholder_move_plugin"))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        self.assertTrue(hasattr(request, 'toolbar'))
+
+        # copy plugin
+        request = self.get_request(admin_reverse("cms_placeholder_copy_plugins"))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
         self.assertTrue(hasattr(request, 'toolbar'))
 
     def test_cms_internal_ips_unset(self):

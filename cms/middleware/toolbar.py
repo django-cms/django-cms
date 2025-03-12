@@ -20,12 +20,11 @@ admin_namespace = get_cms_setting('ADMIN_NAMESPACE')
 cms_endpoints = (
     'pages-root',
     'pages-details-by-slug',
-    'cms_placeholder_add_plugin',
     'cms_placeholder_clear_placeholder',
     'cms_placeholder_copy_plugins',
     'cms_placeholder_move_plugin',
     'cms_placeholder_render_object_edit',
-    'cms_placeholder_render_object_prewview',
+    'cms_placeholder_render_object_preview',
     'cms_placeholder_render_object_structure',
 )
 
