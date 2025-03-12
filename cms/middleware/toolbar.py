@@ -14,9 +14,6 @@ from cms.utils.request_ip_resolvers import get_request_ip_resolver
 
 get_request_ip = get_request_ip_resolver()
 
-
-admin_namespace = get_cms_setting('ADMIN_NAMESPACE')
-
 cms_endpoints = (
     'pages-root',
     'pages-details-by-slug',
