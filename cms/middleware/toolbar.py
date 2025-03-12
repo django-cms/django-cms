@@ -15,6 +15,17 @@ from cms.utils.request_ip_resolvers import get_request_ip_resolver
 
 get_request_ip = get_request_ip_resolver()
 
+cms_endpoints = (
+    'pages-root',
+    'pages-details-by-slug',
+    'cms_placeholder_clear_placeholder',
+    'cms_placeholder_copy_plugins',
+    'cms_placeholder_move_plugin',
+    'cms_placeholder_render_object_edit',
+    'cms_placeholder_render_object_preview',
+    'cms_placeholder_render_object_structure',
+)
+
 
 class ToolbarMiddleware(MiddlewareMixin):
     """
@@ -50,8 +61,7 @@ class ToolbarMiddleware(MiddlewareMixin):
             match = resolve(request.path_info)
         except Resolver404:
             return False
-
-        return match.url_name in ('pages-root', 'pages-details-by-slug')
+        return match.url_name in cms_endpoints
 
     def process_request(self, request):
         """
@@ -77,13 +87,9 @@ class ToolbarMiddleware(MiddlewareMixin):
         request.toolbar = SimpleLazyObject(lambda: CMSToolbar(request))
 
     def process_response(self, request, response):
-        if not self.is_cms_request(request):
-            return response
+        if toolbar := get_toolbar_from_request(request):
+            from django.utils.cache import add_never_cache_headers
 
-        from django.utils.cache import add_never_cache_headers
-
-        toolbar = get_toolbar_from_request(request)
-
-        if toolbar._cache_disabled:
-            add_never_cache_headers(response)
+            if toolbar._cache_disabled:
+                add_never_cache_headers(response)
         return response
