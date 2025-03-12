@@ -1,8 +1,8 @@
 import datetime
-import iptools
 import re
 from unittest.mock import patch
 
+import iptools
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.auth.models import AnonymousUser, Permission
