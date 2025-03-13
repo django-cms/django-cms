@@ -19,6 +19,8 @@ cms_endpoints = (
     'pages-root',
     'pages-details-by-slug',
     'cms_placeholder_clear_placeholder',
+    'cms_placeholder_add_plugin',
+    'cms_placeholder_edit_plugin',
     'cms_placeholder_copy_plugins',
     'cms_placeholder_move_plugin',
     'cms_placeholder_render_object_edit',

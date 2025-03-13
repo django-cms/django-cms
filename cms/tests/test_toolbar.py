@@ -159,6 +159,18 @@ class ToolbarMiddlewareTest(ToolbarTestBase):
     def test_app_setted_provide_toolbar_obj_to_edit_actions(self):
         from cms.middleware.toolbar import ToolbarMiddleware
 
+        # Add plugin
+        request = self.get_request(admin_reverse("cms_placeholder_add_plugin"))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        self.assertTrue(hasattr(request, 'toolbar'))
+
+        # Edit plugin
+        request = self.get_request(admin_reverse("cms_placeholder_edit_plugin", args=(1, )))
+        mid = ToolbarMiddleware(lambda req: HttpResponse(""))
+        mid(request)
+        self.assertTrue(hasattr(request, 'toolbar'))
+
         # clear placeholder
         request = self.get_request(admin_reverse("cms_placeholder_clear_placeholder", args=(1,)))
         mid = ToolbarMiddleware(lambda req: HttpResponse(""))
