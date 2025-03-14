@@ -277,6 +277,10 @@ class CMSToolbarBase(BaseToolbar):
         if self.is_staff:
             try:
                 user_settings = UserSettings.objects.select_related('clipboard').get(user=self.request.user)
+                if user_settings.clipboard and not user_settings.clipboard.object_id:
+                    # Add source field to existing clipboard objects
+                    user_settings.clipboard.source = user_settings
+                    user_settings.clipboard.save()
             except UserSettings.DoesNotExist:
                 placeholder = Placeholder.objects.create(slot="clipboard")
                 user_settings = UserSettings.objects.create(
@@ -284,6 +288,8 @@ class CMSToolbarBase(BaseToolbar):
                     language=self.request_language,
                     user=self.request.user,
                 )
+                placeholder.source = user_settings  # Populate source
+                placeholder.save()
         return user_settings
 
     def _reorder_toolbars(self):
@@ -409,15 +415,6 @@ class CMSToolbarBase(BaseToolbar):
                 return obj.is_editable(self.request)
             return True
         return False
-
-    @property
-    def edit_mode_active(self):
-        """``True`` if editing mode is active。"""
-        # Cannot be cached since it changes depending on the object.
-        if self.structure_mode_active:
-            return self.object_is_editable()
-        return super().edit_mode_active
-
 
     # Internal API
 
@@ -568,7 +565,7 @@ class CMSToolbarBase(BaseToolbar):
         return f'{toolbar}\n{rendered_contents}'
 
 
-# Add toolbar mixins from extensions to toolbar
+#: :class:`CMSToolbarBase` including toolbar mixins from extensions to toolbar
 CMSToolbar = type("CMSToolbar", tuple(cms_toolbar_extensions + [CMSToolbarBase]), dict())
 
 

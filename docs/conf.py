@@ -23,6 +23,9 @@ sys.path.append(os.path.abspath('./'))
 
 import django
 
+from djangocms_ecosystem import write_LTS_table, write_current_LTS, write_plugin_table
+
+
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'django_settings')
 django.setup()
 
@@ -191,6 +194,16 @@ show_cloud_banner = True
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+# include the following files in the build output
+html_js_files = [
+    "kapa-ai.js",
+]
+
+# include the following files in the build output
+html_css_files = [
+    "kapa-ai.css",
+]
+
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 #html_last_updated_fmt = '%b %d, %Y'
@@ -284,3 +297,23 @@ spelling_ignore_pypi_package_names = True
 #https://github.com/sphinx-contrib/spelling/blob/master/sphinxcontrib/spelling/filters.py
 #See https://sphinxcontrib-spelling.readthedocs.io/en/latest/customize.html#word-filters
 spelling_filters=["sphinxcontrib.spelling.filters.ContractionFilter"]
+
+os.makedirs("autogenerate", exist_ok=True)
+
+with open("autogenerate/compatibility.include", "w") as f:
+    write_LTS_table(f)
+
+with open("autogenerate/lts.include", "w") as f:
+    write_current_LTS(f, current=True)
+
+with open("autogenerate/past_lts.include", "w") as f:
+    write_current_LTS(f, current=False)
+
+with open("autogenerate/plugins.include", "w") as f:
+    write_plugin_table(f, deprecated=False)
+
+with open("autogenerate/deprecated_plugins.include", "w") as f:
+    write_plugin_table(f, deprecated=True)
+
+with open("autogenerate/third-party.include", "w") as f:
+    write_plugin_table(f, chapter="Third-party packages", deprecated=False)

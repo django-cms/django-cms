@@ -91,8 +91,8 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 class BaseCMSTestCase:
     counter = 1
 
-    def _fixture_setup(self):
-        super()._fixture_setup()
+    def _pre_setup(self):
+        super()._pre_setup()
         self.create_fixtures()
         activate("en")
 
@@ -476,8 +476,6 @@ class BaseCMSTestCase:
             self.fail(f"Warning {message} not given.")
         return result
 
-    assertWarns = failUnlessWarns
-
     def load_template_from_string(self, template):
         return engines['django'].from_string(template)
 
@@ -578,8 +576,8 @@ class BaseCMSTestCase:
     def get_change_plugin_uri(self, plugin, language=None):
         language = language or 'en'
 
-        if plugin.page:
-            path = plugin.page.get_absolute_url(language) or f'/{language}/'
+        if plugin.placeholder and plugin.placeholder.page:
+            path = plugin.placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -590,8 +588,8 @@ class BaseCMSTestCase:
     def get_move_plugin_uri(self, plugin, language=None):
         language = language or 'en'
 
-        if plugin.page:
-            path = plugin.page.get_absolute_url(language) or f'/{language}/'
+        if plugin.placeholder and plugin.placeholder.page:
+            path = plugin.placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -602,8 +600,8 @@ class BaseCMSTestCase:
     def get_copy_plugin_uri(self, plugin, language=None):
         language = language or 'en'
 
-        if plugin.page:
-            path = plugin.page.get_absolute_url(language) or f'/{language}/'
+        if plugin.placeholder and plugin.placeholder.page:
+            path = plugin.placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 
@@ -626,8 +624,8 @@ class BaseCMSTestCase:
     def get_delete_plugin_uri(self, plugin, language=None):
         language = language or 'en'
 
-        if plugin.page:
-            path = plugin.page.get_absolute_url(language) or f'/{language}/'
+        if plugin.placeholder and plugin.placeholder.page:
+            path = plugin.placeholder.page.get_absolute_url(language) or f'/{language}/'
         else:
             path = f'/{language}/'
 

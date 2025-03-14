@@ -124,7 +124,7 @@ organisation that exists to support the development of django CMS and its commun
 .. rst-class:: column column2
 
 Discord
-~~~~~
+~~~~~~~
 
 Join `our friendly Discord server <https://discord-support-channel.django-cms.org>`_ for **support** and
 to **share ideas** and **discuss technical questions** with other members of the
@@ -182,14 +182,7 @@ versions:
 Current LTS table
 +++++++++++++++++
 
-========== ============== ====== ========================
-django CMS Feature freeze Django End of long-term support
-========== ============== ====== ========================
-4.1 x      tbd            4.2    April 2026
-\          \              3.2    April 2024
-3.11.x     September 2023 4.2    April 2026
-\          \              3.2    April 2024
-========== ============== ====== ========================
+.. include:: autogenerate/lts.include
 
 After feature freeze, new features go into the next major version of django CMS.
 
@@ -198,13 +191,7 @@ Unsupported LTS versions
 
 The following LTS versions **do not** receive any support any more:
 
-========== ============== ====== ========================
-django CMS Feature freeze Django End of long-term support
-========== ============== ====== ========================
-3.8 x      June 2020      2.2    April 2022
-3.7.x      October 2020   2.2    March 2022
-\          \              1.11   March 2020
-========== ============== ====== ========================
+.. include:: autogenerate/past_lts.include
 
 Django/Python compatibility table
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -215,7 +202,7 @@ long-term support policy.
 *✓* indicates that the version has been tested and works. *×* indicates that it has not
 been tested, or is known to be incompatible.
 
-.. include:: compatibility.include
+.. include:: autogenerate/compatibility.include
 
 .. _django: https://www.djangoproject.com
 

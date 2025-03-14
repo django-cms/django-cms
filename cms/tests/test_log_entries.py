@@ -7,6 +7,7 @@ from cms.forms.wizards import CreateCMSPageForm
 from cms.models import Page, Placeholder, UserSettings
 from cms.test_utils.testcases import URL_CMS_PAGE_MOVE, CMSTestCase
 from cms.utils import get_current_site
+from cms.utils.i18n import force_language
 from cms.wizards.forms import WizardStep2BaseForm, step2_form_factory
 
 # Snippet to create wizard page taken from: test_wizards.py
@@ -158,6 +159,7 @@ class LogPageOperationsTests(CMSTestCase):
             endpoint = self.get_admin_url(Page, 'delete', page.pk)
             post_data = {'post': 'yes'}
 
+            self.assertEqual(0, LogEntry.objects.count())
             response = self.client.post(endpoint, post_data)
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)
@@ -211,12 +213,17 @@ class LogPageOperationsTests(CMSTestCase):
         When a pages translation is deleted a log entry is created.
         """
         with self.login_user_context(self._admin_user):
-            page = create_page("page_a", "nav_playground.html", "en")
-            create_page_content(language='de', title="other title %s" % page.get_title('en'), page=page)
+            title_en = "page_a"
+            page = create_page(title_en, "nav_playground.html", "en")
+            create_page_content(language='de', title="other title %s" % title_en, page=page)
+            with force_language("de"):  # The remaining language
+                expected_entry = str(page)
             endpoint = self.get_page_delete_translation_uri('en', page)
             post_data = {'post': 'yes', 'language': 'en'}
 
             response = self.client.post(endpoint, post_data)
+            page.page_content_cache = {}  # Reset cache of local object after translation is deleted
+
             # Test that the end point is valid
             self.assertEqual(response.status_code, 302)
             # Test that the log count is correct
@@ -230,7 +237,7 @@ class LogPageOperationsTests(CMSTestCase):
             # Check the object id is set correctly
             self.assertEqual(str(page.pk), log_entry.object_id)
             # Check the object_repr is set correctly
-            self.assertEqual(str(page), log_entry.object_repr)
+            self.assertEqual(expected_entry, log_entry.object_repr)
             # Check that the correct user created the log
             self.assertEqual(self._admin_user.pk, log_entry.user_id)
 
@@ -374,7 +381,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
             data = {'post': True}
             response = self.client.post(endpoint, data)
             # Test that the end point is valid
-            self.assertEqual(response.status_code, 302)
+            self.assertContains(response, '<div class="success"></div>')
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
 

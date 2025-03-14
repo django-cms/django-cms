@@ -5,12 +5,14 @@ from django.db import models
 
 from cms.forms.fields import PageSelectFormField
 from cms.models.placeholdermodel import Placeholder
+from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 
 
 class PlaceholderField(models.ForeignKey):
     """
     .. warning::
-        This field is for django CMS versions below 4 only. It may only used for migrations.
+        This field is for django CMS versions below 4 only. It may only be used for migrations. PlaceholderField
+        will be removed in django CMS 4.3.
 
     The ``PlaceholderField`` has been replaced by the :class:`~cms.models.fields.PlaceholderRelationField`,
     the built-in migrations will automatically take care of the replacement.
@@ -18,9 +20,16 @@ class PlaceholderField(models.ForeignKey):
     See documentation of :class:`~cms.models.fields.PlaceholderRelationField` for how to replace the code.
     """
     def __init__(self, slotname, default_width=None, actions=None, **kwargs):
+        import warnings
+
         from cms.utils.placeholder import (
             PlaceholderNoAction,
             validate_placeholder_name,
+        )
+        warnings.warn(
+            "PlaceholderField is deprecated. "
+            "Replace by PlaceholderRelationField.",
+            RemovedInDjangoCMS51Warning, stacklevel=2
         )
 
         if not actions:
@@ -130,9 +139,6 @@ class PlaceholderRelationField(GenericRelation):
             @cached_property
             def content(self):
                 return get_placeholder_from_slot(self.placeholders, "content")  # A specific placeholder
-
-
-
     """
     default_checks = []
 

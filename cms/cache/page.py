@@ -1,5 +1,6 @@
 import hashlib
 from datetime import timedelta
+from importlib import import_module
 
 from django.conf import settings
 from django.utils.cache import (
@@ -9,6 +10,7 @@ from django.utils.cache import (
 )
 from django.utils.encoding import iri_to_uri
 from django.utils.timezone import now
+from django.utils.translation import get_language_from_request
 
 from cms.cache import _get_cache_key, _get_cache_version, _set_cache_version
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
@@ -16,17 +18,27 @@ from cms.toolbar.utils import get_toolbar_from_request
 from cms.utils.compat.response import get_response_headers
 from cms.utils.conf import get_cms_setting
 from cms.utils.helpers import get_timezone_name
+from cms.utils.i18n import get_default_language_for_site
 
 
 def _page_cache_key(request):
-    # sha1 key of current path
-    cache_key = "%s:%d:%s" % (
+    """
+    Generate a cache key based on the request path and language.
+    The language is determined following django-cms's language resolution order.
+    """
+    if hasattr(request, "LANGUAGE_CODE"):
+        language = request.LANGUAGE_CODE
+    else:
+        language = get_default_language_for_site(settings.SITE_ID)
+
+    cache_key = "%s:%d:%s:%s" % (
         get_cms_setting("CACHE_PREFIX"),
         settings.SITE_ID,
-        hashlib.sha1(iri_to_uri(request.get_full_path()).encode('utf-8')).hexdigest()
+        language,
+        hashlib.sha1(iri_to_uri(request.get_full_path()).encode("utf-8")).hexdigest(),
     )
     if settings.USE_TZ:
-        cache_key += '.%s' % get_timezone_name()
+        cache_key += ".%s" % get_timezone_name()
     return cache_key
 
 
@@ -66,10 +78,7 @@ def set_page_cache(response):
         else:
             # Should only happen when there are no placeholders at all
             min_placeholder_ttl = MAX_EXPIRATION_TTL
-        ttl = min(
-            get_cms_setting('CACHE_DURATIONS')['content'],
-            min_placeholder_ttl
-        )
+        ttl = min(get_cms_setting("CACHE_DURATIONS")["content"], min_placeholder_ttl)
 
         if ttl > 0:
             # Adds expiration, etc. to headers
@@ -89,7 +98,7 @@ def set_page_cache(response):
                     expires_datetime,
                 ),
                 ttl,
-                version=version
+                version=version,
             )
             # See note in invalidate_cms_page_cache()
             _set_cache_version(version)
@@ -98,35 +107,40 @@ def set_page_cache(response):
 
 def get_page_cache(request):
     from django.core.cache import cache
+
     return cache.get(_page_cache_key(request), version=_get_cache_version())
 
 
 def get_xframe_cache(page):
     from django.core.cache import cache
-    return cache.get('cms:xframe_options:%s' % page.pk)
+
+    return cache.get("cms:xframe_options:%s" % page.pk)
 
 
 def set_xframe_cache(page, xframe_options):
     from django.core.cache import cache
-    cache.set('cms:xframe_options:%s' % page.pk,
-              xframe_options,
-              version=_get_cache_version())
+
+    cache.set("cms:xframe_options:%s" % page.pk, xframe_options, version=_get_cache_version())
     _set_cache_version(_get_cache_version())
 
 
 def _page_url_key(page_lookup, lang, site_id):
-    return _get_cache_key('page_url', page_lookup, lang, site_id) + '_type:absolute_url'
+    return _get_cache_key("page_url", page_lookup, lang, site_id) + "_type:absolute_url"
 
 
 def set_page_url_cache(page_lookup, lang, site_id, url):
     from django.core.cache import cache
-    cache.set(_page_url_key(page_lookup, lang, site_id),
-              url,
-              get_cms_setting('CACHE_DURATIONS')['content'], version=_get_cache_version())
+
+    cache.set(
+        _page_url_key(page_lookup, lang, site_id),
+        url,
+        get_cms_setting("CACHE_DURATIONS")["content"],
+        version=_get_cache_version(),
+    )
     _set_cache_version(_get_cache_version())
 
 
 def get_page_url_cache(page_lookup, lang, site_id):
     from django.core.cache import cache
-    return cache.get(_page_url_key(page_lookup, lang, site_id),
-                     version=_get_cache_version())
+
+    return cache.get(_page_url_key(page_lookup, lang, site_id), version=_get_cache_version())

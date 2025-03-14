@@ -1,4 +1,3 @@
-from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
@@ -39,32 +38,39 @@ class PageContent(models.Model):
     ]
 
     language = models.CharField(_("language"), max_length=15, db_index=True)
-    title = models.CharField(_("title"), max_length=255)
+    title = models.CharField(
+        verbose_name=_("title"),
+        max_length=255,
+        help_text=_("The default title"),
+    )
     page_title = models.CharField(
-        _("title"),
+        verbose_name=_("Page Title"),
         max_length=255,
         blank=True,
         null=True,
-        help_text=_("overwrite the title (html title tag)")
+        help_text=_(
+            "Overwrites what is displayed at the top of your browser or in bookmarks"
+        ),
     )
     menu_title = models.CharField(
-        _("title"),
+        verbose_name=_("Menu Title"),
         max_length=255,
         blank=True,
         null=True,
-        help_text=_("overwrite the title in the menu")
+        help_text=_("Overwrite what is displayed in the menu"),
     )
     meta_description = models.TextField(
-        _("description"),
+        verbose_name=_("Description meta tag"),
         blank=True,
         null=True,
-        help_text=_("The text displayed in search engines.")
+        help_text=_("A description of the page used by search engines."),
     )
     redirect = models.CharField(
-        _("redirect"),
+        verbose_name=_("redirect"),
         max_length=2048,
         blank=True,
-        null=True
+        null=True,
+        help_text=_("Redirects to this URL."),
     )
     page = models.ForeignKey(
         Page,
@@ -73,7 +79,7 @@ class PageContent(models.Model):
         related_name="pagecontent_set"
     )
     creation_date = models.DateTimeField(
-        _("creation date"),
+        verbose_name=_("creation date"),
         editable=False,
         default=timezone.now
     )
@@ -81,41 +87,50 @@ class PageContent(models.Model):
     placeholders = PlaceholderRelationField()
 
     created_by = models.CharField(
-        _("created by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
-        editable=False)
+        verbose_name=_("created by"),
+        max_length=constants.PAGE_USERNAME_MAX_LENGTH,
+        editable=False,
+    )
     changed_by = models.CharField(
-        _("changed by"), max_length=constants.PAGE_USERNAME_MAX_LENGTH,
-        editable=False)
+        verbose_name=_("changed by"),
+        max_length=constants.PAGE_USERNAME_MAX_LENGTH,
+        editable=False,
+    )
     changed_date = models.DateTimeField(auto_now=True)
 
-    in_navigation = models.BooleanField(_("in navigation"), default=True, db_index=True)
+    in_navigation = models.BooleanField(
+        verbose_name=_("in navigation"),
+        default=True,
+        db_index=True,
+    )
     soft_root = models.BooleanField(
-        _("soft root"),
+        verbose_name=_("soft root"),
         db_index=True,
         default=False,
-        help_text=_("All ancestors will not be displayed in the navigation")
+        help_text=_("All ancestors will not be displayed in the navigation"),
     )
     template = models.CharField(
-        _("template"),
+        verbose_name=_("template"),
         max_length=100,
         choices=template_choices,
         help_text=_('The template used to render the content.'),
-        default=TEMPLATE_DEFAULT
+        default=TEMPLATE_DEFAULT,
     )
     limit_visibility_in_menu = models.SmallIntegerField(
-        _("menu visibility"),
+        verbose_name=_("menu visibility"),
         default=constants.VISIBILITY_ALL,
         choices=LIMIT_VISIBILITY_IN_MENU_CHOICES,
         db_index=True,
         blank=True,
         null=True,
-        help_text=_("limit when this page is visible in the menu")
+        help_text=_("limit when this page is visible in the menu"),
     )
 
     # X Frame Options for clickjacking protection
     xframe_options = models.IntegerField(
         choices=X_FRAME_OPTIONS_CHOICES,
         default=get_cms_setting('DEFAULT_X_FRAME_OPTIONS'),
+        verbose_name=_("X Frame Options"),
     )
 
     objects = PageContentManager()
@@ -221,7 +236,7 @@ class PageContent(models.Model):
             else:
                 placeholder_set = self.template or get_cms_setting('PLACEHOLDERS')[0][0]
 
-            for key, value, _ in get_cms_setting("PLACEHOLDERS"):
+            for key, value, __ in get_cms_setting("PLACEHOLDERS"):
                 if key == placeholder_set or key == "":  # NOQA: PLR1714 - Empty string matches always
                     self._placeholder_slot_cache = value
                     break

@@ -1,22 +1,24 @@
 import json
 import re
+from functools import lru_cache, wraps
+from typing import Callable, Optional, TypeVar, cast
 
 from django import forms
 from django.contrib import admin, messages
-from django.core.exceptions import (
-    ImproperlyConfigured,
-    ObjectDoesNotExist,
-    ValidationError,
-)
+from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
+from django.template import Context
 from django.utils.encoding import force_str, smart_str
+from django.utils.functional import lazy
 from django.utils.html import escapejs
 from django.utils.translation import gettext, gettext_lazy as _
 
 from cms import operations
 from cms.exceptions import SubClassNeededError
-from cms.models import CMSPlugin
-from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree, get_plugin_tree_as_json
+from cms.models import CMSPlugin, Page
+from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree
+from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 
 
@@ -96,6 +98,36 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
         return new_plugin
 
 
+T = TypeVar('T', bound=Callable)
+
+def template_slot_caching(method: T) -> T:
+    """
+    Decorator that enables global caching for methods based on placeholder slots and templates.
+
+    This decorator marks methods that should participate in the CMS's template and slot-based
+    caching system. Decorated methods will have their results cached according to the
+    configuration specified in CMS_PLACEHOLDER_CONF.
+
+    Args:
+        method: The method to be decorated.
+
+    Returns:
+        The decorated method with template slot caching enabled.
+
+    Example:
+        @template_slot_caching
+        def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+            # Method implementation...
+            pass
+    """
+    @wraps(method)
+    def wrapper(*args, **kwargs):
+        return method(*args, **kwargs)
+
+    wrapper._template_slot_caching = True
+    return cast(T, wrapper)
+
+
 class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     """
     Inherits :class:`django:django.contrib.admin.ModelAdmin` and in most respects behaves like a
@@ -128,7 +160,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     See also: :attr:`frontend_edit_template`.
     """
-    #: If True, displays a preview in the admin.
+    # If True, displays a preview in the admin. Not used any more.
     admin_preview = False
 
     #:  The path to the template used to render the template. If ``render_plugin`` is ``True`` either this or
@@ -159,7 +191,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     See also: :meth:`icon_alt`, :meth:`icon_src`."""
 
     #: Set to ``True`` if this plugin should only be used in a placeholder that is attached to a django CMS page,
-    #: and not other models with ``PlaceholderFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
+    #: and not other models with ``PlaceholderRelationFields``. See also: :attr:`child_classes`, :attr:`parent_classes`,
     #: :attr:`require_parent`.
     page_only = False
 
@@ -199,6 +231,25 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     #: Disables *dragging* of child plugins in structure mode.
     disable_child_plugins = False
+
+    #: Disables *editing* of this plugin in structure mode. Useful for plugins which, for example, are managed by
+    #: their parent plugins.
+    #:
+    #: If editing is disabled, the plugin will be rendered in structure mode normally, but double-clicking on it will
+    #: not open the plugin edit dialog. The user will not have a direct way to change the plugin instance.
+    #:
+    #: Moving or adding child plugins are not affected.
+    disable_edit = False
+
+    #: Determines if the add plugin modal is shown for this plugin (default: yes). Useful for plugins which have no
+    #: fields to fill, or which have valid default values for *all* fields.
+    #: If the plugin's form will not validate with the default values the add plugin modal is shown with the form
+    #: errors.
+    show_add_form = True
+
+    #: The plugin does not modify the context or request and its rendering is not influenced by its parent
+    #: plugins. Defaults to ``True`` unless :setting:`CMS_ALWAYS_REFRESH_CONTENT` is set to ``True``.
+    is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
 
     # Warning: setting these to False, may have a serious performance impact,
     # because their child-parent-relation must be recomputed each
@@ -257,6 +308,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             raise ValidationError("plugin has no render_template: %s" % self.__class__)
         return template
 
+    if DJANGO_5_1:
+        # Avoid a bug in Django's template engine that is incompatible with Python 3.9+
+        # type hinting. By default, the parent class has no __class_getitem__ method.
+        # There exist third-party packages, however, that inject type hinting into Django.
+        # This ensures, that any type hinting is ignore for CMSPlugin (below Django 5.2)
+        # See https://github.com/django-cms/django-cms/issues/7948
+        def __class_getitem__(cls, item):
+            raise TypeError
+
     @classmethod
     def get_render_queryset(cls):
         return cls.model._default_manager.all()
@@ -301,10 +361,24 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return bool(allowed_parents)
 
     @classmethod
-    def get_require_parent(cls, slot, page):
+    @lru_cache
+    def _get_template_for_conf(cls, page: Optional[Page], instance: Optional[CMSPlugin]):
+        """Cache page template because page.get_template() might have to fetch the page content object from the db
+         since django CMS 4"""
+        if page:
+            # Make the database access lazy, so that it only happens if needed.
+            return lazy(page.get_template, str)()
+        if instance is not None and instance.placeholder.source and hasattr(instance.placeholder.source, 'get_template'):
+            # If source object has get_template method, use it (lazily)
+            return lazy(instance.placeholder.source.get_template, str)()
+        return None
+
+    @classmethod
+    @template_slot_caching
+    def get_require_parent(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None) -> bool:
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page.get_template() if page else None
+        template = cls._get_template_for_conf(page, instance)
 
         # config overrides..
         require_parent = get_placeholder_conf('require_parent', slot, template, default=cls.require_parent)
@@ -318,7 +392,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         :param request: Relevant ``HTTPRequest`` instance.
         :param instance: The ``CMSPlugin`` instance that is being rendered.
-        :rtype: ``None`` or ``datetime`` or ```time_delta`` or ``int``
+        :rtype: ``None`` or ``datetime`` or ``time_delta`` or ``int``
 
         Must return one of:
 
@@ -343,18 +417,18 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             An integer number of seconds that this plugin's content can be cached.
 
         There are constants are defined in ``cms.constants`` that may be
-        useful: :const:`~cms.constants.EXPIRE_NOW` and :data:`~cms.constants.MAX_EXPIRATION_TTL`.
+        useful: :const:`~cms.constants.EXPIRE_NOW` and :const:`~cms.constants.MAX_EXPIRATION_TTL`.
 
         An integer value of 0 (zero) or :const:`~cms.constants.EXPIRE_NOW` effectively means "do not
-        cache". Negative values will be treated as `EXPIRE_NOW`. Values exceeding the value
-        `~cms.constants.MAX_EXPIRATION_TTL` will be set to that value.
+        cache". Negative values will be treated as :const:`~cms.constants.EXPIRE_NOW`. Values exceeding the value
+        :const:`~cms.constants.MAX_EXPIRATION_TTL` will be set to that value.
 
-        Negative `timedelta` values or those greater than `MAX_EXPIRATION_TTL`
+        Negative `timedelta` values or those greater than ``MAX_EXPIRATION_TTL``
         will also be ranged in the same manner.
 
-        Similarly, `datetime` values earlier than now will be treated as
-        `EXPIRE_NOW`. Values greater than `MAX_EXPIRATION_TTL` seconds in the
-        future will be treated as `MAX_EXPIRATION_TTL` seconds in the future.
+        Similarly, ``datetime`` values earlier than now will be treated as
+        ``EXPIRE_NOW``. Values greater than ``MAX_EXPIRATION_TTL`` seconds in the
+        future will be treated as ``MAX_EXPIRATION_TTL`` seconds in the future.
         """
         return None
 
@@ -398,38 +472,45 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         return super().render_change_form(request, context, add, change, form_url, obj)
 
-    def render_close_frame(self, request, obj, extra_context=None):
+    def render_close_frame(
+        self,
+        request: HttpRequest,
+        obj: CMSPlugin,
+        add: bool = False,
+        extra_context: Optional[Context] = None
+    ) -> HttpResponse:
+        from cms.utils.plugins import get_plugin_restrictions
+
         try:
             root = obj.parent.get_bound_plugin() if obj.parent else obj
         except ObjectDoesNotExist:
             # This is a nasty edge-case.
             # If the parent plugin is a ghost plugin, fetching the plugin tree
             # will fail because the downcasting function filters out all ghost plugins.
-            # Currently this case is only present in the djangocms-text-ckeditor app
+            # Currently, this case is only present in the djangocms-text-ckeditor app
             # which uses ghost plugins to create inline plugins on the text.
             root = obj
 
         plugins = [root] + list(root.get_descendants())
 
-        child_classes = self.get_child_classes(
-            slot=obj.placeholder.slot,
-            page=obj.page,
-            instance=obj,
-        )
-
-        parent_classes = self.get_parent_classes(
-            slot=obj.placeholder.slot,
-            page=obj.page,
-            instance=obj,
-        )
-
+        restrictions = {}  # Restrictions cache
+        child_classes, parent_classes = get_plugin_restrictions(obj, restrictions_cache=restrictions)
         data = get_plugin_toolbar_info(
             obj,
             children=child_classes,
             parents=parent_classes,
         )
         data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
-        data['structure'] = get_plugin_tree(request, plugins)
+        target_plugin = plugins[0] if add else next(
+            (plugin for plugin in plugins if plugin.pk == obj.pk), None
+        )
+        data['structure'] = get_plugin_tree(request, plugins, restrictions=restrictions, target_plugin=target_plugin)
+        data['messages'] = [{
+            'level': message.level,
+            'message': message.message,
+            'tags': message.tags,
+            } for message in messages.get_messages(request)]
+
         context = {
             'plugin': obj,
             'is_popup': True,
@@ -487,7 +568,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # was added successfully but looks like the CMS has not
         # supported this and can lead to issues with plugins
         # like ckeditor.
-        return self.render_close_frame(request, obj)
+        return self.render_close_frame(request, obj, add=True)
 
     def response_change(self, request, obj):
         self.object_successfully_changed = True
@@ -495,7 +576,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         msg_dict = {'name': force_str(opts.verbose_name), 'obj': force_str(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
-        return self.render_close_frame(request, obj)
+        return self.render_close_frame(request, obj, add=False)
 
     def log_addition(self, request, obj, bypass=None):
         pass
@@ -507,15 +588,15 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         pass
 
     def icon_src(self, instance):
-        """By default, this returns an empty string, which, if left un-overridden would result in no icon
+        """Deprecated: Since djangocms-text-ckeditor introduced inline previews of plugins, the icon will not be
+        rendered in TextPlugins anymore.
+
+        By default, this returns an empty string, which, if left un-overridden would result in no icon
         rendered at all, which, in turn, would render the plugin un-editable by the operator inside a parent
         text plugin.
 
         Therefore, this should be overridden when the plugin has text_enabled set to True to return the path
         to an icon to display in the text of the text plugin.
-
-        Since djangocms-text-ckeditor introduced inline previews of plugins, the icon will not be
-        rendered in TextPlugins anymore.
 
         :param instance: The instance of the plugin model.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
@@ -523,7 +604,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         Example::
 
             def icon_src(self, instance):
-                return settings.STATIC_URL + "cms/img/icons/plugins/link.png"
+                return static("cms/img/icons/plugins/link.png")
 
         See also: :attr:`text_enabled`, :meth:`icon_alt`
         """
@@ -539,7 +620,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             for the 'alt' text.
         :type instance: :class:`cms.models.pluginmodel.CMSPlugin` instance
 
-        By default :meth:`icon_alt` will return a string of the form: "[plugin type] -
+        By default, :meth:`icon_alt` will return a string of the form: "[plugin type] -
         [instance]", but can be modified to return anything you like.
 
         This function accepts the ``instance`` as a parameter and returns a string to be
@@ -584,21 +665,22 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return gettext('There are no further settings for this plugin. Please press save.')
 
     @classmethod
-    def get_child_class_overrides(cls, slot, page):
+    @template_slot_caching
+    def get_child_class_overrides(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
         Returns a list of plugin types that are allowed
         as children of this plugin.
         """
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page.get_template() if page else None
+        template = cls._get_template_for_conf(page, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf('child_classes', slot, template, default={})
         return ph_conf.get(cls.__name__, cls.child_classes)
 
     @classmethod
-    def get_child_plugin_candidates(cls, slot, page):
+    def get_child_plugin_candidates(cls, slot: str, page: Optional[Page] = None):
         """
         Returns a list of all plugin classes
         that will be considered when fetching
@@ -607,19 +689,20 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # Adding this as a separate method,
         # we allow other plugins to affect
         # the list of child plugin candidates.
-        # Useful in cases like djangocms-text-ckeditor
-        # where only text only plugins are allowed.
+        # Useful in cases like djangocms-text
+        # where only text-only plugins are allowed.
         from cms.plugin_pool import plugin_pool
         return plugin_pool.registered_plugins
 
     @classmethod
-    def get_child_classes(cls, slot, page, instance=None):
+    @template_slot_caching
+    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
         """
         # Placeholder overrides are highest in priority
-        child_classes = cls.get_child_class_overrides(slot, page)
+        child_classes = cls.get_child_class_overrides(slot, page=page, instance=instance)
 
         if child_classes:
             return child_classes
@@ -648,10 +731,11 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return child_classes
 
     @classmethod
-    def get_parent_classes(cls, slot, page, instance=None):
+    @template_slot_caching
+    def get_parent_classes(cls, slot: str, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
         from cms.utils.placeholder import get_placeholder_conf
 
-        template = page.get_template() if page else None
+        template = cls._get_template_for_conf(page, instance)
 
         # config overrides..
         ph_conf = get_placeholder_conf('parent_classes', slot, template, default={})

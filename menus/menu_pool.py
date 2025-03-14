@@ -107,12 +107,13 @@ class MenuRenderer:
         # instance lives.
         self.menus = pool.get_registered_menus(for_rendering=True)
         self.request = request
-        self.request_language = None
-        if is_language_prefix_patterns_used():
-            self.request_language = get_language_from_request(request, check_path=True)
-        if not self.request_language:
-            self.request_language = get_default_language_for_site(get_current_site().pk)
         self.site = Site.objects.get_current(request)
+        self.request_language = None
+        if hasattr(request, "LANGUAGE_CODE"):
+            # use language from middleware - usually django.middleware.locale.LocaleMiddleware
+            self.request_language = request.LANGUAGE_CODE
+        if not self.request_language:
+            self.request_language = get_default_language_for_site(self.site.pk)
         toolbar = getattr(request, "toolbar", None)
         self.edit_or_preview = toolbar.edit_mode_active or toolbar.preview_mode_active if toolbar else False
 
@@ -204,9 +205,38 @@ class MenuRenderer:
         return final_nodes
 
     def _mark_selected(self, nodes):
-        for node in nodes:
-            node.selected = node.is_selected(self.request)
+        """Mark the selected node and its ancestors, descendants and siblings."""
+        selected = next((node for node in nodes if node.is_selected(self.request)), None)
+        if selected:
+            selected.selected = True
+            self._mark_ancestors(selected)
+            self._mark_descendants(selected)
+            root_nodes = (node for node in nodes if not node.parent)
+            self._mark_siblings(selected, root_nodes)
         return nodes
+
+    def _mark_ancestors(self, node):
+        """Marks the ancestors of the selected node."""
+        while node.parent:
+            node = node.parent
+            node.ancestor = True
+
+    def _mark_descendants(self, node):
+        """Marks the descendants of the selected node."""
+        for child in node.children:
+            child.descendant = True
+            self._mark_descendants(child)
+
+    def _mark_siblings(self, node, root_nodes):
+        """Marks the siblings of the selected node. All root nodes are siblings of a root node."""
+        if node.parent:
+            for sibling in node.parent.children:
+                if sibling != node:
+                    sibling.sibling = True
+        else:
+            for sibling in root_nodes:
+                if sibling != node:
+                    sibling.sibling = True
 
     def apply_modifiers(self, nodes, namespace=None, root_id=None, post_cut=False, breadcrumb=False):
         if not post_cut:

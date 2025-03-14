@@ -231,7 +231,7 @@ class PermissionTuple(tuple):
         return False
 
     def allow_list(self, filter: str = "", steplen: int = Page.steplen) -> Q:
-        if filter !="":
+        if filter != "":
             filter = f"{filter}__"
         grant_on, path = self
         if grant_on == ACCESS_PAGE:
@@ -277,15 +277,14 @@ class PagePermission(AbstractPagePermission):
             raise ValidationError(message)
 
     def get_page_permission_tuple(self):
-        node = self.page.node
-        return PermissionTuple((self.grant_on, node.path))
+        return PermissionTuple((self.grant_on, self.page.path))
 
     def get_page_ids(self):
         import warnings
 
-        from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
-        warnings.warn("get_page_ids is deprecated and will be removed in django CMS 4.3, "
-                      "use get_page_permission_tuple instead", RemovedInDjangoCMS43Warning, stacklevel=2)
+        from cms.utils.compat.warnings import RemovedInDjangoCMS60Warning
+        warnings.warn("get_page_ids is deprecated, "
+                      "use get_page_permission_tuple instead", RemovedInDjangoCMS60Warning, stacklevel=2)
 
         return self._get_page_ids()
 
@@ -313,7 +312,7 @@ class PageUserManager(UserManager):
 class PageUser(User):
     """Cms specific user data, required for permission system
     """
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="created_users")
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name="created_users")
 
     objects = PageUserManager()
 
@@ -328,7 +327,8 @@ class PageUserGroup(Group):
     """
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
         related_name="created_usergroups"
     )
 

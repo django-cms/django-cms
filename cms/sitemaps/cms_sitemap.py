@@ -1,5 +1,5 @@
 from django.contrib.sitemaps import Sitemap
-from django.db.models import OuterRef, Q, Subquery
+from django.db.models import OuterRef, Q, QuerySet, Subquery
 
 from cms.models import PageContent, PageUrl
 from cms.utils import get_current_site
@@ -15,10 +15,10 @@ def from_iterable(iterables):
 
 
 class CMSSitemap(Sitemap):
-    changefreq = "monthly"
-    priority = 0.5
+    changefreq: str = "monthly"
+    priority: float = 0.5
 
-    def items(self):
+    def items(self) -> QuerySet:
         #
         # It is counter-productive to provide entries for:
         #   > Pages which redirect:
@@ -42,27 +42,30 @@ class CMSSitemap(Sitemap):
         # If, for some reason, you require redirecting pages (PageContent) to be
         # included, simply create a new class inheriting from this one, and
         # supply a new items() method which doesn't filter out the redirects.
+        #
+        # Even though items() can also return a sequence, we should return a
+        # QuerySet in this case in order to be compatible with
+        # djangocms-page-sitemap.
         site = get_current_site()
         languages = get_public_languages(site_id=site.pk)
 
-        return list(
-            PageUrl
-            .objects
-            .get_for_site(site)
+        return (
+            PageUrl.objects.get_for_site(site)
             .filter(language__in=languages, path__isnull=False, page__login_required=False)
-            .order_by('page__path')
+            .order_by("page__path")
             .select_related("page")
-            .annotate(content_pk=Subquery(
-                PageContent.objects
-                .filter(page=OuterRef("page"), language=OuterRef("language"))
-                .filter(Q(redirect="") | Q(redirect=None))
-                .values_list("pk")[:1]
-            ))
-            .filter(content_pk__isnull=False)  # Remove page content with redirects
+            .annotate(
+                content_changed_date=Subquery(
+                    PageContent.objects.filter(page=OuterRef("page"), language=OuterRef("language"))
+                    .filter(Q(redirect="") | Q(redirect=None))
+                    .values_list("changed_date")[:1]
+                )
+            )
+            .filter(content_changed_date__isnull=False)  # Remove page content with redirects
         )
 
     def lastmod(self, page_url):
-        return page_url.page.changed_date
+        return page_url.content_changed_date
 
     def location(self, page_url):
         return page_url.get_absolute_url(page_url.language)

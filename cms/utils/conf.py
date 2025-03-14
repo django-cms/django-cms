@@ -14,7 +14,8 @@ __all__ = [
 ]
 
 
-class VERIFIED: pass  # need a unique identifier for CMS_LANGUAGES
+class VERIFIED:
+    pass  # need a unique identifier for CMS_LANGUAGES
 
 
 def _load_from_file(module_path):
@@ -90,6 +91,9 @@ DEFAULTS = {
     'HIDE_LEGACY_FEATURES': True,
     'COLOR_SCHEME': 'auto',
     'COLOR_SCHEME_TOGGLE': True,
+    'CATCH_PLUGIN_500_EXCEPTION': True,
+    'DEFAULT_IN_NAVIGATION': True,
+    'ALWAYS_REFRESH_CONTENT': False,
 }
 
 

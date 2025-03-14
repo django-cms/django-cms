@@ -152,8 +152,7 @@ class ToolbarAPIMixin(metaclass=ABCMeta):
             if result.item.name > new_menu_name:
                 return result.index
 
-            if result.index > last_position:
-                last_position = result.index
+            last_position = max(result.index, last_position)
         else:
             return last_position + 1
 
@@ -418,7 +417,7 @@ class SideframeItem(FrameItem):
 class ModalItem(FrameItem):
     """
     Sends a GET request; loads response in a modal window. Use an
-    :class:`~ToolbarAPIMixin.add_modal_item` method to create a ``ModalItem`` instance. Can be
+    :class:`~cms.toolbar.items.ToolbarAPIMixin.add_modal_item` method to create a ``ModalItem`` instance. Can be
     added to :class:`~cms.toolbar.toolbar.CMSToolbar`, :class:`~cms.toolbar.items.Menu`,
     :class:`~cms.toolbar.items.SubMenu`.
     """
@@ -430,7 +429,7 @@ class ModalItem(FrameItem):
 
 class AjaxItem(BaseItem):
     """
-    Sends a POST request. Use an :class:`~ToolbarAPIMixin.add_ajax_item` method to create a
+    Sends a POST request. Use an :class:`~cms.toolbar.items.ToolbarAPIMixin.add_ajax_item` method to create a
     ``AjaxItem`` instance. Can be added to :class:`~cms.toolbar.toolbar.CMSToolbar`,
     :class:`~cms.toolbar.items.Menu`, :class:`~cms.toolbar.items.SubMenu`.
 

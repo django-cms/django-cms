@@ -36,6 +36,9 @@
 .cms-icon {
     @extend %icon;
 }
+.cms-icon-none {
+    width: 1em;
+}
 @mixin icon($filename, $insert: before) {
     &:#{$insert} {
         content: #{"\"\\"}#{icon-char($filename) + "\""};

@@ -10,7 +10,7 @@ from django.db.models import Q
 
 from cms.constants import ROOT_USER_LEVEL, SCRIPT_USERNAME
 from cms.exceptions import NoPermissionsException
-from cms.models import GlobalPagePermission, Page, PagePermission
+from cms.models import GlobalPagePermission, PagePermission
 from cms.utils.compat.dj import available_attrs
 from cms.utils.conf import get_cms_setting
 from cms.utils.page import get_clean_username
@@ -158,6 +158,20 @@ def cached_func(func):
     return cached_func
 
 
+def clear_func_cache(user, func):
+    func_cache_name = '_djangocms_cached_func_%s' % func.__name__
+    if hasattr(user, func_cache_name):
+        delattr(user, func_cache_name)
+
+
+def clear_permission_lru_caches(user):
+    """
+    Clear all python lru caches used by the permission system
+    """
+    clear_func_cache(user, get_global_actions_for_user)
+    clear_func_cache(user, get_page_actions_for_user)
+
+
 @cached_func
 def get_global_actions_for_user(user, site):
     actions = set()
@@ -202,12 +216,23 @@ def has_global_permission(user, site, action, use_cache=True):
 def has_page_permission(user, page, action, use_cache=True):
     import warnings
 
-    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
     from cms.utils.page_permissions import has_generic_permission
 
-    warnings.warn("has_page_permission is deprecated and will be removed in django CMS 4.3. "
+    warnings.warn("has_page_permission is deprecated. "
                   "Use cms.utils.page_permissions.has_generic_permission instead.",
-                  RemovedInDjangoCMS43Warning, stacklevel=2)
+                  RemovedInDjangoCMS51Warning, stacklevel=2)
+
+    action_map = {
+        "change": "change_page",
+        "add": "add_page",
+        "move": "move_page",
+        "publish": "publish_page",
+        "delete": "delete_page",
+        "view": "view_page",
+    }
+    if action in action_map:
+        action = action_map[action]
 
     return has_generic_permission(page, user, action, site=page.site, check_global=False, use_cache=use_cache)
 
@@ -323,10 +348,10 @@ def get_view_restrictions(pages):
     Load all view restrictions for the pages
     """
 
-    from cms.utils.compat.warnings import RemovedInDjangoCMS43Warning
+    from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 
-    warnings.warn("get_view_restrictions will be removed in django CMS 4.3",
-                  RemovedInDjangoCMS43Warning, stacklevel=2)
+    warnings.warn("get_view_restrictions will be removed",
+                  RemovedInDjangoCMS51Warning, stacklevel=2)
 
     restricted_pages = defaultdict(list)
 
@@ -364,9 +389,14 @@ def has_plugin_permission(user, plugin_type, permission_type):
     permission_type should be 'add', 'change' or 'delete'.
     """
     from cms.plugin_pool import plugin_pool
-    plugin_class = plugin_pool.get_plugin(plugin_type)
-    codename = get_model_permission_codename(
-        plugin_class.model,
-        action=permission_type,
-    )
-    return user.has_perm(codename)
+    try:
+        plugin_class = plugin_pool.get_plugin(plugin_type)
+        codename = get_model_permission_codename(
+            plugin_class.model,
+            action=permission_type,
+        )
+        return user.has_perm(codename)
+    except KeyError:
+        # Grant all permissions for uninstalled plugins, so they do not block
+        # emptying placeholders.
+        return True
