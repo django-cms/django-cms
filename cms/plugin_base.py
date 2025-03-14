@@ -100,6 +100,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 
 T = TypeVar('T', bound=Callable)
 
+
 def template_slot_caching(method: T) -> T:
     """
     Decorator that enables global caching for methods based on placeholder slots and templates.
