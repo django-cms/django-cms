@@ -875,7 +875,7 @@ class PluginsTestCase(PluginsTestBaseCase):
         with register_plugins(ParentPlugin, ChildPlugin):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             # Populate cache
-            child_classes, parent_classes = get_plugin_restrictions(plugin, page, restriction_cache)  # Populate cahe
+            child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
             # Baseline
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
@@ -884,7 +884,7 @@ class PluginsTestCase(PluginsTestBaseCase):
             ChildPlugin.parent_classes = [""]
 
             # Use cache
-            child_classes, parent_classes = get_plugin_restrictions(plugin, page, restriction_cache)
+            child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
             # Despite using the cache the change in allowed parent plugins should be reflected
             self.assertNotIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
