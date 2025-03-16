@@ -859,6 +859,37 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
+    def test_plugin_child_classes_cache(self):
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False))
+        ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(
+            cache_parent_classes=False,
+            parent_classes=["ParentPlugin"],
+            render_plugin=False,
+            ))
+        restriction_cache = {}  # cache is empty
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
+            # Populate cache
+            child_classes, parent_classes = get_plugin_restrictions(plugin, page, restriction_cache)  # Populate cahe
+            # Baseline
+            self.assertIn("ChildPlugin", child_classes)
+            self.assertIn("ParentPlugin", child_classes)
+
+            # Change parent class rules (cache should NOT be used)
+            ChildPlugin.parent_classes = [""]
+
+            # Use cache
+            child_classes, parent_classes = get_plugin_restrictions(plugin, page, restriction_cache)
+            # Despite using the cache the change in allowed parent plugins should be reflected
+            self.assertNotIn("ChildPlugin", child_classes)
+            self.assertIn("ParentPlugin", child_classes)
+
+
     def test_plugin_require_parent_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
