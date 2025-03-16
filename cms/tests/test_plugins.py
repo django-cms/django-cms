@@ -848,7 +848,7 @@ class PluginsTestCase(PluginsTestBaseCase):
     def test_plugin_parent_classes_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
-        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False))
+        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
         ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(parent_classes=["ParentPlugin"], render_plugin=False))
 
         with register_plugins(ParentPlugin, ChildPlugin):
@@ -859,12 +859,12 @@ class PluginsTestCase(PluginsTestBaseCase):
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
-    def test_plugin_child_classes_cache(self):
+    def test_plugin_child_classes_cache_ignores_uncachable_children(self):
         from cms.utils.plugins import get_plugin_restrictions
 
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
-        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False))
+        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
         ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(
             cache_parent_classes=False,
             parent_classes=["ParentPlugin"],
@@ -876,24 +876,54 @@ class PluginsTestCase(PluginsTestBaseCase):
             plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
             # Populate cache
             child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
+
             # Baseline
             self.assertIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
             # Change parent class rules (cache should NOT be used)
             ChildPlugin.parent_classes = [""]
-
             # Use cache
             child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
+
             # Despite using the cache the change in allowed parent plugins should be reflected
             self.assertNotIn("ChildPlugin", child_classes)
             self.assertIn("ParentPlugin", child_classes)
 
+    def test_plugin_child_classes_allows_add_by_uncachable_children(self):
+        from cms.utils.plugins import get_plugin_restrictions
+
+        page = api.create_page("page", "nav_playground.html", "en")
+        placeholder = page.get_placeholders("en").get(slot="body")
+        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
+        ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(
+            cache_parent_classes=False,
+            parent_classes=[""],
+            render_plugin=False,
+            ))
+        restriction_cache = {}  # cache is empty
+
+        with register_plugins(ParentPlugin, ChildPlugin):
+            plugin = api.add_plugin(placeholder, ParentPlugin, settings.LANGUAGES[0][0])
+            # Populate cache
+            child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
+            # Baseline
+            self.assertNotIn("ChildPlugin", child_classes)
+            self.assertIn("ParentPlugin", child_classes)
+
+            # Change parent class rules (cache should NOT be used)
+            ChildPlugin.parent_classes = ["ParentPlugin"]
+
+            # Use cache
+            child_classes, _ = get_plugin_restrictions(plugin, page, restriction_cache)
+            # Despite using the cache the change in allowed parent plugins should be reflected
+            self.assertIn("ChildPlugin", child_classes)
+            self.assertIn("ParentPlugin", child_classes)
 
     def test_plugin_require_parent_from_object(self):
         page = api.create_page("page", "nav_playground.html", "en")
         placeholder = page.get_placeholders("en").get(slot="body")
-        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False))
+        ParentPlugin = type("ParentPlugin", (CMSPluginBase,), dict(render_plugin=False, allow_children=True))
         ChildPlugin = type("ChildPlugin", (CMSPluginBase,), dict(require_parent=True, render_plugin=False))
 
         with register_plugins(ParentPlugin, ChildPlugin):

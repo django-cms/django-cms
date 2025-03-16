@@ -195,20 +195,33 @@ def get_plugin_restrictions(plugin, page=None, restrictions_cache=None):
     if plugin_class.cache_parent_classes:
         parents_cache[plugin_type] = parent_classes or []
 
-    try:
-        child_classes = children_cache[plugin_type]
-    except KeyError:
-        cache_child_classes = plugin_class.cache_child_classes
-        child_classes = plugin_class.get_child_classes(
-            slot=plugin.placeholder.slot,
-            page=page,
-            instance=plugin,
-        )
-        cache_child_classes = cache_child_classes and all(
-            plugin_pool.get_plugin(child_class).cache_parent_classes for child_class in child_classes
-        )
-        if cache_child_classes:
-            children_cache[plugin_type] = child_classes or []
+    child_classes = []
+    if plugin_class.allow_children:
+        # Only check for children if children are allowed
+        try:
+            child_classes = children_cache[plugin_type]
+            # Still check child classes that did not cache their parent classes
+            uncached_child_classes = plugin_class.get_child_classes(
+                slot=plugin.placeholder.slot,
+                page=page,
+                instance=plugin,
+                only_uncached=True,
+            )
+            child_classes = child_classes + uncached_child_classes  # Creates a new list to not change the cache
+
+        except KeyError:
+            child_classes = plugin_class.get_child_classes(
+                slot=plugin.placeholder.slot,
+                page=page,
+                instance=plugin,
+            )
+            if plugin_class.cache_child_classes:  # Check if child classes should be cached
+                # Only add plugins to the cache that have the cache_parent_class attribute set
+                children_cache[plugin_type] = [plugin for plugin in (child_classes or [])
+                                            if plugin_pool.get_plugin(plugin).cache_parent_classes]
+                if not children_cache[plugin_type] and child_classes:
+                    # Edge case:
+                    children_cache[plugin_type] = [""]
 
     return child_classes, parent_classes
 

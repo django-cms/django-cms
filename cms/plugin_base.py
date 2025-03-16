@@ -677,7 +677,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return ph_conf.get(cls.__name__, cls.child_classes)
 
     @classmethod
-    def get_child_plugin_candidates(cls, slot: str, page: Optional[Page] = None):
+    def get_child_plugin_candidates(cls, slot: str, page: Optional[Page] = None) -> list:
         """
         Returns a list of all plugin classes
         that will be considered when fetching
@@ -693,7 +693,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, only_uncached: bool = False) -> list:
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
@@ -719,11 +719,12 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # If there are no restrictions then the plugin
         # is a valid child class.
         for plugin_class in installed_plugins:
-            allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
-            if not allowed_parents or plugin_type in allowed_parents:
-                # Plugin has no parent restrictions or
-                # Current plugin (self) is a configured parent
-                child_classes.append(plugin_class.__name__)
+            if not only_uncached or not plugin_class.cache_parent_classes:
+                allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
+                if not allowed_parents or plugin_type in allowed_parents:
+                    # Plugin has no parent restrictions or
+                    # Current plugin (self) is a configured parent
+                    child_classes.append(plugin_class.__name__)
 
         return child_classes
 
