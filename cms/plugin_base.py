@@ -251,9 +251,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: plugins. Defaults to ``True`` unless :setting:`CMS_ALWAYS_REFRESH_CONTENT` is set to ``True``.
     is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
 
-    # Warning: setting these to False, may have a serious performance impact,
-    # because their child-parent-relation must be recomputed each
-    # time the plugin tree is rendered.
+    # Warning: setting these to False, may have a serious performance impact, because their child-parent-relation must
+    # be recomputed each time the plugin tree is rendered. If a parent with cache_child_classes is True but has
+    # children with cache_parent_classes set to False, the child classes will not be cached.
     cache_child_classes = True
     cache_parent_classes = True
 
