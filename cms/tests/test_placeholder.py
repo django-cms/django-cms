@@ -289,7 +289,7 @@ class PlaceholderTestCase(TransactionCMSTestCase):
         n = 4  # This will be the position of the last plugin
 
         plugins = {lang: [] for lang in language_fun}
-        parent = {lang: None for lang in language_fun}
+        parent = dict.fromkeys(language_fun)
         for i in range(n):
             for lang in language_fun:
                 parent[lang] = add_plugin(ph, "TextPlugin", lang, target=parent[lang]).cmsplugin_ptr
