@@ -1446,7 +1446,7 @@ class StructureBoard {
 
     handleDeletePlugin(data) {
         const placeholder_id = CMS._instances.find(
-            plugin => plugin.options.plugin_id === data.plugin_id
+            plugin => plugin && plugin.options.plugin_id == data.plugin_id  // eslint-disable-line eqeqeq (data.plugin_id might be string)
         ).options.placeholder_id;
         const draggable = $('.cms-draggable-' + data.plugin_id);
         const children = draggable.find('.cms-draggable');
