@@ -93,7 +93,7 @@ def get_plugin_tree(
     Returns:
         tuple[dict[str, Any]]: A dictionary with up to five keys:
             - 'html': A string of rendered HTML for the plugin tree.
-            - 'plugins': A list of plugin information dictionaries.
+            - 'plugins': A flat list of plugin information dictionaries.
             - 'content': The rendered content of target_plugin (if given) including its children
             - 'target_position': The position of the target_plugin (if given)
             - 'target_placeholder_id': The placeholder id of the target_plugin (if given)

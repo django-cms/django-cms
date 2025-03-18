@@ -252,9 +252,9 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     #: plugins. Defaults to ``True`` unless :setting:`CMS_ALWAYS_REFRESH_CONTENT` is set to ``True``.
     is_local = not get_cms_setting("ALWAYS_REFRESH_CONTENT")
 
-    # Warning: setting these to False, may have a serious performance impact,
-    # because their child-parent-relation must be recomputed each
-    # time the plugin tree is rendered.
+    # Warning: setting these to False, may have a serious performance impact, because their child-parent-relation must
+    # be recomputed each time the plugin tree is rendered. If a parent with cache_child_classes is True but has
+    # children with cache_parent_classes set to False, the child classes will not be cached.
     cache_child_classes = True
     cache_parent_classes = True
 
@@ -488,34 +488,31 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
             # This is a nasty edge-case.
             # If the parent plugin is a ghost plugin, fetching the plugin tree
             # will fail because the downcasting function filters out all ghost plugins.
-            # Currently, this case is only present in the djangocms-text-ckeditor app
+            # Currently, this case is only present in the djangocms-text app
             # which uses ghost plugins to create inline plugins on the text.
             root = obj
 
         plugins = [root] + list(root.get_descendants())
 
-        restrictions = {}  # Restrictions cache
-        child_classes, parent_classes = get_plugin_restrictions(obj, restrictions_cache=restrictions)
-        data = get_plugin_toolbar_info(
-            obj,
-            children=child_classes,
-            parents=parent_classes,
-        )
-        data['plugin_desc'] = escapejs(force_str(obj.get_short_description()))
         target_plugin = plugins[0] if add else next(
             (plugin for plugin in plugins if plugin.pk == obj.pk), None
         )
-        data['structure'] = get_plugin_tree(request, plugins, restrictions=restrictions, target_plugin=target_plugin)
-        data['messages'] = [{
-            'level': message.level,
-            'message': message.message,
-            'tags': message.tags,
-            } for message in messages.get_messages(request)]
+        structure = get_plugin_tree(request, plugins, target_plugin=target_plugin)
+        plugin_data = next((plugin_data for plugin_data in structure['plugins'] if plugin_data["plugin_id"] == obj.pk), None)
 
         context = {
             'plugin': obj,
             'is_popup': True,
-            'data_bridge': data,
+            'data_bridge': {
+                **plugin_data,
+                "plugin_desc": escapejs(force_str(obj.get_short_description())),
+                "structure": structure,
+                "messages": [{
+                    'level': message.level,
+                    'message': message.message,
+                    'tags': message.tags,
+                    } for message in messages.get_messages(request)],
+            },
         }
 
         if extra_context:
@@ -681,7 +678,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         return ph_conf.get(cls.__name__, cls.child_classes)
 
     @classmethod
-    def get_child_plugin_candidates(cls, slot: str, page: Optional[Page] = None):
+    def get_child_plugin_candidates(cls, slot: str, page: Optional[Page] = None) -> list:
         """
         Returns a list of all plugin classes
         that will be considered when fetching
@@ -697,7 +694,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
     @classmethod
     @template_slot_caching
-    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None):
+    def get_child_classes(cls, slot, page: Optional[Page] = None, instance: Optional[CMSPlugin] = None, only_uncached: bool = False) -> list:
         """
         Returns a list of plugin types that can be added
         as children to this plugin.
@@ -723,11 +720,12 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # If there are no restrictions then the plugin
         # is a valid child class.
         for plugin_class in installed_plugins:
-            allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
-            if not allowed_parents or plugin_type in allowed_parents:
-                # Plugin has no parent restrictions or
-                # Current plugin (self) is a configured parent
-                child_classes.append(plugin_class.__name__)
+            if not only_uncached or not plugin_class.cache_parent_classes:
+                allowed_parents = plugin_class.get_parent_classes(slot, page, instance)
+                if not allowed_parents or plugin_type in allowed_parents:
+                    # Plugin has no parent restrictions or
+                    # Current plugin (self) is a configured parent
+                    child_classes.append(plugin_class.__name__)
 
         return child_classes
 
