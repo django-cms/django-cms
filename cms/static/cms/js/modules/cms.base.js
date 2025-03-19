@@ -117,18 +117,27 @@ export const Helpers = {
      * @public
      */
     onPluginSave: function() {
-        var data = this.dataBridge;
-        var editedPlugin =
-            data &&
-            data.plugin_id &&
-            window.CMS._instances.some(function(plugin) {
-                return Number(plugin.options.plugin_id) === Number(data.plugin_id) && plugin.options.type === 'plugin';
-            });
-        var addedPlugin = !editedPlugin && data && data.plugin_id;
+        const data = this.dataBridge;
+        const action = data && data.action ? data.action.toUpperCase() : '') : '';
 
-        if (editedPlugin || addedPlugin) {
-            CMS.API.StructureBoard.invalidateState(addedPlugin ? 'ADD' : 'EDIT', data);
-            return;
+        switch (action) {
+            case 'CHANGE':
+            case 'EDIT':
+                if (window.CMS._instances.some(plugin =>
+                    Number(plugin.options.plugin_id) === Number(data.plugin_id) &&
+                    plugin.options.type === 'plugin')
+                ) {
+                    CMS.API.StructureBoard.invalidateState('EDIT', data);
+                    return;
+                }
+                break;
+            case 'ADD':
+            case 'DELETE':
+            case 'CLEAR_PLACEHOLDER':
+                CMS.API.StructureBoard.invalidateState(action, data);
+                return;
+            default:
+                break;
         }
 
         // istanbul ignore else

@@ -159,35 +159,36 @@ def get_plugin_tree(
         parent = next(
             (plugin for plugin in plugins if plugin.pk == target_plugin.parent_id), None
         ) if target_plugin.parent_id else None
-        try:
-            content["content"] = get_plugin_content(request, downcasted, {"parent": parent})
-        except Exception:
-            pass  # do not deliver content if rendering fails
+        content["content"] = get_plugin_content(request, downcasted, {"parent": parent})
 
     return {'html': '\n'.join(tree_structure), 'plugins': tree_data, **content}
 
 
-def get_plugin_content(request: HttpRequest, plugin: CMSPlugin, context: dict = {}) -> dict[str, Any]:
+def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin], context: dict = {}) -> dict[str, Any]:
+    plugin_list = plugin if isinstance(plugin, list) else [plugin]
     toolbar = get_toolbar_from_request(request)
     renderer = toolbar.content_renderer
     # Switch to edit mode despite the request originally coming from the admin
     toolbar.edit_mode_active = True
     renderer._placeholders_are_editable = True
     context = SekizaiContext({'request': request, **context})
-    content = renderer.render_plugin(plugin, context, placeholder=plugin.placeholder, editable=True)
-    return {
-        "html": content,
-        "js": "".join(context[get_varname()].get("js", [])),
-        "css": "".join(context[get_varname()].get("css", [])),
-        "position": plugin.position,
-        "placeholder_id": plugin.placeholder_id,
-        "pluginIds": get_plugin_tree_ids(plugin),
-    }
+    try:
+        return [{
+            "html": renderer.render_plugin(plugin, context, placeholder=plugin.placeholder, editable=True),
+            "js": "".join(context[get_varname()].get("js", [])),
+            "css": "".join(context[get_varname()].get("css", [])),
+            "position": plugin.position,
+            "placeholder_id": plugin.placeholder_id,
+            "pluginIds": get_plugin_tree_ids(plugin),
+        } for plugin in plugin_list]
+    except Exception:
+        return []  # do not deliver content if rendering fails
+
 
 
 def get_plugin_tree_ids(plugin: CMSPlugin) -> list[int]:
     plugin_ids = [plugin.pk]
-    for child in plugin.child_plugin_instances:
+    for child in plugin.child_plugin_instances or []:
         plugin_ids += get_plugin_tree_ids(child)
     return plugin_ids
 
