@@ -14,7 +14,6 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseNotFound,
-    HttpResponseRedirect,
 )
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.template.response import TemplateResponse
@@ -785,13 +784,14 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 target_position=target_position,
             )
         elif move_to_clipboard:
+            old_parent = plugin.parent  # Previous parent needs content update, too
             new_plugin = self._cut_plugin(
                 request,
                 plugin=plugin,
                 target_language=target_language,
                 target_placeholder=placeholder,
             )
-            new_plugins = [new_plugin]
+            new_plugins = [plugin]
         else:
             old_parent = plugin.parent  # Previous parent needs content update, too
             new_plugin = self._move_plugin(
@@ -813,6 +813,8 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         # Pass the target_position
         if len(data["content"]) > 0:
             data["content"][0]["insert"] = new_plugins[0].pk == plugin.pk  # Insert the content (old_parent is always only updated)
+            if move_to_clipboard:
+                data["content"].pop(0)
         data["source_placeholder_id"] = source_placeholder.pk
         return HttpResponse(json.dumps(data), content_type='application/json')
 
