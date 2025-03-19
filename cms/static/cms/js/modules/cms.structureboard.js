@@ -1076,7 +1076,7 @@ class StructureBoard {
     }
 
     _updateContentFromDataBridge(data) {  // eslint-disable-line complexity
-        if (!data || !data.content) {
+        if (!data || !data.content || data.content.length === 0) {
             return true;
         }
         if (data.source_placeholder_id && !CMS._instances.some(
