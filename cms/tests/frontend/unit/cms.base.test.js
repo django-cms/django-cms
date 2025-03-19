@@ -146,7 +146,9 @@ describe('cms.base.js', function() {
 
                 CMS.API.Helpers.dataBridge = { plugin_id: '1', action: 'edit' };
                 CMS.API.Helpers.onPluginSave();
-                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith('EDIT', { plugin_id: '1', action: 'edit' });
+                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith(
+                    'EDIT', { plugin_id: '1', action: 'edit' }
+                );
             });
 
             it('invalidates state if the plugin was added', () => {
@@ -154,7 +156,9 @@ describe('cms.base.js', function() {
 
                 CMS.API.Helpers.dataBridge = { plugin_id: '1', action: 'add' };
                 CMS.API.Helpers.onPluginSave();
-                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith('ADD', { plugin_id: '1', action: 'add' });
+                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith(
+                    'ADD', { plugin_id: '1', action: 'add' }
+                );
             });
 
             it('invalidates state if the plugin was added', () => {

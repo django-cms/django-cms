@@ -118,7 +118,7 @@ export const Helpers = {
      */
     onPluginSave: function() {
         const data = this.dataBridge;
-        const action = data && data.action ? data.action.toUpperCase() : '';
+        const action = data && data.plugin_id ? (data.action || 'ADD').toUpperCase() : '';
 
         switch (action) {
             case 'CHANGE':
