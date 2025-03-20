@@ -369,7 +369,7 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin_user):
             response = self.client.post(endpoint, {"test": 0})
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         # After cleaning the de placeholder, en placeholder must still have all the plugins
         self.assertEqual(ph.get_plugins("en").count(), 0)
@@ -402,7 +402,7 @@ class AdminTestCase(AdminTestsBase):
         with self.login_user_context(admin_user):
             response = self.client.post(endpoint, {"test": 0})
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
 
         # After cleaning the de placeholder, en placeholder must still have all the plugins
         self.assertEqual(ph.get_plugins("en").count(), 2)

@@ -1,6 +1,5 @@
 import hashlib
 from datetime import timedelta
-from importlib import import_module
 
 from django.conf import settings
 from django.utils.cache import (
@@ -10,7 +9,6 @@ from django.utils.cache import (
 )
 from django.utils.encoding import iri_to_uri
 from django.utils.timezone import now
-from django.utils.translation import get_language_from_request
 
 from cms.cache import _get_cache_key, _get_cache_version, _set_cache_version
 from cms.constants import EXPIRE_NOW, MAX_EXPIRATION_TTL
