@@ -1010,6 +1010,7 @@ class Modal {
                     // We have a special case here cause the CMS namespace
                     // can be either inside the current window or the parent
                     const dataBridge = body[0].querySelector('script#data-bridge');
+
                     if (dataBridge) {
                         // hello ckeditor
                         Helpers.removeEventListener('modal-close.text-plugin');
