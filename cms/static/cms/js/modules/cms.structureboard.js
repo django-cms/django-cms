@@ -1472,8 +1472,12 @@ class StructureBoard {
 
         StructureBoard.actualizePluginsCollapsibleStatus(parent.find('> .cms-draggables'));
         StructureBoard.actualizePlaceholders();
+        const contentData = (data.structure || data);  // delete has content in data.structure, cut in data
 
         deletedPluginIds.forEach(function(pluginId) {
+            if (!contentData.content) {
+                $(`.cms-plugin.cms-plugin-${pluginId}`).remove();  // Remove from content
+            }
             $(`script[data-cms-plugin]#cms-plugin-${pluginId}`).remove();  // Remove script elements
             remove(CMS._plugins, settings => settings[0] === `cms-plugin-${pluginId}`);
             remove(
@@ -1485,8 +1489,7 @@ class StructureBoard {
         const lastPluginDeleted = CMS._instances.find(
             plugin => plugin.options.placeholder_id == placeholder_id  // eslint-disable-line eqeqeq
         ) === undefined;
-
-        return lastPluginDeleted || this._updateContentFromDataBridge(data.structure);
+        return lastPluginDeleted || contentData.content && this._updateContentFromDataBridge(contentData);
     }
 
     handleClearPlaceholder(data) {
