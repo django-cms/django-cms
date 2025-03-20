@@ -1097,7 +1097,7 @@ class StructureBoard {
             if (nextEl.length < 1 || content.insert) {
                 // Plugin not found, but placeholder is known - plugin was added
                 const {placeholder_id} = content;
-                const position = content.position;
+                const {position} = content;
 
                 nextEl = this._findNextElement(position, placeholder_id, content.pluginIds);
             }
