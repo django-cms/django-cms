@@ -19,7 +19,7 @@ from django.urls import Resolver404, resolve, reverse
 from django.utils.cache import patch_cache_control
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.timezone import now
-from django.utils.translation import activate, get_language_from_request
+from django.utils.translation import activate
 from django.views.decorators.http import require_POST
 
 from cms.apphook_pool import apphook_pool

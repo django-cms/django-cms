@@ -288,8 +288,8 @@ class GrouperModelAdmin(ChangeListActionsMixin, ModelAdmin):
         for content_field in self.form._content_fields:
             if (
                 not hasattr(self, CONTENT_PREFIX + content_field)
-                and content_field != self.grouper_field_name  # noqa: W504
-                and content_field not in self.extra_grouping_fields  # noqa: W504
+                and content_field != self.grouper_field_name
+                and content_field not in self.extra_grouping_fields
             ):
                 if CONTENT_PREFIX + content_field in self.list_display:
                     # Identify content fields in list_display to annotate to queryset

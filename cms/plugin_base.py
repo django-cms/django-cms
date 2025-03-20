@@ -7,8 +7,8 @@ from django import forms
 from django.contrib import admin, messages
 from django.core.exceptions import ImproperlyConfigured, ObjectDoesNotExist, ValidationError
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import render
 from django.template import Context
+from django.template.response import TemplateResponse
 from django.utils.encoding import force_str, smart_str
 from django.utils.functional import lazy
 from django.utils.html import escapejs
@@ -17,7 +17,7 @@ from django.utils.translation import gettext, gettext_lazy as _
 from cms import operations
 from cms.exceptions import SubClassNeededError
 from cms.models import CMSPlugin, Page
-from cms.toolbar.utils import get_plugin_toolbar_info, get_plugin_tree
+from cms.toolbar.utils import get_plugin_tree
 from cms.utils.compat import DJANGO_5_1
 from cms.utils.conf import get_cms_setting
 
@@ -99,6 +99,7 @@ class CMSPluginBaseMetaclass(forms.MediaDefiningClass):
 
 
 T = TypeVar('T', bound=Callable)
+
 
 def template_slot_caching(method: T) -> T:
     """
@@ -475,11 +476,62 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
     def render_close_frame(
         self,
         request: HttpRequest,
-        obj: CMSPlugin,
-        add: bool = False,
-        extra_context: Optional[Context] = None
+        obj: Optional[CMSPlugin],
+        action: Optional[str] = "edit",
+        extra_data: Optional[Context] = None,
+        extra_context: Optional[Context] = None,
     ) -> HttpResponse:
-        from cms.utils.plugins import get_plugin_restrictions
+        """
+        Renders the close frame for a CMS plugin in the Django admin interface.
+
+        This method is used to send information to the javascript frontend
+        after an edit action has taken place. It allows the javascript frontend
+        to update the structure and content on the edit endpoints.
+
+        Args:
+            request (HttpRequest): The HTTP request object.
+            obj (CMSPlugin): The CMS plugin instance being rendered.
+            action (Optional[str]): The action being performed on the plugin.
+                Defaults to "edit". Possible values are "add", "edit", "move", and "delete".
+            extra_data (Optional[Context]): Additional data to include in
+                the data bridge to the frontend. Defaults to None.
+            extra_context (Optional[Context]): Additional context to include in
+                the rendering. Defaults to None.
+
+        Returns:
+            HttpResponse: The rendered confirmation form as an HTTP response.
+
+        Raises:
+            ObjectDoesNotExist: If the parent plugin is a ghost plugin and the
+                plugin tree cannot be fetched.
+
+        Notes:
+            - Handles edge cases where the parent plugin is a ghost plugin.
+            - Constructs the plugin tree structure and gathers plugin-specific
+              data for rendering.
+            - Includes messages from the request in the context.
+        """
+
+        dj_messages = [{
+                    'level': message.level,
+                    'message': message.message,
+                    'tags': message.tags,
+                    } for message in messages.get_messages(request)]
+
+        if not obj:
+            # No object specified - just close the modal frame
+            context = {
+                "is_popup": True,
+                "data_bridge": {
+                    "action": action,
+                    "messages": dj_messages,
+                    **(extra_data or {}),
+                },
+                **(extra_context or {}),
+            }
+            return TemplateResponse(
+                request, 'admin/cms/page/plugin/confirm_form.html', context
+            )
 
         try:
             root = obj.parent.get_bound_plugin() if obj.parent else obj
@@ -493,30 +545,27 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
 
         plugins = [root] + list(root.get_descendants())
 
-        target_plugin = plugins[0] if add else next(
+        target_plugin = plugins[0] if action in ("add", "delete") else next(
             (plugin for plugin in plugins if plugin.pk == obj.pk), None
         )
         structure = get_plugin_tree(request, plugins, target_plugin=target_plugin)
-        plugin_data = next((plugin_data for plugin_data in structure['plugins'] if plugin_data["plugin_id"] == obj.pk), None)
+        plugin_data = next((plugin_data for plugin_data in structure['plugins'] if plugin_data["plugin_id"] == obj.pk), {})
 
         context = {
             'plugin': obj,
             'is_popup': True,
             'data_bridge': {
                 **plugin_data,
+                "action": action,
                 "plugin_desc": escapejs(force_str(obj.get_short_description())),
                 "structure": structure,
-                "messages": [{
-                    'level': message.level,
-                    'message': message.message,
-                    'tags': message.tags,
-                    } for message in messages.get_messages(request)],
+                "messages": dj_messages,
+                **(extra_data or {}),
             },
+            **(extra_context or {}),
         }
 
-        if extra_context:
-            context.update(extra_context)
-        return render(
+        return TemplateResponse(
             request, 'admin/cms/page/plugin/confirm_form.html', context
         )
 
@@ -565,7 +614,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         # was added successfully but looks like the CMS has not
         # supported this and can lead to issues with plugins
         # like ckeditor.
-        return self.render_close_frame(request, obj, add=True)
+        return self.render_close_frame(request, obj, action="add")
 
     def response_change(self, request, obj):
         self.object_successfully_changed = True
@@ -573,7 +622,7 @@ class CMSPluginBase(admin.ModelAdmin, metaclass=CMSPluginBaseMetaclass):
         msg_dict = {'name': force_str(opts.verbose_name), 'obj': force_str(obj)}
         msg = _('The %(name)s "%(obj)s" was changed successfully.') % msg_dict
         self.message_user(request, msg, messages.SUCCESS)
-        return self.render_close_frame(request, obj, add=False)
+        return self.render_close_frame(request, obj, action="change")
 
     def log_addition(self, request, obj, bypass=None):
         pass

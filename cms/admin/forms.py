@@ -196,7 +196,7 @@ class BasePageContentForm(forms.ModelForm):
     _request = None
 
     title = forms.CharField(
-        label=PageContent._meta.get_field("title").verbose_name,
+        label=PageContent._meta.get_field("title").verbose_name.capitalize(),
         max_length=255,
         widget=forms.TextInput(),
         help_text=PageContent._meta.get_field("title").help_text,
@@ -207,19 +207,19 @@ class BasePageContentForm(forms.ModelForm):
         help_text=_("The part of the title that is used in the URL"),
     )
     menu_title = forms.CharField(
-        label=PageContent._meta.get_field("menu_title").verbose_name,
+        label=PageContent._meta.get_field("menu_title").verbose_name.capitalize(),
         widget=forms.TextInput(),
         help_text=PageContent._meta.get_field("menu_title").help_text,
         required=False,
     )
     page_title = forms.CharField(
-        label=PageContent._meta.get_field("page_title").verbose_name,
+        label=PageContent._meta.get_field("page_title").verbose_name.capitalize(),
         widget=forms.TextInput(),
         required=False,
         help_text=PageContent._meta.get_field("page_title").help_text,
     )
     meta_description = forms.CharField(
-        label=PageContent._meta.get_field("meta_description").verbose_name,
+        label=PageContent._meta.get_field("meta_description").verbose_name.capitalize(),
         max_length=320,
         required=False,
         widget=forms.Textarea(attrs={"maxlength": "320", "rows": "4"}),

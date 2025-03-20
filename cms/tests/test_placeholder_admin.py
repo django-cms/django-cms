@@ -171,7 +171,7 @@ class PlaceholderAdminTestCase(CMSTestCase):
         with self.login_user_context(superuser):
             response = self.client.post(endpoint, {"test": 0})
 
-        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.status_code, 200)
         self.assertEqual(placeholder.get_plugins("en").count(), 0)
 
     def _fill_page_body(self, page, lang):

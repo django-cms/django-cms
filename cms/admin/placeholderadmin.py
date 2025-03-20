@@ -14,9 +14,8 @@ from django.http import (
     HttpResponseBadRequest,
     HttpResponseForbidden,
     HttpResponseNotFound,
-    HttpResponseRedirect,
 )
-from django.shortcuts import get_list_or_404, get_object_or_404, render
+from django.shortcuts import get_list_or_404, get_object_or_404
 from django.template.response import TemplateResponse
 from django.urls import include, re_path
 from django.utils.datastructures import MultiValueDict
@@ -37,16 +36,16 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
-from cms.toolbar.utils import get_plugin_tree
+from cms.toolbar.utils import get_plugin_content, get_plugin_tree
 from cms.utils import get_current_site
 from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
 from cms.utils.i18n import get_language_code, get_language_list
 from cms.utils.plugins import (
     copy_plugins_to_placeholder,
+    downcast_plugins,
     has_reached_plugin_limit,
 )
-from cms.utils.urlutils import admin_reverse
 from cms.views import (
     render_object_edit,
     render_object_preview,
@@ -103,13 +102,13 @@ class BaseEditableAdminMixin:
                 'opts': opts,
                 'message': _("Field %s not found") % raw_fields
             }
-            return render(request, 'admin/cms/page/plugin/error_form.html', context)
+            return TemplateResponse(request, 'admin/cms/page/plugin/error_form.html', context)
         if not request.user.has_perm(f"{admin_obj.model._meta.app_label}.change_{admin_obj.model._meta.model_name}"):
             context = {
                 'opts': opts,
                 'message': _("You do not have permission to edit this item")
             }
-            return render(request, 'admin/cms/page/plugin/error_form.html', context)
+            return TemplateResponse(request, 'admin/cms/page/plugin/error_form.html', context)
             # Dynamically creates the form class with only `field_name` field
         # enabled
         form_class = admin_obj.get_form(request, obj, fields=fields)
@@ -141,16 +140,12 @@ class BaseEditableAdminMixin:
         }
         if cancel_clicked:
             # cancel button was clicked
-            context.update({
-                'cancel': True,
-            })
-            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
-        if not cancel_clicked and request.method == 'POST' and saved_successfully:
-            if isinstance(admin_obj, CMSPluginBase):
-                # Update the structure board by populating the data bridge
-                return admin_obj.render_close_frame(request, obj, add=False)
-            return render(request, 'admin/cms/page/plugin/confirm_form.html', context)
-        return render(request, 'admin/cms/page/plugin/change_form.html', context)
+            context["cancel"] = True
+            return TemplateResponse(request, 'admin/cms/page/plugin/confirm_form.html', context)
+        if not cancel_clicked and request.method == 'POST' and saved_successfully and isinstance(admin_obj, CMSPluginBase):
+            # Update the structure board by populating the data bridge
+            return admin_obj.render_close_frame(request, obj, add=False)
+        return TemplateResponse(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
 class FrontendEditableAdminMixin(BaseEditableAdminMixin):
@@ -762,10 +757,12 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         else:
             target_parent = None
 
-        new_plugin = None
-        fetch_tree = False
+        old_parent = None
+        fetch_tree = True
 
         if move_a_copy and plugin.plugin_type == "PlaceholderPlugin":
+            fetch_tree = False
+            new_plugin = None
             new_plugins = self._paste_placeholder(
                 request,
                 plugin=plugin,
@@ -774,7 +771,6 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 target_position=target_position,
             )
         elif move_a_copy:
-            fetch_tree = True
             new_plugin = self._paste_plugin(
                 request,
                 plugin=plugin,
@@ -784,15 +780,16 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 target_position=target_position,
             )
         elif move_to_clipboard:
+            old_parent = plugin.parent  # Previous parent needs content update, too
             new_plugin = self._cut_plugin(
                 request,
                 plugin=plugin,
                 target_language=target_language,
                 target_placeholder=placeholder,
             )
-            new_plugins = [new_plugin]
+            new_plugins = [plugin]
         else:
-            fetch_tree = True
+            old_parent = plugin.parent  # Previous parent needs content update, too
             new_plugin = self._move_plugin(
                 request,
                 plugin=plugin,
@@ -805,8 +802,15 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             root = (new_plugin.parent or new_plugin)
             new_plugins = [root] + list(root.get_descendants())
         data = get_plugin_tree(request, new_plugins, target_plugin=new_plugins[0])
+        if old_parent and old_parent not in new_plugins:
+            # Update previous parent and its children
+            old_parent_plugins = downcast_plugins([old_parent] + list(old_parent.get_descendants()), select_placeholder=True)
+            data["content"] += get_plugin_content(request, next(old_parent_plugins, None))
         # Pass the target_position
-        data["insert"] = new_plugins[0].pk == plugin.pk
+        if len(data["content"]) > 0:
+            data["content"][0]["insert"] = new_plugins[0].pk == plugin.pk  # Insert the content (old_parent is always only updated)
+            if move_to_clipboard:
+                data["content"].pop(0)
         data["source_placeholder_id"] = source_placeholder.pk
         return HttpResponse(json.dumps(data), content_type='application/json')
 
@@ -1063,10 +1067,9 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 raise PermissionDenied(_("You do not have permission to delete this plugin"))
             obj_display = force_str(plugin)
             placeholder = plugin.placeholder
-            plugin_tree_order = placeholder.get_plugin_tree_order(
-                language=plugin.language,
-                parent_id=plugin.parent_id,
-            )
+            plugin_class_instance = plugin.get_plugin_class_instance()
+            plugin_parent = plugin.parent
+            plugin_tree_order = placeholder.get_plugin_tree_order(language=plugin.language)
 
             operation_token = self._send_pre_placeholder_operation(
                 request,
@@ -1089,7 +1092,11 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 placeholder=placeholder,
                 tree_order=plugin_tree_order,
             )
-            return render(request, "admin/cms/page/close_frame.html", {})
+            return plugin_class_instance.render_close_frame(
+                request,
+                plugin_parent,
+                action="delete",
+                extra_data=dict(deleted=True, plugin_id=plugin.pk))
 
         plugin_name = force_str(plugin.get_plugin_class().name)
 
@@ -1123,7 +1130,13 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             # There could be a case where a plugin has relationship to
             # an object the user does not have permission to delete.
             placeholder.clear(language)
-            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
+            return TemplateResponse(request, "admin/cms/page/plugin/confirm_form.html", {
+                "data_bridge": {
+                    "action": "clear_placeholder",
+                    "deleted": True,
+                    "placeholder_id": placeholder.pk,
+                }
+            })
 
         if not self.has_clear_placeholder_permission(request, placeholder, language):
             message = _("You do not have permission to clear this placeholder")
@@ -1170,7 +1183,13 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
                 plugins=plugins,
                 placeholder=placeholder,
             )
-            return HttpResponseRedirect(admin_reverse('index', current_app=self.admin_site.name))
+            return TemplateResponse(request, "admin/cms/page/plugin/confirm_form.html", {
+                "data_bridge": {
+                    "action": "clear_placeholder",
+                    "deleted": True,
+                    "placeholder_id": placeholder.pk,
+                }
+            })
 
         if perms_needed or protected:
             title = _("Cannot delete %(name)s") % {"name": obj_display}
