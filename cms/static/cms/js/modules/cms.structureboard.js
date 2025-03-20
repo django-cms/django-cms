@@ -1075,7 +1075,40 @@ class StructureBoard {
             .fail(() => loader.remove() && Helpers.reloadBrowser());
     }
 
-    _updateContentFromDataBridge(data) {  // eslint-disable-line complexity
+    _updateSingleContent(content) {
+        if (!content.pluginIds || content.pluginIds.length < 1 || content.html === undefined) {
+            // No valid content data available – update needed.
+            return true;
+        }
+
+        let nextEl = $(`:not(template).cms-plugin.cms-plugin-${content.pluginIds[0]}.cms-plugin-start`);
+
+        if (nextEl.length < 1 || content.insert) {
+            // Plugin not found, but placeholder is known – plugin was added.
+            nextEl = this._findNextElement(content.position, content.placeholder_id, content.pluginIds);
+        }
+
+        if (nextEl.length === 0) {
+            // Placeholder not found – update needed.
+            return true;
+        }
+
+        nextEl.before(content.html);
+
+        // Remove previous plugin and related script elements.
+        content.pluginIds.forEach(id => {
+            $(`:not(template).cms-plugin.cms-plugin-${id}`).remove();
+            $(`script[data-cms-plugin]#cms-plugin-${id}`).remove();
+        });
+
+        // Update Sekizai blocks.
+        this._updateSekizai(content, 'css');
+        this._updateSekizai(content, 'js');
+
+        return false;
+    }
+
+    _updateContentFromDataBridge(data) {
         if (!data || !data.content || data.content.length === 0) {
             return true;
         }
@@ -1088,34 +1121,9 @@ class StructureBoard {
         }
 
         for (const content of data.content) {
-            if (!content.pluginIds || content.pluginIds.length < 1 || content.html === undefined) {
-                // No content data available in data bridge? Full content upudate needed.
-                return true;  // Update needed
+            if (this._updateSingleContent(content)) {
+                return true; // Early exit if full content update is needed.
             }
-            let nextEl = $(`:not(template).cms-plugin.cms-plugin-${content.pluginIds[0]}.cms-plugin-start`);
-
-            if (nextEl.length < 1 || content.insert) {
-                // Plugin not found, but placeholder is known - plugin was added
-                const {placeholder_id} = content;
-                const {position} = content;
-
-                nextEl = this._findNextElement(position, placeholder_id, content.pluginIds);
-            }
-            if (nextEl.length === 0) {
-                // Placeholder not found - update needed
-                return true;
-            }
-            nextEl.before(content.html);
-
-            // Delete previous content
-            // Go through all plugins and child plugins (they might not be nested)
-            content.pluginIds.forEach(id => {
-                $(`:not(template).cms-plugin.cms-plugin-${id}`).remove();
-                // Plugin data is updated through the data bridge - script elements can be removed
-                $(`script[data-cms-plugin]#cms-plugin-${id}`).remove();
-            });
-            this._updateSekizai(content, 'css');
-            this._updateSekizai(content, 'js');
         }
         this._contentChanged(data.messages);
 
@@ -1451,10 +1459,10 @@ class StructureBoard {
     }
 
     handleDeletePlugin(data) {
-        const placeholder_id = CMS._instances.find(
+        const {placeholder_id} = CMS._instances.find(
             // data.plugin_id might be string
             plugin => plugin && plugin.options.plugin_id == data.plugin_id  // eslint-disable-line eqeqeq
-        ).options.placeholder_id;
+        ).options;
         const draggable = $('.cms-draggable-' + data.plugin_id);
         const children = draggable.find('.cms-draggable');
         let deletedPluginIds = [data.plugin_id];

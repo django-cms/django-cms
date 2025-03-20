@@ -140,15 +140,11 @@ class BaseEditableAdminMixin:
         }
         if cancel_clicked:
             # cancel button was clicked
-            context.update({
-                'cancel': True,
-            })
+            context["cancel"] = True
             return TemplateResponse(request, 'admin/cms/page/plugin/confirm_form.html', context)
-        if not cancel_clicked and request.method == 'POST' and saved_successfully:
-            if isinstance(admin_obj, CMSPluginBase):
-                # Update the structure board by populating the data bridge
-                return admin_obj.render_close_frame(request, obj, add=False)
-            return TemplateResponse(request, 'admin/cms/page/plugin/confirm_form.html', context)
+        if not cancel_clicked and request.method == 'POST' and saved_successfully and isinstance(admin_obj, CMSPluginBase):
+            # Update the structure board by populating the data bridge
+            return admin_obj.render_close_frame(request, obj, add=False)
         return TemplateResponse(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
