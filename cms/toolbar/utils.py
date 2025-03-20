@@ -166,7 +166,9 @@ def get_plugin_tree(
     return {'html': '\n'.join(tree_structure), 'plugins': tree_data, **content}
 
 
-def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin], context: dict = {}) -> dict[str, Any]:
+def get_plugin_content(request: HttpRequest, plugin: CMSPlugin | list[CMSPlugin], context: dict = None) -> dict[str, Any]:
+    if context is None:
+        context = {}
     plugin_list = plugin if isinstance(plugin, list) else [plugin]
     toolbar = get_toolbar_from_request(request)
     renderer = toolbar.content_renderer
