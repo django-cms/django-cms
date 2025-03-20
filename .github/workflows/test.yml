@@ -53,8 +53,8 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install pytest uv
+        python -m pip install --upgrade pip uv
+        uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
         python setup.py install
@@ -111,8 +111,8 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install pytest uv
+        python -m pip install --upgrade pip uv
+        uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
         python setup.py install
@@ -158,9 +158,10 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install pytest uv
+        python -m pip install --upgrade pip uv
+        uv pip install --system pytest
         uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
     - name: Test with django test runner
@@ -189,10 +190,9 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        python -m pip install --upgrade pip uv
         uv pip install --system pytest
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         python setup.py install
 
     - name: Test with django test runner
@@ -235,10 +235,9 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        python -m pip install --upgrade pip uv
         uv pip install --system pytest
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 
@@ -283,10 +282,9 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt install gettext gcc -y
-        python -m pip install --upgrade pip
-        pip install uv
-        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
+        python -m pip install --upgrade pip uv
         uv pip install --system pytest
+        uv pip install --system -r test_requirements/${{ matrix.requirements-file }}
         uv pip install --system -r test_requirements/databases.txt
         python setup.py install
 

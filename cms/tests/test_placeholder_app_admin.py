@@ -536,7 +536,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, {'test': 0})
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
 
     def test_user_cant_clear_empty_placeholder(self):
         """
@@ -572,7 +572,7 @@ class AppAdminPermissionsTest(AppAdminTestCase):
 
         with self.login_user_context(staff_user):
             response = self.client.post(endpoint, {'test': 0})
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
             self.assertEqual(placeholder.get_plugins('en').count(), 0)
 
     def test_user_cant_clear_non_empty_placeholder(self):

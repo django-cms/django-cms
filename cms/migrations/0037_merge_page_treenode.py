@@ -57,7 +57,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='page',
             name='path',
-            field=models.CharField(default=None, null=True, max_length=255, unique=True), 
+            field=models.CharField(default=None, null=True, max_length=255, unique=True),
             preserve_default=False,
         ),
         migrations.AddField(

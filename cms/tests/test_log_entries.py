@@ -564,7 +564,7 @@ class LogPlaceholderOperationsTests(CMSTestCase):
         with self.login_user_context(self._admin_user):
             response = self.client.post(endpoint, {'test': 0})
             # Test that the end point is valid
-            self.assertEqual(response.status_code, 302)
+            self.assertEqual(response.status_code, 200)
             # Test that the log count is correct
             self.assertEqual(1, LogEntry.objects.count())
 

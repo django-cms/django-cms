@@ -2631,10 +2631,10 @@ describe('CMS.StructureBoard', function() {
             const incompleteData = {};
             expect(CMS.API.StructureBoard._updateContentFromDataBridge(incompleteData)).toBe(true);
 
-            const missingContent = { content: {} };
+            const missingContent = { content: [] };
             expect(CMS.API.StructureBoard._updateContentFromDataBridge(missingContent)).toBe(true);
 
-            const missingPluginIds = { content: { html: '<div></div>' } };
+            const missingPluginIds = { content: [{ html: '<div></div>' }] };
             expect(CMS.API.StructureBoard._updateContentFromDataBridge(missingPluginIds)).toBe(true);
         });
 
@@ -2652,35 +2652,35 @@ describe('CMS.StructureBoard', function() {
 
         it('should update content and return false if data is valid', () => {
             const data = {
-                content: {
+                content: [{
                     pluginIds: [1],
                     html: '<template class="cms-plugin cms-plugin-1 cms-plugin-start"></template>' +
                           '<div>My new plugin</div>' +
                           '<template class="cms-plugin cms-plugin-1 cms-plugin-end"></template>',
                     placeholder_id: 1,
                     position: 0
-                }
+                }]
             };
             spyOn(CMS.API.StructureBoard, '_findNextElement').and.returnValue($('<div></div>'));
             spyOn(CMS.API.StructureBoard, '_updateSekizai');
             spyOn(CMS.API.StructureBoard, '_contentChanged');
 
             expect(CMS.API.StructureBoard._updateContentFromDataBridge(data)).toBe(false);
-            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data, 'css');
-            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data, 'js');
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'css');
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'js');
             expect(CMS.API.StructureBoard._contentChanged).toHaveBeenCalledWith(undefined);
         });
 
         it('should remove previous content and update Sekizai blocks', () => {
             const data = {
-                content: {
+                content: [{
                     pluginIds: [1, 2],
                     html: '<div class="cms-plugin cms-plugin-1 cms-plugin-start"></div>',
                     placeholder_id: 1,
                     position: 0,
                     css: '<link rel="stylesheet" href="style.css">',
                     js: '<script src="script.js"></script>'
-                }
+                }]
             };
             spyOn(CMS.API.StructureBoard, '_findNextElement').and.returnValue($('<div></div>'));
             spyOn(CMS.API.StructureBoard, '_updateSekizai');
@@ -2696,8 +2696,8 @@ describe('CMS.StructureBoard', function() {
             expect($('.cms-plugin.cms-plugin-2').length).toBe(0);
             expect($('script[data-cms-plugin]#cms-plugin-1').length).toBe(0);
             expect($('script[data-cms-plugin]#cms-plugin-2').length).toBe(0);
-            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data, 'css');
-            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data, 'js');
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'css');
+            expect(CMS.API.StructureBoard._updateSekizai).toHaveBeenCalledWith(data.content[0], 'js');
             expect(CMS.API.StructureBoard._contentChanged).toHaveBeenCalledWith(undefined);
         });
     });

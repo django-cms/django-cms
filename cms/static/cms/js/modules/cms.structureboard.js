@@ -1075,11 +1075,42 @@ class StructureBoard {
             .fail(() => loader.remove() && Helpers.reloadBrowser());
     }
 
-    _updateContentFromDataBridge(data) {  // eslint-disable-line complexity
-        if (!data || !data.content || !data.content.pluginIds ||
-            data.content.pluginIds.length < 1 || data.content.html === undefined) {
-            // No content data available in data bridge? Full content upudate needed.
-            return true;  // Update needed
+    _updateSingleContent(content) {
+        if (!content.pluginIds || content.pluginIds.length < 1 || content.html === undefined) {
+            // No valid content data available – update needed.
+            return true;
+        }
+
+        let nextEl = $(`:not(template).cms-plugin.cms-plugin-${content.pluginIds[0]}.cms-plugin-start`);
+
+        if (nextEl.length < 1 || content.insert) {
+            // Plugin not found, but placeholder is known – plugin was added.
+            nextEl = this._findNextElement(content.position, content.placeholder_id, content.pluginIds);
+        }
+
+        if (nextEl.length === 0) {
+            // Placeholder not found – update needed.
+            return true;
+        }
+
+        nextEl.before(content.html);
+
+        // Remove previous plugin and related script elements.
+        content.pluginIds.forEach(id => {
+            $(`:not(template).cms-plugin.cms-plugin-${id}`).remove();
+            $(`script[data-cms-plugin]#cms-plugin-${id}`).remove();
+        });
+
+        // Update Sekizai blocks.
+        this._updateSekizai(content, 'css');
+        this._updateSekizai(content, 'js');
+
+        return false;
+    }
+
+    _updateContentFromDataBridge(data) {
+        if (!data || !data.content || data.content.length === 0) {
+            return true;
         }
         if (data.source_placeholder_id && !CMS._instances.some(
                 instance => instance.options.type === 'plugin' &&
@@ -1089,32 +1120,15 @@ class StructureBoard {
             return true;  // Update needed
         }
 
-        let nextEl = $(`:not(template).cms-plugin.cms-plugin-${data.content.pluginIds[0]}.cms-plugin-start`);
-
-        if (nextEl.length < 1 || data.insert) {
-            // Plugin not found, but placeholder is known - plugin was added
-            const placeholder_id = data.content.placeholder_id;
-            const position = data.content.position;
-
-            nextEl = this._findNextElement(position, placeholder_id, data.content.pluginIds);
+        for (const content of data.content) {
+            if (this._updateSingleContent(content)) {
+                return true; // Early exit if full content update is needed.
+            }
         }
-        if (nextEl.length === 0) {
-            // Placeholder not found - update needed
-            return true;
-        }
-        nextEl.before(data.content.html);
-
-        // Delete previous content
-        // Go through all plugins and child plugins (they might not be nested)
-        data.content.pluginIds.forEach(id => {
-            $(`:not(template).cms-plugin.cms-plugin-${id}`).remove();
-            // Plugin data is updated through the data bridge - script elements can be removed
-            $(`script[data-cms-plugin]#cms-plugin-${id}`).remove();
-        });
         this._contentChanged(data.messages);
-        this._updateSekizai(data, 'css');
-        if (!this._updateSekizai(data, 'js')) {
-            // No scripts need to be loaded - content update is done
+
+        if (this.scriptReferenceCount === 0) {
+            // No scripts need to be loaded - content update is already done
             StructureBoard._triggerRefreshEvents();
         }
         return false;
@@ -1140,7 +1154,7 @@ class StructureBoard {
     }
 
     _updateSekizai(data, block) {
-        if ((data.content[block] || '').length === 0) {
+        if ((data[block] || '').length === 0) {
             return;
         }
 
@@ -1164,7 +1178,7 @@ class StructureBoard {
         // Parse new block, by creating the diff
         // Cannot use innerHTML since this would prevent scripts to be executed.
         const newElements = document.createElement('div');
-        const diff = dd.diff(newElements, `<div>${data.content[block]}</div>`);
+        const diff = dd.diff(newElements, `<div>${data[block]}</div>`);
 
         dd.apply(newElements, diff);
 
@@ -1445,9 +1459,10 @@ class StructureBoard {
     }
 
     handleDeletePlugin(data) {
-        const placeholder_id = CMS._instances.find(
-            plugin => plugin.options.plugin_id === data.plugin_id
-        ).options.placeholder_id;
+        const { placeholder_id } = CMS._instances.find(
+            // data.plugin_id might be string
+            plugin => plugin && plugin.options.plugin_id == data.plugin_id  // eslint-disable-line eqeqeq
+        ).options;
         const draggable = $('.cms-draggable-' + data.plugin_id);
         const children = draggable.find('.cms-draggable');
         let deletedPluginIds = [data.plugin_id];
@@ -1465,8 +1480,12 @@ class StructureBoard {
 
         StructureBoard.actualizePluginsCollapsibleStatus(parent.find('> .cms-draggables'));
         StructureBoard.actualizePlaceholders();
+        const contentData = (data.structure || data);  // delete has content in data.structure, cut in data
+
         deletedPluginIds.forEach(function(pluginId) {
-            $(`.cms-plugin.cms-plugin-${pluginId}`).remove();  // Remove from content
+            if (!contentData.content) {
+                $(`.cms-plugin.cms-plugin-${pluginId}`).remove();  // Remove from content
+            }
             $(`script[data-cms-plugin]#cms-plugin-${pluginId}`).remove();  // Remove script elements
             remove(CMS._plugins, settings => settings[0] === `cms-plugin-${pluginId}`);
             remove(
@@ -1474,11 +1493,12 @@ class StructureBoard {
                 instance => instance.options.plugin_id && Number(instance.options.plugin_id) === Number(pluginId)
             );
         });
+
         const lastPluginDeleted = CMS._instances.find(
             plugin => plugin.options.placeholder_id == placeholder_id  // eslint-disable-line eqeqeq
         ) === undefined;
 
-        return lastPluginDeleted;
+        return lastPluginDeleted || contentData.content && this._updateContentFromDataBridge(contentData);
     }
 
     handleClearPlaceholder(data) {

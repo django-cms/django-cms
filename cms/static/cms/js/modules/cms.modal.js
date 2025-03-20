@@ -772,20 +772,6 @@ class Modal {
                         that.ui.modal.find('.cms-modal-frame iframe').hide();
                         // page has been saved or deleted, run checkup
                         that.saved = true;
-                        if (item.hasClass('deletelink')) {
-                            that.justDeleted = true;
-
-                            var action = item.closest('form').prop('action');
-
-                            // in case action is an input (see https://github.com/jquery/jquery/issues/3691)
-                            // it's definitely not a plugin/placeholder deletion
-                            if (typeof action === 'string' && action.match(/delete-plugin/)) {
-                                that.justDeletedPlugin = /delete-plugin\/(\d+)\//gi.exec(action)[1];
-                            }
-                            if (typeof action === 'string' && action.match(/clear-placeholder/)) {
-                                that.justDeletedPlaceholder = /clear-placeholder\/(\d+)\//gi.exec(action)[1];
-                            }
-                        }
                     }
                 }
 
@@ -919,8 +905,9 @@ class Modal {
                 return true;
             }
 
-            // If the response contains the data bridge, the form was saved successfully
-            that.saved = that.saved || body.find('script#data-bridge').length;
+            // If the response contains the close-frame (and potentially the data bridge),
+            // the form was saved successfully
+            that.saved = that.saved || body.hasClass('cms-close-frame');
 
             // tabindex is required for keyboard navigation
             // body.attr('tabindex', '0');
