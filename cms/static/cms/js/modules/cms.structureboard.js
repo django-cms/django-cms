@@ -1489,6 +1489,7 @@ class StructureBoard {
         const lastPluginDeleted = CMS._instances.find(
             plugin => plugin.options.placeholder_id == placeholder_id  // eslint-disable-line eqeqeq
         ) === undefined;
+
         return lastPluginDeleted || contentData.content && this._updateContentFromDataBridge(contentData);
     }
 
