@@ -1459,7 +1459,7 @@ class StructureBoard {
     }
 
     handleDeletePlugin(data) {
-        const {placeholder_id} = CMS._instances.find(
+        const { placeholder_id } = CMS._instances.find(
             // data.plugin_id might be string
             plugin => plugin && plugin.options.plugin_id == data.plugin_id  // eslint-disable-line eqeqeq
         ).options;
