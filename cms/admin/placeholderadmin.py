@@ -36,7 +36,7 @@ from cms.models.pluginmodel import CMSPlugin
 from cms.plugin_base import CMSPluginBase
 from cms.plugin_pool import plugin_pool
 from cms.signals import post_placeholder_operation, pre_placeholder_operation
-from cms.toolbar.utils import get_plugin_content, get_plugin_tree
+from cms.toolbar.utils import create_child_plugin_references, get_plugin_content, get_plugin_tree
 from cms.utils import get_current_site
 from cms.utils.compat.warnings import RemovedInDjangoCMS51Warning
 from cms.utils.conf import get_cms_setting
@@ -804,8 +804,9 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
         data = get_plugin_tree(request, new_plugins, target_plugin=new_plugins[0])
         if old_parent and old_parent not in new_plugins:
             # Update previous parent and its children
-            old_parent_plugins = downcast_plugins([old_parent] + list(old_parent.get_descendants()), select_placeholder=True)
-            data["content"] += get_plugin_content(request, next(old_parent_plugins, None))
+            old_parent_plugins = list(downcast_plugins([old_parent] + list(old_parent.get_descendants()), select_placeholder=True))
+            create_child_plugin_references(old_parent_plugins)
+            data["content"] += get_plugin_content(request, old_parent_plugins[0])
         # Pass the target_position
         if len(data["content"]) > 0:
             data["content"][0]["insert"] = new_plugins[0].pk == plugin.pk  # Insert the content (old_parent is always only updated)
