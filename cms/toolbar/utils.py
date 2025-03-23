@@ -77,6 +77,7 @@ def get_plugin_tree_as_json(request: HttpRequest, plugins: list[CMSPlugin]) -> s
 
 
 def create_child_plugin_references(plugins: list[CMSPlugin]) -> deque[CMSPlugin]:
+    """Creates the ``child_plugin_instances`` attribute on each plugin instance after downcasting."""
     plugin_children = defaultdict(deque)
     root_plugins = deque()
 
