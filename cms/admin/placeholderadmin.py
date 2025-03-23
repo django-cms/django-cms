@@ -144,7 +144,7 @@ class BaseEditableAdminMixin:
             return TemplateResponse(request, 'admin/cms/page/plugin/confirm_form.html', context)
         if not cancel_clicked and request.method == 'POST' and saved_successfully and isinstance(admin_obj, CMSPluginBase):
             # Update the structure board by populating the data bridge
-            return admin_obj.render_close_frame(request, obj, add=False)
+            return admin_obj.render_close_frame(request, obj, action="change")
         return TemplateResponse(request, 'admin/cms/page/plugin/change_form.html', context)
 
 
