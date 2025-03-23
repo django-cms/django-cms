@@ -76,6 +76,23 @@ def get_plugin_tree_as_json(request: HttpRequest, plugins: list[CMSPlugin]) -> s
     return json.dumps(get_plugin_tree(request, plugins)[0])
 
 
+def create_child_plugin_references(plugins: list[CMSPlugin]) -> deque[CMSPlugin]:
+    """Creates the ``child_plugin_instances`` attribute on each plugin instance after downcasting."""
+    plugin_children = defaultdict(deque)
+    root_plugins = deque()
+
+    plugin_ids = frozenset(plugin.pk for plugin in plugins)
+
+    for plugin in reversed(plugins):
+        plugin.child_plugin_instances = plugin_children[plugin.pk]
+
+        if plugin.parent_id in plugin_ids:
+            plugin_children[plugin.parent_id].appendleft(plugin)
+        else:
+            root_plugins.appendleft(plugin)
+    return root_plugins
+
+
 def get_plugin_tree(
     request: HttpRequest,
     plugins: list[CMSPlugin],
@@ -105,23 +122,13 @@ def get_plugin_tree(
     tree_data = []
     tree_structure = []
     restrictions = restrictions or {}
-    root_plugins = deque()
-    plugin_children = defaultdict(deque)
     toolbar = get_toolbar_from_request(request)
     template = toolbar.templates.drag_item_template
     get_plugin_info = get_plugin_toolbar_info
     placeholder = plugins[0].placeholder
     copy_to_clipboard = placeholder.pk == toolbar.clipboard.pk
     plugins = list(downcast_plugins(plugins, select_placeholder=True))
-    plugin_ids = frozenset(plugin.pk for plugin in plugins)
-
-    for plugin in reversed(plugins):
-        plugin.child_plugin_instances = plugin_children[plugin.pk]
-
-        if plugin.parent_id in plugin_ids:
-            plugin_children[plugin.parent_id].appendleft(plugin)
-        else:
-            root_plugins.appendleft(plugin)
+    root_plugins = create_child_plugin_references(plugins)
 
     def collect_plugin_data(plugin):
         child_classes, parent_classes = get_plugin_restrictions(
