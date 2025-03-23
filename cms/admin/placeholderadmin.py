@@ -802,13 +802,13 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             root = (new_plugin.parent or new_plugin)
             new_plugins = [root] + list(root.get_descendants())
         data = get_plugin_tree(request, new_plugins, target_plugin=new_plugins[0])
-        if old_parent and old_parent not in new_plugins:
+        if old_parent and old_parent not in new_plugins and "content" in data:
             # Update previous parent and its children
             old_parent_plugins = list(downcast_plugins([old_parent] + list(old_parent.get_descendants()), select_placeholder=True))
             create_child_plugin_references(old_parent_plugins)
             data["content"] += get_plugin_content(request, old_parent_plugins[0])
         # Pass the target_position
-        if len(data["content"]) > 0:
+        if "content" in data and len(data["content"]) > 0:
             data["content"][0]["insert"] = new_plugins[0].pk == plugin.pk  # Insert the content (old_parent is always only updated)
             if move_to_clipboard:
                 data["content"].pop(0)
