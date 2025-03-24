@@ -1,6 +1,7 @@
 from collections import OrderedDict, namedtuple
 from copy import copy
 from datetime import datetime
+from django.urls import NoReverseMatch
 
 from classytags.arguments import (
     Argument,
@@ -238,14 +239,16 @@ class PageUrl(AsTag):
         # We wish to maintain backwards functionality where the non-as-variant
         # of using this tag will raise DoesNotExist exceptions only when
         # settings.DEBUG=False.
-        #
         try:
             return super().get_value_for_context(context, **kwargs)
-        except Page.DoesNotExist:
+        
+        except (Page.DoesNotExist, NoReverseMatch):
+            # Fix: Catch NoReverseMatch errors in addition to Page.DoesNotExist
+            # to prevent crashes when a page exists but has no Title object
+            # for the current language, ensuring pre-3.5 behavior.
             return ''
 
     def get_value(self, context, page_lookup, lang, site):
-
         site_id = get_site_id(site)
         request = context.get('request', False)
 
@@ -259,11 +262,14 @@ class PageUrl(AsTag):
         if url is None:
             page = _get_page_by_untyped_arg(page_lookup, request, site_id)
             if page:
-                url = page.get_absolute_url(language=lang)
-                set_page_url_cache(page_lookup, lang, site_id, url)
-        if url:
-            return url
-        return ''
+                try:
+                    url = page.get_absolute_url(language=lang)
+                    if not url:
+                        return ''  # Return empty string if Title object is missing
+                    set_page_url_cache(page_lookup, lang, site_id, url)
+                except NoReverseMatch:
+                    return ''  # Suppress NoReverseMatch error
+        return url if url else ''
 
 
 class PlaceholderParser(Parser):
