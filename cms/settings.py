@@ -1,10 +1,12 @@
 import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # Base directory of the project
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Secret Key (Change this to a secure key for production)
-SECRET_KEY = "your-secret-key"
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "your-secret-key")
 
 # Debug mode (Set to False in production)
 DEBUG = True
