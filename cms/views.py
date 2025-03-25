@@ -297,7 +297,7 @@ def render_object_endpoint(request, content_type_id, object_id, require_editable
             content_type_obj = model.admin_manager.select_related("page").get(pk=object_id)
             request.current_page = content_type_obj.page
             if (
-                content_type_obj.page.application_urls and  # noqa: W504
+                content_type_obj.page.application_urls and
                 content_type_obj.page.application_urls in dict(apphook_pool.get_apphooks())
             ):
                 try:
