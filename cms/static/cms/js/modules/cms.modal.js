@@ -1017,8 +1017,13 @@ class Modal {
                         that.close();
                         // the dataBridge is used to access plugin information from different resources
                         // Do NOT move this!!!
-                        CMS.API.Helpers.dataBridge = JSON.parse(dataBridge.textContent);
-                        CMS.API.Helpers.onPluginSave();
+                        try {
+                            CMS.API.Helpers.dataBridge = JSON.parse(dataBridge.textContent);
+                            CMS.API.Helpers.onPluginSave();
+                        } catch (e) {
+                            // istanbul ignore next
+                            Helpers.reloadBrowser();
+                        }
                     }
                 }
             } else {
