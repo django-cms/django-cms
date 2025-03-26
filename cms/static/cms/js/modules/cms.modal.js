@@ -1006,12 +1006,25 @@ class Modal {
                         true
                     );
                 } else {
-                    setTimeout(function() {
+                    // Serve the data bridge:
+                    // We have a special case here cause the CMS namespace
+                    // can be either inside the current window or the parent
+                    const dataBridge = body[0].querySelector('script#data-bridge');
+
+                    if (dataBridge) {
                         // hello ckeditor
                         Helpers.removeEventListener('modal-close.text-plugin');
                         that.close();
-                    // must be more than 100ms
-                    }, 150); // eslint-disable-line
+                        // the dataBridge is used to access plugin information from different resources
+                        // Do NOT move this!!!
+                        try {
+                            CMS.API.Helpers.dataBridge = JSON.parse(dataBridge.textContent);
+                            CMS.API.Helpers.onPluginSave();
+                        } catch (e) {
+                            // istanbul ignore next
+                            Helpers.reloadBrowser();
+                        }
+                    }
                 }
             } else {
                 if (that.ui.modal.hasClass('cms-modal-open')) {
