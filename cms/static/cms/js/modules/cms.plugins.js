@@ -215,6 +215,8 @@ var Plugin = new Class({
         });
 
         itemContents.addClass(`cms-plugin ${className}`);
+        itemContents.first().addClass('cms-plugin-start');
+        itemContents.last().addClass('cms-plugin-end');
 
         return itemContents;
     },
