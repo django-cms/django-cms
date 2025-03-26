@@ -220,7 +220,7 @@ class BaseRenderer:
 class ContentRenderer(BaseRenderer):
     plugin_edit_template = (
         '<template class="cms-plugin '
-        'cms-plugin-start cms-plugin-{pk}" data-cms-placeholder="{placeholder}" data-cms-position="{position}"></template>{content}'
+        'cms-plugin-start cms-plugin-{pk}" data-cms-placeholder="{placeholder}"></template>{content}'
         '<template class="cms-plugin cms-plugin-end cms-plugin-{pk}"></template>'
     )
     placeholder_edit_template = (
