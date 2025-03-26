@@ -346,6 +346,36 @@ class FormsTestCase(CMSTestCase):
             "Form should report slug collision error",
         )
 
+    def test_move_page_form_child_parent_slug_collision(self):
+        """Test that pages cannot be moved to create duplicate slugs at the same level"""
+        site = get_current_site()
+
+        # Create grandparent page
+        grandparent = create_page("Grandparent", "nav_playground.html", "en", slug="grandparent")
+
+        # Create parent page
+        parent = create_page("Parent", "nav_playground.html", "en", slug="parent", parent=grandparent)
+
+        # Create a child under parent with the same slug
+        child = create_page("Child", "nav_playground.html", "en", slug="parent", parent=parent)
+
+        # Try to move child to be on the same level as parent (should fail because parent is already there with same slug)
+        data = {
+            "target": grandparent.pk,
+            "position": 2,  # 2 = first-child position
+            "site": site.pk,
+        }
+
+        form = forms.MovePageForm(data=data, page=child, site=site)
+        is_valid = form.is_valid()
+
+        self.assertFalse(is_valid, "Form should be invalid due to slug collision")
+        self.assertIn(
+            "You cannot have two pages with the same slug",
+            str(form.errors["__all__"]),
+            "Form should report slug collision error",
+        )
+
 
 class PermissionFormTestCase(CMSTestCase):
     def test_permission_forms(self):
