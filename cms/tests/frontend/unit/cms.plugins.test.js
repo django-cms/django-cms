@@ -373,8 +373,8 @@ describe('CMS.Plugin', function() {
                         '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101 cms-plugin-start">\n' +
                         '        text </cms-plugin>',
                         '<div class="plugin101 cms-plugin cms-plugin-101">element</div>',
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101 cms-plugin-end"> another text\n' +
-                        '    </cms-plugin>'
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-101 cms-plugin-end">' +
+                        ' another text\n    </cms-plugin>'
                     ]
                 },
                 {
@@ -382,8 +382,8 @@ describe('CMS.Plugin', function() {
                     name: 'element + textnode',
                     expected: [
                         '<div class="plugin102 cms-plugin cms-plugin-102 cms-plugin-start">element</div>',
-                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-102 cms-plugin-end"> and text\n' +
-                        '    </cms-plugin>'
+                        '<cms-plugin class="cms-plugin-text-node cms-plugin cms-plugin-102 cms-plugin-end">' +
+                        ' and text\n    </cms-plugin>'
                     ]
                 },
                 {
