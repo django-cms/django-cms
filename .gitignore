@@ -50,5 +50,3 @@ screenshots
 .idea
 .better_test.db
 .vscode/
-.env
-cms/settings.py
