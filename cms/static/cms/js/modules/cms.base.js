@@ -123,14 +123,12 @@ export const Helpers = {
         switch (action) {
             case 'CHANGE':
             case 'EDIT':
-                if (window.CMS._instances.some(plugin =>
-                    Number(plugin.options.plugin_id) === Number(data.plugin_id) &&
-                    plugin.options.type === 'plugin')
-                ) {
+                if (this._pluginExists(data.plugin_id)) {
                     CMS.API.StructureBoard.invalidateState('EDIT', data);
-                    return;
+                } else {
+                    CMS.API.StructureBoard.invalidateState('ADD', data);
                 }
-                break;
+                return;
             case 'ADD':
             case 'DELETE':
             case 'CLEAR_PLACEHOLDER':
