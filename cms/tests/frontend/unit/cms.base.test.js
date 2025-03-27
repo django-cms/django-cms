@@ -168,7 +168,9 @@ describe('cms.base.js', function() {
                 // add action
                 CMS.API.Helpers.dataBridge = { plugin_id: '1', action: 'change' };
                 CMS.API.Helpers.onPluginSave();
-                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith('ADD', { plugin_id: '1', action: 'change' });
+                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith(
+                    'ADD', { plugin_id: '1', action: 'change' }
+                );
             });
 
             it('proxies to reloadBrowser', function() {
