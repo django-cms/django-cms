@@ -251,12 +251,11 @@ class PlaceholderAdmin(BaseEditableAdminMixin, admin.ModelAdmin):
             pat(r'^copy-plugins/$', self.copy_plugins),
             pat(r'^add-plugin/$', self.add_plugin),
             pat(r'^edit-plugin/([0-9]+)/$', self.edit_plugin),
-            pat(r'^edit-plugin/([0-9]+)/([a-z\-]+)/$', self.edit_field),
+            pat(r'^edit-field/([0-9]+)/([a-z\-]+)/$', self.edit_field),
             pat(r'^delete-plugin/([0-9]+)/$', self.delete_plugin),
             pat(r'^clear-placeholder/([0-9]+)/$', self.clear_placeholder),
             pat(r'^move-plugin/$', self.move_plugin),
             # Register object edit/structure/preview endpoints.
-            # pat(r'^object/(?P<content_type_id>\d+)/structure/(?P<object_id>.+)$', render_object_structure),
             pat(r'^object/([0-9]+)/edit/([0-9]+)/$', render_object_edit),
             pat(r'^object/([0-9]+)/structure/([0-9]+)/$', render_object_structure),
             pat(r'^object/([0-9]+)/preview/([0-9]+)/$', render_object_preview),
