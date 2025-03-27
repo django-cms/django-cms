@@ -52,7 +52,7 @@ describe('cms.base.js', function() {
         it('exists', function() {
             expect(CMS.API.Helpers).toEqual(jasmine.any(Object));
             // this expectation is here so no one ever forgets to add a test
-            expect(Object.keys(CMS.API.Helpers).length).toEqual(26);
+            expect(Object.keys(CMS.API.Helpers).length).toEqual(27);
         });
 
         describe('.reloadBrowser()', function() {
@@ -164,9 +164,13 @@ describe('cms.base.js', function() {
             it('invalidates state if the plugin was added', () => {
                 CMS._instances = [{ options: { plugin_id: 1, type: 'generic' } }];
 
-                CMS.API.Helpers.dataBridge = { plugin_id: '1' };
+                // FrontendEditableMixin issues "change" action, databridge processes it as an
+                // add action
+                CMS.API.Helpers.dataBridge = { plugin_id: '1', action: 'change' };
                 CMS.API.Helpers.onPluginSave();
-                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith('ADD', { plugin_id: '1' });
+                expect(CMS.API.StructureBoard.invalidateState).toHaveBeenCalledWith(
+                    'ADD', { plugin_id: '1', action: 'change' }
+                );
             });
 
             it('proxies to reloadBrowser', function() {

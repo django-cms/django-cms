@@ -510,8 +510,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         request.toolbar.show_toolbar = True
         output = self.render_template_obj(template, {'plugin': plugin}, request)
         expected = (
-            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}" data-cms-placeholder="{2}" '
-            'data-cms-position="{1}"></template>'
+            '<template class="cms-plugin cms-plugin-start cms-plugin-{0}" data-cms-placeholder="{2}"></template>'
             '<b>Test</b>'
             '<template class="cms-plugin cms-plugin-end cms-plugin-{0}"></template>'
         )
@@ -552,7 +551,7 @@ class NoFixtureDatabaseTemplateTagTests(CMSTestCase):
         self.assertEqual(
             output,
             f'<template class="cms-plugin cms-plugin-start cms-plugin-{plugin.pk}" '
-            f'data-cms-placeholder="{plugin.placeholder_id}" data-cms-position="{plugin.position}"></template>'
+            f'data-cms-placeholder="{plugin.placeholder_id}"></template>'
             f'Test<template class="cms-plugin cms-plugin-end cms-plugin-{plugin.pk}"></template>'
         )
 

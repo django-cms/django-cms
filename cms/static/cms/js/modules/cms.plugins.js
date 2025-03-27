@@ -189,17 +189,16 @@ var Plugin = new Class({
      * @returns {jQuery}
      * @example
      * // Given the following HTML:
-     * <template class="cms-plugin cms-plugin-4711 cms-plugin-start" data-cms-position="1"></template>
+     * <template class="cms-plugin cms-plugin-4711 cms-plugin-start"></template>
      * <p>Some text</p>
-     * <template class="cms-plugin cms-plugin-4711 cms-plugin-end" data-cms-position="1"></template>
+     * <template class="cms-plugin cms-plugin-4711 cms-plugin-end"></template>
      *
      * // The following jQuery collection will be returned:
-     * $('<p class="cms-plugin cms-plugin-4711 cms-plugin-start cms-plugin-end" data-cms-position="1">Some text</p>')
+     * $('<p class="cms-plugin cms-plugin-4711 cms-plugin-start cms-plugin-end">Some text</p>')
      */
     _processTemplateGroup: function (items, container) {
         const templateStart = $(items[0]);
         const className = templateStart.attr('class').replace('cms-plugin-start', '');
-        const position = templateStart.attr('data-cms-position');
         let itemContents = $(nextUntil(templateStart[0], container));
 
         itemContents.each((index, el) => {
@@ -216,8 +215,8 @@ var Plugin = new Class({
         });
 
         itemContents.addClass(`cms-plugin ${className}`);
-        itemContents.first().addClass('cms-plugin-start').attr('data-cms-position', position);
-        itemContents.last().addClass('cms-plugin-end').attr('data-cms-position', position);
+        itemContents.first().addClass('cms-plugin-start');
+        itemContents.last().addClass('cms-plugin-end');
 
         return itemContents;
     },
