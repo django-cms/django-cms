@@ -1716,7 +1716,7 @@ class StructureBoard {
         setTimeout(() => {
             Helpers._getWindow().document.dispatchEvent(new Event('DOMContentLoaded'));
             Helpers._getWindow().dispatchEvent(new Event('load'));
-            $(Helpers._getWindow()).trigger('cms-content-refresh');
+            Helpers._getWindow().dispatchEvent(new Event('cms-content-refresh'));
         }, 0);
     }
 
