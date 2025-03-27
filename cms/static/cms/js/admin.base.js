@@ -18,3 +18,9 @@ const CMS = {
 // in case some data is already attached to the global CMS
 // we must not override it
 window.CMS = CMS.$.extend(window.CMS || {}, CMS);
+
+// make sure that jQuery is available as $ and jQuery
+if (!window.jQuery) {
+    window.jQuery = CMS.$;
+    window.$ = window.jQuery;
+}
