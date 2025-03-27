@@ -144,6 +144,20 @@ export const Helpers = {
         }
     },
 
+    /*
+     * Check if a plugin object existst for the given plugin id
+     *
+     * @method _pluginExists
+     * @private
+     * @param {String} pluginId
+     * @returns {Boolean}
+     */
+    _pluginExists: function(pluginId) {
+        return window.CMS._instances.some(function(plugin) {
+            return Number(plugin.options.plugin_id) === Number(pluginId) && plugin.options.type === 'plugin';
+        });
+    },
+
     /**
      * Assigns an event handler to forms located in the toolbar
      * to prevent multiple submissions.
