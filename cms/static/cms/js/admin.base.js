@@ -21,6 +21,5 @@ window.CMS = CMS.$.extend(window.CMS || {}, CMS);
 
 // make sure that jQuery is available as $ and jQuery
 if (!window.jQuery) {
-    window.jQuery = CMS.$;
-    window.$ = window.jQuery;
+    window.$ = window.jQuery = CMS.$;
 }
