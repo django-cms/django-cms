@@ -777,29 +777,27 @@ class Modal {
 
                 if (item.is('input') || item.is('button')) {
                     that.ui.modalBody.addClass('cms-loader');
-                    var frm = item.closest('form');
+                    var frm = item[0].form;
 
                     // In Firefox with 1Password extension installed (FF 45 1password 4.5.6 at least)
                     // the item[0].click() doesn't work, which notably breaks
                     // deletion of the plugin. Workaround is that if the clicked button
                     // is the only button in the form - submit a form, otherwise
                     // click on the button
-                    if (frm.find('button, input[type="button"], input[type="submit"]').length > 1) {
+                    if (frm.querySelectorAll('button, input[type="button"], input[type="submit"]').length > 1) {
                         // we need to use native `.click()` event specifically
                         // as we are inside an iframe and magic is happening
                         item[0].click();
                     } else {
                         // have to dispatch native submit event so all the submit handlers
                         // can be fired, see #5590
-                        var evt = document.createEvent('HTMLEvents');
-
-                        evt.initEvent('submit', false, true);
-                        if (frm[0].dispatchEvent(evt)) {
+                        var evt = new CustomEvent('submit', {bubbles: false, cancelable: true});
+                        if (frm.dispatchEvent(evt)) {
                             // triggering submit event in webkit based browsers won't
                             // actually submit the form, while in Gecko-based ones it
                             // will and calling frm.submit() would throw NS_ERROR_UNEXPECTED
                             try {
-                                frm[0].submit();
+                                frm.submit();
                             } catch (err) {}
                         }
                     }
