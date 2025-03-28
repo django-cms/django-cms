@@ -791,7 +791,8 @@ class Modal {
                     } else {
                         // have to dispatch native submit event so all the submit handlers
                         // can be fired, see #5590
-                        var evt = new CustomEvent('submit', {bubbles: false, cancelable: true});
+                        var evt = new CustomEvent('submit', { bubbles: false, cancelable: true });
+
                         if (frm.dispatchEvent(evt)) {
                             // triggering submit event in webkit based browsers won't
                             // actually submit the form, while in Gecko-based ones it
