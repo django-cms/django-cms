@@ -94,7 +94,7 @@ class SimpleChangeListActionsTestCase(SimpleSetupMixin, CMSTestCase):
         The button is supposed to be arranged by the GrouperAdminMixin."""
         with self.login_user_context(self.admin_user):
             # Act
-            response = self.client.get(self.changelist_url + "?language=en", follow=True)
+            response = self.client.get(f"{self.changelist_url}?language=en", follow=True)
             # Assert
             self.assertContains(response, 'class="cms-icon cms-icon-plus"')
             self.assertContains(response, f'href="/en/admin/sampleapp/{self.groupermodel}/{self.grouper_instance.pk}'
