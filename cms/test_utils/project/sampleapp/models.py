@@ -98,6 +98,17 @@ class SimpleGrouperModelContent(models.Model):
         on_delete=models.CASCADE,
     )
 
+    language = models.TextField(
+        default="en",
+        choices=(
+            ("en", "English"),
+            ("de", "German"),
+            ("it", "Italian"),
+        )
+    )
+
+
+
     region = models.TextField(
         default="world",
         max_length=10,

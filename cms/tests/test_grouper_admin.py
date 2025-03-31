@@ -452,6 +452,7 @@ class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
         data = {
             "category_name": "Changed content",
             "content__region": "world",
+            "content__language": "de",
             "content__secret_greeting": random_content.secret_greeting,
         }
         with self.login_user_context(self.admin_user):
@@ -468,6 +469,7 @@ class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
         data = {
             "category_name": self.grouper_instance.category_name,
             "content__region": "world",
+            "content__language": "de",
             "content__secret_greeting": "New greeting",
         }
         # Act
@@ -484,6 +486,7 @@ class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
         data = {
             "category_name": "My new category",
             "content__region": "world",
+            "content__language": "de",
             "content__secret_greeting": "Some new content",
         }
         # Act
@@ -505,6 +508,7 @@ class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
         data = {
             "category_name": self.grouper_instance.category_name,
             "content__region": "world",
+            "content__language": "de",
             "content__secret_greeting": "New content",
         }
         # Act
