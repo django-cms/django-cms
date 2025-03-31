@@ -779,8 +779,9 @@ class _GrouperAdminFormMixin:
 
     def clean(self) -> dict:
         if (
-            CONTENT_PREFIX + "language" in self.cleaned_data and
-            self.cleaned_data[CONTENT_PREFIX + "language"] not in get_language_list()
+            f"{CONTENT_PREFIX}language" in self.cleaned_data
+            and self.cleaned_data[f"{CONTENT_PREFIX}language"]
+            not in get_language_list()
         ):
             raise ValidationError(
                 _(
