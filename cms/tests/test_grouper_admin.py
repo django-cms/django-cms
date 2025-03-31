@@ -289,7 +289,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
         random_content = self.createContentInstance("en")
         with self.login_user_context(self.admin_user):
             # Act
-            response = self.client.get(self.change_url + "?language=en", follow=True)
+            response = self.client.get(f"{self.change_url}?language=en", follow=True)
             # Assert
             # Contains relation to grouper as hidden input
             self.assertContains(
