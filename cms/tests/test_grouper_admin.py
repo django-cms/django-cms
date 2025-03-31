@@ -83,7 +83,7 @@ class SimpleChangeListActionsTestCase(SimpleSetupMixin, CMSTestCase):
         The js and css files are supposed to be arranged by the GrouperAdminMixin."""
         with self.login_user_context(self.admin_user):
             # Act
-            response = self.client.get(self.changelist_url + "?", follow=True)
+            response = self.client.get(f"{self.changelist_url}?", follow=True)
             # Assert
             self.assertContains(response, static("admin/js/jquery.init.js"))
             self.assertContains(response, static("cms/js/admin/actions.js"))
