@@ -341,7 +341,7 @@ class GrouperChangeTestCase(SetupMixin, CMSTestCase):
             # Contains extra grouping field as hidden input
             self.assertContains(
                 response,
-                f'<input type="hidden" name="content__language" value="en" id="id_content__language">',
+                '<input type="hidden" name="content__language" value="en" id="id_content__language">',
             )
             # Contains extra grouping field as hidden input
             self.assertContains(
@@ -504,7 +504,7 @@ class SimpleGrouperChangeTestCase(SimpleSetupMixin, CMSTestCase):
 
     def test_create_content_model(self) -> None:
         # Arrange
-        random_content = self.createContentInstance()
+        self.createContentInstance()
         data = {
             "category_name": self.grouper_instance.category_name,
             "content__region": "world",
