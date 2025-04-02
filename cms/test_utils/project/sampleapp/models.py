@@ -85,3 +85,48 @@ class GrouperModelContent(models.Model):
     secret_greeting = models.TextField(
         max_length=100,
     )
+
+
+class SimpleGrouperModel(models.Model):
+    category_name = models.CharField(max_length=200, default="")
+
+
+class SimpleGrouperModelContent(models.Model):
+    # grouper field name: snake case of GrouperModel
+    simple_grouper_model = models.ForeignKey(
+        SimpleGrouperModel,
+        on_delete=models.CASCADE,
+    )
+
+    language = models.TextField(
+        default="en",
+        choices=(
+            ("en", "English"),
+            ("de", "German"),
+            ("it", "Italian"),
+        )
+    )
+
+
+
+    region = models.TextField(
+        default="world",
+        max_length=10,
+        choices=(
+            ("world", "World"),
+            ("americas", "Americas"),
+            ("europe", "Europe"),
+            ("africa", "Africa"),
+            ("asia", "Asia"),
+            ("australia", "Australia")
+        )
+    )
+
+    uptodate = models.BooleanField(
+        verbose_name="Yes/No",
+        default=False,
+    )
+
+    secret_greeting = models.TextField(
+        max_length=100,
+    )

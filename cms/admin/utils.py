@@ -23,7 +23,7 @@ from django.utils.translation import get_language, gettext_lazy as _
 from cms.models.managers import ContentAdminManager
 from cms.toolbar.utils import get_object_preview_url
 from cms.utils import get_language_from_request
-from cms.utils.i18n import get_language_dict, get_language_tuple
+from cms.utils.i18n import get_language_dict, get_language_list, get_language_tuple
 from cms.utils.urlutils import admin_reverse, static_with_version
 
 
@@ -779,8 +779,9 @@ class _GrouperAdminFormMixin:
 
     def clean(self) -> dict:
         if (
-            self.cleaned_data.get(CONTENT_PREFIX + "language", None)
-            not in get_language_dict()
+            f"{CONTENT_PREFIX}language" in self.cleaned_data
+            and self.cleaned_data[f"{CONTENT_PREFIX}language"]
+            not in get_language_list()
         ):
             raise ValidationError(
                 _(
