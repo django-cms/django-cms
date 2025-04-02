@@ -7,6 +7,7 @@ from cms.test_utils.project.sampleapp.models import (
     GrouperModel,
     Picture,
     SampleAppConfig,
+    SimpleGrouperModel,
     SomeEditableModel,
 )
 
@@ -31,7 +32,15 @@ class GrouperAdmin(GrouperModelAdmin):
         return getattr(self, "change_content", True)
 
 
+class SimpleGrouperAdmin(GrouperModelAdmin):
+    list_display = ("category_name", "content__secret_greeting", "admin_list_actions")
+
+    def can_change_content(self, request, content_obj):
+        return getattr(self, "change_content", True)
+
+
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(SampleAppConfig)
 admin.site.register(SomeEditableModel, SomeEditableAdmin)
 admin.site.register(GrouperModel, GrouperAdmin)
+admin.site.register(SimpleGrouperModel, SimpleGrouperAdmin)
