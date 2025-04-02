@@ -23,7 +23,7 @@ from django.utils.translation import activate, get_language
 
 from cms.api import add_plugin, create_page
 from cms.middleware.toolbar import ToolbarMiddleware
-from cms.models import Page, PageContent
+from cms.models import Page, PageContent, PageUrl
 from cms.models.permissionmodels import (
     GlobalPagePermission,
     PagePermission,
@@ -45,7 +45,7 @@ URL_CMS_PAGE_PUBLISHED = urljoin(URL_CMS_PAGE, "list/")
 URL_CMS_PAGE_MOVE = urljoin(URL_CMS_PAGE, "%d/move-page/")
 URL_CMS_PAGE_COPY = urljoin(URL_CMS_PAGE, "%d/copy-page/")
 URL_CMS_PAGE_DELETE = urljoin(URL_CMS_PAGE, "%d/delete/")
-URL_CMS_TRANSLATION_DELETE = urljoin('/en/admin/cms/pagecontent/', "delete-translation/")
+URL_CMS_TRANSLATION_DELETE = urljoin("/en/admin/cms/pagecontent/", "delete-translation/")
 URL_CMS_USERSETTINGS = "/en/admin/cms/usersettings/"
 
 
@@ -60,8 +60,7 @@ class _Warning:
 def _collectWarnings(observeWarning, f, *args, **kwargs):
     def showWarning(message, category, filename, lineno, file=None, line=None):
         assert isinstance(message, Warning)
-        observeWarning(_Warning(
-            message.args[0], category, filename, lineno))
+        observeWarning(_Warning(message.args[0], category, filename, lineno))
 
     # Disable the per-module cache for every module otherwise if the warning
     # which the caller is expecting us to collect was already emitted it won't
@@ -70,7 +69,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
         if v is not None:
             try:
                 v.__warningregistry__ = None
-            except: # noqa
+            except:  # noqa
                 # Don't specify a particular exception type to handle in case
                 # some wacky object raises some wacky exception in response to
                 # the setattr attempt.
@@ -78,7 +77,7 @@ def _collectWarnings(observeWarning, f, *args, **kwargs):
 
     origFilters = warnings.filters[:]
     origShow = warnings.showwarning
-    warnings.simplefilter('always')
+    warnings.simplefilter("always")
     try:
         warnings.showwarning = showWarning
         result = f(*args, **kwargs)
@@ -93,8 +92,15 @@ class BaseCMSTestCase:
 
     def _pre_setup(self):
         super()._pre_setup()
+        # Clean up any existing pages and URLs before each test
+        self._clean_urls()
         self.create_fixtures()
         activate("en")
+
+    def _clean_urls(self):
+        """Clean up any existing URLs to prevent constraint violations"""
+        PageUrl.objects.all().delete()
+        Page.objects.all().delete()
 
     def create_fixtures(self):
         pass
@@ -119,15 +125,15 @@ class BaseCMSTestCase:
 
     def add_global_permission(self, user, **kwargs):
         options = {
-            'can_add': False,
-            'can_change': False,
-            'can_delete': False,
-            'can_publish': False,
-            'can_change_advanced_settings': False,
-            'can_change_permissions': False,
-            'can_move_page': False,
-            'can_recover_page': False,
-            'user': user,
+            "can_add": False,
+            "can_change": False,
+            "can_delete": False,
+            "can_publish": False,
+            "can_change_advanced_settings": False,
+            "can_change_permissions": False,
+            "can_move_page": False,
+            "can_recover_page": False,
+            "user": user,
         }
         options.update(**kwargs)
 
@@ -137,15 +143,15 @@ class BaseCMSTestCase:
 
     def add_page_permission(self, user, page, **kwargs):
         options = {
-            'can_add': False,
-            'can_change': False,
-            'can_delete': False,
-            'can_publish': False,
-            'can_change_advanced_settings': False,
-            'can_change_permissions': False,
-            'can_move_page': False,
-            'page': page,
-            'user': user,
+            "can_add": False,
+            "can_change": False,
+            "can_delete": False,
+            "can_publish": False,
+            "can_change_advanced_settings": False,
+            "can_change_permissions": False,
+            "can_move_page": False,
+            "page": page,
+            "user": user,
         }
         options.update(**kwargs)
 
@@ -156,8 +162,15 @@ class BaseCMSTestCase:
     def get_pagecontent_obj(self, page, language="en"):
         return PageContent.objects.get(page=page, language=language)
 
-    def _create_user(self, username, is_staff=False, is_superuser=False,
-                     is_active=True, add_default_permissions=False, permissions=None):
+    def _create_user(
+        self,
+        username,
+        is_staff=False,
+        is_superuser=False,
+        is_active=True,
+        add_default_permissions=False,
+        permissions=None,
+    ):
         """
         Use this method to create users.
 
@@ -170,12 +183,15 @@ class BaseCMSTestCase:
         User = get_user_model()
 
         fields = dict(
-            email=username + '@django-cms.org', last_login=now(),
-            is_staff=is_staff, is_active=is_active, is_superuser=is_superuser
+            email=username + "@django-cms.org",
+            last_login=now(),
+            is_staff=is_staff,
+            is_active=is_active,
+            is_superuser=is_superuser,
         )
 
         # Check for special case where email is used as username
-        if (get_user_model().USERNAME_FIELD != 'email'):
+        if get_user_model().USERNAME_FIELD != "email":
             fields[get_user_model().USERNAME_FIELD] = username
 
         user = User(**fields)
@@ -190,18 +206,18 @@ class BaseCMSTestCase:
 
     def _add_default_permissions(self, user):
         # Text plugin permissions
-        user.user_permissions.add(Permission.objects.get(codename='add_text'))
-        user.user_permissions.add(Permission.objects.get(codename='delete_text'))
-        user.user_permissions.add(Permission.objects.get(codename='change_text'))
+        user.user_permissions.add(Permission.objects.get(codename="add_text"))
+        user.user_permissions.add(Permission.objects.get(codename="delete_text"))
+        user.user_permissions.add(Permission.objects.get(codename="change_text"))
         # Link plugin permissions
-        user.user_permissions.add(Permission.objects.get(codename='add_link'))
-        user.user_permissions.add(Permission.objects.get(codename='delete_link'))
-        user.user_permissions.add(Permission.objects.get(codename='change_link'))
+        user.user_permissions.add(Permission.objects.get(codename="add_link"))
+        user.user_permissions.add(Permission.objects.get(codename="delete_link"))
+        user.user_permissions.add(Permission.objects.get(codename="change_link"))
         # Page permissions
-        user.user_permissions.add(Permission.objects.get(codename='publish_page'))
-        user.user_permissions.add(Permission.objects.get(codename='add_page'))
-        user.user_permissions.add(Permission.objects.get(codename='change_page'))
-        user.user_permissions.add(Permission.objects.get(codename='delete_page'))
+        user.user_permissions.add(Permission.objects.get(codename="publish_page"))
+        user.user_permissions.add(Permission.objects.get(codename="add_page"))
+        user.user_permissions.add(Permission.objects.get(codename="change_page"))
+        user.user_permissions.add(Permission.objects.get(codename="delete_page"))
 
     def get_superuser(self):
         try:
@@ -228,8 +244,7 @@ class BaseCMSTestCase:
         """
         This is a non superuser staff
         """
-        staff = self._create_user("staff", is_staff=True, is_superuser=False,
-                                  add_default_permissions=True)
+        staff = self._create_user("staff", is_staff=True, is_superuser=False, add_default_permissions=True)
         return staff
 
     def get_standard_user(self):
@@ -245,35 +260,39 @@ class BaseCMSTestCase:
 
         parent_link_field = list(PageUser._meta.parents.values())[0]
         user = self._create_user(
-            'perms-testuser',
+            "perms-testuser",
             is_staff=True,
             is_superuser=False,
         )
-        data = model_to_dict(user, exclude=['groups', 'user_permissions'])
+        data = model_to_dict(user, exclude=["groups", "user_permissions"])
         data[parent_link_field.name] = user
-        data['created_by'] = created_by
+        data["created_by"] = created_by
         return PageUser.objects.create(**data)
 
-    def get_new_page_data(self, parent_id=''):
+    def get_new_page_data(self, parent_id=""):
         page_data = {
-            'title': 'test page %d' % self.counter,
-            'slug': 'test-page-%d' % self.counter,
-            'parent_page': parent_id,
+            "title": "test page %d" % self.counter,
+            "slug": "test-page-%d" % self.counter,
+            "parent_page": parent_id,
         }
         # required only if user haves can_change_permission
         self.counter += 1
         return page_data
 
-    def get_new_page_data_dbfields(self, parent=None, site=None,
-                                   language=None,
-                                   template='nav_playground.html', ):
+    def get_new_page_data_dbfields(
+        self,
+        parent=None,
+        site=None,
+        language=None,
+        template="nav_playground.html",
+    ):
         page_data = {
-            'title': 'test page %d' % self.counter,
-            'slug': 'test-page-%d' % self.counter,
-            'language': settings.LANGUAGES[0][0] if not language else language,
-            'template': template,
-            'parent': parent if parent else None,
-            'site': site if site else Site.objects.get_current(),
+            "title": "test page %d" % self.counter,
+            "slug": "test-page-%d" % self.counter,
+            "language": settings.LANGUAGES[0][0] if not language else language,
+            "template": template,
+            "parent": parent if parent else None,
+            "site": site if site else Site.objects.get_current(),
         }
         self.counter = self.counter + 1
         return page_data
@@ -282,32 +301,29 @@ class BaseCMSTestCase:
         """Converts data created by get_new_page_data_dbfields to data
         created from get_new_page_data so you can switch between test cases
         in api.create_page and client.post"""
-        page_data['site'] = page_data['site'].id
-        page_data['parent'] = page_data['parent'].id if page_data['parent'] else ''
+        page_data["site"] = page_data["site"].id
+        page_data["parent"] = page_data["parent"].id if page_data["parent"] else ""
         # required only if user haves can_change_permission
-        page_data['pagepermission_set-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-MAX_NUM_FORMS'] = 0
-        page_data['pagepermission_set-2-TOTAL_FORMS'] = 0
-        page_data['pagepermission_set-2-INITIAL_FORMS'] = 0
-        page_data['pagepermission_set-2-MAX_NUM_FORMS'] = 0
+        page_data["pagepermission_set-TOTAL_FORMS"] = 0
+        page_data["pagepermission_set-INITIAL_FORMS"] = 0
+        page_data["pagepermission_set-MAX_NUM_FORMS"] = 0
+        page_data["pagepermission_set-2-TOTAL_FORMS"] = 0
+        page_data["pagepermission_set-2-INITIAL_FORMS"] = 0
+        page_data["pagepermission_set-2-MAX_NUM_FORMS"] = 0
         return page_data
 
     def print_page_structure(self, qs):
-        """Just a helper to see the page struct.
-        """
-        for page in qs.order_by('path'):
+        """Just a helper to see the page struct."""
+        for page in qs.order_by("path"):
             ident = "  " * page.level
-            print(
-                f"{ident}{page} ({page.pk}), path: {page.path}, depth: {page.depth}, numchild: {page.numchild}"
-            )
+            print(f"{ident}{page} ({page.pk}), path: {page.path}, depth: {page.depth}, numchild: {page.numchild}")
 
     def print_node_structure(self, nodes, *extra):
         def _rec(nodes, level=0):
-            ident = level * '  '
+            ident = level * "  "
             for node in nodes:
                 raw_attrs = [(bit, getattr(node, bit, node.attr.get(bit, "unknown"))) for bit in extra]
-                attrs = ', '.join(['%s: %r' % data for data in raw_attrs])
+                attrs = ", ".join(["%s: %r" % data for data in raw_attrs])
                 print(f"{ident}{node.title}: {attrs}")
                 _rec(node.children, level + 1)
 
@@ -328,39 +344,68 @@ class BaseCMSTestCase:
         raise self.failureException("ObjectDoesNotExist not raised for filter %s" % filter)
 
     def copy_page(self, page, target_page, position=0, target_site=None):
+        """
+        Copy a page ensuring URL uniqueness at the target location
+        """
         from cms.utils.page import get_available_slug
 
         if target_site is None:
             target_site = target_page.site
 
-        data = {
-            'position': position,
-            'target': target_page.pk,
-            'source_site': page.site_id,
-            'copy_permissions': 'on',
-            'copy_moderation': 'on',
-        }
+        # Clean up any potentially conflicting URLs at the target location
         source_url = page.get_urls()[0]
         parent_url = target_page.get_urls()[0]
         language = source_url.language
         copied_page_path = source_url.get_path_for_base(parent_url.path)
+
+        PageUrl.objects.filter(language=language, path=copied_page_path, site=target_site).delete()
+
+        data = {
+            "position": position,
+            "target": target_page.pk,
+            "source_site": page.site_id,
+            "copy_permissions": "on",
+            "copy_moderation": "on",
+        }
         new_page_slug = get_available_slug(target_site, copied_page_path, language)
 
         with self.settings(SITE_ID=target_site.pk):
             response = self.client.post(URL_CMS_PAGE + "%d/copy-page/" % page.pk, data)
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode('utf8'))
+        response_data = json.loads(response.content.decode("utf8"))
         copied_page = self.assertObjectExist(
             Page.objects.all(),
-            pk=response_data['id'],
+            pk=response_data["id"],
         )
         self.assertObjectExist(copied_page.urls.filter(language=language), slug=new_page_slug)
         return copied_page
 
     def create_homepage(self, *args, **kwargs):
-        homepage = create_page(*args, **kwargs)
+        """
+        Creates a homepage ensuring URL uniqueness
+        """
+        # Clean up any existing homepages
+        Page.objects.filter(is_home=True).delete()
+
+        homepage = self.create_page(*args, **kwargs)
         homepage.set_as_homepage()
         return homepage.reload()
+
+    def create_page(self, title, template="nav_playground.html", language=None, **kwargs):
+        """
+        Helper method to create a page that ensures URL uniqueness
+        """
+        from cms.models import PageUrl
+
+        if language is None:
+            language = "en"
+
+        # If there's an existing page with same path/language, clean it up
+        if "slug" in kwargs:
+            path = kwargs.get("path") or kwargs["slug"]
+            PageUrl.objects.filter(language=language, path=path).delete()
+
+        return create_page(title, template, language, **kwargs)
 
     def move_page(self, page, target_page, position="first-child"):
         page.move_page(target_page, position)
@@ -383,7 +428,7 @@ class BaseCMSTestCase:
             path = self.get_pages_root()
         context = {}
         request = self.get_request(path, page=page)
-        context['request'] = request
+        context["request"] = request
         return Context(context)
 
     def get_content_renderer(self, request=None):
@@ -411,7 +456,7 @@ class BaseCMSTestCase:
         else:
             request = factory.get(path)
         request.session = self.client.session
-        request.user = getattr(self, 'user', AnonymousUser())
+        request.user = getattr(self, "user", AnonymousUser())
         request.LANGUAGE_CODE = language
         request._dont_enforce_csrf_checks = not enforce_csrf_checks
         if page:
@@ -420,14 +465,13 @@ class BaseCMSTestCase:
             request.current_page = None
 
         class MockStorage:
-
             def __len__(self):
                 return 0
 
             def __iter__(self):
                 return iter([])
 
-            def add(self, level, message, extra_tags=''):
+            def add(self, level, message, extra_tags=""):
                 pass
 
             def update(self, response):
@@ -436,7 +480,7 @@ class BaseCMSTestCase:
         request._messages = MockStorage()
         return request
 
-    def get_page_request(self, page, user, path=None, lang_code='en', disable=False, persist=None):
+    def get_page_request(self, page, user, path=None, lang_code="en", disable=False, persist=None):
         path = path or page and page.get_absolute_url()
 
         request = RequestFactory().get(path)
@@ -447,15 +491,15 @@ class BaseCMSTestCase:
 
         # Hide the toolbar
         if disable:
-            request.GET[get_cms_setting('CMS_TOOLBAR_URL__DISABLE')] = None
+            request.GET[get_cms_setting("CMS_TOOLBAR_URL__DISABLE")] = None
         if persist is not None:
-            request.GET[get_cms_setting('CMS_TOOLBAR_URL__PERSIST')] = persist
+            request.GET[get_cms_setting("CMS_TOOLBAR_URL__PERSIST")] = persist
         request.current_page = page
         mid = LocaleMiddleware(lambda req: HttpResponse(""))
         mid(request)
         mid = ToolbarMiddleware(lambda req: HttpResponse(""))
         mid(request)
-        if hasattr(request, 'toolbar'):
+        if hasattr(request, "toolbar"):
             request.toolbar.populate()
         return request
 
@@ -470,17 +514,17 @@ class BaseCMSTestCase:
             if warning.message == message and warning.category is category:
                 break
             else:
-                if warning.category not in (DeprecationWarning, ):
+                if warning.category not in (DeprecationWarning,):
                     self.fail(f"Unexpected warning {warning.message} ({warning.category})")
         else:
             self.fail(f"Warning {message} not given.")
         return result
 
     def load_template_from_string(self, template):
-        return engines['django'].from_string(template)
+        return engines["django"].from_string(template)
 
     def get_template(self, template):
-        return engines['django'].get_template(template)
+        return engines["django"].get_template(template)
 
     def render_template_obj(self, template, context, request):
         template_obj = self.load_template_from_string(template)
@@ -488,6 +532,7 @@ class BaseCMSTestCase:
 
     def apphook_clear(self):
         from cms.apphook_pool import apphook_pool
+
         for name, label in list(apphook_pool.get_apphooks()):
             if apphook_pool.apps[name].__class__.__module__ in sys.modules:
                 del sys.modules[apphook_pool.apps[name].__class__.__module__]
@@ -511,7 +556,7 @@ class BaseCMSTestCase:
             "nav_playground.html",
             "en",
             created_by=admin,
-            reverse_id='permissions',
+            reverse_id="permissions",
         )
         return page
 
@@ -521,146 +566,148 @@ class BaseCMSTestCase:
         return plugin_pool.get_plugin(plugin_type).model
 
     def get_pages_admin_list_uri(self, language=None):
-        endpoint = admin_reverse('cms_pagecontent_changelist')
-        data = {'language': language or get_language()}
-        return endpoint + '?' + urlencode(data)
+        endpoint = admin_reverse("cms_pagecontent_changelist")
+        data = {"language": language or get_language()}
+        return endpoint + "?" + urlencode(data)
 
     def get_page_add_uri(self, language, page=None):
-        endpoint = admin_reverse('cms_pagecontent_add')
-        data = {'language': language}
+        endpoint = admin_reverse("cms_pagecontent_add")
+        data = {"language": language}
 
         if page:
-            data['cms_page'] = page.pk
-        return endpoint + '?' + urlencode(data)
+            data["cms_page"] = page.pk
+        return endpoint + "?" + urlencode(data)
 
     def get_page_change_uri(self, language, page):
         content = page.get_content_obj(language, fallback=False)
-        endpoint = admin_reverse('cms_pagecontent_change', args=(content.pk,))
-        data = {'language': language}
-        return endpoint + '?' + urlencode(data)
+        endpoint = admin_reverse("cms_pagecontent_change", args=(content.pk,))
+        data = {"language": language}
+        return endpoint + "?" + urlencode(data)
 
     def get_page_delete_translation_uri(self, language, page):
         content = page.get_content_obj(language, fallback=False)
-        endpoint = admin_reverse('cms_pagecontent_delete', args=(content.pk,))
-        data = {'language': language}
-        return endpoint + '?' + urlencode(data)
+        endpoint = admin_reverse("cms_pagecontent_delete", args=(content.pk,))
+        data = {"language": language}
+        return endpoint + "?" + urlencode(data)
 
     def get_page_change_template_uri(self, language, page):
         content = page.get_content_obj(language, fallback=False)
-        endpoint = admin_reverse('cms_pagecontent_change_template', args=(content.pk,))
-        data = {'language': language}
-        return endpoint + '?' + urlencode(data)
+        endpoint = admin_reverse("cms_pagecontent_change_template", args=(content.pk,))
+        data = {"language": language}
+        return endpoint + "?" + urlencode(data)
 
-    def get_add_plugin_uri(self, placeholder, plugin_type, language='en', parent=None, position=None):
+    def get_add_plugin_uri(self, placeholder, plugin_type, language="en", parent=None, position=None):
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
+            path = placeholder.page.get_absolute_url(language) or f"/{language}/"
         else:
-            path = f'/{language}/'
+            path = f"/{language}/"
 
         if position is None:
-            position = placeholder.get_next_plugin_position(language, parent=parent, insert_order='last')
+            position = placeholder.get_next_plugin_position(language, parent=parent, insert_order="last")
 
-        endpoint = admin_reverse('cms_placeholder_add_plugin')
+        endpoint = admin_reverse("cms_placeholder_add_plugin")
         data = {
-            'plugin_type': plugin_type,
-            'placeholder_id': placeholder.pk,
-            'plugin_language': language,
-            'cms_path': path,
-            'plugin_position': position,
+            "plugin_type": plugin_type,
+            "placeholder_id": placeholder.pk,
+            "plugin_language": language,
+            "cms_path": path,
+            "plugin_position": position,
         }
 
         if parent:
-            data['plugin_parent'] = parent.pk
-        return endpoint + '?' + urlencode(data)
+            data["plugin_parent"] = parent.pk
+        return endpoint + "?" + urlencode(data)
 
     def get_change_plugin_uri(self, plugin, language=None):
-        language = language or 'en'
+        language = language or "en"
 
         if plugin.placeholder and plugin.placeholder.page:
-            path = plugin.placeholder.page.get_absolute_url(language) or f'/{language}/'
+            path = plugin.placeholder.page.get_absolute_url(language) or f"/{language}/"
         else:
-            path = f'/{language}/'
+            path = f"/{language}/"
 
-        endpoint = admin_reverse('cms_placeholder_edit_plugin', args=(plugin.pk,))
-        endpoint += '?' + urlencode({'cms_path': path})
+        endpoint = admin_reverse("cms_placeholder_edit_plugin", args=(plugin.pk,))
+        endpoint += "?" + urlencode({"cms_path": path})
         return endpoint
 
     def get_move_plugin_uri(self, plugin, language=None):
-        language = language or 'en'
+        language = language or "en"
 
         if plugin.placeholder and plugin.placeholder.page:
-            path = plugin.placeholder.page.get_absolute_url(language) or f'/{language}/'
+            path = plugin.placeholder.page.get_absolute_url(language) or f"/{language}/"
         else:
-            path = f'/{language}/'
+            path = f"/{language}/"
 
-        endpoint = admin_reverse('cms_placeholder_move_plugin')
-        endpoint += '?' + urlencode({'cms_path': path})
+        endpoint = admin_reverse("cms_placeholder_move_plugin")
+        endpoint += "?" + urlencode({"cms_path": path})
         return endpoint
 
     def get_copy_plugin_uri(self, plugin, language=None):
-        language = language or 'en'
+        language = language or "en"
 
         if plugin.placeholder and plugin.placeholder.page:
-            path = plugin.placeholder.page.get_absolute_url(language) or f'/{language}/'
+            path = plugin.placeholder.page.get_absolute_url(language) or f"/{language}/"
         else:
-            path = f'/{language}/'
+            path = f"/{language}/"
 
-        endpoint = admin_reverse('cms_placeholder_copy_plugins')
-        endpoint += '?' + urlencode({'cms_path': path})
+        endpoint = admin_reverse("cms_placeholder_copy_plugins")
+        endpoint += "?" + urlencode({"cms_path": path})
         return endpoint
 
     def get_copy_placeholder_uri(self, placeholder, language=None):
-        language = language or 'en'
+        language = language or "en"
 
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
+            path = placeholder.page.get_absolute_url(language) or f"/{language}/"
         else:
-            path = f'/{language}/'
+            path = f"/{language}/"
 
-        endpoint = admin_reverse('cms_placeholder_copy_plugins')
-        endpoint += '?' + urlencode({'cms_path': path})
+        endpoint = admin_reverse("cms_placeholder_copy_plugins")
+        endpoint += "?" + urlencode({"cms_path": path})
         return endpoint
 
     def get_delete_plugin_uri(self, plugin, language=None):
-        language = language or 'en'
+        language = language or "en"
 
         if plugin.placeholder and plugin.placeholder.page:
-            path = plugin.placeholder.page.get_absolute_url(language) or f'/{language}/'
+            path = plugin.placeholder.page.get_absolute_url(language) or f"/{language}/"
         else:
-            path = f'/{language}/'
+            path = f"/{language}/"
 
-        endpoint = admin_reverse('cms_placeholder_delete_plugin', args=(plugin.pk,))
-        endpoint += '?' + urlencode({'cms_path': path})
+        endpoint = admin_reverse("cms_placeholder_delete_plugin", args=(plugin.pk,))
+        endpoint += "?" + urlencode({"cms_path": path})
         return endpoint
 
     def get_clear_placeholder_url(self, placeholder, language=None):
-        language = language or 'en'
+        language = language or "en"
 
         if placeholder.page:
-            path = placeholder.page.get_absolute_url(language) or f'/{language}/'
+            path = placeholder.page.get_absolute_url(language) or f"/{language}/"
         else:
-            path = f'/{language}/'
+            path = f"/{language}/"
 
-        endpoint = admin_reverse('cms_placeholder_clear_placeholder', args=(placeholder.pk,))
-        endpoint += '?' + urlencode({
-            'language': language,
-            'cms_path': path,
-        })
+        endpoint = admin_reverse("cms_placeholder_clear_placeholder", args=(placeholder.pk,))
+        endpoint += "?" + urlencode(
+            {
+                "language": language,
+                "cms_path": path,
+            }
+        )
         return endpoint
 
     def get_toolbar_disable_url(self, url):
-        return '{}?{}'.format(url, get_cms_setting('TOOLBAR_URL__DISABLE'))
+        return "{}?{}".format(url, get_cms_setting("TOOLBAR_URL__DISABLE"))
 
-    def _add_plugin_to_placeholder(self, placeholder, plugin_type='LinkPlugin', language='en'):
+    def _add_plugin_to_placeholder(self, placeholder, plugin_type="LinkPlugin", language="en"):
         plugin_data = {
-            'TextPlugin': {'body': '<p>text</p>'},
-            'LinkPlugin': {'name': 'A Link', 'external_link': 'https://www.django-cms.org'},
+            "TextPlugin": {"body": "<p>text</p>"},
+            "LinkPlugin": {"name": "A Link", "external_link": "https://www.django-cms.org"},
         }
         plugin = add_plugin(placeholder, plugin_type, language, **plugin_data[plugin_type])
         return plugin
 
     def _render_placeholder(self, placeholder, context, **kwargs):
-        request = context['request']
+        request = context["request"]
         toolbar = get_toolbar_from_request(request)
         content_renderer = toolbar.content_renderer
         return content_renderer.render_placeholder(placeholder, context, **kwargs)
