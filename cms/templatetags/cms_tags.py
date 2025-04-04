@@ -1,8 +1,9 @@
+# Standard library imports
 from collections import OrderedDict, namedtuple
 from copy import copy
 from datetime import datetime
-from django.urls import NoReverseMatch
 
+# Third-party imports
 from classytags.arguments import (
     Argument,
     MultiKeywordArgument,
@@ -19,7 +20,7 @@ from django.contrib.sites.models import Site
 from django.core.mail import mail_managers
 from django.db.models import Model
 from django.template.loader import render_to_string
-from django.urls import reverse
+from django.urls import NoReverseMatch, reverse
 from django.utils.encoding import smart_str
 from django.utils.html import escape
 from django.utils.http import urlencode
@@ -31,6 +32,7 @@ from django.utils.translation import (
 )
 from sekizai.templatetags.sekizai_tags import RenderBlock, SekizaiParser
 
+# Local application imports
 from cms.cache.page import get_page_url_cache, set_page_url_cache
 from cms.exceptions import PlaceholderNotFound
 from cms.models import (
@@ -231,21 +233,21 @@ class PageUrl(AsTag):
     )
 
     def get_value_for_context(self, context, **kwargs):
-        #
-        # A design decision with several active members of the django-cms
-        # community that using this tag with the 'as' breakpoint should never
-        # return Exceptions regardless of the setting of settings.DEBUG.
-        #
-        # We wish to maintain backwards functionality where the non-as-variant
-        # of using this tag will raise DoesNotExist exceptions only when
-        # settings.DEBUG=False.
+
+        """A design decision with several active members of the django-cms
+        community that using this tag with the 'as' breakpoint should never
+        return Exceptions regardless of the setting of settings.DEBUG.
+
+        We wish to maintain backwards functionality where the non-as-variant
+        of using this tag will raise DoesNotExist exceptions only when
+        settings.DEBUG=False.
+        """
+        """Fix: Catch NoReverseMatch errors in addition to Page.DoesNotExist
+        to prevent crashes when a page exists but has no Title object
+        for the current language, ensuring pre-3.5 behavior."""
         try:
             return super().get_value_for_context(context, **kwargs)
-        
         except (Page.DoesNotExist, NoReverseMatch):
-            # Fix: Catch NoReverseMatch errors in addition to Page.DoesNotExist
-            # to prevent crashes when a page exists but has no Title object
-            # for the current language, ensuring pre-3.5 behavior.
             return ''
 
     def get_value(self, context, page_lookup, lang, site):
