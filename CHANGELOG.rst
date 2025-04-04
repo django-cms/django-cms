@@ -1,17 +1,29 @@
+4.1.4 (2025-04-04)
+==================
+
 Bug Fixes:
 ----------
 * Grouper models w/o must not assume language grouper (#8194) (#8195) (35521bc7f) -- Fabian Braun
+* Ensure correct placeholder retrieval for PageContent instances (#8088) -- Fabian Braun
+* Fallback page names were not escaped (#8113) (#8114) -- Fabian Braun
+* Use PageContent.changed_date for sitemap lastmod (#8125) -- Jacob Rief
+* Allow frontend editing of page title fields -- Fabian Braun
+* Detect page when getting toolbar for endpoint (#8137) (#8138) -- Fabian Braun
+* CMS_TOOLBAR_HIDE broke endpoints in django CMS 4+ (#8176) -- Fabian Braun
+* Preview did not show the redirect page (#8175) -- Fabian Braun
+
 
 Statistics:
 -----------
 
-This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 8 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
+* Fabian Braun (7 pull request)
+* Jacob Rief (1 pull request)
 
 With the review help of the following contributors:
 
+* Vinit Kumar
 * sourcery-ai[bot]
 
 Thanks to all contributors for their efforts!

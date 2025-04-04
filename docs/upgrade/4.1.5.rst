@@ -4,7 +4,7 @@
 4.1.5 release notes
 *******************
 
-*November 12, 2024*
+*April 4, 2025*
 
 .. warning:: Upgrading from previous versions
 
@@ -12,27 +12,7 @@
     process of upgrading from 3.5+ to 4 here: :ref:`upgrade-to-4.0`
 
 
-Welcome to django CMS 4.1.4!
-
-Security fix
-============
-
-django CMS 4.1.4 closes a security vulnerability that could allow an attacker
-to inject malicious code into the page title allowing to load arbitrary
-javascript code when viewing the page. We recommend that you upgrade to
-this version as soon as possible.
-
-The security issue is of low severity, since an attacker needs to have access
-to the django CMS admin interface to exploit it.
-
-Thanks to `Ali İltizar (@alii76tt) <https://twitter.com/alii76tt>`_ for
-reporting the issue.
-
-.. note::
-
-   As ever, we remind our users and contributors that all security reports,
-   patches and concerns be addressed only to our security team by email, at
-   `security@django-cms.org <mailto:security@django-cms.org>`_.
+Welcome to django CMS 4.1.5!
 
 
 Django and Python compatibility
@@ -50,33 +30,29 @@ What's new in 4.1.5
 
 Bug Fixes:
 ----------
-* XSS vulnerability for page title (#8075) (c045a990e) -- Fabian Braun
-* Menus crashed when unexpected page content was present (#8052) -- Fabian Braun
-* Sites menu was empty in the page tree (#8064) -- Fabian Braun
-* Added redirect message when in editing a redirect toolbar object (#8056) -- Sal
-* X frame options added to page settings form (#8041) -- Sal
-* template tag ``get_admin_url_for_language`` did not return the latest page content (#7967) -- Fabian Braun
-* Sitemap return a QuerySet in CMSSitemap.items() (#8031) -- Jens-Erik Weber
-* Improved UX when page content is missing in selected language (#8033) -- Jacob Rief
+Bug Fixes:
+----------
+* Grouper models w/o must not assume language grouper (#8194) (#8195) (35521bc7f) -- Fabian Braun
+* Ensure correct placeholder retrieval for PageContent instances (#8088) -- Fabian Braun
+* Fallback page names were not escaped (#8113) (#8114) -- Fabian Braun
+* Use PageContent.changed_date for sitemap lastmod (#8125) -- Jacob Rief
+* Allow frontend editing of page title fields -- Fabian Braun
+* Detect page when getting toolbar for endpoint (#8137) (#8138) -- Fabian Braun
+* CMS_TOOLBAR_HIDE broke endpoints in django CMS 4+ (#8176) -- Fabian Braun
+* Preview did not show the redirect page (#8175) -- Fabian Braun
 
-Other:
-------
-* Updated welcome page (#8057) -- Fabian Braun
 
 Statistics:
 -----------
 
-This release includes 9 pull requests, and was created with the help of the following contributors (in alphabetical order):
+This release includes 8 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (5 pull request)
+* Fabian Braun (7 pull request)
 * Jacob Rief (1 pull request)
-* Jens-Erik Weber (1 pull request)
-* Sal (2 pull request)
 
 With the review help of the following contributors:
 
-* Jacob Rief
-* Mark Walker
 * Vinit Kumar
+* sourcery-ai[bot]
 
 Thanks to all contributors for their efforts!
