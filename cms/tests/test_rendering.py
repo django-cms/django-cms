@@ -793,8 +793,7 @@ class RenderingTestCase(CMSTestCase):
                 placeholder=placeholder,
                 editable=True,
             )
-            tag_format = ('<template class="cms-plugin cms-plugin-start cms-plugin-{}" data-cms-placeholder="{}" '
-                          'data-cms-position="{}">')
+            tag_format = ('<template class="cms-plugin cms-plugin-start cms-plugin-{}" data-cms-placeholder="{}">')
 
         for plugin in plugins:
             start_tag = tag_format.format(plugin.pk, plugin.placeholder_id, plugin.position)

@@ -117,20 +117,18 @@ export const Helpers = {
      * @public
      */
     onPluginSave: function() {
-        const data = this.dataBridge;
-        const action = data && data.plugin_id ? (data.action || 'ADD').toUpperCase() : '';
+        const data = this.dataBridge || {};
+        const action = data.action ? data.action.toUpperCase() : null;
 
         switch (action) {
             case 'CHANGE':
             case 'EDIT':
-                if (window.CMS._instances.some(plugin =>
-                    Number(plugin.options.plugin_id) === Number(data.plugin_id) &&
-                    plugin.options.type === 'plugin')
-                ) {
+                if (this._pluginExists(data.plugin_id)) {
                     CMS.API.StructureBoard.invalidateState('EDIT', data);
-                    return;
+                } else {
+                    CMS.API.StructureBoard.invalidateState('ADD', data);
                 }
-                break;
+                return;
             case 'ADD':
             case 'DELETE':
             case 'CLEAR_PLACEHOLDER':
@@ -144,6 +142,20 @@ export const Helpers = {
         if (!this._isReloading) {
             this.reloadBrowser(null, 300); // eslint-disable-line
         }
+    },
+
+    /*
+     * Check if a plugin object existst for the given plugin id
+     *
+     * @method _pluginExists
+     * @private
+     * @param {String} pluginId
+     * @returns {Boolean}
+     */
+    _pluginExists: function(pluginId) {
+        return window.CMS._instances.some(function(plugin) {
+            return Number(plugin.options.plugin_id) === Number(pluginId) && plugin.options.type === 'plugin';
+        });
     },
 
     /**

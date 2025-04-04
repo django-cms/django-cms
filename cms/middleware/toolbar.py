@@ -26,6 +26,7 @@ cms_endpoints = (
     'cms_placeholder_render_object_edit',
     'cms_placeholder_render_object_preview',
     'cms_placeholder_render_object_structure',
+    'cms_placeholder_edit_field',
 )
 
 
