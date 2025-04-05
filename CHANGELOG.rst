@@ -2,16 +2,25 @@
 Changelog
 =========
 
+3.11.10 (2025-04-05)
+====================
+
+Bug Fixes:
+----------
+* Remove deprecated get_storage_class import from cms.utils (#8102) -- Fabian Braun
+* Add missing compiled French messages (#8126) -- Fabian Braun
+
+
 Statistics:
 -----------
 
 This release includes 4 pull requests, and was created with the help of the following contributors (in alphabetical order):
 
-* Fabian Braun (1 pull request)
-* Github Release Action (3 pull requests)
+* Fabian Braun (2 pull request)
 
 With the review help of the following contributors:
 
+* Vinit Kumar
 
 Thanks to all contributors for their efforts!
 
