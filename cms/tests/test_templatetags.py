@@ -16,6 +16,8 @@ from django.utils.timezone import now
 from django.utils.translation import override as force_language
 from djangocms_text_ckeditor.cms_plugins import TextPlugin
 from sekizai.context import SekizaiContext
+from django.template import Template, Context
+from django.urls import NoReverseMatch
 
 import cms
 from cms.api import add_plugin, create_page, create_page_content
@@ -718,3 +720,34 @@ class EditablePluginsTemplateTags(CMSTestCase):
         output = self.render_template_obj(template, {'plugin': self.plugin}, request)
 
         self.assertEqual(output, expectation)
+
+class CmsTagTemplateTagTests(CMSTestCase):
+    """Test cases for the cms_tags.py template tags."""
+
+    def test_page_url_tag_non_existing_page(self):
+        """Test page_url tag with a non-existing page (should return empty string)."""
+        template = Template("{% load cms_tags %}{% page_url 'non-existent' as url %}{{ url }}")
+        context = Context({})
+        rendered = template.render(context)
+
+        # Print output for debugging
+        print("\nTest: Non-Existing Page URL")
+        print(f"Rendered Output: '{rendered.strip()}'")
+
+        self.assertEqual(rendered.strip(), "")
+
+    def test_page_url_tag_handles_noreversematch(self):
+        """Test that the page_url tag does not crash with NoReverseMatch."""
+        template = Template("{% load cms_tags %}{% page_url 'invalid-page' as url %}{{ url }}")
+        context = Context({})
+
+        try:
+            rendered = template.render(context)
+            # Print output for debugging
+            print("\nTest: Handles NoReverseMatch")
+            print(f"Rendered Output: '{rendered.strip()}'")
+        except NoReverseMatch:
+            self.fail("NoReverseMatch should not be raised.")
+
+        self.assertEqual(rendered.strip(), "")
+
