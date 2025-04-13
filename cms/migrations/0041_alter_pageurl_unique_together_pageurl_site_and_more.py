@@ -2,12 +2,162 @@
 
 import django.db.models.deletion
 from django.db import migrations, models
+from django.db.models import Count
+import re
 
 def set_site_from_page(apps, schema_editor):
     PageUrl = apps.get_model('cms', 'PageUrl')
     for url in PageUrl.objects.all():
         url.site = url.page.site
         url.save()
+
+def get_versioning_state(apps, page_id):
+    """
+    Helper to get versioning state if available
+    Returns:
+    - 'published' if the page is published
+    - None if versioning isn't installed or page isn't found
+    """
+    try:
+        Version = apps.get_model('djangocms_versioning', 'Version')
+        Version.objects.get(
+            content_type__app_label='cms',
+            content_type__model='pagecontent',
+            object_id=page_id,
+            state='published'
+        )
+        return 'published'
+    except (LookupError, Version.DoesNotExist):
+        return None
+
+def sort_urls_by_priority(urls, has_versioning=False):
+    """
+    Sort URLs by priority:
+    1. Published pages first (if versioning is installed)
+    2. Home pages second
+    3. Oldest pages last (by ID)
+    """
+    urls = list(urls)
+    if has_versioning:
+        urls.sort(key=lambda url: (
+            get_versioning_state(url._apps, url.page.pk) is None,
+            not url.page.is_home,
+            url.page.id
+        ))
+    else:
+        urls.sort(key=lambda url: (
+            not url.page.is_home,
+            url.page.id
+        ))
+    return urls
+
+def deduplicate_paths(apps, schema_editor):
+    if schema_editor.connection.alias != 'default':
+        return
+
+    PageUrl = apps.get_model('cms', 'PageUrl')
+    print("Starting deduplication...")
+
+    # Check if versioning is installed
+    has_versioning = True
+    try:
+        apps.get_model('djangocms_versioning', 'Version')
+        print("Versioning is installed")
+    except LookupError:
+        has_versioning = False
+        print("Versioning is not installed")
+
+    try:
+        with schema_editor.connection.schema_editor().connection.cursor() as cursor:
+            cursor.execute('SAVEPOINT deduplicate_paths')
+
+            # First, handle pages at the same level (same parent)
+            pages_by_parent = {}
+            for url in PageUrl.objects.select_related('page'):
+                parent_id = url.page.parent_id
+                key = (parent_id, url.language, url.site_id)
+                pages_by_parent.setdefault(key, []).append(url)
+
+            # Fix duplicate slugs at each level
+            for urls in pages_by_parent.values():
+                # Find exact duplicate slugs first
+                slug_counts = {}
+                for url in urls:
+                    slug_counts[url.slug] = slug_counts.get(url.slug, 0) + 1
+                    print(f"URL ID: {url.id}, Slug: {url.slug}, Page ID: {url.page.id}")
+
+                duplicate_slugs = {slug: count for slug, count in slug_counts.items() if count > 1}
+                print(f"Found duplicate slugs: {duplicate_slugs}")
+
+                # Handle each set of duplicate slugs
+                for slug in duplicate_slugs:
+                    duplicate_urls = [u for u in urls if u.slug == slug]
+                    print(f"Processing {len(duplicate_urls)} URLs with slug '{slug}'")
+
+                    # Store apps reference for the helper function
+                    for url in duplicate_urls:
+                        url._apps = apps
+
+                    # Sort by priority but keep track of original slugs
+                    sorted_urls = sort_urls_by_priority(duplicate_urls, has_versioning)
+                    print("Sorted URLs:")
+                    for url in sorted_urls:
+                        state = get_versioning_state(apps, url.page.pk)
+                        print(f"- URL ID: {url.id}, Page ID: {url.page.id}, State: {state}")
+
+                    # Keep the highest priority URL unchanged, update others
+                    original_slug = sorted_urls[0].slug
+                    print(f"Keeping original slug '{original_slug}' for URL ID: {sorted_urls[0].id}")
+
+                    # Update all URLs except the first one
+                    for url in sorted_urls[1:]:
+                        print(f"Processing URL ID: {url.id} for changes")
+                        original_path = url.path
+                        counter = 2
+                        max_attempts = 100
+
+                        while max_attempts > 0:
+                            new_slug = f"{original_slug}-{counter}"
+
+                            # Update path based on new slug
+                            if url.page.parent:
+                                parent_path = PageUrl.objects.filter(
+                                    page=url.page.parent,
+                                    language=url.language
+                                ).values_list('path', flat=True).first() or ''
+                                new_path = f"{parent_path}/{new_slug}" if parent_path else new_slug
+                            else:
+                                new_path = new_slug
+
+                            # Check if the new path exists
+                            exists = PageUrl.objects.filter(
+                                path=new_path,
+                                language=url.language,
+                                site=url.site
+                            ).exists()
+
+                            if not exists:
+                                print(f"Updating URL ID: {url.id} to slug: {new_slug}")
+                                url.slug = new_slug
+                                url.path = new_path
+                                url.save()
+                                break
+
+                            counter += 1
+                            max_attempts -= 1
+
+                        if max_attempts == 0:
+                            raise Exception(
+                                f"Could not find unique path for PageUrl ID {url.id} "
+                                f"after 100 attempts. Original path: {original_path}"
+                            )
+
+            cursor.execute('RELEASE SAVEPOINT deduplicate_paths')
+
+    except Exception as e:
+        with schema_editor.connection.schema_editor().connection.cursor() as cursor:
+            cursor.execute('ROLLBACK TO SAVEPOINT deduplicate_paths')
+        raise Exception(f"Failed to deduplicate paths: {str(e)}")
 
 class Migration(migrations.Migration):
 
@@ -27,6 +177,10 @@ class Migration(migrations.Migration):
             field=models.ForeignKey(default=1, on_delete=django.db.models.deletion.CASCADE, to='sites.site', verbose_name='site'),
             preserve_default=False,
         ),
+        migrations.RunPython(
+            deduplicate_paths,
+            reverse_code=migrations.RunPython.noop,
+        ),
         migrations.AddConstraint(
             model_name='pageurl',
             constraint=models.UniqueConstraint(condition=models.Q(('path__isnull', False)), fields=('path', 'language', 'site'), name='unique_together_path_language_site'),
@@ -35,5 +189,5 @@ class Migration(migrations.Migration):
             model_name='pageurl',
             constraint=models.UniqueConstraint(fields=('page', 'language'), name='unique_together_page_language'),
         ),
-        migrations.RunPython(set_site_from_page),
+        migrations.RunPython(set_site_from_page, reverse_code=migrations.RunPython.noop),
     ]
